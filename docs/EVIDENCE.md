@@ -1,6 +1,6 @@
 # Implementer test evidence — agentic-engineering-os 4.1.2 (release candidate)
 
-Collected: 2026-09-12T02:03:37Z · commit: d6744ed · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
+Collected: 2026-09-12T02:05:29Z · commit: c0abe4c · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
 
 > This is **implementer** evidence. It does not certify the release. Status remains
 > READY_FOR_INDEPENDENT_OS_VERIFICATION until an independent verifier records a verdict.
@@ -18,7 +18,7 @@ git version 2.43.0
 | Suite | Result |
 |---|---|
 | Rust unit tests (gov-runtime) | test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s |
-| Certification harness (7 fixtures + architectural tests) | test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.45s |
+| Certification harness (7 fixtures + architectural tests) | test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 25.98s |
 | Python capability plugin tests | 4 passed in 0.11s |
 | Release build (`cargo build --release`) | exit 0 |
 
@@ -44,12 +44,12 @@ git version 2.43.0
 - memory::embeddings::tests::sha1_matches_known_vector ... ok
 - util::tests::hashing_is_canonical ... ok
 - memory::chunking::tests::hierarchical_chunks ... ok
-- memory::embeddings::tests::deterministic_unit_vectors ... ok
-- records::tests::parse_yaml_and_markdown_records ... ok
 - util::tests::deep_helpers ... ok
+- records::tests::parse_yaml_and_markdown_records ... ok
+- memory::embeddings::tests::deterministic_unit_vectors ... ok
 - security::secrets::tests::detects_and_redacts ... ok
-- util::tests::glob_semantics ... ok
 - paths::tests::secret_classification_can_never_be_downgraded ... ok
+- util::tests::glob_semantics ... ok
 
 ## What each certification test proves
 See [docs/FIXTURES.md](FIXTURES.md) and the fixture READMEs under `fixtures/`.

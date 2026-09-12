@@ -95,8 +95,8 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
     let adapters = crate::adapters::generate(&p)?;
     let mut index = Value::Null;
     if !opts.skip_index { let r = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false })?; index = json!({"artifacts": r.counts["artifacts"], "manifest_hash": r.manifest_hash, "excluded": r.excluded.len(), "ecosystems": r.ecosystems["count"]}); }
-    let doctor = crate::doctor::run(&p)?;
     let conformance = crate::verification::audit(&p, &crate::verification::SuiteOptions { deep: false, families: vec![] }, true)?;
     if !opts.skip_index { let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true })?; }
+    let doctor = crate::doctor::run(&p)?; // reported on the final, fresh state
     Ok(json!({"root": root.display().to_string(), "version": lock["version"], "release_hash": lock["release_hash"], "kernel_files": manifest["files"].as_object().map(|m| m.len()).unwrap_or(0), "overlay_written": overlay, "tools": registry["tools"].as_array().map(|a| a.len()).unwrap_or(0), "adapters": adapters["adapters"].as_object().map(|m| m.len()).unwrap_or(0), "index": index, "doctor": doctor.verdict, "conformance": {"audit": conformance["audit"], "verdict": conformance["verdict"]}}))
 }

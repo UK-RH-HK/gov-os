@@ -1,4 +1,6 @@
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+   Compiling gov-runtime v4.1.2 (/home/usain/Dynamic-Agentic-Engineering-OS/runtime)
+   Compiling gov-cli v4.1.2 (/home/usain/Dynamic-Agentic-Engineering-OS/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.06s
      Running ../tests/certification/main.rs (target/debug/deps/certification-18dcbe0b02c9bbc3)
 
 running 15 tests
@@ -18,5 +20,5 @@ test brownfield::brownfield_adoption_end_to_end ... ok
 test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
 test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
 
-test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.45s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 25.98s
 
