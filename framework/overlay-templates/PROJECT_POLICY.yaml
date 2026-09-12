@@ -16,7 +16,7 @@ staleness:
 readiness:
   enforce_pre_implementation_cells: true
 tests:
-  product_test_command: []            # e.g. ["python3", "-m", "pytest", "product/tests", "-q"]
+  product_test_command: []            # native test runner command, e.g. ["<runner>", "test"]; empty = resolve via ecosystem detection
   baseline_record: spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml
 gates:
   presentation_channel: chat

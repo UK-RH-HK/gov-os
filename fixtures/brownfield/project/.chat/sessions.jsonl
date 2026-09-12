@@ -1,0 +1,2 @@
+{"session":"s1","messages":[{"role":"user","content":"what did we decide about billing tests?"},{"role":"assistant","content":"Decision: we decided billing must be tested before release; the old cursor rule saying otherwise is obsolete."}]}
+{"session":"s2","messages":[{"role":"assistant","content":"Lesson: in future always run the migration before rebuilding memory, never again index docs/ as authoritative."}]}

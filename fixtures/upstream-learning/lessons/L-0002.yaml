@@ -1,0 +1,14 @@
+id: L-0002
+type: lesson
+title: Our zone-B tariff table was wrong
+status: ACTIVE
+state_class: EVIDENCE
+created: "2026-09-02"
+scope: PROJECT
+lifecycle: candidate
+category: product-data
+problem_statement: Zone B rate was 6.5 instead of 7.0 for two weeks.
+generic_failure_mode: n/a (project specific)
+impact: 41 mispriced quotes
+evidence_strength: high
+suggested_change: fix the table and add a data test

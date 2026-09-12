@@ -1,0 +1,335 @@
+//! `gov` — the Governance OS command-line control surface (API-0002 machine contract).
+use clap::{Args, Parser, Subcommand};
+use gov_runtime::memory::db::RuntimeDb;
+use gov_runtime::{GovError, Project, Result};
+use serde_json::{json, Value};
+use std::path::{Path, PathBuf};
+
+#[derive(Parser)]
+#[command(name = "gov", version = gov_runtime::CLI_VERSION, about = "Governance OS control surface (agentic-engineering-os)")]
+struct Cli {
+    /// Repository root (default: discovered from the current directory)
+    #[arg(long, global = true)]
+    root: Option<PathBuf>,
+    /// Structured JSON output envelope
+    #[arg(long, global = true)]
+    json: bool,
+    /// Session id (default: $GOV_SESSION or a new id)
+    #[arg(long, global = true)]
+    session: Option<String>,
+    /// Acting role (default: $GOV_ROLE or orchestrator)
+    #[arg(long, global = true)]
+    role: Option<String>,
+    #[command(subcommand)]
+    cmd: Cmd,
+}
+
+#[derive(Subcommand)]
+enum Cmd {
+    /// Print versions
+    Version,
+    /// Greenfield onboarding: install kernel, overlay, roots, adapters, runtime, conformance suite
+    Init { #[arg(long)] source: Option<String>, #[arg(long)] name: Option<String>, #[arg(long)] alias: Option<String>, #[arg(long)] intent: Option<String>, #[arg(long)] force: bool, #[arg(long)] skip_index: bool },
+    /// Reconstruct current governed project state (no prior conversation needed)
+    Status,
+    /// Determine the correct next work and bounded authority
+    Continue { #[arg(long)] claim: bool },
+    /// Answer a Human Decision Gate
+    Decide { gate: String, #[arg(long)] option: String, #[arg(long, default_value = "human")] by: String, #[arg(long)] rationale: Option<String> },
+    /// Run the governance verification suite and record an audit
+    Audit { #[arg(long)] deep: bool, #[arg(long)] family: Vec<String>, #[arg(long)] no_persist: bool },
+    /// Emergency: pause execution
+    Pause { #[arg(long)] reason: Option<String> },
+    /// Emergency: freeze all writes
+    FreezeWrites { #[arg(long)] reason: Option<String> },
+    /// Emergency: cancel agents (pause + cancel)
+    CancelAgents { #[arg(long)] reason: Option<String> },
+    /// Lift pause/freeze
+    Resume,
+    /// Health checks with remediation
+    Doctor,
+    /// Rebuild derived memory from Git + authoritative records
+    RebuildMemory { #[arg(long)] incremental: bool },
+    /// Interrupted-session recovery
+    Recover { #[arg(long)] dry_run: bool },
+    /// Brownfield adoption stages A0-A11
+    Adopt { #[command(subcommand)] stage: AdoptCmd },
+    /// Path-migration tooling (aliases of adopt stages)
+    Migrate { #[command(subcommand)] stage: AdoptCmd },
+    /// Framework update: --check, --apply, --rollback
+    Update { #[arg(long)] check: bool, #[arg(long)] apply: bool, #[arg(long)] rollback: bool, #[arg(long)] source: Option<String>, #[arg(long)] approve: bool, #[arg(long, default_value = "human")] by: String },
+    /// Upstream learning: prepare/submit sanitised framework lesson packets
+    Upstream { #[command(subcommand)] op: UpstreamCmd },
+    /// Task operations
+    Task { #[command(subcommand)] op: TaskCmd },
+    /// Change-Impact Transactions
+    Cit { #[command(subcommand)] op: CitCmd },
+    /// Context packets
+    Context { #[command(subcommand)] op: ContextCmd },
+    /// Checkpoints
+    Checkpoint { #[command(subcommand)] op: CheckpointCmd },
+    /// Skills registry
+    Skills { #[command(subcommand)] op: SkillsCmd },
+    /// Tool / MCP capability registry
+    Tools { #[command(subcommand)] op: ToolsCmd },
+    /// Typed A2A handoffs
+    Handoff { #[command(subcommand)] op: HandoffCmd },
+    /// Memory: query / verify / freshness
+    Memory { #[command(subcommand)] op: MemoryCmd },
+    /// Human Decision Gates
+    Gate { #[command(subcommand)] op: GateCmd },
+    /// Feature readiness
+    Readiness { #[command(subcommand)] op: ReadinessCmd },
+    /// Natural-language intent routing
+    Intent { text: String },
+    /// Model routing
+    Route { #[arg(long)] task: Option<String>, #[arg(long)] class: Option<String>, #[arg(long)] radius: Option<String>, #[arg(long)] record: Option<String>, #[arg(long)] report: bool },
+    /// Telemetry
+    Telemetry { #[command(subcommand)] op: TelemetryCmd },
+    /// Provider adapters
+    Adapters { #[command(subcommand)] op: AdaptersCmd },
+    /// Release build/verify (canonical repository)
+    Release { #[command(subcommand)] op: ReleaseCmd },
+    /// Kernel verify/reinstall
+    Kernel { #[command(subcommand)] op: KernelCmd },
+    /// Capability ecosystem: ecosystems, plugins, invoke
+    Capabilities { #[command(subcommand)] op: CapCmd },
+    /// Session claims
+    Claims { #[command(subcommand)] op: ClaimsCmd },
+    /// Verify governance (audit) or product suite
+    Verify { #[arg(default_value = "governance")] what: String },
+    /// MCP server (planned)
+    Mcp { #[arg(default_value = "serve")] op: String },
+}
+
+#[derive(Subcommand)]
+enum AdoptCmd {
+    Baseline, Inventory, Classify, Map, Plan, TestDesign,
+    Review { #[arg(long)] verdict: String, #[arg(long)] reviewer_session: Option<String>, #[arg(long, default_value = "migration-reviewer")] reviewer_role: String, #[arg(long)] notes: Option<String> },
+    Migrate { #[arg(long)] batch: Option<i64>, #[arg(long)] source: Option<String>, #[arg(long)] gate_answer: Vec<String>, #[arg(long)] name: Option<String>, #[arg(long)] alias: Option<String> },
+    VerifyMigration { #[arg(long)] verdict: Option<String>, #[arg(long, default_value = "migration-verifier")] verifier_role: String },
+    ExtractLegacy, BuildMemory,
+    VerifyMemory { #[arg(long)] verdict: Option<String>, #[arg(long, default_value = "memory-verifier")] verifier_role: String },
+    Audit { #[arg(long)] accept_exceptions: bool },
+    Status,
+    Rollback { #[arg(long)] batch: i64 },
+}
+#[derive(Subcommand)]
+enum UpstreamCmd { Prepare { lesson: String }, Submit { packet: String, #[arg(long)] destination: String, #[arg(long)] approved_by: Option<String> } }
+#[derive(Subcommand)]
+enum TaskCmd {
+    Create { #[arg(long)] class: Option<String>, #[arg(long)] objective: String, #[arg(long)] title: Option<String>, #[arg(long)] feature: Option<String>, #[arg(long)] deps: Option<String>, #[arg(long)] allowed: Option<String>, #[arg(long)] status: Option<String>, #[arg(long)] fields: Option<String>, #[arg(long)] id: Option<String> },
+    List { #[arg(long)] status: Option<String> },
+    Show { id: String },
+    Status { id: String, status: String, #[arg(long)] note: Option<String> },
+    Claim { id: String },
+    Release { id: String, #[arg(long)] force: bool },
+    Close { id: String, #[arg(long)] report: String, #[arg(long)] force: bool },
+    Dag,
+    Replan,
+}
+#[derive(Subcommand)]
+enum CitCmd {
+    Propose { #[arg(long)] proposal: String, #[arg(long)] trigger: Option<String>, #[arg(long)] targets: Option<String>, #[arg(long)] manifest: Option<String>, #[arg(long)] title: Option<String> },
+    Simulate { id: String }, Approve { id: String, #[arg(long, default_value = "human")] by: String, #[arg(long, default_value = "human")] method: String },
+    Reject { id: String, #[arg(long, default_value = "human")] by: String, #[arg(long)] reason: Option<String> },
+    Execute { id: String }, Rollback { id: String, #[arg(long)] reason: Option<String> }, List, Show { id: String },
+}
+#[derive(Subcommand)]
+enum ContextCmd { Compile { task: String } }
+#[derive(Subcommand)]
+enum CheckpointCmd { Create { #[arg(long)] next_action: String, #[arg(long)] task: Option<String>, #[arg(long, default_value = "manual")] trigger: String, #[arg(long)] step: Option<String>, #[arg(long)] tests_status: Option<String> }, Latest, Watchdog { #[arg(long, default_value = "0")] utilisation: f64, #[arg(long, default_value = "0")] ops: i64, #[arg(long)] task: Option<String>, #[arg(long, default_value = "gov continue")] next_action: String } }
+#[derive(Subcommand)]
+enum SkillsCmd { List, Resolve { task: String } }
+#[derive(Subcommand)]
+enum ToolsCmd { List, Registry, Resolve { #[arg(long)] role: Option<String>, #[arg(long)] capability: String }, Install { #[arg(long)] descriptor: String, #[arg(long)] role: Option<String>, #[arg(long)] execute: bool }, Health }
+#[derive(Subcommand)]
+enum HandoffCmd { Create { #[arg(long)] to_role: String, #[arg(long)] task: String, #[arg(long)] fields: Option<String> }, Return { id: String, #[arg(long)] file: String } }
+#[derive(Subcommand)]
+enum MemoryCmd { Query { query: String, #[arg(long, default_value = "0")] k: usize, #[arg(long)] route: Option<String>, #[arg(long)] include_historical: bool }, Verify, Freshness, Rebuild { #[arg(long)] incremental: bool }, Graph { node: String, #[arg(long, default_value = "1")] depth: usize }, Impact { seeds: String, #[arg(long, default_value = "2")] depth: usize } }
+#[derive(Subcommand)]
+enum GateCmd { Create { #[arg(long)] question: String, #[arg(long)] fields: Option<String> }, Present { id: String }, List }
+#[derive(Subcommand)]
+enum ReadinessCmd { Check { feature: String }, Plan { feature: String } }
+#[derive(Subcommand)]
+enum TelemetryCmd { Summary, Emit { #[arg(long)] name: String, #[arg(long)] attrs: Option<String> } }
+#[derive(Subcommand)]
+enum AdaptersCmd { Generate, Verify }
+#[derive(Subcommand)]
+enum ReleaseCmd { Build { #[arg(long)] version: String, #[arg(long)] out: Option<PathBuf>, #[arg(long, default_value = "READY_FOR_INDEPENDENT_OS_VERIFICATION")] certification: String, #[arg(long)] evidence: Option<String>, #[arg(long)] canonical: Option<PathBuf> }, Verify { dir: PathBuf } }
+#[derive(Subcommand)]
+enum KernelCmd { Verify, Reinstall { #[arg(long)] source: Option<String> } }
+#[derive(Subcommand)]
+enum CapCmd { Ecosystems, Plugins, Invoke { #[arg(long)] plugin: String, #[arg(long)] inputs: String } }
+#[derive(Subcommand)]
+enum ClaimsCmd { List, Sweep }
+
+#[derive(Args)]
+struct Empty {}
+
+fn parse_json_arg(s: &Option<String>) -> Result<Value> {
+    match s { None => Ok(json!({})), Some(t) => { if let Some(path) = t.strip_prefix('@') { let text = gov_runtime::util::read_text(Path::new(path))?; if path.ends_with(".yaml") || path.ends_with(".yml") { Ok(serde_yaml::from_str(&text)?) } else { Ok(serde_json::from_str(&text)?) } } else { serde_json::from_str(t).or_else(|_| serde_yaml::from_str(t)).map_err(|e| GovError::new("USAGE", format!("invalid JSON/YAML argument: {e}"))) } } }
+}
+fn csv(s: &Option<String>) -> Vec<String> { s.as_ref().map(|x| x.split(',').map(|y| y.trim().to_string()).filter(|y| !y.is_empty()).collect()).unwrap_or_default() }
+fn load_file_value(path: &str) -> Result<Value> { parse_json_arg(&Some(format!("@{path}"))) }
+
+fn open_project(cli: &Cli, need_install: bool) -> Result<Project> {
+    let root = match &cli.root { Some(r) => r.clone(), None => gov_runtime::project::find_root(&std::env::current_dir()?).unwrap_or(std::env::current_dir()?) };
+    let p = Project::open(&root).with_session(cli.session.clone(), cli.role.clone());
+    if need_install { p.require_installed()?; }
+    Ok(p)
+}
+fn db(p: &Project) -> Result<RuntimeDb> { let d = RuntimeDb::open(&p.db_path())?; d.init_schema()?; Ok(d) }
+
+fn run(cli: &Cli) -> Result<Value> {
+    let name = command_name(&cli.cmd);
+    match &cli.cmd {
+        Cmd::Version => Ok(json!({"framework": gov_runtime::FRAMEWORK_NAME, "version": gov_runtime::VERSION, "cli_version": gov_runtime::CLI_VERSION, "runtime_version": gov_runtime::RUNTIME_VERSION, "index_version": gov_runtime::INDEX_VERSION})),
+        Cmd::Init { source, name: pname, alias, intent, force, skip_index } => {
+            let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
+            let pn = pname.clone().unwrap_or_else(|| root.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or("project".into()));
+            let al = alias.clone().unwrap_or_else(|| format!("project-{}", &gov_runtime::util::sha256_text(&pn)[..6]));
+            gov_runtime::init::init(&root, gov_runtime::init::InitOptions { source: source.clone(), project_name: pn, alias: al, mode: "init".into(), force: *force, intent: intent.clone(), skip_index: *skip_index })
+        }
+        Cmd::Status => { let p = open_project(cli, true)?; gov_runtime::status::status(&p) }
+        Cmd::Continue { claim } => { let p = open_project(cli, true)?; let d = db(&p)?; gov_runtime::status::continue_work(&p, &d, *claim) }
+        Cmd::Decide { gate, option, by, rationale } => { let p = open_project(cli, true)?; gov_runtime::orchestration::gates::answer(&p, gate, option, by, rationale.as_deref()) }
+        Cmd::Audit { deep, family, no_persist } => { let p = open_project(cli, true)?; run_audit(&p, *deep, family.clone(), !no_persist) }
+        Cmd::Verify { what } => { let p = open_project(cli, true)?; if what == "governance" { run_audit(&p, false, vec![], true) } else { gov_runtime::verification::product_suite(&p) } }
+        Cmd::Pause { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "PAUSE", reason.as_deref()) }
+        Cmd::FreezeWrites { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "FREEZE_WRITES", reason.as_deref()) }
+        Cmd::CancelAgents { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "CANCEL_AGENTS", reason.as_deref()) }
+        Cmd::Resume => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "RESUME", None) }
+        Cmd::Doctor => { let p = open_project(cli, false)?; let r = gov_runtime::doctor::run(&p)?; let v = serde_json::to_value(&r)?; if r.verdict == "UNHEALTHY" { return Err(GovError::new("UNHEALTHY", format!("doctor: UNHEALTHY ({} failed checks)", r.failed)).with_details(v)); } Ok(v) }
+        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental })?; Ok(serde_json::to_value(&r)?) }
+        Cmd::Recover { dry_run } => { let p = open_project(cli, true)?; gov_runtime::recovery::recover(&p, *dry_run) }
+        Cmd::Adopt { stage } | Cmd::Migrate { stage } => {
+            let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
+            let session = cli.session.clone().or(std::env::var("GOV_SESSION").ok()).unwrap_or_else(gov_runtime::util::new_session_id);
+            use gov_runtime::adopt as a;
+            match stage {
+                AdoptCmd::Baseline => a::a0_baseline(&root, &session), AdoptCmd::Inventory => a::a1_inventory(&root), AdoptCmd::Classify => a::a2_classify(&root), AdoptCmd::Map => a::a3_map(&root), AdoptCmd::Plan => a::a4_plan(&root), AdoptCmd::TestDesign => a::a5_test_design(&root),
+                AdoptCmd::Review { verdict, reviewer_session, reviewer_role, notes } => a::a5_review(&root, verdict, reviewer_session.as_deref().unwrap_or(&session), reviewer_role, notes.as_deref()),
+                AdoptCmd::Migrate { batch, source, gate_answer, name: pn, alias } => { let pn2 = pn.clone().unwrap_or_else(|| root.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or("project".into())); let al = alias.clone().unwrap_or_else(|| format!("project-{}", &gov_runtime::util::sha256_text(&pn2)[..6])); a::a6_migrate(&root, *batch, source.as_deref(), gate_answer, &pn2, &al, &session) }
+                AdoptCmd::VerifyMigration { verdict, verifier_role } => a::a7_verify_migration(&root, verdict.as_deref(), &session, verifier_role),
+                AdoptCmd::ExtractLegacy => a::a8_extract_legacy(&root), AdoptCmd::BuildMemory => a::a9_build_memory(&root, &session),
+                AdoptCmd::VerifyMemory { verdict, verifier_role } => a::a10_verify_memory(&root, verdict.as_deref(), &session, verifier_role),
+                AdoptCmd::Audit { accept_exceptions } => a::a11_audit(&root, *accept_exceptions), AdoptCmd::Status => a::status(&root), AdoptCmd::Rollback { batch } => a::rollback_batch(&root, *batch),
+            }
+        }
+        Cmd::Update { check, apply, rollback, source, approve, by } => {
+            let mut p = open_project(cli, true)?;
+            if *rollback { return gov_runtime::update::rollback(&mut p, None); }
+            if *apply { return gov_runtime::update::apply_update(&mut p, source.as_deref(), *approve, by); }
+            let _ = check; gov_runtime::update::check(&p, source.as_deref())
+        }
+        Cmd::Upstream { op } => { let p = open_project(cli, true)?; match op { UpstreamCmd::Prepare { lesson } => gov_runtime::upstream::prepare(&p, lesson), UpstreamCmd::Submit { packet, destination, approved_by } => gov_runtime::upstream::submit(&p, packet, destination, approved_by.as_deref()) } }
+        Cmd::Task { op } => {
+            let p = open_project(cli, true)?;
+            use gov_runtime::orchestration::tasks as t;
+            match op {
+                TaskCmd::Create { class, objective, title, feature, deps, allowed, status, fields, id } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } let o = f.as_object_mut().unwrap(); o.insert("objective".into(), json!(objective)); if let Some(c) = class { o.insert("class".into(), json!(c)); } if let Some(x) = title { o.insert("title".into(), json!(x)); } if let Some(x) = feature { o.insert("feature".into(), json!(x)); } if deps.is_some() { o.insert("dependencies".into(), json!(csv(deps))); } if allowed.is_some() { o.insert("allowed_paths".into(), json!(csv(allowed))); } if let Some(s) = status { o.insert("task_status".into(), json!(s)); } if let Some(i) = id { o.insert("id".into(), json!(i)); } t::create(&p, f) }
+                TaskCmd::List { status } => Ok(json!(t::list(&p, status.as_deref()))),
+                TaskCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found"))) }
+                TaskCmd::Status { id, status, note } => t::set_status(&p, id, status, note.as_deref()),
+                TaskCmd::Claim { id } => { let d = db(&p)?; t::claim(&p, &d, id) }
+                TaskCmd::Release { id, force } => { let d = db(&p)?; Ok(json!({"released": t::release(&p, &d, id, *force)?})) }
+                TaskCmd::Close { id, report, force } => { let d = db(&p)?; let r = load_file_value(report)?; t::close(&p, &d, id, r, *force) }
+                TaskCmd::Dag => Ok(serde_json::to_value(gov_runtime::orchestration::dag::compute(&p)?)?),
+                TaskCmd::Replan => gov_runtime::orchestration::dag::replan(&p),
+            }
+        }
+        Cmd::Cit { op } => {
+            let p = open_project(cli, true)?;
+            use gov_runtime::cit as c;
+            match op {
+                CitCmd::Propose { proposal, trigger, targets, manifest, title } => { let mut f = json!({"proposal": proposal}); if let Some(t) = trigger { f["trigger"] = json!(t); } if targets.is_some() { f["targets"] = json!(csv(targets)); } if let Some(m) = manifest { f["mutation_manifest"] = load_file_value(m)?; } if let Some(t) = title { f["title"] = json!(t); } c::propose(&p, f) }
+                CitCmd::Simulate { id } => { let d = db(&p)?; c::simulate(&p, &d, id) }
+                CitCmd::Approve { id, by, method } => c::approve(&p, id, by, method),
+                CitCmd::Reject { id, by, reason } => c::reject(&p, id, by, reason.as_deref()),
+                CitCmd::Execute { id } => { let d = db(&p)?; c::execute(&p, &d, id) }
+                CitCmd::Rollback { id, reason } => c::rollback(&p, id, reason.as_deref()),
+                CitCmd::List => Ok(json!(c::list(&p))),
+                CitCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found"))) }
+            }
+        }
+        Cmd::Context { op } => { let p = open_project(cli, true)?; let d = db(&p)?; match op { ContextCmd::Compile { task } => gov_runtime::context::compile(&p, &d, task) } }
+        Cmd::Checkpoint { op } => {
+            let p = open_project(cli, true)?; let d = db(&p)?;
+            match op {
+                CheckpointCmd::Create { next_action, task, trigger, step, tests_status } => gov_runtime::checkpoints::create(&p, &d, json!({"next_action": next_action, "task": task, "trigger": trigger, "last_completed_step": step, "tests_status": tests_status})),
+                CheckpointCmd::Latest => Ok(gov_runtime::checkpoints::latest(&p).unwrap_or(Value::Null)),
+                CheckpointCmd::Watchdog { utilisation, ops, task, next_action } => gov_runtime::checkpoints::watchdog(&p, &d, *utilisation, *ops, task.as_deref(), next_action),
+            }
+        }
+        Cmd::Skills { op } => { let p = open_project(cli, true)?; match op { SkillsCmd::List => Ok(json!(gov_runtime::skills::list_skills(&p))), SkillsCmd::Resolve { task } => { let s = gov_runtime::records::RecordStore::load(&p.root); let t = s.get(task).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{task} not found")))?; gov_runtime::skills::resolve(&p, &t) } } }
+        Cmd::Tools { op } => {
+            let p = open_project(cli, true)?;
+            match op {
+                ToolsCmd::List => { let mut t = gov_runtime::tools::kernel_tools(&p); t.extend(gov_runtime::tools::project_tools(&p)); Ok(json!({"tools": t, "mcp_servers": gov_runtime::tools::mcp_servers(&p)})) }
+                ToolsCmd::Registry => gov_runtime::tools::generate_registry(&p),
+                ToolsCmd::Resolve { role, capability } => gov_runtime::tools::resolve(&p, role.as_deref().unwrap_or(&p.role), capability),
+                ToolsCmd::Install { descriptor, role, execute } => { let d = load_file_value(descriptor)?; gov_runtime::tools::install(&p, d, role.as_deref().unwrap_or(&p.role), *execute) }
+                ToolsCmd::Health => Ok(json!(gov_runtime::tools::health(&p))),
+            }
+        }
+        Cmd::Handoff { op } => { let p = open_project(cli, true)?; match op { HandoffCmd::Create { to_role, task, fields } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } f["to_role"] = json!(to_role); f["task"] = json!(task); gov_runtime::orchestration::handoffs::create(&p, f) } HandoffCmd::Return { id, file } => gov_runtime::orchestration::handoffs::return_result(&p, id, load_file_value(file)?) } }
+        Cmd::Memory { op } => {
+            let p = open_project(cli, true)?;
+            match op {
+                MemoryCmd::Query { query, k, route, include_historical } => { let d = db(&p)?; let r = gov_runtime::retrieval::retrieve(&p, &d, query, gov_runtime::retrieval::RetrieveOptions { k: *k, route: route.clone(), include_historical: *include_historical, log: true, ..Default::default() })?; gov_runtime::observability::emit(&p, "retrieval", json!({"routes": r.routes, "hits": r.hits.len(), "latency_ms": r.latency_ms}))?; Ok(serde_json::to_value(&r)?) }
+                MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
+                MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
+                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental })?)?),
+                MemoryCmd::Graph { node, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::neighbours(&d, node, *depth)?)) }
+                MemoryCmd::Impact { seeds, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::impact_set(&d, &csv(&Some(seeds.clone())), *depth)?)) }
+            }
+        }
+        Cmd::Gate { op } => { let p = open_project(cli, true)?; match op { GateCmd::Create { question, fields } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } f["question"] = json!(question); gov_runtime::orchestration::gates::create(&p, f) } GateCmd::Present { id } => { let (d, text) = gov_runtime::orchestration::gates::present(&p, id)?; if !cli.json { println!("{text}"); } Ok(json!({"gate": d, "chat_text": text})) } GateCmd::List => Ok(json!(gov_runtime::orchestration::gates::pending(&p))) } }
+        Cmd::Readiness { op } => { let p = open_project(cli, true)?; match op { ReadinessCmd::Check { feature } => Ok(serde_json::to_value(gov_runtime::orchestration::readiness::check(&p, feature)?)?), ReadinessCmd::Plan { feature } => gov_runtime::orchestration::readiness::plan(&p, feature) } }
+        Cmd::Intent { text } => { let p = open_project(cli, true)?; gov_runtime::orchestration::intents::route(&p, text) }
+        Cmd::Route { task, class, radius, record, report } => { let p = open_project(cli, true)?; if *report { return gov_runtime::routing::report(&p); } if let Some(r) = record { return gov_runtime::routing::record(&p, load_file_value(r)?); } let t = task.as_ref().map(|id| gov_runtime::records::RecordStore::load(&p.root).get(id).map(|r| r.data.clone())).flatten(); gov_runtime::routing::route(&p, t.as_ref(), class.as_deref(), None, radius.as_deref()) }
+        Cmd::Telemetry { op } => { let p = open_project(cli, true)?; match op { TelemetryCmd::Summary => gov_runtime::observability::summary(&p), TelemetryCmd::Emit { name, attrs } => gov_runtime::observability::emit(&p, name, parse_json_arg(attrs)?) } }
+        Cmd::Adapters { op } => { let p = open_project(cli, true)?; match op { AdaptersCmd::Generate => gov_runtime::adapters::generate(&p), AdaptersCmd::Verify => { let v = gov_runtime::adapters::verify(&p)?; if !v["ok"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "adapter conformance failed").with_details(v)); } Ok(v) } } }
+        Cmd::Release { op } => match op {
+            ReleaseCmd::Build { version, out, certification, evidence, canonical } => { let croot = canonical.clone().or_else(gov_runtime::kernel::canonical_root).ok_or_else(|| GovError::new("KERNEL_SOURCE_NOT_FOUND", "canonical repository root not found (pass --canonical)"))?; let out = out.clone().unwrap_or(croot.join("release")); gov_runtime::release::build(&croot, version, &out, certification, evidence.as_deref()) }
+            ReleaseCmd::Verify { dir } => gov_runtime::release::verify(dir),
+        },
+        Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => Ok(serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?), KernelCmd::Reinstall { source } => { gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?; let lock = p.lock()?.clone(); let src = source.clone().or(lock["source"].as_str().map(|s| s.to_string())); let m = gov_runtime::kernel::install_kernel(src.as_deref().map(Path::new), &p.governance_dir())?; if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); } p.invalidate(); Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"]})) } } }
+        Cmd::Capabilities { op } => { let p = open_project(cli, false)?; match op { CapCmd::Ecosystems => Ok(gov_runtime::capabilities::ecosystems::detect(&p.root, &["product/".into()])), CapCmd::Plugins => Ok(json!(gov_runtime::capabilities::host::discover(&p.root))), CapCmd::Invoke { plugin, inputs } => { let plugins = gov_runtime::capabilities::host::discover(&p.root); let d = plugins.iter().find(|x| x.plugin_id == *plugin).cloned().ok_or_else(|| GovError::new("PLUGIN_NOT_FOUND", format!("plugin {plugin} not declared")))?; let out = gov_runtime::capabilities::host::invoke(&d, &p.root, parse_json_arg(&Some(inputs.clone()))?, std::time::Duration::from_secs(60))?; Ok(serde_json::to_value(&out)?) } } }
+        Cmd::Claims { op } => { let p = open_project(cli, true)?; let d = db(&p)?; match op { ClaimsCmd::List => Ok(json!(gov_runtime::orchestration::claims::list(&d)?)), ClaimsCmd::Sweep => Ok(json!({"swept": gov_runtime::orchestration::claims::sweep_expired(&d)?})) } }
+        Cmd::Mcp { .. } => Err(GovError::new("MCP_NOT_IMPLEMENTED", "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)")),
+    }.map(|v| { let _ = name; v })
+}
+
+fn run_audit(p: &Project, deep: bool, families: Vec<String>, persist: bool) -> Result<Value> {
+    let r = gov_runtime::verification::audit(p, &gov_runtime::verification::SuiteOptions { deep, families }, persist)?;
+    gov_runtime::observability::emit(p, "audit", json!({"verdict": r["verdict"], "audit": r["audit"]}))?;
+    if r["verdict"] == "UNHEALTHY" { return Err(GovError::new("UNHEALTHY", format!("governance suite UNHEALTHY: {} critical, {} high", r["counts"]["critical"], r["counts"]["high"])).with_details(r)); }
+    Ok(r)
+}
+
+fn command_name(c: &Cmd) -> &'static str {
+    match c { Cmd::Version => "version", Cmd::Init { .. } => "init", Cmd::Status => "status", Cmd::Continue { .. } => "continue", Cmd::Decide { .. } => "decide", Cmd::Audit { .. } => "audit", Cmd::Pause { .. } => "pause", Cmd::FreezeWrites { .. } => "freeze-writes", Cmd::CancelAgents { .. } => "cancel-agents", Cmd::Resume => "resume", Cmd::Doctor => "doctor", Cmd::RebuildMemory { .. } => "rebuild-memory", Cmd::Recover { .. } => "recover", Cmd::Adopt { .. } => "adopt", Cmd::Migrate { .. } => "migrate", Cmd::Update { .. } => "update", Cmd::Upstream { .. } => "upstream", Cmd::Task { .. } => "task", Cmd::Cit { .. } => "cit", Cmd::Context { .. } => "context", Cmd::Checkpoint { .. } => "checkpoint", Cmd::Skills { .. } => "skills", Cmd::Tools { .. } => "tools", Cmd::Handoff { .. } => "handoff", Cmd::Memory { .. } => "memory", Cmd::Gate { .. } => "gate", Cmd::Readiness { .. } => "readiness", Cmd::Intent { .. } => "intent", Cmd::Route { .. } => "route", Cmd::Telemetry { .. } => "telemetry", Cmd::Adapters { .. } => "adapters", Cmd::Release { .. } => "release", Cmd::Kernel { .. } => "kernel", Cmd::Capabilities { .. } => "capabilities", Cmd::Claims { .. } => "claims", Cmd::Verify { .. } => "verify", Cmd::Mcp { .. } => "mcp" }
+}
+
+fn main() {
+    let cli = Cli::parse();
+    let name = command_name(&cli.cmd);
+    let session = cli.session.clone().or(std::env::var("GOV_SESSION").ok()).unwrap_or_default();
+    let started = std::time::Instant::now();
+    let result = run(&cli);
+    // telemetry span for every command when a project is available
+    if let Ok(p) = open_project(&cli, true) { let _ = gov_runtime::observability::emit(&p, &format!("cli.{name}"), json!({"ok": result.is_ok(), "duration_ms": started.elapsed().as_millis() as u64, "error": result.as_ref().err().map(|e| e.code.clone())})); }
+    match result {
+        Ok(v) => {
+            if cli.json { println!("{}", serde_json::to_string_pretty(&json!({"ok": true, "command": name, "result": v, "session": session})).unwrap()); }
+            else { print!("{}", serde_yaml::to_string(&v).unwrap_or_else(|_| v.to_string())); }
+        }
+        Err(e) => {
+            if cli.json { println!("{}", serde_json::to_string_pretty(&json!({"ok": false, "command": name, "error": {"code": e.code, "message": e.message, "details": e.details}, "session": session})).unwrap()); }
+            else { eprintln!("error [{}]: {}", e.code, e.message); if !e.details.is_null() { eprintln!("{}", serde_yaml::to_string(&e.details).unwrap_or_default()); } }
+            std::process::exit(e.exit_code());
+        }
+    }
+}

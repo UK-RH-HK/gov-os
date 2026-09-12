@@ -1,0 +1,18 @@
+id: PRJ-0001
+type: project
+title: Governance OS (agentic-engineering-os) canonical source product
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: "2026-09-12"
+owner_role: orchestrator
+mission: >
+  Develop the model-agnostic Dynamic Agentic Software Engineering Operating Framework v4.1 once, as a certified,
+  distributable Governance OS kernel + runtime + gov CLI, consumable by many product repositories in any language.
+outcomes:
+  - A consumer repository in any language can run gov init / gov adopt / gov update / gov doctor / gov rebuild-memory.
+  - Derived memory is rebuildable from Git plus authoritative records on any machine.
+  - Releases are immutable, manifested, migratable and independently certifiable.
+  - Project lessons reach the framework only through the sanitised upstream export gate.
+actors: [product-owner, framework-developer, independent-verifier, consumer-project-agent]
+product_intent: >
+  Implement the framework as real software (schemas, runtime, CLI, fixtures, tests), not as prose alone.

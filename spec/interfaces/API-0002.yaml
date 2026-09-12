@@ -1,0 +1,20 @@
+id: API-0002
+type: interface
+title: gov CLI machine contract (--json output, exit codes)
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: "2026-09-12"
+governed_by: [D-0002]
+kind: cli
+version: "1"
+consumers: [provider adapters, MCP server, certification harness, independent verifiers]
+contract:
+  global_flags: ["--json (structured output)", "--root <path>", "--session <id>", "--role <role>"]
+  exit_codes:
+    "0": success
+    "1": "governance error (GovError code in JSON)"
+    "2": usage error
+    "3": "verification failed / unhealthy"
+    "4": "blocked by control state (pause/freeze) or human gate"
+  json_envelope: "{ok: boolean, command: string, result: object, error?: {code, message, details}, session: string}"
+  commands_source: framework/commands/COMMAND_CONTRACT.yaml (command-contract consistency is a governance test family)

@@ -1,0 +1,24 @@
+[package]
+name = "gov-runtime"
+description = "Governance OS deterministic core: kernel, lock, policies, repository contract, Development Knowledge Fabric, orchestration, CIT, adoption/migration/update, release and upstream export gate"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "gov_runtime"
+path = "src/lib.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+rusqlite.workspace = true
+sha2.workspace = true
+regex.workspace = true
+walkdir.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+jsonschema.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true

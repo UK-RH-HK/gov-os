@@ -1,0 +1,37 @@
+id: RPT-0004
+type: report
+title: Closing report for TASK-0004
+status: ACTIVE
+state_class: EVIDENCE
+created: '2026-09-12'
+task: TASK-0004
+role: orchestrator
+session: S-implementer
+outcome: success
+work_completed: 'Orchestration and change control implemented: task contracts, DAG
+  (runnable/blocked/cycles/longest chain/human-gate deps), claims with leases, readiness
+  evaluation + gap-task planning, human gates with INV-008 enforcement, control state
+  (pause/freeze/cancel/resume), typed handoffs with mutation-scope checks, checkpoints
+  + watchdog, CIT-P/CIT-E with snapshots/propagation/verification/rollback, model
+  routing + evidence, skills/tools/MCP registries with install gate, telemetry.'
+files_changed:
+- runtime/src/orchestration/
+- runtime/src/cit/
+- runtime/src/checkpoints.rs
+- runtime/src/routing.rs
+- runtime/src/skills.rs
+- runtime/src/tools.rs
+- runtime/src/observability.rs
+evidence:
+- docs/EVIDENCE.md
+- release/evidence/certification-tests.txt
+tests:
+  status: passed
+  reason: cargo test (unit + certification) and pytest for Python plugins; see docs/EVIDENCE.md
+discoveries: []
+risks:
+- implementer-authored tests only; independent verification pending
+lessons: []
+proposed_decisions: []
+unresolved: []
+recommended_next_action: independent OS verification of release 4.1.2

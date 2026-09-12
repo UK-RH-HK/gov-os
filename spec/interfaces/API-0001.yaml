@@ -1,0 +1,35 @@
+id: API-0001
+type: interface
+title: Capability Plugin Protocol v1 (gov-capability/1)
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: "2026-09-12"
+governed_by: [D-0002]
+kind: protocol
+version: "1"
+producers: [capabilities/python/govos_capabilities, capabilities/shell]
+consumers: [runtime/src/capabilities]
+contract:
+  transport: "stdin/stdout, one JSON request object in, one JSON response object out, UTF-8, exit code 0 on protocol success"
+  discovery: "plugin descriptor YAML in tools/registry or governance/project/plugins/*.yaml: {plugin_id, capability, command: [...], version, languages?, health: {command}}"
+  request:
+    protocol: gov-capability/1
+    capability: embed | rerank | code_intel | ecosystem | secret_scan
+    request_id: string
+    inputs: object (capability-specific)
+  response:
+    protocol: gov-capability/1
+    ok: boolean
+    provider: {id: string, version: string}
+    outputs: object (capability-specific)
+    error: "{code: string, message: string} (present when ok=false)"
+  capabilities:
+    embed: {inputs: {texts: [string], dimensions?: int}, outputs: {vectors: [[number]], dim: int}}
+    rerank: {inputs: {query: string, candidates: [{id, text}]}, outputs: {scores: [{id, score}]}}
+    code_intel: {inputs: {path: string, language: string, source: string}, outputs: {symbols: [{name, qualname, kind, lineno, end_lineno, parent, signature}], imports: [string], calls: [{from, name}], chunks: [{qualname, lineno, end_lineno}]}}
+    ecosystem: {inputs: {root: string}, outputs: {ecosystems: [{id, manifest, build?, test?, lint?, format?}]}}
+  invariants:
+    - The core never imports or links a plugin; it only spawns the declared command.
+    - A failing or missing plugin degrades to the built-in fallback (embed, code_intel) or to a capability gap (ecosystem tools); never a crash.
+    - Provider id/version are pinned in index-manifest.json; changing them requires a re-index and regression run.
+    - Plugins never receive secret-class content: the core filters by repository contract before invocation.

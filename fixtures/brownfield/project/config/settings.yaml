@@ -1,0 +1,3 @@
+service: shipping-quotes
+cache_ttl_seconds: 600
+gateway_url: https://gateway.example.internal

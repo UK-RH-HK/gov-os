@@ -49,3 +49,4 @@ payload_dirs:
   - commands
   - overlay-templates
   - migrations
+  - tools

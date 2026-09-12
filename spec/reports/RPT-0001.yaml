@@ -1,0 +1,33 @@
+id: RPT-0001
+type: report
+title: Assessment of implementation state against D-0002 (Rust-first core amendment)
+status: ACTIVE
+state_class: EVIDENCE
+created: "2026-09-12"
+task: TASK-0002
+role: orchestrator
+outcome: success
+work_completed: |
+  Inspected the implementation at commit d6744ed:
+  - Kernel payload (framework/, migrations/, tools/): language-neutral data. No change required. Preserved.
+  - Python core scaffolding (govos/runtime: util, paths, kernel, lock, schemas, policy, records, project, security/secrets,
+    memory/db, memory/embeddings, memory/chunking, code_intelligence/python_ast, code_intelligence/generic; ~1,600 lines,
+    no CLI, no tests): maps to the deterministic control plane -> superseded by the Rust core. Two components are
+    genuinely polyglot capabilities and are retained as plugins: python_ast (Python parsing Python with its own stdlib
+    AST is the strongest maintainable implementation) and the reference hashed-ngram embedder (used to prove the Rust
+    built-in embedder is bit-identical, i.e. cross-implementation determinism).
+  - Environment check: rustc/cargo 1.98.1 available; crates.io index reachable; rusqlite bundled build includes FTS5.
+    Feasible to implement the Rust core here.
+  - Materially changed by D-0002: implementation tasks TASK-0002..0005 (retargeted to Rust), new TASK-0006 (plugin
+    protocol + ecosystem detection), new TASK-0008 (architectural coupling tests), fixture language mix (TASK-0007).
+  - Not changed: documents, schemas, policies, adoption protocol stages, CLI command surface, memory architecture.
+files_changed: [spec/decisions/D-0001.yaml, spec/decisions/D-0002.yaml, spec/decisions/CIT-0001.yaml, spec/architecture/ARCH-0001.yaml, spec/interfaces/API-0001.yaml, spec/interfaces/API-0002.yaml, spec/tasks/TASK-0001.yaml, spec/tasks/TASK-0009.yaml]
+evidence: [git commit d6744ed]
+tests: {status: not_applicable_with_reason, reason: assessment only}
+discoveries:
+  - The product-owner message item 7 was truncated ("...at least one governed project whose"); interpreted as a non-Python governed project requirement.
+risks:
+  - Rust implementation volume is larger than Python; mitigated by keeping records schemaless (serde_json::Value) and by declarative kernel data.
+unresolved:
+  - Confirmation of the truncated fixture requirement (item 7).
+recommended_next_action: Execute TASK-0002 and TASK-0006, then TASK-0003/TASK-0004, then TASK-0005.

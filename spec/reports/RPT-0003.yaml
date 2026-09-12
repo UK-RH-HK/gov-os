@@ -1,0 +1,35 @@
+id: RPT-0003
+type: report
+title: Closing report for TASK-0003
+status: ACTIVE
+state_class: EVIDENCE
+created: '2026-09-12'
+task: TASK-0003
+role: orchestrator
+session: S-implementer
+outcome: success
+work_completed: 'Development Knowledge Fabric implemented: SQLite/FTS5 store, hierarchical
+  chunking, built-in hashed-ngram embedder (bit-identical to the Python reference),
+  indexer with fail-closed secret exclusion, typed graph edges + traversal, built-in
+  multi-language code intelligence + plugin dispatch, retrieval router with RRF fusion
+  and authority precedence, held-out regression, context compiler, index/memory manifests,
+  freshness and rebuild guarantee.'
+files_changed:
+- runtime/src/memory/
+- runtime/src/graph/
+- runtime/src/code_intelligence/
+- runtime/src/retrieval/
+- runtime/src/context/
+evidence:
+- docs/EVIDENCE.md
+- release/evidence/certification-tests.txt
+tests:
+  status: passed
+  reason: cargo test (unit + certification) and pytest for Python plugins; see docs/EVIDENCE.md
+discoveries: []
+risks:
+- implementer-authored tests only; independent verification pending
+lessons: []
+proposed_decisions: []
+unresolved: []
+recommended_next_action: independent OS verification of release 4.1.2

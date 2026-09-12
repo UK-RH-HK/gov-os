@@ -1,0 +1,12 @@
+id: D-0001
+type: decision
+title: Retry limit is 3
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: "2024-05-01"
+question: How many times should gateway calls be retried?
+chosen_option: A
+options:
+  - {id: A, description: "3 retries"}
+rationale: legacy gateway rate limits
+human_approved: true

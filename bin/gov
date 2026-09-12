@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# gov CLI shim for running from a source checkout without installation.
+# gov CLI shim for a source checkout: builds the Rust binary on first use, then execs it.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-export PYTHONPATH="${ROOT}${PYTHONPATH:+:$PYTHONPATH}"
-exec python3 -m govos "$@"
+export PATH="$HOME/.cargo/bin:$PATH"
+BIN="$ROOT/target/release/gov"
+if [ ! -x "$BIN" ] || [ -n "$GOV_REBUILD" ]; then (cd "$ROOT" && cargo build --release -q) || exit 1; fi
+export GOV_CANONICAL_ROOT="${GOV_CANONICAL_ROOT:-$ROOT}"
+exec "$BIN" "$@"

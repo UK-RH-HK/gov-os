@@ -1,0 +1,23 @@
+id: L-0003
+type: lesson
+title: Secret scanning missed a key in chat memory
+status: ACTIVE
+state_class: EVIDENCE
+created: "2026-09-03"
+scope: FRAMEWORK
+lifecycle: candidate
+category: security
+problem_statement: |
+  The key AKIAIOSFODNN7EXAMPLE for customer Acme Freight Ltd was found in memory/chat_history.sqlite and copied
+  into product/api/gateway.py by an agent.
+generic_failure_mode: Legacy chat stores were indexed raw before secret scanning.
+impact: credential exposure
+evidence_strength: medium
+suggested_change: |
+  Scan every string extracted from legacy stores. Reference implementation:
+  ```python
+  def scan(rows):
+      for r in rows:
+          if "AKIA" in r:
+              raise ValueError("secret")
+  ```

@@ -1,0 +1,35 @@
+id: TASK-0008
+type: task
+title: 'Architectural coupling tests: core builds/runs without Python or any governed-project
+  toolchain; kernel data free of language assumptions; ecosystem resolution per fixture;
+  plugin protocol proven with a non-Python plugin; static scan for external process
+  invocations outside registry/plugin host'
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: '2026-09-12'
+class: validation
+task_status: DONE
+feature: PRJ-0001
+objective: 'Architectural coupling tests: core builds/runs without Python or any governed-project
+  toolchain; kernel data free of language assumptions; ecosystem resolution per fixture;
+  plugin protocol proven with a non-Python plugin; static scan for external process
+  invocations outside registry/plugin host'
+decisions:
+- D-0002
+dependencies:
+- TASK-0002
+- TASK-0006
+required_skills:
+- SKL-TEST-DESIGN
+minimum_model_tier: T3
+minimum_reasoning: high
+allowed_paths:
+- tests/**
+- cli/tests/**
+forbidden_paths:
+- governance/kernel/**
+production_merge_allowed: true
+role: orchestrator
+generated_by: CIT-0001
+updated: '2026-09-12'
+closed_by_report: RPT-0008

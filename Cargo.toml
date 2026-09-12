@@ -1,0 +1,29 @@
+[workspace]
+members = ["runtime", "cli"]
+resolver = "2"
+
+[workspace.package]
+version = "4.1.2"
+edition = "2021"
+license = "Proprietary"
+rust-version = "1.80"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde_yaml = "0.9"
+rusqlite = { version = "0.31", features = ["bundled"] }
+sha2 = "0.10"
+regex = "1"
+walkdir = "2"
+chrono = "0.4"
+uuid = { version = "1", features = ["v4"] }
+jsonschema = { version = "0.18", default-features = false, features = ["draft202012"] }
+thiserror = "1"
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+
+[profile.release]
+opt-level = 2
+debug = false
+strip = true

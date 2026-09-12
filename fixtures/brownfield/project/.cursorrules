@@ -1,0 +1,5 @@
+# Cursor rules (LEGACY - written 2024)
+You are the shipping-quotes assistant. THIS FILE IS THE SOURCE OF TRUTH for coding conventions.
+- Always use tabs for indentation.
+- Retries: never more than 3.
+- Never write tests for billing; it is deprecated.

@@ -1,0 +1,37 @@
+id: TASK-0004
+type: task
+title: 'Orchestration and change control in Rust: tasks/DAG/claims, readiness->tasks,
+  human gates, control state, handoffs, checkpoints/watchdog, CIT-P/CIT-E with snapshots
+  and rollback, model routing, skills/tools/MCP registries, telemetry'
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: '2026-09-12'
+class: implementation
+task_status: DONE
+feature: PRJ-0001
+objective: 'Orchestration and change control in Rust: tasks/DAG/claims, readiness->tasks,
+  human gates, control state, handoffs, checkpoints/watchdog, CIT-P/CIT-E with snapshots
+  and rollback, model routing, skills/tools/MCP registries, telemetry'
+decisions:
+- D-0002
+dependencies:
+- TASK-0002
+required_skills:
+- SKL-BACKEND-IMPL
+- SKL-IMPACT-ANALYSIS
+minimum_model_tier: T3
+minimum_reasoning: high
+allowed_paths:
+- runtime/src/orchestration/**
+- runtime/src/cit/**
+- runtime/src/checkpoints/**
+- runtime/src/routing/**
+- runtime/src/tools/**
+- runtime/src/observability/**
+forbidden_paths:
+- governance/kernel/**
+production_merge_allowed: true
+role: orchestrator
+generated_by: CIT-0001
+updated: '2026-09-12'
+closed_by_report: RPT-0004

@@ -1,0 +1,14 @@
+id: D-0002
+type: decision
+title: Retry limit is 5
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: "2025-03-10"
+supersedes: [D-0001]
+governed_by: [REQ-R1]
+question: How many times should gateway calls be retried?
+chosen_option: B
+options:
+  - {id: B, description: "5 retries"}
+rationale: new gateway tolerates 5; product requirement REQ-R1
+human_approved: true

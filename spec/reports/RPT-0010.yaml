@@ -1,0 +1,28 @@
+id: RPT-0010
+type: report
+title: Closing report for TASK-0001
+status: ACTIVE
+state_class: EVIDENCE
+created: '2026-09-12'
+task: TASK-0001
+role: orchestrator
+session: S-implementer
+outcome: success
+work_completed: 'Kernel payload authored: constitution, 15 hard invariants, 13 policies,
+  59 schemas, 12 skills, 5 adapters, roles, taxonomy, readiness dimensions, command
+  contract, 7 overlay templates, tool/MCP registries, migration M-4.1.1-4.1.2.'
+files_changed:
+- framework/
+- migrations/
+- tools/
+evidence:
+- tests/certification/arch.rs::schemas_policies_and_registries_validate_against_kernel_schemas
+tests:
+  status: passed
+  reason: schema validation of all kernel data
+discoveries: []
+risks: []
+lessons: []
+proposed_decisions: []
+unresolved: []
+recommended_next_action: none

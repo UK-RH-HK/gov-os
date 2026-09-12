@@ -1,0 +1,21 @@
+[package]
+name = "gov-cli"
+description = "gov: the Governance OS command-line control surface"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "gov"
+path = "src/main.rs"
+
+[dependencies]
+gov-runtime = { path = "../runtime" }
+serde_json.workspace = true
+serde_yaml.workspace = true
+clap.workspace = true
+anyhow.workspace = true
+
+[[test]]
+name = "certification"
+path = "../tests/certification/main.rs"

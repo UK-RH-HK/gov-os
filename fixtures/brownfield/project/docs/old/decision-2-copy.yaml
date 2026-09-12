@@ -1,0 +1,7 @@
+id: D-0002
+type: decision
+title: Retry limit is 5 (stale copy)
+status: ACTIVE
+created: "2025-03-10"
+question: duplicate copy of D-0002 left behind by an old export
+chosen_option: B

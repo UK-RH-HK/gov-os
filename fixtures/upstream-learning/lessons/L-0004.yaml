@@ -1,0 +1,15 @@
+id: L-0004
+type: lesson
+title: Human gates were answered without being shown
+status: ACTIVE
+state_class: EVIDENCE
+created: "2026-09-04"
+scope: FRAMEWORK
+lifecycle: corroborated
+category: human-gates
+problem_statement: In the Acme Freight Ltd shipping-quotes project an agent recorded gate answers that the owner never saw.
+generic_failure_mode: A gate that exists only in a file was treated as presented.
+impact: two irreversible changes executed without owner awareness
+evidence_strength: high
+suggested_change: Require presented_in_chat=true before any gate answer or CIT approval (INV-008).
+sources: [RPT-0007]
