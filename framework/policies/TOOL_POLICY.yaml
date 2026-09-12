@@ -1,6 +1,6 @@
 policy: TOOL_POLICY
 version: 1.0.0
-permission_classes: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_READ, DB_WRITE, CLOUD_READ, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
+permission_classes: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, EXEC_PLUGIN, NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_READ, DB_WRITE, CLOUD_READ, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
 tool_types: [MCP, CLI, API, library]
 # All conditions must hold for autonomous installation; otherwise a Human Decision Gate is raised.
 auto_install_conditions:
@@ -17,3 +17,13 @@ health_check_required: true
 mcp:
   registry_path: governance/generated/tool-registry.json
   scope: role_and_task        # tool exposure is role/task scoped; never grant every agent every server
+# Capability plugins (gov-capability/1) are executable capabilities and are governed like tools (framework §28-32):
+# a descriptor executes only when schema-valid, registered in the generated registry, healthy, version/content pinned
+# and authorised for the acting role. Unknown, malformed, unregistered, unpinned or unauthorised plugins fail closed.
+plugins:
+  descriptor_schema: plugin-descriptor
+  require_valid_descriptor: true
+  min_authority: L2                 # hand-declared (unregistered) descriptors execute only for roles at/above this level
+  elevated_permission_classes: [NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_WRITE, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
+  refuse_on_pin_drift: true         # implementation changed without a version change -> PLUGIN_PIN_MISMATCH
+  timeout_seconds: 60

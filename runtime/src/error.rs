@@ -11,7 +11,11 @@ pub struct GovError {
 
 impl GovError {
     pub fn new(code: &str, message: impl Into<String>) -> Self {
-        GovError { code: code.to_string(), message: message.into(), details: Value::Null }
+        GovError {
+            code: code.to_string(),
+            message: message.into(),
+            details: Value::Null,
+        }
     }
     pub fn with_details(mut self, details: Value) -> Self {
         self.details = details;
@@ -25,7 +29,11 @@ impl GovError {
         match self.code.as_str() {
             "USAGE" => 2,
             "VERIFICATION_FAILED" | "UNHEALTHY" | "SCHEMA_INVALID" => 3,
-            "BLOCKED_BY_CONTROL" | "HUMAN_GATE_REQUIRED" | "VERDICT_REQUIRED" | "FROZEN" | "PAUSED" => 4,
+            "BLOCKED_BY_CONTROL"
+            | "HUMAN_GATE_REQUIRED"
+            | "VERDICT_REQUIRED"
+            | "FROZEN"
+            | "PAUSED" => 4,
             _ => 1,
         }
     }

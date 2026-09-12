@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.2/policy-MODEL_ROUTING_POLICY.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/policy-MODEL_ROUTING_POLICY.schema.json",
   "title": "policy-MODEL_ROUTING_POLICY",
   "x-schema-version": "1.0.0",
   "type": "object",

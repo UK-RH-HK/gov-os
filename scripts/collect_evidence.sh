@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Implementer evidence collection. Tool availability is recorded explicitly: an unavailable tool is reported as NOT_RUN
-# and never counted as a passing or failing result (verifier M15).
+# Implementer evidence collection. Every row carries one of PASS | FAIL | NOT_AVAILABLE | NOT_RUN | NOT_APPLICABLE.
+# An unavailable tool is NOT_AVAILABLE (never counted as a pass), a tool present but not executed is NOT_RUN, and a
+# check that does not apply is NOT_APPLICABLE with the reason (verifier M15 / directive §11).
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -10,23 +11,31 @@ STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"; COMMIT="$(git rev-parse --short HEAD 2>/
 { echo "toolchain:"; rustc --version; cargo --version; python3 --version 2>&1; git --version; } > "$EV/toolchain.txt"
 tool_status() { # name, probe command...
   local name="$1"; shift
-  if "$@" >/dev/null 2>&1; then echo "$name: available"; else echo "$name: NOT_INSTALLED"; fi
+  if "$@" >/dev/null 2>&1; then echo "$name: available"; else echo "$name: NOT_AVAILABLE"; fi
 }
 { tool_status clippy cargo clippy --version; tool_status rustfmt cargo fmt --version; tool_status python3 python3 --version; tool_status pytest python3 -c "import pytest"; } > "$EV/tool-status.txt"
 cargo build --release 2>&1 | tail -3 > "$EV/build.txt"; BUILD_RC=${PIPESTATUS[0]}
-cargo test -p gov-runtime 2>&1 | tee "$EV/unit-tests.txt" | grep -E "^test result" | head -1 > "$EV/unit-summary.txt"
-cargo test -p gov-cli --test certification -- --test-threads=4 2>&1 | tee "$EV/certification-tests.txt" | grep -E "^test result" | tail -1 > "$EV/certification-summary.txt"
-if python3 -c "import pytest" >/dev/null 2>&1; then ( cd capabilities/python && PYTHONPATH=. python3 -m pytest -q ../tests 2>&1 ) | tee "$EV/python-plugin-tests.txt" | tail -1 > "$EV/python-summary.txt"; else echo "NOT_RUN (pytest not installed)" > "$EV/python-summary.txt"; fi
+status_of_test_result() { # "test result: ok. N passed; M failed" -> PASS/FAIL with counts
+  local line="$1"; if [ -z "$line" ]; then echo "NOT_RUN (no result line)"; elif echo "$line" | grep -q "^test result: ok"; then echo "PASS ($(echo "$line" | sed -E 's/^test result: ok\. //; s/; 0 ignored.*//'))"; else echo "FAIL ($line)"; fi; }
+cargo test -p gov-runtime 2>&1 | tee "$EV/unit-tests.txt" | grep -E "^test result" | head -1 > "$EV/unit-summary.raw"
+status_of_test_result "$(cat "$EV/unit-summary.raw")" > "$EV/unit-summary.txt"
+cargo test -p gov-cli --test certification -- --test-threads=4 2>&1 | tee "$EV/certification-tests.txt" | grep -E "^test result" | tail -1 > "$EV/certification-summary.raw"
+status_of_test_result "$(cat "$EV/certification-summary.raw")" > "$EV/certification-summary.txt"
+if python3 -c "import pytest" >/dev/null 2>&1; then
+  ( cd capabilities/python && PYTHONPATH=. python3 -m pytest -q ../tests 2>&1 ) | tee "$EV/python-plugin-tests.txt" | tail -1 > "$EV/python-summary.raw"
+  if grep -qE "^[0-9]+ passed" "$EV/python-summary.raw" && ! grep -qE "failed|error" "$EV/python-summary.raw"; then echo "PASS ($(cat "$EV/python-summary.raw"))" > "$EV/python-summary.txt"; else echo "FAIL ($(cat "$EV/python-summary.raw"))" > "$EV/python-summary.txt"; fi
+else echo "NOT_AVAILABLE (pytest not installed)" > "$EV/python-summary.txt"; fi
 if cargo clippy --version >/dev/null 2>&1; then
-  cargo clippy --all-targets 2> "$EV/clippy.txt" >/dev/null; CLIPPY_RC=$?
+  cargo clippy --workspace --all-targets 2> "$EV/clippy.txt" >/dev/null; CLIPPY_RC=$?
   W=$(grep -cE "^warning: " "$EV/clippy.txt" || true); E=$(grep -cE "^error(\[|:)" "$EV/clippy.txt" || true)
-  echo "RAN exit=$CLIPPY_RC warnings=$W errors=$E" > "$EV/clippy-summary.txt"
-else echo "NOT_RUN (cargo-clippy not installed)" > "$EV/clippy-summary.txt"; fi
+  if [ "$CLIPPY_RC" -eq 0 ] && [ "$E" -eq 0 ]; then echo "PASS (exit 0, warnings=$W, errors=0; warning lines include per-crate summaries)" > "$EV/clippy-summary.txt"; else echo "FAIL (exit $CLIPPY_RC, warnings=$W, errors=$E)" > "$EV/clippy-summary.txt"; fi
+else echo "NOT_AVAILABLE (cargo-clippy not installed)" > "$EV/clippy-summary.txt"; fi
 if cargo fmt --version >/dev/null 2>&1; then
-  if cargo fmt --all -- --check > "$EV/rustfmt.txt" 2>&1; then echo "RAN formatted=yes" > "$EV/rustfmt-summary.txt"; else echo "RAN formatted=no (diff in rustfmt.txt; formatting is advisory in this release)" > "$EV/rustfmt-summary.txt"; fi
-else echo "NOT_RUN (rustfmt not installed)" > "$EV/rustfmt-summary.txt"; fi
-rm -f "$EV/clippy-diagnostic-count.txt"
-HELD="$EV/heldout-rerun-summary.txt"; [ -f "$ROOT/release/verification/4.1.2/heldout-rerun/summary.txt" ] && cp "$ROOT/release/verification/4.1.2/heldout-rerun/summary.txt" "$HELD" || echo "not run in this collection" > "$HELD"
+  if cargo fmt --all -- --check > "$EV/rustfmt.txt" 2>&1; then echo "PASS (rustfmt --check: formatted)" > "$EV/rustfmt-summary.txt"; else echo "FAIL (rustfmt --check reports $(grep -c '^Diff in' "$EV/rustfmt.txt") differences; see rustfmt.txt)" > "$EV/rustfmt-summary.txt"; fi
+else echo "NOT_AVAILABLE (rustfmt not installed)" > "$EV/rustfmt-summary.txt"; fi
+rm -f "$EV/clippy-diagnostic-count.txt" "$EV/unit-summary.raw" "$EV/certification-summary.raw" "$EV/python-summary.raw"
+HELD="$EV/heldout-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.2/heldout-rerun-4.1.4/summary.txt" ]; then cp "$ROOT/release/verification/4.1.2/heldout-rerun-4.1.4/summary.txt" "$HELD"; else echo "NOT_RUN (first verifier harness not rerun in this collection)" > "$HELD"; fi
+HELD2="$EV/heldout-v2-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.3/heldout-new-rerun-4.1.4/summary.txt" ]; then cp "$ROOT/release/verification/4.1.3/heldout-new-rerun-4.1.4/summary.txt" "$HELD2"; else echo "NOT_RUN (second verifier harness not rerun in this collection)" > "$HELD2"; fi
 UNIT="$(cat "$EV/unit-summary.txt")"; CERT="$(cat "$EV/certification-summary.txt")"; PY="$(cat "$EV/python-summary.txt")"; CL="$(cat "$EV/clippy-summary.txt")"; FM="$(cat "$EV/rustfmt-summary.txt")"
 CERT_LIST="$(grep -E '^test .* \.\.\. (ok|FAILED)$' "$EV/certification-tests.txt" | sed 's/^test /- /')"
 UNIT_LIST="$(grep -E '^test .* \.\.\. (ok|FAILED)$' "$EV/unit-tests.txt" | sed 's/^test /- /')"
@@ -36,7 +45,8 @@ cat > "$ROOT/docs/EVIDENCE.md" <<MD
 Collected: $STAMP · commit: $COMMIT · script: \`scripts/collect_evidence.sh\` · raw outputs: \`release/evidence/\`
 
 > Implementer evidence only. Certification remains pending independent re-verification.
-> Unavailable tools are reported as NOT_RUN and are never counted as evidence.
+> Status vocabulary: PASS | FAIL | NOT_AVAILABLE (tool missing) | NOT_RUN (not executed) | NOT_APPLICABLE (with reason).
+> An unavailable tool is never counted as evidence.
 
 ## Toolchain and tool status
 \`\`\`
@@ -48,12 +58,13 @@ $(cat "$EV/tool-status.txt")
 | Suite | Result |
 |---|---|
 | Rust unit tests (gov-runtime) | $UNIT |
-| Certification harness (7 fixtures + architectural + repair regressions) | $CERT |
+| Certification harness (7 fixtures + architectural + repair regressions, 4.1.2 and 4.1.3 findings) | $CERT |
 | Python capability plugin tests | $PY |
 | Clippy (\`cargo clippy --all-targets\`) | $CL |
 | rustfmt (\`cargo fmt --check\`) | $FM |
-| Release build (\`cargo build --release\`) | exit $BUILD_RC |
-| Independent held-out harness rerun (unchanged, 4.1.2 verifier) | $(cat "$HELD") |
+| Release build (\`cargo build --release\`) | $( [ "$BUILD_RC" -eq 0 ] && echo "PASS (exit 0)" || echo "FAIL (exit $BUILD_RC)" ) |
+| First independent held-out harness rerun (unchanged, 4.1.2 verifier) | $(cat "$HELD") |
+| Second independent held-out harness rerun (unchanged, 4.1.3 verifier) | $(cat "$HELD2") |
 
 ## Certification tests
 $CERT_LIST

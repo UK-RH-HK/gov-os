@@ -15,5 +15,5 @@ Starting from a healthy `gov init` project, the harness injects faults one at a 
 | Secret planted in product source | D011 critical; file excluded from index; no chunk contains it | move to secret-class path |
 | Task depending on a missing task | `graph_integrity` finding; DAG blocked with reason | fix dependency |
 | Missing overlay file | D006 | restore file |
-| Failing embed plugin | rebuild degrades to builtin, degradation recorded, no crash | — |
+| Failing embed plugin | rebuild fails closed with a typed error (EMBEDDER_BAD_OUTPUT / PLUGIN_*), the previous index stays intact, doctor D025/D028 report it; never a silent fallback to the built-in embedder | fix or re-register the plugin, or re-pin and rebuild |
 | Gate answered without presentation | `GATE_NOT_PRESENTED` (INV-008) | `gov gate present` |

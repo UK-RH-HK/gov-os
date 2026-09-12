@@ -6,10 +6,18 @@ use serde_json::{json, Value};
 
 pub fn generate_starter(p: &Project, db: &RuntimeDb, generated_by: &str) -> Result<Value> {
     let mut queries: Vec<Value> = vec![];
-    let mut push = |cat: &str, query: String, expected: Vec<String>, forbidden: Vec<String>, route: Option<&str>| {
-        if query.trim().is_empty() || expected.is_empty() { return; }
+    let mut push = |cat: &str,
+                    query: String,
+                    expected: Vec<String>,
+                    forbidden: Vec<String>,
+                    route: Option<&str>| {
+        if query.trim().is_empty() || expected.is_empty() {
+            return;
+        }
         let mut q = json!({"id": format!("HQ-{:03}", queries.len() + 1), "category": cat, "query": query, "expected_refs": expected, "forbidden": forbidden, "k": 8});
-        if let Some(r) = route { q["route"] = json!(r); }
+        if let Some(r) = route {
+            q["route"] = json!(r);
+        }
         queries.push(q);
     };
     // exact ids of governed records (non-file artefacts, not superseded)
@@ -39,5 +47,7 @@ pub fn generate_starter(p: &Project, db: &RuntimeDb, generated_by: &str) -> Resu
     let n = queries.len();
     queries.push(json!({"id": format!("HQ-{:03}", n + 1), "category": "semantic_paraphrase", "query": "TODO: paraphrase a decision rationale without reusing its words", "expected_refs": ["TODO"], "forbidden": [], "k": 8, "pending": true, "note": "author this query, then remove `pending`"}));
     queries.push(json!({"id": format!("HQ-{:03}", n + 2), "category": "semantic_paraphrase", "query": "TODO: describe a scenario outcome in different terms", "expected_refs": ["TODO"], "forbidden": [], "k": 8, "pending": true, "note": "author this query, then remove `pending`"}));
-    Ok(json!({"version": "2", "generated_by": generated_by, "generated_at": crate::util::now_iso(), "note": "starter set: exact id/path/symbol/literal/graph/supersession queries generated from the index; paraphrase placeholders are pending", "queries": queries, "project": p.project_alias()}))
+    Ok(
+        json!({"version": "2", "generated_by": generated_by, "generated_at": crate::util::now_iso(), "note": "starter set: exact id/path/symbol/literal/graph/supersession queries generated from the index; paraphrase placeholders are pending", "queries": queries, "project": p.project_alias()}),
+    )
 }

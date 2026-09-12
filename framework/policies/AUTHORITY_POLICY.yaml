@@ -60,6 +60,9 @@ authority_levels_required:
   create_gate: L2
   present_gate: L1
   answer_gate: L3            # relaying a human's answer; the `human` role (L5) answers directly; agents only within agent_resolvable_when
+  revoke_gate: L4            # withdraw a gate and every approval derived from it
+  execute_plugin: L2         # trigger a governed capability plugin (plus TOOL_POLICY.plugins and the descriptor's approved_roles)
+  register_plugin: L2        # plus TOOL_PERMISSIONS.install_authority_roles; elevated permissions raise a gate
   propose_cit: L2
   simulate_cit: L2
   approve_cit_auto: L3

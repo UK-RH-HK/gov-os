@@ -1,6 +1,6 @@
-# Fixture 4 — Framework update (4.1.1 → 4.1.2)
+# Fixture 4 — Framework update (stored synthetic 4.1.1 → current release; genuine 4.1.2 → 4.1.3 → 4.1.4 in repair2.rs)
 
-The harness derives a synthetic **previous release 4.1.1** from the current kernel payload (documented differences
+The stored synthetic **previous release 4.1.1** under `previous-release/4.1.1/` (derived once from the 4.1.2 payload; documented differences
 below), installs it into a fresh project, creates project state (overlay customisation, decisions, tasks), then upgrades
 to the 4.1.2 release candidate with `gov update --check` / `--apply` and finally exercises `--rollback`.
 

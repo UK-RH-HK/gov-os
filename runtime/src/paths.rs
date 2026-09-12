@@ -5,7 +5,16 @@ use serde_json::{json, Map, Value};
 use std::path::{Path, PathBuf};
 
 pub const SECRET_CLASS: &str = "secret";
-pub const ALWAYS_EXCLUDED_DIRS: &[&str] = &[".git", "node_modules", "__pycache__", ".pytest_cache", ".governance-runtime", ".venv", "venv", "target"];
+pub const ALWAYS_EXCLUDED_DIRS: &[&str] = &[
+    ".git",
+    "node_modules",
+    "__pycache__",
+    ".pytest_cache",
+    ".governance-runtime",
+    ".venv",
+    "venv",
+    "target",
+];
 
 #[derive(Debug, Clone)]
 pub struct PathDecision {
@@ -16,45 +25,86 @@ pub struct PathDecision {
 
 impl PathDecision {
     pub fn class(&self) -> String {
-        self.attrs.get("class").and_then(|v| v.as_str()).unwrap_or("unknown").to_string()
+        self.attrs
+            .get("class")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown")
+            .to_string()
     }
     pub fn is_secret(&self) -> bool {
-        self.class() == SECRET_CLASS || self.attrs.get("sensitivity").and_then(|v| v.as_str()) == Some("secret")
+        self.class() == SECRET_CLASS
+            || self.attrs.get("sensitivity").and_then(|v| v.as_str()) == Some("secret")
     }
     /// Never read/indexed: secret-class or a sensitivity class in SECURITY_POLICY.never_index_classes.
-    pub fn is_never_index(&self) -> bool { self.is_secret() || self.attrs.get("never_index").and_then(|v| v.as_bool()).unwrap_or(false) }
-    pub fn sensitivity(&self) -> String { self.str("sensitivity") }
-    pub fn export_allowed(&self) -> bool { self.attrs.get("export").and_then(|v| v.as_str()) == Some("allowed") }
+    pub fn is_never_index(&self) -> bool {
+        self.is_secret()
+            || self
+                .attrs
+                .get("never_index")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false)
+    }
+    pub fn sensitivity(&self) -> String {
+        self.str("sensitivity")
+    }
+    pub fn export_allowed(&self) -> bool {
+        self.attrs.get("export").and_then(|v| v.as_str()) == Some("allowed")
+    }
     pub fn flag(&self, key: &str) -> bool {
         if self.is_secret() && key.ends_with("_index") {
             return false;
         }
-        self.attrs.get(key).and_then(|v| v.as_bool()).unwrap_or(false)
+        self.attrs
+            .get(key)
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false)
     }
     pub fn str(&self, key: &str) -> String {
-        self.attrs.get(key).and_then(|v| v.as_str()).unwrap_or("").to_string()
+        self.attrs
+            .get(key)
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string()
     }
     pub fn namespace(&self) -> String {
         self.str("namespace")
     }
     pub fn default_retrieval(&self) -> bool {
-        self.attrs.get("default_retrieval").and_then(|v| v.as_bool()).unwrap_or(true) && !self.is_secret()
+        self.attrs
+            .get("default_retrieval")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(true)
+            && !self.is_secret()
     }
 }
 
 fn class_defaults(cls: &str) -> Value {
     match cls {
-        "source" => json!({"semantic_index": true, "lexical_index": true, "graph_index": true, "code_index": true}),
-        "test" => json!({"semantic_index": true, "lexical_index": true, "graph_index": true, "code_index": true}),
-        "authoritative" => json!({"semantic_index": true, "lexical_index": true, "graph_index": true}),
+        "source" => {
+            json!({"semantic_index": true, "lexical_index": true, "graph_index": true, "code_index": true})
+        }
+        "test" => {
+            json!({"semantic_index": true, "lexical_index": true, "graph_index": true, "code_index": true})
+        }
+        "authoritative" => {
+            json!({"semantic_index": true, "lexical_index": true, "graph_index": true})
+        }
         "evidence" => json!({"semantic_index": true, "lexical_index": true, "graph_index": true}),
         "narrative" => json!({"semantic_index": true, "lexical_index": true}),
         "derived" => json!({"semantic_index": false, "lexical_index": false, "graph_index": false}),
-        "generated" => json!({"semantic_index": false, "lexical_index": false, "graph_index": false, "mutation": "generated"}),
-        "historical" => json!({"semantic_index": false, "lexical_index": true, "default_retrieval": false, "mutation": "restricted"}),
-        "secret" => json!({"semantic_index": false, "lexical_index": false, "graph_index": false, "code_index": false, "default_retrieval": false,
-                           "agent_read": "prohibited", "export": "denied", "sensitivity": "secret", "namespace": "secret"}),
-        "runtime-data" => json!({"semantic_index": false, "lexical_index": false, "graph_index": false}),
+        "generated" => {
+            json!({"semantic_index": false, "lexical_index": false, "graph_index": false, "mutation": "generated"})
+        }
+        "historical" => {
+            json!({"semantic_index": false, "lexical_index": true, "default_retrieval": false, "mutation": "restricted"})
+        }
+        "secret" => {
+            json!({"semantic_index": false, "lexical_index": false, "graph_index": false, "code_index": false, "default_retrieval": false,
+                           "agent_read": "prohibited", "export": "denied", "sensitivity": "secret", "namespace": "secret"})
+        }
+        "runtime-data" => {
+            json!({"semantic_index": false, "lexical_index": false, "graph_index": false})
+        }
         "devops" => json!({"semantic_index": true, "lexical_index": true}),
         "tooling" => json!({"semantic_index": true, "lexical_index": true, "code_index": true}),
         _ => json!({}),
@@ -77,7 +127,15 @@ pub struct SensitivityRules {
     pub secret_agent_read: Option<String>,
 }
 
-pub fn sensitivity_rank(class: &str) -> u8 { match class { "secret" => 4, "restricted" => 3, "confidential" => 2, "internal" => 1, _ => 0 } }
+pub fn sensitivity_rank(class: &str) -> u8 {
+    match class {
+        "secret" => 4,
+        "restricted" => 3,
+        "confidential" => 2,
+        "internal" => 1,
+        _ => 0,
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct RepositoryContract {
@@ -96,15 +154,31 @@ impl RepositoryContract {
                 roots.push((k.clone(), s));
             }
         }
-        let rules = data.get("paths").and_then(|p| p.as_array()).cloned().unwrap_or_default();
-        RepositoryContract { data, roots, rules, sensitivity: SensitivityRules::default() }
+        let rules = data
+            .get("paths")
+            .and_then(|p| p.as_array())
+            .cloned()
+            .unwrap_or_default();
+        RepositoryContract {
+            data,
+            roots,
+            rules,
+            sensitivity: SensitivityRules::default(),
+        }
     }
-    pub fn with_sensitivity(mut self, rules: SensitivityRules) -> Self { self.sensitivity = rules; self }
+    pub fn with_sensitivity(mut self, rules: SensitivityRules) -> Self {
+        self.sensitivity = rules;
+        self
+    }
     pub fn load(p: &Path) -> Result<Self> {
         Ok(Self::new(read_yaml(p)?))
     }
     pub fn root(&self, name: &str) -> String {
-        self.roots.iter().find(|(k, _)| k == name).map(|(_, v)| v.clone()).unwrap_or(format!("{name}/"))
+        self.roots
+            .iter()
+            .find(|(k, _)| k == name)
+            .map(|(_, v)| v.clone())
+            .unwrap_or(format!("{name}/"))
     }
     pub fn namespace_for(&self, path: &str) -> String {
         for (name, root) in &self.roots {
@@ -126,7 +200,10 @@ impl RepositoryContract {
             if pat.is_empty() || !glob_match(pat, &path) {
                 continue;
             }
-            let cls = rule.get("class").and_then(|v| v.as_str()).unwrap_or("unknown");
+            let cls = rule
+                .get("class")
+                .and_then(|v| v.as_str())
+                .unwrap_or("unknown");
             if secret_locked && cls != SECRET_CLASS {
                 continue;
             }
@@ -149,33 +226,83 @@ impl RepositoryContract {
                 secret_locked = true;
             }
         }
-        let ns = attrs.get("namespace").and_then(|v| v.as_str()).unwrap_or("unknown").to_string();
+        let ns = attrs
+            .get("namespace")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown")
+            .to_string();
         if ns == "unknown" || ns.is_empty() {
             attrs.insert("namespace".into(), Value::String(self.namespace_for(&path)));
         }
         // --- sensitivity: DATA_SENSITIVITY classifications (highest class wins) + SECURITY_POLICY never_index / never_export
-        let mut sensitivity = attrs.get("sensitivity").and_then(|v| v.as_str()).unwrap_or("internal").to_string();
+        let mut sensitivity = attrs
+            .get("sensitivity")
+            .and_then(|v| v.as_str())
+            .unwrap_or("internal")
+            .to_string();
         for (pat, cls) in &self.sensitivity.classifications {
-            if glob_match(pat, &path) && sensitivity_rank(cls) > sensitivity_rank(&sensitivity) { sensitivity = cls.clone(); }
+            if glob_match(pat, &path) && sensitivity_rank(cls) > sensitivity_rank(&sensitivity) {
+                sensitivity = cls.clone();
+            }
         }
-        if attrs.get("class").and_then(|v| v.as_str()) == Some(SECRET_CLASS) { sensitivity = "secret".into(); }
+        if attrs.get("class").and_then(|v| v.as_str()) == Some(SECRET_CLASS) {
+            sensitivity = "secret".into();
+        }
         attrs.insert("sensitivity".into(), Value::String(sensitivity.clone()));
-        if self.sensitivity.never_index.iter().any(|c| c == &sensitivity) {
-            for k in ["semantic_index", "lexical_index", "graph_index", "code_index"] { attrs.insert(k.into(), Value::Bool(false)); }
+        if self
+            .sensitivity
+            .never_index
+            .iter()
+            .any(|c| c == &sensitivity)
+        {
+            for k in [
+                "semantic_index",
+                "lexical_index",
+                "graph_index",
+                "code_index",
+            ] {
+                attrs.insert(k.into(), Value::Bool(false));
+            }
             attrs.insert("default_retrieval".into(), Value::Bool(false));
             attrs.insert("export".into(), Value::String("denied".into()));
-            let ar = if sensitivity == "secret" { self.sensitivity.secret_agent_read.clone().unwrap_or("prohibited".into()) } else { "restricted".into() };
+            let ar = if sensitivity == "secret" {
+                self.sensitivity
+                    .secret_agent_read
+                    .clone()
+                    .unwrap_or("prohibited".into())
+            } else {
+                "restricted".into()
+            };
             attrs.insert("agent_read".into(), Value::String(ar));
             attrs.insert("never_index".into(), Value::Bool(true));
         }
-        if self.sensitivity.never_export.iter().any(|c| c == &sensitivity) { attrs.insert("export".into(), Value::String("denied".into())); }
-        if attrs.get("class").and_then(|v| v.as_str()) == Some("historical") { if let Some(dr) = self.sensitivity.archive_default_retrieval { if attrs.get("default_retrieval").is_none() || matched.is_none() { attrs.insert("default_retrieval".into(), Value::Bool(dr)); } } }
-        PathDecision { path, rule_pattern: matched, attrs }
+        if self
+            .sensitivity
+            .never_export
+            .iter()
+            .any(|c| c == &sensitivity)
+        {
+            attrs.insert("export".into(), Value::String("denied".into()));
+        }
+        if attrs.get("class").and_then(|v| v.as_str()) == Some("historical") {
+            if let Some(dr) = self.sensitivity.archive_default_retrieval {
+                if attrs.get("default_retrieval").is_none() || matched.is_none() {
+                    attrs.insert("default_retrieval".into(), Value::Bool(dr));
+                }
+            }
+        }
+        PathDecision {
+            path,
+            rule_pattern: matched,
+            attrs,
+        }
     }
     pub fn to_framework_json(&self, framework: &str, version: &str) -> Value {
         let mut paths = Map::new();
         for r in &self.rules {
-            if let (Some(pat), Some(obj)) = (r.get("pattern").and_then(|v| v.as_str()), r.as_object()) {
+            if let (Some(pat), Some(obj)) =
+                (r.get("pattern").and_then(|v| v.as_str()), r.as_object())
+            {
                 let mut o = obj.clone();
                 o.shift_remove("pattern");
                 paths.insert(pat.to_string(), Value::Object(o));
@@ -193,22 +320,30 @@ impl RepositoryContract {
 /// Deterministically list repository files (sorted), skipping VCS/runtime/cache directories.
 pub fn iter_repo_files(root: &Path, include_runtime: bool) -> Vec<(PathBuf, String)> {
     let mut out = vec![];
-    let walker = walkdir::WalkDir::new(root).sort_by_file_name().into_iter().filter_entry(|e| {
-        if e.depth() == 0 {
-            return true;
-        }
-        let name = e.file_name().to_string_lossy();
-        if e.file_type().is_dir() {
-            if name == ".governance-runtime" {
-                return include_runtime;
+    let walker = walkdir::WalkDir::new(root)
+        .sort_by_file_name()
+        .into_iter()
+        .filter_entry(|e| {
+            if e.depth() == 0 {
+                return true;
             }
-            return !ALWAYS_EXCLUDED_DIRS.contains(&name.as_ref());
-        }
-        true
-    });
+            let name = e.file_name().to_string_lossy();
+            if e.file_type().is_dir() {
+                if name == ".governance-runtime" {
+                    return include_runtime;
+                }
+                return !ALWAYS_EXCLUDED_DIRS.contains(&name.as_ref());
+            }
+            true
+        });
     for entry in walker.filter_map(|e| e.ok()) {
         if entry.file_type().is_file() && !entry.path_is_symlink() {
-            let rel = entry.path().strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/");
+            let rel = entry
+                .path()
+                .strip_prefix(root)
+                .unwrap()
+                .to_string_lossy()
+                .replace('\\', "/");
             out.push((entry.path().to_path_buf(), rel));
         }
     }
@@ -220,17 +355,25 @@ mod tests {
     use super::*;
     use serde_json::json;
     fn contract() -> RepositoryContract {
-        RepositoryContract::new(json!({"roots": {"governance": "governance/", "spec": "spec/", "product": "product/", "archive": "archive/"},
-            "paths": [{"pattern": "spec/**", "class": "authoritative"}, {"pattern": "product/**", "class": "source"}, {"pattern": "**/.env*", "class": "secret"}, {"pattern": "product/secrets/**", "class": "secret"}, {"pattern": "product/**", "class": "source", "semantic_index": true}, {"pattern": "archive/**", "class": "historical"}]}))
+        RepositoryContract::new(
+            json!({"roots": {"governance": "governance/", "spec": "spec/", "product": "product/", "archive": "archive/"},
+            "paths": [{"pattern": "spec/**", "class": "authoritative"}, {"pattern": "product/**", "class": "source"}, {"pattern": "**/.env*", "class": "secret"}, {"pattern": "product/secrets/**", "class": "secret"}, {"pattern": "product/**", "class": "source", "semantic_index": true}, {"pattern": "archive/**", "class": "historical"}]}),
+        )
     }
     #[test]
     fn secret_classification_can_never_be_downgraded() {
         let c = contract();
         let d = c.decide("product/secrets/key.pem");
-        assert!(d.is_secret() && !d.flag("semantic_index") && !d.flag("lexical_index") && d.str("agent_read") == "prohibited");
+        assert!(
+            d.is_secret()
+                && !d.flag("semantic_index")
+                && !d.flag("lexical_index")
+                && d.str("agent_read") == "prohibited"
+        );
         assert!(c.decide("product/.env.prod").is_secret());
         let s = c.decide("product/app.py");
-        assert_eq!(s.class(), "source"); assert!(s.flag("code_index") && s.flag("semantic_index"));
+        assert_eq!(s.class(), "source");
+        assert!(s.flag("code_index") && s.flag("semantic_index"));
         let a = c.decide("archive/old.md");
         assert!(!a.default_retrieval() && a.class() == "historical" && a.flag("lexical_index"));
         assert_eq!(c.decide("spec/x.yaml").namespace(), "spec");

@@ -2,15 +2,15 @@
 
 ## Building a release
 ```bash
-bin/gov release build --canonical . --version 4.1.3 --certification READY_FOR_INDEPENDENT_REVERIFICATION --evidence docs/EVIDENCE.md
-bin/gov release verify release/releases/4.1.3
+bin/gov release build --canonical . --version 4.1.4 --certification READY_FOR_INDEPENDENT_REVERIFICATION --evidence docs/EVIDENCE.md
+bin/gov release verify release/releases/4.1.4
 ```
 `release/releases/<version>/` contains the immutable `kernel/` payload (with `KERNEL_MANIFEST.json`), `manifest.yaml`
 and `manifest.json` (schema `release-manifest`), `RELEASE_NOTES.md` and `ROLLBACK.md`. A second build of the same
 version is refused (`RELEASE_IMMUTABLE`).
 
 ## Release manifest fields
-`framework`, `version`, `release_commit`, `release_hash` (= kernel payload hash), `schema_versions`, `cli_version`,
+`framework`, `version`, `release_commit`, `release_hash` (= kernel payload hash), `provenance`, `schema_versions`, `cli_version`,
 `runtime_version`, `supported_from_versions`, `migration_ids`, `adapter_versions`, `required_index_rebuilds`,
 `breaking_changes`, `human_gates`, `file_hashes`, `release_notes`, `rollback_procedure`, `certification`
 (`status` ∈ UNCERTIFIED | READY_FOR_INDEPENDENT_OS_VERIFICATION | READY_FOR_INDEPENDENT_REVERIFICATION | CERTIFIED |
@@ -19,9 +19,24 @@ Only an independent verifier may set CERTIFIED or REJECTED; a rejected release s
 candidate that changes the kernel payload gets a new PATCH version (4.1.2 → 4.1.3).
 
 ## Consumer lock
-`governance/framework.lock`: `framework`, `version`, `release_commit`, `release_hash`, `source`, `installed_at`,
-`kernel_manifest_hash`, `cli_version`, `schema_versions`, `lock_schema_version`. `gov doctor` D003/D004 verify the
+`governance/framework.lock` (schema 1.1.0): `framework`, `version`, `release_commit` (the framework release's
+commit: release manifest, embedded payload or framework checkout — never the consumer's HEAD), `release_hash`,
+`source` (logical label `release:|embedded:|source:<framework>@<version>`, never a machine path),
+`installed_at_commit` (consumer HEAD at install/update), `installed_at`, `kernel_manifest_hash`, `cli_version`,
+`schema_versions`, `lock_schema_version`. `gov doctor` D003/D004 verify the
 installed payload against its manifest and the lock; any in-place edit of `governance/kernel/` is CRITICAL (INV-007).
+
+## Branches, tags and reproduction
+Each candidate lives on `release/<version>-rc1` and is tagged `v<version>-rc1` at its candidate commit (rejected
+candidates keep their tag; history is never rewritten). The manifest records `provenance.release_branch` and
+`provenance.release_tag`. Rebuilding an already-released version reproduces it from the tree at its recorded
+`release_commit` (`git archive`), so `release_hash` and `file_hashes` are stable regardless of the working tree;
+building into `release/` again is `RELEASE_IMMUTABLE`. A new version is refused (`MIGRATION_INCOMPLETE`) when a
+migration into it neither performs nor declares an overlay-template change between the payloads it spans.
+
+A verifier who cannot edit shared release files records the verdict in `release/verification/<version>/VERDICT.md`;
+the release owner transcribes the certification block verbatim into `manifest.{yaml,json}` (the kernel payload and
+`file_hashes` stay untouched, so `gov release verify` still passes).
 
 ## Repair iterations
 `release/verification/<version>/` holds the independent verifier's report, harness and results (never modified by the

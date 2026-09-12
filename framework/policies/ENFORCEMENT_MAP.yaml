@@ -12,6 +12,20 @@ keys:
   AUTHORITY_POLICY.default_state_class_by_type.*: {enforced_by: [records::state_class_for]}
   AUTHORITY_POLICY.retrieval_default_excludes_statuses: {enforced_by: [retrieval::retrieve]}
   AUTHORITY_POLICY.authority_levels_required.*: {enforced_by: [authority::require, authority::required_level]}
+  AUTHORITY_POLICY.authority_levels_required.revoke_gate: {enforced_by: [gates::revoke]}
+  AUTHORITY_POLICY.authority_levels_required.execute_plugin: {enforced_by: [capabilities::governance::authorize]}
+  AUTHORITY_POLICY.authority_levels_required.register_plugin: {enforced_by: [capabilities::governance::register]}
+  # ---- POLICY_PRECEDENCE (constitutional; evaluated at policy load)
+  POLICY_PRECEDENCE.layers: {enforced_by: [policy_precedence::load, context::compile]}
+  POLICY_PRECEDENCE.default_mode: {enforced_by: [policy_precedence::evaluate]}
+  POLICY_PRECEDENCE.rules: {enforced_by: [policy_precedence::evaluate, policy::PolicySet::load]}
+  # ---- TOOL_POLICY.plugins (capability supply-chain boundary)
+  TOOL_POLICY.plugins.descriptor_schema: {informational: "names the kernel schema (plugin-descriptor) that capabilities::host::discover_all validates every descriptor against; the schema id is fixed by the kernel, not read at runtime"}
+  TOOL_POLICY.plugins.require_valid_descriptor: {informational: "always true: an invalid descriptor is rejected by capabilities::host::discover_all and can never execute; declared strengthen-only so no overlay can relax it"}
+  TOOL_POLICY.plugins.min_authority: {enforced_by: [capabilities::governance::authorize, tools::plugin_tools]}
+  TOOL_POLICY.plugins.elevated_permission_classes: {enforced_by: [capabilities::governance::authorize, capabilities::governance::register]}
+  TOOL_POLICY.plugins.refuse_on_pin_drift: {enforced_by: [capabilities::governance::authorize]}
+  TOOL_POLICY.plugins.timeout_seconds: {enforced_by: [capabilities::governance::invoke_timeout]}
   # ---- MEMORY_POLICY
   MEMORY_POLICY.runtime_dir: {enforced_by: [project::runtime_dir_name]}
   MEMORY_POLICY.memory_classes: {informational: "taxonomy of the fabric; each class maps to a store (docs/ARCHITECTURE.md §4)"}

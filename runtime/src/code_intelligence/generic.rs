@@ -4,35 +4,180 @@ use super::{CodeFacts, Symbol};
 use regex::Regex;
 use std::sync::OnceLock;
 
-struct LangRules { symbol: Vec<(&'static str, &'static str)>, import: Vec<&'static str>, block_scoped: bool }
+struct LangRules {
+    symbol: Vec<(&'static str, &'static str)>,
+    import: Vec<&'static str>,
+    block_scoped: bool,
+}
 
 fn rules(language: &str) -> LangRules {
     match language {
-        "python" => LangRules { symbol: vec![(r"^\s*class\s+([A-Za-z_]\w*)", "class"), (r"^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(", "function")], import: vec![r"^\s*import\s+([\w\.]+)", r"^\s*from\s+([\w\.]+)\s+import"], block_scoped: false },
-        "rust" => LangRules { symbol: vec![(r"^\s*(?:pub(?:\([^)]*\))?\s+)?(?:async\s+)?fn\s+([A-Za-z_]\w*)", "function"), (r"^\s*(?:pub(?:\([^)]*\))?\s+)?struct\s+([A-Za-z_]\w*)", "struct"), (r"^\s*(?:pub(?:\([^)]*\))?\s+)?enum\s+([A-Za-z_]\w*)", "enum"), (r"^\s*(?:pub(?:\([^)]*\))?\s+)?trait\s+([A-Za-z_]\w*)", "trait"), (r"^\s*impl(?:<[^>]*>)?\s+(?:[\w:]+\s+for\s+)?([A-Za-z_]\w*)", "impl"), (r"^\s*(?:pub(?:\([^)]*\))?\s+)?mod\s+([A-Za-z_]\w*)", "module")], import: vec![r"^\s*use\s+([\w:]+)", r"^\s*(?:pub\s+)?mod\s+([A-Za-z_]\w*)\s*;"], block_scoped: true },
-        "javascript" | "typescript" => LangRules { symbol: vec![(r"^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(", "function"), (r"^\s*(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z_$][\w$]*)", "class"), (r"^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*(?::[^=]+)?=>", "function"), (r"^\s*(?:export\s+)?interface\s+([A-Za-z_$][\w$]*)", "interface"), (r"^\s*(?:export\s+)?type\s+([A-Za-z_$][\w$]*)\s*=", "type")], import: vec![r#"^\s*import\s+.*?from\s+['"]([^'"]+)['"]"#, r#"require\(\s*['"]([^'"]+)['"]\s*\)"#, r#"^\s*import\s+['"]([^'"]+)['"]"#, r#"^\s*export\s+.*?from\s+['"]([^'"]+)['"]"#], block_scoped: true },
-        "go" => LangRules { symbol: vec![(r"^\s*func\s+(?:\([^)]*\)\s*)?([A-Za-z_]\w*)\s*\(", "function"), (r"^\s*type\s+([A-Za-z_]\w*)\s+(?:struct|interface)", "type")], import: vec![r#"^\s*"([\w\./-]+)"\s*$"#, r#"^\s*import\s+"([\w\./-]+)""#], block_scoped: true },
-        "c" | "cpp" => LangRules { symbol: vec![(r"^\s*(?:class|struct)\s+([A-Za-z_]\w*)", "class"), (r"^[A-Za-z_][\w:<>\*&\s]*?\s\*?([A-Za-z_]\w*)\s*\([^;]*\)\s*(?:const)?\s*\{?\s*$", "function")], import: vec![r#"^\s*#include\s*[<"]([^>"]+)[>"]"#], block_scoped: true },
-        "java" | "kotlin" | "csharp" | "scala" => LangRules { symbol: vec![(r"^\s*(?:public|private|protected|internal|static|final|abstract|sealed|data|open|\s)*\s*(?:class|interface|enum|object|record)\s+([A-Za-z_]\w*)", "class"), (r"^\s*(?:public|private|protected|internal|static|final|override|async|virtual|abstract|\s)*\s*(?:fun\s+)?[\w<>\[\],\s\?]+\s+([A-Za-z_]\w*)\s*\([^;]*\)\s*(?:throws\s+[\w,\s]+)?\s*\{?\s*$", "method")], import: vec![r"^\s*(?:import|using)\s+([\w\.]+)"], block_scoped: true },
-        "ruby" => LangRules { symbol: vec![(r"^\s*class\s+([A-Za-z_]\w*)", "class"), (r"^\s*module\s+([A-Za-z_]\w*)", "module"), (r"^\s*def\s+(?:self\.)?([A-Za-z_]\w*[?!=]?)", "function")], import: vec![r#"^\s*require(?:_relative)?\s+['"]([^'"]+)['"]"#], block_scoped: false },
-        "shell" => LangRules { symbol: vec![(r"^\s*(?:function\s+)?([A-Za-z_]\w*)\s*\(\)\s*\{?", "function")], import: vec![r#"^\s*(?:source|\.)\s+([^\s]+)"#], block_scoped: true },
-        _ => LangRules { symbol: vec![(r"^\s*(?:function|def|fn|func)\s+([A-Za-z_]\w*)", "function"), (r"^\s*(?:class|struct|trait|interface)\s+([A-Za-z_]\w*)", "class")], import: vec![], block_scoped: true },
+        "python" => LangRules {
+            symbol: vec![
+                (r"^\s*class\s+([A-Za-z_]\w*)", "class"),
+                (r"^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)\s*\(", "function"),
+            ],
+            import: vec![r"^\s*import\s+([\w\.]+)", r"^\s*from\s+([\w\.]+)\s+import"],
+            block_scoped: false,
+        },
+        "rust" => LangRules {
+            symbol: vec![
+                (
+                    r"^\s*(?:pub(?:\([^)]*\))?\s+)?(?:async\s+)?fn\s+([A-Za-z_]\w*)",
+                    "function",
+                ),
+                (
+                    r"^\s*(?:pub(?:\([^)]*\))?\s+)?struct\s+([A-Za-z_]\w*)",
+                    "struct",
+                ),
+                (
+                    r"^\s*(?:pub(?:\([^)]*\))?\s+)?enum\s+([A-Za-z_]\w*)",
+                    "enum",
+                ),
+                (
+                    r"^\s*(?:pub(?:\([^)]*\))?\s+)?trait\s+([A-Za-z_]\w*)",
+                    "trait",
+                ),
+                (
+                    r"^\s*impl(?:<[^>]*>)?\s+(?:[\w:]+\s+for\s+)?([A-Za-z_]\w*)",
+                    "impl",
+                ),
+                (
+                    r"^\s*(?:pub(?:\([^)]*\))?\s+)?mod\s+([A-Za-z_]\w*)",
+                    "module",
+                ),
+            ],
+            import: vec![
+                r"^\s*use\s+([\w:]+)",
+                r"^\s*(?:pub\s+)?mod\s+([A-Za-z_]\w*)\s*;",
+            ],
+            block_scoped: true,
+        },
+        "javascript" | "typescript" => LangRules {
+            symbol: vec![
+                (
+                    r"^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(",
+                    "function",
+                ),
+                (
+                    r"^\s*(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z_$][\w$]*)",
+                    "class",
+                ),
+                (
+                    r"^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*(?::[^=]+)?=>",
+                    "function",
+                ),
+                (
+                    r"^\s*(?:export\s+)?interface\s+([A-Za-z_$][\w$]*)",
+                    "interface",
+                ),
+                (r"^\s*(?:export\s+)?type\s+([A-Za-z_$][\w$]*)\s*=", "type"),
+            ],
+            import: vec![
+                r#"^\s*import\s+.*?from\s+['"]([^'"]+)['"]"#,
+                r#"require\(\s*['"]([^'"]+)['"]\s*\)"#,
+                r#"^\s*import\s+['"]([^'"]+)['"]"#,
+                r#"^\s*export\s+.*?from\s+['"]([^'"]+)['"]"#,
+            ],
+            block_scoped: true,
+        },
+        "go" => LangRules {
+            symbol: vec![
+                (
+                    r"^\s*func\s+(?:\([^)]*\)\s*)?([A-Za-z_]\w*)\s*\(",
+                    "function",
+                ),
+                (r"^\s*type\s+([A-Za-z_]\w*)\s+(?:struct|interface)", "type"),
+            ],
+            import: vec![r#"^\s*"([\w\./-]+)"\s*$"#, r#"^\s*import\s+"([\w\./-]+)""#],
+            block_scoped: true,
+        },
+        "c" | "cpp" => LangRules {
+            symbol: vec![
+                (r"^\s*(?:class|struct)\s+([A-Za-z_]\w*)", "class"),
+                (
+                    r"^[A-Za-z_][\w:<>\*&\s]*?\s\*?([A-Za-z_]\w*)\s*\([^;]*\)\s*(?:const)?\s*\{?\s*$",
+                    "function",
+                ),
+            ],
+            import: vec![r#"^\s*#include\s*[<"]([^>"]+)[>"]"#],
+            block_scoped: true,
+        },
+        "java" | "kotlin" | "csharp" | "scala" => LangRules {
+            symbol: vec![
+                (
+                    r"^\s*(?:public|private|protected|internal|static|final|abstract|sealed|data|open|\s)*\s*(?:class|interface|enum|object|record)\s+([A-Za-z_]\w*)",
+                    "class",
+                ),
+                (
+                    r"^\s*(?:public|private|protected|internal|static|final|override|async|virtual|abstract|\s)*\s*(?:fun\s+)?[\w<>\[\],\s\?]+\s+([A-Za-z_]\w*)\s*\([^;]*\)\s*(?:throws\s+[\w,\s]+)?\s*\{?\s*$",
+                    "method",
+                ),
+            ],
+            import: vec![r"^\s*(?:import|using)\s+([\w\.]+)"],
+            block_scoped: true,
+        },
+        "ruby" => LangRules {
+            symbol: vec![
+                (r"^\s*class\s+([A-Za-z_]\w*)", "class"),
+                (r"^\s*module\s+([A-Za-z_]\w*)", "module"),
+                (r"^\s*def\s+(?:self\.)?([A-Za-z_]\w*[?!=]?)", "function"),
+            ],
+            import: vec![r#"^\s*require(?:_relative)?\s+['"]([^'"]+)['"]"#],
+            block_scoped: false,
+        },
+        "shell" => LangRules {
+            symbol: vec![(
+                r"^\s*(?:function\s+)?([A-Za-z_]\w*)\s*\(\)\s*\{?",
+                "function",
+            )],
+            import: vec![r#"^\s*(?:source|\.)\s+([^\s]+)"#],
+            block_scoped: true,
+        },
+        _ => LangRules {
+            symbol: vec![
+                (r"^\s*(?:function|def|fn|func)\s+([A-Za-z_]\w*)", "function"),
+                (
+                    r"^\s*(?:class|struct|trait|interface)\s+([A-Za-z_]\w*)",
+                    "class",
+                ),
+            ],
+            import: vec![],
+            block_scoped: true,
+        },
     }
 }
 
 fn compiled(language: &str) -> (Vec<(Regex, &'static str)>, Vec<Regex>, bool) {
-    static CACHE: OnceLock<std::sync::Mutex<std::collections::HashMap<String, (Vec<(Regex, &'static str)>, Vec<Regex>, bool)>>> = OnceLock::new();
+    type LangPatterns = (Vec<(Regex, &'static str)>, Vec<Regex>, bool);
+    static CACHE: OnceLock<std::sync::Mutex<std::collections::HashMap<String, LangPatterns>>> =
+        OnceLock::new();
     let cache = CACHE.get_or_init(|| std::sync::Mutex::new(std::collections::HashMap::new()));
-    if let Some(c) = cache.lock().unwrap().get(language) { return c.clone(); }
+    if let Some(c) = cache.lock().unwrap().get(language) {
+        return c.clone();
+    }
     let r = rules(language);
-    let sy: Vec<(Regex, &'static str)> = r.symbol.iter().filter_map(|(rx, k)| Regex::new(rx).ok().map(|c| (c, *k))).collect();
-    let im: Vec<Regex> = r.import.iter().filter_map(|rx| Regex::new(rx).ok()).collect();
+    let sy: Vec<(Regex, &'static str)> = r
+        .symbol
+        .iter()
+        .filter_map(|(rx, k)| Regex::new(rx).ok().map(|c| (c, *k)))
+        .collect();
+    let im: Vec<Regex> = r
+        .import
+        .iter()
+        .filter_map(|rx| Regex::new(rx).ok())
+        .collect();
     let out = (sy, im, r.block_scoped);
-    cache.lock().unwrap().insert(language.to_string(), out.clone());
+    cache
+        .lock()
+        .unwrap()
+        .insert(language.to_string(), out.clone());
     out
 }
 
-fn indent_of(line: &str) -> usize { line.chars().take_while(|c| c.is_whitespace()).count() }
+fn indent_of(line: &str) -> usize {
+    line.chars().take_while(|c| c.is_whitespace()).count()
+}
 
 /// End line of a unit: next non-empty line with indentation <= the unit's start (python) or matching brace depth (block-scoped).
 fn unit_end(lines: &[&str], start_idx: usize, block_scoped: bool) -> usize {
@@ -41,20 +186,37 @@ fn unit_end(lines: &[&str], start_idx: usize, block_scoped: bool) -> usize {
         let mut seen_open = false;
         for (i, line) in lines.iter().enumerate().skip(start_idx) {
             for ch in line.chars() {
-                if ch == '{' { depth += 1; seen_open = true; }
-                if ch == '}' { depth -= 1; }
+                if ch == '{' {
+                    depth += 1;
+                    seen_open = true;
+                }
+                if ch == '}' {
+                    depth -= 1;
+                }
             }
-            if seen_open && depth <= 0 { return i + 1; }
-            if !seen_open && line.trim_end().ends_with(';') && i > start_idx { return i + 1; }
-            if i - start_idx > 2000 { break; }
+            if seen_open && depth <= 0 {
+                return i + 1;
+            }
+            if !seen_open && line.trim_end().ends_with(';') && i > start_idx {
+                return i + 1;
+            }
+            if i - start_idx > 2000 {
+                break;
+            }
         }
-        if !seen_open { return start_idx + 1; }
+        if !seen_open {
+            return start_idx + 1;
+        }
         lines.len()
     } else {
         let base = indent_of(lines[start_idx]);
         for (i, line) in lines.iter().enumerate().skip(start_idx + 1) {
-            if line.trim().is_empty() { continue; }
-            if indent_of(line) <= base { return i; }
+            if line.trim().is_empty() {
+                continue;
+            }
+            if indent_of(line) <= base {
+                return i;
+            }
         }
         lines.len()
     }
@@ -63,26 +225,65 @@ fn unit_end(lines: &[&str], start_idx: usize, block_scoped: bool) -> usize {
 pub fn analyze(path: &str, language: &str, source: &str) -> CodeFacts {
     let (sy, im, block_scoped) = compiled(language);
     let lines: Vec<&str> = source.lines().collect();
-    let module = path.rsplit('/').next().unwrap_or(path).rsplit_once('.').map(|(a, _)| a.to_string()).unwrap_or(path.to_string());
-    let mut symbols = vec![Symbol { name: module.clone(), qualname: module.clone(), kind: "module".into(), lineno: 1, end_lineno: lines.len().max(1), parent: None, signature: String::new() }];
+    let module = path
+        .rsplit('/')
+        .next()
+        .unwrap_or(path)
+        .rsplit_once('.')
+        .map(|(a, _)| a.to_string())
+        .unwrap_or(path.to_string());
+    let mut symbols = vec![Symbol {
+        name: module.clone(),
+        qualname: module.clone(),
+        kind: "module".into(),
+        lineno: 1,
+        end_lineno: lines.len().max(1),
+        parent: None,
+        signature: String::new(),
+    }];
     let mut imports = vec![];
     let mut units = vec![];
     let mut stack: Vec<(usize, String, usize)> = vec![]; // (indent, qualname, end_line)
     for (i, line) in lines.iter().enumerate() {
         for rx in &im {
-            if let Some(c) = rx.captures(line) { imports.push(c[1].to_string()); }
+            if let Some(c) = rx.captures(line) {
+                imports.push(c[1].to_string());
+            }
         }
         for (rx, kind) in &sy {
             if let Some(c) = rx.captures(line) {
                 let name = c[1].to_string();
                 let ind = indent_of(line);
-                while let Some(top) = stack.last() { if top.0 >= ind || top.2 <= i { stack.pop(); } else { break; } }
+                while let Some(top) = stack.last() {
+                    if top.0 >= ind || top.2 <= i {
+                        stack.pop();
+                    } else {
+                        break;
+                    }
+                }
                 let parent = stack.last().map(|t| t.1.clone());
-                let qual = match &parent { Some(p) => format!("{p}.{name}"), None => name.clone() };
+                let qual = match &parent {
+                    Some(p) => format!("{p}.{name}"),
+                    None => name.clone(),
+                };
                 let end = unit_end(&lines, i, block_scoped);
-                let kind_final = if *kind == "function" && parent.is_some() { "method" } else { kind };
-                symbols.push(Symbol { name: name.clone(), qualname: qual.clone(), kind: kind_final.into(), lineno: i + 1, end_lineno: end, parent: parent.clone(), signature: line.trim().chars().take(120).collect() });
-                if parent.is_none() { units.push((qual.clone(), i + 1, end)); }
+                let kind_final = if *kind == "function" && parent.is_some() {
+                    "method"
+                } else {
+                    kind
+                };
+                symbols.push(Symbol {
+                    name: name.clone(),
+                    qualname: qual.clone(),
+                    kind: kind_final.into(),
+                    lineno: i + 1,
+                    end_lineno: end,
+                    parent: parent.clone(),
+                    signature: line.trim().chars().take(120).collect(),
+                });
+                if parent.is_none() {
+                    units.push((qual.clone(), i + 1, end));
+                }
                 stack.push((ind, qual, end));
                 break;
             }
@@ -93,20 +294,117 @@ pub fn analyze(path: &str, language: &str, source: &str) -> CodeFacts {
     // calls: identifiers followed by '(' inside each top-level unit, excluding keywords, definitions and the unit itself
     static CALL_RX: OnceLock<Regex> = OnceLock::new();
     let call_rx = CALL_RX.get_or_init(|| Regex::new(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(").unwrap());
-    const KEYWORDS: &[&str] = &["if", "for", "while", "switch", "return", "fn", "def", "class", "func", "function", "match", "catch", "print", "println", "printf", "assert", "elif", "except", "with", "sizeof", "new", "super", "self", "this", "impl", "struct", "enum", "trait", "type", "let", "var", "const", "import", "from", "async", "await", "lambda", "not", "and", "or", "in", "is", "as", "yield", "raise", "throw", "try", "typeof", "instanceof", "case", "defer", "go", "range", "make", "len", "cap", "append", "Some", "Ok", "Err", "None", "vec", "format", "panic", "unwrap", "expect", "json", "require", "export", "static", "extern", "unsafe", "loop", "where", "pub", "mod", "use", "test", "it", "describe"];
-    let defined: std::collections::HashSet<String> = symbols.iter().map(|s| s.name.clone()).collect();
+    const KEYWORDS: &[&str] = &[
+        "if",
+        "for",
+        "while",
+        "switch",
+        "return",
+        "fn",
+        "def",
+        "class",
+        "func",
+        "function",
+        "match",
+        "catch",
+        "print",
+        "println",
+        "printf",
+        "assert",
+        "elif",
+        "except",
+        "with",
+        "sizeof",
+        "new",
+        "super",
+        "self",
+        "this",
+        "impl",
+        "struct",
+        "enum",
+        "trait",
+        "type",
+        "let",
+        "var",
+        "const",
+        "import",
+        "from",
+        "async",
+        "await",
+        "lambda",
+        "not",
+        "and",
+        "or",
+        "in",
+        "is",
+        "as",
+        "yield",
+        "raise",
+        "throw",
+        "try",
+        "typeof",
+        "instanceof",
+        "case",
+        "defer",
+        "go",
+        "range",
+        "make",
+        "len",
+        "cap",
+        "append",
+        "Some",
+        "Ok",
+        "Err",
+        "None",
+        "vec",
+        "format",
+        "panic",
+        "unwrap",
+        "expect",
+        "json",
+        "require",
+        "export",
+        "static",
+        "extern",
+        "unsafe",
+        "loop",
+        "where",
+        "pub",
+        "mod",
+        "use",
+        "test",
+        "it",
+        "describe",
+    ];
+    let defined: std::collections::HashSet<String> =
+        symbols.iter().map(|s| s.name.clone()).collect();
     let mut calls: Vec<(String, String)> = vec![];
     for (qual, a, b) in &units {
-        let a1 = a.saturating_sub(1).min(lines.len()); let b1 = (*b).min(lines.len()).max(a1);
+        let a1 = a.saturating_sub(1).min(lines.len());
+        let b1 = (*b).min(lines.len()).max(a1);
         let text = lines[a1..b1].join("\n");
         let mut seen = std::collections::HashSet::new();
         for c in call_rx.captures_iter(&text) {
             let name = c[1].to_string();
-            if KEYWORDS.contains(&name.as_str()) || name == *qual || name.len() < 3 { continue; }
+            if KEYWORDS.contains(&name.as_str()) || name == *qual || name.len() < 3 {
+                continue;
+            }
             // skip definition lines of this unit (the unit's own header)
-            if !defined.contains(&name) && !text.lines().any(|l| l.contains(&format!("{name}("))) { continue; }
-            if seen.insert(name.clone()) { calls.push((qual.clone(), name)); }
+            if !defined.contains(&name) && !text.lines().any(|l| l.contains(&format!("{name}("))) {
+                continue;
+            }
+            if seen.insert(name.clone()) {
+                calls.push((qual.clone(), name));
+            }
         }
     }
-    CodeFacts { language: language.into(), provider: "builtin-generic".into(), symbols, imports, calls, units, degraded: None }
+    CodeFacts {
+        language: language.into(),
+        provider: "builtin-generic".into(),
+        symbols,
+        imports,
+        calls,
+        units,
+        degraded: None,
+    }
 }

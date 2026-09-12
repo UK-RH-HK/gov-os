@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.2/migration.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/migration.schema.json",
   "title": "migration",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -48,7 +48,8 @@
               "set_lock_field",
               "require_index_rebuild",
               "regenerate_adapters",
-              "note"
+              "note",
+              "set_overlay_rule"
             ]
           },
           "file": {
@@ -75,6 +76,21 @@
           },
           "if_missing": {
             "type": "boolean"
+          },
+          "list_key": {
+            "type": "string"
+          },
+          "match": {
+            "type": "object"
+          },
+          "set": {
+            "type": "object"
+          },
+          "add_if_missing": {
+            "type": "boolean"
+          },
+          "template_rule": {
+            "type": "object"
           }
         },
         "required": [
@@ -84,6 +100,49 @@
     },
     "rollback": {
       "type": "string"
+    },
+    "overlay_template_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "handled_by": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "handled_by",
+          "reason"
+        ]
+      }
+    },
+    "amendments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "what"
+        ]
+      }
     }
   },
   "required": [

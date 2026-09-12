@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.2/project-policy.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/project-policy.schema.json",
   "title": "project-policy",
   "x-schema-version": "1.0.0",
   "type": "object",

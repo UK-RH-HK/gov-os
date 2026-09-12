@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.2/decision.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/decision.schema.json",
   "title": "decision",
   "x-schema-version": "1.0.0",
   "type": "object",

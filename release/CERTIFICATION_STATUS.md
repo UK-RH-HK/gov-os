@@ -49,3 +49,23 @@ Repair iteration applied on branch `release/4.1.2-rc1` (not merged to `main`), p
 **Status of 4.1.3: READY_FOR_INDEPENDENT_REVERIFICATION — certification pending.** The implementer has not issued
 `OS_RELEASE_CANDIDATE_ACCEPTED` and must not; the 4.1.3 manifest `certification.status` records the pending state.
 Repair code commit: `78f6853`; the repair candidate commit adds `release/releases/4.1.3/` on top of it (hash in the handoff message and `git log`).
+
+
+---
+
+## Status of 4.1.3: REJECTED (OS_RELEASE_CANDIDATE_REJECTED) — independent re-verification 2026-09-12; report release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md
+
+Recorded by the release owner verbatim from the verifier's `release/verification/4.1.3/VERDICT.md` (the verifier was
+not permitted to edit shared release files). The 4.1.3 manifest certification block carries the same text; the kernel
+payload and `file_hashes` are untouched (`gov release verify release/releases/4.1.3` remains ok). Verifier artefacts
+under `release/verification/4.1.3/` were not modified.
+
+## Implementer repair statement (2026-09-12, second repair iteration)
+
+Repair candidate **4.1.4** on branch `release/4.1.4-rc1` (tag `v4.1.4-rc1` at the candidate commit; the rejected
+4.1.3 candidate is tagged `v4.1.3-rc1` at `26ab5b6`). Repair mapping for every finding of the re-verification:
+[release/repair/4.1.4/REPAIR_REPORT.md](repair/4.1.4/REPAIR_REPORT.md). Both independent harnesses were rerun
+unchanged (`release/verification/4.1.2/heldout-rerun-4.1.4/`, `release/verification/4.1.3/heldout-new-rerun-4.1.4/`).
+
+**Status of 4.1.4: READY_FOR_INDEPENDENT_REVERIFICATION — certification pending.** The implementer has not issued
+`OS_RELEASE_CANDIDATE_ACCEPTED` and must not.

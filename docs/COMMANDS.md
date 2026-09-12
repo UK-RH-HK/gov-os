@@ -39,9 +39,17 @@ Global flags: `--root <path>` (default: discovered upwards from cwd), `--json` (
 `gov memory benchmark --candidate <c> --candidate <c> [--heldout f] [--record]` (candidates: `current`, `builtin[:dim]`,
 `plugin:<id>[:dim]`, any `+rerank:<id>`) · `gov memory select <candidate> [--research RES-x] [--by who]` ·
 `gov memory heldout-starter [--force]` · `gov lessons cluster [--inbox d] [--proposals d] [--write]` ·
-`gov gate create --question … | present <HDG> | list` · `gov capabilities serve-embed [--reverse] [--id]` (the binary acting as an embed plugin) ·
+`gov gate create --question … | present <HDG> | list | revoke <HDG> [--reason]` · `gov capabilities serve-embed [--reverse] [--id]` (the binary acting as an embed plugin) ·
+`gov plugins register --descriptor f | list | health [--ping]` · `gov policy overrides | effective <POLICY>` · `gov update --rollback [--reason …]` ·
 `gov adapters generate|verify` · `gov tools list|registry|resolve --capability c [--role r]|install --descriptor f [--execute]|health` ·
 `gov capabilities ecosystems|plugins|invoke --plugin id --inputs json` · `gov verify governance|product` · `gov version`
+
+Human approval is derived, never supplied: `gov cit approve` requires the CIT's gate presented and answered A
+(`GATE_NOT_PRESENTED`, `GATE_NOT_ANSWERED`, `GATE_DECLINED`, `GATE_REVOKED`, `GATE_MISMATCH`, `APPROVAL_METHOD_MISMATCH`)
+and `gov cit execute` revalidates it (`APPROVAL_STALE`). Policy overrides that weaken a floor are refused
+(`gov policy overrides` lists them; doctor D027). Plugin execution errors: `PLUGIN_DESCRIPTOR_INVALID`,
+`PLUGIN_NOT_AUTHORIZED`, `PLUGIN_NOT_APPROVED`, `PLUGIN_PIN_MISMATCH`, `PLUGIN_UNHEALTHY` (doctor D028).
+Rollback errors: `SNAPSHOT_MISSING`, `SNAPSHOT_CONSUMED`. Release build: `MIGRATION_INCOMPLETE`.
 
 Authority: every mutating command checks the session role's level (L0–L5) against
 `AUTHORITY_POLICY.authority_levels_required` and fails with `AUTHORITY_DENIED` (or `UNKNOWN_ROLE`). Gates are answered

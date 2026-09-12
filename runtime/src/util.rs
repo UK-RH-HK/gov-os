@@ -16,13 +16,15 @@ pub fn read_bytes(p: &Path) -> Result<Vec<u8>> {
 }
 pub fn write_text(p: &Path, s: &str) -> Result<()> {
     if let Some(parent) = p.parent() {
-        fs::create_dir_all(parent).map_err(|e| GovError::io(&format!("mkdir {}", parent.display()), e))?;
+        fs::create_dir_all(parent)
+            .map_err(|e| GovError::io(&format!("mkdir {}", parent.display()), e))?;
     }
     fs::write(p, s).map_err(|e| GovError::io(&format!("write {}", p.display()), e))
 }
 pub fn read_yaml(p: &Path) -> Result<Value> {
     let text = read_text(p)?;
-    let v: Value = serde_yaml::from_str(&text).map_err(|e| GovError::new("YAML_ERROR", format!("{}: {e}", p.display())))?;
+    let v: Value = serde_yaml::from_str(&text)
+        .map_err(|e| GovError::new("YAML_ERROR", format!("{}: {e}", p.display())))?;
     Ok(if v.is_null() { json!({}) } else { v })
 }
 pub fn write_yaml(p: &Path, v: &Value) -> Result<()> {
@@ -34,12 +36,19 @@ pub fn to_yaml(v: &Value) -> Result<String> {
     // YAML 1.1 loaders would read unquoted dates/timestamps as datetime objects; our schemas declare strings.
     static TS: OnceLock<Regex> = OnceLock::new();
     let rx = TS.get_or_init(|| Regex::new(r"^(\s*(?:- )?(?:[A-Za-z_][\w.-]*: )?)(\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})?)?)\s*$").unwrap());
-    let out: Vec<String> = raw.lines().map(|l| match rx.captures(l) { Some(c) => format!("{}'{}'", &c[1], &c[2]), None => l.to_string() }).collect();
+    let out: Vec<String> = raw
+        .lines()
+        .map(|l| match rx.captures(l) {
+            Some(c) => format!("{}'{}'", &c[1], &c[2]),
+            None => l.to_string(),
+        })
+        .collect();
     Ok(out.join("\n") + "\n")
 }
 pub fn read_json(p: &Path) -> Result<Value> {
     let text = read_text(p)?;
-    serde_json::from_str(&text).map_err(|e| GovError::new("JSON_ERROR", format!("{}: {e}", p.display())))
+    serde_json::from_str(&text)
+        .map_err(|e| GovError::new("JSON_ERROR", format!("{}: {e}", p.display())))
 }
 pub fn write_json(p: &Path, v: &Value) -> Result<()> {
     let s = serde_json::to_string_pretty(&sorted(v))?;
@@ -83,11 +92,20 @@ pub fn sha256_file(p: &Path) -> Result<String> {
 /// Deterministic tree hash: (tree_hash, {relpath: filehash}) skipping excluded globs.
 pub fn hash_tree(root: &Path, exclude: &[&str]) -> Result<(String, BTreeMap<String, String>)> {
     let mut files = BTreeMap::new();
-    for entry in walkdir::WalkDir::new(root).sort_by_file_name().into_iter().filter_map(|e| e.ok()) {
+    for entry in walkdir::WalkDir::new(root)
+        .sort_by_file_name()
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
         if !entry.file_type().is_file() {
             continue;
         }
-        let rel = entry.path().strip_prefix(root).unwrap_or(entry.path()).to_string_lossy().replace('\\', "/");
+        let rel = entry
+            .path()
+            .strip_prefix(root)
+            .unwrap_or(entry.path())
+            .to_string_lossy()
+            .replace('\\', "/");
         if exclude.iter().any(|pat| glob_match(pat, &rel)) {
             continue;
         }
@@ -151,7 +169,10 @@ pub fn glob_to_regex(pattern: &str) -> Regex {
     }
     out.push('$');
     let rx = Regex::new(&out).unwrap_or_else(|_| Regex::new("^$").unwrap());
-    cache.lock().unwrap().insert(pattern.to_string(), rx.clone());
+    cache
+        .lock()
+        .unwrap()
+        .insert(pattern.to_string(), rx.clone());
     rx
 }
 
@@ -192,7 +213,9 @@ pub fn deep_set(v: &mut Value, dotted: &str, value: Value) {
     if !cur.is_object() {
         *cur = json!({});
     }
-    cur.as_object_mut().unwrap().insert(parts[parts.len() - 1].to_string(), value);
+    cur.as_object_mut()
+        .unwrap()
+        .insert(parts[parts.len() - 1].to_string(), value);
 }
 pub fn deep_delete(v: &mut Value, dotted: &str) -> bool {
     let parts: Vec<&str> = dotted.split('.').collect();
@@ -203,7 +226,9 @@ pub fn deep_delete(v: &mut Value, dotted: &str) -> bool {
             None => return false,
         }
     }
-    cur.as_object_mut().map(|m| m.shift_remove(parts[parts.len() - 1]).is_some()).unwrap_or(false)
+    cur.as_object_mut()
+        .map(|m| m.shift_remove(parts[parts.len() - 1]).is_some())
+        .unwrap_or(false)
 }
 pub fn str_of(v: &Value, key: &str) -> String {
     match v.get(key) {
@@ -215,7 +240,10 @@ pub fn str_of(v: &Value, key: &str) -> String {
 }
 pub fn str_list(v: &Value, key: &str) -> Vec<String> {
     match v.get(key) {
-        Some(Value::Array(a)) => a.iter().filter_map(|x| x.as_str().map(|s| s.to_string())).collect(),
+        Some(Value::Array(a)) => a
+            .iter()
+            .filter_map(|x| x.as_str().map(|s| s.to_string()))
+            .collect(),
         Some(Value::String(s)) => vec![s.clone()],
         _ => vec![],
     }
@@ -249,11 +277,17 @@ pub fn is_text_file(p: &Path) -> bool {
 }
 
 pub fn rel_posix(p: &Path, root: &Path) -> String {
-    p.strip_prefix(root).unwrap_or(p).to_string_lossy().replace('\\', "/")
+    p.strip_prefix(root)
+        .unwrap_or(p)
+        .to_string_lossy()
+        .replace('\\', "/")
 }
 
 pub fn copy_dir(src: &Path, dst: &Path) -> Result<()> {
-    for entry in walkdir::WalkDir::new(src).into_iter().filter_map(|e| e.ok()) {
+    for entry in walkdir::WalkDir::new(src)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
         let rel = entry.path().strip_prefix(src).unwrap();
         let target = dst.join(rel);
         if entry.file_type().is_dir() {
@@ -283,9 +317,16 @@ pub fn run_cmd(cmd: &[String], cwd: &Path) -> Result<(i32, String, String)> {
     if cmd.is_empty() {
         return Err(GovError::new("USAGE", "empty command"));
     }
-    let out = std::process::Command::new(&cmd[0]).args(&cmd[1..]).current_dir(cwd).output();
+    let out = std::process::Command::new(&cmd[0])
+        .args(&cmd[1..])
+        .current_dir(cwd)
+        .output();
     match out {
-        Ok(o) => Ok((o.status.code().unwrap_or(-1), String::from_utf8_lossy(&o.stdout).to_string(), String::from_utf8_lossy(&o.stderr).to_string())),
+        Ok(o) => Ok((
+            o.status.code().unwrap_or(-1),
+            String::from_utf8_lossy(&o.stdout).to_string(),
+            String::from_utf8_lossy(&o.stderr).to_string(),
+        )),
         Err(e) => Ok((-1, String::new(), e.to_string())),
     }
 }
@@ -309,7 +350,10 @@ mod tests {
         let a = json!({"b": 1, "a": [3, {"z": 1, "y": 2}]});
         let b = json!({"a": [3, {"y": 2, "z": 1}], "b": 1});
         assert_eq!(hash_value(&a), hash_value(&b));
-        assert_eq!(sha256_text("abc"), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+        assert_eq!(
+            sha256_text("abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
     }
     #[test]
     fn deep_helpers() {
@@ -318,6 +362,13 @@ mod tests {
         assert_eq!(deep_get(&v, "a.b.c"), Some(&json!(1)));
         assert!(deep_delete(&mut v, "a.b.c"));
         assert_eq!(deep_get(&v, "a.b.c"), None);
-        assert_eq!(next_id("TASK", &["TASK-0003".into(), "TASK-0010".into(), "D-0099".into()], 4), "TASK-0011");
+        assert_eq!(
+            next_id(
+                "TASK",
+                &["TASK-0003".into(), "TASK-0010".into(), "D-0099".into()],
+                4
+            ),
+            "TASK-0011"
+        );
     }
 }

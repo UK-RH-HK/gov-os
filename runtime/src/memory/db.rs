@@ -40,8 +40,12 @@ pub fn row_to_json(row: &rusqlite::Row, cols: &[String]) -> Value {
             Ok(rusqlite::types::ValueRef::Null) => Value::Null,
             Ok(rusqlite::types::ValueRef::Integer(n)) => json!(n),
             Ok(rusqlite::types::ValueRef::Real(f)) => json!(f),
-            Ok(rusqlite::types::ValueRef::Text(t)) => Value::String(String::from_utf8_lossy(t).to_string()),
-            Ok(rusqlite::types::ValueRef::Blob(b)) => Value::String(format!("<blob {} bytes>", b.len())),
+            Ok(rusqlite::types::ValueRef::Text(t)) => {
+                Value::String(String::from_utf8_lossy(t).to_string())
+            }
+            Ok(rusqlite::types::ValueRef::Blob(b)) => {
+                Value::String(format!("<blob {} bytes>", b.len()))
+            }
             Err(_) => Value::Null,
         };
         m.insert(c.clone(), v);
@@ -51,35 +55,59 @@ pub fn row_to_json(row: &rusqlite::Row, cols: &[String]) -> Value {
 
 impl RuntimeDb {
     pub fn open(path: &Path) -> Result<Self> {
-        if let Some(p) = path.parent() { std::fs::create_dir_all(p)?; }
+        if let Some(p) = path.parent() {
+            std::fs::create_dir_all(p)?;
+        }
         let conn = Connection::open(path)?;
         conn.execute_batch("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;")?;
         Ok(RuntimeDb { conn })
     }
     pub fn open_memory() -> Result<Self> {
-        let db = RuntimeDb { conn: Connection::open_in_memory()? };
+        let db = RuntimeDb {
+            conn: Connection::open_in_memory()?,
+        };
         db.init_schema()?;
         Ok(db)
     }
-    pub fn init_schema(&self) -> Result<()> { self.init_schema_with("unicode61") }
+    pub fn init_schema(&self) -> Result<()> {
+        self.init_schema_with("unicode61")
+    }
     /// Create the schema; the FTS5 tokenizer is part of the lexical pin (MEMORY_POLICY.lexical.tokenizer).
     pub fn init_schema_with(&self, tokenizer: &str) -> Result<()> {
-        let safe: String = tokenizer.chars().filter(|c| c.is_ascii_alphanumeric() || *c == ' ' || *c == '_').collect();
-        self.conn.execute_batch(&SCHEMA.replace("__TOKENIZER__", if safe.is_empty() { "unicode61" } else { &safe }))?;
+        let safe: String = tokenizer
+            .chars()
+            .filter(|c| c.is_ascii_alphanumeric() || *c == ' ' || *c == '_')
+            .collect();
+        self.conn.execute_batch(&SCHEMA.replace(
+            "__TOKENIZER__",
+            if safe.is_empty() { "unicode61" } else { &safe },
+        ))?;
         Ok(())
     }
     pub fn integrity_ok(&self) -> bool {
-        self.conn.query_row("PRAGMA integrity_check", [], |r| r.get::<_, String>(0)).map(|s| s == "ok").unwrap_or(false)
+        self.conn
+            .query_row("PRAGMA integrity_check", [], |r| r.get::<_, String>(0))
+            .map(|s| s == "ok")
+            .unwrap_or(false)
     }
     pub fn has_schema(&self) -> bool {
-        self.conn.query_row("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='artifacts'", [], |r| r.get::<_, i64>(0)).map(|n| n > 0).unwrap_or(false)
+        self.conn
+            .query_row(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='artifacts'",
+                [],
+                |r| r.get::<_, i64>(0),
+            )
+            .map(|n| n > 0)
+            .unwrap_or(false)
     }
     pub fn query(&self, sql: &str, params: &[&dyn rusqlite::ToSql]) -> Result<Vec<Value>> {
         let mut stmt = self.conn.prepare(sql)?;
         let cols: Vec<String> = stmt.column_names().iter().map(|s| s.to_string()).collect();
         let rows = stmt.query_map(params, |row| Ok(row_to_json(row, &cols)))?;
         let mut out = vec![];
-        for r in rows { out.push(r?); }
+        for r in rows {
+            out.push(r?);
+        }
         Ok(out)
     }
     pub fn query_one(&self, sql: &str, params: &[&dyn rusqlite::ToSql]) -> Result<Option<Value>> {
@@ -89,37 +117,90 @@ impl RuntimeDb {
         Ok(self.conn.execute(sql, params)?)
     }
     pub fn count(&self, table: &str) -> i64 {
-        self.conn.query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |r| r.get(0)).unwrap_or(0)
+        self.conn
+            .query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |r| r.get(0))
+            .unwrap_or(0)
     }
     pub fn counts(&self) -> Value {
         let mut m = Map::new();
-        for t in ["artifacts", "chunks", "vectors", "edges", "symbols", "symbol_refs", "excluded"] {
+        for t in [
+            "artifacts",
+            "chunks",
+            "vectors",
+            "edges",
+            "symbols",
+            "symbol_refs",
+            "excluded",
+        ] {
             m.insert(t.into(), json!(self.count(t)));
         }
         Value::Object(m)
     }
     pub fn get_meta(&self, key: &str) -> Option<Value> {
-        self.conn.query_row("SELECT value FROM meta WHERE key=?1", params![key], |r| r.get::<_, String>(0)).optional().ok().flatten().and_then(|s| serde_json::from_str(&s).ok())
+        self.conn
+            .query_row("SELECT value FROM meta WHERE key=?1", params![key], |r| {
+                r.get::<_, String>(0)
+            })
+            .optional()
+            .ok()
+            .flatten()
+            .and_then(|s| serde_json::from_str(&s).ok())
     }
     pub fn set_meta(&self, key: &str, value: &Value) -> Result<()> {
-        self.conn.execute("INSERT OR REPLACE INTO meta(key,value) VALUES (?1,?2)", params![key, serde_json::to_string(value)?])?;
+        self.conn.execute(
+            "INSERT OR REPLACE INTO meta(key,value) VALUES (?1,?2)",
+            params![key, serde_json::to_string(value)?],
+        )?;
         Ok(())
     }
     pub fn delete_artifact(&self, artifact_id: &str) -> Result<()> {
-        let path: Option<String> = self.conn.query_row("SELECT path FROM artifacts WHERE artifact_id=?1", params![artifact_id], |r| r.get(0)).optional()?;
-        self.conn.execute("DELETE FROM chunks_fts WHERE artifact_id=?1", params![artifact_id])?;
-        self.conn.execute("DELETE FROM vectors WHERE artifact_id=?1", params![artifact_id])?;
-        self.conn.execute("DELETE FROM chunks WHERE artifact_id=?1", params![artifact_id])?;
-        self.conn.execute("DELETE FROM edges WHERE source_artifact=?1", params![artifact_id])?;
+        let path: Option<String> = self
+            .conn
+            .query_row(
+                "SELECT path FROM artifacts WHERE artifact_id=?1",
+                params![artifact_id],
+                |r| r.get(0),
+            )
+            .optional()?;
+        self.conn.execute(
+            "DELETE FROM chunks_fts WHERE artifact_id=?1",
+            params![artifact_id],
+        )?;
+        self.conn.execute(
+            "DELETE FROM vectors WHERE artifact_id=?1",
+            params![artifact_id],
+        )?;
+        self.conn.execute(
+            "DELETE FROM chunks WHERE artifact_id=?1",
+            params![artifact_id],
+        )?;
+        self.conn.execute(
+            "DELETE FROM edges WHERE source_artifact=?1",
+            params![artifact_id],
+        )?;
         if let Some(p) = path {
-            self.conn.execute("DELETE FROM symbols WHERE path=?1", params![p])?;
-            self.conn.execute("DELETE FROM symbol_refs WHERE path=?1", params![p])?;
+            self.conn
+                .execute("DELETE FROM symbols WHERE path=?1", params![p])?;
+            self.conn
+                .execute("DELETE FROM symbol_refs WHERE path=?1", params![p])?;
         }
-        self.conn.execute("DELETE FROM artifacts WHERE artifact_id=?1", params![artifact_id])?;
+        self.conn.execute(
+            "DELETE FROM artifacts WHERE artifact_id=?1",
+            params![artifact_id],
+        )?;
         Ok(())
     }
     pub fn clear_index(&self) -> Result<()> {
-        for t in ["chunks_fts", "vectors", "chunks", "edges", "symbols", "symbol_refs", "artifacts", "excluded"] {
+        for t in [
+            "chunks_fts",
+            "vectors",
+            "chunks",
+            "edges",
+            "symbols",
+            "symbol_refs",
+            "artifacts",
+            "excluded",
+        ] {
             self.conn.execute(&format!("DELETE FROM {t}"), [])?;
         }
         Ok(())
@@ -131,8 +212,22 @@ impl RuntimeDb {
         self.query_one("SELECT * FROM artifacts WHERE path=?1", &[&path])
     }
     pub fn artifact_ids(&self) -> Result<std::collections::HashSet<String>> {
-        Ok(self.query("SELECT artifact_id FROM artifacts", &[])?.into_iter().filter_map(|v| v.get("artifact_id").and_then(|x| x.as_str()).map(|s| s.to_string())).collect())
+        Ok(self
+            .query("SELECT artifact_id FROM artifacts", &[])?
+            .into_iter()
+            .filter_map(|v| {
+                v.get("artifact_id")
+                    .and_then(|x| x.as_str())
+                    .map(|s| s.to_string())
+            })
+            .collect())
     }
-    pub fn begin(&self) -> Result<()> { self.conn.execute_batch("BEGIN")?; Ok(()) }
-    pub fn commit(&self) -> Result<()> { self.conn.execute_batch("COMMIT")?; Ok(()) }
+    pub fn begin(&self) -> Result<()> {
+        self.conn.execute_batch("BEGIN")?;
+        Ok(())
+    }
+    pub fn commit(&self) -> Result<()> {
+        self.conn.execute_batch("COMMIT")?;
+        Ok(())
+    }
 }

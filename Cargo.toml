@@ -3,7 +3,7 @@ members = ["runtime", "cli"]
 resolver = "2"
 
 [workspace.package]
-version = "4.1.3"
+version = "4.1.4"
 edition = "2021"
 license = "Proprietary"
 rust-version = "1.80"

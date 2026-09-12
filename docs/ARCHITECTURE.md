@@ -1,4 +1,4 @@
-# Governance OS — Architecture (repair candidate 4.1.3)
+# Governance OS — Architecture (repair candidate 4.1.4)
 
 Source framework: [DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md](../DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md),
 [release/distribution protocol v1.2](../GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md),
@@ -125,7 +125,18 @@ touched by `gov rebuild-memory` (doctor D026 checks the claims store). Everythin
 (reason `sensitivity:<class>`), never retrievable, export-denied, and a dangling import to it is recorded as
 `excluded:<path>`. The suite family reports such artefacts in the index as CRITICAL.
 
-## 4.5 Authority and policy enforcement
+## 4.5 Constitutional policy precedence
+`framework/policies/POLICY_PRECEDENCE.yaml` is kernel data: an ordered list of layers (hard invariants →
+security/authority → kernel policy → project policy → decisions/spec → task contracts → retrieved context) and, per
+policy key, a mode — `immutable`, `floor` (only raise), `ceiling` (only lower), `additive` (lists may only grow),
+`shrink_only`, `strengthen_only_bool`, `overridable`; keys without a rule are not overridable (deny by default).
+`policy_precedence::evaluate` decides every `PROJECT_POLICY.policy_overrides` entry and every `PROJECT_EXCEPTIONS`
+entry (which additionally needs a decision record and may relax only keys flagged `exception_relaxable`) before it
+touches the effective policy. A refused override is recorded (`gov policy overrides`), reported by doctor D027
+(CRITICAL), by the suite family `policy_precedence` and in context-packet layer 3, and leaves the effective policy
+unchanged. Authority requirements can therefore only be raised, never lowered, by a repository.
+
+## 4.6 Authority and policy enforcement
 `authority::require(project, operation)` maps the session role (ROLES.yaml level L0–L5, `UNKNOWN_ROLE` otherwise)
 against `AUTHORITY_POLICY.authority_levels_required` (missing operation → L3) and returns `AUTHORITY_DENIED` with the
 required and actual level. It guards task create/status/claim/release/close, CIT propose/simulate/approve/execute/
@@ -134,6 +145,31 @@ update apply/rollback, tool install, adoption batches, upstream prepare/submit, 
 `framework/policies/ENFORCEMENT_MAP.yaml` maps every policy key to its enforcing function; `policy_coverage::report`
 verifies the map against the core and the `policy_enforcement_coverage` suite family fails on any unmapped key
 (decision D-0003).
+
+## 4.7 Governed capability plugins
+A plugin descriptor is discovery, not authorisation (D-0005). `capabilities::governance::plugin_set` classifies every
+descriptor for the acting role: **rejected** (fails the kernel `plugin-descriptor` schema — identity, version pin and
+capability required — never executable), **denied** (valid but the role may not trigger it) or **usable**. Execution
+requires: the role at/above `TOOL_POLICY.plugins.min_authority` for hand-declared descriptors or in `approved_roles`
+for registered ones; every `required_permission_classes` entry held by the role (TOOL_PERMISSIONS); a presented,
+answered registration gate for elevated permissions (`gov plugins register`); a resolvable executable; and a content
+pin — a declared `pin.sha256` must match, and an implementation that changes without a version change is refused
+(`PLUGIN_PIN_MISMATCH`). Plugins appear in the generated Tool/Capability Registry as `type: plugin`; doctor D028 and
+the suite family `plugin_governance` report invalid, denied or drifting plugins.
+
+## 4.8 Human Decision Gates and CIT approval
+Human approval is never caller-supplied. `cit approve` derives the approval from the gate record raised for that
+transaction: the gate must reference the CIT, be presented (`presented_by`/`presented_at`), be ANSWERED with option A,
+and its decision record (written by `gov decide`) must be ACTIVE; the approval object records gate, decision,
+answerer, answer kind and time, presenter and recorder. A presented-but-unanswered gate is `GATE_NOT_ANSWERED`, a
+decline is `GATE_DECLINED` and marks the CIT REJECTED, a withdrawn gate is `GATE_REVOKED`, a re-answered or replaced
+gate makes the approval `APPROVAL_STALE`. `cit execute` revalidates the same state before touching the repository.
+Without a gate only the automatic path within `CHANGE_POLICY.auto_approve_max_radius` exists and its decision record
+carries `human_approved: false`. `gov gate revoke` withdraws a gate and every approval derived from it.
+
+**Trust boundary.** The acting role is declared by the caller (`--role`, `GOV_ROLE`); the OS enforces what a role may
+do but does not authenticate who holds the session. Deployments that need authenticated human answers must bind
+`gov decide` to an authenticated channel (adapter responsibility); this is a documented boundary, not a hidden one.
 
 ## 5. Change control
 
@@ -159,13 +195,32 @@ the removal and defers its scaffolded tests with the recorded reason); every bat
 rolled back when independent tests fail. `ARCHIVE_POLICY.unused_code_action` decides between removal and archival of
 dead code. Catalogue entries carry `imports`/`references`/`consumers` from the import graph.
 
+### 6.1 Observed mutation scope
+`task claim` snapshots the working tree (git `ls-files -co --exclude-standard` + sha256; walk fallback). `task close`
+diffs the tree against that baseline, discards OS-managed paths (generated views, evidence records, gate/CIT/task
+records) and contract-declared generated classes, and compares the observed set with the report's `files_changed`
+and the task contract: undeclared or out-of-scope changes are `MUTATION_SCOPE_VIOLATION` unless a committed CIT
+governs them (propagation writes count as governed). The report and checkpoint record `observed_files_changed` and
+the baseline used.
+
 ## 7. Releases, updates, upstream learning
 
 `gov release build` stages an immutable payload + manifest (file hashes, schema/CLI/runtime/adapter versions,
 migration ids, index rebuilds, breaking changes, human gates, rollback procedure, certification status).
 `gov update --check` is a CIT-P against the project and creates the framework-update gate; `--apply` requires that
 gate presented and answered (`--approve` alone returns `applied: false`), snapshots kernel/overlay/lock/generated,
-replaces the kernel only, runs declarative migrations (overlay/lock/generated only — never `spec/` or `product/`), verifies overlay
+replaces the kernel only, applies the declared migration chain, then **reconciles template defaults**: every overlay
+leaf that still equals the OLD kernel template inherits the NEW default (rule lists keyed by `pattern`/`id`), values
+the project customised are preserved, and each change is listed in `overlay_reconciled`. The lock records the
+release's commit (`release_commit`, from the release manifest / embedded payload / framework checkout — never the
+consumer's HEAD, which goes to `installed_at_commit`) and a logical `source` label. `gov update --rollback [--reason]`
+restores the snapshot, appends a `rollback` entry to `spec/reports/framework-updates.jsonl` (source and target
+versions, identity and authority level, reason, migrations reverted, resulting lock, verification) and consumes the
+snapshot (`SNAPSHOT_CONSUMED` on a second attempt). Migrations may use `set_overlay_rule` to change one element of a
+rule list; `gov release build` refuses a new version whose migrations neither perform nor declare
+(`overlay_template_changes`) an overlay-template change, and reproduces an already-released version from its recorded
+`release_commit` (`git archive`) rather than the working tree.
+It then runs declarative migrations (overlay/lock/generated only — never `spec/` or `product/`), verifies overlay
 preservation, regenerates adapters, rebuilds indexes, runs doctor + suite, and rolls back on failure.
 `gov upstream prepare` builds a sanitised FRAMEWORK lesson packet (identifier redaction incl. hyphen/underscore
 variants over every emitted field, path stripping, secret and code-line scans, `never_export_classes`,

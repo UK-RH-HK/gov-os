@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.2/release-manifest.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/release-manifest.schema.json",
   "title": "release-manifest",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "framework": {
@@ -104,6 +104,32 @@
     },
     "immutable": {
       "const": true
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "release_branch": {
+          "type": "string"
+        },
+        "release_tag": {
+          "type": "string"
+        },
+        "reproduced_from_commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kernel_source": {
+          "type": "string"
+        },
+        "migration_substance_problems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [

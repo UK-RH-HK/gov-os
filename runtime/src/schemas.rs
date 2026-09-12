@@ -13,7 +13,10 @@ pub struct SchemaRegistry {
 
 impl SchemaRegistry {
     pub fn new(schema_dir: &Path) -> Self {
-        SchemaRegistry { schema_dir: schema_dir.to_path_buf(), cache: Mutex::new(BTreeMap::new()) }
+        SchemaRegistry {
+            schema_dir: schema_dir.to_path_buf(),
+            cache: Mutex::new(BTreeMap::new()),
+        }
     }
     pub fn has(&self, name: &str) -> bool {
         self.schema_dir.join(format!("{name}.schema.json")).exists()
@@ -24,10 +27,16 @@ impl SchemaRegistry {
         }
         let p = self.schema_dir.join(format!("{name}.schema.json"));
         if !p.exists() {
-            return Err(GovError::new("SCHEMA_NOT_FOUND", format!("schema not found: {name} ({})", p.display())));
+            return Err(GovError::new(
+                "SCHEMA_NOT_FOUND",
+                format!("schema not found: {name} ({})", p.display()),
+            ));
         }
         let v = read_json(&p)?;
-        self.cache.lock().unwrap().insert(name.to_string(), v.clone());
+        self.cache
+            .lock()
+            .unwrap()
+            .insert(name.to_string(), v.clone());
         Ok(v)
     }
     pub fn errors(&self, name: &str, data: &Value) -> Result<Vec<String>> {
@@ -40,7 +49,15 @@ impl SchemaRegistry {
         if let Err(errs) = compiled.validate(data) {
             for e in errs {
                 let loc = e.instance_path.to_string();
-                out.push(format!("{}: {}", if loc.is_empty() { "<root>".to_string() } else { loc }, e));
+                out.push(format!(
+                    "{}: {}",
+                    if loc.is_empty() {
+                        "<root>".to_string()
+                    } else {
+                        loc
+                    },
+                    e
+                ));
             }
         }
         out.sort();
@@ -51,15 +68,27 @@ impl SchemaRegistry {
         if errs.is_empty() {
             Ok(())
         } else {
-            Err(GovError::new("SCHEMA_INVALID", format!("schema validation failed for {name} {context}: {}", errs.iter().take(6).cloned().collect::<Vec<_>>().join("; ")))
-                .with_details(serde_json::json!({"errors": errs})))
+            Err(GovError::new(
+                "SCHEMA_INVALID",
+                format!(
+                    "schema validation failed for {name} {context}: {}",
+                    errs.iter().take(6).cloned().collect::<Vec<_>>().join("; ")
+                ),
+            )
+            .with_details(serde_json::json!({"errors": errs})))
         }
     }
     pub fn names(&self) -> Vec<String> {
-        let mut v: Vec<String> = std::fs::read_dir(&self.schema_dir).map(|rd| rd.filter_map(|e| e.ok()).filter_map(|e| {
-            let n = e.file_name().to_string_lossy().to_string();
-            n.strip_suffix(".schema.json").map(|s| s.to_string())
-        }).collect()).unwrap_or_default();
+        let mut v: Vec<String> = std::fs::read_dir(&self.schema_dir)
+            .map(|rd| {
+                rd.filter_map(|e| e.ok())
+                    .filter_map(|e| {
+                        let n = e.file_name().to_string_lossy().to_string();
+                        n.strip_suffix(".schema.json").map(|s| s.to_string())
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
         v.sort();
         v
     }
