@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-engineering-os"
+version = "4.1.2"
+description = "Governance OS: model-agnostic Dynamic Agentic Software Engineering Operating Framework kernel, runtime and gov CLI"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Proprietary"}
+dependencies = ["pyyaml>=6.0", "jsonschema>=4.10"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+gov = "govos.cli.main:main"
+
+[tool.setuptools]
+packages = ["govos", "govos.cli", "govos.runtime", "govos.runtime.memory", "govos.runtime.retrieval",
+  "govos.runtime.graph", "govos.runtime.code_intelligence", "govos.runtime.context", "govos.runtime.cit",
+  "govos.runtime.orchestration", "govos.runtime.checkpoints", "govos.runtime.observability",
+  "govos.runtime.routing", "govos.runtime.security", "govos.runtime.verification", "govos.runtime.skills",
+  "govos.tools", "govos.migrations", "govos.release"]
+
+[tool.setuptools.package-data]
+govos = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/test-obligation.schema.json",
+  "title": "test-obligation",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "type": {
+      "const": "test-obligation"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "PROVISIONAL",
+        "SUPERSEDED",
+        "LEGACY",
+        "HISTORICAL",
+        "REJECTED",
+        "DEPRECATED",
+        "RETIRED"
+      ]
+    },
+    "state_class": {
+      "type": "string",
+      "enum": [
+        "AUTHORITATIVE",
+        "DERIVED",
+        "NARRATIVE",
+        "EVIDENCE",
+        "HISTORICAL",
+        "UNKNOWN_OR_CONFLICTING"
+      ]
+    },
+    "created": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    },
+    "owner_role": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DEPENDS_ON",
+              "BLOCKS",
+              "IMPLEMENTS",
+              "REALISES",
+              "GOVERNED_BY",
+              "CONSTRAINS",
+              "DERIVED_FROM",
+              "SUPERSEDES",
+              "VALIDATED_BY",
+              "TESTS",
+              "USES",
+              "PRODUCES",
+              "CONSUMES",
+              "AFFECTS",
+              "GENERATED_FROM",
+              "CALLS",
+              "IMPORTS",
+              "OWNS",
+              "FAILED_BECAUSE",
+              "LEARNED_FROM"
+            ]
+          },
+          "target": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "target"
+        ]
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "superseded_by": {
+      "type": "string"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "implements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "governed_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validated_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "derived_from": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "staleness": {
+      "type": "object"
+    },
+    "legacy_source": {
+      "type": "string"
+    },
+    "feature": {
+      "type": "string"
+    },
+    "scenario": {
+      "type": "string"
+    },
+    "family": {
+      "type": "string"
+    },
+    "test_path": {
+      "type": "string"
+    },
+    "author_role": {
+      "type": "string"
+    },
+    "independent_of_implementer": {
+      "type": "boolean"
+    },
+    "data_provenance": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "status",
+    "family"
+  ]
+}

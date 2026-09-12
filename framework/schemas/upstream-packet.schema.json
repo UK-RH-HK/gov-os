@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/upstream-packet.schema.json",
+  "title": "upstream-packet",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "packet_id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "lesson_id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "scope": {
+      "const": "FRAMEWORK"
+    },
+    "category": {
+      "type": "string"
+    },
+    "problem_statement": {
+      "type": "string"
+    },
+    "generic_failure_mode": {
+      "type": "string"
+    },
+    "impact": {
+      "type": "string"
+    },
+    "evidence_strength": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "suggested_framework_change": {
+      "type": "string"
+    },
+    "source_project_alias": {
+      "type": "string"
+    },
+    "local_reference": {
+      "type": "string"
+    },
+    "sensitive_content_removed": {
+      "const": true
+    },
+    "raw_product_code_included": {
+      "const": false
+    },
+    "raw_customer_data_included": {
+      "const": false
+    },
+    "raw_spec_included": {
+      "const": false
+    },
+    "synthetic_fixture": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "metrics": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "payload_hash": {
+      "type": "string"
+    },
+    "prepared_at": {
+      "type": "string"
+    },
+    "framework_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "approval": {
+      "type": "object"
+    },
+    "scans": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "packet_id",
+    "lesson_id",
+    "scope",
+    "category",
+    "problem_statement",
+    "generic_failure_mode",
+    "impact",
+    "evidence_strength",
+    "suggested_framework_change",
+    "source_project_alias",
+    "sensitive_content_removed",
+    "raw_product_code_included",
+    "raw_customer_data_included",
+    "raw_spec_included"
+  ]
+}

@@ -1,0 +1,18 @@
+id: SKL-MEMORY-RECONSTRUCTION
+name: Memory reconstruction
+version: 1.0.0
+status: ACTIVE
+model_agnostic: true
+roles: [memory-engineer]
+task_classes: [memory]
+purpose: "Rebuild derived memory from Git and authoritative records and prove manifest equivalence."
+required_permissions: [READ_REPO, WRITE_REPO_SCOPED]
+required_tools: [TOOL-FS-001, TOOL-SQLITE-001]
+inputs: [repository]
+outputs: [rebuilt runtime, index manifest, verification]
+method:
+  - {step: delete-derived, description: Remove derived runtime stores only.}
+  - {step: rebuild, description: Re-index respecting the repository contract and secret exclusions.}
+  - {step: verify, description: Compare index manifest hash with the tracked manifest; run held-out retrieval tests.}
+validation_scenarios:
+  - {id: V1, given: secret file in tree, expect: no chunk or vector of it exists after rebuild}

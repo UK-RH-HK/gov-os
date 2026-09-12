@@ -1,0 +1,18 @@
+id: SKL-API-CONTRACT-REVIEW
+name: API contract review
+version: 1.0.0
+status: ACTIVE
+model_agnostic: true
+roles: [integration-engineer, architecture-agent]
+task_classes: [architecture, validation]
+purpose: "Review interface contracts for consistency, versioning and consumer impact."
+required_permissions: [READ_REPO]
+required_tools: [TOOL-FS-001]
+inputs: [interface records, consumers]
+outputs: [review findings, proposed CIT]
+method:
+  - {step: enumerate-consumers, description: Traverse CONSUMES/USES edges to list consumers.}
+  - {step: diff-contract, description: Compare proposed and active contract; classify as additive or breaking.}
+  - {step: propose, description: Open a CIT with impact simulation when breaking.}
+validation_scenarios:
+  - {id: V1, given: breaking field removal, expect: CIT proposed with radius >= R2}

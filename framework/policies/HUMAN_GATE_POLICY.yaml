@@ -1,0 +1,9 @@
+policy: HUMAN_GATE_POLICY
+version: 1.0.0
+raise_for: [product_direction, expensive_or_irreversible_architecture, privacy_security_legal, major_data_migration, destructive_data_action, vendor_choice, ux_direction, commercial_assumption, high_cost_infrastructure, material_acceptance_criterion, low_confidence_critical_path, governance_change]
+agent_resolvable_when: {max_radius: R1, min_confidence: 0.8, reversible: true}
+decision_package_fields: [question, why_now, current_state, options, impact, reversibility, cost_rework, recommendation, confidence, permitted_next_actions]
+prioritisation: [critical_path_effect, tasks_blocked, impact_radius, time_sensitivity, irreversibility]
+must_be_presented_in_chat: true
+continue_independent_work: true
+batch_low_priority: true

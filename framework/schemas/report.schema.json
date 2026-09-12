@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/report.schema.json",
+  "title": "report",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "type": {
+      "const": "report"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "PROVISIONAL",
+        "SUPERSEDED",
+        "LEGACY",
+        "HISTORICAL",
+        "REJECTED",
+        "DEPRECATED",
+        "RETIRED"
+      ]
+    },
+    "state_class": {
+      "type": "string",
+      "enum": [
+        "AUTHORITATIVE",
+        "DERIVED",
+        "NARRATIVE",
+        "EVIDENCE",
+        "HISTORICAL",
+        "UNKNOWN_OR_CONFLICTING"
+      ]
+    },
+    "created": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    },
+    "owner_role": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DEPENDS_ON",
+              "BLOCKS",
+              "IMPLEMENTS",
+              "REALISES",
+              "GOVERNED_BY",
+              "CONSTRAINS",
+              "DERIVED_FROM",
+              "SUPERSEDES",
+              "VALIDATED_BY",
+              "TESTS",
+              "USES",
+              "PRODUCES",
+              "CONSUMES",
+              "AFFECTS",
+              "GENERATED_FROM",
+              "CALLS",
+              "IMPORTS",
+              "OWNS",
+              "FAILED_BECAUSE",
+              "LEARNED_FROM"
+            ]
+          },
+          "target": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "target"
+        ]
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "superseded_by": {
+      "type": "string"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "implements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "governed_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validated_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tests": {
+      "type": "object"
+    },
+    "derived_from": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "staleness": {
+      "type": "object"
+    },
+    "legacy_source": {
+      "type": "string"
+    },
+    "task": {
+      "type": "string"
+    },
+    "session": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "work_completed": {
+      "type": "string"
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "files_read": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "discoveries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lessons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "proposed_decisions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommended_next_action": {
+      "type": "string"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed",
+        "blocked"
+      ]
+    },
+    "skills_used": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tools_used": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "model": {
+      "type": "object"
+    },
+    "cost": {
+      "type": "object"
+    },
+    "repair_count": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "status"
+  ]
+}

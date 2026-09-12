@@ -1,0 +1,5 @@
+schema_version: 1.0.0
+# Accepted, time-bound deviations from kernel policy. Each must cite a decision and an expiry.
+exceptions: []
+# exceptions:
+#   - {id: EXC-0001, policy: MEMORY_POLICY, key: freshness.on_stale_close, value: degrade, decision: D-0007, expires: 2026-12-31, reason: "..."}
