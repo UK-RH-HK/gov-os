@@ -1,0 +1,844 @@
+{
+  "work_dir": "/tmp/gov-verifier2-eeshczc7",
+  "candidate_commit": "47d8394b945bcfd9f35a5fee80836e424a4570dc",
+  "gov413": "framework: agentic-engineering-os\nversion: 4.1.4\ncli_version: 4.1.4\nruntime_version: 4.1.4\nindex_version: 4.1.3-idx2\n",
+  "gov412": "framework: agentic-engineering-os\nversion: 4.1.2\ncli_version: 4.1.2\nruntime_version: 4.1.2\nindex_version: 4.1.2-idx1\n",
+  "results": [
+    {
+      "id": "NV-01",
+      "title": "CIT approval/execution require a presented AND answered gate; a human decline (option B) stops the transaction (INV-008, framework \u00a747.2/\u00a752)",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "a_gate_presented_not_answered": {
+          "approve_ok": false,
+          "error_code": "GATE_NOT_ANSWERED",
+          "decision_record_written": null,
+          "decision_human_approved_flag": null,
+          "gate_status_after": [
+            {
+              "id": "HDG-0001",
+              "question": "Approve change CIT-0001: tighten security headers",
+              "gate_status": "PRESENTED",
+              "presented_in_chat": true,
+              "priority_score": 6.0,
+              "batchable": false,
+              "blocks_tasks": [],
+              "cit": "CIT-0001",
+              "trigger": "security_change"
+            }
+          ]
+        },
+        "b_gate_answered_B": {
+          "decide_result": "B",
+          "cit_status_after_decline": "REJECTED",
+          "approve_ok": false,
+          "approve_error": "USAGE",
+          "execute_ok": null,
+          "manifest_file_written": null
+        },
+        "c_agent_roles": {
+          "change_controller_L3_approved_unanswered_gate_as_human": false,
+          "backend_engineer_L1_error": "AUTHORITY_DENIED"
+        }
+      }
+    },
+    {
+      "id": "NV-02",
+      "title": "project overlay policy_overrides cannot silently lower AUTHORITY_POLICY levels or empty SECURITY_POLICY.never_index_classes (framework \u00a721 precedence; INV-006)",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "doctor_D007_policies": [
+          true,
+          "14 policies loaded, 0 overrides",
+          "UNHEALTHY"
+        ],
+        "audit_verdict": "UNHEALTHY",
+        "audit_findings_mentioning_override": [
+          "override of AUTHORITY_POLICY.authority_levels_required.create_task from PROJECT_POLICY.policy_overrides refused by POLICY_PRECEDENCE: AUTHORITY_POLICY.authority_levels_required.create_task: \"L0\" would weaken the kernel minimum \"L2\" (POLICY_PRECEDENCE mode 'floor', rule AUTHORITY_POLICY.authority_levels_required.*)",
+          "override of AUTHORITY_POLICY.authority_levels_required.execute_cit from PROJECT_POLICY.policy_overrides refused by POLICY_PRECEDENCE: AUTHORITY_POLICY.authority_levels_required.execute_cit: \"L0\" would weaken the kernel minimum \"L3\" (POLICY_PRECEDENCE mode 'floor', rule AUTHORITY_POLICY.authority_levels_required.*)",
+          "override of AUTHORITY_POLICY.authority_levels_required.install_kernel from PROJECT_POLICY.policy_overrides refused by POLICY_PRECEDENCE: AUTHORITY_POLICY.authority_levels_required.install_kernel: \"L0\" would weaken the kernel minimum \"L4\" (POLICY_PRECEDENCE mode 'floor', rule AUTHORITY_POLICY.authority_levels_required.*)",
+          "override of SECURITY_POLICY.never_index_classes from PROJECT_POLICY.policy_overrides refused by POLICY_PRECEDENCE: SECURITY_POLICY.never_index_classes: kernel entries [\"secret\", \"restricted\"] may not be removed (additive key: a lower layer may only add) (POLICY_PRECEDENCE mode 'additive', rule SECURITY_POLICY.never_index_classes)",
+          "override of SECURITY_POLICY.never_export_classes from PROJECT_POLICY.policy_overrides refused by POLICY_PRECEDENCE: SECURITY_POLICY.never_export_classes: kernel entries [\"secret\", \"restricted\", \"confidential\"] may not be removed (additive key: a lower layer may only add) (POLICY_PRECEDENCE mode 'additive', rule SECURITY_POLICY.never_export_classes)"
+        ],
+        "L0_task_create_ok": false,
+        "L0_error": "AUTHORITY_DENIED",
+        "restricted_file_indexed_rows": [],
+        "restricted_excluded_by_indexer": [
+          {
+            "path": "product/data/customers.md",
+            "reason": "sensitivity:restricted"
+          }
+        ],
+        "restricted_content_retrievable": false
+      }
+    },
+    {
+      "id": "NV-03",
+      "title": "genuine 4.1.2 consumer (created by the 4.1.2 binary) updated to release 4.1.3 by the 4.1.3 binary, verified on a second machine, rolled back; lock/provenance/overlay/spec/index/ledger semantics",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "defects": [],
+        "init_412": {
+          "version": "4.1.2",
+          "lock_release_hash_eq_412_manifest": true,
+          "lock_source": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/acaaaf16-f919-4cc5-90c8-8901b83fdda6/scratchpad/wt412/framework",
+          "lock_release_commit_eq_project_head": false
+        },
+        "413_on_412_project": {
+          "doctor_verdict": "UNHEALTHY",
+          "D005": [
+            false,
+            "medium",
+            "installed kernel 4.1.2 differs from CLI 4.1.4; run gov update --check"
+          ],
+          "D010": [
+            false,
+            "medium",
+            "pin mismatch: lexical: expected {\"engine\":\"sqlite-fts5\",\"tokenizer\":\"unicode61\"} but live index has null; index_version: expected \"4.1.3-idx2\" but live index ha"
+          ],
+          "D025": [
+            false,
+            "high",
+            "index pins differ from policy: embedder: expected {\"id\":\"hashed-ngram\",\"version\":\"1\",\"dimensions\":512,\"source\":\"builtin\"} but live index has null; chunking: exp"
+          ],
+          "status_version": "4.1.2"
+        },
+        "update_check": {
+          "current": "4.1.2",
+          "available": "4.1.3",
+          "compatible": true,
+          "migration_path": [
+            "M-4.1.2-4.1.3"
+          ],
+          "migration_path_complete": true,
+          "certification": "REJECTED",
+          "human_gate_required": true,
+          "recommendation": "review impact; approve with `gov update --apply --approve --by <human>`"
+        },
+        "impact": {
+          "radius": "R3",
+          "overlay_changes": [],
+          "index_rebuild": true,
+          "regenerate_adapters": true,
+          "notes": [
+            "4.1.3 enforces authority levels, mutation scope, sensitivity classes, destructive-migration gates and embedder pins; existing overlays remain valid."
+          ],
+          "breaking_changes": [],
+          "human_gates": [],
+          "consequences": [
+            "kernel 4.1.2 \u2192 4.1.3 (1 migration step(s))",
+            "spec/ and product/ are not touched (INV-013)",
+            "all derived indexes are rebuilt after install",
+            "target release is NOT certified: human approval required"
+          ]
+        },
+        "apply_without_gate_error": "HUMAN_GATE_REQUIRED",
+        "approve_flag_only_applied": false,
+        "apply": {
+          "applied": true,
+          "from": "4.1.2",
+          "to": "4.1.3",
+          "migrations": [
+            "M-4.1.2-4.1.3"
+          ],
+          "operations": [
+            {
+              "op": "note",
+              "file": "",
+              "dry_run": false
+            },
+            {
+              "op": "set_lock_field",
+              "file": "",
+              "dry_run": false
+            },
+            {
+              "op": "require_index_rebuild",
+              "file": "",
+              "dry_run": false
+            },
+            {
+              "op": "regenerate_adapters",
+              "file": "",
+              "dry_run": false
+            }
+          ],
+          "overlay_keys_changed": [
+            "reconciled:REPOSITORY_CONTRACT.yaml.paths[pattern=governance/tests/**].lexical_index"
+          ],
+          "doctor": "DEGRADED",
+          "audit": "HEALTHY"
+        },
+        "lock_after": {
+          "version": "4.1.3",
+          "release_hash_eq_413_manifest": true,
+          "release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+          "manifest_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+          "release_commit_eq_manifest": true,
+          "release_commit_eq_project_head": false,
+          "source": "release:agentic-engineering-os@4.1.3",
+          "lock_schema_version": "1.0.0",
+          "cli_version": "4.1.4"
+        },
+        "kernel_verify": true,
+        "index_version_after": "4.1.3-idx2",
+        "index_embedder_after": {
+          "dimensions": 512,
+          "id": "hashed-ngram",
+          "source": "builtin",
+          "version": "1"
+        },
+        "index_lexical_after": {
+          "engine": "sqlite-fts5",
+          "tokenizer": "porter unicode61"
+        },
+        "overlay_preserved": {
+          "policy_override": 5,
+          "name": "upg-project"
+        },
+        "spec_unchanged": true,
+        "repository_contract_governance_tests_rule": {
+          "before_update": {
+            "pattern": "governance/tests/**",
+            "class": "authoritative",
+            "owner_role": "memory-engineer",
+            "mutation": "restricted",
+            "semantic_index": false,
+            "lexical_index": true,
+            "graph_index": false,
+            "namespace": "governance"
+          },
+          "after_update": {
+            "pattern": "governance/tests/**",
+            "class": "authoritative",
+            "owner_role": "memory-engineer",
+            "mutation": "restricted",
+            "semantic_index": false,
+            "lexical_index": false,
+            "graph_index": false,
+            "namespace": "governance"
+          },
+          "template_4.1.3_lexical_index": false
+        },
+        "heldout_file_in_index_after_update": [],
+        "heldout_marker_query_hits": [],
+        "doctor_after_update": {
+          "verdict": "DEGRADED",
+          "failed": {
+            "D005": [
+              false,
+              "medium",
+              "installed kernel 4.1.3 differs from CLI 4.1.4; run gov update --check"
+            ],
+            "D021": [
+              false,
+              "medium",
+              "green record \"AUD-0001\" is obsolete (inputs changed)"
+            ],
+            "D022": [
+              false,
+              "low",
+              "capability gap: rust-cargo (cargo)"
+            ]
+          }
+        },
+        "update_ledger_entries": [
+          [
+            "4.1.2",
+            "4.1.3",
+            "committed"
+          ]
+        ],
+        "machine_B": {
+          "doctor_verdict_before_rebuild": "DEGRADED",
+          "D009": [
+            false,
+            "medium",
+            "derived runtime absent"
+          ],
+          "rebuilt_manifest_equals_A": true
+        },
+        "412_binary_on_413_project": {
+          "doctor_verdict": "DEGRADED",
+          "D005": [
+            false,
+            "medium",
+            "installed kernel 4.1.3 differs from CLI 4.1.2; run gov update --check"
+          ],
+          "D002": [
+            true,
+            "info",
+            "valid"
+          ],
+          "update_check": false
+        },
+        "rollback": {
+          "rolled_back_to": "4.1.2",
+          "kernel_ok": true,
+          "lock_version": "4.1.2",
+          "lock_bytes_identical_to_412": true,
+          "overlay_bytes_identical": true,
+          "kernel_verify": true,
+          "doctor_verdict": "DEGRADED",
+          "D005": [
+            false,
+            "medium",
+            "installed kernel 4.1.2 differs from CLI 4.1.4; run gov update --check"
+          ],
+          "D010": [
+            false,
+            "medium",
+            "stale: 1 changed, 0 added, 0 removed"
+          ],
+          "ledger_has_rollback_entry": true,
+          "ledger_entries_after_rollback": [
+            [
+              "4.1.2",
+              "4.1.3",
+              "committed"
+            ],
+            [
+              "4.1.3",
+              "4.1.2",
+              "rolled_back"
+            ]
+          ],
+          "second_rollback": "SNAPSHOT_MISSING"
+        },
+        "412_binary_after_rollback": {
+          "doctor_verdict": "DEGRADED",
+          "D005": [
+            true,
+            "info",
+            "match"
+          ],
+          "D010": [
+            false,
+            "medium",
+            "stale: 1 changed, 0 added, 0 removed"
+          ]
+        }
+      }
+    },
+    {
+      "id": "NV-04",
+      "title": "plugin descriptors (arbitrary commands) are governed like tools: registration/approval, version pin, health check, permission classes, schema validation; an L0 role cannot execute them",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "descriptor_schema_accepts_minimal": false,
+        "schema_error": "'version' is a required property\n\nFailed validating 'required' in schema:\n    {'$id': 'https://schemas.agentic-engineering-os/4.1.4/plugin-descriptor.schema.json',\n     '$schema': 'https://json-schema",
+        "core_discovered_minimal_descriptor": true,
+        "L0_invoke_ok": false,
+        "L0_invoke_error": "AUTHORITY_DENIED",
+        "rogue_command_executed_by_L0": false,
+        "rogue_in_tool_registry": false,
+        "tools_resolve_embed_for_auditor": {
+          "tools": [],
+          "gap": true
+        },
+        "doctor_verdict": "UNHEALTHY",
+        "doctor_plugin_checks": {
+          "D028": [
+            false,
+            "high",
+            "plugin descriptor /tmp/gov-verifier2-eeshczc7/nv04-greenfield/governance/project/plugins/rogue.yaml is invalid and cannot execute: plugin-descriptor schema: : \""
+          ]
+        },
+        "audit_plugin_findings": [
+          "plugin descriptor /tmp/gov-verifier2-eeshczc7/nv04-greenfield/governance/project/plugins/rogue.yaml is invalid and cannot execute: plugin-descriptor schema: : \"version\" is a required property"
+        ],
+        "L0_rebuild_ok": false,
+        "L0_rebuild_error": "PLUGIN_DESCRIPTOR_INVALID",
+        "rogue_executed_on_rebuild_by_L0": false,
+        "schema_enforced_by_core": "grep: plugin-descriptor schema is not referenced anywhere in runtime/src"
+      }
+    },
+    {
+      "id": "NV-05",
+      "title": "task close cross-checks the self-reported files_changed against the actual working-tree changes (git) for out-of-scope mutations",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "git_dirty_at_close": [
+          "M .gitignore",
+          " M src/lib.rs",
+          "?? archive/",
+          "?? docs/",
+          "?? framework.json",
+          "?? governance/",
+          "?? spec/"
+        ],
+        "reported_files_changed": [
+          "docs/notes.md"
+        ],
+        "close_ok": false,
+        "close_error": "MUTATION_SCOPE_VIOLATION",
+        "checkpoint_files_changed": null,
+        "checkpoint_captured_out_of_scope_git_change": false,
+        "note": "git status showed src/lib.rs modified while the report omitted it; close succeeded and the checkpoint copied the self-reported list, so the discrepancy was neither enforced nor recorded"
+      }
+    },
+    {
+      "id": "NV-13",
+      "title": "control: a framework-update gate answered B (decline) stops `update --apply --approve` and the lock stays at 4.1.2",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "applied": false,
+        "reason": "human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record",
+        "lock_version": "4.1.2"
+      }
+    },
+    {
+      "id": "NV-19",
+      "title": "migration M-4.1.2-4.1.3 operations perform what its description and the release notes claim (overlay/contract changes)",
+      "verdict": "FAIL",
+      "severity": "MEDIUM",
+      "detail": {
+        "operations": [
+          "note",
+          "set_lock_field",
+          "require_index_rebuild",
+          "regenerate_adapters"
+        ],
+        "overlay_operations": [],
+        "description_claims_contract_tightening": true,
+        "release_notes_claim_overlay_keys": false,
+        "overlay_template_changed_between_releases": true,
+        "affected_indexes": [
+          "lexical",
+          "semantic",
+          "graph",
+          "code"
+        ],
+        "breaking": false,
+        "human_gate": "none"
+      }
+    },
+    {
+      "id": "NV-06",
+      "title": "paraphrase retrieval obtained end-to-end through the governed mechanism (benchmark >= 3 candidates on a held-out set -> research record -> selection decision with alternatives -> overlay pin -> full rebuild), with no silent fallback",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "baseline_embedder_semantic_recall": {
+          "V-SEM-1": 0.0,
+          "V-SEM-3": 1.0
+        },
+        "baseline_pass": true,
+        "baseline_recall_at_k": 0.9,
+        "baseline_mrr": 0.745,
+        "benchmark_seconds": 0.7,
+        "benchmark_rows": {
+          "current": {
+            "usable": true,
+            "recall_at_k": 0.9,
+            "mrr": 0.745,
+            "precision_at_k": 0.4208333333333334,
+            "stale_hit_rate": 0.0,
+            "superseded_hit_rate": 0.0,
+            "forbidden_violations": 0,
+            "symbol_recall": 1.0,
+            "avg_query_latency_ms": 3.6,
+            "index_ms": 98,
+            "vectors": 493,
+            "dimensions": 512,
+            "error": null
+          },
+          "plugin:syn-embed:512": {
+            "usable": true,
+            "recall_at_k": 1.0,
+            "mrr": 0.8392857142857142,
+            "precision_at_k": 0.4333333333333334,
+            "stale_hit_rate": 0.0,
+            "superseded_hit_rate": 0.0,
+            "forbidden_violations": 0,
+            "symbol_recall": 1.0,
+            "avg_query_latency_ms": 15.9,
+            "index_ms": 255,
+            "vectors": 493,
+            "dimensions": 512,
+            "error": null
+          },
+          "builtin:128": {
+            "usable": true,
+            "recall_at_k": 0.8,
+            "mrr": 0.75,
+            "precision_at_k": 0.39583333333333337,
+            "stale_hit_rate": 0.0,
+            "superseded_hit_rate": 0.0,
+            "forbidden_violations": 0,
+            "symbol_recall": 1.0,
+            "avg_query_latency_ms": 1.7,
+            "index_ms": 89,
+            "vectors": 493,
+            "dimensions": 128,
+            "error": null
+          }
+        },
+        "semantic_paraphrase_by_candidate": {
+          "current": [
+            {
+              "category": "semantic_paraphrase",
+              "queries": 2,
+              "recall": 0.5
+            }
+          ],
+          "plugin:syn-embed:512": [
+            {
+              "category": "semantic_paraphrase",
+              "queries": 2,
+              "recall": 1.0
+            }
+          ],
+          "builtin:128": [
+            {
+              "category": "semantic_paraphrase",
+              "queries": 2,
+              "recall": 0.5
+            }
+          ]
+        },
+        "recommended": "plugin:syn-embed:512",
+        "research_record": "RES-0001",
+        "selection": {
+          "decision": "D-0003",
+          "chosen": "plugin:syn-embed:512",
+          "alternatives_recorded": 3,
+          "human_approved": false,
+          "pinned": {
+            "id": "syn-embed",
+            "version": "1",
+            "dimensions": 512,
+            "source": "plugin"
+          }
+        },
+        "after_selection": {
+          "pass": true,
+          "status": "PASS",
+          "recall_at_k": 1.0,
+          "mrr": 0.8392857142857142,
+          "precision_at_k": 0.4333333333333334,
+          "per_query": {
+            "V-EXACT-1": [
+              1.0,
+              [
+                "D-0002",
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md",
+                "D-0002",
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md"
+              ]
+            ],
+            "V-PATH-1": [
+              1.0,
+              [
+                "file:src/app/billing.py",
+                "file:src/app/billing.py"
+              ]
+            ],
+            "V-LEX-1": [
+              1.0,
+              [
+                "file:src/app/retry.py",
+                "file:src/app/retry.py"
+              ]
+            ],
+            "V-SYM-1": [
+              1.0,
+              [
+                "file:src/app/retry.py",
+                "file:src/app/main.py"
+              ]
+            ],
+            "V-SEM-1": [
+              1.0,
+              [
+                "file:src/app/retry.py",
+                "file:src/app/retry.py",
+                "file:governance/project/MODEL_ROUTING_OVERRIDES.yaml",
+                "file:governance/kernel/overlay-templates/MODEL_ROUTING_OVERRIDES.yaml"
+              ]
+            ],
+            "V-SEM-3": [
+              1.0,
+              [
+                "D-0002",
+                "file:spec/requirements/requirements.md",
+                "file:governance/kernel/constitution/CONSTITUTION.md",
+                "file:governance/kernel/policies/POLICY_PRECEDENCE.yaml"
+              ]
+            ],
+            "V-SUP-1": [
+              1.0,
+              [
+                "D-0002",
+                "D-C0002",
+                "file:spec/requirements/requirements.md",
+                "D-C0002"
+              ]
+            ],
+            "V-GRAPH-1": [
+              1.0,
+              [
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md",
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md",
+                "file:spec/audits/GOVERNANCE-ADOPTION/08-INDEPENDENT-MIGRATION-VERIFICATION.md",
+                "D-0002"
+              ]
+            ],
+            "V-XFILE-1": [
+              1.0,
+              [
+                "file:web/src/api/client.ts",
+                "file:src/app/old_export.py",
+                "D-0003",
+                "RES-0001"
+              ]
+            ],
+            "V-MIX-1": [
+              1.0,
+              [
+                "file:src/app/billing.py",
+                "file:src/app/billing.py",
+                "file:tests/test_utils.py",
+                "file:src/app/main.py"
+              ]
+            ]
+          }
+        },
+        "live_index_embedder": {
+          "dimensions": 512,
+          "id": "syn-embed",
+          "source": "plugin",
+          "version": "1"
+        },
+        "paraphrase_query_top": [
+          "file:src/app/retry.py",
+          "file:src/app/retry.py",
+          "file:governance/project/MODEL_ROUTING_OVERRIDES.yaml",
+          "file:governance/kernel/overlay-templates/MODEL_ROUTING_OVERRIDES.yaml",
+          "file:governance/kernel/adapters/generic/template.md"
+        ],
+        "plugin_removed_query_error": "EMBEDDER_UNAVAILABLE",
+        "no_silent_fallback": true,
+        "baseline_failed_paraphrase_as_expected": true
+      }
+    },
+    {
+      "id": "NV-07",
+      "title": "a governed record survives an incremental rebuild after being moved (git mv) within spec/",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "path_before": [
+          [
+            "spec/decisions/D-0001.yaml"
+          ]
+        ],
+        "path_after_first_incremental": [
+          [
+            "spec/decisions/2026/D-0001.yaml"
+          ]
+        ],
+        "problems_reported": [],
+        "removed": 0,
+        "indexed": 1,
+        "fresh_after": true,
+        "added": [],
+        "structured_query_hits": [
+          "AUD-0001",
+          "D-0001",
+          "file:governance/kernel/overlay-templates/PROJECT_EXCEPTIONS.yaml"
+        ],
+        "path_after_second_incremental": [
+          [
+            "spec/decisions/2026/D-0001.yaml"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "NV-08",
+      "title": "framework.lock.release_commit identifies the framework release commit (manifest.release_commit), and source is a logical label on every install path",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "install_from_release_dir": {
+          "lock_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+          "manifest_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+          "project_head": "ff132bc868b8799cb58144851272f4345ad7e50f",
+          "equals_project_head": false,
+          "source": "release:agentic-engineering-os@4.1.3",
+          "release_hash_eq_manifest": true
+        },
+        "install_from_canonical_root": {
+          "release_commit": "47d8394b945bcfd9f35a5fee80836e424a4570dc",
+          "source": "source:agentic-engineering-os@4.1.4",
+          "equals_project_head": false
+        },
+        "install_from_embedded_payload": {
+          "release_commit": "c6b594ba7c8729e56a9de9f506b6efd17804d8ab",
+          "source": "embedded:agentic-engineering-os@4.1.4",
+          "release_hash_eq_manifest": false
+        }
+      }
+    },
+    {
+      "id": "NV-09",
+      "title": "KERNEL.yaml is strict-YAML valid (no duplicate mapping keys) and schema_versions agree across KERNEL.yaml / KERNEL_MANIFEST.json / manifest.json",
+      "verdict": "FAIL",
+      "severity": "LOW",
+      "detail": {
+        "duplicate_keys": [
+          "release-manifest"
+        ],
+        "strict_loader_ok": false,
+        "strict_error": "duplicate key 'release-manifest'",
+        "schema_versions_agree_after_last_wins": true,
+        "release_manifest_schema_version_in_kernel_yaml_last_wins": "1.1.0",
+        "same_in_framework_source": false
+      }
+    },
+    {
+      "id": "NV-10",
+      "title": "a pinned reranker's scores govern the final ranking (not just invoked) and are exposed per hit",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "order_before_pin": [
+          "file:tests/ledger_test.rs",
+          "file:src/lib.rs",
+          "file:src/lib.rs",
+          "file:tests/ledger_test.rs"
+        ],
+        "query_with_pin_but_stale_index": "RERANKER_MISMATCH",
+        "order_after": [
+          "REQ-0003",
+          "file:tests/ledger_test.rs",
+          "file:src/lib.rs",
+          "file:src/lib.rs"
+        ],
+        "rerank_scores": [
+          [
+            "REQ-0003",
+            10.0
+          ],
+          [
+            "file:tests/ledger_test.rs",
+            0.5
+          ],
+          [
+            "file:src/lib.rs",
+            0.3333333333333333
+          ],
+          [
+            "file:src/lib.rs",
+            0.25
+          ]
+        ],
+        "reranker_used": {
+          "provider": "pref-rerank",
+          "version": "0"
+        }
+      }
+    },
+    {
+      "id": "NV-12",
+      "title": "after an embedder pin change without rebuild, gov continue / context compile fail closed (EMBEDDER_MISMATCH) while gov status still works",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "continue": "EMBEDDER_MISMATCH",
+        "context_compile": "EMBEDDER_MISMATCH",
+        "status_ok": true,
+        "freshness_pin_mismatch": [
+          "embedder: expected {\"id\":\"hashed-ngram\",\"version\":\"1\",\"dimensions\":64,\"source\":\"builtin\"} but live index has {\"dimensions\":512,\"id\":\"hashed-ngram\",\"source\":\"builtin\",\"version\":\"1\"}"
+        ],
+        "fresh": false
+      }
+    },
+    {
+      "id": "NV-16",
+      "title": "release 4.1.3 identity: verify ok, payload == kernel data at manifest.release_commit (ancestor of the candidate), rebuild from the candidate reproduces release_hash + file hashes, second build refused (RELEASE_IMMUTABLE), repository untouched",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "release_verify": {
+          "version": "4.1.3",
+          "ok": true,
+          "modified": [],
+          "missing": [],
+          "added": [],
+          "release_hash_matches_kernel": true,
+          "certification": {
+            "status": "REJECTED",
+            "implementer_evidence": "docs/EVIDENCE.md",
+            "independent_verifier": "Independent Governance OS Verifier (fresh re-verification session, Claude Fable 5.1), 2026-09-12; verdict OS_RELEASE_CANDIDATE_REJECTED; report: release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md",
+            "certified_at": ""
+          }
+        },
+        "release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+        "release_commit_is_ancestor_of_HEAD": true,
+        "kernel_data_diff_release_commit_to_HEAD": "framework/KERNEL.yaml                              |  17 ++-\n framework/policies/AUTHORITY_POLICY.yaml           |   3 +\n framework/policies/ENFORCEMENT_MAP.yaml            |  14 +++\n framework/policies/POLICY_PRECEDENCE.yaml          | 118 +++++++++++++++++++\n framework/policies/TEST_POLICY.yaml                |   2 +-\n framework/policies/TOOL_POLICY.yaml                |  12 +-\n framework/schemas/adapter-manifest.schema.json     |   2 +-\n framework/schemas/adoption-baseline.schema.json    |   2 +-\n framework/schemas/audit.schema.json                |   2 +-\n framework/schemas/capability-profile.schema.json   |   2 +-\n framework/schemas/checkpoint.schema.json           |   2 +-\n framework/schemas/cit.schema.json                  |   2 +-\n framework/schemas/command-contract.schema.json     |   2 +-\n framework/schemas/context-packet.schema.json       |   2 +-\n framework/schemas/data-sensitivity.schema.json     |   2 +-\n framework/schemas/decision.schema.json             |   2 +-\n framework/schemas/experiment.schema.json           |   2 +-\n framework/schemas/feature.schema.json              |   2 +-\n .../schemas/framework-change-proposal.schema.json  |   2 +-\n framework/schemas/framework-lock.schema.json       |  15 ++-\n framework/schemas/handoff.schema.json              |   2 +-\n framework/schemas/hard-invariants.schema.json      |   2 +-\n framework/schemas/heldout-tests.schema.json        |   2 +-\n framework/schemas/human-gate.schema.json           |   2 +-\n framework/schemas/index-manifest.schema.json       |   2 +-\n framework/schemas/interface.schema.json            |   2 +-\n framework/schemas/kernel-manifest.schema.json      |   2 +-\n framework/schemas/lesson.schema.json               |   2 +-\n framework/schemas/mcp-registry.schema.json         |   2 +-\n framework/schemas/memory-manifest.schema.json      |   2 +-\n .../schemas/migration-catalogue-entry.schema.json  |   2 +-\n framework/schemas/migration.schema.json            |  65 ++++++++++-\n .../schemas/model-routing-overrides.schema.json    |   2 +-\n framework/schemas/plugin-descriptor.schema.json    | 130 ++++++++++++++++++++-\n .../schemas/policy-ARCHIVE_POLICY.schema.json      |   2 +-\n .../schemas/policy-AUTHORITY_POLICY.schema.json    |   2 +-\n framework/schemas/policy-BUDGET_POLICY.schema.json |   2 +-\n framework/schemas/policy-CHANGE_POLICY.schema.json |   2 +-\n .../schemas/policy-CHECKPOINT_POLICY.schema.json   |   2 +-\n .../schemas/policy-CONTEXT_POLICY.schema.json      |   2 +-\n .../schemas/policy-HUMAN_GATE_POLICY.schema.json   |   2 +-\n .../schemas/policy-LEARNING_POLICY.schema.json     |   2 +-\n framework/schemas/policy-MEMORY_POLICY.schema.json |   2 +-\n .../policy-MODEL_ROUTING_POLICY.schema.json        |   2 +-\n .../schemas/policy-SECURITY_POLICY.schema.json     |   2 +-\n framework/schemas/policy-TEST_POLICY.schema.json   |   2 +-\n framework/schemas/policy-TOOL_POLICY.schema.json   |   2 +-\n framework/schemas/project-exceptions.schema.json   |   2 +-\n framework/schemas/project-policy.schema.json       |   2 +-\n framework/schemas/project.schema.json              |   2 +-\n framework/schemas/readiness-dimensions.schema.json |   2 +-\n framework/schemas/record.schema.json               |   2 +-\n framework/schemas/release-manifest.schema.json     |  30 ++++-\n framework/schemas/report.schema.json               |   2 +-\n framework/schemas/repository-contract.schema.json  |   2 +-\n framework/schemas/requirement.schema.json          |   2 +-\n framework/schemas/research.schema.json             |   2 +-\n framework/schemas/roles.schema.json                |   2 +-\n framework/schemas/scenario.schema.json             |   2 +-\n framework/schemas/skill.schema.json                |   2 +-\n framework/schemas/task.schema.json                 |   2 +-\n framework/schemas/test-obligation.schema.json      |   2 +-\n framework/schemas/tool-permissions.schema.json     |   2 +-\n framework/schemas/tool-registry.schema.json        |   2 +-\n framework/schemas/tool.schema.json                 |   2 +-\n framework/schemas/upstream-packet.schema.json      |   2 +-\n framework/schemas/worker-return.schema.json        |   2 +-\n migrations/M-4.1.2-4.1.3.yaml                      |  11 +-\n migrations/M-4.1.3-4.1.4.yaml                      |  27 +++++\n 69 files changed, 473 insertions(+), 85 deletions(-)",
+        "payload_files_differing_from_release_commit": [],
+        "manifest_hashes_without_source_file": [],
+        "rebuild_release_hash_equal": true,
+        "rebuild_file_hashes_equal": true,
+        "rebuild_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+        "immutability_error": "RELEASE_IMMUTABLE",
+        "release_dir_untouched": true
+      }
+    },
+    {
+      "id": "NV-17",
+      "title": "an external embed plugin never receives secret-class, secret-content or restricted-class text (API-0001 invariant; framework \u00a716/\u00a772)",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "leaked_markers": {
+          "AKIAIOSFODNN7EXAMPLE": false,
+          "SECRETMARKER-KUMQUAT": false,
+          "RESTRICTEDMARKER-LOQUAT": false,
+          "PLANTEDMARKER-MANGO": false
+        },
+        "public_text_reached_plugin": true,
+        "excluded": [
+          {
+            "path": "product/config.py",
+            "reason": "secret_content",
+            "patterns": [
+              "generic-api-key",
+              "aws-access-key"
+            ]
+          },
+          {
+            "path": "product/data/customers.md",
+            "reason": "sensitivity:restricted"
+          },
+          {
+            "path": "secrets/api.yaml",
+            "reason": "secret_class"
+          }
+        ],
+        "secret_blocked": [
+          {
+            "path": "product/config.py",
+            "patterns": [
+              "generic-api-key",
+              "aws-access-key"
+            ],
+            "lines": [
+              1,
+              1
+            ]
+          }
+        ],
+        "log_lines": 311
+      }
+    }
+  ]
+}
