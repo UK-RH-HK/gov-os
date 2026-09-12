@@ -195,7 +195,20 @@ pub fn invoke(
         use std::os::unix::process::CommandExt;
         command.process_group(0);
     } // own process group: a timeout kills grandchildren too
-    let mut child = command.spawn().map_err(|e| {
+      // ETXTBSY: the plugin executable was written moments ago and a concurrently forked process still holds a write
+      // descriptor to it, so exec is refused. That is a transient condition of the filesystem, not a governance
+      // decision, so retry briefly before surfacing it (it also makes `plugins register` + immediate use deterministic).
+    let mut spawned = command.spawn();
+    for _ in 0..20 {
+        match &spawned {
+            Err(e) if e.raw_os_error() == Some(26) => {
+                std::thread::sleep(Duration::from_millis(25));
+                spawned = command.spawn();
+            }
+            _ => break,
+        }
+    }
+    let mut child = spawned.map_err(|e| {
         GovError::new(
             "PLUGIN_SPAWN_FAILED",
             format!("{}: {e} (command: {})", desc.plugin_id, cmd.join(" ")),

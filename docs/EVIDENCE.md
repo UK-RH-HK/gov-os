@@ -1,6 +1,6 @@
 # Implementer test evidence — agentic-engineering-os 4.1.5 (repair candidate)
 
-Collected: 2026-09-12T19:37:33Z · commit: f4ad6b6 · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
+Collected: 2026-09-12T19:47:10Z · commit: e59ce6c · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
 
 > Implementer evidence only. Certification remains pending independent re-verification.
 > Status vocabulary: PASS | FAIL | NOT_AVAILABLE (tool missing) | NOT_RUN (not executed) | NOT_APPLICABLE (with reason).
@@ -24,7 +24,7 @@ pytest: available
 |---|---|
 | Rust unit tests (gov-runtime) | PASS (19 passed; 0 failed) |
 | Certification harness (7 fixtures + architectural + repair regressions for the 4.1.2, 4.1.3 and 4.1.4 findings) | PASS (49 passed; 0 failed) |
-| Python capability plugin tests | PASS (4 passed in 0.11s) |
+| Python capability plugin tests | PASS (4 passed in 0.12s) |
 | Clippy (`cargo clippy --all-targets`) | PASS (exit 0, warnings=0, errors=0; warning lines include per-crate summaries) |
 | rustfmt (`cargo fmt --check`) | PASS (rustfmt --check: formatted) |
 | Release build (`cargo build --release`) | PASS (exit 0) |
@@ -72,8 +72,8 @@ pytest: available
 - repair::plugin_host_large_response_through_cli ... ok
 - repair::implementation_prerequisites_and_symbol_route ... ok
 - repair::policy_enforcement_coverage_is_complete_and_honest ... ok
-- repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
 - repair::reranker_hook_invoked_and_never_silently_skipped ... ok
+- repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
 - repair::sensitivity_classes_and_namespaces_are_enforced ... ok
 - repair::task_close_enforces_mutation_scope ... ok
 - repair::unmeasured_memory_recall_is_not_green ... ok
@@ -85,21 +85,21 @@ pytest: available
 
 ## Unit tests
 - lock::tests::versions_and_compat ... ok
-- kernel_trust::tests::uninstalled_projects_keep_the_installed_kernel_path_and_never_block ... ok
 - memory::embeddings::tests::sha1_matches_known_vector ... ok
-- exceptions::tests::a_fabricated_decision_reference_is_refused ... ok
-- policy_precedence::tests::pattern_matching ... ok
+- kernel_trust::tests::uninstalled_projects_keep_the_installed_kernel_path_and_never_block ... ok
 - policy_precedence::tests::floors_and_additive_sets ... ok
-- memory::chunking::tests::hierarchical_chunks ... ok
-- memory::embeddings::tests::deterministic_unit_vectors ... ok
+- policy_precedence::tests::pattern_matching ... ok
 - util::tests::hashing_is_canonical ... ok
-- util::tests::deep_helpers ... ok
+- exceptions::tests::a_fabricated_decision_reference_is_refused ... ok
+- memory::embeddings::tests::deterministic_unit_vectors ... ok
+- memory::chunking::tests::hierarchical_chunks ... ok
 - records::tests::parse_yaml_and_markdown_records ... ok
+- util::tests::deep_helpers ... ok
 - exceptions::tests::lifecycle_scope_and_authority_are_all_required ... ok
-- security::secrets::tests::detects_and_redacts ... ok
 - capabilities::host::tests::bad_json_and_protocol_mismatch_are_reported ... ok
-- util::tests::glob_semantics ... ok
+- security::secrets::tests::detects_and_redacts ... ok
 - paths::tests::secret_classification_can_never_be_downgraded ... ok
+- util::tests::glob_semantics ... ok
 - capabilities::host::tests::large_stdin_request_and_stderr_flood_are_drained ... ok
 - capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock ... ok
 - capabilities::host::tests::timeout_kills_child_promptly ... ok

@@ -135,6 +135,17 @@ tool review, forged approval decision, self-attested mutation report, hand-writt
   tree while a new payload directory is still untracked, and PASSES from the committed tag — the clean-clone
   reproduction is the authoritative evidence, and it passes there.
 
+## 5a. One further defect found by the reproduction itself
+
+The clean-clone reproduction surfaced an intermittent unit-test failure
+(`capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock`, ~2 runs in 12 under load) that
+had been seen once during the first repair iteration and never reproduced. Its cause is now established:
+`PLUGIN_SPAWN_FAILED ... Text file busy (os error 26)`. Executing a plugin script that was written moments earlier is
+refused by the kernel while any process still holds a write descriptor to it — a real race between `gov plugins
+register` (or any tool that writes a plugin) and the first invocation, not only a test artefact. `host::invoke` now
+retries the spawn on `ETXTBSY` for up to half a second before surfacing the error; the unit suite was then run 15
+times consecutively without a failure. Recorded here rather than left for the verifier to hit.
+
 ## 6. Escalation boundary (directive §9)
 
 No Human Decision Gate was required. Both HIGH findings were repairable within the existing architecture: they were
