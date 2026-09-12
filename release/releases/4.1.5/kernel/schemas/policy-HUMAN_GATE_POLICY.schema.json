@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/policy-HUMAN_GATE_POLICY.schema.json",
+  "title": "policy-HUMAN_GATE_POLICY",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "policy": {
+      "const": "HUMAN_GATE_POLICY"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "raise_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agent_resolvable_when": {
+      "type": "object"
+    },
+    "decision_package_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prioritisation": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "must_be_presented_in_chat": {
+      "const": true
+    },
+    "continue_independent_work": {
+      "type": "boolean"
+    },
+    "batch_low_priority": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "policy",
+    "version",
+    "raise_for",
+    "must_be_presented_in_chat",
+    "decision_package_fields"
+  ]
+}

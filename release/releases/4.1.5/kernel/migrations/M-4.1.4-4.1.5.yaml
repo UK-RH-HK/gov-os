@@ -1,0 +1,26 @@
+id: M-4.1.4-4.1.5
+from_version: 4.1.4
+to_version: 4.1.5
+description: >
+  Repair release after the third independent re-verification of 4.1.4 (OS_RELEASE_CANDIDATE_REJECTED). Kernel changes:
+  TOOL_POLICY.plugins gains the authoritative plugin registry (registry_path, registration_binds) and its
+  min_authority floor now applies to every plugin execution rather than only to hand-declared descriptors;
+  AUTHORITY_POLICY gains grant_policy_exception and override_kernel_integrity; POLICY_PRECEDENCE classifies the new
+  keys; the plugin-descriptor schema (1.2.0) marks approved_roles/provenance as advisory, the decision schema (1.1.0)
+  gains authorises_exceptions / permits_policy_keys, the tool schema (1.2.0) gains security_review_record, and a new
+  plugin-registry schema describes governance/generated/plugin-registry.json. No overlay file changes shape: the
+  registry is generated state and is created by `gov plugins register`. All derived indexes are rebuilt because the
+  index version changed.
+breaking: false
+human_gate: none
+affected_indexes: [lexical, semantic, graph, code]
+overlay_template_changes: []
+operations:
+  - {op: note, text: "4.1.5 makes plugin authorisation and policy-exception governance derive from authoritative state outside the descriptor/overlay, and refuses constitutional enforcement against an unverified installed kernel (KERNEL_TAMPERED). Existing overlays remain valid; previously hand-declared plugins keep working for roles at or above TOOL_POLICY.plugins.min_authority and must be registered with `gov plugins register` to carry elevated permissions or approved_roles."}
+  - {op: note, text: "PROJECT_EXCEPTIONS entries now require a resolvable ACTIVE decision that names the exception id or its policy key (authorises_exceptions / permits_policy_keys) and was approved at AUTHORITY_POLICY.authority_levels_required.grant_policy_exception; unresolved references are refused and reported by doctor D027."}
+  - {op: set_lock_field, key: lock_schema_version, value: 1.1.0}
+  - {op: require_index_rebuild, index: all}
+  - {op: regenerate_adapters}
+rollback: >
+  `gov update --rollback [--reason ...]` restores the previous kernel, overlay snapshot and framework.lock, rebuilds
+  indexes, appends a rollback entry to spec/reports/framework-updates.jsonl and consumes the snapshot.

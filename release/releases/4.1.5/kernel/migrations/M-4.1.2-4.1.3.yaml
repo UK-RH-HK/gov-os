@@ -1,0 +1,26 @@
+id: M-4.1.2-4.1.3
+from_version: 4.1.2
+to_version: 4.1.3
+description: >
+  Repair release after independent verification of 4.1.2 (OS_RELEASE_CANDIDATE_REJECTED). Kernel changes: authority
+  operation map (AUTHORITY_POLICY.authority_levels_required), MEMORY_POLICY lexical/reranker/min_queries pins, role
+  groups, ENFORCEMENT_MAP, language-tagged tool registry, held-out file excluded from lexical indexing. The lexical
+  tokenizer and index format changed, so every derived index must be rebuilt in full; the project overlay is preserved.
+  NOTE (amended after independent re-verification NV-19): this migration does NOT tighten the tracked
+  repository-contract rule for governance/tests/** although its original description claimed so; only the overlay
+  TEMPLATE changed. The tightening is delivered to upgraded projects by M-4.1.3-4.1.4 (set_overlay_rule) and by
+  template-default reconciliation in gov update. Operations below are the ones that shipped in 4.1.3 (unchanged).
+breaking: false
+human_gate: none
+affected_indexes: [lexical, semantic, graph, code]
+operations:
+  - {op: note, text: "4.1.3 enforces authority levels, mutation scope, sensitivity classes, destructive-migration gates and embedder pins; existing overlays remain valid."}
+  - {op: set_lock_field, key: lock_schema_version, value: 1.0.0}
+  - {op: require_index_rebuild, index: all}
+  - {op: regenerate_adapters}
+overlay_template_changes:
+  - {file: REPOSITORY_CONTRACT.yaml, handled_by: "op:set_overlay_rule in M-4.1.3-4.1.4", reason: "shipped 4.1.3 migration lacked the operation (verifier NV-19); corrected in the next migration, history preserved"}
+amendments:
+  - {at: "2026-09-12", what: "description corrected and overlay_template_changes declared", why: "independent re-verification NV-19: description claimed a contract tightening the operations do not perform; operations left exactly as shipped in release 4.1.3"}
+rollback: >
+  `gov update --rollback` restores the previous kernel, overlay snapshot and framework.lock and rebuilds indexes.

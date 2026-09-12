@@ -1,0 +1,19 @@
+version: 1.0.0
+core:
+  - product-outcome
+  - ux
+  - frontend
+  - backend
+  - database-storage
+  - integration-api
+  - devops-infrastructure
+  - security-privacy
+  - testing-quality
+optional_first_class:
+  - data-engineering
+  - ai-ml-model
+  - evaluation
+  - observability-sre
+  - performance-capacity
+  - operations-recovery
+  - scientific-rd

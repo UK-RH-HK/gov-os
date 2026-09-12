@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/command-contract.schema.json",
+  "title": "command-contract",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "human_surface": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "internal_operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string"
+          },
+          "cli": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation",
+          "cli"
+        ]
+      }
+    },
+    "intent_patterns": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "version",
+    "human_surface",
+    "internal_operations",
+    "intent_patterns"
+  ]
+}

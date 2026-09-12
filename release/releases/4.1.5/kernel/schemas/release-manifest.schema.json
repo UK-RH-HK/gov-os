@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/release-manifest.schema.json",
+  "title": "release-manifest",
+  "x-schema-version": "1.2.0",
+  "type": "object",
+  "properties": {
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "release_commit": {
+      "type": "string"
+    },
+    "release_hash": {
+      "type": "string"
+    },
+    "schema_versions": {
+      "type": "object"
+    },
+    "cli_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "runtime_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "supported_from_versions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+      }
+    },
+    "migration_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "adapter_versions": {
+      "type": "object"
+    },
+    "required_index_rebuilds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "breaking_changes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "human_gates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "file_hashes": {
+      "type": "object"
+    },
+    "release_notes": {
+      "type": "string"
+    },
+    "rollback_procedure": {
+      "type": "string"
+    },
+    "certification": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "UNCERTIFIED",
+            "READY_FOR_INDEPENDENT_OS_VERIFICATION",
+            "READY_FOR_INDEPENDENT_REVERIFICATION",
+            "CERTIFIED",
+            "REJECTED"
+          ]
+        },
+        "implementer_evidence": {
+          "type": "string"
+        },
+        "independent_verifier": {
+          "type": "string"
+        },
+        "certified_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "built_at": {
+      "type": "string"
+    },
+    "immutable": {
+      "const": true
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "release_branch": {
+          "type": "string"
+        },
+        "release_tag": {
+          "type": "string"
+        },
+        "reproduced_from_commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kernel_source": {
+          "type": "string"
+        },
+        "migration_substance_problems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "framework",
+    "version",
+    "release_hash",
+    "schema_versions",
+    "cli_version",
+    "runtime_version",
+    "supported_from_versions",
+    "migration_ids",
+    "adapter_versions",
+    "required_index_rebuilds",
+    "breaking_changes",
+    "human_gates",
+    "file_hashes",
+    "certification",
+    "rollback_procedure"
+  ]
+}

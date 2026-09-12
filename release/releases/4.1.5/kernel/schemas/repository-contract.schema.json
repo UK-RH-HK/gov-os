@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/repository-contract.schema.json",
+  "title": "repository-contract",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "roots": {
+      "type": "object",
+      "properties": {
+        "governance": {
+          "type": "string"
+        },
+        "spec": {
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "archive": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "governance",
+        "spec",
+        "product",
+        "archive"
+      ]
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "type": "string"
+          },
+          "class": {
+            "type": "string",
+            "enum": [
+              "source",
+              "test",
+              "authoritative",
+              "derived",
+              "narrative",
+              "evidence",
+              "historical",
+              "generated",
+              "secret",
+              "runtime-data",
+              "devops",
+              "tooling",
+              "unknown"
+            ]
+          },
+          "owner_role": {
+            "type": "string"
+          },
+          "semantic_index": {
+            "type": "boolean"
+          },
+          "lexical_index": {
+            "type": "boolean"
+          },
+          "graph_index": {
+            "type": "boolean"
+          },
+          "code_index": {
+            "type": "boolean"
+          },
+          "default_retrieval": {
+            "type": "boolean"
+          },
+          "mutation": {
+            "type": "string",
+            "enum": [
+              "allowed",
+              "restricted",
+              "prohibited",
+              "generated"
+            ]
+          },
+          "agent_read": {
+            "type": "string",
+            "enum": [
+              "allowed",
+              "restricted",
+              "prohibited"
+            ]
+          },
+          "export": {
+            "type": "string",
+            "enum": [
+              "allowed",
+              "denied"
+            ]
+          },
+          "sensitivity": {
+            "type": "string",
+            "enum": [
+              "public",
+              "internal",
+              "confidential",
+              "restricted",
+              "secret"
+            ]
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "feature": {
+            "type": "string"
+          },
+          "layer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern",
+          "class"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "capability_roots": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "roots",
+    "paths"
+  ]
+}

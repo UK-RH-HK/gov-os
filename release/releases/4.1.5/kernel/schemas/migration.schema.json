@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/migration.schema.json",
+  "title": "migration",
+  "x-schema-version": "1.1.0",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "from_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "to_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "breaking": {
+      "type": "boolean"
+    },
+    "human_gate": {
+      "type": "string"
+    },
+    "affected_indexes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "rename_overlay_file",
+              "add_overlay_file_from_template",
+              "set_overlay_key",
+              "rename_overlay_key",
+              "delete_overlay_key",
+              "set_lock_field",
+              "require_index_rebuild",
+              "regenerate_adapters",
+              "note",
+              "set_overlay_rule"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {},
+          "template": {
+            "type": "string"
+          },
+          "index": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "if_missing": {
+            "type": "boolean"
+          },
+          "list_key": {
+            "type": "string"
+          },
+          "match": {
+            "type": "object"
+          },
+          "set": {
+            "type": "object"
+          },
+          "add_if_missing": {
+            "type": "boolean"
+          },
+          "template_rule": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "op"
+        ]
+      }
+    },
+    "rollback": {
+      "type": "string"
+    },
+    "overlay_template_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "handled_by": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "handled_by",
+          "reason"
+        ]
+      }
+    },
+    "amendments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "what"
+        ]
+      }
+    }
+  },
+  "required": [
+    "id",
+    "from_version",
+    "to_version",
+    "operations"
+  ]
+}

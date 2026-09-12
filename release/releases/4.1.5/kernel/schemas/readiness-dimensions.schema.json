@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/readiness-dimensions.schema.json",
+  "title": "readiness-dimensions",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "cell_states": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "gap_task_class": {
+            "type": "string",
+            "enum": [
+              "discovery",
+              "research",
+              "experiment",
+              "specification",
+              "decision-preparation",
+              "data",
+              "architecture",
+              "implementation",
+              "integration",
+              "test-design",
+              "test-execution",
+              "security",
+              "devops",
+              "performance",
+              "validation",
+              "refactor",
+              "repair",
+              "documentation",
+              "release",
+              "tooling",
+              "memory",
+              "governance",
+              "migration"
+            ]
+          },
+          "pre_implementation": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "gap_task_class",
+          "pre_implementation"
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "dimensions"
+  ]
+}

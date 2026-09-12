@@ -1,0 +1,7 @@
+schema_version: 1.0.0
+default_class: internal
+# Identifiers that must be removed from any upstream packet (customer names, product codenames, internal hosts...).
+identifiers_to_strip: []
+classifications: []
+# classifications:
+#   - {pattern: "product/data/customers/**", class: restricted, reason: "customer data"}

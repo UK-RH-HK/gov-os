@@ -1,0 +1,18 @@
+id: SKL-TEST-DESIGN
+name: Independent test design
+version: 1.0.0
+status: ACTIVE
+model_agnostic: true
+roles: [independent-test-designer]
+task_classes: [test-design]
+purpose: "Derive behavioural acceptance tests from approved scenarios without reading implementation assumptions."
+required_permissions: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+required_tools: [TOOL-FS-001, TOOL-TEST-001]
+inputs: [scenarios, acceptance criteria]
+outputs: [test obligations, test files]
+method:
+  - {step: scenarios-only, description: Read scenarios and acceptance criteria; do not copy implementation assumptions.}
+  - {step: author, description: Write tests and test-obligation records linked with TESTS edges.}
+  - {step: independence, description: Record independent_of_implementer=true and author role.}
+validation_scenarios:
+  - {id: V1, given: obligation authored by implementer role, expect: independent_of_implementer=false and readiness cell PROVISIONAL}

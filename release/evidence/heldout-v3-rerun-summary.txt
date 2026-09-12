@@ -1,0 +1,1 @@
+Third verifier harness (4.1.4) rerun 2026-09-12T19:15:20Z: PASS=14, FAIL=2, INFO=0, ERROR=0 (verifier's own run: PASS=13, FAIL=3, INFO=0, ERROR=0); harness unchanged; non-PASS: ['VV-05', 'VV-07']
