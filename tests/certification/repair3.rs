@@ -833,9 +833,15 @@ fn current_release_payload_identity_and_hygiene() {
     assert_eq!(km["schema_versions"], m["schema_versions"]);
     assert_eq!(m["version"], version);
     assert_eq!(m["provenance"]["release_tag"], format!("v{version}-rc1"));
-    assert_eq!(
-        m["provenance"]["release_branch"].as_str().unwrap(),
-        git(&croot, &["rev-parse", "--abbrev-ref", "HEAD"]).1.trim()
+    // provenance records where the release was BUILT; a verifier clones at the tag (detached HEAD), so the checkout
+    // shape is never asserted — only that a branch was recorded and the release commit is in this history
+    assert!(
+        m["provenance"]["release_branch"]
+            .as_str()
+            .map(|b| !b.is_empty() && b != "unknown")
+            .unwrap_or(false),
+        "{}",
+        m["provenance"]
     );
     assert!(m["provenance"]["migration_substance_problems"]
         .as_array()
