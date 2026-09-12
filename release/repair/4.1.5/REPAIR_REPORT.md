@@ -7,7 +7,7 @@ Written for: the independent verifier re-verifying the candidate, and the produc
 | Rejected candidate | 4.1.4 at commit `47d8394b945bcfd9f35a5fee80836e424a4570dc` (tag `v4.1.4-rc1`) — verdict OS_RELEASE_CANDIDATE_REJECTED (`release/verification/4.1.4/INDEPENDENT_REVERIFICATION_REPORT.md`, `VERDICT.md`) |
 | Repair branch | `release/4.1.5-rc1` (branched from the verifier's commit `f4b3429`; nothing rewritten, nothing merged to `main`) |
 | Repair code commit | `25dac6e` |
-| Candidate commit | `CANDIDATE_COMMIT` (adds `release/releases/4.1.5/`, the three harness reruns and the regenerated evidence; tag `v4.1.5-rc1`) |
+| Candidate commit | the commit tagged **`v4.1.5-rc1`** on `release/4.1.5-rc1` (`git rev-parse v4.1.5-rc1^{commit}`; exact hash also given in the handoff message). It carries the payload `release/releases/4.1.5/` built at `2e53657`, the clean-clone harness reruns, the regenerated evidence and this report. |
 | Release version | 4.1.5 — kernel payload changed (TOOL_POLICY.plugins registry, authority classes, precedence rules, four schemas) → new immutable PATCH release; 4.1.4 untouched and REJECTED |
 | Migration chain | `M-4.1.1-4.1.2` → `M-4.1.2-4.1.3` → `M-4.1.3-4.1.4` → `M-4.1.4-4.1.5`; `supported_from_versions` 4.1.1 / 4.1.2 / 4.1.3 / 4.1.4; exercised from a consumer created by the genuine 4.1.2 binary through to 4.1.5 with ledgered rollbacks |
 | Certification | **pending** — READY_FOR_INDEPENDENT_REVERIFICATION; the implementer has not certified anything |
