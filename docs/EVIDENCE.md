@@ -1,6 +1,6 @@
 # Implementer test evidence — agentic-engineering-os 4.1.5 (repair candidate)
 
-Collected: 2026-09-12T19:15:28Z · commit: 25dac6e · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
+Collected: 2026-09-12T19:26:18Z · commit: 2e53657 · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
 
 > Implementer evidence only. Certification remains pending independent re-verification.
 > Status vocabulary: PASS | FAIL | NOT_AVAILABLE (tool missing) | NOT_RUN (not executed) | NOT_APPLICABLE (with reason).
@@ -24,13 +24,13 @@ pytest: available
 |---|---|
 | Rust unit tests (gov-runtime) | PASS (19 passed; 0 failed) |
 | Certification harness (7 fixtures + architectural + repair regressions for the 4.1.2, 4.1.3 and 4.1.4 findings) | PASS (49 passed; 0 failed) |
-| Python capability plugin tests | PASS (4 passed in 0.12s) |
+| Python capability plugin tests | PASS (4 passed in 0.11s) |
 | Clippy (`cargo clippy --all-targets`) | PASS (exit 0, warnings=0, errors=0; warning lines include per-crate summaries) |
 | rustfmt (`cargo fmt --check`) | PASS (rustfmt --check: formatted) |
 | Release build (`cargo build --release`) | PASS (exit 0) |
-| First independent held-out harness rerun (unchanged, 4.1.2 verifier) | First verifier harness (4.1.2) rerun 2026-09-12T19:15:20Z: PASS=36, FAIL=1, INFO=1, ERROR=0 (verifier's own run: PASS=12, FAIL=25, INFO=1, ERROR=0); harness unchanged; non-PASS: ['HV-08', 'HV-08b'] |
-| Second independent held-out harness rerun (unchanged, 4.1.3 verifier) | Second verifier harness (4.1.3) rerun 2026-09-12T19:15:20Z: PASS=12, FAIL=3, INFO=0, ERROR=0 (verifier's own run: PASS=6, FAIL=9, INFO=0, ERROR=0); harness unchanged; non-PASS: ['NV-19', 'NV-09', 'NV-16'] |
-| Third independent held-out harness rerun (unchanged, 4.1.4 verifier) | Third verifier harness (4.1.4) rerun 2026-09-12T19:15:20Z: PASS=14, FAIL=2, INFO=0, ERROR=0 (verifier's own run: PASS=13, FAIL=3, INFO=0, ERROR=0); harness unchanged; non-PASS: ['VV-05', 'VV-07'] |
+| First independent held-out harness rerun (unchanged, 4.1.2 verifier) | First verifier harness (4.1.2) rerun 2026-09-12T19:24:21Z (clean clone of tag v4.1.5-rc1): PASS=36, FAIL=1, INFO=1, ERROR=0 (verifier's own run: PASS=12, FAIL=25, INFO=1, ERROR=0); harness unchanged; non-PASS: ['HV-08', 'HV-08b'] |
+| Second independent held-out harness rerun (unchanged, 4.1.3 verifier) | Second verifier harness (4.1.3) rerun 2026-09-12T19:24:21Z (clean clone of tag v4.1.5-rc1): PASS=13, FAIL=2, INFO=0, ERROR=0 (verifier's own run: PASS=6, FAIL=9, INFO=0, ERROR=0); harness unchanged; non-PASS: ['NV-19', 'NV-09'] |
+| Third independent held-out harness rerun (unchanged, 4.1.4 verifier) | Third verifier harness (4.1.4) rerun 2026-09-12T19:24:21Z (clean clone of tag v4.1.5-rc1): PASS=14, FAIL=2, INFO=0, ERROR=0 (verifier's own run: PASS=13, FAIL=3, INFO=0, ERROR=0); harness unchanged; non-PASS: ['VV-05', 'VV-07'] |
 
 ## Certification tests
 - arch::core_crates_have_no_python_or_node_bindings ... ok
@@ -71,9 +71,9 @@ pytest: available
 - repair::freeze_writes_is_honoured_by_adopt_and_upstream ... ok
 - repair::plugin_host_large_response_through_cli ... ok
 - repair::implementation_prerequisites_and_symbol_route ... ok
-- repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
 - repair::policy_enforcement_coverage_is_complete_and_honest ... ok
 - repair::reranker_hook_invoked_and_never_silently_skipped ... ok
+- repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
 - repair::sensitivity_classes_and_namespaces_are_enforced ... ok
 - repair::task_close_enforces_mutation_scope ... ok
 - repair::unmeasured_memory_recall_is_not_green ... ok
@@ -85,21 +85,21 @@ pytest: available
 
 ## Unit tests
 - lock::tests::versions_and_compat ... ok
-- memory::embeddings::tests::sha1_matches_known_vector ... ok
 - policy_precedence::tests::floors_and_additive_sets ... ok
-- policy_precedence::tests::pattern_matching ... ok
 - kernel_trust::tests::uninstalled_projects_keep_the_installed_kernel_path_and_never_block ... ok
-- memory::chunking::tests::hierarchical_chunks ... ok
+- memory::embeddings::tests::sha1_matches_known_vector ... ok
 - exceptions::tests::a_fabricated_decision_reference_is_refused ... ok
-- util::tests::hashing_is_canonical ... ok
-- records::tests::parse_yaml_and_markdown_records ... ok
+- memory::chunking::tests::hierarchical_chunks ... ok
+- policy_precedence::tests::pattern_matching ... ok
 - util::tests::deep_helpers ... ok
+- records::tests::parse_yaml_and_markdown_records ... ok
+- util::tests::hashing_is_canonical ... ok
 - memory::embeddings::tests::deterministic_unit_vectors ... ok
-- exceptions::tests::lifecycle_scope_and_authority_are_all_required ... ok
 - security::secrets::tests::detects_and_redacts ... ok
-- paths::tests::secret_classification_can_never_be_downgraded ... ok
-- util::tests::glob_semantics ... ok
+- exceptions::tests::lifecycle_scope_and_authority_are_all_required ... ok
 - capabilities::host::tests::bad_json_and_protocol_mismatch_are_reported ... ok
+- util::tests::glob_semantics ... ok
+- paths::tests::secret_classification_can_never_be_downgraded ... ok
 - capabilities::host::tests::large_stdin_request_and_stderr_flood_are_drained ... ok
 - capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock ... ok
 - capabilities::host::tests::timeout_kills_child_promptly ... ok

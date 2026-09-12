@@ -1,6 +1,4 @@
-   Compiling gov-runtime v4.1.5 (/home/usain/Dynamic-Agentic-Engineering-OS/runtime)
-   Compiling gov-cli v4.1.5 (/home/usain/Dynamic-Agentic-Engineering-OS/cli)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.22s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
      Running ../tests/certification/main.rs (target/debug/deps/certification-8373d4210bc8789e)
 
 running 49 tests
@@ -42,9 +40,9 @@ test repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index .
 test repair::freeze_writes_is_honoured_by_adopt_and_upstream ... ok
 test repair::plugin_host_large_response_through_cli ... ok
 test repair::implementation_prerequisites_and_symbol_route ... ok
-test repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
 test repair::policy_enforcement_coverage_is_complete_and_honest ... ok
 test repair::reranker_hook_invoked_and_never_silently_skipped ... ok
+test repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
 test repair::sensitivity_classes_and_namespaces_are_enforced ... ok
 test repair::task_close_enforces_mutation_scope ... ok
 test repair::unmeasured_memory_recall_is_not_green ... ok
@@ -55,5 +53,5 @@ test update::update_from_previous_release_preserves_project_and_rolls_back ... o
 test repair::benchmark_records_evidence_and_selection_pins_through_decision has been running for over 60 seconds
 test repair::benchmark_records_evidence_and_selection_pins_through_decision ... ok
 
-test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 122.92s
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 122.67s
 

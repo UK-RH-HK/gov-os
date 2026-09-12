@@ -1,6 +1,6 @@
 # First verifier harness (4.1.2) — implementer rerun for candidate 4.1.5
 
-Harness `release/verification/4.1.2/heldout/harness.py` executed **unchanged** (byte-identical to the verifier's commit) with `GOV_CANONICAL_ROOT` set to this repository and `GOV_VERIFIER_OUT` pointing here. The verifier's own results are untouched.
+Harness `release/verification/4.1.2/heldout/harness.py` executed **unchanged** (byte-identical to the verifier's commit) from a fresh `git clone` of tag `v4.1.5-rc1`, with `GOV_CANONICAL_ROOT` set to that clone and `GOV_VERIFIER_OUT` pointing here. The verifier's own results are untouched.
 
 | Verdict | Verifier run | Rerun (4.1.5) |
 |---|---|---|

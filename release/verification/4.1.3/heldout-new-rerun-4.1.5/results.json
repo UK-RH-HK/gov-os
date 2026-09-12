@@ -1,6 +1,6 @@
 {
-  "work_dir": "/tmp/gov-verifier2-dnkxovaa",
-  "candidate_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
+  "work_dir": "/tmp/gov-verifier2-5nf8q2yw",
+  "candidate_commit": "2e53657ac0ea3e334159247cca4f25c2866511d4",
   "gov413": "framework: agentic-engineering-os\nversion: 4.1.5\ncli_version: 4.1.5\nruntime_version: 4.1.5\nindex_version: 4.1.5-idx3\n",
   "gov412": "framework: agentic-engineering-os\nversion: 4.1.2\ncli_version: 4.1.2\nruntime_version: 4.1.2\nindex_version: 4.1.2-idx1\n",
   "results": [
@@ -340,11 +340,11 @@
           "D028": [
             false,
             "high",
-            "plugin descriptor /tmp/gov-verifier2-dnkxovaa/nv04-greenfield/governance/project/plugins/rogue.yaml is invalid and cannot execute: plugin-descriptor schema: : \""
+            "plugin descriptor /tmp/gov-verifier2-5nf8q2yw/nv04-greenfield/governance/project/plugins/rogue.yaml is invalid and cannot execute: plugin-descriptor schema: : \""
           ]
         },
         "audit_plugin_findings": [
-          "plugin descriptor /tmp/gov-verifier2-dnkxovaa/nv04-greenfield/governance/project/plugins/rogue.yaml is invalid and cannot execute: plugin-descriptor schema: : \"version\" is a required property"
+          "plugin descriptor /tmp/gov-verifier2-5nf8q2yw/nv04-greenfield/governance/project/plugins/rogue.yaml is invalid and cannot execute: plugin-descriptor schema: : \"version\" is a required property"
         ],
         "L0_rebuild_ok": false,
         "L0_rebuild_error": "PLUGIN_DESCRIPTOR_INVALID",
@@ -427,7 +427,7 @@
         "baseline_pass": true,
         "baseline_recall_at_k": 0.9,
         "baseline_mrr": 0.7416666666666667,
-        "benchmark_seconds": 0.7,
+        "benchmark_seconds": 4.3,
         "benchmark_rows": {
           "current": {
             "usable": true,
@@ -439,7 +439,7 @@
             "forbidden_violations": 0,
             "symbol_recall": 1.0,
             "avg_query_latency_ms": 3.1,
-            "index_ms": 98,
+            "index_ms": 94,
             "vectors": 497,
             "dimensions": 512,
             "error": null
@@ -453,8 +453,8 @@
             "superseded_hit_rate": 0.0,
             "forbidden_violations": 0,
             "symbol_recall": 1.0,
-            "avg_query_latency_ms": 15.9,
-            "index_ms": 249,
+            "avg_query_latency_ms": 15.8,
+            "index_ms": 243,
             "vectors": 497,
             "dimensions": 512,
             "error": null
@@ -468,8 +468,8 @@
             "superseded_hit_rate": 0.0,
             "forbidden_violations": 0,
             "symbol_recall": 1.0,
-            "avg_query_latency_ms": 1.9,
-            "index_ms": 91,
+            "avg_query_latency_ms": 1.7,
+            "index_ms": 84,
             "vectors": 497,
             "dimensions": 128,
             "error": null
@@ -665,18 +665,18 @@
         "install_from_release_dir": {
           "lock_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
           "manifest_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
-          "project_head": "70d242dce9754227179a88ae504152aaa80562e8",
+          "project_head": "7708587ba5b10fa9af32b3e7ca5572b7c1ee4c35",
           "equals_project_head": false,
           "source": "release:agentic-engineering-os@4.1.3",
           "release_hash_eq_manifest": true
         },
         "install_from_canonical_root": {
-          "release_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
+          "release_commit": "2e53657ac0ea3e334159247cca4f25c2866511d4",
           "source": "source:agentic-engineering-os@4.1.5",
           "equals_project_head": false
         },
         "install_from_embedded_payload": {
-          "release_commit": "f4b34299d89ed61fc2a2e4d8c0ce083ce058d44c",
+          "release_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
           "source": "embedded:agentic-engineering-os@4.1.5",
           "release_hash_eq_manifest": false
         }
@@ -759,8 +759,8 @@
     {
       "id": "NV-16",
       "title": "release 4.1.3 identity: verify ok, payload == kernel data at manifest.release_commit (ancestor of the candidate), rebuild from the candidate reproduces release_hash + file hashes, second build refused (RELEASE_IMMUTABLE), repository untouched",
-      "verdict": "FAIL",
-      "severity": "HIGH",
+      "verdict": "PASS",
+      "severity": null,
       "detail": {
         "release_verify": {
           "version": "4.1.3",
@@ -785,7 +785,7 @@
         "rebuild_file_hashes_equal": true,
         "rebuild_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
         "immutability_error": "RELEASE_IMMUTABLE",
-        "release_dir_untouched": false
+        "release_dir_untouched": true
       }
     },
     {

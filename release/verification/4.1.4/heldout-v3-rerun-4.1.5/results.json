@@ -446,8 +446,10 @@
      "ok": false,
      "code": "RELEASE_IMMUTABLE"
     },
-    "tag_points_at_head": [],
-    "head": "25dac6efcc4a0d8149d12b619b1776788f34dcaf"
+    "tag_points_at_head": [
+     "v4.1.5-rc1"
+    ],
+    "head": "2e53657ac0ea3e334159247cca4f25c2866511d4"
    }
   }
  },
@@ -463,7 +465,7 @@
      "ok": false,
      "code": "MUTATION_SCOPE_VIOLATION",
      "message": "task TASK-0001: the repository shows mutations the report does not declare or the contract does not allow (undeclared: [\"src/lib.rs\"]; out of scope: [\"src/lib.rs: outside allowed_paths [\\\"docs/**\\\"] and not governed by a committed CIT\"]); declare eve",
-     "details": "{\"undeclared\": [\"src/lib.rs\"], \"out_of_scope\": [\"src/lib.rs: outside allowed_paths [\\\"docs/**\\\"] and not governed by a committed CIT\"], \"reported\": [\"docs/notes.md\"], \"observed\": [\"docs/notes.md\", \"src/lib.rs\"], \"evidence\": {\"baseline\": \"claim baseline 2026-09-12 (commit 743b9392f861c00d89b3ca7666d5"
+     "details": "{\"undeclared\": [\"src/lib.rs\"], \"out_of_scope\": [\"src/lib.rs: outside allowed_paths [\\\"docs/**\\\"] and not governed by a committed CIT\"], \"reported\": [\"docs/notes.md\"], \"observed\": [\"docs/notes.md\", \"src/lib.rs\"], \"evidence\": {\"baseline\": \"claim baseline 2026-09-12 (commit 003b6c257bdb41162e66d68145b8"
     },
     "declared_out_of_scope": {
      "ok": false,
@@ -488,17 +490,17 @@
   "detail": {
    "failures": [],
    "observations": {
-    "manifest_1": "8e250a9312ee06e05bf523d492a7e0703d3ede10d8ff230224866fd0f13bd2cf",
-    "manifest_2": "8e250a9312ee06e05bf523d492a7e0703d3ede10d8ff230224866fd0f13bd2cf",
+    "manifest_1": "92839168e47f651fa3c59425e04a8a7bc2c93710b5b48d01772e6ced6f972ec9",
+    "manifest_2": "92839168e47f651fa3c59425e04a8a7bc2c93710b5b48d01772e6ced6f972ec9",
     "runtime_dir_before": [
      "claims.db",
      "state.db",
      "tasks",
      "telemetry"
     ],
-    "claims_after_wipe": "[{\"task_id\": \"TASK-0001\", \"session_id\": \"S-claimer\", \"role\": \"backend-engineer\", \"claimed_at\": \"2026-09-12T19:13:45Z\", \"expires_at\": \"2026-09-12T23:13:45Z\", \"expired\": false}]",
-    "manifest_3_after_full_wipe": "8e250a9312ee06e05bf523d492a7e0703d3ede10d8ff230224866fd0f13bd2cf",
-    "manifest_machineB": "8e250a9312ee06e05bf523d492a7e0703d3ede10d8ff230224866fd0f13bd2cf",
+    "claims_after_wipe": "[{\"task_id\": \"TASK-0001\", \"session_id\": \"S-claimer\", \"role\": \"backend-engineer\", \"claimed_at\": \"2026-09-12T19:22:56Z\", \"expires_at\": \"2026-09-12T23:22:56Z\", \"expired\": false}]",
+    "manifest_3_after_full_wipe": "92839168e47f651fa3c59425e04a8a7bc2c93710b5b48d01772e6ced6f972ec9",
+    "manifest_machineB": "92839168e47f651fa3c59425e04a8a7bc2c93710b5b48d01772e6ced6f972ec9",
     "machineB_memory_verify": {
      "ok": true,
      "detail": "{\"queries\": 17, \"pending_queries\": 2, \"min_queries\": 5, \"measured\": true, \"status\": \"PASS\", \"recall_at_k\": 1.0, \"mrr\": 1.0, \"precision_at_k\": 0.9705882352941176, \"stale_hit_rate\": 0.0, \"superseded_hit"
@@ -815,14 +817,14 @@
     },
     "review_by_independent_reviewer": {
      "ok": true,
-     "detail": "{\"stage\": \"A5\", \"verdict\": {\"verdict\": \"MIGRATION_PLAN_APPROVED\", \"session\": \"S-independent-reviewer\", \"role\": \"migration-reviewer\", \"at\": \"2026-09-12T19:13:53Z\", \"tests\": 30, \"notes\": null}}"
+     "detail": "{\"stage\": \"A5\", \"verdict\": {\"verdict\": \"MIGRATION_PLAN_APPROVED\", \"session\": \"S-independent-reviewer\", \"role\": \"migration-reviewer\", \"at\": \"2026-09-12T19:23:00Z\", \"tests\": 30, \"notes\": null}}"
     },
     "migrate_batch_0": {
      "ok": true,
      "code": null,
      "moved": null,
      "skipped": null,
-     "gated": "{\"stage\": \"A6\", \"batches\": [{\"batch\": 0, \"at\": \"2026-09-12T19:13:53Z\", \"installed\": {\"version\": \"4.1.5\", \"overlay_written\": [\"PROJECT_POLICY.yaml\", \"REPOSITORY_CONTRACT.yaml\", \"CAPABILITY_PROFILE.yaml"
+     "gated": "{\"stage\": \"A6\", \"batches\": [{\"batch\": 0, \"at\": \"2026-09-12T19:23:00Z\", \"installed\": {\"version\": \"4.1.5\", \"overlay_written\": [\"PROJECT_POLICY.yaml\", \"REPOSITORY_CONTRACT.yaml\", \"CAPABILITY_PROFILE.yaml"
     },
     "migrate_batch_1": {
      "ok": false,
@@ -961,7 +963,7 @@
     "rebuild_after_corruption": {
      "ok": true,
      "code": null,
-     "manifest": "f4163700a85a53bfbec1d6717e6f7fee8dd7e688beaffb377bd4e8cdeb6de33c"
+     "manifest": "6c469e7c26e9c47513e7865df27941b39836fd74c09013e30f11bac1027aea5e"
     },
     "tools_resolve_missing": "{\"role\": \"orchestrator\", \"capability\": \"build\", \"project_languages\": [\"rust\"], \"tools\": [{\"tool_id\": \"TOOL-CARGO-001\", \"name\": \"cargo-test\", \"type\": \"CLI\", \"version\": \"system\", \"languages\": [\"rust\"], \"available\": true}], \"mcp_servers\": [], \"capability_gap\": false, \"reason\": \"\", \"next\": \"\"}"
    }

@@ -28,7 +28,7 @@ remains ok.
 | Certification suite (7 fixtures + architecture + regressions for the 4.1.2, 4.1.3 and 4.1.4 findings) | PASS — 49 passed, 0 failed (7 fixtures, architecture, 17 + 9 + 5 repair regressions) |
 | Python plugin tests | PASS — 4 passed |
 | First verifier harness, unchanged (`release/verification/4.1.2/heldout/harness.py`) | 36 PASS / 1 FAIL (HV-08b) / 1 INFO (HV-08) / 0 ERROR — verifier run 12 / 25 / 1 / 0 |
-| Second verifier harness, unchanged (`release/verification/4.1.3/heldout-new/harness_v2.py`) | 12 PASS / 3 FAIL (NV-09, NV-19 frozen to the 4.1.3 payload; NV-16 `repository untouched` while the 4.1.5 payload was still untracked) / 0 ERROR — verifier run 6 / 9 / 0 / 0 |
+| Second verifier harness, unchanged (`release/verification/4.1.3/heldout-new/harness_v2.py`) | 13 PASS / 2 FAIL (NV-09, NV-19 — both frozen to the immutable 4.1.3 payload) / 0 ERROR — verifier run 6 / 9 / 0 / 0. In the working tree during development NV-16 also reports FAIL while the new payload directory is untracked; from the committed tag it passes. |
 | Third verifier harness, unchanged (`release/verification/4.1.4/heldout-v3/harness_v3.py`) | 14 PASS / 2 FAIL (VV-05, VV-07 pinned to the 4.1.4 candidate identity, §5) / 0 ERROR — verifier run 13 / 3 / 0 / 0. **VV-03, VV-04 and VV-14 — the three findings — all PASS.** |
 | rustfmt (`cargo fmt --all -- --check`) | PASS — `cargo fmt --all -- --check` clean |
 | Clippy (`cargo clippy --workspace --all-targets`) | PASS — exit 0, 0 warnings, 0 errors |
@@ -132,8 +132,8 @@ tool review, forged approval decision, self-attested mutation report, hand-writt
   `repair3::current_release_payload_identity_and_hygiene`.
 - **HV-08b** (first harness) remains a non-blocker by construction (D-0006), as both later verifiers confirmed.
 - **NV-16** asserts that a release build leaves `release/releases` untouched in git. It reports dirty in the working
-  tree while the new 4.1.5 payload is still untracked, and passes from a committed checkout; the clean-clone
-  reproduction of the tag is the authoritative evidence for it.
+  tree while a new payload directory is still untracked, and PASSES from the committed tag — the clean-clone
+  reproduction is the authoritative evidence, and it passes there.
 
 ## 6. Escalation boundary (directive §9)
 

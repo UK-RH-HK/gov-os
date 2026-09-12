@@ -1,5 +1,5 @@
 {
-  "work_dir": "/tmp/gov-verifier-9oz_u0yu",
+  "work_dir": "/tmp/gov-verifier-9qzxsubh",
   "results": [
     {
       "id": "HV-01",
@@ -316,8 +316,8 @@
           "findings": 0,
           "detail": {
             "deep": false,
-            "tracked": "78e47c3f1d469dca02a388931bdb60c971fff0374fb8c9bcb15273ebd3212b84",
-            "live": "78e47c3f1d469dca02a388931bdb60c971fff0374fb8c9bcb15273ebd3212b84"
+            "tracked": "72e893261e48461c8bb322886d1dfa128e5268c3046e240324d5abd286af6031",
+            "live": "72e893261e48461c8bb322886d1dfa128e5268c3046e240324d5abd286af6031"
           }
         },
         "semantic_query_hits": 5
@@ -386,8 +386,8 @@
             [
               "file:src/app/retry.py",
               "file:governance/kernel/overlay-templates/MODEL_ROUTING_OVERRIDES.yaml",
-              "file:governance/project/MODEL_ROUTING_OVERRIDES.yaml",
-              "file:src/app/retry.py"
+              "file:src/app/retry.py",
+              "file:governance/project/MODEL_ROUTING_OVERRIDES.yaml"
             ]
           ],
           "V-SEM-2": [
@@ -538,7 +538,7 @@
       "detail": {
         "identical": true,
         "before": {
-          "manifest": "b0c49232fa2f66f3c9fcf87e4fff20debb0ad69c0329b263f89596870769a8b0",
+          "manifest": "973d4e85ab70a4721918f054077c72997f3079abebead1bb7ae6727e488fdf9b",
           "adapters": {
             "api": "d3d7152ab786699f0e9a1ddf0cf652d0926cbfce5ac03327487678d3df4cf14f",
             "cli": "cf44239373ce3aec452affff8f0a284092b21597e4a4c1d72f399782928aad70",
@@ -558,7 +558,7 @@
           }
         },
         "after": {
-          "manifest": "b0c49232fa2f66f3c9fcf87e4fff20debb0ad69c0329b263f89596870769a8b0",
+          "manifest": "973d4e85ab70a4721918f054077c72997f3079abebead1bb7ae6727e488fdf9b",
           "adapters": {
             "api": "d3d7152ab786699f0e9a1ddf0cf652d0926cbfce5ac03327487678d3df4cf14f",
             "cli": "cf44239373ce3aec452affff8f0a284092b21597e4a4c1d72f399782928aad70",
@@ -893,8 +893,8 @@
       "verdict": "PASS",
       "severity": null,
       "detail": {
-        "manifest_A": "94f7dc969fb54c0107c0bb9ce995447a5a32220bd0464abb61a3a4afd53b01e3",
-        "manifest_B": "94f7dc969fb54c0107c0bb9ce995447a5a32220bd0464abb61a3a4afd53b01e3",
+        "manifest_A": "017dee9e5948a6a1565a7d5cf4c4fada61a6d4d74cf87ddd150632e9cd9e2082",
+        "manifest_B": "017dee9e5948a6a1565a7d5cf4c4fada61a6d4d74cf87ddd150632e9cd9e2082",
         "counts_A": {
           "total": 0,
           "runnable": 0,
