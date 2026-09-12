@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/kernel-manifest.schema.json",
+  "title": "kernel-manifest",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "framework": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "payload_hash": {
+      "type": "string"
+    },
+    "schema_versions": {
+      "type": "object"
+    },
+    "cli_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "runtime_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "adapter_versions": {
+      "type": "object"
+    },
+    "supported_from_versions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+      }
+    },
+    "built_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "framework",
+    "version",
+    "files",
+    "payload_hash"
+  ]
+}

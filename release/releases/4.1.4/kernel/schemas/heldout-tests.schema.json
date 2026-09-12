@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/heldout-tests.schema.json",
+  "title": "heldout-tests",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "expected_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "k": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "query",
+          "expected_refs"
+        ]
+      }
+    }
+  },
+  "required": [
+    "queries"
+  ]
+}

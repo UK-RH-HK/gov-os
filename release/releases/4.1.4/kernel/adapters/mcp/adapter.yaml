@@ -1,0 +1,6 @@
+id: mcp
+version: 1.0.0
+description: MCP connection manifest scoped by role (generated from tool registry + overlay permissions).
+output: governance/generated/adapters/mcp/mcp-connections.json
+format: json
+template: template.json

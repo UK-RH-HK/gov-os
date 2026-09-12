@@ -6,8 +6,8 @@ Written for: the independent verifier re-verifying the candidate, and the produc
 |---|---|
 | Rejected candidate | 4.1.3 at commit `26ab5b6eb111d573f8686bc4f4b1dfc20539f45e` (tag `v4.1.3-rc1`) — verdict OS_RELEASE_CANDIDATE_REJECTED (`release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md`, `VERDICT.md`) |
 | Repair branch | `release/4.1.4-rc1` (branched from the verifier's commit `9cb05d8` on `release/4.1.2-rc1`; nothing rewritten, nothing merged to `main`) |
-| Repair code commit | `REPAIR_CODE_COMMIT` |
-| Candidate commit | `CANDIDATE_COMMIT` (adds `release/releases/4.1.4/`; tag `v4.1.4-rc1`) |
+| Repair code commit | `c6b594b` |
+| Candidate commit | the commit tagged `v4.1.4-rc1` on `release/4.1.4-rc1` (exact hash in the handoff message; it adds `release/releases/4.1.4/`, both harness reruns and the regenerated evidence on top of the code commit `c6b594b`) |
 | Release version | 4.1.4 — kernel payload changed (POLICY_PRECEDENCE, TOOL_POLICY.plugins, schemas, roles/authority map, migration) → new immutable PATCH release; 4.1.3 untouched and REJECTED |
 | Migration chain | `M-4.1.1-4.1.2` → `M-4.1.2-4.1.3` → `M-4.1.3-4.1.4`; supported_from 4.1.1 / 4.1.2 / 4.1.3; exercised from a genuine 4.1.2 payload through 4.1.3 to 4.1.4 with two ledgered rollbacks (`repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`) |
 | Certification | **pending** — READY_FOR_INDEPENDENT_REVERIFICATION; the implementer has not certified anything |
@@ -23,16 +23,16 @@ transcribed verbatim from the verifier's `VERDICT.md` at the verifier's explicit
 
 | Suite | Result |
 |---|---|
-| `cargo build --release` (clean clone) | CLEAN_BUILD |
-| Rust unit tests (gov-runtime) | UNIT_TOTAL |
-| Certification suite (7 fixtures + architecture + 17 repair tests for 4.1.2 findings + 9 repair tests for 4.1.3 findings) | CERT_TOTAL |
-| Python plugin tests | PY_TOTAL |
-| First verifier harness, unchanged (`release/verification/4.1.2/heldout/harness.py`) | HV_TOTAL |
-| Second verifier harness, unchanged (`release/verification/4.1.3/heldout-new/harness_v2.py`) | NV_TOTAL |
-| rustfmt (`cargo fmt --all -- --check`) | FMT_RESULT |
-| Clippy (`cargo clippy --workspace --all-targets`) | CLIPPY_RESULT |
-| `gov release verify release/releases/4.1.4` | RELEASE_VERIFY |
-| Working tree at the candidate commit | TREE_STATUS |
+| `cargo build --release` (clean clone) | PASS (exit 0, `cargo build --release`; clean-clone reproduction recorded in §7) |
+| Rust unit tests (gov-runtime) | PASS — 16 passed, 0 failed |
+| Certification suite (7 fixtures + architecture + 17 repair tests for 4.1.2 findings + 9 repair tests for 4.1.3 findings) | PASS — 44 passed, 0 failed |
+| Python plugin tests | PASS — 4 passed |
+| First verifier harness, unchanged (`release/verification/4.1.2/heldout/harness.py`) | 36 PASS / 1 FAIL (HV-08b, baseline embedder, accepted non-blocking) / 1 INFO (HV-08) / 0 ERROR — original verifier run 12 / 25 / 1 / 0 |
+| Second verifier harness, unchanged (`release/verification/4.1.3/heldout-new/harness_v2.py`) | 13 PASS / 2 FAIL (NV-09, NV-19 — both read the immutable 4.1.3 payload, see §4) / 0 INFO / 0 ERROR — original verifier run 6 / 9 / 0 / 0 |
+| rustfmt (`cargo fmt --all -- --check`) | PASS — `cargo fmt --all -- --check` clean (whole workspace formatted) |
+| Clippy (`cargo clippy --workspace --all-targets`) | PASS — exit 0, 0 warnings, 0 errors |
+| `gov release verify release/releases/4.1.4` | ok — 4.1.4 payload verified, release_hash matches kernel, certification READY_FOR_INDEPENDENT_REVERIFICATION |
+| Working tree at the candidate commit | clean (`git status --porcelain` empty at the candidate commit) |
 
 Evidence: `docs/EVIDENCE.md`, `release/evidence/`, `release/verification/4.1.2/heldout-rerun-4.1.4/`,
 `release/verification/4.1.3/heldout-new-rerun-4.1.4/`.
@@ -65,7 +65,7 @@ except HV-08b (by construction, accepted by the second verifier). H3/H5 are no l
 | **L-N3** LOW — `memory select` derives `human_approved` from `--by` | string comparison | human approval never caller-supplied | `benchmark.rs`: derived from the acting role's authority level (L5 = human), `approved_by_kind` recorded | (covered by benchmark test) | — | — | — |
 | **L-N4** LOW — self-declared role | design | trust boundary must be explicit | documented in `docs/ARCHITECTURE.md` §4.8 | — | — | — | remains a boundary for adapters |
 | **L-N5** LOW — stale docs | — | — | `fixtures/update/README.md`, `docs/FIXTURES.md`, `docs/ARCHITECTURE.md`, `docs/COMMANDS.md`, `docs/RELEASE.md`, `README.md` updated | — | — | — | — |
-| **L-N6** LOW — rustfmt divergent; clippy warnings | — | — | `cargo fmt --all` applied to the whole workspace; clippy diagnostics fixed | evidence | FMT_RESULT / CLIPPY_RESULT | — | — |
+| **L-N6** LOW — rustfmt divergent; clippy warnings | — | — | `cargo fmt --all` applied to the whole workspace; clippy diagnostics fixed | evidence | PASS — `cargo fmt --all -- --check` clean (whole workspace formatted) / PASS — exit 0, 0 warnings, 0 errors | — | — |
 | **L-N7** LOW — optional verifier identity in the lock | — | — | not implemented (optional per the verifier); the manifest certification block carries the verifier identity | — | — | — | — |
 | §11 evidence vocabulary | — | — | `scripts/collect_evidence.sh` reports PASS / FAIL / NOT_AVAILABLE / NOT_RUN / NOT_APPLICABLE and both harness reruns | — | — | — | — |
 | §13 policy consumption | — | — | ENFORCEMENT_MAP extended for POLICY_PRECEDENCE, TOOL_POLICY.plugins, new authority classes; `descriptor_schema` and `require_valid_descriptor` classified informational with reasons | `repair::policy_enforcement_coverage_is_complete_and_honest` | — | — | — |
@@ -98,3 +98,31 @@ self-certification).
 D-0005 (interface truth / plugin governance), D-0006 (embedding candidate policy), TASK-0011, RPT-0011,
 RES-0001, API-0001 v1.1, release notes `release/notes/4.1.4.md`, migration `migrations/M-4.1.3-4.1.4.yaml`,
 amended `migrations/M-4.1.2-4.1.3.yaml` (description + history only).
+
+## 7. Per-scenario results of the unchanged harness reruns
+
+Second verifier harness (`release/verification/4.1.3/heldout-new-rerun-4.1.4/results.json`):
+
+| ID | Original (4.1.3) | Rerun (4.1.4) | Note |
+|---|---|---|---|
+| NV-01 | FAIL | PASS |  |
+| NV-02 | FAIL | PASS |  |
+| NV-03 | FAIL | PASS | lock provenance, logical source, held-out file not indexed, rollback ledger |
+| NV-04 | FAIL | PASS |  |
+| NV-05 | FAIL | PASS |  |
+| NV-13 | PASS | PASS |  |
+| NV-19 | FAIL | FAIL | reads the immutable 4.1.3 payload migration/notes; repaired in 4.1.4 (M-4.1.3-4.1.4 + substance check) |
+| NV-06 | PASS | PASS |  |
+| NV-07 | FAIL | PASS |  |
+| NV-08 | FAIL | PASS |  |
+| NV-09 | FAIL | FAIL | reads the immutable 4.1.3 payload KERNEL.yaml; repaired in 4.1.4 (builder strict-YAML test) |
+| NV-10 | PASS | PASS |  |
+| NV-12 | PASS | PASS |  |
+| NV-16 | PASS | PASS | 4.1.3 reproduced from its recorded commit by `gov release build` |
+| NV-17 | PASS | PASS |  |
+
+First verifier harness (`release/verification/4.1.2/heldout-rerun-4.1.4/results.json`): 36 PASS / 1 FAIL / 1 INFO / 0 ERROR,
+identical to the 4.1.3 rerun apart from HV-08 metrics; the only FAIL is HV-08b.
+
+Clean-clone reproduction of the candidate commit: see the handoff message (build, unit, certification, plugin tests,
+both harnesses and `gov release verify` executed from a fresh `git clone` of the candidate tag).

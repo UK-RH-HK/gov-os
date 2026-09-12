@@ -11,7 +11,7 @@ kind: protocol
 version: "1.1"
 history:
   - {version: "1", at: "2026-09-12", note: "initial contract; invariant 2 promised a silent built-in fallback for failing embed plugins"}
-  - {version: "1.1", at: "2026-09-12", note: "D-0005: embed/rerank fail closed (no silent fallback); code_intel degrades with a recorded degradation; plugin governance (schema, registration, pin, authority) is part of the contract"}
+  - {version: "1.1", at: "2026-09-12", note: "D-0005: embed/rerank fail closed (no silent fallback); code_intel degrades with a recorded degradation; plugin governance (schema, registration, pin, authority) is part of the contract; capability signatures rewritten as valid YAML strings (the v1 flow mappings did not parse under strict loaders)"}
 producers: [capabilities/python/govos_capabilities, capabilities/shell]
 consumers: [runtime/src/capabilities]
 contract:
@@ -30,10 +30,10 @@ contract:
     outputs: object (capability-specific)
     error: "{code: string, message: string} (present when ok=false)"
   capabilities:
-    embed: {inputs: {texts: [string], dimensions?: int}, outputs: {vectors: [[number]], dim: int}}
-    rerank: {inputs: {query: string, candidates: [{id, text}]}, outputs: {scores: [{id, score}]}}
-    code_intel: {inputs: {path: string, language: string, source: string}, outputs: {symbols: [{name, qualname, kind, lineno, end_lineno, parent, signature}], imports: [string], calls: [{from, name}], chunks: [{qualname, lineno, end_lineno}]}}
-    ecosystem: {inputs: {root: string}, outputs: {ecosystems: [{id, manifest, build?, test?, lint?, format?}]}}
+    embed: "inputs: {texts: [string], dimensions?: int}; outputs: {vectors: [[number]], dim: int}"
+    rerank: "inputs: {query: string, candidates: [{id, text}]}; outputs: {scores: [{id, score}]}"
+    code_intel: "inputs: {path: string, language: string, source: string}; outputs: {symbols: [{name, qualname, kind, lineno, end_lineno, parent, signature}], imports: [string], calls: [{from, name}], chunks: [{qualname, lineno, end_lineno}]}"
+    ecosystem: "inputs: {root: string}; outputs: {ecosystems: [{id, manifest, build?, test?, lint?, format?}]}"
   invariants:
     - The core never imports or links a plugin; it only spawns the declared command.
     - "embed and rerank fail closed: a pinned plugin that is missing, invalid, unauthorised, unhealthy, mis-pinned or failing is a typed error (EMBEDDER_UNAVAILABLE / EMBEDDER_MISMATCH / EMBEDDER_BAD_OUTPUT / RERANKER_UNAVAILABLE / RERANKER_MISMATCH or the plugin governance codes); the core never substitutes the built-in embedder for a pinned plugin (D-0005 supersedes the v1 fallback statement)."

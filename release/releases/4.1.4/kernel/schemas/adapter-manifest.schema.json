@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/adapter-manifest.schema.json",
+  "title": "adapter-manifest",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "kernel_hash": {
+      "type": "string"
+    },
+    "overlay_hash": {
+      "type": "string"
+    },
+    "adapters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "output",
+          "hash"
+        ]
+      }
+    },
+    "invariants_hash": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "kernel_hash",
+    "overlay_hash",
+    "adapters",
+    "invariants_hash"
+  ]
+}

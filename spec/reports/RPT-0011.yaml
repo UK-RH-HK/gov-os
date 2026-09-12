@@ -1,0 +1,53 @@
+id: RPT-0011
+type: report
+title: Closing report for TASK-0011 (second repair iteration, candidate 4.1.4)
+status: ACTIVE
+state_class: EVIDENCE
+created: '2026-09-12'
+task: TASK-0011
+role: orchestrator
+session: S-implementer-repair-2
+outcome: success
+work_completed: 'Every finding of the 4.1.3 re-verification repaired at root cause (C-N1 gate-derived CIT approval, H-N1 constitutional policy precedence, H-N2 governed plugins, M-N1..M-N8, M-B1, L-N1..L-N6) with builder regression tests (tests/certification/repair2.rs, 9 scenarios covering every listed bypass route) and adjacent negative tests; the nine confirmed repairs preserved (repair.rs unchanged in intent); both independent harnesses rerun unchanged; kernel payload bumped to 4.1.4 with migration M-4.1.3-4.1.4 and a truthful amendment of M-4.1.2-4.1.3; rustfmt applied and clippy clean; evidence regenerated with the five-state vocabulary; repair report at release/repair/4.1.4/REPAIR_REPORT.md.'
+files_changed:
+- runtime/
+- cli/
+- framework/
+- migrations/
+- tests/
+- fixtures/
+- capabilities/
+- scripts/
+- docs/
+- spec/
+- release/notes/
+- release/repair/
+- release/evidence/
+- release/releases/4.1.3/manifest.yaml
+- release/releases/4.1.3/manifest.json
+- release/verification/4.1.2/heldout-rerun-4.1.4/
+- release/verification/4.1.3/heldout-new-rerun-4.1.4/
+- release/CERTIFICATION_STATUS.md
+- README.md
+evidence:
+- release/repair/4.1.4/REPAIR_REPORT.md
+- docs/EVIDENCE.md
+- release/evidence/certification-tests.txt
+- release/verification/4.1.2/heldout-rerun-4.1.4/summary.txt
+- release/verification/4.1.3/heldout-new-rerun-4.1.4/summary.txt
+tests:
+  status: passed
+  reason: cargo test -p gov-runtime (unit), cargo test -p gov-cli --test certification (44 scenarios), pytest capabilities/tests, both independent harnesses rerun unchanged; see docs/EVIDENCE.md and the repair report totals
+discoveries:
+- A verifier test bound to an immutable released payload (NV-09, NV-19 on release/releases/4.1.3) cannot change verdict without mutating the payload; the repaired state is verified by equivalent builder tests against 4.1.4 and documented rather than hidden.
+- Template-default reconciliation on update is the migration-independent mechanism that lets an immutable, incomplete historical migration still converge upgraded projects to the current contract.
+- A single literal-like query token is an exact lookup; OR-of-subtokens lexical matching and semantic nearest neighbours over its n-grams produce noise, which masked whether a marker was actually indexed.
+risks:
+- HV-08b remains FAIL with the baseline embedder by construction (accepted as non-blocking by the second verifier; D-0006 records the candidate policy).
+- Roles are caller-declared; human answers are trusted from the session that relays them (documented boundary, docs/ARCHITECTURE.md 4.8).
+- Interpreter-only plugin commands without a local script file are pinned by version only (reported as such).
+lessons: []
+proposed_decisions: []
+unresolved:
+- Independent re-verification and certification verdict for 4.1.4.
+recommended_next_action: independent re-verification of candidate 4.1.4 (tag v4.1.4-rc1)

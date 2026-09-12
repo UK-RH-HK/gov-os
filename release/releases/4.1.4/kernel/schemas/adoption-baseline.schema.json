@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/adoption-baseline.schema.json",
+  "title": "adoption-baseline",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "adoption_id": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "session": {
+      "type": "string"
+    },
+    "commit": {
+      "type": "string"
+    },
+    "branch": {
+      "type": "string"
+    },
+    "dirty_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "untracked_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "baseline_tests": {
+      "type": "object"
+    },
+    "interrupted_work": {
+      "type": "object"
+    },
+    "stage_status": {
+      "type": "object"
+    },
+    "verdicts": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "adoption_id",
+    "started_at",
+    "stage_status"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/policy-SECURITY_POLICY.schema.json",
+  "title": "policy-SECURITY_POLICY",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "policy": {
+      "const": "SECURITY_POLICY"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "sensitivity_classes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "never_index_classes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "never_export_classes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "secret_path_patterns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "secret_content_patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "regex": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "regex"
+        ]
+      }
+    },
+    "on_secret_outside_secret_class": {
+      "type": "string"
+    },
+    "on_secret_in_export_payload": {
+      "type": "string"
+    },
+    "agent_read_default_for_secret_class": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy",
+    "version",
+    "never_index_classes",
+    "secret_path_patterns",
+    "secret_content_patterns"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/policy-LEARNING_POLICY.schema.json",
+  "title": "policy-LEARNING_POLICY",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "policy": {
+      "const": "LEARNING_POLICY"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "lesson_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lesson_lifecycle": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "corroboration_min_sources": {
+      "type": "integer"
+    },
+    "upstream_eligible_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "upstream": {
+      "type": "object"
+    },
+    "release_triggers": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "policy",
+    "version",
+    "lesson_scopes",
+    "upstream_eligible_scopes",
+    "upstream"
+  ]
+}

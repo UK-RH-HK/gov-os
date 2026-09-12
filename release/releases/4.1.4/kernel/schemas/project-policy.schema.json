@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.4/project-policy.schema.json",
+  "title": "project-policy",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "alias": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        },
+        "onboarding_mode": {
+          "type": "string",
+          "enum": [
+            "init",
+            "adopt"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "alias"
+      ]
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "framework_lock": {
+          "type": "string"
+        },
+        "kernel_dir": {
+          "type": "string"
+        },
+        "overlay_dir": {
+          "type": "string"
+        },
+        "generated_dir": {
+          "type": "string"
+        },
+        "runtime_dir": {
+          "type": "string"
+        }
+      }
+    },
+    "policy_overrides": {
+      "type": "object"
+    },
+    "staleness": {
+      "type": "object"
+    },
+    "readiness": {
+      "type": "object"
+    },
+    "tests": {
+      "type": "object"
+    },
+    "gates": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "project"
+  ]
+}

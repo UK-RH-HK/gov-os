@@ -1,0 +1,118 @@
+policy: POLICY_PRECEDENCE
+version: 1.0.0
+# Constitutional precedence (framework §21). Layers, highest first. A lower layer may specialise or strengthen a
+# higher one; it may never weaken hard invariants, security floors, authority floors, sensitivity floors or human-gate
+# requirements. Enforced mechanically at policy-load time (runtime policy_precedence::evaluate): a violating override
+# or exception is refused, recorded (doctor D027, suite family policy_precedence, context packet layer 3) and leaves the
+# effective policy unchanged.
+layers:
+  - constitution_hard_invariants
+  - security_and_authority_policy
+  - framework_kernel_policy
+  - project_policy_overrides_and_exceptions
+  - active_decisions_and_specifications
+  - task_contracts_and_mutation_manifests
+  - retrieved_or_inferred_context
+# Keys without a matching rule are NOT overridable (deny by default).
+default_mode: immutable
+# modes: immutable (never), floor (lower layer may only raise), ceiling (may only lower), additive (list: may only add),
+# shrink_only (list: may only remove), strengthen_only_bool (only the strict value), overridable (free).
+# kinds for floor/ceiling: level (L0-L5), radius (R0-R5), tier (T0-T3), number, ordered (with `order`).
+# exception_relaxable: a PROJECT_EXCEPTIONS entry (decision + expiry) may relax the key; never for security/authority.
+rules:
+  # ---- authority (floors only: a project may demand MORE authority, never less)
+  - {key: AUTHORITY_POLICY.authority_levels_required.*, mode: floor, kind: level}
+  - {key: AUTHORITY_POLICY.*, mode: immutable}
+  # ---- security and sensitivity
+  - {key: SECURITY_POLICY.never_index_classes, mode: additive}
+  - {key: SECURITY_POLICY.never_export_classes, mode: additive}
+  - {key: SECURITY_POLICY.secret_path_patterns, mode: additive}
+  - {key: SECURITY_POLICY.secret_content_patterns, mode: additive}
+  - {key: SECURITY_POLICY.*, mode: immutable}
+  # ---- human decision gates
+  - {key: HUMAN_GATE_POLICY.raise_for, mode: additive}
+  - {key: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius, mode: ceiling, kind: radius}
+  - {key: HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence, mode: floor, kind: number}
+  - {key: HUMAN_GATE_POLICY.agent_resolvable_when.reversible, mode: strengthen_only_bool, strict_value: true}
+  - {key: HUMAN_GATE_POLICY.batch_low_priority, mode: overridable}
+  - {key: HUMAN_GATE_POLICY.continue_independent_work, mode: overridable}
+  - {key: HUMAN_GATE_POLICY.*, mode: immutable}
+  # ---- change control
+  - {key: CHANGE_POLICY.auto_approve_max_radius, mode: ceiling, kind: radius}
+  - {key: CHANGE_POLICY.auto_simulate_triggers, mode: additive}
+  - {key: CHANGE_POLICY.human_gate_triggers, mode: additive}
+  - {key: CHANGE_POLICY.verification_required, mode: additive}
+  - {key: CHANGE_POLICY.rollback.snapshot_before_execute, mode: strengthen_only_bool, strict_value: true}
+  - {key: CHANGE_POLICY.rollback.keep_snapshots, mode: floor, kind: number}
+  - {key: CHANGE_POLICY.propagation.*, mode: strengthen_only_bool, strict_value: true}
+  - {key: CHANGE_POLICY.graph_traversal_depth_by_radius.*, mode: floor, kind: number}
+  - {key: CHANGE_POLICY.semantic_candidates_by_radius.*, mode: overridable}
+  - {key: CHANGE_POLICY.*, mode: immutable}
+  # ---- testing and evidence
+  - {key: TEST_POLICY.independent_test_author_required_for, mode: additive}
+  - {key: TEST_POLICY.implementation_task_requires, mode: additive}
+  - {key: TEST_POLICY.task_close_requires_tests_status, mode: shrink_only}
+  - {key: TEST_POLICY.governance_families, mode: additive}
+  - {key: TEST_POLICY.product_families, mode: overridable}
+  - {key: TEST_POLICY.*, mode: immutable}
+  # ---- checkpoints
+  - {key: CHECKPOINT_POLICY.mandatory_triggers, mode: additive}
+  - {key: CHECKPOINT_POLICY.watchdog.context_utilisation_threshold, mode: ceiling, kind: number, exception_relaxable: true}
+  - {key: CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints, mode: ceiling, kind: number, exception_relaxable: true}
+  - {key: CHECKPOINT_POLICY.*, mode: immutable}
+  # ---- tools and plugins
+  - {key: TOOL_POLICY.health_check_required, mode: strengthen_only_bool, strict_value: true}
+  - {key: TOOL_POLICY.auto_install_conditions, mode: additive}
+  - {key: TOOL_POLICY.approved_licences, mode: shrink_only}
+  - {key: TOOL_POLICY.plugins.min_authority, mode: floor, kind: level}
+  - {key: TOOL_POLICY.plugins.require_valid_descriptor, mode: strengthen_only_bool, strict_value: true}
+  - {key: TOOL_POLICY.plugins.refuse_on_pin_drift, mode: strengthen_only_bool, strict_value: true}
+  - {key: TOOL_POLICY.plugins.elevated_permission_classes, mode: additive}
+  - {key: TOOL_POLICY.plugins.timeout_seconds, mode: overridable}
+  - {key: TOOL_POLICY.*, mode: immutable}
+  # ---- budgets (may be tightened, never raised without an exception record)
+  - {key: BUDGET_POLICY.defaults.*, mode: ceiling, kind: number, exception_relaxable: true}
+  - {key: BUDGET_POLICY.*, mode: immutable}
+  # ---- learning / upstream
+  - {key: LEARNING_POLICY.corroboration_min_sources, mode: floor, kind: number}
+  - {key: LEARNING_POLICY.upstream.forbidden_paths, mode: additive}
+  - {key: LEARNING_POLICY.upstream.forbidden_content, mode: additive}
+  - {key: LEARNING_POLICY.upstream.max_code_lines_unless_synthetic, mode: ceiling, kind: number}
+  - {key: LEARNING_POLICY.upstream.allowed_payload, mode: shrink_only}
+  - {key: LEARNING_POLICY.upstream.aggregate_metrics_enabled, mode: overridable}
+  - {key: LEARNING_POLICY.upstream.ledger, mode: overridable}
+  - {key: LEARNING_POLICY.*, mode: immutable}
+  # ---- memory (tuning is project-specific; quality floors and secret namespace are not)
+  - {key: MEMORY_POLICY.regression.min_queries, mode: floor, kind: number, exception_relaxable: true}
+  - {key: MEMORY_POLICY.regression.min_recall_at_k, mode: floor, kind: number, exception_relaxable: true}
+  - {key: MEMORY_POLICY.regression.min_mrr, mode: floor, kind: number, exception_relaxable: true}
+  - {key: MEMORY_POLICY.regression.max_stale_hit_rate, mode: ceiling, kind: number, exception_relaxable: true}
+  - {key: MEMORY_POLICY.regression.max_superseded_hit_rate, mode: ceiling, kind: number, exception_relaxable: true}
+  - {key: MEMORY_POLICY.regression.heldout_file, mode: overridable}
+  - {key: MEMORY_POLICY.freshness.on_stale_close, mode: immutable}
+  - {key: MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close, mode: ceiling, kind: number}
+  - {key: MEMORY_POLICY.freshness.max_index_age_hours, mode: ceiling, kind: number}
+  - {key: MEMORY_POLICY.rebuild.must_reproduce_manifest_hash, mode: strengthen_only_bool, strict_value: true}
+  - {key: MEMORY_POLICY.namespaces.secret.*, mode: immutable}
+  - {key: MEMORY_POLICY.namespaces.*.sensitivity, mode: floor, kind: ordered, order: [public, internal, confidential, restricted, secret]}
+  - {key: MEMORY_POLICY.namespaces.*.roles, mode: shrink_only}
+  - {key: MEMORY_POLICY.namespaces.*.export, mode: floor, kind: ordered, order: [allowed, framework-lessons-only, denied]}
+  - {key: MEMORY_POLICY.namespaces.*.*, mode: overridable}
+  - {key: MEMORY_POLICY.runtime_dir, mode: immutable}
+  - {key: MEMORY_POLICY.memory_classes, mode: immutable}
+  - {key: MEMORY_POLICY.*, mode: overridable}
+  # ---- model routing (tier floors; evidence fields additive)
+  - {key: MODEL_ROUTING_POLICY.record_evidence, mode: additive}
+  - {key: MODEL_ROUTING_POLICY.task_class_minimum_tier.*, mode: floor, kind: tier}
+  - {key: MODEL_ROUTING_POLICY.radius_minimum_tier.*, mode: floor, kind: tier}
+  - {key: MODEL_ROUTING_POLICY.*, mode: overridable}
+  # ---- context packets
+  - {key: CONTEXT_POLICY.reproducibility, mode: immutable}
+  - {key: CONTEXT_POLICY.deterministic_authority_fields, mode: additive}
+  - {key: CONTEXT_POLICY.*, mode: overridable}
+  # ---- archive
+  - {key: ARCHIVE_POLICY.archive_mutation, mode: immutable}
+  - {key: ARCHIVE_POLICY.do_not_archive, mode: additive}
+  - {key: ARCHIVE_POLICY.*, mode: overridable}
+  # ---- this file
+  - {key: POLICY_PRECEDENCE.*, mode: immutable}

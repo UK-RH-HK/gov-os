@@ -1,0 +1,78 @@
+[PASS] HV-01 embedding model replaceable at query time: index built by the pinned plugin, query embedded with the same model? :: {"manifest_embedder": {"dimensions": 8, "id": "reversed-hashed-ngram", "source": "plugin", "version": "1"}, "exact_title_queries_rank_own_record_first": 4, "of": 4, "outcomes": [{"query": "Order totals are exact integer cents", "expected": "REQ-0001", "gov_top": ["REQ-0001", "file:governance/kernel/skills/SKL-TASK-CLOSE.yaml", "file:governance/kernel/policies/ENFORCEMENT_MAP.yaml"], "if_query_used
+   (0.4s)
+[PASS] HV-02 reranker plugin is invoked when pinned (API-0001 rerank capability wired into retrieval?) :: {"plugin_discovered": true, "manifest_reranker": {"provider": "marker-reranker", "version": "0"}, "reranker_invoked_during_query": true}
+   (0.2s)
+[PASS] HV-03 authority levels L0-L5 (AUTHORITY_POLICY.authority_levels_required) enforced on mutating operations :: {"operations_by_low_authority_roles": {"L0_task_create": "AUTHORITY_DENIED", "L0_cit_propose": "AUTHORITY_DENIED", "L1_gate_create": "AUTHORITY_DENIED", "L1_freeze_writes": "AUTHORITY_DENIED", "L1_kernel_reinstall": "AUTHORITY_DENIED"}, "refused": ["L0_task_create", "L0_cit_propose", "L1_gate_create", "L1_freeze_writes", "L1_kernel_reinstall"], "note": "AUTHORITY_POLICY.authority_levels_required i
+   (0.4s)
+[PASS] HV-04 task close rejects files_changed outside the task's allowed_paths (mutation manifest scope) :: {"allowed_paths": ["src/**"], "files_changed": ["spec/scenarios/SCN-0099.yaml", "README.md"], "close_result": {"code": "MUTATION_SCOPE_VIOLATION", "message": "task TASK-0001 reports mutations outside its contract: spec/scenarios/SCN-0099.yaml: outside allowed_paths [\"src/**\"] and not governed by a committed CIT; README.md: outside allowed_paths [\"src/**\"] and not governed by a committed CIT; r
+   (0.4s)
+[PASS] HV-05 session claims (deterministic state) survive a full derived-memory rebuild :: {"claims_before_rebuild": 1, "claims_after_rebuild": 1, "second_session_claim_before": "TASK_CLAIMED", "second_session_claim_after_rebuild": "TASK_CLAIMED", "task_status_after": "IN_PROGRESS"}
+   (0.5s)
+[PASS] HV-06 Tool Capability Registry resolves native run_tests tooling for a Rust governed project (not Python) :: {"resolved_for_run_tests_on_rust_project": ["TOOL-CARGO-001"], "registry_python_specific_tools": ["TOOL-TEST-001", "TOOL-AST-001"], "registry_rust_tools": ["TOOL-CARGO-001", "TOOL-CARGO-002", "TOOL-CARGO-003", "TOOL-LSP-RUST-001"], "health_checks_run": [["TOOL-FS-001", "builtin", true], ["TOOL-GIT-001", "command", true], ["TOOL-TEST-001", "command", true], ["TOOL-AST-001", "builtin", true], ["TOOL
+   (0.7s)
+[PASS] HV-07 an embedder pin change (version/dimensions) forces a full re-index; incremental rebuild must not leave a mixed-embedder index that the manifest misreports :: {"stale_only_because_overlay_file_changed": ["governance/project/PROJECT_POLICY.yaml"], "manifest_embedder_after_incremental": {"dimensions": 64, "id": "hashed-ngram", "source": "builtin", "version": "2"}, "vector_dims_in_db": [[64, 306]], "fresh_after": true, "doctor_D010": [true, "fresh (156 artefacts)"], "doctor_D012": true, "audit_verdict": "DEGRADED", "audit_recovery_rebuild_family": {"ok": t
+   (0.8s)
+[INFO] HV-08 verifier-authored golden retrieval set on the adopted brownfield (recall@k, MRR, stale/superseded hits, by category) :: {"recall_at_k": 0.8333333333333334, "mrr": 0.7152777777777777, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0, "forbidden_violations": 0, "pass_under_policy_thresholds": true, "per_query": {"V-EXACT-1": ["exact id", 1.0, ["D-0002", "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md", "D-0002", "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md"]], "V-PATH
+[FAIL] HV-08b semantic paraphrase retrieval with the pinned baseline embedder :: {"failed_queries": ["V-SEM-1", "V-HIST-1"], "semantic_failures": ["V-SEM-1"], "note": "baseline hashed n-gram embedder has no paraphrase or morphology capability; no comparative benchmark mechanism exists to select a stronger one"}
+   (1.5s)
+[PASS] HV-09 SECURITY_POLICY.never_index_classes [secret, restricted]: restricted-class material (DATA_SENSITIVITY classification / contract sensitivity) is excluded from generic memory :: {"indexed_restricted_artifacts": [], "chunks_from_restricted": 0, "retrieval_returned_restricted_paths": [], "doctor_D011": [true, "none"], "note": "never_index_classes, never_export_classes and DATA_SENSITIVITY.classifications are never read by the core (grep=0); only class=secret is honoured"}
+   (0.3s)
+[PASS] HV-10 CIT-P is automatic for CHANGE_POLICY.auto_simulate_triggers (framework 48: the human should not need to type /impact) :: {"trigger": "architecture_change", "status_after_propose": "SIMULATED", "policy_key_read_by_core": "auto_simulate_triggers grep=0"}
+   (0.4s)
+[PASS] HV-11 gov update --apply --approve bypasses INV-008 (gate presented+answered) while CIT approval enforces it :: {"first_apply_without_approve": "HUMAN_GATE_REQUIRED", "gates_pending_before": ["HDG-0001"], "applied_with_flag_only": false, "to": null, "pending_unpresented_gates_after_update": ["HDG-0001"], "doctor_D019_after": [false, "1 gate(s) exist only in files (INV-008): HDG-0001"]}
+   (0.4s)
+[PASS] HV-12 delete vector/SQLite/graph + ALL generated views + framework.json, then rebuild from Git: identical derived state (framework 19) :: {"identical": true, "before": {"manifest": "13b29a1d2a3a6638ad488259d2cc933e3470d8c92a093925efbe7c4219ea118f", "adapters": {"api": "d7e565003dad2cd92c15fb3205ecf137eec140e1d2db79554a04c5671a545cb6", "cli": "4d851f2a6f5c9bd72f5cae3ca18a413cb22df723e88f0b56a2b9f3eeebc0caf9", "generic": "7d6866afd663fcbddb2c6687734d307d8f2339fdf4ddffdfda6d1e640e39e3c9", "ide": "724145b9cb61101afd0761a56c8dea936dc8c32
+   (1.0s)
+[PASS] HV-13 a Go governed project (language different from the OS core and from every shipped fixture) is inventoried, mapped and indexed :: {"ecosystems": [["go", false, "native tool 'go' not on PATH: capability gap (raise tooling task or human gate)"]], "go_symbols": [["handler", "module"], ["Greet", "function"], ["Server", "type"], ["handler_test", "module"], ["TestGreet", "function"]], "import_edges": [], "native_layout_rules": ["internal/**"], "verify_product": {"ran": false, "status": "not_applicable_with_reason"}, "tools_resolve
+   (0.5s)
+[PASS] HV-14 cit rollback reverts propagation side-effects (retest flags) in addition to file snapshots :: {"retest_required_after_execute": true, "retest_required_after_rollback": null, "REQ_criteria_after_rollback": ["a"], "decision_records_after_rollback": [".gitkeep", "CIT-0001.yaml", "D-0001.yaml", "HDG-0001.yaml"], "approval_decision_kept": true}
+   (0.7s)
+[PASS] HV-15 context compiler: superseded-but-ACTIVE decision is flagged/excluded from the deterministic authority block; hard invariants + project policy precede spec in the packet :: {"active_decisions_in_packet": ["D-0002"], "contradiction_flags_in_deterministic_block": 4, "hard_invariants_in_packet": true, "policy_layer_in_packet": true, "packet_top_level_keys": ["acceptance_criteria", "active_decisions", "allowed_writes", "architecture", "authority_layers", "conflicting_decisions", "dependency_state", "feature", "governing_requirements", "hard_invariants", "interfaces", "mi
+   (0.5s)
+[PASS] HV-16 FREEZE_WRITES is honoured by migration batches and upstream submission (framework 74: every mutating operation) :: {"adopt_migrate_batch1_under_freeze": "FROZEN", "adopt_migrate_batch2_under_freeze": "FROZEN", "files_moved_under_freeze": false, "upstream_submit_under_freeze": "FROZEN", "note": "adopt.rs and upstream.rs never call guard_write"}
+   (0.9s)
+[PASS] HV-17 CIT-E verification blocks committing a governed record that contains a secret pattern (write-side gate, not only index-side) :: {"cit_status": "SECRET_IN_MANIFEST", "secret_record_on_disk": false, "doctor_D011_after": [true, "none", "DEGRADED"], "secret_in_index_chunks": 0, "policy": "SECURITY_POLICY.on_secret_outside_secret_class=block_index_and_report (index-side only)"}
+   (0.5s)
+[PASS] HV-18 natural-language intent routing (T0 deterministic patterns) compiles to governance operations :: {"discover": "DISCOVER", "approve": ["APPROVE", "CIT-0001", ["gov decide HDG-0001 --option <id>", "gov cit approve CIT-0001 --by human", "gov cit execute CIT-0001", "gov continue"]], "rollback": "ROLLBACK", "unknown": "UNKNOWN"}
+   (0.4s)
+[PASS] HV-19 CHECKPOINT_POLICY mandatory trigger before_handoff is honoured automatically by handoff create :: {"checkpoint_before": null, "checkpoint_after_handoff": "CKPT-00001", "handoff": "HND-0001"}
+   (0.4s)
+[PASS] HV-20 governance suite is green while memory recall is unmeasured (0 held-out queries) - framework 17 says that is not healthy :: {"heldout_queries": 19, "memory_verify_pass": true, "family_ok": true, "conformance_verdict_at_init": "HEALTHY"}
+   (0.6s)
+[PASS] HV-21 retrieval applies MEMORY_POLICY.namespaces roles (product namespace roles=[engineering]) as an authority+namespace filter :: {"role": "research-agent", "product_namespace_hits": [], "policy": "namespaces.product.roles=[engineering]"}
+   (0.4s)
+[PASS] HV-22 one dependency-aware DAG expresses research -> experiment -> decision -> scenario -> dataset -> criteria -> test design -> architecture -> implementation -> integration -> validation :: {"longest_chain_len": 11, "runnable_after_replan": ["TASK-0001"], "blocked": 10, "cycles": []}
+   (0.5s)
+[PASS] HV-23 code-intelligence plugin (python-ast) is used and CALLS relationships reach the graph (framework 11.2 CALLS edge type) :: {"symbol_providers": [["python-ast"]], "call_refs_in_symbol_refs": 9, "edge_type_counts": {"CALLS": 3, "IMPORTS": 3, "TESTS": 1}, "degradations": [], "symbol_route_hits": [["file:lib/core/helpers.py", "slugify"], ["file:lib/core/engine.py", "lib/core/engine.py"]]}
+   (0.4s)
+[PASS] HV-24 portable gov executable: kernel payload obtainable without the build machine's source checkout (D-0002: self-contained executable per OS) :: {"build_path_baked_into_binary": false, "init_with_bogus_GOV_CANONICAL_ROOT_succeeded_via_baked_path": true, "lock_source": "embedded:agentic-engineering-os@4.1.4", "note": "kernel is not embedded in the binary; on another machine gov init needs --source; framework.lock records an absolute machine path"}
+   (0.2s)
+[PASS] HV-25 deterministic core runs status/continue/audit/doctor with only git on PATH (no Python, no cargo) :: {"init": true, "status": true, "continue": true, "audit": "HEALTHY", "doctor": "DEGRADED", "linked_libs": 0}
+   (0.6s)
+[PASS] HV-26 upstream packet sanitises every emitted field (category/title/tags carry identifiers?) :: {"identifier_leaks_in_packet": [], "identifiers_redacted": 2, "packet_category": "[REDACTED]-outage"}
+   (0.4s)
+[PASS] HV-27 every generated artefact/record of a fresh project validates against the installed kernel schemas (draft 2020-12, independent validator) :: {"violations": {}}
+   (0.8s)
+[PASS] HV-28 running gov audit (which writes an audit record) leaves the index fresh :: {"D010_before": true, "D010_after_audit": true, "message": "fresh (157 artefacts)", "doctor_verdict": "HEALTHY"}
+   (0.7s)
+[PASS] HV-29 destructive migration batch requires an answered, presented Human Decision Gate record (not a CLI flag naming the artefact) :: {"human_gate_records_before": ["HDG-0001", "HDG-0002"], "dead_code_deleted_with_flag_only": false, "batch_result": 0}
+   (1.5s)
+[PASS] HV-30 multi-machine rebuild after a full brownfield adoption (mixed Python/TypeScript, archived stores, extracted records) is reproducible :: {"manifest_A": "2e527edd602e0d75c4f18fa7f55848d266d9bcbc39b947f831ab20a4ed4e4456", "manifest_B": "2e527edd602e0d75c4f18fa7f55848d266d9bcbc39b947f831ab20a4ed4e4456", "counts_A": {"total": 0, "runnable": 0, "blocked": 0, "waiting_human": 0, "done": 0, "open": 0}, "counts_B": {"total": 0, "runnable": 0, "blocked": 0, "waiting_human": 0, "done": 0, "open": 0}, "next_action_B": "present human gate \"HD
+   (2.3s)
+[PASS] HV-31 TypeScript relative import is rewritten when the imported file is relocated by the migration executor :: {"catalogue_entry": {"current_class": "PRODUCT_SOURCE", "action": "MOVE", "target_path": "product/extra.ts", "batch": 3, "requires_human_gate": false}, "moved": true, "http_ts_after": "import { extra } from '../../../product/extra';", "import_rewritten": true}
+   (1.3s)
+[PASS] HV-32 typed worker return is durably promoted into project state (handoff record carries the return; discoveries/lessons are persisted) :: {"handoff_status": "RETURNED", "return_persisted": true, "lessons_became_records": true}
+   (0.4s)
+[PASS] HV-33 symbol route resolves a bare identifier query (the common form of a code-symbol question) :: {"symbols_named_with_retry": 1, "explicit_symbol_route_hits": ["file:src/app/retry.py", "file:src/app/main.py"], "auto_routes_for_bare_identifier": ["symbol", "lexical"], "auto_hits": ["file:src/app/retry.py", "file:src/app/main.py", "file:src/app/main.py"], "def_prefixed_symbol_route_hits": ["file:src/app/retry.py", "file:src/app/main.py"]}
+   (0.5s)
+[PASS] HV-34 cit propose scans the proposal/mutation manifest before persisting it as a governed record (secret lands in spec/decisions/CIT-*.yaml otherwise) :: {"secret_in_cit_record_on_disk": false, "doctor_D011": [true, "none", "DEGRADED"]}
+   (0.4s)
+[PASS] HV-35 the held-out regression file is not itself indexed (test-set leakage into the retrieval index) :: {"hits": ["D-0001", "file:src/lib.rs", "file:governance/kernel/schemas/policy-CONTEXT_POLICY.schema.json"]}
+   (0.5s)
+[PASS] HV-39 TEST_POLICY.implementation_task_requires [scenarios_present, acceptance_tests_declared] gates implementation tasks that have no feature (readiness gating only applies via a feature) :: {"runnable": [], "continue_picked": null, "policy_key_read_by_core": "implementation_task_requires grep=0"}
+   (0.4s)
+[PASS] HV-36 capability plugin host (API-0001) handles responses larger than the OS pipe buffer (a 512-dim embedder answering a 256-text batch produces ~1 MB) :: {"small_response_20KB": {"seconds": 0.0, "result": true}, "large_response_300KB": {"seconds": 0.0, "result": true}, "cause": "runtime/src/capabilities/host.rs polls child.try_wait() until exit before reading stdout; the child blocks on a full pipe -> deadlock until PLUGIN_TIMEOUT"}
+   (0.2s)
+
+WORK: /tmp/gov-verifier-43uj48pq
+SUMMARY: {'PASS': 36, 'FAIL': 1, 'INFO': 1, 'ERROR': 0}
