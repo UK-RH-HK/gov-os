@@ -1,0 +1,31 @@
+   --> runtime/src/adopt.rs:133:57
+    |
+133 | pub fn ensure_destructive_gates(root: &Path, catalogue: &mut Vec<Value>) -> Result<Vec<String>> {
+    |                                                         ^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#ptr_arg
+    = note: `#[warn(clippy::ptr_arg)]` on by default
+help: change this to
+    |
+133 - pub fn ensure_destructive_gates(root: &Path, catalogue: &mut Vec<Value>) -> Result<Vec<String>> {
+133 + pub fn ensure_destructive_gates(root: &Path, catalogue: &mut [Value]) -> Result<Vec<String>> {
+    |
+
+warning: consider using `sort_by_key`
+  --> runtime/src/status.rs:20:5
+   |
+20 |     reports.sort_by(|a, b| b.id().cmp(&a.id()));
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_sort_by
+help: try
+   |
+20 -     reports.sort_by(|a, b| b.id().cmp(&a.id()));
+20 +     reports.sort_by_key(|a| std::cmp::Reverse(a.id()));
+   |
+
+warning: `gov-runtime` (lib) generated 5 warnings
+    Checking gov-cli v4.1.3 (/home/usain/Dynamic-Agentic-Engineering-OS/cli)
+warning: `gov-runtime` (lib test) generated 5 warnings (5 duplicates)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.89s
+CLIPPY_EXIT=0

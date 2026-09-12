@@ -1,0 +1,833 @@
+{
+  "work_dir": "/tmp/gov-verifier2-ddxep5rg",
+  "candidate_commit": "26ab5b6eb111d573f8686bc4f4b1dfc20539f45e",
+  "gov413": "framework: agentic-engineering-os\nversion: 4.1.3\ncli_version: 4.1.3\nruntime_version: 4.1.3\nindex_version: 4.1.3-idx2\n",
+  "gov412": "framework: agentic-engineering-os\nversion: 4.1.2\ncli_version: 4.1.2\nruntime_version: 4.1.2\nindex_version: 4.1.2-idx1\n",
+  "results": [
+    {
+      "id": "NV-01",
+      "title": "CIT approval/execution require a presented AND answered gate; a human decline (option B) stops the transaction (INV-008, framework \u00a747.2/\u00a752)",
+      "verdict": "FAIL",
+      "severity": "HIGH",
+      "detail": {
+        "a_gate_presented_not_answered": {
+          "approve_ok": true,
+          "error_code": null,
+          "decision_record_written": "D-0001",
+          "decision_human_approved_flag": true,
+          "gate_status_after": [
+            {
+              "id": "HDG-0001",
+              "question": "Approve change CIT-0001: tighten security headers",
+              "gate_status": "PRESENTED",
+              "presented_in_chat": true,
+              "priority_score": 6.0,
+              "batchable": false,
+              "blocks_tasks": [],
+              "cit": "CIT-0001",
+              "trigger": "security_change"
+            }
+          ]
+        },
+        "b_gate_answered_B": {
+          "decide_result": "B",
+          "cit_status_after_decline": "SIMULATED",
+          "approve_ok": true,
+          "approve_error": null,
+          "execute_ok": true,
+          "manifest_file_written": true
+        },
+        "c_agent_roles": {
+          "change_controller_L3_approved_unanswered_gate_as_human": true,
+          "backend_engineer_L1_error": null
+        }
+      }
+    },
+    {
+      "id": "NV-02",
+      "title": "project overlay policy_overrides cannot silently lower AUTHORITY_POLICY levels or empty SECURITY_POLICY.never_index_classes (framework \u00a721 precedence; INV-006)",
+      "verdict": "FAIL",
+      "severity": "HIGH",
+      "detail": {
+        "doctor_D007_policies": [
+          true,
+          "13 policies loaded, 5 overrides",
+          "DEGRADED"
+        ],
+        "audit_verdict": "DEGRADED",
+        "audit_findings_mentioning_override": [],
+        "L0_task_create_ok": true,
+        "L0_error": null,
+        "restricted_file_indexed_rows": [
+          [
+            "product/data/customers.md",
+            "restricted"
+          ]
+        ],
+        "restricted_excluded_by_indexer": [],
+        "restricted_content_retrievable": true
+      }
+    },
+    {
+      "id": "NV-03",
+      "title": "genuine 4.1.2 consumer (created by the 4.1.2 binary) updated to release 4.1.3 by the 4.1.3 binary, verified on a second machine, rolled back; lock/provenance/overlay/spec/index/ledger semantics",
+      "verdict": "FAIL",
+      "severity": "HIGH",
+      "detail": {
+        "defects": [
+          "framework.lock.release_commit is not the release's commit (provenance)",
+          "framework.lock.source is an absolute machine path after update (init writes a logical label)",
+          "held-out regression file is lexically indexed on an upgraded 4.1.2 project (L5 fix not migrated: M-4.1.2-4.1.3 has no overlay operation for governance/tests/**)",
+          "rollback leaves no entry in the framework-updates ledger (provenance of the current state)"
+        ],
+        "init_412": {
+          "version": "4.1.2",
+          "lock_release_hash_eq_412_manifest": true,
+          "lock_source": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/9eb6de6b-38b7-4c89-9b58-58286a9a599a/scratchpad/wt-412/framework",
+          "lock_release_commit_eq_project_head": false
+        },
+        "413_on_412_project": {
+          "doctor_verdict": "UNHEALTHY",
+          "D005": [
+            false,
+            "medium",
+            "installed kernel 4.1.2 differs from CLI 4.1.3; run gov update --check"
+          ],
+          "D010": [
+            false,
+            "medium",
+            "pin mismatch: lexical: expected {\"engine\":\"sqlite-fts5\",\"tokenizer\":\"unicode61\"} but live index has null; index_version: expected \"4.1.3-idx2\" but live index ha"
+          ],
+          "D025": [
+            false,
+            "high",
+            "index pins differ from policy: embedder: expected {\"id\":\"hashed-ngram\",\"version\":\"1\",\"dimensions\":512,\"source\":\"builtin\"} but live index has null; chunking: exp"
+          ],
+          "status_version": "4.1.2"
+        },
+        "update_check": {
+          "current": "4.1.2",
+          "available": "4.1.3",
+          "compatible": true,
+          "migration_path": [
+            "M-4.1.2-4.1.3"
+          ],
+          "migration_path_complete": true,
+          "certification": "READY_FOR_INDEPENDENT_REVERIFICATION",
+          "human_gate_required": true,
+          "recommendation": "review impact; approve with `gov update --apply --approve --by <human>`"
+        },
+        "impact": {
+          "radius": "R3",
+          "overlay_changes": [],
+          "index_rebuild": true,
+          "regenerate_adapters": true,
+          "notes": [
+            "4.1.3 enforces authority levels, mutation scope, sensitivity classes, destructive-migration gates and embedder pins; existing overlays remain valid."
+          ],
+          "breaking_changes": [],
+          "human_gates": [],
+          "consequences": [
+            "kernel 4.1.2 \u2192 4.1.3 (1 migration step(s))",
+            "spec/ and product/ are not touched (INV-013)",
+            "all derived indexes are rebuilt after install",
+            "target release is NOT certified: human approval required"
+          ]
+        },
+        "apply_without_gate_error": "HUMAN_GATE_REQUIRED",
+        "approve_flag_only_applied": false,
+        "apply": {
+          "applied": true,
+          "from": "4.1.2",
+          "to": "4.1.3",
+          "migrations": [
+            "M-4.1.2-4.1.3"
+          ],
+          "operations": [
+            {
+              "op": "note",
+              "file": "",
+              "dry_run": false
+            },
+            {
+              "op": "set_lock_field",
+              "file": "",
+              "dry_run": false
+            },
+            {
+              "op": "require_index_rebuild",
+              "file": "",
+              "dry_run": false
+            },
+            {
+              "op": "regenerate_adapters",
+              "file": "",
+              "dry_run": false
+            }
+          ],
+          "overlay_keys_changed": [],
+          "doctor": "DEGRADED",
+          "audit": "HEALTHY"
+        },
+        "lock_after": {
+          "version": "4.1.3",
+          "release_hash_eq_413_manifest": true,
+          "release_commit": "e7124a1c90a74d46b45c5b42aa27270ffb9ade26",
+          "manifest_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+          "release_commit_eq_manifest": false,
+          "release_commit_eq_project_head": true,
+          "source": "/home/usain/Dynamic-Agentic-Engineering-OS/release/releases/4.1.3/kernel",
+          "lock_schema_version": "1.0.0",
+          "cli_version": "4.1.3"
+        },
+        "kernel_verify": true,
+        "index_version_after": "4.1.3-idx2",
+        "index_embedder_after": {
+          "dimensions": 512,
+          "id": "hashed-ngram",
+          "source": "builtin",
+          "version": "1"
+        },
+        "index_lexical_after": {
+          "engine": "sqlite-fts5",
+          "tokenizer": "porter unicode61"
+        },
+        "overlay_preserved": {
+          "policy_override": 5,
+          "name": "upg-project"
+        },
+        "spec_unchanged": true,
+        "repository_contract_governance_tests_rule": {
+          "before_update": {
+            "pattern": "governance/tests/**",
+            "class": "authoritative",
+            "owner_role": "memory-engineer",
+            "mutation": "restricted",
+            "semantic_index": false,
+            "lexical_index": true,
+            "graph_index": false,
+            "namespace": "governance"
+          },
+          "after_update": {
+            "pattern": "governance/tests/**",
+            "class": "authoritative",
+            "owner_role": "memory-engineer",
+            "mutation": "restricted",
+            "semantic_index": false,
+            "lexical_index": true,
+            "graph_index": false,
+            "namespace": "governance"
+          },
+          "template_4.1.3_lexical_index": false
+        },
+        "heldout_file_in_index_after_update": [
+          [
+            "governance/tests/memory/heldout.yaml",
+            1
+          ]
+        ],
+        "heldout_marker_query_hits": [
+          "file:governance/kernel/schemas/heldout-tests.schema.json",
+          "file:governance/kernel/policies/ENFORCEMENT_MAP.yaml",
+          "TASK-0001"
+        ],
+        "doctor_after_update": {
+          "verdict": "DEGRADED",
+          "failed": {
+            "D021": [
+              false,
+              "medium",
+              "green record \"AUD-0001\" is obsolete (inputs changed)"
+            ]
+          }
+        },
+        "update_ledger_entries": [
+          [
+            "4.1.2",
+            "4.1.3",
+            "committed"
+          ]
+        ],
+        "machine_B": {
+          "doctor_verdict_before_rebuild": "DEGRADED",
+          "D009": [
+            false,
+            "medium",
+            "derived runtime absent"
+          ],
+          "rebuilt_manifest_equals_A": true
+        },
+        "412_binary_on_413_project": {
+          "doctor_verdict": "DEGRADED",
+          "D005": [
+            false,
+            "medium",
+            "installed kernel 4.1.3 differs from CLI 4.1.2; run gov update --check"
+          ],
+          "D002": [
+            true,
+            "info",
+            "valid"
+          ],
+          "update_check": false
+        },
+        "rollback": {
+          "rolled_back_to": "4.1.2",
+          "kernel_ok": true,
+          "lock_version": "4.1.2",
+          "lock_bytes_identical_to_412": true,
+          "overlay_bytes_identical": true,
+          "kernel_verify": true,
+          "doctor_verdict": "DEGRADED",
+          "D005": [
+            false,
+            "medium",
+            "installed kernel 4.1.2 differs from CLI 4.1.3; run gov update --check"
+          ],
+          "D010": [
+            true,
+            "info",
+            "fresh (160 artefacts)"
+          ],
+          "ledger_has_rollback_entry": false,
+          "ledger_entries_after_rollback": [
+            [
+              "4.1.2",
+              "4.1.3",
+              "committed"
+            ]
+          ],
+          "second_rollback": {
+            "rolled_back_to": "4.1.2",
+            "kernel_ok": true,
+            "index_manifest": "ac43e4e5ded413f1b225b050e3863ae72243bc7ef02c590b8393b86fcc1a95b0"
+          }
+        },
+        "412_binary_after_rollback": {
+          "doctor_verdict": "DEGRADED",
+          "D005": [
+            true,
+            "info",
+            "match"
+          ],
+          "D010": [
+            true,
+            "info",
+            "fresh (160 artefacts)"
+          ]
+        }
+      }
+    },
+    {
+      "id": "NV-04",
+      "title": "plugin descriptors (arbitrary commands) are governed like tools: registration/approval, version pin, health check, permission classes, schema validation; an L0 role cannot execute them",
+      "verdict": "FAIL",
+      "severity": "HIGH",
+      "detail": {
+        "descriptor_schema_accepts_minimal": true,
+        "schema_error": null,
+        "core_discovered_minimal_descriptor": true,
+        "L0_invoke_ok": true,
+        "L0_invoke_error": null,
+        "rogue_command_executed_by_L0": true,
+        "rogue_in_tool_registry": false,
+        "tools_resolve_embed_for_auditor": {
+          "tools": [],
+          "gap": true
+        },
+        "doctor_verdict": "DEGRADED",
+        "doctor_plugin_checks": {},
+        "audit_plugin_findings": [],
+        "L0_rebuild_ok": false,
+        "L0_rebuild_error": "EMBEDDER_BAD_OUTPUT",
+        "rogue_executed_on_rebuild_by_L0": true,
+        "schema_enforced_by_core": "grep: plugin-descriptor schema is not referenced anywhere in runtime/src"
+      }
+    },
+    {
+      "id": "NV-05",
+      "title": "task close cross-checks the self-reported files_changed against the actual working-tree changes (git) for out-of-scope mutations",
+      "verdict": "FAIL",
+      "severity": "MEDIUM",
+      "detail": {
+        "git_dirty_at_close": [
+          "M src/lib.rs",
+          "?? .gitignore",
+          "?? archive/",
+          "?? docs/",
+          "?? framework.json",
+          "?? governance/",
+          "?? spec/"
+        ],
+        "reported_files_changed": [
+          "docs/notes.md"
+        ],
+        "close_ok": true,
+        "close_error": null,
+        "checkpoint_files_changed": [
+          "docs/notes.md"
+        ],
+        "checkpoint_captured_out_of_scope_git_change": false,
+        "note": "git status showed src/lib.rs modified while the report omitted it; close succeeded and the checkpoint copied the self-reported list, so the discrepancy was neither enforced nor recorded"
+      }
+    },
+    {
+      "id": "NV-13",
+      "title": "control: a framework-update gate answered B (decline) stops `update --apply --approve` and the lock stays at 4.1.2",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "applied": false,
+        "reason": "human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record",
+        "lock_version": "4.1.2"
+      }
+    },
+    {
+      "id": "NV-19",
+      "title": "migration M-4.1.2-4.1.3 operations perform what its description and the release notes claim (overlay/contract changes)",
+      "verdict": "FAIL",
+      "severity": "MEDIUM",
+      "detail": {
+        "operations": [
+          "note",
+          "set_lock_field",
+          "require_index_rebuild",
+          "regenerate_adapters"
+        ],
+        "overlay_operations": [],
+        "description_claims_contract_tightening": true,
+        "release_notes_claim_overlay_keys": false,
+        "overlay_template_changed_between_releases": true,
+        "affected_indexes": [
+          "lexical",
+          "semantic",
+          "graph",
+          "code"
+        ],
+        "breaking": false,
+        "human_gate": "none"
+      }
+    },
+    {
+      "id": "NV-06",
+      "title": "paraphrase retrieval obtained end-to-end through the governed mechanism (benchmark >= 3 candidates on a held-out set -> research record -> selection decision with alternatives -> overlay pin -> full rebuild), with no silent fallback",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "baseline_embedder_semantic_recall": {
+          "V-SEM-1": 0.0,
+          "V-SEM-3": 1.0
+        },
+        "baseline_pass": true,
+        "baseline_recall_at_k": 0.9,
+        "baseline_mrr": 0.75,
+        "benchmark_seconds": 0.7,
+        "benchmark_rows": {
+          "current": {
+            "usable": true,
+            "recall_at_k": 0.9,
+            "mrr": 0.75,
+            "precision_at_k": 0.4208333333333334,
+            "stale_hit_rate": 0.0,
+            "superseded_hit_rate": 0.0,
+            "forbidden_violations": 0,
+            "symbol_recall": 1.0,
+            "avg_query_latency_ms": 2.5,
+            "index_ms": 95,
+            "vectors": 489,
+            "dimensions": 512,
+            "error": null
+          },
+          "plugin:syn-embed:512": {
+            "usable": true,
+            "recall_at_k": 1.0,
+            "mrr": 0.8392857142857142,
+            "precision_at_k": 0.4333333333333334,
+            "stale_hit_rate": 0.0,
+            "superseded_hit_rate": 0.0,
+            "forbidden_violations": 0,
+            "symbol_recall": 1.0,
+            "avg_query_latency_ms": 15.0,
+            "index_ms": 241,
+            "vectors": 489,
+            "dimensions": 512,
+            "error": null
+          },
+          "builtin:128": {
+            "usable": true,
+            "recall_at_k": 0.8,
+            "mrr": 0.75,
+            "precision_at_k": 0.39583333333333337,
+            "stale_hit_rate": 0.0,
+            "superseded_hit_rate": 0.0,
+            "forbidden_violations": 0,
+            "symbol_recall": 1.0,
+            "avg_query_latency_ms": 1.0,
+            "index_ms": 83,
+            "vectors": 489,
+            "dimensions": 128,
+            "error": null
+          }
+        },
+        "semantic_paraphrase_by_candidate": {
+          "current": [
+            {
+              "category": "semantic_paraphrase",
+              "queries": 2,
+              "recall": 0.5
+            }
+          ],
+          "plugin:syn-embed:512": [
+            {
+              "category": "semantic_paraphrase",
+              "queries": 2,
+              "recall": 1.0
+            }
+          ],
+          "builtin:128": [
+            {
+              "category": "semantic_paraphrase",
+              "queries": 2,
+              "recall": 0.5
+            }
+          ]
+        },
+        "recommended": "plugin:syn-embed:512",
+        "research_record": "RES-0001",
+        "selection": {
+          "decision": "D-0003",
+          "chosen": "plugin:syn-embed:512",
+          "alternatives_recorded": 3,
+          "human_approved": true,
+          "pinned": {
+            "id": "syn-embed",
+            "version": "1",
+            "dimensions": 512,
+            "source": "plugin"
+          }
+        },
+        "after_selection": {
+          "pass": true,
+          "status": "PASS",
+          "recall_at_k": 1.0,
+          "mrr": 0.8392857142857142,
+          "precision_at_k": 0.4333333333333334,
+          "per_query": {
+            "V-EXACT-1": [
+              1.0,
+              [
+                "D-0002",
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md",
+                "D-0002",
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md"
+              ]
+            ],
+            "V-PATH-1": [
+              1.0,
+              [
+                "file:src/app/billing.py",
+                "file:src/app/billing.py"
+              ]
+            ],
+            "V-LEX-1": [
+              1.0,
+              [
+                "file:src/app/retry.py",
+                "file:src/app/retry.py"
+              ]
+            ],
+            "V-SYM-1": [
+              1.0,
+              [
+                "file:src/app/retry.py",
+                "file:src/app/main.py"
+              ]
+            ],
+            "V-SEM-1": [
+              1.0,
+              [
+                "file:src/app/retry.py",
+                "file:src/app/retry.py",
+                "file:governance/project/MODEL_ROUTING_OVERRIDES.yaml",
+                "file:governance/kernel/overlay-templates/MODEL_ROUTING_OVERRIDES.yaml"
+              ]
+            ],
+            "V-SEM-3": [
+              1.0,
+              [
+                "D-0002",
+                "file:spec/requirements/requirements.md",
+                "file:governance/kernel/constitution/CONSTITUTION.md",
+                "file:governance/kernel/migrations/README.md"
+              ]
+            ],
+            "V-SUP-1": [
+              1.0,
+              [
+                "D-0002",
+                "D-C0002",
+                "file:spec/requirements/requirements.md",
+                "D-C0002"
+              ]
+            ],
+            "V-GRAPH-1": [
+              1.0,
+              [
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md",
+                "file:spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md",
+                "file:spec/audits/GOVERNANCE-ADOPTION/08-INDEPENDENT-MIGRATION-VERIFICATION.md",
+                "D-0002"
+              ]
+            ],
+            "V-XFILE-1": [
+              1.0,
+              [
+                "file:web/src/api/client.ts",
+                "file:src/app/old_export.py",
+                "D-0003",
+                "RES-0001"
+              ]
+            ],
+            "V-MIX-1": [
+              1.0,
+              [
+                "file:src/app/billing.py",
+                "file:src/app/billing.py",
+                "file:tests/test_utils.py",
+                "file:src/app/main.py"
+              ]
+            ]
+          }
+        },
+        "live_index_embedder": {
+          "dimensions": 512,
+          "id": "syn-embed",
+          "source": "plugin",
+          "version": "1"
+        },
+        "paraphrase_query_top": [
+          "file:src/app/retry.py",
+          "file:src/app/retry.py",
+          "file:governance/project/MODEL_ROUTING_OVERRIDES.yaml",
+          "file:governance/kernel/overlay-templates/MODEL_ROUTING_OVERRIDES.yaml",
+          "file:governance/kernel/adapters/generic/template.md"
+        ],
+        "plugin_removed_query_error": "EMBEDDER_UNAVAILABLE",
+        "no_silent_fallback": true,
+        "baseline_failed_paraphrase_as_expected": true
+      }
+    },
+    {
+      "id": "NV-07",
+      "title": "a governed record survives an incremental rebuild after being moved (git mv) within spec/",
+      "verdict": "FAIL",
+      "severity": "MEDIUM",
+      "detail": {
+        "path_before": [
+          [
+            "spec/decisions/D-0001.yaml"
+          ]
+        ],
+        "path_after_first_incremental": [],
+        "problems_reported": [
+          "duplicate record id D-0001 at spec/decisions/2026/D-0001.yaml (first occurrence kept)"
+        ],
+        "removed": 1,
+        "indexed": 0,
+        "fresh_after": false,
+        "added": [
+          "spec/decisions/2026/D-0001.yaml"
+        ],
+        "structured_query_hits": [
+          "AUD-0001",
+          "file:governance/kernel/overlay-templates/PROJECT_EXCEPTIONS.yaml",
+          "file:governance/project/PROJECT_EXCEPTIONS.yaml"
+        ],
+        "path_after_second_incremental": [
+          [
+            "spec/decisions/2026/D-0001.yaml"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "NV-08",
+      "title": "framework.lock.release_commit identifies the framework release commit (manifest.release_commit), and source is a logical label on every install path",
+      "verdict": "FAIL",
+      "severity": "MEDIUM",
+      "detail": {
+        "install_from_release_dir": {
+          "lock_release_commit": "6faf2c3e858089b5dc50c21351acf7d95e057257",
+          "manifest_release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+          "project_head": "6faf2c3e858089b5dc50c21351acf7d95e057257",
+          "equals_project_head": true,
+          "source": "release:agentic-engineering-os@4.1.3",
+          "release_hash_eq_manifest": true
+        },
+        "install_from_canonical_root": {
+          "release_commit": "6faf2c3e858089b5dc50c21351acf7d95e057257",
+          "source": "source:agentic-engineering-os@4.1.3",
+          "equals_project_head": true
+        },
+        "install_from_embedded_payload": {
+          "release_commit": "98b311829326493f37a0aab1bd0ec896480e6e45",
+          "source": "embedded:agentic-engineering-os@4.1.3",
+          "release_hash_eq_manifest": true
+        }
+      }
+    },
+    {
+      "id": "NV-09",
+      "title": "KERNEL.yaml is strict-YAML valid (no duplicate mapping keys) and schema_versions agree across KERNEL.yaml / KERNEL_MANIFEST.json / manifest.json",
+      "verdict": "FAIL",
+      "severity": "LOW",
+      "detail": {
+        "duplicate_keys": [
+          "release-manifest"
+        ],
+        "strict_loader_ok": false,
+        "strict_error": "duplicate key 'release-manifest'",
+        "schema_versions_agree_after_last_wins": true,
+        "release_manifest_schema_version_in_kernel_yaml_last_wins": "1.1.0",
+        "same_in_framework_source": true
+      }
+    },
+    {
+      "id": "NV-10",
+      "title": "a pinned reranker's scores govern the final ranking (not just invoked) and are exposed per hit",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "order_before_pin": [
+          "file:tests/ledger_test.rs",
+          "file:src/lib.rs",
+          "file:src/lib.rs",
+          "file:tests/ledger_test.rs"
+        ],
+        "query_with_pin_but_stale_index": "RERANKER_MISMATCH",
+        "order_after": [
+          "REQ-0003",
+          "file:tests/ledger_test.rs",
+          "file:src/lib.rs",
+          "file:src/lib.rs"
+        ],
+        "rerank_scores": [
+          [
+            "REQ-0003",
+            10.0
+          ],
+          [
+            "file:tests/ledger_test.rs",
+            0.5
+          ],
+          [
+            "file:src/lib.rs",
+            0.3333333333333333
+          ],
+          [
+            "file:src/lib.rs",
+            0.25
+          ]
+        ],
+        "reranker_used": {
+          "provider": "pref-rerank",
+          "version": "0"
+        }
+      }
+    },
+    {
+      "id": "NV-12",
+      "title": "after an embedder pin change without rebuild, gov continue / context compile fail closed (EMBEDDER_MISMATCH) while gov status still works",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "continue": "EMBEDDER_MISMATCH",
+        "context_compile": "EMBEDDER_MISMATCH",
+        "status_ok": true,
+        "freshness_pin_mismatch": [
+          "embedder: expected {\"id\":\"hashed-ngram\",\"version\":\"1\",\"dimensions\":64,\"source\":\"builtin\"} but live index has {\"dimensions\":512,\"id\":\"hashed-ngram\",\"source\":\"builtin\",\"version\":\"1\"}"
+        ],
+        "fresh": false
+      }
+    },
+    {
+      "id": "NV-16",
+      "title": "release 4.1.3 identity: verify ok, payload == kernel data at manifest.release_commit (ancestor of the candidate), rebuild from the candidate reproduces release_hash + file hashes, second build refused (RELEASE_IMMUTABLE), repository untouched",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "release_verify": {
+          "version": "4.1.3",
+          "ok": true,
+          "modified": [],
+          "missing": [],
+          "added": [],
+          "release_hash_matches_kernel": true,
+          "certification": {
+            "certified_at": "",
+            "implementer_evidence": "docs/EVIDENCE.md",
+            "independent_verifier": "",
+            "status": "READY_FOR_INDEPENDENT_REVERIFICATION"
+          }
+        },
+        "release_commit": "78f6853897a8f854198d64b1fbb61c0d86657f00",
+        "release_commit_is_ancestor_of_HEAD": true,
+        "kernel_data_diff_release_commit_to_HEAD": "(none)",
+        "payload_files_differing_from_release_commit": [],
+        "manifest_hashes_without_source_file": [],
+        "rebuild_release_hash_equal": true,
+        "rebuild_file_hashes_equal": true,
+        "rebuild_release_commit": "26ab5b6eb111d573f8686bc4f4b1dfc20539f45e",
+        "immutability_error": "RELEASE_IMMUTABLE",
+        "release_dir_untouched": true
+      }
+    },
+    {
+      "id": "NV-17",
+      "title": "an external embed plugin never receives secret-class, secret-content or restricted-class text (API-0001 invariant; framework \u00a716/\u00a772)",
+      "verdict": "PASS",
+      "severity": null,
+      "detail": {
+        "leaked_markers": {
+          "AKIAIOSFODNN7EXAMPLE": false,
+          "SECRETMARKER-KUMQUAT": false,
+          "RESTRICTEDMARKER-LOQUAT": false,
+          "PLANTEDMARKER-MANGO": false
+        },
+        "public_text_reached_plugin": true,
+        "excluded": [
+          {
+            "path": "product/config.py",
+            "reason": "secret_content",
+            "patterns": [
+              "aws-access-key",
+              "generic-api-key"
+            ]
+          },
+          {
+            "path": "product/data/customers.md",
+            "reason": "sensitivity:restricted"
+          },
+          {
+            "path": "secrets/api.yaml",
+            "reason": "secret_class"
+          }
+        ],
+        "secret_blocked": [
+          {
+            "path": "product/config.py",
+            "patterns": [
+              "aws-access-key",
+              "generic-api-key"
+            ],
+            "lines": [
+              1,
+              1
+            ]
+          }
+        ],
+        "log_lines": 307
+      }
+    }
+  ]
+}
