@@ -86,12 +86,35 @@ pub struct PolicySet {
     /// Overrides/exceptions refused by the constitutional precedence rules (verifier H-N1): recorded, never applied.
     pub refused_overrides: Vec<Value>,
     pub precedence: Option<Value>,
+    /// Verified-kernel verdict for the source these policies were read from (verifier V-H2).
+    pub kernel_trust: Value,
     pub problems: Vec<String>,
 }
 
 impl PolicySet {
-    pub fn load(kernel_dir: &Path, overlay: &Overlay, schemas: &SchemaRegistry) -> Self {
-        let mut ps = PolicySet::default();
+    /// Load the effective policy for a repository. Constitutional content is read only from a kernel that has been
+    /// authenticated against the installed release identity (`kernel_trust`); when verification fails the immutable
+    /// payload embedded in this binary is substituted explicitly and the substitution is recorded (verifier V-H2).
+    pub fn load(root: &Path, overlay: &Overlay, schemas: &SchemaRegistry) -> Self {
+        let trust = crate::kernel_trust::trust(root);
+        let kernel_dir = trust.policy_root.clone();
+        let kernel_dir = kernel_dir.as_path();
+        let mut ps = PolicySet {
+            kernel_trust: trust.to_value(),
+            ..Default::default()
+        };
+        if trust.substituted {
+            ps.problems.push(format!(
+                "installed kernel failed verification: {}. Constitutional policy is read from the embedded baseline {} and mutating operations are refused (KERNEL_TAMPERED) until `gov kernel reinstall`.",
+                trust.problems.join("; "),
+                trust.trusted_version
+            ));
+        } else if trust.installed && !trust.verified {
+            ps.problems.push(format!(
+                "installed kernel failed verification and no trusted baseline is available: {}",
+                trust.problems.join("; ")
+            ));
+        }
         let names: Vec<&str> = POLICY_NAMES
             .iter()
             .copied()
@@ -127,7 +150,12 @@ impl PolicySet {
         // ---- constitutional precedence (framework §21, verifier H-N1): evaluate every override/exception against the
         // kernel rules before it touches the effective policy; refusals are recorded and leave the policy unchanged.
         let prec = crate::policy_precedence::load(kernel_dir);
-        ps.precedence = prec.as_ref().map(crate::policy_precedence::describe);
+        ps.precedence = prec.as_ref().map(|pr| {
+            let mut d = crate::policy_precedence::describe(pr);
+            d["source"] = json!(trust.source.clone());
+            d["kernel_verified"] = json!(trust.verified);
+            d
+        });
         if prec.is_none() {
             ps.problems.push("POLICY_PRECEDENCE rules unavailable (installed kernel and embedded payload): every override is refused (fail closed)".into());
         }
@@ -199,12 +227,34 @@ impl PolicySet {
                     .push(format!("exception {id} targets unknown policy {pol}"));
                 continue;
             }
-            if e.get("decision")
+            // V-M1: the `decision` field is a claim. It is applied only when it resolves to an existing, current,
+            // sufficiently approved decision whose own scope covers this exception for this project.
+            let roles_doc = crate::util::read_yaml(&kernel_dir.join("roles").join("ROLES.yaml"))
+                .unwrap_or(json!({}));
+            let required_level = ps
+                .effective
+                .get("AUTHORITY_POLICY")
+                .and_then(|a| {
+                    deep_get(a, "authority_levels_required.grant_policy_exception").cloned()
+                })
+                .and_then(|v| v.as_str().and_then(crate::authority::parse_level))
+                .unwrap_or(4);
+            let project_name = pp
+                .get("project")
+                .and_then(|x| x.get("name"))
                 .and_then(|v| v.as_str())
-                .map(|d| d.is_empty())
-                .unwrap_or(true)
-            {
-                ps.refused_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "reason": format!("exception {id} has no decision record (an exception is a governed decision with an expiry)")}));
+                .unwrap_or("")
+                .to_string();
+            let level_of = |role: &str| -> Option<u8> {
+                roles_doc["roles"]
+                    .as_array()
+                    .and_then(|a| a.iter().find(|r| r["id"].as_str() == Some(role)))
+                    .and_then(|r| r["level"].as_str().and_then(crate::authority::parse_level))
+            };
+            let verdict_exc =
+                crate::exceptions::validate(root, &e, &project_name, required_level, &level_of);
+            if !verdict_exc.ok {
+                ps.refused_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"), "reason": verdict_exc.reason}));
                 continue;
             }
             let kernel_value = ps.raw.get(&pol).and_then(|k| deep_get(k, &key).cloned());
@@ -222,7 +272,7 @@ impl PolicySet {
             match verdict {
                 Ok(mode) => {
                     if let Some(target) = ps.effective.get_mut(&pol) { deep_set(target, &key, value.clone()); }
-                    ps.applied_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"), "mode": mode}));
+                    ps.applied_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"), "mode": mode, "authorised_by": verdict_exc.reason}));
                 }
                 Err(reason) => ps.refused_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"), "kernel_value": kernel_value, "reason": reason})),
             }

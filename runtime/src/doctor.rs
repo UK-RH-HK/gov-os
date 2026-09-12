@@ -179,13 +179,23 @@ pub fn run(p: &Project) -> Result<Report> {
         },
         Some("repair policy overrides/exceptions"),
     ));
+    // D029 constitutional policy source: enforcement must consume a kernel authenticated against the release identity
+    let kt = crate::kernel_trust::trust(&p.root);
+    add(chk(
+        "D029",
+        "constitutional policy read from a verified kernel",
+        kt.verified,
+        "critical",
+        kt.summary(),
+        Some("gov kernel verify; gov kernel reinstall (or `gov kernel override --reason ...` as an L4+ role, which raises a gate)"),
+    ));
     // D027 constitutional precedence: refused overrides/exceptions are a CRITICAL finding (verifier H-N1)
     let refused = pol.refused_overrides.len();
     add(chk("D027", "policy precedence respected (no override weakens security/authority/gate floors)", refused == 0, "critical", if refused == 0 { format!("{} override(s) applied within POLICY_PRECEDENCE; rules from {}", pol.applied_overrides.len(), pol.precedence.as_ref().and_then(|v| v["source"].as_str()).unwrap_or("?")) } else { format!("{refused} refused: {}", pol.refused_overrides.iter().map(|r| format!("{}.{} ({})", r["policy"].as_str().unwrap_or(""), r["key"].as_str().unwrap_or(""), r["reason"].as_str().unwrap_or(""))).collect::<Vec<_>>().join("; ")) }, Some("remove the weakening override from governance/project/PROJECT_POLICY.yaml or PROJECT_EXCEPTIONS.yaml; only strengthening overrides are applied")));
     // D028 plugin governance: invalid descriptors, denied/pinned plugins, pin drift (verifier H-N2)
     let pf = crate::capabilities::governance::findings(p);
     let high: Vec<&Value> = pf.iter().filter(|f| f["severity"] == "high").collect();
-    add(chk("D028", "capability plugins governed (schema-valid, registered, pinned, authorised)", high.is_empty(), "high", if pf.is_empty() { "no plugin problems".into() } else { pf.iter().map(|f| f["message"].as_str().unwrap_or("").to_string()).collect::<Vec<_>>().join("; ") }, Some("gov plugins list; fix or register the descriptor (gov plugins register --descriptor <file>)")));
+    add(chk("D028", "capability plugins governed (schema-valid, registered, pinned, authorised)", pf.is_empty(), if high.is_empty() { "medium" } else { "high" }, if pf.is_empty() { "no plugin problems".into() } else { pf.iter().map(|f| f["message"].as_str().unwrap_or("").to_string()).collect::<Vec<_>>().join("; ") }, Some("gov plugins list; fix or register the descriptor (gov plugins register --descriptor <file>)")));
     let fj = p.root.join("framework.json");
     let fj_ok = fj.exists()
         && crate::util::read_json(&fj)

@@ -427,7 +427,14 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         layer3["policy_overrides_refused"].as_array().unwrap().len() >= 10,
         "{layer3}"
     );
-    // exceptions follow the same rules and need a decision
+    // exceptions follow the same rules and need a real governing decision (verifier V-M1)
+    write_yaml(
+        &root,
+        "spec/decisions/D-0001.yaml",
+        &json!({"id": "D-0001", "type": "decision", "title": "Budget headroom for the migration window",
+        "status": "ACTIVE", "question": "may parallel agents exceed the default?", "chosen_option": "A", "rationale": "measured",
+        "human_approved": true, "authorises_exceptions": ["EXC-0001", "EXC-0003"]}),
+    );
     let mut ex = yaml(&root, "governance/project/PROJECT_EXCEPTIONS.yaml");
     ex["exceptions"] = json!([
         {"id": "EXC-0001", "policy": "AUTHORITY_POLICY", "key": "authority_levels_required.create_task", "value": "L0", "decision": "D-0001", "expires": "2999-01-01", "reason": "attempt"},
@@ -986,27 +993,53 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         5
     );
     git_commit_all(&root, "4.1.3");
-    // 4.1.3 -> 4.1.4 with the canonical kernel (M-4.1.3-4.1.4 carries the explicit set_overlay_rule)
+    // 4.1.3 -> current release with the canonical kernel (M-4.1.3-4.1.4 carries the explicit set_overlay_rule)
     let chk2 = g.ok(&[
         "update",
         "--check",
         "--source",
         canonical_root().join("framework").to_str().unwrap(),
     ]);
-    assert_eq!(chk2["migration_path"], json!(["M-4.1.3-4.1.4"]), "{chk2}");
+    let chain2: Vec<String> = chk2["migration_path"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|m| m.as_str().unwrap().to_string())
+        .collect();
+    assert_eq!(
+        chain2.first().map(|s| s.as_str()),
+        Some("M-4.1.3-4.1.4"),
+        "{chk2}"
+    );
+    assert_eq!(
+        chain2.last().map(|s| s.as_str()),
+        Some(
+            format!("M-{}", {
+                let v = gov_runtime::VERSION.rsplit_once('.').unwrap();
+                format!(
+                    "{}.{}-{}",
+                    v.0,
+                    v.1.parse::<u32>().unwrap() - 1,
+                    gov_runtime::VERSION
+                )
+            })
+            .as_str()
+        ),
+        "the chain must end at the current release: {chain2:?}"
+    );
     let a2 = apply(&canonical_root().join("framework"));
-    assert_eq!(a2["to"], "4.1.4");
+    assert_eq!(a2["to"], gov_runtime::VERSION);
     let lock2 = yaml(&root, "governance/framework.lock");
-    assert_eq!(lock2["version"], "4.1.4");
+    assert_eq!(lock2["version"], gov_runtime::VERSION);
     assert_eq!(lock2["lock_schema_version"], "1.1.0");
     assert_eq!(
         lock2["release_commit"].as_str().unwrap(),
         git(&canonical_root(), &["rev-parse", "HEAD"]).1.trim()
     );
-    assert!(lock2["source"]
-        .as_str()
-        .unwrap()
-        .starts_with("source:agentic-engineering-os@4.1.4"));
+    assert!(lock2["source"].as_str().unwrap().starts_with(&format!(
+        "source:agentic-engineering-os@{}",
+        gov_runtime::VERSION
+    )));
     assert_eq!(
         yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml")["paths"]
             .as_array()
@@ -1092,7 +1125,7 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     ] {
         assert!(!rbe[k].is_null(), "rollback ledger lacks {k}: {rbe}");
     }
-    assert_eq!(rbe["from"], "4.1.4");
+    assert_eq!(rbe["from"], gov_runtime::VERSION);
     assert_eq!(rbe["to"], "4.1.3");
     assert_eq!(rbe["reason"], "verifier requested downgrade");
     assert_eq!(rbe["resulting_lock"]["version"], "4.1.3");

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.4/research.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/research.schema.json",
   "title": "research",
   "x-schema-version": "1.0.0",
   "type": "object",

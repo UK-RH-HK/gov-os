@@ -68,6 +68,9 @@ rules:
   - {key: TOOL_POLICY.plugins.require_valid_descriptor, mode: strengthen_only_bool, strict_value: true}
   - {key: TOOL_POLICY.plugins.refuse_on_pin_drift, mode: strengthen_only_bool, strict_value: true}
   - {key: TOOL_POLICY.plugins.elevated_permission_classes, mode: additive}
+  - {key: TOOL_POLICY.plugins.registry_path, mode: immutable}
+  - {key: TOOL_POLICY.plugins.registration_binds, mode: immutable}
+  - {key: TOOL_POLICY.plugins.descriptor_schema, mode: immutable}
   - {key: TOOL_POLICY.plugins.timeout_seconds, mode: overridable}
   - {key: TOOL_POLICY.*, mode: immutable}
   # ---- budgets (may be tightened, never raised without an exception record)

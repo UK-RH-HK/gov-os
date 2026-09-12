@@ -71,8 +71,12 @@ pub fn route(
             reasoning = r.into();
         }
     }
-    let roles = crate::util::read_yaml(&p.kernel_dir().join("roles").join("ROLES.yaml"))
-        .unwrap_or(json!({}));
+    let roles = crate::util::read_yaml(
+        &crate::kernel_trust::trusted_root(p)
+            .join("roles")
+            .join("ROLES.yaml"),
+    )
+    .unwrap_or(json!({}));
     if let Some(r) = roles["roles"]
         .as_array()
         .and_then(|a| a.iter().find(|r| r["id"].as_str() == Some(&role)))

@@ -328,8 +328,12 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 }
             }
             "authority_role_limits" => {
-                let roles = read_yaml(&p.kernel_dir().join("roles").join("ROLES.yaml"))
-                    .unwrap_or(json!({}));
+                let roles = read_yaml(
+                    &crate::kernel_trust::trusted_root(p)
+                        .join("roles")
+                        .join("ROLES.yaml"),
+                )
+                .unwrap_or(json!({}));
                 let known: Vec<String> = roles["roles"]
                     .as_array()
                     .map(|a| {
@@ -706,6 +710,18 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 }
                 if pol.precedence.is_none() {
                     f.findings.push(finding("critical", &fam, "POLICY_PRECEDENCE rules unavailable: every override is refused (fail closed)".into(), None));
+                }
+                let kt = crate::kernel_trust::trust(&p.root);
+                if kt.installed && !kt.verified {
+                    f.findings.push(finding(
+                        "critical",
+                        &fam,
+                        format!(
+                            "constitutional policy is not being read from a verified kernel: {}",
+                            kt.summary()
+                        ),
+                        Some("governance/kernel".into()),
+                    ));
                 }
                 f.detail = json!({"applied": pol.applied_overrides, "refused": pol.refused_overrides, "precedence": pol.precedence});
             }

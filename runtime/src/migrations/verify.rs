@@ -204,7 +204,9 @@ pub fn run_tests_file_upto(
                     } else {
                         let scanner = crate::security::secrets::SecretScanner::from_policies(
                             &crate::util::read_yaml(
-                                &root.join("governance/kernel/policies/SECURITY_POLICY.yaml"),
+                                &crate::kernel_trust::trusted_root_of(root)
+                                    .join("policies")
+                                    .join("SECURITY_POLICY.yaml"),
                             )
                             .unwrap_or(json!({})),
                             &json!({}),

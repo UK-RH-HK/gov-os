@@ -11,5 +11,6 @@ mod migration;
 mod multi_machine;
 mod repair;
 mod repair2;
+mod repair3;
 mod update;
 mod upstream;

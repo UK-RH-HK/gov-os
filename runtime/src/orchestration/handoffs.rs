@@ -18,7 +18,12 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
         .and_then(|v| v.as_str())
         .unwrap_or("")
         .to_string();
-    let roles = read_yaml(&p.kernel_dir().join("roles").join("ROLES.yaml")).unwrap_or(json!({}));
+    let roles = read_yaml(
+        &crate::kernel_trust::trusted_root(p)
+            .join("roles")
+            .join("ROLES.yaml"),
+    )
+    .unwrap_or(json!({}));
     let known: Vec<String> = roles["roles"]
         .as_array()
         .map(|a| {

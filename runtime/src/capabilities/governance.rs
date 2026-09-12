@@ -7,6 +7,7 @@
 //! Every refusal is a typed, auditable error and the plugin is listed as `denied`/`rejected`, never silently skipped.
 use super::host::discover_all;
 use super::protocol::PluginDescriptor;
+use super::registry::{self, Standing};
 use crate::util::{now_iso, read_json, sha256_hex, write_json};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
@@ -178,66 +179,141 @@ fn parse_level(s: &str) -> u8 {
     crate::authority::parse_level(s).unwrap_or(2)
 }
 
+/// Claims a descriptor makes about its own standing. They are inert — recorded only so that doctor D028 and the
+/// `plugin_governance` suite family can report a descriptor that tries to authorise itself (verifier V-H1).
+pub fn self_authorising_claims(desc: &PluginDescriptor) -> Vec<String> {
+    let mut v = vec![];
+    if desc.approved_roles.iter().any(|r| r == "all") {
+        v.push(
+            "approved_roles: [\"all\"] (a descriptor cannot widen role authorisation)".to_string(),
+        );
+    }
+    if desc.raw.get("provenance").is_some() {
+        v.push("provenance (registration is proven by the OS-written plugin registry, not by the descriptor)".to_string());
+    }
+    if desc.raw.get("status").and_then(|s| s.as_str()) == Some("active") {
+        v.push("status: active".to_string());
+    }
+    v
+}
+
+fn strings(v: &Value, key: &str) -> Vec<String> {
+    v.get(key)
+        .and_then(|x| x.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|s| s.as_str().map(|t| t.to_string()))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn declares_elevated(v: &Value, required: &[String], elevated: &[String]) -> bool {
+    required.iter().any(|r| elevated.contains(r))
+        || v.get("permissions")
+            .map(|x| {
+                x["network"].as_bool().unwrap_or(false)
+                    || x["filesystem_write"].as_bool().unwrap_or(false)
+            })
+            .unwrap_or(false)
+}
+
 /// Authorise `desc` for the acting role. Ok(grant) or a typed refusal.
+///
+/// Trust sources: the authority floor and permission classes come from verified kernel policy
+/// (`kernel_trust`-backed `PolicySet`); registration, approved roles and the elevated-permission gate come from the
+/// OS-written plugin registry; only the command, capability and declared pin come from the descriptor — and the pin
+/// is checked against observed bytes. Nothing a descriptor says about its own standing grants anything.
 pub fn authorize(p: &Project, desc: &PluginDescriptor) -> Result<Value> {
     let pol = p.policies();
     let mut checks = vec![];
     let level = role_level(p)?;
     let min = parse_level(&pol.get_str("TOOL_POLICY", "plugins.min_authority", "L2"));
-    let registered = desc
-        .raw
-        .get("provenance")
-        .and_then(|v| v.get("registered_at"))
-        .and_then(|v| v.as_str())
-        .map(|s| !s.is_empty())
-        .unwrap_or(false);
-    // 1. authority floor: an unregistered (hand-declared) descriptor executes only for roles at/above the floor; a
-    //    registered one (governed act, gate when elevated) executes for its approved_roles
-    let approved: Vec<String> = desc.approved_roles.clone();
-    let role_ok = if !approved.is_empty() {
-        approved.iter().any(|r| r == "all" || r == &p.role)
-    } else if registered {
-        true
-    } else {
-        level >= min
-    };
-    checks.push(json!({"check": "role_authorised", "ok": role_ok, "detail": format!("role {} L{level}; approved_roles {:?}; registered {registered}; min_authority L{min}", p.role, approved)}));
-    if !role_ok {
-        return Err(GovError::new("AUTHORITY_DENIED", format!("role '{}' (L{level}) may not execute plugin '{}': {}", p.role, desc.plugin_id, if !approved.is_empty() { format!("not in approved_roles {approved:?}") } else { format!("unregistered descriptors execute only for roles at/above TOOL_POLICY.plugins.min_authority (L{min}); register it with `gov plugins register`") })).with_details(json!({"operation": "execute_plugin", "plugin_id": desc.plugin_id, "role": p.role, "level": format!("L{level}"), "checks": checks})));
+    let claims = self_authorising_claims(desc);
+
+    // 0. standing: an edited, re-versioned or re-purposed descriptor never matches its registration -> fail closed
+    let standing = registry::standing(p, desc);
+    if let Standing::Mismatched(why) = &standing {
+        checks.push(json!({"check": "registry_binding", "ok": false, "detail": why}));
+        return Err(GovError::new("PLUGIN_REGISTRY_MISMATCH", why.clone()).with_details(
+            json!({"plugin_id": desc.plugin_id, "checks": checks, "registry": registry::REGISTRY_PATH}),
+        ));
     }
-    // 2. permission classes: required classes must be held by the role; elevated classes need a registration gate
+    let reg: Option<Value> = match &standing {
+        Standing::Registered(e) => Some((**e).clone()),
+        _ => None,
+    };
+    let registered = reg.is_some();
+    checks.push(json!({"check": "registry_binding", "ok": true, "detail": if registered { format!("registered in {} (identity, version and descriptor content bound)", registry::REGISTRY_PATH) } else { "hand-declared descriptor (no registration record)".to_string() }, "descriptor_claims_ignored": claims}));
+
+    // 1. authority floor from verified kernel policy: applies to every execution, registered or not, and cannot be
+    //    widened by anything inside the descriptor (verifier V-H1)
+    let floor_ok = level >= min;
+    checks.push(json!({"check": "authority_floor", "ok": floor_ok, "detail": format!("role {} L{level} vs TOOL_POLICY.plugins.min_authority L{min}", p.role)}));
+    if !floor_ok {
+        return Err(GovError::new("AUTHORITY_DENIED", format!(
+            "role '{}' (L{level}) may not execute plugin '{}': TOOL_POLICY.plugins.min_authority is L{min} and a descriptor cannot grant itself authority (approved_roles and provenance inside a descriptor are ignored){}",
+            p.role, desc.plugin_id,
+            if claims.is_empty() { String::new() } else { format!("; ignored descriptor claims: {claims:?}") }))
+        .with_details(json!({"operation": "execute_plugin", "plugin_id": desc.plugin_id, "role": p.role, "level": format!("L{level}"), "required": format!("L{min}"), "registered": registered, "ignored_descriptor_claims": claims, "checks": checks})));
+    }
+
+    // 2. approved_roles may only NARROW; the authoritative list is the registry's when the plugin is registered
+    let approved: Vec<String> = match &reg {
+        Some(e) => strings(e, "approved_roles"),
+        None => desc.approved_roles.clone(),
+    };
+    let role_ok = approved.is_empty() || approved.iter().any(|r| r == "all" || r == &p.role);
+    checks.push(json!({"check": "approved_roles", "ok": role_ok, "detail": format!("{approved:?} (source: {})", if registered { "registry" } else { "descriptor, narrowing only" })}));
+    if !role_ok {
+        return Err(GovError::new("AUTHORITY_DENIED", format!(
+            "role '{}' is not in the approved roles {approved:?} for plugin '{}'", p.role, desc.plugin_id))
+        .with_details(json!({"operation": "execute_plugin", "plugin_id": desc.plugin_id, "role": p.role, "checks": checks})));
+    }
+
+    // 3. permission classes: the role must hold every class either side declares (a descriptor may only add needs)
     let perms = crate::tools::role_permissions(p, &p.role);
-    let required = desc.required_permission_classes.clone();
+    let mut required: Vec<String> = desc.required_permission_classes.clone();
+    if let Some(e) = &reg {
+        for r in strings(e, "required_permission_classes") {
+            if !required.contains(&r) {
+                required.push(r);
+            }
+        }
+    }
     let missing: Vec<&String> = required.iter().filter(|r| !perms.contains(r)).collect();
     checks.push(json!({"check": "permission_classes", "ok": missing.is_empty(), "detail": format!("required {required:?}; role holds {perms:?}")}));
     if !missing.is_empty() {
         return Err(GovError::new("PLUGIN_NOT_AUTHORIZED", format!("plugin '{}' requires permission classes {missing:?} that role '{}' does not hold (TOOL_PERMISSIONS)", desc.plugin_id, p.role)).with_details(json!({"plugin_id": desc.plugin_id, "checks": checks})));
     }
+
+    // 4. elevated permissions: approval is the gate recorded in the REGISTRY, never a field in the descriptor
     let elevated = pol.get_list("TOOL_POLICY", "plugins.elevated_permission_classes");
-    let needs_gate = required.iter().any(|r| elevated.contains(r))
-        || desc
-            .raw
-            .get("permissions")
-            .map(|x| {
-                x["network"].as_bool().unwrap_or(false)
-                    || x["filesystem_write"].as_bool().unwrap_or(false)
-            })
+    let needs_gate = declares_elevated(&desc.raw, &required, &elevated)
+        || reg
+            .as_ref()
+            .map(|e| declares_elevated(e, &required, &elevated))
             .unwrap_or(false);
     if needs_gate {
-        let gate = desc
-            .raw
-            .get("provenance")
-            .and_then(|v| v.get("gate"))
-            .and_then(|v| v.as_str())
-            .unwrap_or("")
-            .to_string();
+        let gate = reg
+            .as_ref()
+            .and_then(|e| {
+                e.get("registration_gate")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string())
+            })
+            .unwrap_or_default();
         let gate_ok = !gate.is_empty() && crate::orchestration::gates::is_answered_yes(p, &gate);
-        checks.push(json!({"check": "elevated_permissions_approved", "ok": gate_ok, "detail": format!("gate {gate:?}")}));
+        checks.push(json!({"check": "elevated_permissions_approved", "ok": gate_ok, "detail": format!("registry gate {gate:?}; registered {registered}")}));
         if !gate_ok {
-            return Err(GovError::new("PLUGIN_NOT_APPROVED", format!("plugin '{}' declares elevated permissions ({required:?}/network/filesystem_write) but no presented, answered-A registration gate is recorded in provenance.gate", desc.plugin_id)).with_details(json!({"plugin_id": desc.plugin_id, "checks": checks})));
+            return Err(GovError::new("PLUGIN_NOT_APPROVED", format!(
+                "plugin '{}' declares elevated permissions ({required:?}/network/filesystem_write); it must be registered with `gov plugins register` against a presented, answered-A gate recorded in {} (a gate id written into the descriptor proves nothing)",
+                desc.plugin_id, registry::REGISTRY_PATH))
+            .with_details(json!({"plugin_id": desc.plugin_id, "checks": checks})));
         }
     }
-    // 3. health: the executable must resolve
+
+    // 5. health: the executable must resolve
     let (healthy, hmsg) = health_static(desc, &p.root);
     checks.push(json!({"check": "health", "ok": healthy, "detail": hmsg}));
     if !healthy {
@@ -250,13 +326,23 @@ pub fn authorize(p: &Project, desc: &PluginDescriptor) -> Result<Value> {
         )
         .with_details(json!({"plugin_id": desc.plugin_id, "checks": checks})));
     }
-    // 4. pin: declared sha256 must match; an observed implementation change without a version change is drift
+
+    // 6. pin: declared sha256, the registered implementation hash, and observed drift must all agree
     let observed = pin_hash(desc, &p.root);
     if let Some(declared) = &desc.pin_sha256 {
         let ok = observed.as_deref() == Some(declared.as_str());
         checks.push(json!({"check": "pin_sha256", "ok": ok, "detail": format!("declared {declared}, observed {observed:?}")}));
         if !ok {
             return Err(GovError::new("PLUGIN_PIN_MISMATCH", format!("plugin '{}' implementation does not match its declared pin (sha256 {declared}); re-register after review", desc.plugin_id)).with_details(json!({"plugin_id": desc.plugin_id, "checks": checks})));
+        }
+    }
+    if let Some(e) = &reg {
+        if let Some(reg_impl) = e.get("implementation_sha256").and_then(|v| v.as_str()) {
+            let ok = observed.as_deref() == Some(reg_impl);
+            checks.push(json!({"check": "registered_implementation", "ok": ok, "detail": format!("registered {reg_impl}, observed {observed:?}")}));
+            if !ok {
+                return Err(GovError::new("PLUGIN_PIN_MISMATCH", format!("plugin '{}' implementation does not match the registered content hash; re-register after review", desc.plugin_id)).with_details(json!({"plugin_id": desc.plugin_id, "checks": checks})));
+            }
         }
     }
     let drift = record_observed(p, desc, observed.as_deref());
@@ -273,7 +359,7 @@ pub fn authorize(p: &Project, desc: &PluginDescriptor) -> Result<Value> {
         checks.push(json!({"check": "pin_drift", "ok": true, "detail": observed.clone().unwrap_or_else(|| "no local files to pin (interpreter-only command)".into())}));
     }
     Ok(
-        json!({"plugin_id": desc.plugin_id, "capability": desc.capability, "version": desc.version, "role": p.role, "level": format!("L{level}"), "registered": registered, "pin_sha256": observed, "checks": checks}),
+        json!({"plugin_id": desc.plugin_id, "capability": desc.capability, "version": desc.version, "role": p.role, "level": format!("L{level}"), "registered": registered, "pin_sha256": observed, "ignored_descriptor_claims": claims, "checks": checks}),
     )
 }
 
@@ -411,6 +497,43 @@ pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
     }
     std::fs::create_dir_all(dest.parent().unwrap())?;
     crate::util::write_yaml(&dest, &descriptor)?;
+    // The authoritative record lives OUTSIDE the descriptor (verifier V-H1): identity, version, descriptor content
+    // hash, implementation hash, approved roles, permission classes and the approving gate are written by the OS.
+    let written = PluginDescriptor::from_value(&descriptor, &dest.to_string_lossy())
+        .ok_or_else(|| GovError::new("USAGE", "descriptor is not a plugin descriptor"))?;
+    let dsha = registry::descriptor_hash(&written).ok_or_else(|| {
+        GovError::new(
+            "IO_ERROR",
+            format!(
+                "cannot read the registered descriptor at {}",
+                dest.display()
+            ),
+        )
+    })?;
+    let approved_roles: Vec<String> = descriptor
+        .get("approved_roles")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default();
+    let files: Vec<String> = command_files(&written, &p.root)
+        .iter()
+        .map(|(n, _)| n.clone())
+        .collect();
+    let entry = registry::record(
+        p,
+        &written,
+        &dsha,
+        pin.as_deref(),
+        &files,
+        &approved_roles,
+        &required,
+        descriptor.get("permissions").cloned().unwrap_or(json!({})),
+        gate_id.clone(),
+    )?;
     // reset the observed hash for this id (a registration is the governed act that pins the implementation)
     let path = observed_path(p);
     let mut doc = read_json(&path).unwrap_or(json!({}));
@@ -419,7 +542,19 @@ pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
     let _ = write_json(&path, &doc);
     let _ = crate::tools::generate_registry(p);
     Ok(
-        json!({"registered": true, "plugin_id": id, "path": format!("governance/project/plugins/{id}.yaml"), "pin": descriptor["pin"], "provenance": descriptor["provenance"], "approved_roles": descriptor["approved_roles"]}),
+        json!({"registered": true, "plugin_id": id, "path": format!("governance/project/plugins/{id}.yaml"), "pin": descriptor["pin"], "provenance": descriptor["provenance"], "approved_roles": descriptor["approved_roles"], "registry": registry::REGISTRY_PATH, "registry_entry": entry}),
+    )
+}
+
+/// Remove a plugin's registration (a governed act with the same authority as registering it). The descriptor stays
+/// on disk and simply reverts to hand-declared standing.
+pub fn unregister(p: &Project, plugin_id: &str) -> Result<Value> {
+    crate::orchestration::control::guard_write(p, "plugins unregister")?;
+    crate::authority::require(p, "register_plugin")?;
+    let removed = registry::remove(p, plugin_id)?;
+    let _ = crate::tools::generate_registry(p);
+    Ok(
+        json!({"unregistered": removed, "plugin_id": plugin_id, "registry": registry::REGISTRY_PATH}),
     )
 }
 
@@ -457,20 +592,48 @@ pub fn health(p: &Project, ping: bool) -> Vec<Value> {
     out
 }
 
-/// Findings for doctor/suite: rejected descriptors, drift, unauthorised pinned implementations.
+/// Findings for doctor/suite: invalid descriptors, self-authorising claims, registry mismatches, drift and
+/// unusable pinned implementations (verifier V-H1: a descriptor that tries to authorise itself is always reported,
+/// whatever the acting role, because the claim is what is wrong — not the outcome for one session).
 pub fn findings(p: &Project) -> Vec<Value> {
+    let (valid, rejected) = discover_all(&p.root);
     let set = plugin_set(p);
-    let mut out = vec![];
-    for r in &set.rejected {
-        out.push(json!({"severity": "high", "plugin_id": r["plugin_id"], "message": format!("plugin descriptor {} is invalid and cannot execute: {}", r["source"].as_str().unwrap_or("?"), r["reason"].as_str().unwrap_or("")), "path": r["source"]}));
-    }
     let pol = p.policies();
+    let min = parse_level(&pol.get_str("TOOL_POLICY", "plugins.min_authority", "L2"));
     let pinned_embed = pol.get_str("MEMORY_POLICY", "embedding.provider", "hashed-ngram");
     let pinned_rerank = pol.get_str("MEMORY_POLICY", "reranker.provider", "none");
+    let mut out = vec![];
+    for r in &rejected {
+        out.push(json!({"severity": "high", "plugin_id": r["plugin_id"], "message": format!("plugin descriptor {} is invalid and cannot execute: {}", r["source"].as_str().unwrap_or("?"), r["reason"].as_str().unwrap_or("")), "path": r["source"]}));
+    }
+    for d in &valid {
+        let claims = self_authorising_claims(d);
+        let standing = registry::standing(p, d);
+        match &standing {
+            Standing::Mismatched(why) => out.push(json!({"severity": "high", "plugin_id": d.plugin_id, "message": format!("plugin {} does not match its registration: {why}", d.plugin_id), "path": d.source})),
+            Standing::Unregistered if !claims.is_empty() => out.push(json!({"severity": "high", "plugin_id": d.plugin_id,
+                "message": format!("plugin descriptor {} declares its own authorisation ({}) but no record exists in {}; the claims are ignored by the executable paths and the descriptor must be registered with `gov plugins register` or the fields removed", d.plugin_id, claims.join(", "), registry::REGISTRY_PATH),
+                "path": d.source})),
+            _ => {}
+        }
+    }
+    for id in registry::orphans(
+        p,
+        &valid
+            .iter()
+            .map(|d| d.plugin_id.clone())
+            .collect::<Vec<_>>(),
+    ) {
+        out.push(json!({"severity": "medium", "plugin_id": id, "message": format!("plugin registry records '{id}' but no descriptor declares it (stale registration; run `gov plugins unregister {id}`)"), "path": registry::REGISTRY_PATH}));
+    }
     for d in &set.denied {
         let id = d["plugin_id"].as_str().unwrap_or("");
+        if out.iter().any(|f| f["plugin_id"].as_str() == Some(id)) {
+            continue;
+        }
         let sev = if d["code"] == "PLUGIN_PIN_MISMATCH"
             || d["code"] == "PLUGIN_NOT_APPROVED"
+            || d["code"] == "PLUGIN_REGISTRY_MISMATCH"
             || id == pinned_embed
             || id == pinned_rerank
         {
@@ -478,6 +641,14 @@ pub fn findings(p: &Project) -> Vec<Value> {
         } else {
             "medium"
         };
+        // an under-authority denial for the acting role is the floor working as designed, not a defect
+        let expected_floor_denial = d["code"] == "AUTHORITY_DENIED"
+            && crate::authority::level_of(p, &p.role)
+                .map(|l| l < min)
+                .unwrap_or(false);
+        if expected_floor_denial {
+            continue;
+        }
         out.push(json!({"severity": sev, "plugin_id": id, "message": format!("plugin {id} not usable by role {}: {} ({})", p.role, d["reason"].as_str().unwrap_or(""), d["code"].as_str().unwrap_or("")), "path": d["source"]}));
     }
     out

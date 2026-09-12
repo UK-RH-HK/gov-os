@@ -30,6 +30,7 @@ pub fn write_lock(
         "lock_schema_version": LOCK_SCHEMA_VERSION,
     });
     write_yaml(path, &lock)?;
+    crate::kernel_trust::clear();
     Ok(lock)
 }
 

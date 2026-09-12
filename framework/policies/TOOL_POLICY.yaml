@@ -23,7 +23,11 @@ mcp:
 plugins:
   descriptor_schema: plugin-descriptor
   require_valid_descriptor: true
-  min_authority: L2                 # hand-declared (unregistered) descriptors execute only for roles at/above this level
+  # A descriptor is discovery, never authorisation (D-0007). The floor below applies to EVERY plugin execution,
+  # registered or not, and nothing inside a descriptor (approved_roles, provenance, status) can widen it.
+  min_authority: L2                 # minimum authority level to trigger any capability plugin
+  registry_path: governance/generated/plugin-registry.json   # OS-written; the only proof of registration
+  registration_binds: [plugin_id, version, descriptor_sha256, implementation_sha256]
   elevated_permission_classes: [NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_WRITE, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
   refuse_on_pin_drift: true         # implementation changed without a version change -> PLUGIN_PIN_MISMATCH
   timeout_seconds: 60

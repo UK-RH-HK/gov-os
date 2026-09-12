@@ -257,6 +257,12 @@ enum PluginsCmd {
         #[arg(long)]
         descriptor: String,
     },
+    /// Remove a plugin's registration (the descriptor reverts to hand-declared standing)
+    Unregister {
+        plugin_id: String,
+    },
+    /// The authoritative plugin registry (governance/generated/plugin-registry.json)
+    Registry,
     List,
     Health {
         #[arg(long)]
@@ -629,6 +635,13 @@ enum KernelCmd {
         #[arg(long)]
         source: Option<String>,
     },
+    /// Trust verdict for the installed kernel (what constitutional policy is being read from)
+    Trust,
+    /// L4+: raise a gate to proceed on an installed kernel that failed verification
+    Override {
+        #[arg(long)]
+        reason: Option<String>,
+    },
 }
 #[derive(Subcommand)]
 enum CapCmd {
@@ -835,7 +848,9 @@ fn run(cli: &Cli) -> Result<Value> {
             ReleaseCmd::Build { version, out, certification, evidence, canonical } => { let croot = canonical.clone().or_else(gov_runtime::kernel::canonical_root).ok_or_else(|| GovError::new("KERNEL_SOURCE_NOT_FOUND", "canonical repository root not found (pass --canonical)"))?; let out = out.clone().unwrap_or(croot.join("release")); gov_runtime::release::build(&croot, version, &out, certification, evidence.as_deref()) }
             ReleaseCmd::Verify { dir } => gov_runtime::release::verify(dir),
         },
-        Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => Ok(serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?), KernelCmd::Reinstall { source } => { gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?; gov_runtime::authority::require(&p, "install_kernel")?; let lock = p.lock()?.clone(); let src = source.clone().or_else(|| lock["source"].as_str().filter(|s| Path::new(s).exists()).map(|s| s.to_string())); let m = gov_runtime::kernel::install_kernel(src.as_deref().map(Path::new), &p.governance_dir())?; if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); } p.invalidate(); Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"]})) } } }
+        Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => { let v = serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?; let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"ok": v["ok"], "modified": v["modified"], "missing": v["missing"], "added": v["added"], "payload_hash": v["payload_hash"], "version": v["version"], "trust": t.to_value()})) }
+            KernelCmd::Trust => { let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"verified": t.verified, "summary": t.summary(), "trust": t.to_value()})) }
+            KernelCmd::Override { reason } => gov_runtime::kernel_trust::request_override(&p, reason.as_deref()), KernelCmd::Reinstall { source } => { gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?; gov_runtime::authority::require(&p, "install_kernel")?; let lock = p.lock()?.clone(); let src = source.clone().or_else(|| lock["source"].as_str().filter(|s| Path::new(s).exists()).map(|s| s.to_string())); let m = gov_runtime::kernel::install_kernel(src.as_deref().map(Path::new), &p.governance_dir())?; if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); } p.invalidate(); Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"]})) } } }
         Cmd::Capabilities { op: CapCmd::ServeEmbed { reverse, id } } => {
             use std::io::Read; let mut raw = String::new(); std::io::stdin().read_to_string(&mut raw)?;
             let req: Value = serde_json::from_str(&raw).unwrap_or(json!({}));
@@ -858,9 +873,11 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::Plugins { op } => { let p = open_project(cli, true)?; match op {
             PluginsCmd::Register { descriptor } => gov_runtime::capabilities::governance::register(&p, load_file_value(descriptor)?),
             PluginsCmd::List => { let set = gov_runtime::capabilities::governance::plugin_set(&p); Ok(json!({"role": p.role, "usable": set.usable, "denied": set.denied, "rejected": set.rejected})) }
+            PluginsCmd::Unregister { plugin_id } => gov_runtime::capabilities::governance::unregister(&p, plugin_id),
+            PluginsCmd::Registry => Ok(gov_runtime::capabilities::registry::load(&p)),
             PluginsCmd::Health { ping } => Ok(json!(gov_runtime::capabilities::governance::health(&p, *ping))) } }
         Cmd::Policy { op } => { let p = open_project(cli, true)?; let pol = p.policies(); match op {
-            PolicyCmd::Overrides => Ok(json!({"applied": pol.applied_overrides, "refused": pol.refused_overrides, "precedence": pol.precedence, "problems": pol.problems})),
+            PolicyCmd::Overrides => Ok(json!({"applied": pol.applied_overrides, "refused": pol.refused_overrides, "precedence": pol.precedence, "kernel_trust": pol.kernel_trust, "problems": pol.problems})),
             PolicyCmd::Effective { policy } => Ok(json!({"policy": policy, "effective": pol.effective.get(policy), "kernel": pol.raw.get(policy)})) } }
         Cmd::Claims { op } => { let p = open_project(cli, true)?; match op { ClaimsCmd::List => Ok(json!(gov_runtime::orchestration::claims::list(&p)?)), ClaimsCmd::Sweep => { gov_runtime::authority::require(&p, "sweep_claims")?; Ok(json!({"swept": gov_runtime::orchestration::claims::sweep_expired(&p)?})) } } }
         Cmd::Lessons { op } => match op { LessonsCmd::Cluster { inbox, proposals, write } => {

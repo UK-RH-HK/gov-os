@@ -143,7 +143,7 @@ impl Project {
     }
     pub fn policies(&self) -> &PolicySet {
         self.policies
-            .get_or_init(|| PolicySet::load(&self.kernel_dir(), self.overlay(), self.schemas()))
+            .get_or_init(|| PolicySet::load(&self.root, self.overlay(), self.schemas()))
     }
     pub fn contract(&self) -> &RepositoryContract {
         self.contract.get_or_init(|| {
@@ -235,6 +235,7 @@ impl Project {
     }
     /// Drop cached state after mutations to governance/.
     pub fn invalidate(&mut self) {
+        crate::kernel_trust::clear();
         self.lock = OnceCell::new();
         self.manifest = OnceCell::new();
         self.overlay = OnceCell::new();

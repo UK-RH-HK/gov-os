@@ -16,7 +16,9 @@ The canonical repository governs itself with the same record types it ships. Aut
 | [D-0004](../spec/decisions/D-0004.yaml) | ACTIVE | MCP transport deferred with a record; lesson clustering → Framework Change Proposal records |
 | [D-0005](../spec/decisions/D-0005.yaml) | ACTIVE | Embed/rerank plugins fail closed, code_intel degrades; plugins are governed executables (API-0001 v1.1) |
 | [D-0006](../spec/decisions/D-0006.yaml) | ACTIVE | No paraphrase model in the kernel; per-repository benchmark/selection, optional plugin template, candidate classes |
-| [TASK-0001 … TASK-0011](../spec/tasks/) | see records | Implementation workstreams (DAG); TASK-0010/TASK-0011 = repair iterations for candidates 4.1.3/4.1.4 |
+| [D-0007](../spec/decisions/D-0007.yaml) | ACTIVE | Trust classes: a lower-trust input may never manufacture a higher-trust fact (kernel trust root, plugin registry, governed exceptions) |
+| [TASK-0001 … TASK-0012](../spec/tasks/) | see records | Implementation workstreams (DAG); TASK-0010/0011/0012 = repair iterations for candidates 4.1.3/4.1.4/4.1.5 |
 | [RPT-0010](../spec/reports/RPT-0010.yaml) | EVIDENCE | Closing report of the first repair iteration |
 | [RPT-0011](../spec/reports/RPT-0011.yaml) | EVIDENCE | Closing report of the second repair iteration (4.1.4) |
+| [RPT-0012](../spec/reports/RPT-0012.yaml) | EVIDENCE | Closing report of the third repair iteration (4.1.5) |
 | [RPT-0001](../spec/reports/RPT-0001.yaml) | EVIDENCE | Assessment of the implementation against D-0002 |

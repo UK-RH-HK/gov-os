@@ -3,3 +3,4 @@ pub mod ecosystems;
 pub mod governance;
 pub mod host;
 pub mod protocol;
+pub mod registry;

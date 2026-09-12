@@ -34,8 +34,9 @@ if cargo fmt --version >/dev/null 2>&1; then
   if cargo fmt --all -- --check > "$EV/rustfmt.txt" 2>&1; then echo "PASS (rustfmt --check: formatted)" > "$EV/rustfmt-summary.txt"; else echo "FAIL (rustfmt --check reports $(grep -c '^Diff in' "$EV/rustfmt.txt") differences; see rustfmt.txt)" > "$EV/rustfmt-summary.txt"; fi
 else echo "NOT_AVAILABLE (rustfmt not installed)" > "$EV/rustfmt-summary.txt"; fi
 rm -f "$EV/clippy-diagnostic-count.txt" "$EV/unit-summary.raw" "$EV/certification-summary.raw" "$EV/python-summary.raw"
-HELD="$EV/heldout-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.2/heldout-rerun-4.1.4/summary.txt" ]; then cp "$ROOT/release/verification/4.1.2/heldout-rerun-4.1.4/summary.txt" "$HELD"; else echo "NOT_RUN (first verifier harness not rerun in this collection)" > "$HELD"; fi
-HELD2="$EV/heldout-v2-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.3/heldout-new-rerun-4.1.4/summary.txt" ]; then cp "$ROOT/release/verification/4.1.3/heldout-new-rerun-4.1.4/summary.txt" "$HELD2"; else echo "NOT_RUN (second verifier harness not rerun in this collection)" > "$HELD2"; fi
+HELD="$EV/heldout-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.2/heldout-rerun-4.1.5/summary.txt" ]; then cp "$ROOT/release/verification/4.1.2/heldout-rerun-4.1.5/summary.txt" "$HELD"; else echo "NOT_RUN (first verifier harness not rerun in this collection)" > "$HELD"; fi
+HELD2="$EV/heldout-v2-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.3/heldout-new-rerun-4.1.5/summary.txt" ]; then cp "$ROOT/release/verification/4.1.3/heldout-new-rerun-4.1.5/summary.txt" "$HELD2"; else echo "NOT_RUN (second verifier harness not rerun in this collection)" > "$HELD2"; fi
+HELD3="$EV/heldout-v3-rerun-summary.txt"; if [ -f "$ROOT/release/verification/4.1.4/heldout-v3-rerun-4.1.5/summary.txt" ]; then cp "$ROOT/release/verification/4.1.4/heldout-v3-rerun-4.1.5/summary.txt" "$HELD3"; else echo "NOT_RUN (third verifier harness not rerun in this collection)" > "$HELD3"; fi
 UNIT="$(cat "$EV/unit-summary.txt")"; CERT="$(cat "$EV/certification-summary.txt")"; PY="$(cat "$EV/python-summary.txt")"; CL="$(cat "$EV/clippy-summary.txt")"; FM="$(cat "$EV/rustfmt-summary.txt")"
 CERT_LIST="$(grep -E '^test .* \.\.\. (ok|FAILED)$' "$EV/certification-tests.txt" | sed 's/^test /- /')"
 UNIT_LIST="$(grep -E '^test .* \.\.\. (ok|FAILED)$' "$EV/unit-tests.txt" | sed 's/^test /- /')"
@@ -58,13 +59,14 @@ $(cat "$EV/tool-status.txt")
 | Suite | Result |
 |---|---|
 | Rust unit tests (gov-runtime) | $UNIT |
-| Certification harness (7 fixtures + architectural + repair regressions, 4.1.2 and 4.1.3 findings) | $CERT |
+| Certification harness (7 fixtures + architectural + repair regressions for the 4.1.2, 4.1.3 and 4.1.4 findings) | $CERT |
 | Python capability plugin tests | $PY |
 | Clippy (\`cargo clippy --all-targets\`) | $CL |
 | rustfmt (\`cargo fmt --check\`) | $FM |
 | Release build (\`cargo build --release\`) | $( [ "$BUILD_RC" -eq 0 ] && echo "PASS (exit 0)" || echo "FAIL (exit $BUILD_RC)" ) |
 | First independent held-out harness rerun (unchanged, 4.1.2 verifier) | $(cat "$HELD") |
 | Second independent held-out harness rerun (unchanged, 4.1.3 verifier) | $(cat "$HELD2") |
+| Third independent held-out harness rerun (unchanged, 4.1.4 verifier) | $(cat "$HELD3") |
 
 ## Certification tests
 $CERT_LIST

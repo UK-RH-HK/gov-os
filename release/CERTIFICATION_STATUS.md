@@ -69,3 +69,27 @@ unchanged (`release/verification/4.1.2/heldout-rerun-4.1.4/`, `release/verificat
 
 **Status of 4.1.4: READY_FOR_INDEPENDENT_REVERIFICATION — certification pending.** The implementer has not issued
 `OS_RELEASE_CANDIDATE_ACCEPTED` and must not.
+
+---
+
+## Status of 4.1.4: REJECTED (OS_RELEASE_CANDIDATE_REJECTED) — independent re-verification 2026-09-12; report release/verification/4.1.4/INDEPENDENT_REVERIFICATION_REPORT.md
+
+Recorded by the release owner verbatim from the verifier's `release/verification/4.1.4/VERDICT.md` (that session did
+not edit shared release files). The 4.1.4 manifest certification block carries the same text; the kernel payload and
+`file_hashes` are untouched, so `gov release verify release/releases/4.1.4` remains ok. Verifier artefacts under
+`release/verification/4.1.4/` were not modified.
+
+The 4.1.4 verification confirmed C-N1, H-N1 and every MEDIUM/LOW item of the 4.1.3 delta as repaired, and rejected the
+candidate on two HIGH trust-root defects (V-H1 plugin descriptors authorising themselves; V-H2 constitutional floors
+read from an unverified installed kernel) and one MEDIUM (V-M1 self-attested policy exceptions).
+
+## Implementer repair statement (2026-09-12, third repair iteration)
+
+Repair candidate **4.1.5** on branch `release/4.1.5-rc1` (tag `v4.1.5-rc1` at the candidate commit; rejected candidates
+keep their tags `v4.1.3-rc1` and `v4.1.4-rc1`). Repair mapping for every finding:
+[release/repair/4.1.5/REPAIR_REPORT.md](repair/4.1.5/REPAIR_REPORT.md). All three independent harnesses were rerun
+unchanged (`release/verification/4.1.2/heldout-rerun-4.1.5/`, `release/verification/4.1.3/heldout-new-rerun-4.1.5/`,
+`release/verification/4.1.4/heldout-v3-rerun-4.1.5/`).
+
+**Status of 4.1.5: READY_FOR_INDEPENDENT_REVERIFICATION — certification pending.** The implementer has not issued
+`OS_RELEASE_CANDIDATE_ACCEPTED` and must not.

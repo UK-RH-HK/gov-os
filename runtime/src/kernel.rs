@@ -238,7 +238,14 @@ pub fn stage_payload(source_dir: &Path, dest: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Install a kernel payload into `governance/`; any installation invalidates the cached trust verdict.
 pub fn install_kernel(source: Option<&Path>, governance_dir: &Path) -> Result<Value> {
+    let r = install_kernel_inner(source, governance_dir);
+    crate::kernel_trust::clear();
+    r
+}
+
+fn install_kernel_inner(source: Option<&Path>, governance_dir: &Path) -> Result<Value> {
     let src = resolve_kernel_source(source)?;
     let dest = governance_dir.join("kernel");
     stage_payload(&src, &dest)?;

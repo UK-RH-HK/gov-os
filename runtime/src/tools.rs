@@ -374,16 +374,27 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
         format!("required {req:?} within role permissions {perms:?}"),
     );
     let lic = descriptor["license"].as_str().unwrap_or("").to_string();
+    // A descriptor's own "security_review: passed" is a claim, not evidence (trust-boundary audit, D-0007): it counts
+    // only when `security_review_record` resolves to an existing governed record. Otherwise the condition fails and a
+    // Human Decision Gate is raised, exactly as for any other unmet auto-install condition.
+    let review_record = descriptor["security_review_record"]
+        .as_str()
+        .filter(|s| !s.is_empty())
+        .and_then(|id| crate::exceptions::resolve_record(&p.root, id).map(|(_, path)| path));
+    let review_ok = descriptor["security_review"]
+        .as_str()
+        .map(|s| s == "passed")
+        .unwrap_or(false)
+        && review_record.is_some();
     push(
         "licence_and_security_satisfied",
-        approved_licences.contains(&lic)
-            && descriptor["security_review"]
-                .as_str()
-                .map(|s| s == "passed")
-                .unwrap_or(false),
+        approved_licences.contains(&lic) && review_ok,
         format!(
-            "license {lic}; security_review {}",
-            descriptor["security_review"]
+            "license {lic}; security_review {} evidenced by {}",
+            descriptor["security_review"],
+            review_record
+                .clone()
+                .unwrap_or_else(|| "no governed record (descriptor.security_review_record)".into())
         ),
     );
     push(

@@ -44,7 +44,11 @@ fn covered(key: &str, entries: &[(String, Value)]) -> Option<Value> {
 }
 
 pub fn report(p: &Project) -> Result<Value> {
-    let map = read_yaml(&p.kernel_dir().join("policies").join("ENFORCEMENT_MAP.yaml"))?;
+    let map = read_yaml(
+        &crate::kernel_trust::trusted_root(p)
+            .join("policies")
+            .join("ENFORCEMENT_MAP.yaml"),
+    )?;
     let entries: Vec<(String, Value)> = map
         .get("keys")
         .and_then(|k| k.as_object())
@@ -59,8 +63,11 @@ pub fn report(p: &Project) -> Result<Value> {
         .iter()
         .chain(crate::policy::OPTIONAL_POLICY_NAMES.iter())
     {
-        let Ok(pol) = read_yaml(&p.kernel_dir().join("policies").join(format!("{name}.yaml")))
-        else {
+        let Ok(pol) = read_yaml(
+            &crate::kernel_trust::trusted_root(p)
+                .join("policies")
+                .join(format!("{name}.yaml")),
+        ) else {
             continue;
         };
         let mut keys = BTreeSet::new();

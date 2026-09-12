@@ -1,4 +1,4 @@
-# Governance OS — Architecture (repair candidate 4.1.4)
+# Governance OS — Architecture (repair candidate 4.1.5)
 
 Source framework: [DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md](../DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md),
 [release/distribution protocol v1.2](../GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md),
@@ -125,6 +125,19 @@ touched by `gov rebuild-memory` (doctor D026 checks the claims store). Everythin
 (reason `sensitivity:<class>`), never retrievable, export-denied, and a dangling import to it is recorded as
 `excluded:<path>`. The suite family reports such artefacts in the index as CRITICAL.
 
+## 4.4a Verified kernel trust root
+Every constitutional decision — authority levels, security floors, sensitivity classes, human-gate rules, export
+rules, budget limits, plugin permissions, precedence itself — is read through one boundary (`kernel_trust`), never by
+reading `governance/kernel/**` directly. The boundary: identify the installed release from `framework.lock`; verify
+the payload against its own `KERNEL_MANIFEST.json`; verify that manifest against `framework.lock.kernel_manifest_hash`
+(so neither file nor manifest can be rewritten alone); only then expose the payload as the policy root. When
+verification fails, the immutable payload embedded in the binary is substituted **explicitly** — verified and
+unverified sources are never mixed — the substitution appears in `gov policy overrides`, the context packet and doctor
+D029, and every mutating operation (including `gov rebuild-memory`) fails closed with `KERNEL_TAMPERED`. The remedy is
+`gov kernel reinstall`; an L4+ role may instead answer a presented gate raised by `gov kernel override`, bound to a
+fingerprint of that exact kernel state so it cannot outlive it. Presenting and answering gates stay available while
+untrusted, because that is the channel the remedy is recorded through.
+
 ## 4.5 Constitutional policy precedence
 `framework/policies/POLICY_PRECEDENCE.yaml` is kernel data: an ordered list of layers (hard invariants →
 security/authority → kernel policy → project policy → decisions/spec → task contracts → retrieved context) and, per
@@ -147,7 +160,14 @@ verifies the map against the core and the `policy_enforcement_coverage` suite fa
 (decision D-0003).
 
 ## 4.7 Governed capability plugins
-A plugin descriptor is discovery, not authorisation (D-0005). `capabilities::governance::plugin_set` classifies every
+A plugin descriptor is discovery, not authorisation (D-0005, D-0007). `TOOL_POLICY.plugins.min_authority` comes from
+verified kernel policy and gates **every** plugin execution, registered or not; nothing inside a descriptor can widen
+it. `approved_roles` in a descriptor may only narrow, and for a registered plugin the authoritative list is the
+registry's; `provenance` and `status` in a descriptor prove nothing. Registration is an OS-written record in
+`governance/generated/plugin-registry.json` (`gov plugins register|unregister|registry`) binding plugin id, version,
+descriptor bytes and implementation bytes to the acting session, role and approving gate; an edited, re-versioned or
+id-spoofing descriptor is `PLUGIN_REGISTRY_MISMATCH` for every role. Elevated permissions are approved only by the gate
+recorded in that registry entry. `capabilities::governance::plugin_set` classifies every
 descriptor for the acting role: **rejected** (fails the kernel `plugin-descriptor` schema — identity, version pin and
 capability required — never executable), **denied** (valid but the role may not trigger it) or **usable**. Execution
 requires: the role at/above `TOOL_POLICY.plugins.min_authority` for hand-declared descriptors or in `approved_roles`
@@ -166,6 +186,12 @@ decline is `GATE_DECLINED` and marks the CIT REJECTED, a withdrawn gate is `GATE
 gate makes the approval `APPROVAL_STALE`. `cit execute` revalidates the same state before touching the repository.
 Without a gate only the automatic path within `CHANGE_POLICY.auto_approve_max_radius` exists and its decision record
 carries `human_approved: false`. `gov gate revoke` withdraws a gate and every approval derived from it.
+
+**Trust classes (D-0007).** Immutable release state (verified kernel, embedded baseline) > OS-written project state
+(governed records, plugin registry, ledgers) > verified derived state > project configuration (overlay, plugin
+descriptors) > caller input (`--role`, `--by`, report fields) > plugin and model output. A fact named `approved`,
+`registered`, `verified`, `human_approved`, `authority`, `provenance` or `override` is established only by the two
+highest classes; the same field arriving from a lower class is a request that is recorded and ignored.
 
 **Trust boundary.** The acting role is declared by the caller (`--role`, `GOV_ROLE`); the OS enforces what a role may
 do but does not authenticate who holds the session. Deployments that need authenticated human answers must bind

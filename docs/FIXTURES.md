@@ -37,3 +37,15 @@ release-identifying `framework.lock` on three install paths; a genuine 4.1.2 pay
 with template reconciliation, then two ledgered rollbacks; observed mutation scope at close; record relocation
 under incremental rebuild; interface/kernel-YAML/migration-substance consistency; release reproduction from the
 recorded commit. The greenfield fixture now carries a realistic `.gitignore` (`target/`, `Cargo.lock`).
+
+## Third repair iteration scenarios (4.1.5)
+`tests/certification/repair3.rs`: plugin descriptors can never authorise themselves (self-declared `approved_roles`,
+forged provenance, everything at once, registration by an authorised role, edited descriptor, version drift, identity
+spoofing, orphan registration, elevated permissions with and without an answered gate — each checked for L0, L1 and L4
+roles and for actual command execution during `rebuild-memory`); constitutional floors require a verified kernel
+(precedence and security tampering, refused overrides, every mutating path refused with `KERNEL_TAMPERED`, D003/D004/
+D029 diagnostics, manifest rewrite, the L4+ override gate and its binding to one kernel state, restoration);
+policy exceptions require a real governing decision (nonexistent, wrong type, out of scope, superseded, rejected,
+revoked, expired, insufficient authority, wrong project, and constitutional floors that no exception can reach); and a
+trust-boundary sweep (self-certified tool security review, forged approval decision, self-attested mutation report,
+hand-written plugin registry entry).

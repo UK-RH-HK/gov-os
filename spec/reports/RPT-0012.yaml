@@ -1,0 +1,47 @@
+id: RPT-0012
+type: report
+title: Closing report for TASK-0012 (third repair iteration, candidate 4.1.5)
+status: ACTIVE
+state_class: EVIDENCE
+created: '2026-09-12'
+task: TASK-0012
+role: orchestrator
+session: S-implementer-repair-3
+outcome: success
+work_completed: 'V-H1 (plugin descriptors authorising themselves), V-H2 (constitutional floors read from an unverified installed kernel) and V-M1 (self-attested policy exceptions) repaired at the root cause and across the whole trust class, with the trust model stated as decision D-0007 and a targeted audit of every governance-critical input; builder regression tests in tests/certification/repair3.rs cover each root cause plus its adjacent bypasses; all three independent harnesses rerun unchanged; kernel payload bumped to 4.1.5 with migration M-4.1.4-4.1.5; repair report at release/repair/4.1.5/REPAIR_REPORT.md.'
+files_changed:
+- runtime/
+- cli/
+- framework/
+- migrations/
+- tests/
+- docs/
+- spec/
+- release/notes/
+- release/repair/
+- release/evidence/
+- release/releases/4.1.4/manifest.yaml
+- release/releases/4.1.4/manifest.json
+- release/CERTIFICATION_STATUS.md
+- README.md
+evidence:
+- release/repair/4.1.5/REPAIR_REPORT.md
+- docs/EVIDENCE.md
+- release/evidence/certification-tests.txt
+- release/verification/4.1.4/heldout-v3-rerun-4.1.5/summary.txt
+tests:
+  status: passed
+  reason: cargo test -p gov-runtime (unit), cargo test -p gov-cli --test certification (48 scenarios), pytest capabilities/tests, three independent harnesses rerun unchanged, clippy, rustfmt, release verify and a clean-clone reproduction; see docs/EVIDENCE.md and the repair report totals
+discoveries:
+- "Both HIGH findings were one mistake in two places (reading an assertion from the artefact whose privileges that assertion controls), so the repair defines trust classes (D-0007) rather than patching two call sites."
+- "A fail-closed trust root must leave the human-decision channel open: gate present and gate answer are exempt from KERNEL_TAMPERED because they are how the override decision is recorded; everything a gate could unblock stays refused."
+- "An override of an integrity failure must be bound to a fingerprint of the exact failing state, or it becomes a permanent bypass the next time the payload changes."
+risks:
+- "The acting role remains caller-declared; binding human answers to an authenticated channel is an adapter responsibility (documented boundary, V-L5)."
+- "The plugin registry and framework.lock are repository files: their protection is that no forged content can lower the authority floor (read from the verified kernel) plus doctor/audit reporting. There is no cryptographic signature chain in this release."
+- "Substituting the embedded baseline for a tampered kernel can mean newer floors than the installed version declared; this is deliberate (floors only strengthen) and every mutating operation is refused while it applies."
+lessons: []
+proposed_decisions: []
+unresolved:
+- Independent re-verification and certification verdict for 4.1.5.
+recommended_next_action: independent re-verification of candidate 4.1.5 (tag v4.1.5-rc1)

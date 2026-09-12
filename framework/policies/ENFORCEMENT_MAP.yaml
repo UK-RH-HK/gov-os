@@ -13,6 +13,8 @@ keys:
   AUTHORITY_POLICY.retrieval_default_excludes_statuses: {enforced_by: [retrieval::retrieve]}
   AUTHORITY_POLICY.authority_levels_required.*: {enforced_by: [authority::require, authority::required_level]}
   AUTHORITY_POLICY.authority_levels_required.revoke_gate: {enforced_by: [gates::revoke]}
+  AUTHORITY_POLICY.authority_levels_required.grant_policy_exception: {enforced_by: [exceptions::validate, policy::PolicySet::load]}
+  AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity: {enforced_by: [kernel_trust::request_override]}
   AUTHORITY_POLICY.authority_levels_required.execute_plugin: {enforced_by: [capabilities::governance::authorize]}
   AUTHORITY_POLICY.authority_levels_required.register_plugin: {enforced_by: [capabilities::governance::register]}
   # ---- POLICY_PRECEDENCE (constitutional; evaluated at policy load)
@@ -23,6 +25,8 @@ keys:
   TOOL_POLICY.plugins.descriptor_schema: {informational: "names the kernel schema (plugin-descriptor) that capabilities::host::discover_all validates every descriptor against; the schema id is fixed by the kernel, not read at runtime"}
   TOOL_POLICY.plugins.require_valid_descriptor: {informational: "always true: an invalid descriptor is rejected by capabilities::host::discover_all and can never execute; declared strengthen-only so no overlay can relax it"}
   TOOL_POLICY.plugins.min_authority: {enforced_by: [capabilities::governance::authorize, tools::plugin_tools]}
+  TOOL_POLICY.plugins.registry_path: {informational: "documents where the OS writes the authoritative plugin registry; the path is a kernel constant read by capabilities::registry (REGISTRY_PATH) and is immutable under POLICY_PRECEDENCE"}
+  TOOL_POLICY.plugins.registration_binds: {informational: "documents the fields a registration binds (plugin_id, version, descriptor_sha256, implementation_sha256); enforced structurally by capabilities::registry::standing"}
   TOOL_POLICY.plugins.elevated_permission_classes: {enforced_by: [capabilities::governance::authorize, capabilities::governance::register]}
   TOOL_POLICY.plugins.refuse_on_pin_drift: {enforced_by: [capabilities::governance::authorize]}
   TOOL_POLICY.plugins.timeout_seconds: {enforced_by: [capabilities::governance::invoke_timeout]}

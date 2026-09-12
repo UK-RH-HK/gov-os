@@ -61,6 +61,8 @@ authority_levels_required:
   present_gate: L1
   answer_gate: L3            # relaying a human's answer; the `human` role (L5) answers directly; agents only within agent_resolvable_when
   revoke_gate: L4            # withdraw a gate and every approval derived from it
+  grant_policy_exception: L4 # the authority a decision must carry to authorise a PROJECT_EXCEPTIONS entry
+  override_kernel_integrity: L4 # proceed on an unverified installed kernel (plus a presented, answered gate)
   execute_plugin: L2         # trigger a governed capability plugin (plus TOOL_POLICY.plugins and the descriptor's approved_roles)
   register_plugin: L2        # plus TOOL_PERMISSIONS.install_authority_roles; elevated permissions raise a gate
   propose_cit: L2

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.4/plugin-descriptor.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.5/plugin-descriptor.schema.json",
   "title": "plugin-descriptor",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "plugin_id": {
@@ -51,7 +51,7 @@
       "items": {
         "type": "string"
       },
-      "description": "roles that may trigger execution ('all' = every role); absent = roles at/above TOOL_POLICY.plugins.min_authority for hand-declared descriptors"
+      "description": "roles the descriptor asks to be limited to; it may only NARROW the authority floor, never widen it. The authoritative list for a registered plugin is the registry's."
     },
     "required_permission_classes": {
       "type": "array",
@@ -134,7 +134,8 @@
         "source": {
           "type": "string"
         }
-      }
+      },
+      "description": "advisory copy of the registration recorded by `gov plugins register`; proves nothing on its own (the registry is authoritative)"
     },
     "registration_gate": {
       "type": [
@@ -163,5 +164,6 @@
     "command",
     "version"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "description": "A capability plugin descriptor. Discovery only: approved_roles, provenance and status describe REQUESTED properties and never grant authority. Authorisation derives from verified kernel policy (TOOL_POLICY.plugins.min_authority, TOOL_PERMISSIONS) and from the OS-written plugin registry (TOOL_POLICY.plugins.registry_path)."
 }

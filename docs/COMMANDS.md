@@ -40,7 +40,9 @@ Global flags: `--root <path>` (default: discovered upwards from cwd), `--json` (
 `plugin:<id>[:dim]`, any `+rerank:<id>`) · `gov memory select <candidate> [--research RES-x] [--by who]` ·
 `gov memory heldout-starter [--force]` · `gov lessons cluster [--inbox d] [--proposals d] [--write]` ·
 `gov gate create --question … | present <HDG> | list | revoke <HDG> [--reason]` · `gov capabilities serve-embed [--reverse] [--id]` (the binary acting as an embed plugin) ·
-`gov plugins register --descriptor f | list | health [--ping]` · `gov policy overrides | effective <POLICY>` · `gov update --rollback [--reason …]` ·
+`gov plugins register --descriptor f | unregister <id> | registry | list | health [--ping]` ·
+`gov policy overrides | effective <POLICY>` · `gov kernel verify | trust | override [--reason] | reinstall` ·
+`gov update --rollback [--reason …]` ·
 `gov adapters generate|verify` · `gov tools list|registry|resolve --capability c [--role r]|install --descriptor f [--execute]|health` ·
 `gov capabilities ecosystems|plugins|invoke --plugin id --inputs json` · `gov verify governance|product` · `gov version`
 
@@ -50,6 +52,9 @@ and `gov cit execute` revalidates it (`APPROVAL_STALE`). Policy overrides that w
 (`gov policy overrides` lists them; doctor D027). Plugin execution errors: `PLUGIN_DESCRIPTOR_INVALID`,
 `PLUGIN_NOT_AUTHORIZED`, `PLUGIN_NOT_APPROVED`, `PLUGIN_PIN_MISMATCH`, `PLUGIN_UNHEALTHY` (doctor D028).
 Rollback errors: `SNAPSHOT_MISSING`, `SNAPSHOT_CONSUMED`. Release build: `MIGRATION_INCOMPLETE`.
+Trust-root errors: `KERNEL_TAMPERED` (every mutating operation while the installed kernel fails verification; see
+`gov kernel trust`, doctor D029) and `PLUGIN_REGISTRY_MISMATCH` (a descriptor that no longer matches its registration).
+A descriptor's `approved_roles`/`provenance` never grant authority: register the plugin instead (doctor D028).
 
 Authority: every mutating command checks the session role's level (L0–L5) against
 `AUTHORITY_POLICY.authority_levels_required` and fails with `AUTHORITY_DENIED` (or `UNKNOWN_ROLE`). Gates are answered

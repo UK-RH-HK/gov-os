@@ -4,8 +4,15 @@ use crate::util::read_yaml;
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 
+/// Role definitions come from the VERIFIED kernel (verifier V-H2): a tampered installed payload must not be able to
+/// redefine authority levels.
 pub fn roles_doc(p: &Project) -> Value {
-    read_yaml(&p.kernel_dir().join("roles").join("ROLES.yaml")).unwrap_or(json!({}))
+    read_yaml(
+        &crate::kernel_trust::trusted_root(p)
+            .join("roles")
+            .join("ROLES.yaml"),
+    )
+    .unwrap_or(json!({}))
 }
 
 pub fn parse_level(s: &str) -> Option<u8> {

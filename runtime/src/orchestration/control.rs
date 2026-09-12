@@ -56,6 +56,8 @@ pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
 
 /// Every mutating governance operation calls this first.
 pub fn guard_write(p: &Project, operation: &str) -> Result<()> {
+    // constitutional floors must come from a verified kernel before any governed mutation (verifier V-H2)
+    crate::kernel_trust::guard(p, operation)?;
     let s = state(p);
     if s["writes_frozen"].as_bool().unwrap_or(false) {
         return Err(GovError::new("FROZEN", format!("writes are frozen (FREEZE_WRITES active); '{operation}' refused. Run `gov resume` (L4) to lift.")));

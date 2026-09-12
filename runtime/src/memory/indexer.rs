@@ -250,6 +250,9 @@ fn go_modules(root: &Path, files: &[(PathBuf, String)]) -> Vec<(String, String)>
 pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
     let started = std::time::Instant::now();
     p.require_installed()?;
+    // the never-index / secret floors applied below come from kernel policy: refuse to index against an
+    // unverified kernel rather than silently indexing under a tampered floor (verifier V-H2 / VV-14)
+    crate::kernel_trust::guard(p, "rebuild-memory")?;
     std::fs::create_dir_all(p.runtime_dir())?;
     let pol = p.policies();
     let governed = plugin_set(p); // schema-valid, registered, healthy, pinned, authorised for the acting role

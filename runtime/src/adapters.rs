@@ -23,7 +23,12 @@ pub fn generate(p: &Project) -> Result<Value> {
     let precedence = pol.get_list("AUTHORITY_POLICY", "precedence");
     let triggers = pol.get_list("CHECKPOINT_POLICY", "mandatory_triggers");
     let secret_patterns = pol.get_list("SECURITY_POLICY", "secret_path_patterns");
-    let roles = read_yaml(&p.kernel_dir().join("roles").join("ROLES.yaml")).unwrap_or(json!({}));
+    let roles = read_yaml(
+        &crate::kernel_trust::trusted_root(p)
+            .join("roles")
+            .join("ROLES.yaml"),
+    )
+    .unwrap_or(json!({}));
     let commands = read_yaml(
         &p.kernel_dir()
             .join("commands")
