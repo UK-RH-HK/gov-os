@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/migration.schema.json",
+  "title": "migration",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "from_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "to_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "breaking": {
+      "type": "boolean"
+    },
+    "human_gate": {
+      "type": "string"
+    },
+    "affected_indexes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "rename_overlay_file",
+              "add_overlay_file_from_template",
+              "set_overlay_key",
+              "rename_overlay_key",
+              "delete_overlay_key",
+              "set_lock_field",
+              "require_index_rebuild",
+              "regenerate_adapters",
+              "note"
+            ]
+          },
+          "file": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {},
+          "template": {
+            "type": "string"
+          },
+          "index": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "if_missing": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "op"
+        ]
+      }
+    },
+    "rollback": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "from_version",
+    "to_version",
+    "operations"
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## Building a release
 ```bash
-bin/gov release build --version 4.1.3 --certification READY_FOR_INDEPENDENT_REVERIFICATION --evidence docs/EVIDENCE.md
+bin/gov release build --canonical . --version 4.1.3 --certification READY_FOR_INDEPENDENT_REVERIFICATION --evidence docs/EVIDENCE.md
 bin/gov release verify release/releases/4.1.3
 ```
 `release/releases/<version>/` contains the immutable `kernel/` payload (with `KERNEL_MANIFEST.json`), `manifest.yaml`

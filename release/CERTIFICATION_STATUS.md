@@ -48,4 +48,4 @@ Repair iteration applied on branch `release/4.1.2-rc1` (not merged to `main`), p
 
 **Status of 4.1.3: READY_FOR_INDEPENDENT_REVERIFICATION — certification pending.** The implementer has not issued
 `OS_RELEASE_CANDIDATE_ACCEPTED` and must not; the 4.1.3 manifest `certification.status` records the pending state.
-Repair commit hashes: see the repair report header and the git history of the branch.
+Repair code commit: `78f6853`; the repair candidate commit adds `release/releases/4.1.3/` on top of it (hash in the handoff message and `git log`).

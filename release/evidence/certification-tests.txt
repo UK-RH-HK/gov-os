@@ -28,15 +28,15 @@ test repair::destructive_migration_requires_answered_gate_record ... ok
 test repair::plugin_host_large_response_through_cli ... ok
 test repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index ... ok
 test repair::reranker_hook_invoked_and_never_silently_skipped ... ok
-test repair::implementation_prerequisites_and_symbol_route ... ok
 test repair::sensitivity_classes_and_namespaces_are_enforced ... ok
+test repair::implementation_prerequisites_and_symbol_route ... ok
 test repair::policy_enforcement_coverage_is_complete_and_honest ... ok
-test repair::unmeasured_memory_recall_is_not_green ... ok
 test repair::update_approval_requires_presented_answered_gate ... ok
+test repair::unmeasured_memory_recall_is_not_green ... ok
 test repair::task_close_enforces_mutation_scope ... ok
 test repair::smaller_findings_regressions ... ok
 test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
 test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
 
-test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 52.04s
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.88s
 

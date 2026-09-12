@@ -1,0 +1,6 @@
+id: ide
+version: 1.0.0
+description: IDE rules projection (generic rules file consumed by IDE agents).
+output: governance/generated/adapters/ide/RULES.md
+format: markdown
+template: template.md

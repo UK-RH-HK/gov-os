@@ -1,6 +1,6 @@
 # Implementer test evidence — agentic-engineering-os 4.1.3 (repair candidate)
 
-Collected: 2026-09-12T03:51:04Z · commit: 9563192 · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
+Collected: 2026-09-12T03:53:33Z · commit: 78f6853 · script: `scripts/collect_evidence.sh` · raw outputs: `release/evidence/`
 
 > Implementer evidence only. Certification remains pending independent re-verification.
 > Unavailable tools are reported as NOT_RUN and are never counted as evidence.
@@ -22,8 +22,8 @@ pytest: available
 | Suite | Result |
 |---|---|
 | Rust unit tests (gov-runtime) | test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s |
-| Certification harness (7 fixtures + architectural + repair regressions) | test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 52.04s |
-| Python capability plugin tests | 4 passed in 0.12s |
+| Certification harness (7 fixtures + architectural + repair regressions) | test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.88s |
+| Python capability plugin tests | 4 passed in 0.11s |
 | Clippy (`cargo clippy --all-targets`) | RAN exit=0 warnings=7 errors=0 |
 | rustfmt (`cargo fmt --check`) | RAN formatted=no (diff in rustfmt.txt; formatting is advisory in this release) |
 | Release build (`cargo build --release`) | exit 0 |
@@ -56,11 +56,11 @@ pytest: available
 - repair::plugin_host_large_response_through_cli ... ok
 - repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index ... ok
 - repair::reranker_hook_invoked_and_never_silently_skipped ... ok
-- repair::implementation_prerequisites_and_symbol_route ... ok
 - repair::sensitivity_classes_and_namespaces_are_enforced ... ok
+- repair::implementation_prerequisites_and_symbol_route ... ok
 - repair::policy_enforcement_coverage_is_complete_and_honest ... ok
-- repair::unmeasured_memory_recall_is_not_green ... ok
 - repair::update_approval_requires_presented_answered_gate ... ok
+- repair::unmeasured_memory_recall_is_not_green ... ok
 - repair::task_close_enforces_mutation_scope ... ok
 - repair::smaller_findings_regressions ... ok
 - upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
@@ -70,14 +70,14 @@ pytest: available
 - lock::tests::versions_and_compat ... ok
 - memory::embeddings::tests::sha1_matches_known_vector ... ok
 - util::tests::hashing_is_canonical ... ok
-- memory::embeddings::tests::deterministic_unit_vectors ... ok
 - records::tests::parse_yaml_and_markdown_records ... ok
 - memory::chunking::tests::hierarchical_chunks ... ok
 - util::tests::deep_helpers ... ok
+- memory::embeddings::tests::deterministic_unit_vectors ... ok
 - security::secrets::tests::detects_and_redacts ... ok
+- paths::tests::secret_classification_can_never_be_downgraded ... ok
 - util::tests::glob_semantics ... ok
 - capabilities::host::tests::bad_json_and_protocol_mismatch_are_reported ... ok
-- paths::tests::secret_classification_can_never_be_downgraded ... ok
 - capabilities::host::tests::large_stdin_request_and_stderr_flood_are_drained ... ok
 - capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock ... ok
 - capabilities::host::tests::timeout_kills_child_promptly ... ok

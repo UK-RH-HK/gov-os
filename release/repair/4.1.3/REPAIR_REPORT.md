@@ -5,7 +5,7 @@ Written for: the independent verifier re-verifying the candidate, and the produc
 | | |
 |---|---|
 | Rejected candidate | 4.1.2 at commit `8ad06be` — verdict OS_RELEASE_CANDIDATE_REJECTED (`release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md`) |
-| Repair code commit | `REPAIR_CODE_COMMIT` (branch `release/4.1.2-rc1`; not merged to `main`) |
+| Repair code commit | `78f6853` (branch `release/4.1.2-rc1`; not merged to `main`) |
 | Repair candidate commit | the commit that adds `release/releases/4.1.3/` on top of the repair code commit (hash reported in the handoff message and in `release/CERTIFICATION_STATUS.md`) |
 | Kernel version | 4.1.3 (payload changed → new immutable release; 4.1.2 untouched, still REJECTED) |
 | Certification | **pending** — READY_FOR_INDEPENDENT_REVERIFICATION; the implementer has not certified anything |
