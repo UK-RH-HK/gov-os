@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/migration-catalogue-entry.schema.json",
+  "title": "migration-catalogue-entry",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "artifact_id": {
+      "type": "string"
+    },
+    "current_path": {
+      "type": "string"
+    },
+    "current_class": {
+      "type": "string"
+    },
+    "authority": {
+      "type": "string"
+    },
+    "target_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target_class": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "KEEP_IN_PLACE",
+        "MOVE",
+        "RENAME",
+        "SPLIT",
+        "MERGE",
+        "EXTRACT",
+        "RETIRE",
+        "DELETE_FROM_ACTIVE_TREE"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "consumers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_from": {
+      "type": "string"
+    },
+    "index_policy": {
+      "type": "object"
+    },
+    "sensitivity": {
+      "type": "string"
+    },
+    "rollback": {
+      "type": "string"
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "batch": {
+      "type": "integer"
+    },
+    "requires_human_gate": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "finding_state": {
+      "type": "string",
+      "enum": [
+        "PRESENT",
+        "ABSENT_CONFIRMED",
+        "NOT_FOUND",
+        "UNKNOWN",
+        "INACCESSIBLE",
+        "CONFLICTING",
+        "MIGRATED",
+        "RETIRED"
+      ]
+    }
+  },
+  "required": [
+    "artifact_id",
+    "current_path",
+    "current_class",
+    "authority",
+    "action",
+    "reason"
+  ]
+}

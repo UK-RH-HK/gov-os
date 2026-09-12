@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/project-exceptions.schema.json",
+  "title": "project-exceptions",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "policy": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {},
+          "decision": {
+            "type": "string"
+          },
+          "expires": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "policy",
+          "key",
+          "decision",
+          "expires",
+          "reason"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "exceptions"
+  ]
+}

@@ -1,0 +1,9 @@
+policy: CONTEXT_POLICY
+version: 1.0.0
+packet_blocks: [deterministic_authority, retrieved_intelligence]
+deterministic_authority_fields: [task, objective, project_state, governing_requirements, active_decisions, architecture, interfaces, scenarios, acceptance_criteria, allowed_writes, prohibited_writes, required_skills, required_tools, dependency_state]
+retrieved_fields: [query, retrieval_strategy, index_snapshot, ranked_evidence, semantic_candidates, lessons_failures, code_references]
+max_packet_chars: 60000
+max_retrieved_slices: 12
+fresh_agent_read_budget_files: 25
+reproducibility: deterministic_block_must_hash_stable

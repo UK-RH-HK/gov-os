@@ -1,0 +1,6 @@
+id: api
+version: 1.0.0
+description: Compiled system instruction for API-hosted models.
+output: governance/generated/adapters/api/system-instruction.txt
+format: text
+template: template.txt

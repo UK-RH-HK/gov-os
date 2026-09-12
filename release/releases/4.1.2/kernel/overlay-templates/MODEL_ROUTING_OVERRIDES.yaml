@@ -1,0 +1,12 @@
+schema_version: 1.0.0
+# Provider/model names live ONLY here (project overlay), never in kernel policy, skills, tasks or decisions.
+providers: []
+# providers:
+#   - name: provider-alias
+#     models:
+#       - {id: model-alias-large, tier: T3, max_reasoning: extra_high, cost_per_1k_in: 0.0, cost_per_1k_out: 0.0}
+#       - {id: model-alias-small, tier: T1, max_reasoning: low, cost_per_1k_in: 0.0, cost_per_1k_out: 0.0}
+role_overrides: {}       # role -> {minimum_tier, default_reasoning}
+task_class_overrides: {} # task class -> minimum tier
+preferences:
+  prefer_lowest_cost_meeting_tier: true

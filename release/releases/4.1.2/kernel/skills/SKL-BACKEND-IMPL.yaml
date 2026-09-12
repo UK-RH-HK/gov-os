@@ -1,0 +1,21 @@
+id: SKL-BACKEND-IMPL
+name: Backend implementation
+version: 1.0.0
+status: ACTIVE
+model_agnostic: true
+roles: [backend-engineer, integration-engineer]
+task_classes: [implementation, integration, repair]
+purpose: "Implement or repair backend behaviour strictly within the task contract, scenarios and interface contracts."
+required_permissions: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+required_tools: [TOOL-FS-001, TOOL-GIT-001, TOOL-TEST-001]
+inputs: [task contract, context packet, interface contracts, scenarios]
+outputs: [implementation, tests run, worker return]
+method:
+  - {step: compile-context, description: Obtain the context packet for the task and confirm allowed/prohibited paths.}
+  - {step: confirm-authority, description: Verify governing requirements, active decisions and interface contracts; stop on UNKNOWN_OR_CONFLICTING.}
+  - {step: implement, description: Change only allowed paths; keep native architecture; no governance edits.}
+  - {step: test, description: Run declared acceptance tests plus affected unit/contract tests.}
+  - {step: return, description: Produce the worker return contract with files changed, evidence, discoveries and unresolved items.}
+validation_scenarios:
+  - {id: V1, given: task with forbidden path governance/**, expect: no file under governance/ is modified}
+  - {id: V2, given: failing acceptance test, expect: status partial or failed with evidence, never silently passing}

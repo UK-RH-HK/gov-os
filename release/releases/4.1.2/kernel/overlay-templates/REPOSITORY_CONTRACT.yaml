@@ -1,0 +1,145 @@
+schema_version: 1.0.0
+roots:
+  governance: governance/
+  spec: spec/
+  product: product/
+  archive: archive/
+# Ordered rules; later rules override earlier ones for the same path. `secret` class always wins.
+paths:
+  - pattern: "governance/kernel/**"
+    class: authoritative
+    owner_role: release-agent
+    mutation: prohibited
+    semantic_index: true
+    lexical_index: true
+    graph_index: false
+    namespace: governance
+  - pattern: "governance/project/**"
+    class: authoritative
+    owner_role: change-controller
+    mutation: restricted
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: governance
+  - pattern: "governance/generated/**"
+    class: generated
+    owner_role: orchestrator
+    mutation: generated
+    semantic_index: false
+    lexical_index: false
+    graph_index: false
+    namespace: governance
+  - pattern: "governance/framework.lock"
+    class: authoritative
+    owner_role: release-agent
+    mutation: restricted
+    semantic_index: false
+    lexical_index: true
+    graph_index: false
+    namespace: governance
+  - pattern: "governance/tests/**"
+    class: authoritative
+    owner_role: memory-engineer
+    mutation: restricted
+    semantic_index: false
+    lexical_index: true
+    graph_index: false
+    namespace: governance
+  - pattern: "spec/decisions/**"
+    class: authoritative
+    owner_role: change-controller
+    mutation: restricted
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "spec/reports/**"
+    class: evidence
+    owner_role: orchestrator
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "spec/lessons/**"
+    class: evidence
+    owner_role: orchestrator
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "spec/research/**"
+    class: evidence
+    owner_role: research-agent
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "spec/experiments/**"
+    class: evidence
+    owner_role: research-agent
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "spec/audits/**"
+    class: evidence
+    owner_role: independent-auditor
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "spec/**"
+    class: authoritative
+    owner_role: product-spec-agent
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    namespace: spec
+  - pattern: "product/tests/**"
+    class: test
+    owner_role: independent-test-designer
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    code_index: true
+    namespace: product
+  - pattern: "product/**"
+    class: source
+    owner_role: backend-engineer
+    semantic_index: true
+    lexical_index: true
+    graph_index: true
+    code_index: true
+    namespace: product
+  - pattern: "archive/**"
+    class: historical
+    owner_role: orchestrator
+    default_retrieval: false
+    mutation: restricted
+    semantic_index: false
+    lexical_index: true
+    graph_index: false
+    namespace: archive
+  - pattern: "**/.env*"
+    class: secret
+    semantic_index: false
+    lexical_index: false
+    graph_index: false
+    code_index: false
+    agent_read: prohibited
+    export: denied
+    namespace: secret
+  - pattern: "**/secrets/**"
+    class: secret
+    semantic_index: false
+    lexical_index: false
+    agent_read: prohibited
+    export: denied
+    namespace: secret
+  - pattern: ".governance-runtime/**"
+    class: derived
+    semantic_index: false
+    lexical_index: false
+    graph_index: false
+    namespace: runtime

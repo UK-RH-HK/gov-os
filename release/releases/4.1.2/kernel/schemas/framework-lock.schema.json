@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/framework-lock.schema.json",
+  "title": "framework-lock",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "release_commit": {
+      "type": "string"
+    },
+    "release_hash": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "installed_at": {
+      "type": "string"
+    },
+    "kernel_manifest_hash": {
+      "type": "string"
+    },
+    "cli_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "schema_versions": {
+      "type": "object"
+    },
+    "lock_schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    }
+  },
+  "required": [
+    "framework",
+    "version",
+    "release_hash",
+    "source",
+    "kernel_manifest_hash"
+  ]
+}
