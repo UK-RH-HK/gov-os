@@ -198,9 +198,9 @@ release_notes: |
   Implementer tests and evidence only. Status: READY_FOR_INDEPENDENT_OS_VERIFICATION (not certified).
 rollback_procedure: gov update --rollback restores the previous kernel, overlay snapshot and framework.lock from .governance-runtime/update/<version>/ and rebuilds indexes; spec/ and product/ are never modified by an update.
 certification:
-  status: READY_FOR_INDEPENDENT_OS_VERIFICATION
+  status: REJECTED
   implementer_evidence: docs/EVIDENCE.md
-  independent_verifier: ''
+  independent_verifier: 'Independent Governance OS Verifier (fresh session, Claude Fable 5.1), 2026-09-12; verdict OS_RELEASE_CANDIDATE_REJECTED; report: release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md'
   certified_at: ''
 built_at: 2026-09-12T02:04:59Z
 immutable: true

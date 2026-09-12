@@ -11,8 +11,8 @@
   "certification": {
     "certified_at": "",
     "implementer_evidence": "docs/EVIDENCE.md",
-    "independent_verifier": "",
-    "status": "READY_FOR_INDEPENDENT_OS_VERIFICATION"
+    "independent_verifier": "Independent Governance OS Verifier (fresh session, Claude Fable 5.1), 2026-09-12; verdict OS_RELEASE_CANDIDATE_REJECTED; report: release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md",
+    "status": "REJECTED"
   },
   "cli_version": "4.1.2",
   "file_hashes": {
