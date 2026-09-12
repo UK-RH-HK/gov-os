@@ -11,3 +11,4 @@ mod update;
 mod upstream;
 mod multi_machine;
 mod failure_injection;
+mod repair;

@@ -88,8 +88,22 @@ impl Project {
         self.policies.get_or_init(|| PolicySet::load(&self.kernel_dir(), self.overlay(), self.schemas()))
     }
     pub fn contract(&self) -> &RepositoryContract {
-        self.contract.get_or_init(|| RepositoryContract::new(self.overlay().get("REPOSITORY_CONTRACT.yaml")))
+        self.contract.get_or_init(|| {
+            let pol = self.policies();
+            let ds = self.overlay().get("DATA_SENSITIVITY.yaml");
+            let classifications: Vec<(String, String)> = ds.get("classifications").and_then(|v| v.as_array()).map(|a| a.iter().filter_map(|c| Some((c.get("pattern")?.as_str()?.to_string(), c.get("class")?.as_str()?.to_string()))).collect()).unwrap_or_default();
+            let rules = crate::paths::SensitivityRules {
+                classifications,
+                never_index: pol.get_list("SECURITY_POLICY", "never_index_classes"),
+                never_export: pol.get_list("SECURITY_POLICY", "never_export_classes"),
+                archive_default_retrieval: pol.get("ARCHIVE_POLICY", "default_retrieval_for_archive").and_then(|v| v.as_bool()),
+                secret_agent_read: pol.get("SECURITY_POLICY", "agent_read_default_for_secret_class").and_then(|v| v.as_str().map(|s| s.to_string())),
+            };
+            RepositoryContract::new(self.overlay().get("REPOSITORY_CONTRACT.yaml")).with_sensitivity(rules)
+        })
     }
+    /// Runtime directory from MEMORY_POLICY.runtime_dir (default .governance-runtime).
+    pub fn runtime_dir_name(&self) -> String { if self.is_installed() { self.policies().get_str("MEMORY_POLICY", "runtime_dir", RUNTIME_DIR) } else { RUNTIME_DIR.into() } }
     pub fn project_policy(&self) -> Value { self.overlay().get("PROJECT_POLICY.yaml") }
     pub fn secret_scanner(&self) -> &SecretScanner {
         self.scanner.get_or_init(|| {

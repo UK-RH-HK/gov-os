@@ -46,7 +46,7 @@ fn injected_failures_are_detected_and_recovered() {
     g.ok(&["rebuild-memory", "--incremental"]);
     g.ok(&["task", "close", &tid, "--report", &rep]);
     // 4. expired claim
-    { let d = db(&root); d.exec("INSERT OR REPLACE INTO claims(task_id, session_id, role, claimed_at, expires_at) VALUES ('TASK-0001','S-dead','x','2020-01-01T00:00:00Z','2020-01-01T01:00:00Z')", &[]).unwrap(); }
+    { let p = gov_runtime::Project::open(&root); let cs = gov_runtime::memory::claims::ClaimsStore::open(&p).unwrap(); cs.insert_raw("TASK-0001", "S-dead", "x", "2020-01-01T00:00:00Z", "2020-01-01T01:00:00Z").unwrap(); }
     let (ok, _) = doctor_check(&g, "D017"); assert!(!ok);
     assert_eq!(g.ok(&["claims", "sweep"])["swept"], 1);
     // 5. freeze left on: mutations refused with exit code 4
@@ -93,13 +93,16 @@ fn injected_failures_are_detected_and_recovered() {
     let (ok, _) = doctor_check(&g, "D006"); assert!(!ok);
     std::fs::rename(root.join("governance/project/DATA_SENSITIVITY.yaml.bak"), root.join("governance/project/DATA_SENSITIVITY.yaml")).unwrap();
     assert!(doctor_check(&g, "D006").0);
-    // 11. failing embed plugin degrades to builtin without crashing
+    // 11. a failing embed plugin is a clear error, never a silent fallback; the previous index survives
     write_yaml(&root, "governance/project/plugins/bad.yaml", &json!({"plugin_id": "bad-embed", "capability": "embed", "version": "1", "command": ["/bin/false"]}));
     let mut pp = yaml(&root, "governance/project/PROJECT_POLICY.yaml"); pp["policy_overrides"] = json!({"MEMORY_POLICY.embedding.provider": "bad-embed"}); write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);
-    let rb = g.ok(&["rebuild-memory"]);
-    assert_eq!(rb["embedder"]["id"], "hashed-ngram"); assert!(!rb["degradations"].as_array().unwrap().is_empty());
+    let e = g.err(&["rebuild-memory"]);
+    assert!(e.error_code().starts_with("PLUGIN_") || e.error_code() == "EMBEDDER_BAD_OUTPUT", "{}", e.error_code());
+    assert!(exists(&root, ".governance-runtime/state.db"));
+    let (ok25, _) = doctor_check(&g, "D025"); assert!(!ok25, "pin (bad-embed) differs from the live index");
     pp["policy_overrides"] = json!({}); write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);
     std::fs::remove_file(root.join("governance/project/plugins/bad.yaml")).unwrap();
+    assert!(doctor_check(&g, "D025").0);
     // 12. a gate that exists only in a file is not presented (INV-008)
     let gate = g.ok(&["gate", "create", "--question", "Ship it?"]);
     let gid = gate["id"].as_str().unwrap().to_string();

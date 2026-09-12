@@ -39,6 +39,8 @@ Optional Python capability plugins: `capabilities/python` (`python3 -m govos_cap
 [docs/RELEASE.md](docs/RELEASE.md) · [docs/EVIDENCE.md](docs/EVIDENCE.md) · [capabilities/PROTOCOL.md](capabilities/PROTOCOL.md)
 
 ## Certification status
-`release/CERTIFICATION_STATUS.md`: **READY_FOR_INDEPENDENT_OS_VERIFICATION**. The implementer does not certify its own
-release (protocol §6). An independent verifier runs the fixtures and the suite from a fresh context and records the
-verdict in the release manifest.
+`release/CERTIFICATION_STATUS.md`: release 4.1.2 was **REJECTED** by independent verification
+(`release/verification/4.1.2/`); repair candidate **4.1.3** is **READY_FOR_INDEPENDENT_REVERIFICATION**
+(`release/repair/4.1.3/REPAIR_REPORT.md`). The implementer does not certify its own release (protocol §6). An
+independent verifier runs the fixtures, the suite and the held-out harness from a fresh context and records the verdict
+in the release manifest.

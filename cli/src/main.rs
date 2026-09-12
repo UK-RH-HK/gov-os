@@ -100,13 +100,18 @@ enum Cmd {
     Verify { #[arg(default_value = "governance")] what: String },
     /// MCP server (planned)
     Mcp { #[arg(default_value = "serve")] op: String },
+    /// Framework lesson intake (canonical repository): cluster inbox packets into Framework Change Proposals
+    Lessons { #[command(subcommand)] op: LessonsCmd },
 }
+#[derive(Subcommand)]
+enum LessonsCmd { Cluster { #[arg(long)] inbox: Option<PathBuf>, #[arg(long)] proposals: Option<PathBuf>, #[arg(long)] write: bool } }
 
 #[derive(Subcommand)]
 enum AdoptCmd {
     Baseline, Inventory, Classify, Map, Plan, TestDesign,
     Review { #[arg(long)] verdict: String, #[arg(long)] reviewer_session: Option<String>, #[arg(long, default_value = "migration-reviewer")] reviewer_role: String, #[arg(long)] notes: Option<String> },
-    Migrate { #[arg(long)] batch: Option<i64>, #[arg(long)] source: Option<String>, #[arg(long)] gate_answer: Vec<String>, #[arg(long)] name: Option<String>, #[arg(long)] alias: Option<String> },
+    Migrate { #[arg(long)] batch: Option<i64>, #[arg(long)] source: Option<String>, /// Deprecated and ignored: destructive entries execute only with an answered Human Decision Gate record
+        #[arg(long)] gate_answer: Vec<String>, #[arg(long)] name: Option<String>, #[arg(long)] alias: Option<String> },
     VerifyMigration { #[arg(long)] verdict: Option<String>, #[arg(long, default_value = "migration-verifier")] verifier_role: String },
     ExtractLegacy, BuildMemory,
     VerifyMemory { #[arg(long)] verdict: Option<String>, #[arg(long, default_value = "memory-verifier")] verifier_role: String },
@@ -146,7 +151,13 @@ enum ToolsCmd { List, Registry, Resolve { #[arg(long)] role: Option<String>, #[a
 #[derive(Subcommand)]
 enum HandoffCmd { Create { #[arg(long)] to_role: String, #[arg(long)] task: String, #[arg(long)] fields: Option<String> }, Return { id: String, #[arg(long)] file: String } }
 #[derive(Subcommand)]
-enum MemoryCmd { Query { query: String, #[arg(long, default_value = "0")] k: usize, #[arg(long)] route: Option<String>, #[arg(long)] include_historical: bool }, Verify, Freshness, Rebuild { #[arg(long)] incremental: bool }, Graph { node: String, #[arg(long, default_value = "1")] depth: usize }, Impact { seeds: String, #[arg(long, default_value = "2")] depth: usize } }
+enum MemoryCmd { Query { query: String, #[arg(long, default_value = "0")] k: usize, #[arg(long)] route: Option<String>, #[arg(long)] include_historical: bool }, Verify, Freshness, Rebuild { #[arg(long)] incremental: bool }, Graph { node: String, #[arg(long, default_value = "1")] depth: usize }, Impact { seeds: String, #[arg(long, default_value = "2")] depth: usize },
+    /// Benchmark embedder/reranker candidates on the held-out set (evidence-based selection, framework 14.3)
+    Benchmark { #[arg(long = "candidate")] candidates: Vec<String>, #[arg(long)] heldout: Option<PathBuf>, #[arg(long)] record: bool },
+    /// Pin a benchmarked candidate through a decision record and a full rebuild
+    Select { candidate: String, #[arg(long)] research: Option<String>, #[arg(long, default_value = "human")] by: String },
+    /// Generate a starter held-out set from the live index (only when the file has no queries)
+    HeldoutStarter { #[arg(long)] force: bool } }
 #[derive(Subcommand)]
 enum GateCmd { Create { #[arg(long)] question: String, #[arg(long)] fields: Option<String> }, Present { id: String }, List }
 #[derive(Subcommand)]
@@ -160,7 +171,9 @@ enum ReleaseCmd { Build { #[arg(long)] version: String, #[arg(long)] out: Option
 #[derive(Subcommand)]
 enum KernelCmd { Verify, Reinstall { #[arg(long)] source: Option<String> } }
 #[derive(Subcommand)]
-enum CapCmd { Ecosystems, Plugins, Invoke { #[arg(long)] plugin: String, #[arg(long)] inputs: String } }
+enum CapCmd { Ecosystems, Plugins, Invoke { #[arg(long)] plugin: String, #[arg(long)] inputs: String },
+    /// Act as a gov-capability/1 `embed` plugin over stdin/stdout using the built-in embedder (reference plugin; --reverse yields a distinct vector space for tests)
+    ServeEmbed { #[arg(long)] reverse: bool, #[arg(long, default_value = "gov-builtin-embed")] id: String } }
 #[derive(Subcommand)]
 enum ClaimsCmd { List, Sweep }
 
@@ -201,8 +214,8 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::CancelAgents { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "CANCEL_AGENTS", reason.as_deref()) }
         Cmd::Resume => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "RESUME", None) }
         Cmd::Doctor => { let p = open_project(cli, false)?; let r = gov_runtime::doctor::run(&p)?; let v = serde_json::to_value(&r)?; if r.verdict == "UNHEALTHY" { return Err(GovError::new("UNHEALTHY", format!("doctor: UNHEALTHY ({} failed checks)", r.failed)).with_details(v)); } Ok(v) }
-        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental })?; Ok(serde_json::to_value(&r)?) }
-        Cmd::Recover { dry_run } => { let p = open_project(cli, true)?; gov_runtime::recovery::recover(&p, *dry_run) }
+        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
+        Cmd::Recover { dry_run } => { let p = open_project(cli, true)?; if !*dry_run { gov_runtime::authority::require(&p, "recover")?; } gov_runtime::recovery::recover(&p, *dry_run) }
         Cmd::Adopt { stage } | Cmd::Migrate { stage } => {
             let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
             let session = cli.session.clone().or(std::env::var("GOV_SESSION").ok()).unwrap_or_else(gov_runtime::util::new_session_id);
@@ -228,12 +241,18 @@ fn run(cli: &Cli) -> Result<Value> {
             let p = open_project(cli, true)?;
             use gov_runtime::orchestration::tasks as t;
             match op {
-                TaskCmd::Create { class, objective, title, feature, deps, allowed, status, fields, id } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } let o = f.as_object_mut().unwrap(); o.insert("objective".into(), json!(objective)); if let Some(c) = class { o.insert("class".into(), json!(c)); } if let Some(x) = title { o.insert("title".into(), json!(x)); } if let Some(x) = feature { o.insert("feature".into(), json!(x)); } if deps.is_some() { o.insert("dependencies".into(), json!(csv(deps))); } if allowed.is_some() { o.insert("allowed_paths".into(), json!(csv(allowed))); } if let Some(s) = status { o.insert("task_status".into(), json!(s)); } if let Some(i) = id { o.insert("id".into(), json!(i)); } t::create(&p, f) }
+                TaskCmd::Create { class, objective, title, feature, deps, allowed, status, fields, id } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } let o = f.as_object_mut().unwrap(); o.insert("objective".into(), json!(objective)); if let Some(c) = class { o.insert("class".into(), json!(c)); }
+                    if let Some(x) = title { o.insert("title".into(), json!(x)); }
+                    if let Some(x) = feature { o.insert("feature".into(), json!(x)); }
+                    if deps.is_some() { o.insert("dependencies".into(), json!(csv(deps))); }
+                    if allowed.is_some() { o.insert("allowed_paths".into(), json!(csv(allowed))); }
+                    if let Some(s) = status { o.insert("task_status".into(), json!(s)); }
+                    if let Some(i) = id { o.insert("id".into(), json!(i)); } t::create(&p, f) }
                 TaskCmd::List { status } => Ok(json!(t::list(&p, status.as_deref()))),
                 TaskCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found"))) }
                 TaskCmd::Status { id, status, note } => t::set_status(&p, id, status, note.as_deref()),
-                TaskCmd::Claim { id } => { let d = db(&p)?; t::claim(&p, &d, id) }
-                TaskCmd::Release { id, force } => { let d = db(&p)?; Ok(json!({"released": t::release(&p, &d, id, *force)?})) }
+                TaskCmd::Claim { id } => t::claim(&p, id),
+                TaskCmd::Release { id, force } => Ok(json!({"released": t::release(&p, id, *force)?})),
                 TaskCmd::Close { id, report, force } => { let d = db(&p)?; let r = load_file_value(report)?; t::close(&p, &d, id, r, *force) }
                 TaskCmd::Dag => Ok(serde_json::to_value(gov_runtime::orchestration::dag::compute(&p)?)?),
                 TaskCmd::Replan => gov_runtime::orchestration::dag::replan(&p),
@@ -243,7 +262,10 @@ fn run(cli: &Cli) -> Result<Value> {
             let p = open_project(cli, true)?;
             use gov_runtime::cit as c;
             match op {
-                CitCmd::Propose { proposal, trigger, targets, manifest, title } => { let mut f = json!({"proposal": proposal}); if let Some(t) = trigger { f["trigger"] = json!(t); } if targets.is_some() { f["targets"] = json!(csv(targets)); } if let Some(m) = manifest { f["mutation_manifest"] = load_file_value(m)?; } if let Some(t) = title { f["title"] = json!(t); } c::propose(&p, f) }
+                CitCmd::Propose { proposal, trigger, targets, manifest, title } => { let mut f = json!({"proposal": proposal}); if let Some(t) = trigger { f["trigger"] = json!(t); }
+                    if targets.is_some() { f["targets"] = json!(csv(targets)); }
+                    if let Some(m) = manifest { f["mutation_manifest"] = load_file_value(m)?; }
+                    if let Some(t) = title { f["title"] = json!(t); } c::propose(&p, f) }
                 CitCmd::Simulate { id } => { let d = db(&p)?; c::simulate(&p, &d, id) }
                 CitCmd::Approve { id, by, method } => c::approve(&p, id, by, method),
                 CitCmd::Reject { id, by, reason } => c::reject(&p, id, by, reason.as_deref()),
@@ -278,28 +300,50 @@ fn run(cli: &Cli) -> Result<Value> {
             let p = open_project(cli, true)?;
             match op {
                 MemoryCmd::Query { query, k, route, include_historical } => { let d = db(&p)?; let r = gov_runtime::retrieval::retrieve(&p, &d, query, gov_runtime::retrieval::RetrieveOptions { k: *k, route: route.clone(), include_historical: *include_historical, log: true, ..Default::default() })?; gov_runtime::observability::emit(&p, "retrieval", json!({"routes": r.routes, "hits": r.hits.len(), "latency_ms": r.latency_ms}))?; Ok(serde_json::to_value(&r)?) }
-                MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
+                MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if r["measured"].as_bool().unwrap_or(false) && !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
+                MemoryCmd::Benchmark { candidates, heldout, record } => gov_runtime::memory::benchmark::run(&p, candidates, heldout.clone(), *record),
+                MemoryCmd::Select { candidate, research, by } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), by),
+                MemoryCmd::HeldoutStarter { force } => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let existing = gov_runtime::util::read_yaml(&hp).ok().and_then(|h| h["queries"].as_array().map(|a| a.len())).unwrap_or(0); if existing > 0 && !force { return Err(GovError::new("USAGE", format!("{} already has {existing} queries (use --force to overwrite)", hp.display()))); } let set = gov_runtime::memory::heldout::generate_starter(&p, &d, "gov memory heldout-starter")?; gov_runtime::util::write_yaml(&hp, &set)?; Ok(json!({"path": hp.display().to_string(), "queries": set["queries"].as_array().map(|a| a.len()).unwrap_or(0)})) }
                 MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
-                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental })?)?),
+                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?)?),
                 MemoryCmd::Graph { node, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::neighbours(&d, node, *depth)?)) }
                 MemoryCmd::Impact { seeds, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::impact_set(&d, &csv(&Some(seeds.clone())), *depth)?)) }
             }
         }
         Cmd::Gate { op } => { let p = open_project(cli, true)?; match op { GateCmd::Create { question, fields } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } f["question"] = json!(question); gov_runtime::orchestration::gates::create(&p, f) } GateCmd::Present { id } => { let (d, text) = gov_runtime::orchestration::gates::present(&p, id)?; if !cli.json { println!("{text}"); } Ok(json!({"gate": d, "chat_text": text})) } GateCmd::List => Ok(json!(gov_runtime::orchestration::gates::pending(&p))) } }
-        Cmd::Readiness { op } => { let p = open_project(cli, true)?; match op { ReadinessCmd::Check { feature } => Ok(serde_json::to_value(gov_runtime::orchestration::readiness::check(&p, feature)?)?), ReadinessCmd::Plan { feature } => gov_runtime::orchestration::readiness::plan(&p, feature) } }
+        Cmd::Readiness { op } => { let p = open_project(cli, true)?; match op { ReadinessCmd::Check { feature } => Ok(serde_json::to_value(gov_runtime::orchestration::readiness::check(&p, feature)?)?), ReadinessCmd::Plan { feature } => { gov_runtime::authority::require(&p, "readiness_plan")?; gov_runtime::orchestration::readiness::plan(&p, feature) } } }
         Cmd::Intent { text } => { let p = open_project(cli, true)?; gov_runtime::orchestration::intents::route(&p, text) }
-        Cmd::Route { task, class, radius, record, report } => { let p = open_project(cli, true)?; if *report { return gov_runtime::routing::report(&p); } if let Some(r) = record { return gov_runtime::routing::record(&p, load_file_value(r)?); } let t = task.as_ref().map(|id| gov_runtime::records::RecordStore::load(&p.root).get(id).map(|r| r.data.clone())).flatten(); gov_runtime::routing::route(&p, t.as_ref(), class.as_deref(), None, radius.as_deref()) }
+        Cmd::Route { task, class, radius, record, report } => { let p = open_project(cli, true)?; if *report { return gov_runtime::routing::report(&p); }
+            if let Some(r) = record { return gov_runtime::routing::record(&p, load_file_value(r)?); } let t = task.as_ref().and_then(|id| gov_runtime::records::RecordStore::load(&p.root).get(id).map(|r| r.data.clone())); gov_runtime::routing::route(&p, t.as_ref(), class.as_deref(), None, radius.as_deref()) }
         Cmd::Telemetry { op } => { let p = open_project(cli, true)?; match op { TelemetryCmd::Summary => gov_runtime::observability::summary(&p), TelemetryCmd::Emit { name, attrs } => gov_runtime::observability::emit(&p, name, parse_json_arg(attrs)?) } }
         Cmd::Adapters { op } => { let p = open_project(cli, true)?; match op { AdaptersCmd::Generate => gov_runtime::adapters::generate(&p), AdaptersCmd::Verify => { let v = gov_runtime::adapters::verify(&p)?; if !v["ok"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "adapter conformance failed").with_details(v)); } Ok(v) } } }
         Cmd::Release { op } => match op {
             ReleaseCmd::Build { version, out, certification, evidence, canonical } => { let croot = canonical.clone().or_else(gov_runtime::kernel::canonical_root).ok_or_else(|| GovError::new("KERNEL_SOURCE_NOT_FOUND", "canonical repository root not found (pass --canonical)"))?; let out = out.clone().unwrap_or(croot.join("release")); gov_runtime::release::build(&croot, version, &out, certification, evidence.as_deref()) }
             ReleaseCmd::Verify { dir } => gov_runtime::release::verify(dir),
         },
-        Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => Ok(serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?), KernelCmd::Reinstall { source } => { gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?; let lock = p.lock()?.clone(); let src = source.clone().or(lock["source"].as_str().map(|s| s.to_string())); let m = gov_runtime::kernel::install_kernel(src.as_deref().map(Path::new), &p.governance_dir())?; if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); } p.invalidate(); Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"]})) } } }
-        Cmd::Capabilities { op } => { let p = open_project(cli, false)?; match op { CapCmd::Ecosystems => Ok(gov_runtime::capabilities::ecosystems::detect(&p.root, &["product/".into()])), CapCmd::Plugins => Ok(json!(gov_runtime::capabilities::host::discover(&p.root))), CapCmd::Invoke { plugin, inputs } => { let plugins = gov_runtime::capabilities::host::discover(&p.root); let d = plugins.iter().find(|x| x.plugin_id == *plugin).cloned().ok_or_else(|| GovError::new("PLUGIN_NOT_FOUND", format!("plugin {plugin} not declared")))?; let out = gov_runtime::capabilities::host::invoke(&d, &p.root, parse_json_arg(&Some(inputs.clone()))?, std::time::Duration::from_secs(60))?; Ok(serde_json::to_value(&out)?) } } }
-        Cmd::Claims { op } => { let p = open_project(cli, true)?; let d = db(&p)?; match op { ClaimsCmd::List => Ok(json!(gov_runtime::orchestration::claims::list(&d)?)), ClaimsCmd::Sweep => Ok(json!({"swept": gov_runtime::orchestration::claims::sweep_expired(&d)?})) } }
+        Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => Ok(serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?), KernelCmd::Reinstall { source } => { gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?; gov_runtime::authority::require(&p, "install_kernel")?; let lock = p.lock()?.clone(); let src = source.clone().or_else(|| lock["source"].as_str().filter(|s| Path::new(s).exists()).map(|s| s.to_string())); let m = gov_runtime::kernel::install_kernel(src.as_deref().map(Path::new), &p.governance_dir())?; if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); } p.invalidate(); Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"]})) } } }
+        Cmd::Capabilities { op: CapCmd::ServeEmbed { reverse, id } } => {
+            use std::io::Read; let mut raw = String::new(); std::io::stdin().read_to_string(&mut raw)?;
+            let req: Value = serde_json::from_str(&raw).unwrap_or(json!({}));
+            let resp = if req["protocol"] != "gov-capability/1" { json!({"protocol": "gov-capability/1", "ok": false, "provider": {"id": id, "version": "1"}, "error": {"code": "PROTOCOL_MISMATCH", "message": "expected gov-capability/1"}}) } else {
+                let dim = req["inputs"]["dimensions"].as_u64().unwrap_or(512).max(8) as usize;
+                let e = gov_runtime::memory::embeddings::HashedNgramEmbedder::new(dim, "1");
+                let vecs: Vec<Vec<f64>> = req["inputs"]["texts"].as_array().cloned().unwrap_or_default().iter().map(|t| { let mut v = e.embed(t.as_str().unwrap_or("")); if *reverse { v.reverse(); } v }).collect();
+                json!({"protocol": "gov-capability/1", "ok": true, "provider": {"id": id, "version": "1"}, "outputs": {"vectors": vecs, "dim": dim}}) };
+            println!("{}", serde_json::to_string(&resp)?);
+            std::process::exit(0);
+        }
+        Cmd::Capabilities { op } => { let p = open_project(cli, false)?; match op { CapCmd::ServeEmbed { .. } => unreachable!(), CapCmd::Ecosystems => Ok(gov_runtime::capabilities::ecosystems::detect(&p.root, &["product/".into()])), CapCmd::Plugins => Ok(json!(gov_runtime::capabilities::host::discover(&p.root))), CapCmd::Invoke { plugin, inputs } => { let plugins = gov_runtime::capabilities::host::discover(&p.root); let d = plugins.iter().find(|x| x.plugin_id == *plugin).cloned().ok_or_else(|| GovError::new("PLUGIN_NOT_FOUND", format!("plugin {plugin} not declared")))?; let out = gov_runtime::capabilities::host::invoke(&d, &p.root, parse_json_arg(&Some(inputs.clone()))?, std::time::Duration::from_secs(60))?; Ok(serde_json::to_value(&out)?) } } }
+        Cmd::Claims { op } => { let p = open_project(cli, true)?; match op { ClaimsCmd::List => Ok(json!(gov_runtime::orchestration::claims::list(&p)?)), ClaimsCmd::Sweep => { gov_runtime::authority::require(&p, "sweep_claims")?; Ok(json!({"swept": gov_runtime::orchestration::claims::sweep_expired(&p)?})) } } }
+        Cmd::Lessons { op } => match op { LessonsCmd::Cluster { inbox, proposals, write } => {
+            let root = cli.root.clone().or_else(gov_runtime::kernel::canonical_root).unwrap_or(std::env::current_dir()?);
+            let inbox = inbox.clone().unwrap_or(root.join("lessons").join("inbox"));
+            let proposals = proposals.clone().unwrap_or(root.join("change-proposals"));
+            let policy = gov_runtime::util::read_yaml(&root.join("framework/policies/LEARNING_POLICY.yaml")).or_else(|_| gov_runtime::util::read_yaml(&root.join("governance/kernel/policies/LEARNING_POLICY.yaml")))?;
+            gov_runtime::lessons::cluster(&inbox, &proposals, &policy, *write)
+        } },
         Cmd::Mcp { .. } => Err(GovError::new("MCP_NOT_IMPLEMENTED", "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)")),
-    }.map(|v| { let _ = name; v })
+    }.inspect(|_v| { let _ = name; })
 }
 
 fn run_audit(p: &Project, deep: bool, families: Vec<String>, persist: bool) -> Result<Value> {
@@ -310,7 +354,7 @@ fn run_audit(p: &Project, deep: bool, families: Vec<String>, persist: bool) -> R
 }
 
 fn command_name(c: &Cmd) -> &'static str {
-    match c { Cmd::Version => "version", Cmd::Init { .. } => "init", Cmd::Status => "status", Cmd::Continue { .. } => "continue", Cmd::Decide { .. } => "decide", Cmd::Audit { .. } => "audit", Cmd::Pause { .. } => "pause", Cmd::FreezeWrites { .. } => "freeze-writes", Cmd::CancelAgents { .. } => "cancel-agents", Cmd::Resume => "resume", Cmd::Doctor => "doctor", Cmd::RebuildMemory { .. } => "rebuild-memory", Cmd::Recover { .. } => "recover", Cmd::Adopt { .. } => "adopt", Cmd::Migrate { .. } => "migrate", Cmd::Update { .. } => "update", Cmd::Upstream { .. } => "upstream", Cmd::Task { .. } => "task", Cmd::Cit { .. } => "cit", Cmd::Context { .. } => "context", Cmd::Checkpoint { .. } => "checkpoint", Cmd::Skills { .. } => "skills", Cmd::Tools { .. } => "tools", Cmd::Handoff { .. } => "handoff", Cmd::Memory { .. } => "memory", Cmd::Gate { .. } => "gate", Cmd::Readiness { .. } => "readiness", Cmd::Intent { .. } => "intent", Cmd::Route { .. } => "route", Cmd::Telemetry { .. } => "telemetry", Cmd::Adapters { .. } => "adapters", Cmd::Release { .. } => "release", Cmd::Kernel { .. } => "kernel", Cmd::Capabilities { .. } => "capabilities", Cmd::Claims { .. } => "claims", Cmd::Verify { .. } => "verify", Cmd::Mcp { .. } => "mcp" }
+    match c { Cmd::Version => "version", Cmd::Init { .. } => "init", Cmd::Status => "status", Cmd::Continue { .. } => "continue", Cmd::Decide { .. } => "decide", Cmd::Audit { .. } => "audit", Cmd::Pause { .. } => "pause", Cmd::FreezeWrites { .. } => "freeze-writes", Cmd::CancelAgents { .. } => "cancel-agents", Cmd::Resume => "resume", Cmd::Doctor => "doctor", Cmd::RebuildMemory { .. } => "rebuild-memory", Cmd::Recover { .. } => "recover", Cmd::Adopt { .. } => "adopt", Cmd::Migrate { .. } => "migrate", Cmd::Update { .. } => "update", Cmd::Upstream { .. } => "upstream", Cmd::Task { .. } => "task", Cmd::Cit { .. } => "cit", Cmd::Context { .. } => "context", Cmd::Checkpoint { .. } => "checkpoint", Cmd::Skills { .. } => "skills", Cmd::Tools { .. } => "tools", Cmd::Handoff { .. } => "handoff", Cmd::Memory { .. } => "memory", Cmd::Gate { .. } => "gate", Cmd::Readiness { .. } => "readiness", Cmd::Intent { .. } => "intent", Cmd::Route { .. } => "route", Cmd::Telemetry { .. } => "telemetry", Cmd::Adapters { .. } => "adapters", Cmd::Release { .. } => "release", Cmd::Kernel { .. } => "kernel", Cmd::Capabilities { .. } => "capabilities", Cmd::Claims { .. } => "claims", Cmd::Verify { .. } => "verify", Cmd::Mcp { .. } => "mcp", Cmd::Lessons { .. } => "lessons" }
 }
 
 fn main() {

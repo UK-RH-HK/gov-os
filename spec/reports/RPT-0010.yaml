@@ -1,28 +1,47 @@
 id: RPT-0010
 type: report
-title: Closing report for TASK-0001
+title: Closing report for TASK-0010 (repair iteration, candidate 4.1.3)
 status: ACTIVE
 state_class: EVIDENCE
 created: '2026-09-12'
-task: TASK-0001
+task: TASK-0010
 role: orchestrator
-session: S-implementer
+session: S-implementer-repair
 outcome: success
-work_completed: 'Kernel payload authored: constitution, 15 hard invariants, 13 policies,
-  59 schemas, 12 skills, 5 adapters, roles, taxonomy, readiness dimensions, command
-  contract, 7 overlay templates, tool/MCP registries, migration M-4.1.1-4.1.2.'
+work_completed: 'All CRITICAL/HIGH findings repaired at root cause with builder regression tests (tests/certification/repair.rs, host unit tests); MEDIUM M1-M16 and LOW L1-L9 addressed; kernel payload bumped to 4.1.3 with migration M-4.1.2-4.1.3; independent held-out harness rerun unchanged (36 PASS / 1 FAIL / 1 INFO / 0 ERROR, residual HV-08b documented); evidence regenerated with real clippy/rustfmt runs; repair report at release/repair/4.1.3/REPAIR_REPORT.md.'
 files_changed:
+- runtime/
+- cli/
 - framework/
 - migrations/
 - tools/
+- tests/
+- fixtures/
+- scripts/
+- docs/
+- spec/
+- release/notes/
+- release/repair/
+- release/evidence/
+- release/verification/4.1.2/heldout-rerun/
+- release/CERTIFICATION_STATUS.md
+- README.md
 evidence:
-- tests/certification/arch.rs::schemas_policies_and_registries_validate_against_kernel_schemas
+- release/repair/4.1.3/REPAIR_REPORT.md
+- docs/EVIDENCE.md
+- release/evidence/certification-tests.txt
+- release/verification/4.1.2/heldout-rerun/SUMMARY.md
 tests:
   status: passed
-  reason: schema validation of all kernel data
-discoveries: []
-risks: []
+  reason: cargo test -p gov-runtime (unit), cargo test -p gov-cli --test certification (35 scenarios incl. 17 repair regressions), pytest capabilities/tests, independent harness rerun unchanged; see docs/EVIDENCE.md
+discoveries:
+- A declined destructive human gate (option B) is a decision that withdraws the planned removal; scaffolded independent migration tests for that entry are deferred with the recorded reason instead of failing the batch.
+- Benchmark candidate indexes must be built directly at their isolated path; the atomic staged swap applies only to the live runtime database.
+risks:
+- HV-08b remains FAIL by construction with the baseline embedder; a stronger embedder is selected per repository through gov memory benchmark/select, never hard-coded in the kernel.
+- rustfmt reports formatting divergence (advisory; not applied to keep the repair diff reviewable). Five clippy style warnings remain (zero errors).
 lessons: []
 proposed_decisions: []
-unresolved: []
-recommended_next_action: none
+unresolved:
+- Independent re-verification and certification verdict.
+recommended_next_action: independent re-verification of candidate 4.1.3

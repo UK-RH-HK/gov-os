@@ -31,3 +31,21 @@ verifier of a release candidate"). Independent verification must:
 - re-execute the seven fixture scenarios and the negative controls independently of the harness assertions;
 - audit the kernel payload against the governing documents;
 - record the verdict (`CERTIFIED` or `REJECTED`) in `release/releases/4.1.2/manifest.yaml` → `certification`.
+
+---
+
+## Implementer repair statement (2026-09-12, after the rejection)
+
+Repair iteration applied on branch `release/4.1.2-rc1` (not merged to `main`), producing repair candidate **4.1.3**
+(`release/releases/4.1.3/`, kernel payload changed → new immutable version; 4.1.2 stays REJECTED and untouched).
+
+- Repair mapping (every CRITICAL/HIGH → root cause / change / builder regression test / held-out result):
+  [release/repair/4.1.3/REPAIR_REPORT.md](repair/4.1.3/REPAIR_REPORT.md).
+- Unchanged independent harness rerun: `release/verification/4.1.2/heldout-rerun/` — 36 PASS / 1 FAIL (HV-08b,
+  MEDIUM, baseline-embedder paraphrase; documented residual) / 1 INFO / 0 ERROR (verifier run: 12 / 25 / 1 / 0).
+- Builder evidence: `docs/EVIDENCE.md` (35/35 certification, 14/14 unit, 4/4 plugin; clippy and rustfmt ran).
+- Verifier artefacts were not modified; no verifier-authored test was changed.
+
+**Status of 4.1.3: READY_FOR_INDEPENDENT_REVERIFICATION — certification pending.** The implementer has not issued
+`OS_RELEASE_CANDIDATE_ACCEPTED` and must not; the 4.1.3 manifest `certification.status` records the pending state.
+Repair commit hashes: see the repair report header and the git history of the branch.

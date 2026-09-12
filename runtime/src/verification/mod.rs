@@ -8,7 +8,7 @@ use crate::{graph, Project, Result};
 use serde_json::{json, Value};
 
 pub const KNOWN_CLI: &[&str] = &["status", "continue", "decide", "audit", "pause", "freeze-writes", "cancel-agents", "resume", "doctor", "init", "adopt", "update", "rebuild-memory",
-    "upstream", "recover", "task", "cit", "context", "checkpoint", "skills", "tools", "handoff", "memory", "gate", "readiness", "intent", "route", "telemetry", "adapters", "release", "migrate", "verify", "kernel", "capabilities", "claims", "version", "mcp"];
+    "upstream", "recover", "task", "cit", "context", "checkpoint", "skills", "tools", "handoff", "memory", "gate", "readiness", "intent", "route", "telemetry", "adapters", "release", "migrate", "verify", "kernel", "capabilities", "claims", "version", "mcp", "lessons"];
 
 /// Hash of inputs relevant to the governance suite: kernel, overlay, governance tests, decisions.
 pub fn inputs_hash(p: &Project) -> String {
@@ -24,7 +24,7 @@ pub fn inputs_hash(p: &Project) -> String {
 pub fn latest_green(p: &Project) -> Option<Value> {
     let store = RecordStore::load(&p.root);
     let mut audits: Vec<&crate::records::Record> = store.of_type("audit").into_iter().filter(|a| a.data["green"].as_bool().unwrap_or(false) && a.get("scope") == "governance-suite").collect();
-    audits.sort_by(|a, b| a.id().cmp(&b.id()));
+    audits.sort_by_key(|a| a.id());
     audits.last().map(|a| a.data.clone())
 }
 
@@ -51,10 +51,14 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 for pr in &pol.problems { f.findings.push(finding("high", &fam, pr.clone(), None)); }
                 if let Ok(inv) = read_yaml(&p.kernel_dir().join("constitution").join("HARD_INVARIANTS.yaml")) { if let Ok(e) = p.schemas().errors("hard-invariants", &inv) { for x in e { f.findings.push(finding("critical", &fam, x, None)); } } } else { f.findings.push(finding("critical", &fam, "HARD_INVARIANTS.yaml unreadable".into(), None)); }
                 let mut checked = 0;
+                let statuses = pol.get_list("AUTHORITY_POLICY", "lifecycle_statuses");
+                let classes = pol.get_list("AUTHORITY_POLICY", "state_classes");
                 for r in &store.records {
                     if r.problems.iter().any(|x| x == "archived") { continue; }
                     let t = r.rtype(); let schema = if p.schemas().has(&t) { t.clone() } else { "record".into() };
                     match p.schemas().errors(&schema, &r.data) { Ok(errs) => { checked += 1; for e in errs.iter().take(3) { f.findings.push(finding("high", &fam, format!("{} ({t}): {e}", r.id()), Some(r.path.clone()))); } } Err(e) => f.findings.push(finding("medium", &fam, e.to_string(), Some(r.path.clone()))) }
+                    if !statuses.is_empty() && !statuses.contains(&r.status()) { f.findings.push(finding("high", &fam, format!("{} has status '{}' outside AUTHORITY_POLICY.lifecycle_statuses", r.id(), r.status()), Some(r.path.clone()))); }
+                    let sc = r.get("state_class"); if !sc.is_empty() && !classes.is_empty() && !classes.contains(&sc) { f.findings.push(finding("high", &fam, format!("{} has state_class '{sc}' outside AUTHORITY_POLICY.state_classes", r.id()), Some(r.path.clone()))); }
                 }
                 for (id, paths) in &store.duplicates { f.findings.push(finding("high", &fam, format!("duplicate record id {id} at {}", paths.join(", ")), None)); }
                 // authority must be unambiguous: a superseded record that is still ACTIVE is a contradiction
@@ -73,7 +77,10 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
             "index_freshness" => { let fr = freshness(p); if !fr.manifest_present { f.findings.push(finding("medium", &fam, "index manifest missing".into(), None)); } else if !fr.fresh { f.findings.push(finding("medium", &fam, format!("index stale: {} changed, {} added, {} removed", fr.stale.len(), fr.added.len(), fr.removed.len()), None)); } f.detail = json!({"checked": fr.checked, "stale": fr.stale, "added": fr.added, "removed": fr.removed}); }
             "memory_retrieval_regression" => {
                 let hp = p.root.join(pol.get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml"));
-                if let (Some(db), true) = (&db, hp.exists()) { let held = read_yaml(&hp)?; let r = crate::retrieval::run_heldout(p, db, &held)?; if !r["pass"].as_bool().unwrap_or(false) { f.findings.push(finding("high", &fam, format!("held-out retrieval regression failed: recall@k {:.2} mrr {:.2} stale {:.2} superseded {:.2} forbidden {}", r["recall_at_k"].as_f64().unwrap_or(0.0), r["mrr"].as_f64().unwrap_or(0.0), r["stale_hit_rate"].as_f64().unwrap_or(0.0), r["superseded_hit_rate"].as_f64().unwrap_or(0.0), r["forbidden_violations"]), None)); } f.detail = json!({"recall_at_k": r["recall_at_k"], "mrr": r["mrr"], "queries": r["queries"], "failed": r["results"].as_array().map(|a| a.iter().filter(|x| !x["pass"].as_bool().unwrap_or(false)).map(|x| x["id"].clone()).collect::<Vec<_>>())}); }
+                if let (Some(db), true) = (&db, hp.exists()) { let held = read_yaml(&hp)?; let r = crate::retrieval::run_heldout(p, db, &held)?;
+                    if !r["measured"].as_bool().unwrap_or(false) { f.findings.push(finding("medium", &fam, format!("memory recall is UNMEASURED: {} held-out queries (< MEMORY_POLICY.regression.min_queries {}); a green suite with unmeasured recall is not healthy (framework §17)", r["queries"], r["min_queries"]), Some(hp.strip_prefix(&p.root).unwrap_or(&hp).to_string_lossy().to_string()))); }
+                    else if !r["pass"].as_bool().unwrap_or(false) { f.findings.push(finding("high", &fam, format!("held-out retrieval regression failed: recall@k {:.2} mrr {:.2} stale {:.2} superseded {:.2} forbidden {}", r["recall_at_k"].as_f64().unwrap_or(0.0), r["mrr"].as_f64().unwrap_or(0.0), r["stale_hit_rate"].as_f64().unwrap_or(0.0), r["superseded_hit_rate"].as_f64().unwrap_or(0.0), r["forbidden_violations"]), None)); }
+                    f.detail = json!({"status": r["status"], "recall_at_k": r["recall_at_k"], "mrr": r["mrr"], "precision_at_k": r["precision_at_k"], "queries": r["queries"], "pending": r["pending_queries"], "failed": r["results"].as_array().map(|a| a.iter().filter(|x| !x["pass"].as_bool().unwrap_or(false)).map(|x| x["id"].clone()).collect::<Vec<_>>())}); }
                 else if !hp.exists() { f.findings.push(finding("medium", &fam, format!("held-out memory tests missing at {}", hp.display()), None)); }
                 else { f.findings.push(finding("medium", &fam, "runtime DB missing".into(), None)); }
             }
@@ -101,10 +108,15 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 f.detail = json!({"unmatched": unknown, "secret_content_outside_secret_class": secrets_wrong});
             }
             "context_reproducibility" => {
-                if let Some(db) = &db { if let Some(t) = store.of_type("task").first() { let a = crate::context::compile(p, db, &t.id())?; let b = crate::context::compile(p, db, &t.id())?; if a["deterministic_hash"] != b["deterministic_hash"] { f.findings.push(finding("high", &fam, format!("deterministic authority block not reproducible for {}", t.id()), None)); } f.detail = json!({"task": t.id(), "deterministic_hash": a["deterministic_hash"], "chars": a["chars"]}); } }
+                if let Some(db) = &db { if let Some(t) = store.of_type("task").first() { let a = crate::context::compile(p, db, &t.id())?; let b = crate::context::compile(p, db, &t.id())?; if a["deterministic_hash"] != b["deterministic_hash"] { f.findings.push(finding("high", &fam, format!("deterministic authority block not reproducible for {}", t.id()), None)); }
+                    // CONTEXT_POLICY.deterministic_authority_fields / retrieved_fields must all be present in the packet
+                    for fld in pol.get_list("CONTEXT_POLICY", "deterministic_authority_fields") { if a["deterministic_authority"].get(&fld).is_none() { f.findings.push(finding("medium", &fam, format!("context packet lacks deterministic field '{fld}' (CONTEXT_POLICY.deterministic_authority_fields)"), None)); } }
+                    for fld in pol.get_list("CONTEXT_POLICY", "retrieved_fields") { if a["retrieved_intelligence"].get(&fld).is_none() { f.findings.push(finding("low", &fam, format!("context packet lacks retrieved field '{fld}' (CONTEXT_POLICY.retrieved_fields)"), None)); } }
+                    for blk in pol.get_list("CONTEXT_POLICY", "packet_blocks") { if a.get(&blk).is_none() { f.findings.push(finding("medium", &fam, format!("context packet lacks block '{blk}' (CONTEXT_POLICY.packet_blocks)"), None)); } }
+                    f.detail = json!({"task": t.id(), "deterministic_hash": a["deterministic_hash"], "chars": a["chars"]}); } }
                 else { f.findings.push(finding("medium", &fam, "runtime DB missing".into(), None)); }
             }
-            "concurrency_claims" => { if let Some(db) = &db { let cl = crate::orchestration::claims::list(db)?; let expired = cl.iter().filter(|c| c["expired"].as_bool().unwrap_or(false)).count(); if expired > 0 { f.findings.push(finding("low", &fam, format!("{expired} expired claim(s) not swept"), None)); } for c in &cl { if store.get(c["task_id"].as_str().unwrap_or("")).is_none() { f.findings.push(finding("medium", &fam, format!("claim references unknown task {}", c["task_id"]), None)); } } f.detail = json!({"claims": cl.len(), "expired": expired}); } }
+            "concurrency_claims" => { { let cl = crate::orchestration::claims::list(p)?; let expired = cl.iter().filter(|c| c["expired"].as_bool().unwrap_or(false)).count(); if expired > 0 { f.findings.push(finding("low", &fam, format!("{expired} expired claim(s) not swept"), None)); } for c in &cl { if store.get(c["task_id"].as_str().unwrap_or("")).is_none() { f.findings.push(finding("medium", &fam, format!("claim references unknown task {}", c["task_id"]), None)); } } f.detail = json!({"claims": cl.len(), "expired": expired}); } }
             "adapter_portability" => { let v = crate::adapters::verify(p)?; if !v["ok"].as_bool().unwrap_or(false) { for pr in v["problems"].as_array().cloned().unwrap_or_default() { f.findings.push(finding("medium", &fam, pr.as_str().unwrap_or("").to_string(), None)); } } f.detail = v; }
             "skill_regression" => { for pr in crate::skills::validate_all(p) { f.findings.push(finding("medium", &fam, pr, None)); } }
             "command_contract_consistency" => {
@@ -116,6 +128,7 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 if let Some(db) = &db {
                     let secret_arts = db.query("SELECT path FROM artifacts WHERE path_class='secret' OR namespace='secret'", &[])?;
                     for a in &secret_arts { f.findings.push(finding("critical", &fam, "secret-class path present in index (INV-009)".into(), a["path"].as_str().map(|s| s.to_string()))); }
+                    for cls in pol.get_list("SECURITY_POLICY", "never_index_classes") { for a in db.query("SELECT path FROM artifacts WHERE sensitivity=?1", &[&cls])? { f.findings.push(finding("critical", &fam, format!("{cls}-class artefact present in generic memory (SECURITY_POLICY.never_index_classes)"), a["path"].as_str().map(|s| s.to_string()))); } }
                     let scanner = p.secret_scanner();
                     let mut leaked = 0;
                     for row in db.query("SELECT chunk_id, artifact_id, text FROM chunks", &[])? { if !scanner.scan_text(row["text"].as_str().unwrap_or(""), "chunk").is_empty() { leaked += 1; f.findings.push(finding("critical", &fam, format!("secret pattern found in indexed chunk {} (INV-009)", row["chunk_id"]), row["artifact_id"].as_str().map(|s| s.to_string()))); } }
@@ -133,8 +146,8 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
             "recovery_rebuild" => {
                 if opts.deep {
                     let tracked = crate::memory::manifest::read_index_manifest(p).and_then(|m| m["manifest_hash"].as_str().map(|s| s.to_string()));
-                    let first = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false })?;
-                    let second = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false })?;
+                    let first = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
+                    let second = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
                     if first.manifest_hash != second.manifest_hash && pol.get_bool("MEMORY_POLICY", "rebuild.must_reproduce_manifest_hash", true) { f.findings.push(finding("high", &fam, format!("two consecutive full rebuilds differ ({} → {})", first.manifest_hash, second.manifest_hash), None)); }
                     f.detail = json!({"deep": true, "tracked_before": tracked, "rebuild_1": first.manifest_hash, "rebuild_2": second.manifest_hash, "duration_ms": first.duration_ms + second.duration_ms});
                 } else if let Some(db) = &db { let tracked = crate::memory::manifest::read_index_manifest(p).and_then(|m| m["manifest_hash"].as_str().map(|s| s.to_string())); let live = db.get_meta("index_manifest_hash").and_then(|v| v.as_str().map(|s| s.to_string())); if tracked != live { f.findings.push(finding("medium", &fam, "tracked index-manifest hash differs from live runtime (rebuild or commit manifests)".into(), None)); } f.detail = json!({"deep": false, "tracked": tracked, "live": live}); }
@@ -150,8 +163,18 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 if chars > max { f.findings.push(finding("low", &fam, format!("status packet {chars} chars exceeds max_packet_chars {max}"), None)); }
                 f.detail = json!({"reads": needed, "budget": budget, "status_chars": chars, "next_action": st["next_action"]});
             }
+            "policy_enforcement_coverage" => {
+                match crate::policy_coverage::report(p) {
+                    Ok(r) => { for k in r["uncovered"].as_array().cloned().unwrap_or_default() { f.findings.push(finding("high", &fam, format!("policy key {} is declared but neither enforced nor classified informational (ENFORCEMENT_MAP.yaml)", k.as_str().unwrap_or("")), None)); } for k in r["map_entries_without_policy_key"].as_array().cloned().unwrap_or_default() { f.findings.push(finding("low", &fam, format!("ENFORCEMENT_MAP entry {} has no policy key", k.as_str().unwrap_or("")), None)); } f.detail = r; }
+                    Err(e) => f.findings.push(finding("high", &fam, format!("ENFORCEMENT_MAP.yaml unreadable: {e}"), None)),
+                }
+            }
             "product_traceability" => {
                 let tasks = store.of_type("task");
+                let families = pol.get_list("TEST_POLICY", "product_families");
+                let indep = pol.get_list("TEST_POLICY", "independent_test_author_required_for");
+                for o in store.of_type("test-obligation") { let fam_name = o.get("family"); if !families.is_empty() && !families.contains(&fam_name) { f.findings.push(finding("medium", &fam, format!("{} declares test family '{fam_name}' outside TEST_POLICY.product_families", o.id()), Some(o.path.clone()))); }
+                    if indep.contains(&fam_name) && !o.data.get("independent_of_implementer").and_then(|v| v.as_bool()).unwrap_or(false) { f.findings.push(finding("medium", &fam, format!("{} ({fam_name}) is not independent of the implementer (TEST_POLICY.independent_test_author_required_for)", o.id()), Some(o.path.clone()))); } }
                 let done: Vec<_> = tasks.iter().filter(|t| t.get("task_status") == "DONE").collect();
                 let untraced: Vec<String> = done.iter().filter(|t| t.get("closed_by_report").is_empty() && t.get("class") != "governance").map(|t| t.id()).collect();
                 let features = store.of_type("feature");
@@ -195,6 +218,8 @@ pub fn audit(p: &Project, opts: &SuiteOptions, persist: bool) -> Result<Value> {
         id = store.next_id("audit");
         let rec = new_record("audit", &id, &format!("Governance suite audit {id} ({verdict})"), json!({"scope": "governance-suite", "auditor_role": p.role, "session": p.session_id, "families": families, "findings": findings, "verdict": verdict, "inputs_hash": ih, "result_hash": h1, "green": green, "state_class": "EVIDENCE", "run_at": now_iso(), "deep": opts.deep}));
         save_record(&p.root, &rec)?;
+        // the audit record is evidence; keep the derived index fresh (verifier L4 / HV-28)
+        if p.db_path().exists() { let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() }); }
     }
     Ok(json!({"audit": id, "verdict": verdict, "green": green, "families": families, "findings": findings, "inputs_hash": ih, "result_hash": h1, "reproducible": reproducible, "counts": {"critical": findings.iter().filter(|x| x["severity"] == "critical").count(), "high": findings.iter().filter(|x| x["severity"] == "high").count(), "medium": findings.iter().filter(|x| x["severity"] == "medium").count(), "low": findings.iter().filter(|x| x["severity"] == "low").count()}}))
 }

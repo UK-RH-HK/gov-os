@@ -36,8 +36,20 @@ Global flags: `--root <path>` (default: discovered upwards from cwd), `--json` (
 ## Change control and memory
 `gov cit propose --proposal … [--trigger] [--targets a,b] [--manifest ops.json] | simulate|approve|reject|execute|rollback|list|show <CIT>` ·
 `gov memory query "<q>" [--k] [--route] [--include-historical] | verify | freshness | rebuild | graph <node> | impact <ids>` ·
+`gov memory benchmark --candidate <c> --candidate <c> [--heldout f] [--record]` (candidates: `current`, `builtin[:dim]`,
+`plugin:<id>[:dim]`, any `+rerank:<id>`) · `gov memory select <candidate> [--research RES-x] [--by who]` ·
+`gov memory heldout-starter [--force]` · `gov lessons cluster [--inbox d] [--proposals d] [--write]` ·
+`gov gate create --question … | present <HDG> | list` · `gov capabilities serve-embed [--reverse] [--id]` (the binary acting as an embed plugin) ·
 `gov adapters generate|verify` · `gov tools list|registry|resolve --capability c [--role r]|install --descriptor f [--execute]|health` ·
 `gov capabilities ecosystems|plugins|invoke --plugin id --inputs json` · `gov verify governance|product` · `gov version`
+
+Authority: every mutating command checks the session role's level (L0–L5) against
+`AUTHORITY_POLICY.authority_levels_required` and fails with `AUTHORITY_DENIED` (or `UNKNOWN_ROLE`). Gates are answered
+only after `gov gate present` (`GATE_NOT_PRESENTED` otherwise); `gov adopt migrate --gate-answer` is deprecated and
+ignored (a note is returned). `gov task close` refuses `MUTATION_SCOPE_VIOLATION`, `INDEX_PIN_MISMATCH` and
+`INDEX_STALE`. Retrieval/index errors: `EMBEDDER_UNAVAILABLE`, `EMBEDDER_MISMATCH`, `EMBEDDER_BAD_OUTPUT`,
+`RERANKER_UNAVAILABLE`, `RERANKER_MISMATCH`; plugin host: `PLUGIN_TIMEOUT`, `PLUGIN_BAD_RESPONSE`,
+`PLUGIN_PROTOCOL_MISMATCH`, `PLUGIN_ERROR`.
 
 Mutation manifest ops (CIT): `set_status`, `set_field`, `mark_stale`, `write_file`, `move_file`, `delete_file`,
 `append_record`, `regenerate_views`. Framework migration ops: `add_overlay_file_from_template`, `rename_overlay_file`,

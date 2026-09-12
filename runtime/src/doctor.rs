@@ -53,17 +53,33 @@ pub fn run(p: &Project) -> Result<Report> {
     add(chk("D009", "derived runtime", runtime_ok, if db_path.exists() { "high" } else { "medium" }, runtime_msg, Some("gov rebuild-memory")));
     // D010 freshness
     let fr = freshness(p);
-    add(chk("D010", "index freshness", fr.manifest_present && fr.fresh, "medium", if !fr.manifest_present { "no index manifest".into() } else if fr.fresh { format!("fresh ({} artefacts)", fr.checked) } else { format!("stale: {} changed, {} added, {} removed", fr.stale.len(), fr.added.len(), fr.removed.len()) }, Some("gov rebuild-memory --incremental")));
+    add(chk("D010", "index freshness", fr.manifest_present && fr.fresh && !fr.age_exceeded, "medium", if !fr.manifest_present { "no index manifest".into() } else if !fr.pin_mismatch.is_empty() { format!("pin mismatch: {}", fr.pin_mismatch.join("; ")) } else if fr.age_exceeded { format!("index older than MEMORY_POLICY.freshness.max_index_age_hours ({:.0} h)", fr.age_hours.unwrap_or(0.0)) } else if fr.fresh { format!("fresh ({} artefacts)", fr.checked) } else { format!("stale: {} changed, {} added, {} removed", fr.stale.len(), fr.added.len(), fr.removed.len()) }, Some("gov rebuild-memory (full when pins changed; --incremental otherwise)")));
     // D011 secrets outside secret class / D012 secret content in index
     let contract = p.contract(); let scanner = p.secret_scanner();
     let mut wrong = vec![];
-    for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) { let d = contract.decide(&rel); if d.is_secret() || scanner.path_is_secret(&rel) { continue; } if !scanner.scan_file(&abs, &rel).is_empty() { wrong.push(rel); } }
-    add(chk("D011", "secrets outside secret class", wrong.is_empty(), "critical", if wrong.is_empty() { "none".into() } else { format!("{} file(s) contain secret patterns but are not secret-class: {}", wrong.len(), wrong.join(", ")) }, Some("move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile")));
+    for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) { let d = contract.decide(&rel); if d.is_secret() || scanner.path_is_secret(&rel) { continue; }
+        if !scanner.scan_file(&abs, &rel).is_empty() { wrong.push(rel); } }
+    let d011_sev = if pol.get_str("SECURITY_POLICY", "on_secret_outside_secret_class", "block_index_and_report") == "block_index_and_report" { "critical" } else { "high" };
+    add(chk("D011", "secrets outside secret class", wrong.is_empty(), d011_sev, if wrong.is_empty() { "none".into() } else { format!("{} file(s) contain secret patterns but are not secret-class: {}", wrong.len(), wrong.join(", ")) }, Some("move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile")));
     if let Some(d) = &db {
         let leaked = d.query("SELECT chunk_id, text FROM chunks", &[]).unwrap_or_default().into_iter().filter(|r| !scanner.scan_text(r["text"].as_str().unwrap_or(""), "c").is_empty()).count();
         let sec_art = d.count_where("artifacts", "path_class='secret'");
         add(chk("D012", "no secrets in index", leaked == 0 && sec_art == 0, "critical", if leaked == 0 && sec_art == 0 { "clean".into() } else { format!("{leaked} chunk(s) with secret patterns, {sec_art} secret-class artefact(s) indexed (INV-009)") }, Some("gov rebuild-memory (fail-closed re-index) and rotate the exposed secret")));
     }
+    // D025 semantic index consistent with the pinned embedder/reranker (no mixed-embedder index)
+    if let Some(d) = &db {
+        let groups = d.query("SELECT embedder, dim, COUNT(*) AS n FROM vectors GROUP BY embedder, dim", &[]).unwrap_or_default();
+        let live = crate::memory::indexer::live_pins(d);
+        let expected = crate::memory::indexer::expected_pins(p);
+        let diffs = crate::memory::indexer::pin_differences(&expected, &live);
+        let rr_ok = live["reranker"].get("provider") == expected["reranker"].get("provider");
+        let mixed = groups.len() > 1;
+        let ok = !mixed && diffs.is_empty() && rr_ok;
+        let msg = if mixed { format!("heterogeneous semantic index: {} embedder/dimension groups {:?}", groups.len(), groups.iter().map(|g| format!("{}@{}d×{}", g["embedder"], g["dim"], g["n"])).collect::<Vec<_>>()) } else if !diffs.is_empty() { format!("index pins differ from policy: {}", diffs.join("; ")) } else if !rr_ok { format!("reranker pinned as {} but index built with {}", expected["reranker"]["provider"], live["reranker"]["provider"]) } else { format!("consistent: {} ({} vectors)", live["embedder"]["id"].as_str().unwrap_or("?"), groups.first().map(|g| g["n"].as_i64().unwrap_or(0)).unwrap_or(0)) };
+        add(chk("D025", "semantic index consistent with pinned embedder/reranker", ok, if mixed { "critical" } else { "high" }, msg, Some("gov rebuild-memory (full rebuild re-embeds every chunk with the pinned implementation)")));
+    }
+    // D026 claims store (deterministic concurrency state outside the derived index)
+    match crate::memory::claims::ClaimsStore::open(p) { Ok(cs) => { let ok = cs.integrity_ok(); add(chk("D026", "claims store present and intact", ok, "high", if ok { format!("{}", cs.path.display()) } else { "claims.db corrupt".into() }, Some("restore claims.db or gov claims sweep"))); } Err(e) => add(chk("D026", "claims store present and intact", false, "high", e.to_string(), Some("check .governance-runtime permissions"))) }
     // D013 legacy mechanisms
     let store = RecordStore::load(&p.root);
     let legacy = legacy_mechanisms(&p.root);
@@ -80,7 +96,7 @@ pub fn run(p: &Project) -> Result<Report> {
     let inter = crate::cit::interrupted(p);
     add(chk("D016", "no interrupted transactions", inter.is_empty(), "high", if inter.is_empty() { "none".into() } else { format!("{} CIT(s) left EXECUTING: {}", inter.len(), inter.iter().map(|c| c["id"].as_str().unwrap_or("").to_string()).collect::<Vec<_>>().join(", ")) }, Some("gov recover (classifies and rolls back/finishes interrupted mutations)")));
     // D017 claims
-    if let Some(d) = &db { let cl = claims::list(d).unwrap_or_default(); let exp = cl.iter().filter(|c| c["expired"].as_bool().unwrap_or(false)).count(); add(chk("D017", "session claims", exp == 0, "low", format!("{} claim(s), {exp} expired", cl.len()), Some("gov claims sweep"))); }
+    { let cl = claims::list(p).unwrap_or_default(); let exp = cl.iter().filter(|c| c["expired"].as_bool().unwrap_or(false)).count(); add(chk("D017", "session claims", exp == 0, "low", format!("{} claim(s), {exp} expired (claims store: .governance-runtime/claims.db, survives rebuilds)", cl.len()), Some("gov claims sweep"))); }
     // D018 control
     let ctl = control::state(p);
     let running = ctl["mode"].as_str() == Some("RUNNING") && !ctl["writes_frozen"].as_bool().unwrap_or(false);

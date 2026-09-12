@@ -1,0 +1,22 @@
+schema_version: 0.9.0
+project:
+  name: "{{project_name}}"
+  alias: "{{project_alias}}"          # non-identifying alias used in upstream lesson packets
+  created: "{{today}}"
+  onboarding_mode: "{{mode}}"         # init | adopt
+governance:
+  framework_lock: governance/framework.lock
+  kernel_dir: governance/kernel
+  overlay_dir: governance/project
+  generated_dir: governance/generated
+  runtime_dir: .governance-runtime
+policy_overrides: {}                  # keys: <POLICY_NAME>.<dotted.key>: value  (validated against kernel policies)
+staleness:
+  on_stale_close: fail
+readiness:
+  enforce_pre_implementation_cells: true
+tests:
+  product_test_command: []            # native test runner command, e.g. ["<runner>", "test"]; empty = resolve via ecosystem detection
+  baseline_record: spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml
+human_gates:
+  channel: chat

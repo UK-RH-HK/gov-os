@@ -1,0 +1,13 @@
+version: 1.0.0
+# Canonical MCP server registry template. Product overlays scope exposure per role in TOOL_PERMISSIONS.yaml.
+servers:
+  - id: MCP-REPO-001
+    name: repository-intelligence
+    transport: stdio
+    command: [gov, mcp, serve]
+    capabilities: [status, retrieval, context_compile, task_dag, cit_simulate]
+    required_permission_classes: [READ_REPO]
+    approved_roles: [all]
+    credential_scope: none
+    status: planned      # server implementation is a future release item; registry entry defines the contract
+    health: {kind: none}

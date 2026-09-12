@@ -4,3 +4,7 @@ pub mod embeddings;
 pub mod chunking;
 pub mod indexer;
 pub mod manifest;
+pub mod embedder;
+pub mod claims;
+pub mod heldout;
+pub mod benchmark;

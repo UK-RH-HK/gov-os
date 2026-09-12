@@ -90,5 +90,23 @@ pub fn analyze(path: &str, language: &str, source: &str) -> CodeFacts {
     }
     imports.sort();
     imports.dedup();
-    CodeFacts { language: language.into(), provider: "builtin-generic".into(), symbols, imports, calls: vec![], units, degraded: None }
+    // calls: identifiers followed by '(' inside each top-level unit, excluding keywords, definitions and the unit itself
+    static CALL_RX: OnceLock<Regex> = OnceLock::new();
+    let call_rx = CALL_RX.get_or_init(|| Regex::new(r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(").unwrap());
+    const KEYWORDS: &[&str] = &["if", "for", "while", "switch", "return", "fn", "def", "class", "func", "function", "match", "catch", "print", "println", "printf", "assert", "elif", "except", "with", "sizeof", "new", "super", "self", "this", "impl", "struct", "enum", "trait", "type", "let", "var", "const", "import", "from", "async", "await", "lambda", "not", "and", "or", "in", "is", "as", "yield", "raise", "throw", "try", "typeof", "instanceof", "case", "defer", "go", "range", "make", "len", "cap", "append", "Some", "Ok", "Err", "None", "vec", "format", "panic", "unwrap", "expect", "json", "require", "export", "static", "extern", "unsafe", "loop", "where", "pub", "mod", "use", "test", "it", "describe"];
+    let defined: std::collections::HashSet<String> = symbols.iter().map(|s| s.name.clone()).collect();
+    let mut calls: Vec<(String, String)> = vec![];
+    for (qual, a, b) in &units {
+        let a1 = a.saturating_sub(1).min(lines.len()); let b1 = (*b).min(lines.len()).max(a1);
+        let text = lines[a1..b1].join("\n");
+        let mut seen = std::collections::HashSet::new();
+        for c in call_rx.captures_iter(&text) {
+            let name = c[1].to_string();
+            if KEYWORDS.contains(&name.as_str()) || name == *qual || name.len() < 3 { continue; }
+            // skip definition lines of this unit (the unit's own header)
+            if !defined.contains(&name) && !text.lines().any(|l| l.contains(&format!("{name}("))) { continue; }
+            if seen.insert(name.clone()) { calls.push((qual.clone(), name)); }
+        }
+    }
+    CodeFacts { language: language.into(), provider: "builtin-generic".into(), symbols, imports, calls, units, degraded: None }
 }

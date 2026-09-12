@@ -29,6 +29,25 @@ pub fn compile(p: &Project, db: &RuntimeDb, task_id: &str) -> Result<Value> {
         if d.list("affects").contains(&feature_id) || d.list("affects").contains(&task_id.to_string()) || (!feature_id.is_empty() && d.list("governed_by").contains(&feature_id)) { dec_ids.push(d.id()); }
     }
     dec_ids.sort(); dec_ids.dedup();
+    // authority precedence (framework §2/§21): a superseded-but-ACTIVE decision is UNKNOWN_OR_CONFLICTING, never authority
+    let superseded_by_map: std::collections::BTreeMap<String, String> = store.records.iter().flat_map(|r| r.list("supersedes").into_iter().map(move |s| (s, r.id()))).collect();
+    let mut active_decisions: Vec<Value> = vec![]; let mut conflicting: Vec<Value> = vec![];
+    for id in &dec_ids {
+        let Some(r) = store.get(id) else { continue };
+        if r.rtype() != "decision" { continue; }
+        let mut b = brief(r);
+        let sup = superseded_by_map.get(id).cloned().or_else(|| { let s = r.get("superseded_by"); if s.is_empty() { None } else { Some(s) } });
+        if let Some(by) = sup { b["authority_flag"] = json!("UNKNOWN_OR_CONFLICTING"); b["superseded_by"] = json!(by); b["reason"] = json!("superseded by a later decision but still marked ACTIVE; resolve via CIT before relying on it"); conflicting.push(b); }
+        else if r.status() == "ACTIVE" || r.status() == "PROVISIONAL" { active_decisions.push(b); }
+    }
+    let invariants = crate::util::read_yaml(&p.kernel_dir().join("constitution").join("HARD_INVARIANTS.yaml")).ok().and_then(|v| v["invariants"].as_array().cloned()).unwrap_or_default();
+    let pp = p.project_policy();
+    let authority_layers = json!([
+        {"layer": 1, "name": "constitution_hard_invariants", "items": invariants.iter().map(|i| json!({"id": i["id"], "statement": i["statement"]})).collect::<Vec<_>>()},
+        {"layer": 2, "name": "security_authority", "precedence": pol.get_list("AUTHORITY_POLICY", "precedence"), "never_index_classes": pol.get_list("SECURITY_POLICY", "never_index_classes"), "never_export_classes": pol.get_list("SECURITY_POLICY", "never_export_classes"), "acting_role": p.role, "authority_level": crate::authority::level_of(p, &p.role).map(|l| format!("L{l}")).unwrap_or("unknown".into())},
+        {"layer": 3, "name": "project_policy", "project": pp.get("project"), "policy_overrides": pol.applied_overrides.len(), "readiness_enforced": pp["readiness"]["enforce_pre_implementation_cells"], "staleness": pp.get("staleness")},
+        {"layer": 4, "name": "active_decisions_and_spec"}, {"layer": 5, "name": "task_contract_and_mutation_manifest"}, {"layer": 6, "name": "role_and_skill"}, {"layer": 7, "name": "retrieved_context"}, {"layer": 8, "name": "model_inference"}
+    ]);
     let mut scn_ids = task.list("scenarios");
     if let Some(f) = feature { scn_ids.extend(f.list("scenarios")); }
     scn_ids.sort(); scn_ids.dedup();
@@ -51,7 +70,8 @@ pub fn compile(p: &Project, db: &RuntimeDb, task_id: &str) -> Result<Value> {
     let det = json!({
         "task": brief(task), "objective": task.get("objective"),
         "project_state": {"framework_version": p.framework_version(), "task_status_counts": status_counts, "pending_human_gates": pending_gates, "control": ctl.get("mode"), "projects": store.of_type("project").iter().map(|r| brief(r)).collect::<Vec<_>>()},
-        "feature": feature.map(brief), "governing_requirements": collect(&req_ids, "requirement"), "active_decisions": collect(&dec_ids, "decision"),
+        "authority_layers": authority_layers, "hard_invariants": invariants.iter().map(|i| i["id"].clone()).collect::<Vec<_>>(),
+        "feature": feature.map(brief), "governing_requirements": collect(&req_ids, "requirement"), "active_decisions": active_decisions, "conflicting_decisions": conflicting,
         "architecture": store.active("architecture").iter().map(|r| brief(r)).collect::<Vec<_>>(), "interfaces": collect(&iface_ids, "interface"), "scenarios": collect(&scn_ids, "scenario"),
         "acceptance_criteria": acceptance, "allowed_writes": task.list("allowed_paths"), "prohibited_writes": prohibited, "required_skills": skills, "required_tools": task.list("required_tools"),
         "dependency_state": dependency_state, "minimum_model_tier": task.get("minimum_model_tier"), "minimum_reasoning": task.get("minimum_reasoning"),
@@ -69,14 +89,26 @@ pub fn compile(p: &Project, db: &RuntimeDb, task_id: &str) -> Result<Value> {
     let ret = json!({"query": query, "retrieval_strategy": res.strategy, "routes": res.routes, "index_snapshot": {"index_version": res.index_version, "manifest_hash": res.index_manifest_hash},
         "ranked_evidence": res.hits.iter().map(|h| json!({"artifact_id": h.artifact_id, "path": h.path, "section": h.section, "score": h.score, "routes": h.routes, "status": h.status, "state_class": h.state_class, "excerpt": h.excerpt, "parent_excerpt": h.parent_excerpt, "neighbours": h.neighbours, "flags": h.flags})).collect::<Vec<_>>(),
         "lessons_failures": lessons.hits.iter().map(|h| json!({"artifact_id": h.artifact_id, "path": h.path, "excerpt": h.excerpt})).collect::<Vec<_>>(), "code_references": code_refs});
+    let mut ret = ret;
+    // CONTEXT_POLICY.max_packet_chars: bound the packet deterministically by dropping retrieved slices from the tail
+    let max = pol.get_i64("CONTEXT_POLICY", "max_packet_chars", 60000) as usize;
+    let det_len = serde_json::to_string(&det)?.len();
+    let mut truncated = 0usize;
+    loop {
+        let total = det_len + serde_json::to_string(&ret)?.len() + 400;
+        if total <= max { break; }
+        let mut dropped = false;
+        for key in ["code_references", "lessons_failures", "ranked_evidence"] { if let Some(a) = ret[key].as_array_mut() { if !a.is_empty() { a.pop(); dropped = true; truncated += 1; break; } } }
+        if !dropped { break; }
+    }
+    if truncated > 0 { ret["truncated_slices"] = json!(truncated); }
     let mut packet = json!({"packet_id": format!("CTX-{}-{}", task_id, &det_hash[..8]), "task": task_id, "deterministic_authority": det, "deterministic_hash": det_hash, "retrieved_intelligence": ret, "index_version": crate::INDEX_VERSION});
     let ph = hash_value(&json!({"d": packet["deterministic_authority"], "r": packet["retrieved_intelligence"]}));
     packet["packet_hash"] = Value::String(ph);
     packet["compiled_at"] = Value::String(now_iso());
     let chars = serde_json::to_string(&packet)?.len();
     packet["chars"] = json!(chars);
-    let max = pol.get_i64("CONTEXT_POLICY", "max_packet_chars", 60000) as usize;
-    if chars > max { packet["warning"] = json!(format!("packet exceeds CONTEXT_POLICY.max_packet_chars ({chars} > {max})")); }
+    if chars > max { packet["warning"] = json!(format!("deterministic authority block alone exceeds CONTEXT_POLICY.max_packet_chars ({chars} > {max}); split the task")); }
     write_json(&p.runtime_dir().join("context").join(format!("{task_id}.json")), &packet)?;
     Ok(packet)
 }

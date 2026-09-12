@@ -11,7 +11,9 @@ fn spec_subdir(class: &str, path: &str, low: &str) -> &'static str {
 }
 
 /// Build the migration catalogue (one entry per classified artefact) with actions, batches and verification.
-pub fn plan(root: &Path, classified: &[Value], product_test_dir: Option<&str>) -> Vec<Value> {
+pub fn plan(root: &Path, classified: &[Value], product_test_dir: Option<&str>, unused_code_action: &str) -> Vec<Value> {
+    // ARCHIVE_POLICY.unused_code_action: `remove_from_active_tree` (git preserves history) or `archive_reference`
+    let dead_action = if unused_code_action == "archive_reference" { "RETIRE" } else { "DELETE_FROM_ACTIVE_TREE" };
     let mut out = vec![];
     for c in classified {
         let path = c["path"].as_str().unwrap_or("").to_string();
@@ -35,14 +37,14 @@ pub fn plan(root: &Path, classified: &[Value], product_test_dir: Option<&str>) -
             "SPEC_AUTHORITATIVE" | "SPEC_DERIVED" | "RESEARCH_EVIDENCE" | "REPORT_EVIDENCE" | "TASK" | "DECISION" | "LESSON" => ("KEEP_IN_PLACE", None, class, "already in canonical location".into(), 0, false, json!({"semantic_index": true}), vec!["path_present"]),
             "PRODUCT_TEST" if misplaced => ("MOVE", Some(format!("{}/{}", product_test_dir.unwrap_or("tests"), name)), "PRODUCT_TEST", "test file relocated into the native test directory; imports updated".into(), 4, false, json!({"code_index": true}), vec!["path_present_at_target", "imports_resolve", "tests_run"]),
             "PRODUCT_TEST" => ("KEEP_IN_PLACE", None, "PRODUCT_TEST", "native test layout preserved (mapped via repository contract)".into(), 0, false, json!({"code_index": true}), vec!["tests_run"]),
-            "PRODUCT_SOURCE" if misplaced => ("MOVE", Some(format!("product/{}", name)), "PRODUCT_SOURCE", "source located outside the product tree; relocated (imports updated); human review advised".into(), 3, true, json!({"code_index": true}), vec!["path_present_at_target", "imports_resolve", "build_or_tests_run"]),
+            "PRODUCT_SOURCE" if misplaced => ("MOVE", Some(format!("product/{}", name)), "PRODUCT_SOURCE", "source located outside the product tree; relocated with imports rewritten (reversible: batch snapshot + independent tests; no human gate for a non-destructive move)".into(), 3, false, json!({"code_index": true}), vec!["path_present_at_target", "imports_resolve", "build_or_tests_run"]),
             "PRODUCT_SOURCE" | "TOOLING" | "DEVOPS" | "DATA_TEST" | "DATA_RUNTIME" => ("KEEP_IN_PLACE", None, class, "native product/devops/data layout preserved and described by the repository contract (§8.1, §79.3)".into(), 0, false, json!({"code_index": class == "PRODUCT_SOURCE"}), vec!["path_present"]),
-            "DEAD_OR_UNUSED" => ("RETIRE", None, "DEAD_OR_UNUSED", "no references found; remove from active tree (git preserves history) — destructive, requires human gate (§71)".into(), 7, true, json!({"semantic_index": false}), vec!["human_gate_answered", "path_absent_at_source", "build_or_tests_run"]),
+            "DEAD_OR_UNUSED" => (dead_action, None, "DEAD_OR_UNUSED", format!("no references found; ARCHIVE_POLICY.unused_code_action={unused_code_action} — destructive, requires an answered Human Decision Gate (§71)"), 7, true, json!({"semantic_index": false}), vec!["human_gate_answered", "path_absent_at_source", "build_or_tests_run"]),
             _ => ("KEEP_IN_PLACE", None, "UNKNOWN", "unknown artefact: blocks destructive batches until classified (protocol §8)".into(), 0, false, json!({}), vec!["classified_before_destructive_batches"]),
         };
         let finding_state = if class == "UNKNOWN" { "UNKNOWN" } else { "PRESENT" };
         out.push(json!({"artifact_id": c["artifact_id"], "current_path": path, "current_class": class, "authority": authority, "target_path": target, "target_class": target_class, "action": action, "reason": reason,
-            "references": [], "imports": [], "consumers": [], "index_policy": index_policy, "sensitivity": if class == "SECRET" { "secret" } else { "internal" },
+            "references": c.get("references").cloned().unwrap_or(json!([])), "imports": c.get("imports").cloned().unwrap_or(json!([])), "consumers": c.get("references").cloned().unwrap_or(json!([])), "index_policy": index_policy, "sensitivity": if class == "SECRET" { "secret" } else { "internal" },
             "rollback": "batch snapshot under .governance-runtime/migration/batch-<n>/ restored by `gov adopt rollback --batch <n>`; git history preserves deletions", "verification": verification, "batch": batch, "requires_human_gate": gate, "confidence": c["confidence"], "finding_state": finding_state}));
     }
     out

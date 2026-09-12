@@ -1,0 +1,18 @@
+id: SKL-THREAT-MODEL
+name: Security threat modelling
+version: 1.0.0
+status: ACTIVE
+model_agnostic: true
+roles: [security-engineer]
+task_classes: [security]
+purpose: "Produce a threat model and security analysis for a feature before implementation readiness."
+required_permissions: [READ_REPO]
+required_tools: [TOOL-FS-001, TOOL-SECRETS-001]
+inputs: [feature, interfaces, data model]
+outputs: [security analysis record, findings, readiness cell update]
+method:
+  - {step: assets, description: Enumerate assets, trust boundaries and data classes.}
+  - {step: threats, description: Enumerate threats per boundary with likelihood and impact.}
+  - {step: controls, description: Map controls and residual risk; record findings as tasks.}
+validation_scenarios:
+  - {id: V1, given: feature handling credentials, expect: secret-handling control listed and SECRET_READ scoped}

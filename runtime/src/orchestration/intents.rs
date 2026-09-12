@@ -16,11 +16,12 @@ pub fn route(p: &Project, text: &str) -> Result<Value> {
     let intent = ip["intent"].as_str().unwrap_or("UNKNOWN").to_string();
     let mut commands: Vec<String> = vec![];
     let store = RecordStore::load(&p.root);
-    let pending_cit = store.of_type("cit").into_iter().filter(|c| c.get("cit_status") == "SIMULATED").map(|c| c.id()).last();
+    let pending_cit = store.of_type("cit").into_iter().filter(|c| c.get("cit_status") == "SIMULATED").map(|c| c.id()).next_back();
     let pending_gate = store.of_type("human-gate").into_iter().filter(|g| matches!(g.get("gate_status").as_str(), "PENDING" | "PRESENTED")).map(|g| g.id()).next();
     match intent.as_str() {
         "DISCOVER" => { commands.push(format!("gov task create --class discovery --objective \"{}\"", text.replace('"', "'"))); commands.push("gov cit propose ... && gov cit simulate <CIT>".into()); }
-        "APPROVE" => { if let Some(g) = &pending_gate { commands.push(format!("gov decide {g} --option <id>")); } if let Some(c) = &pending_cit { commands.push(format!("gov cit approve {c} --by human")); commands.push(format!("gov cit execute {c}")); } commands.push("gov continue".into()); }
+        "APPROVE" => { if let Some(g) = &pending_gate { commands.push(format!("gov decide {g} --option <id>")); }
+            if let Some(c) = &pending_cit { commands.push(format!("gov cit approve {c} --by human")); commands.push(format!("gov cit execute {c}")); } commands.push("gov continue".into()); }
         "REJECT" => { if let Some(c) = &pending_cit { commands.push(format!("gov cit reject {c} --by human")); } }
         "STATUS" => commands.push("gov status".into()),
         "CONTINUE" => commands.push("gov continue".into()),

@@ -112,3 +112,18 @@ pub fn write_report(root: &Path, name: &str, work: &str, files: &[&str], tests_s
     std::fs::write(&f, serde_json::to_string(&v).unwrap()).unwrap();
     f.to_string_lossy().to_string()
 }
+
+/// Brownfield adoption through A6 (all batches; destructive entries stay gated). Returns (root, planner, executor).
+pub fn run_brownfield_to_a6(tag: &str) -> (PathBuf, Gov, Gov) {
+    let (root, planner) = setup_fixture("brownfield", tag, "S-planner");
+    let sql = read(&root, "memory/chat_history.sql");
+    let dbf = gov_runtime::memory::db::RuntimeDb::open(&root.join("memory/chat_history.sqlite")).unwrap();
+    dbf.conn.execute_batch(&format!("PRAGMA journal_mode=DELETE; {sql}")).unwrap(); drop(dbf);
+    std::fs::remove_file(root.join("memory/chat_history.sql")).unwrap();
+    git_commit_all(&root, "with chat db");
+    for s in ["baseline", "inventory", "classify", "map", "plan", "test-design"] { planner.ok(&["adopt", s]); }
+    planner.with_session("S-reviewer").with_role("migration-reviewer").ok(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"]);
+    let executor = planner.with_session("S-executor").with_role("migration-executor");
+    executor.ok(&["adopt", "migrate", "--name", "shipping-quotes", "--alias", "fx-brown"]);
+    (root, planner, executor)
+}

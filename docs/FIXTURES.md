@@ -14,3 +14,15 @@ hazards it contains and the scenario that exercises it; the harness is `tests/ce
 | 6 | `fixtures/multi-machine` | Rust | `multi_machine.rs` | clone without runtime → doctor → rebuild → identical manifest hash, status and deterministic context hash |
 | 7 | `fixtures/failure-injection` | Rust | `failure_injection.rs` | 13 injected faults detected by doctor/suite and repaired by recovery primitives (see fixture README table) |
 | — | architectural | Rust + Python | `arch.rs` | no toolchain coupling (core runs with only `git` on PATH), language-neutral kernel data, bash plugin satisfies API-0001, Rust/Python embedder bit-identical, ecosystem resolution per project, all kernel data + canonical records validate against schemas |
+
+## Repair regression scenarios (4.1.3)
+`tests/certification/repair.rs` adds one builder regression test per verifier root cause on top of the seven fixtures:
+embedder replaceable end-to-end with no silent fallback (C1), pin change escalates to a full rebuild and mixed indexes
+are detected (H1), reranker hook and benchmark/selection through a decision (H7), unmeasured held-out sets are never
+green, authority levels on executable paths (H3), mutation scope at task close (H4), claims survive rebuilds (H2),
+budget gate on parallel claims, destructive gate records vs. `--gate-answer` (H6), sensitivity classes and namespace
+roles (H5), CIT auto-simulation + secret redaction, update approval gate, freeze on adoption/upstream, context
+authority layers, implementation-task prerequisites + bare-identifier symbol route, embedded kernel, policy coverage
+map, and a plugin response larger than the pipe buffer through the CLI (C2; unit tests in `capabilities/host.rs`).
+`fixtures/update/previous-release/4.1.1/` is a stored synthetic 4.1.1 payload (108 files, `SYNTHETIC.md`) used by the
+framework-update fixture instead of deriving the previous release in-test (M16).

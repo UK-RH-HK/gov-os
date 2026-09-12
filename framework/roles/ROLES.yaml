@@ -6,6 +6,10 @@ authority_levels:
   L3: {name: change controller, mutation: cross-artifact state transaction}
   L4: {name: orchestrator/CTO, mutation: planning, routing, dispatch and coordination}
   L5: {name: human/product owner, mutation: final authority at defined gates}
+# Role groups referenced by MEMORY_POLICY.namespaces.<ns>.roles (namespace/role retrieval filter).
+groups:
+  engineering: [orchestrator, architecture-agent, frontend-engineer, backend-engineer, data-engineer, integration-engineer, ai-ml-engineer, devops-engineer, security-engineer, performance-engineer, independent-test-designer, test-execution-agent, integration-agent, change-controller, memory-engineer, tooling-engineer, independent-auditor, release-agent, migration-executor, migration-reviewer, migration-verifier, memory-verifier, human]
+  product: [orchestrator, product-spec-agent, ux-agent, research-agent, data-author, routine-documentation, human]
 roles:
   - {id: orchestrator, name: CTO / Senior Full-Stack Orchestrator, level: L4, minimum_tier: T3, default_reasoning: high}
   - {id: product-spec-agent, name: Product/Specification Agent, level: L2, minimum_tier: T2, default_reasoning: medium}

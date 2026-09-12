@@ -1,30 +1,14 @@
 //! Fixture 4 — framework update from a synthetic previous release 4.1.1 to the 4.1.2 candidate, then rollback.
 use crate::common::*;
 use serde_json::{json, Value};
-use std::path::Path;
 
-/// Derive the synthetic 4.1.1 kernel payload from the current framework (differences documented in fixtures/update/README.md).
-fn make_previous_release(dst: &Path) {
-    let src = canonical_root().join("framework");
-    copy_dir(&src, dst);
-    copy_dir(&canonical_root().join("tools"), &dst.join("tools"));
-    let mut k = gov_runtime::util::read_yaml(&dst.join("KERNEL.yaml")).unwrap();
-    k["version"] = json!("4.1.1"); k["cli_version"] = json!("4.1.1"); k["runtime_version"] = json!("4.1.1"); k["supported_from_versions"] = json!([]);
-    k["payload_dirs"] = json!(["constitution", "policies", "schemas", "skills", "adapters", "roles", "taxonomy", "commands", "overlay-templates", "tools"]);
-    gov_runtime::util::write_yaml(&dst.join("KERNEL.yaml"), &k).unwrap();
-    std::fs::remove_file(dst.join("policies/LEARNING_POLICY.yaml")).unwrap();
-    std::fs::remove_file(dst.join("policies/ARCHIVE_POLICY.yaml")).unwrap();
-    std::fs::remove_file(dst.join("overlay-templates/PROJECT_EXCEPTIONS.yaml")).unwrap();
-    std::fs::remove_file(dst.join("schemas/project-exceptions.schema.json")).unwrap();
-    let pp = std::fs::read_to_string(dst.join("overlay-templates/PROJECT_POLICY.yaml")).unwrap().replace("schema_version: 1.0.0", "schema_version: 0.9.0").replace("gates:\n  presentation_channel: chat\n", "human_gates:\n  channel: chat\n");
-    std::fs::write(dst.join("overlay-templates/PROJECT_POLICY.yaml"), pp).unwrap();
-}
+/// The synthetic previous release is stored immutably under fixtures/update/previous-release/4.1.1 (see README).
+fn previous_release() -> std::path::PathBuf { canonical_root().join("fixtures/update/previous-release/4.1.1") }
 
 #[test]
 fn update_from_previous_release_preserves_project_and_rolls_back() {
     let root = tmp("update");
-    let prev = root.join("_prev-4.1.1"); std::fs::create_dir_all(&prev).unwrap();
-    make_previous_release(&prev);
+    let prev = previous_release();
     let proj = root.join("project"); std::fs::create_dir_all(&proj).unwrap();
     write(&proj, "README.md", "# upd project\n");
     git_init_commit(&proj);
@@ -44,19 +28,21 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
     let overlay_before = tree_hash(&proj.join("governance/project"), &[]);
     // --- check (CIT-P) ---
     let chk = g.ok(&["update", "--check"]);
-    assert_eq!(chk["current"], "4.1.1"); assert_eq!(chk["available"], "4.1.2");
-    assert_eq!(chk["migration_path"][0], "M-4.1.1-4.1.2"); assert_eq!(chk["compatible"], true);
+    assert_eq!(chk["current"], "4.1.1"); assert_eq!(chk["available"], gov_runtime::VERSION);
+    assert_eq!(chk["migration_path"][0], "M-4.1.1-4.1.2"); assert_eq!(chk["migration_path"][1], "M-4.1.2-4.1.3"); assert_eq!(chk["compatible"], true);
     assert_eq!(chk["human_gate_required"], true, "uncertified target must require a human gate: {chk}");
     assert!(chk["impact"]["consequences"].to_string().contains("not touched"));
-    // --- apply without approval → gate ---
+    // --- apply without approval → gate; --approve without an answered gate does nothing (INV-008) ---
     let e = g.err(&["update", "--apply"]);
     assert_eq!(e.error_code(), "HUMAN_GATE_REQUIRED");
-    assert!(g.ok(&["gate", "list"]).as_array().unwrap().len() >= 1);
+    let gid = e.details()["gate"].as_str().unwrap().to_string();
+    assert_eq!(g.ok(&["update", "--apply", "--approve", "--by", "owner"])["applied"], false);
+    g.ok(&["gate", "present", &gid]); g.ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
     // --- apply with approval (spec/ measured from here: the gate record above is legitimate governance state) ---
     let spec_before = tree_hash(&proj.join("spec"), &["audits/**", "reports/**"]);
     let ap = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);
-    assert_eq!(ap["applied"], true); assert_eq!(ap["to"], "4.1.2");
-    assert_eq!(yaml(&proj, "governance/framework.lock")["version"], "4.1.2");
+    assert_eq!(ap["applied"], true); assert_eq!(ap["to"], gov_runtime::VERSION);
+    assert_eq!(yaml(&proj, "governance/framework.lock")["version"], gov_runtime::VERSION);
     assert_eq!(yaml(&proj, "governance/framework.lock")["lock_schema_version"], "1.0.0");
     let pp2 = yaml(&proj, "governance/project/PROJECT_POLICY.yaml");
     assert_eq!(pp2["gates"]["presentation_channel"], "chat"); assert!(pp2.get("human_gates").is_none());
@@ -66,12 +52,12 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
     assert!(exists(&proj, "governance/project/PROJECT_EXCEPTIONS.yaml"));
     assert!(exists(&proj, "governance/kernel/policies/LEARNING_POLICY.yaml") && exists(&proj, "governance/kernel/policies/ARCHIVE_POLICY.yaml"));
     assert_eq!(tree_hash(&proj.join("spec"), &["audits/**", "reports/**"]), spec_before, "spec/ must not change on framework update (INV-013)");
-    assert!(read(&proj, "spec/reports/framework-updates.jsonl").contains("\"to\":\"4.1.2\""));
+    assert!(read(&proj, "spec/reports/framework-updates.jsonl").contains(&format!("\"to\":\"{}\"", gov_runtime::VERSION)));
     let d = g.run(&["doctor"]);
     let checks = if d.ok() { d.result() } else { d.details() };
     assert!(checks["checks"].as_array().unwrap().iter().all(|c| c["ok"] == true || c["severity"] != "critical"), "no critical doctor finding after update: {}", checks["checks"]);
     assert_eq!(json(&proj, "governance/generated/adapter-manifest.json")["kernel_hash"], yaml(&proj, "governance/framework.lock")["kernel_manifest_hash"]);
-    assert_eq!(g.ok(&["status"])["framework"]["version"], "4.1.2");
+    assert_eq!(g.ok(&["status"])["framework"]["version"], gov_runtime::VERSION);
     // --- rollback ---
     let rb = g.ok(&["update", "--rollback"]);
     assert_eq!(rb["rolled_back_to"], "4.1.1"); assert_eq!(rb["kernel_ok"], true);

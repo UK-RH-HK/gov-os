@@ -48,25 +48,43 @@ pub fn generate_registry(p: &Project) -> Result<Value> {
         }
     }
     let reg = json!({"generated_from": {"kernel": p.lock().map(|l| l["kernel_manifest_hash"].clone()).unwrap_or(Value::Null), "overlay": p.overlay().hash(), "generated_at": now_iso()}, "tools": tools, "mcp_servers": servers, "role_exposure": exposure});
-    write_json(&p.generated_dir().join("tool-registry.json"), &reg)?;
+    let path = p.policies().get_str("TOOL_POLICY", "mcp.registry_path", "governance/generated/tool-registry.json");
+    write_json(&p.root.join(path), &reg)?;
     Ok(reg)
 }
+
+/// Languages of the governed project's detected ecosystems (used to resolve native tooling, never the OS language).
+pub fn project_languages(p: &Project) -> Vec<String> {
+    let eco = crate::capabilities::ecosystems::detect(&p.root, &[p.contract().root("product")]);
+    let mut v: Vec<String> = eco["ecosystems"].as_array().map(|a| a.iter().flat_map(|e| e["languages"].as_array().cloned().unwrap_or_default()).filter_map(|l| l.as_str().map(|s| s.to_string())).collect()).unwrap_or_default();
+    v.sort(); v.dedup(); v
+}
+
+fn tool_languages(t: &Value) -> Vec<String> { t["languages"].as_array().map(|a| a.iter().filter_map(|x| x.as_str().map(|s| s.to_string())).collect()).unwrap_or_default() }
 
 pub fn resolve(p: &Project, role: &str, capability: &str) -> Result<Value> {
     let perms = role_permissions(p, role);
     let mut tools = kernel_tools(p); tools.extend(project_tools(p));
+    let langs = project_languages(p);
+    // a tool tagged with `languages` applies only to governed projects of those languages (registry-driven, not OS-driven)
+    let lang_ok = |t: &Value| { let tl = tool_languages(t); tl.is_empty() || tl.iter().any(|l| langs.contains(l)) };
     let matches: Vec<Value> = tools.iter().filter(|t| t["capabilities"].as_array().map(|a| a.iter().any(|c| c.as_str() == Some(capability))).unwrap_or(false)).cloned().collect();
-    let usable: Vec<Value> = matches.iter().filter(|t| t["status"].as_str() == Some("active") && role_allowed(t, role, &perms)).map(|t| json!({"tool_id": t["tool_id"], "name": t["name"], "type": t["type"], "version": t["version"]})).collect();
+    let usable: Vec<Value> = matches.iter().filter(|t| t["status"].as_str() == Some("active") && role_allowed(t, role, &perms) && lang_ok(t)).map(|t| json!({"tool_id": t["tool_id"], "name": t["name"], "type": t["type"], "version": t["version"], "languages": t["languages"], "available": t["health_check"]["command"].as_array().and_then(|c| c.first()).and_then(|c| c.as_str()).map(crate::capabilities::ecosystems::binary_available)})).collect();
     let mcp: Vec<Value> = mcp_servers(p).into_iter().filter(|s| s["capabilities"].as_array().map(|a| a.iter().any(|c| c.as_str() == Some(capability))).unwrap_or(false) && s["status"].as_str() == Some("active") && role_allowed(s, role, &perms)).map(|s| json!({"mcp_id": s["id"], "name": s["name"]})).collect();
     let gap = usable.is_empty() && mcp.is_empty();
-    let reason = if gap { if matches.is_empty() { "no registered tool provides this capability" } else if matches.iter().any(|t| t["status"].as_str() != Some("active")) { "a tool exists but is not active (proposed/deprecated)" } else { "role lacks approval or permission classes for the available tool" } } else { "" };
-    Ok(json!({"role": role, "capability": capability, "tools": usable, "mcp_servers": mcp, "capability_gap": gap, "reason": reason, "next": if gap { "gov tools install --descriptor <file> (checks TOOL_POLICY auto-install conditions) or raise a tooling task" } else { "" }}))
+    let reason = if gap { if matches.is_empty() { "no registered tool provides this capability" } else if matches.iter().all(|t| !lang_ok(t)) { "registered tools for this capability target other languages than the governed project's" } else if matches.iter().any(|t| t["status"].as_str() != Some("active")) { "a tool exists but is not active (proposed/deprecated)" } else { "role lacks approval or permission classes for the available tool" } } else { "" };
+    Ok(json!({"role": role, "capability": capability, "project_languages": langs, "tools": usable, "mcp_servers": mcp, "capability_gap": gap, "reason": reason, "next": if gap { "gov tools install --descriptor <file> (checks TOOL_POLICY auto-install conditions) or raise a tooling task" } else { "" }}))
 }
 
 /// Install/register a tool only when every TOOL_POLICY auto-install condition holds; otherwise raise a Human Decision Gate.
 pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Result<Value> {
     crate::orchestration::control::guard_write(p, "tools install")?;
+    crate::authority::require(p, "install_tool")?;
     let pol = p.policies();
+    if pol.get_bool("TOOL_POLICY", "health_check_required", true) && descriptor.get("health_check").and_then(|h| h.get("kind")).is_none() { return Err(GovError::new("USAGE", "TOOL_POLICY.health_check_required: the descriptor must declare health_check.kind")); }
+    let tool_types = pol.get_list("TOOL_POLICY", "tool_types");
+    if let Some(t) = descriptor.get("type").and_then(|v| v.as_str()) { if !tool_types.is_empty() && !tool_types.iter().any(|x| x == t) { return Err(GovError::new("USAGE", format!("tool type '{t}' is not in TOOL_POLICY.tool_types {tool_types:?}"))); } }
+    let conditions = pol.get_list("TOOL_POLICY", "auto_install_conditions");
     let install_roles: Vec<String> = p.overlay().get("TOOL_PERMISSIONS.yaml").get("install_authority_roles").and_then(|v| v.as_array()).map(|a| a.iter().filter_map(|x| x.as_str().map(|s| s.to_string())).collect()).unwrap_or_default();
     let approved_licences = pol.get_list("TOOL_POLICY", "approved_licences");
     let max_cost = pol.get_f64("BUDGET_POLICY", "defaults.max_install_cost_usd", 0.0);
@@ -86,10 +104,12 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
     push("version_pinned_and_recorded", descriptor["version_pin"].as_str().map(|s| !s.is_empty()).unwrap_or(false), "descriptor.version_pin".into());
     push("tool_registered", true, "will be registered under governance/project/tools/".into());
     push("environment_reproducible", descriptor["install_command"].as_array().map(|a| !a.is_empty()).unwrap_or(false) && descriptor["uninstall_command"].as_array().map(|a| !a.is_empty()).unwrap_or(false), "install and uninstall commands declared".into());
+    // only the conditions the policy declares are evaluated (all must hold)
+    let checks: Vec<Value> = checks.into_iter().filter(|c| conditions.is_empty() || conditions.iter().any(|n| n == c["condition"].as_str().unwrap_or(""))).collect();
     let all_ok = checks.iter().all(|c| c["ok"].as_bool().unwrap_or(false));
     if !all_ok {
         let failed: Vec<String> = checks.iter().filter(|c| !c["ok"].as_bool().unwrap_or(false)).map(|c| c["condition"].as_str().unwrap_or("").to_string()).collect();
-        let gate = gates::create(p, json!({"question": format!("Approve installation of tool {tool_id}? Automatic installation conditions failed: {}", failed.join(", ")), "why_now": "a task requires a capability that is not available", "current_state": "tool not installed", "options": [{"id": "A", "description": "approve installation as described"}, {"id": "B", "description": "reject; find an alternative"}], "impact": "adds an executable capability to the environment", "reversibility": if descriptor["reversible"].as_bool().unwrap_or(false) { "reversible" } else { "irreversible or unknown" }, "recommendation": "B unless the tool is essential", "confidence": 0.6, "trigger": "tool_install", "impact_radius": "R2"}))?;
+        let gate = gates::create_system(p, json!({"question": format!("Approve installation of tool {tool_id}? Automatic installation conditions failed: {}", failed.join(", ")), "why_now": "a task requires a capability that is not available", "current_state": "tool not installed", "options": [{"id": "A", "description": "approve installation as described"}, {"id": "B", "description": "reject; find an alternative"}], "impact": "adds an executable capability to the environment", "reversibility": if descriptor["reversible"].as_bool().unwrap_or(false) { "reversible" } else { "irreversible or unknown" }, "recommendation": "B unless the tool is essential", "confidence": 0.6, "trigger": "tool_install", "impact_radius": "R2"}))?;
         return Ok(json!({"installed": false, "human_gate": gate["id"], "checks": checks}));
     }
     let mut desc = descriptor.clone();

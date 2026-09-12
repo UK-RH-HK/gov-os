@@ -60,7 +60,13 @@ pub fn summary(p: &Project) -> Result<Value> {
         *cost_by_class.entry(class).or_insert(0.0) += r.data.get("cost").and_then(|c| c.get("usd")).and_then(|v| v.as_f64()).unwrap_or(0.0);
     }
     let gates_by_feature: BTreeMap<String, usize> = store.of_type("human-gate").iter().fold(BTreeMap::new(), |mut m, g| { for t in g.list("blocks_tasks") { let f = store.get(&t).map(|x| x.get("feature")).unwrap_or_default(); *m.entry(f).or_insert(0) += 1; } m });
+    // BUDGET_POLICY.defaults.max_network_calls_per_task: network.call events per task vs budget
+    let max_net = p.policies().get_i64("BUDGET_POLICY", "defaults.max_network_calls_per_task", 200);
+    let mut net_by_task: BTreeMap<String, i64> = BTreeMap::new();
+    for e in &evs { if e["name"] == "network.call" { *net_by_task.entry(e["attributes"]["task"].as_str().unwrap_or("unassigned").to_string()).or_insert(0) += 1; } }
+    let net_over: Vec<Value> = net_by_task.iter().filter(|(_, n)| **n > max_net).map(|(t, n)| json!({"task": t, "network_calls": n, "budget": max_net})).collect();
     Ok(json!({
+        "budget": {"max_network_calls_per_task": max_net, "network_calls_by_task": net_by_task, "over_budget": net_over, "max_parallel_agents": p.policies().get_i64("BUDGET_POLICY", "defaults.max_parallel_agents", 4), "active_sessions": crate::orchestration::claims::active_sessions(p).unwrap_or_default()},
         "events": evs.len(),
         "commands": by_cmd.iter().map(|(k, (n, ok, ms))| json!({"name": k, "count": n, "ok": ok, "avg_ms": if *n > 0 { *ms as f64 / *n as f64 } else { 0.0 }})).collect::<Vec<_>>(),
         "retrieval": {"queries": retrieval.0, "avg_latency_ms": if retrieval.0 > 0 { retrieval.1 as f64 / retrieval.0 as f64 } else { 0.0 }, "avg_hits": if retrieval.0 > 0 { retrieval.2 as f64 / retrieval.0 as f64 } else { 0.0 }},

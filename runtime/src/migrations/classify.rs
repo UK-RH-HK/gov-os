@@ -22,8 +22,9 @@ pub fn legacy_mechanisms(root: &Path) -> Vec<LegacyItem> {
 fn kinds(item: &Value) -> Vec<String> { item["kinds"].as_array().map(|a| a.iter().filter_map(|k| k.as_str().map(|s| s.to_string())).collect()).unwrap_or_default() }
 
 /// Build a reverse import graph over source files to detect dead/unused modules (heuristic, low confidence).
-fn imported_files(root: &Path, items: &[Value]) -> HashSet<String> {
-    let mut imported = HashSet::new();
+/// Import graph over the inventory: (importer path, imported path) edges resolved loosely by module stem.
+fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)> {
+    let mut edges: Vec<(String, String)> = vec![];
     let plugins: Vec<crate::capabilities::protocol::PluginDescriptor> = vec![];
     for it in items {
         let rel = it["path"].as_str().unwrap_or("");
@@ -37,14 +38,16 @@ fn imported_files(root: &Path, items: &[Value]) -> HashSet<String> {
             // resolve loosely: any file whose stem matches the last import segment
             let last = imp.trim_start_matches('.').rsplit(['.', '/', ':']).next().unwrap_or("").to_string();
             if last.is_empty() { continue; }
-            for other in items { let op = other["path"].as_str().unwrap_or(""); let stem = Path::new(op).file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default(); if op != rel && (stem == last || (stem == "__init__" && op.contains(&format!("/{last}/")) || op.ends_with(&format!("{last}/mod.rs")) || op.ends_with(&format!("{last}/index.ts")) || op.ends_with(&format!("{last}/index.js")))) { imported.insert(op.to_string()); } }
+            for other in items { let op = other["path"].as_str().unwrap_or(""); let stem = Path::new(op).file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default(); if op != rel && (stem == last || (stem == "__init__" && op.contains(&format!("/{last}/")) || op.ends_with(&format!("{last}/mod.rs")) || op.ends_with(&format!("{last}/index.ts")) || op.ends_with(&format!("{last}/index.js")))) { let e = (rel.to_string(), op.to_string()); if !edges.contains(&e) { edges.push(e); } } }
         }
     }
-    imported
+    edges
 }
 
+
 pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
-    let imported = imported_files(root, items);
+    let edges = import_edges(root, items);
+    let imported: HashSet<String> = edges.iter().map(|(_, to)| to.clone()).collect();
     let mut records: HashMap<String, Value> = HashMap::new();
     let mut supersedes: HashMap<String, String> = HashMap::new(); // superseded id -> superseder
     for it in items {
@@ -102,7 +105,9 @@ pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
         else if has("doc") { class = "SPEC_DERIVED"; authority = "ACTIVE"; confidence = 0.6; reasons.push("narrative documentation".into()); }
         else if has("config") { class = "TOOLING"; authority = "ACTIVE"; confidence = 0.7; reasons.push("configuration".into()); }
         else if has("binary") { class = "DATA_RUNTIME"; authority = "ACTIVE"; confidence = 0.5; reasons.push("binary file".into()); }
-        out.push(json!({"artifact_id": format!("ART-{n:05}"), "path": rel, "class": class, "authority": authority, "confidence": confidence, "reasons": reasons, "kinds": k, "git_tracked": it["git_tracked"], "size": it["size"], "hash": it["hash"]}));
+        let imports: Vec<&str> = edges.iter().filter(|(from, _)| from == &rel).map(|(_, to)| to.as_str()).collect();
+        let references: Vec<&str> = edges.iter().filter(|(_, to)| to == &rel).map(|(from, _)| from.as_str()).collect();
+        out.push(json!({"artifact_id": format!("ART-{n:05}"), "path": rel, "class": class, "authority": authority, "confidence": confidence, "reasons": reasons, "kinds": k, "git_tracked": it["git_tracked"], "size": it["size"], "hash": it["hash"], "imports": imports, "references": references}));
     }
     out
 }

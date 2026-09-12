@@ -45,7 +45,7 @@ fn brownfield_adoption_end_to_end() {
     assert_eq!(e(".cursorrules")["action"], "MOVE"); assert!(e(".cursorrules")["target_path"].as_str().unwrap().starts_with("archive/governance/legacy-rules/"));
     assert_eq!(e("memory/chat_history.sqlite")["action"], "EXTRACT");
     assert_eq!(e(".index/vectors.json")["action"], "DELETE_FROM_ACTIVE_TREE");
-    assert_eq!(e("src/app/old_export.py")["action"], "RETIRE"); assert_eq!(e("src/app/old_export.py")["requires_human_gate"], true);
+    assert_eq!(e("src/app/old_export.py")["action"], "DELETE_FROM_ACTIVE_TREE", "ARCHIVE_POLICY.unused_code_action=remove_from_active_tree drives the planned action"); assert_eq!(e("src/app/old_export.py")["requires_human_gate"], true);
     assert_eq!(e("docs/old/decision-2-copy.yaml")["action"], "MOVE"); assert_eq!(e("docs/old/decision-2-copy.yaml")["target_path"], "spec/decisions/decision-2-copy.yaml");
     assert_eq!(e("src/app/retry.py")["action"], "KEEP_IN_PLACE");
     planner.ok(&["adopt", "plan"]); planner.ok(&["adopt", "test-design"]);
@@ -60,6 +60,13 @@ fn brownfield_adoption_end_to_end() {
     assert!(exists(&root, "tests/test_utils.py"));
     assert!(exists(&root, "src/app/old_export.py"), "dead code must not be deleted without a human gate");
     assert!(exists(&root, ".env") && exists(&root, "config/secrets.yaml") && exists(&root, "src/app/config.py"), "secrets are never moved by automation");
+    // destructive entries carry gate records; the executor (L3) relays the human's answers, then batch 7 executes
+    let cat2: Vec<serde_json::Value> = read(&root, "spec/audits/GOVERNANCE-ADOPTION/04-TARGET-PATH-MAP.jsonl").lines().map(|l| serde_json::from_str(l).unwrap()).collect();
+    let gates: Vec<String> = cat2.iter().filter(|e| e["requires_human_gate"] == true).map(|e| e["human_gate"].as_str().expect("gate record per destructive entry").to_string()).collect();
+    assert!(gates.len() >= 2, "{gates:?}");
+    for gid in &gates { executor.ok(&["gate", "present", gid]); executor.ok(&["decide", gid, "--option", "A", "--by", "owner"]); }
+    executor.ok(&["adopt", "migrate", "--batch", "7"]);
+    assert!(!exists(&root, "src/app/old_export.py") && !exists(&root, "docs/legacy_module.py"), "answered gates => dead code removed from the active tree");
     assert!(exists(&root, "spec/decisions/decision-2-copy.yaml"));
     assert!(exists(&root, "memory/chat_history.sqlite"), "memory stores are inspected/extracted in A8, not retired blindly in A6");
     // A7 independent verification

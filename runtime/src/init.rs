@@ -56,7 +56,10 @@ pub fn contract_with_native_layout(kernel_dir: &Path, root: &Path) -> Result<Val
 
 pub fn ensure_roots(root: &Path) -> Result<()> {
     for d in SPEC_DIRS { let p = root.join("spec").join(d); std::fs::create_dir_all(&p)?; let keep = p.join(".gitkeep"); if !keep.exists() && std::fs::read_dir(&p)?.next().is_none() { write_text(&keep, "")?; } }
-    for d in ARCHIVE_DIRS { let p = root.join("archive").join(d); std::fs::create_dir_all(&p)?; let keep = p.join(".gitkeep"); if !keep.exists() && std::fs::read_dir(&p)?.next().is_none() { write_text(&keep, "")?; } }
+    // ARCHIVE_POLICY.archive_root / archive_subdirs decide the archive layout
+    let pr = Project::open(root);
+    let (archive_root, subdirs): (String, Vec<String>) = if pr.is_installed() { let pol = pr.policies(); let subs = pol.get_list("ARCHIVE_POLICY", "archive_subdirs"); (pol.get_str("ARCHIVE_POLICY", "archive_root", "archive"), if subs.is_empty() { ARCHIVE_DIRS.iter().map(|s| s.to_string()).collect() } else { subs }) } else { ("archive".into(), ARCHIVE_DIRS.iter().map(|s| s.to_string()).collect()) };
+    for d in &subdirs { let p = root.join(&archive_root).join(d); std::fs::create_dir_all(&p)?; let keep = p.join(".gitkeep"); if !keep.exists() && std::fs::read_dir(&p)?.next().is_none() { write_text(&keep, "")?; } }
     std::fs::create_dir_all(root.join("product"))?;
     std::fs::create_dir_all(root.join("governance").join("generated"))?;
     let tests = root.join("governance").join("tests").join("memory");
@@ -74,16 +77,18 @@ pub fn ensure_roots(root: &Path) -> Result<()> {
 pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
     let gov = root.join("governance");
     if gov.join("framework.lock").exists() && !opts.force { return Err(GovError::new("ALREADY_INSTALLED", format!("{} already has a Governance OS installation (use gov update, or --force to reinstall the kernel)", root.display()))); }
+    { let p0 = Project::open(root); if p0.is_installed() { crate::authority::require(&p0, "install_kernel")?; } else if crate::authority::parse_level(&format!("L{}", 0)).is_some() { /* uninstalled repository: authority is checked against the kernel being installed below */ } }
     let src = resolve_kernel_source(opts.source.as_deref().map(Path::new))?;
     std::fs::create_dir_all(&gov)?;
     let manifest = install_kernel(Some(&src), &gov)?;
     let commit = Project::open(root).git_commit();
-    let lock = write_lock(&gov.join("framework.lock"), &manifest, &src.to_string_lossy(), Some(&commit))?;
+    let lock = write_lock(&gov.join("framework.lock"), &manifest, &crate::kernel::source_label(&src), Some(&commit))?;
     let contract = contract_with_native_layout(&gov.join("kernel"), root)?;
     let overlay = write_overlay(root, &gov.join("kernel"), &opts, Some(contract))?;
     ensure_roots(root)?;
     let mut p = Project::open(root);
     p.invalidate();
+    crate::authority::require(&p, "install_kernel").inspect_err(|_e| { let _ = std::fs::remove_file(gov.join("framework.lock")); })?;
     if let Some(intent) = &opts.intent {
         let store = crate::records::RecordStore::load(root);
         if store.of_type("project").is_empty() {
@@ -94,9 +99,17 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
     let registry = crate::tools::generate_registry(&p)?;
     let adapters = crate::adapters::generate(&p)?;
     let mut index = Value::Null;
-    if !opts.skip_index { let r = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false })?; index = json!({"artifacts": r.counts["artifacts"], "manifest_hash": r.manifest_hash, "excluded": r.excluded.len(), "ecosystems": r.ecosystems["count"]}); }
+    let mut heldout_generated = 0usize;
+    if !opts.skip_index {
+        let r = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
+        index = json!({"artifacts": r.counts["artifacts"], "manifest_hash": r.manifest_hash, "excluded": r.excluded.len(), "ecosystems": r.ecosystems["count"], "embedder": r.embedder});
+        // a starter held-out set so that memory recall is measured from day one (framework §17; verifier HV-20)
+        let held = root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml"));
+        let existing = read_yaml(&held).ok().and_then(|h| h["queries"].as_array().map(|a| a.len())).unwrap_or(0);
+        if existing == 0 { let db = crate::memory::db::RuntimeDb::open(&p.db_path())?; let set = crate::memory::heldout::generate_starter(&p, &db, "gov init")?; heldout_generated = set["queries"].as_array().map(|a| a.len()).unwrap_or(0); drop(db); write_yaml(&held, &set)?; let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() })?; }
+    }
     let conformance = crate::verification::audit(&p, &crate::verification::SuiteOptions { deep: false, families: vec![] }, true)?;
-    if !opts.skip_index { let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true })?; }
+    if !opts.skip_index { let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() })?; }
     let doctor = crate::doctor::run(&p)?; // reported on the final, fresh state
-    Ok(json!({"root": root.display().to_string(), "version": lock["version"], "release_hash": lock["release_hash"], "kernel_files": manifest["files"].as_object().map(|m| m.len()).unwrap_or(0), "overlay_written": overlay, "tools": registry["tools"].as_array().map(|a| a.len()).unwrap_or(0), "adapters": adapters["adapters"].as_object().map(|m| m.len()).unwrap_or(0), "index": index, "doctor": doctor.verdict, "conformance": {"audit": conformance["audit"], "verdict": conformance["verdict"]}}))
+    Ok(json!({"root": root.display().to_string(), "version": lock["version"], "release_hash": lock["release_hash"], "source": lock["source"], "kernel_files": manifest["files"].as_object().map(|m| m.len()).unwrap_or(0), "overlay_written": overlay, "tools": registry["tools"].as_array().map(|a| a.len()).unwrap_or(0), "adapters": adapters["adapters"].as_object().map(|m| m.len()).unwrap_or(0), "index": index, "heldout_generated": heldout_generated, "doctor": doctor.verdict, "conformance": {"audit": conformance["audit"], "verdict": conformance["verdict"]}}))
 }

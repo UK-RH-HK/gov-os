@@ -1,3 +1,1 @@
-   Compiling gov-runtime v4.1.2 (/home/usain/Dynamic-Agentic-Engineering-OS/runtime)
-   Compiling gov-cli v4.1.2 (/home/usain/Dynamic-Agentic-Engineering-OS/cli)
-    Finished `release` profile [optimized] target(s) in 9.12s
+    Finished `release` profile [optimized] target(s) in 0.05s

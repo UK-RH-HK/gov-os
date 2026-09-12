@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.2/release-manifest.schema.json",
   "title": "release-manifest",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "framework": {
@@ -80,6 +80,7 @@
           "enum": [
             "UNCERTIFIED",
             "READY_FOR_INDEPENDENT_OS_VERIFICATION",
+            "READY_FOR_INDEPENDENT_REVERIFICATION",
             "CERTIFIED",
             "REJECTED"
           ]

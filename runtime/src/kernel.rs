@@ -7,33 +7,55 @@ use std::path::{Path, PathBuf};
 
 pub const KERNEL_MANIFEST: &str = "KERNEL_MANIFEST.json";
 
-/// The canonical repository root when running from a source checkout (CARGO_MANIFEST_DIR/..).
-pub fn canonical_root() -> Option<PathBuf> {
-    let candidates = [
-        std::env::var("GOV_CANONICAL_ROOT").ok().map(PathBuf::from),
-        Some(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..")),
-        std::env::current_exe().ok().and_then(|p| p.parent().map(|d| d.join("../.."))),
-    ];
-    for c in candidates.into_iter().flatten() {
-        if c.join("framework").join("KERNEL.yaml").exists() {
-            return Some(c.canonicalize().unwrap_or(c));
-        }
-    }
-    None
+/// The kernel payload compiled into the binary (build.rs embeds framework/, migrations/ and tools/), so a single
+/// `gov` executable can install a kernel on any machine without the source checkout (D-0002, verifier M6).
+pub mod embedded {
+    include!(concat!(env!("OUT_DIR"), "/embedded_kernel.rs"));
+    pub fn version() -> &'static str { EMBEDDED_VERSION }
+    pub fn files() -> &'static [(&'static str, &'static [u8])] { EMBEDDED_FILES }
 }
 
-/// Accepts: None (bundled canonical framework/), a canonical repo root, a framework/ dir, a built release dir, or a kernel dir.
+/// Materialise the embedded payload into a per-user cache directory (idempotent, content-addressed).
+pub fn embedded_kernel_dir() -> Result<PathBuf> {
+    let files = embedded::files();
+    let mut listing: Vec<(String, String)> = files.iter().map(|(p, b)| (p.to_string(), crate::util::sha256_hex(b))).collect();
+    listing.sort();
+    let id = crate::util::sha256_text(&serde_json::to_string(&listing)?);
+    let base = std::env::var("GOV_KERNEL_CACHE").ok().map(PathBuf::from).or_else(|| std::env::var("XDG_CACHE_HOME").ok().map(|c| PathBuf::from(c).join("gov"))).or_else(|| std::env::var("HOME").ok().map(|h| PathBuf::from(h).join(".cache").join("gov"))).unwrap_or(std::env::temp_dir().join("gov-cache"));
+    let dir = base.join("kernels").join(format!("{}-{}", embedded::version(), &id[..12]));
+    if dir.join("KERNEL.yaml").exists() && dir.join(".complete").exists() { return Ok(dir); }
+    let staging = base.join("kernels").join(format!(".staging-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&staging);
+    for (rel, bytes) in files { let p = staging.join(rel); if let Some(d) = p.parent() { std::fs::create_dir_all(d)?; } std::fs::write(&p, bytes)?; }
+    std::fs::write(staging.join(".complete"), id.as_bytes())?;
+    if dir.exists() { let _ = std::fs::remove_dir_all(&staging); } else if let Err(e) = std::fs::rename(&staging, &dir) { let _ = std::fs::remove_dir_all(&staging); if !dir.join(".complete").exists() { return Err(GovError::io("materialise embedded kernel", e)); } }
+    Ok(dir)
+}
+
+/// The canonical repository root, only when explicitly provided (GOV_CANONICAL_ROOT); no build path is baked in.
+pub fn canonical_root() -> Option<PathBuf> {
+    let c = std::env::var("GOV_CANONICAL_ROOT").ok().map(PathBuf::from)?;
+    if c.join("framework").join("KERNEL.yaml").exists() { Some(c.canonicalize().unwrap_or(c)) } else { None }
+}
+
+/// Kernel source precedence: explicit --source > GOV_CANONICAL_ROOT (developer checkout) > embedded payload.
 pub fn resolve_kernel_source(source: Option<&Path>) -> Result<PathBuf> {
     let src = match source {
         Some(s) => s.to_path_buf(),
-        None => canonical_root().map(|r| r.join("framework")).ok_or_else(|| GovError::new("KERNEL_SOURCE_NOT_FOUND", "no kernel source given and canonical framework/ not found (set GOV_CANONICAL_ROOT or pass --source)"))?,
+        None => match canonical_root() { Some(r) => r.join("framework"), None => embedded_kernel_dir()? },
     };
-    for cand in [src.clone(), src.join("kernel"), src.join("framework")] {
-        if cand.join("KERNEL.yaml").exists() {
-            return Ok(cand);
-        }
-    }
+    for cand in [src.clone(), src.join("kernel"), src.join("framework")] { if cand.join("KERNEL.yaml").exists() { return Ok(cand); } }
     Err(GovError::new("KERNEL_SOURCE_NOT_FOUND", format!("no kernel payload found at {}", src.display())))
+}
+
+/// Logical, machine-independent source label recorded in framework.lock.
+pub fn source_label(src: &Path) -> String {
+    let meta = kernel_meta(src).unwrap_or(serde_json::json!({}));
+    let ver = meta.get("version").map(|v| match v { Value::String(s) => s.clone(), o => o.to_string() }).unwrap_or("unknown".into());
+    let s = src.to_string_lossy();
+    if s.contains("/kernels/") && s.contains(".cache") || s.contains("gov-cache") || std::env::var("GOV_KERNEL_CACHE").map(|c| s.starts_with(&c)).unwrap_or(false) { return format!("embedded:{}@{}", FRAMEWORK_NAME, ver); }
+    if s.contains("/release/releases/") { return format!("release:{}@{}", FRAMEWORK_NAME, ver); }
+    format!("source:{}@{}", FRAMEWORK_NAME, ver)
 }
 
 pub fn kernel_meta(kernel_dir: &Path) -> Result<Value> {

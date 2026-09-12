@@ -1,7 +1,7 @@
 policy: TEST_POLICY
 version: 1.0.0
 product_families: [unit, contract, integration, system, acceptance, scenario, security, performance, recovery, smoke]
-governance_families: [schema_invariants, graph_integrity, index_freshness, memory_retrieval_regression, authority_role_limits, mutation_scope, path_map_compliance, context_reproducibility, concurrency_claims, adapter_portability, skill_regression, command_contract_consistency, secrets_sensitivity_indexing, recovery_rebuild, fresh_agent_reconstruction, product_traceability, audit_reproducibility]
+governance_families: [schema_invariants, graph_integrity, index_freshness, memory_retrieval_regression, authority_role_limits, mutation_scope, path_map_compliance, context_reproducibility, concurrency_claims, adapter_portability, skill_regression, command_contract_consistency, secrets_sensitivity_indexing, recovery_rebuild, fresh_agent_reconstruction, product_traceability, audit_reproducibility, policy_enforcement_coverage]
 independent_test_author_required_for: [acceptance, scenario, system]
 implementation_task_requires: [scenarios_present, acceptance_tests_declared]
 green_record_currency: inputs_hash            # a green result is stale when its inputs hash changes

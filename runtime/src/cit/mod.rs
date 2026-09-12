@@ -14,12 +14,28 @@ use std::path::{Path, PathBuf};
 const RADII: &[&str] = &["R0", "R1", "R2", "R3", "R4", "R5"];
 fn radius_rank(r: &str) -> usize { RADII.iter().position(|x| *x == r).unwrap_or(1) }
 
+/// Redact secret patterns inside every string of a JSON value; returns the number of redactions.
+fn redact_value(p: &Project, v: &mut Value, field: &str, hits: &mut Vec<String>) {
+    match v {
+        Value::String(s) => { let found = p.secret_scanner().scan_text(s, field); if !found.is_empty() { for h in &found { hits.push(format!("{}: {}", field, h.pattern_id)); } let mut out = s.clone(); for (_, rx) in &p.secret_scanner().patterns { out = rx.replace_all(&out, "[REDACTED]").to_string(); } *s = out; } }
+        Value::Array(a) => { for (i, x) in a.iter_mut().enumerate() { redact_value(p, x, &format!("{field}[{i}]"), hits); } }
+        Value::Object(o) => { for (k, x) in o.iter_mut() { redact_value(p, x, &format!("{field}.{k}"), hits); } }
+        _ => {}
+    }
+}
+
 pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
     control::guard_write(p, "cit propose")?;
+    crate::authority::require(p, "propose_cit")?;
     let store = RecordStore::load(&p.root);
     let id = store.next_id("cit");
     let o = fields.as_object_mut().ok_or_else(|| GovError::new("USAGE", "cit fields must be an object"))?;
     if o.get("proposal").and_then(|v| v.as_str()).map(|s| s.is_empty()).unwrap_or(true) { return Err(GovError::new("USAGE", "proposal text required")); }
+    // SECURITY: a proposal/manifest is a governed record; secret material is redacted before it is persisted and the
+    // transaction is flagged so that it can never be executed with that content (verifier M9 / HV-34, HV-17).
+    let mut secret_hits: Vec<String> = vec![];
+    { let mut tmp = Value::Object(o.clone()); redact_value(p, &mut tmp, "cit", &mut secret_hits); if let Value::Object(m) = tmp { *o = m; } }
+    if !secret_hits.is_empty() { o.insert("secret_flagged".into(), json!(true)); o.insert("blocked_reasons".into(), json!(secret_hits.iter().map(|h| format!("secret pattern redacted from {h}")).collect::<Vec<_>>())); }
     o.insert("cit_status".into(), json!("PROPOSED"));
     o.entry("proposed_by").or_insert(json!(p.role));
     o.entry("trigger").or_insert(json!("behaviour_change"));
@@ -32,6 +48,12 @@ pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
     let rec = new_record("cit", &id, &title, Value::Object(o.clone()));
     p.schemas().validate("cit", &rec.data, &format!("({id})"))?;
     save_record(&p.root, &rec)?;
+    // CHANGE_POLICY.auto_simulate_triggers: CIT-P is automatic above the impact threshold (framework §48)
+    let trigger = rec.get("trigger");
+    if p.policies().get_list("CHANGE_POLICY", "auto_simulate_triggers").contains(&trigger) && p.db_path().exists() {
+        let db = RuntimeDb::open(&p.db_path())?;
+        if db.has_schema() { let sim = simulate_inner(p, &db, &id)?; let mut data = RecordStore::load(&p.root).get(&id).map(|r| r.data.clone()).unwrap_or(rec.data.clone()); data["auto_simulated"] = json!(true); data["simulation"] = sim; return Ok(data); }
+    }
     Ok(rec.data)
 }
 
@@ -82,6 +104,11 @@ fn estimate_radius(p: &Project, cit: &Value, affected: &[graph::Reach], db: &Run
 /// CIT-P: deterministic graph traversal + bounded retrieval -> impact radius and human-readable consequences.
 pub fn simulate(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     control::guard_write(p, "cit simulate")?;
+    crate::authority::require(p, "simulate_cit")?;
+    simulate_inner(p, db, id)
+}
+
+fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let pol = p.policies();
     let mut store = RecordStore::load(&p.root);
     let rec = store.get(id).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found")))?.clone();
@@ -144,6 +171,7 @@ pub fn simulate(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
 
 pub fn approve(p: &Project, id: &str, by: &str, method: &str) -> Result<Value> {
     control::guard_write(p, "cit approve")?;
+    crate::authority::require(p, if method == "human" { "approve_cit_human" } else { "approve_cit_auto" })?;
     let pol = p.policies();
     let mut store = RecordStore::load(&p.root);
     let r = store.get_mut(id).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found")))?;
@@ -175,6 +203,7 @@ pub fn approve(p: &Project, id: &str, by: &str, method: &str) -> Result<Value> {
 
 pub fn reject(p: &Project, id: &str, by: &str, reason: Option<&str>) -> Result<Value> {
     control::guard_write(p, "cit reject")?;
+    crate::authority::require(p, "reject_cit")?;
     let mut store = RecordStore::load(&p.root);
     let r = store.get_mut(id).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found")))?;
     if matches!(r.get("cit_status").as_str(), "COMMITTED" | "EXECUTING") { return Err(GovError::new("USAGE", format!("{id} is {}; cannot reject", r.get("cit_status")))); }
@@ -255,10 +284,13 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
 /// CIT-E: snapshot -> apply -> propagate -> regenerate -> refresh index -> verify -> commit or rollback.
 pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     control::guard_write(p, "cit execute")?;
+    crate::authority::require(p, "execute_cit")?;
     let pol = p.policies();
     let store = RecordStore::load(&p.root);
     let rec = store.get(id).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found")))?.clone();
     if rec.get("cit_status") != "APPROVED" { return Err(GovError::new("USAGE", format!("{id} must be APPROVED to execute (is {})", rec.get("cit_status")))); }
+    if rec.data.get("secret_flagged").and_then(|v| v.as_bool()).unwrap_or(false) { return Err(GovError::new("SECRET_IN_MANIFEST", format!("{id} was flagged at proposal time because its proposal/manifest contained secret material (redacted); it cannot be executed. Re-propose without secrets (store them in a secret-class path).")).with_details(rec.data.get("blocked_reasons").cloned().unwrap_or(Value::Null))); }
+    if !pol.get_bool("CHANGE_POLICY", "rollback.snapshot_before_execute", true) { return Err(GovError::new("POLICY_UNSAFE", "CHANGE_POLICY.rollback.snapshot_before_execute is false; execution without a snapshot is refused by this release")); }
     if let Some(gate) = Some(rec.get("human_gate")).filter(|g| !g.is_empty()) { if let Some(g) = store.get(&gate) { if g.get("gate_status") != "ANSWERED" { return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("gate {gate} not answered"))); } } }
     let snapshot = take_snapshot(p, id, &rec.data, &store)?;
     let dangling_before: std::collections::BTreeSet<String> = graph::dangling_edges(db)?.iter().map(|e| e.to_string()).collect();
@@ -278,7 +310,7 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
             for t in rec.data["impact"]["tests_required"].as_array().cloned().unwrap_or_default() { if let Some(tr) = t.as_str().and_then(|x| st.get_mut(x)) { tr.set("staleness", json!({"stale": true, "reason": format!("CIT {id}"), "at": now_iso()})); save_record(&p.root, tr)?; stale.push(tr.id()); } }
         }
         if pol.get_bool("CHANGE_POLICY", "propagation.regenerate_derived_views", true) { crate::tools::generate_registry(p)?; crate::adapters::generate(p)?; }
-        if pol.get_bool("CHANGE_POLICY", "propagation.refresh_index", true) { crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true })?; }
+        if pol.get_bool("CHANGE_POLICY", "propagation.refresh_index", true) { crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() })?; }
         // verification
         let mut problems = vec![];
         let required = pol.get_list("CHANGE_POLICY", "verification_required");
@@ -298,19 +330,30 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
             let mut ex = r.data["execution"].clone(); ex["finished"] = json!(now_iso()); ex["result"] = json!("committed"); ex["verification"] = json!({"ok": true}); ex["propagation"] = v.clone();
             r.set("execution", ex); r.set("cit_status", json!("COMMITTED")); if let Some(j) = r.data["journal"].as_array_mut() { j.push(json!({"at": now_iso(), "event": "committed"})); }
             save_record(&p.root, r)?;
-            let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true });
+            let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() });
             let db2 = RuntimeDb::open(&p.db_path())?;
             let ck = crate::checkpoints::create(p, &db2, json!({"trigger": "accepted_cit", "next_action": "gov continue", "last_completed_step": format!("executed {id}"), "open_transactions": []}))?;
+            prune_snapshots(p, pol.get_i64("CHANGE_POLICY", "rollback.keep_snapshots", 20).max(1) as usize);
             Ok(json!({"cit": id, "cit_status": "COMMITTED", "propagation": v, "checkpoint": ck["id"]}))
         }
         Err(e) => {
             let rb = restore_snapshot(p, id)?;
             let mut s2 = RecordStore::load(&p.root);
             if let Some(r) = s2.get_mut(id) { let mut ex = r.data["execution"].clone(); ex["finished"] = json!(now_iso()); ex["result"] = json!("rolled_back"); ex["error"] = json!(e.to_string()); ex["verification"] = json!({"ok": false, "details": e.details}); r.set("execution", ex); r.set("cit_status", json!("ROLLED_BACK")); if let Some(j) = r.data["journal"].as_array_mut() { j.push(json!({"at": now_iso(), "event": "rolled_back", "error": e.to_string()})); } save_record(&p.root, r)?; }
-            let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true });
+            let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() });
             Err(GovError::new(&e.code, format!("{} — rolled back ({} files restored)", e.message, rb["restored"].as_array().map(|a| a.len()).unwrap_or(0))).with_details(json!({"rollback": rb, "details": e.details})))
         }
     }
+}
+
+/// CHANGE_POLICY.rollback.keep_snapshots: keep only the newest N CIT snapshot directories (older transactions cannot be
+/// rolled back automatically afterwards; git history remains).
+pub fn prune_snapshots(p: &Project, keep: usize) {
+    let base = p.runtime_dir().join("cit");
+    let Ok(rd) = std::fs::read_dir(&base) else { return };
+    let mut dirs: Vec<(std::time::SystemTime, PathBuf)> = rd.filter_map(|e| e.ok()).map(|e| e.path()).filter(|d| d.join("snapshot.json").exists()).map(|d| (std::fs::metadata(d.join("snapshot.json")).and_then(|m| m.modified()).unwrap_or(std::time::UNIX_EPOCH), d)).collect();
+    dirs.sort_by(|a, b| b.0.cmp(&a.0));
+    for (_, d) in dirs.into_iter().skip(keep) { let _ = std::fs::remove_dir_all(d); }
 }
 
 /// Restore the snapshot taken before execution; remove files created by the transaction.
@@ -337,15 +380,18 @@ pub fn restore_snapshot(p: &Project, id: &str) -> Result<Value> {
 
 /// Explicit rollback of a COMMITTED or EXECUTING (interrupted) transaction.
 pub fn rollback(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
-    if control::state(p)["writes_frozen"].as_bool().unwrap_or(false) { /* rollback is an emergency control: allowed while frozen */ }
+    crate::authority::require(p, "rollback_cit")?; // rollback is an emergency control: allowed while frozen
     let store = RecordStore::load(&p.root);
     let rec = store.get(id).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found")))?;
     if !matches!(rec.get("cit_status").as_str(), "COMMITTED" | "EXECUTING" | "ROLLED_BACK") { return Err(GovError::new("USAGE", format!("{id} is {}; nothing to roll back", rec.get("cit_status")))); }
     let rb = restore_snapshot(p, id)?;
     let mut s2 = RecordStore::load(&p.root);
-    if let Some(r) = s2.get_mut(id) { r.set("cit_status", json!("ROLLED_BACK")); if let Some(j) = r.data["journal"].as_array_mut() { j.push(json!({"at": now_iso(), "event": "rolled_back", "reason": reason, "by": p.session_id})); } save_record(&p.root, r)?; }
+    let mut decision_id = String::new();
+    if let Some(r) = s2.get_mut(id) { decision_id = r.get("decision"); r.set("cit_status", json!("ROLLED_BACK")); if let Some(j) = r.data["journal"].as_array_mut() { j.push(json!({"at": now_iso(), "event": "rolled_back", "reason": reason, "by": p.session_id})); } save_record(&p.root, r)?; }
+    // the approval decision no longer describes the project (verifier L7): mark it REJECTED with provenance
+    if !decision_id.is_empty() { let mut s3 = RecordStore::load(&p.root); if let Some(d) = s3.get_mut(&decision_id) { d.set("status", json!("REJECTED")); d.set("state_class", json!("HISTORICAL")); d.set("rollback_of", json!(id)); d.set("updated", json!(crate::util::today())); save_record(&p.root, d)?; } }
     let _ = crate::tools::generate_registry(p); let _ = crate::adapters::generate(p);
-    let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true });
+    let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() });
     Ok(json!({"cit": id, "cit_status": "ROLLED_BACK", "rollback": rb}))
 }
 

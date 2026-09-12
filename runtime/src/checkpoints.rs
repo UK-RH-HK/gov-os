@@ -10,6 +10,7 @@ pub fn dir(p: &Project) -> std::path::PathBuf { p.root.join(p.policies().get_str
 
 pub fn create(p: &Project, db: &RuntimeDb, mut fields: Value) -> Result<Value> {
     control::guard_write(p, "checkpoint")?;
+    crate::authority::require(p, "checkpoint")?;
     let pol = p.policies();
     let triggers = pol.get_list("CHECKPOINT_POLICY", "mandatory_triggers");
     let trigger = fields.get("trigger").and_then(|v| v.as_str()).unwrap_or("manual").to_string();
@@ -20,11 +21,11 @@ pub fn create(p: &Project, db: &RuntimeDb, mut fields: Value) -> Result<Value> {
     let o = fields.as_object_mut().unwrap();
     o.retain(|_, v| !v.is_null());
     if o.get("next_action").and_then(|v| v.as_str()).map(|s| s.is_empty()).unwrap_or(true) { return Err(GovError::new("USAGE", "checkpoint requires next_action")); }
-    if o.get("summary").and_then(|v| v.as_str()).map(|s| s.len() > 2000).unwrap_or(false) { return Err(GovError::new("CHECKPOINT_POLICY", "prose summaries are prohibited as checkpoints; use structured fields")); }
+    if pol.get_str("CHECKPOINT_POLICY", "prose_summary_as_checkpoint", "prohibited") == "prohibited" && o.get("summary").and_then(|v| v.as_str()).map(|s| s.len() > 2000).unwrap_or(false) { return Err(GovError::new("CHECKPOINT_POLICY", "prose summaries are prohibited as checkpoints (CHECKPOINT_POLICY.prose_summary_as_checkpoint); use structured fields")); }
     o.insert("session".into(), json!(p.session_id)); o.insert("role".into(), json!(p.role)); o.insert("sequence".into(), json!(seq));
     o.insert("trigger".into(), json!(trigger));
     o.entry("mode").or_insert(json!(control::state(p)["mode"]));
-    if let Some(t) = o.get("task").and_then(|v| v.as_str()).map(|s| s.to_string()) { if let Ok(Some(c)) = claims::holder(db, &t) { o.insert("claim".into(), c); } }
+    if let Some(t) = o.get("task").and_then(|v| v.as_str()).map(|s| s.to_string()) { if let Ok(Some(c)) = claims::holder(p, &t) { o.insert("claim".into(), c); } }
     o.entry("pending_decisions").or_insert(json!(crate::orchestration::gates::pending(p).iter().map(|g| g["id"].clone()).collect::<Vec<_>>()));
     o.entry("open_transactions").or_insert(json!(store.of_type("cit").into_iter().filter(|c| matches!(c.get("cit_status").as_str(), "PROPOSED" | "SIMULATED" | "APPROVED" | "EXECUTING")).map(|c| c.id()).collect::<Vec<_>>()));
     o.entry("open_questions").or_insert(json!([]));
@@ -40,7 +41,7 @@ pub fn create(p: &Project, db: &RuntimeDb, mut fields: Value) -> Result<Value> {
     let mut rec = rec; rec.path = format!("{}/{id}.yaml", pol.get_str("CHECKPOINT_POLICY", "location", "spec/reports/checkpoints"));
     save_record(&p.root, &rec)?;
     write_yaml(&dir(p).join("LATEST.yaml"), &json!({"latest": id, "sequence": seq, "path": rec.path, "written_at": now_iso()}))?;
-    if p.db_path().exists() { let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true }); }
+    if p.db_path().exists() { let _ = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() }); }
     Ok(rec.data)
 }
 

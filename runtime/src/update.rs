@@ -13,7 +13,7 @@ use std::path::Path;
 fn migrations_for_source(src: &Path) -> Vec<Value> {
     let m = load_migrations(src);
     if !m.is_empty() { return m; }
-    src.parent().map(|p| load_migrations(&p.join("migrations").parent().unwrap_or(p))).unwrap_or_default()
+    src.parent().map(|p| load_migrations(p.join("migrations").parent().unwrap_or(p))).unwrap_or_default()
 }
 
 fn source_manifest(src: &Path) -> Result<Value> {
@@ -53,14 +53,35 @@ pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
 
 fn snapshot_dir(p: &Project, target: &str) -> std::path::PathBuf { p.runtime_dir().join("update").join(target) }
 
+/// The gate raised for updating to `target`, if any.
+fn update_gate(p: &Project, target: &str) -> Option<crate::records::Record> {
+    let store = crate::records::RecordStore::load(&p.root);
+    store.of_type("human-gate").into_iter().rfind(|g| g.get("trigger") == "framework_update" && g.get("update_target") == target).cloned()
+}
+
 pub fn apply_update(p: &mut Project, source: Option<&str>, approve: bool, by: &str) -> Result<Value> {
     control::guard_write(p, "update --apply")?;
+    crate::authority::require(p, "update_apply")?;
     let chk = check(p, source)?;
     if chk["up_to_date"].as_bool().unwrap_or(false) { return Ok(json!({"applied": false, "reason": "already up to date", "check": chk})); }
     if !chk["compatible"].as_bool().unwrap_or(false) || !chk["migration_path_complete"].as_bool().unwrap_or(false) { return Err(GovError::new("UPDATE_UNSUPPORTED", "no supported migration path from the installed version").with_details(chk)); }
-    if chk["human_gate_required"].as_bool().unwrap_or(true) && !approve {
-        let g = gates::create(p, json!({"question": format!("Approve framework update {} → {}?", chk["current"], chk["available"]), "why_now": "gov update --apply requested", "current_state": format!("installed {}", chk["current"]), "options": [{"id": "A", "description": "approve update"}, {"id": "B", "description": "stay on current release"}], "impact": chk["impact"]["consequences"].to_string(), "reversibility": "gov update --rollback restores kernel/overlay/lock", "recommendation": "A after reviewing release notes", "confidence": 0.7, "trigger": "governance_change", "impact_radius": chk["impact"]["radius"]}))?;
-        return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("update requires human approval: gate {} created; re-run with --approve --by <human> after presenting it", g["id"])).with_details(json!({"gate": g["id"], "check": chk})));
+    let target_v = chk["available"].as_str().unwrap_or("").to_string();
+    if chk["human_gate_required"].as_bool().unwrap_or(true) {
+        // INV-008: approval means a presented, answered gate record — never a CLI flag alone (verifier M3 / HV-11)
+        let gate = match update_gate(p, &target_v) {
+            Some(g) => g,
+            None => {
+                let g = gates::create_system(p, json!({"question": format!("Approve framework update {} → {}?", chk["current"], chk["available"]), "why_now": "gov update --apply requested", "current_state": format!("installed {}", chk["current"]), "options": [{"id": "A", "description": "approve update"}, {"id": "B", "description": "stay on current release"}], "impact": chk["impact"]["consequences"].to_string(), "reversibility": "gov update --rollback restores kernel/overlay/lock", "recommendation": "A after reviewing release notes", "confidence": 0.7, "trigger": "framework_update", "update_target": target_v, "impact_radius": chk["impact"]["radius"]}))?;
+                let gid = g["id"].as_str().unwrap_or("").to_string();
+                if !approve { return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("update requires human approval: gate {gid} created; present it (`gov gate present {gid}`), record the answer (`gov decide {gid} --option A --by <human>`), then re-run `gov update --apply --approve`")).with_details(json!({"gate": gid, "check": chk}))); }
+                crate::records::RecordStore::load(&p.root).get(&gid).cloned().unwrap()
+            }
+        };
+        let answered_yes = gate.get("gate_status") == "ANSWERED" && gate.data["answer"]["option"].as_str() == Some("A") && gate.data.get("presented_in_chat").and_then(|v| v.as_bool()).unwrap_or(false);
+        if !answered_yes {
+            return Ok(json!({"applied": false, "reason": "human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record", "human_gate": gate.id(), "gate_status": gate.get("gate_status"), "presented_in_chat": gate.data.get("presented_in_chat"), "next": [format!("gov gate present {}", gate.id()), format!("gov decide {} --option A --by <human>", gate.id()), "gov update --apply --approve"], "check": chk}));
+        }
+        if gate.get("gate_status") == "ANSWERED" && gate.data["answer"]["option"].as_str() == Some("B") { return Ok(json!({"applied": false, "reason": "human declined the update", "human_gate": gate.id()})); }
     }
     let target = chk["available"].as_str().unwrap_or("").to_string();
     let src = Path::new(chk["source"].as_str().unwrap_or(""));
@@ -89,7 +110,7 @@ pub fn apply_update(p: &mut Project, source: Option<&str>, approve: bool, by: &s
         if !p.overlay().problems.is_empty() { return Err(GovError::new("OVERLAY_INVALID", format!("overlay invalid after migration: {}", p.overlay().problems.join("; ")))); }
         crate::tools::generate_registry(p)?;
         crate::adapters::generate(p)?;
-        let rebuilt = if out.index_rebuild || !chk["impact"]["index_rebuild"].is_null() { Some(crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: !out.index_rebuild })?.manifest_hash) } else { None };
+        let rebuilt = if out.index_rebuild || !chk["impact"]["index_rebuild"].is_null() { Some(crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: !out.index_rebuild, ..Default::default() })?.manifest_hash) } else { None };
         let doc = crate::doctor::run(p)?;
         let critical: Vec<Value> = doc.checks.iter().filter(|c| !c["ok"].as_bool().unwrap_or(true) && c["severity"] == "critical").cloned().collect();
         if !critical.is_empty() { return Err(GovError::new("VERIFICATION_FAILED", format!("doctor reports critical findings after update: {}", critical.iter().map(|c| c["id"].as_str().unwrap_or("").to_string()).collect::<Vec<_>>().join(", "))).with_details(json!(critical))); }
@@ -113,6 +134,7 @@ pub fn apply_update(p: &mut Project, source: Option<&str>, approve: bool, by: &s
 
 /// Restore kernel, overlay, generated and lock from the update snapshot; rebuild indexes.
 pub fn rollback(p: &mut Project, target: Option<&str>) -> Result<Value> {
+    crate::authority::require(p, "update_apply")?;
     let base = p.runtime_dir().join("update");
     let dir = match target { Some(t) => base.join(t), None => { let mut dirs: Vec<_> = std::fs::read_dir(&base).map(|rd| rd.filter_map(|e| e.ok()).map(|e| e.path()).filter(|x| x.join("snapshot.json").exists()).collect()).unwrap_or_default(); dirs.sort_by_key(|d| std::fs::metadata(d.join("snapshot.json")).and_then(|m| m.modified()).ok()); dirs.pop().ok_or_else(|| GovError::new("SNAPSHOT_MISSING", "no update snapshot found"))? } };
     let meta = read_json(&dir.join("snapshot.json"))?;
@@ -120,6 +142,6 @@ pub fn rollback(p: &mut Project, target: Option<&str>) -> Result<Value> {
     std::fs::copy(dir.join("framework.lock"), p.lock_path())?;
     p.invalidate();
     let ok = p.kernel_dir().join(KERNEL_MANIFEST).exists() && crate::kernel::verify_kernel(&p.kernel_dir()).map(|v| v.ok).unwrap_or(false);
-    let r = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false })?;
+    let r = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
     Ok(json!({"rolled_back_to": meta["from"], "kernel_ok": ok, "index_manifest": r.manifest_hash}))
 }

@@ -26,9 +26,9 @@ pub fn recover(p: &Project, dry_run: bool) -> Result<Value> {
     }
     // 3. runtime DB health
     let db_ok = p.db_path().exists() && RuntimeDb::open(&p.db_path()).map(|d| d.has_schema() && d.integrity_ok()).unwrap_or(false);
-    if p.db_path().exists() && !db_ok { items.push(json!({"kind": "runtime_db", "classification": "PARTIAL_SAFE_TO_FINISH"})); if !dry_run { let r = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false })?; actions.push(json!({"rebuilt_runtime": true, "manifest_hash": r.manifest_hash})); } }
+    if p.db_path().exists() && !db_ok { items.push(json!({"kind": "runtime_db", "classification": "PARTIAL_SAFE_TO_FINISH"})); if !dry_run { let r = crate::memory::indexer::rebuild(p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?; actions.push(json!({"rebuilt_runtime": true, "manifest_hash": r.manifest_hash})); } }
     // 4. expired claims
-    if let Ok(db) = RuntimeDb::open(&p.db_path()) { if db.has_schema() { let n = if dry_run { claims::list(&db)?.iter().filter(|c| c["expired"].as_bool().unwrap_or(false)).count() } else { claims::sweep_expired(&db)? }; if n > 0 { items.push(json!({"kind": "claims", "expired": n, "classification": "COMPLETE_UNVERIFIED"})); actions.push(json!({"claims_swept": n})); } } }
+    { let n = if dry_run { claims::list(p)?.iter().filter(|c| c["expired"].as_bool().unwrap_or(false)).count() } else { claims::sweep_expired(p)? }; if n > 0 { items.push(json!({"kind": "claims", "expired": n, "classification": "COMPLETE_UNVERIFIED"})); actions.push(json!({"claims_swept": n})); } }
     // 5. dirty governance files (uncommitted) → COMPLETE_UNVERIFIED
     let dirty: Vec<String> = p.git_dirty_files().into_iter().filter(|f| f.starts_with("governance/") || f.starts_with("spec/")).collect();
     if !dirty.is_empty() { items.push(json!({"kind": "uncommitted_governance_changes", "files": dirty, "classification": "COMPLETE_UNVERIFIED"})); }

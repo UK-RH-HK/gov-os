@@ -43,7 +43,7 @@ paths:
     owner_role: memory-engineer
     mutation: restricted
     semantic_index: false
-    lexical_index: true
+    lexical_index: false      # held-out queries must never leak into the retrieval index
     graph_index: false
     namespace: governance
   - pattern: "spec/decisions/**"

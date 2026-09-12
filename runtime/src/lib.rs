@@ -13,6 +13,9 @@ pub mod policy;
 pub mod records;
 pub mod project;
 pub mod security;
+pub mod authority;
+pub mod lessons;
+pub mod policy_coverage;
 pub mod memory;
 pub mod code_intelligence;
 pub mod capabilities;
@@ -39,10 +42,10 @@ pub mod recovery;
 pub mod status;
 
 pub const FRAMEWORK_NAME: &str = "agentic-engineering-os";
-pub const VERSION: &str = "4.1.2";
-pub const CLI_VERSION: &str = "4.1.2";
-pub const RUNTIME_VERSION: &str = "4.1.2";
-pub const INDEX_VERSION: &str = "4.1.2-idx1";
+pub const VERSION: &str = "4.1.3";
+pub const CLI_VERSION: &str = "4.1.3";
+pub const RUNTIME_VERSION: &str = "4.1.3";
+pub const INDEX_VERSION: &str = "4.1.3-idx2";
 pub const RUNTIME_DIR: &str = ".governance-runtime";
 
 pub use error::{GovError, Result};

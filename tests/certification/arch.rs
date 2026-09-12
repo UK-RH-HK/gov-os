@@ -58,7 +58,7 @@ fn core_runs_without_any_governed_toolchain_on_path() {
         let (ok, _) = doctor_check(&g, "D022");
         assert!(!ok, "doctor must report the toolchain capability gap (never a crash)");
         g.ok(&["verify", "product"]); // returns not_applicable_with_reason instead of crashing
-        assert_eq!(doctor_verdict(&g) != "", true);
+        assert!(!doctor_verdict(&g).is_empty());
     }
 }
 fn which(name: &str) -> Option<std::path::PathBuf> { std::env::split_paths(&std::env::var_os("PATH")?).map(|d| d.join(name)).find(|p| p.is_file()) }

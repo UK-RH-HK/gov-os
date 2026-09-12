@@ -21,6 +21,10 @@ impl PathDecision {
     pub fn is_secret(&self) -> bool {
         self.class() == SECRET_CLASS || self.attrs.get("sensitivity").and_then(|v| v.as_str()) == Some("secret")
     }
+    /// Never read/indexed: secret-class or a sensitivity class in SECURITY_POLICY.never_index_classes.
+    pub fn is_never_index(&self) -> bool { self.is_secret() || self.attrs.get("never_index").and_then(|v| v.as_bool()).unwrap_or(false) }
+    pub fn sensitivity(&self) -> String { self.str("sensitivity") }
+    pub fn export_allowed(&self) -> bool { self.attrs.get("export").and_then(|v| v.as_str()) == Some("allowed") }
     pub fn flag(&self, key: &str) -> bool {
         if self.is_secret() && key.ends_with("_index") {
             return false;
@@ -63,11 +67,24 @@ fn base_defaults() -> Map<String, Value> {
            "sensitivity": "internal", "namespace": "unknown"}).as_object().unwrap().clone()
 }
 
+/// Sensitivity enforcement inputs (SECURITY_POLICY + DATA_SENSITIVITY + ARCHIVE_POLICY).
+#[derive(Debug, Clone, Default)]
+pub struct SensitivityRules {
+    pub classifications: Vec<(String, String)>, // (pattern, class)
+    pub never_index: Vec<String>,
+    pub never_export: Vec<String>,
+    pub archive_default_retrieval: Option<bool>,
+    pub secret_agent_read: Option<String>,
+}
+
+pub fn sensitivity_rank(class: &str) -> u8 { match class { "secret" => 4, "restricted" => 3, "confidential" => 2, "internal" => 1, _ => 0 } }
+
 #[derive(Debug, Clone)]
 pub struct RepositoryContract {
     pub data: Value,
     pub roots: Vec<(String, String)>,
     pub rules: Vec<Value>,
+    pub sensitivity: SensitivityRules,
 }
 
 impl RepositoryContract {
@@ -80,8 +97,9 @@ impl RepositoryContract {
             }
         }
         let rules = data.get("paths").and_then(|p| p.as_array()).cloned().unwrap_or_default();
-        RepositoryContract { data, roots, rules }
+        RepositoryContract { data, roots, rules, sensitivity: SensitivityRules::default() }
     }
+    pub fn with_sensitivity(mut self, rules: SensitivityRules) -> Self { self.sensitivity = rules; self }
     pub fn load(p: &Path) -> Result<Self> {
         Ok(Self::new(read_yaml(p)?))
     }
@@ -135,6 +153,23 @@ impl RepositoryContract {
         if ns == "unknown" || ns.is_empty() {
             attrs.insert("namespace".into(), Value::String(self.namespace_for(&path)));
         }
+        // --- sensitivity: DATA_SENSITIVITY classifications (highest class wins) + SECURITY_POLICY never_index / never_export
+        let mut sensitivity = attrs.get("sensitivity").and_then(|v| v.as_str()).unwrap_or("internal").to_string();
+        for (pat, cls) in &self.sensitivity.classifications {
+            if glob_match(pat, &path) && sensitivity_rank(cls) > sensitivity_rank(&sensitivity) { sensitivity = cls.clone(); }
+        }
+        if attrs.get("class").and_then(|v| v.as_str()) == Some(SECRET_CLASS) { sensitivity = "secret".into(); }
+        attrs.insert("sensitivity".into(), Value::String(sensitivity.clone()));
+        if self.sensitivity.never_index.iter().any(|c| c == &sensitivity) {
+            for k in ["semantic_index", "lexical_index", "graph_index", "code_index"] { attrs.insert(k.into(), Value::Bool(false)); }
+            attrs.insert("default_retrieval".into(), Value::Bool(false));
+            attrs.insert("export".into(), Value::String("denied".into()));
+            let ar = if sensitivity == "secret" { self.sensitivity.secret_agent_read.clone().unwrap_or("prohibited".into()) } else { "restricted".into() };
+            attrs.insert("agent_read".into(), Value::String(ar));
+            attrs.insert("never_index".into(), Value::Bool(true));
+        }
+        if self.sensitivity.never_export.iter().any(|c| c == &sensitivity) { attrs.insert("export".into(), Value::String("denied".into())); }
+        if attrs.get("class").and_then(|v| v.as_str()) == Some("historical") { if let Some(dr) = self.sensitivity.archive_default_retrieval { if attrs.get("default_retrieval").is_none() || matched.is_none() { attrs.insert("default_retrieval".into(), Value::Bool(dr)); } } }
         PathDecision { path, rule_pattern: matched, attrs }
     }
     pub fn to_framework_json(&self, framework: &str, version: &str) -> Value {

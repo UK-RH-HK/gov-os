@@ -7,7 +7,7 @@ use serde_json::json;
 fn greenfield_end_to_end() {
     let (root, g) = setup_fixture("greenfield", "greenfield", "S-alpha");
     let r = g.ok(&["init", "--name", "orders-ledger", "--alias", "fx-green", "--intent", "Append-only order ledger with totals"]);
-    assert_eq!(r["version"], "4.1.2");
+    assert_eq!(r["version"], gov_runtime::VERSION);
     for f in ["governance/framework.lock", "governance/kernel/KERNEL_MANIFEST.json", "governance/kernel/constitution/CONSTITUTION.md", "governance/project/REPOSITORY_CONTRACT.yaml", "governance/generated/index-manifest.json", "governance/generated/adapter-manifest.json", "governance/generated/tool-registry.json", "governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md", "framework.json", "spec/product/PRJ-0001.yaml", ".gitignore"] { assert!(exists(&root, f), "{f} missing after init"); }
     assert!(read(&root, ".gitignore").contains(".governance-runtime/"));
     assert_eq!(r["adapters"], 5);
@@ -86,7 +86,7 @@ fn greenfield_end_to_end() {
     assert!(pv["source"].as_str().unwrap().contains("rust-cargo"));
     // --- routing evidence + telemetry ---
     let rec = root.join(".governance-runtime/route-ev.json");
-    std::fs::write(&rec, json!({"model": "model-alias-large", "provider": "provider-alias", "task_class": "implementation", "reasoning_effort": "medium", "cost": 0.12, "latency_ms": 900, "pass": true, "repair_count": 0}).to_string()).unwrap();
+    std::fs::write(&rec, json!({"model": "model-alias-large", "provider": "provider-alias", "task_class": "implementation", "reasoning_effort": "medium", "cost": 0.12, "latency_ms": 900, "pass": true, "repair_count": 0, "reviewer_findings": 1}).to_string()).unwrap();
     g.ok(&["route", "--record", rec.to_str().unwrap()]);
     let rr = g.ok(&["route", "--report"]);
     assert_eq!(rr["rows"][0]["task_class"], "implementation");

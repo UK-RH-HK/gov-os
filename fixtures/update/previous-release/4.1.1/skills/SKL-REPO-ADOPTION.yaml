@@ -1,0 +1,23 @@
+id: SKL-REPO-ADOPTION
+name: Repository adoption
+version: 1.0.0
+status: ACTIVE
+model_agnostic: true
+roles: [orchestrator, migration-executor]
+task_classes: [governance, migration]
+purpose: "Adopt an existing repository through the staged, path-first, memory-safe protocol A0-A11."
+required_permissions: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+required_tools: [TOOL-FS-001, TOOL-GIT-001]
+inputs: [existing repository]
+outputs: [adoption evidence tree, adopted repository]
+method:
+  - {step: A0-baseline, description: Safety snapshot and interrupted-work detection.}
+  - {step: A1-inventory, description: Cold deterministic inventory without semantic memory.}
+  - {step: A2-classify, description: Classify every material artefact and legacy mechanism.}
+  - {step: A3-A4-plan, description: Target path map and batched migration plan; no moves yet.}
+  - {step: A5-independent-review, description: Wait for an independent reviewer verdict and held-out tests.}
+  - {step: A6-A7-migrate-verify, description: Controlled batches then independent verification.}
+  - {step: A8-A11, description: Legacy memory extraction, memory rebuild, independent memory verification, full audit.}
+validation_scenarios:
+  - {id: V1, given: no reviewer verdict recorded, expect: A6 refuses to execute}
+  - {id: V2, given: legacy rule file present after adoption, expect: it is marked LEGACY and excluded from default retrieval}

@@ -55,6 +55,7 @@ pub fn continue_work(p: &Project, db: &RuntimeDb, claim: bool) -> Result<Value> 
     let mut candidates: Vec<String> = d.runnable.clone();
     candidates.sort_by_key(|t| (if d.longest_chain.contains(t) { 0 } else { 1 }, t.clone()));
     if ctl["mode"].as_str() == Some("PAUSED") { return Ok(json!({"status": "PAUSED", "gate": gate_text, "message": "execution paused; gov resume after the reason is resolved"})); }
+    if !pend.is_empty() && !p.policies().get_bool("HUMAN_GATE_POLICY", "continue_independent_work", true) { return Ok(json!({"status": "WAITING_HUMAN", "gate": gate_text, "message": "HUMAN_GATE_POLICY.continue_independent_work=false: work halts while a gate is pending"})); }
     let Some(next) = candidates.first().cloned() else { return Ok(json!({"status": "NO_RUNNABLE_WORK", "gate": gate_text, "waiting_human": d.waiting_human, "blocked": d.blocked, "suggestion": "run `gov readiness plan <feature>` or create discovery tasks"})) };
     let store = RecordStore::load(&p.root);
     let task = store.get(&next).map(|r| r.data.clone()).unwrap_or(json!({}));
@@ -62,7 +63,7 @@ pub fn continue_work(p: &Project, db: &RuntimeDb, claim: bool) -> Result<Value> 
     let skills = crate::skills::resolve(p, &task)?;
     let routing = crate::routing::route(p, Some(&task), None, None, None)?;
     let mut claimed = Value::Null;
-    if claim { claimed = crate::orchestration::tasks::claim(p, db, &next)?; }
+    if claim { claimed = crate::orchestration::tasks::claim(p, &next)?; }
     Ok(json!({"status": "NEXT_WORK", "task": next, "task_contract": task, "context_packet": {"path": format!(".governance-runtime/context/{next}.json"), "deterministic_hash": packet["deterministic_hash"], "packet_hash": packet["packet_hash"], "chars": packet["chars"]},
         "skills": skills, "routing": {"minimum_tier": routing["minimum_tier"], "reasoning": routing["reasoning"], "chosen": routing["chosen"]}, "claimed": claimed, "parallel_runnable": candidates.iter().skip(1).take(5).cloned().collect::<Vec<_>>(), "gate": gate_text, "status_summary": st["next_action"]}))
 }

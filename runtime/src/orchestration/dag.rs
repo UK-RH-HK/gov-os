@@ -43,6 +43,23 @@ pub fn compute(p: &Project) -> Result<DagView> {
                 if !r.pre_implementation_ok { reasons.push(format!("feature {} pre-implementation readiness cells missing: {}", f.id(), r.pre_implementation_gaps.join(", "))); }
             }
         }
+        if t.get("class") == "implementation" {
+            // TEST_POLICY.implementation_task_requires: scenarios and acceptance tests must be declared (task or feature)
+            let feature = store.get(&t.get("feature")).filter(|f| f.rtype() == "feature");
+            let has_scn = !t.list("scenarios").is_empty() || feature.map(|f| !f.list("scenarios").is_empty()).unwrap_or(false);
+            let declared_tests: Vec<String> = { let mut v = t.list("acceptance_tests"); if let Some(f) = feature { v.extend(f.list("acceptance_tests")); }
+                if let Some(f) = feature { v.extend(store.of_type("test-obligation").iter().filter(|o| o.get("feature") == f.id()).map(|o| o.id())); } v };
+            for req in p.policies().get_list("TEST_POLICY", "implementation_task_requires") {
+                match req.as_str() {
+                    "scenarios_present" => if !has_scn { reasons.push("TEST_POLICY.implementation_task_requires: no scenarios declared on the task or its feature".into()); },
+                    "acceptance_tests_declared" if declared_tests.is_empty() => { reasons.push("TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature".into()); },
+                    _ => {}
+                }
+            }
+            // TEST_POLICY.independent_test_author_required_for: declared obligations of those families must be independent
+            let indep = p.policies().get_list("TEST_POLICY", "independent_test_author_required_for");
+            for tid in &declared_tests { if let Some(o) = store.get(tid) { if o.rtype() == "test-obligation" && indep.contains(&o.get("family")) && !o.data.get("independent_of_implementer").and_then(|v| v.as_bool()).unwrap_or(false) { reasons.push(format!("{tid} ({}) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for)", o.get("family"))); } } }
+        }
         if t.data.get("retest_required").and_then(|v| v.as_bool()).unwrap_or(false) { reasons.push("retest required after CIT propagation".into()); }
         if reasons.is_empty() {
             if st == "DRAFT" { blocked.push(json!({"task": id, "reasons": ["DRAFT: promote with `gov task status <id> READY`"]})); } else { runnable.push(id); }

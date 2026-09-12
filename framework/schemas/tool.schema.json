@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.2/tool.schema.json",
   "title": "tool",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "tool_id": {
@@ -125,6 +125,12 @@
           "DEPLOY_STAGING",
           "DEPLOY_PRODUCTION"
         ]
+      }
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     }
   },

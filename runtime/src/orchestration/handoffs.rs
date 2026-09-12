@@ -7,6 +7,7 @@ use serde_json::{json, Value};
 
 pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     control::guard_write(p, "handoff create")?;
+    crate::authority::require(p, "create_handoff")?;
     let store = RecordStore::load(&p.root);
     let id = store.next_id("handoff");
     let o = fields.as_object_mut().ok_or_else(|| GovError::new("USAGE", "handoff fields must be an object"))?;
@@ -30,12 +31,18 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     o.insert("state_class".into(), json!("DERIVED"));
     let rec = new_record("handoff", &id, &format!("Handoff {} → {} for {task}", o["from_role"].as_str().unwrap_or(""), to_role), Value::Object(o.clone()));
     p.schemas().validate("handoff", &rec.data, &format!("({id})"))?;
+    // CHECKPOINT_POLICY mandatory trigger `before_handoff`
+    if p.policies().get_list("CHECKPOINT_POLICY", "mandatory_triggers").iter().any(|t| t == "before_handoff") {
+        let db = crate::memory::db::RuntimeDb::open(&p.db_path())?; db.init_schema()?;
+        crate::checkpoints::create(p, &db, json!({"trigger": "before_handoff", "task": task, "next_action": format!("worker {} executes {task} via {id}", to_role), "last_completed_step": format!("handoff {id} prepared")}))?;
+    }
     save_record(&p.root, &rec)?;
     Ok(rec.data)
 }
 
 pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
     control::guard_write(p, "handoff return")?;
+    crate::authority::require(p, "return_handoff")?;
     p.schemas().validate("worker-return", &ret, "(worker return contract)")?;
     let mut store = RecordStore::load(&p.root);
     let h = store.get_mut(id).ok_or_else(|| GovError::new("HANDOFF_NOT_FOUND", format!("{id} not found")))?;
@@ -51,7 +58,18 @@ pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
     h.set("returned_at", json!(now_iso()));
     h.set("handoff_status", json!("RETURNED"));
     if !violations.is_empty() { h.set("authority_violations", json!(violations)); }
+    let task_id = h.get("task");
     save_record(&p.root, h)?;
     if !violations.is_empty() { return Err(GovError::new("MUTATION_SCOPE_VIOLATION", format!("worker changed files outside its authority: {}", violations.join("; "))).with_details(json!({"violations": violations}))); }
-    Ok(json!({"handoff": id, "status": "RETURNED", "files_changed": ret["files_changed"], "unresolved": ret["unresolved"]}))
+    // lessons in the return contract become PROVISIONAL lesson candidates (framework §67); never authority
+    let mut created = vec![];
+    let mut s2 = RecordStore::load(&p.root);
+    for l in ret["lessons"].as_array().cloned().unwrap_or_default() {
+        let text = l.as_str().map(|s| s.to_string()).or_else(|| l.get("text").and_then(|t| t.as_str()).map(|s| s.to_string())).unwrap_or_default();
+        if text.trim().is_empty() { continue; }
+        let lid = s2.next_id("lesson");
+        let rec = new_record("lesson", &lid, &text.chars().take(90).collect::<String>(), json!({"status": "PROVISIONAL", "state_class": "EVIDENCE", "scope": "PROJECT", "lifecycle": "candidate", "category": "worker-return", "problem_statement": text, "evidence_strength": "low", "sources": [id, task_id], "provenance": {"from_handoff": id, "task": task_id, "at": now_iso()}}));
+        save_record(&p.root, &rec)?; s2.records.push(rec.clone()); created.push(lid);
+    }
+    Ok(json!({"handoff": id, "status": "RETURNED", "files_changed": ret["files_changed"], "unresolved": ret["unresolved"], "lessons_created": created}))
 }

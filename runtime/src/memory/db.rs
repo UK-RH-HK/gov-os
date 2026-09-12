@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS chunks (
   chunk_id TEXT PRIMARY KEY, artifact_id TEXT NOT NULL, parent_chunk_id TEXT, level TEXT, section TEXT, ordinal INTEGER,
   content_hash TEXT, text TEXT, chars INTEGER, lexical INTEGER DEFAULT 1, semantic INTEGER DEFAULT 1);
 CREATE INDEX IF NOT EXISTS idx_chunks_artifact ON chunks(artifact_id);
-CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(text, chunk_id UNINDEXED, artifact_id UNINDEXED, tokenize='unicode61');
+CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(text, chunk_id UNINDEXED, artifact_id UNINDEXED, tokenize='__TOKENIZER__');
 CREATE TABLE IF NOT EXISTS vectors (chunk_id TEXT PRIMARY KEY, artifact_id TEXT, embedder TEXT, dim INTEGER, vec TEXT);
 CREATE INDEX IF NOT EXISTS idx_vectors_artifact ON vectors(artifact_id);
 CREATE TABLE IF NOT EXISTS edges (src TEXT, type TEXT, dst TEXT, source_artifact TEXT, provenance TEXT, PRIMARY KEY (src, type, dst, source_artifact));
@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS symbols (symbol_id TEXT PRIMARY KEY, artifact_id TEXT
 CREATE INDEX IF NOT EXISTS idx_symbols_name ON symbols(name);
 CREATE TABLE IF NOT EXISTS symbol_refs (path TEXT, name TEXT, kind TEXT, lineno INTEGER, target TEXT);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
-CREATE TABLE IF NOT EXISTS claims (task_id TEXT PRIMARY KEY, session_id TEXT, role TEXT, claimed_at TEXT, expires_at TEXT);
 CREATE TABLE IF NOT EXISTS retrieval_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, query TEXT, routes TEXT, hits TEXT, latency_ms REAL);
 CREATE TABLE IF NOT EXISTS excluded (path TEXT PRIMARY KEY, reason TEXT, detail TEXT);
 CREATE TABLE IF NOT EXISTS capability (key TEXT PRIMARY KEY, value TEXT, updated_at TEXT);
@@ -62,8 +61,11 @@ impl RuntimeDb {
         db.init_schema()?;
         Ok(db)
     }
-    pub fn init_schema(&self) -> Result<()> {
-        self.conn.execute_batch(SCHEMA)?;
+    pub fn init_schema(&self) -> Result<()> { self.init_schema_with("unicode61") }
+    /// Create the schema; the FTS5 tokenizer is part of the lexical pin (MEMORY_POLICY.lexical.tokenizer).
+    pub fn init_schema_with(&self, tokenizer: &str) -> Result<()> {
+        let safe: String = tokenizer.chars().filter(|c| c.is_ascii_alphanumeric() || *c == ' ' || *c == '_').collect();
+        self.conn.execute_batch(&SCHEMA.replace("__TOKENIZER__", if safe.is_empty() { "unicode61" } else { &safe }))?;
         Ok(())
     }
     pub fn integrity_ok(&self) -> bool {
@@ -91,7 +93,7 @@ impl RuntimeDb {
     }
     pub fn counts(&self) -> Value {
         let mut m = Map::new();
-        for t in ["artifacts", "chunks", "vectors", "edges", "symbols", "symbol_refs", "excluded", "claims"] {
+        for t in ["artifacts", "chunks", "vectors", "edges", "symbols", "symbol_refs", "excluded"] {
             m.insert(t.into(), json!(self.count(t)));
         }
         Value::Object(m)

@@ -4,7 +4,7 @@ use crate::kernel::{install_kernel, resolve_kernel_source};
 use crate::lock::write_lock;
 use crate::memory::db::RuntimeDb;
 use crate::migrations::{classify, executor, inventory, planner, verify};
-use crate::records::{new_record, save_record, RecordStore};
+use crate::records::{new_record, save_record};
 use crate::util::{glob_match, now_iso, read_json, read_text, read_yaml, write_text, write_yaml};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
@@ -113,7 +113,9 @@ pub fn a3_map(root: &Path) -> Result<Value> {
     let b = load_baseline(root)?; require_stage(&b, "A2")?;
     set_stage(root, "A3", "in_progress", None)?;
     let classified = read_jsonl(&ev(root).join("02-CLASSIFICATION.jsonl"))?;
-    let catalogue = planner::plan(root, &classified, native_test_dir(root).as_deref());
+    // ARCHIVE_POLICY.unused_code_action of the kernel being adopted decides how dead code is treated
+    let unused_action = { let p0 = Project::open(root); if p0.is_installed() { p0.policies().get_str("ARCHIVE_POLICY", "unused_code_action", "remove_from_active_tree") } else { crate::kernel::resolve_kernel_source(None).ok().and_then(|k| read_yaml(&k.join("policies").join("ARCHIVE_POLICY.yaml")).ok()).and_then(|v| v["unused_code_action"].as_str().map(|s| s.to_string())).unwrap_or("remove_from_active_tree".into()) } };
+    let catalogue = planner::plan(root, &classified, native_test_dir(root).as_deref(), &unused_action);
     let schemas = Project::open(root).schemas().schema_dir.clone();
     let reg = crate::schemas::SchemaRegistry::new(&schemas);
     let mut problems = vec![];
@@ -126,17 +128,44 @@ pub fn a3_map(root: &Path) -> Result<Value> {
     Ok(json!({"stage": "A3", "entries": catalogue.len(), "actions": actions, "unknown_blocking_destructive": unknown, "schema_problems": problems, "evidence": format!("{EVIDENCE}/04-TARGET-PATH-MAP.jsonl")}))
 }
 
+/// Destructive catalogue entries (RETIRE / DELETE_FROM_ACTIVE_TREE / gated moves) get a Human Decision Gate record
+/// each; the executor accepts only ANSWERED (option A), presented gates — never a CLI flag (INV-008, verifier H6).
+pub fn ensure_destructive_gates(root: &Path, catalogue: &mut Vec<Value>) -> Result<Vec<String>> {
+    let p = Project::open(root);
+    if !p.is_installed() { return Ok(vec![]); }
+    let mut created = vec![];
+    for e in catalogue.iter_mut() {
+        if !e["requires_human_gate"].as_bool().unwrap_or(false) { continue; }
+        if e.get("human_gate").and_then(|v| v.as_str()).map(|g| !g.is_empty()).unwrap_or(false) { continue; }
+        let aid = e["artifact_id"].as_str().unwrap_or("").to_string();
+        let g = crate::orchestration::gates::create_system(&p, json!({"question": format!("Adoption migration: {} {} ({})? {}", e["action"].as_str().unwrap_or(""), e["current_path"].as_str().unwrap_or(""), aid, e["reason"].as_str().unwrap_or("")), "why_now": "destructive or structural migration action in the approved plan", "current_state": format!("present at {}", e["current_path"].as_str().unwrap_or("")), "options": [{"id": "A", "description": format!("approve {}", e["action"].as_str().unwrap_or(""))}, {"id": "B", "description": "keep in place (skip this entry)"}], "impact": format!("target: {}", e["target_path"].as_str().unwrap_or("removed from active tree")), "reversibility": "batch snapshot + git history", "recommendation": "A if no reference or unique data exists", "confidence": e["confidence"].as_f64().unwrap_or(0.5), "trigger": "destructive_migration", "impact_radius": "R2", "artifact_id": aid}))?;
+        let gid = g["id"].as_str().unwrap_or("").to_string();
+        e["human_gate"] = json!(gid);
+        created.push(gid);
+    }
+    if !created.is_empty() { let mut jl = String::new(); for e in catalogue.iter() { jl.push_str(&serde_json::to_string(e)?); jl.push('\n'); } write_text(&ev(root).join("04-TARGET-PATH-MAP.jsonl"), &jl)?; }
+    Ok(created)
+}
+
+/// Artefact ids whose destructive gate has been presented and answered with option A.
+pub fn answered_destructive(root: &Path, catalogue: &[Value]) -> Vec<String> {
+    let p = Project::open(root);
+    if !p.is_installed() { return vec![]; }
+    catalogue.iter().filter(|e| e["requires_human_gate"].as_bool().unwrap_or(false)).filter(|e| e.get("human_gate").and_then(|g| g.as_str()).map(|g| crate::orchestration::gates::is_answered_yes(&p, g)).unwrap_or(false)).filter_map(|e| e["artifact_id"].as_str().map(|s| s.to_string())).collect()
+}
+
 // ---------------------------------------------------------------- A4
 pub fn a4_plan(root: &Path) -> Result<Value> {
     let b = load_baseline(root)?; require_stage(&b, "A3")?;
     set_stage(root, "A4", "in_progress", None)?;
-    let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
+    let mut catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
+    let gates_created = ensure_destructive_gates(root, &mut catalogue)?;
     let batches = planner::batches(&catalogue);
     let unknown = catalogue.iter().filter(|e| e["finding_state"] == "UNKNOWN").count();
     write_yaml(&ev(root).join("05-plan.yaml"), &json!({"batches": batches, "unknown_blocking": unknown, "created_at": now_iso()}))?;
     write_md(root, "05-ADOPTION-MIGRATION-PLAN.md", &planner::plan_markdown(&catalogue, &batches, unknown))?;
     set_stage(root, "A4", "done", None)?;
-    Ok(json!({"stage": "A4", "batches": batches.iter().map(|b| json!({"batch": b["batch"], "entries": b["entries"], "human_gate": b["requires_human_gate"]})).collect::<Vec<_>>(), "evidence": [format!("{EVIDENCE}/05-ADOPTION-MIGRATION-PLAN.md"), format!("{EVIDENCE}/05-plan.yaml")]}))
+    Ok(json!({"stage": "A4", "batches": batches.iter().map(|b| json!({"batch": b["batch"], "entries": b["entries"], "human_gate": b["requires_human_gate"]})).collect::<Vec<_>>(), "human_gates_created": gates_created, "evidence": [format!("{EVIDENCE}/05-ADOPTION-MIGRATION-PLAN.md"), format!("{EVIDENCE}/05-plan.yaml")]}))
 }
 
 // ---------------------------------------------------------------- A5
@@ -200,7 +229,9 @@ fn brownfield_contract(root: &Path, kernel_dir: &Path, classified: &[Value]) -> 
 pub fn a6_migrate(root: &Path, batch: Option<i64>, source: Option<&str>, gate_answers: &[String], project_name: &str, alias: &str, session: &str) -> Result<Value> {
     let b = load_baseline(root)?; require_stage(&b, "A4")?;
     require_verdict(&b, "A5", &["MIGRATION_PLAN_APPROVED", "MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS"])?;
-    let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
+    { let p0 = Project::open(root); if p0.is_installed() { crate::orchestration::control::guard_write(&p0, "adopt migrate")?; crate::authority::require(&p0, "migrate_execute")?; } }
+    let deprecated_flag_note = if gate_answers.is_empty() { Value::Null } else { json!(format!("--gate-answer {:?} ignored: a destructive entry executes only when its Human Decision Gate record is presented and answered (gov gate present / gov decide)", gate_answers)) };
+    let mut catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
     let classified = read_jsonl(&ev(root).join("02-CLASSIFICATION.jsonl"))?;
     let plan = read_yaml(&ev(root).join("05-plan.yaml"))?;
     let batches: Vec<i64> = match batch { Some(n) => vec![n], None => plan["batches"].as_array().map(|a| a.iter().filter_map(|x| x["batch"].as_i64()).collect()).unwrap_or_default() };
@@ -224,12 +255,16 @@ pub fn a6_migrate(root: &Path, batch: Option<i64>, source: Option<&str>, gate_an
             crate::init::ensure_roots(root)?;
             let mut p = Project::open(root); p.invalidate();
             crate::tools::generate_registry(&p)?; crate::adapters::generate(&p)?;
-            entry["installed"] = json!({"version": manifest["version"], "overlay_written": written});
+            let gates_created = ensure_destructive_gates(root, &mut catalogue)?;
+            entry["installed"] = json!({"version": manifest["version"], "overlay_written": written, "destructive_gates_created": gates_created});
         } else {
             if n >= 6 && unknown > 0 { return Err(GovError::new("UNKNOWN_BLOCKS_DESTRUCTIVE", format!("{unknown} UNKNOWN artefact(s) block destructive batch {n} (protocol §8)"))); }
             let p = Project::open(root);
-            if p.is_installed() { let db = RuntimeDb::open(&p.db_path())?; db.init_schema()?; let _ = crate::checkpoints::create(&p, &db, json!({"trigger": "significant_mutation", "next_action": format!("execute migration batch {n}"), "last_completed_step": format!("pre-batch {n} checkpoint")})); }
-            let r = executor::apply_batch(root, &catalogue, n, gate_answers, &ledger)?;
+            if p.is_installed() { crate::orchestration::control::guard_write(&p, "adopt migrate")?; let db = RuntimeDb::open(&p.db_path())?; db.init_schema()?; let _ = crate::checkpoints::create(&p, &db, json!({"trigger": "significant_mutation", "next_action": format!("execute migration batch {n}"), "last_completed_step": format!("pre-batch {n} checkpoint")})); }
+            let _ = ensure_destructive_gates(root, &mut catalogue)?;
+            let answered = answered_destructive(root, &catalogue);
+            let mut r = executor::apply_batch(root, &catalogue, n, &answered, &ledger)?;
+            { let pj = Project::open(root); for sk in r.skipped.iter_mut() { let aid = sk["artifact_id"].as_str().unwrap_or("").to_string(); if let Some(e) = catalogue.iter().find(|e| e["artifact_id"].as_str() == Some(&aid)) { if let Some(g) = e["human_gate"].as_str() { match crate::orchestration::gates::answered_option(&pj, g).as_deref() { Some("A") => {}, Some(o) => { sk["reason"] = json!(format!("human gate {g} answered {o}: kept in place by decision")); sk["gate"] = json!(g); }, None => { sk["reason"] = json!(format!("human gate {g} pending (present it in chat and decide; a CLI flag is not an answer)")); sk["gate"] = json!(g); } } } } } }
             entry["applied"] = json!(r.applied.len()); entry["moves"] = json!(r.moves); entry["created"] = json!(r.created); entry["references_updated"] = json!(r.references_updated); entry["skipped"] = json!(r.skipped);
         }
         // post-batch tests
@@ -240,6 +275,7 @@ pub fn a6_migrate(root: &Path, batch: Option<i64>, source: Option<&str>, gate_an
         results.push(entry);
     }
     write_text(&ev(root).join("07-MIGRATION-EXECUTION-REPORT.md"), &report)?;
+    if !deprecated_flag_note.is_null() { results.push(json!({"note": deprecated_flag_note})); }
     let all_done = batch.is_none() || plan["batches"].as_array().map(|a| a.iter().all(|x| x["batch"].as_i64() == batch || read_text(&ledger).map(|t| t.contains(&format!("\"batch\":{},\"status\":\"batch_complete\"", x["batch"]))).unwrap_or(false) || x["entries"].as_u64() == Some(0))).unwrap_or(true);
     b2["stage_status"]["A6"] = json!(if all_done { "done" } else { "in_progress" }); b2["stage_times"]["A6"] = json!(now_iso());
     save_baseline(root, &b2)?;
@@ -297,6 +333,7 @@ const LESSON_CUES: &[&str] = &["lesson:", "learned", "lesson learned", "in futur
 pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
     let b = load_baseline(root)?; require_stage(&b, "A7")?;
     require_verdict(&b, "A7", &["MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"])?;
+    { let p0 = Project::open(root); crate::orchestration::control::guard_write(&p0, "adopt extract-legacy")?; crate::authority::require(&p0, "migrate_execute")?; }
     set_stage(root, "A8", "in_progress", None)?;
     let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
     let scanner = scanner_for(root);
@@ -341,25 +378,21 @@ pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
 pub fn a9_build_memory(root: &Path, session: &str) -> Result<Value> {
     let b = load_baseline(root)?; require_stage(&b, "A8")?;
     require_verdict(&b, "A7", &["MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"])?;
+    { let p0 = Project::open(root); crate::orchestration::control::guard_write(&p0, "adopt build-memory")?; crate::authority::require(&p0, "build_memory")?; }
     let mut b2 = b.clone(); b2["memory_builder_session"] = json!(session); b2["stage_status"]["A9"] = json!("in_progress"); save_baseline(root, &b2)?;
     let mut p = Project::open(root); p.invalidate(); p.require_installed()?;
-    let r = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false })?;
+    let r = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
     // held-out template from governed records (only when none exist yet)
     let held_path = root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml"));
     let existing = read_yaml(&held_path).ok().and_then(|h| h["queries"].as_array().map(|a| a.len())).unwrap_or(0);
     let mut generated = 0;
     if existing == 0 {
-        let store = RecordStore::load(root);
-        let superseded: std::collections::HashSet<String> = store.records.iter().flat_map(|r| r.list("supersedes")).collect();
-        let dup_ids: std::collections::HashSet<String> = store.duplicates.iter().map(|(id, _)| id.clone()).collect();
-        let mut queries = vec![];
-        for r in store.records.iter().filter(|r| matches!(r.rtype().as_str(), "decision" | "feature" | "requirement" | "lesson") && (r.status() == "ACTIVE" || r.status() == "PROVISIONAL") && r.get("superseded_by").is_empty() && !superseded.contains(&r.id()) && !dup_ids.contains(&r.id()) && !r.problems.iter().any(|x| x == "archived")).take(20) {
-            let forbidden: Vec<String> = r.list("supersedes");
-            queries.push(json!({"id": format!("HQ-{:03}", queries.len() + 1), "query": r.title(), "expected_refs": [r.id()], "forbidden": forbidden, "k": 8}));
-        }
-        write_yaml(&held_path, &json!({"version": "1", "generated_by": "gov adopt build-memory", "queries": queries}))?;
-        generated = queries.len();
-        let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true });
+        let db = RuntimeDb::open(&p.db_path())?;
+        let set = crate::memory::heldout::generate_starter(&p, &db, "gov adopt build-memory")?;
+        generated = set["queries"].as_array().map(|a| a.len()).unwrap_or(0);
+        drop(db);
+        write_yaml(&held_path, &set)?;
+        let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() });
     }
     let md = format!("# 10 — Memory implementation report\n\nBuilt after path stabilisation (A7 accepted) on canonical paths.\n\n- artefacts: {} · chunks: {} · vectors: {} · edges: {} · symbols: {}\n- excluded (secret/binary/large): {}\n- secret-content blocked: {}\n- embedder: {}\n- manifest hash: {}\n- degradations: {:?}\n- held-out queries generated: {generated}\n", r.counts["artifacts"], r.counts["chunks"], r.counts["vectors"], r.counts["edges"], r.counts["symbols"], r.excluded.len(), r.secret_blocked.len(), r.embedder, r.manifest_hash, r.degradations);
     write_md(root, "10-MEMORY-IMPLEMENTATION-REPORT.md", &md)?;
@@ -373,9 +406,9 @@ pub fn a10_verify_memory(root: &Path, verdict: Option<&str>, session: &str, role
     if b["memory_builder_session"].as_str() == Some(session) { return Err(GovError::new("INDEPENDENCE", "memory verifier session must differ from the memory builder session (Role F)")); }
     let mut p = Project::open(root); p.invalidate();
     // delete/rebuild guarantee (§19): two full rebuilds from Git + records at the same tree state must be identical
-    let first = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false })?;
+    let first = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
     let before = Some(first.manifest_hash.clone());
-    let rebuilt = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false })?;
+    let rebuilt = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: false, ..Default::default() })?;
     let reproducible = before.as_deref() == Some(rebuilt.manifest_hash.as_str());
     // held-out retrieval regression on the fresh index
     let db = RuntimeDb::open(&p.db_path())?;
@@ -398,9 +431,9 @@ pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
     let b = load_baseline(root)?; require_stage(&b, "A10")?;
     require_verdict(&b, "A10", &["MEMORY_ACCEPTED_FOR_V4_AUDIT"])?;
     let mut p = Project::open(root); p.invalidate();
-    let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true })?; // audit a fresh index
+    let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() })?; // audit a fresh index
     let audit = crate::verification::audit(&p, &crate::verification::SuiteOptions { deep: true, families: vec![] }, true)?;
-    let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true })?; // the audit record is evidence; keep the index fresh
+    let _ = crate::memory::indexer::rebuild(&p, crate::memory::indexer::IndexOptions { incremental: true, ..Default::default() })?; // the audit record is evidence; keep the index fresh
     let doctor = crate::doctor::run(&p)?;
     let legacy_active = classify::legacy_mechanisms(root).len();
     let inv_count = b["inventory_summary"]["files"].as_u64().unwrap_or(0);

@@ -16,7 +16,7 @@ pub fn verify_catalogue(root: &Path, catalogue: &[Value]) -> Value {
             "MOVE" | "RENAME" => if !src && dst { "MIGRATED" } else if src && dst { "CONFLICTING" } else if src { "PRESENT" } else { "NOT_FOUND" },
             "EXTRACT" if to.contains("memory-stores") => if src { "PRESENT" } else { "RETIRED" },
             "EXTRACT" => if !src { "MIGRATED" } else { "PRESENT" },
-            "RETIRE" | "DELETE_FROM_ACTIVE_TREE" => if !src { "RETIRED" } else if e["requires_human_gate"].as_bool().unwrap_or(false) { "PRESENT" } else { "PRESENT" },
+            "RETIRE" | "DELETE_FROM_ACTIVE_TREE" => if !src { "RETIRED" } else if e["requires_human_gate"].as_bool().unwrap_or(false) { "PRESENT_GATED" } else { "PRESENT" },
             _ => "UNKNOWN",
         };
         let deferred_store = action == "EXTRACT" && to.contains("memory-stores");
@@ -38,9 +38,24 @@ pub fn run_tests_file(root: &Path, tests_path: &Path) -> Result<Value> { run_tes
 /// Run tests whose `after_batch` is <= `upto_batch` (tests without `after_batch` always run).
 pub fn run_tests_file_upto(root: &Path, tests_path: &Path, upto_batch: Option<i64>) -> Result<Value> {
     let tests = read_yaml(tests_path)?;
-    let mut results = vec![]; let mut pass = 0; let mut fail = 0; let mut deferred = 0;
+    let mut results = vec![]; let mut pass = 0; let mut fail = 0; let mut deferred = 0; let mut deferred_reasons = vec![];
+    let catalogue_path = root.join(crate::adopt::EVIDENCE).join("04-TARGET-PATH-MAP.jsonl");
+    let catalogue: Vec<Value> = if catalogue_path.exists() { read_text(&catalogue_path)?.lines().filter(|l| !l.trim().is_empty()).filter_map(|l| serde_json::from_str(l).ok()).collect() } else { vec![] };
+    let project = crate::project::Project::open(root);
     for t in tests["tests"].as_array().cloned().unwrap_or_default() {
         if let (Some(ub), Some(ab)) = (upto_batch, t["after_batch"].as_i64()) { if ab > ub { deferred += 1; continue; } }
+        // Tests for entries behind a Human Decision Gate follow the recorded decision: pending → deferred (the batch
+        // must not act), answered A → the test runs, any other option → the human kept the entry in place and the
+        // planned removal is no longer part of the plan (recorded, not counted as a failure).
+        if let Some(aid) = t["gate_artifact"].as_str() {
+            let entry = catalogue.iter().find(|e| e["artifact_id"].as_str() == Some(aid));
+            let gate = entry.and_then(|e| e["human_gate"].as_str()).unwrap_or("");
+            match crate::orchestration::gates::answered_option(&project, gate).as_deref() {
+                Some("A") => {}
+                Some(other) => { deferred += 1; deferred_reasons.push(json!({"id": t["id"], "artifact_id": aid, "gate": gate, "reason": format!("human gate answered {other}: entry kept in place by decision; planned action withdrawn")})); continue; }
+                None => { deferred += 1; deferred_reasons.push(json!({"id": t["id"], "artifact_id": aid, "gate": gate, "reason": if gate.is_empty() { "no gate record for a gated entry (A4 creates one)".to_string() } else { "human gate pending: destructive action not executed".to_string() }})); continue; }
+            }
+        }
         let kind = t["kind"].as_str().unwrap_or(""); let target = t["path"].as_str().unwrap_or("").to_string();
         let ok = match kind {
             "path_present" => root.join(&target).exists(),
@@ -66,7 +81,7 @@ pub fn run_tests_file_upto(root: &Path, tests_path: &Path, upto_batch: Option<i6
         if ok { pass += 1; } else { fail += 1; }
         results.push(json!({"id": t["id"], "kind": kind, "ok": ok, "path": target, "description": t["description"]}));
     }
-    Ok(json!({"tests": results.len(), "pass": pass, "fail": fail, "deferred": deferred, "ok": fail == 0, "results": results}))
+    Ok(json!({"tests": results.len(), "pass": pass, "fail": fail, "deferred": deferred, "deferred_reasons": deferred_reasons, "ok": fail == 0, "results": results}))
 }
 
 /// Scaffold held-out migration tests from the catalogue for the independent reviewer to extend.
@@ -81,7 +96,13 @@ pub fn scaffold_tests(catalogue: &[Value], legacy_paths: &[String], product_test
         push("path_absent", e["current_path"].as_str().unwrap_or(""), json!({"after_batch": b}), format!("{} moved away", e["artifact_id"]));
         push("path_present", e["target_path"].as_str().unwrap_or(""), json!({"after_batch": b}), format!("{} present at target", e["artifact_id"]));
     }
-    for e in catalogue.iter().filter(|e| e["action"] == "DELETE_FROM_ACTIVE_TREE") { push("path_absent", e["current_path"].as_str().unwrap_or(""), json!({"after_batch": e["batch"].as_i64().unwrap_or(6)}), format!("{} deleted from active tree", e["artifact_id"])); }
+    for e in catalogue.iter().filter(|e| e["action"] == "DELETE_FROM_ACTIVE_TREE" || e["action"] == "RETIRE") {
+        let gated = e["requires_human_gate"].as_bool().unwrap_or(false);
+        let mut extra = json!({"after_batch": e["batch"].as_i64().unwrap_or(6)});
+        if gated { extra["gate_artifact"] = e["artifact_id"].clone(); }
+        let what = if e["action"] == "RETIRE" { "retired to archive/code-reference" } else { "deleted from active tree" };
+        push("path_absent", e["current_path"].as_str().unwrap_or(""), extra, format!("{} {what}{}", e["artifact_id"], if gated { " (after its human gate is answered A)" } else { "" }));
+    }
     for l in legacy_paths {
         let entry = catalogue.iter().find(|e| e["current_path"].as_str() == Some(l.as_str()));
         if entry.map(|e| e["action"] == "EXTRACT" && e["target_path"].as_str().map(|t| t.contains("memory-stores")).unwrap_or(false)).unwrap_or(false) { continue; } // extracted/retired in A8, registered in LEG record

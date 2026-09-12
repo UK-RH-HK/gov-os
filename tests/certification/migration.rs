@@ -21,6 +21,10 @@ fn path_migration_with_rollback_and_memory_rebuild() {
     assert_eq!(map["unknown_blocking_destructive"], 0);
     let cat: Vec<serde_json::Value> = read(&root, "spec/audits/GOVERNANCE-ADOPTION/04-TARGET-PATH-MAP.jsonl").lines().map(|l| serde_json::from_str(l).unwrap()).collect();
     let entry = |p: &str| cat.iter().find(|x| x["current_path"] == p).unwrap().clone();
+    // verifier M13: catalogue references/imports come from the import graph, not empty placeholders
+    assert!(cat.iter().any(|e| !e["imports"].as_array().map(|a| a.is_empty()).unwrap_or(true)), "some catalogue entry must list its imports");
+    assert!(cat.iter().any(|e| !e["references"].as_array().map(|a| a.is_empty()).unwrap_or(true)), "some catalogue entry must list files referencing it");
+    assert!(entry("web/src/util/http.ts")["references"].to_string().contains("client.ts") || entry("lib/core/helpers.py")["references"].as_array().map(|a| !a.is_empty()).unwrap_or(false), "{}", entry("web/src/util/http.ts"));
     assert_eq!(entry("notes/api-spec.md")["action"], "MOVE"); assert_eq!(entry("notes/api-spec.md")["target_path"], "spec/requirements/api-spec.md");
     assert_eq!(entry("docs/helpers_test.py")["action"], "MOVE"); assert_eq!(entry("docs/helpers_test.py")["target_path"], "tests/helpers_test.py");
     assert_eq!(entry("docs/old/legacy_decisions.md")["action"], "EXTRACT");
@@ -60,6 +64,13 @@ fn path_migration_with_rollback_and_memory_rebuild() {
     for b in ["3", "4", "5", "6", "7"] { executor.ok(&["adopt", "migrate", "--batch", b]); }
     assert!(exists(&root, "tests/helpers_test.py") && !exists(&root, "docs/helpers_test.py"));
     assert!(read(&root, "spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl").contains("batch_complete"));
+    // destructive entries (heuristic dead code) carry gate records; the operator keeps them (option B) => nothing deleted
+    let cat_after: Vec<serde_json::Value> = read(&root, "spec/audits/GOVERNANCE-ADOPTION/04-TARGET-PATH-MAP.jsonl").lines().map(|l| serde_json::from_str(l).unwrap()).collect();
+    for e in cat_after.iter().filter(|e| e["requires_human_gate"] == true) {
+        let gid = e["human_gate"].as_str().expect("gate record for destructive entry");
+        executor.ok(&["gate", "present", gid]); executor.ok(&["decide", gid, "--option", "B", "--by", "owner"]);
+        assert!(exists(&root, e["current_path"].as_str().unwrap()));
+    }
     // --- independent verification against reality ---
     let e3 = executor.err(&["adopt", "verify-migration"]);
     assert_eq!(e3.error_code(), "INDEPENDENCE");

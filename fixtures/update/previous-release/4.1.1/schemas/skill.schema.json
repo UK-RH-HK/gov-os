@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.2/skill.schema.json",
+  "title": "skill",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VALIDATED",
+        "ACTIVE",
+        "DEPRECATED",
+        "RETIRED"
+      ]
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "task_classes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "method": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "produces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "step"
+        ]
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_permissions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "READ_REPO",
+          "WRITE_REPO_SCOPED",
+          "RUN_TESTS",
+          "NETWORK_READ",
+          "NETWORK_WRITE",
+          "PACKAGE_INSTALL",
+          "SYSTEM_INSTALL",
+          "DB_READ",
+          "DB_WRITE",
+          "CLOUD_READ",
+          "CLOUD_WRITE",
+          "CI_TRIGGER",
+          "SECRET_READ",
+          "DEPLOY_STAGING",
+          "DEPLOY_PRODUCTION"
+        ]
+      }
+    },
+    "validation_scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "given": {
+            "type": "string"
+          },
+          "expect": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "expect"
+        ]
+      }
+    },
+    "lineage": {
+      "type": "object"
+    },
+    "model_agnostic": {
+      "const": true
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "version",
+    "status",
+    "roles",
+    "method",
+    "validation_scenarios"
+  ]
+}

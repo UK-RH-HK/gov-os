@@ -30,7 +30,12 @@ pub fn write_yaml(p: &Path, v: &Value) -> Result<()> {
     write_text(p, &s)
 }
 pub fn to_yaml(v: &Value) -> Result<String> {
-    Ok(serde_yaml::to_string(v)?)
+    let raw = serde_yaml::to_string(v)?;
+    // YAML 1.1 loaders would read unquoted dates/timestamps as datetime objects; our schemas declare strings.
+    static TS: OnceLock<Regex> = OnceLock::new();
+    let rx = TS.get_or_init(|| Regex::new(r"^(\s*(?:- )?(?:[A-Za-z_][\w.-]*: )?)(\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})?)?)\s*$").unwrap());
+    let out: Vec<String> = raw.lines().map(|l| match rx.captures(l) { Some(c) => format!("{}'{}'", &c[1], &c[2]), None => l.to_string() }).collect();
+    Ok(out.join("\n") + "\n")
 }
 pub fn read_json(p: &Path) -> Result<Value> {
     let text = read_text(p)?;
