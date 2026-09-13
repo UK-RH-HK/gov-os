@@ -1,0 +1,45 @@
+id: ARCH-0002
+type: architecture
+title: "PROPOSED — PENDING OWNER APPROVAL (not active): Governance OS root-of-trust architecture RoT-1 (signed release statements, single authentication boundary, authenticated installed kernel)"
+# The record schema has no PROPOSED status value; PROVISIONAL is the nearest valid lifecycle status. This architecture is
+# a proposal companion to D-0008 (also pending): NOT active, NOT approved, NOT implemented. ARCH-0001 remains ACTIVE.
+status: PROVISIONAL
+proposal_state: PROPOSED
+approval_state: PENDING_OWNER_HUMAN_DECISION_GATE
+in_effect: false
+state_class: NARRATIVE
+created: "2026-09-13"
+tags: [proposed, pending-owner-approval, not-in-effect, root-of-trust]
+governed_by: [D-0002]
+depends_on: [D-0008]
+affects: [ARCH-0001, D-0007]
+summary: >
+  PROPOSED — PENDING OWNER APPROVAL. Not active, not approved, not implemented. Companion architecture to the proposed
+  decision D-0008; it can become ACTIVE only if D-0008 is approved through its Human Decision Gate. Full specification in
+  release/root-of-trust/4.1.6/ (outputs 1-16, schemas, evidence).
+body: |
+  STATUS: PROPOSED / PENDING. Nothing below is in effect.
+
+  ## Chain
+  trust-root metadata compiled into gov (T0) -> DSSE-signed release statement (Ed25519 over RFC 8785 canonical payload)
+  -> identity + complete kernel file map + component and migration digests -> authenticate(source) in quarantine
+  (V0-V14) -> AuthenticatedRelease -> authorisation (certification, gates bound to statement digest, downgrade, authority)
+  -> journaled install transaction (prepared, staged, swapped, migrated, committed, verified) -> governance/trust/ +
+  framework.lock (record) -> kernel_trust v2 on every use (installed files == statement, statement verifies under T0,
+  not revoked, lock consistent) -> TrustedKernel read handle.
+
+  ## Proposed modules (runtime/src/trust/)
+  root, jcs, dsse, statement, quarantine, authenticate, authorise, revocation, install_tx, kernel_fs; kernel_trust.rs v2.
+
+  ## Proposed key roles
+  root (k-of-n offline), release, certification, profile; disjoint key sets; test lineage compiled only with feature
+  trust-profile-test; production binaries refuse test material.
+
+  ## Proposed coupling rules
+  - Only install_tx writes governance/kernel, governance/trust, governance/framework.lock; it accepts AuthenticatedRelease.
+  - Only kernel_trust resolves paths to kernel content; everything else receives a TrustedKernel.
+  - No decision reads a release manifest.json/yaml or a source KERNEL_MANIFEST.json.
+  - Statement and lock schemas are compiled into the binary.
+  - Environment variables select sources only.
+  - The pure-Rust signature dependency keeps D-0002's self-contained binary; algorithm choice is recorded in the trust
+    root and replaceable.

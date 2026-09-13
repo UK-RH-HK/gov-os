@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/artifact-statement.schema.json",
+  "title": "artifact-statement",
+  "description": "PROPOSED (RoT-1). Binary artifact digests for one release, signed by the release role after the binaries are built.",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_type", "trust_profile", "framework", "release_id", "release_statement_digest", "artifacts", "build"],
+  "properties": {
+    "_type": {"const": "https://agentic-engineering-os/statement/artifact/v1"},
+    "trust_profile": {"enum": ["production", "test"]},
+    "framework": {"const": "agentic-engineering-os"},
+    "release_id": {"type": "string", "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"},
+    "release_statement_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "target", "digest", "size"],
+        "properties": {
+          "name": {"type": "string", "maxLength": 256},
+          "target": {"type": "string", "description": "target triple or platform id", "maxLength": 128},
+          "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "size": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["toolchain", "trust_profile_feature", "reproducible"],
+      "properties": {
+        "toolchain": {"type": "string", "maxLength": 256},
+        "trust_profile_feature": {"enum": ["production", "test"]},
+        "reproducible": {"type": "boolean"}
+      }
+    }
+  }
+}

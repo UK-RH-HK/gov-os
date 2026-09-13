@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/dsse-envelope.schema.json",
+  "title": "dsse-envelope",
+  "description": "PROPOSED (RoT-1). DSSE envelope carrying one GOV-JCS-1 canonical statement. Structural checks only; signature, canonical-form and role checks are performed by the authentication boundary (V3-V7).",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payloadType", "payload", "signatures"],
+  "properties": {
+    "payloadType": {
+      "type": "string",
+      "enum": [
+        "application/vnd.agentic-engineering-os.trust-root.v1+json",
+        "application/vnd.agentic-engineering-os.release-statement.v1+json",
+        "application/vnd.agentic-engineering-os.artifact-statement.v1+json",
+        "application/vnd.agentic-engineering-os.certification-statement.v1+json",
+        "application/vnd.agentic-engineering-os.revocation-statement.v1+json",
+        "application/vnd.agentic-engineering-os.legacy-identity.v1+json",
+        "application/vnd.agentic-engineering-os.profile-statement.v1+json"
+      ]
+    },
+    "payload": {
+      "type": "string",
+      "description": "standard base64 (RFC 4648 section 4, padded) of the canonical payload bytes; <= 4 MiB decoded",
+      "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+      "maxLength": 5592408
+    },
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["keyid", "sig"],
+        "properties": {
+          "keyid": {"type": "string", "pattern": "^ed25519:[0-9a-f]{64}$"},
+          "sig": {"type": "string", "description": "base64 of the 64-byte Ed25519 signature over PAE(payloadType, payload bytes)", "pattern": "^[A-Za-z0-9+/]{86}==$"}
+        }
+      }
+    }
+  }
+}

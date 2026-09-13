@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/profile-statement.schema.json",
+  "title": "profile-statement",
+  "description": "PROPOSED (RoT-1). Reference retrieval profile statement signed by the profile role (10-RETRIEVAL-PROFILE-TRUST.md). Provenance and integrity only; authorisation stays with the plugin registry and kernel authority floor.",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_type", "trust_profile", "profile_id", "profile_version", "capability", "compatibility", "plugin", "runtime", "model", "evidence", "offline"],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "semver": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"},
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?!.*(^|/)\\.{1,2}(/|$))[^\\\\\\u0000]+$"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "properties": {
+    "_type": {"const": "https://agentic-engineering-os/statement/profile/v1"},
+    "trust_profile": {"enum": ["production", "test"]},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9./-]{2,127}$"},
+    "profile_version": {"$ref": "#/$defs/semver"},
+    "capability": {"enum": ["embed", "rerank"]},
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["framework_min", "framework_max_exclusive", "capability_protocol"],
+      "properties": {
+        "framework_min": {"$ref": "#/$defs/semver"},
+        "framework_max_exclusive": {"$ref": "#/$defs/semver"},
+        "capability_protocol": {"const": "gov-capability/1"}
+      }
+    },
+    "plugin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["descriptor", "implementation_files"],
+      "properties": {
+        "descriptor": {"$ref": "#/$defs/file"},
+        "implementation_files": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/file"}}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "requires", "lock", "packages"],
+      "properties": {
+        "kind": {"enum": ["python", "native", "container"]},
+        "requires": {"type": "string", "maxLength": 128},
+        "lock": {"$ref": "#/$defs/file"},
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "version", "digests"],
+            "properties": {
+              "name": {"type": "string", "maxLength": 256},
+              "version": {"type": "string", "maxLength": 64},
+              "digests": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/digest"}}
+            }
+          }
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source_kind", "revision", "licence", "dimensions", "normalised", "files"],
+      "properties": {
+        "id": {"type": "string", "maxLength": 256},
+        "source_kind": {"enum": ["model-hub", "vendored", "local-build"]},
+        "revision": {"type": "string", "description": "immutable content-addressed revision (commit id); branch or tag names are invalid", "pattern": "^[0-9a-f]{40,64}$"},
+        "licence": {"type": "string", "maxLength": 128},
+        "dimensions": {"type": "integer", "minimum": 1},
+        "normalised": {"type": "boolean"},
+        "files": {"type": "array", "minItems": 1, "items": {"allOf": [{"$ref": "#/$defs/file"}, {"required": ["size"]}]}}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["benchmark_record_digest", "heldout_set_digest", "metrics"],
+      "properties": {
+        "benchmark_record_digest": {"$ref": "#/$defs/digest"},
+        "heldout_set_digest": {"$ref": "#/$defs/digest"},
+        "metrics": {"type": "object", "additionalProperties": {"type": "string", "description": "decimal strings (GOV-JCS-1 forbids floats)"}}
+      }
+    },
+    "offline": {"const": true}
+  }
+}

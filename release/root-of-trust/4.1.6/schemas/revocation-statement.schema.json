@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/revocation-statement.schema.json",
+  "title": "revocation-statement",
+  "description": "PROPOSED (RoT-1). Release revocations, signed by the certification role; monotonic sequence. Key revocation is expressed only by a new trust-root version.",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_type", "trust_profile", "framework", "sequence", "revoked_releases", "issued_at"],
+  "properties": {
+    "_type": {"const": "https://agentic-engineering-os/statement/revocation/v1"},
+    "trust_profile": {"enum": ["production", "test"]},
+    "framework": {"const": "agentic-engineering-os"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "revoked_releases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["release_id", "statement_digest", "effect", "reason"],
+        "properties": {
+          "release_id": {"type": "string", "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"},
+          "statement_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "effect": {"enum": ["refuse_install", "refuse_operation"]},
+          "reason": {"type": "string", "maxLength": 1024}
+        }
+      }
+    },
+    "issued_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"}
+  }
+}

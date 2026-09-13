@@ -1,0 +1,98 @@
+id: D-0008
+type: decision
+title: "PROPOSED — PENDING OWNER APPROVAL (not active, not approved): root of trust — every kernel/release ingress consumes an authenticated release identity derived from anchors compiled into the binary"
+# The record schema has no PROPOSED status value; PROVISIONAL is the nearest valid lifecycle status. This decision is a
+# proposal only: it is NOT active, NOT approved, NOT in effect and confers no authority until the product owner answers
+# its Human Decision Gate. D-0007 remains the ACTIVE trust-class decision until then.
+status: PROVISIONAL
+proposal_state: PROPOSED
+approval_state: PENDING_OWNER_HUMAN_DECISION_GATE
+in_effect: false
+state_class: NARRATIVE
+created: "2026-09-13"
+updated: "2026-09-13"
+owner_role: orchestrator
+tags: [proposed, pending-owner-approval, not-in-effect, root-of-trust]
+supersedes: []
+governed_by: [PRJ-0001, D-0002]
+affects: [D-0007, ARCH-0001, ARCH-0002, API-0001, API-0002, D-0005, D-0006]
+summary: >
+  PROPOSED — PENDING OWNER APPROVAL. Not active, not approved, not in effect. Proposed root-of-trust architecture RoT-1
+  for candidate 4.1.6. If and only if the owner approves it through a presented and answered Human Decision Gate, it
+  supersedes D-0007 in full, restating D-0007 rules (1)-(4). Until then D-0007 remains ACTIVE and unchanged. Full design,
+  evidence and acceptance plan: release/root-of-trust/4.1.6/.
+question: >
+  Four consecutive candidates (4.1.3-4.1.5) were rejected for trust facts derived from artefacts controlled by the party
+  seeking the trust. V-H3 showed gov init/update install an unauthenticated source and re-mint the V-H2 anchor from it;
+  the root-of-trust escalation probes E1-E5 (release/root-of-trust/4.1.6/evidence/ESCALATION_PROBES.md) showed that
+  regenerated manifests pass source verification, a self-declared CERTIFIED manifest skips the update gate, a poisoned
+  embedded-kernel cache is installed and used as the fail-closed baseline, a Git-shaped coherent replacement verifies,
+  and a tampered rollback snapshot verifies. Which root of trust should govern every Governance OS release/kernel ingress?
+options:
+  - {id: A, description: "Bounded repair: verify the source against its shipped manifest and declared release_hash (4.1.5 report section 12) - circular, fails E1/E2"}
+  - {id: B, description: "Binary-embedded digest registry only - non-circular but cannot extend trust (new releases, certification, revocation) after the binary ships"}
+  - {id: C, description: "RoT-1: DSSE-signed statements (Ed25519 over RFC 8785 canonical payloads) under trust-root metadata compiled into the gov binary; separate root/release/certification/profile roles; one authentication boundary producing an AuthenticatedRelease consumed by every ingress; journaled install transaction; use-time authentication of the installed kernel against its signed statement; framework.lock as a record only"}
+  - {id: D, description: "Keyless signing bound to an identity provider plus a transparency log as the root - provider-bound, online checks"}
+  - {id: E, description: "Signed Git tags/commits as the root - authenticates commits, not delivered payload bytes"}
+  - {id: F, description: "Full TUF deployment with online timestamp/snapshot roles - incompatible with offline verification; rotation and threshold rules adopted inside C"}
+# No option is chosen until the owner answers the approval gate; chosen_option is deliberately absent.
+recommended_option: C
+rationale: |
+  RECOMMENDATION ONLY — NOT A DECISION. Pending the owner's approval gate.
+
+  Trust must originate from an anchor that exists before the source is seen, cannot be produced by whoever controls the
+  source, repository, cache, environment or transport, and can be extended after ship. Only public keys compiled into
+  the binary, validating signatures made by offline private keys, meet all three.
+
+  Proposed trust classes (would replace D-0007's table on approval), highest first:
+    T0 trust anchors compiled into the running gov binary: trust-root metadata chain, revocation floor, statement schemas,
+       embedded kernel bytes and embedded statements;
+    T1 authenticated framework material: bytes whose digests are bound by a statement verifying under T0 for the
+       required role, not revoked, identity and compatibility checked - at ingress an AuthenticatedRelease, at use the
+       installed files equal to the installed statement; includes verified certification, revocation, profile statements;
+    T2 authoritative project state written by the OS (records, gates, CITs, reports, plugin registry, ledgers,
+       checkpoints); framework.lock is a T2 record of T1 identity, never a source of it;
+    T3 verified registry/derived state;
+    T4 project-controlled configuration, plugin descriptors, and every repository- or user-writable artefact not
+       currently authenticated (installed kernel files, KERNEL_MANIFEST.json, lock fields, governance/trust files before
+       verification, caches, snapshots);
+    T5 caller-controlled input: CLI arguments, environment variables, --source paths and their contents, release
+       directories and bundles before authentication, downloaded files, descriptive release manifests, report fields,
+       worker returns;
+    T6 plugin- and model-controlled data.
+
+  Rules restated from D-0007: (1) an enforcement decision reads its floor from T1 only; when T1 cannot be established
+  the embedded baseline is substituted explicitly and mutating operations fail closed. (2) registered, approved,
+  verified, human_approved, authority, provenance are facts of T0/T1/T2 only; a T4/T5/T6 field carrying such a name is a
+  request, recorded and ignored. (3) A T4 layer may specialise or strengthen a higher layer, never weaken it. (4) Every
+  refusal is typed and auditable.
+  Proposed new rules: (5) class membership is determined by a verification chain to T0, never by agreement among
+  artefacts; (6) every write to a T1 location and every migration execution consumes an AuthenticatedRelease produced by
+  the single authentication boundary before any byte leaves quarantine; (7) certification, revocation, signer role,
+  release identity, compatibility and update-impact facts are T1 statements, the same facts in a descriptive file are T5
+  requests; (8) an authentication failure never falls back to a lower acceptance path, and the explicit development path
+  never yields production-authenticated or certified state; (9) CLI flags and environment variables may select a source
+  or opt into a lower labelled state, never add or extend anchors; (10) trust statements are validated with schemas from
+  T0, never with schemas from the material being authenticated.
+consequences_if_approved:
+  - "Every ingress in release/root-of-trust/4.1.6/02-INGRESS-MAP.md (init, init --force, adopt batch 0, update check/apply, automatic and explicit rollback, kernel reinstall, recovery, embedded materialisation, environment sources, Git delivery, use-time readers, migrations, release build/verify, certification, fetch/bundles) is rewired to authenticate -> authorise -> install transaction; install code accepts only an AuthenticatedRelease."
+  - "kernel_trust v2 authenticates the installed kernel against governance/trust/release.dsse.json under T0 on every use and keeps V-H2 substitution and KERNEL_TAMPERED; new KERNEL_UNAUTHENTICATED, LOCK_IDENTITY_MISMATCH, INSTALL_INTERRUPTED; doctor D030-D033."
+  - "Certification and revocation are signed statements by separate roles; manifest.json/yaml are descriptive and never read for decisions; update gates bind the release statement digest."
+  - "framework.lock 2.0.0 records release_id, statement digest, signer, trust root, trust level and certification; it never creates trust; set_lock_field cannot write identity fields."
+  - "Development (unsigned) and test material have explicit labelled paths that cannot produce production-authenticated or certified state; production binaries keep floors on the authenticated embedded baseline for unsigned kernels."
+  - "Legacy 4.1.2-4.1.5 kernels are identified through a signed legacy-identity statement as AUTHENTICATED_REJECTED."
+  - "Private GitHub or any host is a transport only; verification of downloaded releases and cloned consumers is offline."
+  - "Reference retrieval profiles use signed profile statements binding plugin, runtime-lock and model file digests and an immutable model revision; D-0005 fail-closed and D-0006 non-constitutional model choice are preserved; profile signatures are provenance, never authorisation."
+  - "Private signing keys never exist in any repository, payload, CI log or consumer; release build refuses private key material."
+  - "Only after approval: this record becomes ACTIVE (state_class AUTHORITATIVE, chosen_option recorded, human_approved true, supersedes [D-0007]); D-0007 becomes SUPERSEDED (superseded_by D-0008); ARCH-0002 becomes ACTIVE; owner parameters OP-1..OP-6 are recorded."
+owner_parameters_pending:
+  - "OP-1 root role keys/threshold/custodians (recommended 3 keys, threshold 2, three named custodians, offline hardware-backed)"
+  - "OP-2 release role custody (recommended active hardware token on an isolated signing host + registered standby key)"
+  - "OP-3 adoption policy for authenticated but uncertified/rejected releases (recommended init allowed and labelled; update gated; revoked refused)"
+  - "OP-4 separate candidate signing role (recommended no)"
+  - "OP-5 revocation freshness warning age (recommended 180 days, informational)"
+  - "OP-6 mandatory --confirm-trust-root on first init (recommended no; fingerprint always printed)"
+human_approved: false
+impact_radius: R5
+reversibility: low
+confidence: 0.85

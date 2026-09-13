@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/framework-lock.schema.json",
+  "title": "framework-lock",
+  "description": "PROPOSED (RoT-1) framework.lock 2.0.0. A record of authenticated identity; every identity field is cross-checked against governance/trust/release.dsse.json at use time and never read as a source of trust.",
+  "x-schema-version": "2.0.0",
+  "type": "object",
+  "required": ["lock_schema_version", "framework", "version", "release_id", "release_sequence", "release_commit", "release_hash", "kernel_manifest_hash", "release_statement_digest", "signer", "trust_root", "trust_level", "certification", "source", "installed_at", "install_evidence"],
+  "$defs": {
+    "semver": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"},
+    "hex64": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "properties": {
+    "lock_schema_version": {"const": "2.0.0"},
+    "framework": {"const": "agentic-engineering-os"},
+    "version": {"$ref": "#/$defs/semver"},
+    "release_id": {"type": "string", "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"},
+    "release_sequence": {"type": "integer", "minimum": 1},
+    "release_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "release_hash": {"$ref": "#/$defs/hex64"},
+    "kernel_manifest_hash": {"$ref": "#/$defs/hex64"},
+    "release_statement_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null", "description": "only for DEVELOPMENT_UNSIGNED"}]},
+    "signer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["role", "algorithm", "key_ids"],
+          "properties": {
+            "role": {"enum": ["release"]},
+            "algorithm": {"const": "ed25519"},
+            "key_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^ed25519:[0-9a-f]{64}$"}}
+          }
+        },
+        {"type": "null"}
+      ]
+    },
+    "trust_root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "id", "version"],
+      "properties": {
+        "profile": {"enum": ["production", "test"]},
+        "id": {"$ref": "#/$defs/digest"},
+        "version": {"type": "integer", "minimum": 1}
+      }
+    },
+    "trust_level": {"enum": ["CERTIFIED", "AUTHENTICATED_UNCERTIFIED", "AUTHENTICATED_REJECTED", "DEVELOPMENT_UNSIGNED", "TEST"]},
+    "identity_source": {"enum": ["statement", "legacy-identity", "development-record"]},
+    "certification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "statement_digest", "sequence"],
+      "properties": {
+        "status": {"enum": ["CERTIFIED", "REJECTED", "WITHDRAWN", "UNCERTIFIED"]},
+        "statement_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+        "sequence": {"oneOf": [{"type": "integer", "minimum": 1}, {"type": "null"}]}
+      }
+    },
+    "revocation_sequence_seen": {"type": "integer", "minimum": 0},
+    "source": {"type": "string", "pattern": "^(release|embedded|source|bundle|remote|snapshot):agentic-engineering-os@"},
+    "source_reference": {"type": "string", "description": "logical reference; never an absolute path or a credential", "pattern": "^(bundle|github-release|remote|embedded|checkout|snapshot):[^\\s]+$", "not": {"pattern": "(^|:)/|[A-Za-z]:\\\\|@[^/]*:[^/]*@"}},
+    "installed_at": {"type": "string"},
+    "installed_at_commit": {"type": "string"},
+    "installed_by": {
+      "type": "object",
+      "properties": {
+        "gov_version": {"$ref": "#/$defs/semver"},
+        "trust_profile": {"enum": ["production", "test"]},
+        "session": {"type": "string"},
+        "role": {"type": "string"},
+        "authority_level": {"type": "string", "pattern": "^L[0-5]$"}
+      }
+    },
+    "install_evidence": {
+      "type": "object",
+      "required": ["transaction_id", "ledger_entry"],
+      "properties": {
+        "transaction_id": {"type": "string"},
+        "ledger_entry": {"type": "string"},
+        "gate": {"type": ["string", "null"]}
+      }
+    },
+    "cli_version": {"$ref": "#/$defs/semver"},
+    "schema_versions": {"type": "object"}
+  }
+}
