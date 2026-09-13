@@ -1,0 +1,136 @@
+{
+  "continuity": {
+    "tree_digest_equals_published_release_hash": true,
+    "manifest_digest_equals_KERNEL_MANIFEST_hash": true,
+    "all_paths_ascii_tree_rule": true,
+    "file_count": 121
+  },
+  "migration_chain_unique": true,
+  "historical_tree_digest_equals_published": {
+    "4.1.2": true,
+    "4.1.3": true,
+    "4.1.4": true,
+    "4.1.5": true
+  },
+  "schemas_meta_valid": [
+    "artifact-statement.schema.json",
+    "certification-statement.schema.json",
+    "dsse-envelope.schema.json",
+    "framework-lock-2.0.0.schema.json",
+    "legacy-identity-statement.schema.json",
+    "profile-statement.schema.json",
+    "release-statement.schema.json",
+    "revocation-statement.schema.json",
+    "trust-format.schema.json",
+    "trust-policy-statement.schema.json",
+    "trust-root.schema.json",
+    "trust-state-statement.schema.json",
+    "verification-attestation.schema.json"
+  ],
+  "schema_problems": "none",
+  "reference_model": {
+    "every_statement_verifies_under_its_purpose": {
+      "trust-root.v1": "OK",
+      "trust-policy.v1": "OK",
+      "release-candidate": "OK",
+      "release-final": "OK",
+      "verification-attestation": "OK",
+      "certification.1-CERTIFIED": "OK",
+      "certification.2-WITHDRAWN": "OK",
+      "revocation.1": "OK",
+      "trust-state.1": "OK",
+      "trust-state.2": "OK",
+      "trust-state.3": "OK",
+      "historical-identity": "OK",
+      "artifact-candidate": "OK",
+      "retrieval-profile": "OK"
+    },
+    "negative": {
+      "payload_altered__SIGNATURE_INVALID": "SIGNATURE_INVALID",
+      "certification_key_signs_release_final__PURPOSE_NOT_GRANTED": "PURPOSE_NOT_GRANTED",
+      "certification_key_signs_historical_identity__PURPOSE_NOT_GRANTED": "PURPOSE_NOT_GRANTED",
+      "historical_identity_from_bundle__STATEMENT_SOURCE_NOT_PERMITTED": "STATEMENT_SOURCE_NOT_PERMITTED",
+      "release_key_signs_certification__PURPOSE_NOT_GRANTED": "PURPOSE_NOT_GRANTED",
+      "attestation_signed_by_release_key__PURPOSE_NOT_GRANTED": "PURPOSE_NOT_GRANTED",
+      "root_grants_release_final_to_certification_key__PURPOSE_SEPARATION_VIOLATION": "PURPOSE_SEPARATION_VIOLATION",
+      "other_lineage__STATEMENT_LINEAGE_MISMATCH": "STATEMENT_LINEAGE_MISMATCH",
+      "test_statement_on_production__TRUST_PROFILE_MISMATCH": "TRUST_PROFILE_MISMATCH",
+      "candidate_payload_under_final_type__STATEMENT_MALFORMED_or_TYPE_MISMATCH": "STATEMENT_TYPE_MISMATCH",
+      "unknown_key__SIGNER_UNKNOWN": "SIGNER_UNKNOWN"
+    },
+    "promotion": {
+      "final_promoted_from_candidate": true,
+      "identical_tree_digest": true,
+      "attestation_binds_candidate": true,
+      "certification_binds_attestation_and_final": true
+    },
+    "certification_views": {
+      "TSS1_only_certification_present__CERTIFICATION_UNREFERENCED": {
+        "view": "CERTIFICATION_UNREFERENCED",
+        "trust_state": "CURRENT_KNOWN(1)"
+      },
+      "TSS1_TSS2__CERTIFIED_AS_OF_2_no_relaxation": {
+        "view": "CERTIFIED_AS_OF(2)",
+        "trust_state": "CURRENT_KNOWN(2)",
+        "relaxes_gate_under_mode_A": false
+      },
+      "TSS1_3_with_WITHDRAWN__WITHDRAWN": {
+        "view": "WITHDRAWN",
+        "trust_state": "CURRENT_KNOWN(3)"
+      },
+      "TSS3_withheld_WITHDRAWN_statement_known__WITHDRAWN_sticky": {
+        "view": "WITHDRAWN",
+        "trust_state": "CURRENT_KNOWN(2)"
+      },
+      "TSS3_and_WITHDRAWN_withheld__CERTIFIED_AS_OF_2_residual_RS1": {
+        "view": "CERTIFIED_AS_OF(2)",
+        "trust_state": "CURRENT_KNOWN(2)",
+        "relaxes_gate_under_mode_A": false
+      },
+      "signed_reference_to_sequence_3_present__STALE": {
+        "view": "CERTIFIED_AS_OF(2)",
+        "trust_state": "STALE",
+        "relaxes_gate_under_mode_A": false
+      },
+      "higher_TSS_omits_revocation__TRUST_STATE_REGRESSION": {
+        "view": "TRUST_STATE_REGRESSION",
+        "at_sequence": 3,
+        "violation": "revocations"
+      }
+    },
+    "floor_join_on_4_1_2_kernel": {
+      "update_apply": {
+        "kernel_4_1_2": null,
+        "runtime_default_without_floor": "L3",
+        "trust_policy_floor": "L4",
+        "effective": "L4"
+      },
+      "resume_control": {
+        "kernel_4_1_2": null,
+        "runtime_default_without_floor": "L3",
+        "trust_policy_floor": "L4",
+        "effective": "L4"
+      },
+      "install_kernel": {
+        "kernel_4_1_2": "L4",
+        "runtime_default_without_floor": "L4",
+        "trust_policy_floor": "L4",
+        "effective": "L4"
+      },
+      "answer_gate": {
+        "kernel_4_1_2": null,
+        "runtime_default_without_floor": "L3",
+        "trust_policy_floor": "L3",
+        "effective": "L3"
+      }
+    }
+  },
+  "lineage_trust_root_id": "sha256:8a1f3e85094fc1bae5baffc0a9c3eeb7b1e401c3f27a2d51f695c60af1ade16f",
+  "statement_digests": {
+    "candidate": "sha256:c414c5a08e56c4650ac5784b012f79b85793d878421ef3f26950b4544f3ce131",
+    "final": "sha256:407f772cb572549f0c8b5904a9bb4ceb6a8e6e8563d49bb66e75aae03c4b446a",
+    "attestation": "sha256:36620750f3538b187ca8d3ee496888dae828a10ae07f8c79df7854e6448aa9fb",
+    "certification": "sha256:415751ae89d496e00612b523db9a3c8daa51a427091adb1248bb14c42d11a14b",
+    "tss2": "sha256:7a2ed8162e03537669d89c66b3cfc617d856cbf66a9a7c1890dcdc287025b74d"
+  }
+}

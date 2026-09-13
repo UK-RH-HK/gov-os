@@ -1,145 +1,143 @@
 # Output 4 — Canonical release-authentication architecture (RoT-1)
 
+> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 2 keeps the anchor the independent review confirmed sound and moves currency, freshness, byte binding and
+> purpose checks into dedicated models: `17` trust state, `18` verify-and-use, `19` eligibility and floor, `20` rollback
+> and recovery, `05` purposes.
+
 ## 1. Alternatives evaluated
 
-| Option | Description | Non-circular | Offline | Extensible after ship (new releases, certification, revocation) | Provider-neutral | Rotation / recovery | Verdict |
+| Option | Description | Non-circular | Offline | Extensible after ship | Provider-neutral | Rotation / recovery | Verdict |
 |---|---|---|---|---|---|---|---|
-| O1 | Harden hashes only (4.1.5 report §12: verify source against shipped manifest; declared vs recomputed hash) | **No** (E1) | yes | yes | yes | n/a | Rejected — circular |
-| O2 | Binary-embedded release registry (digest allowlist compiled into `gov`) | yes | yes | **No** — every new release, certification or revocation needs a new binary, and the binary's own distribution still needs authentication | yes | via new binary only | Kept as a **component**: compiled-in trust root, revocation floor, embedded statement, legacy-identity statement |
-| **O3** | **Signed statements; trust-root keys compiled into the binary (RoT-1)** | yes | yes | yes | yes (Ed25519, DSSE, RFC 8785 are open standards) | root-signed rotation, revocation, re-attestation | **Recommended** |
-| O4 | Keyless signing with an identity provider + public transparency log | yes | partially (log inclusion/revocation checks typically online) | yes | **No** — binds trust to an OIDC identity provider, often the same hosting provider that must not be the root | provider-managed | Rejected as root; optional future *additional* attestation |
-| O5 | Signed Git tags/commits (SSH or OpenPGP) | partially | yes | yes | yes | tied to developer identities | Rejected as root — authenticates commits, not payload bytes delivered through bundles, caches, snapshots or consumer repositories; requires Git history on every consumer. Optional supplementary provenance |
-| O6 | Full TUF deployment (root, targets, snapshot, timestamp roles) | yes | **No** for freshness (timestamp role must be online) | yes | yes | strongest | Not adopted wholesale; RoT-1 adopts TUF's root-rotation rule, thresholds, role separation and monotonic counters, and documents the freshness residual |
+| O1 | Harden hashes only (verify a source against its shipped manifest) | **no** (E1) | yes | yes | yes | n/a | rejected: circular |
+| O2 | Binary-embedded digest registry only | yes | yes | **no** | yes | via new binary only | kept as components: compiled root, TPS, TSS, historical-identity registry, embedded statement |
+| **O3** | **Signed statements under trust roots compiled into the binary (RoT-1)** | yes | yes | yes | yes | root-signed rotation, revocation, re-attestation | **recommended** |
+| O4 | Keyless signing with an identity provider and transparency log | yes | partially | yes | **no** | provider-managed | rejected as root; optional additional attestation later |
+| O5 | Signed Git tags or commits | partially | yes | yes | yes | tied to developer identities | rejected as root: authenticates commits, not delivered bytes |
+| O6 | Full TUF including an online timestamp role | yes | **no** for freshness | yes | yes | strongest | not adopted wholesale. Revision 2 adopts TUF's root rotation, thresholds, role separation, snapshot-style trust state and monotonic counters. It replaces the online timestamp role with sticky negative facts plus “no relaxation without freshness”, and offers optional expiring trust state (OP-3 mode B). |
 
 ## 2. Components
 
 | Component | Proposed location (4.1.6) | Responsibility |
 |---|---|---|
-| Trust context (T0) | `runtime/src/trust/root.rs`; data in canonical repo `trust/production/` (public), compiled via `include_bytes!` | parse and chain-verify trust-root metadata; key/role lookup; compiled revocation floor; trust profile (`production`/`test`) |
-| Canonical JSON | `trust/jcs.rs` | RFC 8785 serialisation under the GOV-JCS-1 profile; canonical-bytes check |
-| DSSE | `trust/dsse.rs` | strict envelope parse; PAE; signature verification (Ed25519 strict) |
-| Statements | `trust/statement.rs` | typed release, certification, revocation, artifact, profile, legacy-identity statements; validation against **compiled-in** schemas |
-| Quarantine | `trust/quarantine.rs` | source adapters (release dir, bundle archive, canonical checkout, embedded, snapshot, downloaded file) → single read into a private 0700 directory or memory; tree rules |
-| Authentication boundary | `trust/authenticate.rs` | the only constructor of `AuthenticatedRelease` |
-| Authorisation layer | `trust/authorise.rs` | certification policy, gates bound to statement digest, authority, minimum trust level, downgrade rules |
-| Install transaction | `trust/install_tx.rs` | journaled stage/swap/migrate/commit; interrupted-install recovery |
-| Use-time trust | `kernel_trust.rs` v2 + `trust/kernel_fs.rs` | `TrustedKernel` read handle over installed dir or embedded in-memory map |
-| Producer tools | `release.rs` (`gov release build`, `attach-signature`, `verify`), external signer | unsigned statement generation, signature attachment with verification, report-only authentication |
+| Trust context (T0) | `runtime/src/trust/root.rs`, `purposes.rs`; data compiled from `trust/production/` | root chain, purpose table and separation constraints, compiled TPS, TSS and historical registry |
+| Canonical JSON | `trust/jcs.rs` | GOV-JCS-1 |
+| DSSE | `trust/dsse.rs` | strict envelope parse; PAE; Ed25519 strict verification |
+| Statements | `trust/statement.rs` | typed statements validated with compiled schemas (`07` §4) |
+| Knowledge and trust state | `trust/state.rs` | knowledge set, effective root, TPS, TSS, negative set, views, staleness (`17` §5) |
+| Floor and eligibility | `trust/floor.rs`, `trust/eligibility.rs` | floor operators, effective floor, eligibility predicate, install-authority floor (`19`) |
+| Secure reader | `trust/secure_fs.rs` | `SecureDir`, read-once VerifiedBlobs, no-follow opens (`18` §3) |
+| Governed filesystem | `trust/governed_fs.rs` | the only mutation API; Protected Path Set guard (`18` §8) |
+| Authentication boundary | `trust/authenticate.rs` | the only constructor of `AuthenticatedRelease` (§3) |
+| Authorisation | `trust/authorise.rs` | gates, authority floor, computed weakenings, downgrade policy (§4) |
+| Install transaction | `trust/install_tx.rs` | journal, staging, read-back, exchange, lock commit, uninstall, recovery (`18` §5, `20` §5) |
+| Use-time snapshot | `kernel_trust.rs` v2 + `trust/snapshot.rs` | installation state, KernelSnapshot, EmbeddedSnapshot, verdict (`18` §6, §9) |
+| Format boundary | `trust/format.rs` | `FORMAT`, lock sentinels, tombstone (`13` §3) |
+| Producer tools | `release.rs` (`build`, `attach-signature`, `promote`, `verify`), `trust/publish.rs` (`draft-policy`, `publish`) | unsigned payloads; verification before attaching |
 
-Dependency: one pure-Rust Ed25519 implementation with strict verification (implementation choice recorded in ARCH-0002,
-replaceable; D-0002 single self-contained binary preserved; `sha2` already present).
+Dependencies:
+- one pure-Rust Ed25519 implementation with strict verification (choice recorded in ARCH-0002; replaceable);
+- `sha2` (already present);
+- platform secure-open primitives through a thin OS layer;
+- D-0002's single self-contained binary is preserved.
 
 ## 3. Normative authentication algorithm
 
 `authenticate(source: SourceRef, ctx: &TrustContext, req: &AdoptionRequest) -> Result<AuthenticatedRelease, TrustError>`
 
-Every failure returns `ok: false`, the error code below, and `details.stage` set to the step ID. No byte is written to
-any trust location before V14 completes.
+Every failure returns `ok: false`, the code below, and `details.stage` set to the step ID. **No byte is written to any
+Protected Path before step V12 completes and authorisation (§4) succeeds.**
 
 | Step | Action | Failure code |
 |---|---|---|
-| V0 | Resolve the source to a `SourceRef` {kind, logical reference}. Environment variables may only select the source. | `KERNEL_SOURCE_NOT_FOUND` |
-| V1 | Materialise into quarantine by **reading each file exactly once**. Tree rules (`07-RELEASE-ENVELOPE-SPEC.md` §5): regular files only; no symlink, device, FIFO; relative POSIX paths, NFC, no `.`/`..`/empty segments, no case-fold collisions; size/count limits; archives extracted with the same rules. The kernel tree is staged with the same `payload_dirs` rules as the producer, entirely inside the source root (no parent-directory fallback). | `RELEASE_TREE_INVALID` |
-| V2 | Locate the release statement (`release.dsse.json` at bundle root; `release/releases/<version>/release.dsse.json` for a canonical checkout; embedded statement for the embedded payload). **Absent** → production profile: `UNSIGNED_SOURCE_REFUSED` unless the explicit development path applies (§7). **Present but failing any later step → never falls back to the development path.** | `RELEASE_STATEMENT_MISSING` / `UNSIGNED_SOURCE_REFUSED` |
-| V3 | Parse DSSE strictly: exactly `payloadType`, `payload`, `signatures`; no duplicate keys; payloadType in the allowlist for the requested statement kind; base64 strict; payload ≤ 4 MiB; payload bytes must equal `JCS(parse(payload))`. | `RELEASE_STATEMENT_MALFORMED` |
-| V4 | Build the trust context: compiled-in root chain; accept a newer root version only if chain-verified (§5 of key management) and ≥ the compiled-in and locally recorded high-water mark; accept a newer revocation statement only if verified and its sequence ≥ floor. | `TRUST_ROOT_INVALID` / `TRUST_ROOT_ROLLBACK` / `TRUST_ROOT_THRESHOLD_NOT_MET` / `REVOCATION_LIST_ROLLBACK` |
-| V5 | Signatures: for each entry, look up `keyid` in the effective root; the key's role set must include the role bound to the payloadType; algorithm is taken **from the root key record** (an envelope cannot select it); verify strictly over `PAE(payloadType, payload)`; count distinct valid keys; require ≥ role threshold. A production binary refuses any key, root or statement whose trust profile is `test`. | `RELEASE_SIGNER_UNKNOWN` / `RELEASE_SIGNER_NOT_AUTHORISED` / `RELEASE_SIGNATURE_INVALID` / `RELEASE_ALGORITHM_MISMATCH` / `RELEASE_THRESHOLD_NOT_MET` / `TRUST_PROFILE_MISMATCH` |
-| V6 | Revocation: any counted signer key revoked → reduce count (may fail threshold); release_id or statement digest revoked with `refuse_install` → fail. | `RELEASE_SIGNER_REVOKED` / `RELEASE_REVOKED` |
-| V7 | Validate the statement payload against the **compiled-in** statement schema (never a schema from the material under authentication). `statement.signing.role` and `statement.signing.algorithm` must match V5. | `RELEASE_STATEMENT_MALFORMED` |
-| V8 | Identity: `framework` equals the compiled framework name; `release.version` equals quarantine `KERNEL.yaml` `version`; `release.release_id` equals `<framework>@<version>#<tree_digest[0:16]>` recomputed; if the request names a version or statement digest, they must match; for reinstall, statement digest must equal the installed statement digest. | `RELEASE_IDENTITY_MISMATCH` / `RELEASE_REPLAY_DETECTED` |
-| V9 | Content: recompute the file map over the quarantine tree; compare with `kernel.files` (report `modified`, `missing`, `added`); recompute `kernel.tree_digest`, `kernel.manifest_digest` and every `components.*` digest from the recomputed map and compare. A source `KERNEL_MANIFEST.json` is excluded and ignored. | `RELEASE_DIGEST_MISMATCH` |
-| V10 | Migrations: every `migrations/*.yaml` in the tree appears in `migrations[]` with identical `path`, `digest`; each file's `id`, `from_version`, `to_version` equals its entry; no migration outside the tree is ever loaded. | `MIGRATION_NOT_IN_STATEMENT` / `MIGRATION_DIGEST_MISMATCH` |
-| V11 | Compatibility: running CLI version inside `compatibility.cli`; `kernel_contract_version` supported by this binary; for update, the installed version is in `compatibility.supported_from_versions` and a complete migration path exists **using statement data only**. | `RELEASE_INCOMPATIBLE` |
-| V12 | Downgrade and replay, against the **installed authenticated identity** (installed statement, never the lock): lower version, or same version with a different statement digest, or lower `release.sequence` → refuse, except a governed rollback to the ledger-recorded previous identity (`09` R-RB). | `RELEASE_DOWNGRADE_REFUSED` / `RELEASE_REPLAY_DETECTED` |
-| V13 | Certification: collect certification statements for this statement digest (bundle `certification/`, embedded, `governance/trust/`); verify each under the certification role; highest `sequence` wins; mismatching digest → ignore with warning, forged → error. | `CERTIFICATION_STATEMENT_INVALID` / `CERTIFICATION_MISMATCH` |
-| V14 | Produce `AuthenticatedRelease` { statement, statement_bytes, statement_digest, signer key ids, trust_root_id + version, revocation sequence, certification, trust_level, recomputed digests, quarantine handle }. | — |
+| V0 | Resolve the source to `SourceRef {kind, logical reference}`. Environment variables may only select a source. | `KERNEL_SOURCE_NOT_FOUND` |
+| V1 | **Secure read-once** (`18` §3–§4). Enumerate through `SecureDir`: regular files only; `gov-tree-v2` path rules (`07` §5); limits. Read each file once into a VerifiedBlob candidate (bytes + SHA-256). Archives are streamed into buffers under the same rules. Nothing is extracted to disk. | `RELEASE_TREE_INVALID` (`rule`, `path`) |
+| V2 | Locate statements: the release envelope (`release-final.dsse.json` or `release-candidate.dsse.json` at bundle root; `release/releases/<version>/` for a canonical checkout; compiled for the embedded payload), the promoted-from candidate envelope (`lineage/`), and bundle trust metadata (`trust/`). No release envelope → production: `UNSIGNED_SOURCE_REFUSED` unless the explicit development path applies (§8). **A present but failing statement never falls back to the development path.** | `RELEASE_STATEMENT_MISSING` / `UNSIGNED_SOURCE_REFUSED` |
+| V3 | Strict envelope and canonical payload for every statement found (`05` SV-1…SV-3). | `STATEMENT_MALFORMED` / `STATEMENT_TYPE_UNKNOWN` / `STATEMENT_SOURCE_NOT_PERMITTED` |
+| V4 | Build the knowledge set and effective state (`17` S1–S10): effective root, TPS, admissible TSS, negative set, views, staleness. A compiled root, TPS or registry that does not verify makes the binary refuse every authenticated operation (`TRUST_ROOT_INVALID`); there is no unsigned fallback. | `TRUST_ROOT_INVALID` / `PURPOSE_SEPARATION_VIOLATION` / `TRUST_STATE_REGRESSION` / `BINARY_BELOW_TRUST_POLICY` |
+| V5 | Purpose-bound signatures on the release statement (and the candidate, if present) (`05` SV-4…SV-7). | `SIGNER_UNKNOWN` / `PURPOSE_NOT_GRANTED` / `SIGNER_REVOKED` / `SIGNATURE_INVALID` / `THRESHOLD_NOT_MET` |
+| V6 | Payload validated with the **compiled** schema for its payloadType (`05` SV-8), never a schema from the material under authentication. | `STATEMENT_MALFORMED` |
+| V7 | Type, stage and profile consistency (`05` SV-9, SV-10 profile): `_type`, `signing.purpose`, `release.stage` ↔ payloadType; `trust_profile` = binary profile. | `STATEMENT_TYPE_MISMATCH` / `TRUST_PROFILE_MISMATCH` |
+| V8 | **Identity, lineage, promotion.** `trust_root_id` = binary lineage (`STATEMENT_LINEAGE_MISMATCH`). `framework` = compiled name. `release.version` = the version parsed from the `KERNEL.yaml` blob. `release.release_id` = `<framework>@<version>#<first 16 hex characters of the tree-digest hex, without the sha256: prefix>`, recomputed. Requested version or digest (if any) match. For stage `final`: the `promoted_from_candidate` envelope is present, verifies under `release-candidate` (V3–V7), and has an identical `kernel.tree_digest`. For reinstall: the statement digest equals the installed one. | `RELEASE_IDENTITY_MISMATCH` / `RELEASE_REPLAY_DETECTED` / `STATEMENT_LINEAGE_MISMATCH` |
+| V9 | **Content.** Compare every VerifiedBlob digest with `kernel.files`: report `modified`, `missing`, `added`. Recompute `tree_digest`, `manifest_digest` and every `components.*` digest from the blob map. A source `KERNEL_MANIFEST.json` is excluded and ignored. | `RELEASE_DIGEST_MISMATCH` |
+| V10 | **Migrations.** Every `migrations/*.yaml` blob appears in `migrations[]` with identical `path` and `digest`. `id`, `from_version`, `to_version`, `breaking` and `human_gate` parsed from the blob equal the entry. `from_version` values are unique (a single chain). Nothing outside the blob set is ever loaded. | `MIGRATION_NOT_IN_STATEMENT` / `MIGRATION_DIGEST_MISMATCH` / `MIGRATION_CHAIN_AMBIGUOUS` |
+| V11 | **Compatibility.** CLI version within `compatibility.cli`; binary supports `kernel_contract_version` and `floor_schema_version`; for update, the installed version is in `supported_from_versions` and a complete migration path exists **using statement data only**. | `RELEASE_INCOMPATIBLE` |
+| V12 | Produce the `AuthenticatedRelease`: `{P, D, CI, signer key ids, purpose, trust_root_id, root version, blobs, candidate digest, trust_references}`. | — |
 
-After V14, **authorisation** (§8) and the **install transaction** (`09-INTEGRATION-REQUIREMENTS.md` §3) run. The
-transaction re-digests the staged copy before the swap (`SOURCE_CHANGED_DURING_INSTALL` if the quarantine was altered) and
-performs a full kernel_trust v2 check after commit; failure triggers automatic journal rollback.
+## 4. Authorisation (after V12, before any trusted write)
 
-## 4. Making "manufacturing trust from source contents" unrepresentable
+| Decision | Inputs | Defined in |
+|---|---|---|
+| Is the release eligible for this operation? | ARO, T0, effective TPS, negative set, trust state, VTS per-project record, installed verdict | `19` §6 (E1–E9) |
+| Is trust state sufficient? | staleness, hint mismatch, operation class | `17` §7 |
+| Which gate is required? | OP-3 mode (TPS `gating`), certification view, computed weakenings, signer-declared breaking changes and gates, downgrade | `17` §7, `19` §9, `20` §4, `21` OP-3 |
+| Which gate authorises it? | a presented, answered-A Human Decision Gate whose `release_statement_digest` (and, for downgrade, both digests; for weakenings, the list digest) matches exactly | `09` R-UPD |
+| Is the actor authorised? | install-authority floor: TPS ⊔ EmbeddedSnapshot ⊔ current eligible KernelSnapshot ⊔ overlay; **never the target** | `19` §8 |
+| Is the transaction possible now? | installation state, transaction lock, platform primitives | `18` §5, §9 |
 
-1. `AuthenticatedRelease` has private fields, no `Deserialize`, no public constructor, and is not persisted; it is created
-   only by `authenticate`.
-2. Install API: `install_tx::install(&AuthenticatedRelease, &GovernanceDir, &Authorisation)`; restore API:
-   `install_tx::restore(&AuthenticatedSnapshot, …)` where `AuthenticatedSnapshot` is produced by `authenticate` over a
-   snapshot source. There is no `install_kernel(Option<&Path>, …)`.
-3. `write_lock` takes `&InstalledRelease` returned by the transaction.
-4. `load_migrations` takes `&AuthenticatedRelease` or `&TrustedKernel`.
-5. `kernel::build_manifest` and `kernel::stage_payload` are private to `release::build` (producer) and
-   `trust::quarantine`.
-6. The `release_ingress` conformance family asserts 1–5 by source inspection (the style already used in
-   `tests/certification/arch.rs`) and by black-box refusal tests over every ingress command.
-7. A test filesystem hook asserts that no write under `governance/` occurs before V14 for every failure injection.
+## 5. Use-time verification (`kernel_trust` v2)
 
-## 5. Use-time installed-kernel verification (kernel_trust v2)
-
-Inputs: installed files, `governance/trust/release.dsse.json`, `governance/trust/certification.dsse.json` (optional),
-compiled T0, recorded revocation high-water mark. `framework.lock` is read only for cross-checking and display.
+Algorithm: `18` §6. Inputs: installation state; `governance/trust/release.dsse.json`; the installed tree read once
+through the secure reader; T0; the knowledge set; the VTS per-project record. `framework.lock` is read only for record
+cross-checks and hints.
 
 | Check | Detects |
 |---|---|
-| statement verifies under T0 (V3–V7), not revoked | Git-delivered or manual replacement of kernel + statement + lock (E4); revoked releases |
-| installed file map ≡ statement `kernel.files` | post-install tampering (V-H2 preserved) |
-| `KERNEL_MANIFEST.json` ≡ deterministic derivation from the statement | manifest drift |
-| lock identity fields ≡ statement | edited lock (`LOCK_IDENTITY_MISMATCH`) |
-| no incomplete install journal | interrupted install (`INSTALL_INTERRUPTED`) |
+| installation state (`18` §9) | partial or interrupted installs; unknown formats |
+| statement verifies under T0 for `release-final` or `release-candidate`, lineage and profile | Git-delivered forged or regenerated sets (E4); wrong lineage |
+| installed file map ≡ statement `kernel.files` (from snapshot buffers) | post-install tampering (V-H2 preserved) |
+| eligibility E1–E7, E10 | legacy, below-policy, revoked, candidate, binary-below-policy, unregistered floors, downgrade without transaction |
+| trust-state status | stale or regressed metadata (use continues except on regression) |
+| lock identity ≡ statement | edited lock (`LOCK_IDENTITY_MISMATCH`) |
 
-Verdict fields (superset of 4.1.5 output; `verified` keeps its consumer meaning — *floors may be read from the installed
-kernel*):
+Verdict axes and the definition of `verified`: `19` §6.
 
-| Field | Meaning |
-|---|---|
-| `installed` | a kernel and lock are present |
-| `integrity_verified` | installed files ≡ statement map (or the development record map) |
-| `authenticated` | statement verified under T0 and not revoked |
-| `trust_level` | `CERTIFIED` \| `AUTHENTICATED_UNCERTIFIED` \| `AUTHENTICATED_REJECTED` \| `REVOKED` \| `DEVELOPMENT_UNSIGNED` \| `TEST` \| `UNAUTHENTICATED` \| `TAMPERED` |
-| `identity_source` | `statement` \| `legacy-identity` \| `development-record` |
-| `verified` | production profile: `integrity_verified ∧ authenticated ∧ trust_level ≠ REVOKED`; test profile additionally admits `DEVELOPMENT_UNSIGNED` and `TEST` |
-| `release_id`, `statement_digest`, `signer_key_ids`, `trust_root_id`, `certification`, `lock_consistent`, `substituted_embedded_baseline`, `problems`, `codes[]`, `fingerprint` | diagnostics |
+Enforcement:
+- When `verified` is false, constitutional content comes from the EmbeddedSnapshot joined with the effective floor.
+- Mutations fail closed: `KERNEL_TAMPERED` (integrity), `KERNEL_UNAUTHENTICATED` (authenticity), `KERNEL_INELIGIBLE`
+  (eligibility), `INSTALL_STATE_PARTIAL`, `INSTALL_IN_PROGRESS`.
+- Exempt remedies: read-only diagnostics, `gov recover`, `gov kernel reinstall` (authenticated, same identity), and
+  `gov update --apply` to an eligible target (strictly trust-increasing; gates and authority evaluated with the floor).
 
-Enforcement is unchanged in shape: when `verified` is false, constitutional content is read from the authenticated
-embedded baseline and mutating operations fail closed (`KERNEL_TAMPERED` for integrity failures,
-`KERNEL_UNAUTHENTICATED` for identity failures, `RELEASE_REVOKED` for `refuse_operation` revocations). Exempt remedies
-gain `update --apply` **only when its target authenticates** (replacing an untrusted kernel with an authenticated one is
-strictly trust-increasing; its gates are evaluated with floors from the embedded baseline).
+There is no cross-process verdict cache: anything under `.governance-runtime/` is writable by A3.
 
-No cross-process verdict cache: a cache under `.governance-runtime/` is writable by A3 and cannot be authenticated
-without a secret. Expected cost per process is one Ed25519 verification plus hashing ~120 files (already done today).
+## 6. Making “manufacturing trust” unrepresentable (API rules)
 
-## 6. Embedded baseline
+1. `AuthenticatedRelease` has private fields, no `Deserialize`, no public constructor, and is never persisted.
+2. `install_tx` entry points accept `&AuthenticatedRelease` (or an authenticated, eligibility-checked restore target) and
+   `&Authorisation`. They mint the only `InstallTxToken`. No function installs from a `Path`.
+3. The lock writer accepts only the transaction's `InstalledRelease`. There is no migration lock operation.
+4. Migrations and templates are read from ARO blobs (ingress) or the KernelSnapshot (use); `load_migrations(&Path)` is
+   removed.
+5. `build_manifest`, `stage_payload` and tree hashing over paths are private to the producer (`release.rs`).
+6. `GovernedFs` is the only mutation API; `std::fs` mutation calls outside it fail an architecture test.
+7. The `release_ingress` conformance family asserts rules 1–6 by source inspection **and** by filesystem interception
+   across every CLI command (`02` §5).
+8. A test hook asserts that no Protected Path mutation occurs before V12 and authorisation, for every failure injection.
 
-- `runtime/build.rs` embeds kernel bytes, the matching `release/releases/<version>/release.dsse.json` if present, the
-  certification statement if present, and the legacy-identity statement. `build.rs` makes no trust decision.
-- At first use in a process the embedded statement is authenticated against T0 and the embedded bytes are digested **in
-  memory**. The result is the embedded trust level (`gov version --trust` reports it).
-- Policy reads for the fail-closed baseline go through `KernelFs::Embedded` (in-memory map). Where a real directory is
-  required (e.g. to install from the embedded payload), materialisation writes to a fresh private directory and the
-  quarantine step re-digests it. A `.complete` marker is never evidence (`EMBEDDED_BASELINE_CORRUPT`).
-- A binary built from a tree with no matching signed statement has embedded trust level `DEVELOPMENT_UNSIGNED`; a
-  production-profile development binary therefore cannot install its embedded kernel as authenticated.
+## 7. Embedded baseline
 
-## 7. Development and test paths
+`18` §7: in-memory EmbeddedSnapshot, verified against its compiled statement at first use; never materialised for trust;
+no cache.
 
-| Binary profile | Source | Acceptance | Floors read from | Recorded trust level |
+A binary built from a tree without a matching signed final statement has an embedded kernel of `DEVELOPMENT_UNSIGNED`.
+A production-profile development binary therefore cannot install its own embedded kernel as authenticated or eligible.
+
+## 8. Development and test paths
+
+| Binary | Source | Acceptance | Policy root | Verdict |
 |---|---|---|---|---|
-| production | signed statement under production root | normal | installed kernel | `CERTIFIED` / `AUTHENTICATED_*` |
-| production | no statement present | refused `UNSIGNED_SOURCE_REFUSED`; with `--allow-unsigned-development` installs, writes `governance/trust/development.json` (unsigned record of file map, actor, time) | **authenticated embedded baseline**; mutations need the existing fingerprint-bound L4+ override gate | `DEVELOPMENT_UNSIGNED` |
-| production | statement or root with trust profile `test` | refused | — | — |
-| test (`--features trust-profile-test`) | test-signed statement | normal | installed kernel | `TEST` |
-| test | no statement present | accepted without flag, labelled | installed kernel | `DEVELOPMENT_UNSIGNED` |
+| `gov` (production) | signed final under the production lineage | normal (eligibility, gates) | installed snapshot if eligible | `AUTHENTICATED` / `ELIGIBLE` |
+| `gov` (production) | signed candidate | only with evaluation flag + gate (TPS permitting) | installed snapshot | `ELIGIBLE_EVALUATION` |
+| `gov` (production) | no statement | refused `UNSIGNED_SOURCE_REFUSED`; with `--allow-unsigned-development`: installs and writes `governance/trust/development.json` (unsigned acknowledgement record) | **EmbeddedSnapshot ⊔ floor**; mutations need the fingerprint-bound override gate | `DEVELOPMENT_UNSIGNED`, `verified: false` |
+| `gov` (production) | test-profile statement, root or record | refused | — | `TRUST_PROFILE_MISMATCH` |
+| `gov-test-profile` | test-signed statement | normal | installed snapshot | `TEST` |
+| `gov-test-profile` | no statement, or a historical identity | accepted, labelled | installed snapshot | `DEVELOPMENT_UNSIGNED` / `HISTORICAL_IDENTIFIED` (test) |
 
-A present-but-invalid statement is refused in every profile. No path writes `CERTIFIED` or `AUTHENTICATED_*` for
-unsigned or test material, and production binaries refuse locks and `governance/trust/` records whose profile is `test`.
+A present but invalid statement is refused in every profile. No path writes an `AUTHENTICATED`, `ELIGIBLE` or
+certification view for unsigned or test material. Production binaries refuse locks and trust records whose profile is
+`test`.
 
-## 8. Authorisation layer (after authentication)
+## 9. Producer and signer interface
 
-| Decision | Input (all from authenticated objects or T2 records) |
-|---|---|
-| Is a human gate required for update? | certification ≠ `CERTIFIED` (OP-3), or statement `update_impact.breaking_changes` / `human_gates` non-empty, or trust-level decrease |
-| Which gate authorises it? | a presented, answered-A `framework_update` gate whose `release_statement_digest` equals this statement digest (a gate for one digest never approves another, closing a same-version substitution) |
-| May `init` proceed on an uncertified or rejected release? | OP-3 policy (default allowed, labelled; overlay may require `CERTIFIED`) |
-| Minimum trust level for the project | kernel floor `SECURITY_POLICY.release_trust.minimum_trust_level: AUTHENTICATED_UNCERTIFIED` (production); overlay may raise to `CERTIFIED`, never lower (POLICY_PRECEDENCE) |
-| Who may install/update/reinstall/rollback | `AUTHORITY_POLICY` levels read from the authenticated kernel (for first install: from the authenticated target) |
-| Revoked | refused regardless of gates |
+`07` §7.

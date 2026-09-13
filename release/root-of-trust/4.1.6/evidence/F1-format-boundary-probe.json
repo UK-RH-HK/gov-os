@@ -1,0 +1,34 @@
+{
+  "init": true,
+  "kernel_trust": {
+    "verified": false,
+    "substituted": true,
+    "problems_mention_sentinel": true
+  },
+  "kernel_verify_ok": false,
+  "doctor": {
+    "code": "UNHEALTHY",
+    "failed_critical": [
+      "D003",
+      "D004",
+      "D029"
+    ]
+  },
+  "mutation_task_create": {
+    "ok": false,
+    "code": "KERNEL_TAMPERED",
+    "message_mentions_sentinel": true
+  },
+  "rebuild_memory": {
+    "ok": false,
+    "code": "KERNEL_TAMPERED"
+  },
+  "policy_effective_kernel_trust_verified": null,
+  "capabilities_plugins_ok": true,
+  "status_ok": true,
+  "kernel_reinstall": {
+    "ok": false,
+    "code": "KERNEL_MISMATCH",
+    "kernel_manifest_overwritten": true
+  }
+}

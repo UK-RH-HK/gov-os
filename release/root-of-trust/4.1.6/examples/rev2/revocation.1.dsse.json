@@ -1,0 +1,10 @@
+{
+  "payloadType": "application/vnd.agentic-engineering-os.revocation.v2+json",
+  "payload": "eyJfdHlwZSI6Imh0dHBzOi8vYWdlbnRpYy1lbmdpbmVlcmluZy1vcy9zdGF0ZW1lbnQvcmV2b2NhdGlvbi92MiIsImZyYW1ld29yayI6ImFnZW50aWMtZW5naW5lZXJpbmctb3MiLCJpc3N1ZWRfYXQiOiIyMDI2LTA5LTEzVDAwOjAwOjAwWiIsInJldm9jYXRpb25fc2VxdWVuY2UiOjEsInRhcmdldHMiOlt7ImVmZmVjdCI6InJlZnVzZV9pbnN0YWxsIiwia2luZCI6InJlbGVhc2VfY2FuZGlkYXRlIiwicmVhc29uIjoiaWxsdXN0cmF0aXZlOiByZWplY3RlZCBjYW5kaWRhdGUiLCJyZWxlYXNlX2lkIjpudWxsLCJzdGF0ZW1lbnRfZGlnZXN0Ijoic2hhMjU2Ojc4OGY0NDIwODkzOTkyMDE3ZDk0MzZkODc4MDIyNDJjMjNhZTE1Zjk0YzU3OWFiMTJmNjBjMTA1ZDUwYjllY2MifV0sInRydXN0X3Byb2ZpbGUiOiJ0ZXN0IiwidHJ1c3Rfcm9vdF9pZCI6InNoYTI1Njo4YTFmM2U4NTA5NGZjMWJhZTViYWZmYzBhOWMzZWViN2IxZTQwMWMzZjI3YTJkNTFmNjk1YzYwYWYxYWRlMTZmIn0=",
+  "signatures": [
+    {
+      "keyid": "ed25519:a94d9f24e75d5dafb0be53ac9c6cca50de34b46cb601cda2a2301a3d5dd1cb37",
+      "sig": "yF4krXx9UPI15ACHAvwEBXandc6GlBHqnD+Ypn/ejLs/GimVKLkcUead7CbqIniX4zPlXegiz64DdvoJdoddBw=="
+    }
+  ]
+}

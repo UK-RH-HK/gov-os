@@ -1,67 +1,87 @@
 # Output 10 — Reference retrieval profile trust integration
 
+> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 2 moves use-time integrity to host-side verification (RV-M7, CD-11), binds profiles to a purpose (`05`), and
+> routes profile installs through the install transaction.
+
 ## 1. Constraints preserved
 
-- Framework §14.3 and D-0006: no embedding or reranking model is a constitutional dependency; selection is
+- **Framework §14.3 and D-0006.** No embedding or reranking model is a constitutional dependency. Selection is
   per-repository and evidence-driven; the kernel default stays the dependency-free `hashed-ngram` embedder.
-- D-0005: embed/rerank plugins fail closed; code intelligence degrades.
-- D-0007 (restated in D-0008): plugin **authorisation** comes from the authenticated kernel's authority floor and the
-  OS-written plugin registry. A profile signature is **provenance and integrity**, never authorisation.
+- **D-0005.** Embed/rerank plugins fail closed; code intelligence degrades.
+- **D-0007, restated in D-0008.** Plugin **authorisation** comes from the effective floor (authority, permission classes)
+  and the OS-written plugin registry. A profile signature is **provenance and integrity**, never authorisation.
 
-The kernel therefore defines only the *verification contract* for profiles. Which model a certified reference profile
-uses is profile content, replaceable by publishing another profile statement.
+The kernel defines only the *verification contract*. Which model a reference profile uses is profile content,
+replaceable by publishing another profile statement. That is how the selected embedding/reranker profile (Qwen, BGE or
+another) joins the same supply-chain model without becoming constitutional:
+**signed pinned identity → host-verified integrity → governed install → local use**.
 
-## 2. Current gap
+## 2. Current gap (4.1.5)
 
-`capabilities/python/govos_capabilities/embed_sentence_transformers.py` is invoked as
+`capabilities/python/govos_capabilities/embed_sentence_transformers.py` is invoked with
 `--model sentence-transformers/all-MiniLM-L6-v2` and loads by hub **name**: no revision, no file digests, no package
-pins, network download permitted. The plugin registry pins the descriptor and command files, not the model or the Python
-environment. Weights can change underneath a "pinned" profile (TH-20).
+pins, network download permitted. The plugin registry pins descriptor and command files, not the model or the Python
+environment.
 
-## 3. Profile statement (`schemas/profile-statement.schema.json`, payloadType `…profile-statement.v1+json`, role `profile`)
+## 3. Profile statement
+
+payloadType `retrieval-profile.v1+json`, purpose `retrieval-profile`. Schema: `schemas/profile-statement.schema.json`.
 
 | Field | Semantics |
 |---|---|
+| `_type`, `trust_profile`, `trust_root_id` | as every statement (`07` §4) |
 | `profile_id`, `profile_version` | e.g. `retrieval-reference/sentence-embedding`, `1.0.0` |
 | `capability` | `embed` \| `rerank` |
-| `trust_profile` | `production` \| `test` |
 | `compatibility` | `{framework_min, framework_max_exclusive, capability_protocol: "gov-capability/1"}` |
-| `plugin.descriptor` | `{path, digest}` of the descriptor YAML |
-| `plugin.implementation_files[]` | `{path, digest}` for every file executed (module sources, entry scripts) |
-| `runtime` | `{kind: python \| native \| container, requires, lock {path, digest}, packages[] {name, version, digests[]}}` — installable with hash-checking only |
-| `model` | `{id, source_kind, revision (immutable commit id, never a branch/tag), licence, dimensions, normalised, files[] {path, digest, size}}` |
-| `evidence` | `{benchmark_record_digest, heldout_set_digest, metrics {recall_at_k, mrr, …}}` — the RES record that justified publication |
-| `offline` | `true`: the plugin must load from the verified local files only |
+| `plugin.descriptor`, `plugin.implementation_files[]` | `{path, digest, size}` for the descriptor and every executed file |
+| `runtime` | `{kind, requires, lock {path, digest}, packages[] {name, version, digests[]}}` — installable only with hash checking |
+| `model` | `{id, source_kind, revision (immutable id), licence, dimensions, normalised, files[] {path, digest, size}}` |
+| `evidence` | `{benchmark_record_digest, heldout_set_digest, metrics}` — the research record justifying publication |
+| `offline` | const `true` |
 
-## 4. Installation flow (`gov profile install <bundle>`, future MINOR release)
+## 4. Installation (`gov profile install <bundle>`, may ship in a later MINOR release)
 
-1. Quarantine the bundle (same tree rules as releases).
-2. Authenticate the statement under the `profile` role; check compatibility with the authenticated kernel.
-3. Recompute every plugin, runtime-lock and model file digest in quarantine (`PROFILE_DIGEST_MISMATCH`,
-   `MODEL_DIGEST_MISMATCH`).
-4. Materialise into derived runtime state `.governance-runtime/profiles/<profile_id>/<profile_version>/` (rebuildable,
-   never authoritative), installing packages only from the hash-locked set.
-5. Register the plugin through the existing `gov plugins register` path (authority, permission classes, registration gate
-   unchanged); the registry entry additionally binds `profile_id`, `profile_version`, `profile_statement_digest` and the
-   model file digests.
-6. Selection remains `gov memory benchmark` → research record → gated decision → `gov memory select`; the pin in
+1. Read the bundle through the secure reader into buffers where size allows. Model files larger than the in-memory
+   limit are streamed and digested incrementally into a staging object.
+2. Authenticate the statement under the `retrieval-profile` purpose (`05` SV-1…SV-10); check compatibility with the
+   current snapshot.
+3. Verify every plugin, runtime-lock, package and model digest.
+4. Materialise into a **content-addressed store** `.governance-runtime/profiles/cas/<sha256>`, written from verified
+   buffers or streams with exclusive creation, read-only permissions and, where the platform supports it, fs-verity
+   enabled on each object. The runtime environment is built only from hash-verified package archives into
+   `.governance-runtime/profiles/env/<profile statement digest>/`.
+5. Register through `gov plugins register` (authority, permission classes and registration gate unchanged). The registry
+   entry additionally binds `profile_id`, `profile_version`, `profile_statement_digest`, and the CAS digests of
+   implementation and model files.
+6. Selection stays `gov memory benchmark` → research record → gated decision → `gov memory select`. The pin in
    `PROJECT_POLICY.yaml` gains `MEMORY_POLICY.embedding.profile_statement_digest`.
-7. The profile statement envelope is copied to `governance/trust/profiles/<profile_id>.dsse.json` so other machines can
-   re-verify offline and rebuild the derived runtime.
+7. The profile statement envelope is written to `governance/trust/profiles/<profile_id>.dsse.json` **through the install
+   transaction** (operation `profile_install`), because `governance/trust/**` is a Protected Path (`18` §8).
 
-## 5. Use-time verification
+## 5. Use-time verification — host-side
 
-| When | Check | Failure |
+The plugin is a separate process whose outputs are T6. **Digests reported by the plugin are informational and never
+establish integrity.** The host verifies.
+
+| When | Host check | Failure |
 |---|---|---|
-| `rebuild-memory`, `memory verify`, `plugins health` | statement verifies; registry entry binds the same statement digest; every plugin, runtime and model file digest recomputed | `PROFILE_STATEMENT_INVALID`, `PROFILE_DIGEST_MISMATCH`, `MODEL_DIGEST_MISMATCH` → embedding fails closed (D-0005), index not built, no fallback |
-| every plugin start (query path) | host passes `model_pins {revision, files[] {path, digest, size}}` in the invocation; plugin verifies before loading, runs with network disabled for the hub (offline mode) and returns observed digests; host compares | `MODEL_DIGEST_MISMATCH` → query refused |
-| cost control | full digests at install, registration and rebuild; at plugin start a full digest when size or mtime differ from the verified record, otherwise a sampled digest; a full check at least once per process lifetime of a long-running server | documented trade-off (model files may be hundreds of MB) |
-| kernel update | profile compatibility re-checked against the new authenticated kernel | `PROFILE_INCOMPATIBLE` → pin marked stale, query refused until reselected |
+| Registration, `rebuild-memory`, `memory verify`, `plugins health` | statement verifies; registry binds the same statement digest; host recomputes full digests of implementation files, runtime lock, environment files and model files | `PROFILE_STATEMENT_INVALID`, `PROFILE_DIGEST_MISMATCH`, `MODEL_DIGEST_MISMATCH` → embedding fails closed (D-0005); no index build; no fallback |
+| Plugin start (every invocation) | host fully re-digests implementation files and the runtime lock (small); for model files: fs-verity measurement check where enabled, otherwise a full digest when size, inode or mtime changed since the last host verification, and otherwise a digest of host-chosen random ranges | mismatch → invocation refused |
+| **After any invocation that feeds a persistent write** (index build, rebuild) | host fully re-digests model and implementation files **after the plugin exits and before committing index writes**; the index manifest records the profile statement digest and the kernel CI | mismatch → index writes discarded; `MODEL_DIGEST_MISMATCH` |
+| Kernel update | profile compatibility re-checked against the new snapshot | `PROFILE_INCOMPATIBLE` → pin stale; queries refused until reselected |
 
 ## 6. What stays outside framework trust
 
 - Third-party or project-authored plugins keep working under D-0007 governance (registry, authority floor, gates). They
-  can never display or record `profile_statement_digest`, and doctor distinguishes "reference profile (signed)" from
-  "project plugin (governed, unsigned)".
-- Remote embedding APIs (D-0006 class 3) cannot be digest-pinned; they are recorded as unsigned project plugins with the
+  can never display or record `profile_statement_digest`. Doctor distinguishes “reference profile (signed)” from
+  “project plugin (governed, unsigned)”.
+- Remote embedding APIs (D-0006 class 3) cannot be digest-pinned. They are recorded as unsigned project plugins with the
   existing sensitivity restrictions.
+
+## 7. Residual (VR-4, explicit)
+
+A same-user process can modify CAS or environment files while a plugin is running and restore them before the post-use
+check. Where fs-verity is enabled, the kernel refuses modified reads, closing this. Where it is not, the window is
+limited to query-path invocations: persistent index writes are always bracketed by full host verification. The residual
+is recorded in `01` §5 and `18` §11.

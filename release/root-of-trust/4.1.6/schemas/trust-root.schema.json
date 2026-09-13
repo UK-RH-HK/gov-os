@@ -2,53 +2,130 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-root.schema.json",
   "title": "trust-root",
-  "description": "PROPOSED (RoT-1). Trust-root metadata payload, signed by the root role (threshold of the previous and the new root key sets for version > 1). Disjointness of role key sets and chain rules are enforced by the verifier.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 2). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Purpose separation KS-1..KS-7 and key-id recomputation are enforced by the verifier (05 \u00a73-\u00a74).",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
-  "required": ["_type", "trust_profile", "framework", "version", "keys", "roles", "revoked_keys", "revocation_floor_sequence", "issued_at"],
-  "$defs": {
-    "keyid": {"type": "string", "pattern": "^ed25519:[0-9a-f]{64}$"},
-    "role": {
+  "required": [
+    "_type",
+    "trust_profile",
+    "framework",
+    "version",
+    "lineage",
+    "keys",
+    "purposes",
+    "revoked_keys",
+    "issued_at"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/trust-root/v2"
+    },
+    "trust_profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "lineage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key_ids", "threshold"],
+      "required": [
+        "trust_root_id"
+      ],
       "properties": {
-        "key_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/keyid"}},
-        "threshold": {"type": "integer", "minimum": 1}
-      }
-    }
-  },
-  "properties": {
-    "_type": {"const": "https://agentic-engineering-os/statement/trust-root/v1"},
-    "trust_profile": {"enum": ["production", "test"]},
-    "framework": {"const": "agentic-engineering-os"},
-    "version": {"type": "integer", "minimum": 1},
-    "keys": {
-      "type": "object",
-      "minProperties": 1,
-      "propertyNames": {"$ref": "#/$defs/keyid"},
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["alg", "public_key", "label", "added_in_version"],
-        "properties": {
-          "alg": {"const": "ed25519"},
-          "public_key": {"type": "string", "description": "base64 of the raw 32-byte public key", "pattern": "^[A-Za-z0-9+/]{43}=$"},
-          "label": {"type": "string", "maxLength": 128},
-          "added_in_version": {"type": "integer", "minimum": 1}
+        "trust_root_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
-    "roles": {
+    "keys": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "#/$defs/keyid"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "alg",
+          "public_key",
+          "label",
+          "added_in_version"
+        ],
+        "properties": {
+          "alg": {
+            "const": "ed25519"
+          },
+          "public_key": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9+/]{43}=$"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "added_in_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "purposes": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["root", "release", "certification", "profile"],
+      "required": [
+        "root",
+        "trust-policy",
+        "trust-state",
+        "release-final",
+        "release-candidate",
+        "verification-attestation",
+        "certification-status",
+        "revocation",
+        "retrieval-profile"
+      ],
       "properties": {
-        "root": {"$ref": "#/$defs/role"},
-        "release": {"$ref": "#/$defs/role"},
-        "certification": {"$ref": "#/$defs/role"},
-        "profile": {"$ref": "#/$defs/role"}
+        "root": {
+          "$ref": "#/$defs/purpose"
+        },
+        "trust-policy": {
+          "$ref": "#/$defs/purpose"
+        },
+        "trust-state": {
+          "$ref": "#/$defs/purpose"
+        },
+        "release-final": {
+          "$ref": "#/$defs/purpose"
+        },
+        "release-candidate": {
+          "$ref": "#/$defs/purpose"
+        },
+        "verification-attestation": {
+          "$ref": "#/$defs/purpose"
+        },
+        "certification-status": {
+          "$ref": "#/$defs/purpose"
+        },
+        "revocation": {
+          "$ref": "#/$defs/purpose"
+        },
+        "retrieval-profile": {
+          "$ref": "#/$defs/purpose"
+        }
       }
     },
     "revoked_keys": {
@@ -56,15 +133,113 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["key_id", "reason", "revoked_in_version"],
+        "required": [
+          "key_id",
+          "reason",
+          "revoked_in_version"
+        ],
         "properties": {
-          "key_id": {"$ref": "#/$defs/keyid"},
-          "reason": {"enum": ["compromised", "lost", "retired"]},
-          "revoked_in_version": {"type": "integer", "minimum": 2}
+          "key_id": {
+            "$ref": "#/$defs/keyid"
+          },
+          "reason": {
+            "enum": [
+              "compromised",
+              "lost",
+              "retired"
+            ]
+          },
+          "revoked_in_version": {
+            "type": "integer",
+            "minimum": 2
+          }
         }
       }
     },
-    "revocation_floor_sequence": {"type": "integer", "minimum": 0},
-    "issued_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"}
-  }
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "keyid": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$"
+    },
+    "profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "purpose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key_ids",
+        "threshold"
+      ],
+      "properties": {
+        "key_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/keyid"
+          }
+        },
+        "threshold": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "require_algorithms": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "const": "ed25519"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "version": {
+            "const": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "lineage": {
+            "properties": {
+              "trust_root_id": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "lineage": {
+            "properties": {
+              "trust_root_id": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

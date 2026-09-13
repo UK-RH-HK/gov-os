@@ -1,88 +1,370 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.6/framework-lock.schema.json",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/framework-lock-2.0.0.schema.json",
   "title": "framework-lock",
-  "description": "PROPOSED (RoT-1) framework.lock 2.0.0. A record of authenticated identity; every identity field is cross-checked against governance/trust/release.dsse.json at use time and never read as a source of trust.",
+  "description": "PROPOSED (RoT-1 revision 2). framework.lock 2.0.0: a record of the installed identity (08 \u00a73). Identity fields are cross-checked against the verified statement; reference fields are hints; the 1.1.0 hash field names carry compatibility sentinels.",
   "x-schema-version": "2.0.0",
   "type": "object",
-  "required": ["lock_schema_version", "framework", "version", "release_id", "release_sequence", "release_commit", "release_hash", "kernel_manifest_hash", "release_statement_digest", "signer", "trust_root", "trust_level", "certification", "source", "installed_at", "install_evidence"],
-  "$defs": {
-    "semver": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"},
-    "hex64": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
-  },
+  "additionalProperties": false,
+  "required": [
+    "lock_schema_version",
+    "trust_format",
+    "kernel_manifest_hash",
+    "release_hash",
+    "framework",
+    "version",
+    "release_id",
+    "release_sequence",
+    "release_stage",
+    "release_commit",
+    "kernel",
+    "release_statement_digest",
+    "signer",
+    "trust_root",
+    "trust_references",
+    "project_trust_id",
+    "verdict_at_install",
+    "source",
+    "source_reference",
+    "installed_at",
+    "installed_at_commit",
+    "installed_by",
+    "install_evidence",
+    "informational",
+    "cli_version",
+    "schema_versions"
+  ],
   "properties": {
-    "lock_schema_version": {"const": "2.0.0"},
-    "framework": {"const": "agentic-engineering-os"},
-    "version": {"$ref": "#/$defs/semver"},
-    "release_id": {"type": "string", "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"},
-    "release_sequence": {"type": "integer", "minimum": 1},
-    "release_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "release_hash": {"$ref": "#/$defs/hex64"},
-    "kernel_manifest_hash": {"$ref": "#/$defs/hex64"},
-    "release_statement_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null", "description": "only for DEVELOPMENT_UNSIGNED"}]},
+    "lock_schema_version": {
+      "const": "2.0.0"
+    },
+    "trust_format": {
+      "const": "rot-1"
+    },
+    "kernel_manifest_hash": {
+      "const": "ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-verify-this-project",
+      "description": "compatibility sentinel: pre-RoT binaries fail closed (13 \u00a73); never read by RoT-1 binaries"
+    },
+    "release_hash": {
+      "const": "ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-verify-this-project",
+      "description": "compatibility sentinel (13 \u00a73)"
+    },
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "release_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/release_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "release_sequence": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "release_stage": {
+      "enum": [
+        "final",
+        "candidate",
+        "development"
+      ]
+    },
+    "release_commit": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "kernel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tree_digest",
+        "manifest_digest"
+      ],
+      "properties": {
+        "tree_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "manifest_digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "release_statement_digest": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null",
+          "description": "only for DEVELOPMENT_UNSIGNED installs"
+        }
+      ]
+    },
     "signer": {
       "oneOf": [
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["role", "algorithm", "key_ids"],
+          "required": [
+            "purpose",
+            "algorithm",
+            "key_ids"
+          ],
           "properties": {
-            "role": {"enum": ["release"]},
-            "algorithm": {"const": "ed25519"},
-            "key_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^ed25519:[0-9a-f]{64}$"}}
+            "purpose": {
+              "enum": [
+                "release-final",
+                "release-candidate"
+              ]
+            },
+            "algorithm": {
+              "const": "ed25519"
+            },
+            "key_ids": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/keyid"
+              }
+            }
           }
         },
-        {"type": "null"}
+        {
+          "type": "null"
+        }
       ]
     },
     "trust_root": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["profile", "id", "version"],
+      "required": [
+        "profile",
+        "id",
+        "version_min",
+        "confirmation"
+      ],
       "properties": {
-        "profile": {"enum": ["production", "test"]},
-        "id": {"$ref": "#/$defs/digest"},
-        "version": {"type": "integer", "minimum": 1}
+        "profile": {
+          "$ref": "#/$defs/profile"
+        },
+        "id": {
+          "$ref": "#/$defs/digest"
+        },
+        "version_min": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "confirmation": {
+          "enum": [
+            "human",
+            "pin",
+            "unconfirmed"
+          ]
+        }
       }
     },
-    "trust_level": {"enum": ["CERTIFIED", "AUTHENTICATED_UNCERTIFIED", "AUTHENTICATED_REJECTED", "DEVELOPMENT_UNSIGNED", "TEST"]},
-    "identity_source": {"enum": ["statement", "legacy-identity", "development-record"]},
-    "certification": {
+    "trust_references": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "statement_digest", "sequence"],
+      "required": [
+        "trust_policy_version_min",
+        "trust_state_sequence_min"
+      ],
       "properties": {
-        "status": {"enum": ["CERTIFIED", "REJECTED", "WITHDRAWN", "UNCERTIFIED"]},
-        "statement_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
-        "sequence": {"oneOf": [{"type": "integer", "minimum": 1}, {"type": "null"}]}
+        "trust_policy_version_min": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "trust_state_sequence_min": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
-    "revocation_sequence_seen": {"type": "integer", "minimum": 0},
-    "source": {"type": "string", "pattern": "^(release|embedded|source|bundle|remote|snapshot):agentic-engineering-os@"},
-    "source_reference": {"type": "string", "description": "logical reference; never an absolute path or a credential", "pattern": "^(bundle|github-release|remote|embedded|checkout|snapshot):[^\\s]+$", "not": {"pattern": "(^|:)/|[A-Za-z]:\\\\|@[^/]*:[^/]*@"}},
-    "installed_at": {"type": "string"},
-    "installed_at_commit": {"type": "string"},
+    "project_trust_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "verdict_at_install": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authenticity",
+        "eligibility",
+        "certification_view",
+        "trust_state"
+      ],
+      "properties": {
+        "authenticity": {
+          "enum": [
+            "AUTHENTICATED",
+            "DEVELOPMENT_UNSIGNED",
+            "TEST"
+          ]
+        },
+        "eligibility": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "certification_view": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "trust_state": {
+          "type": "string",
+          "maxLength": 128
+        }
+      }
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^(release|embedded|source|bundle|remote|snapshot):agentic-engineering-os@"
+    },
+    "source_reference": {
+      "type": "string",
+      "pattern": "^(bundle|github-release|remote|embedded|checkout|snapshot):[^\\s]+$",
+      "not": {
+        "pattern": "(^|:)/|[A-Za-z]:\\\\|@[^/]*:[^/]*@"
+      }
+    },
+    "installed_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "installed_at_commit": {
+      "type": "string",
+      "maxLength": 64
+    },
     "installed_by": {
       "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gov_version",
+        "trust_profile",
+        "session",
+        "role",
+        "authority_level"
+      ],
       "properties": {
-        "gov_version": {"$ref": "#/$defs/semver"},
-        "trust_profile": {"enum": ["production", "test"]},
-        "session": {"type": "string"},
-        "role": {"type": "string"},
-        "authority_level": {"type": "string", "pattern": "^L[0-5]$"}
+        "gov_version": {
+          "$ref": "#/$defs/semver"
+        },
+        "trust_profile": {
+          "$ref": "#/$defs/profile"
+        },
+        "session": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "authority_level": {
+          "$ref": "#/$defs/level"
+        }
       }
     },
     "install_evidence": {
       "type": "object",
-      "required": ["transaction_id", "ledger_entry"],
+      "additionalProperties": false,
+      "required": [
+        "transaction_id",
+        "ledger_entry",
+        "gate"
+      ],
       "properties": {
-        "transaction_id": {"type": "string"},
-        "ledger_entry": {"type": "string"},
-        "gate": {"type": ["string", "null"]}
+        "transaction_id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "ledger_entry": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "gate": {
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
       }
     },
-    "cli_version": {"$ref": "#/$defs/semver"},
-    "schema_versions": {"type": "object"}
+    "informational": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "integer",
+          "boolean"
+        ]
+      }
+    },
+    "cli_version": {
+      "$ref": "#/$defs/semver"
+    },
+    "schema_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/semver"
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "keyid": {
+      "type": "string",
+      "pattern": "^ed25519:[0-9a-f]{64}$"
+    },
+    "release_id": {
+      "type": "string",
+      "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"
+    },
+    "level": {
+      "type": "string",
+      "pattern": "^L[0-5]$"
+    },
+    "profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    }
   }
 }

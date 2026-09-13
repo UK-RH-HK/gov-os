@@ -1,70 +1,117 @@
-# Output 2 — Complete privileged-ingress map
+# Output 2 — Privileged-ingress map
 
-An **ingress** is any route by which bytes can enter, replace, select or be executed as privileged framework material,
-or by which a fact about such material (identity, certification, compatibility, gate requirement) can be established.
-The map was produced by enumerating every caller of `install_kernel`, `write_lock`, `stage_payload`,
-`resolve_kernel_source`, `embedded_kernel_dir`, `load_migrations`, every direct reader of `Project::kernel_dir()`,
-every `GOV_*` environment variable, every CLI subcommand in `cli/src/main.rs`, and every Git-tracked or runtime
-location that holds kernel state.
+> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 2 adds the eight ingress routes the independent review found missing (I-34…I-41), six more found while
+> amending (I-42…I-47), and a complete inventory of file-mutation mechanisms against the Protected Path Set (§4).
+> Addresses RV-M1 (CD-5).
 
-Trust locations (the destinations RoT-1 protects): `governance/kernel/**`, `governance/trust/**` (new),
-`governance/framework.lock`, the embedded-kernel materialisation directory, migration execution, and the in-process
-policy root returned by `kernel_trust`.
+An **ingress** is any route by which bytes can enter, replace, select or be executed as privileged framework material, or
+by which a fact about such material (identity, eligibility, certification, revocation, floors, gate requirement) can be
+established.
 
-Legend — *Now*: current authentication. *Class*: provenance class of the incoming material under the D-0008 table
-(`15-D-0007-SUPERSESSION.md`). *Req*: integration requirement ID in `09-INTEGRATION-REQUIREMENTS.md`.
+Legend. *4.1.5 code*: where the route exists today. *Class*: provenance class under D-0008 (`15` §4). *Control*: the
+revision 2 mechanism. *Req*: requirement group in `09`.
 
 ## 1. Kernel and release ingress
 
-| ID | Route | Code path | Material / destination | Now | Defect (evidence) | Class | RoT-1 control | Req |
-|---|---|---|---|---|---|---|---|---|
-| I-01 | `gov init [--source P]` | `init::init` → `resolve_kernel_source` → `install_kernel` → `write_lock` | any kernel dir → `governance/kernel`, lock | none: manifest regenerated from source | V-H3 | T5 | `authenticate(SourceRef)` → install transaction consuming `AuthenticatedRelease` | R-INIT-* |
-| I-02 | `gov init --force` on an installed project | same as I-01; authority read from the currently installed kernel | replaces an installed kernel | none | V-H3 + no downgrade rule | T5 | treated as reinstall/update: identity, downgrade and gate rules apply; authority read from the authenticated trust root | R-INIT-6 |
-| I-03 | `gov adopt migrate --batch 0 [--source P]` | `adopt::a6_migrate` batch 0 | install; when a lock exists, reads the existing manifest unverified | none | V-H3 class | T5 | same as I-01; existing installation authenticated first | R-ADOPT-* |
-| I-04 | `gov update --check --source P` | `update::check` → `source_manifest` (reads `P/../manifest.json`) → dry-run `apply` over migrations from the source and its parent | identity, compatibility, certification, gate requirement | none; **certification self-declared** | E2 | T5 | check = `authenticate` in read-only mode; all decision inputs from statements | R-UPD-1..3 |
-| I-05 | `gov update --apply [--approve]` | `update::apply_update` → `install_kernel` → `load_migrations(kernel_dir)` → `apply` → `write_lock` → `set_lock_field` | kernel, migrations executed, lock | none | V-H3, E2 | T5 | install transaction; migrations from the authenticated object only; lock-field allowlist; gate bound to statement digest | R-UPD-4..12 |
-| I-06 | automatic rollback inside `apply_update` on any failure | `update::rollback` | snapshot → kernel, overlay, generated, lock | none | E5 class | T4 (runtime dir) | transaction rollback restores the previous *authenticated* state recorded in the journal | R-TX-* |
-| I-07 | `gov update --rollback [--reason]` | `update::rollback` | `.governance-runtime/update/<v>/` (gitignored, user-writable) | `verify_kernel` against the snapshot's own manifest | E5 | T4 | snapshot carries statement bytes; restore = authenticate + ledger-bound downgrade rule + gate | R-RB-* |
-| I-08 | `gov kernel reinstall [--source P]` | `cli/src/main.rs` `KernelCmd::Reinstall` | any source; accepted when `payload_hash == lock.release_hash` | compared to a repository-writable lock value | E4 + I-01 | T5 | must authenticate **and** equal the installed statement digest; the lock is never the reference | R-RI-* |
-| I-09 | `gov kernel override --reason` | `kernel_trust::request_override` | permission to operate on an untrusted kernel (not material) | L4+ gate bound to fingerprint | sound | T2 | retained; never marks a kernel authenticated; floors stay on the authenticated baseline | R-OV-1 |
-| I-10 | `gov recover` | `recovery::recover` (CIT rollback, adoption batch rollback, runtime DB rebuild, claims) | project state only today | n/a | none, but no install-transaction recovery exists | T2/T4 | adds interrupted-install recovery; must never restore kernel/lock/trust except through the transaction journal | R-REC-* |
-| I-11 | Embedded payload materialisation | `kernel::embedded_kernel_dir` (`$GOV_KERNEL_CACHE`, `$XDG_CACHE_HOME/gov`, `~/.cache/gov`, temp) | install source for I-01/I-03/I-08 when no `--source` | reused when `KERNEL.yaml` and `.complete` exist | E3 | T4 | embedded bytes served from memory or re-verified against compiled-in digests on every use | R-EMB-* |
-| I-12 | V-H2 fail-closed baseline | `kernel_trust::compute` → `embedded_kernel_dir` | policy root for all enforcement when installed kernel is untrusted | same as I-11 | E3 | T4 | same as I-11 | R-EMB-3 |
-| I-13 | `GOV_CANONICAL_ROOT` | `kernel::canonical_root` in `resolve_kernel_source`; `Project::schemas` fallback; `adopt::scanner_for` | developer checkout as install source; schemas; adoption secret-scanner policy | none | TH-11 | T5 | source selection only; authenticated if its staged tree matches a signed statement, else the unsigned development path; never used for schemas or scanner policy | R-ENV-1 |
-| I-14 | `GOV_KERNEL_SOURCE` | `adopt::scanner_for` | `SECURITY_POLICY` for the pre-install adoption scanner | none | TH-11 | T5 | removed; pre-install scanner uses the authenticated embedded baseline | R-ENV-2 |
-| I-15 | **Git delivery**: pull, merge, checkout, rebase, cherry-pick, PR merge, clone on a second machine | none (no `gov` involvement) | `governance/kernel/**`, `framework.lock`, future `governance/trust/**` | integrity only (self-consistent set passes) | E4 | T4 | use-time authentication against the installed statement under T0 | R-USE-* |
-| I-16 | In-place edit of the installed kernel | none | `governance/kernel/**` | V-H2 integrity check | closed | T4 | preserved | R-USE-4 |
-| I-17 | Use-time readers outside `kernel_trust` | `Project::schemas` (+ `GOV_CANONICAL_ROOT` fallback), `Project::kernel_manifest`, `tools::kernel_tools`, `tools::mcp_servers`, `skills`, `adapters::invariants`/templates, `context` HARD_INVARIANTS, `orchestration::intents`, `orchestration::readiness`, `verification` HARD_INVARIANTS/COMMAND_CONTRACT, doctor D003 | schemas, tool registry, skills, invariants, command contract | none at read time | TH-14 | T4 | one `TrustedKernel` read handle; architecture test forbids `kernel_dir()` outside the trust module | R-USE-5 |
-| I-18 | Migration loading and execution | `update::migrations_for_source` (source and **its parent** dir), `kernel::stage_payload` sibling fallback for `migrations`/`tools`, `migrations::framework::apply`, `set_lock_field` (any key) | overlay, lock, generated | none | TH-12 | T5 | statement lists every migration id/from/to/digest; only migrations inside the authenticated tree run; `set_lock_field` restricted to non-identity keys | R-MIG-* |
-| I-19 | `gov release build` (producer) | `release::build` | payload + unsigned `manifest.{json,yaml}`; certification default `READY_FOR_INDEPENDENT_OS_VERIFICATION` | n/a | no separation of build from signing | T4 | emits an **unsigned statement payload**; signing is an external offline step; build refuses private key material | R-REL-1..4 |
-| I-20 | `gov release verify DIR` | `release::verify` | a verdict used as evidence by operators and verifiers | self-referential | E1 | T5 | becomes `authenticate` in report-only mode | R-REL-5 |
-| I-21 | Certification block transcription into `manifest.{json,yaml}` | manual (release owner, per `VERDICT.md`) | certification status consumed by I-04 | unsigned | E2 | T5 | signed certification statement by the certification role; manifest block becomes descriptive only | R-CERT-* |
-| I-22 | Binary build and distribution (`cargo build`, `runtime/build.rs`) | `build.rs` embeds `framework/`, `migrations/`, `tools/`, and `release_commit` from `release/releases/<v>/manifest.json` or `git rev-parse HEAD` | T0 carrier | none | provenance string from an unsigned file | TCB | build embeds statement bytes if present; runtime authenticates them; artifact statement for binaries; bootstrap fingerprint | R-EMB-4, `06-BOOTSTRAP.md` |
-| I-23 | Future private-GitHub (or any remote) release fetch | none yet (`REMOTE_TRANSPORT_NOT_CONFIGURED` for upstream) | bundle download | n/a | would inherit A1/A5 | T5 | transport-only `gov release fetch` into quarantine; identical authentication | R-NET-* |
-| I-24 | Packaged release bundle (tar/zip) | none yet | archive extraction | n/a | archive path traversal, symlinks | T5 | safe extraction rules, then authentication | R-BUN-* |
+| ID | Route | 4.1.5 code | Class | Revision 2 control | Req |
+|---|---|---|---|---|---|
+| I-01 | `gov init [--source P]` | `init.rs:217-248` | T5 | secure read → `authenticate` → eligibility → authority floor from TPS ⊔ embedded (never the target) → init acknowledgement gate → install transaction | R-INIT |
+| I-02 | `gov init --force` on an installed project | `init.rs:219-226` | T5 | treated as reinstall (same statement digest) or update/downgrade (different digest); authority from the floor | R-INIT |
+| I-03 | `gov adopt migrate --batch 0 [--source P]` | `adopt.rs:628-646` | T5 | same pipeline as `init` (operation `adopt_install`); an existing installation is evaluated through the installation state machine, never read unverified | R-ADOPT |
+| I-04 | `gov update --check` | `update.rs:46-102` | T5 | `authenticate` in report mode; eligibility, trust state, certification view, computed weakenings and gate requirement from signed data only | R-UPD |
+| I-05 | `gov update --apply` | `update.rs:118-342` | T5 | re-authenticate; eligibility; gate (mode A always); migrations from ARO blobs; weakening gate; install transaction | R-UPD |
+| I-06 | Automatic rollback inside a failed update | `update.rs:330-340` | T4 | journal exchange-back, then normal evaluation (`20` RB-1) | R-RB |
+| I-07 | `gov update --rollback` | `update.rs:348-420` | T4 | restore pipeline + downgrade policy (`20` §2, §4) | R-RB |
+| I-08 | `gov kernel reinstall [--source P]` | `cli/src/main.rs:853` | T5 | must authenticate to the installed statement digest; never follows `lock.source`; re-attestation allowed | R-RI |
+| I-09 | `gov kernel override --reason` | `kernel_trust.rs:320-347` | T2 | fingerprint-bound L4+ gate permitting governed mutations on an untrusted kernel; never changes authenticity, eligibility or the policy root; unavailable for revoked releases | R-OV |
+| I-10 | `gov recover` | `recovery.rs:9-147` | T2/T4 | CIT and adoption recovery through GovernedFs (never protected paths); install-journal recovery per `20` §5 | R-REC |
+| I-11 | Embedded payload | `kernel.rs:31-80` | T0 | in-memory EmbeddedSnapshot; never materialised for trust | R-EMB |
+| I-12 | Fail-closed baseline | `kernel_trust.rs:191-238` | T0 | EmbeddedSnapshot ⊔ effective floor | R-EMB |
+| I-13 | `GOV_CANONICAL_ROOT` | `kernel.rs:83-112`, `project.rs:127-139`, `adopt.rs:79` | T5 | source selection only; never schemas or scanner policy | R-ENV |
+| I-14 | `GOV_KERNEL_SOURCE` | `adopt.rs:80` | T5 | removed | R-ENV |
+| I-15 | Git delivery (pull, merge, checkout, clone, PR merge) | none | T4 | evaluated at use: authenticity, integrity, eligibility (E10), floors (`19`), installation state (`18` §9) | R-USE |
+| I-16 | In-place edit or race on installed files | none | T4 | per-process KernelSnapshot from the secure reader; enforcement from snapshot bytes | R-USE |
+| I-17 | Use-time readers of kernel content | `context/mod.rs:93-97`, `tools.rs`, `skills.rs`, `adapters.rs`, `orchestration/{intents,readiness}.rs`, `verification/mod.rs`, `project.rs:120-139` | T4 | KernelSnapshot API only; GovernedFs read guard | R-USE |
+| I-18 | Migration loading and execution | `update.rs:19-27, 201-233`; `kernel.rs:226-232`; `migrations/framework.rs:7-58, 236-242` | T5 | only from ARO blobs; unique chain; statement/file equality; no lock operation; weakening gate | R-MIG |
+| I-19 | `gov release build` (producer) | `release.rs:62-228` | T4 | unsigned candidate payload; deterministic inputs; floor-registration check; private-key scan | R-REL |
+| I-20 | `gov release verify DIR` | `release.rs:230-256` | T5 | `authenticate` in report mode | R-REL |
+| I-21 | Certification publication | manual transcription into `manifest.*` | T5 | verification attestation → certification statement → trust-state reference; manifests descriptive only | R-CERT |
+| I-22 | Binary build and distribution | `build.rs:40-117` | TCB | compiles T0 including TPS, TSS and historical registry; separate test-profile binary; artifact statements | R-EMB, R-BOOT |
+| I-23 | Remote release fetch (future) | none | T5 | transport only, into memory or scratch; then `authenticate` | R-NET |
+| I-24 | Release bundle archives (future) | none | T5 | streamed into buffers under tree rules; then `authenticate` | R-BUN |
 
 ## 2. Adjacent ingress where framework trust is relevant
 
-| ID | Route | Code path | Now | Relevance | RoT-1 treatment | Req |
-|---|---|---|---|---|---|---|
-| I-25 | Plugin descriptors `governance/project/plugins/*.yaml`, `$GOV_PLUGINS_DIR`, `gov plugins register` | `capabilities::host::discover_all`, `registry::record`, `governance::authorize` | D-0007 registry binding (T2) + authority floor from verified kernel | the floor must come from an *authenticated* kernel; profile-shipped plugins need provenance | floor read via `TrustedKernel`; registry entries of profile plugins bind `profile_statement_digest`; descriptors from `$GOV_PLUGINS_DIR` can never carry profile trust | R-PLG-* |
-| I-26 | `gov tools install` executing `install_command` | `tools::install` | TOOL_POLICY conditions + governed `security_review_record` | kernel-shipped tool descriptors are framework material | kernel descriptors authenticated as part of the release; project descriptors stay governed by TOOL_POLICY; package hash pins recommended (non-blocking) | R-TOOL-1 |
-| I-27 | `gov memory benchmark` / `select` writing `MEMORY_POLICY.embedding.*` pins into `PROJECT_POLICY.yaml` | `memory::benchmark::select` | gated decision + overlay (T4) | choice of retrieval implementation | unchanged for arbitrary plugins; a reference-profile pin additionally binds the profile statement digest | R-PRF-6 |
-| I-28 | Reference retrieval profile installation | none today; plugin template pins `--model sentence-transformers/all-MiniLM-L6-v2` by name only | none | model and runtime supply chain | signed profile statement (`10-RETRIEVAL-PROFILE-TRUST.md`) | R-PRF-* |
-| I-29 | Upstream lessons into canonical `lessons/inbox/` → change proposals → release | `upstream::submit` (local path only) | export gate | input to framework development, not trusted state | trust boundary is the signing ceremony: sign-what-you-reproduced, independent verification, separate certification key | `05-KEY-MANAGEMENT.md` §3 |
-| I-30 | Pre-install adoption planning policy | `adopt::a3_map` reads `ARCHIVE_POLICY` via `resolve_kernel_source(None)` | none (env-redirectable) | policy decides destructive actions | authenticated embedded baseline | R-ADOPT-3 |
-| I-31 | Generated views `governance/generated/**` (adapters, tool registry, plugin registry, index manifest) | `adapters::generate`, `tools::generate_registry` | derived (T3) | regenerated after install | generated only from `TrustedKernel` + overlay after authentication | R-UPD-9 |
-| I-32 | Schemas used to validate trust statements and the lock | none yet; today `release-manifest` is validated with the schema of the payload being built | validating with the material under test is circular | statement schemas compiled into the binary, never loaded from a kernel | R-AUTH-7 |
-| I-33 | Manual `framework.lock` edits | read by `kernel reinstall`, D004, D005, `Project::framework_version` | believed | lock-derived decisions | lock cross-checked against the installed statement; mismatch `LOCK_IDENTITY_MISMATCH` | R-LOCK-* |
+| ID | Route | 4.1.5 code | Revision 2 control | Req |
+|---|---|---|---|---|
+| I-25 | Plugin descriptors and registration | `capabilities/{host,registry,governance}.rs` | authority floor and permission classes from the effective floor; profile-bound entries record the profile statement digest | R-PLG |
+| I-26 | `gov tools install` | `tools.rs` | kernel tool descriptors via KernelSnapshot; project descriptors under TOOL_POLICY; file writes through GovernedFs | R-TOOL |
+| I-27 | `gov memory select` pins | `memory/benchmark.rs` | unchanged; a reference-profile pin binds the profile statement digest | R-PRF |
+| I-28 | Reference retrieval profile install | none | signed profile statement; host-side verification (`10`) | R-PRF |
+| I-29 | Upstream lessons | `upstream.rs` | input to development, never trusted state; writes through GovernedFs | — |
+| I-30 | Pre-install adoption policy (scanner, `ARCHIVE_POLICY`) | `adopt.rs:74-95, 280-292` | EmbeddedSnapshot ⊔ floor | R-ADOPT |
+| I-31 | Generated views (adapters, registries, index manifest) | `adapters.rs`, `tools.rs`, `memory/indexer.rs` | generated from the snapshot; each records the content identity (`18` VU-8) | R-USE |
+| I-32 | Schemas validating trust statements and locks | none | compiled into the binary | R-AUTH |
+| I-33 | Manual `framework.lock` edits | `project.rs:113-119`; doctor D004/D005 | record cross-check → `LOCK_IDENTITY_MISMATCH`; reference fields are hints | R-LOCK |
 
-## 3. Completeness rule (enforced by tests)
+## 3. Ingress added in revision 2
 
-1. Only the install-transaction module may write `governance/kernel/**`, `governance/trust/**` or `governance/framework.lock`;
-   its entry points accept `&AuthenticatedRelease` (or a journal-bound restore of a previously authenticated state) and
-   no `Path`.
-2. Only `kernel_trust` may resolve a filesystem path to kernel content; everything else receives a `TrustedKernel`.
-3. No code path reads a release `manifest.json`/`manifest.yaml` or a source `KERNEL_MANIFEST.json` to make a decision.
-4. Every CLI subcommand that reaches (1) is listed in an ingress register asserted by the `release_ingress` test family,
-   and each is exercised with a tampered source (RT-27).
-5. A new `GOV_*` environment variable that selects kernel material fails the architecture test unless registered as
-   *source selection only*.
+| ID | Route | 4.1.5 code | What it can do without a control | Revision 2 control | Req |
+|---|---|---|---|---|---|
+| **I-34** | Adoption batch rollback (`gov adopt rollback --batch N`) and `gov recover` for an interrupted batch | `migrations/executor.rs:9-13, 304-350` | restore any path, including `governance/kernel/**` and `framework.lock`, from `.governance-runtime/migration/batch-N/` | batch 0 rollback is `install_tx::uninstall`; batches ≥ 1 restore through GovernedFs, which refuses PPS targets; planner never snapshots PPS paths (`20` §6) | R-ADOPT, R-FS |
+| **I-35** | CIT `write_file`, `move_file`, `delete_file`, `append_record`, and CIT snapshot restore | `cit/mod.rs:700-745, 1124-1185` | `write_file` guards only `governance/kernel/**`; `move_file` and `delete_file` have no guard | planning refuses PPS (`CIT_PROTECTED_PATH`); execution and restore via GovernedFs (`20` §7) | R-FS |
+| **I-36** | Adoption A7 migration verification and A11 audit kernel checks | `adopt.rs:816`, `adopt.rs:1363` | a self-manifest check decides `MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD` | use the snapshot verdict (`verified` per `19` §6) | R-ADOPT |
+| **I-37** | Adapter freshness check | `adapters.rs:168` | lock-hash comparison decides freshness | compare the adapter manifest's CI with the snapshot CI | R-USE |
+| **I-38** | Partial install states | `kernel_trust.rs:128-130, 289-291`; `cli/src/main.rs:743, 865` | policy root silently becomes an unverified directory | installation state machine (`18` §9) | R-PART |
+| **I-39** | Trust metadata refresh and the Verifier Trust Store | none (rev 1 proposed an env-selectable store) | select or reset high-water state | VTS path from the account database; only verified statements enter K; monotonic acceptance (`17` §4–§5) | R-TS |
+| **I-40** | Pre-RoT binaries opening RoT-1 projects | `kernel_trust.rs:156-169` (4.1.5) | circular verification continues on RoT-1 data | trust-format boundary (`13` §3); executed F1 | R-FMT |
+| **I-41** | Install journal and `.tx/<TX>/*.prev` | none | forged phase plus planted previous state | recovery re-authenticates and applies eligibility and downgrade policy (`20` §5) | R-REC |
+| **I-42** | Trust Policy acceptance (bundle, refresh, PTR, VTS, compiled) | none | lower floors; remove eligibility constraints | `trust-policy` purpose (root threshold); monotonic `policy_version`; explicit `lowers[]` with a per-project gate (`19` §10) | R-TS |
+| **I-43** | Trust State, certification, attestation and revocation acceptance | rev 1: V13 highest-present | stale replay; omission | admissibility; sticky negative set; views without relaxation (`17`) | R-TS, R-CERT |
+| **I-44** | Lineage confirmation and pin files | none | confirm an unverified root | human command, explicit flag or pin file resolved from the account database; never environment (`06` §3) | R-BOOT |
+| **I-45** | `gov`-run git subprocess mutations (adoption `git mv`, `git rm`) | `migrations/executor.rs` | move or remove protected paths | arguments pre-validated by GovernedFs (`18` §8) | R-FS |
+| **I-46** | Non-`gov` subprocesses (plugins, tools, test commands) writing files | n/a | modify installed files | outside GovernedFs by nature (A3-equivalent); detected by the next snapshot; never enforced (VR-3) | R-USE |
+| **I-47** | Candidate → final promotion and artifact statements | none | promote different content; mislabel candidates | `gov release promote`: same tree digest, `promoted_from_candidate`, new sequence, `release-final` purpose; V8 promotion check (`07` §7) | R-REL |
+
+## 4. Protected Path Set and file-mutation inventory
+
+**Protected Path Set** (`18` §8): `governance/kernel/**`, `governance/trust/**`, `governance/framework.lock`,
+`governance/.tx/**`, and the directory entries `governance`, `governance/kernel`, `governance/trust`, `governance/.tx`.
+
+Every mechanism in the runtime that mutates files, and its revision 2 treatment:
+
+| Mechanism | 4.1.5 location | May touch PPS? | Treatment |
+|---|---|---|---|
+| Install transaction (init, adopt batch 0, update, rollback, reinstall, recovery, uninstall, trust refresh) | `kernel.rs`, `lock.rs`, `update.rs`, `init.rs`, `adopt.rs` | **yes, only with `InstallTxToken`** | `18` §5 |
+| CIT `write_file` / `move_file` / `delete_file` / `append_record` | `cit/mod.rs:700-745` | no | planning refusal + GovernedFs |
+| CIT snapshot take and restore | `cit/mod.rs:586-660, 1124-1185` | no | GovernedFs |
+| Adoption executor moves, deletes, extractions | `migrations/executor.rs` | no | planner classification + GovernedFs |
+| Adoption `git mv` / `git rm` | `migrations/executor.rs` | no | argument pre-validation |
+| Adoption batch rollback | `migrations/executor.rs:304-350` | no (batch 0 → `install_tx::uninstall`) | `20` §6 |
+| Migration overlay operations | `migrations/framework.rs:69-259` | no; the lock operation is removed | GovernedFs; weakening gate |
+| Overlay template reconciliation | `migrations/framework.rs:339-382` | no | templates from ARO blobs |
+| `init` roots, `.gitignore`, overlay, NOW.md | `init.rs:43-215` | no | GovernedFs |
+| Gate, decision, report and other records | `records.rs`, `orchestration/gates.rs` | no | GovernedFs |
+| Update ledger, checkpoints, claims, telemetry | `update.rs`, `checkpoints.rs`, `orchestration/claims.rs`, `observability.rs` | no | GovernedFs |
+| Memory indexer DB and manifests | `memory/indexer.rs` | no | GovernedFs; manifest records CI |
+| Adapter and registry generation | `adapters.rs`, `tools.rs`, `capabilities/registry.rs` | no | GovernedFs; outputs record CI |
+| Tool installer file writes | `tools.rs` | no | GovernedFs (subprocess installs are I-46) |
+| Upstream packaging, lesson clustering | `upstream.rs`, `lessons.rs` | no | GovernedFs |
+| Release build output (canonical repository) | `release.rs` | n/a (writes `release/releases/<v>/`, not a consumer PPS) | producer rules (`07` §7) |
+
+## 5. Completeness rules (enforced by tests)
+
+1. Only `install_tx` holds `InstallTxToken`. Its entry points accept an `AuthenticatedRelease`, or an authenticated,
+   eligibility-checked restore target, and an `Authorisation`. They never accept a `Path`.
+2. Only `kernel_trust` and `install_tx` can open `governance/kernel/**` or `governance/trust/**`. Everything else
+   receives a KernelSnapshot.
+3. No code path reads a release `manifest.json`/`manifest.yaml`, a source `KERNEL_MANIFEST.json` or the installed
+   tombstone to make a decision.
+4. Every CLI subcommand is in a command register. The conformance suite runs each with a filesystem interception layer
+   and asserts: no PPS mutation outside `install_tx`, and no open of a kernel or trust path outside the two modules.
+   Inputs include protected-path CIT manifests, adoption plans, `../` spellings, case variants and symlinked parents
+   (`12` RT-27, RT-48).
+5. A new `GOV_*` environment variable that selects kernel material, trust metadata or a trust-store location fails the
+   architecture test unless registered as *source selection only*.
+6. Every ingress in this map names at least one `RT-*` scenario in `12`; the response matrix (`22`) checks this.

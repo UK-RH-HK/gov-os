@@ -2,32 +2,139 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/certification-statement.schema.json",
   "title": "certification-statement",
-  "description": "PROPOSED (RoT-1). Signed by the certification role; binds a certification status to one release statement digest. The highest sequence for a digest wins.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 2). Certification status for one final release statement digest, signed by the certification-status purpose. CERTIFIED requires a verification attestation; a CERTIFIED view additionally requires a trust-state reference (17 \u00a76).",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
-  "required": ["_type", "trust_profile", "framework", "release_id", "version", "release_statement_digest", "status", "sequence", "verifier_report", "verdict", "issued_at", "supersedes"],
-  "$defs": {
-    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-    "evidence": {
+  "required": [
+    "_type",
+    "trust_profile",
+    "framework",
+    "trust_root_id",
+    "issued_at",
+    "release_id",
+    "version",
+    "release_statement_digest",
+    "candidate_statement_digest",
+    "status",
+    "certification_sequence",
+    "verification_attestation_digest",
+    "issued_under",
+    "supersedes"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/certification/v2"
+    },
+    "trust_profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "trust_root_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "release_id": {
+      "$ref": "#/$defs/release_id"
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "release_statement_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "candidate_statement_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "status": {
+      "enum": [
+        "CERTIFIED",
+        "REJECTED",
+        "WITHDRAWN"
+      ]
+    },
+    "certification_sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "verification_attestation_digest": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "issued_under": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "digest"],
-      "properties": {"path": {"type": "string", "maxLength": 1024}, "digest": {"$ref": "#/$defs/digest"}}
+      "required": [
+        "trust_state_sequence"
+      ],
+      "properties": {
+        "trust_state_sequence": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "supersedes": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
-  "properties": {
-    "_type": {"const": "https://agentic-engineering-os/statement/certification/v1"},
-    "trust_profile": {"enum": ["production", "test"]},
-    "framework": {"const": "agentic-engineering-os"},
-    "release_id": {"type": "string", "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"},
-    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"},
-    "release_statement_digest": {"$ref": "#/$defs/digest"},
-    "status": {"enum": ["CERTIFIED", "REJECTED", "WITHDRAWN"]},
-    "sequence": {"type": "integer", "minimum": 1},
-    "verifier_report": {"$ref": "#/$defs/evidence"},
-    "verdict": {"$ref": "#/$defs/evidence"},
-    "issued_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"},
-    "supersedes": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]}
-  }
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "release_id": {
+      "type": "string",
+      "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"
+    },
+    "profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "CERTIFIED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "verification_attestation_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    }
+  ]
 }

@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-state-statement.schema.json",
+  "title": "trust-state-statement",
+  "description": "PROPOSED (RoT-1 revision 2). Trust State Statement signed by the trust-state purpose: the published set of separately signed revocation, certification, attestation and policy statements at a sequence. Admissibility against lower known sequences is 17 S4.",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_type",
+    "trust_profile",
+    "framework",
+    "trust_root_id",
+    "issued_at",
+    "sequence",
+    "previous_state_digest",
+    "references",
+    "revocations",
+    "certifications",
+    "attestations",
+    "expires_at"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/trust-state/v1"
+    },
+    "trust_profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "trust_root_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "previous_state_digest": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_version",
+        "trust_policy"
+      ],
+      "properties": {
+        "root_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "trust_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "policy_version",
+            "statement_digest"
+          ],
+          "properties": {
+            "policy_version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "statement_digest": {
+              "$ref": "#/$defs/digest"
+            }
+          }
+        }
+      }
+    },
+    "revocations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/digest"
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "release_statement_digest",
+          "certification_statement_digest"
+        ],
+        "properties": {
+          "release_statement_digest": {
+            "$ref": "#/$defs/digest"
+          },
+          "certification_statement_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    },
+    "attestations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/digest"
+      }
+    },
+    "expires_at": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "sequence": {
+            "const": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "previous_state_digest": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "previous_state_digest": {
+            "$ref": "#/$defs/digest"
+          }
+        }
+      }
+    }
+  ]
+}

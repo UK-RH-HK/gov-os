@@ -1,237 +1,325 @@
-# Output 9 — Integration requirements (init, adopt, update, reinstall, rollback, recovery and adjacent ingress)
+# Output 9 — Integration requirements
 
-Normative keywords: MUST / MUST NOT / SHOULD. Requirement IDs are referenced by `02-INGRESS-MAP.md` and
-`12-ACCEPTANCE-TEST-PLAN.md`.
+> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Normative keywords: MUST, MUST NOT, SHOULD. Requirement IDs are referenced by `02` and `12`. Mechanisms are defined in
+> `04`, `05`, `17`, `18`, `19` and `20`; this file states obligations per ingress and catalogues codes.
 
-## 1. Common order of evaluation (every ingress command)
+## 1. Common order of evaluation (every command)
 
-1. `control::guard_write` (pause/freeze) and kernel_trust v2 guard, with the remedy exemptions of `04` §5;
-2. authority check for the operation (levels read from the authenticated kernel; for a first install, from the
-   authenticated target release after step 3, before any write);
-3. `authenticate(SourceRef)` → `AuthenticatedRelease`;
-4. authorisation (`04` §8): certification policy, gates bound to `release_statement_digest`, downgrade, minimum trust;
-5. install transaction (§3);
-6. post-commit kernel_trust v2 must return the same statement digest with `verified: true` (production) — else automatic
-   journal rollback;
-7. ledger entry, checkpoint, typed result.
+1. Read `governance/trust/FORMAT`; an unsupported format stops here (`TRUST_FORMAT_UNSUPPORTED`).
+2. Determine the installation state (`18` §9).
+3. Build the knowledge set and effective trust state (`17` §5).
+4. Load the KernelSnapshot or EmbeddedSnapshot and compute the verdict and effective floor (`18` §6, `19` §5–§6).
+5. `control::guard_write` (pause/freeze) and the kernel-trust guard, with the remedy exemptions of `04` §5.
+6. For ingress: `authenticate` (`04` V0–V12).
+7. For ingress: eligibility, trust-state requirement, gates, install-authority floor, computed weakenings, downgrade
+   policy (`04` §4).
+8. For ingress: install transaction (`18` §5), including post-commit snapshot equality and eligibility.
+9. Ledger entry (idempotent from the journal), checkpoint, typed result.
 
-Every trust failure in steps 1–6 MUST return `ok: false` (API-0002 exit code 1) with a code from §4, never
-`ok: true, applied: false` (closes V-L2 for trust refusals).
+Every trust failure MUST return `ok: false` (API-0002 exit code 1) with a code from §4. Trust refusals are never
+`ok: true, applied: false`.
 
-## 2. Per-ingress requirements
+## 2. Requirements by ingress
 
 ### init — I-01, I-02
 
 | ID | Requirement |
 |---|---|
-| R-INIT-1 | `init` MUST authenticate its source (explicit `--source`, canonical checkout, or embedded payload) before creating `governance/`. |
-| R-INIT-2 | The embedded payload MUST be authenticated via the embedded statement and in-memory digests (R-EMB-1); a development binary's embedded kernel is `DEVELOPMENT_UNSIGNED` and follows R-DEV. |
-| R-INIT-3 | `init` MUST write `governance/trust/release.dsse.json` (and certification if present) inside the transaction and the lock last. |
-| R-INIT-4 | A `release_commit` or `source` label MUST come from the statement and `SourceRef.kind`, never from `manifest.json`, `git rev-parse` or path text. |
-| R-INIT-5 | If authority validation fails after install (today's `remove_file(framework.lock)` pattern), the transaction MUST roll back kernel, trust files and lock together. |
-| R-INIT-6 | `init --force` on an installed project MUST be treated as reinstall (same identity) or update (different identity): downgrade, gate and identity rules apply. |
-| R-INIT-7 | `init` MUST print the trust-root id and record it in the lock; OP-6 decides whether confirmation is mandatory. |
+| R-INIT-1 | `init` MUST authenticate its source (explicit `--source`, canonical checkout, or EmbeddedSnapshot) and complete authorisation before creating any Protected Path. |
+| R-INIT-2 | Required authority MUST come from the install-authority floor (`19` §8) — TPS and EmbeddedSnapshot for an `ABSENT` project — never from the release being installed. |
+| R-INIT-3 | Production `init` MUST require an eligible final release (`19` E1–E8), or an eligible candidate with the evaluation flag. |
+| R-INIT-4 | Production `init` MUST record an init-acknowledgement Human Decision Gate bound to the statement digest, showing authenticity, eligibility, certification view with its sequence, and trust state (`21` OP-3). |
+| R-INIT-5 | `init` MUST write `governance/trust/` (FORMAT, release envelope, lineage candidate, PTR state) and lock 2.0.0 inside the transaction, lock last. |
+| R-INIT-6 | `init --force` on an installed project MUST be treated as reinstall (same statement digest) or update/downgrade (different digest), with the corresponding rules. |
+| R-INIT-7 | `init` MUST print the trust-root id and apply OP-6 confirmation before any trusted write (`06` §3). |
+| R-INIT-8 | `release_commit` and `source` labels MUST come from the statement and `SourceRef.kind`, never from `manifest.json`, `git rev-parse` or path text. |
 
-### adopt — I-03, I-30
+### adopt — I-03, I-30, I-34, I-36
 
 | ID | Requirement |
 |---|---|
-| R-ADOPT-1 | `adopt migrate --batch 0` MUST use the same authenticate → transaction path as init. |
-| R-ADOPT-2 | When a lock already exists, batch 0 MUST run kernel_trust v2 and refuse on `UNAUTHENTICATED`/`TAMPERED` instead of reading the existing manifest. |
-| R-ADOPT-3 | Pre-install adoption stages (A1 inventory secret scanner, A3 `ARCHIVE_POLICY`) MUST read policy from the authenticated embedded baseline, never from `GOV_CANONICAL_ROOT`/`GOV_KERNEL_SOURCE`. |
+| R-ADOPT-1 | `adopt migrate --batch 0` MUST use the `init` pipeline with operation `adopt_install`. |
+| R-ADOPT-2 | When protected paths already exist, batch 0 MUST evaluate them through the installation state machine and refuse to proceed unless the state is `ABSENT` or `COMPLETE`, verified and eligible. |
+| R-ADOPT-3 | Pre-install stages (A1 scanner, A3 `ARCHIVE_POLICY`) MUST read policy from the EmbeddedSnapshot ⊔ floor, never from `GOV_CANONICAL_ROOT` or `GOV_KERNEL_SOURCE`. |
+| R-ADOPT-4 | The planner MUST classify all PPS paths as `GOVERNANCE_CURRENT` and never include them in moves, deletions or snapshots. Batch 0 rollback MUST be `install_tx::uninstall`; rollback of batches ≥ 1 MUST go through GovernedFs (`20` §6). |
+| R-ADOPT-5 | A7 migration verification and A11 audit MUST use the snapshot verdict, not a self-manifest check (I-36). |
 
 ### update — I-04, I-05, I-31
 
 | ID | Requirement |
 |---|---|
-| R-UPD-1 | `update --check` MUST run `authenticate` (report mode) and report the trust verdict, trust level, signer, certification and any refusal code. |
-| R-UPD-2 | Every value in the check result (target version, compatibility, migration path, breaking changes, human gates, certification) MUST come from the authenticated statement and certification statements. `manifest.json` MUST NOT be read. |
-| R-UPD-3 | Dry-run migrations MUST be loaded from the authenticated quarantine tree only (no `migrations_for_source` parent-directory search). |
-| R-UPD-4 | `update --apply` MUST re-authenticate (never reuse a check result from another process). |
-| R-UPD-5 | The `framework_update` gate MUST record `release_statement_digest`; only a gate whose digest equals the authenticated statement digest authorises the apply. |
-| R-UPD-6 | Gate requirement MUST be computed per `04` §8 (certification ≠ CERTIFIED, breaking changes, declared human gates, trust-level decrease). |
-| R-UPD-7 | The snapshot MUST include `governance/trust/` and the journal of the previous authenticated identity. |
-| R-UPD-8 | Migrations MUST be loaded from the `AuthenticatedRelease`, validated against the authenticated kernel's migration schema, and restricted by the `set_lock_field` allowlist (`08` §4). |
-| R-UPD-9 | Tool registry, plugin registry checks and adapters MUST be regenerated from `TrustedKernel` after commit. |
-| R-UPD-10 | Post-update doctor/audit MUST include the new trust checks (§5); a critical trust finding triggers rollback. |
-| R-UPD-11 | The ledger entry MUST record `release_id`, `release_statement_digest`, signer key ids, trust level, certification, gate id and source reference. |
-| R-UPD-12 | An update whose target authenticates MAY run while the installed kernel is `UNAUTHENTICATED`/`TAMPERED` (strictly trust-increasing); gates and authority for it are evaluated with floors from the embedded baseline. |
+| R-UPD-1 | `update --check` MUST run `authenticate` in report mode and report eligibility, trust state, certification view, computed weakenings, gate requirement and authority. |
+| R-UPD-2 | Every value in the check result MUST come from signed statements, the effective state and the snapshot. `manifest.json` MUST NOT be read. |
+| R-UPD-3 | Dry-run migrations MUST be interpreted from ARO blobs only. |
+| R-UPD-4 | `update --apply` MUST re-authenticate and never reuse a check result from another process. |
+| R-UPD-5 | The `framework_update` gate MUST record `release_statement_digest` (and, for downgrade, both digests; for weakenings, the list digest). Only an exactly matching presented, answered-A gate authorises. |
+| R-UPD-6 | Gate requirement per OP-3 mode (TPS `gating`); certification MUST NOT remove a gate in mode A; computed weakenings MUST gate in every mode (`19` §9). |
+| R-UPD-7 | Trust state MUST NOT be `STALE`; `HINT_MISMATCH` MUST add a gate (`17` §7). |
+| R-UPD-8 | Migrations MUST come from the ARO, form a unique chain, and have no lock operation (`08` §4). |
+| R-UPD-9 | The transaction MUST snapshot overlay and generated views into `.tx/<TX>/overlay.prev/` and write `.governance-runtime/snapshots/<CI>/` for the previous identity (`20` §3). |
+| R-UPD-10 | Tool registry, plugin registry and adapters MUST be regenerated from the new snapshot after commit and record the new CI. |
+| R-UPD-11 | Post-commit verification MUST include snapshot CI equality, eligibility, doctor D030–D034 and the audit families. Any critical finding triggers automatic rollback. |
+| R-UPD-12 | The ledger entry MUST record previous and new CI, signer key ids, purpose, eligibility, certification view, trust-state status, TPS version, gate ids and source reference. |
+| R-UPD-13 | An update whose target authenticates and is eligible MAY run while the installed kernel is `UNAUTHENTICATED`, `TAMPERED`, `INELIGIBLE` or `PARTIAL`; gates and authority use the floor. |
+| R-UPD-14 | Known REJECTED or WITHDRAWN finals MUST be refused when TPS `gating.refuse_known_*` is true. |
 
 ### kernel reinstall — I-08
 
 | ID | Requirement |
 |---|---|
-| R-RI-1 | Reinstall restores the **installed identity**: the source MUST authenticate and its statement digest MUST equal `governance/trust/release.dsse.json`'s digest (or, for legacy installs, its tree digest MUST equal the legacy-identity entry of the installed version). |
-| R-RI-2 | Source resolution order: explicit `--source`; bundle in the user release cache; embedded payload if its statement digest matches. `lock.source` MUST NOT be treated as a filesystem path. |
-| R-RI-3 | A reinstall MAY replace `governance/trust/release.dsse.json` with a re-signed envelope of the same payload digest (re-attestation). |
+| R-RI-1 | The source MUST authenticate, and its statement digest MUST equal the installed `release.dsse.json` payload digest. |
+| R-RI-2 | Source order: explicit `--source`; a bundle in the user release cache (an untrusted source); the EmbeddedSnapshot if its statement digest matches. `lock.source` MUST NOT be treated as a path. |
+| R-RI-3 | A re-signed envelope of the same payload digest MAY replace `release.dsse.json` (re-attestation). |
 
 ### rollback — I-06, I-07
 
 | ID | Requirement |
 |---|---|
-| R-RB-1 | A snapshot restore MUST authenticate the snapshot's kernel against the snapshot's statement (or legacy identity) before any byte is restored (`SNAPSHOT_UNAUTHENTICATED`). |
-| R-RB-2 | Explicit rollback MAY lower the version only to the identity recorded as `from` in the matching ledger `update` entry, and MUST be refused if that identity is now revoked with `refuse_install`. |
-| R-RB-3 | Explicit rollback that lowers the trust level (e.g. `CERTIFIED` → `AUTHENTICATED_REJECTED`) MUST raise a Human Decision Gate bound to both statement digests. |
-| R-RB-4 | Kernel, `governance/trust/`, overlay, generated views and lock are restored as one transaction. |
+| R-RB-1 | Every restore MUST run the restore pipeline (`20` §2): authenticate, eligibility under the current policy, downgrade policy, authority floor, transaction. |
+| R-RB-2 | A downgrade MUST require a Human Decision Gate bound to both statement digests (`20` §4). |
+| R-RB-3 | Targets below `min_release_sequence`, revoked, historical, or candidates in production MUST be refused without override. |
+| R-RB-4 | Kernel, trust record, overlay, generated views and lock MUST be restored as one transaction. |
+| R-RB-5 | Accepted trust metadata MUST NOT be removed by any rollback. |
 
 ### override — I-09
 
 | ID | Requirement |
 |---|---|
-| R-OV-1 | `kernel override` remains a fingerprint-bound L4+ gate permitting operation on an untrusted kernel; it MUST NOT change `authenticated`, `trust_level` or the policy root (floors stay on the authenticated baseline), and MUST NOT be available for revoked releases. |
+| R-OV-1 | `kernel override` MUST remain a fingerprint-bound L4+ gate permitting governed mutations on an untrusted kernel. It MUST NOT change authenticity, eligibility, the certification view or the policy root. |
+| R-OV-2 | Override MUST NOT be available for `refuse_operation` revocations, `TRUST_STATE_REGRESSION`, `BINARY_BELOW_TRUST_POLICY` or `TRUST_ROOT_LINEAGE_MISMATCH`. |
 
-### recovery — I-10
+### recovery — I-10, I-41
 
 | ID | Requirement |
 |---|---|
-| R-REC-1 | Every `gov` invocation MUST detect an incomplete install journal and refuse mutating operations with `INSTALL_INTERRUPTED` (read-only diagnostics and `gov recover` remain available). |
-| R-REC-2 | `gov recover` MUST complete or roll back the transaction per §3.3 and write a recovery report. |
-| R-REC-3 | Recovery MUST NOT restore kernel, trust files or lock except through the journal-bound authenticated restore. |
-| R-REC-4 | Adoption A0 classification of `governance/` without a lock MUST consult the install journal first. |
+| R-REC-1 | Every invocation MUST detect `IN_TRANSACTION` and refuse mutations with `INSTALL_IN_PROGRESS` (read-only diagnostics and `gov recover` remain available). |
+| R-REC-2 | `gov recover` MUST follow `20` §5 and treat the journal and `.prev` directories as hints only. |
+| R-REC-3 | Recovery MUST NOT write Protected Paths except through the install transaction. |
+| R-REC-4 | CIT and adoption recovery MUST go through GovernedFs. |
+| R-REC-5 | Adoption A0 classification of an existing `governance/` MUST consult the installation state machine first. |
 
 ### embedded payload — I-11, I-12, I-22
 
 | ID | Requirement |
 |---|---|
-| R-EMB-1 | The embedded statement MUST be authenticated and the embedded bytes digested in memory once per process. |
-| R-EMB-2 | Materialised directories MUST be re-digested before use; `.complete` markers are never evidence. |
-| R-EMB-3 | The fail-closed policy baseline MUST be served from `KernelFs::Embedded` (memory). |
-| R-EMB-4 | `build.rs` MUST NOT derive provenance from unsigned files; it embeds statement bytes and lets the runtime decide. |
+| R-EMB-1 | The EmbeddedSnapshot MUST be verified against its compiled statement and digested in memory once per process. |
+| R-EMB-2 | The embedded payload MUST NOT be materialised for any trust purpose; `GOV_KERNEL_CACHE` is removed. |
+| R-EMB-3 | The fail-closed baseline MUST be the EmbeddedSnapshot joined with the effective floor. |
+| R-EMB-4 | `build.rs` MUST NOT derive provenance from unsigned files. It embeds the root chain, TPS, TSS and referenced statements, historical registry and final statement bytes, and makes no trust decision. |
 
-### environment — I-13, I-14
-
-| ID | Requirement |
-|---|---|
-| R-ENV-1 | `GOV_CANONICAL_ROOT` selects a source only; `Project::schemas` MUST NOT fall back to it. |
-| R-ENV-2 | `GOV_KERNEL_SOURCE` MUST be removed. |
-| R-ENV-3 | `GOV_KERNEL_CACHE` may relocate materialisation only. |
-| R-ENV-4 | No environment variable may add keys, roots, revocation data or trust levels. |
-
-### use-time — I-15, I-16, I-17
+### environment — I-13, I-14, I-39, I-44
 
 | ID | Requirement |
 |---|---|
-| R-USE-1 | kernel_trust v2 per `04` §5 on every process that reads kernel content. |
-| R-USE-2 | New doctor checks: **D030** installed kernel authenticated (CRITICAL when `UNAUTHENTICATED`/`TAMPERED`/`REVOKED`; HIGH for `DEVELOPMENT_UNSIGNED` or legacy; MEDIUM for `AUTHENTICATED_UNCERTIFIED`); **D031** lock identity consistent (CRITICAL); **D032** trust metadata freshness (MEDIUM, OP-5); **D033** no incomplete install journal (CRITICAL). D003/D004/D029 wording distinguishes integrity from authenticity. |
-| R-USE-3 | Context packets and `gov status` surface `trust_level`, `release_id`, certification. |
-| R-USE-4 | V-H2 behaviour (substitution, `KERNEL_TAMPERED`, fingerprint-bound override) is preserved. |
-| R-USE-5 | All kernel reads go through `TrustedKernel`; the architecture test forbids `Project::kernel_dir()` outside the trust module. |
+| R-ENV-1 | `GOV_CANONICAL_ROOT` MUST select a source only; `Project::schemas` MUST NOT fall back to it. |
+| R-ENV-2 | `GOV_KERNEL_SOURCE` and `GOV_KERNEL_CACHE` MUST be removed. |
+| R-ENV-3 | The VTS and pin-file locations MUST be resolved from the account database, never from `HOME`, `XDG_*` or `GOV_*`. |
+| R-ENV-4 | No environment variable may add keys, roots, policies, trust state, certification, confirmation or eligibility. |
+| R-ENV-5 | Lineage confirmation MUST come from a human command, an explicit flag or a pin file (`06` §3). |
+
+### use time — I-15, I-16, I-17, I-31, I-37, I-46
+
+| ID | Requirement |
+|---|---|
+| R-USE-1 | Every process that reads kernel content MUST build a KernelSnapshot or EmbeddedSnapshot per `18` §6. |
+| R-USE-2 | All consumers MUST read kernel content from the snapshot API; GovernedFs MUST refuse other opens of `governance/kernel/**` and `governance/trust/**`. |
+| R-USE-3 | The effective floor MUST be applied in policy loading from the snapshot (`19` §5). |
+| R-USE-4 | V-H2 behaviour (substitution, `KERNEL_TAMPERED`, fingerprint-bound override) MUST be preserved. |
+| R-USE-5 | Derived artefacts MUST record the CI and be treated as stale on mismatch (`18` VU-8). |
+| R-USE-6 | Context packets and `gov status` MUST surface all verdict axes (`19` §6). |
+| R-USE-7 | Doctor checks D030–D034 (§5) MUST be implemented; D003, D004 and D029 wording MUST distinguish integrity, authenticity and eligibility. |
+| R-USE-8 | The VTS per-project record MUST be updated after verified snapshots and install transactions, and compared per E10. |
 
 ### migrations — I-18
 
 | ID | Requirement |
 |---|---|
-| R-MIG-1 | Migration files are loaded only from an `AuthenticatedRelease` or `TrustedKernel`. |
-| R-MIG-2 | `stage_payload`'s parent-directory fallback for `migrations`/`tools` MUST be removed from consumer paths (producer only). |
-| R-MIG-3 | `set_lock_field` allowlist (`08` §4). |
-| R-MIG-4 | Migration operations remain declarative; any future executable migration step requires its own statement binding and a new decision. |
+| R-MIG-1 | Migrations MUST be loaded only from ARO blobs (ingress) or the KernelSnapshot (use). |
+| R-MIG-2 | The `stage_payload` parent-directory fallback MUST NOT exist on consumer paths. |
+| R-MIG-3 | There MUST be no migration lock operation; informational keys only through the compiled allowlist (`08` §4). |
+| R-MIG-4 | The migration set MUST form a unique chain (`MIGRATION_CHAIN_AMBIGUOUS`). |
+| R-MIG-5 | Computed weakenings MUST gate (`19` §9). |
+| R-MIG-6 | Migration operations remain declarative; any executable step requires its own statement binding and a new decision. |
 
-### producer, verification, certification — I-19, I-20, I-21
+### producer, verification, certification — I-19, I-20, I-21, I-47
 
 | ID | Requirement |
 |---|---|
-| R-REL-1 | `release build` emits `release.statement.json` (unsigned canonical payload) and never signs. |
-| R-REL-2 | `release build` refuses private key material (`PRIVATE_KEY_MATERIAL_DETECTED`). |
-| R-REL-3 | `release build` validates the statement with the compiled-in schema. |
-| R-REL-4 | `release attach-signature` verifies before attaching. |
-| R-REL-5 | `release verify` = authenticate in report mode. |
-| R-CERT-1 | Certification is a signed certification statement; the `certification` block in `manifest.{json,yaml}` becomes descriptive only. |
-| R-CERT-2 | `VERDICT.md` convention continues; the release owner signs the certification statement referencing the verifier report digest instead of editing a trusted field. |
+| R-REL-1 | `release build` MUST emit an unsigned candidate payload and never sign. |
+| R-REL-2 | `release build` MUST refuse private key material. |
+| R-REL-3 | `release build` MUST validate with compiled schemas and enforce `FLOOR_NOT_REGISTERED` / `FLOOR_VIOLATION`. |
+| R-REL-4 | `release attach-signature` MUST verify (purpose, lineage, profile) before attaching. |
+| R-REL-5 | `release verify` MUST be `authenticate` in report mode plus views. |
+| R-REL-6 | `release promote` MUST require a verified ACCEPTED attestation for the candidate and produce identical content with `stage: final`. |
+| R-REL-7 | Statement inputs MUST be deterministic (`05` §7). |
+| R-REL-8 | The release pipeline MUST refuse a binary whose compiled `policy_version` is lower than the previous published binary's (`FLOOR_REGRESSION_IN_BUILD`), and a shipped binary not reporting `trust_profile: production`. |
+| R-CERT-1 | Certification MUST be a signed certification-status statement; the manifest block is descriptive only. |
+| R-CERT-2 | CERTIFIED MUST reference a verified ACCEPTED attestation for the promoted-from candidate. |
+| R-CERT-3 | A CERTIFIED view MUST additionally require an admissible TSS reference (`17` §6). |
+| R-CERT-4 | Negative certification states MUST be sticky (`17` MS-2). |
+| R-CERT-5 | `VERDICT.md` continues. The verifier signs the attestation; the certification owner signs the certification; the publisher references both in the TSS. |
+
+### trust state — I-39, I-42, I-43
+
+| ID | Requirement |
+|---|---|
+| R-TS-1 | Only verified statements MAY enter the knowledge set (`17` §4). |
+| R-TS-2 | The effective state MUST be computed per `17` S1–S10. |
+| R-TS-3 | Non-admissible TSS MUST raise `TRUST_STATE_REGRESSION` and MUST NOT be used. |
+| R-TS-4 | The negative set MUST be the union of all known negative facts minus TPS `unrevokes`. |
+| R-TS-5 | Ingress MUST refuse on `STALE`, with no override. |
+| R-TS-6 | TPS acceptance MUST be monotonic. Lowering MUST follow `19` §10 step 6. |
+| R-TS-7 | `gov trust refresh` MUST write the PTR only through the install transaction area. |
+| R-TS-8 | OP-3 mode B freshness proofs MUST follow `17` §13 exactly. |
+
+### filesystem and protected paths — I-34, I-35, I-45
+
+| ID | Requirement |
+|---|---|
+| R-FS-1 | All runtime file mutations MUST go through GovernedFs (`18` §8). |
+| R-FS-2 | GovernedFs MUST refuse PPS targets without `InstallTxToken` (`PROTECTED_PATH_WRITE_REFUSED`). |
+| R-FS-3 | GovernedFs MUST resolve targets through the secure primitives and refuse link crossings (`PATH_SUBSTITUTION_DETECTED`). |
+| R-FS-4 | CIT planning MUST refuse PPS targets (`CIT_PROTECTED_PATH`) for every file operation. |
+| R-FS-5 | `gov`-run git subprocess arguments MUST be pre-validated. |
+| R-FS-6 | The conformance suite MUST prove no PPS mutation outside `install_tx` for every command, by interception (`02` §5). |
+| R-FS-7 | Production-profile operation MUST refuse platforms lacking the `18` §3 primitives (`TRUST_PLATFORM_UNSUPPORTED`). |
+
+### partial install — I-38
+
+| ID | Requirement |
+|---|---|
+| R-PART-1 | Every process MUST evaluate the installation state machine before reading policy (`18` §9). |
+| R-PART-2 | `PARTIAL`, `IN_TRANSACTION` and `ABSENT` MUST use the EmbeddedSnapshot ⊔ floor, including for commands not requiring an installation. |
+| R-PART-3 | `PARTIAL` MUST refuse mutations except the remedies of `20` §8. |
+
+### format boundary — I-40
+
+| ID | Requirement |
+|---|---|
+| R-FMT-1 | Every RoT-1 install MUST write `governance/trust/FORMAT`, the lock sentinels and the tombstone `KERNEL_MANIFEST.json` exactly as `13` §3. |
+| R-FMT-2 | RoT-1 binaries MUST NOT read the sentinel fields or the tombstone. |
+| R-FMT-3 | Unknown formats or `minimum_reader` above the binary version MUST stop with `TRUST_FORMAT_UNSUPPORTED`. |
+| R-FMT-4 | A project modified by a pre-RoT binary MUST be detected (`KERNEL_TAMPERED` / `INSTALL_STATE_PARTIAL`) and remediable by reinstall. |
+| R-FMT-5 | The acceptance suite MUST run the real 4.1.5 binary against a genuine 4.1.6 project (`12` RT-50). |
+
+### bootstrap — I-22, I-44
+
+| ID | Requirement |
+|---|---|
+| R-BOOT-1 | The trust-root id MUST be published in at least two channels not sharing an attacker with the release host (`06` §2 step 2). |
+| R-BOOT-2 | OP-6 confirmation MUST be implemented as chosen, and recorded in the VTS and lock. |
+| R-BOOT-3 | Lineage mismatch MUST fail closed with no re-pin (`06` §4). |
+| R-BOOT-4 | `gov trust verify-artifact` MUST verify `artifact-final` statements under the pinned lineage and root high-water. |
 
 ### transport and bundles — I-23, I-24
 
 | ID | Requirement |
 |---|---|
-| R-NET-1 | `gov release fetch <reference>` is a transport into the user release cache or a scratch directory; it MUST NOT install. |
-| R-NET-2 | Credentials for private hosting are read from the platform credential store or environment, never written to locks, ledgers or statements. |
-| R-NET-3 | Nothing fetched is trusted before `authenticate`; network failure never changes a trust decision on already-present material. |
-| R-BUN-1 | Archive extraction rules per `07` §6 run in quarantine before authentication. |
+| R-NET-1 | `gov release fetch <reference>` is transport into memory or scratch only; it MUST NOT install. |
+| R-NET-2 | Credentials for private hosting MUST come from the platform credential store and never enter locks, ledgers or statements. |
+| R-NET-3 | Network failure MUST never change a trust decision on material already present. |
+| R-BUN-1 | Archive members MUST be streamed into buffers under `07` §5.1 and §6 before authentication. |
 
-### plugins, tools, profiles — I-25, I-26, I-27, I-28, I-32, I-33
-
-| ID | Requirement |
-|---|---|
-| R-PLG-1 | The plugin authority floor and permission classes are read via `TrustedKernel`. |
-| R-PLG-2 | Profile-bound registry entries record `profile_statement_digest`; descriptors discovered via `$GOV_PLUGINS_DIR` can never be profile-bound. |
-| R-TOOL-1 | Kernel-shipped tool descriptors are trusted only through the authenticated kernel; project descriptors remain governed by TOOL_POLICY. Hash-pinned package installation SHOULD be added to TOOL_POLICY (non-blocking). |
-| R-PRF-1…6 | Per `10-RETRIEVAL-PROFILE-TRUST.md` §4–§5; R-PRF-6: memory-select pins of a reference profile record the profile statement digest. |
-| R-AUTH-7 | Statement and lock schemas used for trust decisions are compiled into the binary. |
-| R-LOCK-1 | Lock identity cross-check per `08` §3; `LOCK_IDENTITY_MISMATCH` on any disagreement. |
-
-### development path — R-DEV
+### plugins, tools, profiles — I-25…I-28
 
 | ID | Requirement |
 |---|---|
-| R-DEV-1 | Production profile: unsigned sources require `--allow-unsigned-development` per command. |
-| R-DEV-2 | The acknowledgement (actor, role, session, time, file map) is written to `governance/trust/development.json`, and the ledger records it. |
-| R-DEV-3 | Floors are read from the authenticated embedded baseline; mutations require the fingerprint-bound override gate. |
-| R-DEV-4 | A development install MUST NOT be reported as authenticated or certified by any command. |
-| R-DEV-5 | Any transition from a higher trust level to `DEVELOPMENT_UNSIGNED` raises a gate (`DEVELOPMENT_TRUST_DOWNGRADE_REFUSED` without one). |
+| R-PLG-1 | Plugin authority floor and permission classes MUST come from the effective floor. |
+| R-PLG-2 | Profile-bound registry entries MUST record `profile_statement_digest`; descriptors from `$GOV_PLUGINS_DIR` MUST never be profile-bound. |
+| R-TOOL-1 | Kernel tool descriptors MUST come from the snapshot; project descriptors remain governed by TOOL_POLICY; hash-pinned package installation SHOULD be added. |
+| R-PRF-1…7 | Per `10` §4–§5 (host-side verification; plugin-reported digests informational; CAS store; index writes rejected on post-use mismatch; compatibility re-check on kernel update; pins bind the profile digest). |
+
+### schemas, lock, development path
+
+| ID | Requirement |
+|---|---|
+| R-AUTH-1 | Statement, lock and FORMAT schemas used for trust decisions MUST be compiled into the binary. |
+| R-AUTH-2 | Floor operators and `floor_schema_version` MUST be compiled (`19` §4). |
+| R-LOCK-1 | Lock identity fields MUST be cross-checked against the statement (`LOCK_IDENTITY_MISMATCH`). |
+| R-LOCK-2 | Lock reference fields MUST be treated as hints (`17` S8). |
+| R-LOCK-3 | Only the install transaction MUST write the lock (`08` §4). |
+| R-DEV-1 | Production: unsigned sources require `--allow-unsigned-development` per command. |
+| R-DEV-2 | The acknowledgement MUST be written to `governance/trust/development.json` and the ledger. |
+| R-DEV-3 | Floors MUST come from the EmbeddedSnapshot ⊔ floor; mutations need the override gate. |
+| R-DEV-4 | A development install MUST NOT be reported as authenticated, eligible or certified by any command. |
+| R-DEV-5 | Any transition to `DEVELOPMENT_UNSIGNED` MUST raise a gate (`DEVELOPMENT_TRUST_DOWNGRADE_REFUSED` without one). |
 
 ## 3. Install transaction
 
-### 3.1 Journal
+Defined normatively in `18` §5 (layout, phases, locking, platforms) and `20` §5 (recovery). Not duplicated here.
 
-`.governance-runtime/install/<TX>/journal.json` (local, derived) with phases and the statement digests of the previous and
-target identities. An exclusive lock file prevents concurrent transactions (`INSTALL_TRANSACTION_CONFLICT`).
-
-### 3.2 Phases
-
-| Phase | Action | Writes to trust locations |
-|---|---|---|
-| `prepared` | ARO produced; authorisation recorded; previous identity + snapshot (kernel, trust, overlay, generated, lock) captured | none |
-| `staged` | `governance/.kernel.next-<TX>/` and `governance/.trust.next-<TX>/` built from quarantine bytes, fsynced, re-digested (`SOURCE_CHANGED_DURING_INSTALL`) | staging dirs only |
-| `swapped` | rename `kernel`→`.kernel.prev-<TX>`, `.kernel.next`→`kernel`; same for `trust` | kernel, trust |
-| `migrated` | migrations from the ARO applied to overlay/generated; overlay preservation check | overlay, generated |
-| `committed` | lock written via temp + rename (**commit point**) | lock |
-| `verified` | kernel_trust v2 authenticated with the target digest; doctor/audit; ledger; `.prev` removed | ledger |
-
-### 3.3 Recovery rules
-
-| Journal phase found | Recovery |
-|---|---|
-| `prepared` or `staged` | delete staging; nothing else changed |
-| `swapped` or `migrated` | swap back `.kernel.prev`/`.trust.prev`; restore overlay/generated from snapshot; lock untouched |
-| `committed` but not `verified` | re-run verification; on failure, authenticated restore of the previous identity (R-RB-1) |
-
-Invariant: kernel files of one identity are never paired with a trust directory or lock of another identity in any state
-that kernel_trust v2 reports as verified (both are checked against the same statement digest). Directory rename is
-atomic on POSIX filesystems; on platforms without atomic directory replacement, the journal-driven swap-back is the
-guarantee.
-
-## 4. Error catalogue (machine-readable; `error.code`, `error.details.stage`, `error.details.*`)
+## 4. Error catalogue (`error.code`, `error.details.stage`, `error.details.*`)
 
 | Code | Stage | Meaning | Key details |
 |---|---|---|---|
 | `KERNEL_SOURCE_NOT_FOUND` | V0 | no kernel at the source | `source_reference` |
-| `RELEASE_TREE_INVALID` | V1 | symlink, traversal, collision, limits | `path`, `rule` |
+| `RELEASE_TREE_INVALID` | V1 | link, special file, traversal, non-ASCII path, case collision, limits | `path`, `rule` |
 | `RELEASE_STATEMENT_MISSING` | V2 | required statement absent | `looked_in[]` |
-| `UNSIGNED_SOURCE_REFUSED` | V2 | production binary, no statement, no dev flag | `remediation` |
-| `RELEASE_STATEMENT_MALFORMED` | V3/V7 | envelope/payload/schema/canonical-form error | `reason` |
-| `TRUST_ROOT_INVALID` / `TRUST_ROOT_ROLLBACK` / `TRUST_ROOT_THRESHOLD_NOT_MET` | V4 | root chain problems | `root_version`, `high_water` |
-| `REVOCATION_LIST_ROLLBACK` | V4 | older revocation sequence | `sequence`, `floor` |
-| `RELEASE_SIGNER_UNKNOWN` | V5 | key id not in root | `key_id` |
-| `RELEASE_SIGNER_NOT_AUTHORISED` | V5 | key lacks role for payloadType | `key_id`, `role_required` |
-| `RELEASE_SIGNATURE_INVALID` | V5 | signature does not verify | `key_id` |
-| `RELEASE_ALGORITHM_MISMATCH` | V5/V7 | declared algorithm ≠ key algorithm | |
-| `RELEASE_THRESHOLD_NOT_MET` | V5/V6 | too few valid signatures | `valid`, `threshold` |
-| `TRUST_PROFILE_MISMATCH` | V5 | test material on production binary (or vice versa for locks) | `profile` |
-| `RELEASE_SIGNER_REVOKED` / `RELEASE_REVOKED` | V6 / use | revoked key or release | `revocation_sequence` |
-| `RELEASE_IDENTITY_MISMATCH` | V8 | framework/version/release_id disagreement | `expected`, `observed` |
-| `RELEASE_REPLAY_DETECTED` | V8/V12 | statement for another identity, or equivocation | `statement_digest`, `installed_digest` |
+| `UNSIGNED_SOURCE_REFUSED` | V2 | production, no statement, no development flag | `remediation` |
+| `STATEMENT_MALFORMED` | V3/V6 | envelope, canonical form, schema, empty signatures | `reason` |
+| `STATEMENT_TYPE_UNKNOWN` | V3 | payloadType not in the compiled table | `payload_type` |
+| `STATEMENT_SOURCE_NOT_PERMITTED` | V3 | statement type not accepted from this source (historical identity outside the binary) | `source` |
+| `STATEMENT_TYPE_MISMATCH` | V7 | `_type`, `signing.purpose` or `stage` inconsistent with the payloadType | `field` |
+| `STATEMENT_LINEAGE_MISMATCH` | V8 / SV-10 | `trust_root_id` differs from the binary lineage | `expected`, `observed` |
+| `TRUST_PROFILE_MISMATCH` | V7 | test material on production, or vice versa | `profile` |
+| `TRUST_ROOT_INVALID` | V4 | root chain, key id recomputation, duplicate public key, corrupt compiled root/TPS/registry | `root_version`, `reason` |
+| `PURPOSE_SEPARATION_VIOLATION` | V4 | root grants violate KS-1…KS-7 | `constraint` |
+| `TRUST_ROOT_ROLLBACK` | V4 / bootstrap | older root presented as current to `verify-artifact` | `root_version`, `high_water` |
+| `TRUST_ROOT_STALE` | V4 / ingress | a signed reference names a newer root than known | `required`, `effective` |
+| `TRUST_ROOT_LINEAGE_MISMATCH` | use / bootstrap | binary lineage differs from the project or VTS pin | `binary`, `pinned` |
+| `TRUST_ROOT_UNCONFIRMED` | ingress | lineage not confirmed per OP-6 | `trust_root_id` |
+| `SIGNER_UNKNOWN` | V5 | key id not in the effective root | `key_id` |
+| `PURPOSE_NOT_GRANTED` | V5 | key lacks the purpose of the payloadType | `key_id`, `purpose` |
+| `SIGNER_REVOKED` | V5 | key revoked in the effective root | `key_id` |
+| `SIGNATURE_INVALID` | V5 | signature does not verify | `key_id` |
+| `THRESHOLD_NOT_MET` | V5 | too few valid distinct signatures, or a required algorithm missing | `valid`, `threshold` |
+| `TRUST_STATE_STALE` | V4 / ingress | effective state below a signed required minimum | `required`, `effective` |
+| `TRUST_STATE_HINT_MISMATCH` | V4 | effective state below a hint; adds a gate | `hint`, `effective` |
+| `TRUST_STATE_REGRESSION` | V4 / use | higher TSS not admissible | `sequence`, `violation` |
+| `BINARY_BELOW_TRUST_POLICY` | V4 / use | TPS needs a newer binary or unknown floor operators | `min_binary_version`, `operator` |
+| `TRUST_FORMAT_UNSUPPORTED` | pre-V0 / use | `FORMAT` unknown or `minimum_reader` above this binary | `trust_format`, `minimum_reader` |
+| `TRUST_PLATFORM_UNSUPPORTED` | any | secure primitives unavailable | `primitive` |
+| `RELEASE_IDENTITY_MISMATCH` | V8 | framework, version, release id, promotion content | `expected`, `observed` |
+| `RELEASE_REPLAY_DETECTED` | V8 | statement for another identity; equivocation; reinstall digest differs | `statement_digest`, `installed_digest` |
 | `RELEASE_DIGEST_MISMATCH` | V9 | content ≠ statement | `modified[]`, `missing[]`, `added[]`, `component` |
 | `MIGRATION_NOT_IN_STATEMENT` / `MIGRATION_DIGEST_MISMATCH` | V10 | migration binding | `migration`, `path` |
-| `RELEASE_INCOMPATIBLE` | V11 | CLI/contract/supported-from | `requirement` |
-| `RELEASE_DOWNGRADE_REFUSED` | V12 | lower version/sequence | `installed`, `target` |
-| `CERTIFICATION_STATEMENT_INVALID` / `CERTIFICATION_MISMATCH` | V13 | certification problems | `statement` |
-| `DEVELOPMENT_TRUST_DOWNGRADE_REFUSED` | auth | trust decrease without gate | |
-| `SOURCE_CHANGED_DURING_INSTALL` | tx | staged bytes ≠ authenticated bytes | `path` |
-| `INSTALL_TRANSACTION_CONFLICT` / `INSTALL_INTERRUPTED` | tx / use | concurrent or incomplete transaction | `transaction_id`, `phase` |
+| `MIGRATION_CHAIN_AMBIGUOUS` | V10 | duplicate `from_version` | `from_version` |
+| `MIGRATION_FAILED` | tx | operation failed; `lock_key_not_allowed` | `reason` |
+| `RELEASE_INCOMPATIBLE` | V11 | CLI, contract, floor schema, supported-from | `requirement` |
+| `RELEASE_INELIGIBLE` | auth | eligibility failure at ingress | `reason` (`19` §6), `condition` |
+| `KERNEL_INELIGIBLE` | use | installed release not eligible | `reason` |
+| `HUMAN_GATE_REQUIRED` | auth | a gate is required | `gate`, `kind` (`framework_update`, `init_ack`, `downgrade`, `weakening`, `hint_mismatch`) |
+| `OVERLAY_WEAKENING_GATE_REQUIRED` | auth | computed weakenings need a gate | `weakenings[]`, `list_digest` |
+| `AUTHORITY_DENIED` | auth | actor below the install-authority floor | `operation`, `required`, `actual` |
+| `DEVELOPMENT_TRUST_DOWNGRADE_REFUSED` | auth | move to `DEVELOPMENT_UNSIGNED` without a gate | — |
+| `STAGED_CONTENT_CHANGED` | tx | read-back digest differs from the buffer | `path` |
+| `INSTALL_TRANSACTION_CONFLICT` | tx | another transaction holds the lock | `transaction_id` |
+| `INSTALL_IN_PROGRESS` | use | journal present or lock wait timed out | `transaction_id`, `phase` |
+| `INSTALL_STATE_PARTIAL` | use | partial protected-path state | `present[]`, `missing[]` |
 | `SNAPSHOT_UNAUTHENTICATED` | rollback | snapshot fails authentication | nested code |
-| `EMBEDDED_BASELINE_CORRUPT` / `EMBEDDED_BASELINE_UNAVAILABLE` | use | materialised embedded bytes ≠ compiled digests | `path` |
-| `KERNEL_UNAUTHENTICATED` | use | installed statement missing/invalid/unknown identity | nested code |
-| `KERNEL_TAMPERED` | use | installed files ≠ authenticated statement (unchanged meaning) | `modified[]`… |
-| `LOCK_IDENTITY_MISMATCH` | use | lock ≠ statement | `field` |
+| `SNAPSHOT_INELIGIBLE` | rollback | authentic snapshot not eligible | nested reason |
+| `KERNEL_UNAUTHENTICATED` | use | installed statement missing, invalid or of unknown identity | nested code |
+| `KERNEL_TAMPERED` | use | installed files ≠ statement | `modified[]`… |
+| `LOCK_IDENTITY_MISMATCH` | use | lock identity ≠ statement, or a better verdict than recomputed | `field` |
+| `PROTECTED_PATH_WRITE_REFUSED` | any | mutation of a Protected Path outside the transaction | `operation`, `path`, `caller` |
+| `CIT_PROTECTED_PATH` | CIT planning | manifest targets a Protected Path | `op`, `path` |
+| `PATH_SUBSTITUTION_DETECTED` | any | link or special file on a resolved path | `path`, `component` |
+| `FLOOR_NOT_REGISTERED` / `FLOOR_VIOLATION` | producer / E7 | release floor values stronger / weaker than the referenced TPS | `key`, `release`, `policy` |
+| `FLOOR_REGRESSION_IN_BUILD` | pipeline | compiled TPS older than the previous binary's | `previous`, `candidate` |
 | `PROFILE_STATEMENT_INVALID` / `PROFILE_DIGEST_MISMATCH` / `MODEL_DIGEST_MISMATCH` / `PROFILE_INCOMPATIBLE` | profile | profile trust | `profile_id`, `path` |
-| `PRIVATE_KEY_MATERIAL_DETECTED` | producer | key material in tree | `path` |
+| `PRIVATE_KEY_MATERIAL_DETECTED` | producer | key material in the tree | `path` |
 | `TRANSPORT_FAILED` | fetch | download failed (never a trust verdict) | `reference` |
+
+## 5. Doctor checks
+
+| Check | Severity | Condition |
+|---|---|---|
+| D003 kernel payload integrity | CRITICAL | `integrity = TAMPERED` (wording: integrity only) |
+| D004 lock present and schema-valid | CRITICAL | lock missing or not 2.0.0 for a RoT-1 project |
+| D029 constitutional policy read from a verified, eligible kernel | CRITICAL | `verified = false` (wording names the failing axis) |
+| **D030** authenticity and eligibility | CRITICAL for `UNAUTHENTICATED`, `TAMPERED`, `INELIGIBLE(revoked, historical, below_min_release_sequence, downgrade_without_transaction, lineage_mismatch)`; HIGH for `DEVELOPMENT_UNSIGNED`, `ELIGIBLE_EVALUATION`, `INELIGIBLE(binary_below_policy)`; MEDIUM for `NOT_CERTIFIED` on a final | verdict axes |
+| **D031** lock identity consistent | CRITICAL | `LOCK_IDENTITY_MISMATCH` |
+| **D032** trust metadata | CRITICAL for `REGRESSION`; HIGH for `STALE`, `HINT_MISMATCH`; MEDIUM when OP-5 age exceeded | `17` §5 |
+| **D033** installation state | CRITICAL | `PARTIAL`, `IN_TRANSACTION` outside a running transaction, `FORMAT_UNSUPPORTED` |
+| **D034** lineage confirmation | MEDIUM | lineage `unconfirmed` (OP-6 mode b) |

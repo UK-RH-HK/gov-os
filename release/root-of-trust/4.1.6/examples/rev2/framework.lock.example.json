@@ -1,0 +1,63 @@
+{
+  "lock_schema_version": "2.0.0",
+  "trust_format": "rot-1",
+  "kernel_manifest_hash": "ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-verify-this-project",
+  "release_hash": "ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-verify-this-project",
+  "framework": "agentic-engineering-os",
+  "version": "4.1.5",
+  "release_id": "agentic-engineering-os@4.1.5#962f98480fc311c5",
+  "release_sequence": 6,
+  "release_stage": "final",
+  "release_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
+  "kernel": {
+    "tree_digest": "sha256:962f98480fc311c5857e7eef6f951f5713c3e62e4b1e9703c8c5d1f5c74a314b",
+    "manifest_digest": "sha256:b3086404d93a53aef69343bb85c6a277d5fdbea0f194473d2ecee6ac4171c30d"
+  },
+  "release_statement_digest": "sha256:407f772cb572549f0c8b5904a9bb4ceb6a8e6e8563d49bb66e75aae03c4b446a",
+  "signer": {
+    "purpose": "release-final",
+    "algorithm": "ed25519",
+    "key_ids": [
+      "ed25519:4d2e512504421e5e8d8c3f0e52b560cdc13e4060dc29324d992f5b8f66a47acb"
+    ]
+  },
+  "trust_root": {
+    "profile": "test",
+    "id": "sha256:8a1f3e85094fc1bae5baffc0a9c3eeb7b1e401c3f27a2d51f695c60af1ade16f",
+    "version_min": 1,
+    "confirmation": "pin"
+  },
+  "trust_references": {
+    "trust_policy_version_min": 1,
+    "trust_state_sequence_min": 2
+  },
+  "project_trust_id": "0123456789abcdef0123456789abcdef",
+  "verdict_at_install": {
+    "authenticity": "TEST",
+    "eligibility": "ELIGIBLE",
+    "certification_view": "CERTIFIED_AS_OF(2)",
+    "trust_state": "CURRENT_KNOWN(2)"
+  },
+  "source": "bundle:agentic-engineering-os@4.1.5",
+  "source_reference": "bundle:agentic-engineering-os-4.1.5.tar#sha256:407f772cb572549f0c8b5904a9bb4ceb6a8e6e8563d49bb66e75aae03c4b446a",
+  "installed_at": "2026-09-13T00:00:00Z",
+  "installed_at_commit": "0000000000000000000000000000000000000000",
+  "installed_by": {
+    "gov_version": "4.1.6",
+    "trust_profile": "test",
+    "session": "S-illustrative",
+    "role": "orchestrator",
+    "authority_level": "L4"
+  },
+  "install_evidence": {
+    "transaction_id": "TX-illustrative",
+    "ledger_entry": "spec/reports/framework-updates.jsonl#1",
+    "gate": "HG-0001"
+  },
+  "informational": {},
+  "cli_version": "4.1.6",
+  "schema_versions": {
+    "framework-lock": "2.0.0",
+    "release-statement": "2.0.0"
+  }
+}

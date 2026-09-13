@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/verification-attestation.schema.json",
+  "title": "verification-attestation",
+  "description": "PROPOSED (RoT-1 revision 2). Independent verification verdict for one candidate statement digest, signed by the verification-attestation purpose. Certifies nothing by itself.",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_type",
+    "trust_profile",
+    "framework",
+    "trust_root_id",
+    "issued_at",
+    "candidate_statement_digest",
+    "release_id",
+    "version",
+    "verdict",
+    "report",
+    "verdict_record",
+    "harnesses",
+    "findings",
+    "verifier_label"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/verification-attestation/v1"
+    },
+    "trust_profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "trust_root_id": {
+      "$ref": "#/$defs/digest"
+    },
+    "issued_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "candidate_statement_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "release_id": {
+      "$ref": "#/$defs/release_id"
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "verdict": {
+      "enum": [
+        "ACCEPTED",
+        "REJECTED"
+      ]
+    },
+    "report": {
+      "$ref": "#/$defs/evidence"
+    },
+    "verdict_record": {
+      "$ref": "#/$defs/evidence"
+    },
+    "harnesses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "findings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "properties": {
+        "critical": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "medium": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "low": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "verifier_label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "release_id": {
+      "type": "string",
+      "pattern": "^agentic-engineering-os@\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?#[0-9a-f]{16}$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "digest"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    }
+  }
+}
