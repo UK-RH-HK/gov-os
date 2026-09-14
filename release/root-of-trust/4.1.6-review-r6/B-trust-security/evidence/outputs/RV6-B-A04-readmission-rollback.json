@@ -1,0 +1,85 @@
+{
+ "code": {
+  "accept_parameters": [
+   "binary_bytes",
+   "typed_values",
+   "statements",
+   "target",
+   "evaluator_digest",
+   "flags",
+   "verifier",
+   "workdir",
+   "first_contact_manifest",
+   "compiled",
+   "now"
+  ],
+  "accept_reads_accepted_tbm_or_high_water": false,
+  "gov_run_reads_accepted_tbm_or_tbm": false
+ },
+ "design": {
+  "25_AP8_running_mode_only": true,
+  "25_s7_older_binary_row": [
+   "| a genuine older binary presented as an upgrade | no | `BINARY_T0_ROLLBACK`; `min_binary_version` (a TBM without a version fails closed when the floor is set) |"
+  ]
+ },
+ "executor_sha256": "272afdafd699a1882d4e311b8c24dae929997445c9057ea8764ab2d4a5603f49",
+ "probe": "RV6-B-A04 re-admission rollback below the kept accepted-TBM high-water (AR-0016)",
+ "step1_first_admission_B9": {
+  "is_first_admission": true,
+  "moved_aside": false,
+  "result": "ACCEPTED",
+  "tbm": {
+   "policy": 1,
+   "root": 2,
+   "state": 10
+  }
+ },
+ "step2_B9_record_expired_C2": "ADMISSION_RECORD_EXPIRED",
+ "step3_readmission_B8": {
+  "B8_published_in_T11": true,
+  "B8_revoked_in_T11": false,
+  "B8_tbm": {
+   "policy": 1,
+   "root": 2,
+   "state": 9
+  },
+  "is_first_admission": false,
+  "result": "ACCEPTED",
+  "store_high_water_after": {
+   "accepted_tbm": {
+    "policy": 1,
+    "root": 2,
+    "state": 10
+   },
+   "clock_high_water": "2026-09-14T00:00:00Z"
+  },
+  "store_kept": true
+ },
+ "step4_B8_runs_C2": "ALLOWED",
+ "step4_store_high_water_exceeds_running_binary_tbm_state": true,
+ "step5_running_mode_committed_rows": {
+  "P4r5": [
+   {
+    "key": "/scenarios/RV3-D-A13r5_older_binary_after_newer",
+    "value": {
+     "expected": "BINARY_T0_ROLLBACK",
+     "holds": true
+    }
+   }
+  ],
+  "P4r6_p4r5_under_r6": [
+   {
+    "key": "/p4r5_under_r6/rows/RV3-D-A13r5_older_binary_after_newer",
+    "value": {}
+   }
+  ]
+ },
+ "verdicts": {
+  "bootstrap_predicate_has_no_store_input": true,
+  "expired_record_blocks_C2": true,
+  "first_admission_B9_accepted": true,
+  "older_B8_runs_C2_after_readmission": true,
+  "readmission_accepts_older_genuine_B8_below_kept_high_water": true,
+  "readmission_is_not_first_admission_and_keeps_store": true
+ }
+}

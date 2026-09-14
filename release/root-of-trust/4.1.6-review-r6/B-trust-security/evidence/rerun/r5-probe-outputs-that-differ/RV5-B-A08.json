@@ -1,0 +1,62 @@
+{
+ "cc": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+ "probe": "RV5-B-A08 build image selects bytes (AR-0012)",
+ "rows": {
+  "clean": {
+   "image_digest": "sha256:9f5b3b21f24e50d76eb8bdea26dc7c1f806c99061a96ed0686e329a0da364a5b",
+   "reproducer_1": {
+    "binary_digest": "sha256:2954f7131880a1ddb9a30667c272f910c4a0ad81d33d71ff1027e22d084845bc",
+    "contains_build_path": false,
+    "contains_image_path": false,
+    "rc": 0,
+    "stderr_tail": "",
+    "stdout": "gov: genuine behaviour\n"
+   },
+   "reproducer_2": {
+    "binary_digest": "sha256:2954f7131880a1ddb9a30667c272f910c4a0ad81d33d71ff1027e22d084845bc",
+    "contains_build_path": false,
+    "contains_image_path": false,
+    "rc": 0,
+    "stderr_tail": "",
+    "stdout": "gov: genuine behaviour\n"
+   }
+  },
+  "evil": {
+   "image_digest": "sha256:e4c7ca65bcdcc620955645f8752065b4527ed6eadbeec99837c72204c7235ff5",
+   "reproducer_1": {
+    "binary_digest": "sha256:d8426b8921f41c45ea3e8cc2de700b5e89066311e0aebcdeb1b699b66fe02e75",
+    "contains_build_path": false,
+    "contains_image_path": false,
+    "rc": 0,
+    "stderr_tail": "",
+    "stdout": "INJECTED-BY-BUILD-IMAGE\ngov: genuine behaviour\n"
+   },
+   "reproducer_2": {
+    "binary_digest": "sha256:d8426b8921f41c45ea3e8cc2de700b5e89066311e0aebcdeb1b699b66fe02e75",
+    "contains_build_path": false,
+    "contains_image_path": false,
+    "rc": 0,
+    "stderr_tail": "",
+    "stdout": "INJECTED-BY-BUILD-IMAGE\ngov: genuine behaviour\n"
+   }
+  }
+ },
+ "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+ "same_for_both_images": {
+  "flags": "opt-level=2 codegen-units=1 debuginfo=0 strip=symbols --build-id=none, remap work and image prefixes",
+  "source_sha256": "sha256:4ef061f9db59d326ee2216477c2db28ccf13362c9cccfe8d8c94de39ec03c759",
+  "toolchain": {
+   "librustc_driver-eaf3ed1d23ca5027.so": "sha256:96218b68a4a569c06c6fea5ee95b9052ce61c7316ac265a7963e7fea90e985d2",
+   "rustc": "sha256:859254978c0a0402c32f949f6de0d99aee73be8d15f45aac00ae1448aac51e74"
+  }
+ },
+ "verdicts": {
+  "clean_binary_has_no_injected_code": true,
+  "clean_reproducers_bit_identical": true,
+  "evil_binary_runs_injected_code": true,
+  "evil_reproducers_bit_identical": true,
+  "image_alone_changes_binary": true,
+  "no_build_or_image_path_embedded": true,
+  "toolchain_unchanged": true
+ }
+}
