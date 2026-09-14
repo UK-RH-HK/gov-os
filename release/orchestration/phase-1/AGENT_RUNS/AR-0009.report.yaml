@@ -1,0 +1,322 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0009
+role: rot-specialist-architect
+objective: 'Root-cause the persistent RoT-1 blocking classes BC4-1..BC4-4 (lens A: verifier''s minimal trusted inputs) and propose and falsify an alternative mechanism
+  before revision 5'
+agent_model: claude-opus-5
+independence_statement: 'Authored no RoT-1 revision, no review and not specialist B''s proposal. Under release/orchestration/ read only HO-0009, HO-0001 and AGENT_RUNS/README.md.
+  Incidental exposure, nothing opened: a HANDOFFS/ listing showed other handoff file names (incl. HO-0010); one listing of the scratchpad root showed sibling scratch
+  directory names (incl. ar-0010); the host context included the user''s auto-memory index lines. Did not inspect other branches, worktrees or scratch directories.
+  Hygiene slip: one command wrote a temporary copy of pack file 24 to the scratchpad root; the next command moved it into ar-0009/notes. Treated the revision-4 pack,
+  its response matrix and every review statement as claims; re-executed the decisive probes unmodified (E0).'
+input:
+  base_commit: 6ea45a57cb17820c02366f2e75e37cee8f38099d
+  release: 4.1.6-rc1 (RoT-1 revision 4 bca05a7e2c2791126fde1d3d812facdaa45b2e45; review r4 97a554525a4677035b56c10c6ff6f1096c818e6c)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0009-rot-specialist-r5-a.md
+inspected:
+- release/orchestration/phase-1/HANDOFFS/HO-0009-rot-specialist-r5-a.md
+- release/orchestration/phase-1/HANDOFFS/HO-0001-rot-architect-r3.md
+- release/orchestration/phase-1/AGENT_RUNS/README.md
+- release/root-of-trust/4.1.6-review-r4/ (00, 10, 11; B-trust-security 00-04 and evidence scripts; C-compat-transaction 00-05; D-synthesis 01-05 and probes)
+- release/root-of-trust/4.1.6-review-r3/ (00, 10, 11)
+- release/root-of-trust/4.1.6-review-r2/ (00, 10, 11)
+- release/root-of-trust/4.1.6-review/ (00, 10, 11 headings)
+- release/root-of-trust/4.1.6/ (00, 01, 05, 06, 07, 17, 19, 21, 23, 24, 25, 27, 28, 11 Phase 4; constitutional-surface/; evidence VA4 header)
+- spec/decisions/D-0007.yaml
+- spec/decisions/D-0008.yaml
+- spec/architecture/ARCH-0002.yaml
+- runtime/build.rs
+- runtime/src/security/secrets.rs
+- cli/src/main.rs (root discovery lines)
+- 'git history reachable from branch: 676dfce, d37b05c, ca77a43, bca05a7'
+- legacy binaries gov-4.1.2..4.1.5 (read-only; SHA-256 in E0 log)
+produced:
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/00-ROOT-CAUSE.md
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/01-ALTERNATIVE.md
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/03-OWNER-CHOICES.md
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/README.md
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/E0-baseline-reproduction.sh
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/E1-selector-audit.py
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/E2-tcb-capability-sets.py
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/E3-first-binary-acceptance.py
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/E4-release-scoped-registration.py
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/gov_accept_reference.py
+- release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/
+- release/orchestration/phase-1/AGENT_RUNS/AR-0009.report.yaml
+tests_or_attacks:
+- id: E0-baseline
+  description: 'Unmodified re-execution vs revision 4: CSI selftest/check, P4r4, VA4, P1r4, reviewer B model/AF1-AF3/surface/first-binary, D-A02, r3 A01/lattice/removal'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E0-baseline-LOG.txt
+- id: R4-01 RV4-B-A01
+  description: 'Route B'': one build-attestation key + pipeline vs SAM reproduction quorum'
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: R4-02 RV4-B-A02
+  description: 'Route S'': one verification-attestation key + pipeline vs SAM registration'
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: R4-03 RV4-B-A06
+  description: 'Every capability subset x options: SAM 64 rows, none below 2 keys except TA-12'
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: R4-04 RV4-D-A07
+  description: OP-2 (iii) root co-signature route
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: R4-05 RV4-B-A03 FB1
+  description: Revoked binary with revocation withheld, first install (real Ed25519)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R4-06 RV4-B-A03 FB2
+  description: Remediated compromise served with root v1 metadata
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R4-07 RV4-B-A04
+  description: Planted binary from moved tag printing genuine lineage/TBM
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R4-08 RV4-B-A04 Phase 4
+  description: Legacy consumer self-verification; legacy 4.1.5 register lacks verify-artifact
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R4-09 RV4-D-A04
+  description: TA-5 ceremonies on the unaccepted binary (0 candidate executions)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R4-10 RV4-B-A08
+  description: Pinned regex retention mix at higher sequence; consumption on real 4.1.5
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: R4-11 RV4-D-A02
+  description: Retention breadth T1-T4 (tool descriptor, invariant, schema, skill)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: R4-12 RV4-D-A06
+  description: Git-delivered forged final with no gate
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: R4-13 RV4-D-A10
+  description: Forged final naming an older Trust Policy
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: R4-14 RV4-C-A01/D-A01
+  description: 'Subdirectory legacy escape (RV4-M1): SAM does not change the layout; carried'
+  result: NOT_RUN
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: R4-15 RV4-D-A03
+  description: 'Oracle sensitivity of SAM rules: E3 12/13 mutants detected + 1 equivalent; E4 open/union/latest detected'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R3-16 RV3-B-A01
+  description: Precedence to immutable (retained mechanism)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E0-baseline-LOG.txt
+- id: R3-17 RV3-D-A01/A02
+  description: Order lattice and TPS tightening (retained)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E0-baseline-LOG.txt
+- id: R3-18 RV3-D-A10
+  description: Registered-file removals R01-R09 (retained)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E0-baseline-LOG.txt
+- id: R3-19 RV3-B-A02
+  description: Stale CI pin (retained pin validity; image acceptance cadence)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E0-baseline-summary.json
+- id: R3-20 RV3-B-A06
+  description: Threshold-1 witness (retained witness purpose)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E0-baseline-summary.json
+- id: R3-21 RV3-B-A12/D-A12
+  description: Higher unchained TSS; trust-state thief TSS vs typed fingerprint
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R3-22 RV3-D-A15
+  description: Revoked binary on pinned CI / first acceptance
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R3-23 RV3-B-A08
+  description: release-final names the source (no authority; wrong-source reproduction not counted)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: R3-24 RV3-D-A03
+  description: 'OP-4 no: candidate/final keys in no SAM minimal set'
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N01
+  description: 'Poisoned input mirror used by every honest builder (r4/RID: {input_mirror} under mirror-fetch reading)'
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N02
+  description: 'Malicious build inputs named by the release process (r4 S0/S1/S2 and RID: {pipeline} when inputs are not evaluated)'
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N03
+  description: Compromised upstream toolchain release (TA-12)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N04
+  description: Reproductions submitted through the pipeline ({pipeline, 2 reproducer keys}); R-REP-3 load-bearing
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N05
+  description: 2 reproducer keys + trust-state key + transport vs pinned machine (stated minimum)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N06
+  description: Registration quorum + pipeline + trust-state key + transport (stated minimum)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E2-tcb-capability-sets.json
+- id: N07
+  description: Fingerprint typed from a stale channel page (RS-B1)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N08
+  description: Attacker lineage / fingerprint grinding
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N09
+  description: Right binary, wrong target
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N10
+  description: One reproducer key signs a conflicting digest (availability)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N11
+  description: 2 reproducer keys + trust-state key publish malicious binary vs owner's typed fingerprint
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N12
+  description: Same with the channel compromised (outside TA-5)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N13
+  description: Substituted independent executor vs channel digest
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N14
+  description: Accepted binary replaced after install in a same-uid location (OC-4 b)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N15
+  description: Malformed root/threshold/link/signature and duplicate-counting vectors V09-V16
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E3-first-binary-acceptance.json
+- id: N16
+  description: Superseded content under a forged gap sequence (open ranges admit)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N17
+  description: Sequence inflation (open ranges admit)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N18
+  description: Stale Trust Policy machine + superseded content at higher sequence (open ranges admit)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N19
+  description: Registration entry rewrite
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N20
+  description: Owner reversion without a gate
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N21
+  description: Weaker migration file in a later release
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N22
+  description: Owner contract set Markdown vN + YAML vN-1 (r4 per-path slots accept)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N23
+  description: Additive secret pattern with invalid regex (4.1.5 keeps ASIA file excluded)
+  result: REFUTED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N24
+  description: r4 global registration of a new required member refuses legitimate 4.1.6 (exit 2)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E4-release-scoped-registration.json
+- id: N25
+  description: runtime/build.rs git rev-parse HEAD provenance fallback (reproducibility precondition)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: N26
+  description: Binary revoked after CI image build, revocation withheld (RS-1c bound)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: N27
+  description: Delegated registration quorum as concentrated target (OC-1 b)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: N28
+  description: 'SEL-1 specificity: 0/12 sound mechanisms flagged; 18/18 HIGH rows and 10/10 MEDIUM/LOW rows flagged'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/outputs/E1-selector-audit.json
+- id: N29
+  description: All reproducers under one custodian (TA-10', not verifier-checkable)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: N30
+  description: Insider source accepted by deceived verifier and ceremony (TB-4)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+findings:
+- id: AR9-F1
+  severity: INFO
+  title: 'Root cause of BC4-1..BC4-3: set membership at higher authority used where selection at that authority was required (invariant SEL-1, selection authority,
+    never established)'
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/00-ROOT-CAUSE.md
+- id: AR9-F2
+  severity: HIGH
+  title: 'Revision 4 (reading-dependent): build inputs in release.source are selected by the release process and evaluated by no stated check; pipeline alone yields
+    an accepted malicious binary under OP-2 S0/S1/S2, and under the literal CD4-1 closure'
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: AR9-F3
+  severity: HIGH
+  title: 'Revision 4 and CD4-1 closure (reading-dependent): a poisoned input mirror used by every honest builder yields an accepted malicious binary with zero keys
+    unless inputs are fetched by digest'
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: AR9-F4
+  severity: MEDIUM
+  title: 'CD4-2 invariant lacks execution binding: bytes that run are not bound to bytes accepted; executor authenticity and channel currency unstated'
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/00-ROOT-CAUSE.md
+- id: AR9-F5
+  severity: MEDIUM
+  title: CD4-3 sequence-range reading admits forged gap sequences, inflated sequences and stale-policy superseded content; only exact per-release registration meets
+    all vectors
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: AR9-F6
+  severity: INFO
+  title: Revision 4 global registration of a new required member makes a legitimately installed older release surface_required_missing (part of forced retention)
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/02-FALSIFICATION.md
+- id: AR9-F7
+  severity: INFO
+  title: runtime/build.rs git rev-parse HEAD provenance fallback is a precondition to remove for byte-reproducible production builds
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/01-ALTERNATIVE.md
+- id: AR9-F8
+  severity: INFO
+  title: 'SAM residuals stated with bounds: RS-B1 stale channel, TB-S1 reproducer quorum, TB-S2 upstream toolchain (TA-12), TB-S3 reproducer custody, VR-B1 user-writable
+    install, AV-S1 conflict denial of service'
+  path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/01-ALTERNATIVE.md
+verdict: ALTERNATIVE_PROPOSED
+output:
+  branch: phase1/rot1-r5-specialist-a
+  commit: afda6635184311f58188a000105f753bce604540
+  evidence_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a/evidence/
+unresolved:
+- Owner choices OC-1..OC-8 undecided (registration authority, reproducer count/quorum, toolchain common mode, installed-binary integrity, retention, revoked-binary
+  behaviour, OP-7, executor distribution)
+- 'No RoT-1 implementation: gov-accept is a prototype on a toy lineage; byte-reproducible builds of this code base (R-REP-7) not demonstrated'
+- E1 is design-encoded; E2 is symbolic with named readings of revision-4 text
+- Reviewer C's 10,618-invocation matrix not re-run (layout unchanged by SAM); RV4-M1, M2, M4, M6, L1-L5, C-2..C-6 carried unchanged
+- Revision-4 oracle mutants of D-A03 (20) carried as RV4-M7; SAM's own selector mutants (R-SEL-4) specified, not built for the full register
+- Residuals TA-12 (upstream toolchain) and RS-B1 (channel currency) bounded only by assumptions
+recommended_next_action: Synthesis architect compares this proposal with specialist B's and authors RoT-1 revision 5; fresh reviewers re-run E2-E4 against the revision-5
+  rules
+completed_at: '2026-09-14T08:10:31Z'
