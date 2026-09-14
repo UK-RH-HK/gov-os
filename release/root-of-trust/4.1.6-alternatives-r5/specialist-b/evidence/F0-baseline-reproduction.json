@@ -1,0 +1,54 @@
+{
+ "record": "F0 baseline reproduction (AR-0010): reviewer and architect instruments re-run unchanged in scratch before any alternative was modelled",
+ "hygiene": "env -i; HOME, XDG_* and GOV_KERNEL_CACHE in scratch; PYTHONDONTWRITEBYTECODE=1; no other GOV_*",
+ "legacy_binaries_sha256": {
+  "gov-4.1.2": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7",
+  "gov-4.1.3": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89",
+  "gov-4.1.4": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f",
+  "gov-4.1.5": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+ },
+ "rows": [
+  {
+   "instrument": "review r4 B RV4-B-M-reference-model.py (unmodified)",
+   "identical_to_committed_output": true
+  },
+  {
+   "instrument": "architect VA4-verify-artifact-source-scenarios.py (unmodified)",
+   "identical_to_committed_output": true
+  },
+  {
+   "instrument": "architect csi_check.py selftest (unmodified)",
+   "result": [
+    "\"passed\": 56,",
+    "\"failed\": 0"
+   ]
+  },
+  {
+   "instrument": "review r4 D RV4-D-A02-pinned-retention-breadth.py (unmodified)",
+   "identical_to_committed_output": true
+  },
+  {
+   "instrument": "review r4 B RV4-B-surface-probes.py (unmodified; real 4.1.5) - second run after creating its scratch parent",
+   "identical_to_committed_output": true
+  },
+  {
+   "instrument": "review r3 probe copy RV3-B-A01-precedence-immutable.py (from review r4 B r3-probe-copies, unmodified)",
+   "identical_to_review_r4_rerun_after_path_normalisation": true
+  },
+  {
+   "instrument": "review r3 probe copy RV3-B-CSI-injections.py (from review r4 B r3-probe-copies, unmodified)",
+   "identical_to_review_r4_rerun_after_path_normalisation": true
+  },
+  {
+   "instrument": "review r3 probe copy RV3-D-precedence-lattice.py (from review r4 B r3-probe-copies, unmodified)",
+   "identical_to_review_r4_rerun_after_path_normalisation": true
+  },
+  {
+   "instrument": "review r3 probe copy RV3-D-surface-forward-compat-and-removal.py (from review r4 B r3-probe-copies, unmodified)",
+   "identical_to_review_r4_rerun_after_path_normalisation": true
+  }
+ ],
+ "notes": [
+  "The first attempts of RV4-B-surface-probes.py, RV3-B-A01 and RV3-B-CSI-injections failed with FileNotFoundError because their GOV_REVIEW_SCRATCH parent directory did not exist; they were re-run after creating it."
+ ]
+}
