@@ -1,0 +1,65 @@
+{
+ "ci_image_codes_provisioned_at_T7_a_b_B7x": {
+  "age_note": "issued_at: 2026-05-01T00:00:00Z",
+  "result": "ACCEPTED",
+  "selected_state_sequence": 7
+ },
+ "control_current_media_T10_Q1_B7x": {
+  "age_note": null,
+  "result": "BINARY_REVOKED",
+  "selected_state_sequence": 10
+ },
+ "control_media_with_valid_until_2026_06_01": {
+  "age_note": null,
+  "result": "FIRST_CONTACT_MANIFEST_EXPIRED",
+  "selected_state_sequence": null
+ },
+ "design": {
+  "31_R_ADM_7_prime_valid_until_sentence": [
+   "| **R-ADM-7\u2032** | **Admission record** `{binary_digest, target, release_id, lineage, first_contact_code, admitted_at, admitter_digest, valid_until, location_protected}` (`schemas/admission-record.schema.json` v2).",
+   "`valid_until` is mandatory for CI image records (\u2264 `pin_max_validity_days`) and, under OP-14 (b), for every record."
+  ],
+  "32_FC_R4": [
+   "| FC-R4 | Under (d): media custody | inside FC-R1 (`media`) | RT-156 |"
+  ],
+  "32_RS_B1": [
+   "| RS-B1 (restated) | A stale page selects the state its code names | `issued_at`, `valid_until`, age shown; under (b) and (c) \"all\" every required source must be stale; the admitted binary anchors next (`24` \u00a73.2) | FA5 `CH1` (FA6 S1) |"
+  ],
+  "32_s3_valid_until_row": [
+   "| `issued_at`, `valid_until` (optional) | shown to the operator; past `valid_until` the admitter refuses (`FIRST_CONTACT_MANIFEST_EXPIRED`) |"
+  ],
+  "32_s7_d_row": [
+   "| **(d)** | T1-d | physical provisioning media or a hardware token carrying code, FCM and admitter, for designated machines | custody of the media | a ceremony per machine or batch; CI runners only through images built with the media; machines not designated need an (a)\u2013(c) answer |"
+  ],
+  "32_s8_ci_row": [
+   "| CI runner image | codes and FCM provisioned by the image operator from the OP-13 sources, or the media under (d) | the image build runs FC-1\u2026FC-8; TA-9 |"
+  ],
+  "any_rule_bounding_manifest_age_for_media_or_images": false,
+  "schema_requires_valid_until": false
+ },
+ "executor_sha256": "272afdafd699a1882d4e311b8c24dae929997445c9057ea8764ab2d4a5603f49",
+ "media_d_prepared_T7_used_now_B7_genuine_revoked": {
+  "age_note": "issued_at: 2026-05-01T00:00:00Z",
+  "result": "ACCEPTED",
+  "selected_state_sequence": 7
+ },
+ "media_d_prepared_T7_used_now_B7x": {
+  "age_note": "issued_at: 2026-05-01T00:00:00Z",
+  "result": "ACCEPTED",
+  "selected_state_sequence": 7
+ },
+ "probe": "RV6-D-A08 stale first-contact values on media and CI images (AR-0018)",
+ "verdicts": {
+  "ci_image_codes_provisioned_at_T7_admit_B7x": true,
+  "control_current_media_refuses_B7x": true,
+  "control_valid_until_refuses": true,
+  "media_prepared_at_T7_admit_revoked_genuine_B7_now": true,
+  "media_prepared_at_T7_admit_revoked_malicious_B7x_now": true,
+  "no_rule_bounds_stored_value_age": true,
+  "valid_until_optional": true
+ },
+ "world": {
+  "B7x_revoked_at_T9": true,
+  "T7_Q1_publishes_B7x": true
+ }
+}

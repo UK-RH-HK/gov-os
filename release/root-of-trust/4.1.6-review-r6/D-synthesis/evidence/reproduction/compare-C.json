@@ -1,0 +1,76 @@
+{
+ "gitops6": {
+  "byte_identical": true
+ },
+ "struct6": {
+  "byte_identical": true
+ },
+ "attrprec6": {
+  "byte_identical": true
+ },
+ "admtx6": {
+  "byte_identical": true
+ },
+ "crashmig6": {
+  "byte_identical": true
+ },
+ "matrix6-summary": {
+  "byte_identical": false,
+  "leaves_committed": 988,
+  "differing_leaves": 6,
+  "differing": [
+   "/binaries_sha256/4.1.2",
+   "/binaries_sha256/4.1.3",
+   "/binaries_sha256/4.1.4",
+   "/binaries_sha256/4.1.5",
+   "/elapsed_seconds",
+   "/resummarised_from_rows_file"
+  ],
+  "note": "differing leaves: binaries_sha256 (recorded by this run; absent in C's re-summarised file), elapsed_seconds, resummarised_from_rows_file; every row count, property and per-position aggregate equal"
+ },
+ "registers6": {
+  "byte_identical": false,
+  "leaves_committed": 2824,
+  "differing_leaves": 196,
+  "differing": [
+   "/4.1.2/option_or_positional_differences[0]/help_opts[0][0]",
+   "/4.1.2/option_or_positional_differences[0]/help_opts[1][0]",
+   "/4.1.2/option_or_positional_differences[0]/help_opts[1][1]",
+   "/4.1.2/option_or_positional_differences[0]/help_opts[2][0]",
+   "/4.1.2/option_or_positional_differences[0]/help_opts[2][1]",
+   "/4.1.2/option_or_positional_differences[0]/help_opts[3][0]",
+   "/4.1.2/option_or_positional_differences[0]/help_opts[3][1]",
+   "/4.1.2/option_or_positional_differences[0]/help_required[0]",
+   "/4.1.2/option_or_positional_differences[0]/path[0]",
+   "/4.1.2/option_or_positional_differences[0]/path[1]",
+   "/4.1.2/option_or_positional_differences[0]/source_opts[0][0]",
+   "/4.1.2/option_or_positional_differences[0]/source_opts[1][0]"
+  ],
+  "summary_fields_equal_per_version": {
+   "4.1.2": true,
+   "4.1.3": true,
+   "4.1.4": true,
+   "4.1.5": true
+  },
+  "leaf_paths_equal_per_version": {
+   "4.1.2": true,
+   "4.1.3": true,
+   "4.1.4": true,
+   "4.1.5": true
+  },
+  "note": "differing leaves lie in option_or_positional_differences detail lists; every count, cross-check field and leaf path is equal",
+  "summary_fields_compared": [
+   "leaf_count_help",
+   "leaf_count_source",
+   "in_help_not_source",
+   "in_source_not_help",
+   "option_count_help",
+   "option_count_source",
+   "positional_count_help",
+   "cwd_rooted_non_install_families",
+   "binary_sha256",
+   "commit",
+   "len(option_or_positional_differences)"
+  ]
+ }
+}
