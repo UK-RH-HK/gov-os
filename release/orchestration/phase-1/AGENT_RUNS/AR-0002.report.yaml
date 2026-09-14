@@ -1,0 +1,87 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0002
+role: rot-reviewer-trust-security
+objective: Independent adversarial trust and security review (reviewer B) of RoT-1 revision 3 at ca77a43
+agent_model: claude-opus-5
+independence_statement: >-
+  This run authored no RoT-1 revision, no prior review and not reviewer C's work. Under release/orchestration/ it read
+  only HO-0002, HO-0001 and AGENT_RUNS/README.md; it did not read the architect's AGENT_RUNS report, other branches,
+  other worktrees or other scratch directories. The architect's response matrix and evidence were treated as claims and
+  re-executed or re-derived; revision-3 rules were encoded in an independent reference model written from the pack text.
+input:
+  base_commit: 83aa8223dcb5a3eb8842b045af25d46ab20be867
+  release: 4.1.6 (RoT-1 revision 3, ca77a431418bd6b349f465aa2521ca43bccfd5a6)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0002-rot-review-r3-b-trust-security.md
+inspected:
+  - release/root-of-trust/4.1.6/ at ca77a431418bd6b349f465aa2521ca43bccfd5a6 (00, 03, 05, 06, 07, 17-27 in full; 01, 02, 04, 09, 12, 13, 14 relevant sections; constitutional-surface/; trust schemas; evidence P1r3, P4r3)
+  - spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml at ca77a43
+  - release/root-of-trust/4.1.6-review-r2/ (00, 08, 09, 10, 11, evidence README, P1, P2, P4) at e5a6b8a
+  - d37b05c release/root-of-trust/4.1.6/04 V8 and 09 R-REL-6 (revision 2 text referenced as unchanged)
+  - runtime/src policy_precedence.rs, policy.rs, authority.rs, orchestration/gates.rs, verification/mod.rs, tools.rs, migrations/framework.rs, memory/embedder.rs, upstream.rs, project.rs, paths.rs, capabilities/host.rs, capabilities/governance.rs, util.rs; cli/src/main.rs (excerpts)
+  - legacy binary gov-4.1.5 (executed read-only)
+produced:
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/00-REPORT.md
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/02-HELDOUT-ATTACKS.md
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/03-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/04-CARRIED-REQUIREMENTS.md
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/
+tests_or_attacks:
+  - {id: R2-P1-rerun, description: "review r2 P1 re-executed on unchanged 4.1.5 (floor coverage and harms)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/r2rerun-P1-floor-coverage.json}
+  - {id: R2-P1-vs-rev3, description: "architect P1r3 re-run: r2 tamper ineligible, harms flip, output identical to committed", result: FLIPPED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/arch-rerun-P1r3-floor-coverage.json}
+  - {id: R2-P2-rerun, description: "review r2 P2 re-executed on 4.1.5: forged gate record applies update", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/r2rerun-P2-gate-record-forgery.json}
+  - {id: R2-P2-vs-rev3, description: "repository gate record under revision-3 rules is a request (independent model)", result: FLIPPED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: R2-P4-rerun, description: "review r2 P4 under revision-2 rules: B1-B6 agrees false", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/r2rerun-P4-trust-state-model.json}
+  - {id: R2-P4-B1-B4-B6-vs-rev3, description: "B1, B2, B3, B4, B6 under revision-3 rules (independent model)", result: FLIPPED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: R2-P4-B5-vs-rev3, description: "B5 under revision-3 rules: holds without pin or with current held pin; fails with stale pin and higher unchained TSS", result: NOT_FLIPPED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: ARCH-CSI-check, description: "architect coverage checker re-run on framework, 4.1.5, 4.1.2-4.1.4 payloads; selftest 26/26", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/README.md}
+  - {id: ARCH-P4r3-rerun, description: "architect P4r3 re-run, 34/34, byte-identical", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/arch-rerun-P4r3-trust-state-model.json}
+  - {id: RV3-B-CSI-injections, description: "independent unknown key/file/dir/structure injections fail closed; new migration file passes (exit 0)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-CSI-injections.json}
+  - {id: RV3-B-A01, description: "precedence-only kernel (modes to immutable) passes E7 and discards project strengthening on 4.1.5", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-A01-precedence-immutable.json}
+  - {id: RV3-B-A02, description: "stale CI pin under OP-7 (a): revoked release anchored C2 policy root", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A03, description: "gov 4.1.5 verify product runs A2-committed command that writes pin and decision-pin files", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-A03-A14-A16-probes.json}
+  - {id: RV3-B-A04, description: "same-account decision pin authorises framework_update, weakening, project_strength", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A05, description: "WITHDRAWN lifted with two keys reusing pre-withdrawal attestation", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A06, description: "OP-7 (c) witness minted by trust-state key on stateless runner", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A07, description: "issued_at high-water poisoning permanently disables clock-based freshness", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A08, description: "verify-artifact accepts binary from unverified release_commit chosen by release-final", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A09, description: "playbook unreference of artefact yields REGRESSION freeze", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A10, description: "OP-7 (d) INCOMPLETE decision-table conflict", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A11, description: "OP-7 (c) non-witness anchor text/table conflict", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A12, description: "trust-state key bypasses current pin or first-install anchor with higher unchained TSS", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A13, description: "machine class x OP-7 x adversary matrix (132 rows; revoked release C2 policy root in 90)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-M-reference-model.json}
+  - {id: RV3-B-A14, description: "YAML 1.1 'on' token passes checker; 4.1.5 runtime reads string", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-A03-A14-A16-probes.json}
+  - {id: RV3-B-A15, description: "reinstall identity from A2-writable lock (design reading)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/02-HELDOUT-ATTACKS.md}
+  - {id: RV3-B-A16, description: "project_tunable leaves with security consumers pass checker", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-A03-A14-A16-probes.json}
+  - {id: RV3-B-A17, description: "TPS non-surface field reductions outside computed-reduction set (design reading)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/02-HELDOUT-ATTACKS.md}
+  - {id: RV3-B-A18, description: "release-signed migration writes overlay keys outside computed weakening (design and code reading)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/02-HELDOUT-ATTACKS.md}
+  - {id: P3r3-legacy-matrix, description: "pre-RoT legacy command matrix (reviewer C scope)", result: NOT_RUN, evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/00-REPORT.md}
+findings:
+  - {id: RV3-B-H1, severity: HIGH, title: "Precedence order treats immutable as strongest; a surface-eligible kernel silently discards project-owned strengthening", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-H2, severity: HIGH, title: "Freshness anchors do not stop attacker-selected stale state becoming anchored-current on CI and first-install machines", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-H3, severity: HIGH, title: "Binary acceptance never binds the compiled source to verified source; TCB source chosen by threshold-1 release-final", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-M1, severity: MEDIUM, title: "Lifting WITHDRAWN/REJECTED needs two keys, not three (pre-withdrawal attestation reusable)", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-M2, severity: MEDIUM, title: "Pins, decision pins and confirmations writable by the governed account; gov runs repository-supplied commands in it", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-M3, severity: MEDIUM, title: "Any verified issued_at raises a monotonic clock high-water; permanent loss of clock-based freshness", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-M4, severity: MEDIUM, title: "Compromise playbook 'TSS stops referencing' contradicts artefact admissibility and freezes verifiers", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-M5, severity: MEDIUM, title: "Computed weakening covers four overlay categories; release-signed migrations write other overlay keys ungated", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-L1, severity: LOW, title: "Decision-table conflicts (OP-7 d with INCOMPLETE; OP-7 c with non-witness anchor)", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-L2, severity: LOW, title: "Draft inventory marks keys read by security decision points as project_tunable", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-L3, severity: LOW, title: "No single YAML profile between checker and runtime", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-L4, severity: LOW, title: "Reinstall identity checked against A2-writable lock", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-L5, severity: LOW, title: "TPS non-surface fields outside computed-reduction set", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+  - {id: RV3-B-I1, severity: INFO, title: "Acting role remains caller-declared (V-L5)", path: release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md}
+verdict: BLOCKING_FINDINGS_PRESENT
+output:
+  branch: phase1/rot1-r3-review-b
+  commit: 7d8c73a91a7c5fc7912427c59314d9259fbe25c9
+  evidence_path: release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/
+unresolved:
+  - P3r3 legacy-binary matrix and G1 not re-executed by B (reviewer C scope)
+  - VU-11, VU-12, adapter rendering record and foreign-journal handling judged by design reading only
+  - No RoT-1 binary exists; revision-3 behaviour established by checker, architect scripts and independent model
+  - OP-7 parameters max_anchor_age_days (180) and witness_max_validity_days (7) assumed
+  - Whether M2 and M5 are carriable (CR-02, CR-03) or need architecture change is for the synthesis reviewer
+recommended_next_action: Synthesis reviewer weighs RV3-B-H1..H3 with reviewer C; revision 4 must correct the precedence order, anchor satisfaction and currency, and binary source binding before re-review
+completed_at: "2026-09-14T02:46:16Z"
