@@ -196,3 +196,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge, instantiate revision-4 B/C handoffs, spawn B and C in parallel |
+
+## L-0013 — 2026-09-14 — revision 4 authored
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-architect (`AR-0005`) |
+| Input commit | `f83da03` |
+| Work performed | Pack 00–27 revised; new `28-CLASS-REMAINDER-ANALYSIS.md`. Constitutional surface floor schema v3. Schemas (2 new: freshness witness, decision pin). `examples/rev4`. 38 evidence files. D-0008 and ARCH-0002 PROPOSED revision 4. OP-2, OP-3, OP-4 and OP-7 restated. |
+| Report / evidence | `AGENT_RUNS/AR-0005.report.yaml`; `release/root-of-trust/4.1.6/evidence/` |
+| Verdict | `ARCHITECTURE_REVISION_READY_FOR_REVIEW` (author's readiness claim; not an acceptance) |
+| Output commit | work `bca05a7`, report `9c24821`, merged `fd0a368` |
+| Findings | Architect-reported claims, to be independently tested: checker self-test 56/56; P1r4 9/9 strengthening kept, lattice 0/343 unsound; P4r4 54/54 with 9/9 mutants caught, 132-row matrix 77 refused / 42 stated core / 13 OP-7 (d) residual / 0 unstated; verify-artifact source scenarios 16/16; P3r3 unchanged (2085 jobs equal); review probes re-run or rebuilt. Disclosed non-material scope deviation (read 60 lines of the completed AR-0004 report as format reference). |
+| Next action | independent review panel B and C on revision 4 |
+
+## L-0014 — 2026-09-14 — revision-4 review panel handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | orchestrator |
+| Input commit | `fd0a368` |
+| Work performed | Wrote HO-0006 (B) and HO-0007 (C) from the generic reviewer templates (prior review r3 `79a09a1`). Claimed AR-0006 and AR-0007. Created separate worktrees and branches. |
+| Report / evidence | `HANDOFFS/HO-0006-*.md`, `HANDOFFS/HO-0007-*.md`, `CHECKPOINTS/CP-0005.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0006 and AR-0007 in parallel |

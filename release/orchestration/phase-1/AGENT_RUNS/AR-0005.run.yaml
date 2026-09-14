@@ -11,6 +11,17 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r4-architect
 agent_id: a6dfc2c822ec6aa57   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T03:35Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0005.report.yaml
-outcome: null
+outcome:
+  verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW
+  work_commit: bca05a7e2c2791126fde1d3d812facdaa45b2e45
+  report_commit: 9c2482177e0caa035f564114c28b824cd1fcee4c
+  integration_merge_commit: fd0a368e19945ee018ece38438b03309e496ca5b
+  report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0005.report.yaml
+  provenance_checks: [report present and output.commit matches work commit, only allowed paths changed, worktree clean incl. ignored, D-0008 PROVISIONAL in_effect false]
+  disclosed_scope_deviation: >-
+    Read its own run record AR-0005.run.yaml and the first 60 lines of the completed AR-0004
+    synthesis report as a format reference, beyond the three orchestration files HO-0005 names.
+    Assessed non-material: architects may read completed rejection evidence; no in-progress or
+    held-out material was exposed.

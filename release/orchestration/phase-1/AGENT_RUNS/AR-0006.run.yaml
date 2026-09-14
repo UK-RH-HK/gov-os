@@ -1,0 +1,16 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0006
+role: rot-reviewer-trust-security
+objective: Independent trust/security review of RoT-1 revision 4 (bca05a7)
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0006-rot-review-r4-b-trust-security.md
+base_commit: null   # the orchestrator commit adding this record (ledger L-0014)
+architecture_commit: bca05a7e2c2791126fde1d3d812facdaa45b2e45
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r4-b
+branch: phase1/rot1-r4-review-b
+agent_id: null
+status: CLAIMED
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0006.report.yaml
+outcome: null
