@@ -1,0 +1,141 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0022
+role: rot-review-synthesis
+objective: Independent architecture synthesis review of RoT-1 revision 7 (certified profile CP-1, d07d200) against HO-0022 §3, verifying reviewers B and C and issuing the architecture verdict
+agent_model: claude-opus-5
+independence_statement: >-
+  This run authored no RoT-1 revision, specialist proposal, reviewer B or C work, prior review or owner requirement. Under
+  release/orchestration/ it read only HO-0022, HO-0001, AGENT_RUNS/README.md and GATES/OWNER-DESIGN-REQUIREMENTS-0001.md/.yaml and
+  GATES/OWNER-DESIGN-REQUIREMENTS-0002.md/.yaml; a GATES listing filtered to those names and the subject lines of commits fbd09d5
+  and 30542e5 were printed, and no other orchestration file was opened. It did not inspect other branches, worktrees or scratch
+  directories, and read no session or agent transcript, task-output file or harness tool-result file; the user's auto-memory index
+  was present in the host context and no memory file was opened. No helper sessions. All probes ran in scratch with GOV_* stripped
+  and GOV_KERNEL_CACHE in scratch.
+input:
+  base_commit: 1d4d9f3621854e6414b299b0265a4e6dab25428c
+  release: 4.1.6 (RoT-1 revision 7, d07d200ac08a52c45071d33074e20cc62fbcc26e)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0022-rot-review-r7-d-synthesis.md
+inspected:
+  - release/root-of-trust/4.1.6/ at d07d200ac08a52c45071d33074e20cc62fbcc26e (00–35, profile/CP-1.yaml, decision-register/, schemas/ incl. withdrawn-non-production/, examples/rev7, evidence/r7, constitutional-surface/)
+  - spec/decisions/D-0007.yaml, spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md at d07d200
+  - release/root-of-trust/4.1.6-review-r7/B-trust-security/ at 54be694cc6291538fe0901f3d71eb685ce3138d4
+  - release/root-of-trust/4.1.6-review-r7/C-compat-transaction/ at 34633ccc53a4928262b4f38e5d1d018239b7a322
+  - release/root-of-trust/4.1.6-review-r6/00-REVIEW-REPORT.md, 11-CORRECTION-DELTA.md, D-synthesis/05-RESIDUALS.md at ab6b1f8
+  - release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md and .yaml (fbd09d5); OWNER-DESIGN-REQUIREMENTS-0002.md and .yaml (30542e5)
+  - release/orchestration/phase-1/HANDOFFS/HO-0022-rot-review-r7-d-synthesis.md, HO-0001-rot-architect-r3.md; AGENT_RUNS/README.md
+  - framework/, release/releases/4.1.2–4.1.5, fixtures/ (scratch export at d07d200)
+  - legacy binaries gov-4.1.2, gov-4.1.3, gov-4.1.4, gov-4.1.5 (read-only copies; sha256 in evidence/REVIEWED-CONTENT-DIGESTS.txt)
+produced:
+  - release/root-of-trust/4.1.6-review-r7/00-REVIEW-REPORT.md
+  - release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r7/11-CORRECTION-DELTA.md
+  - release/root-of-trust/4.1.6-review-r7/D-synthesis/01-REPRODUCTION.md
+  - release/root-of-trust/4.1.6-review-r7/D-synthesis/02-ADJUDICATION.md
+  - release/root-of-trust/4.1.6-review-r7/D-synthesis/03-HELDOUT-ATTACKS-RV7-D.md
+  - release/root-of-trust/4.1.6-review-r7/D-synthesis/04-OWNER-REQUIREMENTS-AND-OPTIONS.md
+  - release/root-of-trust/4.1.6-review-r7/D-synthesis/05-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/ (README, REVIEWED-CONTENT-DIGESTS.txt, probes, outputs, run, reproduction)
+  - release/orchestration/phase-1/AGENT_RUNS/AR-0022.report.yaml
+tests_or_attacks:
+  - id: REPRO-ARCH-R7
+    description: Architect's 15 revision-7 instruments (CS7, FA7 x2, CUR7, ADM7, ENV7 real rustc, BA11r7, BA12r7, PPR7, DA05r7, DA06r7, PROF7, STATEMENTS-CHECK, REGISTER-CHECK, DA09r7, DA04r7) re-run
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/reproduction/REPRODUCTION-COMPARISON.json
+  - id: REPRO-B
+    description: Reviewer B probes RV7-B-A01, A01m, A02, CS7, A04-A05, A09 re-run byte-identical; A08 reproduced (EX-01, EX-04 fail); B-L5 stale leaves reproduced
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/reproduction/REPRODUCTION-COMPARISON.json
+  - id: REPRO-C
+    description: Reviewer C cur7x, adm7x, design7, ident7, registers7, build7, struct7, gitops7, txn7 re-run (equal except run-dependent leaves)
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/reproduction/REPRODUCTION-COMPARISON.json
+  - id: REPRO-C-MATRIX7
+    description: Reviewer C matrix7 (118,732 rows; P-TXN positions re-run over resolved paths) composed; 196 position aggregates and every property equal; R2-H4 0 violations; LP-1r 0 writes
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/reproduction/MATRIX7-COMPARISON.json
+  - id: RV7-D-A01
+    description: Admitter revocation and security-relevant registration omitted by daily Trust States; custodians publish; admitted on 11 states
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A01.json
+  - id: RV7-D-A02
+    description: One toolchain lineage plus the other supplier class; reference accepts diagonal reproductions; real rustc bit-identical injected bytes; 120 of 144 text-permitted assignments admit a cross pair
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A02.json
+  - id: RV7-D-A03
+    description: A distribution's rustc bootstrapped from upstream counted as an independent toolchain lineage; no bootstrap evidence checked
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A03.json
+  - id: RV7-D-A04
+    description: Clean CI runner first governed use raises a terminal-only, non-pinnable project_first_use gate; no provisioning rule
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A04.json
+  - id: RV7-D-A05
+    description: Replayed or persistent bootstrap.clock_reset lowers the clock high-water on the retained model; no semantics stated
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A05.json
+  - id: RV7-D-A06
+    description: 22 code-level mutants of the executor against FA7, CUR7, ADM7, PROF7; 14 detected, 8 survive
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A06.json
+  - id: RV7-D-A07
+    description: Forward compatibility; new files and keyed-member keys default deny; new keys under the informational wildcard ROLES.authority_levels.*.* pass
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A07.json
+  - id: RV7-D-A08
+    description: Air-gapped admission and in-gate codes; independent reading of the private channel unstated
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A04.json
+  - id: RV7-D-A09
+    description: OT-1 read with OP-7 (a); C1–C2 within anchor validity is the owner's selection; C's new-trade-off claim refuted
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A04.json
+  - id: RV7-D-A10
+    description: C3 transitions reachable without a terminal; CI pin currency reaches only gate-less C3 (verify-artifact acceptance)
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence/outputs/RV7-D-A04.json
+findings:
+  - {id: RV7-H1, severity: HIGH, title: "Restrictive facts issued by authorities other than the trust-state authority take effect at first contact only if a Trust State lists them; no party establishes the listing or bounds its delay", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-H2, severity: HIGH, title: "Running-machine C3 currency bounds the anchoring event, not the named Trust State's age; deviates from OWNER-DESIGN-REQUIREMENTS-0002 OT-1", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M1, severity: MEDIUM, title: "One onboarding record designates both first-contact sources; the stated root omits {onboard} (blocking)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M2, severity: MEDIUM, title: "Certification independence criteria are label comparisons; CC-3 not executable; owner label not adopted (blocking)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M3, severity: MEDIUM, title: "One toolchain lineage plus the other supplier class yields accepted malicious bytes outside the stated bounds (blocking)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M4, severity: MEDIUM, title: "A clean CI runner cannot answer project_first_use; the claimed C1–C2 is unreachable (blocking)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M5, severity: MEDIUM, title: "First admission after protected-store loss discards a surviving account-store high-water (carried)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M6, severity: MEDIUM, title: "No realizable per-project record identity (carried)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M7, severity: MEDIUM, title: "Journal honouring unreachable for a first install (carried)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M8, severity: MEDIUM, title: "git clean -fdx in the first-install crash window defeats R-INIT-9 (carried)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M9, severity: MEDIUM, title: "Roll-forward depends on the in-memory ARO (carried)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-M10, severity: MEDIUM, title: "Shared conformance vectors detect 14 of 22 held-out regressions (carried)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L1, severity: LOW, title: "Trust-root schema accepts root-held purposes at threshold 1", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L2, severity: LOW, title: "Custodian without publication history publishes a drop", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L3, severity: LOW, title: "No Trust State issuance and publication cadence rule", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L4, severity: LOW, title: "Stale committed outputs; runner not self-contained", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L5, severity: LOW, title: "No genesis procedure for the source custodians' verifier", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L6, severity: LOW, title: "Recovery undo readings; uninstall result inconsistent", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L7, severity: LOW, title: "Clock high-water poisoned by the machine's own wrong-ahead clock", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L8, severity: LOW, title: "floors.json / high-water.json atomicity unstated", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L9, severity: LOW, title: "bootstrap.clock_reset has no replay or persistence semantics", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L10, severity: LOW, title: "Air-gapped second-channel procedure unstated", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L11, severity: LOW, title: "Wildcard informational subtree accepts new authority-bearing keys (instance of CR4-B-05)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-L12, severity: LOW, title: "Unflagged security-relevant change not listed per project (RV6-L1)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-I1, severity: INFO, title: "OP-8 independence is mechanically distinct ids only", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-I2, severity: INFO, title: "ARCH-0002 has no human_approved field", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-I3, severity: INFO, title: "OWNER-DESIGN-REQUIREMENTS-0002 read with OP-7 (a): C1–C2 within validity stands; no new owner trade-off", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-I4, severity: INFO, title: "17 keeps excluded-mode rows under a non-production banner", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-I5, severity: INFO, title: "Caller-declared role (RV6-I1)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+  - {id: RV7-I6, severity: INFO, title: "Binding-group derivation carried (RV6-I2)", path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md}
+verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+output:
+  branch: phase1/rot1-r7-review-d
+  commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+  evidence_path: release/root-of-trust/4.1.6-review-r7/D-synthesis/evidence
+unresolved:
+  - "BC7-1 first-contact restrictive-fact listing (RV7-H1): ENGINEERING_CORRECTION, route architect"
+  - "BC7-2 running-machine currency of the named state (RV7-H2): ENGINEERING_CORRECTION, route architect"
+  - "BC7-3 statements and certification criteria from rules and evidence (RV7-M1, M2, M3): ENGINEERING_CORRECTION; owner confirmation only if a single designation atom is kept"
+  - "BC7-4 clean CI runner governed use (RV7-M4): ENGINEERING_CORRECTION; owner confirmation if a provisioned CI selection is chosen"
+  - "Carried: RV7-M5 … M10, RV7-L1 … L12 (CR7-B-01 … 07, CR7-C-1 … 9, CR7-D-01 … 04, CR4-B-01/04/05, RT-198)"
+  - "No implementation exists; no target is certified; the OP-10 (b) criterion is not yet executable"
+recommended_next_action: Record the verdict, consolidated findings and correction delta as evidence for the meta-architecture review (the revision loop is frozen); D-0008 stays PROPOSED and D-0007 ACTIVE
+completed_at: 2026-09-14T21:45:22Z
