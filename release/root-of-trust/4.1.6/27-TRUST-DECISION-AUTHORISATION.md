@@ -1,6 +1,9 @@
 # Output 27 — Authorisation of trust decisions
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6: trust gates add `registration_change` (`34` R-CON-5). Under OP-3 mode B each certified update still needs
+> a currency proof naming the publishing Trust State (`21` OP-3, RV5-L9). Confirmations need a protected installation
+> (`31` GB-4′).
 > Revision 5: decision-pin maximum validity and binding groups (§3.2); confinement restated as an allow list with the TCB
 > location rule (§3.3). Trust gates run only on admitted binaries (`31` GB-1).
 > Revision 3 added this file. Review r3 recorded R2-M1 as NARROWED to RV3-M2: repository records are requests, but pins,

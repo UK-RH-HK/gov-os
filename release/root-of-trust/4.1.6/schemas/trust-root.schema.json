@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-root.schema.json",
   "title": "trust-root",
-  "description": "PROPOSED (RoT-1 revision 5). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Twelve purposes (05 \u00a71): release-registration and reproducer added; release-artifact and build-attestation withdrawn (KS-13). The binary applies the compiled pairwise whitelist and the Fact Threshold Check (KS-9\u2032, KS-10\u2032, KS-12, KS-13) to every root version (05 \u00a73).",
-  "x-schema-version": "4.0.0",
+  "description": "PROPOSED (RoT-1 revision 6). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Twelve purposes (05 §1): release-registration and reproducer added; release-artifact and build-attestation withdrawn (KS-13). The binary applies the compiled pairwise whitelist and the Fact Threshold Check (KS-9′, KS-10′, KS-12, KS-13) to every root version (05 §3). Revision 6: the root threshold is at least 2 (KS-14).",
+  "x-schema-version": "4.1.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -103,7 +103,19 @@
       ],
       "properties": {
         "root": {
-          "$ref": "#/$defs/purpose"
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "threshold": {
+                  "minimum": 2
+                }
+              }
+            }
+          ],
+          "description": "KS-14 (revision 6): root threshold >= 2"
         },
         "trust-policy": {
           "$ref": "#/$defs/purpose"
@@ -145,11 +157,11 @@
               }
             }
           ],
-          "description": "KS-10\u2032: threshold >= 2; root keys at root threshold (OP-2 (a)) or single-purpose keys (OP-2 (b))"
+          "description": "KS-10′: threshold >= 2; root keys at root threshold (OP-2 (a)) or single-purpose keys (OP-2 (b))"
         },
         "reproducer": {
           "$ref": "#/$defs/purpose",
-          "description": "KS-9\u2032: single-purpose keys; one signature per reproduction statement; quorum in `quorums.reproducer`"
+          "description": "KS-9′: single-purpose keys; one signature per reproduction statement; quorum in `quorums.reproducer`"
         }
       }
     },

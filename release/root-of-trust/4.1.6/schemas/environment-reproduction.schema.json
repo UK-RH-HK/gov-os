@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-engineering-os/schemas/environment-reproduction/1",
+  "title": "Environment reproduction statement payload (purpose reproducer; exactly one signature; RoT-1 revision 6, PROPOSED; 33 R-BENV-2)",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_type",
+    "trust_root_id",
+    "environment_id",
+    "environment_tree_digest",
+    "target",
+    "supplier_class",
+    "reproduced_at"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/environment-reproduction/v1"
+    },
+    "trust_root_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "environment_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "environment_tree_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "target": {
+      "type": "string"
+    },
+    "supplier_class": {
+      "type": "string",
+      "pattern": "^[A-Z]$"
+    },
+    "reproduced_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    }
+  }
+}

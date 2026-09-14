@@ -1,0 +1,51 @@
+{
+ "instrument": "statements_check (AR-0015)",
+ "calculator_output": "evidence/r6/CS6-derivation-calculator.json",
+ "S1_generated_blocks": {
+  "blocks": 17,
+  "placements": {
+   "FC-ROOT": [
+    "05-KEY-MANAGEMENT.md",
+    "21-OWNER-OPTIONS.md",
+    "32-FIRST-CONTACT-ROOT.md"
+   ],
+   "OP-8-SRC": [
+    "21-OWNER-OPTIONS.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md"
+   ],
+   "CONTENT": [
+    "21-OWNER-OPTIONS.md",
+    "34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md"
+   ],
+   "OP-9-BYTES": [
+    "21-OWNER-OPTIONS.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md"
+   ],
+   "OP-10-TOOLCHAIN": [
+    "21-OWNER-OPTIONS.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md"
+   ],
+   "FC-KEY-THEFT": [
+    "21-OWNER-OPTIONS.md",
+    "32-FIRST-CONTACT-ROOT.md"
+   ],
+   "FC-CONTENT": [
+    "21-OWNER-OPTIONS.md",
+    "34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md"
+   ],
+   "OP-16-ENV": [
+    "21-OWNER-OPTIONS.md",
+    "33-BUILD-ENVIRONMENT.md"
+   ]
+  },
+  "failures": []
+ },
+ "S2_hand_written_sets": {
+  "sets_checked": 1,
+  "failures": []
+ },
+ "summary": {
+  "failures": 0,
+  "result": "PASS"
+ }
+}

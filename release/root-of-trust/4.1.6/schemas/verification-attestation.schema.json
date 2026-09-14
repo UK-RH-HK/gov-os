@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/verification-attestation.schema.json",
   "title": "verification-attestation",
-  "description": "PROPOSED (RoT-1 revision 4). Verification attestation v2 (payloadType verification-attestation.v2, purpose verification-attestation): the independent verifier's verdict for one candidate statement digest, and the source it reproduced the candidate from (25 \u00a75.1). A final is authentic only if its release.source equals its candidate's (V8); verify-artifact accepts a binary only if an ACCEPTED attestation of that candidate, referenced by the effective TSS, names the same source (A4b). lifts_negative_statement_digest names the REJECTED or WITHDRAWN statement an ACCEPTED verdict lifts (17 MS-2, CR-01).",
-  "x-schema-version": "3.0.0",
+  "description": "PROPOSED (RoT-1 revision 6). Verification attestation v4 (payloadType verification-attestation.v4, purpose verification-attestation): the independent verifier's verdict for exactly one candidate statement digest, the source identity (v2) and input manifest it reproduced the candidate from, and the digest of the kernel payload it reproduced (34 R-CON-2). AP-5, R-VER-2 and E7 count an ACCEPTED attestation only for the registered candidate and kernel tree digest. lifts_negative_statement_digest names the REJECTED or WITHDRAWN statement an ACCEPTED verdict lifts (17 MS-2).",
+  "x-schema-version": "4.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -22,11 +22,12 @@
     "findings",
     "verifier_label",
     "source",
-    "inputs_manifest_digest"
+    "inputs_manifest_digest",
+    "kernel_tree_digest"
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/verification-attestation/v2"
+      "const": "https://agentic-engineering-os/statement/verification-attestation/v4"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -54,6 +55,7 @@
       "additionalProperties": false,
       "required": [
         "release_commit",
+        "git_tree",
         "content_digest"
       ],
       "properties": {
@@ -61,10 +63,14 @@
           "type": "string",
           "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
         },
+        "git_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+        },
         "content_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
+          "description": "governance-os.source-content-digest/2: SHA-256 over length-prefixed (mode, path, blob SHA-256) records of the commit's tree, paths with control characters refused (30 §4.1, revision 6)"
         }
       }
     },
@@ -126,6 +132,11 @@
     "inputs_manifest_digest": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "kernel_tree_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "digest of the kernel payload the verifier reproduced from the source (never a value supplied to it)"
     }
   },
   "$defs": {

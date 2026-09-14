@@ -1,6 +1,9 @@
 # Output 26 — Legacy-binary damage containment and project-owned strength
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6: the `.gitattributes` member and its stated override condition (§2; RV5-M6); LP-1s restated to what holds (§4;
+> RV5-L7); the ignore-source condition with detection (§8; RV5-M7); legacy containment re-run on the revision-6 layout
+> (LAY6: property R2-H4 0 violations). The layout is otherwise unchanged.
 > Revision 5: §3 scope, §4 LP-1 and §8 LR-2 restated for subdirectory-rooted invocations (carried RV4-M1, RV4-M6); the
 > layout is unchanged.
 > Revision 3 added this file. Review r3 recorded R2-H4 **CLOSED as a class**, with HO-0001 §3.4 SATISFIED. Revision 4
@@ -35,6 +38,7 @@ path the old binary would use is occupied by an entry of the wrong type, or is o
 governance/
 ├── trust/                         RoT-1 root — Protected Path Set; unknown to every pre-RoT binary
 │   ├── FORMAT                     {"layout":"legacy-path-occupation-v1","minimum_reader":"4.1.6","trust_format":"rot-1"}
+│   ├── .gitattributes             exactly `* -text` (revision 6, RV5-M6)
 │   ├── framework.lock             lock 3.0.0 (08 §3)
 │   ├── kernel/**                  installed kernel (no KERNEL_MANIFEST.json)
 │   ├── release.dsse.json · lineage/ · state/ · root/ · profiles/
@@ -60,6 +64,14 @@ spec/audits/GOVERNANCE-ADOPTION    OCCUPIED: regular file (RoT-1 adoption eviden
   - **Evidence.** `evidence/RV3-D-A05-A07-rerun-r4-layout.json` (the synthesis reviewer's probe, run on the layout with
     this delta: `tracked_but_ignored_listed: []`, occupation in the fresh clone: `file`) and
     `evidence/LR2-installation-state-and-strength-reference.json` (fresh clone after the idiom: `COMPLETE`).
+- **Line endings (revision 6, RV5-M6, RV5-C-M1).** The install transaction writes `governance/trust/.gitattributes` with the
+  exact content `* -text`, a member of the trust top-level entry set (`18` §9.1). Clones with `core.autocrlf=true` (the Git
+  for Windows default), with a project `.gitattributes` `* text=auto` and `core.eol=crlf`, or with a project `* text
+  eol=crlf`, keep the kernel bytes (`evidence/r6/ATTR6-*`; LAY6 `AUTOCRLF`, `TEXTAUTO_EOLCRLF`: `COMPLETE`). **Stated
+  condition:** `.git/info/attributes` has the highest attribute precedence in Git; a clone whose `.git/info/attributes` sets
+  `text` (or `text=auto`, or `eol=crlf`) for the kernel paths, with CRLF conversion configured, still converts them. That
+  clone fails closed (`PARTIAL(kernel_content_mismatch)`; `KERNEL_TAMPERED`), and doctor D033 names `.git/info/attributes`
+  as the source (ATTR6 rows O1–O4; RT-173).
 - **Partial state.** A missing or retyped occupation entry makes the RoT-1 installation state `PARTIAL(occupation)`
   (`18` §9), doctor D033 CRITICAL. Doctor also names stray legacy artefacts left by merges or partial removal (C-3).
 
@@ -93,9 +105,14 @@ Unchanged. `.governance-runtime/update/<v>/` is blocked by set (i) and quarantin
 **Restated (revision 5).** LP-1 is two properties. **LP-1r (root-anchored):** every invocation of each binary's own register
 with `--root <project>` writes nothing (P3r3 re-run on revision 5: 2,085 jobs, summary, property and chain results equal to
 the committed output, `evidence/r5/P3r3-rerun-r5-summary.json`; reviewer C's 2,504 root-anchored rows). **LP-1s
-(subdirectory-rooted):** invocations with no `--root` from any working directory may write; every write under
-`governance/**` other than the overlay files leaves a state that is not `COMPLETE`, and every nested legacy install is
-reported (`evidence/r5/ST5-subdir-matrix-summary.json`: 6,292 invocations, P5-1 and P5-2 hold with 0 counterexamples).
+(subdirectory-rooted; restated in revision 6, RV5-L7):** invocations with no `--root` from any working directory may write;
+every write under `governance/trust/**` or the occupation directory leaves a state that is not `COMPLETE`, and every nested
+legacy install is reported. Subtree `adopt baseline` and `migrate baseline` litter under `governance/spec` and
+`governance/views/spec` stays `COMPLETE` (inert: nothing reads it) and doctor names it (RT-176). Revision 5's wording
+("every write under `governance/**` other than the overlay files") was false for that litter (review r5 16 counterexamples).
+Evidence: `evidence/r5/ST5-subdir-matrix-summary.json` (6,292 invocations); `evidence/r6/LAY6/` (reviewer C's matrix on the
+revision-6 layout: 30,735 rows, R2-H4 0 violations; LP-1s as restated 0 counterexamples over 540 rows; as stated in revision 5,
+16).
 RT-50 and RT-50b run both (`12`).
 
 
@@ -167,6 +184,14 @@ Unchanged, plus one item. The first RoT-1 install transaction on a legacy projec
 7. write the ledger entry.
 
 ## 8. Residuals
+
+**Revision 6 (RV5-M7, RV5-C-M2): ignore sources.** The `.gitignore` surgery reaches only the project file. The occupation's
+survival of the "untrack ignored files" idiom **requires that no active ignore source matches `.governance-runtime/`**: not
+the project `.gitignore` (the surgery ensures it), not a user `core.excludesFile`, not `.git/info/exclude`. Under either of
+the latter the idiom lists `.governance-runtime/migration`, and a later clone is `PARTIAL(occupation)` (fail closed; LAY6
+`GLOBALEXCL`, `INFOEXCL`). Doctor D033 names the resulting `PARTIAL(occupation)` together with the ignore source that
+matches, as reported by `git check-ignore --no-index -v .governance-runtime/migration` (LAY6 check-ignore rows: the user
+excludes file line 1 and `.git/info/exclude` line 7; control: the project `.gitignore` negation). Test: RT-174.
 
 **Revision 5 restatement of LR-2 (RV4-M1 (c)).** LR-2's bounds apply to every trigger that removes occupation entries or
 restores pre-migration paths **and** to the subdirectory trigger on the intact layout: after any of them RoT-1 binaries fail

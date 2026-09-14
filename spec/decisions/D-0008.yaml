@@ -1,9 +1,9 @@
 id: D-0008
 type: decision
-title: "PROPOSED (revision 5) — PENDING FRESH INDEPENDENT REVIEW AND OWNER APPROVAL (not active, not approved): root of trust — every kernel, release and binary ingress and use consumes an identity whose every selector has at least the authority and currency the decision confers: releases registered once by the registration authority, binaries established by a first-hand reproduction quorum and admitted by an evaluator other than themselves over measured bytes, constitutional content fixed per registered release, inclusion anchors with currency proofs naming the state, local trust-decision authorisation, verify-and-use and legacy-binary containment"
+title: "PROPOSED (revision 6) — PENDING FRESH INDEPENDENT REVIEW AND OWNER APPROVAL (not active, not approved): root of trust — every kernel, release and binary ingress and use consumes an identity whose every selector has at least the authority and currency the decision confers: releases registered once by the registration authority with source, inputs, build environments and constitutional content established first-hand, binaries established by a first-hand reproduction quorum and admitted by an evaluator other than themselves over measured bytes, a first-contact root stated and enforced at its true authority, inclusion anchors with currency proofs naming the state, local trust-decision authorisation, verify-and-use and legacy-binary containment"
 # The record schema has no PROPOSED status value; PROVISIONAL is the nearest valid lifecycle status. This decision is a
 # proposal only: it is NOT active, NOT approved, NOT in effect and confers no authority until the product owner answers
-# its Human Decision Gate, which may happen only after fresh independent reviews accept revision 5. D-0007 remains the
+# its Human Decision Gate, which may happen only after fresh independent reviews accept revision 6. D-0007 remains the
 # ACTIVE trust-class decision until then.
 status: PROVISIONAL
 proposal_state: PROPOSED
@@ -11,70 +11,78 @@ approval_state: PENDING_OWNER_HUMAN_DECISION_GATE
 review_state: PENDING_FRESH_INDEPENDENT_REVIEW
 in_effect: false
 state_class: NARRATIVE
-revision: 5
+revision: 6
 revision_history:
   - {revision: 1, commit: 676dfce, independent_review_commit: 1c6027c, outcome: ROOT_OF_TRUST_ARCHITECTURE_REJECTED}
   - {revision: 2, commit: d37b05c, independent_review_commit: e5a6b8a, outcome: ROOT_OF_TRUST_ARCHITECTURE_REJECTED}
   - {revision: 3, commit: ca77a43, independent_review_commit: 79a09a1, outcome: ROOT_OF_TRUST_ARCHITECTURE_REJECTED, author_run: AR-0001}
   - {revision: 4, commit: bca05a7, independent_review_commit: 97a5545, outcome: ROOT_OF_TRUST_ARCHITECTURE_REJECTED, author_run: AR-0005}
-  - {revision: 5, commit: null, independent_review_commit: null, outcome: PENDING_FRESH_INDEPENDENT_REVIEW, author_run: AR-0011, inputs: [specialist A afda663 (AR-0009), specialist B ed07926 (AR-0010)]}
+  - {revision: 5, commit: cdb4e14, independent_review_commit: d1228cb, outcome: ROOT_OF_TRUST_ARCHITECTURE_REJECTED, author_run: AR-0011, inputs: [specialist A afda663 (AR-0009), specialist B ed07926 (AR-0010)]}
+  - {revision: 6, commit: null, independent_review_commit: null, outcome: PENDING_FRESH_INDEPENDENT_REVIEW, author_run: AR-0015, inputs: [review r5 d1228cb (AR-0014)]}
 created: "2026-09-13"
 updated: "2026-09-14"
 owner_role: orchestrator
-tags: [proposed, pending-fresh-independent-review, pending-owner-approval, not-in-effect, root-of-trust, revision-5]
+tags: [proposed, pending-fresh-independent-review, pending-owner-approval, not-in-effect, root-of-trust, revision-6]
 supersedes: []
 governed_by: [PRJ-0001, D-0002]
 affects: [D-0007, ARCH-0001, ARCH-0002, API-0001, API-0002, D-0003, D-0005, D-0006]
 summary: >
-  PROPOSED (revision 5) — PENDING FRESH INDEPENDENT REVIEWS AND OWNER APPROVAL. Not active, not approved, not in effect.
-  Root-of-trust architecture RoT-1 revision 5 for candidate 4.1.6, the escalation synthesis of two root-cause specialist
-  alternatives, amending revision 4 (bca05a7) after review 97a5545 returned ROOT_OF_TRUST_ARCHITECTURE_REJECTED
-  (RV4-H1..RV4-H3, BC4-4). If and only if the owner approves it through a presented and answered Human Decision Gate, it
-  supersedes D-0007 in full, restating D-0007 rules (1)-(4) amended. Until then D-0007 remains ACTIVE and unchanged. Full
-  design, evidence, acceptance plan, class remainder analysis, response matrix and synthesis:
-  release/root-of-trust/4.1.6/ and release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md.
+  PROPOSED (revision 6) — PENDING FRESH INDEPENDENT REVIEWS AND OWNER APPROVAL. Not active, not approved, not in effect.
+  Root-of-trust architecture RoT-1 revision 6 for candidate 4.1.6, amending revision 5 (cdb4e14) after review d1228cb
+  returned ROOT_OF_TRUST_ARCHITECTURE_REJECTED (BC5-1 first-contact root, BC5-2 build environment, BC5-3 first-hand
+  constitutional content, BC5-4 complete register and derived statements). If and only if the owner approves it through a
+  presented and answered Human Decision Gate, it supersedes D-0007 in full, restating D-0007 rules (1)-(4) amended. Until
+  then D-0007 remains ACTIVE and unchanged. Full design, evidence, acceptance plan, class remainder analysis, response
+  matrix and decision register: release/root-of-trust/4.1.6/.
 question: >
-  Seven consecutive rejections (4.1.3, 4.1.4, 4.1.5, RoT-1 revisions 1-4) share one class: a lower-trust input yielding a
-  current, higher-trust fact. Revision 4's remaining instances were one threshold-1 attestation key plus release-pipeline
-  input deciding which binary is the TCB, a first binary accepted outside the anchor, negative-set and currency rules by
-  procedures the binary itself could satisfy, and a threshold-1 final choosing among registered non-orderable
-  constitutional digests. Which root of trust should govern every Governance OS kernel, release and binary ingress and use?
+  Eight consecutive rejections (4.1.3, 4.1.4, 4.1.5, RoT-1 revisions 1-5) share one class: a lower-trust input yielding a
+  current, higher-trust fact. Revision 5's remaining instances were one first-contact channel page selecting the lineage, the
+  channel quorum and the evaluator of a machine's first TCB; a build-image record with no assigned authority selecting the
+  bytes of every production binary; the release pipeline with threshold-1 candidate and final keys selecting the constitutional
+  content the registration signed; and consequence statements derived from an incomplete decision register. Which root of
+  trust should govern every Governance OS kernel, release and binary ingress and use?
 options:
   - {id: A, description: "Bounded repair: verify the source against its shipped manifest and declared release_hash - circular, fails E1/E2"}
   - {id: B, description: "Binary-embedded digest registry only - non-circular but cannot extend trust after the binary ships"}
-  - {id: C, description: "RoT-1 revision 5: rule FD-1 (every input of a trust decision is a selector, restrictor or carrier in a compiled decision register; selectors have the authority and currency the decision confers; signatures count only for facts their signers established; the artefact judged never evaluates itself; minimum capability sets are computed); a release registered once, append-only, by the root threshold or a root-granted quorum of at least two keys, fixing source identity (commit and canonical content digest), input manifest, final, targets, verification records and every non-join constitutional unit; production binaries established by at least two first-person reproductions confirmed first-hand and free of conflict; release-artifact and build-attestation withdrawn; one admission predicate evaluated by the independent executor gov-admit on first admission (typed state fingerprint, measured bytes, install from buffer, fresh verifier trust store) or by an admitted gov with a currency proof naming the selected state; genuine binaries refuse above C0 without an admission record; a total Constitutional Surface with default deny, exact precedence registration, release-scoped presence and a directed project join; monotonic trust state with inclusion anchors; local trust gates and allow-list confinement; verify-and-use; legacy-path occupation with closed trust entry sets and RoT-1 root discovery"}
+  - {id: C, description: "RoT-1 revision 6: rule FD-1 over a complete decision register (every input of a trust decision is a selector, restrictor or carrier; selectors have the authority and currency the decision confers; signatures count only for facts their signers established; the artefact judged never evaluates itself; every selector substitution is a strategy of the derivation calculator and every consequence statement is generated by it); a release registered once, append-only, by the root threshold or a root-granted quorum of at least two keys, fixing source identity v2, input manifest, build environments established by first-hand environment reproduction from upstream-checked components, final, targets, verification records bound to exactly the registered candidate and kernel, and every non-join constitutional unit derived first-hand by each custodian; production binaries established by at least two first-person reproductions under registered environments, confirmed first-hand and free of conflict, restrictors removed only by the registration authority; one admission predicate evaluated by the independent executor gov-admit on first admission (a first-contact code agreed across the owner's designated sources binding lineage, state and admitter list; compiled source quorum; evaluator binding; measured bytes; install from buffer; store kept on re-admission) or by an admitted gov with a currency proof naming the selected state; the first-contact root stated with computed minima; genuine binaries refuse above C0 without an admission record in the protected store; a total Constitutional Surface with default deny, exact precedence registration, release-scoped presence, E7 with the admission predicate's restrictors and verifier-side registration reductions; monotonic trust state with inclusion anchors; local trust gates and allow-list confinement; verify-and-use; legacy-path occupation with closed trust entry sets including a line-ending attribute member, and RoT-1 root discovery"}
   - {id: D, description: "Keyless signing bound to an identity provider plus a transparency log as the root - provider-bound, online checks"}
   - {id: E, description: "Signed Git tags/commits as the root - authenticates commits, not delivered payload bytes"}
   - {id: F, description: "Full TUF deployment with online timestamp/snapshot roles - incompatible with offline verification; rotation, thresholds, role separation and snapshot-style state adopted inside C, with local anchors, currency proofs and an owner-optional freshness-witness purpose"}
-# No option is chosen until the owner answers the approval gate; chosen_option is deliberately absent. Revision 5 states no
-# proposal and no default for any owner parameter (release/root-of-trust/4.1.6/21-OWNER-OPTIONS.md).
+# No option is chosen until the owner answers the approval gate; chosen_option is deliberately absent. Revision 6 states no
+# proposal and no default for any owner parameter (release/root-of-trust/4.1.6/21-OWNER-OPTIONS.md); draft-policy refuses a
+# Trust Policy draft with an unanswered security-material option.
 recommended_option: C
 rationale: |
   RECOMMENDATION ONLY — NOT A DECISION. Pending fresh independent reviews and the owner's approval gate.
 
   Trust must originate from anchors that exist before the source is seen, cannot be produced by whoever controls the
-  source, repository, pipeline, cache, environment or transport, and can be extended after ship. Revision 5 makes that a
-  rule about facts, not artefacts: every input that can select an effective fact has at least the authority and currency
-  the fact confers, and no signature counts for a fact its signer did not establish
-  (release/root-of-trust/4.1.6/29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md).
+  source, repository, pipeline, cache, build environment or transport, and can be extended after ship. Revision 6 applies
+  rule FD-1 over a complete decision register: every input that can select an effective fact has at least the authority
+  and currency the fact confers, no signature counts for a fact its signer did not establish, and the one remainder no
+  mechanism removes on a machine with no prior trust, the first-contact root, is stated with its computed minimum and its
+  composition is an owner option (release/root-of-trust/4.1.6/29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md,
+  32-FIRST-CONTACT-ROOT.md).
 
   Proposed trust classes (would replace D-0007's table on approval), highest first:
-    T0   compiled into the running gov binary and named by its Trust Base Manifest v3: trust-root chain, purpose table
-         (twelve purposes of revision 5) and pairwise whitelist, Fact Threshold Check, decision register, statement
-         schemas, floor vocabulary v3, precedence order and YAML profile, newest Trust Policy, Trust State, embedded kernel
-         snapshot and its final, the binary's registered source identity and input manifest; genuine only for a binary
-         admitted on the machine by an evaluator other than itself (admission-predicate/1);
+    T0   compiled into the running gov binary and named by its Trust Base Manifest v3: trust-root chain, purpose table and
+         pairwise whitelist, Fact Threshold Check (including root threshold >= 2), decision register, statement schemas,
+         floor vocabulary v3, precedence order and YAML profile, newest Trust Policy, Trust State, embedded kernel snapshot
+         and its final, the binary's registered source identity and input manifest; genuine only for a binary admitted on
+         the machine by an evaluator other than itself (admission-predicate/1);
     T1   authenticated material verified under the T0-rooted chain for its purpose;
     T1-R registered release: a release whose registration is referenced by the effective Trust State;
-    T1-E eligible registered release (E1-E10, E7 against its own registration); only T1-E may be the policy root;
-    LA   local machine authority: admission records, anchors, trust-gate confirmations and per-project records in this
-         account's verifier trust store, and operator pins in the system pin directory or, under the integrity predicate,
-         the account configuration; valid only on this machine; never transferable through a repository;
+    T1-E eligible registered release (E1-E10; E7 against its own registration with the admission predicate's
+         restrictors); only T1-E may be the policy root;
+    LA   local machine authority: admission records in the protected verifier trust store, anchors, trust-gate
+         confirmations and per-project records, operator pins in the system pin directory or, under the integrity
+         predicate, the account configuration, and a human reading the first-contact sources now; valid only on this
+         machine; never transferable through a repository;
     T2   OS-written project state; Git-tracked T2 records are requests for every trust decision;
     T3   derived state bound to content identity and effective-policy digest;
     T4   repository- or user-writable artefacts not currently verified, including the project overlay, journals,
          snapshots and adapter bodies;
-    T5   caller-controlled input, environment variables, source paths and contents, descriptive manifests;
+    T5   caller-controlled input, environment variables, source paths and contents, descriptive manifests, CI-proposed
+         registration content;
     T6   plugin- and model-controlled data.
 
   Rules retained from D-0007: (1) an enforcement decision reads its floor from the highest eligible class only, with
@@ -85,63 +93,69 @@ rationale: |
   strengthen, never weaken; admitted project strengthening is removed only by a computed reduction accepted per project,
   and no refusal of a weakening discards an admitted strengthening. (4) Every refusal is typed and auditable.
 
-  Proposed rules (5)-(24) (O1-O8 were the owner-required rules of revision 2):
+  Proposed rules (5)-(27) (O1-O8 were the owner-required rules of revision 2; release/root-of-trust/4.1.6/15-D-0007-SUPERSESSION.md §5):
   (5) [O1] Authenticity cannot be derived from mutually consistent candidate files.
   (6) [O2] Authenticity does not imply eligibility, and floors are total and sound: every file and leaf of the
       Constitutional Surface has exactly one floor semantics from a closed compiled vocabulary; unclassified content is
       denied; registered content that is absent is refused or resolves to a registered value or a typed refusal; floors
       are joins; POLICY_PRECEDENCE must equal its registration exactly and the project layer's precedence comes only from
-      registrations, applied as a directed join; the strength order comparing registrations is sound in both directions;
-      non-join constitutional units (pinned leaves and members, member-id sets, pinned and migration files, owner binding
-      groups) are fixed per registered release: exactly one value per unit per release, append-only; eligibility and
-      effective values use only the registration of the release judged; presence is release-scoped; a later registration
-      that restores a superseded value, removes a unit or narrows a member set is a computed reduction; exceptions never
-      relax floor-, pinned-, members- or precedence-class keys or compiled prefixes; values and admitted project
-      strengthening move down only through a computed, cumulatively declared reduction accepted per project by a trust
-      gate.
+      registrations, applied as a directed join; non-join constitutional units are fixed per registered release by a
+      registration whose content each custodian established first-hand: exactly one value per unit per release,
+      append-only; eligibility and effective values use only the registration of the release judged; presence is
+      release-scoped; for non-orderable units "down" means a later registration that restores a superseded value, removes a
+      unit or narrows a member set, computed by the verifier over every registration the effective Trust State references
+      (INCOMPLETE when one is not held) and refused when undeclared; every other change of a security-classified
+      non-orderable unit is selected by the registration authority and listed in the per-project gate before
+      security-relevant use; exceptions never relax floor-, pinned-, members- or precedence-class keys or compiled
+      prefixes; values and admitted project strengthening move down only through a computed, cumulatively declared
+      reduction accepted per project by a trust gate.
   (7) [O3] Trust state is monotonic, anchors are satisfied by inclusion, and currency needs a proof that names the
-      selected Trust State (a pin or confirmation naming it within the window, a typed fingerprint, or witnesses at
-      threshold): negative facts are sticky and are lifted only with certification, a trust-state reference and an
-      attestation naming the negative; absence is never positive; trust-state minimums come only from the trust-state
-      lineage; equivocations and forks are refused and statements outside an anchored chain are never effective; pins
-      carry mandatory validity; no surface says current; on a machine with a verifier trust store every ingested
-      non-future statement raises the clock high-water.
+      selected Trust State; negative facts are sticky; absence is never positive; trust-state minimums come only from the
+      trust-state lineage; equivocations and forks are refused; pins carry mandatory validity; no surface says current; on a
+      machine with a verifier trust store every ingested non-future statement raises the clock high-water, and a statement
+      refused as issued in the future makes clock-based proofs unusable.
   (8) [O4] The bytes verified are the bytes installed and enforced, in every unit of work of every process; a binary is
       installed from the buffer its evaluator measured.
   (9) [O5] Key purposes and statement types are domain-separated under a compiled pairwise whitelist and the Fact
       Threshold Check. A production binary is accepted only by admission-predicate/1: a release registration at root
       threshold or a root-granted quorum of at least two keys, referenced by the selected Trust State, fixing source
-      identity, input manifest, final, targets and verification records; at least two first-person reproductions by
-      distinct reproducer keys that hold no other purpose, confirmed first-hand and free of conflict; publication in the
-      selected Trust State; the negative set; a Trust Base Manifest resolving at or above the accepted-TBM high-water; and
-      a currency proof naming the selected state. No purpose signs a fact its signer did not establish; release-artifact
-      and build-attestation are withdrawn; currency is never signed by the trust-state purpose.
+      identity, input manifest, build environments established first-hand, final, targets and verification records counted
+      only for exactly the registered candidate and kernel; at least two first-person reproductions by distinct reproducer
+      keys that hold no other purpose, under registered environments, confirmed first-hand and free of conflict, a conflict
+      or REJECTED attestation removed only by the registration authority; publication in the selected Trust State; the
+      negative set; a Trust Base Manifest resolving at or above the accepted-TBM high-water; and a currency proof naming the
+      selected state. No purpose signs a fact its signer did not establish; release-artifact and build-attestation are
+      withdrawn; currency is never signed by the trust-state purpose.
   (10) [O6] Protected trust paths (governance/trust, the occupation entries, the transaction area) are written only by the
-      install transaction; RoT-1 commands refuse a working directory inside them; the installation state is COMPLETE only
-      when their closed entry sets hold.
+      install transaction; RoT-1 commands refuse a working directory inside them, the transaction area included; the
+      installation state is COMPLETE only when their closed entry sets hold; legacy litter in the transaction area is
+      reported and inert.
   (11) [O7] Incoming releases never define the authority required to install themselves, nor the actor levels used to
       check it.
   (12) [O8] Pre-RoT binaries fail before any write on RoT-1 projects for invocations rooted at the project while the
-      occupation layout is intact; for invocations rooted in a subdirectory, every write under governance/ other than
-      overlay content, and every nested legacy install, leaves a state RoT-1 binaries treat as PARTIAL or report; no
-      binary interprets a format or layout it does not implement; once occupation entries are removed or pre-migration
-      paths are restored by Git, RoT-1 binaries fail closed and report lost project strength where it was recorded.
+      occupation layout is intact; for invocations rooted in a subdirectory, every write under governance/trust or the
+      occupation directory leaves a state RoT-1 binaries treat as not COMPLETE, and every nested legacy install and stray
+      governance/spec or governance/views/spec tree is reported; no binary interprets a format or layout it does not
+      implement; once occupation entries are removed or pre-migration paths are restored by Git, RoT-1 binaries fail closed
+      and report lost project strength where it was recorded.
   (13) Statement facts only; signer-declared impact can add gates, never remove computed ones.
   (14) No fallback on failure.
   (15) Flags, environment and repository files cannot add trust (no admissions, anchors, confirmations, keys, policies,
       registrations, state, certification or eligibility).
   (16) No self-validation: no binary evaluates its own acceptance, first acceptance, CI image acceptance and legacy
       migration included; no trust ceremony runs on a binary that an evaluator other than itself has not admitted on the
-      machine.
-  (17) Release authenticity, source selection, build-input selection, byte observation, verification result,
-      certification state, publication, currency and eligibility are distinct facts with distinct selectors;
-      release-final selects none of them.
+      machine; the evaluator of a first admission is selected by the code agreed across the owner's first-contact sources,
+      never by one source.
+  (17) Release authenticity, source selection, build-input and build-environment selection, constitutional-content
+      selection, byte observation, verification result, certification state, publication, currency and eligibility are
+      distinct facts with distinct selectors; release-final selects none of them.
   (18) Authorisation for trust decisions is never a repository record or a file the governed account can write: trust
       gates are answered only by local confirmations bound to the decision's digests (and, for C3 kinds, a typed state
       fingerprint) or by protected decision pins within their maximum validity; repository gate records are requests.
   (19) No trust ingress without an anchor and a currency proof naming the selected state; first admission of a binary
-      uses a state fingerprint typed now from the independent channels as its only selector of state; governed use
-      without an anchor only as OP-7 allows.
+      uses the first-contact manifest bound by a code agreed across the sources of the owner's OP-13 answer as its only
+      selector of lineage, state and evaluator, with a compiled source quorum; the first-contact root that remains is stated
+      with its computed minimum; governed use without an anchor only as OP-7 allows.
   (20) Project-owned strength is recorded as requirements over the effective policy and overlay by every install
       transaction and gated overlay change; on a machine without a record the requirements are computed from the
       pre-transaction inputs; a weakening made outside a gated transaction, by any change, is reported and
@@ -151,41 +165,58 @@ rationale: |
       verifier trust store, trust paths, PATH directories, the running executable and shell start-up files, and run only
       after the unit of work's trust decisions; code the account later runs unconfined is A3.
   (22) Fact derivation and selection authority (FD-1): every input of a trust decision is a selector, restrictor or
-      carrier in a compiled decision register; every selector has authority and currency at least those the decision
-      confers; a signature counts only for a fact its signer established first-hand; the artefact judged is never a
-      selector or its own evaluator; a shortfall fails closed or is a stated, labelled, tested residual; minimum capability
-      sets are computed by the derivation calculator, never argued.
-  (23) Independent admission: a RoT-1 binary without an admission record naming its own digest runs C0 only; C3 and
-      ceremonies need a protected executable and record; the first admission starts a fresh verifier trust store; a
-      genuine binary holding its own revocation restricts itself as OP-15 decides.
-  (24) A release is registered once; a registration that changes a registered release, gives one sequence two releases,
-      or registers several values for one unit is malformed and refused.
+      carrier in a complete compiled decision register (release/root-of-trust/4.1.6/decision-register/DECISION_REGISTER.yaml);
+      every selector has authority and currency at least those the decision confers and every selector substitution is a
+      strategy of the derivation calculator; a signature counts only for a fact its signer established first-hand; the
+      artefact judged is never a selector or its own evaluator; a shortfall fails closed or is a stated, labelled, tested
+      residual; minimum capability sets and every consequence statement are generated by the calculator, never argued.
+  (23) Independent admission: a RoT-1 binary without an admission record held in its protected verifier trust store naming
+      its own digest runs C0 only; C3 and ceremonies need a protected executable and record (an effective uid of 0 is
+      writable); only a first admission (no store, or no admission record ever written in it) starts a fresh verifier
+      trust store, and re-admission keeps it; admissions are serialised; a genuine binary holding its own revocation
+      restricts itself as OP-15 decides.
+  (24) A release is registered once, with its content established first-hand by the registration authority; a
+      registration that changes a registered release, gives one sequence two releases, or registers several values for one
+      unit is malformed and refused.
+  (25) First-contact root: on a machine with no prior trust, lineage, state, source quorum and evaluator are selected only
+      through a first-contact manifest bound by a code agreed across the sources the owner's OP-13 answer names; the quorum
+      is compiled and never read from the selected state; lineage comes from the typed value; the evaluator is bound to the
+      selected state; the remainder is the first-contact root, stated with calculator-computed minima equal to executed
+      results.
+  (26) Build environment established first-hand: every byte-determining build input has a registered selector whose content
+      is established first-hand (components against upstream signed checksums; environments by a first-hand reproduction
+      quorum; reproducers re-assemble), or is the stated residual of the owner's OP-16 answer; the pipeline selects none.
+  (27) Every root version has a root threshold of at least 2; a restrictor (a conflicting reproduction, a REJECTED
+      attestation) is removed only by a revocation under the registration authority.
 consequences_if_approved:
-  - "Every release that ships a kernel, binaries or the admitter is registered once (source identity with canonical content digest, input manifest, final, targets, verification records, constitutional unit map and kernel tree digest) by the root threshold or a root-granted quorum; the ceremony checks first-hand verification records and upstream toolchain checksums (release/root-of-trust/4.1.6/30-RELEASE-REGISTRATION-AND-REPRODUCTION.md)."
-  - "Production binaries are reproduced by at least two independent reproducers from the registered source with inputs by digest, bit-for-bit under a normative build profile; the production build has no VCS-state provenance fallback; the trust-state publisher references exactly one quorum digest per release and target."
-  - "Every machine admits its first gov with gov-admit and a typed state fingerprint, never executing the candidate and installing the measured bytes; CI images do the same at image build with expiring records; legacy consumers never verify a RoT-1 binary with itself; genuine binaries refuse above C0 without an admission record (release/root-of-trust/4.1.6/31-INDEPENDENT-ADMISSION.md)."
-  - "Eligibility (E7) and effective non-orderable values use only the registration of the release judged; the coverage checker implements release-scoped registration, single-valued and append-only lints and registration reductions (release/root-of-trust/4.1.6/constitutional-surface/)."
-  - "Anchors are satisfied only by inclusion; a currency proof names the Trust State it covers; pins and decision pins expire within maxima; a stateful clock high-water is raised by every ingested non-future statement; no surface says current."
+  - "Every release that ships a kernel, binaries or the admitter is registered once (source identity v2, input manifest v2, build environments, final, targets, verification records for exactly the candidate and kernel, constitutional unit map and kernel tree digest derived first-hand by each custodian) by the root threshold or a root-granted quorum (release/root-of-trust/4.1.6/30-RELEASE-REGISTRATION-AND-REPRODUCTION.md, 33-BUILD-ENVIRONMENT.md, 34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md)."
+  - "Build environments are pinned to upstream signed checksums and established by at least two first-hand environment reproductions; binary reproducers re-assemble them; the owner answers OP-16 for the common-mode environment residual."
+  - "Production binaries are reproduced by at least two independent reproducers from the registered source in registered environments with inputs by digest, bit-for-bit under a normative build profile; the trust-state publisher references exactly one quorum digest per release and target and applies E7's restrictors before referencing a registration."
+  - "The owner publishes a first-contact manifest and code for every Trust State through the sources of its OP-13 answer; every machine admits its first gov with gov-admit after the first-contact procedure, never executing the candidate and installing the measured bytes; re-admission keeps the verifier trust store; CI images do the same at image build with expiring records; legacy consumers never verify a RoT-1 binary with itself (release/root-of-trust/4.1.6/31-INDEPENDENT-ADMISSION.md, 32-FIRST-CONTACT-ROOT.md)."
+  - "Eligibility (E7) applies the admission predicate's restrictors and verifier-side registration reductions; the coverage checker implements first-hand registration verification, verifier reductions and registration changes (release/root-of-trust/4.1.6/constitutional-surface/)."
+  - "Anchors are satisfied only by inclusion; a currency proof names the Trust State it covers; pins and decision pins expire within maxima; a stateful clock high-water is raised by every ingested non-future statement; no surface says current; a user-writable installation reaches only the classes stated per OP-7 answer."
   - "Trust gates are local confirmations or protected decision pins within their maximum validity; repository gate records are requests; repository-supplied commands run under allow-list confinement; C3 needs a binary installed where the governed account cannot write."
-  - "RoT-1 projects use the legacy-path-occupation layout with closed trust entry sets and RoT-1 root discovery; pre-RoT binaries write nothing for root-anchored invocations, and subdirectory-rooted writes leave PARTIAL or reported states."
+  - "RoT-1 projects use the legacy-path-occupation layout with closed trust entry sets (including governance/trust/.gitattributes) and RoT-1 root discovery; pre-RoT binaries write nothing for root-anchored invocations."
+  - "The decision register and the derivation calculator are part of the release: the binary compiles the register, and owner-option consequences are regenerated by the calculator whenever the release process changes."
   - "Private signing keys never exist in any repository, payload, CI log or consumer; release build refuses private key material."
-  - "Only after approval: this record becomes ACTIVE (state_class AUTHORITATIVE, chosen_option recorded, human_approved true, supersedes [D-0007]); D-0007 becomes SUPERSEDED; ARCH-0002 becomes ACTIVE; owner answers to OP-1..OP-15 are recorded; the record schema gains a PROPOSED status (or active() excludes in_effect false)."
+  - "Only after approval: this record becomes ACTIVE (state_class AUTHORITATIVE, chosen_option recorded, human_approved true, supersedes [D-0007]); D-0007 becomes SUPERSEDED; ARCH-0002 becomes ACTIVE; owner answers to OP-1..OP-16 are recorded; the record schema gains a PROPOSED status (or active() excludes in_effect false)."
 owner_parameters_pending:
-  - "OP-1 root keys, threshold, custodians (no proposal)"
+  - "OP-1 root keys, threshold (at least 2, KS-14), custodians (no proposal)"
   - "OP-2 release registration authority: (a) root threshold; (b) delegated release-registration quorum >= 2 (no proposal)"
-  - "OP-3 gating for adoption, update and rollback: mode A or B (no proposal)"
+  - "OP-3 gating for adoption, update and rollback: mode A or B; mode B still needs a per-update currency proof naming the publishing Trust State (no proposal)"
   - "OP-4 separate candidate key; custody and sharing of trust-state, certification, revocation, retrieval-profile and witness keys (no proposal)"
   - "OP-5 trust-metadata age warning (informational; no proposal)"
   - "OP-6 lineage confirmation after admission: (a) once per verifier trust store; (c) on every init (no proposal)"
-  - "OP-7 currency for machines without a current proof: (a) anchored only; (b) maximum anchor age; (c) expiring witnesses; (d) compiled epoch; parameters (no proposal)"
-  - "OP-8 independent verification records per registration: 1 or 2 (no proposal)"
+  - "OP-7 currency for machines without a current proof: (a) anchored only; (b) maximum anchor age; (c) expiring witnesses; (d) compiled epoch; parameters; user-writable installation consequence stated (no proposal)"
+  - "OP-8 independent verification records per registration, bound to the registered candidate and kernel: 1 or 2 (no proposal)"
   - "OP-9 reproducer set: (a) n=2,q=2; (b) n=3,q=2; (c) n=3,q=3; each with or without (d) registration of binary digests after the custodians' own reproduction (no proposal)"
-  - "OP-10 common-mode toolchain: (a) accept TA-12; (b) diverse reproducer; (c) owner-built toolchain (no proposal)"
+  - "OP-10 common-mode toolchain archive: (a) accept TA-12; (b) diverse reproducer; (c) owner-built toolchain (no proposal)"
   - "OP-11 retention of releases whose non-orderable content was superseded: (a) keep eligible; (b) raise min_release_sequence on security-relevant change; (c) grace period (no proposal)"
   - "OP-12 form of the independent admitter: (a) separate program; (b) auditable script; (c) helper machine (no proposal)"
-  - "OP-13 channel agreement for typed state fingerprints: (a) one channel; (b) two agreeing channels (no proposal)"
-  - "OP-14 admission-record validity on workstations: (a) images only; (b) every record (no proposal)"
+  - "OP-13 first-contact root (review r5 T1-a..T1-d): (a) one owner source [T1-a]; (b) two owner sources under distinct custody with a compiled quorum [T1-b]; (c) a second authentication path independent of the owner's sources, all-agree or either-suffices, with one or two owner sources [T1-c]; (d) physical provisioning media for designated machines [T1-d] (no proposal)"
+  - "OP-14 admission-record validity on workstations: (a) images only; (b) every record, re-admission keeps the store (no proposal)"
   - "OP-15 what a genuine but revoked running binary may do: (a) C0 only; (b) C0-C2 (no proposal)"
+  - "OP-16 common-mode build environment (review r5 E-a..E-c): (a) accept the registered upstream components [E-a]; (b) environment diversity across supplier classes [E-b]; (c) owner-built environment [E-c] (no proposal)"
 human_approved: false
 impact_radius: R5
 reversibility: low

@@ -1,0 +1,16 @@
+{
+  "_type": "https://agentic-engineering-os/statement/binary-reproduction/v2",
+  "binary_digest": "sha256:b3a12e0a97d0fd16736c8fb1c44eb6e598df2b5ce376aec20938e6b31b44af11",
+  "environment_id": "sha256:4da641ff4dcd0866f714dba40891bb0991d83fc43d3a5a6b07967fbf0b84c535",
+  "inputs_manifest_digest": "sha256:c6dc35cbb761b2599f1ea4a86ff364b23f4dc1df115611bf64b0cf859ad5ef87",
+  "release_id": "4.1.6",
+  "reproduced_at": "2026-09-14T01:00:00Z",
+  "source": {
+    "content_digest": "sha256:338b7707fa7cad7862e7b82fa8d3e876951a67a655c8e7f00c633b1fb2cbabcb",
+    "git_tree": "2222222222222222222222222222222222222222",
+    "release_commit": "1111111111111111111111111111111111111111"
+  },
+  "target": "x86_64-unknown-linux-gnu",
+  "tbm_digest": "sha256:0e39d2c2247be3161d0a8bb9c2e2384eecc1d55a63e3664538e34ad914ad167d",
+  "trust_root_id": "sha256:0852b2688e5b5cde345ea0c7c0ab7f1fdbee7648ff1e5410b5b8df518b714e2d"
+}

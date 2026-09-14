@@ -1,28 +1,29 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/release-registration/1",
-  "title": "Release Registration Statement payload (RoT-1 revision 5, PROPOSED; 30 \u00a75)",
-  "x-schema-version": "1.0.0",
+  "$id": "https://agentic-engineering-os/schemas/release-registration/2",
+  "title": "Release Registration Statement payload (RoT-1 revision 6, PROPOSED; 30 §5, 33, 34)",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "trust_root_id",
+    "candidate_statement_digest",
+    "constitution",
+    "environments",
+    "final_statement_digest",
+    "inputs_manifest_digest",
+    "issued_at",
+    "migrations",
     "release_id",
     "sequence",
-    "final_statement_digest",
-    "candidate_statement_digest",
     "source",
-    "inputs_manifest_digest",
     "targets",
-    "verification_records",
-    "constitution",
-    "migrations",
-    "issued_at"
+    "trust_root_id",
+    "verification_records"
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/release-registration/v1"
+      "const": "https://agentic-engineering-os/statement/release-registration/v2"
     },
     "trust_root_id": {
       "type": "string",
@@ -49,6 +50,7 @@
       "additionalProperties": false,
       "required": [
         "release_commit",
+        "git_tree",
         "content_digest"
       ],
       "properties": {
@@ -56,10 +58,14 @@
           "type": "string",
           "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
         },
+        "git_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+        },
         "content_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
+          "description": "governance-os.source-content-digest/2: SHA-256 over length-prefixed (mode, path, blob SHA-256) records of the commit's tree, paths with control characters refused (30 §4.1, revision 6)"
         }
       }
     },
@@ -115,7 +121,8 @@
             ]
           }
         }
-      }
+      },
+      "description": "derived first-hand by each registration custodian from its own kernel build of the fetched source (34 R-CON-1); a CI-derived map is a proposal only"
     },
     "migrations": {
       "type": "object",
@@ -168,6 +175,48 @@
     "issued_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "environments": {
+      "type": "array",
+      "minItems": 1,
+      "description": "registered build environments per target, each established by at least two first-hand environment reproductions (33 R-BENV-2)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target",
+          "environment_id",
+          "environment_tree_digest",
+          "supplier_class",
+          "environment_reproductions"
+        ],
+        "properties": {
+          "target": {
+            "type": "string"
+          },
+          "environment_id": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "environment_tree_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "supplier_class": {
+            "type": "string",
+            "pattern": "^[A-Z]$"
+          },
+          "environment_reproductions": {
+            "type": "array",
+            "minItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
     }
   }
 }

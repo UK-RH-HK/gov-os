@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-base-manifest.schema.json",
   "title": "trust-base-manifest",
-  "description": "PROPOSED (RoT-1 revision 4). Trust Base Manifest v2 compiled into every gov binary (25 \u00a74). Signed components are named by digest; compiled code is covered by the build attestation. binary.source must equal the attested source of the final's candidate (A4b). compiled_rules name floor_schema_version 3 and operator vocabulary floor-ops/3.",
+  "description": "PROPOSED (RoT-1 revision 6). Trust Base Manifest v3 compiled into every gov binary (25 §4): binary.source is source identity v2; binary.version is required (AP-4); signed components are named by digest.",
   "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -67,6 +67,7 @@
           "additionalProperties": false,
           "required": [
             "release_commit",
+            "git_tree",
             "content_digest"
           ],
           "properties": {
@@ -74,10 +75,14 @@
               "type": "string",
               "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
             },
+            "git_tree": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+            },
             "content_digest": {
               "type": "string",
               "pattern": "^sha256:[0-9a-f]{64}$",
-              "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
+              "description": "governance-os.source-content-digest/2: SHA-256 over length-prefixed (mode, path, blob SHA-256) records of the commit's tree, paths with control characters refused (30 §4.1, revision 6)"
             }
           }
         },

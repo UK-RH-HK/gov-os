@@ -1294,3 +1294,65 @@ def registration_reductions(regs, history_subjects=(), inv=None):
     declared = set(history_subjects) | {h.get("subject") for r in regs for h in (r.get("lowering_history") or [])}
     undeclared = [x for x in reds if x["subject"] not in declared]
     return {"exit": 6 if undeclared else 0, "reductions": reds, "undeclared": undeclared}
+
+
+# ------------------------------------------------------------------------------------------------ revision 6: first-hand content, verifier reductions, security-classified changes (34, 23 §12.4–§12.6)
+SECURITY_CLASSIFIED_NAMES = ("SECURITY_POLICY", "AUTHORITY_POLICY", "HUMAN_GATE_POLICY", "TOOL_POLICY", "ROLES", "HARD_INVARIANTS", "TOOLS", "TOOLS_REGISTRY", "MCP", "MCP_REGISTRY",
+                             "MEMORY_POLICY", "LEARNING_POLICY", "ARCHIVE_POLICY", "CHANGE_POLICY", "CONTEXT_POLICY", "POLICY_PRECEDENCE")
+SECURITY_CLASSIFIED_FILE_PREFIXES = ("tools/", "constitution/", "migrations/", "skills/", "schemas/", "adapters/", "policies/", "contracts/", "roles/")
+
+
+def unit_security_classified(unit, inv=None):
+    """Draft TPS v1 marking (23 §12.6): a non-join unit is security-classified when its rule carries `security_classified: true`
+    in the inventory, or, until the TPS enumerates the marking, when it belongs to a policy, role, invariant or tool document, or is
+    a pinned or migration file outside documentation. Conservative: every unit of the listed documents is marked."""
+    kind, ident = unit.split(":", 1)
+    if kind == "file":
+        if inv is not None:
+            fr = match_file_rule(inv, ident)
+            if isinstance(fr, dict) and fr.get("security_classified") is not None:
+                return bool(fr["security_classified"])
+        return ident.startswith(SECURITY_CLASSIFIED_FILE_PREFIXES)
+    name = ident.split(".", 1)[0].split("[", 1)[0]
+    return name in SECURITY_CLASSIFIED_NAMES or name.endswith("_POLICY")
+
+
+def registration_first_hand_problems(inv, source_kernel_dir, proposed):
+    """R-CON-1: a custodian (or verifier) derives the registration content from the kernel payload it built from the fetched
+    source, and signs only when the proposal equals it: kernel tree digest, every non-join unit, no extra or missing unit."""
+    derived = registration_record(inv, source_kernel_dir, proposed.get("release_id"), proposed.get("sequence"), proposed.get("final_statement_digest"))
+    probs = []
+    if derived["kernel_tree_digest"] != proposed.get("kernel_tree_digest"):
+        probs.append({"problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED", "field": "kernel_tree_digest", "derived": derived["kernel_tree_digest"], "proposed": proposed.get("kernel_tree_digest")})
+    du, pu = derived["units"], proposed.get("units") or {}
+    for u in sorted(set(du) | set(pu)):
+        if canon(du.get(u)) != canon(pu.get(u)):
+            probs.append({"problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED", "unit": u, "derived_present": u in du, "proposed_present": u in pu})
+    return {"derived": derived, "problems": probs}
+
+
+def registration_reductions_verifier(referenced, held, history_subjects=(), inv=None):
+    """CR5-B-04 (a): the verifier computes registration reductions over every registration the effective Trust State references.
+    A referenced registration that is not held gives INCOMPLETE (exit 7): withholding an intermediate registration cannot hide
+    a reversion. Undeclared reductions refuse (exit 6, REGISTRATION_UNDECLARED_REDUCTION)."""
+    by_id = {r["release_id"]: r for r in held}
+    missing = [rid for rid in referenced if rid not in by_id]
+    if missing:
+        return {"exit": 7, "result": "INCOMPLETE", "missing": sorted(missing), "reductions": [], "undeclared": []}
+    rep = registration_reductions([by_id[rid] for rid in referenced], history_subjects, inv=inv)
+    if rep["exit"] == 6:
+        rep["result"] = "REGISTRATION_UNDECLARED_REDUCTION"
+    return rep
+
+
+def registration_changes(held_reg, new_reg, inv=None):
+    """CR5-B-04 (b): every non-join unit whose value differs between the registration a project's record holds and the new one.
+    Security-classified changes are listed in the per-project gate package and, on a recorded machine, need the gate before
+    security-relevant use (exit 8)."""
+    hu, nu = held_reg.get("units") or {}, new_reg.get("units") or {}
+    ch = []
+    for u in sorted(set(hu) | set(nu)):
+        if canon(hu.get(u)) != canon(nu.get(u)):
+            ch.append({"unit": u, "change": "added" if u not in hu else "removed" if u not in nu else "changed", "security_classified": unit_security_classified(u, inv)})
+    sec = [c for c in ch if c["security_classified"]]
+    return {"exit": 8 if sec else 0, "changes": ch, "security_classified_changes": sec, "held_release": held_reg.get("release_id"), "new_release": new_reg.get("release_id")}

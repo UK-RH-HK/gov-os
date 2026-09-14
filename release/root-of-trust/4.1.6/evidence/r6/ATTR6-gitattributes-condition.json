@@ -1,0 +1,79 @@
+{
+ "git": "git version 2.43.0",
+ "probe": "ATTR6 .gitattributes member and line-ending overrides (AR-0015)",
+ "rows": {
+  "C1_autocrlf_true": {
+   "config": [
+    "core.autocrlf=true"
+   ],
+   "crlf_introduced": false,
+   "info_attributes": null,
+   "kernel_bytes_equal_committed": true
+  },
+  "C2_project_text_auto_eol_crlf": {
+   "config": [
+    "core.eol=crlf"
+   ],
+   "crlf_introduced": false,
+   "info_attributes": null,
+   "kernel_bytes_equal_committed": true
+  },
+  "C2b_project_text_eol_attribute_crlf": {
+   "config": [],
+   "crlf_introduced": false,
+   "info_attributes": null,
+   "kernel_bytes_equal_committed": true
+  },
+  "K1_control_no_member_autocrlf_true": {
+   "config": [
+    "core.autocrlf=true"
+   ],
+   "crlf_introduced": true,
+   "info_attributes": null,
+   "kernel_bytes_equal_committed": false
+  },
+  "K2_control_no_member_project_text_auto_eol_crlf": {
+   "config": [
+    "core.eol=crlf"
+   ],
+   "crlf_introduced": true,
+   "info_attributes": null,
+   "kernel_bytes_equal_committed": false
+  },
+  "O1_info_text_autocrlf_true": {
+   "config": [
+    "core.autocrlf=true"
+   ],
+   "crlf_introduced": true,
+   "info_attributes": "* text\n",
+   "kernel_bytes_equal_committed": false
+  },
+  "O2_info_text_eol_crlf": {
+   "config": [
+    "core.eol=crlf"
+   ],
+   "crlf_introduced": true,
+   "info_attributes": "* text\n",
+   "kernel_bytes_equal_committed": false
+  },
+  "O3_info_text_eol_attribute_crlf": {
+   "config": [],
+   "crlf_introduced": true,
+   "info_attributes": "* text eol=crlf\n",
+   "kernel_bytes_equal_committed": false
+  },
+  "O4_info_text_auto_eol_crlf": {
+   "config": [
+    "core.eol=crlf"
+   ],
+   "crlf_introduced": true,
+   "info_attributes": "* text=auto\n",
+   "kernel_bytes_equal_committed": false
+  }
+ },
+ "verdicts": {
+  "controls_show_the_harm_without_member": true,
+  "member_protects_under_RV5-C-M1_configurations": true,
+  "stated_condition_git_info_attributes_text_overrides_member": true
+ }
+}

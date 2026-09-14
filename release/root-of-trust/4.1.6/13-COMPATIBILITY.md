@@ -1,6 +1,11 @@
 # Output 13 — Legacy-version compatibility model
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: (1) statement drafts `verification-attestation.v3`, `release-registration.v1` and
+> `binary-reproduction.v1` are superseded by v4, v2 and v2 (`05` §2); (2) prior harnesses: `evidence/r5/*` stay unchanged and
+> re-run identical (`22` §1); `evidence/r6/*` are the revision-6 instruments; (3) legacy containment is unchanged and
+> re-run on the revision-6 layout with the `.gitattributes` member (LAY6: property R2-H4 0 violations); (4) §10 adds the
+> Git-attribute and ignore-source conditions of `26` §2, §8.
 > Revision 5 amendments: (1) revision-4 statement drafts `artifact-final.v2`, `build-attestation.v2`,
 > `verification-attestation.v2` and `trust-state.v2` were never issued and are refused (`05` §2). (2) Prior harnesses:
 > `evidence/VA4-*` and the P4r4 binary scenarios are superseded by `evidence/r5/P4r5-conformance-oracle.*`; P4r4's other

@@ -1,6 +1,25 @@
 # Output 9 — Integration requirements
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments (normative requirements; codes in `25` §5, `31`, `32`, `33`, `34`, `18` §9):
+> - **FC-1…FC-8** first contact (`32`); **R-ADM-2′, R-ADM-3′, R-ADM-7′, R-ADM-8′, R-ADM-13, R-ADM-14**, **GB-1′, GB-4′, GB-6** (`31`);
+>   `gov trust fc-procedure` prints the procedure for the owner's OP-13 answer.
+> - **R-BENV-1…6** and **IR-REP-5** environment reproduction tooling (`33`); **IR-REP-6** source identity v2 (`30` §4.1).
+> - **R-CON-1…5** (`34`): `gov trust draft-registration` runs `verify-registration` on each custodian's own kernel build;
+>   the verifier computes registration reductions over every referenced registration; the `registration_change` gate.
+> - **R-REG-3 (c′), (g), R-REG-11, R-REP-5′, R-PUB-1′** (`30`); **AP-5r** (`25`); **KS-14** (`05` §3).
+> - **R-DR-1** the compiled decision register equals `decision-register/DECISION_REGISTER.yaml` (`29` R-SEL-1).
+> - **R-ST6-1** the trust top-level entry set includes `.gitattributes` (`* -text`); **R-ST6-2** RoT-1 commands refuse a working
+>   directory inside the transaction area; doctor D033 names `.git/info/attributes` text settings and the ignore source that
+>   drops the migration occupation (`git check-ignore --no-index -v`) (`18` §9.1–§9.2, `26` §2, §8).
+> - New error codes: `FIRST_CONTACT_DISAGREEMENT`, `FIRST_CONTACT_SOURCES_BELOW_PROCEDURE`, `FIRST_CONTACT_MANIFEST_MISMATCH`,
+>   `FIRST_CONTACT_MANIFEST_MALFORMED`, `FIRST_CONTACT_MANIFEST_EXPIRED`, `FIRST_CONTACT_LINEAGE_NOT_COMPILED`,
+>   `FIRST_CONTACT_MANIFEST_INCONSISTENT`, `ADMITTER_NOT_LISTED`, `ADMITTER_REVOKED`, `PLATFORM_SIGNATURE_INVALID`,
+>   `ENVIRONMENT_COMPONENT_UNVERIFIED`, `ENVIRONMENT_NOT_REPRODUCED`, `ENVIRONMENT_REPRODUCTION_CONFLICT`,
+>   `ENVIRONMENT_DIVERSITY_NOT_MET`, `INPUT_DIGEST_MISMATCH`, `REGISTRATION_CONTENT_NOT_ESTABLISHED`,
+>   `VERIFICATION_RECORDS_NOT_FIRST_HAND_FOR_CANDIDATE`, `REGISTRATION_UNDECLARED_REDUCTION`, `REGISTRATION_CHANGE_GATE_REQUIRED`,
+>   `SOURCE_PATH_REFUSED`, `OWNER_OPTION_UNANSWERED`, `FIRST_CONTACT_SOURCES_SHARE_CUSTODY` (draft-policy flag); E7 reasons of
+>   `34` R-CON-3 and `registration_history_incomplete`.
 > Revision 5 amendments (normative requirements; codes in `25` §5, `31` §4–§5, `23` §12, `18` §9):
 > - **R-REG-1…10, R-VER-1…4, R-REP-1…9, R-PUB-1…4** (`30`); **IR-REP-1…4** implementation requirements (`30` §11).
 > - **R-ADM-1…12, GB-1…5, R-CER-1…4** (`31`); admission-predicate/1 for `verify-artifact` (`25` §5).

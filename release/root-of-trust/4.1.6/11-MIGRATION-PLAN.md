@@ -1,6 +1,16 @@
 # Output 11 — Migration plan from 4.1.5
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: **Phase 0** also records the owner's OP-13 answer (first-contact sources and custody, the second
+> path or media) and OP-16 answer, the environment reproducers, and publishes the first-contact manifest and code of every
+> Trust State. **Phase 2** adds WP-28 first-contact procedure and admitter rules FC-1…FC-8 with the shared vectors R1–R5
+> (`32`, `31` R-ADM-14), WP-29 environment manifests and environment reproduction tooling (`33`), WP-30 first-hand
+> registration content in `draft-registration` and verifier-side registration reductions and changes (`34`), WP-31 source
+> identity v2 (`30` §4.1), WP-32 the compiled decision register from `DECISION_REGISTER.yaml` and the pack checks (`29`),
+> WP-33 the `.gitattributes` member, transaction-area refusal and doctor sources (`18`, `26`). **Phase 4 (RV5-M8):** a
+> legacy consumer on a workstation whose installation the governed account can write stays `LEGACY` until an
+> administrator-protected installation (or system pin under OP-7 (d) or witnesses under (c)) exists: `gov-admit` can install
+> and record there, but `update --apply` (C3) and `confirm-state` are refused (`31` §7.1).
 > Revision 5: every phase below applies to revision 5 (read "revision 4" as "revision 5"). **Phase 0** adds the
 > registration authority (OP-2), the reproducer set and quorum (OP-9), the verification processes (OP-8), the admitter
 > registration and the publication of its digest in the channels. **Phase 2** adds WP-22 reproducible production builds

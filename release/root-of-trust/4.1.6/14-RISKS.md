@@ -1,6 +1,13 @@
 # Output 14 — Risks and trade-offs
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 risks added: **RK-46** first install needs the OP-13 sources (availability; custody of two sources under (b));
+> **RK-47** dependence on a platform signing service under OP-13 (c); **RK-48** per-machine media ceremonies under OP-13 (d);
+> **RK-49** environment reproduction per environment change (two first-hand reproductions) and, under OP-16 (b), per-target
+> cross-supplier reproducibility (a target may be unregistrable); **RK-50** custodians build the kernel payload themselves
+> per release (ceremony duration); **RK-51** workstations need an administrator-protected installation or system pin for
+> governed use under OP-7 (a)/(b) (RV5-M8); **RK-52** the decision register and calculator must be kept equal to the
+> implementation (RT-183).
 > Revision 5 risks added: **RK-38** bit-for-bit reproducibility across operating systems and distributions not yet shown
 > (IR-REP-3; a target is not registered until shown); **RK-39** reproducer availability blocks releases (OP-9 (a), (c));
 > **RK-40** one registration ceremony per release (OP-2 (a) touches root keys per release); **RK-41** a second implementation of

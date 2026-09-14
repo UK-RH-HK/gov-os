@@ -1,6 +1,10 @@
 # Output 17 — Monotonic trust-state model (certification, withdrawal, revocation, root rotation)
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: the clock rule is `24` §8 as restated in revision 6 (every ingested non-future statement raises the
+> high-water; a refused future statement disables clock-based proofs for the unit of work); the witness-only text of the
+> revision-4 header, S11 and §13 is withdrawn (CR5-B-09). Registration revocations (`30` R-REG-11) are held like other
+> statements; a trust-state revocation removes no restrictor (`25` AP-5r).
 > Revision 5 amendments: S4 (d) admissibility covers `registrations[]` and `published_binaries[]` (a TSS never drops either;
 > P4r5 `RET-D-admissibility-ignores-artifacts`). §15 trust-state blast radius restated: on a machine anchored by a pin or
 > confirmation, a descendant the thief issues after the proof carries no C3 (`24` §4.4); it never registers a release,
@@ -91,7 +95,7 @@ statements. It cannot forge statements, and it cannot anchor.
 | S8 | **Hints** (unchanged): warnings only. |
 | S9 | **Trust-state axis** = `EQUIVOCATION` \| `REGRESSION` \| `INCOMPLETE(n′)` \| `KNOWN(n)`. |
 | S10 | **Freshness and currency axes** (`24` §4.1, §4.4). |
-| S11 | **Persist.** Newly verified statements go into the VTS (union). High-water components rise monotonically. Only witnesses raise `clock_high_water`. Human and in-gate anchors are recorded; pin anchors are recomputed per process. The PTR is written only inside an install transaction or `gov trust refresh`, as a union (`18` §5.2). |
+| S11 | **Persist.** Newly verified statements go into the VTS (union). High-water components rise monotonically. Every ingested verified non-future statement raises `clock_high_water` (revision 5–6; the revision-4 witness-only rule is withdrawn, CR5-B-09). Human and in-gate anchors are recorded; pin anchors are recomputed per process. The PTR is written only inside an install transaction or `gov trust refresh`, as a union (`18` §5.2). |
 | S12 | **Chain reset.** Only a root-signed TPS `state_chain_reset {after_sequence, genesis_digest}`. |
 
 Evidence: `evidence/P4r4-trust-state-model.json`, 54 scenarios, all hold. The conformance oracle kills each of 9
@@ -167,7 +171,7 @@ There is no override for `INCOMPLETE`, `REGRESSION`, `EQUIVOCATION`, `BELOW_ANCH
 | a higher TSS that does not chain through the anchor | S4 (b): never a candidate |
 | forked history across missing intermediates | cumulative `prior_states[]` |
 | older witness | highest witness `issued_at`; validity bound; separate purpose |
-| future-dated statement poisoning the clock | S1 ingest refusal; only witnesses raise the high-water |
+| future-dated statement poisoning the clock | S1 ingest refusal; a refused future statement makes clock-based proofs unusable for that unit of work (revision 6) |
 | gate answer reused for another digest or project | confirmation bound to kind, project, digests and, for C3, the typed state fingerprint; consumed once |
 | CERTIFIED after WITHDRAWN | MS-2 with `lifts_negative_statement_digest` |
 | older binary as upgrade | accepted-TBM high-water (`25` A7) |
@@ -201,7 +205,9 @@ There is no override for `INCOMPLETE`, `REGRESSION`, `EQUIVOCATION`, `BELOW_ANCH
   - OP-7 (b) and (c).
 - `clock_ok` iff the local clock is ≥ `clock_high_water`. When it is not, clock-based proofs and pins are unusable (fail
   closed).
-- `clock_high_water` rises only with verified `freshness-witness` statements.
+- `clock_high_water` rises with every ingested verified non-future statement (revision 5; `24` §8). A statement refused at ingest as
+  issued in the future makes clock-based proofs (pins, the C3 window, witnesses) unusable for that unit of work (revision 6,
+  CR5-B-08).
 - A root-signed TPS `bootstrap.clock_reset {reset_to}` lowers it.
 
 Evidence: `P4r4` `RV3-B-A07_issued_at_high_water`. A candidate issued 100 years ahead is refused at ingest; OP-7 (b)

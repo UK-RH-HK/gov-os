@@ -1,6 +1,9 @@
 # Output 18 — Verify-and-use transaction model
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6: §9.1 adds the `governance/trust/.gitattributes` member (`* -text`, RV5-M6); §9.2 extends the working-directory
+> refusal to the transaction area and states the containment of legacy litter there (RV5-L8); evidence re-run on the
+> revision-6 layout (LAY6).
 > Revision 5: §9 gains closed entry sets and RoT-1 root discovery (carried RV4-M1); the transaction and snapshot model is
 > otherwise unchanged. The release registration is installed as `governance/trust/registration.dsse.json` (`30`, `23` §12).
 > Revision 4 keeps the byte-binding proof, the transaction area, union records, VU-1…VU-13 and the installation state
@@ -219,7 +222,9 @@ A foreign transaction artefact (§5.1) is reported and ignored; the state is com
 
 `COMPLETE` additionally requires, by `st_mode` (never by name) and with no symbolic link anywhere below `governance/trust/`:
 1. the entries of `governance/trust/` ⊆ {`FORMAT` (file), `framework.lock` (file), `kernel` (directory), `release.dsse.json`
-   or `development.json` (file), `registration.dsse.json` (file), `lineage`, `state`, `root`, `profiles` (directories)};
+   or `development.json` (file), `registration.dsse.json` (file), `lineage`, `state`, `root`, `profiles` (directories)}, and
+   (revision 6, RV5-M6) `.gitattributes` is present as a regular file whose content is exactly `* -text\n`: absent
+   `PARTIAL(trust_components)`, other content `PARTIAL(foreign_trust_entry)`;
 2. the path set of `governance/trust/kernel/` equals the release content set recorded by the install transaction (the lock's
    file map), every file digest equal;
 3. `governance/trust/{state,root,lineage,profiles}/` contain only regular files named `*.dsse.json`;
@@ -235,8 +240,10 @@ Otherwise the state is `PARTIAL` with the reasons above, and doctor D033 CRITICA
 1. The project root of a RoT-1 command is the nearest ancestor of the working directory (or of `--root`) that holds
    `governance/trust/FORMAT` as a regular file.
 2. When the resolved working directory is inside that project's Protected Path Set (`governance/trust/**`, the occupation
-   directory, an occupation file), every command except `version` and `doctor` refuses with
-   `WORKING_DIRECTORY_IN_PROTECTED_PATH`.
+   directory, an occupation file, **and the transaction area `.governance-runtime/trust-tx/**`**, revision 6, RV5-L8), every
+   command except `version` and `doctor` refuses with `WORKING_DIRECTORY_IN_PROTECTED_PATH`. A legacy binary's nested install
+   inside the transaction area is reported by doctor and is inert: its journal is not VTS-registered (§5.1), and it is
+   outside the closed entry sets of §9.1, which govern `governance/`.
 3. A legacy marker between the working directory and that root is reported and never operated as a separate project.
 
 **Evidence** (`evidence/r5/ST5-*`, real legacy 4.1.2–4.1.5 binaries, reviewer C's trees): the three pristine layouts are
@@ -253,6 +260,15 @@ Evidence: `evidence/LR2-installation-state-and-strength-reference.json` applies 
 review r3's legacy probes. Every removed, restored, sparse or merged tree with legacy entries is `PARTIAL(occupation)` or
 `LEGACY`. Intact trees, reviewer C's clean clone, checkout, merge and archive trees, and a fresh clone after the
 untracking idiom under the revision-4 ignore rule are `COMPLETE`.
+
+**Evidence (revision 6; `evidence/r6/LAY6/`, reviewer C's `matrix5` harness re-run by a helper session on the revision-6
+layout with the `.gitattributes` member, real legacy 4.1.2–4.1.5 binaries).** 30,735 writing rows (285 skipped by the harness);
+property R2-H4 0 violations (revision 5: 0); LP-1r 1,335 rows, 0 violations; classification lost 0; Git operations leaving a
+written tree `COMPLETE` 0. LP-1s as stated in revision 5 still has 16 counterexamples, all `governance/spec` and
+`governance/views/spec` litter; LP-1s as restated in revision 6 (writes under `governance/trust/**` or the occupation) has 0
+counterexamples over 540 rows. The 96 transaction-area rows stay reported and inert as item 2 states. Reviewer C's `gitops`
+rows: `AUTOCRLF` and `TEXTAUTO_EOLCRLF` are now `COMPLETE` (revision 5: `PARTIAL(kernel_content_mismatch)`); `GLOBALEXCL` and
+`INFOEXCL` stay `PARTIAL(occupation)` with the ignore source named by `git check-ignore --no-index -v` (`26` §8).
 
 ## 10. Closure table
 

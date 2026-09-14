@@ -26,6 +26,16 @@ release named by `--release-id`: an unregistered release exits 3 (`release_unreg
 member-id set, pinned file and migration file must equal that release's registered value, and the kernel tree digest must
 equal the registered one (exit 3). A registration set that rewrites a registered release or gives one sequence two releases
 is malformed (exit 5). `registration-reductions` exits 6 for an undeclared registration_reversion.
+
+Revision 6 (first-hand constitutional content, `34`; verifier reductions, CR5-B-04):
+  csi_check.py verify-registration --registration FILE --source-kernel DIR [--inventory FILE] [--json]
+  csi_check.py registration-reductions --verifier --referenced FILE --registrations FILE [--lowering-history FILE] [--json]
+  csi_check.py registration-changes --held FILE --new FILE [--inventory FILE] [--json]
+`verify-registration` exits 3 (REGISTRATION_CONTENT_NOT_ESTABLISHED) when the proposed kernel tree digest or any unit differs
+from what the custodian derives from the kernel payload it built from the fetched source (R-CON-1). `registration-reductions
+--verifier` exits 7 (INCOMPLETE) when a registration referenced by the effective Trust State is not held, and 6 for an
+undeclared reduction. `registration-changes` exits 8 when a security-classified non-orderable unit changed between the held and
+the new registration (gate package on recorded machines).
 """
 import argparse, copy, json, os, shutil, sys, tempfile
 
@@ -265,6 +275,28 @@ def run_reductions(old, new, history_subjects=(), as_json=False, quiet=False):
     rep = {"exit": 6 if undeclared else 0, "reductions": reds, "undeclared": undeclared}
     if not quiet:
         print(json.dumps(rep, indent=1, default=str) if as_json else f"exit {rep['exit']} reductions={len(reds)} undeclared={len(undeclared)}")
+    return rep
+
+
+def run_verify_registration(proposed, source_kernel, inv, as_json=False, quiet=False):
+    r = L.registration_first_hand_problems(inv, source_kernel, proposed)
+    rep = {"exit": 3 if r["problems"] else 0, "problems": r["problems"][:50], "problem_count": len(r["problems"])}
+    if not quiet:
+        print(json.dumps(rep, indent=1, default=str) if as_json else f"exit {rep['exit']} problems={rep['problem_count']}")
+    return rep
+
+
+def run_registration_reductions_verifier(referenced, held, history_subjects=(), as_json=False, quiet=False, inv=None):
+    rep = L.registration_reductions_verifier(referenced, held, history_subjects, inv=inv)
+    if not quiet:
+        print(json.dumps(rep, indent=1, default=str) if as_json else f"exit {rep['exit']} {rep.get('result', '')}")
+    return rep
+
+
+def run_registration_changes(held, new, inv=None, as_json=False, quiet=False):
+    rep = L.registration_changes(held, new, inv=inv)
+    if not quiet:
+        print(json.dumps(rep, indent=1, default=str) if as_json else f"exit {rep['exit']} changes={len(rep['changes'])} security={len(rep['security_classified_changes'])}")
     return rep
 
 
@@ -583,6 +615,40 @@ def selftest(scratch, kernel_dir, inv):
     record("S70", "a later registration removes a unit the previous registration had (registration_unit_removed) without lowering_history", 6, run_registration_reductions([reg_base, reg70], quiet=True, inv=inv))
     rcase("S68", "additive collection member added by the kernel but not in the release's registered member-id set", 3,
           lambda k: mut(k, "policies/SECURITY_POLICY.yaml", lambda d: d["secret_content_patterns"].append({"id": "gcp-api-key", "regex": "AIza[0-9A-Za-z_\\-]{35}"})))
+    # ---- revision 6: first-hand content (34 R-CON-1), verifier reductions and security-classified changes (CR5-B-04)
+    def regex_kernel(cid, regex):
+        k = os.path.join(base, cid)
+        shutil.copytree(kernel_dir, k)
+        mut(k, "policies/SECURITY_POLICY.yaml", lambda d: [p.__setitem__("regex", regex) for p in d["secret_content_patterns"] if p["id"] == "aws-access-key"])
+        return k
+    k_fix = regex_kernel("S71-source-kernel", "(AKIA|ASIA)[0-9A-Z]{16}")
+    k_weak = regex_kernel("S71-final-kernel", "(?:AKIA|ABIA)[0-9A-Z]{16}")
+    prop_ok = L.registration_record(inv, k_fix, "4.1.8", 1800, "sha256:final-4.1.8")
+    prop_ci = L.registration_record(inv, k_weak, "4.1.8", 1800, "sha256:final-4.1.8x")
+    record("S71", "verify-registration: proposal equals the content derived first-hand from the fetched source", 0, run_verify_registration(prop_ok, k_fix, copy.deepcopy(inv), quiet=True))
+    record("S72", "verify-registration: proposal derived by CI from a final whose kernel differs from the fetched source (RV5-D-A01)", 3, run_verify_registration(prop_ci, k_fix, copy.deepcopy(inv), quiet=True))
+    r416 = L.registration_record(inv, regex_kernel("S73-416", "AKIA[0-9A-Z]{16}"), "4.1.6", 1600)
+    r417 = L.registration_record(inv, regex_kernel("S73-417", "(AKIA|ASIA)[0-9A-Z]{16}"), "4.1.7", 1700)
+    r418rev = L.registration_record(inv, regex_kernel("S73-418rev", "AKIA[0-9A-Z]{16}"), "4.1.8", 1800)
+    record("S73", "verifier reductions: undeclared exact reversion over the referenced registrations (RV5-B-A10 (i))", 6,
+           run_registration_reductions_verifier(["4.1.6", "4.1.7", "4.1.8"], [r416, r417, r418rev], quiet=True, inv=inv))
+    record("S74", "verifier reductions: the intermediate registration is referenced but withheld (RV5-B-A10 (ii)) -> INCOMPLETE", 7,
+           run_registration_reductions_verifier(["4.1.6", "4.1.7", "4.1.8"], [r416, r418rev], quiet=True, inv=inv))
+    r418var = L.registration_record(inv, regex_kernel("S75-418var", "(?:AKIA)[0-9A-Z]{16}"), "4.1.8", 1800)
+    record("S75", "registration changes: non-identical weakening of the aws-access-key regex is listed for the gate package (RV5-B-A09)", 8,
+           run_registration_changes(r417, r418var, inv=inv, quiet=True))
+    k_tool = os.path.join(base, "S76-tool")
+    shutil.copytree(kernel_dir, k_tool)
+    rel_tools = os.path.join(os.path.dirname(kernel_dir), "release", "releases", "4.1.5", "kernel", "tools")
+    if not os.path.exists(os.path.join(k_tool, "tools/registry/TOOLS.yaml")) and os.path.isdir(rel_tools):
+        shutil.copytree(rel_tools, os.path.join(k_tool, "tools"))
+    k_tool2 = os.path.join(base, "S76-tool2")
+    shutil.copytree(k_tool, k_tool2)
+    mut(k_tool2, "tools/registry/TOOLS.yaml", lambda d: [t.__setitem__("health_check", {"kind": "command", "command": ["sh", "-c", "touch $HOME/s76-ran"], "expect_exit": 0}) for t in d["tools"] if t["tool_id"] == "TOOL-GIT-001"])
+    record("S76", "registration changes: a tool descriptor (command) change is listed for the gate package (RV5-B-A09 tool command)", 8,
+           run_registration_changes(L.registration_record(inv, k_tool, "4.1.7", 1700), L.registration_record(inv, k_tool2, "4.1.8", 1800), inv=inv, quiet=True))
+    record("S77", "registration changes: identical non-join content (only the kernel tree of tunable leaves may differ) lists nothing", 0,
+           run_registration_changes(r417, dict(r417, release_id="4.1.8", sequence=1800), inv=inv, quiet=True))
     return {"base": "<scratch>", "cases": results, "passed": sum(r["pass"] for r in results), "failed": sum(not r["pass"] for r in results)}
 
 
@@ -603,7 +669,19 @@ def main():
     rr = sub.add_parser("registration-reductions")
     rr.add_argument("--registrations", required=True)
     rr.add_argument("--lowering-history")
+    rr.add_argument("--verifier", action="store_true")
+    rr.add_argument("--referenced")
     rr.add_argument("--json", action="store_true")
+    vr = sub.add_parser("verify-registration")
+    vr.add_argument("--registration", required=True)
+    vr.add_argument("--source-kernel", required=True)
+    vr.add_argument("--inventory", default=DEFAULT_INV)
+    vr.add_argument("--json", action="store_true")
+    rc = sub.add_parser("registration-changes")
+    rc.add_argument("--held", required=True)
+    rc.add_argument("--new", required=True)
+    rc.add_argument("--inventory", default=DEFAULT_INV)
+    rc.add_argument("--json", action="store_true")
     dr = sub.add_parser("derive-registration")
     dr.add_argument("kernel_dir")
     dr.add_argument("--release-id", required=True)
@@ -621,7 +699,16 @@ def main():
     a = ap.parse_args()
     if a.cmd == "registration-reductions":
         hist = json.load(open(a.lowering_history)) if a.lowering_history else []
-        rep = run_registration_reductions(json.load(open(a.registrations)), [h["subject"] for h in hist], as_json=a.json, inv=yaml.safe_load(open(DEFAULT_INV)))
+        if a.verifier:
+            rep = run_registration_reductions_verifier(json.load(open(a.referenced)), json.load(open(a.registrations)), [h["subject"] for h in hist], as_json=a.json, inv=yaml.safe_load(open(DEFAULT_INV)))
+        else:
+            rep = run_registration_reductions(json.load(open(a.registrations)), [h["subject"] for h in hist], as_json=a.json, inv=yaml.safe_load(open(DEFAULT_INV)))
+        sys.exit(rep["exit"])
+    if a.cmd == "verify-registration":
+        rep = run_verify_registration(json.load(open(a.registration)), os.path.abspath(a.source_kernel), yaml.safe_load(open(a.inventory)), as_json=a.json)
+        sys.exit(rep["exit"])
+    if a.cmd == "registration-changes":
+        rep = run_registration_changes(json.load(open(a.held)), json.load(open(a.new)), inv=yaml.safe_load(open(a.inventory)), as_json=a.json)
         sys.exit(rep["exit"])
     if a.cmd == "derive-registration":
         print(json.dumps(L.registration_record(yaml.safe_load(open(a.inventory)), os.path.abspath(a.kernel_dir), a.release_id, a.sequence), indent=1, sort_keys=True))

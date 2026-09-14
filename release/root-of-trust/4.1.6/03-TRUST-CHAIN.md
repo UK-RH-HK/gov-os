@@ -1,6 +1,9 @@
 # Output 3 — Trust-chain diagram
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendment: the chain of record is `25` §6 as amended in revision 6. First contact is selected by the agreed
+> first-contact code over the OP-13 sources (`32`); build environments are registered and reproduced first-hand (`33`);
+> registered content is derived first-hand and verification is bound to the registered candidate and kernel (`34`).
 > Revision 5 amendment: the chain of record is `25` §6 (registration selects source, inputs, content and final; a first-hand
 > reproduction quorum establishes bytes; the selected Trust State selects publication and negatives; `gov-admit` or an
 > admitted `gov` evaluates over measured bytes). Rows below that name `release-artifact`, build attestations or first-binary

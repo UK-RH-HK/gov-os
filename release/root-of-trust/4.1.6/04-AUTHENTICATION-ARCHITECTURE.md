@@ -1,6 +1,9 @@
 # Output 4 — Canonical release-authentication architecture (RoT-1)
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: V8 names source identity v2 (`30` §4.1) and the input manifest digest; admission-predicate/1 and E7
+> bind counted attestations to the registered candidate and kernel (`34`); API rules 16–18 (§6) make the first-contact
+> manifest, eligible releases and counted attestations distinct types.
 > Revision 5 amendments: V8 (final source equals candidate source) stays at every verifier and becomes part of AP-5 (the
 > registered final must carry the registered source and candidate). A final authenticates content only; it is a policy root
 > only with its registration (E7, `23` §12). API rules added: (13) a `RegisteredRelease` is constructible only from a
@@ -66,7 +69,7 @@ before V12 and authorisation (§4) succeed.**
 | V5 | Purpose-bound signatures on the release statement (and candidate) (SV-4…SV-7). | `SIGNER_UNKNOWN` / `PURPOSE_NOT_GRANTED` / `SIGNER_REVOKED` / `SIGNATURE_INVALID` / `THRESHOLD_NOT_MET` |
 | V6 | Compiled-schema validation (SV-8). | `STATEMENT_MALFORMED` |
 | V7 | Type, stage and profile consistency (SV-9, SV-10). | `STATEMENT_TYPE_MISMATCH` / `TRUST_PROFILE_MISMATCH` |
-| V8 | Identity, lineage, promotion. A final's `promoted_from_candidate` names a candidate that verifies under `release-candidate`; `kernel.tree_digest` **and `release.source {release_commit, source_tree_digest, build_inputs_digest}`** are equal in final and candidate. Every verifier checks this, not only `gov release promote` (CD3-3). | `RELEASE_IDENTITY_MISMATCH` / `RELEASE_IDENTITY_MISMATCH(source)` / `RELEASE_REPLAY_DETECTED` / `STATEMENT_LINEAGE_MISMATCH` |
+| V8 | Identity, lineage, promotion. A final's `promoted_from_candidate` names a candidate that verifies under `release-candidate`; `kernel.tree_digest` **and `release.source {release_commit, git_tree, content_digest}` with `inputs_manifest_digest`** (revision 6, source identity v2, `30` §4.1) are equal in final and candidate. Every verifier checks this, not only `gov release promote` (CD3-3). | `RELEASE_IDENTITY_MISMATCH` / `RELEASE_IDENTITY_MISMATCH(source)` / `RELEASE_REPLAY_DETECTED` / `STATEMENT_LINEAGE_MISMATCH` |
 | V9 | Content: every blob digest = `kernel.files`; recompute tree, manifest and component digests. | `RELEASE_DIGEST_MISMATCH` |
 | V10 | Migrations: listed, equal, unique chain. | `MIGRATION_NOT_IN_STATEMENT` / `MIGRATION_DIGEST_MISMATCH` / `MIGRATION_CHAIN_AMBIGUOUS` |
 | V11 | Compatibility using statement data only. | `RELEASE_INCOMPATIBLE` |
@@ -145,8 +148,16 @@ There is no cross-process verdict cache.
     - A missing pinned value reaches its decision point as `SURFACE_VALUE_UNAVAILABLE`, never as a default.
 11. `confine::spawn` is the only way to run a repository- or plugin-supplied command. It cannot be called while an
     `Authorisation` is being constructed.
-12. The `release_ingress` conformance family asserts rules 1–11 by source inspection, and by interception or OS tracing
+12. The `release_ingress` conformance family asserts rules 1–18 by source inspection, and by interception or OS tracing
     across every CLI command (`02` §6).
+13. (Revision 5.) A `RegisteredRelease` is constructible only from a registration referenced by the effective Trust State.
+14. (Revision 5.) An `AdmittedBinary` is constructible only from admission-predicate/1 run by an evaluator other than the candidate.
+15. (Revision 5.) Every selector is a `Selected<T>` from the compiled decision register (`29` R-SEL-2).
+16. (Revision 6.) A `FirstContactManifest` is constructible in `gov-admit` only from canonical bytes whose digest equals a typed
+    code that met the compiled first-contact quorum (`32` FC-4, FC-5).
+17. (Revision 6.) An `EligibleRelease` is constructible only after R-CON-3 (AP-5's restrictors) and R-CON-4 (reductions over every
+    referenced registration) hold (`34`).
+18. (Revision 6.) A `CountedAttestation` is constructible only for the registered candidate and kernel tree digest (`34` R-CON-2).
 
 ## 7. Embedded baseline
 

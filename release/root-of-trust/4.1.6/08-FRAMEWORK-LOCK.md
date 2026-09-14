@@ -1,6 +1,9 @@
 # Output 8 — Project layout, `framework.lock` and the project trust record
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: the trust top-level entry set gains `governance/trust/.gitattributes` with exact content `* -text`
+> (RV5-M6; `18` §9.1; `26` §2). `.git/info/attributes` has the highest attribute precedence in Git and overrides it; that
+> condition fails closed (`PARTIAL(kernel_content_mismatch)`) and doctor names the source (`evidence/r6/ATTR6-*`).
 > Revision 5 amendments: `governance/trust/registration.dsse.json` joins the trust top-level entry set; lock 3.0.0 records
 > the release content set (the kernel file map) and the registration digest, which `18` §9.1 uses for `COMPLETE`. The
 > `.gitignore` surgery of `26` §8 (RV4-M6) is part of every install transaction that writes the ignore rule.
@@ -24,12 +27,14 @@ the installation. It is written last inside the staged trust tree, and it is the
 governance/
 ├── trust/                              Protected Path Set (18 §8); read and written only by kernel_trust / install_tx
 │   ├── FORMAT                          {"layout":"legacy-path-occupation-v1","minimum_reader":"4.1.6","trust_format":"rot-1"}
+│   ├── .gitattributes                  exactly `* -text` (revision 6, RV5-M6): no line-ending conversion of trust files
+│   ├── registration.dsse.json          the installed release's registration (revision 5)
 │   ├── framework.lock                  lock 3.0.0 (§3)
 │   ├── kernel/**                       installed kernel payload (no KERNEL_MANIFEST.json)
 │   ├── release.dsse.json               exact installed release envelope
 │   ├── lineage/                        candidate statement named by promoted_from_candidate
 │   ├── state/                          Project Trust Record: TSS chain, TPS versions, certification, attestation, revocation,
-│   │                                   build-attestation and artefact statements; always a union (18 §5.2)
+│   │                                   registration, reproduction and registration-revocation statements; always a union (18 §5.2)
 │   ├── root/<version>.dsse.json        root links newer than v1
 │   ├── profiles/<profile_id>.dsse.json retrieval profile statements (10)
 │   └── development.json                ONLY for DEVELOPMENT_UNSIGNED installs

@@ -17,6 +17,11 @@ tree digest; exit 3 when unregistered or different); `registration-reductions` r
 member-set narrowing (exit 6 undeclared); `derive-registration` produces a release's unit map; `check-owner` supports
 binding groups. The self-test has 71 cases (S00–S55 unchanged; S56–S70 new).
 
+**Revision 6** (`../34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md`) adds `verify-registration` (R-CON-1: exit 3
+`REGISTRATION_CONTENT_NOT_ESTABLISHED`), `registration-reductions --verifier` (R-CON-4: exit 6 undeclared, exit 7
+`INCOMPLETE`) and `registration-changes` (R-CON-5: exit 8 security-classified changes listed). The self-test has 78 cases
+(S00–S70 unchanged; S71–S77 new).
+
 ## Running
 
 ```sh
@@ -26,7 +31,7 @@ $E python3 csi_check.py check --json ../../../../release/releases/4.1.5/kernel  
 $E python3 csi_check.py check --json ../../../../release/releases/4.1.2/kernel      # exit 2
 $E python3 csi_check.py reductions --old <inventory v1> --new <inventory v2> [--lowering-history <file>] --json   # exit 6 when undeclared
 $E python3 csi_check.py check-owner --registrations <file> --json <repo root>
-$E python3 csi_check.py selftest --scratch <scratch dir>                              # exit 0 when all 71 cases behave as expected
+$E python3 csi_check.py selftest --scratch <scratch dir>                              # exit 0 when all 78 cases behave as expected
 $E python3 csi_check.py derive-registration <kernel> --release-id 4.1.6 --sequence 1600 > <registration.json>
 $E python3 csi_check.py check --json --registrations <set.json> --release-id 4.1.6 <kernel>   # exit 3 if unregistered or different
 $E python3 csi_check.py registration-reductions --registrations <set.json> [--lowering-history H]   # exit 6 when undeclared
@@ -50,6 +55,6 @@ Requires Python 3 with PyYAML only. The self-test writes only under `--scratch`.
 **Recorded results:**
 - `../evidence/CSI-check-*.json`: framework exit 0; 4.1.5 exit 3; 4.1.5 with lock operations removed exit 0; 4.1.2, 4.1.3
   and 4.1.4 exit 2;
-- `../evidence/CSI-selftest.json`: 56 of 56 (revision 4); `../evidence/r5/CSI5-selftest.json`: 71 of 71 (revision 5).
+- `../evidence/CSI-selftest.json`: 56 of 56 (revision 4); `../evidence/r5/CSI5-selftest.json`: 71 of 71 (revision 5); `../evidence/r6/CSI6-selftest.json`: 78 of 78, the 71 revision-5 cases identical (revision 6).
 
 The self-test is a conformance oracle for the implementation's evaluator, not an expected count (`../12-ACCEPTANCE-TEST-PLAN.md` §8).

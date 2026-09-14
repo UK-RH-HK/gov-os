@@ -1,0 +1,18 @@
+{
+  "admitters": {
+    "aarch64-apple-darwin": "sha256:3ee0a6370900e478c79dbf685878ea6fefd4b0f814440128ac86149653ef615f",
+    "x86_64-unknown-linux-gnu": "sha256:7f55e3d72b44d22c1df429afeaa90e1e615f85fdc7c3489f70f0a381f46ed9f5"
+  },
+  "issued_at": "2026-09-14T00:00:00Z",
+  "lineage_id": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04",
+  "schema": "governance-os.first-contact-manifest/1",
+  "state_epoch": {
+    "policy_digest": "sha256:2192a7a9c1a3d5b74fa9c6b850c1f4123ec6fca049f97d0ce90db5edf6b55e5e",
+    "policy_version": 1,
+    "root_digest": "sha256:cb39f0b61a586ba5d862ed6332d4b0c1ad7d387d1cda02ce8726c2e4f5b562c0",
+    "root_version": 2,
+    "state_digest": "sha256:f9d2a0ee21bc8f6f0efab65138c42a90336d3802369e9df11802010f8ec43304",
+    "state_sequence": 10
+  },
+  "valid_until": "2026-10-14T00:00:00Z"
+}
