@@ -1,0 +1,246 @@
+{
+  "_type": "https://agentic-engineering-os/statement/trust-root/v2",
+  "framework": "agentic-engineering-os",
+  "issued_at": "2026-09-14T00:00:00Z",
+  "keys": {
+    "ed25519:0c058c9a5229aa9d7939a2a7c5b75ca42314cccb506bd51b5c118f10bce2fa83": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "ts1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT="
+    },
+    "ed25519:16a04d8ab23b69a113e1abd351c5b542a81b6b6adf624d290a515b131dc5f4bd": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "cs1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC="
+    },
+    "ed25519:251688f1a2a19781dbec89aa110798368d8189bd8e3f61548d8bb18089cf4ebe": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "f2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF="
+    },
+    "ed25519:2c91a4c1b24a600fc8fee97fdcb83696028e1473eb9679190a30fcf6774296fa": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "g3",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG="
+    },
+    "ed25519:2dee9eb9678e654f9dfeef453a3fa9ed81efb41eed9e02fc68309000bacfc898": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "f1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF="
+    },
+    "ed25519:2e43dc6cf36046c17f28c3b77f6fec1225d9c956c68b387630b8fa74aa9b9e44": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "r2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:408b4621c796737acb81a7877c3e19b56316f503e7ed85b39204e88941f74a0a": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "p3",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP="
+    },
+    "ed25519:4588007475f7affb89f162d24407bad1d596258c06c24ecaf6772d15f55bb967": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "rp1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:4c142fc51c1e9db8db87c64bdedbba50075d0a1d8456672a4fe08fd216a58812": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "rv3",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:4ceca70a42ca4be50571e9b86e3eb3395bc0e4a4918006272e5bb6be6efebc4e": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "rv2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:5943990a788721ca3f7178dd63c1c1f21e9e7e34028431ebc3a1c6da5b7e624f": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "r1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:5c5f98a63e2091490bf07c4e5091a99fbd5574b657d29a6f2425a6e51aa9b3e9": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "g2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG="
+    },
+    "ed25519:6211e25a67f69a071a4f8db04f808fd4530df0625143f07f2cbc4a8d50425504": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "p1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP="
+    },
+    "ed25519:b8befc0b793b7b325bd5b2d5bcb0ef05b4dff4a9ac2caf4e9440b59ab2282237": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "cs2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC="
+    },
+    "ed25519:bc818e73a5dd80aba9fd7e931b2d9b887a9fa7ba4c5fbec07c9f48f2981daf7a": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "ts2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT="
+    },
+    "ed25519:be80d0fbc229fdb16c73d5ee417313fddef14ee64822b75787f5fc7437583304": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "c1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC="
+    },
+    "ed25519:bfc1bd5d187a59b72c6ed92ab8727b520133c9f2bd8c019ff5681d96aba8d96b": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "r3",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:c47fe8ee31e9b8b659178d08775b462bb8949bec7bc62c1bea4db222ad9e469d": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "ts3",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT="
+    },
+    "ed25519:cd2677a8bf681793f0058671bffb5a9a942693aaa8c0d2b82e9a5d710095317e": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "rv1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR="
+    },
+    "ed25519:d0415ee33f48939b279cadddc295733e0db9b562427b05ba58d21d3572c5c14f": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "v1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV="
+    },
+    "ed25519:d05409385643dae45bd7cc7dc14ee382f7190bca8389e8cbd76b77300aa7094a": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "v2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV="
+    },
+    "ed25519:ebdc98101863ad9fb417bd4122836d46c9d67d07349864ec7e33e0b552061b84": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "p2",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP="
+    },
+    "ed25519:fe05acc492f1a3bdce30b40d8a65539e0b071445b2abcc35cecfc5c0c84fdda7": {
+      "added_in_version": 1,
+      "alg": "ed25519",
+      "label": "g1",
+      "public_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG="
+    }
+  },
+  "lineage": {
+    "trust_root_id": null
+  },
+  "profile_id": "governance-os.rot1/CP-1",
+  "purposes": {
+    "certification-status": {
+      "key_ids": [
+        "ed25519:16a04d8ab23b69a113e1abd351c5b542a81b6b6adf624d290a515b131dc5f4bd",
+        "ed25519:b8befc0b793b7b325bd5b2d5bcb0ef05b4dff4a9ac2caf4e9440b59ab2282237"
+      ],
+      "threshold": 2
+    },
+    "first-contact-authority": {
+      "key_ids": [
+        "ed25519:5943990a788721ca3f7178dd63c1c1f21e9e7e34028431ebc3a1c6da5b7e624f",
+        "ed25519:2e43dc6cf36046c17f28c3b77f6fec1225d9c956c68b387630b8fa74aa9b9e44",
+        "ed25519:bfc1bd5d187a59b72c6ed92ab8727b520133c9f2bd8c019ff5681d96aba8d96b"
+      ],
+      "threshold": 2
+    },
+    "release-candidate": {
+      "key_ids": [
+        "ed25519:be80d0fbc229fdb16c73d5ee417313fddef14ee64822b75787f5fc7437583304"
+      ],
+      "threshold": 1
+    },
+    "release-final": {
+      "key_ids": [
+        "ed25519:2dee9eb9678e654f9dfeef453a3fa9ed81efb41eed9e02fc68309000bacfc898",
+        "ed25519:251688f1a2a19781dbec89aa110798368d8189bd8e3f61548d8bb18089cf4ebe"
+      ],
+      "threshold": 2
+    },
+    "release-registration": {
+      "key_ids": [
+        "ed25519:fe05acc492f1a3bdce30b40d8a65539e0b071445b2abcc35cecfc5c0c84fdda7",
+        "ed25519:5c5f98a63e2091490bf07c4e5091a99fbd5574b657d29a6f2425a6e51aa9b3e9",
+        "ed25519:2c91a4c1b24a600fc8fee97fdcb83696028e1473eb9679190a30fcf6774296fa"
+      ],
+      "threshold": 2
+    },
+    "reproducer": {
+      "key_ids": [
+        "ed25519:6211e25a67f69a071a4f8db04f808fd4530df0625143f07f2cbc4a8d50425504",
+        "ed25519:ebdc98101863ad9fb417bd4122836d46c9d67d07349864ec7e33e0b552061b84",
+        "ed25519:408b4621c796737acb81a7877c3e19b56316f503e7ed85b39204e88941f74a0a"
+      ],
+      "threshold": 1
+    },
+    "retrieval-profile": {
+      "key_ids": [
+        "ed25519:4588007475f7affb89f162d24407bad1d596258c06c24ecaf6772d15f55bb967"
+      ],
+      "threshold": 1
+    },
+    "revocation": {
+      "key_ids": [
+        "ed25519:cd2677a8bf681793f0058671bffb5a9a942693aaa8c0d2b82e9a5d710095317e",
+        "ed25519:4ceca70a42ca4be50571e9b86e3eb3395bc0e4a4918006272e5bb6be6efebc4e",
+        "ed25519:4c142fc51c1e9db8db87c64bdedbba50075d0a1d8456672a4fe08fd216a58812"
+      ],
+      "threshold": 2
+    },
+    "root": {
+      "key_ids": [
+        "ed25519:5943990a788721ca3f7178dd63c1c1f21e9e7e34028431ebc3a1c6da5b7e624f",
+        "ed25519:2e43dc6cf36046c17f28c3b77f6fec1225d9c956c68b387630b8fa74aa9b9e44",
+        "ed25519:bfc1bd5d187a59b72c6ed92ab8727b520133c9f2bd8c019ff5681d96aba8d96b"
+      ],
+      "threshold": 2
+    },
+    "trust-policy": {
+      "key_ids": [
+        "ed25519:5943990a788721ca3f7178dd63c1c1f21e9e7e34028431ebc3a1c6da5b7e624f",
+        "ed25519:2e43dc6cf36046c17f28c3b77f6fec1225d9c956c68b387630b8fa74aa9b9e44",
+        "ed25519:bfc1bd5d187a59b72c6ed92ab8727b520133c9f2bd8c019ff5681d96aba8d96b"
+      ],
+      "threshold": 2
+    },
+    "trust-state": {
+      "key_ids": [
+        "ed25519:0c058c9a5229aa9d7939a2a7c5b75ca42314cccb506bd51b5c118f10bce2fa83",
+        "ed25519:bc818e73a5dd80aba9fd7e931b2d9b887a9fa7ba4c5fbec07c9f48f2981daf7a",
+        "ed25519:c47fe8ee31e9b8b659178d08775b462bb8949bec7bc62c1bea4db222ad9e469d"
+      ],
+      "threshold": 2
+    },
+    "verification-attestation": {
+      "key_ids": [
+        "ed25519:d0415ee33f48939b279cadddc295733e0db9b562427b05ba58d21d3572c5c14f",
+        "ed25519:d05409385643dae45bd7cc7dc14ee382f7190bca8389e8cbd76b77300aa7094a"
+      ],
+      "threshold": 1
+    }
+  },
+  "quorums": {
+    "reproducer": 2
+  },
+  "revoked_keys": [],
+  "trust_profile": "production",
+  "version": 1
+}

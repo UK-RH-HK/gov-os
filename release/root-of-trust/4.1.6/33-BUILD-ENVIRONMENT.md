@@ -1,148 +1,153 @@
-# Output 33 — The build environment as a first-hand-established input (BC5-2)
+# Output 33 — Build environments and toolchains of CP-1: derived manifests, provenance-independent suppliers and lineages (BC6-3)
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
-> New in revision 6. It closes blocking class **BC5-2** (review r5 RV5-H2: the build environment selects the bytes of every
-> production binary). It applies rule FD-1 (`29`) to the one byte-determining input whose content no party established.
-> `30` §4.2, R-REG-3 (c), R-VER-1, R-REP-2 and §12 are amended to match. The residual common-mode environment is owner option
-> **OP-16** (`21`; review r5 options E-a…E-c), with consequences computed by the derivation calculator (`evidence/r6/CS6-*`).
-> Normative keywords: MUST, MUST NOT, SHOULD.
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Rewritten in revision 7 for the certified profile CP-1 (`35`). It closes blocking class **BC6-3** (review r6 RV6-H3: no party
+> establishes the environment manifest; its author selects every production binary's bytes) and carries RV6-L3 and RV6-L4. It
+> applies the owner requirements OP-16 (b), OP-10 (b), OP-9 (b) + (d) and "Build-environment manifest author/signer"
+> (OWNER-DESIGN-REQUIREMENTS-0001). The unselected answers are excluded (EX-15, EX-21); revision 6's authored manifest (recipe,
+> tool, key reference, supplier label) is withdrawn; history at `4106885`.
+> Amended to match: `30` §4.2, R-REG-3 (c″), R-VER-1, R-REP-2, R-REP-9; `25` AP-6. Normative keywords: MUST, MUST NOT, SHOULD.
 
 ## 1. The class
 
-**Mistaken equivalence (revision 5):** *every input is named by digest ⇒ every input is legitimately selected.*
+**Mistaken equivalence (revision 6):** *reproduced from the manifest by independent parties ⇒ the manifest was legitimately
+selected.* Revision 6 required a reproduction quorum over an environment manifest whose component selection, placement, recipe,
+assembly tool, upstream key reference and supplier-class label no rule assigned to any party. Review r6 (B-A02 A07a/b/c, A08,
+A09) showed with the real toolchain that an author of that manifest, in a conforming process, selects the bytes of every
+production binary, and that two labels over one supplier satisfy "diversity".
 
-A reproduction quorum shows that independent parties obtained the same bytes from the same inputs. It cannot detect an input
-that every reproducer is required to use. Revision 5 required every reproducer to fetch the one registered build image by
-digest (R-REP-2). It checked that image only against "the owner's image record" (R-REG-3 (c)), and no rule named who produces
-that record, from what, or under which authority. RV5-B-A08 showed the result with the real Rust toolchain: two reproducers
-with a substituted C runtime object in the image produced bit-identical binaries that ran injected code. The toolchain was
-unchanged. The quorum was met and no conflict arose.
+## 2. Invariant (CP-1)
 
-Under FD-1 the image record was a **selector** (it decided which bytes every production binary has) with **no assigned
-authority**. It could be produced by the release pipeline, rank 5.
+1. Every byte-determining fact of an environment is established at the registration's authority, with a stated establishing
+   party: component selection and placement come from registered source (the environment lock); component bytes verify under
+   keys pinned at the root threshold; assembly is a fixed function with no free content.
+2. The environment manifest has **no author**. It is derived deterministically, and it is authoritative for a release only when
+   independent environment reproductions agree with it **and** the 2-of-3 registration names that exact identity.
+3. The pipeline selects none of these facts and produces no record that selects one.
+4. Supplier-class and toolchain-lineage independence are computed from provenance registered at the root threshold, never
+   from labels, filenames or mirrors.
 
-## 2. Invariant
+## 3. The environment lock (registered source)
 
-1. Every input that determines a binary's bytes has a registered selector whose content is established first-hand. Such
-   inputs are the toolchain archive, the base environment, the linker, C runtime objects and system libraries. The only
-   exception is an input the owner's OP-16 answer names as a residual, with computed minima (§6).
-2. The pipeline selects none of these inputs, and produces no record that selects one.
-3. A reproduction counts toward the faithful-build fact only under a registered environment. Its content is established by
-   parties independent of the pipeline, and under OP-16 (b) by matching reproductions from environments that share no
-   unestablished input.
-
-## 3. The environment manifest
-
-A **build environment** is a registered, digest-addressed input. Each environment of each registered target has an
-**environment manifest** (`governance-os.environment-manifest/1`, published; digest `environment_id`):
+`governance-os.environment-lock/1` (`schemas/environment-lock.schema.json`) is a file of the product's release source tree
+(`build/ENVIRONMENT_LOCK.json`). Its digest is `environment_lock_digest` in the input manifest v3 and in the release
+registration.
 
 | Field | Content |
 |---|---|
-| `components[]` | `{name, version, sha256, upstream_url, upstream_checksum_reference, supplier_class}`: every package, archive or object the environment contains (base system, linker driver, C runtime objects, system libraries) |
-| `assembly` | `{recipe_digest, tool}`: the deterministic assembly recipe that turns the components into the environment tree (sorted, fixed timestamps and owners) |
-| `environment_tree_digest` | SHA-256 of the assembled tree, computed as `30` §4.1 source identity v2 over the tree |
-| `supplier_class` | `A`, `B`, …: the independent upstream from which every component was obtained (OP-16 (b)) |
+| `environments[]` | `{target, supplier_id, components[]}` |
+| `components[]` | `{name, version, sha256, placement_path, mode}` and nothing else: no inline content, no scripts, no URLs, no key references (`additionalProperties: false`) |
 
-The input manifest v2 (`30` §4.2) lists `environments[] {target, environment_id, environment_tree_digest, supplier_class}`.
-`build_image_digest` is withdrawn.
+The lock is changed only by a source change. Source changes are reviewed under OP-8 verification, and the registration
+selects source (`30` §5), so the lock's establishing party is the registration authority restricted by two verification records.
 
-## 4. Rules (R-BENV)
+## 4. The derived environment manifest
+
+`gov-envmanifest/1` is a normative function of the admitted `gov` (and of the registered checker):
+
+- **Inputs.** One lock entry; the supplier registry of the root-signed Trust Policy (`supply_chain.suppliers[]`); each
+  component's upstream signed checksum file, obtained by any carrier.
+- **Checks.** Each component's `sha256` appears in a checksum file that verifies under one of `checksum_keys` of the entry's
+  `supplier_id`.
+- **Output.** `governance-os.environment-manifest/2`: `{target, supplier_id, lock_digest, components[] {name, version, sha256,
+  placement_path, mode, checksum_key_id, checksum_file_digest}, assembly_function: "gov-envassemble/1", environment_tree_digest}`.
+  `environment_id` is the digest of the canonical manifest.
+
+`gov-envassemble/1` places each component's bytes at `placement_path` with `mode`, fixed owner and timestamps, in sorted order.
+The tree digest is the source identity v2 of the tree (`30` §4.1). There is no recipe, no tool choice and no free content.
+
+## 5. Rules (R-BENV, revision 7)
 
 (`R-ENV-1`…`R-ENV-4` in `09` §7 are the environment-variable rules and are unrelated.)
 
 | ID | Rule | Refusal |
 |---|---|---|
-| **R-BENV-1** | **Components pinned upstream.** Every component digest in an environment manifest MUST match a checksum signed by that component's upstream release. The registration ceremony (R-REG-3 (c′)) and every independent verifier (R-VER-1) check this themselves, as they already do for toolchain archives. A component with no upstream signed checksum is not admissible under OP-16 (a) or (b). Under (c) it is built by the owner (R-BENV-6). | `ENVIRONMENT_COMPONENT_UNVERIFIED` (ceremony, verifier) |
-| **R-BENV-2** | **Environment established by a first-hand reproduction quorum.** At least two environment reproducers, holding `reproducer` keys and independent of the pipeline and of each other (TA-10′), assemble the environment from the pinned components with the registered recipe. Each signs one first-person `environment-reproduction.v1+json` statement `{environment_id, environment_tree_digest, reproduced_at}` with exactly one signature and confirms first-hand to the ceremony. The ceremony registers an environment only when at least two such reproductions agree on the tree digest. | `ENVIRONMENT_NOT_REPRODUCED` (ceremony); `ENVIRONMENT_REPRODUCTION_CONFLICT` when a valid reproduction of the same `environment_id` names another tree digest |
-| **R-BENV-3** | **No pipeline record.** No image record produced or supplied by the pipeline is an input to any decision. The producer of the environment identity is the environment reproduction quorum; its authority is the registration (`29` DR-13). Revision 5's "owner's image record" of R-REG-3 (c) is withdrawn. | — |
-| **R-BENV-4** | **Reproducers re-assemble.** A binary reproducer (R-REP-2) obtains each component by digest from any carrier and re-assembles the registered environment. Alternatively it obtains an environment by digest and verifies it by re-assembly. It refuses when any component or the tree digest differs. A `binary-reproduction` statement names its `environment_id`. | `INPUT_DIGEST_MISMATCH` (reproducer) |
-| **R-BENV-5** | **Diversity under OP-16 (b).** The registration names at least two environments per target from distinct `supplier_class` values. Acceptance (AP-6) counts reproductions only under registered environments, and requires the quorum to include matching reproductions from at least two supplier classes. A target that does not reproduce bit for bit across the registered supplier classes cannot be registered under (b). | `ENVIRONMENT_DIVERSITY_NOT_MET` (verifier, ceremony) |
-| **R-BENV-6** | **Owner-built environment under OP-16 (c).** Every component is built by the owner from upstream source. The environment is itself a registered, quorum-reproduced release (`30` §5, §7) whose source identity and inputs follow `30`. Its manifest names those registrations instead of upstream checksums. | as `30` |
+| **R-BENV-1″** | **Supplier registry pinned at root threshold.** The Trust Policy lists each supplier `{supplier_id, provenance {base_image_lineage, package_source, build_system, signing_infrastructure}, checksum_keys[]}`. A component verifies only under a key of its own supplier's entry. A key named anywhere else, in a manifest, a lock or a pipeline record, is never a selector. | `ENVIRONMENT_COMPONENT_UNVERIFIED` |
+| **R-BENV-2″** | **Selection in source.** Component selection, versions, digests, placement and mode come only from the environment lock of the registered source. A lock carrying content, scripts or key references is not a lock. | `ENVIRONMENT_ASSEMBLY_NONCONFORMANT` |
+| **R-BENV-3″** | **Derived, never authored.** Every party that uses a manifest (environment reproducers, custodians, verifiers, reproducers) recomputes it with `gov-envmanifest/1` from the registered lock and the pinned registry. A manifest that differs from the derivation is refused. No pipeline-supplied manifest or image record is an input to any decision. | `ENVIRONMENT_MANIFEST_NOT_DERIVED` |
+| **R-BENV-4″** | **Fixed assembly; reproducers re-assemble.** Environments are assembled only by `gov-envassemble/1`. A binary reproducer obtains each component by digest from any carrier and re-assembles; a component or tree digest that differs refuses. A `binary-reproduction` statement names its `environment_id` and `toolchain_id`. | `ENVIRONMENT_ASSEMBLY_NONCONFORMANT` / `INPUT_DIGEST_MISMATCH` |
+| **R-BENV-5″** | **Supplier-class independence by provenance (OP-16 (b)).** Two suppliers are independent only when all four provenance attributes differ, their checksum key sets are disjoint, and their locks share no component digest. The registration names at least two environments per target from independent suppliers. Acceptance (AP-6) requires matching reproductions under at least two independent supplier classes. A target that does not reproduce bit for bit across them is not certified (CC-2). | `ENVIRONMENT_DIVERSITY_NOT_MET` |
+| **R-BENV-6″** | **Toolchain lineages (OP-10 (b)).** The Trust Policy lists each toolchain `{toolchain_id, provenance {bootstrap_root, package_source, build_system, signing_infrastructure}, archive_sha256 or bootstrap_registration}`. Two lineages are independent only when all four attributes differ. At least one lineage's `bootstrap_root` is not an upstream binary compiler archive, and its compiler is itself a registered, reproduced bootstrap release. Acceptance requires matching reproductions from at least two independent lineages. A target without them is not certified (CC-3); there is no fallback to an upstream archive alone (EX-15). | `TOOLCHAIN_DIVERSITY_NOT_MET` |
+| **R-BENV-7″** | **Authority of an environment identity.** An environment is authoritative for release R only when (1) at least two environment reproductions, each by a distinct `reproducer` key with one signature, first-hand and independent of the pipeline, assemble the derived manifest and agree on its tree digest; and (2) the 2-of-3 registration of R lists that exact `environment_id` with those reproductions. | `ENVIRONMENT_NOT_REPRODUCED` / `ENVIRONMENT_REPRODUCTION_CONFLICT` |
+| **R-BENV-8** | **Verification environment (RV6-L3, CR6-B-06).** Before registration, verifiers derive the environments from the lock of the candidate's source (R-BENV-3″) and build there. Verification attestations name the `environment_ids` and `toolchain_ids` they reproduced in. An attestation that does not name the registered environments is not counted. | not counted (`VERIFICATION_RECORDS_BELOW_MINIMUM`) |
+| **R-BENV-9** | **Derivation-tool provenance (RV6-L4, CR6-B-07).** `gov-envmanifest/1`, `gov-envassemble/1` and the R-CON-1 content derivation run only from an admitted `gov` or from a build of the registered source made by the party itself. A ceremony record naming a pipeline-supplied tool digest is refused. | `DERIVATION_TOOL_UNREGISTERED` (specification; RT-186) |
 
-**Verifier additions to admission-predicate/1** (`25` AP-6): a reproduction counts only when its `environment_id` is
-registered for the target. Under OP-16 (b) R-BENV-5 applies. The TBM carries no environment field: environment identity is a
-registration fact, not a binary claim.
-
-## 5. What each party checks first-hand
+## 6. What each party checks first-hand
 
 | Party | Checks itself | Never takes from |
 |---|---|---|
-| Environment reproducer | component digests against upstream signed checksums; assembly with the registered recipe; the tree digest | the pipeline, a CI-built image, another reproducer |
-| Registration custodian | upstream checksums of every component (R-REG-3 (c′)); at least two agreeing first-hand environment reproductions | an image record, the pipeline |
-| Independent verifier | upstream checksums of toolchain and environment components (R-VER-1) | the ceremony's own check |
-| Binary reproducer | re-assembly or verification by re-assembly (R-BENV-4) | a cached or mirrored image not re-assembled |
-| Verifier (`gov`, `gov-admit`) | reproductions name a registered `environment_id`; diversity under (b) | the TBM |
+| Environment reproducer | derivation of the manifest from the registered lock and pinned registry; component checksums under pinned keys; assembly; the tree digest | the pipeline, a CI image, another reproducer, a manifest it did not derive |
+| Registration custodian | the same derivation; at least two agreeing environment reproductions; supplier and lineage independence from the registry | an image record, the pipeline |
+| Independent verifier | derivation and assembly for the candidate's source before registration (R-BENV-8) | the ceremony's own check |
+| Binary reproducer | re-assembly from components by digest; the registered toolchain lineage | a cached or mirrored environment not re-assembled |
+| Verifier (`gov`, `gov-admit`) | reproductions name registered environments and toolchains; independent classes and lineages by registered provenance | labels, the TBM |
 
-## 6. OP-16 — Common-mode build environment (owner option; review r5 E-a…E-c)
+Computed consequences for CP-1 (victim P1 for both; FA for the environment):
 
-Every answer keeps §4 R-BENV-1…R-BENV-4: components are pinned upstream and the environment is reproduced first-hand. The
-answers differ in the common-mode residual that remains when the components themselves are malicious.
-
-<!-- CS6:BEGIN OP-16-ENV -->
+<!-- CS7:BEGIN CP-ENV -->
 Process compromise of a party implies its key; a set is not shown when the same set with a key in place of a process is also minimal (every minimal set: `minimal_sets_table`).
 
-| OP-16 | OP-9 | Minimal sets: malicious build environment (victim P1, OP-2 (a), OP-8 = 1) |
-|---|---|---|
-| a | n2q2 | {env_up_a}; {2 reproducer processes} |
-| a | n3q2 | {env_up_a}; {3 reproducer processes} |
-| b | n2q2 | {2 reproducer processes}; {1 reproducer process, env_up_b}; {1 reproducer process, env_up_a}; {env_up_a, env_up_b} |
-| b | n3q2 | {1 reproducer process, env_up_a}; {env_up_a, env_up_b}; {3 reproducer processes}; {2 reproducer processes, env_up_b} |
-| c | n2q2 | {owner_env}; {2 reproducer processes} |
-| c | n3q2 | {owner_env}; {3 reproducer processes} |
-<!-- CS6:END OP-16-ENV -->
+| Victim | Minimal sets: malicious build environment (CP-1, two independent supplier classes) |
+|---|---|
+| P1 | {env_common}; {env_up_a, env_up_b}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 3 reproducer processes}; {2 registration custodians, 2 verification keys, 2 reproducer processes}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck} |
+| FA | {env_common}; {env_up_a, env_up_b}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 3 reproducer processes}; {2 registration custodians, 2 verification keys, 2 reproducer processes}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck}; {2 registration custodians, 1 reproducer key, 2 trust-state keys, env_up_a, fcpub}; {2 registration custodians, 1 reproducer key, 2 trust-state keys, env_up_b, fcpub}; {2 registration keys, 2 reproducer keys, 2 trust-state keys, fcpub} |
+<!-- CS7:END CP-ENV -->
 
-Atoms: `env_up_a` is the class-A upstream environment supplier, and `env_up_b` the class-B supplier. `owner_env` is the
-owner's environment build or its upstream sources. `rp1`…`rp3` are reproducer processes (they re-assemble the environment,
-R-BENV-4).
+<!-- CS7:BEGIN CP-TOOLCHAIN -->
+Process compromise of a party implies its key; a set is not shown when the same set with a key in place of a process is also minimal (every minimal set: `minimal_sets_table`).
 
-| Answer | Trust added | Residual (computed above) | Operational cost |
-|---|---|---|---|
-| **(a)** accept the registered upstream components (TA-12′) | the upstream component suppliers of the one class used | a compromised upstream component that passes its checksum check yields identical malicious bytes from every reproducer; otherwise the reproducer quorum | component pinning and upstream checksum checks by ceremony and verifiers; two first-hand environment reproductions per environment change |
-| **(b)** environment diversity | the suppliers of every class used, jointly | compromise of every supplier class used, or one supplier with the reproducers of the other class | static or self-contained linking and per-target engineering so that a target reproduces bit for bit across supplier classes; longer builds; **a target that does not reproduce across classes cannot be registered** (`ENVIRONMENT_DIVERSITY_NOT_MET`); at least one reproducer per class |
-| **(c)** owner-built environment | the owner's environment build and its upstream sources | compromise of the owner's environment build or its upstream sources | highest engineering and maintenance cost: a registered and reproduced environment release per change |
+| Victim | Minimal sets: compromised toolchain (CP-1, two independent lineages) |
+|---|---|
+| P1 | {tc_src}; {toolchain_up, diverse_tc}; {2 registration custodians, 3 reproducer processes} |
+<!-- CS7:END CP-TOOLCHAIN -->
 
-OP-16 is independent of OP-10, which covers the toolchain archive. Their residuals add: `21` states the combinations.
+Atoms: `env_up_a`, `env_up_b` are the two supplier classes compromised (TA-12′). `env_common` is hidden common provenance between
+the registered classes (TA-12″). `toolchain_up` is the upstream binary toolchain lineage compromised, `diverse_tc` the
+independently bootstrapped lineage, and `tc_src` the compiler source common to every lineage (TA-12″).
 
-## 7. Minimal-set claims and invariants (computed)
+## 7. Invariants (computed)
 
-The calculator (`evidence/r6/CS6-derivation-calculator.py`, goal `G_ENV`) models the environment as a selector with
-strategies for every environment substitution: a pipeline-produced record (rule `H_REG_ENV_QUORUM` off), a component not
-re-assembled by reproducers (`H_REP_ENV_REASSEMBLE` off), an unverified upstream component (`H_VER_UPSTREAM`,
-`H_REG_UPSTREAM` off), and diversity not enforced (`V_ENV_DIVERSITY` off). Invariants, checked over every configuration:
-- **INV-ENV.** Every minimal set contains one of: an OP-16 residual atom; at least q reproducer compromises; or the
-  registration threshold with OP-8 verification compromises.
-- **INV-ENV-PIPELINE.** Pipeline, infrastructure and the trust-state key never select the environment, alone or together.
-- **INV-ENV-B.** Under (b), no minimal set holds a single supplier compromise without a second supplier or a reproducer of
-  the other class.
+The calculator (`evidence/r7/CS7-derivation-calculator.py`, goals `G_ENV`, `G_TOOLCHAIN`) models the environment with rules
+`H_ENV_LOCK_IN_SOURCE`, `V_SUPPLIER_PINNED_KEYS`, `V_SUPPLIER_PROVENANCE`, `V_ENV_DIVERSITY`, `H_REG_ENV_QUORUM`,
+`H_REP_ENV_REASSEMBLE` and `V_TOOLCHAIN_DIVERSITY`:
+- **INV7-ENV.** Every minimal set contains both supplier classes, hidden common provenance, a supplier with a reproducer
+  compromise, two reproducer compromises, or source selection (the registration threshold with two verification compromises, or
+  the pipeline with two verification processes).
+- **INV7-ENV-PIPELINE.** The pipeline, infrastructure, trust-state and release keys never select the environment.
+- **INV7-ENV-B.** No minimal set holds one supplier class without the other class, a reproducer compromise or hidden common
+  provenance.
+- **INV7-TC.** No minimal set holds one toolchain lineage without the other lineage, a reproducer compromise or the compiler
+  source.
 
-Result: 0 failures (`22` §1).
-Control (review r5, revision-5 rule profile `R5`): {pipeline} and {cust1, cust2, …} again select the environment, as review r5 found.
+The revision-6 rule shapes (manifest authored, label diversity, manifest-named keys) survive only as the labelled non-production
+control, where the pipeline selects the environment again (CP-R6-CONTROLS, `28` §12).
 
 ## 8. Residuals
 
 | ID | Residual | Bound | Test |
 |---|---|---|---|
-| TB-S2′ (TA-12′) | A malicious upstream environment component that passes its signed checksum (OP-16 (a)); every supplier class used (b); the owner's environment build (c) | §6 minimal sets; OP-16 | CS6 `G_ENV`; ENV6 E4, E6 |
-| TB-S1 (environment) | Environment reproducers at the quorum compromised together | registration refuses a conflict with any honest reproducer (R-BENV-2) | ENV6 E8a, E8b |
-| TB-S3 | Environment reproducers under common custody | procedural; ceremony record (CR5-B-02) | — |
+| TB-S2″ (TA-12′, TA-12″) | Both supplier classes compromised together, or hidden common provenance between them that the registry does not show | CP-ENV block | ENV7 A08 control; RT-186 |
+| TA-12″ (toolchain) | Both toolchain lineages compromised, or the compiler source | CP-TOOLCHAIN block | ENV7 T3; RT-187 |
+| TB-S1 (environment) | Environment reproducers at the quorum compromised together | registration refuses a conflict with any honest reproducer (R-BENV-7″) | ENV7 T1, control rows |
+| TB-4 / TB-4′ (lock) | A lock change accepted by honest verification (insider), or by two verification processes with the pipeline | the source route of `30` §10 (CP-SRC) | ENV7 A07b source-authority control |
+| OT-2 | No evidenced independent bootstrap lineage for the current compiler | no target certified until CC-3 holds (`35` §6) | — |
 
-## 9. Evidence (`evidence/r6/ENV6-build-environment.{py,json}`; executed)
-
-The probe uses the real Rust toolchain (`rustc 1.98.1`) and system C compiler. Components are signed by Ed25519
-upstream-checksum keys and builds use reviewer B's normative flags. Two runs are bit-identical.
+## 9. Evidence (`evidence/r7/ENV7-environment-authority.{py,json}`; executed with the real Rust toolchain `rustc 1.98.1`)
 
 | Case | Construction | Result |
 |---|---|---|
-| E0 | honest components, OP-16 (a) | registered; two reproducers bit-identical; `ACCEPTED` |
-| E1 | revision-5 shape: the pipeline supplies the image digest; independent environment reproduction yields another tree | `ENVIRONMENT_NOT_REPRODUCED` (the injected binary runs when built with the pipeline image; revision 5 would register it) |
-| E2 | one component substituted (`bin/cc` with the injected object), its checksum not signed upstream | `ENVIRONMENT_COMPONENT_UNVERIFIED` at the ceremony |
-| E3 | a carrier substitutes the component after registration | `INPUT_DIGEST_MISMATCH` at the reproducer |
-| E4 | the class-A upstream supplier itself compromised, OP-16 (a) | `ACCEPTED`, injected code runs: the stated residual (a) |
-| E5 | class A compromised, class B clean, OP-16 (b) | `REPRODUCTION_CONFLICT` |
-| E6 | both classes compromised, OP-16 (b) | `ACCEPTED`, injected: the stated residual (b) |
-| E7 | both classes clean, OP-16 (b) | `ACCEPTED`, bit-identical across classes |
-| E8a / E8b | one or both environment reproducers compromised | `ENVIRONMENT_REPRODUCTION_CONFLICT` / registered (TB-S1 residual) |
-| E9 | OP-16 (b) with reproductions from one class only | `ENVIRONMENT_DIVERSITY_NOT_MET` |
+| E0 | honest lock, both supplier classes, both lineages | registered in both classes; 8 builds bit-identical; `ACCEPTED` |
+| A07a | a lock carrying inline component content; a pipeline-supplied manifest carrying an injected object | `ENVIRONMENT_ASSEMBLY_NONCONFORMANT`; `ENVIRONMENT_MANIFEST_NOT_DERIVED` |
+| A07b | a pipeline manifest selecting instrumented artefacts | `ENVIRONMENT_MANIFEST_NOT_DERIVED`; control: the same selection made by a lock change in reviewed source is registered and accepted, which is the TB-4/TB-4′ source route, not the pipeline |
+| A07c | the same injection offered for both classes | `ENVIRONMENT_MANIFEST_NOT_DERIVED` twice |
+| A08 | two labels over one compromised supplier | `ENVIRONMENT_DIVERSITY_NOT_MET`; control (label counting): accepted with injected code |
+| A09 | a checksum key named by the manifest | `ENVIRONMENT_COMPONENT_UNVERIFIED`; control (revision-6 shape): registered |
+| T1 | the upstream binary lineage compromised, the bootstrapped lineage honest | `REPRODUCTION_CONFLICT` |
+| T2 | the second lineage is the upstream lineage relabelled | `TOOLCHAIN_DIVERSITY_NOT_MET`; control (label counting): accepted with injected code |
+| T3 | both lineages compromised | `ACCEPTED`, injected: the stated residual |
+| control | one compromised class with an independent honest class | `REPRODUCTION_CONFLICT` |
 
-The probe was written by a helper session under this architect's specification. It follows reviewer B's
-`RV5-B-A08-build-image-selects-bytes.py` for image construction and flags (`22` §1 states the attribution).
+ENV7 also recomputes `G_ENV` for victims P1, FA and CIR with the CP-1 rules on (the pipeline is never minimal and the invariants
+hold) and with each of `H_ENV_LOCK_IN_SOURCE`, `V_SUPPLIER_PINNED_KEYS` and `V_SUPPLIER_PROVENANCE` off (each is load-bearing).
+The toolchain provenance of T1–T3 is modelled: the lineages are distinct toolchain identities built with `rustc 1.98.1` under
+distinct registered provenance, not a diverse double-compilation of the compiler itself (OT-2).

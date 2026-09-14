@@ -1,0 +1,177 @@
+{
+ "aws_access_key_line_found": true,
+ "default_deny_check": {
+  "K0": {
+   "exit": 0,
+   "unclassified": null
+  },
+  "K5": {
+   "exit": 2,
+   "unclassified": null
+  },
+  "K6": {
+   "exit": 2,
+   "unclassified": null
+  }
+ },
+ "derive_registration_exits": {
+  "K0": 0,
+  "K1": 0,
+  "K2": 0,
+  "K3": 0,
+  "K4": 0
+ },
+ "probe": "RV6-B-A10 surface classes on the revision-6 checker (AR-0016)",
+ "registration_changes_vs_K0": {
+  "K1": {
+   "changes": [
+    "file:commands/COMMAND_CONTRACT.yaml"
+   ],
+   "exit": 0,
+   "security_classified": []
+  },
+  "K2": {
+   "changes": [
+    "file:overlay-templates/TOOL_PERMISSIONS.yaml"
+   ],
+   "exit": 0,
+   "security_classified": []
+  },
+  "K3": {
+   "changes": [
+    "file:taxonomy/CAPABILITY_TAXONOMY.yaml"
+   ],
+   "exit": 0,
+   "security_classified": []
+  },
+  "K4": {
+   "changes": [
+    "leaf:SECURITY_POLICY.agent_read_default_for_secret_class",
+    "leaf:SECURITY_POLICY.on_secret_in_export_payload",
+    "leaf:SECURITY_POLICY.on_secret_outside_secret_class",
+    "leaf:SECURITY_POLICY.policy"
+   ],
+   "exit": 8,
+   "security_classified": [
+    "leaf:SECURITY_POLICY.agent_read_default_for_secret_class",
+    "leaf:SECURITY_POLICY.on_secret_in_export_payload",
+    "leaf:SECURITY_POLICY.on_secret_outside_secret_class",
+    "leaf:SECURITY_POLICY.policy"
+   ]
+  }
+ },
+ "runtime_4_1_5_consumers_lines": {
+  "runtime/src/adapters.rs": [
+   35
+  ],
+  "runtime/src/init.rs": [
+   49,
+   141
+  ],
+  "runtime/src/orchestration/intents.rs": [
+   11
+  ],
+  "runtime/src/tools.rs": [
+   52,
+   147,
+   324
+  ],
+  "runtime/src/verification/mod.rs": [
+   517
+  ]
+ },
+ "security_classified_names_and_prefixes": [
+  "\"SECURITY_POLICY\", \"AUTHORITY_POLICY\", \"HUMAN_GATE_POLICY\", \"TOOL_POLICY\", \"ROLES\", \"HARD_INVARIANTS\", \"TOOLS\", \"TOOLS_REGISTRY\", \"MCP\", \"MCP_REGISTRY\",\n                             \"MEMORY_POLICY\", \"LEARNING_POLICY\", \"ARCHIVE_POLICY\", \"CHANGE_POLICY\", \"CONTEXT_POLICY\", \"POLICY_PRECEDENCE\"",
+  "\"tools/\", \"constitution/\", \"migrations/\", \"skills/\", \"schemas/\", \"adapters/\", \"policies/\", \"contracts/\", \"roles/\""
+ ],
+ "verdicts": {
+  "K1_command_contract_change_not_listed": true,
+  "K2_tool_permissions_template_change_not_listed": true,
+  "K3_taxonomy_change_not_listed": true,
+  "K4_security_change_listed_exit_8": true,
+  "K5_unknown_key_default_deny": true,
+  "K6_new_file_default_deny": true,
+  "verify_registration_accepts_K0": true,
+  "verify_registration_refuses_every_changed_proposal_against_K0_build": true
+ },
+ "verify_registration_proposal_vs_custodian_build_K0": {
+  "K0": {
+   "exit": 0,
+   "problems": []
+  },
+  "K1": {
+   "exit": 3,
+   "problems": [
+    {
+     "derived": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63",
+     "field": "kernel_tree_digest",
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed": "sha256:179e169e0c6cef997f443c4a4319d0b9ef4ddf7289581cd5f4de6a1695680f03"
+    },
+    {
+     "derived_present": true,
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed_present": true,
+     "unit": "file:commands/COMMAND_CONTRACT.yaml"
+    }
+   ]
+  },
+  "K2": {
+   "exit": 3,
+   "problems": [
+    {
+     "derived": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63",
+     "field": "kernel_tree_digest",
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed": "sha256:fe5cce95106b68952b46828e6450bf9076689e4f0b7bf4b942ce53d45a33bac5"
+    },
+    {
+     "derived_present": true,
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed_present": true,
+     "unit": "file:overlay-templates/TOOL_PERMISSIONS.yaml"
+    }
+   ]
+  },
+  "K3": {
+   "exit": 3,
+   "problems": [
+    {
+     "derived": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63",
+     "field": "kernel_tree_digest",
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed": "sha256:0449ea3a5c3db9aa1aa571373edad56d4adf046742f9a4be8207e90d9b6befcc"
+    },
+    {
+     "derived_present": true,
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed_present": true,
+     "unit": "file:taxonomy/CAPABILITY_TAXONOMY.yaml"
+    }
+   ]
+  },
+  "K4": {
+   "exit": 3,
+   "problems": [
+    {
+     "derived": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63",
+     "field": "kernel_tree_digest",
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed": "sha256:13b61ee5bd2c351283d524fcf23e7eb18f0c7df761f9f4967bb500f7c136d225"
+    },
+    {
+     "derived_present": true,
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed_present": false,
+     "unit": "leaf:SECURITY_POLICY.agent_read_default_for_secret_class"
+    },
+    {
+     "derived_present": true,
+     "problem": "REGISTRATION_CONTENT_NOT_ESTABLISHED",
+     "proposed_present": false,
+     "unit": "leaf:SECURITY_POLICY.on_secret_in_export_payload"
+    }
+   ]
+  }
+ }
+}

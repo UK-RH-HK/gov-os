@@ -2,20 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-state-pin.schema.json",
   "title": "trust-state-pin",
-  "description": "PROPOSED (RoT-1 revision 4). One entry of trust-state-pins in the system pin directory (/etc/gov/, /Library/Application Support/gov/, %ProgramData%\\gov\\) or, only when the integrity predicate holds, <account-home>/.config/gov/ (24 §3.2, §3.5): an operator-provisioned anchor (TA-9 restated). valid_until is mandatory; valid_until - provisioned_at must not exceed the Trust Policy bootstrap.pin_max_validity_days, and outside [provisioned_at, valid_until] by the local clock the pin is not an anchor (PIN_OUTSIDE_VALIDITY). The anchor is satisfied only by inclusion of (state_sequence, state_digest) in the effective chain (24 §3.4). Never read from a repository or the environment.",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). A protected operator pin (system pin directory, or the account location only under the integrity predicate): valid_until mandatory; valid_until - provisioned_at at most 7 days for machine_class ci and 90 days for workstation (OP-7 (a), compiled); C3 needs the pin provisioned within 24 hours and naming the effective Trust State. The state code replaces the revision-6 fingerprint.",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "lineage",
-    "root_version",
-    "root_digest",
-    "policy_version",
+    "machine_class",
     "policy_digest",
-    "state_sequence",
-    "state_digest",
-    "provisioned_by",
+    "policy_version",
     "provisioned_at",
+    "provisioned_by",
+    "root_digest",
+    "root_version",
+    "state_code",
+    "state_digest",
+    "state_sequence",
     "valid_until"
   ],
   "properties": {
@@ -47,10 +49,6 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
-    "fingerprint": {
-      "type": "string",
-      "pattern": "^gov-state:[0-9a-f]{8}:[0-9]+:[0-9a-f]{32}$"
-    },
     "provisioned_by": {
       "type": "string",
       "minLength": 1,
@@ -67,6 +65,16 @@
     "note": {
       "type": "string",
       "maxLength": 1024
+    },
+    "state_code": {
+      "type": "string",
+      "pattern": "^gov-fcs:[0-9a-f]{8}:[0-9]+:[0-9a-f]{64}$"
+    },
+    "machine_class": {
+      "enum": [
+        "workstation",
+        "ci"
+      ]
     }
   }
 }

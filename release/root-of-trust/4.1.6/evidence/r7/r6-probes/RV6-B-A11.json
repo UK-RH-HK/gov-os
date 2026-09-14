@@ -1,0 +1,4216 @@
+{
+ "probe": "RV6-B-A11 machine classes under revision-6 rules (AR-0016; adapted from RV5-B-A12, AR-0012)",
+ "rows": {
+  "M1s|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1s|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age -395d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M1s|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M1|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-pin100d|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-pin100d|OP-7 (d)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin100d|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-pin1d|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-pin1d|OP-7 (d)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin1d|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-pin20d|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-pin20d|OP-7 (d)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-pin20d|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "WITNESSED(11, by freshness-witness, 2 signer(s), expires in 100h)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M2-witness|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-witness|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M2-witness|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M3|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 5d; held 5) CURRENCY(human anchored within the C3 currency window) CLOCK_BEHIND_HELD_",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M3|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M4|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age -375d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M4|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2980, age 20d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 9)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M5|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M5|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M5|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 12)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-A|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 11) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 5) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 9) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M6-B|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age -393d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M6-B|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "axis": "ANCHORED(5, human, as-of 2998, age 2d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 11) CURRENCY_UNPROVEN",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 9) CURRENCY_UNPROVEN",
+   "effective_tss": "t9",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M7|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 700d; held 5) CURRENCY_UNPROVEN",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M7|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 11) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 12) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 11) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 12) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 11) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 12) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 11) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "downgrade_detection_E10_with_kept_record": [
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M8-readmitted-store-kept|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "axis": "ANCHORED(11, human, as-of 2970, age 30d; held 12) CURRENCY_UNPROVEN",
+   "downgrade_detection_E10_with_kept_record": [
+    "revoked",
+    "downgrade_without_transaction"
+   ],
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (a)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (b)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (c)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (d)|A2/A5-full": {
+   "C3_with_currency_naming_effective": true,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 11) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (d)|A5-strip": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (d)|A5-t9": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "BELOW_ANCHOR(anchored (11,t11) not held in the effective chain)",
+   "effective_tss": null,
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (d)|CLOCK-back-later-withheld": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M9-record-expired|OP-7 (d)|CLOCK-back-newer-delivered": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+   "effective_tss": "t5",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": true
+  },
+  "M9-record-expired|OP-7 (d)|PIN-writable": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 11)",
+   "effective_tss": "t11",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  },
+  "M9-record-expired|OP-7 (d)|TS-thief": {
+   "C3_with_currency_naming_effective": false,
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "allowed_after_GB": [
+    "C0"
+   ],
+   "axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "label_says_current": false,
+   "revoked_R7_eligible_for_use": false
+  }
+ },
+ "summary": {
+  "M3_M4_M7_clock_back_later_withheld_C3_rows (RS-2b)": [],
+  "M3_M4_M7_clock_back_newer_delivered_C3_rows": [],
+  "M8_store_kept_E10_detects_downgrade": true,
+  "errors": [],
+  "rows": 352,
+  "rows_saying_current": [],
+  "rows_where_C1_C2_run_on_the_thief_descendant": 47,
+  "rows_where_C3_is_allowed_on_a_state_below_t9": [
+   "M1s|OP-7 (a)|A5-strip",
+   "M1s|OP-7 (b)|A5-strip",
+   "M1s|OP-7 (c)|A5-strip",
+   "M1s|OP-7 (d)|A5-strip",
+   "M6-B|OP-7 (a)|A5-strip",
+   "M6-B|OP-7 (b)|A5-strip",
+   "M6-B|OP-7 (c)|A5-strip",
+   "M6-B|OP-7 (d)|A5-strip"
+  ],
+  "rows_where_C3_is_allowed_on_the_thief_descendant": [],
+  "rows_where_revoked_R7_is_eligible_for_use": [
+   "M1s|OP-7 (a)|CLOCK-back-newer-delivered",
+   "M1s|OP-7 (a)|CLOCK-back-later-withheld",
+   "M1s|OP-7 (b)|CLOCK-back-newer-delivered",
+   "M1s|OP-7 (b)|CLOCK-back-later-withheld",
+   "M1s|OP-7 (c)|CLOCK-back-newer-delivered",
+   "M1s|OP-7 (c)|CLOCK-back-later-withheld",
+   "M1s|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M1s|OP-7 (d)|CLOCK-back-later-withheld",
+   "M2-pin1d|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M2-pin1d|OP-7 (d)|CLOCK-back-later-withheld",
+   "M2-pin20d|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M2-pin20d|OP-7 (d)|CLOCK-back-later-withheld",
+   "M2-pin100d|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M2-pin100d|OP-7 (d)|CLOCK-back-later-withheld",
+   "M2-witness|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M2-witness|OP-7 (d)|CLOCK-back-later-withheld",
+   "M3|OP-7 (a)|CLOCK-back-newer-delivered",
+   "M3|OP-7 (a)|CLOCK-back-later-withheld",
+   "M3|OP-7 (b)|CLOCK-back-newer-delivered",
+   "M3|OP-7 (b)|CLOCK-back-later-withheld",
+   "M3|OP-7 (c)|CLOCK-back-newer-delivered",
+   "M3|OP-7 (c)|CLOCK-back-later-withheld",
+   "M3|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M3|OP-7 (d)|CLOCK-back-later-withheld",
+   "M4|OP-7 (a)|CLOCK-back-newer-delivered",
+   "M4|OP-7 (a)|CLOCK-back-later-withheld",
+   "M4|OP-7 (b)|CLOCK-back-newer-delivered",
+   "M4|OP-7 (b)|CLOCK-back-later-withheld",
+   "M4|OP-7 (c)|CLOCK-back-newer-delivered",
+   "M4|OP-7 (c)|CLOCK-back-later-withheld",
+   "M4|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M4|OP-7 (d)|CLOCK-back-later-withheld",
+   "M5|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M5|OP-7 (d)|CLOCK-back-later-withheld",
+   "M6-B|OP-7 (a)|CLOCK-back-newer-delivered",
+   "M6-B|OP-7 (a)|CLOCK-back-later-withheld",
+   "M6-B|OP-7 (b)|CLOCK-back-newer-delivered",
+   "M6-B|OP-7 (b)|CLOCK-back-later-withheld",
+   "M6-B|OP-7 (c)|CLOCK-back-newer-delivered",
+   "M6-B|OP-7 (c)|CLOCK-back-later-withheld",
+   "M6-B|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M6-B|OP-7 (d)|CLOCK-back-later-withheld",
+   "M7|OP-7 (a)|CLOCK-back-newer-delivered",
+   "M7|OP-7 (a)|CLOCK-back-later-withheld",
+   "M7|OP-7 (b)|CLOCK-back-newer-delivered",
+   "M7|OP-7 (b)|CLOCK-back-later-withheld",
+   "M7|OP-7 (c)|CLOCK-back-newer-delivered",
+   "M7|OP-7 (c)|CLOCK-back-later-withheld",
+   "M7|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M7|OP-7 (d)|CLOCK-back-later-withheld",
+   "M9-record-expired|OP-7 (d)|CLOCK-back-newer-delivered",
+   "M9-record-expired|OP-7 (d)|CLOCK-back-later-withheld"
+  ]
+ }
+}

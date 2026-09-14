@@ -1,0 +1,18 @@
+{
+  "_type": "https://agentic-engineering-os/statement/revocation/v2",
+  "authority": "revocation-quorum",
+  "framework": "agentic-engineering-os",
+  "issued_at": "2026-09-14T00:00:00Z",
+  "revocation_sequence": 9,
+  "targets": [
+    {
+      "effect": "refuse_operation",
+      "kind": "binary",
+      "reason": "enforcement defect",
+      "release_id": null,
+      "statement_digest": "sha256:fe622c43aac9d3cdcdb76c8d3625b1f47391d8e2a7a77e9d08eccc4f585faecd"
+    }
+  ],
+  "trust_profile": "production",
+  "trust_root_id": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04"
+}

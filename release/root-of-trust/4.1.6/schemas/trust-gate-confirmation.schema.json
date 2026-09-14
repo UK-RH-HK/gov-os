@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-gate-confirmation.schema.json",
   "title": "trust-gate-confirmation",
-  "description": "PROPOSED (RoT-1 revision 4). Local trust-gate confirmation recorded in the Verifier Trust Store (27 §3). The only authorisation for a trust decision besides a protected decision pin; never a repository record. For C3 kinds confirmed on the terminal, state_fingerprint is the fingerprint the operator typed from an independent channel; it must name the effective TSS and is a clockless currency proof (24 §4.4 P2).",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). Local trust-gate confirmation in the account verifier trust store (27 §3). Mode A (OP-3): every adoption, first use of a project on this machine, production installation, update, rollback and recovery exchange needs one. For C3 kinds the operator types the state code read now from both designated sources; the two values must be identical and name the effective Trust State (24 §4.4 P2).",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,14 +21,18 @@
     "gate_kind": {
       "enum": [
         "init_ack",
+        "project_first_use",
         "framework_update",
         "downgrade",
+        "rollback",
+        "recovery_exchange",
         "weakening",
         "policy_lowering",
         "project_strength",
         "evaluation_candidate",
         "override_kernel_integrity",
         "adopt_lineage",
+        "registration_change",
         "owner_constitutional_file"
       ]
     },
@@ -56,10 +60,6 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
-    "state_fingerprint": {
-      "type": "string",
-      "pattern": "^gov-state:[0-9a-f]{8}:[0-9]+:[0-9a-f]{32}$"
-    },
     "method": {
       "enum": [
         "interactive_terminal",
@@ -84,6 +84,15 @@
           "maxLength": 64
         }
       ]
+    },
+    "state_codes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "pattern": "^gov-fcs:[0-9a-f]{8}:[0-9]+:[0-9a-f]{64}$"
+      }
     }
   },
   "allOf": [
@@ -100,8 +109,11 @@
           "gate_kind": {
             "enum": [
               "init_ack",
+              "project_first_use",
               "framework_update",
               "downgrade",
+              "rollback",
+              "recovery_exchange",
               "evaluation_candidate",
               "adopt_lineage"
             ]
@@ -110,7 +122,7 @@
       },
       "then": {
         "required": [
-          "state_fingerprint"
+          "state_codes"
         ]
       }
     }

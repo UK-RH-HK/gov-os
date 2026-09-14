@@ -1,0 +1,10 @@
+{
+  "_type": "https://agentic-engineering-os/statement/environment-reproduction/v2",
+  "environment_id": "sha256:e2cf177206c84b1d76b715d51109df8a7ce5459c4d70d8cd6b18c0484601a741",
+  "environment_tree_digest": "sha256:1edc9af8c79fc2575a6be1450dcf8255d2aecaa45fa4cc9d8705d952d2c12b53",
+  "lock_digest": "sha256:bc6c1cdff73249dbe62ec77a621f6e3a012103c4530f7eb7e57797ad2db47930",
+  "reproduced_at": "2026-09-14T00:00:00Z",
+  "supplier_id": "sup-A",
+  "target": "x86_64-unknown-linux-musl",
+  "trust_root_id": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04"
+}

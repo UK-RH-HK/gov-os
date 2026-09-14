@@ -1,141 +1,169 @@
-# RoT-1 decision register (rule FD-1, `29` §4; R-SEL-1…R-SEL-4) — revision 6, PROPOSED, not approved, not implemented.
-# Source of `29` §4 (rendered by register_check.py --write) and of the binary's compiled register (R-SEL-1).
-# Every trust decision lists its selectors (authority; currency), restrictors, carriers, the normative rules it consists of,
-# the calculator strategy that substitutes each selector (or the bound when the selector is outside the calculator), and the
-# oracle, executed or checker scenario that fails when each restrictor is removed.
-schema: governance-os.decision-register/1
-revision: 6
+# RoT-1 decision register (rule FD-1, `29` §4; R-SEL-1…R-SEL-4) — revision 7, certified profile CP-1. PROPOSED, not approved,
+# not implemented. Source of `29` §4 (rendered by register_check.py --write) and of the binary's compiled register (R-SEL-1).
+# Revision 7 (review r6 CD6-4): completeness is checked over every INPUT VALUE with its role and establishing party:
+#   decisions         every trust decision: selectors (authority; currency; established by), restrictors, carriers, rules, tests
+#   inputs            every leaf field of every certified schema (C9)
+#   procedure_inputs  every input no schema holds (C10), each with a test whose input does not come from this file
+#   excluded_inputs   every exclusion of profile/CP-1.yaml (C11)
+schema: governance-os.decision-register/2
+revision: 7
+profile_id: governance-os.rot1/CP-1
 authority_ranks:
-  1: the root threshold
-  2: a quorum of at least two distinct single-purpose keys each establishing the fact first-hand; or local machine authority (a human typing a value read now from independent sources, a protected operator pin within its validity, a local confirmation)
+  1: the root threshold (2 of 3)
+  2: a quorum of at least two distinct single-purpose keys each establishing the fact first-hand; or local machine authority (a human typing values read now from both first-contact sources, a protected operator pin within its validity, a local confirmation)
   3: one key of one purpose
   4: the repository writer, project configuration, the governed account
   5: transport, unauthenticated input, the pipeline, the artefact under judgement
 rule_scope:
-  files: [05-KEY-MANAGEMENT.md, 19-ELIGIBILITY-AND-SECURITY-FLOOR.md, 25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md, 30-RELEASE-REGISTRATION-AND-REPRODUCTION.md,
-          31-INDEPENDENT-ADMISSION.md, 32-FIRST-CONTACT-ROOT.md, 33-BUILD-ENVIRONMENT.md, 34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md]
-  prefixes: [AP, FC, R-REG, R-VER, R-REP, R-PUB, R-BENV, R-CON, R-ADM, GB, R-CER, IR-REP, KS]
-  file_prefixes: {19-ELIGIBILITY-AND-SECURITY-FLOOR.md: [E]}
+  files: [05-KEY-MANAGEMENT.md, 19-ELIGIBILITY-AND-SECURITY-FLOOR.md, 24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md, 25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md,
+          30-RELEASE-REGISTRATION-AND-REPRODUCTION.md, 31-INDEPENDENT-ADMISSION.md, 32-FIRST-CONTACT-ROOT.md, 33-BUILD-ENVIRONMENT.md,
+          34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md, 35-CERTIFIED-PROFILE.md]
+  prefixes: [AP-R, AP, FC, R-REG, R-VER, R-REP, R-PUB, R-BENV, R-CON, R-ADM, GB, R-CER, IR-REP, KS, R-FCA, R-FCS, R-FCD, R-STORE, R-ANC, R-CLK, R-CUR]
+  file_prefixes: {19-ELIGIBILITY-AND-SECURITY-FLOOR.md: [E], 35-CERTIFIED-PROFILE.md: [EX, CC]}
   ranges:
     - {text: "KS-3…KS-8", expands_to: [KS-3, KS-4, KS-5, KS-6, KS-7, KS-8]}
-  named_elsewhere_prefixes: []
+instruments:
+  CS7: evidence/r7/CS7-derivation-calculator.json
+  FA7: evidence/r7/FA7-first-contact-authority.json
+  CUR7: evidence/r7/CUR7-first-contact-currency.json
+  ADM7: evidence/r7/ADM7-admission-stores.json
+  ENV7: evidence/r7/ENV7-environment-authority.json
+  PROF7: evidence/r7/PROF7-profile-conformance.json
+  BA11r7: evidence/r7/BA11r7-machine-classes.json
+  BA12r7: evidence/r7/BA12r7-key-subsets-below-threshold.json
+  CRASH7: evidence/r7/LAY7/crashmig7.json
+  P4r6: evidence/r6/P4r6-conformance-oracle.json
+  DA03r6: evidence/r6/DA03r6-oracle-regression-sensitivity.json
+  CON6: evidence/r6/CON6-first-hand-constitutional-content.json
+  UW6: evidence/r6/UW6-user-writable-install.json
+  SRC6: evidence/r6/SRC6-source-identity-v2.json
+  CSI: evidence/r6/CSI6-selftest.json
+  ATTR6: evidence/r6/ATTR6-gitattributes-condition.json
+  LAY6: evidence/r6/LAY6/LAY6-comparison.json
 
 decisions:
   - id: DR-01
     decision: TCB acceptance of binary B, running mode
     confers: T0
     selectors:
-      - input: source identity, input manifest, environments, content, final, targets
-        authority: the release registration, rank 1 (OP-2 (a)) or rank 2 (OP-2 (b))
+      - input: source identity, input manifest, environments, toolchains, content, final, targets, binary digests
+        authority: the 2-of-3 delegated release registration (rank 2)
         currency: referenced by the selected Trust State
+        established_by: each signing registration custodian, first-hand (30 R-REG-3 (a)–(h))
         calculator: {strategy: registration_routes, goals: [G_SRC, G_INPUTS]}
       - input: bytes
-        authority: first-hand reproduction quorum of at least two single-purpose reproducer keys (rank 2)
+        authority: two first-hand reproductions by distinct single-purpose reproducer keys from two independent supplier classes and toolchain lineages, equal to the registered digest (rank 2)
         currency: reproductions of the registered release
+        established_by: the reproducers' own builds and the custodians' own reproduction
         calculator: {strategy: build, goals: [G_BYTES]}
       - input: publication and negatives
-        authority: the selected Trust State (trust-state purpose within the anchored chain)
-        currency: inclusion anchor plus a currency proof naming that Trust State (P1 naming it, P2, P3)
+        authority: the selected Trust State (2 of 3 trust-state keys within the anchored chain)
+        currency: inclusion anchor plus a currency proof of at most 24 hours naming that Trust State
+        established_by: the trust-state key holders at threshold; currency from both sources' state codes typed or pinned by the operator
         calculator: {strategy: thief_selectable, goals: [G_BYTES], rule: V_P1_NAMES_STATE}
     restrictors:
-      - {rule: "AP-4 negatives (binary, release, registration, registered final and candidate)", scenarios: ["P4r6:R6-AP-R1_registered_final_revoked", "P4r6:R6-AP-R2_registered_candidate_revoked", "P4r6:R6-AP-R2b_registration_revoked", "DA03r6:R6-final-revocation", "DA03r6:R6-registration-revocation"]}
-      - {rule: "AP-4 binary floor (min_binary_version)", scenarios: ["P4r6:R6-AP-R4_binary_below_min_binary_version", "DA03r6:R6-min-binary-version"]}
-      - {rule: "AP-5 verification count", calculator_rule: V_VERIFICATION_COUNT, scenarios: ["DA03r6:R6-A4b-attestation-not-registered"]}
-      - {rule: "AP-5 candidate and kernel binding (R-CON-2)", calculator_rule: V_CANDIDATE_BINDING, scenarios: ["P4r6:R6-AP-R3_attestation_for_another_candidate_same_source", "P4r6:R6-AP-kernel_attestation_for_other_kernel", "P4r6:R6-AP-kernel_final_kernel_differs_from_registration", "DA03r6:R6-candidate-binding", "DA03r6:R6-kernel-binding", "DA03r6:R6-final-kernel"]}
+      - {rule: "AP-4 negatives (binary, registration, registered final and candidate)", scenarios: ["FA7:R1_registered_final_revoked", "FA7:R2_registered_candidate_revoked", "P4r6:R6-AP-R1_registered_final_revoked"]}
+      - {rule: "AP-4 binary floor", scenarios: ["FA7:R4_binary_below_min_binary_version"]}
+      - {rule: "AP-5 two verification records from distinct keys, executions and reports", calculator_rule: V_VERIFICATION_COUNT, scenarios: ["FA7:R6_two_signatures_over_one_verification_execution", "FA7:count_attestation_signatures"]}
       - {rule: "AP-5 REJECTED attestation", calculator_rule: V_REJECTED, scenarios: ["P4r6:R6-AP5r_trust_state_revocation_does_not_clear_REJECTED", "DA03r6:R6-A4b-ignores-REJECTED"]}
       - {rule: "AP-5 registration referenced by the selected Trust State", calculator_rule: V_REGISTRATION_REFERENCED, scenarios: ["DA03r6:R6-registration-not-referenced"]}
-      - {rule: "AP-5 registered final restrictor", scenarios: ["DA03r6:R6-final-restrictor", "DA03r6:R6-A8-omits-candidate"]}
-      - {rule: "AP-6 quorum of distinct one-signature reproducer keys", calculator_rule: V_QUORUM, scenarios: ["DA03r6:R6-single-signature", "DA03r6:R6-count-statements", "DA03r6:R6-revoked-reproduction-counted"]}
-      - {rule: "AP-6 conflict (R-REP-5′)", calculator_rule: V_CONFLICT, scenarios: ["DA03r6:R6-conflict"]}
-      - {rule: "AP-6 OP-9 (d) registered digest", calculator_rule: V_OP9D_DIGEST}
+      - {rule: "AP-6 reproducer quorum 2", calculator_rule: V_QUORUM, scenarios: ["FA7:quorum_one", "DA03r6:R6-single-signature"]}
+      - {rule: "AP-6 conflict", calculator_rule: V_CONFLICT, scenarios: ["FA7:conflicting_reproduction_refuses", "DA03r6:R6-conflict"]}
+      - {rule: "AP-6 registered binary digest (OP-9 (d))", calculator_rule: V_OP9D_DIGEST, scenarios: ["FA7:R10_registered_binary_digest_differs"]}
+      - {rule: "AP-6 supplier classes and toolchain lineages by provenance", calculator_rule: V_ENV_DIVERSITY, scenarios: ["FA7:R7_reproductions_from_one_supplier_class", "FA7:R9_second_toolchain_is_a_relabelled_upstream_lineage"]}
       - {rule: "AP-7 publication", calculator_rule: V_PUBLISHED, scenarios: ["DA03r6:R6-A5-publication-not-required"]}
-      - {rule: "AP-8 TBM and accepted-TBM high-water", scenarios: ["DA03r6:R6-A7-disabled", "DA03r6:R6-tbm-source", "DA03r6:R6-first-run-record"]}
-      - {rule: "AP-3 currency proof names the selected Trust State", calculator_rule: V_P1_NAMES_STATE, scenarios: ["DA03r6:R6-descendant-proof", "DA03r6:R6-A9-not-applied"]}
-      - {rule: "targets registered", scenarios: ["DA03r6:R6-target"]}
+      - {rule: "AP-8 TBM and accepted-TBM high-water", scenarios: ["CUR7:rollback_to_admitted_R8_runs_C2", "DA03r6:R6-first-run-record"]}
+      - {rule: "AP-3 currency proof names the selected Trust State", calculator_rule: V_P1_NAMES_STATE, scenarios: ["DA03r6:R6-descendant-proof"]}
+      - {rule: "AP-SEC computed security minimum", scenarios: ["FA7:R11_release_below_computed_security_minimum"]}
     carriers: [Git host, pipeline, mirrors, bundles, download host]
-    rules: [AP-0, AP-2, AP-3, AP-4, AP-5, AP-6, AP-7, AP-8, AP-9, AP-10, R-REG-1, R-REG-2, R-REG-4, R-REP-1, R-REP-3, R-REP-4, R-REP-6, R-REP-7, R-REP-8, R-PUB-3]
-    tests: [RT-134, RT-129, RT-153, RT-165, RT-169]
+    rules: [AP-0, AP-2, AP-3, AP-4, AP-5, AP-6, AP-7, AP-8, AP-9, AP-10, R-REG-1, R-REG-2, R-REG-4, R-REP-1, R-REP-3, R-REP-4′, R-REP-6, R-REP-7, R-REP-8, R-PUB-3]
+    tests: [RT-134, RT-129, RT-153, RT-165, RT-188]
     specified_in: ["25 §5", "30 §5–§8"]
 
   - id: DR-02
-    decision: TCB acceptance at first admission (bootstrap mode)
-    confers: T0 on a machine with no prior trust
+    decision: TCB acceptance at first admission and re-admission (bootstrap mode)
+    confers: T0 on a machine with no prior trust, or a re-admitted machine
     selectors:
-      - input: state, lineage, source quorum and evaluator (through DR-03…DR-06)
-        authority: the first-contact root of the owner's OP-13 answer (rank 2 local authority)
-        currency: codes read now from the OP-13 sources
-        calculator: {strategy: fc_state_root, goals: [G_BYTES, G_CONTENT]}
+      - input: lineage, evaluator and state through DR-03…DR-06 and DR-36…DR-39
+        authority: the First-Contact Authority record at root threshold and the Trust State both sources publish (rank 1 and rank 2)
+        currency: codes read now from both sources; state at most 24 hours old
+        established_by: the root custodians (FCA), the trust-state key holders at threshold and each source custodian's first-hand verification
+        calculator: {strategy: binary_accepted, goals: [G_BYTES, G_CONTENT]}
     restrictors:
-      - {rule: "AP-4…AP-8 as DR-01, in gov-admit (shared vectors R1–R5)", scenarios: ["FA6:R1_registered_final_revoked", "FA6:R3_attestation_for_another_candidate_same_source", "FA6:R5_attestation_for_registered_candidate_other_kernel", "FA6:skip_final_candidate_revocation", "FA6:skip_candidate_binding", "FA6:skip_min_binary_version"]}
-      - {rule: "candidate never executed; self-evaluation refused", scenarios: ["FA6:S1_FA5_scenarios_vectors_mutants_unchanged_on_r6"]}
-    carriers: [download host, bundles, Git host]
-    rules: [AP-1, R-ADM-4, R-ADM-5, R-ADM-10, R-ADM-11, R-ADM-12, R-ADM-14]
-    tests: [RT-135, RT-136, RT-169]
+      - {rule: "AP-4…AP-8 in gov-admit (shared vectors R1–R16)", scenarios: ["FA7:S4_every_vector_refused_control_accepted", "FA7:R3_attestation_for_another_candidate_same_source"]}
+      - {rule: "candidate never executed; self-evaluation refused", scenarios: ["FA7:honest_workstation"]}
+    carriers: [download host, bundles, Git host, media]
+    rules: [AP-1, R-ADM-1″, R-ADM-4, R-ADM-5, R-ADM-10, R-ADM-11, R-ADM-12, R-ADM-14]
+    tests: [RT-135, RT-136, RT-184]
     specified_in: ["31 §3–§4", "25 §5", "32"]
 
   - id: DR-03
     decision: First-contact lineage selection
     confers: the root chain on a machine with no prior trust
     selectors:
-      - input: lineage_id of the first-contact manifest bound by the agreed code
-        authority: the first-contact root (rank 2 local authority); under OP-13 (c)/(d) also the compiled lineage of the registered admitter (rank 1 or 2)
-        currency: now
+      - input: lineage of the admitter build and of the FCA
+        authority: the root ceremony (rank 1), compiled into every registered admitter build
+        currency: the admitter build
+        established_by: the root custodians; the registration of the admitter release
         calculator: {strategy: fc_lineage_sub, goals: [G_BYTES, G_CONTENT], rule: V_FC_LINEAGE}
     restrictors:
-      - {rule: "FC-6 lineage from the typed value, never bundle order", calculator_rule: V_FC_LINEAGE, scenarios: ["FA6:ORD-1_attacker_root_first_genuine_code", "FA6:lineage_from_bundle_order"]}
-      - {rule: "FC-7 compiled lineage under OP-13 (c)/(d)", calculator_rule: V_FC_LINEAGE, scenarios: ["FA6:FIRST_CONTACT_LINEAGE_NOT_COMPILED", "FA6:skip_compiled_lineage"]}
+      - {rule: "FC-6 lineage never from bundle order", calculator_rule: V_FC_LINEAGE, scenarios: ["FA7:bundle_order_attacker_root_first"]}
+      - {rule: "FC-7′ compiled lineage in every admitter build", calculator_rule: V_FC_LINEAGE, scenarios: ["FA7:both_pages_attacker_lineage_genuine_admitter", "FA7:authority_of_attacker_lineage"]}
     carriers: [bundles, download host]
-    rules: [FC-6, FC-7, R-ADM-3]
-    tests: [RT-156, RT-158, RT-159]
-    specified_in: ["32 §5", "25 AP-2"]
+    rules: [FC-6, FC-7′, R-ADM-3″]
+    tests: [RT-156, RT-158, RT-184]
+    specified_in: ["32 §7", "25 AP-2"]
 
   - id: DR-04
     decision: First-contact state selection
     confers: the selected Trust State (publication, negatives) at first admission
     selectors:
-      - input: state_epoch of the first-contact manifest bound by the agreed code
-        authority: the first-contact root (rank 2 local authority)
-        currency: now (bounded by issued_at and valid_until)
-        calculator: {strategy: fc_state_root, goals: [G_BYTES]}
+      - input: the Trust State named by the state code both sources show
+        authority: 2 of 3 trust-state keys, published by both source custodians after first-hand verification (rank 2)
+        currency: at most 24 hours old (FC-9)
+        established_by: the trust-state key holders at threshold; each source custodian (R-FCS-2)
+        calculator: {strategy: sources_publish_thief_state, goals: [G_BYTES, G_REVOKED]}
     restrictors:
-      - {rule: "FC-5 manifest bound by the code", scenarios: ["FA6:FC-5_manifest_not_the_one_the_code_names", "FA6:skip_fcm_digest_check"]}
-      - {rule: "FC-2 procedure manifest hash", scenarios: ["FA6:FC-2_procedure_manifest_hash_mismatch"]}
+      - {rule: "FC-10 state binding at the trust-state threshold, naming the FCA", calculator_rule: V_TS_THRESHOLD, scenarios: ["FA7:genuine_authority_state_signed_by_one_trust_state_key", "FA7:trust_state_threshold_1"]}
+      - {rule: "R-FCS-2 descendant without dropped revocations", calculator_rule: H_SOURCE_FIRST_HAND, scenarios: ["FA7:two_trust_state_keys_descendant_drops_revocation"]}
     carriers: [bundles, download host]
-    rules: [FC-5, R-PUB-4]
-    tests: [RT-156]
-    specified_in: ["32 §3–§5", "25 AP-3"]
+    rules: [FC-10]
+    tests: [RT-156, RT-184, RT-191]
+    specified_in: ["32 §4, §7", "25 AP-3"]
 
   - id: DR-05
     decision: First-contact source quorum
-    confers: how many independent sources must agree at first admission
+    confers: that both sources agree on every first-contact value
     selectors:
-      - input: the owner's OP-13 answer compiled into the registered admitter
-        authority: the registration of the admitter release (rank 1 or 2)
-        currency: the admitter build
-        calculator: {strategy: srcs, goals: [G_BYTES], rule: V_FC_COMPILED_QUORUM}
+      - input: the compiled quorum of gov-admit (2) and the operator reading both sources
+        authority: the registration of the admitter release (rank 2); the operator reading both sources now (rank 2 local authority)
+        currency: the admitter build; now
+        established_by: the owner requirement OP-13 (b) compiled into the admitter; the operator (TA-5′)
+        calculator: {strategy: pages_agree_on_attacker_value, goals: [G_BYTES], rule: V_FC_COMPILED_QUORUM}
     restrictors:
-      - {rule: "FC-4 compiled quorum; the Trust Policy may only raise it", calculator_rule: V_FC_COMPILED_QUORUM, scenarios: ["FA6:quorum_from_selected_state", "FA6:CHANNEL_QUORUM_NOT_MET"]}
-      - {rule: "FC-1 procedure: every required source read, codes identical", scenarios: ["FA6:FC-1_procedure_pages_disagree"]}
-    carriers: [independent sources as carriers of the code]
-    rules: [FC-1, FC-4]
+      - {rule: "FC-4′ compiled quorum", calculator_rule: V_FC_COMPILED_QUORUM, scenarios: ["FA7:procedure_one_source", "FA7:quorum_one"]}
+      - {rule: "FC-1′ codes and procedure digest identical across both sources", scenarios: ["FA7:procedure_state_codes_disagree", "FA7:procedure_procedure_digest_disagrees"]}
+    carriers: [both sources as carriers of the codes]
+    rules: [FC-4′]
     tests: [RT-156, RT-158]
-    specified_in: ["32 §4–§5"]
+    specified_in: ["32 §6–§7"]
 
   - id: DR-06
     decision: Evaluator selection at first admission
     confers: which code evaluates the first TCB
     selectors:
-      - input: admitters[target] of the manifest bound by the agreed code, compared with the platform hash tool; under OP-13 (c) the platform code signature
-        authority: the first-contact root (rank 2 local authority); the admitter digest is registered and reproduced (rank 1 or 2)
+      - input: admitters[target] of the FCA the trust code names, compared with the platform hash tool
+        authority: the FCA at root threshold (rank 1), issued after the admitter's registration, reproduction and verification
         currency: now
+        established_by: the root custodians checking the admitter evidence first-hand (R-FCA-1); the operator's platform hash tool
         calculator: {strategy: fc_eval_sub, goals: [G_BYTES, G_CONTENT], rule: V_FC_EVALUATOR}
     restrictors:
-      - {rule: "FC-3 admitter digest in the agreed manifest", calculator_rule: V_FC_EVALUATOR, scenarios: ["FA6:FC-3_procedure_admitter_digest_not_in_manifest", "FA6:PLATFORM_SIGNATURE_INVALID"]}
-      - {rule: "FC-8 evaluator binding (listed, not revoked, manifest consistent)", scenarios: ["FA6:ADMITTER_NOT_LISTED", "FA6:ADMITTER_REVOKED", "FA6:FIRST_CONTACT_MANIFEST_INCONSISTENT", "FA6:skip_evaluator_binding", "FA6:skip_fcm_consistency"]}
-    carriers: [package manager, owner site, download host]
-    rules: [FC-2, FC-3, FC-8, R-ADM-1, R-ADM-2]
-    tests: [RT-157, RT-159]
-    specified_in: ["32 §4–§5", "31 R-ADM-2′"]
+      - {rule: "FC-3′ admitter digest in the FCA", calculator_rule: V_FC_EVALUATOR, scenarios: ["FA7:procedure_substituted_admitter_bytes"]}
+      - {rule: "FC-8′ evaluator binding (listed, not revoked, target certified)", scenarios: ["FA7:skip_evaluator_binding", "CUR7:readmission_store_holds_the_admitter_revoked"]}
+    carriers: [owner site, download host, media]
+    rules: [FC-8′, R-ADM-2″]
+    tests: [RT-157, RT-159, RT-184]
+    specified_in: ["32 §6–§7", "31 R-ADM-2″"]
 
   - id: DR-07
     decision: Evaluator of later binaries
@@ -144,12 +172,13 @@ decisions:
       - input: the admitted gov N
         authority: its own admission (DR-02 or DR-01)
         currency: its admission record within validity
-        outside_calculator: "the evaluator is the TCB accepted by DR-01/DR-02; bounded by GB-1′…GB-3"
+        established_by: gov-admit or the admitted gov that accepted it
+        outside_calculator: "the evaluator is the TCB accepted by DR-01/DR-02; bounded by GB-1″…GB-7"
     restrictors:
-      - {rule: "GB-3 own revocation (OP-15)", scenarios: ["FA6:S1_FA5_scenarios_vectors_mutants_unchanged_on_r6"]}
+      - {rule: "GB-3′ own revocation: C0-R only (OP-15 (a))", scenarios: ["ADM7:X15_revoked_self_C0_R_only"]}
     carriers: []
-    rules: [GB-3]
-    tests: [RT-137]
+    rules: [GB-3′]
+    tests: [RT-137, RT-185]
     specified_in: ["31 §3, §5"]
 
   - id: DR-08
@@ -159,116 +188,121 @@ decisions:
       - input: the bytes the evaluator measured, installed from its buffer
         authority: the evaluator of DR-02/DR-07
         currency: at installation
+        established_by: the evaluator's single read of the candidate
         outside_calculator: "same-account replacement is A3 (RS-3); GB-4′ and GB-6 bound C3 and ceremonies"
     restrictors:
-      - {rule: "GB-4′ TCB-location predicate for C3 and ceremonies", scenarios: ["UW6:ceremonies_refused_on_user_writable_install", "UW6:every_stated_row_equals_computed"]}
-      - {rule: "GB-6 effective uid 0 writable", scenarios: ["FA6:CR5-B-12_euid_0_location_predicate"]}
-      - {rule: "R-ADM-6 installation from the buffer", scenarios: ["ADM6:A08_fail_closed"]}
+      - {rule: "GB-4′ TCB-location predicate for C3 and ceremonies", scenarios: ["UW6:ceremonies_refused_on_user_writable_install", "ADM7:C3_user_writable_executable"]}
+      - {rule: "GB-6 effective uid 0 writable", defence_in_depth: true, load_bearing: "GB-4′ (UW6)"}
+      - {rule: "R-ADM-6 installation from the buffer; crash between install and record", scenarios: ["ADM7:A08_fail_closed"]}
     carriers: [file system]
-    rules: [R-ADM-6, GB-4, GB-5, GB-6]
+    rules: [R-ADM-6, GB-4′, GB-5, GB-6]
     tests: [RT-138, RT-139, RT-171]
     specified_in: ["31 §4–§5, §7.1"]
 
   - id: DR-09
     decision: Admission record honoured (genuine-binary rule) and ceremony order
-    confers: C1–C3 and TA-5 ceremonies for a running binary
+    confers: C0–C3 and ceremonies for a running binary
     selectors:
-      - input: an admission record in the protected verifier trust store naming the running digest
-        authority: gov-admit or the admitted gov (DR-02/DR-01)
-        currency: valid_until
-        outside_calculator: "A3 can forge records in its own account location (GB-5, RS-3)"
+      - input: an admission record in the protected admission store naming the running digest, with a listed compiled admitter
+        authority: gov-admit (DR-02)
+        currency: valid_until (90 days workstation, 7 days CI image)
+        established_by: gov-admit, writing only the protected store under its lock
+        outside_calculator: "local store integrity (TA-9); an administrator-level attacker is outside the model (store_admin atom in G_REVOKED)"
     restrictors:
-      - {rule: "GB-1′ records honoured only inside the store", scenarios: ["ADM6:A15_record_outside_store_not_honoured", "FA6:RV5-B-A15_record_shipped_beside_binary", "FA6:record_anywhere"]}
-      - {rule: "GB-2 expiry", scenarios: ["FA6:S1_FA5_scenarios_vectors_mutants_unchanged_on_r6"]}
+      - {rule: "GB-1″ records honoured only inside the protected store with a listed admitter", scenarios: ["ADM7:A15_records_outside_protected_store", "ADM7:EX02_helper_machine_admitter_not_listed", "ADM7:L9_store_name_is_full_lineage"]}
+      - {rule: "GB-2′ expiry and clock", scenarios: ["ADM7:X14_record_expiry", "ADM7:CLK_clock_below_high_water"]}
     carriers: [file system]
-    rules: [R-ADM-7, R-ADM-9, GB-1, GB-2, R-CER-1, R-CER-2, R-CER-3, R-CER-4]
-    tests: [RT-137, RT-171]
+    rules: [R-ADM-7″, R-ADM-9, GB-1″, GB-2′, R-CER-1, R-CER-2′, R-CER-3, R-CER-4]
+    tests: [RT-137, RT-171, RT-185]
     specified_in: ["31 §4–§6"]
 
   - id: DR-10
     decision: First admission versus re-admission
-    confers: whether a pre-existing verifier trust store is moved aside
+    confers: whether the account verifier trust store is moved aside
     selectors:
-      - input: whether the store for the lineage holds an admission record
-        authority: the local verifier trust store written by gov-admit (rank 2 local authority)
-        currency: at admission
-        outside_calculator: "monotonic-state availability; bounded by AD-2 and R-ADM-13"
+      - input: the first-admission marker of the protected admission store for the lineage
+        authority: gov-admit's protected store (rank 2 local authority)
+        currency: at admission, under the lock
+        established_by: gov-admit (R-STORE-2); never a file the governed account can write
+        outside_calculator: "store integrity; RV6-M6 closed by R-STORE-2 (ADM7 A07)"
     restrictors:
-      - {rule: "R-ADM-8′ move-aside only at first admission", scenarios: ["ADM6:A09_readmission_keeps_store", "ADM6:A09b_first_admission_moves_recordless_store", "FA6:move_aside_every_run"]}
-      - {rule: "R-ADM-13 exclusive lock", scenarios: ["ADM6:A11_lock_no_record_moved_aside_one_store"]}
+      - {rule: "R-ADM-8″ move-aside only at first admission, decided by the protected store", scenarios: ["ADM7:A07_first_admission_decided_by_protected_store_only", "ADM7:A07_mutant_detected", "ADM7:A09_readmission"]}
+      - {rule: "R-ADM-13 exclusive lock", scenarios: ["ADM7:A11_concurrent_first_admissions"]}
     carriers: [file system]
-    rules: [R-ADM-8, R-ADM-13]
+    rules: [R-ADM-8″, R-ADM-13, R-STORE-1, R-STORE-2]
     tests: [RT-139, RT-170, RT-181]
-    specified_in: ["31 R-ADM-8′, R-ADM-13"]
+    specified_in: ["31 R-ADM-8″, R-ADM-13, §4.2"]
 
   - id: DR-11
     decision: Source identity of release R
     confers: F-SRC
     selectors:
       - input: source {release_commit, git_tree, content_digest v2}
-        authority: the release registration (rank 1 or 2), each custodian recomputing from its own fetch
+        authority: the 2-of-3 registration (rank 2)
         currency: at registration
+        established_by: each signing custodian recomputing from its own fetch, with two first-hand verification records
         calculator: {strategy: registration_routes, goals: [G_SRC]}
     restrictors:
-      - {rule: "R-REG-3 (d) first-hand verification records for exactly the candidate", calculator_rule: H_REG_RECORDS_FIRST_HAND, scenarios: ["P4r6:R6-CER-records_for_another_candidate", "P4r6:R6-CER-records_not_first_hand", "DA03r6:R6-ceremony-first-hand-records"]}
+      - {rule: "R-REG-3 (d) two first-hand verification records for exactly the candidate", calculator_rule: H_REG_RECORDS_FIRST_HAND, scenarios: ["P4r6:R6-CER-records_not_first_hand", "DA03r6:R6-ceremony-first-hand-records"]}
       - {rule: "source identity v2 refusals", scenarios: ["SRC6:T1_v2_refuses_carrier_path", "SRC6:T1_v2_encoding_alone_distinguishes"]}
       - {rule: "R-VER-3 verification selects nothing alone", calculator_rule: V_VERIFICATION_COUNT}
     carriers: [Git host, pipeline]
-    rules: [R-REG-3, R-REG-9, R-REG-10, R-VER-3, R-VER-4, IR-REP-4, IR-REP-6]
+    rules: [R-REG-3, R-REG-9′, R-REG-10, R-VER-3, R-VER-4, IR-REP-4, IR-REP-6]
     tests: [RT-130, RT-172]
     specified_in: ["30 §4.1, §5, §6"]
 
   - id: DR-12
-    decision: Build inputs (toolchain archives, lockfile)
+    decision: Build inputs (toolchain archives, lockfile, build profile)
     confers: F-INPUTS
     selectors:
-      - input: input manifest v2 (toolchain, lockfile)
-        authority: the release registration after upstream checksum checks (rank 1 or 2)
+      - input: input manifest v3 (toolchains, lockfile, environment lock digest, build profile)
+        authority: the 2-of-3 registration against the pinned toolchain registry (rank 2)
         currency: at registration
+        established_by: each signing custodian checking archives under registry keys or bootstrap registrations first-hand
         calculator: {strategy: registration_routes, goals: [G_INPUTS, G_TOOLCHAIN]}
     restrictors:
-      - {rule: "R-REG-3 (a), (b) upstream checks by custodians", calculator_rule: H_REG_UPSTREAM, scenarios: ["ENV6:E2_code_ENVIRONMENT_COMPONENT_UNVERIFIED"]}
-      - {rule: "R-VER-1 upstream checks by verifiers", calculator_rule: H_VER_UPSTREAM, scenarios: ["ENV6:E2_code_ENVIRONMENT_COMPONENT_UNVERIFIED"]}
-      - {rule: "R-REP-2 inputs by digest", calculator_rule: H_REP_BY_DIGEST, scenarios: ["ENV6:E3_code_INPUT_DIGEST_MISMATCH"]}
-      - {rule: "R-REP-9 OP-10 (b)/(c)", calculator_rule: H_REP_BY_DIGEST}
+      - {rule: "R-REG-3 (a), (c″) checks under pinned keys by custodians", calculator_rule: H_REG_UPSTREAM, scenarios: ["ENV7:A09_checksum_key_named_by_manifest"]}
+      - {rule: "R-VER-1′ checks under pinned keys by verifiers", calculator_rule: H_VER_UPSTREAM, scenarios: ["ENV7:A09_checksum_key_named_by_manifest"]}
+      - {rule: "R-REP-2′ inputs by digest", calculator_rule: H_REP_BY_DIGEST}
     carriers: [mirrors, caches, CI configuration]
-    rules: [R-REP-2, R-REP-9]
+    rules: [R-REP-2′, IR-REP-1, IR-REP-2, IR-REP-3]
     tests: [RT-130, RT-131, RT-133]
     specified_in: ["30 §4.2, R-REG-3"]
 
   - id: DR-13
-    decision: Build environment identity
+    decision: Build environment identity for release R
     confers: F-ENV
     selectors:
-      - input: environment manifests (components, recipe, tree digest, supplier class)
-        authority: the release registration, established by at least two first-hand environment reproductions (rank 2 quorum under the rank 1 or 2 registration)
+      - input: environment_id and environment_tree_digest of each environment of each target
+        authority: at least two agreeing environment reproductions under the 2-of-3 registration over that exact identity (rank 2)
         currency: at registration
+        established_by: environment reproducers deriving and assembling first-hand; the registration custodians
         calculator: {strategy: build, goals: [G_ENV]}
     restrictors:
-      - {rule: "R-BENV-2 environment reproduction quorum (no pipeline record)", calculator_rule: H_REG_ENV_QUORUM, scenarios: ["ENV6:E1_code_ENVIRONMENT_NOT_REPRODUCED", "ENV6:E8a_code_ENV_REPRODUCTION_CONFLICT"]}
-      - {rule: "R-BENV-1 components pinned upstream", calculator_rule: H_REG_UPSTREAM, scenarios: ["ENV6:E2_code_ENVIRONMENT_COMPONENT_UNVERIFIED"]}
-      - {rule: "R-BENV-4 reproducers re-assemble", calculator_rule: H_REP_ENV_REASSEMBLE, scenarios: ["ENV6:E3_code_INPUT_DIGEST_MISMATCH"]}
-      - {rule: "R-BENV-5 diversity under OP-16 (b)", calculator_rule: V_ENV_DIVERSITY, scenarios: ["ENV6:E9_code_ENVIRONMENT_DIVERSITY_NOT_MET", "ENV6:E5_code_REPRODUCTION_CONFLICT"]}
+      - {rule: "R-BENV-7″ authority needs agreeing reproductions and the registration", calculator_rule: H_REG_ENV_QUORUM, scenarios: ["ENV7:A07a_pipeline_manifest_with_injection", "ENV7:A07b_pipeline_manifest_selects_instrumented_artefacts"]}
+      - {rule: "R-BENV-4″ reproducers re-assemble", calculator_rule: H_REP_ENV_REASSEMBLE, scenarios: ["ENV7:A07c_both_classes_same_injection"]}
     carriers: [image registries, mirrors, caches]
-    rules: [R-BENV-1, R-BENV-2, R-BENV-3, R-BENV-4, R-BENV-5, R-BENV-6, IR-REP-5]
-    tests: [RT-160, RT-161, RT-162]
-    specified_in: ["33"]
+    rules: [R-BENV-7″, IR-REP-5]
+    tests: [RT-160, RT-161, RT-186]
+    specified_in: ["33 §5"]
 
   - id: DR-14
     decision: Faithful build of a registered release (bytes)
     confers: F-BYTES
     selectors:
-      - input: reproductions of the registered source, inputs and environment
-        authority: at least max(2, OP-9 quorum) distinct single-purpose reproducer keys, first-hand (rank 2)
+      - input: reproductions of the registered source, inputs, environments and toolchains
+        authority: 2 of 3 reproducer roles first-hand, and the custodians' own reproduction naming binary_digests (rank 2)
         currency: reproductions of the registered release
+        established_by: the reproducers' and custodians' own builds
         calculator: {strategy: build, goals: [G_BYTES]}
     restrictors:
       - {rule: "R-REP-3 first-hand confirmation to the publisher", calculator_rule: H_REP_FIRST_HAND}
-      - {rule: "R-REG-3 (f) custodians' own reproduction under OP-9 (d)", calculator_rule: H_REG_OWN_REPRODUCTION}
-      - {rule: "R-REP-5′ conflict refuses", calculator_rule: V_CONFLICT, scenarios: ["P4r6:R6-AP5r_trust_state_revocation_does_not_clear_conflict"]}
-      - {rule: "05 §7 rule 2 candidate and final signers sign only what they rebuilt", calculator_rule: H_SIGN_REPRODUCE, scenarios: ["P4r5u:VA5-06_RV3-D-A03_final_promoted_from_genuine_candidate", "P4r5u:VA5-05_RV3-D-A03_op4_no_everyday_key"], defence_in_depth: true, load_bearing: "V_QUORUM (DR-01)"}
+      - {rule: "R-REG-3 (f) custodians' own reproduction (OP-9 (d))", calculator_rule: H_REG_OWN_REPRODUCTION}
+      - {rule: "R-REP-5′ conflict refuses", calculator_rule: V_CONFLICT, scenarios: ["FA7:trust_state_revocation_of_the_conflict_does_not_clear_it"]}
+      - {rule: "05 §7 rule 2 signers sign only what they rebuilt; release-final threshold 2", calculator_rule: H_SIGN_REPRODUCE, scenarios: ["FA7:R15b_candidate_and_final_share_a_key", "FA7:R15_release_final_threshold_1"], defence_in_depth: true, load_bearing: "V_FINAL_THRESHOLD_2 (KS-15)"}
+      - {rule: "KS-15 release-final threshold 2", calculator_rule: V_FINAL_THRESHOLD_2, scenarios: ["FA7:R15_release_final_threshold_1"]}
     carriers: [pipeline, download host]
-    rules: [R-REP-5, IR-REP-1, IR-REP-2, IR-REP-3]
+    rules: [R-REP-5′]
     tests: [RT-133, RT-134, RT-153]
     specified_in: ["30 §7"]
 
@@ -277,28 +311,30 @@ decisions:
     confers: the OP-8 verification restrictor of source, content and bytes
     selectors: []
     shortfall:
-      statement: "verification records select nothing; they restrict (TB-4′ when OP-8 verification processes are compromised)"
+      statement: "verification records select nothing; they restrict (TB-4′ when two verification processes are compromised with pipeline input)"
       residual: TB-4′
       test: RT-165
     restrictors:
-      - {rule: "R-VER-1 the verifier attests exactly the candidate and kernel it reproduced", calculator_rule: H_VER_BINDS_CANDIDATE, scenarios: ["P4r6:R6-AP-kernel_attestation_for_other_kernel", "CON6:B_ceremony_refuses_CI_derived_registration"]}
-      - {rule: "R-VER-2 / R-CON-2 counted attestations bound to the registered candidate and kernel", calculator_rule: V_CANDIDATE_BINDING, scenarios: ["P4r6:R6-AP-R3_attestation_for_another_candidate_same_source", "FA6:R5_attestation_for_registered_candidate_other_kernel"]}
+      - {rule: "R-VER-1′ the verifier attests exactly the candidate, kernel and environments it reproduced", calculator_rule: H_VER_BINDS_CANDIDATE, scenarios: ["FA7:R3_attestation_for_another_candidate_same_source", "FA7:skip_verification_environment"]}
+      - {rule: "R-VER-2′ / R-CON-2 counted attestations bound to the registered candidate and kernel; two independent executions", calculator_rule: V_CANDIDATE_BINDING, scenarios: ["FA7:R5_attestation_other_kernel", "FA7:R6_two_signatures_over_one_verification_execution"]}
+      - {rule: "R-BENV-8 verification environment named", scenarios: ["FA7:skip_verification_environment"]}
     carriers: [owner ceremony channel]
-    rules: [R-VER-1, R-VER-2, R-CON-2]
+    rules: [R-VER-1′, R-VER-2′, R-CON-2, R-BENV-8]
     tests: [RT-165]
-    specified_in: ["30 §6", "34 R-CON-2"]
+    specified_in: ["30 §6", "34 R-CON-2", "33 R-BENV-8"]
 
   - id: DR-16
     decision: Registered constitutional content (kernel tree, non-join units, migrations)
     confers: F-CON
     selectors:
       - input: the constitution and migrations blocks of the registration
-        authority: the release registration, each custodian deriving them first-hand from its own kernel build (rank 1 or 2)
+        authority: the 2-of-3 registration (rank 2)
         currency: at registration
+        established_by: each signing custodian deriving them first-hand from its own kernel build with registered tools
         calculator: {strategy: content_accepted, goals: [G_CONTENT]}
     restrictors:
-      - {rule: "R-CON-1 first-hand derivation", calculator_rule: H_REG_CONTENT_FIRST_HAND, scenarios: ["P4r6:R6-CER-D-A01_ceremony_derives_content_first_hand", "CSI6:S72", "CON6:B_ceremony_refuses_CI_derived_registration", "CON6:N3_attacker_contract_registration_refused_by_ceremony", "DA03r6:R6-ceremony-first-hand-content"]}
-      - {rule: "R-REG-7 V8 producer restrictor (final and candidate kernel and source equal)", scenarios: ["P4r6:R6-E7-D-A01_variant_registration_names_attested_candidate"]}
+      - {rule: "R-CON-1 first-hand derivation", calculator_rule: H_REG_CONTENT_FIRST_HAND, scenarios: ["P4r6:R6-CER-D-A01_ceremony_derives_content_first_hand", "CON6:B_ceremony_refuses_CI_derived_registration", "CSI:S72"]}
+      - {rule: "R-REG-7 V8 producer restrictor", scenarios: ["P4r6:R6-E7-D-A01_variant_registration_names_attested_candidate"]}
     carriers: [pipeline, kernel payload, Git delivery]
     rules: [R-CON-1, R-REG-6, R-REG-7]
     tests: [RT-163]
@@ -309,15 +345,16 @@ decisions:
     confers: that release R's registration is known and in force
     selectors:
       - input: the effective or selected Trust State referencing the registration
-        authority: trust-state purpose within the anchored chain (currency per DR-20), or the first-contact root
-        currency: as DR-20
+        authority: 2 of 3 trust-state keys within the anchored chain, or both sources' state code at first contact
+        currency: as DR-20 or DR-04
+        established_by: the trust-state key holders; the publisher applying E7's restrictors first-hand
         calculator: {strategy: published_by_owner, goals: [G_CONTENT, G_BYTES], rule: V_REGISTRATION_REFERENCED}
     restrictors:
       - {rule: "R-PUB-1′ publisher applies E7's restrictors", calculator_rule: H_PUB_REGISTRATION_RESTRICTORS, scenarios: ["P4r6:R6-E7-D-A01_attacker_candidate_and_final_weak_kernel"], defence_in_depth: true, load_bearing: "V_E7_RESTRICTORS (DR-23)"}
       - {rule: "R-REG-5 first-hand delivery to the publisher", calculator_rule: H_REP_FIRST_HAND}
       - {rule: "registration referenced", calculator_rule: V_REGISTRATION_REFERENCED, scenarios: ["DA03r6:R6-E7-referenced"]}
     carriers: [Git host, bundles, transport]
-    rules: [R-REG-5, R-PUB-1, R-PUB-2]
+    rules: [R-REG-5, R-PUB-1′, R-PUB-2]
     tests: [RT-164]
     specified_in: ["30 §8"]
 
@@ -325,93 +362,123 @@ decisions:
     decision: Binary publication and negatives
     confers: F-PUB
     selectors:
-      - input: published_binaries[] and revocations of the selected Trust State
-        authority: trust-state purpose within the anchored chain
+      - input: published_binaries[], revocations and revocation statements of the selected Trust State
+        authority: 2 of 3 trust-state keys; revocations at 2 of 3 revocation keys or the root threshold
         currency: as DR-20
+        established_by: the trust-state and revocation key holders at threshold
         calculator: {strategy: published_by_owner, goals: [G_BYTES], rule: V_PUBLISHED}
     restrictors:
       - {rule: "AP-7 publication", calculator_rule: V_PUBLISHED, scenarios: ["DA03r6:R6-A5-publication-not-required"]}
-      - {rule: "R-PUB-3 one digest per release and target", calculator_rule: V_CONFLICT}
+      - {rule: "R-PUB-3 one digest per release and target", calculator_rule: V_CONFLICT, scenarios: ["FA7:conflicting_reproduction_refuses"]}
+      - {rule: "revocation statement at threshold", scenarios: ["FA7:R1_registered_final_revoked"]}
     carriers: [transport, bundles]
-    rules: [R-PUB-3]
+    rules: []
     tests: [RT-134]
-    specified_in: ["30 §8", "25 AP-7"]
+    specified_in: ["30 §8", "25 AP-4, AP-7"]
 
   - id: DR-19
     decision: Restrictor revocation
     confers: removal of a REPRODUCTION_CONFLICT or ARTIFACT_SOURCE_REJECTED refusal
     selectors:
       - input: a registration-revocation statement naming the restricting statement
-        authority: the registration authority at threshold (rank 1 or 2)
+        authority: the 2-of-3 registration (rank 2)
         currency: held
+        established_by: the registration custodians establishing first-hand that the named statement is forged
         calculator: {strategy: build, goals: [G_BYTES], rule: V_REVOCATION_AUTHORITY}
     restrictors:
-      - {rule: "AP-5r a trust-state or revocation-key revocation removes no restrictor", calculator_rule: V_REVOCATION_AUTHORITY, scenarios: ["P4r6:R6-AP5r_trust_state_revocation_does_not_clear_conflict", "P4r6:R6-AP5r_trust_state_revocation_does_not_clear_REJECTED", "FA6:trust_state_revokes_restrictors", "DA03r6:R6-revocation-authority-conflict", "DA03r6:R6-revocation-authority-REJECTED"]}
+      - {rule: "AP-5r a trust-state or revocation-key revocation removes no restrictor", calculator_rule: V_REVOCATION_AUTHORITY, scenarios: ["FA7:trust_state_revocation_of_the_conflict_does_not_clear_it", "FA7:registration_authority_revocation_clears_it", "P4r6:R6-AP5r_trust_state_revocation_does_not_clear_conflict"]}
     carriers: [Git host, bundles]
     rules: [R-REG-11, AP-5r]
     tests: [RT-168]
     specified_in: ["30 R-REG-11, R-REP-5′", "25 AP-5r"]
 
   - id: DR-20
-    decision: Current trust state for C3 and binary acceptance
+    decision: Currency for C3 and binary acceptance
     confers: currency
     selectors:
-      - input: inclusion anchor plus a currency proof naming the effective Trust State (P1 naming it, P2 in-gate fingerprint, P3 witnesses)
-        authority: rank 2 local authority, or witness keys at the C3 threshold under two custodians
-        currency: now (P2) or within the window (P1, P3)
+      - input: inclusion anchor within validity plus a currency proof of at most 24 hours naming the effective Trust State (P1 two-source state codes; P2 in-gate state codes)
+        authority: rank 2 local authority
+        currency: within 24 hours (P1) or now (P2)
+        established_by: the operator reading both sources' state codes; each source custodian publishing first-hand
         calculator: {strategy: thief_selectable, goals: [G_BYTES, G_CONTENT], rule: V_P1_NAMES_STATE}
     restrictors:
-      - {rule: "24 §4.4 P1 proof covers only the Trust State it names (CR4-B-07 option 1)", calculator_rule: V_P1_NAMES_STATE, scenarios: ["DA03r6:R6-descendant-proof"]}
-      - {rule: "24 §8 clock high-water and future statements (CR5-B-08)", scenarios: ["P4r6:R6-CLOCK-CR5-B-08_restored_store_clock_back_newer_statements_delivered", "DA03r6:R6-clock-future", "DA03r6:R6-clock-high-water"]}
-      - {rule: "21 OP-3 mode B needs a proof naming the publishing Trust State (RV5-L9)", scenarios: ["P4r6:R6-OP3-B-RV5-L9_mode_B_update_without_proof_naming_publishing_TSS", "DA03r6:R6-mode-B-currency"]}
+      - {rule: "R-CUR-1 a P1 proof covers only the Trust State it names, within 24 hours", calculator_rule: V_P1_NAMES_STATE, scenarios: ["DA03r6:R6-descendant-proof", "ADM7:C3_currency_25h"]}
+      - {rule: "C3 needs currency naming the state both sources publish", scenarios: ["BA11r7:no_C3_on_a_state_below_t9", "BA11r7:no_C3_on_thief_descendant"]}
     carriers: [repository, bundles, transport]
-    rules: [E8]
-    tests: [RT-101, RT-147, RT-148, RT-178, RT-179]
-    specified_in: ["24 §3.4, §4.4, §8"]
+    rules: [R-ANC-4, R-CUR-1, R-CUR-2]
+    tests: [RT-101, RT-147, RT-189]
+    specified_in: ["24 §4.3, §4.4"]
 
   - id: DR-21
-    decision: Anchoring events (pins, confirmations, in-gate proofs)
+    decision: Anchoring events (pins, confirmations, in-gate state codes)
     confers: anchors
     selectors:
-      - input: a protected pin, a human confirmation on a protected installation, an in-gate fingerprint
+      - input: a protected pin within validity, a confirmation of both state codes on a protected installation, in-gate state codes
         authority: rank 2 local authority
-        currency: pin validity; confirmation window; now for in-gate
+        currency: pin validity (90 days workstation, 7 days CI); confirmation within 24 hours for currency; now for in-gate
+        established_by: the operator reading both sources; the image operator for CI pins (TA-9)
         calculator: {strategy: thief_selectable, goals: [G_BYTES]}
     restrictors:
-      - {rule: "24 §3.5 pin integrity predicate; GB-4′ anchoring ceremonies need a protected installation", scenarios: ["UW6:every_stated_row_equals_computed"]}
+      - {rule: "R-ANC-2, R-ANC-3 anchor validity", scenarios: ["ADM7:workstation_anchor_91d_C2", "ADM7:ci_anchor_8d_C1", "BA11r7:pins_beyond_7_days_not_anchors"]}
+      - {rule: "24 §3.5 pin integrity; GB-4′ anchoring ceremonies need a protected installation", scenarios: ["UW6:every_stated_row_equals_computed"]}
     carriers: [file system]
-    rules: []
-    tests: [RT-102, RT-103, RT-138]
+    rules: [R-ANC-2, R-ANC-3]
+    tests: [RT-102, RT-103, RT-138, RT-189]
     specified_in: ["24 §3.2, §3.5", "31 GB-4′"]
 
   - id: DR-22
-    decision: Witnessed state (OP-7 (c))
-    confers: currency on witness-reliant machines
+    decision: Excluded modes refused (profile conformance of CP-1)
+    confers: that no excluded mode selects anything in the certified verifier and admitter
     selectors:
-      - input: freshness witnesses naming the effective Trust State
-        authority: at least two witness keys under two custodians, input from the ceremony or the channel
-        currency: witness validity
-        calculator: {strategy: thief_selectable, goals: [G_BYTES]}
+      - input: the compiled profile (schemas, constants, command register, purpose table)
+        authority: the registration of the gov and gov-admit releases (rank 2), whose source compiles profile/CP-1
+        currency: the running build
+        established_by: the registration custodians and reproducers (the profile is registered source)
+        outside_calculator: "the calculator has no branch for any excluded mode; PROF7 checks schema, compiled, refusal, calculator and register mechanisms per exclusion"
     restrictors:
-      - {rule: "KS-11 witness keys single-purpose, C3 threshold 2", scenarios: ["P4r5u:AP-00b_stateless_witnessed_runner_op7c"]}
-    carriers: [Git host, bundles]
-    rules: [KS-11]
-    tests: [RT-104, RT-149, RT-154]
-    specified_in: ["24 §3.3", "05 §3"]
+      - {rule: "EX-01 witness service", scenarios: ["PROF7:EX-01", "FA7:WR_witness_statement_offered"]}
+      - {rule: "EX-02 helper-machine admission", scenarios: ["PROF7:EX-02"]}
+      - {rule: "EX-03 script admission", scenarios: ["PROF7:EX-03"]}
+      - {rule: "EX-04 second authentication path", scenarios: ["PROF7:EX-04", "FA7:c_either_platform_path_only"]}
+      - {rule: "EX-05 platform package roots and submitter", scenarios: ["PROF7:EX-05", "FA7:S_package_submitter_signed_package"]}
+      - {rule: "EX-06 mode B", scenarios: ["PROF7:EX-06", "FA7:R13_trust_policy_mode_B"]}
+      - {rule: "EX-07 clock or grace trust", scenarios: ["PROF7:EX-07"]}
+      - {rule: "EX-08 unanchored governed mutation", scenarios: ["PROF7:EX-08"]}
+      - {rule: "EX-09 registration at root threshold", scenarios: ["PROF7:EX-09", "FA7:R14_registration_on_root_keys"]}
+      - {rule: "EX-10 one everyday key", scenarios: ["PROF7:EX-10"]}
+      - {rule: "EX-11 confirmation at every init", scenarios: ["PROF7:EX-11"]}
+      - {rule: "EX-12 maximum anchor age mode", scenarios: ["PROF7:EX-12"]}
+      - {rule: "EX-13 one verification record", scenarios: ["PROF7:EX-13"]}
+      - {rule: "EX-14 other reproducer sets; no binary digests", scenarios: ["PROF7:EX-14"]}
+      - {rule: "EX-15 upstream toolchain alone", scenarios: ["PROF7:EX-15"]}
+      - {rule: "EX-16 superseded releases eligible", scenarios: ["PROF7:EX-16"]}
+      - {rule: "EX-17 one source", scenarios: ["PROF7:EX-17", "FA7:a_one_owner_source"]}
+      - {rule: "EX-18 media as the only source", scenarios: ["PROF7:EX-18", "FA7:d_media_as_the_only_source"]}
+      - {rule: "EX-19 records without expiry", scenarios: ["PROF7:EX-19"]}
+      - {rule: "EX-20 C0–C2 for a revoked binary", scenarios: ["PROF7:EX-20"]}
+      - {rule: "EX-21 one supplier class", scenarios: ["PROF7:EX-21"]}
+      - {rule: "EX-22 D-0008 options A, B, D, E, F", scenarios: ["PROF7:EX-22"]}
+      - {rule: "EX-23 composed first-contact manifest", scenarios: ["PROF7:EX-23", "FA7:R16_authority_signed_by_trust_state_keys"]}
+      - {rule: "EX-24 fc-procedure command", scenarios: ["PROF7:EX-24", "FA7:command_register_has_no_fc_procedure"]}
+    carriers: []
+    rules: [EX-01, EX-02, EX-03, EX-04, EX-05, EX-06, EX-07, EX-08, EX-09, EX-10, EX-11, EX-12, EX-13, EX-14, EX-15, EX-16, EX-17, EX-18, EX-19, EX-20, EX-21, EX-22, EX-23, EX-24]
+    tests: [RT-190]
+    specified_in: ["35 §4"]
 
   - id: DR-23
     decision: Policy-root eligibility of release R (E1–E10; T1-E)
     confers: the release whose kernel is the policy root
     selectors:
       - input: the registration of R referenced by the effective Trust State
-        authority: the registration authority (rank 1 or 2) with OP-8 verification bound to the registered candidate and kernel
-        currency: as DR-17 and DR-20 (ingress)
+        authority: the 2-of-3 registration with two verification records bound to the registered candidate and kernel
+        currency: as DR-17 and DR-20
+        established_by: the registration custodians first-hand; two independent verifiers
         calculator: {strategy: content_accepted, goals: [G_CONTENT], rule: V_E7_RESTRICTORS}
     restrictors:
-      - {rule: "R-CON-3 E7 applies AP-5's restrictors", calculator_rule: V_E7_RESTRICTORS, scenarios: ["P4r6:R6-E7-D-A01_attacker_candidate_and_final_weak_kernel", "P4r6:R6-E7-D-A01_op4_no_one_everyday_key", "P4r6:R6-E7-B-A06_registration_without_verification_record", "P4r6:R6-E7-REJECTED_held", "P4r6:R6-E7-candidate_not_held", "CON6:B_attacker_kernel_refused_by_E7", "CON6:N4_attacker_contract_refused_by_E7", "DA03r6:R6-E7-restrictors", "DA03r6:R6-E7-verification-count", "DA03r6:R6-E7-candidate-held", "DA03r6:R6-E7-final-promoted", "DA03r6:R6-E7-REJECTED"]}
-      - {rule: "R-CON-4 reductions computed at the verifier (INCOMPLETE when a referenced registration is not held)", scenarios: ["CSI6:S73", "CSI6:S74", "CON6:B_A10_reversion_refused_at_verifier_and_withheld_intermediate_incomplete"]}
-      - {rule: "23 §12.3 exact per-release lookup (units and final equal the registration)", scenarios: ["DA03r6:R6-E7-units", "CSI6:S58"]}
-      - {rule: "floors joined, registered precedence, E3/E4/E9/E10", scenarios: ["CSI6:S26", "CSI6:S31"]}
+      - {rule: "R-CON-3 E7 applies AP-5's restrictors", calculator_rule: V_E7_RESTRICTORS, scenarios: ["P4r6:R6-E7-D-A01_attacker_candidate_and_final_weak_kernel", "CON6:B_attacker_kernel_refused_by_E7", "DA03r6:R6-E7-restrictors"]}
+      - {rule: "R-CON-4 reductions computed at the verifier", scenarios: ["CSI:S73", "CSI:S74"]}
+      - {rule: "23 §12.3 exact per-release lookup", scenarios: ["DA03r6:R6-E7-units", "CSI:S58"]}
+      - {rule: "floors joined, registered precedence, E3/E4/E9/E10", scenarios: ["CSI:S26", "CSI:S31"]}
     carriers: [kernel payload, Git delivery]
     rules: [E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, R-CON-3, R-CON-4]
     tests: [RT-164, RT-166, RT-140]
@@ -424,44 +491,47 @@ decisions:
       - input: the registration of the policy-root release; else that of the running binary's embedded release; else SURFACE_VALUE_UNAVAILABLE
         authority: as DR-23
         currency: as DR-23
+        established_by: as DR-23
         outside_calculator: "derived from DR-23; fail-closed meaning per the consumer register (23 §6.3)"
     restrictors:
-      - {rule: "consumer register fail-closed meaning", scenarios: ["CSI6:S35"]}
+      - {rule: "consumer register fail-closed meaning", scenarios: ["CSI:S35"]}
     carriers: [kernel bytes]
     rules: []
     tests: [RT-140, RT-107]
     specified_in: ["23 §6.3, §12.3", "19 §5.2"]
 
   - id: DR-25
-    decision: Release selection among eligible releases (OP-11 (a))
+    decision: Release selection among eligible releases (OP-11 (b))
     confers: which eligible registered release a project uses on a machine without a per-project record
-    selectors: []
-    shortfall:
-      statement: "the repository writer (rank 4) delivers which eligible registered release is installed on a machine with no per-project record; every candidate is a genuine eligible release with its own registered content"
-      residual: RR-2
-      test: RT-118
+    selectors:
+      - input: the release confirmed at the local trust gate (project_first_use), at or above the computed security minimum
+        authority: rank 2 local authority
+        currency: now
+        established_by: the operator at the local trust gate, shown the newest eligible release known; the repository only requests
+        outside_calculator: "local authority (27); residual RR-2′ (35 §7)"
     restrictors:
-      - {rule: "E10 per-project record refuses a downgrade without a transaction", scenarios: ["P4r5u:E7-D-A06_git_delivered_forged_final_unregistered"]}
-      - {rule: "OP-11 (b)/(c) min_release_sequence and eligible_until", scenarios: ["CSI6:S57"]}
+      - {rule: "AP-SEC / E3′ computed security minimum, never below the held minimum", scenarios: ["FA7:R11_release_below_computed_security_minimum", "CUR7:readmission_release_below_held_security_minimum"]}
+      - {rule: "E10 per-project record refuses a downgrade without a transaction", scenarios: ["CSI:S57"]}
     carriers: [Git delivery]
     rules: []
-    tests: [RT-31, RT-118]
-    specified_in: ["21 OP-11", "20 RR-2", "19 E9, E10"]
+    tests: [RT-31, RT-118, RT-188]
+    specified_in: ["35 §2 OP-11", "27", "19 E3, E9, E10"]
 
   - id: DR-26
     decision: Registration changes on recorded projects
     confers: security-relevant use of a release whose non-orderable units changed
     selectors:
-      - input: the new registration's unit values
-        authority: the registration authority (rank 1 or 2)
+      - input: the new registration's unit values and security_relevant_change
+        authority: the 2-of-3 registration (rank 2)
         currency: as DR-17
+        established_by: the registration custodians from the registration-changes listing (R-REG-3 (h))
         calculator: {strategy: content_accepted, goals: [G_CONTENT]}
     restrictors:
-      - {rule: "R-CON-5 security-classified changes listed in the per-project gate", scenarios: ["CSI6:S75", "CSI6:S76", "CON6:B_A09_variant_and_tool_command_listed_for_gate"]}
-      - {rule: "R-REG-8 lowering history for computed reductions", scenarios: ["CSI6:S63", "CSI6:S64", "CSI6:S70"]}
+      - {rule: "R-CON-5 security-classified changes listed in the per-project gate", scenarios: ["CSI:S75", "CSI:S76", "CON6:B_A09_variant_and_tool_command_listed_for_gate"]}
+      - {rule: "R-REG-8 lowering history for computed reductions", scenarios: ["CSI:S63", "CSI:S64", "CSI:S70"]}
     carriers: [Git delivery]
     rules: [R-CON-5, R-REG-8]
-    tests: [RT-141, RT-166, RT-167]
+    tests: [RT-141, RT-166, RT-167, RT-198]
     specified_in: ["34 R-CON-5", "23 §12.4"]
 
   - id: DR-27
@@ -471,9 +541,10 @@ decisions:
       - input: a local confirmation or protected decision pin naming the binding-group digest
         authority: rank 2 local authority
         currency: confirmation or pin validity
+        established_by: the operator
         outside_calculator: "local authority; RV5-I2 derivation carried as RT-182"
     restrictors:
-      - {rule: "exact set match of the binding group", scenarios: ["CSI6:S66", "CSI6:S67"]}
+      - {rule: "exact set match of the binding group", scenarios: ["CSI:S66", "CSI:S67"]}
     carriers: [repository]
     rules: []
     tests: [RT-120, RT-143, RT-182]
@@ -483,15 +554,17 @@ decisions:
     decision: Installation state COMPLETE
     confers: that the working tree is a RoT-1 installation
     selectors:
-      - input: the closed entry sets recorded by the install transaction (trust top level including .gitattributes, kernel content set, statement directories, occupation)
+      - input: the closed entry sets recorded by the install transaction
         authority: the install transaction of an admitted binary
         currency: at use
-        outside_calculator: "legacy containment property R2-H4 (LAY6 matrix: 0 violations)"
+        established_by: the install transaction (18 §9.1)
+        outside_calculator: "legacy containment property R2-H4 (reviewer C matrix6 re-run: 0 violations; LAY6); crash recovery (crashmig7)"
     restrictors:
-      - {rule: "18 §9.1 closed entry sets and nested markers", scenarios: ["LAY6:R2-H4_violations", "LAY6:LP-1s_restated_rev6", "ATTR6:member_protects_under_RV5-C-M1_configurations"]}
+      - {rule: "18 §9.1 closed entry sets and nested markers", scenarios: ["LAY6:R2-H4_violations", "ATTR6:member_protects_under_RV5-C-M1_configurations"]}
+      - {rule: "26 layout migration journal; RoT-1 init never over an overlay (CR6-C-7)", scenarios: ["CRASH7:never_ABSENT_or_PARTIAL_after_recovery", "CRASH7:rot1_init_never_over_overlay"]}
     carriers: [working tree, Git]
     rules: []
-    tests: [RT-50, RT-144, RT-173, RT-174, RT-176]
+    tests: [RT-50, RT-144, RT-173, RT-174, RT-176, RT-195]
     specified_in: ["18 §9.1", "26"]
 
   - id: DR-29
@@ -501,7 +574,8 @@ decisions:
       - input: the nearest ancestor holding governance/trust/FORMAT
         authority: the working tree (restricted by refusal inside the Protected Path Set and the transaction area)
         currency: at use
-        outside_calculator: "legacy containment (LAY6)"
+        established_by: the install transaction that wrote FORMAT
+        outside_calculator: "legacy containment (LAY6, matrix6)"
     restrictors:
       - {rule: "18 §9.2 refusal inside the PPS and the transaction area", scenarios: ["LAY6:LP-1r"]}
     carriers: [working directory]
@@ -514,11 +588,12 @@ decisions:
     confers: overlay migrations applied by the install transaction
     selectors:
       - input: migrations registered with the release
-        authority: as DR-16 (first-hand derivation)
+        authority: as DR-16
         currency: as DR-23
+        established_by: as DR-16
         calculator: {strategy: content_accepted, goals: [G_CONTENT]}
     restrictors:
-      - {rule: "Overlay Surface whitelist; strength vector; CR4-B-04", scenarios: ["CSI6:S46", "CSI6:S47", "CSI6:S48"]}
+      - {rule: "Overlay Surface whitelist; strength vector; CR4-B-04", scenarios: ["CSI:S46", "CSI:S47", "CSI:S48"]}
     carriers: [release payload]
     rules: []
     tests: [RT-109, RT-146, RT-163]
@@ -531,54 +606,59 @@ decisions:
       - input: root version N+1
         authority: thresholds of root N and N+1 (rank 1)
         currency: held
+        established_by: the root custodians in ceremony
         outside_calculator: "root threshold compromise is A8 (outside TA-4)"
     restrictors:
-      - {rule: "Fact Threshold Check KS-9′, KS-10′, KS-12, KS-13, KS-14", scenarios: ["P4r6:R6-KS14_root_threshold_1", "FA6:KS-14_root_v1_threshold_1", "FA6:skip_min_root_threshold", "DA03r6:R6-ks14", "DA03r6:R6-ftc"]}
+      - {rule: "Fact Threshold Check and CP-1 shapes (KS-1″…KS-18)", scenarios: ["FA7:root_threshold_1", "FA7:R12_root_granting_freshness_witness", "FA7:R15b_candidate_and_final_share_a_key", "BA12r7:no_accept_with_at_most_one_key"]}
     carriers: [bundles, Git host]
-    rules: [KS-1, KS-2, KS-3, KS-4, KS-5, KS-6, KS-7, KS-8, KS-9, KS-10, KS-12, KS-13, KS-14]
-    tests: [RT-132, RT-177]
+    rules: [KS-1″, KS-2, KS-3, KS-4, KS-5, KS-6, KS-7, KS-8, KS-9′, KS-10″, KS-12, KS-13, KS-14, KS-15, KS-16, KS-17, KS-18]
+    tests: [RT-132, RT-177, RT-190]
     specified_in: ["05 §3"]
 
   - id: DR-32
     decision: Trust Policy acceptance
-    confers: floors, classification, bootstrap and registration parameters
+    confers: floors, classification, gating, admission ceilings, supply-chain registry, certified targets
     selectors:
       - input: Trust Policy version
         authority: the root threshold (trust-policy purpose)
         currency: held, monotone
+        established_by: the root custodians reviewing draft-policy output (CP-1 conformance, calculator) first-hand
         outside_calculator: "root threshold (A8); computed reductions with cumulative lowering history"
     restrictors:
-      - {rule: "19 §10.6 computed reductions", scenarios: ["CSI6:S53", "CSI6:S54"]}
+      - {rule: "19 §10.6 computed reductions", scenarios: ["CSI:S53", "CSI:S54"]}
+      - {rule: "CP-1 conformance of the Trust Policy", scenarios: ["FA7:R13_trust_policy_mode_B", "PROF7:EX-11"]}
     carriers: [bundles, Git host]
     rules: []
-    tests: [RT-78, RT-108]
-    specified_in: ["19 §10.6", "17 S3"]
+    tests: [RT-78, RT-108, RT-190]
+    specified_in: ["19 §10.6", "17 S3", "35 §2"]
 
   - id: DR-33
     decision: Clock-based proof usability
-    confers: whether pins, the C3 window and witnesses count
+    confers: whether pins, anchor validity and the 24-hour window count
     selectors: []
     shortfall:
-      statement: "the local clock (TA-7) with the stateful high-water; a restored store with the clock set back and every newer statement withheld cannot be distinguished"
-      residual: RS-2b
+      statement: "the local clock (TA-7) with the recorded high-water; a machine without any store, and a restored store with the clock set back and every newer statement withheld, cannot be distinguished"
+      residual: RS-2, RS-2b
       test: RT-178
     restrictors:
-      - {rule: "clock high-water raised by every ingested non-future statement; future statements disable clock proofs", scenarios: ["P4r6:R6-CLOCK-CR5-B-08_restored_store_clock_back_newer_statements_delivered", "DA03r6:R6-clock-high-water", "DA03r6:R6-clock-future"]}
+      - {rule: "R-CLK-1 a clock below the recorded high-water leaves C0-R", scenarios: ["ADM7:CLK_clock_below_high_water_C0_R_only", "BA11r7:clock_below_high_water_C0_only"]}
+      - {rule: "future statements refused at ingest and disabling clock proofs", scenarios: ["P4r6:R6-CLOCK-CR5-B-08_restored_store_clock_back_newer_statements_delivered", "DA03r6:R6-clock-future"]}
     carriers: [local clock]
-    rules: []
-    tests: [RT-56, RT-148, RT-178]
-    specified_in: ["24 §8, §10"]
+    rules: [R-CLK-1]
+    tests: [RT-56, RT-148, RT-178, RT-189]
+    specified_in: ["24 §4.5, §8, §10"]
 
   - id: DR-34
     decision: Trust-gate authorisation
-    confers: trust transitions (update, downgrade, lowering, weakening, registration change)
+    confers: trust transitions (adoption, installation, update, rollback, downgrade, recovery, lowering, weakening, registration change)
     selectors:
-      - input: a local confirmation or a protected decision pin
+      - input: a local confirmation (with both state codes for C3 kinds) or a protected decision pin for the permitted kinds
         authority: rank 2 local authority
-        currency: pin maximum validity; confirmation now
+        currency: decision pin maximum validity (7 days); confirmation now
+        established_by: the operator at the local terminal; never a repository record
         outside_calculator: "local authority; A3 same account is RS-3/TG-2"
     restrictors:
-      - {rule: "27 §3.2 decision-pin maximum validity; confinement", scenarios: ["DA03r6:R6-decision-pin-max-validity"]}
+      - {rule: "27 §3.2 decision-pin maximum validity; decision pins never approve installation, update, rollback, first use or recovery (OP-3 Mode A)", scenarios: ["DA03r6:R6-decision-pin-max-validity", "PROF7:EX-06"]}
     carriers: [repository gate records (never authorising)]
     rules: []
     tests: [RT-89, RT-91, RT-103, RT-152]
@@ -586,15 +666,504 @@ decisions:
 
   - id: DR-35
     decision: Accepted-TBM high-water
-    confers: refusal of older binaries
+    confers: refusal of older binaries at admission and at use
     selectors:
-      - input: the TBM of a resolving release build at first run or verify-artifact acceptance
-        authority: the admitted binary's verifier trust store
+      - input: the TBM of admitted binaries recorded in the stores
+        authority: gov-admit and the admitted binary
         currency: monotone
-        outside_calculator: "stateless runners lack it (TB-L4)"
+        established_by: gov-admit (floors) and the admitted gov (first run)
+        outside_calculator: "machines without stores lack it (TB-L4)"
     restrictors:
-      - {rule: "CR4-B-08 first-run record only for resolving release builds", scenarios: ["DA03r6:R6-first-run-record", "DA03r6:R6-A7-disabled"]}
+      - {rule: "AP-R6 at re-admission", scenarios: ["CUR7:readmission_older_genuine_R8_tbm_below_high_water"]}
+      - {rule: "GB-7 R-ART-2 at use", scenarios: ["CUR7:A04_R_ART_2_at_use", "CUR7:control_mutant_skip_r_art_2"]}
     carriers: [file system]
+    rules: [AP-R6, GB-7]
+    tests: [RT-93, RT-116, RT-151, RT-170]
+    specified_in: ["25 §5", "31 §4.1, GB-7"]
+
+  - id: DR-36
+    decision: First-Contact Authority record accepted
+    confers: lineage, admitters, certified targets, sources and procedure at first contact
+    selectors:
+      - input: the FCA whose digest the trust code names
+        authority: the root threshold (first-contact-authority purpose, KS-18)
+        currency: fca_sequence never below held
+        established_by: the root custodians after checking the admitter's registration, reproductions and two verification records first-hand (R-FCA-1)
+        calculator: {strategy: composer_selects, goals: [G_BYTES], rule: H_FCA_ROOT_THRESHOLD}
+    restrictors:
+      - {rule: "FC-5′ FCA at root threshold", calculator_rule: H_FCA_ROOT_THRESHOLD, scenarios: ["FA7:authority_signed_by_one_root_key", "FA7:authority_signed_by_two_trust_state_keys", "FA7:fca_unsigned_ok"]}
+      - {rule: "R-FCA-3 supersession never below held", scenarios: ["CUR7:readmission_authority_below_held"]}
+      - {rule: "FC-10 Trust State references the FCA", scenarios: ["FA7:skip_fca_state_binding"]}
+    carriers: [bundles, download host, media]
+    rules: [R-FCA-1, R-FCA-3, R-FCA-4, FC-5′]
+    tests: [RT-184]
+    specified_in: ["32 §3, §7"]
+
+  - id: DR-37
+    decision: First-contact codes published by the sources
+    confers: which trust code and state code a machine reads
+    selectors:
+      - input: the codes each source custodian publishes
+        authority: each source custodian's first-hand verification of threshold statements (rank 2 across two custody domains)
+        currency: the newest descendant state each custodian verified
+        established_by: the two source custodians (R-FCS-1, R-FCS-2); byte-identical material (R-FCS-3)
+        calculator: {strategy: sources_publish_thief_state, goals: [G_BYTES, G_REVOKED], rule: H_SOURCE_FIRST_HAND}
+    restrictors:
+      - {rule: "R-FCS-1 authority verified first-hand", calculator_rule: H_SOURCE_FIRST_HAND, scenarios: ["FA7:authority_of_attacker_lineage", "FA7:control_r6_carrying_sources_and_unverified_authority"]}
+      - {rule: "R-FCS-2 state verified first-hand, monotonic", calculator_rule: H_SOURCE_FIRST_HAND, scenarios: ["FA7:two_trust_state_keys_descendant_drops_revocation"]}
+    carriers: [the trust-state publication process (composes nothing), download host]
+    rules: [R-FCS-1, R-FCS-2, R-FCS-3, R-PUB-4′]
+    tests: [RT-184, RT-180]
+    specified_in: ["32 §5.1", "30 R-PUB-4′"]
+
+  - id: DR-38
+    decision: Source designation and operator procedure
+    confers: which sources an operator reads and which steps it runs
+    selectors:
+      - input: the two source identities and the procedure text
+        authority: the root ceremony record delivered at onboarding outside release carriers (rank 1 record; rank 2 local reading)
+        currency: onboarding; the procedure digest in the FCA
+        established_by: the root custodians (R-FCD-1); the organisation's onboarding (R-FCD-2)
+        calculator: {strategy: pages_agree_on_attacker_value, goals: [G_BYTES], rule: V_DESIGNATION_OUT_OF_BAND}
+    restrictors:
+      - {rule: "R-FCD-2 no unadmitted binary or carrier designates", calculator_rule: V_DESIGNATION_OUT_OF_BAND, scenarios: ["FA7:command_register_has_no_fc_procedure", "FA7:one_attacker_page_one_genuine_page"]}
+      - {rule: "FC-1′…FC-3′ procedure stop codes", scenarios: ["FA7:procedure_one_source", "FA7:procedure_substituted_admitter_bytes", "FA7:procedure_procedure_digest_disagrees"]}
+    carriers: [download host, the unadmitted candidate]
+    rules: [R-FCD-1, R-FCD-2, R-FCD-3, FC-1′, FC-2′, FC-3′]
+    tests: [RT-184]
+    specified_in: ["32 §5.2, §6"]
+
+  - id: DR-39
+    decision: First-contact currency and re-admission floors
+    confers: that the selected state is recent and never below held state
+    selectors:
+      - input: the selected Trust State's issued_at and the stores' floors
+        authority: the compiled 24-hour ceiling (registration of gov-admit) and the protected store (rank 2)
+        currency: now
+        established_by: gov-admit's compiled constants; gov-admit's own earlier admissions
+        calculator: {strategy: revoked_admitted, goals: [G_REVOKED], rule: V_FC_MAX_AGE}
+    restrictors:
+      - {rule: "FC-9 state age at most 24 hours", calculator_rule: V_FC_MAX_AGE, scenarios: ["CUR7:R1_replayed_T7_value_malicious_B7x", "CUR7:media_prepared_at_T7_used_now", "FA7:skip_state_age"]}
+      - {rule: "AP-R1…AP-R5 re-admission applies the stores", calculator_rule: V_READMISSION_STORE, scenarios: ["CUR7:readmission_T7_value_B7x_store_holds_T11", "CUR7:readmission_T11_B9_store_holds_a_revocation_the_selected_state_lacks", "CUR7:control_readmission_ignores_store_mutant"]}
+    carriers: [media, CI images, cached pages]
+    rules: [FC-9, AP-R1, AP-R2, AP-R3, AP-R4, AP-R5]
+    tests: [RT-191]
+    specified_in: ["32 §8", "31 §4.1"]
+
+  - id: DR-40
+    decision: Environment lock and derived environment manifest
+    confers: component selection, placement and assembly of every environment
+    selectors:
+      - input: the environment lock of the registered source
+        authority: the 2-of-3 registration of the source (rank 2), restricted by two verification records
+        currency: at registration
+        established_by: the registration custodians (source); every party deriving the manifest with gov-envmanifest/1
+        calculator: {strategy: build, goals: [G_ENV], rule: H_ENV_LOCK_IN_SOURCE}
+    restrictors:
+      - {rule: "R-BENV-2″ selection in source; no content in the lock", calculator_rule: H_ENV_LOCK_IN_SOURCE, scenarios: ["ENV7:A07a_lock_with_inline_content"]}
+      - {rule: "R-BENV-3″ derived, never authored", calculator_rule: H_ENV_LOCK_IN_SOURCE, scenarios: ["ENV7:A07a_pipeline_manifest_with_injection", "ENV7:A07b_pipeline_manifest_selects_instrumented_artefacts"]}
+      - {rule: "R-BENV-9 registered derivation tools", defence_in_depth: true, load_bearing: "R-BENV-3″ (every party re-derives)"}
+    carriers: [pipeline, mirrors]
+    rules: [R-BENV-2″, R-BENV-3″, R-BENV-4″, R-BENV-9]
+    tests: [RT-186]
+    specified_in: ["33 §3–§5"]
+
+  - id: DR-41
+    decision: Supplier registry and supplier-class independence
+    confers: which component checksums verify and which classes are independent
+    selectors:
+      - input: Trust Policy supply_chain.suppliers (provenance, checksum keys)
+        authority: the root threshold (rank 1)
+        currency: held
+        established_by: the root custodians inspecting supplier provenance first-hand
+        calculator: {strategy: build, goals: [G_ENV], rule: V_SUPPLIER_PROVENANCE}
+    restrictors:
+      - {rule: "R-BENV-1″ pinned keys only", calculator_rule: V_SUPPLIER_PINNED_KEYS, scenarios: ["ENV7:A09_checksum_key_named_by_manifest"]}
+      - {rule: "R-BENV-5″ independence by provenance", calculator_rule: V_SUPPLIER_PROVENANCE, scenarios: ["ENV7:A08_two_labels_over_one_compromised_supplier", "FA7:R8_second_class_is_a_relabelled_first_supplier", "FA7:supplier_class_by_label"]}
+      - {rule: "matching reproductions from two independent classes", calculator_rule: V_ENV_DIVERSITY, scenarios: ["FA7:R7_reproductions_from_one_supplier_class", "ENV7:control_one_compromised_class_with_independent_honest_class"]}
+    carriers: [mirrors, checksum files]
+    rules: [R-BENV-1″, R-BENV-5″]
+    tests: [RT-186]
+    specified_in: ["33 §5"]
+
+  - id: DR-42
+    decision: Toolchain lineages and their independence
+    confers: which compiler lineages build production binaries
+    selectors:
+      - input: Trust Policy supply_chain.toolchains (provenance, archive or bootstrap registration)
+        authority: the root threshold (rank 1); a bootstrap lineage's own registration (rank 2)
+        currency: held
+        established_by: the root custodians inspecting provenance; the bootstrap registration custodians
+        calculator: {strategy: build, goals: [G_TOOLCHAIN], rule: V_TOOLCHAIN_DIVERSITY}
+    restrictors:
+      - {rule: "R-BENV-6″ two lineages independent by provenance", calculator_rule: V_TOOLCHAIN_DIVERSITY, scenarios: ["ENV7:T2_relabelled_toolchain_lineage", "FA7:R9_second_toolchain_is_a_relabelled_upstream_lineage", "FA7:toolchain_class_by_label"]}
+      - {rule: "R-REP-9′ upstream archive alone insufficient", scenarios: ["ENV7:T1_upstream_binary_lineage_compromised", "PROF7:EX-15"]}
+    carriers: [mirrors, toolchain archives]
+    rules: [R-BENV-6″, R-REP-9′]
+    tests: [RT-187]
+    specified_in: ["33 §5", "30 R-REP-9′"]
+
+  - id: DR-43
+    decision: Target certification
+    confers: whether a target has any production admission
+    selectors:
+      - input: certified_targets of the Trust Policy and of the FCA
+        authority: the root threshold (rank 1) citing CC-1…CC-8 evidence
+        currency: held
+        established_by: the root custodians reviewing the criteria evidence first-hand
+        outside_calculator: "the calculator models one certified target; uncertified targets are refused (FA7 admission_uncertified_target)"
+    restrictors:
+      - {rule: "R-FCA-2 and FC-8′ uncertified target refused", scenarios: ["FA7:admission_uncertified_target"]}
+    carriers: []
+    rules: [CC-1, CC-2, CC-3, CC-4, CC-5, CC-6, CC-7, CC-8, CC-9, R-FCA-2]
+    tests: [RT-194]
+    specified_in: ["35 §5", "32 R-FCA-2"]
+
+  - id: DR-44
+    decision: Operation class permitted on a running machine
+    confers: C0-R, C0, C1, C2 or C3
+    selectors:
+      - input: admission record, clock high-water, own revocation, accepted-TBM, anchor and its validity, currency
+        authority: DR-09, DR-21, DR-20, DR-33, DR-35
+        currency: at process start and per unit of work
+        established_by: as those decisions
+        outside_calculator: "decision rule 24 §4.3; executed in ADM7 X7/CLK/X15 and BA11r7"
+    restrictors:
+      - {rule: "R-ANC-1 unanchored C0", scenarios: ["ADM7:unanchored_C1", "BA11r7:unanchored_C0_only"]}
+      - {rule: "R-ANC-5 expiry C0", scenarios: ["BA11r7:expired_anchors_C0_only", "ADM7:workstation_anchor_91d_C2"]}
+      - {rule: "OP-5 age warning informational only", scenarios: ["PROF7:EX-07"]}
+    carriers: []
+    rules: [R-ANC-1, R-ANC-5]
+    tests: [RT-189]
+    specified_in: ["24 §4.3", "31 §5"]
+
+  - id: DR-45
+    decision: Retrieval profile acceptance
+    confers: provenance of a reference retrieval profile
+    selectors:
+      - input: a retrieval-profile statement
+        authority: the single-purpose retrieval-profile key (rank 3), profile integrity only
+        currency: held
+        established_by: the retrieval-profile signing ceremony verifying the profile's files first-hand
+        outside_calculator: "confers no trust decision over kernel, release or state (05 KS-16); 10"
+    restrictors:
+      - {rule: "KS-16 retrieval-profile keys hold no other purpose", defence_in_depth: true, load_bearing: "the CP-1 whitelist (DR-31)"}
+    carriers: [registries, download host]
     rules: []
-    tests: [RT-93, RT-116, RT-151]
-    specified_in: ["25 §5", "24 §8"]
+    tests: [RT-46]
+    specified_in: ["10", "05 §1"]
+
+inputs:
+  - schema: admission-record.schema.json
+    fields:
+      - {match: binary_digest, role: selector, decision: DR-09, established_by: "gov-admit measuring the candidate once (DR-02)"}
+      - {match: admitter_digest, role: selector, decision: DR-09, established_by: "gov-admit's own digest, listed in the FCA (DR-36)"}
+      - {match: admitter_kind, role: restrictor, decision: DR-22, established_by: "schema const compiled-gov-admit (EX-02, EX-03)"}
+      - {match: target, role: restrictor, decision: DR-09, established_by: "gov-admit"}
+      - {match: lineage, role: restrictor, decision: DR-09, established_by: "gov-admit's compiled lineage"}
+      - {match: trust_code, role: restrictor, decision: DR-09, established_by: "both sources, agreed under FC-4′"}
+      - {match: state_code, role: restrictor, decision: DR-09, established_by: "both sources, agreed under FC-4′"}
+      - {match: admitted_at, role: restrictor, decision: DR-33, established_by: "gov-admit's clock at admission, raising the recorded high-water (R-CLK-1)"}
+      - {match: path_class, role: restrictor, decision: DR-09, established_by: "gov-admit's invocation (workstation or ci-image)"}
+      - {match: valid_until, role: restrictor, decision: DR-09, established_by: "gov-admit from path_class (90 or 7 days)"}
+      - {match: release_id, role: informational, justification: "shown to the operator; acceptance is by digest"}
+  - schema: artifact-statement.schema.json
+    fields:
+      - {match: "*", role: excluded, justification: "the release-artifact purpose is withdrawn (KS-13); such statements are refused and select nothing"}
+  - schema: binary-reproduction.schema.json
+    fields:
+      - {match: binary_digest, role: selector, decision: DR-14, established_by: "the reproducer's own build"}
+      - {match: tbm_digest, role: restrictor, decision: DR-14, established_by: "the reproducer's own build"}
+      - {match: environment_id, role: restrictor, decision: DR-41, established_by: "the reproducer's own derivation and assembly"}
+      - {match: toolchain_id, role: restrictor, decision: DR-42, established_by: "the reproducer's registered lineage"}
+      - {match: inputs_manifest_digest, role: restrictor, decision: DR-12, established_by: "the reproducer fetching inputs by digest"}
+      - {match: "source.*", role: restrictor, decision: DR-11, established_by: "the reproducer's own fetch", justification: "source identity fields"}
+      - {match: release_id, role: restrictor, decision: DR-14, established_by: "the registration the reproducer received first-hand"}
+      - {match: target, role: restrictor, decision: DR-14, established_by: "the reproducer"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: reproduced_at, role: informational, justification: "shown only"}
+  - schema: build-attestation.schema.json
+    fields:
+      - {match: "*", role: excluded, justification: "the build-attestation purpose is withdrawn (KS-13)"}
+  - schema: certification-statement.schema.json
+    fields:
+      - {match: status, role: restrictor, decision: DR-18, established_by: "2 of the certification-status keys; negatives only"}
+      - {match: "*", role: carrier, justification: "names what a certification status applies to; CERTIFIED stays unreferenced and selects nothing"}
+  - schema: constitutional-surface-inventory.schema.json
+    fields:
+      - {match: "files*", role: selector, decision: DR-32, established_by: "the root custodians reviewing checker output first-hand (Trust Policy surface at root threshold)", justification: "the classification of every constitutional file and leaf"}
+      - {match: "precedence*", role: selector, decision: DR-32, established_by: "root threshold (precedence registration)", justification: "exact precedence registration"}
+      - {match: "overlay_surface*", role: selector, decision: DR-30, established_by: "root threshold (Overlay Surface)", justification: "migration-writable targets"}
+      - {match: "owner_domain*", role: selector, decision: DR-27, established_by: "root threshold (owner-domain slots and binding groups)", justification: "owner constitutional file set"}
+      - {match: default, role: restrictor, decision: DR-32, established_by: "compiled default deny"}
+      - {match: never_exception_relaxable_prefixes, role: restrictor, decision: DR-32, established_by: "compiled prefixes"}
+      - {match: floor_schema_version, role: restrictor, decision: DR-32, established_by: "compiled floor vocabulary"}
+      - {match: vocabulary, role: restrictor, decision: DR-32, established_by: "compiled floor vocabulary"}
+      - {match: csi_version, role: restrictor, decision: DR-32, established_by: "compiled checker"}
+      - {match: schema_version, role: restrictor, decision: DR-32, established_by: "compiled checker"}
+      - {match: "*", role: informational, justification: "rationale, status and provenance notes; read by no decision"}
+  - schema: dsse-envelope.schema.json
+    fields:
+      - {match: payloadType, role: restrictor, decision: DR-31, established_by: "compiled statement-type table"}
+      - {match: "signatures*", role: restrictor, decision: DR-31, established_by: "keys granted by the root chain", justification: "key ids and signatures"}
+      - {match: payload, role: carrier, justification: "bytes whose identity the signatures and purposes fix"}
+  - schema: environment-lock.schema.json
+    fields:
+      - {match: "environments[].components*", role: selector, decision: DR-40, established_by: "registered source under the 2-of-3 registration with two verification records", justification: "component selection and placement"}
+      - {match: "environments[].supplier_id", role: selector, decision: DR-41, established_by: "registered source; independence from the root-signed registry"}
+      - {match: "environments[].target", role: restrictor, decision: DR-40, established_by: "registered source"}
+  - schema: environment-manifest.schema.json
+    fields:
+      - {match: environment_tree_digest, role: selector, decision: DR-13, established_by: "at least two agreeing environment reproductions under the registration (R-BENV-7″)"}
+      - {match: "components*", role: binding, decision: DR-40, established_by: "gov-envmanifest/1 recomputed by every party from the lock and pinned registry", justification: "derived; any other value refused"}
+      - {match: assembly_function, role: binding, decision: DR-40, established_by: "schema const gov-envassemble/1"}
+      - {match: lock_digest, role: binding, decision: DR-40, established_by: "digest of the registered lock entry"}
+      - {match: supplier_id, role: restrictor, decision: DR-41, established_by: "the lock entry; independence from the registry"}
+      - {match: target, role: restrictor, decision: DR-40, established_by: "the lock entry"}
+  - schema: environment-reproduction.schema.json
+    fields:
+      - {match: environment_id, role: selector, decision: DR-13, established_by: "the environment reproducer's own derivation"}
+      - {match: environment_tree_digest, role: selector, decision: DR-13, established_by: "the environment reproducer's own assembly"}
+      - {match: lock_digest, role: restrictor, decision: DR-40, established_by: "the reproducer's own derivation"}
+      - {match: supplier_id, role: restrictor, decision: DR-41, established_by: "the lock entry"}
+      - {match: target, role: restrictor, decision: DR-13, established_by: "the reproducer"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: reproduced_at, role: informational, justification: "shown only"}
+  - schema: first-contact-authority.schema.json
+    fields:
+      - {match: lineage, role: selector, decision: DR-03, established_by: "the root custodians; equal to the compiled lineage"}
+      - {match: admitters, role: selector, decision: DR-06, established_by: "the root custodians after the admitter evidence (R-FCA-1)"}
+      - {match: certified_targets, role: selector, decision: DR-43, established_by: "the root custodians citing CC evidence"}
+      - {match: "sources*", role: selector, decision: DR-38, established_by: "the root ceremony record (R-FCD-1)", justification: "the two source identities"}
+      - {match: procedure_digest, role: selector, decision: DR-38, established_by: "the root ceremony record"}
+      - {match: "admitter_evidence*", role: restrictor, decision: DR-36, established_by: "the root custodians' first-hand check", justification: "registration, reproduction and verification digests of the admitter"}
+      - {match: fca_sequence, role: restrictor, decision: DR-39, established_by: "the root custodians; floored by the stores (AP-R3)"}
+      - {match: root_version, role: restrictor, decision: DR-36, established_by: "the root chain"}
+      - {match: supersedes_fca_digest, role: restrictor, decision: DR-36, established_by: "the root custodians"}
+      - {match: profile_id, role: restrictor, decision: DR-22, established_by: "compiled profile"}
+      - {match: issued_at, role: informational, justification: "shown only"}
+  - schema: framework-lock-3.0.0.schema.json
+    fields:
+      - {match: "*", role: carrier, justification: "a repository record: lock hints are warnings and never authorise (D-0008 rule (18)); trust comes from the admitted binary and the stores"}
+  - schema: input-manifest.schema.json
+    fields:
+      - {match: "toolchains*", role: selector, decision: DR-42, established_by: "the 2-of-3 registration against the root-signed toolchain registry", justification: "toolchain lineages"}
+      - {match: lockfile_sha256, role: selector, decision: DR-12, established_by: "the registration against the file in registered source"}
+      - {match: environment_lock_digest, role: selector, decision: DR-40, established_by: "the registration against the file in registered source"}
+      - {match: "build_profile*", role: selector, decision: DR-12, established_by: "the registration (normative profile, IR-REP-2)", justification: "build profile"}
+      - {match: targets, role: restrictor, decision: DR-43, established_by: "the registration; certification from DR-43"}
+  - schema: legacy-identity-statement.schema.json
+    fields:
+      - {match: "*", role: excluded, justification: "withdrawn statement type (historical-identity); historical releases are root-signed Trust Policy data (eligibility.historical_releases)"}
+  - schema: profile-statement.schema.json
+    fields:
+      - {match: "model*", role: selector, decision: DR-45, established_by: "the retrieval-profile ceremony", justification: "retrieval profile content"}
+      - {match: "plugin*", role: selector, decision: DR-45, established_by: "the retrieval-profile ceremony", justification: "retrieval profile content"}
+      - {match: "runtime*", role: selector, decision: DR-45, established_by: "the retrieval-profile ceremony", justification: "retrieval profile content"}
+      - {match: "*", role: informational, justification: "identifiers, compatibility ranges and evidence digests shown with the profile; no trust decision over kernel, release or state"}
+  - schema: registration-revocation.schema.json
+    fields:
+      - {match: revokes, role: selector, decision: DR-19, established_by: "the 2-of-3 registration establishing forgery first-hand"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: "*", role: informational, justification: "reason, evidence and time shown only"}
+  - schema: release-registration.schema.json
+    fields:
+      - {match: "source.*", role: selector, decision: DR-11, established_by: "each signing custodian's own fetch", justification: "source identity fields"}
+      - {match: inputs_manifest_digest, role: selector, decision: DR-12, established_by: "the custodians against pinned registries"}
+      - {match: environment_lock_digest, role: selector, decision: DR-40, established_by: "the custodians against registered source"}
+      - {match: "environments*", role: selector, decision: DR-13, established_by: "agreeing environment reproductions and the custodians' own derivation", justification: "environment identities"}
+      - {match: "toolchains*", role: selector, decision: DR-42, established_by: "the custodians against the toolchain registry", justification: "toolchain identities"}
+      - {match: "constitution*", role: selector, decision: DR-16, established_by: "each custodian's first-hand derivation (R-CON-1)", justification: "constitutional content"}
+      - {match: migrations, role: selector, decision: DR-30, established_by: "each custodian's first-hand derivation"}
+      - {match: sequence, role: selector, decision: DR-23, established_by: "the registration"}
+      - {match: binary_digests, role: restrictor, decision: DR-14, established_by: "the custodians' own reproduction (OP-9 (d))"}
+      - {match: security_relevant_change, role: restrictor, decision: DR-25, established_by: "the custodians from the registration-changes listing (R-REG-3 (h))"}
+      - {match: final_statement_digest, role: restrictor, decision: DR-01, established_by: "the custodians (V8)"}
+      - {match: candidate_statement_digest, role: restrictor, decision: DR-15, established_by: "the custodians"}
+      - {match: verification_records, role: restrictor, decision: DR-15, established_by: "two verifiers, received first-hand"}
+      - {match: targets, role: restrictor, decision: DR-43, established_by: "the custodians; certification from DR-43"}
+      - {match: "lowering_history*", role: restrictor, decision: DR-26, established_by: "the custodians", justification: "declared computed reductions"}
+      - {match: "admitter*", role: restrictor, decision: DR-36, established_by: "the custodians", justification: "admitter targets"}
+      - {match: release_id, role: restrictor, decision: DR-01, established_by: "the registration"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: issued_at, role: informational, justification: "shown only"}
+  - schema: release-statement.schema.json
+    fields:
+      - {match: "release.promoted_from_candidate", role: restrictor, decision: DR-01, established_by: "the release-final signers (2), V8"}
+      - {match: "release.source*", role: restrictor, decision: DR-01, established_by: "the release-final signers rebuilding the payload", justification: "source consistency"}
+      - {match: "kernel.tree_digest", role: restrictor, decision: DR-23, established_by: "the release-final signers; equal to the registration"}
+      - {match: "*", role: carrier, justification: "release-final content is authenticity only; it selects nothing without the registration (INV-RF)"}
+  - schema: revocation-statement.schema.json
+    fields:
+      - {match: "targets*", role: restrictor, decision: DR-18, established_by: "2 of 3 revocation keys or the root threshold", justification: "negatives"}
+      - {match: authority, role: restrictor, decision: DR-18, established_by: "the signing threshold"}
+      - {match: revocation_sequence, role: restrictor, decision: DR-18, established_by: "the revocation key holders"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: "*", role: informational, justification: "framework, profile and time shown only"}
+  - schema: trust-base-manifest.schema.json
+    fields:
+      - {match: "binary*", role: restrictor, decision: DR-01, established_by: "the registered source build, reproduced (AP-8)", justification: "binary identity"}
+      - {match: "compiled_rules*", role: restrictor, decision: DR-22, established_by: "the registered source build", justification: "compiled profile and register"}
+      - {match: "root_chain*", role: restrictor, decision: DR-35, established_by: "the registered source build", justification: "accepted-TBM components"}
+      - {match: "trust_policy*", role: restrictor, decision: DR-35, established_by: "the registered source build", justification: "accepted-TBM components"}
+      - {match: "trust_state*", role: restrictor, decision: DR-35, established_by: "the registered source build", justification: "accepted-TBM components"}
+      - {match: "embedded_release*", role: restrictor, decision: DR-23, established_by: "the registered source build", justification: "embedded kernel"}
+      - {match: lineage, role: restrictor, decision: DR-03, established_by: "compiled lineage"}
+      - {match: "*", role: informational, justification: "framework and profile labels"}
+  - schema: trust-decision-pin.schema.json
+    fields:
+      - {match: bound_digests, role: selector, decision: DR-34, established_by: "the operator provisioning a protected pin"}
+      - {match: binding_group_digest, role: selector, decision: DR-27, established_by: "the operator"}
+      - {match: gate_kind, role: selector, decision: DR-34, established_by: "the operator; enum excludes installation, update, rollback, first use and recovery"}
+      - {match: project_trust_id, role: restrictor, decision: DR-34, established_by: "the per-project record"}
+      - {match: "approved_under_state*", role: restrictor, decision: DR-34, established_by: "the operator", justification: "the state the pin was approved under"}
+      - {match: expires_at, role: restrictor, decision: DR-34, established_by: "the operator within the 7-day maximum"}
+      - {match: provisioned_at, role: restrictor, decision: DR-34, established_by: "the operator"}
+      - {match: provisioned_by, role: informational, justification: "shown only"}
+      - {match: note, role: informational, justification: "shown only"}
+  - schema: trust-format.schema.json
+    fields:
+      - {match: layout, role: restrictor, decision: DR-28, established_by: "the install transaction"}
+      - {match: minimum_reader, role: restrictor, decision: DR-28, established_by: "the install transaction"}
+      - {match: trust_format, role: restrictor, decision: DR-29, established_by: "the install transaction"}
+  - schema: trust-gate-confirmation.schema.json
+    fields:
+      - {match: bound_digests, role: selector, decision: DR-34, established_by: "the operator at the local terminal"}
+      - {match: gate_kind, role: selector, decision: DR-34, established_by: "the operator"}
+      - {match: state_codes, role: selector, decision: DR-20, established_by: "the operator reading both sources"}
+      - {match: presented_digest, role: restrictor, decision: DR-34, established_by: "the admitted gov"}
+      - {match: project_trust_id, role: restrictor, decision: DR-34, established_by: "the per-project record"}
+      - {match: repository_path, role: restrictor, decision: DR-29, established_by: "root discovery"}
+      - {match: gate_id, role: restrictor, decision: DR-34, established_by: "the admitted gov"}
+      - {match: method, role: restrictor, decision: DR-34, established_by: "the admitted gov"}
+      - {match: consumed_by_transaction, role: restrictor, decision: DR-34, established_by: "the install transaction"}
+      - {match: confirmed_at, role: restrictor, decision: DR-33, established_by: "the local clock bounded by R-CLK-1"}
+      - {match: operator, role: informational, justification: "shown only"}
+  - schema: trust-policy-statement.schema.json
+    fields:
+      - {match: "bootstrap.accepted_tbm_reset", role: selector, decision: DR-35, established_by: "the root threshold"}
+      - {match: "bootstrap.clock_reset", role: selector, decision: DR-33, established_by: "the root threshold"}
+      - {match: "bootstrap.admission_ceilings*", role: restrictor, decision: DR-44, established_by: "the root threshold; lower only", justification: "OP-7 (a) ceilings"}
+      - {match: "certified_targets*", role: selector, decision: DR-43, established_by: "the root threshold citing CC evidence", justification: "certified targets"}
+      - {match: "eligibility*", role: selector, decision: DR-23, established_by: "the root threshold", justification: "eligibility and historical releases"}
+      - {match: "gating*", role: restrictor, decision: DR-34, established_by: "the root threshold; mode const always_gate", justification: "gating"}
+      - {match: "supply_chain.suppliers*", role: selector, decision: DR-41, established_by: "the root custodians inspecting provenance", justification: "supplier registry"}
+      - {match: "supply_chain.toolchains*", role: selector, decision: DR-42, established_by: "the root custodians inspecting provenance", justification: "toolchain registry"}
+      - {match: "surface*", role: selector, decision: DR-32, established_by: "the root threshold", justification: "Constitutional Surface"}
+      - {match: sensitivity_order, role: selector, decision: DR-30, established_by: "the root threshold"}
+      - {match: state_chain_reset, role: selector, decision: DR-32, established_by: "the root threshold"}
+      - {match: install_authority, role: restrictor, decision: DR-32, established_by: "the root threshold"}
+      - {match: "lowering_history*", role: restrictor, decision: DR-26, established_by: "the root threshold", justification: "computed reductions"}
+      - {match: "unrevokes*", role: selector, decision: DR-18, established_by: "the root threshold", justification: "unrevocation"}
+      - {match: "registration.min_verification_records", role: restrictor, decision: DR-15, established_by: "schema const 2"}
+      - {match: floor_schema_version, role: restrictor, decision: DR-32, established_by: "compiled"}
+      - {match: policy_version, role: restrictor, decision: DR-32, established_by: "the root threshold; monotone"}
+      - {match: "prior_policies*", role: restrictor, decision: DR-32, established_by: "the root threshold", justification: "policy chain"}
+      - {match: supersedes_policy_digest, role: restrictor, decision: DR-32, established_by: "the root threshold"}
+      - {match: profile_id, role: restrictor, decision: DR-22, established_by: "compiled profile"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: "*", role: informational, justification: "framework, profile label and issuance time"}
+  - schema: trust-root.schema.json
+    fields:
+      - {match: "keys*", role: selector, decision: DR-31, established_by: "the root custodians in ceremony", justification: "key set"}
+      - {match: "purposes*", role: selector, decision: DR-31, established_by: "the root custodians; CP-1 shapes compiled", justification: "grants"}
+      - {match: "revoked_keys*", role: selector, decision: DR-31, established_by: "the root custodians", justification: "key revocation"}
+      - {match: "quorums.reproducer", role: restrictor, decision: DR-31, established_by: "schema const 2"}
+      - {match: "lineage.trust_root_id", role: restrictor, decision: DR-03, established_by: "compiled lineage"}
+      - {match: profile_id, role: restrictor, decision: DR-22, established_by: "compiled profile"}
+      - {match: version, role: restrictor, decision: DR-31, established_by: "the root chain"}
+      - {match: "*", role: informational, justification: "framework, profile label and issuance time"}
+  - schema: trust-state-pin.schema.json
+    fields:
+      - {match: state_code, role: selector, decision: DR-21, established_by: "the operator provisioning from both sources"}
+      - {match: state_digest, role: selector, decision: DR-21, established_by: "the operator provisioning"}
+      - {match: state_sequence, role: selector, decision: DR-21, established_by: "the operator provisioning"}
+      - {match: "root_*", role: restrictor, decision: DR-21, established_by: "the operator provisioning", justification: "root reference of the pinned state"}
+      - {match: "policy_*", role: restrictor, decision: DR-21, established_by: "the operator provisioning", justification: "policy reference of the pinned state"}
+      - {match: machine_class, role: restrictor, decision: DR-21, established_by: "the operator (validity 90 or 7 days)"}
+      - {match: valid_until, role: restrictor, decision: DR-21, established_by: "the operator within the class maximum"}
+      - {match: provisioned_at, role: restrictor, decision: DR-33, established_by: "the operator; bounded by R-CLK-1"}
+      - {match: lineage, role: restrictor, decision: DR-03, established_by: "compiled lineage"}
+      - {match: "*", role: informational, justification: "provisioner and note shown only"}
+  - schema: trust-state-statement.schema.json
+    fields:
+      - {match: published_binaries, role: selector, decision: DR-18, established_by: "2 of 3 trust-state keys"}
+      - {match: registrations, role: selector, decision: DR-17, established_by: "2 of 3 trust-state keys after the publisher's E7 check"}
+      - {match: revocations, role: restrictor, decision: DR-18, established_by: "2 of 3 trust-state keys"}
+      - {match: revocation_statements, role: restrictor, decision: DR-18, established_by: "revocation keys at threshold or root emergency"}
+      - {match: "references.first_contact_authority*", role: restrictor, decision: DR-36, established_by: "2 of 3 trust-state keys naming the FCA", justification: "FCA in force"}
+      - {match: "references.root*", role: restrictor, decision: DR-31, established_by: "2 of 3 trust-state keys", justification: "root in force"}
+      - {match: "references.trust_policy*", role: restrictor, decision: DR-32, established_by: "2 of 3 trust-state keys", justification: "policy in force"}
+      - {match: "prior_states*", role: restrictor, decision: DR-20, established_by: "2 of 3 trust-state keys (inclusion)", justification: "chain"}
+      - {match: previous_state_digest, role: restrictor, decision: DR-20, established_by: "2 of 3 trust-state keys"}
+      - {match: sequence, role: restrictor, decision: DR-20, established_by: "2 of 3 trust-state keys; floored by the stores"}
+      - {match: issued_at, role: restrictor, decision: DR-39, established_by: "2 of 3 trust-state keys; FC-9 age"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: "certifications*", role: informational, justification: "certification view; CERTIFIED selects nothing"}
+      - {match: "*", role: informational, justification: "framework and profile labels"}
+  - schema: verification-attestation.schema.json
+    fields:
+      - {match: candidate_statement_digest, role: restrictor, decision: DR-15, established_by: "the verifier's own reproduction"}
+      - {match: kernel_tree_digest, role: restrictor, decision: DR-15, established_by: "the verifier's own reproduction"}
+      - {match: environment_ids, role: restrictor, decision: DR-15, established_by: "the verifier's own derivation (R-BENV-8)"}
+      - {match: toolchain_ids, role: restrictor, decision: DR-15, established_by: "the verifier's registered lineages"}
+      - {match: inputs_manifest_digest, role: restrictor, decision: DR-15, established_by: "the verifier"}
+      - {match: "source.*", role: restrictor, decision: DR-15, established_by: "the verifier's own fetch", justification: "source identity fields"}
+      - {match: verdict, role: restrictor, decision: DR-15, established_by: "the verifier"}
+      - {match: verification_report_digest, role: restrictor, decision: DR-15, established_by: "the verifier's execution"}
+      - {match: verifier_execution_id, role: restrictor, decision: DR-15, established_by: "the verifier's execution"}
+      - {match: release_id, role: restrictor, decision: DR-15, established_by: "the verifier"}
+      - {match: lifts_negative_statement_digest, role: restrictor, decision: DR-18, established_by: "the verifier issuing a new verdict"}
+      - {match: trust_root_id, role: restrictor, decision: DR-31, established_by: "compiled lineage"}
+      - {match: "*", role: informational, justification: "label and time shown only"}
+
+procedure_inputs:
+  - {id: PI-01, input: "designation of the two first-contact sources (source identities read by the operator)", role: selector, decision: DR-38, established_by: "the root ceremony record delivered at onboarding outside release carriers (R-FCD-1, R-FCD-2)", tests: ["FA7:one_attacker_page_one_genuine_page", "FA7:both_pages_attacker_lineage_genuine_admitter", RT-184]}
+  - {id: PI-02, input: "procedure text of the first-contact procedure (FC-PROC)", role: restrictor, decision: DR-38, established_by: "the root ceremony record; its digest is in the FCA", tests: ["FA7:procedure_procedure_digest_disagrees", RT-184]}
+  - {id: PI-03, input: "trust codes read by the operator from both sources", role: selector, decision: DR-36, established_by: "each source custodian after first-hand verification (R-FCS-1)", tests: ["FA7:authority_signed_by_one_root_key", RT-184]}
+  - {id: PI-04, input: "state codes read by the operator from both sources", role: selector, decision: DR-04, established_by: "each source custodian after first-hand verification (R-FCS-2)", tests: ["FA7:genuine_authority_state_signed_by_one_trust_state_key", RT-191]}
+  - {id: PI-05, input: "the trust-state publication process (the revision-6 composer of first-contact values)", role: carrier, decision: DR-37, justification: "it composes no first-contact value: codes are digests of threshold statements each source custodian verifies (INV7-NO-COMPOSER)", tests: ["FA7:control_r6_carrying_sources_and_unverified_authority", "FA7:two_trust_state_keys_descendant_drops_revocation"]}
+  - {id: PI-06, input: "platform package submitter (a submitted admitter package under a signing service)", role: excluded, decision: DR-22, justification: "EX-05: no platform root and no submitter path exist", tests: ["FA7:S_package_submitter_signed_package", "PROF7:EX-05"]}
+  - {id: PI-07, input: "environment manifest author (a party proposing manifest content)", role: carrier, decision: DR-40, justification: "no author exists: every party derives the manifest; an authored manifest is refused (R-BENV-3″)", tests: ["ENV7:A07a_pipeline_manifest_with_injection", "ENV7:A07b_pipeline_manifest_selects_instrumented_artefacts"]}
+  - {id: PI-08, input: "stored first-contact codes (provisioning media, CI image codes, cached or designated pages)", role: restrictor, decision: DR-39, established_by: "the compiled 24-hour ceiling (FC-9) and the stores' floors", tests: ["CUR7:media_prepared_at_T7_used_now", "CUR7:ci_image_codes_provisioned_at_T10_image_built_48h_later", "CUR7:designated_pages_show_genuine_T7_codes_genuine_admitter"]}
+  - {id: PI-09, input: "admission clock and the local clock of a running machine", role: restrictor, decision: DR-33, established_by: "the local clock bounded by the recorded high-water (R-CLK-1) and FC-9 (TA-7)", tests: ["ADM7:CLK_clock_below_high_water", "CUR7:stored_codes_with_clock_set_back"]}
+  - {id: PI-10, input: "environment lock in the registered source", role: selector, decision: DR-40, established_by: "the 2-of-3 registration of the source restricted by two verification records", tests: ["ENV7:A07a_lock_with_inline_content", "ENV7:A07b_source_authority_control_lock_changed_in_reviewed_source"]}
+  - {id: PI-11, input: "supplier provenance registry (Trust Policy supply_chain.suppliers)", role: selector, decision: DR-41, established_by: "the root threshold ceremony", tests: ["ENV7:A08_two_labels_over_one_compromised_supplier", "FA7:R8_second_class_is_a_relabelled_first_supplier"]}
+  - {id: PI-12, input: "upstream signed checksum files of environment components", role: carrier, decision: DR-41, justification: "verified only under keys pinned in the supplier registry (R-BENV-1″)", tests: ["ENV7:A09_checksum_key_named_by_manifest"]}
+  - {id: PI-13, input: "toolchain provenance registry (Trust Policy supply_chain.toolchains) and bootstrap registrations", role: selector, decision: DR-42, established_by: "the root threshold; the bootstrap lineage's registration", tests: ["ENV7:T2_relabelled_toolchain_lineage", "FA7:R9_second_toolchain_is_a_relabelled_upstream_lineage"]}
+  - {id: PI-14, input: "derivation tool and assembly tool (gov-envmanifest/1, gov-envassemble/1, the content derivation checker)", role: restrictor, decision: DR-40, established_by: "an admitted gov or the party's own build of the registered source (R-BENV-9)", tests: ["ENV7:A07c_both_classes_same_injection", RT-186]}
+  - {id: PI-15, input: "the operator reading both sources and typing their codes", role: selector, decision: DR-05, established_by: "the operator (TA-5′), restricted by the compiled quorum", tests: ["FA7:genuine_admitter_one_code_typed", "FA7:procedure_one_source"]}
+  - {id: PI-16, input: "gov-admit bytes fetched from a carrier", role: carrier, decision: DR-06, justification: "selected by the FCA digest the operator checks with the platform hash tool (FC-3′)", tests: ["FA7:procedure_substituted_admitter_bytes"]}
+  - {id: PI-17, input: "candidate binary bytes", role: carrier, decision: DR-02, justification: "the artefact under judgement: measured once, never executed, never a selector (FD-1 (4))", tests: ["FA7:honest_workstation", "FA7:R0_control"]}
+  - {id: PI-18, input: "repository request naming which release a project uses", role: carrier, decision: DR-25, justification: "a request only: the local trust gate selects, above the computed security minimum (OP-11 (b))", tests: ["FA7:R11_release_below_computed_security_minimum", "CUR7:readmission_release_below_held_security_minimum"]}
+  - {id: PI-19, input: "account store files (anchors, confirmations, per-project records, planted admission records)", role: restrictor, decision: DR-10, established_by: "the admitted gov; never decides first admission (R-STORE-2); A3 can write them (RS-3)", tests: ["ADM7:A07_planted_account_record_r7", "ADM7:A15_records_outside_protected_store"]}
+  - {id: PI-20, input: "protected admission store files (marker, records, floors)", role: selector, decision: DR-09, established_by: "gov-admit under its lock", tests: ["ADM7:A09_readmission", "ADM7:A11_concurrent_first_admissions"]}
+  - {id: PI-21, input: "bundle order and statements supplied by carriers", role: carrier, decision: DR-03, justification: "order never selects; statements are selected by digest (FC-6)", tests: ["FA7:bundle_order_attacker_root_first"]}
+  - {id: PI-22, input: "OP-5 metadata age warning (30 days)", role: informational, decision: DR-44, read_by_decision: none, justification: "shown only; no decision function reads it", tests: ["PROF7:EX-07"]}
+  - {id: PI-23, input: "CI pin and image provisioning by the image operator", role: selector, decision: DR-21, established_by: "the image operator outside the repository writer's control (TA-9)", tests: ["BA11r7:pins_beyond_7_days_not_anchors", "ADM7:ci_image_record_13_days_old"]}
+
+excluded_inputs:
+  - {exclusion: EX-01, input: "freshness witness statements and witness keys", role: excluded, mechanism: "schema absent; no statement type; PROFILE_NONCONFORMANT / PROFILE_MODE_EXCLUDED; no calculator atom", tests: ["PROF7:EX-01", RT-190]}
+  - {exclusion: EX-02, input: "admission records from a helper machine", role: excluded, mechanism: "admitter_kind const; RECORD_ADMITTER_NOT_LISTED", tests: ["PROF7:EX-02", RT-190]}
+  - {exclusion: EX-03, input: "admission by an auditable script", role: excluded, mechanism: "admitter_kind const; ADMITTER_NOT_LISTED", tests: ["PROF7:EX-03", RT-190]}
+  - {exclusion: EX-04, input: "a second authentication path and its agreement rules", role: excluded, mechanism: "no channel_quorum; exactly two sources; PROFILE_MODE_EXCLUDED; no alt atom", tests: ["PROF7:EX-04", RT-184]}
+  - {exclusion: EX-05, input: "platform or distribution package signatures and submitters", role: excluded, mechanism: "no verification path; PROFILE_MODE_EXCLUDED", tests: ["PROF7:EX-05", RT-184]}
+  - {exclusion: EX-06, input: "Trust Policy gating mode B", role: excluded, mechanism: "gating.mode const always_gate; PROFILE_NONCONFORMANT", tests: ["PROF7:EX-06", RT-190]}
+  - {exclusion: EX-07, input: "grace period eligible_until and a compiled epoch accepted for use", role: excluded, mechanism: "fields absent; the clock only expires; PROFILE_NONCONFORMANT", tests: ["PROF7:EX-07", RT-190]}
+  - {exclusion: EX-08, input: "governed use on an unanchored machine", role: excluded, mechanism: "decision rule; TRUST_STATE_UNANCHORED", tests: ["PROF7:EX-08", RT-189]}
+  - {exclusion: EX-09, input: "release registration by the root keys", role: excluded, mechanism: "purpose shape; whitelist; PROFILE_NONCONFORMANT", tests: ["PROF7:EX-09", RT-190]}
+  - {exclusion: EX-10, input: "one everyday key for candidate and final", role: excluded, mechanism: "whitelist; release-final threshold 2", tests: ["PROF7:EX-10", RT-190]}
+  - {exclusion: EX-11, input: "lineage confirmation mode per init (op6_mode)", role: excluded, mechanism: "field absent; PROFILE_NONCONFORMANT", tests: ["PROF7:EX-11"]}
+  - {exclusion: EX-12, input: "maximum anchor age mode (max_anchor_age_days)", role: excluded, mechanism: "field absent; compiled ceilings", tests: ["PROF7:EX-12"]}
+  - {exclusion: EX-13, input: "one verification record", role: excluded, mechanism: "const 2; VERIFICATION_RECORDS_BELOW_MINIMUM", tests: ["PROF7:EX-13", RT-190]}
+  - {exclusion: EX-14, input: "other reproducer sets; registrations without binary digests", role: excluded, mechanism: "quorum const 2; binary_digests required", tests: ["PROF7:EX-14", RT-190]}
+  - {exclusion: EX-15, input: "an upstream toolchain archive as the only lineage", role: excluded, mechanism: "TOOLCHAIN_DIVERSITY_NOT_MET", tests: ["PROF7:EX-15", RT-187]}
+  - {exclusion: EX-16, input: "superseded security-relevant releases kept eligible", role: excluded, mechanism: "computed security minimum", tests: ["PROF7:EX-16", RT-188]}
+  - {exclusion: EX-17, input: "a single first-contact source", role: excluded, mechanism: "compiled quorum 2", tests: ["PROF7:EX-17", RT-184]}
+  - {exclusion: EX-18, input: "provisioning media as the only source", role: excluded, mechanism: "compiled quorum 2 and 24-hour state age", tests: ["PROF7:EX-18", RT-184]}
+  - {exclusion: EX-19, input: "admission records without expiry", role: excluded, mechanism: "valid_until a string; ADMISSION_RECORD_EXPIRED", tests: ["PROF7:EX-19", RT-185]}
+  - {exclusion: EX-20, input: "C0–C2 for a revoked running binary (revoked_self_scope)", role: excluded, mechanism: "field absent; C0-R compiled", tests: ["PROF7:EX-20", RT-185]}
+  - {exclusion: EX-21, input: "a single supplier class or label diversity", role: excluded, mechanism: "ENVIRONMENT_DIVERSITY_NOT_MET; environments >= 2", tests: ["PROF7:EX-21", RT-186]}
+  - {exclusion: EX-22, input: "D-0008 options A, B, D, E, F", role: excluded, mechanism: "D-0008 marks them not supported production alternatives", tests: ["PROF7:EX-22"]}
+  - {exclusion: EX-23, input: "a first-contact manifest composed per Trust State", role: excluded, mechanism: "schema withdrawn; FIRST_CONTACT_AUTHORITY_UNVERIFIED", tests: ["PROF7:EX-23", RT-184]}
+  - {exclusion: EX-24, input: "gov trust fc-procedure printed instructions", role: excluded, mechanism: "no such command; PROFILE_MODE_EXCLUDED", tests: ["PROF7:EX-24", RT-184]}

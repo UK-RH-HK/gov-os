@@ -1,6 +1,11 @@
 # Output 3 — Trust-chain diagram
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 amendment: the chain of record is `25` §6 as amended in revision 6. First contact is selected by the agreed
 > first-contact code over the OP-13 sources (`32`); build environments are registered and reproduced first-hand (`33`);
 > registered content is derived first-hand and verification is bound to the registered candidate and kernel (`34`).

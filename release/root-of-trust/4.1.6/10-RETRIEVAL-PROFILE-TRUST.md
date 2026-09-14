@@ -1,6 +1,11 @@
 # Output 10 — Reference retrieval profile trust integration
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 amendment: none to the profile model; profile install runs only on an admitted binary on a protected
 > installation for C3 (`31` GB-4′).
 > Revision 5 amendment: profile install is C3 and needs a currency proof naming the selected Trust State (`24` §4.4); it runs

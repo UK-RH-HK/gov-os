@@ -1,9 +1,13 @@
 # Output 27 — Authorisation of trust decisions
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
-> Revision 6: trust gates add `registration_change` (`34` R-CON-5). Under OP-3 mode B each certified update still needs
-> a currency proof naming the publishing Trust State (`21` OP-3, RV5-L9). Confirmations need a protected installation
-> (`31` GB-4′).
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 (CP-1, OP-3 Mode A): every adoption, installation, update, rollback, downgrade and recovery needs the local trust
+> gate; mode B is excluded (EX-06); C3 confirmations carry the state codes read from both first-contact sources (`24` §3.1, §4.4);
+> decision pins are valid for at most 7 days and never approve `init_ack`, `project_first_use`, `framework_update`, `downgrade`,
+> `rollback`, `recovery_exchange` or `adopt_lineage` (schema enum); the gate set adds `project_first_use` (the local choice among
+> eligible releases, OP-11 (b)), `rollback` and `recovery_exchange`.
+> Revision 6: trust gates add `registration_change` (`34` R-CON-5); its mode-B currency note is history (EX-06). Confirmations
+> need a protected installation (`31` GB-4′).
 > Revision 5: decision-pin maximum validity and binding groups (§3.2); confinement restated as an allow list with the TCB
 > location rule (§3.3). Trust gates run only on admitted binaries (`31` GB-1).
 > Revision 3 added this file. Review r3 recorded R2-M1 as NARROWED to RV3-M2: repository records are requests, but pins,
@@ -22,12 +26,16 @@ could commit those records (review r2 P2). Revision 3 made trust gates local. Th
 local automation path could still be written by processes of the governed account, including a repository command that
 `gov` itself ran (RV3-B-A03 executed; RV3-B-A04 computed).
 
-## 2. Trust gates (unchanged set)
+## 2. Trust gates
 
 | Kind | Raised by | Bound to |
 |---|---|---|
 | `init_ack` | `init`, `adopt migrate --batch 0` | statement digest, project_trust_id |
 | `framework_update` | `update --apply` (OP-3 mode A always) | current and target statement digests |
+| `project_first_use` (revision 7) | first governed use of a project on a machine without a per-project record | the eligible release statement digest the repository requests, shown with the newest eligible release known (OP-11 (b)) |
+| `rollback` (revision 7) | rollback of the installed release | both statement digests |
+| `recovery_exchange` (revision 7) | recovery exchange-back | both statement digests and the journal digest |
+| `registration_change` (revision 6) | security-classified changes of a new registration on a recorded project (`34` R-CON-5) | held and new registration digests, change-list digest |
 | `downgrade` | rollback, restore, downgrading recovery | both statement digests |
 | `weakening` | computed weakenings over effective policy (`19` §9); `overlay.prev` restore | statement digest, failure-list digest |
 | `policy_lowering` | a TPS computed reduction that affects a project's held registration (`19` §10.6) | TPS digest, reduction-list digest |
@@ -49,7 +57,7 @@ A trust gate is answered **only** by a **local confirmation** recorded in the Ve
 | `project_trust_id`, `repository_path` | binds the decision to this project on this machine |
 | `bound_digests[]` | exactly the digests of §2 for the kind |
 | `presented_digest` | digest of the decision package `gov` rendered |
-| **`state_fingerprint`** | for C3 kinds (`init_ack`, `framework_update`, `downgrade`, `evaluation_candidate`, `adopt_lineage`): the fingerprint the operator typed; it must name the effective TSS (`24` §4.4 P2) |
+| **`state_codes`** (revision 7) | for C3 kinds (`init_ack`, `project_first_use`, `framework_update`, `downgrade`, `rollback`, `recovery_exchange`, `evaluation_candidate`, `adopt_lineage`): the two state codes the operator read from both first-contact sources; identical and naming the effective Trust State (`24` §4.4 R-CUR-2) |
 | `method` | `interactive_terminal` or `operator_decision_pin` |
 | `confirmed_at`, `operator`, `consumed_by_transaction` | as revision 3 |
 
@@ -61,8 +69,8 @@ A trust gate is answered **only** by a **local confirmation** recorded in the Ve
   axis;
 - requires the operator to type:
   - the first 12 hex characters of the bound digest; and,
-  - **for C3 kinds, the state fingerprint currently published in an independent channel** (`24` §3.2 in-gate
-    confirmation). A fingerprint that does not name the effective TSS makes the transition refuse
+  - **for C3 kinds, the state code currently published by each of the two first-contact sources** (`24` §3.2 in-gate
+    confirmation). Codes that disagree or do not name the effective TSS make the transition refuse
     (`TRUST_STATE_CURRENCY_UNPROVEN`), and it is recorded as a human anchor. If the named TSS is not held, the machine is
     `BELOW_ANCHOR` until it is supplied;
 - refuses when there is no controlling terminal (`TRUST_GATE_NEEDS_TERMINAL`).
@@ -73,7 +81,7 @@ same-user process that allocates a pseudo-terminal (TG-2).
 ### 3.2 Operator decision pin (automation; CR-03)
 
 **Revision 5 (CR4-B-09, RV4-L5; RV4-L10).** A decision pin carries `provisioned_at` and `expires_at`, and
-`expires_at − provisioned_at ≤` TPS `gating.decision_pin_max_validity_days`; a pin beyond it authorises nothing for every
+`expires_at − provisioned_at ≤` TPS `gating.decision_pin_max_validity_days` (revision 7: at most 7 days); a pin beyond it authorises nothing for every
 kind (`DECISION_PIN_OUTSIDE_VALIDITY`); an increase of the parameter is a computed reduction. An
 `owner_constitutional_file` pin for a binding group names the group digest; several valid pins resolve by exact set match
 only (`23` §7.2). Evidence: P4r5 `GATE-CR4-B-09_decision_pin_beyond_maximum_validity`; DA03r5 mutant detected.
@@ -84,10 +92,12 @@ only (`23` §7.2). Evidence: P4r5 `GATE-CR4-B-09_decision_pin_beyond_maximum_val
 - **Content** (schema `trust-decision-pin.schema.json`): `{gate_kind, bound_digests, project_trust_id or "*",
   approved_under_state {sequence, statement_digest}, provisioned_by, provisioned_at, expires_at}`.
   - **`expires_at` is mandatory.** An expired pin authorises nothing.
-  - **`approved_under_state`** must be in the effective chain (inclusion, `24` §3.4). A C3 kind approved by a pin also
-    needs a currency proof of `24` §4.4, P1 or P3.
-- **Limit.** A pin never approves a kind listed in TPS `gating.local_terminal_only`. The default list is `downgrade`,
-  `policy_lowering`, `adopt_lineage` and `override_kernel_integrity`.
+  - **`approved_under_state`** must be in the effective chain (inclusion, `24` §3.4). In CP-1 no C3 kind is approvable by a pin
+    (the pin schema's `gate_kind` enum excludes them; OP-3 Mode A).
+- **Limit.** A pin never approves a kind listed in TPS `gating.local_terminal_only`, nor any kind outside the pin schema's enum
+  (`weakening`, `policy_lowering`, `project_strength`, `registration_change`, `owner_constitutional_file`). In CP-1 the list
+  always includes `init_ack`, `project_first_use`, `framework_update`, `downgrade`, `rollback`, `recovery_exchange` and
+  `adopt_lineage` (OP-3 Mode A).
 - **Trust assumption.** TA-9 restated (`24` §3.5 (4)).
 
 ### 3.3 Never agent-resolvable

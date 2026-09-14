@@ -1,52 +1,56 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/input-manifest/2",
-  "title": "Build-input manifest v2 (unsigned; digest registered; RoT-1 revision 6, PROPOSED; 30 §4.2, 33 §3)",
-  "x-schema-version": "2.0.0",
+  "$id": "https://agentic-engineering-os/schemas/input-manifest/3",
+  "title": "Build-input manifest v3 (unsigned; digest registered; RoT-1 revision 7, CP-1, PROPOSED; 30 §4.2, 33)",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema",
-    "toolchain",
-    "lockfile_sha256",
     "build_profile",
+    "environment_lock_digest",
+    "lockfile_sha256",
+    "schema",
     "targets",
-    "environments"
+    "toolchains"
   ],
   "properties": {
     "schema": {
-      "const": "governance-os.input-manifest/2"
+      "const": "governance-os.input-manifest/3"
     },
-    "toolchain": {
+    "toolchains": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 2,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name",
-          "version",
           "archive_sha256",
-          "upstream_checksum_reference"
+          "compiler_version",
+          "toolchain_id"
         ],
         "properties": {
-          "name": {
-            "type": "string"
+          "toolchain_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
           },
-          "version": {
-            "type": "string"
+          "compiler_version": {
+            "type": "string",
+            "maxLength": 128
           },
           "archive_sha256": {
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$"
-          },
-          "upstream_checksum_reference": {
-            "type": "string"
           }
         }
-      }
+      },
+      "description": "OP-10 (b): at least two toolchain lineages registered in the root-signed toolchain registry; independence computed from provenance"
     },
     "lockfile_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "environment_lock_digest": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
@@ -54,9 +58,10 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "remap_path_prefixes",
+        "flags",
+        "linking",
         "profile",
-        "flags"
+        "remap_path_prefixes"
       ],
       "properties": {
         "remap_path_prefixes": {
@@ -80,6 +85,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "linking": {
+          "const": "static-self-contained"
         }
       }
     },
@@ -87,38 +95,8 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "type": "string"
-      }
-    },
-    "environments": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "target",
-          "environment_id",
-          "environment_tree_digest",
-          "supplier_class"
-        ],
-        "properties": {
-          "target": {
-            "type": "string"
-          },
-          "environment_id": {
-            "type": "string",
-            "pattern": "^sha256:[0-9a-f]{64}$"
-          },
-          "environment_tree_digest": {
-            "type": "string",
-            "pattern": "^sha256:[0-9a-f]{64}$"
-          },
-          "supplier_class": {
-            "type": "string",
-            "pattern": "^[A-Z]$"
-          }
-        }
+        "type": "string",
+        "pattern": "^[a-z0-9_]+-[a-z0-9_]+-[a-z0-9_]+(-[a-z0-9_]+)?$"
       }
     }
   }

@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-decision-pin.schema.json",
   "title": "trust-decision-pin",
-  "description": "PROPOSED (RoT-1 revision 4). One entry of an operator decision pin file (27 \u00a73.2): the automation path for a trust gate. Read from the system pin directory, or from the account location only when the integrity predicate holds (the file and every ancestor directory are not writable by the effective uid, or the file is on a read-only mount; CR-03). Otherwise the pin authorises nothing (TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED). expires_at is mandatory. A pin never approves a kind listed in the Trust Policy gating.local_terminal_only. approved_under_state binds the approval to a state fingerprint: the pinned transition proceeds only while that (sequence, digest) is in the effective chain.",
-  "x-schema-version": "3.0.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). One entry of an operator decision pin file (27 §3.2): the automation path for a trust gate. Read from the system pin directory, or from the account location only when the integrity predicate holds (the file and every ancestor directory are not writable by the effective uid, or the file is on a read-only mount; CR-03). Otherwise the pin authorises nothing (TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED). expires_at is mandatory. A pin never approves a kind listed in the Trust Policy gating.local_terminal_only. approved_under_state binds the approval to a state fingerprint: the pinned transition proceeds only while that (sequence, digest) is in the effective chain. Revision 7: gate kinds of Mode A; a pin never approves production installation, update, rollback, project first use or recovery exchange, which Mode A reserves for the local human (27 §3.2).",
+  "x-schema-version": "4.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,15 +18,10 @@
   "properties": {
     "gate_kind": {
       "enum": [
-        "init_ack",
-        "framework_update",
-        "downgrade",
         "weakening",
         "policy_lowering",
         "project_strength",
-        "evaluation_candidate",
-        "override_kernel_integrity",
-        "adopt_lineage",
+        "registration_change",
         "owner_constitutional_file"
       ]
     },

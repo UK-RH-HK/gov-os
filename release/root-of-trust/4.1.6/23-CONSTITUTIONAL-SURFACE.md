@@ -1,6 +1,11 @@
 # Output 23 — Constitutional Surface, total floor semantics and the Overlay Surface
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > **Revision 6** closes blocking class **BC5-3** (review r5 RV5-H3) with `34`: registered content is derived first-hand by
 > the registration authority, verification is bound to exactly the registered candidate and kernel, E7 applies AP-5's
 > restrictors, and registration reductions are computed at the verifier with security-classified changes listed per

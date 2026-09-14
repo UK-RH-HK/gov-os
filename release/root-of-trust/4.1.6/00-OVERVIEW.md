@@ -1,91 +1,89 @@
-# Governance OS Root-of-Trust Architecture (RoT-1) — revision 6
+# Governance OS Root-of-Trust Architecture (RoT-1) — revision 7, certified profile CP-1
 
 | | |
 |---|---|
 | **Status** | PROPOSED — `ARCHITECTURE_REVISION_READY_FOR_REVIEW`. Not approved, not implemented, not accepted. |
-| Revision | **6**, amending revision 5 (`cdb4e14`) after review `d1228cb` returned `ROOT_OF_TRUST_ARCHITECTURE_REJECTED` (blocking classes BC5-1…BC5-4) |
-| Author role | Root-of-trust architect, run AR-0015 (Phase 1, handoff HO-0015). **Independence:** this session authored no earlier revision, review or specialist proposal. It read review r5 and its evidence, re-ran what revision 6 relies on, and does not claim acceptance. |
+| Revision | **7**, a concretisation of revision 6 (`4106885`) after review `ab6b1f8` returned `ROOT_OF_TRUST_ARCHITECTURE_REJECTED` (blocking classes BC6-1…BC6-4) |
+| Owner input | OWNER-DESIGN-REQUIREMENTS-0001 (`release/orchestration/phase-1/GATES/`): **binding design inputs**, not approval of D-0008 |
+| Author role | Root-of-trust architect, run AR-0019 (Phase 1, handoff HO-0019). **Independence:** this session authored no earlier revision, review or owner text. It read review r6, re-ran what revision 7 relies on, and does not claim acceptance. |
 | Date | 2026-09-14 |
-| Base | branch `phase1/rot1-r6-architect` from `17acb8b` |
+| Base | branch `phase1/rot1-r7-architect` from `4ed71cc` |
 | Rejected release baseline | `release/4.1.5-rc1`, tag `v4.1.5-rc1`, `da9c8518d3fddba6f37bafb4d046ca313335ec1f` |
-| Not modified | runtime, CLI, kernel (`framework/`), migrations, tests, fixtures, capabilities, Cargo files, released payloads, verifier artefacts, review and specialist directories, D-0001…D-0007. D-0008 and ARCH-0002 are amended in place and remain PROPOSED (record status `PROVISIONAL`, `in_effect: false`, no `chosen_option`). |
+| Not modified | runtime, CLI, kernel (`framework/`), migrations, tests, fixtures, capabilities, Cargo files, released payloads, verifier artefacts, review and alternatives directories, orchestration files, D-0001…D-0007. D-0008 and ARCH-0002 are amended in place and remain PROPOSED (`status: PROVISIONAL`, `proposal_state: PROPOSED`, `human_approved: false`, `in_effect: false`, no `chosen_option`). |
 
 ## Document map
 
-| # | Output | File | Revision 6 |
+| # | Output | File | Revision 7 |
 |---|---|---|---|
 | — | Summary | `00-OVERVIEW.md` | rewritten |
-| 1 | Threat model | `01-THREAT-MODEL.md` | amended: TA-5′, TA-7, TA-12′, TA-13, TA-14; A20–A22; G23–G25; TH-101…TH-110 |
-| 2–4 | Ingress map, trust chain, authentication architecture | `02`–`04` | amended: I-75…I-79, I-68; V8 source identity v2; API rules 16–18 |
-| 5 | Key purposes | `05-KEY-MANAGEMENT.md` | amended: registration revocation, environment reproduction, attestation v4, KS-14, generated minima, playbooks |
-| 6 | Bootstrap | `06-BOOTSTRAP.md` | **rewritten**: first-contact code and procedure |
-| 7–11 | Statements, layout, integration requirements, retrieval profiles, migration plan | `07`–`11` | amended: statement set, `.gitattributes` member, requirements and codes, WP-28…WP-33, Phase 4 burden |
-| 12 | Acceptance-test plan | `12-ACCEPTANCE-TEST-PLAN.md` | amended: §4d RT-156…RT-183; §7d review-r5 attacks; §8.2; fourteen RTs revised |
-| 13–20 | Compatibility, risks, D-0007 supersession, ADR, trust state, verify-and-use, eligibility, rollback | `13`–`20` | amended: rules (6), (7), (9), (10), (12), (16), (17), (19), (22)–(24) revised and (25)–(27) added; clock text; §9.1 member and §9.2 transaction area; E7 restrictors |
-| 21 | Owner options | `21-OWNER-OPTIONS.md` | **rewritten**: OP-1…OP-16 with T1-a…T1-d as OP-13 (a)–(d) and E-a…E-c as OP-16 (a)–(c); generated consequences; no proposals; unsupported combinations stated |
-| 22 | Response matrix | `22-REVIEW-RESPONSE-MATRIX.md` | **rewritten** for review r5 |
-| 23–27 | Constitutional Surface, freshness, admission predicate, legacy containment, authorisation | `23`–`27` | amended (`25` rewritten): verifier reductions; clock and RS-2b; AP-1…AP-6 and AP-5r; LP-1s and ignore sources |
-| 28 | Class remainder analysis | `28-…` | updated: root cause of BC5-1…BC5-4; A-R6-01…15 |
-| 29 | Fact derivation and selection authority | `29-…` | **rewritten**: complete decision register (35 decisions), pack checks |
-| 30–31 | Registration and reproduction; independent admission | `30`, `31` | **rewritten** for revision 6 |
-| **32** | **First-contact root** | `32-FIRST-CONTACT-ROOT.md` | **new** (BC5-1) |
-| **33** | **Build environment** | `33-BUILD-ENVIRONMENT.md` | **new** (BC5-2) |
-| **34** | **First-hand constitutional content** | `34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md` | **new** (BC5-3) |
-| — | Decision register and pack checks | `decision-register/` | **new**: `DECISION_REGISTER.yaml`, `register_check.py`, `statements_check.py` (BC5-4) |
-| — | Checker | `constitutional-surface/` | `verify-registration`, verifier reductions, registration changes; self-test 78 cases |
-| — | Schemas, examples, evidence | `schemas/`, `examples/rev6/`, `evidence/r6/` | revision-6 schemas and instances; CS6, P4r6, DA03r6, FA6, CON6, ENV6, SRC6, ADM6, UW6, ATTR6, LAY6, DA07r6, re-runs |
+| 1 | Threat model | `01-THREAT-MODEL.md` | amended: TA-5′, TA-7, TA-12″; TA-13, TA-14 removed by exclusion; TH-111…TH-119 |
+| 2–4, 7, 9–11, 13, 14, 17, 23 | Ingress map, chain, authentication, statements, integration, retrieval profiles, migration, compatibility, risks, trust state, Constitutional Surface | as named | revision-7 banner: CP-1 governs; excluded-mode text is history |
+| 5 | Key purposes | `05-KEY-MANAGEMENT.md` | **rewritten** for CP-1: exact shapes, three-pair whitelist, KS-15…KS-18, `first-contact-authority` |
+| 6 | Bootstrap | `06-BOOTSTRAP.md` | **rewritten**: FCA, both sources, onboarding designation |
+| 8 | Layout and lock | `08-FRAMEWORK-LOCK.md` | amended: signed-file sentence (CR6-C-11) |
+| 12 | Acceptance-test plan | `12-ACCEPTANCE-TEST-PLAN.md` | amended: §4e RT-184…RT-199; §4f rows under CP-1; §4g carried items (RT-200…RT-202) |
+| 15, 16 | D-0007 supersession; ADR | `15`, `16` | rules (7), (9), (10), (14)–(16), (18)–(20), (22), (23), (25)–(27) restated; (28)–(31) added |
+| 18–20, 26, 27 | Verify-and-use, eligibility, rollback, legacy containment, authorisation | as named | amended: carried items CR6-C-2, C-3, C-6…C-9, C-11, C-12; E3 security minimum; gate kinds |
+| 21 | Owner selections | `21-OWNER-OPTIONS.md` | **rewritten**: selections, OT-1/OT-2, review r6 option families, non-production history |
+| 22 | Response matrix | `22-REVIEW-RESPONSE-MATRIX.md` | **rewritten** for review r6 |
+| 24, 25 | Anchoring and currency; admission predicate | `24`, `25` | **rewritten** for OP-7 (a), R-CLK-1, AP-SEC |
+| 28, 29 | Class remainder; fact derivation | `28`, `29` | updated: BC6 classes, A-R7-01…15; register over inputs, S1a/S3 |
+| 30–34 | Registration; admission; first-contact root; build environment; content | as named | **rewritten** for CP-1 (BC6-1…BC6-3) |
+| **35** | **Certified profile CP-1** | `35-CERTIFIED-PROFILE.md` | **new**: every selection and exclusion with its enforcement; certified targets; owner trade-offs |
+| — | Profile file | `profile/CP-1.yaml` | **new** |
+| — | Decision register and pack checks | `decision-register/` | register over every schema field and procedure input; C9–C11; S1a, S3 |
+| — | Schemas, examples, evidence | `schemas/`, `examples/rev7/`, `evidence/r7/` | revision-7 schemas (withdrawn ones in `schemas/withdrawn-non-production/`); CS7, FA7, CUR7, ADM7, ENV7, PROF7, PPR7, DA04r7, DA05r7, DA06r7, DA09r7, BA11r7, BA12r7, crashmig7, re-runs |
 
 ## 1. Executive summary
 
-**The class.** Eight rejections (4.1.3, 4.1.4, 4.1.5, revisions 1–5) share one class: **a lower-trust input yielding a
-current, higher-trust fact.** Review r5 found it in three selectors revision 5 had not assigned, and in the consequence
-statements derived from its partial decision register.
+**The class.** Nine rejections (4.1.3, 4.1.4, 4.1.5, revisions 1–6) share one class: **a lower-trust input yielding a current,
+higher-trust fact.** Review r6 found it in the parties that composed, designated and submitted first-contact values (BC6-1), in
+first-contact values of unbounded age (BC6-2), in the author of the environment manifest (BC6-3), and in a register complete over
+rule ids instead of inputs (BC6-4).
 
-**Root cause accepted** (`28` §7). FD-1 was stated as a rule but applied only to the decisions revision 5 changed. The
-register was not a complete, checked artefact, so neither the calculator's strategies nor the tests saw the omitted selectors.
+**Root cause accepted** (`28` §11). Revision 6 checked completeness over the objects it had written, not over the values that
+enter decisions and the parties that establish them; its option tree multiplied the combinations in which such a party mattered.
 
-**Revision 6** closes the four classes, each as a class:
+**Revision 7** removes the option tree and applies the owner's selections exactly, as **one certified production profile CP-1**
+(`35`). It closes the four classes, each as a class:
 
-| Class | Selector removed | Revision-6 mechanism | Evidence |
+| Class | Selector removed | Revision-7 mechanism (CP-1) | Evidence |
 |---|---|---|---|
-| **BC5-1** first-contact root (RV5-H1) | one channel page choosing lineage (bundle order), channel quorum (read from the selected Trust Policy) and evaluator (one-channel digest) | a **first-contact code** agreed across the OP-13 sources binds a manifest `{lineage, state epoch, admitter digests}`, the only selector of all three; operator procedure FC-1…FC-3 with platform tools before any evaluator runs; **compiled quorum**, lineage from the typed value, compiled lineage under (c)/(d), **evaluator binding** (FC-4…FC-8); the remainder stated as the **first-contact root**; its composition is owner option OP-13 (T1-a…T1-d) (`32`) | **FA6** (real Ed25519): executed first-contact minima equal the calculator's for all seven OP-13 answers; every revision-6 bootstrap mutant detected; FA5 unchanged (45/45, 17/17, 26/27) |
-| **BC5-2** build environment (RV5-H2) | an image record nobody established | environments registered with upstream-pinned components, established by a **first-hand environment reproduction quorum**; reproducers re-assemble; the pipeline selects nothing; the common-mode residual is owner option OP-16 (E-a…E-c) (`33`) | **ENV6** (real Rust toolchain): pipeline image, substituted component and carrier substitution refused; conflicts refuse; diversity enforced; residual rows accepted only as stated; two runs bit-identical |
-| **BC5-3** registered content (RV5-H3) | CI deriving the unit map; attestations reused across candidates; E7 without restrictors | custodians **derive content first-hand**; attestations bound to **exactly the registered candidate and kernel**; **E7 applies AP-5's restrictors**; reductions computed at the verifier; security-classified changes listed per project (`34`) | **CON6** (pack checker; real 4.1.5 consumer): D-A01 parts A and B, D-A05 N3/N4, B-A06, B-A09, B-A10 refused or listed; the `ASIA…` file stays excluded; genuine releases eligible |
-| **BC5-4** register and statements (RV5-M5, D-A07) | hand-written consequences over a partial register | **complete register** (35 decisions; every rule id belongs to a decision; every selector a calculator strategy; every restrictor a failing scenario); **CS6** over 11 victim classes; every consequence a **generated block** (`29`, `21`) | `register_check.py` PASS; `statements_check.py` PASS; **CS6**: 1,648 configurations, 0 invariant failures; **DA07r6**: a failing RT for every review-r5 defect |
+| **BC6-1** first-contact authority (RV6-H1) | the trust-state publisher composing first-contact values; carriers and unadmitted binaries designating sources and steps; a package submitter | the **First-Contact Authority record** signed at root threshold 2-of-3 after the admitter's registration, reproduction and two verification records (owner "First-contact composer/signer"); **both sources publish its code and the Trust State's code only after verifying them first-hand**; designation from the root ceremony record at onboarding; no `fc-procedure` command; platform and submitter paths excluded (`32`) | **FA7** (real Ed25519): every composition, designation and submitter case refused; executed first-contact minima equal CS7's eight root sets; the revision-6-shaped control admits |
+| **BC6-2** first-contact currency (RV6-H2) | replayed, stored and designated values; re-admission ignoring the store | a **compiled 24-hour state age** on every path (OP-7 (a)); **re-admission floors** AP-R1…AP-R6 (OP-14 (b)); **R-CLK-1**; residual CUR-R1 stated exactly (`32` §8, `31` §4.1, `24` §4.5) | **CUR7**, **ADM7**, **BA11r7**: replayed and stored values refused by age; re-admission refused below held state; the 24-hour window residual exactly as stated |
+| **BC6-3** environment manifest (RV6-H3) | the manifest author; supplier labels; manifest-named keys | the **environment lock in registered source**; manifests **derived** by `gov-envmanifest/1`; authoritative only with **agreeing environment reproductions and the 2-of-3 registration over that exact identity** (owner "Build-environment manifest author/signer"); supplier classes and **toolchain lineages independent by root-registered provenance** (OP-16 (b), OP-10 (b)) (`33`) | **ENV7** (real `rustc 1.98.1`): authored manifests, inline lock content, manifest-named keys, relabelled suppliers and lineages refused; label-counting controls accept injected code |
+| **BC6-4** register and statements (RV6-M2, RV6-M1) | completeness over rule ids; text-only statement checks | the register is **complete over every schema field and procedure input** with its establishing party (C9–C11); statements are **checked at atom level** with an injective renderer (S1a, S3); independent detection (`29`) | `register_check.py` PASS; `statements_check.py` PASS; **DA09r7** (every held-out register mutation fails the check); **DA06r7**; **DA04r7** |
 
-**Carried items.** RV5-M1…M9, RV5-L1…L9, RV5-I2, CR5-B-01…12 and reviewer C's items are addressed or carried with named tests
-(`22` §3–§5). Examples:
-- restrictor revocation only by the registration authority (AP-5r);
-- first admission defined, re-admission keeps the store, and admissions serialised;
-- source identity v2;
-- the `.gitattributes` member and the ignore-source condition;
-- the user-writable-installation consequence restated;
-- the shared vectors R1–R5 in both executors;
-- root threshold at least 2;
-- the clock rule and RS-2b.
+**The profile.** OP-1 root 3 keys at 2-of-3 under three custodial roles; OP-2 (b) 2-of-3 delegated registration; OP-3 Mode A;
+OP-4 separate candidate key, release-final threshold 2, trust state and revocation 2-of-3, no witness; OP-5 informational 30-day
+warning; OP-6 (a); OP-7 (a) with 90-day and 7-day anchors and 24-hour production currency; OP-8 = 2; OP-9 (b) + (d); OP-10 (b);
+OP-11 (b); OP-12 (a); OP-13 (b); OP-14 (b); OP-15 (a); OP-16 (b). Exclusions EX-01…EX-24 are absent or refused under every
+declared mechanism (**PROF7**). Certified targets need CC-1…CC-9; the initial set (x86_64 and aarch64 linux-musl) is **not
+certified pending criteria**.
 
-**Legacy containment is not regressed.** Reviewer C's matrix, re-run on the revision-6 layout, gives 30,735 rows: property
-R2-H4 0 violations, LP-1r 0 violations, 0 classifications lost. The unchanged revision-5 instruments re-run byte-identical
-(CS5, P4r5, DA03r5, FA5, REG5, P1r4), and the checker's 71 revision-5 cases are identical (`22` §1).
+**Owner trade-offs surfaced, not decided** (`35` §6): **OT-1** offline media versus the 24-hour production bound; **OT-2**
+feasibility of independently bootstrapped compiler agreement for the current compiler version. No owner parameter is reopened.
 
-**Kept from revision 5** (review r5 CD5-0): the BC4-1, BC4-2 and BC4-3 closures as stated; the carried closures; legacy
-containment.
+**The unavoidable core** (owner text, OP-7): a machine that has never received newer metadata cannot know it. CP-1 bounds and
+labels it (`24` §10 RS-1; `32` CUR-R1).
+
+**Carried items.** RV6-M3…M6, RV6-L1…L12, RV6-I1/I2, CR6-B-01…07, CR6-C-1…12, CR4-B and C-2…C-6 are closed with executed or
+reference evidence, or carried with a named test (`12` §4g; `22` §3–§6).
+
+**Legacy containment is not regressed.** Reviewer C's `matrix6` re-run: property R2-H4 0 violations (`22` §1).
 
 ## 2. Chain (summary; full statement `25` §6)
 
 ```text
-first-contact sources (OP-13) ── first-contact code ─► first-contact manifest {lineage, state epoch, admitter digests}
-release registration (root threshold | root-granted quorum ≥ 2; append-only) ── source identity v2 · input manifest v2 ·
-    environments (first-hand environment reproductions) · final · targets · verification records (first-hand, for exactly the
-    candidate and kernel) · constitutional units + kernel tree digest (derived first-hand by each custodian)
-reproducers (≥ q, one signature each, inputs by digest, environments re-assembled) ── confirm first-hand ──► publisher
-    (E7 restrictors on registrations) ── TSS (registrations[], published_binaries[], revocations)
-first binary: operator FC-1…FC-3 ─► gov-admit (FC-4…FC-8; never executes the candidate) ── admission-predicate/1 ──►
-    install from buffer · admission record in the store
-later binaries: admitted gov (inclusion anchor + currency proof naming the TSS) ── admission-predicate/1 ──► binary N+1
-every process: root discovery (refuse inside PPS and transaction area) → installation state (closed entry sets) → admission
-    record of self (GB) → effective root (FTC, KS-14) · TPS · TSS · negatives → eligibility (E7 with AP-5's restrictors and
-    verifier reductions) → local trust gate → effective policy → C0–C3
+root ceremony (3 keys, 2-of-3) ─► Trust Policy · First-Contact Authority record {lineage, admitter per certified target, two sources}
+two sources (separate custody) ─ verify first-hand ─► trust code · state code (byte-identical)
+2-of-3 registration ─ source v2 · input manifest v3 · environment lock · derived environments (agreeing reproductions) ·
+    two toolchain lineages · final (2) · two verification records · first-hand content · binary digests · security flag
+reproducers (2 of 3; two supplier classes; two toolchain lineages; by provenance) ─► publisher ─► Trust State (2-of-3)
+first binary: FC-1′…FC-3′ ─► gov-admit (FC-4′…FC-10, AP-R1…AP-R6; 24 h) ─► install from buffer · record in the protected store
+later binaries: admitted gov (anchor ≤ 90 d / 7 d; currency ≤ 24 h from both sources) ─► admission-predicate/1 ─► binary N+1
+every process: root discovery → installation state → admission record · R-CLK-1 · GB-7 → effective root (CP-1 shapes) · TPS ·
+    TSS · negatives → eligibility (E7, security minimum) → local trust gate → effective policy → C0-R…C3
 ```
 
 ## 3. Vocabulary — properties kept separate
@@ -93,49 +91,34 @@ every process: root discovery (refuse inside PPS and transaction area) → insta
 | Property | Question | Mechanism | Never implies |
 |---|---|---|---|
 | Integrity | Are these bytes identical to a reference digest? | file map, tree digest | who chose the digest |
-| Authenticity | Was the reference issued by a key granted this purpose? | purpose-bound signatures | selection, currency |
-| Registration | Did the registration authority fix, first-hand, this release's source, inputs, environments, content and final? | release registration (`30` §5, `33`, `34`) | that the source is benign (TB-4) |
-| Reproduction | Did ≥ q independent reproducers obtain these bytes in registered environments? | first-person quorum (`30` §7) | that the upstream toolchain or environment is benign (TA-12, TA-12′) |
-| Eligibility | May this registered release be the policy root here? | E1–E10 with AP-5's restrictors | currency |
-| Anchoring | Does the effective TSS chain through what was confirmed out of band? | inclusion (`24` §3.4) | currency |
-| Currency | Is there a proof naming this TSS as published as of a stated time? | P1 naming it, P2, P3 (`24` §4.4) | "current" beyond the bound |
-| First contact | Which sources select lineage, state and evaluator on a machine with no prior trust? | first-contact code over the OP-13 sources (`32`) | that those sources are uncompromised (the stated root) |
-| Admission | Was this binary accepted on this machine by an evaluator other than itself? | admission-predicate/1, admission record (`31`) | protection against A3 |
+| Authenticity | Was the reference issued by a key granted this purpose? | purpose-bound signatures, CP-1 shapes | selection, currency |
+| Registration | Did 2 of 3 custodians fix, first-hand, this release's source, inputs, environments, toolchains, content, final and binary digests? | release registration (`30` §5, `33`, `34`) | that the source is benign (TB-4) |
+| Reproduction | Did 2 of 3 reproducers obtain these bytes across independent supplier classes and toolchain lineages? | first-person quorum (`30` §7) | that both classes or lineages are benign (TB-S2″, TA-12″) |
+| Eligibility | May this registered release be the policy root here? | E1–E10 with AP-5's restrictors and the security minimum | currency |
+| Anchoring | Does the effective TSS chain through what was confirmed out of band, within validity? | inclusion (`24` §3.4) | currency |
+| Currency | Did both sources publish this TSS within 24 hours? | R-CUR-1, R-CUR-2 (`24` §4.4) | "current" beyond the bound |
+| First contact | Which statements select lineage, state and evaluator on a machine with no prior trust? | FCA at root threshold; Trust State both sources publish (`32`) | that both sources are uncompromised (the stated root) |
+| Admission | Was this binary accepted on this machine by the compiled admitter or an admitted binary? | admission-predicate/1, protected admission store (`31`) | protection against A3 |
 | Byte binding | Are the enforced bytes the verified bytes? | `18`; installation from the buffer | — |
 | Authorisation | May this trust transition happen here now? | local trust gates, protected pins, confinement | authenticity |
 
 ## 4. Root cause
 
-`28` §7 has the account for review r5's classes; §1–§6 keep the earlier analysis.
+`28` §11 has the account for review r6's classes; §1–§10 keep the earlier analysis.
 
-## 5. Owner parameters (analysed in `21`; none decided, none proposed, no default)
+## 5. Owner selections
 
-- OP-1 root keys (threshold ≥ 2).
-- OP-2 registration authority.
-- OP-3 gating.
-- OP-4 candidate key and remaining custody.
-- OP-5 age warning.
-- OP-6 lineage confirmation after admission.
-- OP-7 currency without a current proof.
-- OP-8 verification records per registration.
-- OP-9 reproducer set and registered binary digests.
-- OP-10 common-mode toolchain archive.
-- OP-11 retention of superseded releases.
-- OP-12 admitter form.
-- **OP-13 first-contact root** (a) one source = T1-a, (b) two sources = T1-b, (c) second authentication path = T1-c, (d)
-  provisioning media = T1-d.
-- OP-14 workstation admission-record validity.
-- OP-15 revoked running binary scope.
-- **OP-16 common-mode build environment** (a) = E-a, (b) = E-b, (c) = E-c.
+Recorded in `21` §1 and enforced as `35` §2 states. Nothing in this pack decides beyond the owner text; OT-1 and OT-2 are open.
 
 ## 6. Unresolved and not yet executable
 
-`22` §10:
-- No implementation exists; RT-128…RT-183 need it.
-- CS6, P4r6, FA6 and the reference executor are reference instruments. ENV6 models environment assembly with real toolchain
-  builds, not a distribution's package infrastructure.
-- Cross-OS reproducibility and root-owned install locations are specification only, as are CR4-B-02, CR4-B-04, CR4-B-05 and
-  C-2…C-6.
+`22` §9:
+- No implementation exists; RT-128…RT-202 need it. CC-1…CC-9 evidence cannot exist before implementation, so no target is
+  certified.
+- CS7, FA7, CUR7, ADM7, PPR7 and the reference executor are reference instruments; ENV7 builds with the real toolchain but models
+  supplier and toolchain provenance; no independent compiler bootstrap was performed (OT-2).
+- RV6-L1 (explicit `security_classified` per inventory row) is carried with RT-198; CR4-B-02, CR4-B-04, CR4-B-05 and C-2…C-6 remain
+  specification only.
 
 ## 7. Verdict of this amendment
 

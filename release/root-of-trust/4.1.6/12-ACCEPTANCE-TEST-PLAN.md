@@ -1,6 +1,10 @@
 # Output 12 — Independent acceptance-test plan
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 adds §4e (RT-184…RT-199) for the certified profile CP-1 (`35`) and review r6, §4g (carried items, RT-200…RT-202), §4f (rows whose excluded parts are
+> removed by the profile), §7e (every review-r6 held-out attack mapped to an RT) and §8.3 (the revision-7 instruments and pack
+> checks). Parts of earlier rows that test an excluded mode are removed by exclusion; their CP-1 part stays and PROF7 checks the
+> exclusion (`evidence/r7/DA04r7-plan-regression-detection.json` checks detection of every review-r6 defect).
 > Revision 6 adds §4d (RT-156…RT-183), §7d (every review-r5 held-out attack mapped to an RT) and §8.2 (the revision-6
 > oracles and pack checks). RT-50, RT-122, RT-127, RT-128, RT-130, RT-131, RT-132, RT-133, RT-134, RT-135, RT-138, RT-139, RT-141
 > and RT-148 are revised in §4c. Each new row fails on an implementation that carries the corresponding review-r5 defect
@@ -288,7 +292,102 @@ scenario: it fails against an implementation that carries the review-r5 defect n
 | RT-182 | (Capability-contract phase.) An owner binding group whose compiled YAML does not compile from its Markdown | refused, or confirmable only with the derivation shown | RV5-I2 |
 | RT-183 | Pack checks on the implementation's model: `register_check.py` C1–C8 and `statements_check.py` S1–S2 | both pass | BC5-4, CR5-B-05, RV5-B-A17 |
 
+## 4e. Scenarios added in revision 7 (RT-184 … RT-199; certified profile CP-1)
+
+Rule 13 applies. [D] marks a distinguishing scenario: it fails against an implementation that carries the review-r6 defect named
+in "Covers" (`evidence/r7/DA04r7-*`). Every row runs on the certified profile only; excluded modes are refused (RT-190).
+
+| RT | Scenario | Expected | Covers |
+|---|---|---|---|
+| RT-184 [D] | First contact on CP-1: both sources honest; one source shows an attacker lineage, both show it with the genuine admitter; the operator types one source's codes for both; a substituted admitter both pages list; an authority record signed by two trust-state keys, by one root key, or of another lineage; a Trust State signed by one trust-state key; a descendant that drops a published revocation handed to the custodians; an unadmitted binary or download page presenting source names or steps; `gov trust fc-procedure`; a platform-signed package, a package submitter, a single source, media as the only source | honest: `ACCEPTED`; `FIRST_CONTACT_DISAGREEMENT` / `FIRST_CONTACT_AUTHORITY_UNVERIFIED` / `FIRST_CONTACT_SOURCES_BELOW_QUORUM` / `ADMITTER_DIGEST_MISMATCH` / `TRUST_STATE_UNVERIFIED`; custodian does not publish (`STATE_DROPS_REVOCATIONS`); no command exists; `PROFILE_MODE_EXCLUDED`; substituted evaluator only inside the stated root; harm: no attacker binary installed | RV6-H1, BC6-1; `32` R-FCA, R-FCS, R-FCD, FC-1′…FC-10; EX-04, EX-05, EX-17, EX-18, EX-23, EX-24 |
+| RT-185 [D] | Workstation record 91 days old and CI image record 8 days old; a record with no expiry; a genuine binary whose own digest is revoked in held state runs every command class; same-account code plants an admission record, an anchor, a per-project record and a trust-gate confirmation in the account store before a genuine first admission | `ADMISSION_RECORD_EXPIRED`; the record shape refused; only C0-R commands run (`BINARY_REVOKED_SELF`); the protected admission store decides first admission, the account store is moved aside and no planted artefact survives | OP-14 (b), OP-15 (a); `31` R-ADM-7″, GB-2′, GB-3′; EX-19, EX-20 |
+| RT-186 [D] | Environment lock with inline component content; a pipeline-supplied manifest carrying an injected or instrumented object for one class and for both; a manifest naming its checksum key; two labels over one supplier; a ceremony record naming a pipeline-supplied derivation tool | `ENVIRONMENT_ASSEMBLY_NONCONFORMANT`; `ENVIRONMENT_MANIFEST_NOT_DERIVED`; `ENVIRONMENT_COMPONENT_UNVERIFIED`; `ENVIRONMENT_DIVERSITY_NOT_MET`; `DERIVATION_TOOL_UNREGISTERED`; harm: no binary built in the attacker's environment is accepted | RV6-H3, BC6-3; `33` R-BENV-1″…R-BENV-9; RV6-L4; EX-21 |
+| RT-187 [D] | The upstream binary toolchain lineage compromised with the bootstrapped lineage honest; the second lineage is the upstream lineage relabelled; both lineages compromised | `REPRODUCTION_CONFLICT`; `TOOLCHAIN_DIVERSITY_NOT_MET`; the both-lineages case recorded as residual TA-12″ | OP-10 (b); `33` R-BENV-6″; EX-15 |
+| RT-188 [D] | A release below a registration with `security_relevant_change` while the Trust Policy minimum is lower; the same at re-admission over a store holding a higher minimum; a Trust Policy with `eligible_until` | `RELEASE_BELOW_SECURITY_MINIMUM` twice; `PROFILE_NONCONFORMANT` | OP-11 (b); `25` AP-SEC; `31` AP-R5; EX-07, EX-16 |
+| RT-189 [D] | The OP-7 (a) decision rule on the binary: unanchored; workstation anchor 89 and 91 days; CI anchor 8 days; C3 with currency 23 and 25 hours; C3 and `confirm-state` from a user-writable executable; the clock set back 395 days below the store's high-water; the clock within the skew | C0 / C2 / C0 / C0 / C3 / refused / refused; `TRUST_CLOCK_BELOW_HIGH_WATER` (C0-R only); allowed within skew | OP-7 (a); `24` R-ANC-1…R-ANC-5, R-CLK-1; EX-08, EX-12 |
+| RT-190 | Profile conformance: every exclusion EX-01…EX-24 presented to the implementation's verifier, admitter, schemas and draft-policy | absent or refused by the typed code of `35` §4 | `35`; PROF7 |
+| RT-191 [D] | First-contact currency: a replayed genuine older code pair naming a revoked malicious and a revoked genuine binary; media prepared before the newest revocation; CI image codes older than 24 hours at image build; designated pages showing older genuine codes; re-admission with a value within 24 hours but below the store's state, with a revocation the selected state lacks, with the admitter revoked in held state; a revocation issued 6 hours before admission not yet in the published state | `FIRST_CONTACT_STATE_TOO_OLD` (four); `READMISSION_STATE_BELOW_HELD` / `BINARY_REVOKED_IN_HELD_STATE` / `ADMITTER_REVOKED_IN_HELD_STATE`; the last recorded as CUR-R1 and refused on a machine whose store holds the newer state | RV6-H2, BC6-2; `32` FC-9, §8; `31` AP-R1…AP-R6 |
+| RT-192 [D] | The implementation's decision register with (i) a schema field removed from `inputs`; (ii) the designation, publication-process, submitter or manifest-author procedure input removed; (iii) a selector row without an establishing party; (iv) an exclusion row removed | the register check fails in each case | RV6-M2, BC6-4; CR6-B-03 (b), (ii); `29` C9–C11 |
+| RT-193 [D] | The implementation's statement generator with a renderer that merges atom classes (the repository writer rendered as a reproducer key) | the atom-level statement check fails; the committed blocks with the injective renderer pass | RV6-M1; CR6-B-03 (a), (i) |
+| RT-194 [D] | Admission for a target absent from the Trust Policy's and the FCA's `certified_targets`; a Trust Policy listing a target without a criteria evidence digest | `TARGET_NOT_CERTIFIED`; the policy shape refused | `35` §5 CC-1…CC-9 |
+| RT-195 [D] | A crash after each first-install layout-migration step (both lock orders) and between the exchange and the journal write; RoT-1 `init` on a tree with an existing overlay or views directory (`governance/overlay`, `governance/views`) | after `gov recover` the tree is the pre-transaction legacy layout or the completed install, never `ABSENT` or `PARTIAL`; `init` refuses or evaluates `19` §9 item 5 before commit; no classification lost | RV6-M3; CR6-C-7 (a)–(f); `09` and `26` R-INIT-9 |
+| RT-196 [D] | A worktree, a moved checkout, a container bind-mount, a second clone and a fork with the same `project_trust_id` on one machine | E10 and the strength report kept for the first three; the fork reported and not overwriting the original's record; gated operations fail closed for a different repository identity | RV6-M4; CR6-C-8 |
+| RT-197 [D] | Each remedy (`kernel reinstall`, `update --apply` from `PARTIAL`, recover exchange-back, `init --force`) on a project with a failing strength requirement and a pending `policy_lowering` or `registration_change` | the strength report survives; the pending gate is still required after a completed update and a second unit of work | RV6-M5; CR6-C-9 |
+| RT-198 | Inventory rows of non-orderable units without `security_classified`; `commands/COMMAND_CONTRACT.yaml` and an overlay template changed between registrations | the checker refuses the unflagged row (`INVENTORY_ROW_SECURITY_CLASSIFICATION_MISSING`); both changes listed (exit 8) | RV6-L1; CR6-B-04 (carried) |
+| RT-199 [D] | The implementation's plan and register against every review-r6 defect | every defect has a plan row, a register row and a detecting instrument | RV6-M2 (D-A04); CD6-4 (3) |
+
+## 4f. Earlier rows under the certified profile
+
+The rows below keep their CP-1 part. Their parts that test an excluded mode are removed by exclusion and are covered by RT-190
+(PROF7), not by an owner-option variant.
+
+| RT | Removed by exclusion | Kept or restated for CP-1 |
+|---|---|---|
+| RT-35 | mode B variants (b)–(d) (EX-06) | (a) mode A |
+| RT-46 | the witness purpose column (EX-01) | the purpose matrix over the CP-1 purposes |
+| RT-56 | OP-7 (d) and witness rows (EX-01, EX-07) | clock rules with R-CLK-1 (RT-189) |
+| RT-80 | [OP7] variants other than (a) (EX-12, EX-01, EX-07) | machines M1–M7 under OP-7 (a) (BA11r7) |
+| RT-94 | whitelist pairs outside the three root-held pairs (EX-09, EX-10) | the CP-1 whitelist |
+| RT-98, RT-104, RT-149, RT-154 | witness replay, witness keys and witness-reliant runners (EX-01) | none (the whole rows are removed by exclusion) |
+| RT-101, RT-113, RT-119 | witness and OP-7 (b)/(c)/(d) parts (EX-01, EX-07, EX-12) | C3 currency within 24 hours; far-future statements; `INCOMPLETE` |
+| RT-138 | OP-7 answers other than (a) (EX-07, EX-08, EX-12) | user-writable installation under OP-7 (a) and a system pin |
+| RT-156, RT-157, RT-158, RT-159 | OP-13 (a), (c), (d) answers and the revision-6 manifest (EX-04, EX-05, EX-17, EX-18, EX-23) | superseded by RT-184 for CP-1 |
+| RT-179 | mode B (EX-06) | none (removed by exclusion) |
+| RT-180 | witness-key custody (EX-01) | two first-contact sources or two environment reproducers under one custodian |
+| RT-183 | C1–C8 and S1–S2 only | C1–C11 and S1–S3 (RT-192, RT-193) |
+
 RT-127 (revised in revision 6): every generated consequence block of the pack equals the calculator output for the implementation's release-process model for each OP-2, OP-4, OP-8, OP-9, OP-10, OP-13 and OP-16 answer, and no hand-written minimal set remains (`decision-register/statements_check.py` S1, S2).
+
+## 4g. Carried items and their named tests (revision 7)
+
+Review r6 carries these items (`11` §6; panel B and C `04`). Each is closed in the pack and exercised by the rows named here,
+or carried to the implementation with them. "Extended" adds the review's acceptance case to an existing row. RT-200…RT-202 are
+new.
+
+| RT | Scenario | Expected code; harm assertion | Refs |
+|---|---|---|---|
+| RT-200 [D] | A verification attestation naming no environment, or an environment id not derived from the lock of the candidate's registered source; an attestation from a build in a pipeline-supplied environment | not counted; with fewer than two counted records `VERIFICATION_RECORDS_BELOW_MINIMUM`; harm: no registration or eligibility rests on it | RV6-L3; CR6-B-06; `33` R-BENV-8 |
+| RT-201 | Doctor after a successful RoT-1 install that left `trust-tx/done/<TX>`; a planted `trust-tx/<TX2>/journal.json` that the per-project record does not register | the `done/` archive is not reported; the planted journal is `FOREIGN_TRANSACTION_ARTEFACT` (doctor HIGH), never `IN_TRANSACTION`, never recovered from | RV6-L8; CR6-C-6; `18` §5.1 |
+| RT-202 [D] | (i) a protected admission store for the lineage without the `admission-store.json` marker; (ii) an admission record naming the binary's digest in the store of another lineage; (iii) a store named by a truncated lineage id | (i) first admission: marker created, the account store for the lineage moved aside; (ii) `BINARY_NOT_ADMITTED`; (iii) not a store of the lineage (ignored); harm: no trusted operation rests on a misplaced record | RV6-L9; `31` R-STORE-1, R-ADM-8″, GB-1″; review r6 C `admtx6` T3a, T8 |
+
+RT-127 (revised in revision 7): every generated consequence block of the pack equals the calculator output for CP-1 at text and
+atom level, the renderer is injective, and no hand-written minimal set remains (`decision-register/statements_check.py` S1,
+S1a, S2, S3). The revision-6 wording above is history.
+
+| Item | Requirement (review r6) | Closed or carried in revision 7 | Named tests | Evidence |
+|---|---|---|---|---|
+| RV6-M3 / CR6-C-7 (a)–(e) | layout migration journaled; precedence; `ABSENT`; intent phase; LR-2 trigger; `init` over an existing overlay | `18` §5.3, §9; `19` §9 item 6; `20` §5; `09` and `26` R-INIT-9; `26` §8 | RT-195 (the review's RT-16 case) | crashmig7; RV6-D-A10 re-run |
+| RV6-M4 / CR6-C-8 | per-project record identity | `20` §9; `18` §5.1 | RT-196; RT-99 and RT-118 extended with a worktree, a moved checkout, a container bind-mount and a fork | PPR7 |
+| RV6-M5 / CR6-C-9 | re-record never clears strength reports or pending obligations | `19` §9 item 4; `20` §8; `26` §6 | RT-197; RT-81 extended to each remedy; RT-167 extended across a completed update and a second unit of work | PPR7 |
+| RV6-M6 / CR6-C-10 | two stores; first admission not decided by a file the governed account can write | `31` R-STORE-1, R-STORE-2, R-ADM-8″ | RT-185 (planted record); RT-139, RT-170 and RT-171 extended with a root-owned admission store and a non-root job account: C3 reachable on a protected install, a pre-planted account store moved aside, re-admission keeps both stores' floors | ADM7 A07 |
+| RV6-L1 / CR6-B-04 | `security_classified` carried per inventory row | `34` R-CON-5 (checker change carried to the implementation) | RT-198 | carried: the unchanged checker still does not list K1–K3 (RV6-B-A10, RV6-D-A03 re-runs) |
+| RV6-L2 / CR6-B-05 | `05` §1–§2 text | `05` §1–§2 | text review; RT-127 (revised in revision 7) | — |
+| RV6-L3 / CR6-B-06 | verification environment | `33` R-BENV-8; `30` R-VER-1 | RT-200 | ENV7 (derived environments) |
+| RV6-L4 / CR6-B-07 | derivation-tool provenance | `33` R-BENV-9; `30` R-REG-3 (g) | RT-186 (`DERIVATION_TOOL_UNREGISTERED`) | ENV7 |
+| RV6-L5 / CR6-B-02 (i)–(iii), CR6-C-12 | accepted-TBM high-water at re-admission and at use | `31` AP-R6, GB-7; `20` §9; `25` §5 | RT-170 extended: re-admission of an older genuine binary after `ADMISSION_RECORD_EXPIRED` and after `BINARY_REVOKED_SELF` gives `BINARY_T0_ROLLBACK`, nothing installed, no record written; admit N+1, run it, roll back to N: GB-1″ passes and trusted operations are refused until a root-signed `accepted_tbm_reset`; RT-191 | CUR7 A04 |
+| RV6-L6 / CR6-C-2 | out-of-project ignore sources; remedies force-add the occupation | `26` §8; `20` §8 | RT-174 extended: `kernel reinstall` on `PARTIAL(occupation)` leaves `.governance-runtime/migration` tracked | review r6 C `gitops6` re-run |
+| RV6-L7 / CR6-C-1 | `.gitattributes` member; `.git/info/attributes` override | `18` §9.1; `26` §2; `08` §2 | RT-50, RT-122; RT-173 extended with a repo-root `.gitattributes` (no override) and a kernel-level one (`kernel_content_mismatch`) | review r6 C `gitops6`, `attrprec6` re-runs |
+| RV6-L8 / CR6-C-6 | foreign-artefact scan scope | `18` §5.1 | RT-201 | carried (specification only) |
+| RV6-L9 | `gov-admit` reference edges | `31` R-STORE-1, R-ADM-8″, GB-1″ | RT-202 | ADM7 L9 |
+| RV6-L10 / CR6-C-3 | `governance/overlay/spec` litter named | `26` §4, §8; `18` §9 | RT-176 extended to `governance/overlay/` | review r6 C `matrix6` re-run (reported rows) |
+| RV6-L11 / CR6-C-11 | evidence and text accuracy | `08` §2; `20` §5; `22` §1; the revision-6 LAY6 rows are history and not evidence for revision 7 | text review | — |
+| RV6-L12 | OP-10 × OP-16 combinations stated | `21` §4: one combination, every other pair excluded (EX-15, EX-21) | RT-187; RT-190 | DA05r7 E2 |
+| RV6-I1 | acting role caller-declared | `27` §5, unchanged; no trust gate depends on it | — | INFO |
+| RV6-I2 | binding-group derivation | carried to the capability-contract phase | RT-182 | — |
+| CR6-B-01 | media and environment tooling only from first-hand material | codes are digests of root- and trust-state-threshold statements that each custodian verified first-hand (`32` R-FCS-1…R-FCS-3); media carry the mirror's byte-identical codes under the 24-hour state age (`32` FC-9); environments per `33` | RT-184; RT-191; RT-186 | FA7 S2 P; CUR7 A08; ENV7 A07a |
+| CR6-B-03 | atom-level statements; register over inputs | `29`; `decision-register/` | RT-192, RT-193 | STATEMENTS-CHECK S1a, S3; DA09r7 |
+| CR6-C-4 | RoT-1 working directory refused inside the transaction area | `18` §9.2 | RT-175 | carried (specification only) |
+| CR6-C-5 | first admission, re-admission, one record per binary, lock | `31` R-ADM-8″, R-ADM-13, GB-1″ | RT-139, RT-170, RT-181 | ADM7 A09, A11 |
+| C-2 | cross-device refusal before any write | `18` §3; `20` §8 | RT-123 | carried (specification only) |
+| C-3 | stray artefacts named by doctor | `18` §9 | RT-124 extended with `governance/overlay/spec` litter (CR6-C-3) and an interrupted layout migration (CR6-C-7) | carried (specification only) |
+| C-4 | entry types by `st_mode`; `st_nlink == 1` at use | `18` §3, §9.1; `26` §2 | RT-125 extended with a use-time refusal of a hard-linked kernel or occupation entry | carried (specification only) |
+| C-5 | full legacy register on a genuine 4.1.6 install | `12` RT-50, RT-144 | RT-50 | review r6 C `matrix6` re-run is the analogue on a built layout |
+| C-6 | sparse checkout named | `18` §9 | RT-155 | carried (specification only) |
+| RV4-M2 (transaction part); RV4-M5 (transaction part) | allow-list confinement; pre-transaction weakening inputs | `18` §5.1; `19` §9 item 5 | RT-103; RT-146 | carried (specification only) |
+| CR4-B-01 | as review r4 B `04` | `27` §3.3 | RT-103, RT-138 | carried (specification only) |
+| CR4-B-02 | custody of two parties under one custodian | the witness part is removed by exclusion (EX-01); the custody check is kept for the two first-contact sources and the environment reproducers | RT-149 removed by exclusion; RT-180 | PROF7 EX-01 |
+| CR4-B-04 | weakening computed from pre-transaction inputs | `19` §9 item 5 | RT-146 | carried (specification only) |
+| CR4-B-05 | wildcard `informational` rule | inventory (TPS v1 enumeration) | RT-150 | carried (specification only) |
 
 ## 7c. Coverage of review r4 held-out attacks
 

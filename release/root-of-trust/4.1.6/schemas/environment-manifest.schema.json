@@ -1,28 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/environment-manifest/1",
-  "title": "Build environment manifest (unsigned; digest registered as environment_id; RoT-1 revision 6, PROPOSED; 33 §3)",
-  "x-schema-version": "1.0.0",
+  "$id": "https://agentic-engineering-os/schemas/environment-manifest/2",
+  "title": "Environment manifest v2 (derived by gov-envmanifest/1; digest = environment_id; RoT-1 revision 7, CP-1, PROPOSED; 33 §3)",
+  "x-schema-version": "2.0.0",
+  "description": "Every field is a deterministic function of the environment lock in the registered source, the root-signed supplier registry and the measured component bytes: components copied from the lock, checksum_key_id the pinned registry key that verified the component, lock_digest the canonical digest of the lock entry, environment_tree_digest measured over the assembled tree. No party authors it; a proposal that differs from the derivation is refused (ENVIRONMENT_MANIFEST_NOT_DERIVED). Authoritative only with at least two agreeing environment reproductions and a 2-of-3 registration naming this exact environment_id.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema",
-    "target",
-    "supplier_class",
+    "assembly_function",
     "components",
-    "assembly",
-    "environment_tree_digest"
+    "environment_tree_digest",
+    "lock_digest",
+    "schema",
+    "supplier_id",
+    "target"
   ],
   "properties": {
     "schema": {
-      "const": "governance-os.environment-manifest/1"
+      "const": "governance-os.environment-manifest/2"
     },
     "target": {
-      "type": "string"
-    },
-    "supplier_class": {
       "type": "string",
-      "pattern": "^[A-Z]$"
+      "pattern": "^[a-z0-9_]+-[a-z0-9_]+-[a-z0-9_]+(-[a-z0-9_]+)?$"
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "lock_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
     },
     "components": {
       "type": "array",
@@ -31,53 +39,57 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "checksum_file_digest",
+          "checksum_key_id",
+          "mode",
           "name",
-          "version",
+          "placement_path",
           "sha256",
-          "upstream_checksum_reference"
+          "version"
         ],
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
           },
           "version": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
           },
           "sha256": {
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$"
           },
-          "upstream_url": {
-            "type": "string"
-          },
-          "upstream_checksum_reference": {
+          "placement_path": {
             "type": "string",
-            "description": "the upstream release's signed checksum file and signature, or under OP-16 (c) the registration of the owner-built component"
+            "pattern": "^[A-Za-z0-9._/-]+$",
+            "maxLength": 1024
+          },
+          "mode": {
+            "enum": [
+              420,
+              493
+            ]
+          },
+          "checksum_key_id": {
+            "type": "string",
+            "pattern": "^ed25519:[0-9a-f]{64}$"
+          },
+          "checksum_file_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
           }
         }
       }
     },
-    "assembly": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "tool",
-        "recipe_digest"
-      ],
-      "properties": {
-        "tool": {
-          "type": "string"
-        },
-        "recipe_digest": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
-        }
-      }
+    "assembly_function": {
+      "const": "gov-envassemble/1"
     },
     "environment_tree_digest": {
       "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$",
-      "description": "source identity v2 function applied to the assembled environment tree"
+      "pattern": "^sha256:[0-9a-f]{64}$"
     }
   }
 }

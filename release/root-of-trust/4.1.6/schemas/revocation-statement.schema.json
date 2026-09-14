@@ -2,18 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/revocation-statement.schema.json",
   "title": "revocation-statement",
-  "description": "PROPOSED (RoT-1 revision 5). Release-level revocations signed by the revocation purpose; matched on the full statement or binary digest. Kinds include release registrations, reproductions and binaries (artefact and build-attestation kinds withdrawn). Key revocation is only by a new trust-root version; unrevocation only by a root-signed Trust Policy.",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). Revocation statement signed by 2 of 3 dedicated revocation keys, or by the root keys at root threshold in an emergency (KS-19). Negatives only; never removes a restrictor (AP-5r). Listed by digest in the next Trust State's revocation_statements.",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "trust_profile",
+    "authority",
     "framework",
-    "trust_root_id",
     "issued_at",
     "revocation_sequence",
-    "targets"
+    "targets",
+    "trust_profile",
+    "trust_root_id"
   ],
   "properties": {
     "_type": {
@@ -87,6 +88,12 @@
           }
         }
       }
+    },
+    "authority": {
+      "enum": [
+        "revocation-quorum",
+        "root-emergency"
+      ]
     }
   },
   "$defs": {

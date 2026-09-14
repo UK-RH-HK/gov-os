@@ -1,0 +1,1355 @@
+{
+ "active": 61520,
+ "binaries_sha256": {
+  "4.1.2": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7",
+  "4.1.3": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89",
+  "4.1.4": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f",
+  "4.1.5": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+ },
+ "by_kind_layout_position": {
+  "P-CWD|R6|P-CWD:.": {
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 0
+  },
+  "P-CWD|R6|P-CWD:.governance-runtime": {
+   "part_git": 8,
+   "part_runtime_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:.governance-runtime/legacy-quarantine/update": {
+   "part_git": 8,
+   "part_runtime_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:.governance-runtime/snapshots": {
+   "part_git": 8,
+   "part_runtime_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:.governance-runtime/trust-tx": {
+   "part_git": 8,
+   "part_pps_txarea": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:.governance-runtime/trust-tx/done": {
+   "part_git": 8,
+   "part_pps_txarea": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:docs": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance": {
+   "part_git": 8,
+   "part_governance_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 904,
+   "state_PARTIAL": 40,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/framework.lock": {
+   "part_git": 8,
+   "part_pps_occupation": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/overlay": {
+   "part_git": 8,
+   "part_overlay": 48,
+   "rows": 944,
+   "state_COMPLETE": 904,
+   "state_PARTIAL": 40,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust/kernel": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust/kernel/policies": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust/lineage": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust/profiles": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust/root": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/trust/state": {
+   "part_git": 8,
+   "part_pps_trust": 48,
+   "rows": 944,
+   "state_COMPLETE": 896,
+   "state_PARTIAL": 48,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:governance/views": {
+   "part_git": 8,
+   "part_views": 48,
+   "rows": 944,
+   "state_COMPLETE": 904,
+   "state_PARTIAL": 40,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:product": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:product/customers": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:spec": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:spec/audits": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-CWD|R6|P-CWD:spec/now": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-ENV|R6|P-ENV:ALL@.": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ENV|R6|P-ENV:ALL@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:ALL@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:CACHE_IN_PROJECT@.": {
+   "part_project_other": 3,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 3
+  },
+  "P-ENV|R6|P-ENV:CACHE_IN_PROJECT@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "part_project_other": 6,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:CACHE_IN_PROJECT@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:CANON@.": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ENV|R6|P-ENV:CANON@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:CANON@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:KSRC@.": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ENV|R6|P-ENV:KSRC@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:KSRC@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:PLUGDIR@.": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ENV|R6|P-ENV:PLUGDIR@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:PLUGDIR@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:ROLESESS@.": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ENV|R6|P-ENV:ROLESESS@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:ROLESESS@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:TRACE@.": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ENV|R6|P-ENV:TRACE@governance/trust": {
+   "part_git": 8,
+   "part_pps_trust": 24,
+   "rows": 516,
+   "state_COMPLETE": 492,
+   "state_PARTIAL": 24,
+   "writing": 24
+  },
+  "P-ENV|R6|P-ENV:TRACE@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|ARCHIVE|P-GIT:ARCHIVE@product": {
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|ARCHIVE|P-GIT:ARCHIVE@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|AUTOCRLF|P-GIT:AUTOCRLF@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|AUTOCRLF|P-GIT:AUTOCRLF@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|CHECKOUT_BACK|P-GIT:CHECKOUT_BACK@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|CHECKOUT_BACK|P-GIT:CHECKOUT_BACK@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|CHECKOUT_PRE|P-GIT:CHECKOUT_PRE@product": {
+   "part_git": 25,
+   "part_governance_other": 48,
+   "part_project_other": 106,
+   "part_runtime_other": 489,
+   "rows": 516,
+   "state_LEGACY": 516,
+   "writing": 505
+  },
+  "P-GIT|CHECKOUT_PRE|P-GIT:CHECKOUT_PRE@root": {
+   "part_git": 25,
+   "part_governance_other": 56,
+   "part_pps_occupation": 16,
+   "part_project_other": 98,
+   "part_runtime_other": 505,
+   "rows": 516,
+   "state_LEGACY": 516,
+   "writing": 505
+  },
+  "P-GIT|CLEAN|P-GIT:CLEAN@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|CLEAN|P-GIT:CLEAN@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|CLONE|P-GIT:CLONE@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|CLONE|P-GIT:CLONE@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|GLOBALEXCL|P-GIT:GLOBALEXCL@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 24
+  },
+  "P-GIT|GLOBALEXCL|P-GIT:GLOBALEXCL@root": {
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 0
+  },
+  "P-GIT|IGNORECASE|P-GIT:IGNORECASE@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|IGNORECASE|P-GIT:IGNORECASE@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|INFOATTR_NOCONV|P-GIT:INFOATTR_NOCONV@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|INFOATTR_NOCONV|P-GIT:INFOATTR_NOCONV@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|INFOATTR|P-GIT:INFOATTR@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 24
+  },
+  "P-GIT|INFOATTR|P-GIT:INFOATTR@root": {
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 0
+  },
+  "P-GIT|INFOEXCL|P-GIT:INFOEXCL@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 24
+  },
+  "P-GIT|INFOEXCL|P-GIT:INFOEXCL@root": {
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 0
+  },
+  "P-GIT|PARTIAL_CLONE|P-GIT:PARTIAL_CLONE@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|PARTIAL_CLONE|P-GIT:PARTIAL_CLONE@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|RESTORE_PRE_GOV|P-GIT:RESTORE_PRE_GOV@product": {
+   "part_git": 25,
+   "part_governance_other": 48,
+   "part_project_other": 106,
+   "part_runtime_other": 489,
+   "rows": 516,
+   "state_LEGACY": 516,
+   "writing": 505
+  },
+  "P-GIT|RESTORE_PRE_GOV|P-GIT:RESTORE_PRE_GOV@root": {
+   "part_git": 17,
+   "part_governance_other": 56,
+   "part_pps_occupation": 8,
+   "part_project_other": 90,
+   "part_runtime_other": 505,
+   "rows": 516,
+   "state_LEGACY": 516,
+   "writing": 505
+  },
+  "P-GIT|SHALLOW|P-GIT:SHALLOW@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|SHALLOW|P-GIT:SHALLOW@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|SPARSE_CONE|P-GIT:SPARSE_CONE@root": {
+   "part_git": 8,
+   "part_pps_occupation": 8,
+   "part_project_other": 8,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 8
+  },
+  "P-GIT|SPARSE_NONCONE|P-GIT:SPARSE_NONCONE@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 24
+  },
+  "P-GIT|SPARSE_NONCONE|P-GIT:SPARSE_NONCONE@root": {
+   "part_git": 8,
+   "part_pps_occupation": 8,
+   "part_project_other": 8,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 8
+  },
+  "P-GIT|STASH|P-GIT:STASH@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|STASH|P-GIT:STASH@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|TEXTAUTO_EOLCRLF|P-GIT:TEXTAUTO_EOLCRLF@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|TEXTAUTO_EOLCRLF|P-GIT:TEXTAUTO_EOLCRLF@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|TEXTEOL_CRLF|P-GIT:TEXTEOL_CRLF@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|TEXTEOL_CRLF|P-GIT:TEXTEOL_CRLF@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|UNTRACK_NOSURG|P-GIT:UNTRACK_NOSURG@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 24
+  },
+  "P-GIT|UNTRACK_NOSURG|P-GIT:UNTRACK_NOSURG@root": {
+   "rows": 516,
+   "state_PARTIAL": 516,
+   "writing": 0
+  },
+  "P-GIT|UNTRACK|P-GIT:UNTRACK@product": {
+   "part_git": 8,
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|UNTRACK|P-GIT:UNTRACK@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-GIT|WORKTREE|P-GIT:WORKTREE@product": {
+   "part_project_other": 24,
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 24
+  },
+  "P-GIT|WORKTREE|P-GIT:WORKTREE@root": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ROOT|L0|P-ROOT": {
+   "part_git": 29,
+   "part_governance_other": 64,
+   "part_pps_occupation": 18,
+   "part_project_other": 98,
+   "part_runtime_other": 505,
+   "rows": 516,
+   "state_LEGACY": 516,
+   "writing": 505
+  },
+  "P-ROOT|R6CRASH|P-ROOT": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ROOT|R6RES|P-ROOT": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ROOT|R6V|P-ROOT": {
+   "rows": 516,
+   "state_COMPLETE": 516,
+   "writing": 0
+  },
+  "P-ROOT|R6|P-ROOT": {
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 0
+  },
+  "P-VEND|R6V|P-VEND:vendor": {
+   "part_git": 8,
+   "part_project_other": 48,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 48
+  },
+  "P-VEND|R6V|P-VEND:vendor/legacypkg": {
+   "part_git": 36,
+   "part_project_other": 911,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 911
+  },
+  "P-VEND|R6V|P-VEND:vendor/legacypkg/governance/project": {
+   "part_git": 36,
+   "part_project_other": 911,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 911
+  },
+  "P-VEND|R6V|P-VEND:vendor/legacypkg/product": {
+   "part_git": 36,
+   "part_project_other": 911,
+   "rows": 944,
+   "state_COMPLETE": 944,
+   "writing": 911
+  }
+ },
+ "elapsed_seconds": 1258.1,
+ "properties": {
+  "LP-1r_root_anchored_no_project_write": {
+   "rows": 2492,
+   "sample": [],
+   "violations": 0
+  },
+  "R2-H4_trust_or_occupation_change_left_COMPLETE": {
+   "sample": [],
+   "violations": 0
+  },
+  "classification_lost": {
+   "rows": 16,
+   "sample": [
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--source"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--source"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--source"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ]
+    ],
+    [
+     "P-GIT",
+     "CHECKOUT_PRE",
+     "P-GIT:CHECKOUT_PRE@root",
+     [
+      "init",
+      "--force",
+      "--source"
+     ]
+    ],
+    [
+     "P-GIT",
+     "RESTORE_PRE_GOV",
+     "P-GIT:RESTORE_PRE_GOV@root",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ]
+    ],
+    [
+     "P-GIT",
+     "RESTORE_PRE_GOV",
+     "P-GIT:RESTORE_PRE_GOV@root",
+     [
+      "init",
+      "--force",
+      "--source"
+     ]
+    ],
+    [
+     "P-GIT",
+     "RESTORE_PRE_GOV",
+     "P-GIT:RESTORE_PRE_GOV@root",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ]
+    ],
+    [
+     "P-GIT",
+     "RESTORE_PRE_GOV",
+     "P-GIT:RESTORE_PRE_GOV@root",
+     [
+      "init",
+      "--force",
+      "--source"
+     ]
+    ]
+   ]
+  },
+  "gitop_write_into_COMPLETE": {
+   "rows": 0,
+   "sample": []
+  },
+  "nested_marker_rows": {
+   "by_state": {
+    "COMPLETE": 3728,
+    "LEGACY": 32,
+    "PARTIAL": 752
+   },
+   "rows": 4512
+  },
+  "pps_write_left_COMPLETE_incl_txarea": {
+   "by_partition": {
+    "pps_txarea": 96
+   },
+   "rows": 96,
+   "sample": [
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "adopt",
+      "baseline"
+     ],
+     [
+      ".governance-runtime/trust-tx/spec",
+      ".governance-runtime/trust-tx/spec/audits",
+      ".governance-runtime/trust-tx/spec/audits/GOVERNANCE-ADOPTION",
+      ".governance-runtime/trust-tx/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--source",
+      "<ar17>/releases/4.1.2"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--name",
+      "ar17"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--alias",
+      "ar17-alias"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--intent",
+      "ar17 intent"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--force"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--skip-index"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive",
+      ".governance-runtime/trust-tx/archive/code-reference"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "migrate",
+      "baseline"
+     ],
+     [
+      ".governance-runtime/trust-tx/spec",
+      ".governance-runtime/trust-tx/spec/audits",
+      ".governance-runtime/trust-tx/spec/audits/GOVERNANCE-ADOPTION",
+      ".governance-runtime/trust-tx/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive",
+      ".governance-runtime/trust-tx/archive/code-reference"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--force",
+      "--source"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive",
+      ".governance-runtime/trust-tx/archive/code-reference"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--source",
+      "<ar17>/releases/4.1.2"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl",
+      ".governance-runtime/trust-tx/archive",
+      ".governance-runtime/trust-tx/archive/code-reference"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "adopt",
+      "baseline"
+     ],
+     [
+      ".governance-runtime/trust-tx/spec",
+      ".governance-runtime/trust-tx/spec/audits",
+      ".governance-runtime/trust-tx/spec/audits/GOVERNANCE-ADOPTION",
+      ".governance-runtime/trust-tx/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/claims.db",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl"
+     ]
+    ],
+    [
+     "P-CWD",
+     "R6",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--source",
+      "<ar17>/releases/4.1.3"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/claims.db",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry/events.jsonl"
+     ]
+    ]
+   ]
+  }
+ },
+ "rows": 62036,
+ "skipped": 516,
+ "writing_commands_rot1": {
+  "P-CWD|adopt baseline": 88,
+  "P-CWD|init": 88,
+  "P-CWD|init --alias": 88,
+  "P-CWD|init --force": 264,
+  "P-CWD|init --intent": 88,
+  "P-CWD|init --name": 88,
+  "P-CWD|init --skip-index": 88,
+  "P-CWD|init --source": 176,
+  "P-CWD|migrate baseline": 88,
+  "P-ENV|adopt baseline": 56,
+  "P-ENV|init": 56,
+  "P-ENV|init --force": 115,
+  "P-ENV|init --source": 56,
+  "P-ENV|migrate baseline": 56,
+  "P-GIT|adapters generate": 16,
+  "P-GIT|adapters verify": 16,
+  "P-GIT|adopt audit": 16,
+  "P-GIT|adopt baseline": 100,
+  "P-GIT|adopt build-memory": 16,
+  "P-GIT|adopt classify": 16,
+  "P-GIT|adopt extract-legacy": 16,
+  "P-GIT|adopt inventory": 16,
+  "P-GIT|adopt map": 16,
+  "P-GIT|adopt migrate": 32,
+  "P-GIT|adopt plan": 16,
+  "P-GIT|adopt review": 16,
+  "P-GIT|adopt rollback": 32,
+  "P-GIT|adopt status": 16,
+  "P-GIT|adopt test-design": 16,
+  "P-GIT|adopt verify-memory": 16,
+  "P-GIT|adopt verify-migration": 16,
+  "P-GIT|audit": 16,
+  "P-GIT|cancel-agents": 16,
+  "P-GIT|capabilities ecosystems": 16,
+  "P-GIT|capabilities invoke": 16,
+  "P-GIT|capabilities plugins": 16,
+  "P-GIT|checkpoint create": 32,
+  "P-GIT|checkpoint latest": 16,
+  "P-GIT|checkpoint watchdog": 16,
+  "P-GIT|cit approve": 16,
+  "P-GIT|cit execute": 16,
+  "P-GIT|cit list": 16,
+  "P-GIT|cit propose": 16,
+  "P-GIT|cit reject": 16,
+  "P-GIT|cit rollback": 32,
+  "P-GIT|cit show": 16,
+  "P-GIT|cit simulate": 16,
+  "P-GIT|claims list": 16,
+  "P-GIT|claims sweep": 16,
+  "P-GIT|context compile": 16,
+  "P-GIT|continue": 16,
+  "P-GIT|decide HDG-0002": 32,
+  "P-GIT|doctor": 16,
+  "P-GIT|freeze-writes": 16,
+  "P-GIT|gate create": 16,
+  "P-GIT|gate list": 16,
+  "P-GIT|gate present": 16,
+  "P-GIT|gate revoke": 8,
+  "P-GIT|handoff create": 16,
+  "P-GIT|handoff return": 16,
+  "P-GIT|init": 92,
+  "P-GIT|init --force": 184,
+  "P-GIT|init --source": 92,
+  "P-GIT|intent create a documentation task": 16,
+  "P-GIT|kernel override": 4,
+  "P-GIT|kernel reinstall": 32,
+  "P-GIT|kernel trust": 4,
+  "P-GIT|kernel verify": 16,
+  "P-GIT|lessons cluster": 12,
+  "P-GIT|mcp": 16,
+  "P-GIT|memory benchmark": 12,
+  "P-GIT|memory freshness": 16,
+  "P-GIT|memory graph": 16,
+  "P-GIT|memory heldout-starter": 12,
+  "P-GIT|memory impact": 16,
+  "P-GIT|memory query": 16,
+  "P-GIT|memory rebuild": 16,
+  "P-GIT|memory select": 12,
+  "P-GIT|memory verify": 16,
+  "P-GIT|migrate audit": 16,
+  "P-GIT|migrate baseline": 100,
+  "P-GIT|migrate build-memory": 16,
+  "P-GIT|migrate classify": 16,
+  "P-GIT|migrate extract-legacy": 16,
+  "P-GIT|migrate inventory": 16,
+  "P-GIT|migrate map": 16,
+  "P-GIT|migrate migrate": 32,
+  "P-GIT|migrate plan": 16,
+  "P-GIT|migrate review": 16,
+  "P-GIT|migrate rollback": 32,
+  "P-GIT|migrate status": 16,
+  "P-GIT|migrate test-design": 16,
+  "P-GIT|migrate verify-memory": 16,
+  "P-GIT|migrate verify-migration": 16,
+  "P-GIT|pause": 16,
+  "P-GIT|plugins health": 8,
+  "P-GIT|plugins list": 8,
+  "P-GIT|plugins register": 8,
+  "P-GIT|plugins registry": 4,
+  "P-GIT|plugins unregister": 4,
+  "P-GIT|policy effective": 8,
+  "P-GIT|policy overrides": 8,
+  "P-GIT|readiness check": 16,
+  "P-GIT|readiness plan": 16,
+  "P-GIT|rebuild-memory": 16,
+  "P-GIT|recover": 16,
+  "P-GIT|release verify": 16,
+  "P-GIT|resume": 16,
+  "P-GIT|route": 16,
+  "P-GIT|skills list": 16,
+  "P-GIT|skills resolve": 16,
+  "P-GIT|status": 16,
+  "P-GIT|task claim": 16,
+  "P-GIT|task close": 16,
+  "P-GIT|task create": 16,
+  "P-GIT|task dag": 16,
+  "P-GIT|task list": 16,
+  "P-GIT|task release": 16,
+  "P-GIT|task replan": 16,
+  "P-GIT|task show": 16,
+  "P-GIT|task status": 16,
+  "P-GIT|telemetry emit": 16,
+  "P-GIT|telemetry summary": 16,
+  "P-GIT|tools health": 16,
+  "P-GIT|tools install": 32,
+  "P-GIT|tools list": 16,
+  "P-GIT|tools registry": 16,
+  "P-GIT|tools resolve": 16,
+  "P-GIT|update": 16,
+  "P-GIT|update --apply": 44,
+  "P-GIT|update --rollback": 8,
+  "P-GIT|upstream prepare": 16,
+  "P-GIT|upstream submit": 16,
+  "P-GIT|verify": 16,
+  "P-GIT|verify product": 16,
+  "P-GIT|version": 16,
+  "P-VEND|adapters generate": 12,
+  "P-VEND|adapters verify": 12,
+  "P-VEND|adopt audit": 24,
+  "P-VEND|adopt baseline": 16,
+  "P-VEND|adopt build-memory": 12,
+  "P-VEND|adopt classify": 12,
+  "P-VEND|adopt extract-legacy": 12,
+  "P-VEND|adopt inventory": 12,
+  "P-VEND|adopt map": 12,
+  "P-VEND|adopt migrate": 84,
+  "P-VEND|adopt plan": 12,
+  "P-VEND|adopt review": 48,
+  "P-VEND|adopt rollback": 24,
+  "P-VEND|adopt status": 12,
+  "P-VEND|adopt test-design": 12,
+  "P-VEND|adopt verify-memory": 36,
+  "P-VEND|adopt verify-migration": 36,
+  "P-VEND|audit": 12,
+  "P-VEND|audit --deep": 12,
+  "P-VEND|audit --family": 12,
+  "P-VEND|audit --no-persist": 12,
+  "P-VEND|cancel-agents": 12,
+  "P-VEND|cancel-agents --reason": 12,
+  "P-VEND|capabilities ecosystems": 12,
+  "P-VEND|capabilities invoke": 12,
+  "P-VEND|capabilities plugins": 12,
+  "P-VEND|checkpoint create": 72,
+  "P-VEND|checkpoint latest": 12,
+  "P-VEND|checkpoint watchdog": 60,
+  "P-VEND|cit approve": 36,
+  "P-VEND|cit execute": 12,
+  "P-VEND|cit list": 12,
+  "P-VEND|cit propose": 60,
+  "P-VEND|cit reject": 36,
+  "P-VEND|cit rollback": 24,
+  "P-VEND|cit show": 12,
+  "P-VEND|cit simulate": 12,
+  "P-VEND|claims list": 12,
+  "P-VEND|claims sweep": 12,
+  "P-VEND|context compile": 12,
+  "P-VEND|continue": 12,
+  "P-VEND|continue --claim": 12,
+  "P-VEND|decide HDG-0002": 36,
+  "P-VEND|doctor": 12,
+  "P-VEND|freeze-writes": 12,
+  "P-VEND|freeze-writes --reason": 12,
+  "P-VEND|gate create": 24,
+  "P-VEND|gate list": 12,
+  "P-VEND|gate present": 12,
+  "P-VEND|gate revoke": 12,
+  "P-VEND|handoff create": 24,
+  "P-VEND|handoff return": 12,
+  "P-VEND|init": 16,
+  "P-VEND|init --alias": 16,
+  "P-VEND|init --force": 48,
+  "P-VEND|init --intent": 16,
+  "P-VEND|init --name": 16,
+  "P-VEND|init --skip-index": 16,
+  "P-VEND|init --source": 32,
+  "P-VEND|intent create a documentation task": 12,
+  "P-VEND|kernel override": 6,
+  "P-VEND|kernel reinstall": 24,
+  "P-VEND|kernel trust": 3,
+  "P-VEND|kernel verify": 12,
+  "P-VEND|lessons cluster": 36,
+  "P-VEND|mcp": 12,
+  "P-VEND|mcp serve": 12,
+  "P-VEND|memory benchmark": 36,
+  "P-VEND|memory freshness": 12,
+  "P-VEND|memory graph": 24,
+  "P-VEND|memory heldout-starter": 18,
+  "P-VEND|memory impact": 24,
+  "P-VEND|memory query": 48,
+  "P-VEND|memory rebuild": 24,
+  "P-VEND|memory select": 27,
+  "P-VEND|memory verify": 12,
+  "P-VEND|migrate audit": 24,
+  "P-VEND|migrate baseline": 16,
+  "P-VEND|migrate build-memory": 12,
+  "P-VEND|migrate classify": 12,
+  "P-VEND|migrate extract-legacy": 12,
+  "P-VEND|migrate inventory": 12,
+  "P-VEND|migrate map": 12,
+  "P-VEND|migrate migrate": 84,
+  "P-VEND|migrate plan": 12,
+  "P-VEND|migrate review": 48,
+  "P-VEND|migrate rollback": 24,
+  "P-VEND|migrate status": 12,
+  "P-VEND|migrate test-design": 12,
+  "P-VEND|migrate verify-memory": 36,
+  "P-VEND|migrate verify-migration": 36,
+  "P-VEND|pause": 12,
+  "P-VEND|pause --reason": 12,
+  "P-VEND|plugins health": 12,
+  "P-VEND|plugins list": 6,
+  "P-VEND|plugins register": 6,
+  "P-VEND|plugins registry": 3,
+  "P-VEND|plugins unregister": 3,
+  "P-VEND|policy effective": 6,
+  "P-VEND|policy overrides": 6,
+  "P-VEND|readiness check": 12,
+  "P-VEND|readiness plan": 12,
+  "P-VEND|rebuild-memory": 12,
+  "P-VEND|rebuild-memory --incremental": 12,
+  "P-VEND|recover": 12,
+  "P-VEND|recover --dry-run": 12,
+  "P-VEND|release verify": 12,
+  "P-VEND|resume": 12,
+  "P-VEND|route": 12,
+  "P-VEND|route --class": 12,
+  "P-VEND|route --radius": 12,
+  "P-VEND|route --record": 12,
+  "P-VEND|route --report": 12,
+  "P-VEND|route --task": 12,
+  "P-VEND|skills list": 12,
+  "P-VEND|skills resolve": 12,
+  "P-VEND|status": 12,
+  "P-VEND|task claim": 12,
+  "P-VEND|task close": 24,
+  "P-VEND|task create": 108,
+  "P-VEND|task dag": 12,
+  "P-VEND|task list": 24,
+  "P-VEND|task release": 24,
+  "P-VEND|task replan": 12,
+  "P-VEND|task show": 12,
+  "P-VEND|task status": 24,
+  "P-VEND|telemetry emit": 24,
+  "P-VEND|telemetry summary": 12,
+  "P-VEND|tools health": 12,
+  "P-VEND|tools install": 24,
+  "P-VEND|tools list": 12,
+  "P-VEND|tools registry": 12,
+  "P-VEND|tools resolve": 12,
+  "P-VEND|update": 12,
+  "P-VEND|update --apply": 45,
+  "P-VEND|update --approve": 12,
+  "P-VEND|update --by": 12,
+  "P-VEND|update --check": 12,
+  "P-VEND|update --reason": 6,
+  "P-VEND|update --rollback": 18,
+  "P-VEND|update --source": 12,
+  "P-VEND|upstream prepare": 12,
+  "P-VEND|upstream submit": 24,
+  "P-VEND|verify": 12,
+  "P-VEND|verify governance": 12,
+  "P-VEND|verify product": 12,
+  "P-VEND|version": 12
+ }
+}

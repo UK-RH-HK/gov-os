@@ -1,141 +1,121 @@
-# Output 5 — Key-purpose and key-management model
+# Output 5 — Key-purpose and key-management model (CP-1)
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
-> Revision 6 changes (BC5-1…BC5-4, CR5-B-01, CR5-B-11, RV5-M4): `release-registration` also signs
-> `registration-revocation.v1`, the only statement that removes a restrictor; `reproducer` also signs
-> `environment-reproduction.v1`; `verification-attestation.v4` names the reproduced kernel tree; `revocation` and
-> `trust-state` never remove a restrictor; **KS-14** root threshold ≥ 2; minimum capability sets are generated calculator
-> blocks (§3); playbooks for environment components, first-contact sources, the second path and admitter versions (§9);
-> source identity v2 (§11).
-> Revision 5 changes (rule FD-1, `29`; BC4-1 and BC4-4):
-> - adds **`release-registration`** and **`reproducer`**; **withdraws `release-artifact` and `build-attestation`**
->   (`30` §3); `verification-attestation` and `release-final` become restrictors;
-> - replaces KS-9 and KS-10 with **KS-9′** and **KS-10′**, adds **KS-12** and **KS-13**, and adds the **Fact Threshold
->   Check** to SV-4 (`29` §5.2);
-> - re-derives every minimum-capability statement from the derivation calculator (§3; FD-3), with pipeline input counted;
-> - rotation never re-signs reproductions (§8); playbooks cover the new purposes (§9);
-> - the source identity uses the canonical content digest (§11).
->
-> Retained (review r4 CD4-0): the compiled whitelist principle, KS-1…KS-8, KS-11, SV-1…SV-11, purpose-bound DSSE.
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **Revision 7** concretises the key model to CP-1 (`35`) under the owner selections OP-1, OP-2 (b), OP-4 and "First-contact
+> composer/signer" (OWNER-DESIGN-REQUIREMENTS-0001):
+> - every purpose has one exact shape (key count, threshold) checked on every root version (§3; `PROFILE_NONCONFORMANT`);
+> - new purpose **`first-contact-authority`** on the root keys at root threshold (KS-18; `32` §3);
+> - the compiled whitelist is reduced to three pairs, all among root-held purposes (§3); release-registration, release-candidate,
+>   release-final, trust-state, revocation, certification-status and retrieval-profile keys each hold one purpose;
+> - `release-final` threshold ≥ 2 (KS-15), `trust-state` and `revocation` exactly 2 of 3 (KS-16, KS-17);
+> - the witness purpose is removed by exclusion (EX-01); registration at root threshold is excluded (EX-09);
+> - §1 and §2 list the revision-7 payload versions and name the first-contact codes (RV6-L2, CR6-B-05).
+> Retained: SV-1…SV-11, purpose-bound DSSE, the Fact Threshold Check, KS-3…KS-9′, KS-12…KS-14, rotation without re-signing
+> reproductions. Revision-6 text is history at `4106885`.
 
 ## 1. Purposes
 
 A **purpose** is the authority a key exercises when it signs. Every statement type maps to exactly one purpose, fixed in the
-binary. Root metadata grants purposes to keys under compiled constraints (§3).
+binary. Root metadata grants purposes to keys; the CP-1 shape of every grant is compiled (§3).
 
-| Purpose | Signs | May assert | May never assert | Keys / threshold (owner option) | Impact if this key alone is stolen |
+| Purpose | Signs | May assert | May never assert | CP-1 keys / threshold | Impact if one key alone is stolen |
 |---|---|---|---|---|---|
-| `root` | `trust-root.v4` | key set, grants, thresholds, the reproducer quorum, key revocation | releases, state | OP-1 | none below threshold |
-| `trust-policy` | `trust-policy.v3` | Constitutional Surface classification, floors, precedence registration, Overlay Surface, owner-domain slots and binding groups, eligibility, install authority, gating, bootstrap and registration parameters, lowering history, unrevocation, chain reset | authenticity, registrations of releases (except under OP-2 (a) through `release-registration`) | root keys at root threshold (KS-2) | as root |
-| **`release-registration`** | **`release-registration.v2`** (`30` §5); **`registration-revocation.v1`** (revision 6, `30` R-REG-11) | that release *R* is registered with this source identity, input manifest, environments, final, targets, verification records, constitutional unit map and kernel tree digest (each derived or checked first-hand, `30` R-REG-3 (a)–(g)); that a named restricting statement is forged | anything about other releases; trust state; currency | OP-2: root keys at root threshold, or a delegated quorum ≥ 2 (KS-10′) | **one key: nothing** (threshold ≥ 2). At the threshold, with OP-8 verification compromises bound to the registered candidate and kernel: malicious source, inputs, environment or non-orderable content for a new release (`30` §10, `33` §6, `34` §4) |
-| **`reproducer`** | **`binary-reproduction.v2`** (`30` §7) and **`environment-reproduction.v1`** (revision 6, `33` R-BENV-2), one signature per statement | that this reproducer built the registered source with the registered inputs for a target and obtained this binary and TBM digest | release authenticity; source legitimacy; state | OP-9: n keys, compiled quorum ≥ 2 (KS-9′) | **one key: nothing**; it can block one release by conflict (AV-S1) |
-| `trust-state` | `trust-state.v3` | the published set at a sequence: registrations, published binaries, revocations, prior states and policies | legitimacy of a release or binary; currency (a TSS is never a witness) | OP-4 | **Anchored machine:** a statement that does not descend from the anchor is never effective. A descendant issued after a pin or confirmation carries **no C3** there (`24` §4.4 revision 5). A descendant dropping a held revocation or reference is non-admissible. **First admission:** never selected unless its fingerprint is typed. **Never:** register a release, create reproductions, lift a negative, witness currency. |
-| `release-final` | `release-final.v3` | authenticity of final release content | binaries, source legitimacy, eligibility, registration | OP-4 | **nothing becomes effective**: a final is a policy root or the source of a binary only if a registration names its digest, the final is promoted from the registered candidate with the registered kernel, and OP-8 verification is bound to that candidate and kernel (restrictors, `34`); `release-final` appears in no minimal set without the registration threshold and verification (CS6 INV-RF) |
-| `release-candidate` | `release-candidate.v3`, `artifact-candidate.v3` | candidates for gated evaluation projects | final stage, production binaries | OP-4 | forged evaluation candidates in gated evaluation projects only |
-| `verification-attestation` | **`verification-attestation.v4`** (revision 6) | the verifier's verdict for one candidate over its source identity, input manifest and the kernel tree digest it reproduced, and the negative a new verdict lifts | certification, authenticity, registration | OP-8 | **ACCEPTED selects nothing** without the registration; REJECTED refuses (denial of service) |
-| `certification-status` | `certification-status.v3` | CERTIFIED / REJECTED / WITHDRAWN for a final | authenticity | OP-4 | negatives take effect (denial of service); CERTIFIED stays unreferenced and cannot lift a negative |
-| `revocation` | `revocation.v2` | refusal of named digests | new trust; unrevocation; **removal of a restrictor** (AP-5r) | OP-4 | denial of service only; it lowers positive counts and never clears `REPRODUCTION_CONFLICT` or `ARTIFACT_SOURCE_REJECTED` (CR5-B-01) |
-| `retrieval-profile` | `retrieval-profile.v1` | provenance of a reference retrieval profile | authorisation | OP-4 | profile integrity only |
-| `freshness-witness` (OP-7 (c)) | `freshness-witness.v1` | that an existing TSS was the latest as of `issued_at`, for a TSS taken from the owner's ceremony or channel (CR4-B-02) | any state | OP-7; C3 needs ≥ 2 keys under ≥ 2 custodians | one key at threshold 2: nothing; keys at the C3 threshold: stale selection of genuine TSSs on witness-reliant machines until rotation (RS-5) |
-| ~~`release-artifact`~~ | **withdrawn** | — | — | — | never granted (KS-13) |
-| ~~`build-attestation`~~ | **withdrawn** | — | — | — | never granted (KS-13) |
+| `root` | `trust-root.v5` | key set, grants, the reproducer quorum, key revocation, `profile_id` | releases, state | exactly 3 keys, threshold 2; custodial roles: product-owner root custodian, independent security root custodian, recovery root custodian; offline hardware-backed devices (OP-1) | none |
+| `trust-policy` | `trust-policy.v4` | Constitutional Surface classification, floors, precedence, Overlay Surface, owner-domain slots and binding groups, eligibility, install authority, gating (always gate), admission ceilings (lower only), the supplier and toolchain registry, certified targets, lowering history, unrevocation, chain reset | authenticity; registrations of releases | the root keys at root threshold (KS-2) | none |
+| **`first-contact-authority`** | **`first-contact-authority.v1`** (`32` §3) | lineage, the admitter digest per certified target, the two first-contact sources, the procedure digest, the admitter's evidence | state; releases other than the admitter | the root keys at root threshold (KS-18) | none |
+| `release-registration` | `release-registration.v3` (`30` §5); `registration-revocation.v1` (`30` R-REG-11) | that release *R* is registered with this source identity, input manifest, environment lock, environments, toolchains, final, targets, verification records, binary digests, constitutional unit map and kernel tree digest, each established first-hand (`30` R-REG-3); that a named restricting statement is forged | anything about other releases; trust state; currency | exactly 3 single-purpose keys, threshold 2 (OP-2 (b); KS-10″) | nothing |
+| `reproducer` | `binary-reproduction.v3` (`30` §7) and `environment-reproduction.v2` (`33` R-BENV-7″), one signature per statement | that this reproducer built or assembled the registered input and obtained this digest | release authenticity; source legitimacy; state | exactly 3 single-purpose keys (three reproducer roles); compiled quorum 2 (OP-9 (b); KS-9′) | nothing; it can block one release by conflict (AV-S1) |
+| `trust-state` | `trust-state.v4` | the published set at a sequence: registrations, published binaries, revocations and their statements, prior states, the root, policy and first-contact authority in force | legitimacy of a release or binary; currency; any first-contact value | exactly 3 single-purpose keys, threshold 2 (OP-4; KS-17) | nothing: one key signs no Trust State. The **state code** a machine types is published by the two sources only for a Trust State they verified at threshold (`32` R-FCS-2) |
+| `release-final` | `release-final.v3` | authenticity of final release content | binaries, source legitimacy, eligibility, registration | at least 2 single-purpose keys, threshold ≥ 2 (OP-4; KS-15) | nothing: a final is effective only when a registration names it, promoted from the registered candidate with the registered kernel, with two verification records bound to them (`34`) |
+| `release-candidate` | `release-candidate.v3`, `artifact-candidate.v3` | candidates for gated evaluation projects | final stage, production binaries, certification | one single-purpose key (OP-4 "separate candidate key: YES"; KS-15) | forged evaluation candidates in gated evaluation projects only |
+| `verification-attestation` | `verification-attestation.v5` | one verifier's verdict for one candidate over its source identity, input manifest, kernel tree, environments and toolchains, with its execution id and report digest | certification, authenticity, registration | one key per independent verifier; each attestation one verifier; production eligibility needs two from distinct keys, executions and reports (OP-8) | ACCEPTED selects nothing without the registration; REJECTED refuses (denial of service) |
+| `certification-status` | `certification-status.v3` | CERTIFIED / REJECTED / WITHDRAWN for a final | authenticity | at least 2 single-purpose keys, threshold ≥ 2 (OP-4; KS-16) | nothing |
+| `revocation` | `revocation.v3` (`authority`: `revocation-quorum` or `root-emergency`) | refusal of named digests | new trust; unrevocation; removal of a restrictor (AP-5r) | exactly 3 single-purpose keys, threshold 2; the root threshold may sign an emergency revocation (OP-4; KS-16) | nothing |
+| `retrieval-profile` | `retrieval-profile.v1` | provenance of a reference retrieval profile | kernel, release, trust-state or any other material | single-purpose key (OP-4; KS-16) | profile integrity only |
+| ~~`release-artifact`~~, ~~`build-attestation`~~ | withdrawn (revision 5) | — | — | never granted (KS-13) | — |
+| ~~`freshness-witness`~~ | removed by exclusion (EX-01) | — | — | a root granting it is `PROFILE_NONCONFORMANT` | — |
 
 The test lineage is a trust profile, not a purpose; it exists only in the separate test-profile binary (§10).
 
-## 2. Compiled statement-type table (T0)
+## 2. Compiled statement-type table (T0), revision 7
 
-| payloadType (`application/vnd.agentic-engineering-os.` …) | Purpose | Revision 5 |
+| payloadType (`application/vnd.agentic-engineering-os.` …) | Purpose | Schema (`schemas/`) |
 |---|---|---|
-| `trust-root.v4+json` | `root` | purposes of §1; `quorums {reproducer}` |
-| `trust-policy.v3+json` | `trust-policy` | `registration {min_verification_records, binary_digests_registered}`; `bootstrap {…, channel_quorum, admitter_digests, workstation_record_max_validity_days, revoked_self_scope, accepted_tbm_reset}`; `eligibility.production_sources[]` withdrawn |
-| **`release-registration.v1+json`** | `release-registration` | new (`schemas/release-registration.schema.json`) |
-| **`binary-reproduction.v1+json`** | `reproducer` | new (`schemas/binary-reproduction.schema.json`) |
-| `trust-state.v3+json` | `trust-state` | `registrations[]`, `published_binaries[]`; `artifacts[]` withdrawn |
-| `release-final.v3+json`, `release-candidate.v3+json` | `release-final`, `release-candidate` | `release.source {release_commit, content_digest}`, `inputs_manifest_digest` |
-| `artifact-candidate.v3+json` | `release-candidate` | evaluation only |
-| **`verification-attestation.v3+json`** | `verification-attestation` | source identity and input manifest |
-| `certification-status.v3+json`, `revocation.v2+json`, `retrieval-profile.v1+json`, `freshness-witness.v1+json` | as named | unchanged shapes |
+| `trust-root.v5+json` | `root` | `trust-root.schema.json` 5.0.0: exact purpose shapes; `quorums.reproducer` const 2; `profile_id` |
+| `trust-policy.v4+json` | `trust-policy` | `trust-policy-statement.schema.json` 4.0.0: `gating.mode` const `always_gate`; `bootstrap {clock_reset, accepted_tbm_reset, admission_ceilings}`; `registration.min_verification_records` const 2; `supply_chain`; `certified_targets`; `profile_id` |
+| `first-contact-authority.v1+json` | `first-contact-authority` | `first-contact-authority.schema.json` 1.0.0 |
+| `release-registration.v3+json` | `release-registration` | `release-registration.schema.json` 3.0.0 |
+| `registration-revocation.v1+json` | `release-registration` | `registration-revocation.schema.json` |
+| `binary-reproduction.v3+json` | `reproducer` | `binary-reproduction.schema.json` 3.0.0 (`environment_id`, `toolchain_id`) |
+| `environment-reproduction.v2+json` | `reproducer` | `environment-reproduction.schema.json` 2.0.0 (`lock_digest`, `supplier_id`) |
+| `trust-state.v4+json` | `trust-state` | `trust-state-statement.schema.json` 4.0.0 (`references.first_contact_authority`, `revocation_statements`) |
+| `release-final.v3+json`, `release-candidate.v3+json`, `artifact-candidate.v3+json` | `release-final`, `release-candidate` | release statements |
+| `verification-attestation.v5+json` | `verification-attestation` | `verification-attestation.schema.json` 5.0.0 (`environment_ids`, `toolchain_ids`, `verifier_execution_id`, `verification_report_digest`) |
+| `certification-status.v3+json`, `revocation.v3+json`, `retrieval-profile.v1+json` | as named | `revocation-statement.schema.json` 3.0.0 (`authority`) |
 
-**Withdrawn** (never issued, refused by every revision-5 binary): `artifact-final.v2+json`, `build-attestation.v2+json`,
-`verification-attestation.v2+json`, `trust-state.v2+json`, `historical-identity.v1+json`. Unsigned documents with registered
-digests: `input-manifest.v1+json` (`30` §4.2). Local records (never signed): the admission record (`31` R-ADM-7).
+**First-contact codes** (not signed documents; digests of signed statements, `32` §4): trust code `gov-fct:…` over the FCA
+payload; state code `gov-fcs:…` over the Trust State.
+
+**Unsigned documents with registered digests:** `input-manifest.v3`, `environment-lock.v1` (registered source), the derived
+`environment-manifest.v2` (`33` §4). **Local records (never signed):** admission record v3 (`31` R-ADM-7″), trust-state pin v3,
+trust-gate confirmation v3, trust decision pin v4.
+
+**Withdrawn** (refused by every CP-1 binary): `freshness-witness.v1` (EX-01), the first-contact manifest of revision 6 (EX-23),
+`artifact-final.v2`, `build-attestation.v2`, `verification-attestation.v2`…`v4`, `trust-state.v2`…`v3`, `release-registration.v1`…`v2`,
+`binary-reproduction.v1`…`v2`, `environment-reproduction.v1`, `historical-identity.v1`.
 
 ## 3. Grants, separation and the Fact Threshold Check (compiled)
 
-Root metadata lists, per purpose, `key_ids`, `threshold` and optionally `require_algorithms`, plus `quorums.reproducer`
-(`schemas/trust-root.schema.json`, `x-schema-version` 4.0.0). The binary checks every root version; a violation invalidates
-that version (`PURPOSE_SEPARATION_VIOLATION` or `ROOT_VERSION_INVALID`).
+Root metadata lists, per purpose, `key_ids` and `threshold`, plus `quorums.reproducer` and `profile_id`
+(`schemas/trust-root.schema.json` 5.0.0). The binary checks every root version; a violation invalidates that version
+(`PROFILE_NONCONFORMANT`, `PURPOSE_SEPARATION_VIOLATION` or `ROOT_VERSION_INVALID`).
 
-**Compiled whitelist.** A key may hold two or more purposes only if every pair is listed:
+**Compiled whitelist (CP-1).** A key may hold two purposes only if the pair is listed:
 
-| Permitted pair | Why | Owner choice |
-|---|---|---|
-| `root` + `trust-policy` | floors are constitutional (KS-2) | mandatory |
-| `root` + `release-registration`, `trust-policy` + `release-registration` | registration at root threshold | OP-2 (a) only |
-| `release-final` + `release-candidate` | stage separation still holds | OP-4 |
-| `revocation` + `certification-status` | both only add negatives or unreferenced positives | OP-4 |
-| `revocation` + `trust-state` | revocation adds negatives; trust-state references them | OP-4 |
-| `retrieval-profile` + `release-final` | profile integrity only | OP-4 |
+| Permitted pair | Why |
+|---|---|
+| `root` + `trust-policy` | floors are constitutional (KS-2) |
+| `root` + `first-contact-authority` | the first-contact root is approved at root threshold (KS-18) |
+| `trust-policy` + `first-contact-authority` | both held only by the root keys |
+
+Every other pair is refused. The revision-6 pairs for registration at root threshold, a shared candidate and final key, and
+negative-only or profile keys sharing with other purposes are not part of CP-1 (EX-09, EX-10; OP-4 "domain-separated and
+mechanically enforced").
 
 **Named constraints:**
 
 | ID | Constraint | Reason |
 |---|---|---|
-| KS-1′ | `root` keys may additionally hold only `trust-policy` and, under OP-2 (a), `release-registration` | root keys stay offline |
-| KS-2 | `trust-policy` key ids ⊆ `root` key ids; threshold ≥ root threshold | constitutional content |
-| KS-3…KS-8 | unchanged (release-final ∩ certification = ∅; release-final ∩ verification = ∅; certification ∩ verification = ∅; release-candidate ∩ (certification ∪ verification) = ∅; well-formedness, no revoked key granted; trust-state ∩ (certification ∪ verification) = ∅) | as revision 4 |
-| **KS-9′** | `reproducer` keys hold no other purpose; `quorums.reproducer` ≥ 2 | bytes need two first-hand establishers (BC4-1) |
-| **KS-10′** | `release-registration` threshold ≥ 2; its keys are root keys with threshold ≥ root threshold (OP-2 (a)) or hold no other purpose (OP-2 (b)) | the selector of source, inputs and content is never one key |
-| KS-11 | `freshness-witness` keys hold no other purpose; C3 needs ≥ 2 distinct witness keys | currency not from a key that chooses state |
+| **KS-1″** | `root` keys may additionally hold only `trust-policy` and `first-contact-authority` | root keys stay offline and never register releases |
+| KS-2 | `trust-policy` key ids equal the `root` key ids; threshold ≥ root threshold | constitutional content |
+| KS-3…KS-8 | release-final ∩ certification = ∅; release-final ∩ verification = ∅; certification ∩ verification = ∅; release-candidate ∩ (certification ∪ verification) = ∅; well-formedness, no revoked key granted; trust-state ∩ (certification ∪ verification) = ∅ | as revision 4 (implied by the CP-1 whitelist) |
+| **KS-9′** | `reproducer`: exactly 3 keys holding no other purpose; `quorums.reproducer` = 2 | bytes need two first-hand establishers (OP-9 (b)) |
+| **KS-10″** | `release-registration`: exactly 3 keys holding no other purpose; threshold 2 | the selector of source, inputs and content is never one key and never the root keys (OP-2 (b)) |
 | **KS-12** | `verification-attestation` ∩ (`reproducer` ∪ `release-registration`) = ∅ | the verifier neither registers nor reproduces |
 | **KS-13** | `release-artifact` and `build-attestation` are never granted | withdrawn pass-through purposes |
-| **KS-14** | (Revision 6.) The root threshold is at least 2 in every root version | one root key never signs a Trust Policy or root version (CR5-B-11) |
+| **KS-14** | `root`: exactly 3 keys, threshold 2, in every root version | OP-1; one root key never signs a Trust Policy, an FCA or a root version |
+| **KS-15** | `release-candidate` shares no key with any purpose; `release-final` has at least 2 keys and threshold ≥ 2 | OP-4: no threshold-1 key mints a production identity |
+| **KS-16** | `revocation`: exactly 3 keys, threshold 2; `certification-status`: ≥ 2 keys, threshold ≥ 2; `retrieval-profile` keys hold no other purpose | OP-4 purpose separation |
+| **KS-17** | `trust-state`: exactly 3 keys holding no other purpose, threshold 2 | OP-4 |
+| **KS-18** | `first-contact-authority` key ids equal the `root` key ids; threshold ≥ root threshold | owner "First-contact composer/signer": ordinary release or trust-state keys never redefine the first-contact root |
 
-**Fact Threshold Check (FTC).** SV-4 applies KS-9′, KS-10′, KS-12, KS-13 and KS-14 to every root version, in `gov`, in `gov-admit`
-and in `gov trust draft-policy`. Owner options can raise the quorum and thresholds, never lower them. Evidence:
-P4r5 `AP-R5_ftc_reproducer_key_shared`, `AP-R5_ftc_withdrawn_purpose_granted` (both `ROOT_VERSION_INVALID`); DA03r5 mutant
-`R5-ftc` detected. Revision 6: P4r6 `R6-KS14_root_threshold_1` (`ROOT_VERSION_INVALID`); FA6 S5 (root v1 with threshold 1:
-`ROOT_CHAIN_INVALID`); DA03r6 `R6-ks14` detected.
+A root granting a purpose outside this table (for example the excluded witness purpose) is `PROFILE_NONCONFORMANT`.
 
-**Minimum capability sets (revision 6; FD-3).** Every set is generated by the revision-6 calculator
-(`evidence/r6/CS6-derivation-calculator.json`) and placed in: `30` §10 (bytes per OP-9 and victim class, source per OP-8,
-toolchain per OP-10), `33` §6 (environment per OP-16), `34` §4 (constitutional content per OP-2, OP-4, OP-8), `32` §6 (first
-admission per OP-13). The first-contact root, which review r5 found misstated here:
+**Fact Threshold Check (FTC).** SV-4 applies KS-1″…KS-18 to every root version, in `gov`, in `gov-admit` and in
+`gov trust draft-policy`. CP-1 shapes are exact: no Trust Policy or root field raises or lowers them. Evidence: FA7 S4 R12, R14,
+R15, R15b, R16 and S5 `root_threshold_1` (each `PROFILE_NONCONFORMANT` or `FIRST_CONTACT_AUTHORITY_UNVERIFIED`); PROF7 EX-01,
+EX-09, EX-10, EX-23.
 
-<!-- CS6:BEGIN FC-ROOT -->
-| OP-13 answer | First-contact root: minimal sets that admit a malicious first TCB with no key | Other minimal sets (release-process compromises, as for running machines) |
-|---|---|---|
-| a | {ch1} | 1 |
-| b | {ch1, ch2}; {ch1, op1src} | 1 |
-| c_all_1 | {ch1, alt} | 16 |
-| c_all_2 | {ch1, ch2, alt}; {ch1, op1src, alt} | 31 |
-| c_either_1 | {ch1}; {alt} | 1 |
-| c_either_2 | {alt}; {ch1, ch2}; {ch1, op1src} | 1 |
-| d | {media} | 1 |
-<!-- CS6:END FC-ROOT -->
-
-**Revision-5 table (superseded; kept for the review trail; its first-admission rows were false, RV5-H1).**
-
-| Consequence | Minimal sets (processes / key theft) | Owner options that change it |
-|---|---|---|
-| accepted malicious bytes for a genuine release | q reproducer processes; or q reproducer keys + trust-state key + the victim's channel(s) + transport (or + registration keys); never on pinned machines by key theft | OP-9, OP-13 |
-| accepted malicious source, faithfully built | route I (TB-4); OP-8 verification processes + pipeline (TB-4′); registration custodians at threshold + OP-8 verification keys; key theft: registration keys + OP-8 verification keys + q reproducer keys + trust-state key + channel(s) | OP-2, OP-8, OP-9, OP-13 |
-| accepted malicious named build inputs | registration custodians at threshold + OP-8 verification keys; key theft as above | OP-2, OP-8 |
-| poisoned input mirror | none (inputs by digest) | — |
-| compromised upstream toolchain | TA-12 under OP-10 (a) | OP-10 |
-| visible CERTIFIED | 3 (verification-attestation, certification-status, trust-state) | — |
-| lift of WITHDRAWN/REJECTED | 3, with an attestation issued for the lift naming the negative | — |
-| C3 currency on a witness-reliant machine | 2 witness keys (compiled) under 2 custodians (CR4-B-02) | OP-7 |
-| new floor, surface classification, precedence registration, lowering, clock reset, reproducer quorum | root threshold | OP-1 |
-
-No single key of any purpose, and no key together with pipeline or transport input, yields an accepted production binary,
-registers a release, lifts a negative, witnesses C3 currency or changes constitutional classification (CS5: 0 failures of
-INV-ONE over 408 configurations).
+**Minimum capability sets.** Every consequence statement is a block generated by `evidence/r7/CS7-derivation-calculator.py` for
+CP-1, placed in `30` §10 (bytes, source, inputs), `33` §6 (environment, toolchain), `34` §4 (content) and `32` §8–§9 (first
+admission, revoked binaries). No single key of any purpose, and no key together with pipeline, transport or publication input,
+yields an accepted production binary, registers a release, lifts a negative or changes constitutional classification
+(invariant INV-ONE, 0 failures; BA12r7 brute force over key subsets below the thresholds: no accepting set with at most one key).
 
 ## 4. Signature verification rules (every statement, every source)
 
 SV-1…SV-11 are unchanged from revision 4, with two amendments:
-- **SV-4** also applies the Fact Threshold Check (§3).
+- **SV-4** also applies the Fact Threshold Check and the CP-1 shapes (§3).
 - **SV-7** counts a threshold per statement for every purpose **except `reproducer`**, whose statements carry exactly one
   signature each; the reproducer quorum is counted across statements by distinct keys (`25` AP-6).
 
@@ -143,90 +123,85 @@ SV-1…SV-11 are unchanged from revision 4, with two amendments:
 
 | Authority | Held by | Can another purpose exercise it? |
 |---|---|---|
-| Source identity, input manifest, final, targets and constitutional units of a release | the release registration (OP-2) | no; `release-final`, `verification-attestation` and the pipeline select none of them |
-| Faithful build of a registered release | ≥ q first-person reproductions (OP-9); under (d) also the registration | no |
-| Publication and negatives | `trust-state` within an anchored, currency-proven chain; `revocation` | no |
+| Lineage, first-contact admitter and sources | `first-contact-authority` at root threshold | no |
+| Source identity, input manifest, environments, toolchains, final, targets, binary digests and constitutional units of a release | the 2-of-3 release registration | no; `release-final`, `verification-attestation` and the pipeline select none of them |
+| Faithful build of a registered release | ≥ 2 first-person reproductions from independent supplier classes and toolchain lineages, and the custodians' own reproduction | no |
+| Publication and negatives | `trust-state` at 2 of 3 within an anchored, currency-proven chain; `revocation` at 2 of 3 or the root threshold | no |
 | Production binary acceptance | admission-predicate/1 by an evaluator other than the candidate (`25` §5, `31`) | no |
-| Verification result | `verification-attestation` (restrictor) | no |
-| Certification state | `certification-status`; a visible CERTIFIED also needs an attestation and a trust-state reference | no |
-| Currency on a machine | proven locally (P1 naming the TSS, P2, P3) | never `trust-state` |
-| Current install eligibility | computed (`19` §6) | — |
+| Verification result | `verification-attestation` (restrictor; two records) | no |
+| Certification state | `certification-status` (negatives only) | no |
+| Currency on a machine | proven locally from both sources' state codes (`24` §4.4) | never `trust-state` alone |
 
 ## 6. Representation
 
 Key id: `ed25519:` + 64 lowercase hex of SHA-256(raw public key), recomputed on every use. Trust-root id: `sha256:` of the
 canonical v1 root payload. Canonical repository layout (public data only): `trust/production/root/<version>.dsse.json`,
-`policy/<version>.dsse.json`, `state/<sequence>.dsse.json`, `registrations/<release_id>.dsse.json`,
-`reproductions/<release_id>/<target>/<key id>.dsse.json`, `manifests/<digest>.json`, `statements/<digest>.dsse.json`,
-`fingerprints.txt` (convenience copy, not a channel). Test lineage: `tests/fixtures/trust/`.
+`policy/<version>.dsse.json`, `first-contact/<fca_sequence>.dsse.json`, `state/<sequence>.dsse.json`,
+`registrations/<release_id>.dsse.json`, `reproductions/<release_id>/<target>/<key id>.dsse.json`, `manifests/<digest>.json`,
+`statements/<digest>.dsse.json`. Repository copies are carriers, never sources. Test lineage: `tests/fixtures/trust/`.
 
 ## 7. Ceremony and signing rules
 
-1. **No private keys outside custody** (unchanged).
-2. **Sign what you reproduced** (`release-final`, `release-candidate`): the signer rebuilds the unsigned payload from the
-   source identity and checks `content_digest` and `inputs_manifest_digest`; a final's signer checks V8.
-3. **Attest what you verified** (`verification-attestation`, `30` R-VER-1): reproduce the candidate payload, check the input
-   manifest against upstream signed checksums, and return the record first-hand to the registration ceremony.
-4. **Certify only what was attested** (unchanged).
-5. **Register before you release** (`release-registration`, `30` R-REG-3): the ceremony signs only with first-hand
-   verification records, upstream checksum evidence, each custodian's own `content_digest` and, under OP-9 (d), each
-   custodian's own reproduction; `gov trust draft-registration` refuses without them and lists every unit change and
-   computed reduction.
-6. **Reproduce first-hand** (`reproducer`, `30` R-REP-1…R-REP-3): inputs by digest; one signature; confirm first-hand to the
-   publisher.
-7. **Publish only quorum-reproduced, registered binaries** (`trust-state`, `30` R-PUB-1…R-PUB-4): references are cumulative;
-   one published digest per release and target; state fingerprint in the channels.
-8. **Producer hygiene** (unchanged): `gov release build` refuses private key material and runs the surface checker with the
-   release's registration.
-9. **Ceremony record:** public keys, grants, thresholds, quorum, lineage id, custodians, reproducer environments, verifier
-   identities, date; never secrets.
-10. **Witness custody (OP-7 (c), CR4-B-02):** the witness service takes the fingerprint only from the owner's ceremony or
-    the channel; the C3 witness threshold is met by keys under at least two custodians, or `gov trust draft-policy` flags
-    the one-custody consequence.
+1. **No private keys outside custody.** Root keys live on offline hardware-backed devices under the three custodial roles, in
+   physically separate custody; never in a repository, CI, cloud build environment or ordinary development workstation (OP-1).
+   The same holds for registration, trust-state, revocation, release-final and certification keys (hardware-backed,
+   single-purpose).
+2. **Sign what you reproduced** (`release-final`, `release-candidate`): the signer rebuilds the unsigned payload from the source
+   identity and checks `content_digest` and `inputs_manifest_digest`; a final's signer checks V8.
+3. **Attest what you verified** (`verification-attestation`, `30` R-VER-1): reproduce the candidate in the derived environments
+   and registered toolchain lineages, and return the record first-hand to the registration ceremony.
+4. **Certify only what was attested.**
+5. **Register before you release** (`30` R-REG-3 (a)–(h)); `gov trust draft-registration` refuses without the evidence.
+6. **Reproduce first-hand** (`30` R-REP-1…R-REP-4).
+7. **Publish only quorum-reproduced, registered binaries** (`30` R-PUB-1′…R-PUB-4).
+8. **Approve the first-contact root at root threshold** (`32` R-FCA-1): only after the admitter's registration, reproduction
+   and two verification records, each checked by every signing root custodian.
+9. **Register suppliers and toolchain lineages at root threshold** (`33` R-BENV-1″, R-BENV-6″): provenance attributes and
+   checksum keys are recorded from the custodians' own inspection, never from a pipeline.
+10. **Producer hygiene:** `gov release build` refuses private key material and runs the surface checker with the release's
+    registration.
+11. **Ceremony record:** public keys, grants, thresholds, quorum, lineage id, custodial roles, the two first-contact sources and
+    their custody domains, reproducer and verifier identities, supplier and toolchain provenance, date; never secrets.
 
 ## 8. Rotation, revocation, re-signing and re-reproduction
 
-- **Purpose rotation:** root N+1, signed by the thresholds of N and N+1. **Key revocation:** root N+1 removes the key and
-  lists it in `revoked_keys`.
-- **Re-signing (RV3-L8, retained):** before publishing a root N+1 that removes a key, the owner re-signs retained honest
-  statements of that key with a successor key: the trust-state history, finals and candidates, attestations,
-  certifications, witnesses and registrations (payload digests unchanged, so anchors and references hold).
-- **Reproductions are never re-signed** (`30` R-REP-7): a reproduction by a removed key is replaced by a new reproduction
-  under the successor key, or the release is re-reproduced. Re-signing would launder the reproductions a stolen key signed
-  (specialist B N19).
+- **Purpose rotation:** root N+1, signed by the thresholds of N and N+1. **Key revocation:** root N+1 removes the key and lists it
+  in `revoked_keys`.
+- **Re-signing (retained):** before publishing a root N+1 that removes a key, the owner re-signs retained honest statements of
+  that key with a successor key: the trust-state history, finals and candidates, attestations, certifications, registrations and
+  FCAs (payload digests unchanged, so anchors, codes and references hold).
+- **Reproductions are never re-signed** (`30` R-REP-7).
 
-## 9. Compromise and loss playbooks (revision 5)
+## 9. Compromise and loss playbooks
 
 Every row that publishes root N+1 includes §8.
 
 | Event | Actions | Durable once the verifier holds |
 |---|---|---|
 | `release-final` or `release-candidate` key stolen | root N+1 removes the key; re-sign genuine finals | root N+1 |
-| one `release-registration` key stolen | root N+1 replaces it (threshold) | root N+1 |
-| registration keys at threshold stolen (OP-2 (b)) | root N+1 removes them; **revoke** every registration they signed that the owner did not issue; the next TSS keeps every `registrations[]` reference and adds the revocations | root N+1 and the TSS |
-| one `reproducer` key stolen | root N+1 replaces it; the registration authority revokes its forged reproductions with a `registration-revocation` (clears `REPRODUCTION_CONFLICT`, R-REG-11); re-reproduce its honest ones | root N+1 and the registration revocation |
-| reproducer keys or processes at the quorum compromised | root N+1 removes the keys; revoke the published malicious digests; the next TSS keeps `published_binaries[]` and adds revocations; advise re-admission; review OP-9 | root N+1 and the TSS |
+| one `release-registration` key stolen | root N+1 replaces it (threshold 2 of 3) | root N+1 |
+| registration keys at threshold stolen | root N+1 removes them; revoke every registration they signed that the owner did not issue; the next TSS keeps every `registrations[]` reference and adds the revocations | root N+1 and the TSS |
+| one `reproducer` key stolen | root N+1 replaces it; the registration authority revokes its forged reproductions with a `registration-revocation` (R-REG-11); re-reproduce its honest ones | root N+1 and the registration revocation |
+| reproducer processes at the quorum compromised | root N+1 removes the keys; revoke the published malicious digests; advise re-admission | root N+1 and the TSS |
 | `verification-attestation` key stolen | root N+1 removes the key; revoke attestations the verifier did not issue; review registrations that listed them | root N+1 and revocations |
-| `certification-status`, `revocation`, `retrieval-profile` key stolen | as revision 4 | root N+1 or the TPS |
-| `trust-state` key stolen | root N+1 removes the key and re-signs the retained history; a TPS `state_chain_reset` if histories forked | root N+1 / the TPS |
-| `freshness-witness` keys stolen | root N+1 removes them; TPS `bootstrap.clock_reset` if needed; advise re-anchoring | root N+1 and the TPS |
-| compromised upstream toolchain discovered | revoke affected binaries; register a new release with a corrected manifest; review OP-10 | revocations |
+| `certification-status`, `revocation`, `retrieval-profile` key stolen | root N+1 replaces it | root N+1 |
+| one `trust-state` key stolen | root N+1 replaces it (threshold 2 of 3) | root N+1 |
+| `trust-state` keys at threshold stolen | root N+1 removes them and re-signs the retained history; a TPS `state_chain_reset` if histories forked; the sources refuse descendants that drop published revocations (`32` R-FCS-2) | root N+1 / the TPS |
 | one root key stolen or lost | remaining custodians sign N+1 | immediately |
 | root threshold stolen or lost | new lineage; first admission everywhere (`31`, `32`) | first admission |
-| (revision 6) an upstream environment component found malicious | revoke affected binaries; register a new release with corrected environment manifests; review OP-16 | revocations |
-| (revision 6) a first-contact source compromised | publish the incident through the remaining sources; rotate the source; machines admitted from it re-admit through the OP-13 procedure (the store is kept) | the next first-contact manifest |
-| (revision 6) the OP-13 (c) signing path compromised | withdraw the path's packages; new admitter release with a new digest in the Trust Policy's `admitter_digests`; revoke the old admitter digest in the next Trust State (FC-8) | the next Trust State |
-| (revision 6) a defective admitter version | remove its digest from `bootstrap.admitter_digests` (root threshold) and revoke it in the next Trust State; genuine admitters refuse themselves (`ADMITTER_NOT_LISTED`, `ADMITTER_REVOKED`) | the Trust Policy and Trust State |
+| an upstream environment component or supplier found malicious | revoke affected binaries; the root threshold removes or re-provenances the supplier in the Trust Policy registry; register a new release with a corrected lock | the TPS and revocations |
+| a toolchain lineage found compromised | revoke affected binaries; the root threshold updates the toolchain registry; re-register | the TPS and revocations |
+| a first-contact source compromised | publish the incident through the other source and the ceremony record; rotate the source in a new FCA at root threshold; machines admitted meanwhile re-admit (stores kept) | the next FCA |
+| a defective admitter version | a new FCA at root threshold without its digest; revoke the digest in the next Trust State; genuine admitters refuse themselves (`ADMITTER_NOT_LISTED`, `ADMITTER_REVOKED`) | the FCA and Trust State |
 
 ## 10. Test, development and production separation
 
-Unchanged: the test lineage compiles only into `gov-test-profile`; production refuses test material; development binaries
-have TBM `build: development`, are never admitted, never record an accepted TBM (CR4-B-08), and their embedded kernel is
-`DEVELOPMENT_UNSIGNED` unless its registration verifies.
+Unchanged: the test lineage compiles only into `gov-test-profile`; production refuses test material; development binaries have
+TBM `build: development`, are never admitted, never record an accepted TBM, and their embedded kernel is `DEVELOPMENT_UNSIGNED`
+unless its registration verifies.
 
 ## 11. Algorithms
 
-Ed25519 (RFC 8032, strict) and SHA-256 only. The source identity binds `content_digest` v2 (revision 6: length-prefixed mode,
-path and blob SHA-256 records with control-character paths refused, `30` §4.1) and the Git tree id, so it does not rest on
-SHA-1 commit ids alone and does not depend on archive tools or time (`evidence/r6/SRC6-source-identity-v2.json`; revision 5's
-line encoding was ambiguous, RV5-M4).
+Ed25519 (RFC 8032, strict) and SHA-256 only. The source identity binds `content_digest` v2 (`30` §4.1) and the Git tree id, so it
+does not rest on SHA-1 commit ids alone and does not depend on archive tools or time (`evidence/r6/SRC6-source-identity-v2.json`,
+retained).

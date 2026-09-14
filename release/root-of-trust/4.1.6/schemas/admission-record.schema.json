@@ -1,32 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/admission-record/2",
-  "title": "Local admission record v2 (never signed; RoT-1 revision 6, PROPOSED; 31 R-ADM-7′). Held only inside the verifier trust store as vts-<lineage prefix>/admissions/<binary digest>.json; a record anywhere else is ignored (GB-1′).",
-  "x-schema-version": "2.0.0",
+  "$id": "https://agentic-engineering-os/schemas/admission-record/3",
+  "title": "Local admission record v3 (never signed; held only in the protected admission store; RoT-1 revision 7, CP-1, PROPOSED; 31 R-ADM-7″)",
+  "x-schema-version": "3.0.0",
+  "description": "Written only by gov-admit into <protected admission store>/<64 hex lineage>/admissions/<64 hex binary digest>.json. Honoured only there, only while valid, only for the lineage it names, and only when its admitter digest is listed by the first-contact authority record the effective Trust State names (31 GB-1″). Every record expires (OP-14 (b)): workstation 90 days, CI image 7 days.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema",
-    "binary_digest",
-    "target",
-    "release_id",
-    "lineage",
-    "first_contact_code",
     "admitted_at",
     "admitter_digest",
-    "valid_until",
-    "location_protected"
+    "admitter_kind",
+    "binary_digest",
+    "lineage",
+    "path_class",
+    "release_id",
+    "schema",
+    "state_code",
+    "target",
+    "trust_code",
+    "valid_until"
   ],
   "properties": {
     "schema": {
-      "const": "governance-os.admission-record/2"
+      "const": "governance-os.admission-record/3"
     },
     "binary_digest": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
     "target": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-z0-9_]+-[a-z0-9_]+-[a-z0-9_]+(-[a-z0-9_]+)?$"
     },
     "release_id": {
       "type": "string"
@@ -35,28 +39,34 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
+    "trust_code": {
+      "type": "string",
+      "pattern": "^gov-fct:[0-9a-f]{8}:[0-9]+:[0-9a-f]{64}$"
+    },
+    "state_code": {
+      "type": "string",
+      "pattern": "^gov-fcs:[0-9a-f]{8}:[0-9]+:[0-9a-f]{64}$"
+    },
     "admitted_at": {
       "type": "string",
-      "format": "date-time"
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
     },
     "admitter_digest": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
+    "admitter_kind": {
+      "const": "compiled-gov-admit"
+    },
+    "path_class": {
+      "enum": [
+        "workstation",
+        "ci-image"
+      ]
+    },
     "valid_until": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "date-time"
-    },
-    "location_protected": {
-      "type": "boolean"
-    },
-    "first_contact_code": {
       "type": "string",
-      "pattern": "^gov-fc:[0-9a-f]{8}:[0-9]+:[0-9a-f]{64}$",
-      "description": "the code agreed across the OP-13 sources (32 §3)"
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
     }
   }
 }

@@ -1,0 +1,240 @@
+{
+ "probe": "DA04r7 plan regression detection for review r6 defects (AR-0019; after RV6-D-A04)",
+ "plan_rt_rows": 202,
+ "instruments_present": {
+  "FA7": true,
+  "CUR7": true,
+  "ADM7": true,
+  "ENV7": true,
+  "CRASH7": true,
+  "PPR7": true,
+  "REGISTER-CHECK": true,
+  "STATEMENTS-CHECK": true,
+  "DA09r7": true,
+  "RV6-D-A03": true
+ },
+ "defects": {
+  "RV6-B-H1 first-contact manifest composed by the trust-state publisher": {
+   "plan_rows": [
+    "RT-184"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "FA7:S2_P_custodians_never_publish_a_composed_or_below_threshold_authority_or_state",
+    "FA7:S2_P_genuine_admitter_refuses_composed_codes"
+   ],
+   "detected": true
+  },
+  "RV6-D-A01 source designation and procedure printed by an unadmitted binary or carrier": {
+   "plan_rows": [
+    "RT-184"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "FA7:S2_D_one_attacker_page_disagreement_and_weakened_steps_refused",
+    "FA7:S2_D_attacker_lineage_refused_by_genuine_admitter"
+   ],
+   "detected": true
+  },
+  "RV6-B-H2 platform package submitter selects the admitter": {
+   "plan_rows": [
+    "RT-184"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "FA7:S2_X_only_b_accepted_every_other_answer_refused"
+   ],
+   "detected": true
+  },
+  "RV6-B-H2 / D-A08 replayed or stored first-contact value without a mandatory age bound": {
+   "plan_rows": [
+    "RT-191"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "CUR7:A08_stored_values_older_than_ceiling_refused",
+    "CUR7:R_replayed_old_values_refused_by_age"
+   ],
+   "detected": true
+  },
+  "RV6-B-H3 environment recipe or component selection authored by an unassigned party": {
+   "plan_rows": [
+    "RT-186"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "ENV7:A07a_refused_before_registration",
+    "ENV7:A07b_pipeline_selection_refused"
+   ],
+   "detected": true
+  },
+  "RV6-B-H3 supplier class by label; upstream key named by the manifest": {
+   "plan_rows": [
+    "RT-186"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "ENV7:A08_label_diversity_refused",
+    "ENV7:A09_pinned_keys_refuse"
+   ],
+   "detected": true
+  },
+  "RV6-B-M1 / D-A02 re-admission does not apply the kept store": {
+   "plan_rows": [
+    "RT-191"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "CUR7:A02_store_applied",
+    "CUR7:A04_R_ART_2_at_use"
+   ],
+   "detected": true
+  },
+  "RV6-B-M2 renderer merges atoms of different classes": {
+   "plan_rows": [
+    "RT-193"
+   ],
+   "register": [
+    "29"
+   ],
+   "reference": [
+    "STATEMENTS-CHECK:S3_renderer/sensitivity/mutated_renderer_detected"
+   ],
+   "detected": true
+  },
+  "RV6-B-M3 / D-A09 register completeness over rule ids, not inputs": {
+   "plan_rows": [
+    "RT-192"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "DA09r7:every_held_out_mutation_fails_the_register_check",
+    "DA09r7:every_certified_schema_field_covered"
+   ],
+   "detected": true
+  },
+  "RV6-C-M2 crash inside the first-install layout migration": {
+   "plan_rows": [
+    "RT-195"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "CRASH7:never_ABSENT_or_PARTIAL_after_recovery",
+    "CRASH7:rot1_init_never_over_overlay"
+   ],
+   "detected": true
+  },
+  "RV6-C-M3 per-project record identity under worktree, fork or second clone": {
+   "plan_rows": [
+    "RT-196"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "PPR7:worktree_move_bindmount_keep_E10",
+    "PPR7:clone_and_fork_reported_fail_closed_and_never_overwrite"
+   ],
+   "detected": true
+  },
+  "RV6-C-M4 a remedy re-records strength or clears a pending gate": {
+   "plan_rows": [
+    "RT-197"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "PPR7:remedies_keep_strength_report_and_pending_gate",
+    "PPR7:remedy_rerecord_mutant_detected"
+   ],
+   "detected": true
+  },
+  "RV6-C-M5 admission store versus account verifier trust store": {
+   "plan_rows": [
+    "RT-185",
+    "RT-202"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "ADM7:A07_first_admission_decided_by_protected_store_only"
+   ],
+   "detected": true
+  },
+  "RV6-D-A03 R-CON-5 listing of a new security-relevant constitutional file": {
+   "plan_rows": [
+    "RT-198"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "RV6-D-A03:verdicts"
+   ],
+   "detected": true
+  },
+  "RV6-D-A07 planted admission record suppresses the first-admission move-aside": {
+   "plan_rows": [
+    "RT-185"
+   ],
+   "register": [
+    "DECISION_REGISTER.yaml"
+   ],
+   "reference": [
+    "ADM7:A07_mutant_detected"
+   ],
+   "detected": true
+  }
+ },
+ "successors_of_self_referential_tests": {
+  "RT-184": {
+   "text": "| RT-184 [D] | First contact on CP-1: both sources honest; one source shows an attacker lineage, both show it with the genuine admitter; the operator types one source's codes for both; a substituted admitter both pages list; an authority record signed by two trust-state keys, by one root key, or of ",
+   "distinguishing": true,
+   "input_is_held_out_vectors_or_mutations": true
+  },
+  "RT-186": {
+   "text": "| RT-186 [D] | Environment lock with inline component content; a pipeline-supplied manifest carrying an injected or instrumented object for one class and for both; a manifest naming its checksum key; two labels over one supplier; a ceremony record naming a pipeline-supplied derivation tool | `ENVIRO",
+   "distinguishing": true,
+   "input_is_held_out_vectors_or_mutations": true
+  },
+  "RT-192": {
+   "text": "| RT-192 [D] | The implementation's decision register with (i) a schema field removed from `inputs`; (ii) the designation, publication-process, submitter or manifest-author procedure input removed; (iii) a selector row without an establishing party; (iv) an exclusion row removed | the register check",
+   "distinguishing": true,
+   "input_is_held_out_vectors_or_mutations": true
+  },
+  "RT-193": {
+   "text": "| RT-193 [D] | The implementation's statement generator with a renderer that merges atom classes (the repository writer rendered as a reproducer key) | the atom-level statement check fails; the committed blocks with the injective renderer pass | RV6-M1; CR6-B-03 (a), (i) |",
+   "distinguishing": true,
+   "input_is_held_out_vectors_or_mutations": true
+  }
+ },
+ "summary": {
+  "defects": 15,
+  "detected": 15,
+  "not_detected": []
+ },
+ "verdicts": {
+  "every_review_r6_defect_detected": true,
+  "successor_tests_have_independent_inputs": true
+ }
+}

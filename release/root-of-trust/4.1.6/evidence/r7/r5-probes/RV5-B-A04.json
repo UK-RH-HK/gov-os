@@ -1,0 +1,1553 @@
+{
+ "instruments": {
+  "CS5": "evidence/r5/CS5-tcb-capability-sets.py (unmodified; `accepted` wrapped, original called)",
+  "P4r5": "evidence/r5/P4r5-conformance-oracle.py (unmodified)"
+ },
+ "monotonicity_violations_in_rerun": 0,
+ "part_C_victim_classes_in_CS5": [
+  "FA1",
+  "FA2",
+  "P1",
+  "P2"
+ ],
+ "part_I_build_image_selector": {
+  "CS5 atoms and goals containing an image atom": [],
+  "G_IMAGE|image_record=owner_built_from_upstream_images_or_packages|FA1|any OP-2, OP-8, OP-9, OP-10": [
+   "image_up"
+  ],
+  "G_IMAGE|image_record=owner_built_from_upstream_images_or_packages|P1|any OP-2, OP-8, OP-9, OP-10": [
+   "image_up"
+  ],
+  "G_IMAGE|image_record=owner_built_from_upstream_images_or_packages|P2|any OP-2, OP-8, OP-9, OP-10": [
+   "image_up"
+  ],
+  "G_IMAGE|image_record=produced_by_release_pipeline|FA1|any OP-2, OP-8, OP-9, OP-10": [
+   "pipeline"
+  ],
+  "G_IMAGE|image_record=produced_by_release_pipeline|P1|any OP-2, OP-8, OP-9, OP-10": [
+   "pipeline"
+  ],
+  "G_IMAGE|image_record=produced_by_release_pipeline|P2|any OP-2, OP-8, OP-9, OP-10": [
+   "pipeline"
+  ],
+  "G_IMAGE|image_record=registered_input_reproduced_from_pinned_upstream_digests|FA1|any OP-2, OP-8, OP-9, OP-10": [],
+  "G_IMAGE|image_record=registered_input_reproduced_from_pinned_upstream_digests|P1|any OP-2, OP-8, OP-9, OP-10": [],
+  "G_IMAGE|image_record=registered_input_reproduced_from_pinned_upstream_digests|P2|any OP-2, OP-8, OP-9, OP-10": []
+ },
+ "part_L_channel_selected_lineage": {
+  "L_examples": {
+   "G_BYTES|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + rp1 + rp2 + rp3",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + rp1 + rp2 + rp3"
+    ]
+   },
+   "G_BYTES|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + rp1 + rp2 + rp3",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "cust1 + cust2 + rp1 + rp2 + rp3"
+    ]
+   },
+   "G_BYTES|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "cust1 + cust2 + rp1 + rp2 + rp3",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + rp1 + rp2 + rp3"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "rp1 + rp2"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + ch2 + rep1 + rep2 + transport + ts",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "rp1 + rp2"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + ch2 + rep1 + rep2 + transport + ts",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "rp1 + rp2"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + rp1 + rp2 + rp3",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + rp1 + rp2 + rp3"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + rp1 + rp2 + rp3",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "cust1 + cust2 + rp1 + rp2 + rp3"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "cust1 + cust2 + rp1 + rp2 + rp3",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + rp1 + rp2 + rp3"
+    ]
+   },
+   "G_INPUTS|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + va1"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "cust1 + cust2 + va1"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + va1"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_MIRROR|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [],
+    "with_channel_selected_lineage": [
+     "ch1"
+    ]
+   },
+   "G_MIRROR|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2"
+    ]
+   },
+   "G_MIRROR|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [],
+    "with_channel_selected_lineage": [
+     "ch1"
+    ]
+   },
+   "G_MIRROR|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + rep1 + rep2 + transport + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "rp1 + rp2"
+    ]
+   },
+   "G_MIRROR|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + ch2 + rep1 + rep2 + transport + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2",
+     "rp1 + rp2"
+    ]
+   },
+   "G_MIRROR|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + ch2 + rep1 + rep2 + transport + ts"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "rp1 + rp2"
+    ]
+   },
+   "G_MIRROR|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [],
+    "with_channel_selected_lineage": [
+     "ch1"
+    ]
+   },
+   "G_MIRROR|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [],
+    "with_channel_selected_lineage": [
+     "ch1 + ch2"
+    ]
+   },
+   "G_MIRROR|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [],
+    "with_channel_selected_lineage": [
+     "ch1"
+    ]
+   },
+   "G_SRC|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "insider",
+     "ch1 + ch2",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=delegated|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "with_channel_selected_lineage": [
+     "insider",
+     "ch1 + ch2",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "insider",
+     "ch1 + ch2",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2|quorum-from-selected-state": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "with_channel_selected_lineage": [
+     "ch1",
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2"
+    ]
+   }
+  },
+  "L_summary": {
+   "FA1_configurations": 96,
+   "FA1_minimum_is_ch1_alone": 96,
+   "FA2_quorum_from_selected_state_minimum_is_ch1": 96,
+   "FA2_two_typed_configurations": 96,
+   "FA2_two_typed_minimum_is_ch1_ch2": 96,
+   "committed_FA_sets_containing_a_key_atom_that_the_channel_alone_supersedes": 480,
+   "configurations": 288
+  }
+ },
+ "part_P_computed_with_P4r5": {
+  "control: a binary of the same registration (accept_binary, in-gate fingerprint naming t12x)": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+  "human anchor at t11 (40 days)": {
+   "C3_currency_covers_t12x": true,
+   "allowed_classes": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "currency_axis": "ANCHORED(11, human, as-of 2960, age 40d; held 12) CURRENCY_UNPROVEN",
+   "effective_tss": "t12x",
+   "eligible_release_r5(F12)": {
+    "eligible": true,
+    "reason": null
+   }
+  },
+  "human anchor at t11 (today)": {
+   "C3_currency_covers_t12x": false,
+   "allowed_classes": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "currency_axis": "ANCHORED(11, human, as-of 3000, age 0d; held 12) CURRENCY(human anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "eligible_release_r5(F12)": {
+    "eligible": true,
+    "reason": null
+   }
+  },
+  "pin at t11 provisioned 1 day ago": {
+   "C3_currency_covers_t12x": false,
+   "allowed_classes": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "currency_axis": "ANCHORED(11, pin, as-of 2999, age 1d; held 12) CURRENCY(pin anchored within the C3 currency window)",
+   "effective_tss": "t12x",
+   "eligible_release_r5(F12)": {
+    "eligible": true,
+    "reason": null
+   }
+  },
+  "unanchored CI runner, OP-7 (d)": {
+   "C3_currency_covers_t12x": true,
+   "allowed_classes": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "currency_axis": "UNANCHORED(FRESHNESS_UNPROVEN; held 12)",
+   "effective_tss": "t12x",
+   "eligible_release_r5(F12)": {
+    "eligible": true,
+    "reason": null
+   }
+  }
+ },
+ "part_P_policy_root_goal": {
+  "G_POLICY|OP-2=delegated|OP-8=1|ingress_P1|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + repo + rf",
+    "cust1 + cust2 + pipeline + repo + va1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf"
+   ]
+  },
+  "G_POLICY|OP-2=delegated|OP-8=1|ingress_P1|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=delegated|OP-8=1|ingress_P2|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + repo + rf",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=delegated|OP-8=1|ingress_P2|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=delegated|OP-8=1|use_anchored|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + repo + rf",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts",
+    "cust1 + pipeline + regk2 + repo + ts + va1",
+    "cust2 + pipeline + regk1 + repo + ts + va1",
+    "pipeline + regk1 + regk2 + repo + ts + va1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=delegated|OP-8=1|use_anchored|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "cust1 + pipeline + regk2 + repo + ts + va1",
+    "cust1 + regk2 + repo + rf + ts + va1",
+    "cust1 + regk2 + repo + rf + ts + vp1",
+    "cust2 + pipeline + regk1 + repo + ts + va1",
+    "cust2 + regk1 + repo + rf + ts + va1",
+    "cust2 + regk1 + repo + rf + ts + vp1",
+    "pipeline + regk1 + regk2 + repo + ts + va1",
+    "regk1 + regk2 + repo + rf + ts + va1",
+    "regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "cust1 + regk2 + repo + rf + ts + va1",
+    "cust1 + regk2 + repo + rf + ts + vp1",
+    "cust2 + regk1 + repo + rf + ts + va1",
+    "cust2 + regk1 + repo + rf + ts + vp1",
+    "regk1 + regk2 + repo + rf + ts + va1",
+    "regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=delegated|OP-8=2|ingress_P1|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "cust1 + cust2 + repo + rf",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf"
+   ]
+  },
+  "G_POLICY|OP-2=delegated|OP-8=2|ingress_P1|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=delegated|OP-8=2|ingress_P2|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "cust1 + cust2 + repo + rf",
+    "pipeline + repo + vp1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va2 + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=delegated|OP-8=2|ingress_P2|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va2 + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=delegated|OP-8=2|use_anchored|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "cust1 + cust2 + repo + rf",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "pipeline + regk1 + regk2 + repo + ts + va2 + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=delegated|OP-8=2|use_anchored|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "delegated registration quorum"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "pipeline + regk1 + regk2 + repo + ts + va2 + vp1",
+    "regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=root|OP-8=1|ingress_P1|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + repo + rf",
+    "cust1 + cust2 + pipeline + repo + va1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf"
+   ]
+  },
+  "G_POLICY|OP-2=root|OP-8=1|ingress_P1|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=root|OP-8=1|ingress_P2|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + repo + rf",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=root|OP-8=1|ingress_P2|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=root|OP-8=1|use_anchored|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + repo + rf",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts",
+    "cust1 + pipeline + regk2 + repo + ts + va1",
+    "cust2 + pipeline + regk1 + repo + ts + va1",
+    "pipeline + regk1 + regk2 + repo + ts + va1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=root|OP-8=1|use_anchored|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1",
+    "cust1 + cust2 + pipeline + repo + va1",
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "cust1 + pipeline + regk2 + repo + ts + va1",
+    "cust1 + regk2 + repo + rf + ts + va1",
+    "cust1 + regk2 + repo + rf + ts + vp1",
+    "cust2 + pipeline + regk1 + repo + ts + va1",
+    "cust2 + regk1 + repo + rf + ts + va1",
+    "cust2 + regk1 + repo + rf + ts + vp1",
+    "pipeline + regk1 + regk2 + repo + ts + va1",
+    "regk1 + regk2 + repo + rf + ts + va1",
+    "regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1",
+    "cust1 + cust2 + repo + rf + vp1",
+    "cust1 + regk2 + repo + rf + ts + va1",
+    "cust1 + regk2 + repo + rf + ts + vp1",
+    "cust2 + regk1 + repo + rf + ts + va1",
+    "cust2 + regk1 + repo + rf + ts + vp1",
+    "regk1 + regk2 + repo + rf + ts + va1",
+    "regk1 + regk2 + repo + rf + ts + vp1"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=root|OP-8=2|ingress_P1|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "cust1 + cust2 + repo + rf",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf"
+   ]
+  },
+  "G_POLICY|OP-2=root|OP-8=2|ingress_P1|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=root|OP-8=2|ingress_P2|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "cust1 + cust2 + repo + rf",
+    "pipeline + repo + vp1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va2 + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "ch1 + cust1 + regk2 + repo + rf + ts",
+    "ch1 + cust2 + regk1 + repo + rf + ts",
+    "ch1 + regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=root|OP-8=2|ingress_P2|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "ch1 + cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "ch1 + cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "ch1 + pipeline + regk1 + regk2 + repo + ts + va2 + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "ch1 + cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "ch1 + cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "ch1 + regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "ch1 + regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  },
+  "G_POLICY|OP-2=root|OP-8=2|use_anchored|E7=as-written": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "cust1 + cust2 + repo + rf",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "pipeline + regk1 + regk2 + repo + ts + va2 + vp1"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": [
+    "cust1 + cust2 + repo + rf",
+    "cust1 + regk2 + repo + rf + ts",
+    "cust2 + regk1 + repo + rf + ts",
+    "regk1 + regk2 + repo + rf + ts"
+   ]
+  },
+  "G_POLICY|OP-2=root|OP-8=2|use_anchored|E7=with-verification-records": {
+   "labels": {
+    "cust1+cust2 / regk1+regk2": "root threshold (A8)"
+   },
+   "minimal_sets": [
+    "insider + repo",
+    "pipeline + repo + vp1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va1 + va2",
+    "cust1 + cust2 + pipeline + repo + va1 + vp2",
+    "cust1 + cust2 + pipeline + repo + va2 + vp1",
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + va2",
+    "cust1 + pipeline + regk2 + repo + ts + va1 + vp2",
+    "cust1 + pipeline + regk2 + repo + ts + va2 + vp1",
+    "cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + va2",
+    "cust2 + pipeline + regk1 + repo + ts + va1 + vp2",
+    "cust2 + pipeline + regk1 + repo + ts + va2 + vp1",
+    "cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + va2",
+    "pipeline + regk1 + regk2 + repo + ts + va1 + vp2",
+    "pipeline + regk1 + regk2 + repo + ts + va2 + vp1",
+    "regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_containing_release_final (declared INV-RF: in no minimal set)": [
+    "cust1 + cust2 + repo + rf + va1 + va2",
+    "cust1 + cust2 + repo + rf + va1 + vp2",
+    "cust1 + cust2 + repo + rf + va2 + vp1",
+    "cust1 + cust2 + repo + rf + vp1 + vp2",
+    "cust1 + regk2 + repo + rf + ts + va1 + va2",
+    "cust1 + regk2 + repo + rf + ts + va1 + vp2",
+    "cust1 + regk2 + repo + rf + ts + va2 + vp1",
+    "cust1 + regk2 + repo + rf + ts + vp1 + vp2",
+    "cust2 + regk1 + repo + rf + ts + va1 + va2",
+    "cust2 + regk1 + repo + rf + ts + va1 + vp2",
+    "cust2 + regk1 + repo + rf + ts + va2 + vp1",
+    "cust2 + regk1 + repo + rf + ts + vp1 + vp2",
+    "regk1 + regk2 + repo + rf + ts + va1 + va2",
+    "regk1 + regk2 + repo + rf + ts + va1 + vp2",
+    "regk1 + regk2 + repo + rf + ts + va2 + vp1",
+    "regk1 + regk2 + repo + rf + ts + vp1 + vp2"
+   ],
+   "sets_with_fewer_than_OP8_verification_compromises (declared: `21` OP-2 (b) and `05` \u00a71 'accepted only with OP-8 verification statements')": []
+  }
+ },
+ "part_R_restrictor_revocation_by_trust_state_key": {
+  "R_examples": {
+   "G_BYTES|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|FA1": {
+    "committed": [
+     "rp1 + rp2 + rp3",
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + rep1 + rep3 + transport + ts",
+     "ch1 + rep2 + rep3 + transport + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts"
+    ],
+    "sets_that_lose_transport": [
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + rep1 + rep3 + transport + ts",
+     "ch1 + rep2 + rep3 + transport + ts"
+    ],
+    "with_tss_revocation_of_restrictors": [
+     "rp1 + rp2 + rp3",
+     "ch1 + rep1 + rep2 + ts",
+     "ch1 + rep1 + rep3 + ts",
+     "ch1 + rep2 + rep3 + ts"
+    ]
+   },
+   "G_BYTES|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|FA2": {
+    "committed": [
+     "rp1 + rp2 + rp3",
+     "ch1 + ch2 + rep1 + rep2 + transport + ts",
+     "ch1 + ch2 + rep1 + rep3 + transport + ts",
+     "ch1 + ch2 + rep2 + rep3 + transport + ts",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep3 + ts",
+     "ch1 + ch2 + regk1 + regk2 + rep2 + rep3 + ts"
+    ],
+    "sets_that_lose_transport": [
+     "ch1 + ch2 + rep1 + rep2 + transport + ts",
+     "ch1 + ch2 + rep1 + rep3 + transport + ts",
+     "ch1 + ch2 + rep2 + rep3 + transport + ts"
+    ],
+    "with_tss_revocation_of_restrictors": [
+     "rp1 + rp2 + rp3",
+     "ch1 + ch2 + rep1 + rep2 + ts",
+     "ch1 + ch2 + rep1 + rep3 + ts",
+     "ch1 + ch2 + rep2 + rep3 + ts"
+    ]
+   },
+   "G_BYTES|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|P2": {
+    "committed": [
+     "rp1 + rp2 + rp3",
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + rep1 + rep3 + transport + ts",
+     "ch1 + rep2 + rep3 + transport + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts"
+    ],
+    "sets_that_lose_transport": [
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + rep1 + rep3 + transport + ts",
+     "ch1 + rep2 + rep3 + transport + ts"
+    ],
+    "with_tss_revocation_of_restrictors": [
+     "rp1 + rp2 + rp3",
+     "ch1 + rep1 + rep2 + ts",
+     "ch1 + rep1 + rep3 + ts",
+     "ch1 + rep2 + rep3 + ts"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts"
+    ],
+    "sets_that_lose_transport": [
+     "ch1 + rep1 + rep2 + transport + ts"
+    ],
+    "with_tss_revocation_of_restrictors": [
+     "rp1 + rp2",
+     "ch1 + rep1 + rep2 + ts"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + ch2 + rep1 + rep2 + transport + ts",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts"
+    ],
+    "sets_that_lose_transport": [
+     "ch1 + ch2 + rep1 + rep2 + transport + ts"
+    ],
+    "with_tss_revocation_of_restrictors": [
+     "rp1 + rp2",
+     "ch1 + ch2 + rep1 + rep2 + ts"
+    ]
+   },
+   "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|P2": {
+    "committed": [
+     "rp1 + rp2",
+     "ch1 + rep1 + rep2 + transport + ts",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts"
+    ],
+    "sets_that_lose_transport": [
+     "ch1 + rep1 + rep2 + transport + ts"
+    ],
+    "with_tss_revocation_of_restrictors": [
+     "rp1 + rp2",
+     "ch1 + rep1 + rep2 + ts"
+    ]
+   },
+   "G_INPUTS|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|P2": {
+    "committed": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ]
+   },
+   "G_INPUTS|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|P2": {
+    "committed": [
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ]
+   },
+   "G_SRC|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|FA1": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|FA2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + ch2 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=delegated|OP-8=2|OP-9=n3q2|OP-10=accept|P2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "insider",
+     "pipeline + vp1 + vp2",
+     "cust1 + cust2 + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep1 + rep3 + ts + va1 + va2",
+     "ch1 + regk1 + regk2 + rep2 + rep3 + ts + va1 + va2"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": {
+    "committed": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ]
+   },
+   "G_SRC|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|P2": {
+    "committed": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ],
+    "sets_that_lose_transport": [],
+    "with_tss_revocation_of_restrictors": [
+     "insider",
+     "pipeline + vp1",
+     "cust1 + cust2 + va1",
+     "ch1 + regk1 + regk2 + rep1 + rep2 + ts + va1"
+    ]
+   }
+  },
+  "R_summary": {
+   "configurations": 216,
+   "configurations_where_a_committed_set_needed_transport_and_no_longer_does": 36
+  }
+ },
+ "probe": "RV5-B-A04/A06/A07/A08 calculator extensions (AR-0012)"
+}

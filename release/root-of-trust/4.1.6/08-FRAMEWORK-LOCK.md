@@ -1,6 +1,9 @@
 # Output 8 — Project layout, `framework.lock` and the project trust record
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 (CP-1, `35`): §2's sentence on signed files is corrected (CR6-C-11); the lock's `anchor_at_install.method` no
+> longer accepts `witness` (EX-01); the held registration, strength vector, pending obligations and accepted-TBM high-water are
+> per-project and store records keyed by project identity and repository identity (`20` §9, `24` §8), not lock fields.
 > Revision 6 amendments: the trust top-level entry set gains `governance/trust/.gitattributes` with exact content `* -text`
 > (RV5-M6; `18` §9.1; `26` §2). `.git/info/attributes` has the highest attribute precedence in Git and overrides it; that
 > condition fails closed (`PARTIAL(kernel_content_mismatch)`) and doctor names the source (`evidence/r6/ATTR6-*`).
@@ -49,8 +52,10 @@ spec/audits/ADOPTION/                   RoT-1 adoption evidence;  spec/audits/GO
 .governance-runtime/trust-tx/           install transaction area: untracked; journals honoured only if registered in the VTS (18 §5.1)
 ```
 
-**Why tracked.** A second machine authenticates without network access (G5). Every file under `governance/trust/` except
-`FORMAT`, `framework.lock` and `development.json` is signed. Deleting files produces `PARTIAL`, `INCOMPLETE` or
+**Why tracked.** A second machine authenticates without network access (G5). Every file under `governance/trust/` is either a
+signed statement (`*.dsse.json`) or content bound by digests in a signed statement (the kernel files, by the release and
+registration file map); `FORMAT`, `framework.lock`, `.gitattributes` and `development.json` are unsigned and never authorise
+(revision 7, CR6-C-11). Deleting files produces `PARTIAL`, `INCOMPLETE` or
 `BELOW_ANCHOR`, never trust.
 
 **Ignore rule (RV3-L7).** The install transaction writes two `.gitignore` lines: `/.governance-runtime/*` and

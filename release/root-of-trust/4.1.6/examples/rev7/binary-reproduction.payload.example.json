@@ -1,0 +1,17 @@
+{
+  "_type": "https://agentic-engineering-os/statement/binary-reproduction/v3",
+  "binary_digest": "sha256:b3a12e0a97d0fd16736c8fb1c44eb6e598df2b5ce376aec20938e6b31b44af11",
+  "environment_id": "sha256:7197285922d6e755081e26b5da5488a87b9868e10650c68f5d5b97888e288387",
+  "inputs_manifest_digest": "sha256:32381523e63197c929b67f793a8098bed0ae3a6fa902634fdbcc6fa4567f3346",
+  "release_id": "agentic-engineering-os@4.1.6#0123456789abcdef",
+  "reproduced_at": "2026-09-14T00:00:00Z",
+  "source": {
+    "content_digest": "sha256:ebc0a9b053c0d14e11d89425b47b27f7d1ed71f81b1fad76bdfd408f98464b27",
+    "git_tree": "2222222222222222222222222222222222222222",
+    "release_commit": "1111111111111111111111111111111111111111"
+  },
+  "target": "x86_64-unknown-linux-musl",
+  "tbm_digest": "sha256:0e39d2c2247be3161d0a8bb9c2e2384eecc1d55a63e3664538e34ad914ad167d",
+  "toolchain_id": "tc-boot",
+  "trust_root_id": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04"
+}

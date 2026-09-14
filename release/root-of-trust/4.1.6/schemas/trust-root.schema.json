@@ -2,21 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-root.schema.json",
   "title": "trust-root",
-  "description": "PROPOSED (RoT-1 revision 6). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Twelve purposes (05 §1): release-registration and reproducer added; release-artifact and build-attestation withdrawn (KS-13). The binary applies the compiled pairwise whitelist and the Fact Threshold Check (KS-9′, KS-10′, KS-12, KS-13) to every root version (05 §3). Revision 6: the root threshold is at least 2 (KS-14).",
-  "x-schema-version": "4.1.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). Trust-root metadata signed by the root purpose. Twelve purposes: first-contact-authority added; freshness-witness removed (EX-01). Exact CP-1 shapes: root 3/2, release-registration 3/2, trust-state 3/2, revocation 3/2, reproducer 3 keys with quorum 2, release-final and certification-status threshold >= 2. The compiled pairwise whitelist permits only root+trust-policy, root+first-contact-authority and trust-policy+first-contact-authority (05 §3).",
+  "x-schema-version": "5.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "trust_profile",
     "framework",
-    "version",
-    "lineage",
-    "keys",
-    "purposes",
-    "revoked_keys",
     "issued_at",
-    "quorums"
+    "keys",
+    "lineage",
+    "profile_id",
+    "purposes",
+    "quorums",
+    "revoked_keys",
+    "trust_profile",
+    "version"
   ],
   "properties": {
     "_type": {
@@ -89,17 +90,18 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "certification-status",
+        "first-contact-authority",
+        "release-candidate",
+        "release-final",
+        "release-registration",
+        "reproducer",
+        "retrieval-profile",
+        "revocation",
         "root",
         "trust-policy",
         "trust-state",
-        "release-final",
-        "release-candidate",
-        "verification-attestation",
-        "certification-status",
-        "revocation",
-        "retrieval-profile",
-        "release-registration",
-        "reproducer"
+        "verification-attestation"
       ],
       "properties": {
         "root": {
@@ -109,22 +111,57 @@
             },
             {
               "properties": {
+                "key_ids": {
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "threshold": {
+                  "const": 2
+                }
+              }
+            }
+          ],
+          "description": "OP-1: 3 keys, threshold 2 (KS-14′)"
+        },
+        "trust-policy": {
+          "$ref": "#/$defs/purpose"
+        },
+        "trust-state": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "key_ids": {
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "threshold": {
+                  "const": 2
+                }
+              }
+            }
+          ],
+          "description": "OP-4: 3 single-purpose keys, threshold 2 (KS-17)"
+        },
+        "release-final": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "key_ids": {
+                  "minItems": 2
+                },
                 "threshold": {
                   "minimum": 2
                 }
               }
             }
           ],
-          "description": "KS-14 (revision 6): root threshold >= 2"
-        },
-        "trust-policy": {
-          "$ref": "#/$defs/purpose"
-        },
-        "trust-state": {
-          "$ref": "#/$defs/purpose"
-        },
-        "release-final": {
-          "$ref": "#/$defs/purpose"
+          "description": "OP-4: threshold at least 2; disjoint from release-candidate (KS-15)"
         },
         "release-candidate": {
           "$ref": "#/$defs/purpose"
@@ -133,15 +170,43 @@
           "$ref": "#/$defs/purpose"
         },
         "certification-status": {
-          "$ref": "#/$defs/purpose"
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "key_ids": {
+                  "minItems": 2
+                },
+                "threshold": {
+                  "minimum": 2
+                }
+              }
+            }
+          ],
+          "description": "negatives only; threshold at least 2"
         },
         "revocation": {
-          "$ref": "#/$defs/purpose"
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "key_ids": {
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "threshold": {
+                  "const": 2
+                }
+              }
+            }
+          ],
+          "description": "OP-4: 3 single-purpose keys, threshold 2; root threshold may also sign revocation statements in an emergency (KS-19)"
         },
         "retrieval-profile": {
-          "$ref": "#/$defs/purpose"
-        },
-        "freshness-witness": {
           "$ref": "#/$defs/purpose"
         },
         "release-registration": {
@@ -151,17 +216,37 @@
             },
             {
               "properties": {
+                "key_ids": {
+                  "minItems": 3,
+                  "maxItems": 3
+                },
                 "threshold": {
-                  "minimum": 2
+                  "const": 2
                 }
               }
             }
           ],
-          "description": "KS-10′: threshold >= 2; root keys at root threshold (OP-2 (a)) or single-purpose keys (OP-2 (b))"
+          "description": "OP-2 (b): 3 single-purpose keys, threshold 2 (KS-10″)"
         },
         "reproducer": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "key_ids": {
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              }
+            }
+          ],
+          "description": "OP-9 (b): 3 single-purpose keys; one signature per statement; quorum 2"
+        },
+        "first-contact-authority": {
           "$ref": "#/$defs/purpose",
-          "description": "KS-9′: single-purpose keys; one signature per reproduction statement; quorum in `quorums.reproducer`"
+          "description": "granted only to the root keys at root threshold (KS-18)"
         }
       }
     },
@@ -204,12 +289,13 @@
       ],
       "properties": {
         "reproducer": {
-          "type": "integer",
-          "minimum": 2
+          "const": 2
         }
       }
     },
-    "properties": {}
+    "profile_id": {
+      "const": "governance-os.rot1/CP-1"
+    }
   },
   "$defs": {
     "digest": {

@@ -1,0 +1,107 @@
+{
+ "probe": "RV5-D-A07 plan regression detection (AR-0014)",
+ "calculator_goals": [
+  "G_BYTES",
+  "G_INPUTS",
+  "G_MIRROR",
+  "G_SRC",
+  "G_TOOLCHAIN"
+ ],
+ "calculator_atoms": [
+  "cust1",
+  "cust2",
+  "insider",
+  "mirror",
+  "pipeline",
+  "rc",
+  "regk1",
+  "regk2",
+  "rf",
+  "toolchain_up",
+  "transport",
+  "ts"
+ ],
+ "plan_rt_rows": 200,
+ "register_rows_in_29_s4": 0,
+ "defects": {
+  "RV5-H1 channel shows an attacker lineage's fingerprint (FA)": {
+   "calculator_can_express": "H-CH: 'ch_k shows t_x's' (a descendant in the genuine lineage) only",
+   "plan_rows_naming_fact": [
+    "RT-135",
+    "RT-184"
+   ],
+   "note": "RT-135 names 'attacker lineage' from FA5 CH2, where the genuine fingerprint is typed (refused); no row types the attacker lineage's fingerprint",
+   "register_row_for_lineage_or_evaluator_selection": [],
+   "register_rows_naming_lineage_selection": [],
+   "register_rows_naming_channel_quorum": [],
+   "FA5_rows_typing_an_attacker_lineage_fingerprint": [
+    "CH2"
+   ],
+   "FA5_CH2_types_genuine_fingerprint": true
+  },
+  "RV5-H2 build image selects bytes": {
+   "calculator_goal_or_atom_for_image": [],
+   "plan_rows_substituting_image": [
+    "RT-191"
+   ],
+   "register_row_for_image_record": []
+  },
+  "RV5-H3 registered constitutional content not established first-hand": {
+   "calculator_goal_for_constitutional_content": [],
+   "plan_rows_final_or_candidate_kernel_differs_from_verified_source": [
+    "RT-115",
+    "RT-134",
+    "RT-164",
+    "RT-165"
+   ],
+   "plan_rows_first_hand_unit_map": [
+    "RT-163",
+    "RT-164"
+   ],
+   "register_selector_row": [],
+   "note": "RT-115 is the revision-4 source-identity row (a final naming another source); it does not vary the kernel under an identical source"
+  },
+  "RV5-D-A04 R1/R2 revoked registered final or candidate at admission": {
+   "plan_rows": [
+    "RT-134",
+    "RT-92"
+   ],
+   "P4r5_rows_revoking_registered_final": [],
+   "P4r5_rows_revoking_registered_candidate": [
+    "AP-A8_candidate_revoked"
+   ],
+   "FA5_revokes_final_or_candidate": false,
+   "note": "keyword rows RT-92 (revision-4 artefact matrix), RT-134 (P4r5 shapes) and RT-135 (FA5 shapes) are matched by words only; their shape sources are listed above"
+  },
+  "RV5-D-A04 R3 ACCEPTED attestation for another candidate": {
+   "plan_rows": [
+    "RT-165"
+   ]
+  },
+  "RV5-D-A04 R4 min_binary_version at admission": {
+   "plan_rows": []
+  },
+  "RV5-D-A03 user-writable install reachable classes": {
+   "RT-138_expected": "| RT-138 | OP-7 answers other than (a) (EX-07, EX-08, EX-12) | user-writable installation under OP-7 (a) and a system pin |"
+  },
+  "RV5-B-M3 re-admission discards the store": {
+   "RT-139_expected": "| RT-139 | (Revised r6.) Swap the candidate file between measurement and install; a pre-existing verifier trust store **without any admission record** holding a forged anchor at first admission; the same store **with** an admission record at re-admission | installed digest = measured; the store without a record is moved aside and never read; the store with a record is kept (RT-170) | R-ADM-6, R-ADM-8\u2032 |",
+   "plan_rows_re_admission": [
+    "RT-139",
+    "RT-188",
+    "RT-191"
+   ]
+  }
+ },
+ "verdicts": {
+  "H1_undetectable_by_plan": true,
+  "A04_R1_final_revocation_untested_in_both_oracles": true,
+  "A04_R2_candidate_revocation_untested_in_bootstrap_oracle": true,
+  "H2_undetectable_by_plan": false,
+  "H3_undetectable_by_plan": false,
+  "A04_R4_min_binary_version_untested": true,
+  "A04_R3_untested": false,
+  "A03_RT138_expects_unreachable_outcome": false,
+  "M3_no_re_admission_row": false
+ }
+}
