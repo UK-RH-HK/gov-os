@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T13:55:15Z'
-state_hash: 0153082f6be6eb7d4c7f03a51b70e6b021d5378737758ba0c967865e4e511a97
+updated_at: '2026-09-14T14:39:29Z'
+state_hash: 3d2e25251eb22f4183f9fe61e03495fa7f0887a4c103409f12f118b7dd5fb1ec
 lifecycle_state: ROT_ARCH_REVIEW_PANEL
 
 protocol:

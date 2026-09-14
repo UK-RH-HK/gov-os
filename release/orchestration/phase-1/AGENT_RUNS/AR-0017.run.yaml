@@ -13,5 +13,7 @@ branch: phase1/rot1-r6-review-c
 agent_id: ab45a5e974fca2117   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T13:55Z'
 status: RUNNING
+interruptions:
+  - {at: '2026-09-14T14:39Z', event: turn ended while own matrix6.py probes still running; no commits, no report (INCOMPLETE at that point), action: same run resumed by orchestrator message with instructions to wait for its probes and complete HO-0017; no findings content exchanged}
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0017.report.yaml
 outcome: null

@@ -574,3 +574,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0018 (v3 template), spawn synthesis reviewer D |
+
+## L-0040 — 2026-09-14 — reviewer C (revision 6) stopped early; same run resumed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | orchestrator (routing), concerning rot-reviewer-compat-transaction `AR-0017` |
+| Input commit | `73228fd` |
+| Work performed | AR-0017's turn ended while its own matrix probes were still executing in its scratch root. Its branch had no commits and no report, so the run was INCOMPLETE at that point and advanced no gate. The orchestrator checked only Git and process state, not the transcript. It then resumed the same run by message: wait for its own probes, then complete every HO-0017 deliverable. No findings content was exchanged, and independence is unchanged. |
+| Report / evidence | `AGENT_RUNS/AR-0017.run.yaml` (interruptions) |
+| Verdict | — |
+| Output commit | the commit adding this entry |
+| Findings | — |
+| Next action | await AR-0016 and AR-0017 completion |
