@@ -756,3 +756,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0022 (D v4 template), spawn synthesis reviewer D |
+
+## L-0053 — 2026-09-14 — revision-7 reviewer B completed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | rot-reviewer-trust-security (`AR-0020`) |
+| Input commit | `7e50c6e` (architecture `d07d200`) |
+| Work performed | Re-ran the architect's runner from a scratch export and compared 68 outputs: 53 byte-identical, 8 differ only in run-dependent fields, 2 committed outputs stale with no verdict change, 5 prior probes blocked by withdrawn artefacts (CP-1 equivalents reproduce). Re-ran PROF7 (113/113) with injected excluded fields detected. Authored held-out RV7-B-A01…A13 (9 executed). |
+| Report / evidence | `AGENT_RUNS/AR-0020.report.yaml` (on branch); `release/root-of-trust/4.1.6-review-r7/B-trust-security/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `54be694`, report `44858be` on `phase1/rot1-r7-review-b`; held unmerged until reviewer C completes |
+| Findings | **HIGH RV7-B-H1:** a revocation counts at first contact only if a Trust State lists it, and no party must list it; a revoked binary was admitted on 11 daily states with its revocation up to 342 h old. **HIGH RV7-B-H2:** C3 checks only the age of the confirmation or pin, not of the named state; C3 was allowed on a 4-month-old state and on a re-stamped CI pin. **MEDIUM RV7-B-M1 (blocking per B):** one onboarding record names both first-contact sources. **LOW:** L1–L6. **INFO:** I1, I2. **Prior:** BC6-3 closed within B's attacks; BC6-1, BC6-2 and BC6-4 narrowed; RV6-H1, H2, H3 closed as stated. **Owner conformance:** exclusions EX-01…EX-24 conform; deviations via H1 (OP-4), H2 (OP-7 (a)) and M1 (OP-13 (b) stated consequence); D-0008 fields conform. **OT-1:** genuine owner trade-off, understated. **OT-2:** real, but already answered by the owner's "not certified" rule. |
+| Next action | await AR-0021; then merge B and C, write HO-0022 (D v4), spawn synthesis reviewer D |
