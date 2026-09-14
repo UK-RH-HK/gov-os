@@ -420,3 +420,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0012 and AR-0013 in parallel |
+
+## L-0029 — 2026-09-14 — revision-5 review panel spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | rot-reviewer-trust-security (`AR-0012`) and rot-reviewer-compat-transaction (`AR-0013`), fresh Opus 5 contexts, in parallel |
+| Input commit | `bfaa943` (worktrees `wt/review-r5-b`, `wt/review-r5-c`; branches `phase1/rot1-r5-review-b`, `phase1/rot1-r5-review-c`) |
+| Work performed | spawned on HO-0012 and HO-0013; running. Prompts add the revision-5 surfaces (FD-1 register, calculator, release registration, reproducer quorum, gov-admit and fingerprint, C0 mode, protected install location, OP-1…OP-15) and forbid listing the scratchpad root. |
+| Report / evidence | expected `AGENT_RUNS/AR-0012.report.yaml`, `AGENT_RUNS/AR-0013.report.yaml`; `release/root-of-trust/4.1.6-review-r5/{B-trust-security,C-compat-transaction}/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0014, spawn synthesis reviewer D |
