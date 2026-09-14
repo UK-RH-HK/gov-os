@@ -1,0 +1,19 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0009
+trigger: architecture revision 5 committed (escalation synthesis); before handoff to review panel (HO-0012, HO-0013)
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_REVIEW_PANEL
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: ec9658385fc7dcb14859647ea6bf2e57aae0cca0
+completed_evidence:
+  - {what: RoT-1 revision 5 (AR-0011), commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b, path: release/root-of-trust/4.1.6}
+  - {what: AR-0011 typed report, commit: 42dbfbd8fb169e107cf16cda4ea8a42ab5c9b403, path: release/orchestration/phase-1/AGENT_RUNS/AR-0011.report.yaml}
+  - {what: escalation synthesis rationale, commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b, path: release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md}
+architect_verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW (not an acceptance)
+unresolved_findings: review-r4 classes BC4-1..BC4-4 and RV4-* remain open until an independent synthesis verdict on revision 5
+escalation: {orchestrated_rejections: 2, materially_new_class_streak: 0, persistent_remainder_streak: 2, specialist_escalation: completed}
+pending_owner_gates: []
+running_work: [AR-0012 reviewer B, AR-0013 reviewer C]
+next_deterministic_action: spawn AR-0012 and AR-0013 in parallel

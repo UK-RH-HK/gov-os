@@ -12,6 +12,16 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r5-synthesis-architect
 agent_id: ab85de07439380c7b   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T08:13Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0011.report.yaml
-outcome: null
+outcome:
+  verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW
+  work_commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b
+  report_commit: 42dbfbd8fb169e107cf16cda4ea8a42ab5c9b403
+  integration_merge_commit: ec9658385fc7dcb14859647ea6bf2e57aae0cca0
+  owner_options_presented: OP-1..OP-15 (none decided, none proposed)
+  scope_deviation: >-
+    Disclosed, assessed non-material: two helper sessions produced ST5 and FA5/SRC5/gov_admit_reference.py evidence under
+    this run's specification (same authoring role; outputs checked and one harness gap fixed by the architect); a scratchpad
+    listing showed other runs' scratch folder names (not opened); auto-memory index present in context.
+  provenance_checks: [report present and output.commit matches, only allowed paths changed (95 files), only D-0008/ARCH-0002 DECISIONS rows, specialist directories untouched, D-0008 PROVISIONAL in_effect false, worktree clean incl. ignored]

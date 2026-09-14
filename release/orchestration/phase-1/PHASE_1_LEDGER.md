@@ -392,3 +392,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge, instantiate revision-5 B/C handoffs, spawn B and C in parallel |
+
+## L-0027 — 2026-09-14 — revision 5 authored (escalation synthesis)
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | rot-synthesis-architect (`AR-0011`) |
+| Input commit | `c8cdfac` |
+| Work performed | Wrote `SYNTHESIS.md` comparing specialists A and B. Pack revision 5: new `29` (FD-1 fact-decision rule, decision register, root-version threshold check, attack-set calculator), `30`, `31`; rewrote 00, 05, 06, 21, 22, 25 and 28; amended the rest. Checker gains release-scoped registration. Schemas 4 new, 9 revised, 2 withdrawn. `examples/rev5`, `evidence/r5`. D-0008 and ARCH-0002 PROPOSED revision 5. Owner options OP-1…OP-15. |
+| Report / evidence | `AGENT_RUNS/AR-0011.report.yaml`; `release/root-of-trust/4.1.6/evidence/r5/`; `release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md` |
+| Verdict | `ARCHITECTURE_REVISION_READY_FOR_REVIEW` (author's readiness claim; not an acceptance) |
+| Output commit | work `cdb4e14`, report `42dbfbd`, merged `ec96583` |
+| Findings | Architect-reported claims, to be independently tested: CS5 calculator 408 configurations with 0 invariant or monotonicity failures and no single-key-plus-pipeline acceptance; FA5 45/45, vectors 17/17, mutants 26/27 (1 equivalent); REG5 15/15 mixed releases refused, secret excluded on real 4.1.5; ST5 6,292 subdirectory invocations with all 112 trust-path writes and 200 nested installs detected; DA03r5 20/20 and 17/17; checker self-test 71/71; P1r4, P4r4 and P3r3 unchanged. Disclosed non-material scope notes (helper sessions within the authoring role; folder names seen). |
+| Next action | independent review panel B and C on revision 5 |
+
+## L-0028 — 2026-09-14 — revision-5 review panel handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | orchestrator |
+| Input commit | `ec96583` |
+| Work performed | Wrote HO-0012 (B) and HO-0013 (C) from the generic reviewer templates (prior review r4 `97a5545`; escalation proposals listed as background). Claimed AR-0012 and AR-0013. Created separate worktrees and branches. |
+| Report / evidence | `HANDOFFS/HO-0012-*.md`, `HANDOFFS/HO-0013-*.md`, `CHECKPOINTS/CP-0009.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0012 and AR-0013 in parallel |

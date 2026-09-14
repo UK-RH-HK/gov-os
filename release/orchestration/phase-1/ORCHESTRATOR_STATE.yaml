@@ -4,9 +4,9 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T08:13:23Z'
-state_hash: dc2e0f701f1b0009ccf8ed6e7aa6ec5f0f9efd7f7a9f5847af97d121792da640
-lifecycle_state: ROT_ARCH_R5_AUTHORING
+updated_at: '2026-09-14T09:43:31Z'
+state_hash: 4f70228d39d7fc5d388b6393e7da6c6df8b11ad95f8be721afcd5bd3777c9155
+lifecycle_state: ROT_ARCH_REVIEW_PANEL
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -38,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: c8cdfac82a9b2932e00fc8f7a544faa7e0758507
+  last_recorded_commit: ec9658385fc7dcb14859647ea6bf2e57aae0cca0
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -119,12 +119,16 @@ architecture:
       blocking_classes: [BC4-1, BC4-2, BC4-3, BC4-4]
       materially_new_blocking_class: false
     - revision: 5
-      status: AUTHORING
+      status: UNDER_REVIEW
       specialist_runs:
         - {run: AR-0009, lens: verifier minimal trusted inputs, commit: afda6635184311f58188a000105f753bce604540, verdict: ALTERNATIVE_PROPOSED}
         - {run: AR-0010, lens: release/build/custody supply chain, commit: ed079269282748b7e1e464ad395ab85177efb61f, verdict: ALTERNATIVE_PROPOSED}
       synthesis_architect_run: AR-0011
       handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0011-rot-synthesis-architect-r5.md
+      commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b
+      author_report_commit: 42dbfbd8fb169e107cf16cda4ea8a42ab5c9b403
+      integration_merge_commit: ec9658385fc7dcb14859647ea6bf2e57aae0cca0
+      review_panel: [AR-0012, AR-0013]
       expected_alternatives_path: release/root-of-trust/4.1.6-alternatives-r5
       expected_review_path: release/root-of-trust/4.1.6-review-r5
 
@@ -205,19 +209,28 @@ completed_stages:
   - stage: ROT_ARCH_R5_SPECIALISTS_COMPLETED
     commit: fd2eac4b3a8efe8abace0ddc75c9ee948a36330d
     note: specialist A (AR-0009) merged 1c46100; specialist B (AR-0010) merged fd2eac4; both ALTERNATIVE_PROPOSED
+  - stage: ROT_ARCH_R5_AUTHORED
+    commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b
+    note: AR-0011 ARCHITECTURE_REVISION_READY_FOR_REVIEW; report 42dbfbd; merged ec96583; OP-1..OP-15 presented
 
 running_work:
-  - run_id: AR-0011
-    role: rot-synthesis-architect
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0011.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0011-rot-synthesis-architect-r5.md
-    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r5
-    branch: phase1/rot1-r5-synthesis-architect
-    base_commit: c8cdfac82a9b2932e00fc8f7a544faa7e0758507
-    status: RUNNING
+  - run_id: AR-0012
+    role: rot-reviewer-trust-security
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0012.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0012-rot-review-r5-b-trust-security.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r5-b
+    branch: phase1/rot1-r5-review-b
+    status: CLAIMED
+  - run_id: AR-0013
+    role: rot-reviewer-compat-transaction
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0013.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0013-rot-review-r5-c-compat-transaction.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r5-c
+    branch: phase1/rot1-r5-review-c
+    status: CLAIMED
 
 latest_role_verdicts:
-  rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0005, revision 4
+  rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0011 (escalation synthesis architect), revision 5
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0006, revision 4; 3 HIGH
   rot-reviewer-compat-transaction: BLOCKING_FINDINGS_PRESENT   # AR-0007, revision 4; RV4-C-H1 re-rated MEDIUM by synthesis
   rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0008, revision 4
@@ -276,10 +289,11 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Spawn synthesis architect AR-0011 on HO-0011 (worktree wt/arch-r5, branch phase1/rot1-r5-synthesis-architect) to
-  author revision 5. On completion: verify report and allowed paths, merge, instantiate B/C v2 reviewer handoffs for
-  revision 5 (prior review r4 97a5545; review path release/root-of-trust/4.1.6-review-r5), spawn B and C in parallel,
-  then synthesis D. Escalation counters carry forward (persistent_remainder_streak 2).
+  Await AR-0012 (reviewer B) and AR-0013 (reviewer C) on revision 5, running in parallel. Hold the first completed
+  panel branch unmerged until the other completes. Then verify both, merge, instantiate HO-0014 for synthesis reviewer D
+  (HO-REVIEW-D.v2 template; prior review r4 97a5545; review path release/root-of-trust/4.1.6-review-r5), spawn D.
+  If revision 5 is rejected again on remainders of the same classes after the specialist escalation, record it and
+  assess whether the remaining choice is a genuine owner trade-off to raise with the owner instead of another cycle.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1
