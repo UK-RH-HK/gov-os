@@ -1,0 +1,98 @@
+{
+ "RV3-D-A01_lattice_soundness": {
+  "pairs_evaluated": 36,
+  "unsound_pairs": [
+   {
+    "installed": "immutable",
+    "lattice_installed_ge_registered": true,
+    "project_strengthening_lost_if_installed": [
+     "raise_level"
+    ],
+    "registered": "floor"
+   },
+   {
+    "installed": "immutable",
+    "lattice_installed_ge_registered": true,
+    "project_strengthening_lost_if_installed": [
+     "lower_ceiling"
+    ],
+    "registered": "ceiling"
+   },
+   {
+    "installed": "immutable",
+    "lattice_installed_ge_registered": true,
+    "project_strengthening_lost_if_installed": [
+     "add_entry"
+    ],
+    "registered": "additive"
+   },
+   {
+    "installed": "immutable",
+    "lattice_installed_ge_registered": true,
+    "project_strengthening_lost_if_installed": [
+     "remove_entry"
+    ],
+    "registered": "shrink_only"
+   },
+   {
+    "installed": "immutable",
+    "lattice_installed_ge_registered": true,
+    "project_strengthening_lost_if_installed": [
+     "set_strict_bool"
+    ],
+    "registered": "strengthen_only_bool"
+   }
+  ],
+  "verdict": "order is refusal-only: every move to `immutable` is ranked as at-least-as-strong although it removes all admitted project strengthening"
+ },
+ "RV3-D-A02_root_signed_tps_tightening": {
+  "additive": {
+   "TPS_v2_registers_immutable_is_computed_reduction": false,
+   "effective_project_layer_mode": "immutable",
+   "needs_lowering_history_and_policy_lowering_gate": false,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": true,
+   "project_strengthening_removed": [
+    "add_entry"
+   ]
+  },
+  "ceiling": {
+   "TPS_v2_registers_immutable_is_computed_reduction": false,
+   "effective_project_layer_mode": "immutable",
+   "needs_lowering_history_and_policy_lowering_gate": false,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": true,
+   "project_strengthening_removed": [
+    "lower_ceiling"
+   ]
+  },
+  "floor": {
+   "TPS_v2_registers_immutable_is_computed_reduction": false,
+   "effective_project_layer_mode": "immutable",
+   "needs_lowering_history_and_policy_lowering_gate": false,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": true,
+   "project_strengthening_removed": [
+    "raise_level"
+   ]
+  },
+  "shrink_only": {
+   "TPS_v2_registers_immutable_is_computed_reduction": false,
+   "effective_project_layer_mode": "immutable",
+   "needs_lowering_history_and_policy_lowering_gate": false,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": true,
+   "project_strengthening_removed": [
+    "remove_entry"
+   ]
+  },
+  "strengthen_only_bool": {
+   "TPS_v2_registers_immutable_is_computed_reduction": false,
+   "effective_project_layer_mode": "immutable",
+   "needs_lowering_history_and_policy_lowering_gate": false,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": true,
+   "project_strengthening_removed": [
+    "set_strict_bool"
+   ]
+  }
+ },
+ "lattice": "release/root-of-trust/4.1.6/constitutional-surface/csi_lib.py rule_ge/rule_join (unmodified)",
+ "probe": "RV3-D precedence lattice",
+ "runtime_reference": "runtime/src/policy_precedence.rs evaluate (4.1.5)"
+}
