@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/release-statement.schema.json",
   "title": "release-statement",
-  "description": "PROPOSED (RoT-1 revision 2). Release statement payload (07 \u00a73); payloadType release-final (purpose release-final, stage final, promoted_from_candidate required) or release-candidate (purpose release-candidate, stage candidate, promoted_from_candidate null). Digest recomputation, identity, promotion, migration-chain uniqueness and field equality are verifier steps V8-V10.",
+  "description": "PROPOSED (RoT-1 revision 3). Release statement payload (07 §3). payloadType release-final.v2 (purpose release-final, stage final) or release-candidate.v2 (purpose release-candidate, stage candidate). trust_references are release-local requirements (17 S7); trust_policy_version names the Trust Policy the surface was registered under (E7). security_critical is removed: the Constitutional Surface is root-signed (23).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -18,7 +18,6 @@
     "compatibility",
     "kernel",
     "components",
-    "security_critical",
     "migrations",
     "update_impact",
     "documents",
@@ -26,7 +25,7 @@
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/release/v2"
+      "const": "https://agentic-engineering-os/statement/release/v3"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -38,7 +37,7 @@
       "$ref": "#/$defs/digest"
     },
     "manifest_version": {
-      "const": 2
+      "const": 3
     },
     "release": {
       "type": "object",
@@ -133,7 +132,8 @@
           "type": "integer",
           "minimum": 0
         }
-      }
+      },
+      "description": "Release-local requirements: constrain only the ingress of this release (17 S7); never global minimums."
     },
     "compatibility": {
       "type": "object",
@@ -264,14 +264,6 @@
       ],
       "additionalProperties": {
         "$ref": "#/$defs/digest"
-      }
-    },
-    "security_critical": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/relpath"
       }
     },
     "migrations": {

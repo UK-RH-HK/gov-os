@@ -2,13 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-format.schema.json",
   "title": "trust-format",
-  "description": "PROPOSED (RoT-1 revision 2). governance/trust/FORMAT (GOV-JCS-1 bytes). Read before anything else; unknown format or minimum_reader above the binary -> TRUST_FORMAT_UNSUPPORTED (13 \u00a74).",
+  "description": "PROPOSED (RoT-1 revision 3). governance/trust/FORMAT (GOV-JCS-1 bytes). Read before anything else; unknown trust_format or layout, or minimum_reader above the binary -> TRUST_FORMAT_UNSUPPORTED.",
   "x-schema-version": "1.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "minimum_reader",
-    "trust_format"
+    "trust_format",
+    "layout"
   ],
   "properties": {
     "minimum_reader": {
@@ -18,6 +19,9 @@
       "enum": [
         "rot-1"
       ]
+    },
+    "layout": {
+      "const": "legacy-path-occupation-v1"
     }
   },
   "$defs": {

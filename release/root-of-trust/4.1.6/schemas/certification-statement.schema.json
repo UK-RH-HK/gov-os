@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/certification-statement.schema.json",
   "title": "certification-statement",
-  "description": "PROPOSED (RoT-1 revision 2). Certification status for one final release statement digest, signed by the certification-status purpose. CERTIFIED requires a verification attestation; a CERTIFIED view additionally requires a trust-state reference (17 \u00a76).",
+  "description": "PROPOSED (RoT-1 revision 3). Certification status for one final release statement digest, signed by the certification-status purpose. CERTIFIED requires a verification attestation and is visible only when an admissible Trust State references both (17 §6). A REJECTED/WITHDRAWN fact is lifted only per 17 MS-2. Optional artifact_statement_digests bind production binaries informationally.",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -24,7 +24,7 @@
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/certification/v2"
+      "const": "https://agentic-engineering-os/statement/certification/v3"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -93,6 +93,13 @@
           "type": "null"
         }
       ]
+    },
+    "artifact_statement_digests": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/digest"
+      }
     }
   },
   "$defs": {

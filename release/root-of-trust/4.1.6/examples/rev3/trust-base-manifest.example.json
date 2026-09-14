@@ -1,0 +1,43 @@
+{
+  "_type": "https://agentic-engineering-os/manifest/trust-base/v1",
+  "framework": "agentic-engineering-os",
+  "trust_profile": "production",
+  "binary": {
+    "name": "gov",
+    "version": "4.1.6",
+    "target": "x86_64-unknown-linux-gnu",
+    "build": "release",
+    "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "build_inputs_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "toolchain": "rustc 1.98.1"
+  },
+  "lineage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "root_chain": [
+    {
+      "version": 1,
+      "statement_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    }
+  ],
+  "trust_policy": {
+    "policy_version": 1,
+    "statement_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  },
+  "trust_state": {
+    "sequence": 2,
+    "statement_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  "embedded_release": {
+    "release_statement_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "tree_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "compiled_rules": {
+    "floor_schema_version": 2,
+    "operator_vocabulary": "floor-ops/2",
+    "purpose_table_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "statement_schemas_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+    "format_readers": [
+      "rot-1/legacy-path-occupation-v1"
+    ],
+    "command_register_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+  }
+}

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/legacy-identity-statement.schema.json",
   "title": "historical-identity-statement",
-  "description": "PROPOSED (RoT-1 revision 2). Historical (legacy 4.1.2-4.1.5) release identities. Signed by the release-final purpose; accepted ONLY from the copy compiled into the binary (05 \u00a72 SV-2); confers HISTORICAL_IDENTIFIED, never eligibility (19 \u00a77).",
+  "description": "WITHDRAWN in RoT-1 revision 3 (kept for history). Historical 4.1.2-4.1.5 identities are Trust Policy eligibility.historical_releases[] signed at root threshold (05 §2, 13 §2); no revision-3 binary accepts this payloadType.",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,

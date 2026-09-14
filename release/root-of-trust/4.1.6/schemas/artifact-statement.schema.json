@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/artifact-statement.schema.json",
   "title": "artifact-statement",
-  "description": "PROPOSED (RoT-1 revision 2). Binary artifact digests for one release statement; payloadType artifact-final (release-final purpose) or artifact-candidate (release-candidate purpose), stage must match.",
+  "description": "PROPOSED (RoT-1 revision 3). Binary artefact statement v3. payloadType artifact-final.v2 (purpose release-artifact, threshold >= 2) or artifact-candidate.v2 (purpose release-candidate, evaluation only). Each artefact is bound to its Trust Base Manifest digest (25 §4); acceptance also needs build attestations and a Trust State reference (25 §5).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -20,7 +20,7 @@
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/artifact/v2"
+      "const": "https://agentic-engineering-os/statement/artifact/v3"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -53,10 +53,12 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name",
-          "target",
           "digest",
+          "name",
           "size",
+          "target",
+          "tbm",
+          "tbm_digest",
           "trust_profile"
         ],
         "properties": {
@@ -77,6 +79,14 @@
           },
           "trust_profile": {
             "$ref": "#/$defs/profile"
+          },
+          "tbm_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "tbm": {
+            "type": "object",
+            "description": "the Trust Base Manifest (trust-base-manifest.schema.json); its GOV-JCS-1 digest equals tbm_digest"
           }
         }
       }
@@ -85,8 +95,9 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "toolchain",
-        "reproducible"
+        "build_inputs_digest",
+        "reproducible",
+        "toolchain"
       ],
       "properties": {
         "toolchain": {
@@ -94,7 +105,11 @@
           "maxLength": 256
         },
         "reproducible": {
-          "type": "boolean"
+          "const": true
+        },
+        "build_inputs_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
         }
       }
     }

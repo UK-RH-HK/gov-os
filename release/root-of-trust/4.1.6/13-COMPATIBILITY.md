@@ -1,159 +1,147 @@
 # Output 13 — Legacy-version compatibility model
 
-> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 2 replaces the rev 1 compatibility table with a model for every legacy artefact. It addresses RV-M4 (CD-8) and
-> the legacy parts of RV-H1 and RV-H4.
+> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 3 makes three replacements:
+> - the sentinel boundary and LC-1/LC-2 give way to the legacy-path-occupation layout and the executed property LP-1
+>   (`26`, R2-H4);
+> - historical identities move into the root-signed Trust Policy;
+> - F1 is superseded by P3r3 (R2-L3).
 
 ## 1. Legacy artefacts in scope
 
-| Artefact | Revision 2 treatment | Section |
+| Artefact | Revision 3 treatment | Section |
 |---|---|---|
-| Kernels of releases 4.1.2–4.1.5 | recognised by a compiled registry; never eligible | §2 |
-| Pre-RoT binaries (4.1.2–4.1.5) opening RoT-1 projects | explicit trust-format boundary; fail closed | §3 |
-| Future trust formats | readers refuse unknown formats | §4 |
-| Lock 1.1.0 projects under a RoT-1 binary | `PARTIAL`, read-only, update to an eligible release | §5 |
-| Snapshots made by 4.1.5 | historical identities → refused as restore targets | §6 |
-| Environment variables and CLI behaviour | removals and restrictions | §7 |
-| Prior independent harnesses and the review's evidence | expected results by binary profile | §8 |
-| Revision-1 statement formats | never issued; not accepted | §9 |
+| Kernels of releases 4.1.2–4.1.5 | listed in TPS `eligibility.historical_releases[]`; never eligible; their surfaces also fail E7 | §2 |
+| Pre-RoT binaries (4.1.2–4.1.5) opening RoT-1 projects | legacy-path occupation: fail before any write, executed over their full registers | §3, `26` |
+| Future trust formats and layouts | readers refuse unknown formats or layouts | §4 |
+| Legacy-layout projects under a RoT-1 binary | `LEGACY` state, read-only, layout migration by update | §5 |
+| 4.1.x snapshots and runtime residue | quarantined; historical targets refused | §6 |
+| Environment variables and CLI | removals, restrictions, new commands | §7 |
+| Prior harnesses and review evidence | expected results | §8 |
+| Revision-1 and revision-2 statement formats | never issued; not accepted | §9 |
 
 ## 2. Historical kernels (4.1.2–4.1.5)
 
-- **Recognition.** A historical-identity registry lists version, release id, release commit, tree digest, manifest digest,
-  status (`REJECTED`) and verifier report digest for each release. It is signed under `release-final` and compiled into
-  the binary; it is accepted from **no other source** (`05` §2, SV-2). Digests were independently reproduced
-  (`../4.1.6-review/evidence/continuity-check-4.1.2-4.1.5.txt`): tree digests equal the published `release_hash` values
-  `9964830b…` (4.1.2), `6bebfdbb…` (4.1.3), `e5e2f2c7…` (4.1.4), `962f9848…` (4.1.5).
-- **Status.** `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)` in production, always (`19` §6 E1, §7). Recognition lets
-  a RoT-1 binary report exactly which legacy release is installed and refuse it; it grants nothing.
-- **Why never eligible.** Legacy kernel content is not security-equivalent to current releases:
-  - 4.1.2 `AUTHORITY_POLICY` lacks `update_apply` and `resume_control`, which the 4.1.5 runtime defaults to L3 instead of
-    L4. The review showed an L3 role passing both on the genuine 4.1.2 kernel
-    (`../4.1.6-review/evidence/R1-legacy-kernel-floors.json`).
-  - 4.1.3 `TOOL_POLICY` lacks the plugin governance block.
-  - 4.1.4 `POLICY_PRECEDENCE` lacks the plugin-registry rules added with the V-H1 repair
-    (`../4.1.6-review/evidence/legacy-kernel-security-diffs.txt`).
-- **Consumer consequence.** A project installed by 4.1.2–4.1.5, opened by a RoT-1 binary, is read-only until updated to
-  an eligible signed release. Floors come from the EmbeddedSnapshot ⊔ TPS in the meantime. This is intentional: every
-  legacy release is REJECTED.
-- **Test profile.** `gov-test-profile` treats historical identities as labelled test material so the prior harnesses can
-  still exercise legacy-to-current upgrade logic (§8).
+- **Recognition.** TPS v1 `eligibility.historical_releases[]` lists version, release id, release commit, tree digest
+  (`9964830b…`, `6bebfdbb…`, `e5e2f2c7…`, `962f9848…`), manifest digest, `REJECTED` and the verifier report digest. It is
+  root-signed as part of the TPS.
+- **Withdrawn statement type.** Revision 2's threshold-1 `historical-identity` statement is withdrawn (`05` §2). The set
+  is protected at root threshold and named by the Trust Base Manifest (`25` §8).
+- **Status.** `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)`, always.
+- **Independent failure.** Their constitutional surfaces fail the TPS v1 inventory. 4.1.2 has an unclassified
+  `approve_cit` plus 64 registration violations; 4.1.3 and 4.1.4 have 64 and 62 violations
+  (`evidence/CSI-check-legacy-*.json`).
+- **Consumer consequence.** A project on a legacy kernel opened by a RoT-1 binary is read-only until updated to an
+  eligible signed release. The update performs the layout migration of `26` §7.
 
-## 3. Trust-format boundary for pre-RoT binaries
+## 3. Pre-RoT binaries
 
-### 3.1 Design
+The design, class argument and evidence are in `26`. In summary:
 
-A RoT-1 installation writes three markers that every pre-RoT binary reads in a way that cannot result in “verified”:
+- **Layout.** RoT-1 authority lives under `governance/trust/`; the overlay moves to `governance/overlay/`, views to
+  `governance/views/`.
+- **Occupation.** `governance/kernel`, `governance/project`, `governance/generated`, `governance/framework.lock`,
+  `spec/audits/GOVERNANCE-ADOPTION` and `.governance-runtime/migration` are occupied by entries of the wrong type.
+- **LP-1 (executed).** For 4.1.2, 4.1.3, 4.1.4 and 4.1.5, across 695 invocations derived from their own registers
+  (104/109/115/119 leaf commands) and 40 stateful chains, with a legacy update snapshot and a restricted classification
+  present:
+  - no byte outside `.git/` and `.governance-runtime/` changed;
+  - Git state is unchanged;
+  - the classification survived.
 
-| Marker | Content | Effect on pre-RoT binaries |
-|---|---|---|
-| `framework.lock` `kernel_manifest_hash` and `release_hash` | the sentinel `ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-verify-this-project` | 4.1.5 `kernel_trust` compares its manifest hash with this string → mismatch → not verified. The problem message quotes the sentinel, so the refusal text tells the operator which binary is required. |
-| `governance/kernel/KERNEL_MANIFEST.json` (tombstone) | `trust_format: rot-1`, `notice: <sentinel>`, `payload_hash: <sentinel>`, and a `files` map containing only the non-existent entry `TRUST-FORMAT-ROT-1/requires-gov-4.1.6` | every 4.1.x `verify_kernel` reports that entry missing and every real file added → payload not intact. 4.1.2, 4.1.3 and 4.1.4 have `verify_kernel` and doctor D003, checked in their sources at `8ad06be`, `26ab5b6`, `47d8394`. |
-| `governance/trust/FORMAT` | `{"minimum_reader":"4.1.6","trust_format":"rot-1"}` | ignored by pre-RoT binaries; read first by RoT-1 binaries (§4) |
+  Controls: 36–47 changing invocations per binary on an ordinary legacy project. Ablation: 4 changing invocations per
+  binary without the adoption occupations.
+- **Withdrawn.** LC-1 ("availability impact only") and LC-2 ("RoT-1 cannot change their behaviour through data") are
+  withdrawn as false (review r2 R2-H4). LC-3 is superseded.
+- **Superseded evidence.** The revision-2 F1 probe (`evidence/F1-*`) remains as history. It wrote `FORMAT` as `rot-1\n`
+  instead of the specified JSON, omitted lock `kernel.*` fields, and ran one destructive command. It supports no claim in
+  revision 3.
 
-RoT-1 binaries never read the sentinel fields or the tombstone. Identity lives in `kernel.*`, `release_statement_digest`
-and the trust record (`08` §3).
+## 4. Future format and layout evolution
 
-### 3.2 Executed feasibility evidence against the real 4.1.5 binary
+- `governance/trust/FORMAT` is `{"layout":"legacy-path-occupation-v1","minimum_reader":"4.1.6","trust_format":"rot-1"}`
+  in GOV-JCS-1 bytes. It is read first.
+- A binary that does not implement the named `trust_format` or `layout`, or whose version is below `minimum_reader`,
+  stops with `TRUST_FORMAT_UNSUPPORTED`. It never falls back.
+- A future format keeps the occupation principle. It occupies the previous format's authority paths with wrong-typed
+  entries, and every older RoT-1 binary fails before writing, by the same argument as `26` §3.
+- Format and layout changes are install transactions.
 
-Script and output: `evidence/F1-format-boundary-probe.py`, `evidence/F1-format-boundary-probe.json` (scratch consumer; the
-genuine 4.1.5 payload rewritten into the rev 2 format).
+## 5. Legacy-layout projects under a RoT-1 binary
 
-| 4.1.5 command | Observed |
-|---|---|
-| `kernel trust` | `verified: false`; embedded baseline substituted; problems text contains the sentinel |
-| `kernel verify` | `ok: false` |
-| `doctor` | `UNHEALTHY`; failed critical D003, D004, D029 |
-| `task create` (governed mutation) | refused `KERNEL_TAMPERED`; message contains the sentinel |
-| `rebuild-memory` | refused `KERNEL_TAMPERED` |
-| `status`, `capabilities plugins` (read-only) | run, with 4.1.5's own substituted baseline |
-| `kernel reinstall` (4.1.5's exempt remedy) | refused `KERNEL_MISMATCH`, **after** overwriting the kernel directory and tombstone |
-
-Conclusion: 4.1.5 fails closed and names the required binary. It never interprets a RoT-1 project as verified.
-
-### 3.3 Residuals of the boundary (explicit)
-
-| ID | Residual | Bound |
-|---|---|---|
-| LC-1 | An operator running 4.1.5 `kernel reinstall`, `update --apply` or `init --force` on a RoT-1 project can overwrite the kernel directory with 4.1.5 content before 4.1.5 refuses or completes. | The next RoT-1 process reports `KERNEL_TAMPERED` or `INSTALL_STATE_PARTIAL` and never trusts the result; the remedy is `gov kernel reinstall` with a RoT-1 binary. Availability impact only. |
-| LC-2 | 4.1.2–4.1.4 binaries read constitutional floors from installed files without any trust boundary (their own V-H2 defect). On a RoT-1 project they report the kernel as not intact (D003) but still operate. | These binaries are REJECTED releases. RoT-1 cannot change their behaviour through data. The release protocol lists them as unsupported, and an `artifact-final` revocation entry names them. |
-| LC-3 | 4.1.5 read-only commands run with 4.1.5's own embedded baseline, which 4.1.5 reads from a mutable cache (review E3). | Read-only; 4.1.5's own defect; mutations refused. |
-
-## 4. Future format evolution
-
-- `governance/trust/FORMAT` is read before anything else (`18` §9). A binary that does not implement the named
-  `trust_format`, or whose version is below `minimum_reader`, stops with `TRUST_FORMAT_UNSUPPORTED`. It never falls back
-  to an older interpretation (D-0008 rule 12).
-- A future format (`rot-2`) keeps the same markers: new sentinel text, and the tombstone manifest naming the new minimum.
-  Every older RoT-1 binary then fails closed by the same rule.
-- Format changes are install transactions (update), never in-place edits.
-
-## 5. Lock 1.1.0 projects
-
-| Consumer state (opened by a RoT-1 binary) | Verdict | Allowed | Path forward |
+| Consumer state | Installation state (`18` §9) | Allowed | Path forward |
 |---|---|---|---|
-| lock 1.1.0, kernel equals a historical digest | `PARTIAL` + `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)` | read-only; remedies | `gov update --apply --source <signed eligible release>` (gate; authority from floor) → lock 2.0.0 + trust record |
-| lock 1.1.0, kernel matches no known identity | `PARTIAL` | read-only; remedies | same |
-| lock 2.0.0, eligible final | normal | all | — |
-| lock 2.0.0, format unknown to this binary | `FORMAT_UNSUPPORTED` | `gov version`, `gov doctor` | upgrade `gov` |
+| lock 1.1.0 file, `governance/kernel/` directory, kernel equals a historical digest | `LEGACY` + `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)` | read-only; remedies | anchor the machine (`24`), then `gov update --apply --source <signed eligible release>`: `framework_update` trust gate, layout migration (`26` §7), lock 3.0.0 |
+| legacy layout, unknown kernel | `LEGACY` | read-only | same |
+| RoT-1 layout, eligible final | `COMPLETE` | per freshness | — |
+| RoT-1 layout, unknown format or layout | `FORMAT_UNSUPPORTED` | `gov version`, `gov doctor` | upgrade `gov` |
 
-## 6. Snapshots and rollback targets from 4.1.5
+## 6. Snapshots and runtime residue from 4.1.x
 
-Snapshots under `.governance-runtime/update/<version>/` made by 4.1.5 carry legacy kernels. Restore evaluates them like
-any source (`20` §3): they are historical identities → `SNAPSHOT_INELIGIBLE(historical)`. Rolling back from 4.1.6 to
-4.1.5 is therefore refused. Revision 1's migration plan offered that path; it is removed because 4.1.5 is REJECTED and
-its kernel is below the floor. Recovery from a defective 4.1.6 is a newer eligible release or `kernel reinstall` of 4.1.6.
+- `.governance-runtime/update/<v>/` holds legacy kernels. The first RoT-1 transaction on the machine quarantines it to
+  `.governance-runtime/legacy-quarantine/`. As a restore target it is a historical identity:
+  `SNAPSHOT_INELIGIBLE(historical)`.
+- Legacy adoption snapshots `.governance-runtime/migration/batch-N/` are quarantined. The path is then occupied by a
+  tracked file (`26` §3.1).
+- Rolling back from 4.1.6 to 4.1.5 is refused. Recovery from a defective 4.1.6 is a newer eligible release or
+  `kernel reinstall` of 4.1.6.
 
 ## 7. Environment variables and CLI changes
 
-| Item | Revision 2 |
+| Item | Revision 3 |
 |---|---|
-| `GOV_KERNEL_SOURCE` | removed |
-| `GOV_KERNEL_CACHE` | removed; no cache on any trust path (`18` §7) |
-| `GOV_CANONICAL_ROOT` | source selection only; never a schema, scanner-policy or trust input |
-| `HOME`, `XDG_*` | never select the Verifier Trust Store or pin files (`17` §4, `06` §3) |
-| `gov kernel reinstall --source <arbitrary>` | must authenticate to the installed statement digest; never follows `lock.source` as a path |
-| `gov update` refusals for trust reasons | `ok: false` with typed codes (API-0002 exit 1); gate-pending responses keep the 4.1.5 shape |
-| `gov update --rollback` to a legacy snapshot | refused (§6) |
-| New commands | `gov trust show`, `confirm-root`, `adopt-lineage`, `refresh --from`, `export`, `publish` (producer), `verify-artifact`; `gov release attach-signature`, `promote`; `gov kernel export` |
+| `GOV_KERNEL_SOURCE`, `GOV_KERNEL_CACHE` | removed |
+| `GOV_CANONICAL_ROOT` | source selection only |
+| `HOME`, `XDG_*`, `GOV_*` | never select the VTS, pins or decision pins (account database) |
+| `gov kernel reinstall --source <arbitrary>` | must authenticate to the installed statement digest |
+| Trust refusals | `ok: false` with typed codes (API-0002 exit 1) |
+| `gov update --rollback` to a legacy snapshot | refused |
+| New commands | `gov trust show`, `confirm-root`, **`confirm-state`**, **`confirm <gate>`**, `adopt-lineage`, `refresh --from`, `export`, `publish` (producer), **`verify-artifact`** (`25` §5), **`draft-policy`** (drafts the Constitutional Surface Inventory, `23` §6.2); `gov release attach-signature`, `promote`; `gov kernel export`, **`gov kernel show <path>`** (snapshot bytes with CI, `18` §12) |
+| `gov decide` on a trust gate | `TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED` (`27`) |
+| Paths | overlay `governance/overlay/`, views `governance/views/`, RoT-1 lock `governance/trust/framework.lock`, adoption evidence `spec/audits/ADOPTION/`, transaction area `.governance-runtime/trust-tx/` |
 
 ## 8. Prior harnesses and review evidence — expected results
 
-The four prior harnesses run **unchanged**, with `GOV_CANONICAL_ROOT` pointing at a clone of the 4.1.6 final tag that
-contains signed statements.
+The prior harnesses run with `GOV_CANONICAL_ROOT` pointing at a clone of the 4.1.6 final tag, with a pinned or confirmed
+anchor on the verifier machine.
 
 | Harness | `gov` (production profile) | `gov-test-profile` |
 |---|---|---|
-| `release/verification/4.1.2/heldout/harness.py` | as 4.1.5 (36/1/1), **except HV-11**, which installs a synthetic unsigned `prev-4.1.1`: expected `UNSIGNED_SOURCE_REFUSED`. Classified as an intended trust refusal; INV-008 re-proven by RT-11/RT-30. | 36/1/1 |
-| `release/verification/4.1.3/heldout-new/harness_v2.py` | Scenarios that install or update to historical releases (NV-03, NV-08, NV-13; consumers from the 4.1.2 worktree) are refused `RELEASE_INELIGIBLE(historical)`. Classified as intended refusals and re-proven with signed test-profile equivalents. NV-09 and NV-19 remain frozen to 4.1.3. | 13/2 |
-| `release/verification/4.1.4/heldout-v3/harness_v3.py` | 14/2 (VV-05, VV-07 frozen to the 4.1.4 identity); any scenario installing a historical release classified as above | 14/2 |
-| `release/verification/4.1.5/heldout-wv/harness_wv.py` | 6/0, with historical-install steps classified as above | 6/0 |
-| Review `R1-legacy-kernel-floors.py` (pointed at 4.1.6) | **must flip**: L3 `update --apply` and `resume` refused on the 4.1.2 kernel | — |
-| Review `R2b-use-time-toctou.py` (pointed at 4.1.6) | **must flip**: restricted records excluded and not retrievable in 20/20 trials | — |
-| Escalation `probe.sh` E1–E5 (pointed at 4.1.6) | every probe refused or not verified; restricted floor intact | — |
-| `F1-format-boundary-probe.py` | unchanged expectation for the 4.1.5 binary; with `GOV` pointed at 4.1.6, the same project is `verified` only when genuinely installed | — |
+| `release/verification/4.1.2/heldout/harness.py` | As 4.1.5, except (a) HV-11 (unsigned `prev-4.1.1`): `UNSIGNED_SOURCE_REFUSED`; (b) scenarios reading `governance/kernel/`, `governance/project/` or `governance/framework.lock` paths directly now see occupation entries. Each is classified as an intended layout change and re-proven on the RoT-1 paths. | 36/1/1 with RoT-1 paths |
+| `release/verification/4.1.3/heldout-new/harness_v2.py` | historical installs refused `RELEASE_INELIGIBLE(historical)`; classified and re-proven with signed test-profile equivalents | 13/2 |
+| `release/verification/4.1.4/heldout-v3/harness_v3.py` | 14/2 (VV-05, VV-07 frozen to 4.1.4); layout and historical classifications as above | 14/2 |
+| `release/verification/4.1.5/heldout-wv/harness_wv.py` | 6/0 with classifications as above | 6/0 |
+| Review r1 `R1-legacy-kernel-floors.py` (pointed at 4.1.6) | **must flip** | — |
+| Review r1 `R2b-use-time-toctou.py` | **must flip** | — |
+| Escalation `probe.sh` E1–E5 | every probe refused or not verified | — |
+| Review r2 `P1-floor-coverage.py` harm tests (a)–(c) against a release whose unfloored leaves are weakened | **must flip**: E7 ineligible, effective policy genuine (architect evidence `P1r3`) | — |
+| Review r2 `P2-gate-record-forgery.py` | **must flip**: the edited repository record is a request; `TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED` | — |
+| Review r2 `P3-pre-rot-binary-matrix.py` on a genuine 4.1.6 project | **must hold LP-1** for the real 4.1.2–4.1.5 binaries (architect evidence `P3r3`) | — |
+| Review r2 `P4-trust-state-model.py` scenarios | the implementation's trust-state module MUST reproduce `P4r3` (34 of 34) | — |
 
-Any other change is a regression unless the verifier independently classifies it as an intended refusal of an
-unauthenticated or ineligible path and re-proves the original property with a signed equivalent.
+Any other change is a regression, unless the verifier independently classifies it as an intended refusal and re-proves
+the original property.
 
-## 9. Revision-1 statement formats
+## 9. Revision-1 and revision-2 statement formats
 
-Revision-1 payloadTypes (`release-statement.v1`, `certification-statement.v1`, `revocation-statement.v1`,
-`legacy-identity.v1`, `artifact-statement.v1`, `profile-statement.v1`, `trust-root.v1`) were never issued. No
-revision-2 binary accepts them (`05` §2).
+- **Revision-1 payloadTypes:** never issued, never accepted.
+- **Revision-2 drafts:** `artifact-final.v1` under `release-final`, `historical-identity.v1`, `trust-policy.v1` with
+  `floors[]`, `trust-state.v1` without `prior_states`. These were never issued.
+- **Revision 3 compiles:**
+  - `artifact-final.v2` under `release-artifact`;
+  - `build-attestation.v1`;
+  - `trust-policy.v2` with `surface`;
+  - `trust-state.v2` with `prior_states`, `artifacts` and resolved references.
+- No revision-3 binary accepts the revision-2 draft payloadTypes.
 
 ## 10. Other compatibility consequences
 
 | Area | Change | Mitigation |
 |---|---|---|
-| Unsigned sources | refused on production (`UNSIGNED_SOURCE_REFUSED`) | `gov-test-profile`; `--allow-unsigned-development` (labelled, never eligible) |
-| Every production install and update | Human Decision Gate bound to the statement digest (OP-3 mode A) | automation answers gates through the existing gate channel; mode B is owner-optional |
-| First use of a lineage on a machine | `TRUST_ROOT_UNCONFIRMED` until confirmation (OP-6 mode a) | pin file or `--confirm-trust-root` for CI |
-| `framework.lock` | 2.0.0: identity fields renamed, sentinels in 1.1.0 names | tools read `kernel.*` |
-| New protected directories | `governance/trust/`, `governance/.tx/` | small signed files; documented in the consumer contract |
-| `gov kernel trust` output | multi-axis verdict (`19` §6); `verified` also requires eligibility | unchanged for eligible installs |
-| CIT manifests and adoption plans | protected paths refused at planning | no legitimate CIT writes these paths |
-| Dependencies | one pure-Rust Ed25519 crate; platform secure-open primitives | D-0002 single binary preserved |
-| Platforms | production profile needs the `18` §3 primitives | `TRUST_PLATFORM_UNSUPPORTED` elsewhere |
-| Performance | one signature check per statement; kernel read into memory once per process (~1 MiB today) | no cross-process cache |
-| Records | D-0007 superseded only on approval of D-0008 | D-0008 restates D-0007 rules (1)–(4) |
+| Layout | overlay and views renamed; legacy names occupied; adoption evidence renamed | one install transaction; Git renames; documentation and templates updated |
+| Mixed teams | legacy binaries cannot operate a RoT-1 project | intended (`26`); the release protocol retires 4.1.2–4.1.5 |
+| CI runners | an anchor is needed for governed mutation under OP-7 (a)–(c) | state pins in runner images, or OP-7 (c) witnesses |
+| Every final release that changes constitutional content | a TPS registration at root threshold | `gov trust draft-policy`; `14` RK-17 |
+| Trust gates | local confirmation per machine | operator decision pins for automation (`27` §3.2) |
+| Agents | kernel content through `gov kernel show` and context packets | adapters carry pointers (`18` §12) |
+| Dependencies, platforms, performance | as revision 2, plus a same-filesystem transaction area | `TRUST_PLATFORM_UNSUPPORTED(cross_device_tx)` |

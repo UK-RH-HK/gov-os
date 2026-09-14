@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/4.1.6/build-attestation.schema.json",
+  "title": "build-attestation",
+  "description": "PROPOSED (RoT-1 revision 3). Build attestation statement (payloadType build-attestation.v1, purpose build-attestation; KS-10): an independent rebuild of source_commit with build_inputs_digest produced the same binary and Trust Base Manifest digests (25 §3).",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_type",
+    "trust_profile",
+    "framework",
+    "trust_root_id",
+    "issued_at",
+    "artifact",
+    "source_commit",
+    "build_inputs_digest",
+    "tbm_digest",
+    "reproduced",
+    "rebuilder_label",
+    "method"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/build-attestation/v1"
+    },
+    "trust_profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    },
+    "framework": {
+      "const": "agentic-engineering-os"
+    },
+    "trust_root_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "issued_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "target",
+        "digest",
+        "size"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "target": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "build_inputs_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "tbm_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "reproduced": {
+      "const": true
+    },
+    "rebuilder_label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    }
+  }
+}

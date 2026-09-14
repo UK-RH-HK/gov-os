@@ -1,142 +1,115 @@
 # Output 19 — Current-policy eligibility and the non-downgradable security floor
 
-> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> New in revision 2. Addresses RV-H1 (CD-1), RV-M3 (CD-7) and the floor half of RV-M8 (CD-12). Normative keywords:
-> MUST, MUST NOT, SHOULD.
+> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 3 makes floors total over the Constitutional Surface (`23`, R2-H1), bounds currency by anchors (`24`, R2-H2),
+> and computes lowering against the strongest held values (R2-M5). Normative keywords: MUST, MUST NOT, SHOULD.
 
-## 1. Three questions, three answers
+## 1. Four questions, four answers
 
 | Question | Answered by | Never answered by |
 |---|---|---|
-| **Authenticity** — did an authorised release key sign this exact content? | a release statement verified under the T0-rooted root chain for `release-final` or `release-candidate` (`04`, `05`) | anything else |
-| **Eligibility** — may this authentic release be the *current* policy root of this project, on this binary, now? | the eligibility predicate (§6), evaluated over T0, the effective Trust Policy and trust state (`17`), and the machine's Verifier Trust Store | the release being judged; Git-tracked records; `framework.lock`; the update ledger |
-| **Floor** — which minimum constitutional values does enforcement use, whatever kernel is installed? | the effective floor (§5): effective Trust Policy floors joined with the installed eligible kernel and project strengthening | the candidate kernel alone |
+| **Authenticity:** did an authorised release key sign this exact content? | a release statement verified under the T0-rooted root chain for `release-final` or `release-candidate` (`04`, `05`) | anything else |
+| **Eligibility:** may this authentic release be the policy root of this project, on this binary, given what this machine holds? | the predicate of §6, evaluated over T0, the effective Trust Policy and its Constitutional Surface, trust state (`17`) and the VTS | the release being judged; Git-tracked records; the lock; the ledger |
+| **Floor:** which constitutional values does enforcement use, whatever kernel is installed? | the effective policy (§5): the root kernel with every floor leaf joined with the effective TPS, pinned leaves only when registered, precedence joined per key | the candidate kernel alone |
+| **Currency:** is what this machine holds the currently published state? | an anchor (`24`) | knowledge, the compiled T0, the repository |
 
-An old release can be authentic, recognised, listed, and installed in an evaluation project while being `INELIGIBLE` as
-current production governance. Rollback, recovery and Git delivery can restore bytes. They cannot restore weaker
-floors.
+An old release can be authentic, recognised and installed for evaluation, yet `INELIGIBLE` as production governance.
+Rollback, recovery and Git delivery can restore bytes. They cannot restore values weaker than the floors the machine
+holds, and they cannot restore content the effective Trust Policy does not register.
 
-## 2. Where the non-downgradable floor lives
+## 2. Where the floor lives
 
-The floor lives in the **Trust Policy Statement (TPS) lineage**: statements signed under the `trust-policy` purpose
-(root keys, root threshold; `05` KS-2), ordered by a strictly increasing `policy_version`.
+The floor lives in the **Trust Policy lineage**: statements signed under `trust-policy` (root keys, root threshold,
+`05` KS-2), ordered by `policy_version` and chained by `prior_policies[]`.
 
-1. **Compiled TPS.** The newest TPS at build time is compiled into every binary (T0). It is the hard minimum for that
-   binary; nothing at run time can go below it.
-2. **Accepted newer TPS.** A TPS with a higher `policy_version` delivered by a bundle, `gov trust refresh`, the VTS or
-   the PTR, and verified under the effective root, is accepted monotonically (`17` S3) and persisted to the VTS and PTR.
-3. **Project strengthening.** The project overlay may raise floor values under POLICY_PRECEDENCE. It can never lower
-   them.
+1. **Compiled TPS.** The newest TPS at build time, named in the Trust Base Manifest (`25` §4), is the hard minimum for
+   that binary.
+2. **Accepted newer TPS.** Verified and accepted monotonically (`17` S3), persisted to the VTS and PTR.
+3. **Project strengthening.** The overlay may only strengthen, under the joined precedence (§5.3).
 
-The floor does **not** live in:
-- the installed or incoming kernel (its values are joined in, never used alone);
-- `framework.lock`, `spec/reports/framework-updates.jsonl` or gate records (A2-writable, D-0008 rule 18);
-- any cache, snapshot or journal.
+The floor does **not** live in the installed or incoming kernel (joined in, never used alone), the lock, the ledger, gate
+records (`27`), caches, snapshots or journals.
 
-## 3. Trust Policy content
+## 3. Trust Policy content (revision 3)
 
 Schema: `schemas/trust-policy-statement.schema.json`.
 
 | Field | Meaning |
 |---|---|
-| `policy_version`, `supersedes_policy_digest` | monotonic order; hash link to the previous TPS |
-| `floor_schema_version` | version of the compiled floor-operator vocabulary needed to evaluate `floors` |
-| `floors[] {key, op, value}` | constitutional minimums (§4) |
-| `eligibility.min_release_sequence` | releases with a lower `release.sequence` are never eligible |
-| `eligibility.min_binary_version` | binaries below this version are read-only for projects under this policy |
-| `eligibility.production_stage` | const `final` |
-| `eligibility.historical_releases` | const `never_eligible` |
-| `eligibility.evaluation_candidates` | `refuse` or `flag_and_gate` |
+| `policy_version`, `supersedes_policy_digest`, `prior_policies[]` | monotonic order; cumulative chain (`17` S3) |
+| `floor_schema_version` | `2`: the compiled class and operator vocabulary (`23` §3) |
+| **`surface`** | the Constitutional Surface Inventory: file rules, leaf rules with floors, registered digests and member ids, registered precedence rules (`23`). Draft v1: `constitutional-surface/CONSTITUTIONAL_SURFACE_INVENTORY.yaml`. It replaces revision 2's `floors[]` list. |
+| `eligibility.min_release_sequence`, `.min_binary_version`, `.production_stage` (`final`), `.evaluation_candidates` | as revision 2 |
+| **`eligibility.historical_releases[]`** | `{version, release_id, release_commit, tree_digest, manifest_digest, status: REJECTED, verifier_report_digest}`: never eligible. It replaces the withdrawn threshold-1 historical-identity statement (`05` §2). |
 | `install_authority {operation: level}` | minimum authority for install-class operations (§8) |
-| `gating.mode` | the OP-3 answer: `always_gate` (mode A) or `fresh_certified_may_skip_update_gate` (mode B) (`21`) |
-| `gating.refuse_known_rejected`, `gating.refuse_known_withdrawn` | whether a known REJECTED/WITHDRAWN final is refused outright instead of gated |
-| `sensitivity_order` | the ordered sensitivity classes used to detect weakening (§9); v1 equals `SECURITY_POLICY.sensitivity_classes` |
-| `lowers[]` | explicit floor reductions in this version (§10 step 6) |
-| `unrevokes[]` | root-authorised lifting of named revocations (`17` §8) |
+| `gating.mode`, `.refuse_known_rejected`, `.refuse_known_withdrawn`, **`.local_terminal_only[]`** | OP-3; trust-gate kinds that an operator pin cannot approve (`27` §3.2) |
+| **`bootstrap`** | `{op6_mode, op7_mode, max_anchor_age_days, witness_max_validity_days}` (OP-6, OP-7; `24` §9) |
+| `sensitivity_order` | used for computed weakening (§9) |
+| **`lowering_history[]`** | cumulative `{key or rule, previous, new, in_policy_version, reason}` for every reduction ever published (§10) |
+| `unrevokes[]` | root-authorised lifting of named revocations |
+| `state_chain_reset` | optional (`17` S12) |
 
-## 4. Floor operators (compiled, T0)
+## 4. Floor operators
 
-The operators reuse the vocabulary POLICY_PRECEDENCE already applies to overlays (`framework/policies/POLICY_PRECEDENCE.yaml`
-modes `immutable`, `floor`, `ceiling`, `additive`, `shrink_only`, `strengthen_only_bool`, `overridable`; kinds `level`,
-`radius`, `tier`, `number`, `ordered`). The TPS applies them to the **kernel layer itself**.
+These are the compiled vocabulary of `23` §3, `floor_schema_version: 2`:
+- **Classes:** `floor`, `pinned`, `members`, `precedence`, `release_bound`, `project_tunable`, `informational`,
+  `collection_id`, `covered_by_collection`.
+- **Operators:** `level_at_least`/`at_most`, `ordered_at_least`/`at_most`, `decimal_at_least`/`at_most`, `set_superset`,
+  `set_subset`, `bool_toward`, `equals`; member operators `ids_equal`, `ids_subset`, `ids_superset`.
+- **Precedence:** a per-key strength lattice (`23` §4) that replaces revision 2's `rule_mode_at_least`, which had no order
+  over non-comparable modes (R2-M5).
 
-| `op` | Value | “At least as strong” means | Corresponding precedence mode |
-|---|---|---|---|
-| `level_at_least` | `L0`…`L5` | higher or equal level | `floor` / kind `level` |
-| `ordered_at_least` | member of an order: `R0`…`R5`, `T0`…`T3`, or an explicit `order` list | later or equal in the order | `floor` / kinds `radius`, `tier`, `ordered` |
-| `ordered_at_most` | as above | earlier or equal | `ceiling` |
-| `number_at_least` / `number_at_most` | integer | larger or equal / smaller or equal | `floor` / `ceiling`, kind `number` |
-| `set_superset` | list of strings | contains every floor member | `additive` |
-| `set_subset` | list of strings | contains no member outside the floor list | `shrink_only` |
-| `bool_required` | boolean | equals the floor value | `strengthen_only_bool` |
-| `equals` | string | equals the floor value (enumerations with one safe value, e.g. `fail_closed`) | `immutable` value |
-| `rule_mode_at_least` | a POLICY_PRECEDENCE mode | the effective precedence rule for the named key has the floor mode, or is `immutable` | meta-floor over precedence rules |
+**Unknown vocabulary.** A TPS using an unknown class, operator or `floor_schema_version` makes the binary
+`BINARY_BELOW_TRUST_POLICY` (read-only). There is no partial evaluation.
 
-Key addressing:
-- `<POLICY>.<dotted.path>`, e.g. `AUTHORITY_POLICY.authority_levels_required.update_apply`;
-- precedence rules: `POLICY_PRECEDENCE.rules[key=<rule key>]`;
-- hard invariants: `HARD_INVARIANTS.invariants[*].id` with `set_superset`.
+## 5. Effective policy
 
-**Unknown operator or `floor_schema_version`.** A TPS using either cannot be evaluated by the running binary. The binary
-becomes `BINARY_BELOW_TRUST_POLICY`: read-only, remedy “upgrade gov”. There is no partial evaluation.
-
-**TPS v1 floors (for 4.1.6)** are generated from the 4.1.6 kernel's constitutional files and reviewed in the ceremony:
-- every `AUTHORITY_POLICY.authority_levels_required.*` value → `level_at_least`;
-- `SECURITY_POLICY.never_index_classes` and `never_export_classes` → `set_superset`;
-- `SECURITY_POLICY.on_secret_in_export_payload`, `agent_read_default_for_secret_class` → `equals`;
-- `HUMAN_GATE_POLICY.raise_for` → `set_superset`; `must_be_presented_in_chat` → `bool_required`;
-- `TOOL_POLICY.plugins.min_authority` → `level_at_least`; `elevated_permission_classes` and `registration_binds` →
-  `set_superset`; `refuse_on_pin_drift` and `require_valid_descriptor` → `bool_required`;
-- every POLICY_PRECEDENCE rule → `rule_mode_at_least`; `POLICY_PRECEDENCE.default_mode` → `equals immutable`;
-- `HARD_INVARIANTS.invariants[*].id` → `set_superset`.
-
-`examples/make_example.py` shows the derivation.
-
-## 5. Effective floor
-
-For each floor key k, with join operator ⊔ given by the op:
+### 5.1 Root kernel
 
 ```
-effective(k) = TPS_effective.floor(k)  ⊔  root_kernel(k)
-root_kernel  = KernelSnapshot   if the installed release is verified ∧ eligible (§6)
-             = EmbeddedSnapshot otherwise
+root_kernel = KernelSnapshot    if the installed release is verified ∧ eligible (§6, including E7 surface)
+            = EmbeddedSnapshot  otherwise
 ```
 
-| op | a ⊔ b |
+### 5.2 Per-leaf value
+
+| Leaf class | Effective value |
 |---|---|
-| `level_at_least`, `number_at_least`, `ordered_at_least` | the stronger (max in order) |
-| `number_at_most`, `ordered_at_most` | the stronger (min in order) |
-| `set_superset` | union |
-| `set_subset` | intersection |
-| `bool_required`, `equals` | the floor value |
-| `rule_mode_at_least` | the floor mode, unless the kernel rule is `immutable` |
+| `floor` | `op_join(effective TPS floor, root_kernel value)`; a missing leaf takes the floor value |
+| `pinned` | the root-kernel value if its digest is registered in the effective TPS; otherwise the consumer's compiled fail-closed default (`23` §6.5) |
+| `members` | registered members only (additive collections keep additions) |
+| `precedence` | per concrete key: `join(root_kernel rule, registered rule)` (`23` §4) |
+| `release_bound`, `project_tunable`, `informational`, `collection_id` | the root-kernel value |
 
-- A key the kernel lacks takes the floor value. Example: the 4.1.2 kernel lacks `update_apply` → L4 from the floor, not
-  the runtime's L3 default for missing classes.
-- The project overlay is applied **after** the join, under the joined precedence rules, so it can only strengthen.
-- The effective floor is applied in one place — policy loading from the snapshot (`18` VU-7) — and reaches every
-  consumer: authority checks, precedence evaluation, sensitivity and indexing, plugin authorisation, gate policy and
-  install authority.
+### 5.3 Project layer and exceptions
+
+- **Overlay.** Applied after the join, under the joined precedence, so it can only strengthen.
+- **Exceptions.** Applied after the overlay. Effective `exception_relaxable` = registered ∧ root kernel. They never relax
+  a `floor`, `pinned`, `members` or `precedence` leaf, or a key under the compiled prefixes `SECURITY_POLICY.`,
+  `AUTHORITY_POLICY.`, `HUMAN_GATE_POLICY.`, `TOOL_POLICY.`, `POLICY_PRECEDENCE.`, `ROLES.` (`23` §4).
+- **Single enforcement point.** The effective policy is applied in one place, policy loading from the snapshot
+  (`18` VU-7). It reaches every consumer, including actor levels (ROLES), secret patterns, gate answering, plugin and tool
+  authorisation, export, precedence, exceptions and install authority.
 
 ## 6. Eligibility predicate (production profile, normative)
 
-A verified release R with statement digest D is **eligible as current policy root** iff every applicable condition
-holds.
+A verified release R with statement digest D, named TPS P_named (`trust_references.trust_policy_version`, or the effective
+TPS when unknown) and effective TPS P_eff, is **eligible as policy root** iff every applicable condition holds:
 
 | ID | Condition | Applies at | Failure reason (`RELEASE_INELIGIBLE` at ingress, `KERNEL_INELIGIBLE` at use) |
 |---|---|---|---|
-| E1 | R authenticates as a **release** statement (`release-final` or `release-candidate` purpose). A historical identity never satisfies E1. | both | `historical` |
-| E2 | `R.stage = final`, or `R.stage = candidate` in an evaluation project created through a gate under `eligibility.evaluation_candidates = flag_and_gate` | both | `candidate` |
-| E3 | `R.sequence ≥ TPS_effective.eligibility.min_release_sequence` (and ≥ any project strengthening of it) | both | `below_min_release_sequence` |
-| E4 | D and R's `release_id` are not in the effective negative set N (`17` S5) with `refuse_operation` (use) or either effect (ingress) | both | `revoked` |
-| E5 | binary version ≥ `min_binary_version`; binary supports R's `kernel_contract_version` and `floor_schema_version`; CLI version within `compatibility.cli` | both | `binary_below_policy` / `incompatible` |
-| E6 | `R.trust_root_id` = binary lineage = the lineage pinned for this project and machine (`06` §4) | both | `lineage_mismatch` |
-| E7 | R's kernel values for every floor key are no stronger than the TPS named by `R.trust_references.trust_policy_version` (the producer registered every floor; §10.3) | both | `floor_not_registered` |
-| E8 | trust state is not `STALE` (`17` §7) | ingress | `trust_state_stale` |
-| E9 | if `R.sequence` is lower than the installed eligible release's sequence, a downgrade authorisation exists (`20` §4) | ingress | `downgrade_not_authorised` |
-| E10 | R's sequence is not lower than the VTS per-project record, and the project's `project_trust_id` has not changed at a known path (`20` §9) | use | `downgrade_without_transaction` / `project_trust_id_changed` |
+| E1 | R is a release statement (`release-final` or `release-candidate`), not listed in `P_eff.eligibility.historical_releases` | both | `historical` |
+| E2 | `stage = final`, or a candidate in a gated evaluation project | both | `candidate` |
+| E3 | `R.sequence ≥ P_eff.eligibility.min_release_sequence` | both | `below_min_release_sequence` |
+| E4 | D and R's `release_id` ∉ N (`17` S5) with `refuse_operation` (use) or either effect (ingress) | both | `revoked` |
+| E5 | binary version ≥ `min_binary_version`; contract, `floor_schema_version` and CLI compatible | both | `binary_below_policy` / `incompatible` |
+| E6 | `R.trust_root_id` = binary lineage = the pinned lineage | both | `lineage_mismatch` |
+| **E7** | **Surface check** of R's kernel against P_eff's CSI, with floor violations judged against P_named (`23` §6.3): every file and leaf classified; pinned digests and members registered; floors not weaker than P_named and not stronger than P_named; precedence not weaker | both | `surface_unclassified` / `surface_unregistered` / `surface_membership` / `floor_violation` / `floor_not_registered` / `precedence_weakened` |
+| E8 | trust state `KNOWN`, freshness `ANCHORED` or `WITNESSED`, and R's release-local requirements met (`17` S7, `24` §4.3) | ingress | `trust_state_unanchored` / `below_anchor` / `incomplete` / `equivocation` / `regression` / `references_unknown_state` |
+| E9 | if R.sequence < the installed eligible release's sequence: a consumed `downgrade` trust-gate confirmation bound to both digests (`27`) | ingress | `downgrade_not_authorised` |
+| E10 | R.sequence ≥ the VTS per-project record; `project_trust_id` unchanged at a known path | use | `downgrade_without_transaction` / `project_trust_id_changed` |
 
-Trust state `STALE` never makes an installed release ineligible for **use** (`17` MS-6).
+The freshness axis never makes an installed release ineligible for **use**. It restricts operation classes (`24` §4.3).
 
 ### Verdict axes
 
@@ -146,99 +119,87 @@ Trust state `STALE` never makes an installed release ineligible for **use** (`17
 | `integrity` | `INTACT`, `TAMPERED`, `NOT_APPLICABLE` |
 | `stage` | `final`, `candidate`, `historical`, `development` |
 | `eligibility` | `ELIGIBLE`, `ELIGIBLE_EVALUATION`, `INELIGIBLE(reason)` |
-| `certification` | views of `17` §6 |
-| `trust_state` | `CURRENT_KNOWN(n)`, `HINT_MISMATCH`, `STALE`, `REGRESSION` |
-| `verified` | production: `authenticity = AUTHENTICATED ∧ integrity = INTACT ∧ eligibility ∈ {ELIGIBLE, ELIGIBLE_EVALUATION}`. Test profile additionally admits `TEST`, `DEVELOPMENT_UNSIGNED` and historical identities, always labelled. |
-
-`verified` keeps its consumer meaning: *the KernelSnapshot may be the policy root, joined with the floor.* When it is
-false, the root is the EmbeddedSnapshot joined with the floor. Mutations are refused, except remedies, with
-`KERNEL_TAMPERED` (integrity), `KERNEL_UNAUTHENTICATED` (authenticity) or `KERNEL_INELIGIBLE` (eligibility).
+| `surface` | `REGISTERED`, `UNCLASSIFIED(n)`, `UNREGISTERED(n)`, `FLOOR_VIOLATION(n)` |
+| `certification` | `17` §6 |
+| `trust_state` | `KNOWN(n)`, `INCOMPLETE(n′)`, `REGRESSION`, `EQUIVOCATION` |
+| `freshness` | `ANCHORED(e, method, age)`, `WITNESSED(e, expires)`, `BELOW_ANCHOR`, `UNANCHORED` |
+| `verified` | production: `authenticity = AUTHENTICATED ∧ integrity = INTACT ∧ eligibility ∈ {ELIGIBLE, ELIGIBLE_EVALUATION}`. It means "may be the policy root, joined with floors". It never means "current": that is `freshness`. |
 
 ## 7. Historical, rejected, candidate and development material
 
-| Material | Recognised as | Production policy root? | Installable in production? | Floors when installed |
-|---|---|---|---|---|
-| Legacy 4.1.2–4.1.5 kernels (identities compiled into T0, `05` §5) | `HISTORICAL_IDENTIFIED` | **never** | no (test profile only, labelled) | EmbeddedSnapshot ⊔ floor |
-| Genuine final below `min_release_sequence` | `AUTHENTICATED` | no | no | EmbeddedSnapshot ⊔ floor |
-| Genuine final, revoked | `AUTHENTICATED` | no | no | EmbeddedSnapshot ⊔ floor |
-| Genuine final with REJECTED or WITHDRAWN certification | `AUTHENTICATED` | yes, unless revoked or refused by TPS `gating.refuse_known_*`. Certification is a gate input, not eligibility (`17` §7). | through a gate | installed ⊔ floor |
-| Candidate | `AUTHENTICATED` (`release-candidate`) | only `ELIGIBLE_EVALUATION` in an evaluation project | only with flag + gate | installed ⊔ floor |
-| Development, unsigned | `DEVELOPMENT_UNSIGNED` | no | only with `--allow-unsigned-development` (recorded in `development.json`) | EmbeddedSnapshot ⊔ floor |
-| Test-signed | `TEST` | no (yes in the test-profile binary) | test profile only | — |
+| Material | Recognised as | Production policy root? |
+|---|---|---|
+| Legacy 4.1.2–4.1.5 kernels (tree digests in `P_eff.eligibility.historical_releases`) | `HISTORICAL_IDENTIFIED` | **never** (E1); independently, their surfaces fail E7 (`evidence/CSI-check-legacy-*`) |
+| Genuine final below `min_release_sequence` | `AUTHENTICATED` | no |
+| Genuine final, revoked | `AUTHENTICATED` | no |
+| Genuine final with REJECTED/WITHDRAWN not lifted | `AUTHENTICATED` | only if not refused by `gating.refuse_known_*`, through a trust gate |
+| Candidate | `AUTHENTICATED` | only `ELIGIBLE_EVALUATION` in a gated evaluation project; unregistered surface content is labelled `SURFACE_UNREGISTERED(evaluation)` and never produces a production verdict |
+| Development, unsigned | `DEVELOPMENT_UNSIGNED` | no |
+| Test-signed | `TEST` | test profile only |
 
-**Withdrawal of a rev 1 claim.** Revision 1 (`11` Phase 1.3) said the defects of 4.1.2–4.1.5 “lie in the binaries' install
-and use logic, not in kernel content”. That is withdrawn. The independent review showed security-relevant kernel
-differences (`../4.1.6-review/evidence/legacy-kernel-security-diffs.txt`) and executed an authority-floor lowering on the
-genuine 4.1.2 kernel (`../4.1.6-review/evidence/R1-legacy-kernel-floors.json`).
+## 8. Install-authority floor
 
-## 8. Install-authority floor (RV-M3)
-
-For every install-class operation o — `install_kernel` (init, adopt batch 0, reinstall), `update_apply`, `rollback_apply`,
-`recover`, `override_kernel_integrity`, `trust_refresh`, `trust_confirm_root`, `allow_unsigned_development`,
-`install_evaluation_candidate`:
+For every install-class operation o (`install_kernel`, `update_apply`, `rollback_apply`, `recover`,
+`override_kernel_integrity`, `trust_refresh`, `trust_confirm_root`, `trust_confirm_state`, `allow_unsigned_development`,
+`install_evaluation_candidate`):
 
 ```
-required_level(o) = max( TPS_effective.install_authority[o],
-                         EmbeddedSnapshot AUTHORITY_POLICY.authority_levels_required[o],
-                         KernelSnapshot   AUTHORITY_POLICY.authority_levels_required[o]   if verified ∧ eligible,
+required_level(o) = max( P_eff.install_authority[o],
+                         effective AUTHORITY_POLICY.authority_levels_required[o]  (floor-joined, §5),
                          project overlay strengthening )
+actor_level       = effective ROLES.roles[id=<acting role>].level  (floor-joined level_at_most, §5; never from the incoming release)
 ```
 
-- **The incoming release is never consulted.** An incoming kernel declaring `install_kernel: L0` changes nothing.
-- A first install (`ABSENT`) uses the TPS and EmbeddedSnapshot values only.
-- The acting role remains caller-declared, the documented V-L5 boundary: the floor defines what a role may do; Human
-  Decision Gates remain the human authorisation boundary.
+- The incoming release is never consulted for either value.
+- Install-class trust transitions also need their trust gate (`27`), whatever the actor level.
+- The acting role remains caller-declared (V-L5).
 
-## 9. Strength-reducing changes introduced by migrations (RV-M8)
+## 9. Strength-reducing changes introduced by migrations or recovery
 
-During `update`, the transaction interprets migration operations over the current overlay (`18` §4, `migrated` phase).
-It computes every change that weakens a project-owned value compared with its pre-update value:
+During `update`, or when restoring `overlay.prev` in recovery (`20` §5), the transaction computes every weakening of
+project-owned values:
+- a deleted classification, or a class change to an earlier class in `sensitivity_order`;
+- a deleted or lowered overlay floor raise;
+- a relaxed repository-contract exclusion;
+- a deleted overlay key whose joined precedence is not `overridable`.
 
-- deletion of a DATA_SENSITIVITY classification, or a class change to an earlier class in `sensitivity_order`;
-- deletion or lowering of an overlay value that strengthened a floor key (judged by the op of §4);
-- relaxation of a REPOSITORY_CONTRACT rule that excluded a path from indexing, retrieval or export;
-- deletion of any overlay key whose effective precedence rule is not `overridable`.
-
-A non-empty `computed_weakenings[]` requires a Human Decision Gate bound to the statement digest and to the digest of
-the list. This applies whatever the signer declared in `breaking`/`human_gates` and whatever the OP-3 mode.
-Signer-declared information can add gates; it can never remove computed ones (`OVERLAY_WEAKENING_GATE_REQUIRED`).
+A non-empty list needs the `weakening` trust gate, bound to the statement digest and the list digest (`27`). This
+applies in every OP-3 mode. Signer declarations can add gates, never remove them. After commit, the project-strength
+vector is re-recorded (`26` §6).
 
 ## 10. How the floor evolves safely
 
-1. **Raising.** When a release strengthens any floor-key value, the release owner issues a TPS with a higher
-   `policy_version` containing the stronger value, before or together with the final release statement. The release
-   statement's `trust_references.trust_policy_version` names that TPS.
-2. **Compiling.** Every binary compiles the newest TPS. The release pipeline refuses a binary whose compiled
-   `policy_version` is lower than the previously published binary's (`FLOOR_REGRESSION_IN_BUILD`); the verifier
-   re-checks.
-3. **Producer consistency.** `gov release build` refuses a final release whose kernel floor-key values are stronger than
-   the referenced TPS (`FLOOR_NOT_REGISTERED`) or weaker than it (`FLOOR_VIOLATION`). Verifiers re-check (E7).
-4. **Distribution.** Bundles carry the newest TPS; `gov trust refresh` imports; install transactions write it into the
-   PTR; the VTS persists it.
-5. **Minimum eligible sequence.** Raised when older releases must never again be current (security-relevant kernel
-   defect, key compromise). Per-digest revocation is the complementary tool.
-6. **Lowering.** Only through a higher-version TPS listing each reduction in `lowers[]`, signed by the root threshold. A
-   project whose PTR or VTS holds the previous stronger policy keeps the stronger values until a Human Decision Gate bound
-   to the lowering TPS digest accepts the reduction. Projects with no record of the stronger policy (fresh clones) apply
-   the reduction, which the owner deliberately published.
-7. **Binary floor.** `min_binary_version` retires binaries whose enforcement is inadequate; they become read-only for
-   projects under that policy.
+1. **Raising is mechanical.** A kernel value stronger than its named TPS is `FLOOR_NOT_REGISTERED`; an unregistered
+   pinned value is `SURFACE_UNREGISTERED`. The producer and E7 refuse. The release therefore ships only with a TPS that
+   registers the new value.
+2. **Raising without a kernel.** A TPS may raise a floor over existing releases. Joins apply it to older eligible kernels
+   (`evidence/P1r3` part 2 join path; part 3 d, e on the real 4.1.5 binary).
+3. **Compiling.** Every binary names its compiled TPS in its TBM. The pipeline refuses `FLOOR_REGRESSION_IN_BUILD`, and
+   binaries below the VTS high-water refuse trusted operations (`25` §5 A7).
+4. **Distribution.** Bundles carry the newest TPS; transactions write the PTR as a union; the VTS persists.
+5. **Minimum eligible sequence.** Raised when older releases must never again be current.
+6. **Lowering is computed, not declared (R2-M5).**
+   - When accepting TPS v_new, the verifier computes every reduction of v_new against the **strongest** value it holds
+     for each leaf, precedence key, class and registration. The sources are the VTS, the PTR and T0.
+   - Each reduction MUST appear in `v_new.lowering_history[]` with `in_policy_version` greater than the version of the
+     strongest held value. Otherwise v_new is invalid: `TRUST_POLICY_UNDECLARED_LOWERING`, not used.
+   - Explained reductions apply to a project whose record holds the stronger value only after the per-project
+     `policy_lowering` trust gate (`27`).
+   - A skipped intermediate version does not hide a lowering: the history is cumulative (`evidence/P4r3` `B6`).
+7. **Binary floor.** `min_binary_version` retires binaries.
 
-**Why current floors survive rollback, recovery and Git delivery:**
-- the effective floor never takes a value from a kernel alone (§5);
-- every floor value of every final release is registered in a TPS (step 3);
-- TPS versions only increase (step 2, `17` S3).
-
-Restoring any older eligible kernel therefore yields that kernel's content, joined with floors at least as strong as
-the newest registered ones.
+**Restated claim.** Restoring an older eligible kernel yields that kernel's registered content, joined with floors at
+least as strong as the effective TPS on that machine. On an anchored machine that is at least the anchored epoch's TPS
+(`24`). On an unanchored machine it is at least the compiled TPS, and under OP-7 (a)–(c) such a machine performs no
+governed mutation.
 
 ## 11. Worked examples
 
 | Case | Result |
 |---|---|
-| A2 commits the genuine 4.1.2 kernel and a 1.1.0 lock, and deletes `governance/trust/` — the review's R1 shape | Installation state `PARTIAL` (no trust record) → EmbeddedSnapshot ⊔ floor. If a historical identity is recognised from the tree digest it is reported as `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)`. Floors `authority_levels_required.update_apply` L4 and `resume_control` L4 hold, so L3 `update --apply` and `resume` are refused. **R1 must flip** (`12` RT-32). |
-| A2 commits a genuine signed 4.1.6 set into a project on 4.1.7, whose kernel raised a floor | 4.1.6 is authentic and eligible if ≥ `min_release_sequence`. Floors are joined with the TPS, which holds 4.1.7's registered values, so the floor is preserved. On a machine whose VTS recorded 4.1.7 for this project: `INELIGIBLE(downgrade_without_transaction)` until an authorised rollback or update. |
-| `gov update --rollback` to a revoked release | `RELEASE_INELIGIBLE(revoked)`, refused with no override |
-| Incoming release declares `install_kernel: L0` | ignored (§8) |
-| A newer binary opens a project installed from an older eligible release | content from the installed release; floors from the newer binary's compiled TPS ⊔ installed values |
-| A TPS arrives with a floor operator unknown to the running binary | `BINARY_BELOW_TRUST_POLICY`: read-only until upgraded |
+| The review's unfloored-only tamper (backend-engineer L4, secret patterns emptied, `agent_resolvable_when` R5/0.0/irreversible), authentic and sequence-eligible | E7 fails (`floor_violation`, `surface_membership`), so the root is the EmbeddedSnapshot ⊔ floors. Every harm flips on the real 4.1.5 binary consuming the effective kernel (`evidence/P1r3` part 3 a–c). |
+| A2 commits the genuine 4.1.2 kernel and a 1.1.0 lock and deletes `governance/trust/` (review R1) | occupation missing and no trust record, so `PARTIAL`; historical and surface failure; EmbeddedSnapshot ⊔ floor; L3 `update --apply` and `resume` refused |
+| 4.1.8 caps `migration-executor` at L2 (a TPS raise); A2 commits the eligible 4.1.7 set | effective level L2 from the join (review scenario 1 flips) |
+| A `release-final` thief signs a final whose ROLES maps every role to L5 | E7 `floor_violation` (level_at_most) and `surface_membership`; not a policy root (review scenario 2 flips) |
+| A TPS arrives with an operator unknown to the binary | `BINARY_BELOW_TRUST_POLICY`, read-only |
+| TPS v4 keeps a v3 lowering; the verifier holds v2 | explained by the cumulative history, so the `policy_lowering` trust gate is required; a v4 hiding it is invalid |

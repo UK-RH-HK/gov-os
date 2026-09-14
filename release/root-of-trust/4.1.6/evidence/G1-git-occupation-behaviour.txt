@@ -1,0 +1,15 @@
+== case 1: working copy with IGNORED residue directory in the way, then pull of the occupation commit
+pull exit=0
+type of .governance-runtime/migration: regular-file
+residue batch.json present: no
+808419d rot-1 occupation
+== case 2: working copy with UNIGNORED untracked residue in the way, then checkout of the occupation commit
+error: Updating the following directories would lose untracked files in them:
+	.governance-runtime/migration
+
+Aborting
+checkout exit=1
+HEAD at: 00d6806 legacy
+type of .governance-runtime/migration: directory
+== case 3: fresh clone
+type of .governance-runtime/migration: regular-file

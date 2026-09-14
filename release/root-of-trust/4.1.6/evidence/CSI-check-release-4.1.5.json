@@ -1,0 +1,30 @@
+{
+ "exit": 0,
+ "kernel_dir": "<repo>/release/releases/4.1.5/kernel",
+ "files_classified": 121,
+ "counts": {
+  "structured": 18,
+  "floor": 234,
+  "release_bound": 32,
+  "pinned": 177,
+  "pinned_file": 97,
+  "members": 4,
+  "transaction_input": 4,
+  "informational_file": 2,
+  "project_tunable": 57,
+  "precedence": 1,
+  "covered_by_collection": 85,
+  "collection_id": 37,
+  "informational": 14
+ },
+ "unclassified_files": [],
+ "ambiguous_files": [],
+ "unclassified_leaves": [],
+ "unclassified_leaf_count": 0,
+ "ambiguous_leaves": [],
+ "structure": [],
+ "violations": [],
+ "violation_count": 0,
+ "stronger_than_registered": [],
+ "precedence_weaker_key_count": 0
+}

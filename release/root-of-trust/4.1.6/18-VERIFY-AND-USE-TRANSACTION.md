@@ -1,252 +1,260 @@
 # Output 18 — Verify-and-use transaction model
 
-> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> New in revision 2. Addresses RV-H3 (CD-4), the writer guard of RV-M1 (CD-5, with `02`) and RV-M2 (CD-6).
+> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 3 keeps the byte-binding proof the review confirmed (review r2 `03` §1) and adds five things:
+> - the legacy-path-occupation layout (`26`);
+> - a transaction area outside Git, with a local registry and union trust records (R2-M9);
+> - unit-of-work generation discipline and bounded snapshot lifetime (R2-M7);
+> - `st_nlink` refusal (R2-L2);
+> - agent consumption of kernel content through `gov` (R2-M8).
+>
 > Normative keywords: MUST, MUST NOT, SHOULD.
 
 ## 1. Exactly what is authenticated, installed and enforced
 
 | Object | Definition | Produced by | Consumed by |
 |---|---|---|---|
-| **Statement bytes `P`** | canonical GOV-JCS-1 payload bytes decoded once from the DSSE envelope | source, read once | signature verification (PAE) and parsing — **from the same buffer** |
-| **Statement digest `D`** | `sha256:` + hex(SHA-256(`P`)) | computed | identity of everything below |
-| **Release Content Set `RCS(D)`** | inside `P`: `kernel.files` (relpath → content digest), `tree_digest`, `manifest_digest`, component and migration digests | release signer | V9; snapshot comparison |
-| **Content identity `CI`** | the pair (`D`, `tree_digest`) | computed | the identity recorded in the lock, journal, index manifests, adapter manifests, generated registries, context packets |
-| **VerifiedBlob** | `{digest, bytes}` for one file: an immutable shared buffer whose SHA-256 equals `RCS(D)[path]` | secure reader (§3) | install staging writes; migration and template reads during the transaction |
-| **AuthenticatedRelease (ARO)** | `{P, D, verified signers, RCS, VerifiedBlob per path, eligibility inputs}`, in memory only; no public constructor; not serialisable | `authenticate` (`04`) | authorisation (`19`), install transaction (§5) |
-| **StagedTree** | files written **from VerifiedBlob buffers** into `governance/.tx/<TX>/kernel.next/` and `trust.next/` | install transaction | read-back verification; commit |
-| **KernelSnapshot** | immutable in-memory map relpath → VerifiedBlob, loaded from the installed tree by the secure reader, whose digests equal `RCS(D_installed)` | `kernel_trust` at process start or explicit reload (§6) | **every** consumer of kernel content |
-| **EmbeddedSnapshot** | the same shape built from bytes compiled into the binary and verified against the compiled statement | the binary | fail-closed baseline; `init` with no `--source` |
+| **Statement bytes `P`** | canonical GOV-JCS-1 payload decoded once from the DSSE envelope | source, read once | signature verification (PAE) and parsing, from the same buffer |
+| **Statement digest `D`** | `sha256:` + hex(SHA-256(`P`)) | computed | identity |
+| **Release Content Set `RCS(D)`** | `kernel.files`, `tree_digest`, `manifest_digest`, component and migration digests inside `P` | release signer | V9; snapshot comparison |
+| **Content identity `CI`** | (`D`, `tree_digest`) | computed | lock, journal, VTS records, index and adapter manifests, context packets |
+| **VerifiedBlob** | `{digest, bytes}`: an immutable buffer whose SHA-256 equals `RCS(D)[path]` | secure reader (§3) | staging writes; transaction reads |
+| **AuthenticatedRelease (ARO)** | `{P, D, verified signers, RCS, blobs, eligibility inputs}`, in memory only | `authenticate` (`04`) | authorisation, install transaction |
+| **StagedTree** | files written from VerifiedBlob buffers into `.governance-runtime/trust-tx/<TX>/trust.next/` | install transaction | read-back; commit |
+| **KernelSnapshot** | immutable in-memory map relpath → VerifiedBlob, loaded from `governance/trust/kernel/` by the secure reader, whose digests equal `RCS(D_installed)`, with its generation `(CI, TSS sequence, TPS version, anchor epoch, negative-set digest)` | `kernel_trust` (§6) | **every** consumer of kernel content |
+| **EmbeddedSnapshot** | the same shape built from compiled bytes verified against the compiled statement named in the TBM (`25` §4) | the binary | fail-closed baseline |
 
-**What installation consumes:** the VerifiedBlob buffers that were digested. Installation never reads the source path
-again.
-
-**What runtime enforces:** KernelSnapshot buffers, or the EmbeddedSnapshot. Enforcement never reads a kernel path again
-after it was digested.
+Installation consumes the digested buffers and never re-reads the source path. Enforcement reads KernelSnapshot or
+EmbeddedSnapshot bytes and never re-reads a kernel path after digesting it.
 
 ## 2. Invariants (normative)
 
 | ID | Invariant |
 |---|---|
-| VU-1 | Every source file is opened through the secure reader (§3) and read **once**, in full, into a buffer. The digest is computed over that buffer. |
-| VU-2 | After a buffer is digested, no code path re-opens the source path or the installed path to obtain content for a trust or enforcement decision. |
-| VU-3 | Staging files are created exclusively (they must not exist) and written only from VerifiedBlob buffers. |
-| VU-4 | Immediately before commit, every staged file is re-read through no-follow handles relative to the held staging directory handle and re-digested. Any difference aborts with `STAGED_CONTENT_CHANGED`. |
-| VU-5 | Commit replaces the installed kernel and trust directories atomically per directory, under the exclusive transaction lock. The lock file is the commit point and is written last. |
-| VU-6 | After commit, the transaction loads a KernelSnapshot through the normal use-time path (§6) and requires `snapshot.CI == ARO.CI` and the same eligibility verdict. Otherwise: automatic journal rollback. |
-| VU-7 | At run time all kernel content comes from the KernelSnapshot API: policies, precedence, roles, schemas, skills, adapter templates, tool registry, migrations, overlay templates, invariants, command contract. No other module can open `governance/kernel/**` (GovernedFs read guard, §8). |
-| VU-8 | Every derived artefact whose correctness depends on kernel content records the CI it was built from: index manifest, adapter manifest, generated tool and plugin registries, context packet. A consumer that finds a different current CI treats the artefact as stale. |
-| VU-9 | No cache, materialised directory or on-disk snapshot is read back into a trust decision without passing through the secure reader and a digest comparison against a verified statement. |
+| VU-1 | Every source file is opened through the secure reader and read **once** into a buffer; the digest is computed over that buffer. |
+| VU-2 | After a buffer is digested, no code path re-opens the source or installed path for a trust or enforcement decision. |
+| VU-3 | Staging files are created exclusively and written only from VerifiedBlob buffers. |
+| VU-4 | Immediately before commit, every staged file is re-read through no-follow handles relative to the held staging directory and re-digested; any difference aborts (`STAGED_CONTENT_CHANGED`). |
+| VU-5 | Commit replaces `governance/trust` atomically under the exclusive transaction lock. The RoT-1 lock `governance/trust/framework.lock` is written last, inside the staged tree, and is the commit point. |
+| VU-6 | After commit, a KernelSnapshot loaded through §6 MUST have `snapshot.CI == ARO.CI` and the same eligibility; otherwise automatic journal rollback. |
+| VU-7 | All kernel content at run time comes from the KernelSnapshot API. No other module opens `governance/trust/**` (GovernedFs read guard). |
+| VU-8 | Every derived artefact records the CI **and the effective-policy digest** it was built from: index manifest, adapter manifest, registries, context packets. A consumer finding a different current value treats it as stale; artefacts without the binding (for example written by a legacy binary) are never served. |
+| VU-9 | No cache, materialised directory or on-disk snapshot enters a trust decision without the secure reader and a digest comparison. |
 | VU-10 | Writes, creations, renames, deletions, permission changes and link creation under the Protected Path Set (§8) happen only inside the install transaction. |
+| **VU-11** | **Generation discipline** (R2-M7). Every unit of work (a CLI command, an MCP request, a scheduled job step) that reads policy or performs a governed mutation MUST, under the shared lock, compare its snapshot generation with the installed statement digest, lock and effective trust state (`17` S1–S10). On any difference it MUST reload, if the new state is verified and eligible, or refuse (`SNAPSHOT_GENERATION_STALE`). A long-lived process MUST NOT keep a snapshot beyond `snapshot_max_age` (compiled: 60 seconds, or one unit of work, whichever is shorter) without repeating that comparison. |
+| **VU-12** | **Link count** (R2-L2). Every staged and installed kernel or trust file MUST have `st_nlink == 1` when read and when read back; otherwise `PATH_SUBSTITUTION_DETECTED` before the exchange (staging) or at use. |
+| **VU-13** | **Agent consumption** (R2-M8). Agents receive kernel content only as bytes served by `gov` from the snapshot, with the CI (§12). Direct agent reads of `governance/trust/kernel/**` are T4. |
 
 ## 3. Secure reader and secure directory primitives
 
-All access to sources, staging, kernel and trust content goes through a `SecureDir` abstraction. It holds an open
-directory handle to the repository root (or to the source root) obtained once.
+All access to sources, staging, kernel and trust content goes through `SecureDir`, which holds an open directory handle
+to the repository root obtained once.
 
 | Platform | Opening, component by component | Commit | Locking |
 |---|---|---|---|
-| Linux ≥ 5.6 | `openat2(dirfd, rel, RESOLVE_BENEATH \| RESOLVE_NO_SYMLINKS \| RESOLVE_NO_MAGICLINKS \| RESOLVE_NO_XDEV)`; directories with `O_DIRECTORY`, files with `O_NOFOLLOW`; `fstat` must report the expected type | `renameat2(RENAME_EXCHANGE)` for `kernel` ↔ `.tx/<TX>/kernel.next` and `trust` ↔ `.tx/<TX>/trust.next`; `fsync` of files and of every affected parent directory | `flock` on `governance/.tx/LOCK` through a held descriptor |
-| Other POSIX | `openat(parent_fd, name, O_NOFOLLOW \| O_DIRECTORY \| O_CLOEXEC)` per component, `fstat` type check; files `openat(…, O_NOFOLLOW)` | two `renameat` calls under the journal (§5.4) | `flock` or `fcntl` locks |
-| Windows | `CreateFileW` with `FILE_FLAG_OPEN_REPARSE_POINT \| FILE_FLAG_BACKUP_SEMANTICS`; any reparse point on any component is refused | handle-based rename (`SetFileInformationByHandle`, `FileRenameInfoEx`) under the journal | `LockFileEx` |
+| Linux ≥ 5.6 | `openat2(dirfd, rel, RESOLVE_BENEATH \| RESOLVE_NO_SYMLINKS \| RESOLVE_NO_MAGICLINKS \| RESOLVE_NO_XDEV)`; `fstat` type and `st_nlink == 1` for files | `renameat2(RENAME_EXCHANGE)` of `governance/trust` ↔ `.governance-runtime/trust-tx/<TX>/trust.next` (same filesystem, checked by `st_dev`); `fsync` files and parents | `flock` on `.governance-runtime/trust-tx/LOCK` |
+| Other POSIX | per-component `openat(O_NOFOLLOW)`, `fstat` type and link count | two `renameat` under the journal | `flock`/`fcntl` |
+| Windows | `CreateFileW` with `FILE_FLAG_OPEN_REPARSE_POINT`; refuse reparse points; `GetFileInformationByHandle` link count | handle-based rename under the journal | `LockFileEx` |
 
-The following are refused: a symlink or reparse point on any component (including ancestors such as `governance/` and
-`governance/kernel/`), a device, FIFO or socket, an unexpected file type, and any path that escapes the root. Codes:
-`PATH_SUBSTITUTION_DETECTED` at use time; `RELEASE_TREE_INVALID` with a `rule` detail at ingress.
+Refused:
+- a symlink or reparse point on any component, including ancestors;
+- a device, FIFO or socket;
+- an unexpected type, including an occupation entry of the wrong type (§9);
+- a link count above 1;
+- a path escaping the root.
 
-Platforms offering none of these primitives are unsupported for production-profile operation (`TRUST_PLATFORM_UNSUPPORTED`).
+A staging directory on a different filesystem from `governance/` gives `TRUST_PLATFORM_UNSUPPORTED(cross_device_tx)`.
 
 ## 4. Ingress pipeline (byte flow)
 
 ```text
-SourceRef ─► SecureDir(source root)                        no-follow, beneath, regular files only
-   │  V1  enumerate + gov-tree-v2 path rules + limits (07 §5)
-   │  V1  read each file once → buffer + SHA-256            ← the source may change after this point: irrelevant
-   ▼
-envelope read once → P → V3–V7 (strict parse, purpose, signature, compiled schema)       05 SV-1…SV-10
-   ▼
-V8 identity (KERNEL.yaml version taken from its buffer) · V9 every buffer digest = RCS(D) · V10 migrations from buffers
-   ▼
-ARO (memory only) ─► authorisation: eligibility, trust state, gates, authority floor (17, 19, 21)
-   ▼                                                                               journal: prepared
-install_tx: take exclusive lock; create governance/.tx/<TX>/ exclusively (random 128-bit TX);
-            write buffers → kernel.next/, trust.next/ (envelope bytes, TSS/TPS/certification/attestation statements);
-            fsync files and directories                                            journal: staged
-   ▼
-VU-4 read-back: re-read every staged file via held handles, re-digest               journal: verified-staged
-   ▼
-RENAME_EXCHANGE kernel ; RENAME_EXCHANGE trust ; fsync governance/                  journal: swapped
-   ▼
-migrations interpreted from ARO buffers; overlay writes through GovernedFs (overlay is not protected);
-computed-weakening check (19 §9); gate check if non-empty                          journal: migrated
-   ▼
-framework.lock written to .tx/<TX>/framework.lock.next, fsync, renameat over governance/framework.lock, fsync dir
-                                                                                     journal: committed
-   ▼
-KernelSnapshot load + CI equality + eligibility + doctor/audit on the snapshot (VU-6)  journal: verified
-   ▼
-ledger entry (idempotent from the journal); remove .tx/<TX>/ (including kernel.prev, trust.prev); release lock
+SourceRef ─► SecureDir(source) · V1 enumerate + tree rules · read once → buffers + SHA-256
+   ▼  V3–V7 strict parse, purposes, signatures, compiled schemas (05 SV-1…SV-10)
+   ▼  V8 identity · V9 buffers = RCS(D) · V10 migrations · V11 compatibility · E7 surface (23) against named/effective TPS
+ARO (memory) ─► authorisation: eligibility E1–E9, trust state + freshness (17, 24), trust gates (27), install authority (19 §8)
+   ▼                                                                               VTS open-transaction registry: TX registered
+install_tx: exclusive lock; create .governance-runtime/trust-tx/<TX>/ exclusively (random 128-bit TX); journal: prepared
+            write buffers → trust.next/kernel/…, release.dsse.json, lineage/; trust.next/state and root = UNION(current PTR,
+            ARO bundle statements, VTS knowledge)  (never a subset of the current PTR); trust.next/framework.lock last
+            fsync                                                                   journal: staged
+   ▼  VU-4 read-back + VU-12 link counts                                           journal: verified-staged
+   ▼  first RoT-1 install on a legacy layout only: layout migration steps of 26 §7 (quarantine, moves, occupation entries)
+RENAME_EXCHANGE governance/trust ↔ trust.next ; fsync governance/                  journal: swapped
+   ▼  migrations from ARO buffers; overlay writes through GovernedFs; computed weakenings (19 §9) → `weakening` trust gate
+                                                                                    journal: migrated
+   ▼  KernelSnapshot + CI equality + eligibility + doctor/audit (VU-6); project-strength vector recorded (26 §6)
+                                                                                    journal: verified
+ledger entry (idempotent); VTS per-project record updated; TX deregistered; trust-tx/<TX> moved to trust-tx/done/<TX>
 ```
-
-Rev 1's on-disk quarantine directory is replaced by in-memory VerifiedBlobs, bounded by the tree limits (`07` §5: at
-most 64 MiB total). Archives are read by streaming members into buffers under the same rules; nothing is extracted to
-disk.
 
 ## 5. Install transaction
 
-### 5.1 Layout (entirely inside the Protected Path Set)
+### 5.1 Transaction area (outside Git; registered locally)
 
 ```text
-governance/.tx/LOCK                         advisory lock file, held through a descriptor
-governance/.tx/<TX>/journal.json            operation, phase, ARO CI, previous CI, gate ids, overlay snapshot digest
-governance/.tx/<TX>/kernel.next/            staged kernel; becomes governance/kernel
-governance/.tx/<TX>/trust.next/             staged trust record; becomes governance/trust
-governance/.tx/<TX>/kernel.prev/ trust.prev/   the previous directories after the exchange
-governance/.tx/<TX>/framework.lock.next     staged lock
-governance/.tx/<TX>/overlay.prev/           snapshot of governance/project/ and governance/generated/ (project state)
+.governance-runtime/trust-tx/LOCK                      advisory lock file
+.governance-runtime/trust-tx/<TX>/journal.json         operation, phase, ARO CI, previous CI, gate confirmations, overlay snapshot digest
+.governance-runtime/trust-tx/<TX>/trust.next/          staged governance/trust (kernel, statements, lock)
+.governance-runtime/trust-tx/<TX>/trust.prev/          the previous governance/trust after the exchange
+.governance-runtime/trust-tx/<TX>/overlay.prev/        snapshot of governance/overlay and governance/views
 ```
 
-### 5.2 Phases, visible state and recovery
+- `.governance-runtime/` is ignored by the installer's `.gitignore` entry.
+- A journal is honoured **only if** (a) the VTS per-project record lists `<TX>` as an open transaction for this
+  `project_trust_id` and repository path, and (b) the journal path is not tracked by Git.
+- Anything else is `FOREIGN_TRANSACTION_ARTEFACT`: reported (doctor HIGH), never `IN_TRANSACTION`, never recovered from.
+- A committed or copied journal therefore affects no clone (review RV2-A24).
+
+### 5.2 Union trust record
+
+`trust.next/state` and `trust.next/root` are the union of three sources:
+- the current `governance/trust/state` and `root`, after verification;
+- the ARO's bundle statements;
+- VTS knowledge.
+
+**Consequences:**
+- Exchange-back (automatic rollback, recovery) uses `trust.prev` for **kernel, release statement and lock**, but MUST
+  write `state/` and `root/` as the union of `trust.prev`, `trust.next` and VTS knowledge.
+- A verified statement is never removed from `governance/trust/` by any transaction (review RV2-A26).
+
+### 5.3 Phases, visible state and recovery
 
 | Phase | Installed state a reader could observe | Recovery (`20` §5) |
 |---|---|---|
-| `prepared`, `staged`, `verified-staged` | previous, unchanged | delete `.tx/<TX>` |
-| `swapped` | new kernel and trust with the **old lock** → identity mismatch → `INSTALL_IN_PROGRESS` | evaluate the exchange-back target; exchange back; delete |
-| `migrated` | as `swapped`, plus overlay changes | as `swapped`, plus restore the overlay from `overlay.prev/` through GovernedFs |
-| `committed` | new kernel, trust and lock | re-run verification; if it fails, evaluate `kernel.prev`/`trust.prev` as a restore (`20` §2) |
-| `verified` | new | delete `.tx/<TX>` |
+| `prepared`, `staged`, `verified-staged` | previous, unchanged | move `trust-tx/<TX>` to `trust-tx/abandoned/`; deregister |
+| `swapped` | new `governance/trust` with lock inside; the VTS registry marks the TX open → `IN_TRANSACTION` | evaluate the exchange-back target; exchange back with union state |
+| `migrated` | as `swapped`, plus overlay changes | as `swapped`, plus the `overlay.prev` restore through the computed-weakening check and `weakening` trust gate |
+| `verified` | new | clean up |
 
-### 5.3 Locking
+### 5.4 Locking
 
 - An install transaction holds the exclusive lock from `prepared` until cleanup.
-- These processes take the **shared** lock: every process loading a KernelSnapshot (for the duration of the load), and
-  every writer of project state that depends on kernel content (CIT execution, adoption executor, `rebuild-memory`,
-  adapter and registry generation) for the duration of its operation. Honest processes therefore never observe a
-  mid-exchange state and never write project state against a kernel that is being replaced.
-- Locks are advisory. A3 can ignore them but cannot make an unverified or mixed state verify (`04` §5 identity checks).
-  Ignoring the lock only produces refusals.
-
-### 5.4 Platforms without atomic exchange
-
-Each directory is replaced by two renames under the journal. Between them the path is absent, and the installation
-state machine (§9) classifies the project `IN_TRANSACTION` because the journal exists. It fails closed.
+- Every snapshot load, and every writer of project state that depends on kernel content, takes the shared lock for the
+  duration of its unit of work (VU-11).
+- Locks are advisory. A3 ignoring them produces refusals, never trust.
 
 ## 6. Use-time snapshot (normative)
 
-Once per process, and on explicit reload:
+### 6.1 Load
 
-1. Take the shared lock with a bounded wait. On timeout: `INSTALL_IN_PROGRESS`, EmbeddedSnapshot, read-only.
-2. Determine the installation state (§9). Unless it is `COMPLETE`, stop here: the policy root is the EmbeddedSnapshot
-   joined with the effective floor (`19` §5).
-3. Read `governance/trust/release.dsse.json` once through the secure reader and verify it under T0 (`04` V3–V8,
-   `05` SV-1…SV-10).
-4. Enumerate `governance/kernel/` through held directory handles. Refuse any non-regular entry or path-rule violation
-   anywhere in the tree or its ancestors. Read each file once into a buffer and digest it.
-5. Compare with `RCS(D)`. Any modified, missing or added path → `KERNEL_TAMPERED`.
-6. Evaluate trust state (`17` §5) and eligibility (`19` §6).
-7. Release the shared lock. Build `KernelSnapshot {CI, blobs, statement, verdict}` and publish it as an immutable shared
-   handle. From here on the process never opens `governance/kernel/` again.
-8. Long-lived processes keep the snapshot for their lifetime. `reload` repeats steps 1–7 and swaps the handle
-   atomically. A unit of work keeps the handle it started with, so snapshot generations never mix.
+1. Take the shared lock with a bounded wait (`INSTALL_IN_PROGRESS` on timeout, EmbeddedSnapshot, read-only).
+2. Determine the installation state (§9). Unless `COMPLETE`, the policy root is EmbeddedSnapshot ⊔ floor (`19` §5).
+3. Read `governance/trust/release.dsse.json` once and verify it (`04` V3–V8).
+4. Enumerate `governance/trust/kernel/` through held handles. Refuse non-regular entries, link count > 1 and path-rule
+   violations. Read each file once and digest it.
+5. Compare with `RCS(D)` (`KERNEL_TAMPERED` on any difference).
+6. Evaluate trust state and freshness (`17`, `24`), eligibility including E7 (`19` §6), the project-strength vector
+   (`26` §6) and the negative set.
+7. Build `KernelSnapshot {CI, generation, blobs, statement, verdict}`. Release the shared lock.
 
-Consumers never receive paths into `governance/kernel/`. When an external program needs kernel content (for example,
-rendered adapter files), it receives bytes from the snapshot, written through GovernedFs into its own non-protected
-location, with the CI recorded (VU-8).
+### 6.2 Consumers
 
-Cost: the 4.1.5 kernel is 121 files, about 1 MiB. Reading and hashing it per process already happens today.
+Consumers never receive paths into `governance/trust/kernel/`. External programs receive snapshot bytes written through
+GovernedFs into their own non-protected location, with CI and policy digest (VU-8, §12).
+
+### 6.3 Units of work and long-lived processes (VU-11)
+
+| Process | Rule |
+|---|---|
+| CLI command | one unit of work; generation compared at start and before the first governed mutation |
+| MCP server, daemon or watcher (planned; `cli/src/main.rs:234`) | each request is a unit of work. Take the shared lock, compare the generation, reload or refuse, and never serve a request from a snapshot older than `snapshot_max_age`. A `refuse_operation` revocation, a TPS raise, a new anchor or an update applies to the next request. |
+| Scheduler (for example G0–G6) | each job step is a unit of work |
+
+The MCP server design MUST adopt this rule before it ships.
 
 ## 7. Embedded baseline and caches
 
-- The EmbeddedSnapshot is built from compiled bytes. Its compiled statement is verified at first use, and its CI is
-  compared with that statement.
-- It is never materialised for any trust purpose. `init` without `--source` feeds EmbeddedSnapshot buffers directly
-  into the ARO path; they are already VerifiedBlobs once the compiled statement check passes.
-- **`GOV_KERNEL_CACHE` is removed. No cache exists on any trust path**, so cache substitution has nothing to substitute.
-  A developer command that exports the embedded kernel (`gov kernel export <dir>`) writes a plain copy that is only
-  ever an untrusted *source* afterwards.
+- The EmbeddedSnapshot is built from compiled bytes, verified against the compiled statement named in the TBM, and never
+  materialised for trust.
+- **`GOV_KERNEL_CACHE` is removed. No cache exists on any trust path.**
+- `gov kernel export <dir>` writes an untrusted source.
 
 ## 8. Protected Path Set and GovernedFs
 
-**Protected Path Set (PPS)** — relative to the repository root, compared after secure resolution, never by string
-prefix of a user-supplied path:
-- `governance/kernel/**`
-- `governance/trust/**`
-- `governance/framework.lock`
-- `governance/.tx/**`
-- the directory entries `governance`, `governance/kernel`, `governance/trust` and `governance/.tx` themselves
-  (creation, removal, rename, replacement by a link)
+**Protected Path Set (PPS)**, relative to the repository root and compared after secure resolution:
+- `governance/trust/**` and the directory entries `governance`, `governance/trust`;
+- the occupation entries (`26` §2): `governance/kernel` (regular file), `governance/project` (regular file),
+  `governance/generated` (regular file), `governance/framework.lock` (directory) and its sentinel file,
+  `spec/audits/GOVERNANCE-ADOPTION` (regular file), `.governance-runtime/migration` (regular file);
+- the transaction area `.governance-runtime/trust-tx/**`. It is not tracked, and journals are hints (§5.1), but only
+  `install_tx` writes it through GovernedFs.
 
-**GovernedFs** is the only file-mutation API in the runtime. Every write, create, rename, delete, permission change,
-link creation and directory removal:
-1. resolves its target relative to the held repository-root handle with the no-follow rules of §3;
-2. refuses a PPS target unless the call carries an `InstallTxToken`, which only `install_tx` can construct →
-   `PROTECTED_PATH_WRITE_REFUSED` (details: operation, path, caller);
-3. refuses targets whose resolution crosses a link or leaves the repository → `PATH_SUBSTITUTION_DETECTED`.
+**GovernedFs** is the only file-mutation API in the runtime. It:
+1. resolves targets relative to the held root handle with §3 rules;
+2. refuses PPS targets without an `InstallTxToken` (`PROTECTED_PATH_WRITE_REFUSED`);
+3. refuses link crossings (`PATH_SUBSTITUTION_DETECTED`).
 
-GovernedFs also guards **reads** of `governance/kernel/**` and `governance/trust/**`: only `kernel_trust` and
-`install_tx` may open them (VU-7).
+It also guards reads of `governance/trust/**`: only `kernel_trust` and `install_tx` may open it.
 
-Subprocesses that `gov` starts to perform its own mutations (such as `git mv` and `git rm` in the adoption executor)
-receive only arguments that GovernedFs has pre-validated by the same rules. Subprocesses that are not `gov` mutations —
-plugins, tools, test commands, user shells — are outside GovernedFs. They are A3-equivalent, and VU-1…VU-8 are the
-backstop.
+**Enforcement proof.**
+- **Builder conformance:** a filesystem interception layer across every command in the command register.
+- **Independent verification:** OS-level tracing by the verifier (`strace -f -e trace=%file,%process`, fanotify or
+  eBPF), never an instrumentation layer the builder compiled in (review r2 `07` §2).
 
-Mechanisms constrained by this rule (full inventory in `02` §3):
-- CIT `write_file`, `move_file`, `delete_file`, `append_record`, and CIT snapshot restore;
-- adoption executor moves, deletions, `git mv`/`git rm`, and batch rollback restores;
-- migration overlay operations and recovery;
-- memory indexer outputs; adapter and registry generation;
-- tool installer file writes; upstream packaging; lesson clustering writes.
+Non-`gov` subprocesses (plugins, tools, test commands) remain A3-equivalent (VR-3). Detection is by the next unit of work
+(VU-11).
 
-**Enforcement proof (conformance).** A filesystem interception layer in the test build records every mutation by every
-command in the command register. The suite asserts that no PPS mutation happens outside `install_tx` for every command.
-Cases include CIT manifests and adoption plans naming PPS paths, `../` spellings, case variants on case-insensitive
-filesystems, and symlinked parents.
+## 9. Installation state machine
 
-## 9. Installation state machine (partial-install fail-closed)
-
-Evaluated first in every process, including commands that do not require an installation (such as `doctor` and
-`capabilities`).
+Evaluated first in every process, including commands that need no installation.
 
 | State | Condition | Policy root | Allowed |
 |---|---|---|---|
-| `ABSENT` | none of `governance/framework.lock`, `governance/kernel/`, `governance/trust/`, `governance/.tx/` exists | EmbeddedSnapshot ⊔ effective floor | commands not requiring an installation; `init`; adoption stages before batch 0 |
-| `IN_TRANSACTION` | a `governance/.tx/<TX>/journal.json` exists | EmbeddedSnapshot ⊔ floor | read-only diagnostics; `gov recover` |
-| `COMPLETE` | lock, kernel directory, `trust/FORMAT` and either `trust/release.dsse.json` or `trust/development.json` are all present and readable through the secure reader; no journal | KernelSnapshot if verified and eligible (`19` §6); otherwise EmbeddedSnapshot ⊔ floor | per verdict |
-| `PARTIAL` | any other combination (lock without kernel, kernel without trust, trust without lock, and so on) | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
-| `FORMAT_UNSUPPORTED` | `trust/FORMAT` names a format this binary does not implement | none | `gov version`; `gov doctor` reporting `TRUST_FORMAT_UNSUPPORTED` |
+| `ABSENT` | no `governance/trust/`, no occupation entries, no legacy entries (`governance/framework.lock` file, `governance/kernel` directory) | EmbeddedSnapshot ⊔ floor | `init`; commands needing no installation |
+| `LEGACY` | a legacy layout (`governance/framework.lock` is a file or `governance/kernel` is a directory) and no `governance/trust/` | EmbeddedSnapshot ⊔ floor; tree digest checked against `historical_releases` | read-only diagnostics; `update --apply` to an eligible release (layout migration, `26` §7) |
+| `IN_TRANSACTION` | an honoured journal (§5.1) | EmbeddedSnapshot ⊔ floor | read-only diagnostics; `gov recover` |
+| `COMPLETE` | `governance/trust/{FORMAT, framework.lock, kernel/, release.dsse.json or development.json}` present and readable, **every occupation entry present with its exact type**, and no honoured journal | KernelSnapshot if verified and eligible; otherwise EmbeddedSnapshot ⊔ floor | per verdict and freshness (`24` §4.3) |
+| `PARTIAL` | any other combination, including a missing or retyped occupation entry (`PARTIAL(occupation)`), or legacy and RoT-1 entries mixed | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
+| `FORMAT_UNSUPPORTED` | `governance/trust/FORMAT` names an unimplemented format or layout | none | `gov version`; `gov doctor` |
 
-No state uses an on-disk kernel directory as policy root unless the state is `COMPLETE` and the snapshot is verified and
-eligible. This closes the 4.1.5 `uninstalled` branch, where a missing manifest or lock made the guard pass with the
-installed directory as policy root (`runtime/src/kernel_trust.rs:128-130, 289-291`).
-
-`KERNEL_MANIFEST.json` is a compatibility tombstone for older binaries (`13` §3). It plays no role in any state or
-decision.
+A foreign transaction artefact (§5.1) is reported and ignored; the state is computed as if it were absent.
 
 ## 10. Closure table
 
 | Threat | Mechanism | Test (`12`) |
 |---|---|---|
-| Source file swapped after verification | VU-1…VU-3: installation writes the digested buffers; the source is never read again | RT-40 |
-| Staged file swapped before commit | VU-4 read-back via held handles immediately before the exchange; exclusive `.tx/<TX>` | RT-40 |
-| Installed file swapped after commit, before or during use | VU-6 post-commit snapshot; VU-7 runtime reads only snapshot bytes | RT-42 |
-| Symlink or path substitution in the source | secure reader refuses links; `RESOLVE_BENEATH` | RT-41 |
-| Symlink or path substitution in staging | exclusive creation of `.tx/<TX>` with a random name; handle-relative writes | RT-41 |
-| Symlink or path substitution in the installed tree or its ancestors (e.g. committed through Git) | §6 step 4 refuses; PPS includes the directory entries | RT-41 |
-| Concurrent source mutation | single read into buffers | RT-22 |
-| Concurrent installs; readers mid-swap | exclusive and shared locks; identity-mismatch detection | RT-59 |
-| Partial install (deletion, interrupted copy) | §9 state machine; EmbeddedSnapshot; remedies only | RT-43 |
-| Crash in any phase | journal + §5.2 recovery with re-authentication and eligibility | RT-16 |
-| Same-user races on journal or `.prev` directories | recovery re-authenticates and applies eligibility and the downgrade policy (`20` §5) | RT-58 |
-| Cache replacement | no cache on any trust path; embedded content never materialised for trust | RT-45 |
-| Mixed files from two authentic releases | V9 per-file digests at ingress; §6 step 5 at use | RT-10, RT-51 |
-| Derived index built under a different or tampered kernel | VU-8 CI binding; floors only from the snapshot | RT-71 |
+| Source file swapped after verification | VU-1…VU-3 | RT-40 |
+| Staged file swapped before commit; hard link to a staged file | VU-4, VU-12 | RT-40, RV2-A23 |
+| Installed file swapped after commit | VU-6, VU-7 | RT-42 |
+| Symlink or path substitution anywhere | §3 | RT-41 |
+| Concurrent installs; readers mid-swap | locks, identity checks | RT-59 |
+| Long-lived process across an update, TPS raise, revocation or anchor change | VU-11 | RV2-A21 |
+| Partial install, missing occupation | §9 | RT-43, RT-81 |
+| Crash in any phase | journal + VTS registry + §5.3 | RT-16 |
+| Committed or copied journal | §5.1 foreign artefact | RV2-A24 |
+| Exchange dropping trust statements | §5.2 union | RV2-A26 |
+| Forged `overlay.prev` weakening | computed weakening + trust gate (`20` §5) | RV2-A25 |
+| Cache replacement | no cache | RT-45 |
+| Derived artefact built under another kernel or policy, or by a legacy binary | VU-8 CI and policy digest | RT-71 |
+| Agent reads kernel or adapter content from disk | VU-13, §12 | RV2-A22 |
 
 ## 11. Residuals
 
 | ID | Residual | Bound |
 |---|---|---|
-| VR-1 | A3 can modify installed files after a process built its snapshot. | That process is unaffected; the next process detects `KERNEL_TAMPERED`. |
-| VR-2 | A3 can ignore advisory locks. | Produces refusals only. |
-| VR-3 | Subprocesses that are not `gov` mutations can write protected paths. | Detected at the next snapshot; never enforced. |
-| VR-4 | Plugin runtimes and model files are consumed by external processes through paths (`10`). | Host verification before and after use; kernel-enforced immutability (fs-verity) where available; index writes rejected on a post-use mismatch. |
+| VR-1 | A3 modifies installed files between two units of work. | The current unit is unaffected; the next unit detects it (VU-11). There is no "never re-checked" process. |
+| VR-2 | A3 ignores advisory locks. | Refusals only. |
+| VR-3 | Non-`gov` subprocesses (plugins, tools, tests) write PPS, the overlay, records or the VTS. | PPS: detected by the next unit of work. Overlay: project-strength vector (`26` §6). Records: never authorise trust decisions (`27`). VTS: same-user boundary (RS-3). |
+| VR-4 | Plugin runtimes and model files consumed by path. | `10` §5. |
+
+## 12. Agent consumption of kernel content (R2-M8)
+
+1. **Adapters carry pointers, not constitutional text.** Rendered adapter files contain the framework and project
+   identity, the CI, and instructions to obtain content from `gov`:
+   - `gov context compile`;
+   - `gov kernel show <path>`, which serves snapshot bytes with the CI;
+   - `gov skills show <id>`.
+
+   Invariant statements in adapters are served, not copied. Where a harness requires inline text, the text is rendered
+   per context packet from the snapshot.
+2. **Rendering record outside A2's reach.** When `gov adapters generate` writes an adapter body, it records the body
+   digest and the CI in the VTS per-project record. `gov status`, context packets and doctor D036 report
+   `ADAPTER_BODY_UNRECORDED` or `ADAPTER_BODY_MODIFIED` when the on-disk body differs. A2 rewriting both the body and
+   `adapter-manifest.json` cannot match the local record.
+3. **Direct reads are T4.** The generic adapter's "Canonical sources: governance/kernel/" line
+   (`framework/adapters/generic/template.md:4`) is replaced by a pointer to `gov kernel show`. Agents reading
+   `governance/trust/kernel/**` or adapter files directly act on T4 material. The context packet carries a CI stamp an
+   agent can compare with `gov status`.
+4. **Bound.** An agent that ignores `gov` and follows an arbitrary repository file is outside every design (A2 can write
+   any instruction file). `gov` enforcement is unaffected, and the acceptance plan asserts that governed operations use
+   snapshot bytes only.
