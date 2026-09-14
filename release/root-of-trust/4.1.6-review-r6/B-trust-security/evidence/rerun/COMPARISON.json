@@ -1,0 +1,156 @@
+{
+ "CS6": {
+  "byte_identical": true
+ },
+ "REGISTER-CHECK": {
+  "byte_identical": true
+ },
+ "STATEMENTS-CHECK": {
+  "byte_identical": true
+ },
+ "STATEMENTS-CHECK-with-rerun-CS6": {
+  "byte_identical": false,
+  "differing_leaves": 1,
+  "examples": [
+   [
+    "/calculator_output",
+    "../../../../runs/CS6-derivation-calculator.json",
+    "evidence/r6/CS6-derivation-calculator.json"
+   ]
+  ]
+ },
+ "P4r5": {
+  "byte_identical": true
+ },
+ "DA03r5": {
+  "byte_identical": true
+ },
+ "FA5(json written in export)": {
+  "byte_identical": false,
+  "differing_leaves": 0,
+  "examples": []
+ },
+ "REG5": {
+  "byte_identical": true
+ },
+ "P1r4": {
+  "byte_identical": true
+ },
+ "CS5": {
+  "byte_identical": true
+ },
+ "CS6-results.json.gz(uncompressed)": {
+  "byte_identical": true,
+  "sha256": "18dfaba48833eb65e215ff60ed298d0413f9e407641c46153b1ad831c1e7bf1e"
+ },
+ "RV5-B-A01": {
+  "byte_identical": true
+ },
+ "RV5-B-A04": {
+  "byte_identical": true
+ },
+ "RV5-B-A05": {
+  "byte_identical": false,
+  "differing_leaves": 3,
+  "examples": [
+   [
+    "/part2_src5_function_time_dependence/tree_archive_t0",
+    "252a10238fcc4b366cd07648975ebb7572692266a02dbaf87c65e5a32b7ab4ce",
+    "6c655599ce3325f80331744b889a92284b0dd42102f0109443e8357869986dc5"
+   ],
+   [
+    "/part2_src5_function_time_dependence/tree_archive_t0_again",
+    "252a10238fcc4b366cd07648975ebb7572692266a02dbaf87c65e5a32b7ab4ce",
+    "6c655599ce3325f80331744b889a92284b0dd42102f0109443e8357869986dc5"
+   ],
+   [
+    "/part2_src5_function_time_dependence/tree_archive_t0_plus_2s",
+    "fb9605d059ba35101a5f2323f52570b743c8656cd12b23b4c2187f9dd8dafc5a",
+    "cc436c6bd7041b25c189ae76fcc4c40ac8bda981bf0cd6ee62f43437beb14231"
+   ]
+  ]
+ },
+ "RV5-B-A08": {
+  "byte_identical": false,
+  "differing_leaves": 1,
+  "examples": [
+   [
+    "/rows/evil/image_digest",
+    "sha256:e4c7ca65bcdcc620955645f8752065b4527ed6eadbeec99837c72204c7235ff5",
+    "sha256:4d452831a634200003ee9a7d53777b71f43b5a66aa340567dd6511d5e2a486dd"
+   ]
+  ]
+ },
+ "RV5-B-A09": {
+  "byte_identical": true
+ },
+ "RV5-B-A12": {
+  "byte_identical": true
+ },
+ "RV5-D-A01": {
+  "byte_identical": true
+ },
+ "RV5-D-A03": {
+  "byte_identical": false,
+  "differing_leaves": 3,
+  "examples": [
+   [
+    "/pack_text/12_RT-138_expects_C0-C2",
+    "False",
+    "True"
+   ],
+   [
+    "/pack_text/31_GB-4_claims_C0-C2",
+    "False",
+    "True"
+   ],
+   [
+    "/verdicts/pack_claim_C0_C2_false_under_a_b",
+    "False",
+    "True"
+   ]
+  ]
+ },
+ "RV5-D-A04": {
+  "byte_identical": true
+ },
+ "RV5-D-A05": {
+  "byte_identical": true
+ },
+ "RV5-D-A07": {
+  "byte_identical": false,
+  "differing_leaves": 20,
+  "examples": [
+   [
+    "/defects/RV5-B-M3 re-admission discards the store/RT-139_expected",
+    "| RT-139 | (Revised r6.) Swap the candidate file between measurement and install; a pre-existing verifier trust store **",
+    "| RT-139 | Swap the candidate file between measurement and install; pre-existing verifier trust store with a forged anch"
+   ],
+   [
+    "/defects/RV5-B-M3 re-admission discards the store/plan_rows_re_admission[0]",
+    "RT-139",
+    "None"
+   ],
+   [
+    "/defects/RV5-D-A03 user-writable install reachable classes/RT-138_expected",
+    "| RT-138 | (Revised r6; RV5-M8 option (a).) User-writable install under each OP-7 answer: `update --apply`, `confirm-roo",
+    "| RT-138 | User-writable install: `update --apply`, `trust confirm`, decision-pin evaluation | `TCB_WRITABLE_BY_GOVERNED"
+   ],
+   [
+    "/defects/RV5-D-A04 R1/R2 revoked registered final or candidate at admission/plan_rows[1]",
+    "RT-92",
+    "RT-135"
+   ],
+   [
+    "/defects/RV5-D-A04 R1/R2 revoked registered final or candidate at admission/plan_rows[2]",
+    "None",
+    "RT-92"
+   ],
+   [
+    "/defects/RV5-D-A04 R3 ACCEPTED attestation for another candidate/plan_rows[0]",
+    "RT-165",
+    "None"
+   ]
+  ]
+ }
+}
