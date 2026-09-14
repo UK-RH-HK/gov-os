@@ -1,0 +1,314 @@
+{
+ "build5_states": {
+  "R5": {
+   "committed": "COMPLETE",
+   "repro": "COMPLETE"
+  },
+  "R5NOSURG": {
+   "committed": "COMPLETE",
+   "repro": "COMPLETE"
+  },
+  "R5RES": {
+   "committed": "COMPLETE",
+   "repro": "COMPLETE"
+  },
+  "R5V": {
+   "committed": "COMPLETE",
+   "repro": "COMPLETE"
+  }
+ },
+ "diagnosis": {
+  "INFOATTR_row": "committed and reproduced state COMPLETE although the row's own note says 'stated condition: PARTIAL with kernel_content_mismatch'; the row passes core.autocrlf as a command-level `git -c` on clone (not persisted into the clone) and re-materialises without it, so no conversion occurs. The override claim itself holds on ATTR6 and on AR-0017 gitops6 INFOATTR (persisted config): PARTIAL(kernel_content_mismatch), KERNEL_TAMPERED.",
+  "props6": "committed props6 reports total_active_rows 30450 and rows_touching 540; the reproduction, fed the writing-rows file as the LAY6 run log's step order implies, reports 4333 and 514. The 26-row difference is L0-control rows whose paths share occupation names (the writing-rows file excludes L0). Counterexamples 0 in both.",
+  "register5": "help-side leaf counts equal to review r5 C (104/109/115/119); the source side is empty because the scratch mirror is a git-archive tree without history, so register5's `git show` returns nothing. Environmental; AR-0017 register6 performs the help-vs-source cross-check from the worktree history (0 leaf differences).",
+  "writing_rows": {
+   "committed_LAY6_writing_rows_file": 4333,
+   "executed_rows": 30450,
+   "pack_text": "18 \u00a79 and 22 (LAY6 row) say '30,735 writing rows'; 26 \u00a74 says '30,735 rows'",
+   "reproduction": 4333,
+   "total_rows": 30735
+  }
+ },
+ "gitops5_rows": {
+  "ARCHIVE": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "AUTOCRLF": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "CHECKOUT_BACK": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "CHECKOUT_PRE": {
+   "committed": [
+    "LEGACY",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "LEGACY",
+    []
+   ]
+  },
+  "CLEAN": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "CLONE": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "GLOBALEXCL": {
+   "committed": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ],
+   "equal": true,
+   "repro": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ]
+  },
+  "INFOATTR": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "INFOEXCL": {
+   "committed": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ],
+   "equal": true,
+   "repro": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ]
+  },
+  "PARTIAL_CLONE": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "RESTORE_PRE_GOV": {
+   "committed": [
+    "LEGACY",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "LEGACY",
+    []
+   ]
+  },
+  "SHALLOW": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "SPARSE_CONE": {
+   "committed": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ],
+   "equal": true,
+   "repro": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ]
+  },
+  "SPARSE_NONCONE": {
+   "committed": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ],
+   "equal": true,
+   "repro": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ]
+  },
+  "STASH": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "TEXTAUTO_EOLCRLF": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "UNTRACK_NOSURG": {
+   "committed": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ],
+   "equal": true,
+   "repro": [
+    "PARTIAL",
+    [
+     "occupation"
+    ]
+   ]
+  },
+  "UNTRACK_R5": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  },
+  "WORKTREE": {
+   "committed": [
+    "COMPLETE",
+    []
+   ],
+   "equal": true,
+   "repro": [
+    "COMPLETE",
+    []
+   ]
+  }
+ },
+ "gitops5_states_equal_all": true,
+ "matrix5_by_kind_layout_position_equal": true,
+ "matrix5_properties_equal": true,
+ "matrix5_property_diffs": {},
+ "matrix5_rows": {
+  "committed": [
+   30735,
+   285
+  ],
+  "repro": [
+   30735,
+   285
+  ]
+ },
+ "matrix5_writing_commands_equal": true,
+ "props6": {
+  "committed": {
+   "LP-1s_restated_rev6": {
+    "counterexamples": 0,
+    "description": "rows touching governance/trust/ or occupation entries with state_after=COMPLETE and kernel_tampered!=true",
+    "rows_touching_trust_or_occupation": 540,
+    "sample": [],
+    "total_active_rows": 30450
+   }
+  },
+  "repro": {
+   "LP-1s_restated_rev6": {
+    "counterexamples": 0,
+    "description": "rows touching governance/trust/ or occupation entries with state_after=COMPLETE and kernel_tampered!=true",
+    "rows_touching_trust_or_occupation": 514,
+    "sample": [],
+    "total_active_rows": 4333
+   }
+  }
+ },
+ "props6_equal": false,
+ "register5": {
+  "diff_keys": [
+   "4.1.2",
+   "4.1.3",
+   "4.1.4",
+   "4.1.5"
+  ],
+  "equal_json_to_review_r5_C": false,
+  "leaf_counts": {
+   "4.1.2": 104,
+   "4.1.3": 109,
+   "4.1.4": 115,
+   "4.1.5": 119
+  }
+ }
+}
