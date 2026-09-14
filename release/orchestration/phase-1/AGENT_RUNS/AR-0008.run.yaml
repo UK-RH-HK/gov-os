@@ -6,12 +6,13 @@ objective: Independent architecture synthesis review of RoT-1 revision 4 (bca05a
 agent_model: claude-opus-5
 fresh_context: true
 handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0008-rot-review-r4-d-synthesis.md
-base_commit: null   # the orchestrator commit adding this record (ledger L-0018)
+base_commit: 9349d8c65c4d4fda06116ec336f0d2dd458d8524
 architecture_commit: bca05a7e2c2791126fde1d3d812facdaa45b2e45
 panel_inputs: {B: 152e68e58655649d97382ac3dca64ea7510f5828, C: c6b8ba9985d195fd18470cfe3ae3d80968d71051}
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r4-d
 branch: phase1/rot1-r4-review-d
-agent_id: null
-status: CLAIMED
+agent_id: ae1a8a89c6bc9bf32   # orchestrator-session-local handle; not resumable from a fresh session
+started_at: '2026-09-14T06:40Z'
+status: RUNNING
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0008.report.yaml
 outcome: null

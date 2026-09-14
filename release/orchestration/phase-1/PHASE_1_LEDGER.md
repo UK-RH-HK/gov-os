@@ -280,3 +280,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0008 |
+
+## L-0019 — 2026-09-14 — revision-4 synthesis reviewer spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-review-synthesis (`AR-0008`, fresh Opus 5 context) |
+| Input commit | `9349d8c` (worktree `wt/review-r4-d`, branch `phase1/rot1-r4-review-d`) |
+| Work performed | spawned on HO-0008; running. Asked to classify each confirmed blocking class as a narrowed remainder or materially new, naming the root invariant, so the escalation rule can be applied. |
+| Report / evidence | expected `AGENT_RUNS/AR-0008.report.yaml`; `release/root-of-trust/4.1.6-review-r4/{00,10,11}*`, `D-synthesis/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge; route per verdict and novelty (specialist escalation, revision-5 architect, or GATE-OWNER-D0008) |
