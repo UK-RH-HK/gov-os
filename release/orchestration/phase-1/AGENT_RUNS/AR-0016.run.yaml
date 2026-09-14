@@ -6,11 +6,12 @@ objective: Independent trust/security review of RoT-1 revision 6 (4106885)
 agent_model: claude-opus-5
 fresh_context: true
 handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0016-rot-review-r6-b-trust-security.md
-base_commit: null   # the orchestrator commit adding this record (ledger L-0038)
+base_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
 architecture_commit: 4106885dadebac55596067a2586cf4d3097fc025
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-b
 branch: phase1/rot1-r6-review-b
-agent_id: null
-status: CLAIMED
+agent_id: adae1725abcec96b2   # orchestrator-session-local handle; not resumable from a fresh session
+started_at: '2026-09-14T13:55Z'
+status: RUNNING
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0016.report.yaml
 outcome: null

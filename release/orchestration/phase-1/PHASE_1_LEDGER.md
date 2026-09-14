@@ -560,3 +560,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0016 and AR-0017 in parallel |
+
+## L-0039 — 2026-09-14 — revision-6 review panel spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-reviewer-trust-security (`AR-0016`) and rot-reviewer-compat-transaction (`AR-0017`), fresh Opus 5 contexts, in parallel |
+| Input commit | `cd4526a` (worktrees `wt/review-r6-b`, `wt/review-r6-c`; branches `phase1/rot1-r6-review-b`, `phase1/rot1-r6-review-c`) |
+| Work performed | spawned on HO-0016 and HO-0017; running. Prompts carry the transcript prohibition and the revision-6 surfaces: B covers the decision register, CS6, first-contact root under OP-13, build environments under OP-16, first-hand content and OP-1…OP-16; C covers the r6 layout, transaction-area closure, `.gitattributes` and ignore sources, and admission and re-admission transactions. |
+| Report / evidence | expected `AGENT_RUNS/AR-0016.report.yaml`, `AGENT_RUNS/AR-0017.report.yaml`; `release/root-of-trust/4.1.6-review-r6/{B-trust-security,C-compat-transaction}/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0018 (v3 template), spawn synthesis reviewer D |

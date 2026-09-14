@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T13:54:04Z'
-state_hash: f62b270c6876ca78cd36e532c6d0830208f150bdeacafcb79ca19dc17db9b970
+updated_at: '2026-09-14T13:55:15Z'
+state_hash: 0153082f6be6eb7d4c7f03a51b70e6b021d5378737758ba0c967865e4e511a97
 lifecycle_state: ROT_ARCH_REVIEW_PANEL
 
 protocol:
@@ -38,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 208025590dcd0182ccb0272ed762319eb1a961b9
+  last_recorded_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -251,14 +251,16 @@ running_work:
     handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0016-rot-review-r6-b-trust-security.md
     worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-b
     branch: phase1/rot1-r6-review-b
-    status: CLAIMED
+    base_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
+    status: RUNNING
   - run_id: AR-0017
     role: rot-reviewer-compat-transaction
     run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0017.run.yaml
     handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0017-rot-review-r6-c-compat-transaction.md
     worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-c
     branch: phase1/rot1-r6-review-c
-    status: CLAIMED
+    base_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
+    status: RUNNING
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0015, revision 6
