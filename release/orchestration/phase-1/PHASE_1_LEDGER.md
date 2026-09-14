@@ -322,3 +322,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0009 and AR-0010 in parallel |
+
+## L-0022 — 2026-09-14 — specialist architects spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | rot-specialist-architect `AR-0009` (lens A: verifier's minimal trusted inputs) and `AR-0010` (lens B: release, build and custody supply chain), fresh Opus 5 contexts, in parallel |
+| Input commit | `6ea45a5` (worktrees `wt/spec-r5-a`, `wt/spec-r5-b`; branches `phase1/rot1-r5-specialist-a`, `phase1/rot1-r5-specialist-b`) |
+| Work performed | spawned on HO-0009 and HO-0010; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0009.report.yaml`, `AGENT_RUNS/AR-0010.report.yaml`; `release/root-of-trust/4.1.6-alternatives-r5/specialist-{a,b}/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0011, spawn synthesis architect AR-0011 |

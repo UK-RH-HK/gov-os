@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T07:19:09Z'
-state_hash: 2ab34a047292feb4543c67b0f3804adc0e45db99684a627a0e34aa2c4a184320
+updated_at: '2026-09-14T07:20:08Z'
+state_hash: a337430170fe9d3b4302594b8ea7c37f62785b0de361413d9ea9fbfada7cd071
 lifecycle_state: ROT_ARCH_ESCALATION_SPECIALISTS
 
 protocol:
@@ -38,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 15f0a063873f0cf4980bcaea7069d5c8d0269927
+  last_recorded_commit: 6ea45a57cb17820c02366f2e75e37cee8f38099d
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -207,14 +207,16 @@ running_work:
     handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0009-rot-specialist-r5-a.md
     worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/spec-r5-a
     branch: phase1/rot1-r5-specialist-a
-    status: CLAIMED
+    base_commit: 6ea45a57cb17820c02366f2e75e37cee8f38099d
+    status: RUNNING
   - run_id: AR-0010
     role: rot-specialist-architect
     run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0010.run.yaml
     handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0010-rot-specialist-r5-b.md
     worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/spec-r5-b
     branch: phase1/rot1-r5-specialist-b
-    status: CLAIMED
+    base_commit: 6ea45a57cb17820c02366f2e75e37cee8f38099d
+    status: RUNNING
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0005, revision 4
