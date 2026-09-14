@@ -1,0 +1,226 @@
+{
+ "A_full_removal_then_init_force": {
+  "init_force_code": null,
+  "init_force_ok": true,
+  "legacy": {
+   "cit_writes_trust": {
+    "changed_trust_paths": [
+     "framework.lock",
+     "kernel/policies/SECURITY_POLICY.yaml"
+    ],
+    "governance_trust_mutated": true,
+    "steps": {
+     "approve": {
+      "code": "GATE_NOT_PRESENTED",
+      "ok": false
+     },
+     "approve_after_gate": {
+      "code": null,
+      "ok": true
+     },
+     "execute": {
+      "code": null,
+      "ok": true
+     },
+     "propose": {
+      "code": null,
+      "ok": true
+     },
+     "simulate": {
+      "code": null,
+      "ok": true
+     }
+    },
+    "trust_framework_lock_present_after": "absent"
+   },
+   "kernel_trust_code": null,
+   "kernel_trust_ok": true,
+   "rebuild_code": null,
+   "rebuild_ok": true,
+   "restricted_retrievable": [
+    "product/customers/acme.md"
+   ],
+   "rot1_state_after": "PARTIAL",
+   "trust_paths_changed": [
+    "governance/trust/framework.lock",
+    "governance/trust/kernel/policies/SECURITY_POLICY.yaml"
+   ],
+   "verified": true,
+   "work_changed_by_legacy": true
+  },
+  "pre_state": "PARTIAL(after removal, before init)"
+ },
+ "B_checkout_pre_governance": {
+  "git_rc": 0,
+  "legacy": {
+   "cit_writes_trust": {
+    "changed_trust_paths": [
+     "framework.lock",
+     "kernel/policies/SECURITY_POLICY.yaml"
+    ],
+    "governance_trust_mutated": true,
+    "steps": {
+     "approve": {
+      "code": "GATE_NOT_PRESENTED",
+      "ok": false
+     },
+     "approve_after_gate": {
+      "code": null,
+      "ok": true
+     },
+     "execute": {
+      "code": null,
+      "ok": true
+     },
+     "propose": {
+      "code": null,
+      "ok": true
+     },
+     "simulate": {
+      "code": null,
+      "ok": true
+     }
+    },
+    "trust_framework_lock_present_after": "absent"
+   },
+   "kernel_trust_code": null,
+   "kernel_trust_ok": true,
+   "rebuild_code": null,
+   "rebuild_ok": true,
+   "restricted_retrievable": [
+    "product/customers/acme.md"
+   ],
+   "rot1_state_after": "PARTIAL",
+   "trust_paths_changed": [
+    "governance/trust/framework.lock",
+    "governance/trust/kernel/policies/SECURITY_POLICY.yaml"
+   ],
+   "verified": true,
+   "work_changed_by_legacy": true
+  },
+  "occupation_types": {
+   ".governance-runtime/migration": "file",
+   "governance/framework.lock": "file",
+   "governance/generated": "dir",
+   "governance/kernel": "dir",
+   "governance/project": "dir",
+   "spec/audits/GOVERNANCE-ADOPTION": "file"
+  },
+  "trust_digest_unchanged": true
+ },
+ "C_restore_source_pre": {
+  "git_rc": 0,
+  "legacy": {
+   "kernel_trust_code": null,
+   "kernel_trust_ok": true,
+   "rebuild_code": null,
+   "rebuild_ok": true,
+   "restricted_retrievable": [
+    "product/customers/acme.md"
+   ],
+   "rot1_state_after": "LEGACY",
+   "trust_paths_changed": [],
+   "verified": true,
+   "work_changed_by_legacy": true
+  },
+  "overlay_present_after": "absent",
+  "rot1_state": "LEGACY",
+  "trust_present_after": "absent"
+ },
+ "D_control_intact": {
+  "legacy": {
+   "cit_writes_trust": {
+    "changed_trust_paths": [],
+    "governance_trust_mutated": false,
+    "steps": {
+     "approve": {
+      "code": "NOT_INSTALLED",
+      "ok": false
+     },
+     "execute": {
+      "code": "NOT_INSTALLED",
+      "ok": false
+     },
+     "propose": {
+      "code": "NOT_INSTALLED",
+      "ok": false
+     },
+     "simulate": {
+      "code": "NOT_INSTALLED",
+      "ok": false
+     }
+    },
+    "trust_framework_lock_present_after": "file"
+   },
+   "kernel_trust_code": "NOT_INSTALLED",
+   "kernel_trust_ok": false,
+   "rebuild_code": "NOT_INSTALLED",
+   "rebuild_ok": false,
+   "restricted_retrievable": [],
+   "rot1_state_after": "COMPLETE",
+   "trust_paths_changed": [],
+   "verified": null,
+   "work_changed_by_legacy": false
+  },
+  "rot1_state": "COMPLETE"
+ },
+ "E_partial_removal_then_init_force": {
+  "init_force_code": "IO_ERROR",
+  "init_force_ok": false,
+  "legacy": {
+   "kernel_trust_code": null,
+   "kernel_trust_ok": true,
+   "rebuild_code": "KERNEL_TAMPERED",
+   "rebuild_ok": false,
+   "restricted_retrievable": [],
+   "rot1_state_after": "PARTIAL",
+   "trust_paths_changed": [],
+   "verified": false,
+   "work_changed_by_legacy": false
+  },
+  "rot1_state": "PARTIAL",
+  "stray_kernel_manifest": "file"
+ },
+ "F_symlink_occupation_framework_lock": {
+  "framework_lock_kind": "link",
+  "legacy": {
+   "kernel_trust_code": "NOT_INSTALLED",
+   "kernel_trust_ok": false,
+   "rebuild_code": "NOT_INSTALLED",
+   "rebuild_ok": false,
+   "restricted_retrievable": [],
+   "rot1_state_after": "PARTIAL",
+   "trust_paths_changed": [],
+   "verified": null,
+   "work_changed_by_legacy": false
+  },
+  "occupation_wrong_by_18s9": {
+   "governance/framework.lock": "link"
+  },
+  "rot1_state": "PARTIAL"
+ },
+ "G_nested_legacy_project": {
+  "changed_paths": [
+   "vendor/legacypkg/product/.gitignore",
+   "vendor/legacypkg/product/.governance-runtime",
+   "vendor/legacypkg/product/.governance-runtime/claims.db",
+   "vendor/legacypkg/product/.governance-runtime/telemetry",
+   "vendor/legacypkg/product/.governance-runtime/telemetry/events.jsonl",
+   "vendor/legacypkg/product/archive",
+   "vendor/legacypkg/product/archive/code-reference",
+   "vendor/legacypkg/product/archive/code-reference/.gitkeep",
+   "vendor/legacypkg/product/archive/governance",
+   "vendor/legacypkg/product/archive/governance/.gitkeep",
+   "vendor/legacypkg/product/archive/research",
+   "vendor/legacypkg/product/archive/research/.gitkeep",
+   "vendor/legacypkg/product/archive/spec",
+   "vendor/legacypkg/product/archive/spec/.gitkeep",
+   "vendor/legacypkg/product/framework.json"
+  ],
+  "nested_is_separate_project": true,
+  "nested_lock_kind": "file",
+  "note": "root discovery finds the nearest governance/framework.lock; nested legacy project is contained to its own subtree",
+  "outer_rot1_state": "COMPLETE",
+  "outer_trust_changed": false
+ }
+}
