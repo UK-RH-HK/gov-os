@@ -13,5 +13,7 @@ branch: phase1/rot1-r7-review-c
 agent_id: acc5c1a09d842b836   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T19:23Z'
 status: RUNNING
+messages_received:
+  - {at: '2026-09-14T20:06Z', from: orchestrator, content: owner input only — OWNER-DESIGN-REQUIREMENTS-0002 (OT-1/OT-2 resolutions); permitted to read exactly GATES/OWNER-DESIGN-REQUIREMENTS-0002.md and .yaml via git show 30542e5; no other role's findings}
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0021.report.yaml
 outcome: null
