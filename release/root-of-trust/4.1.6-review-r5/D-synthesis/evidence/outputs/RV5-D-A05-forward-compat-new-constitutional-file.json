@@ -1,0 +1,44 @@
+{
+ "probe": "RV5-D-A05 forward compatibility: new constitutional file set in the kernel (AR-0014)",
+ "N1_unclassified_new_files": {
+  "exit": 2,
+  "violations": [],
+  "unclassified": [
+   "contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+   "contracts/CAPABILITY_ACCEPTANCE_CONTRACT.yaml"
+  ]
+ },
+ "N2_classified_genuine_under_own_registration": {
+  "exit": 0,
+  "violations": [],
+  "unclassified": []
+ },
+ "registration_units_for_new_files": [
+  "file:contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+  "file:contracts/CAPABILITY_ACCEPTANCE_CONTRACT.yaml"
+ ],
+ "N3_attacker_kernel_under_CI_derived_registration": {
+  "exit": 0,
+  "violations": [],
+  "unclassified": []
+ },
+ "N4_attacker_kernel_under_first_hand_registration": {
+  "exit": 3,
+  "violations": [
+   "{'file': 'contracts/CAPABILITY_ACCEPTANCE_CONTRACT.yaml', 'class': 'pinned_file', 'reason': 'file digest not registered', 'digest': 'sha256:a414f12852be4957a5af1ded70fd7135f955b284",
+   "{'class': 'registration', 'reason': 'kernel_tree_digest_mismatch: the kernel is not the registered release content (23 \u00a712.3)', 'kernel': 'sha256:70f9afc0287e6ca16ceab3ebef99556b7d"
+  ],
+  "unclassified": []
+ },
+ "N5_registration_reductions_417_to_attacker": {
+  "exit": 0,
+  "reductions": []
+ },
+ "verdicts": {
+  "N1_default_deny": true,
+  "N2_classifiable_with_existing_vocabulary": true,
+  "N3_attacker_contract_eligible_under_CI_registration": true,
+  "N4_attacker_contract_refused_under_first_hand_registration": true,
+  "N5_no_reduction_reported": true
+ }
+}

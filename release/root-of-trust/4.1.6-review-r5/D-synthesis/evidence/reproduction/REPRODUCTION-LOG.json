@@ -1,0 +1,371 @@
+{
+ "run": "AR-0014",
+ "generated": "2026-09-14",
+ "hygiene": "env -i; HOME, TMPDIR, XDG_*, GOV_KERNEL_CACHE in scratch; no other GOV_* in children; PYTHONDONTWRITEBYTECODE=1; legacy binaries read-only; export of cdb4e14 in scratch; worktree never used as a probe cwd",
+ "note_on_writes_into_export": "FA5-first-admission.py and SRC5-source-identity.py write their JSON into their own evidence directory; they overwrote those two files inside the scratch export only. Comparisons below use the committed blobs (git show cdb4e14) or a second pristine export, never the overwritten copies.",
+ "architect_instruments": [
+  {
+   "id": "CSI-selftest",
+   "exit": 0,
+   "seconds": 17,
+   "rerun_sha256": "7c5ce0791e4917e33e9d4001e3bd79772c18cb93ccb8042f2542fa2b09d62e21",
+   "committed_sha256": "21281fedeb4bf6722c9e7bfda2e254785ddc621741a436d97f69ffefd2664129",
+   "byte_identical": true
+  },
+  {
+   "id": "CSI-framework",
+   "exit": 0,
+   "seconds": 0,
+   "rerun_sha256": "389e64cbf183fe96f2ac0a0c3c9fa311c91696f9c1d56003fb0e742bed5c89ae"
+  },
+  {
+   "id": "CSI-4.1.5",
+   "exit": 3,
+   "seconds": 1,
+   "rerun_sha256": "57f442f3632dabe88064e4b277f87f50421190e59b5e26fe3ff21474cfede7d7"
+  },
+  {
+   "id": "CSI-4.1.2",
+   "exit": 2,
+   "seconds": 0,
+   "rerun_sha256": "8698bdd636d9f0b6c25588071bbcef7907cb1ec8d7fe48931647aca9b7795d79"
+  },
+  {
+   "id": "CSI-4.1.3",
+   "exit": 2,
+   "seconds": 1,
+   "rerun_sha256": "0161f0e9bab415699515212820eb473db81225f7d31bb06972b692c7f1043ad9"
+  },
+  {
+   "id": "CSI-4.1.4",
+   "exit": 2,
+   "seconds": 0,
+   "rerun_sha256": "0483004b6aaea314a4839f0ffec8ac7666ff1fd66b42c4fcb913b796bad6be74"
+  },
+  {
+   "id": "P1r4",
+   "exit": 0,
+   "seconds": 11,
+   "rerun_sha256": "15b537a0264a52b123d8cc6c5a138da304f449e7190851c7d588b67f49409295",
+   "committed_sha256": "15b537a0264a52b123d8cc6c5a138da304f449e7190851c7d588b67f49409295",
+   "byte_identical": true
+  },
+  {
+   "id": "P4r4",
+   "exit": 0,
+   "seconds": 0,
+   "rerun_sha256": "bca2012804773d8bfeaf1d8056310d1eeb1503eec42cd9d2fd0a1db87fce05dd",
+   "committed_sha256": "bca2012804773d8bfeaf1d8056310d1eeb1503eec42cd9d2fd0a1db87fce05dd",
+   "byte_identical": true
+  },
+  {
+   "id": "P4r5",
+   "exit": 0,
+   "seconds": 0,
+   "rerun_sha256": "7db5dbc13318389beedc344336fbbdd850502d162eaa4b2c4e7f30978373d8f2",
+   "committed_sha256": "7db5dbc13318389beedc344336fbbdd850502d162eaa4b2c4e7f30978373d8f2",
+   "byte_identical": true
+  },
+  {
+   "id": "DA03r5",
+   "exit": 0,
+   "seconds": 2,
+   "rerun_sha256": "c2693af480e611496f49c53b4447f122687fc5dcf1c184b88ce3e04b8c7ce454",
+   "committed_sha256": "c2693af480e611496f49c53b4447f122687fc5dcf1c184b88ce3e04b8c7ce454",
+   "byte_identical": true
+  },
+  {
+   "id": "FA5-run1",
+   "exit": 0,
+   "seconds": 2,
+   "rerun_sha256": "c0b951998946bfaab31832af5ac57882aa75c83d8808f61e4eae88c7743ade29",
+   "committed_sha256": "c0b951998946bfaab31832af5ac57882aa75c83d8808f61e4eae88c7743ade29",
+   "byte_identical": true
+  },
+  {
+   "id": "FA5-run2",
+   "exit": 0,
+   "seconds": 1,
+   "rerun_sha256": "c0b951998946bfaab31832af5ac57882aa75c83d8808f61e4eae88c7743ade29",
+   "committed_sha256": "c0b951998946bfaab31832af5ac57882aa75c83d8808f61e4eae88c7743ade29",
+   "byte_identical": true
+  },
+  {
+   "id": "REG5",
+   "exit": 0,
+   "seconds": 17,
+   "rerun_sha256": "855292a5dbf1040ef69635d158ccef146a48cef24fe1f92e05edfbdc0022aff8",
+   "committed_sha256": "855292a5dbf1040ef69635d158ccef146a48cef24fe1f92e05edfbdc0022aff8",
+   "byte_identical": true
+  },
+  {
+   "id": "SRC5",
+   "exit": 0,
+   "seconds": 1,
+   "rerun_sha256": "9f82f4c014e06138ce0b211ab53acc04b58b6318b7f15395b55e6e6bf130fbe6",
+   "committed_sha256": "7d99d1d88cef5985ab79f7507852a6599a39f908f9c403424e3bbc20f2eb825d",
+   "byte_identical": false
+  },
+  {
+   "id": "CS5",
+   "exit": 0,
+   "seconds": 60,
+   "rerun_sha256": "795fed9370b8061039c81908ecdc498f99ca632a43deeac41867a00dfb9024a1",
+   "committed_sha256": "795fed9370b8061039c81908ecdc498f99ca632a43deeac41867a00dfb9024a1",
+   "byte_identical": true
+  }
+ ],
+ "review_r4_r3_probes": [
+  {
+   "id": "RV4-B-M",
+   "exit": 0,
+   "seconds": 6,
+   "rerun_sha256": "463bb90c548772175f08fc500834684922fd1739c6d43425ada12a2caa0f06f2"
+  },
+  {
+   "id": "RV4-B-AF",
+   "exit": 0,
+   "seconds": 0,
+   "rerun_sha256": "2646d38fa0842fd3c2ad254c51ec084b9d0f8f831f334ee293e4199d8c285927"
+  },
+  {
+   "id": "RV4-B-surface",
+   "exit": 0,
+   "seconds": 17,
+   "rerun_sha256": "265fc1ae80f1756fc789767d2487d5a3a070611df08217ac14d60b58149a6bc1"
+  },
+  {
+   "id": "r3copy-RV3-B-A01-precedence-immutable",
+   "exit": 0,
+   "seconds": 6,
+   "rerun_sha256": "abe62b2a4ccd4a25e46fb0a6725a34d7d233541b9518e6c209334b61831d594e"
+  },
+  {
+   "id": "r3copy-RV3-B-CSI-injections",
+   "exit": 0,
+   "seconds": 7,
+   "rerun_sha256": "46f267c8deee833b8e07073886296a68b5d2df12aa30bbe32d2535d29fda6497"
+  },
+  {
+   "id": "r3copy-RV3-D-precedence-lattice",
+   "exit": 0,
+   "seconds": 0,
+   "rerun_sha256": "6779d05dc15fad66ff31fc12815340ea095b6d3d687cd2046f2ece6a39cd8317"
+  },
+  {
+   "id": "r3copy-RV3-D-surface-forward-compat-and-removal",
+   "exit": 1,
+   "seconds": 0,
+   "rerun_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": "RV4-D-A03-oracle-regression-sensitivity",
+   "exit": 1,
+   "seconds": 1,
+   "rerun_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": "RV4-D-A03b-distinguishing-scenarios",
+   "exit": 1,
+   "seconds": 0,
+   "rerun_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+ ],
+ "reviewer_B_probes": [
+  {
+   "probe": "RV5-B-A01-first-admission-channel",
+   "rerun_sha256": "469f9d3ca5a65d7bcff251b58b7368da1f0b4a58c0243ad2515bcc88af4b4747",
+   "committed_sha256": "469f9d3ca5a65d7bcff251b58b7368da1f0b4a58c0243ad2515bcc88af4b4747",
+   "byte_identical": true,
+   "comparison": "identical"
+  },
+  {
+   "probe": "RV5-B-A04-calculator-extensions",
+   "rerun_sha256": "007d89fe64028adefa38f4abd243a142d70e534e93f27fb03135345c51ac52e7",
+   "committed_sha256": "007d89fe64028adefa38f4abd243a142d70e534e93f27fb03135345c51ac52e7",
+   "byte_identical": true,
+   "comparison": "identical"
+  },
+  {
+   "probe": "RV5-B-A05-source-identity",
+   "rerun_sha256": "c56769da5ab2955f8748e349482a712b9746168842368e34c6d0a095153c5c5e",
+   "committed_sha256": "e286e8390b6ba861fb0c61892dbdbf53b138c6ea4e498036dbe959b9756d73a7",
+   "byte_identical": false,
+   "comparison": "verdicts identical; three time-dependent archive digests differ (by design)"
+  },
+  {
+   "probe": "RV5-B-A08-build-image-selects-bytes",
+   "rerun_sha256": "58c784fd4ed075ea2848da8a7066d97b04c75a96dbc740f9cb0823a4fc82b2e6",
+   "committed_sha256": "cf5b65b5881ae43f21bbcfdbb160d77c6f23c7fd876acc954258f99edab0c60a",
+   "byte_identical": false,
+   "comparison": "verdicts identical (26 boolean/short fields); binary digests depend on the local compiler"
+  },
+  {
+   "probe": "RV5-B-A09-floor-class-kernels",
+   "rerun_sha256": "a1d90a87f52f71ae601f4bdc9480ab0c1828340a1876a9e08d2b1a0228abbbc0",
+   "committed_sha256": "a1d90a87f52f71ae601f4bdc9480ab0c1828340a1876a9e08d2b1a0228abbbc0",
+   "byte_identical": true,
+   "comparison": "identical"
+  },
+  {
+   "probe": "RV5-B-A12-machine-classes",
+   "rerun_sha256": "1af2220bb36f056679014b3a28ac7484c6a1758f6b1a0ec2efc9b26fe4f5814c",
+   "committed_sha256": "1af2220bb36f056679014b3a28ac7484c6a1758f6b1a0ec2efc9b26fe4f5814c",
+   "byte_identical": true,
+   "comparison": "identical"
+  }
+ ],
+ "reviewer_C_pipeline": [
+  {
+   "probe": "registers5",
+   "rerun_sha256": "443cde1d99ab51baf12264d72c7753cea40df08844c12e697a1bebd5d34f4117",
+   "committed_sha256": "443cde1d99ab51baf12264d72c7753cea40df08844c12e697a1bebd5d34f4117",
+   "byte_identical": true,
+   "comparison": "byte-identical"
+  },
+  {
+   "probe": "gitops5",
+   "rerun_sha256": "fbf7f8b658da3197130f8331089e68276ec6971c43042f3ae2361496dbbf707f",
+   "committed_sha256": "004eac9750bcd1db5e1330ddeab4368de9a6d63cf8a59b4d32dff465c2e1bf19",
+   "byte_identical": false,
+   "comparison": "identical except 18 scratch tree-path strings"
+  },
+  {
+   "probe": "matrix5",
+   "rerun_sha256": "0b8e32030aebd65be9fa6985577a735be414f14bfbd70a9d5b5a8c03cb0621e6",
+   "committed_sha256": "c68bbb49ad9c39f8c9aeb2fd15b9eb4fee7095211e259c4dd77104f376e6d22c",
+   "byte_identical": false,
+   "comparison": "identical except elapsed_seconds (662.5 vs 603.2)"
+  },
+  {
+   "probe": "admit_tx",
+   "rerun_sha256": "0b3a15a18b601988ee30edb451781df99981f584d87f09d4cbefb4c6fd1aeddf",
+   "committed_sha256": "1ae6102ef3d403d290ed78a01829cc68de4e70afcbfa46d7256322c6997c41d3",
+   "byte_identical": false,
+   "comparison": "A08, A09, A10 identical; A11 concurrent-admission race differs in stray directory count (nondeterministic)"
+  }
+ ],
+ "notes": {
+  "CSI checks": "identical except the kernel_dir path field",
+  "FA5": "stdout equals the committed blob (c0b951...) byte for byte; two runs identical",
+  "SRC5": "16 digest leaves differ from the committed output; all verdict leaves equal (the function hashes git archive of a tree id, which is time-dependent)",
+  "RV4-B-surface-probes": "part P differs: under revision 5 the revision-4 retaining inventory is malformed (exit 5), as reviewer B reports; parts U and T equal",
+  "r3 probe copies and RV4-D-A03/A03b": "byte-identical to review r4's committed re-run outputs once the positional arguments were supplied (the first scripted run omitted them and exited 1 before doing anything)"
+ },
+ "reviewer_C_prior_probe_reproduction": {
+  "review_r4_C/subdir_escape.json": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "review_r4_C/durability.json": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "review_r4_C/legacy_regain.json": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "review_r4_D/RV4-D-A01": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "architect/ST5-subdir-escape.json": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "architect/ST5-gitignore-surgery.json": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "architect/ST5-subdir-matrix-summary.json": {
+   "byte_identical": false,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "architect/ST5-subdir-matrix-writing-rows.json": {
+   "byte_identical": true,
+   "differing_leaves_after_normalisation": 0,
+   "sample": []
+  },
+  "architect/ST5-D-A01-rerun.json": {
+   "byte_identical": false,
+   "differing_leaves_after_normalisation": 6,
+   "sample": [
+    "/cases/N2_cwd_governance_trust_then_cit/cit_from_nested_root_governance_trust/trust_paths_changed[10]",
+    "/cases/N2_cwd_governance_trust_then_cit/cit_from_nested_root_governance_trust/trust_paths_changed[11]",
+    "/cases/N2_cwd_governance_trust_then_cit/cit_from_nested_root_governance_trust/trust_paths_changed[12]",
+    "/cases/N2_cwd_governance_trust_then_cit/cit_from_nested_root_governance_trust/trust_paths_changed[13]",
+    "/cases/N2_cwd_governance_trust_then_cit/cit_from_nested_root_governance_trust/trust_paths_changed[14]",
+    "/cases/N2_cwd_governance_trust_then_cit/cit_from_nested_root_governance_trust/trust_paths_changed[9]"
+   ],
+   "note": "the N2 legacy CIT writes a run-dependent set of legacy generated files under the nested root; every state key (KERNEL_TAMPERED, lock type, overlay paths, steps) and every other case equal"
+  },
+  "architect/P3r3": {
+   "summary": true,
+   "property_L3": true,
+   "chain_summary": true,
+   "job_count": true,
+   "job_count_value": 2085
+  },
+  "review_r4_C/matrix-summary": {
+   "found": [],
+   "committed_exists": true,
+   "stdout": "{\"jobs\": 10618, \"chains\": 168}\n"
+  },
+  "review_r4_C/matrix-aggregates": {
+   "rows": [
+    10618,
+    10618
+   ],
+   "writes_by_layout_position_variant_equal": true,
+   "states_equal": true,
+   "trust_rows": [
+    56,
+    56
+   ],
+   "trust_rows_equal": true,
+   "writing_commands_equal": true,
+   "total_writing_rows": [
+    581,
+    581
+   ],
+   "ST5_D_A01_N2_trust_paths_only_in_rerun": [
+    "governance/trust/governance/generated/adapter-manifest.json",
+    "governance/trust/governance/generated/tool-registry.json"
+   ],
+   "ST5_D_A01_N2_trust_paths_only_in_committed": [
+    "governance/trust/spec/decisions/D-0001.yaml",
+    "governance/trust/spec/reports/checkpoints/CKPT-00001.yaml"
+   ],
+   "ST5_D_A01_verdict_like_leaves_equal": true
+  }
+ },
+ "synthesis_probes_determinism": {
+  "RV5-D-A01-registered-content-not-first-hand": "second run byte-identical",
+  "RV5-D-A03-user-writable-install-anchoring": "second run byte-identical",
+  "RV5-D-A04-conformance-vector-gaps": "second run byte-identical",
+  "RV5-D-A05-forward-compat-new-constitutional-file": "second run byte-identical",
+  "RV5-D-A07-plan-regression-detection": "second run byte-identical"
+ },
+ "legacy_binaries_sha256": {
+  "4.1.2": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7",
+  "4.1.3": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89",
+  "4.1.4": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f",
+  "4.1.5": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+ },
+ "tools": {
+  "python": "3.12.3",
+  "pyyaml": "6.0.1",
+  "cryptography": "41.0.7",
+  "openssl": "3.0.13",
+  "git": "2.43.0",
+  "rustc": "1.98.1",
+  "os": "Linux 6.6 (WSL2)"
+ }
+}
