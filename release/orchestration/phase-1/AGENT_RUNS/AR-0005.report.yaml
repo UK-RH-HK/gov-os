@@ -1,0 +1,190 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0005
+role: rot-architect
+objective: Author RoT-1 revision 4 (architecture only) closing BC-1..BC-4 (RV3-H1..RV3-H3 and the OP-2/OP-4/OP-7 consequence statements) as classes
+agent_model: claude-opus-5
+independence_statement: This run authored no earlier RoT-1 revision and no review of any revision. Under release/orchestration/ it read HO-0005, HO-0001 and AGENT_RUNS/README.md;
+  it also displayed AGENT_RUNS/AR-0005.run.yaml (its own run record) and the first 60 lines of AGENT_RUNS/AR-0004.report.yaml as a format reference for this report.
+  It did not read other branches, other worktrees, orchestrator state or ledgers. It read the review r3 files (00, 10, 11, B-trust-security, C-compat-transaction,
+  D-synthesis) and ran reviewer probes read-only from the review directories or from scratch copies; the review directories were not edited. Probes ran only in scratch
+  with GOV_* stripped and HOME/GOV_KERNEL_CACHE in scratch. D-0008 and ARCH-0002 remain PROPOSED (PROVISIONAL, in_effect false); no owner option was decided and no
+  acceptance is claimed.
+input:
+  base_commit: f83da03afff587415ced4930ad33b7aa70a0ef56
+  release: 4.1.6 (RoT-1 revision 4, amending revision 3 ca77a431418bd6b349f465aa2521ca43bccfd5a6)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0005-rot-architect-r4.md
+inspected:
+- 'release/root-of-trust/4.1.6/ (revision 3 at ca77a431418bd6b349f465aa2521ca43bccfd5a6: 00-27, constitutional-surface/, schemas/, examples/, evidence/)'
+- release/root-of-trust/4.1.6-review-r3/ at 79a09a12e34fd883192efd9f9e529cecbee9a6c8 (00-REVIEW-REPORT.md, 10-BLOCKING-FINDINGS.md, 11-CORRECTION-DELTA.md, B-trust-security/,
+  C-compat-transaction/, D-synthesis/)
+- spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md, framework/schemas/record.schema.json, framework/schemas/decision.schema.json
+- framework/, release/releases/4.1.2-4.1.5/kernel (read-only inputs to the checker and probes)
+- legacy binaries gov-4.1.2, gov-4.1.3, gov-4.1.4, gov-4.1.5 (sha256 in release/root-of-trust/4.1.6/evidence/EVIDENCE-RUN-LOG.json)
+- release/orchestration/phase-1/HANDOFFS/HO-0005-rot-architect-r4.md, HO-0001-rot-architect-r3.md, AGENT_RUNS/README.md
+produced:
+- release/root-of-trust/4.1.6/00-27 revised to revision 4 (17, 19, 21, 22, 23, 24, 25, 16, 05, 00 rewritten; others revised)
+- release/root-of-trust/4.1.6/28-CLASS-REMAINDER-ANALYSIS.md (new)
+- release/root-of-trust/4.1.6/constitutional-surface/ (csi_lib.py, csi_check.py, csi_derive.py, CONSTITUTIONAL_SURFACE_INVENTORY.yaml, README.md; floor_schema_version
+  3)
+- release/root-of-trust/4.1.6/schemas/ (11 schemas revised; freshness-witness.schema.json and trust-decision-pin.schema.json new)
+- release/root-of-trust/4.1.6/examples/rev4/ (9 instances and validation.json), examples/README.md
+- release/root-of-trust/4.1.6/evidence/ (P1r4, P4r4, VA4, LR2 and RV3-D copies with outputs; CSI-check-*.json and CSI-selftest.json regenerated; P3r3-rerun-r4-summary.json;
+  rerun-*.json; EVIDENCE-RUN-LOG.json; README.md)
+- spec/decisions/D-0008.yaml (PROPOSED revision 4)
+- spec/architecture/ARCH-0002.yaml (PROPOSED revision 4)
+- docs/DECISIONS.md (D-0008 and ARCH-0002 rows only)
+- release/orchestration/phase-1/AGENT_RUNS/AR-0005.report.yaml
+tests_or_attacks:
+- id: P1r4
+  description: 'BC-1 on real 4.1.5: 9 attack cases lose project strengthening under revision 3 and keep it under revision 4 (reference = binary 9/9); 0 unsound of
+    343 order pairs; R01-R09 exit 2; strength vector reports 9/9 revision-3 losses, 0 revision-4; migrations M1-M4,M6,M7 refused before write, M5 gated; composition
+    kept'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/evidence/P1r4-project-strength-and-absence.json
+- id: P4r4
+  description: 'BC-2 reference model: 54/54 scenarios hold; 9/9 conformance-oracle mutants detected (M-sequence-anchor fails 3); matrix 132 rows: 77 refused, 42 stated
+    core, 13 OP-7 (d) residual, 0 unstated, 0 labelled current'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/evidence/P4r4-trust-state-model.json
+- id: VA4
+  description: 'BC-3 verify-artifact source scenarios: 16/16 as expected; 12 attacks refused (RV3-B-A08, REJECTED variant, RV3-D-A03, custodial stages); 3 minimum
+    capability sets documented'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/evidence/VA4-verify-artifact-source-scenarios.json
+- id: P3r3-rerun
+  description: pre-RoT register matrix re-run unchanged on real 4.1.2-4.1.5 (2085 jobs); summary, property_L3, chain_summary and job_count equal to committed revision-3
+    output
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/P3r3-rerun-r4-summary.json
+- id: CSI-check
+  description: 'revision-4 checker: framework exit 0 (113 files); 4.1.5 exit 3 (historical set_lock_field); 4.1.5 lock operations removed exit 0; 4.1.2/4.1.3/4.1.4
+    exit 2'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/evidence/CSI-check-framework.json
+- id: CSI-selftest
+  description: checker self-test 56/56 as expected
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/evidence/CSI-selftest.json
+- id: LR2
+  description: 'installation state and strength vector on 24 real trees from the legacy probes: legacy-entry trees PARTIAL(occupation) or LEGACY; untracking-idiom
+    clone PARTIAL on revision 3, COMPLETE on revision 4; PROJECT_STRENGTH_WEAKENED on A05a (3) and A05c (9)'
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/evidence/LR2-installation-state-and-strength-reference.json
+- id: RERUN-RV3-B-A01
+  description: 'precedence-to-immutable kernel against the revision-4 checker: passes_E7_reference_checker false'
+  result: FLIPPED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-B-A01-precedence-immutable.json
+- id: RERUN-RV3-B-A03
+  description: real 4.1.5 gov verify product child still writes both pin files as the invoking uid mode 0644 (legacy behaviour); revision-4 integrity predicate ignores
+    such files (flip is reference, P4r4)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-B-A03-A14-A16-probes.json
+- id: RERUN-RV3-B-A14
+  description: 'on for 10 bool_toward floors: checker exit 2 for all 10'
+  result: FLIPPED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-B-A03-A14-A16-probes.json
+- id: RERUN-RV3-B-A16
+  description: 'project_tunable security keys changed: checker exit 3'
+  result: FLIPPED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-B-A03-A14-A16-probes.json
+- id: RERUN-RV3-B-CSI-injections
+  description: I01-I06 exit 2, I07 exit 3, I08 exit 3 (base payload historical lock operations; injected migration has no operation), I09 exit 2
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-B-CSI-injections.json
+- id: RERUN-RV3-D-A01-A02
+  description: 'lattice against revision-4 library: 36 pairs, no unsound pair; TPS immutable registrations are computed reductions removing no strengthening'
+  result: FLIPPED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-D-precedence-lattice.json
+- id: RERUN-RV3-D-A09-A10
+  description: 'unmodified: R01-R09 exit 2, F01/F05/F06/F07/F09 exit 3 (fixture lacks exact precedence); release-consistent copy: F01/F05/F06/F07/F09 exit 0, F02/F12
+    exit 2, F03/F04/F08/F10/F11 exit 3, R01-R09 exit 2'
+  result: FLIPPED
+  evidence_path: release/root-of-trust/4.1.6/evidence/RV3-D-A09-A10-rerun-r4-release-consistent.json
+- id: RERUN-P1r3
+  description: 'revision-3 floor-coverage probe against the revision-4 library on real 4.1.5: harm verdicts (a)-(e) true'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-P1r3-against-r4-lib.json
+- id: RERUN-RV3-C-destructive
+  description: '84 destructive invocations of real 4.1.2-4.1.5 on the intact layout: 0 writes, property holds'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-C-destructive.json
+- id: RERUN-RV3-C-A04-A06
+  description: 'occupation removal: legacy outcome reproduced (full removal: legacy verified install, restricted retrievable by legacy), governance/trust unchanged,
+    RoT-1 PARTIAL(occupation); carried as restated LR-2'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-C-full_removal_and_merge.json
+- id: RERUN-RV3-C-durability
+  description: clone, archive, clean, checkout, sparse, merge, revert behaviour as review r3
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/rerun-RV3-C-durability.json
+- id: RERUN-RV3-D-A05-A06
+  description: Git restore of pre-migration paths and legacy CIT writes reproduced on revision-3 and revision-4 layouts (documented LR-2 outcome; RoT-1 bounds evaluated
+    in LR2)
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/RV3-D-A05-A07-rerun-r4-layout.json
+- id: RERUN-RV3-D-A07
+  description: 'untracking idiom on the revision-4 layout lists nothing; occupation present in fresh clone (revision-3 layout: listed and dropped)'
+  result: FLIPPED
+  evidence_path: release/root-of-trust/4.1.6/evidence/RV3-D-A05-A07-rerun-r4-layout.json
+- id: RV3-B-M-reference-model
+  description: reviewer B model encodes revision-3 rules; constructions re-encoded as P4r4 scenarios
+  result: NOT_RUN
+  evidence_path: release/root-of-trust/4.1.6/evidence/P4r4-trust-state-model.json
+- id: RV3-D-oracle-anchor-artifact
+  description: synthesis D probe loads P4r3; constructions re-encoded as P4r4 scenarios and A11 answered by P4r4 mutants
+  result: NOT_RUN
+  evidence_path: release/root-of-trust/4.1.6/evidence/P4r4-trust-state-model.json
+- id: SCHEMAS-rev4
+  description: 20 schemas valid JSON Schema 2020-12; 9 revision-4 instances validate; inventory validates; 4 revision-3 shapes refused
+  result: PASS
+  evidence_path: release/root-of-trust/4.1.6/examples/rev4/validation.json
+- id: A-R4-01
+  description: 'architect self-attack: TPS floor raise vs project-added never-index class; revision-3 replacement semantics lose the class on real 4.1.5, directed
+    join keeps it'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/P1r4-project-strength-and-absence.json
+- id: A-R4-02
+  description: 'architect self-attack: route S (verification-attestation + release-candidate + release-final keys + pipeline input) accepted under S0; refused under
+    OP-2 S1/S2'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/VA4-verify-artifact-source-scenarios.json
+- id: A-R4-04
+  description: 'architect self-attack: historical 4.1.5 migrations carry set_lock_field and fail the revision-4 checker; 4.1.6 must re-issue its chain'
+  result: CONFIRMED
+  evidence_path: release/root-of-trust/4.1.6/evidence/CSI-check-release-4.1.5.json
+findings:
+- id: A-R4-02
+  severity: INFO
+  title: Minimum capability set for an accepted malicious binary under the architecture minimum is route S (3 keys, 2 under OP-4 no, plus pipeline input) or route
+    B (4 keys over 3 purposes); OP-2 options change it
+  path: release/root-of-trust/4.1.6/25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md
+- id: A-R4-04
+  severity: INFO
+  title: The 4.1.5 migration chain carries set_lock_field and fails the revision-4 checker (exit 3); WP-18 re-issues the 4.1.6 chain
+  path: release/root-of-trust/4.1.6/28-CLASS-REMAINDER-ANALYSIS.md
+- id: RS-1
+  severity: INFO
+  title: 'Stated core residual: a machine anchored before a revocation and never given later statements admits genuine descendants for C1-C2 (never C3, never labelled
+    current)'
+  path: release/root-of-trust/4.1.6/24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md
+- id: LR-2
+  severity: INFO
+  title: After occupation removal or a Git restore of pre-migration paths a legacy binary regains a verified install and can write RoT-1 paths; RoT-1 fails closed
+    and reports strength loss where recorded
+  path: release/root-of-trust/4.1.6/26-LEGACY-BINARY-CONTAINMENT.md
+verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW
+output:
+  branch: phase1/rot1-r4-architect
+  commit: bca05a7e2c2791126fde1d3d812facdaa45b2e45
+  evidence_path: release/root-of-trust/4.1.6/evidence/
+unresolved:
+- 'Specification only (no implementation): write confinement and pin integrity predicate on real platforms; in-binary surface evaluator, directed join, strength vector
+  and consumer-register build; verify-artifact and custodial stages on real binaries; reinstall identity from the VTS record (RV3-L4); C-2 cross-device refusal; C-4
+  st_mode typing; C-5 RT-50 on a genuine 4.1.6 install'
+- Reviewer B reference model and synthesis D oracle probe not re-run unmodified (they model revision-3 functions); constructions re-encoded in P4r4
+- No full signed release statement, Trust Policy or Trust State example; examples/rev4 covers new record shapes and fragments
+- Owner decisions OP-1..OP-7 pending (including OP-2 binary source authority S0-S3 and OP-7 parameters); proposals labelled, nothing decided
+recommended_next_action: Fresh independent reviewers B (trust and security) and C (compatibility and transactions), then a fresh synthesis reviewer, review RoT-1
+  revision 4 at the work-product commit; D-0008 and ARCH-0002 stay PROPOSED
+completed_at: '2026-09-14T05:45:13Z'
