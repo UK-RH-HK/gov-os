@@ -476,3 +476,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0014 |
+
+## L-0033 — 2026-09-14 — revision-5 synthesis reviewer spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | rot-review-synthesis (`AR-0014`, fresh Opus 5 context) |
+| Input commit | `59c1e5c` (worktree `wt/review-r5-d`, branch `phase1/rot1-r5-review-d`) |
+| Work performed | spawned on HO-0014; running. Must classify each confirmed blocking class as a remainder or materially new, and as ENGINEERING_CORRECTION or OWNER_TRADE_OFF. |
+| Report / evidence | expected `AGENT_RUNS/AR-0014.report.yaml`; `release/root-of-trust/4.1.6-review-r5/{00,10,11}*`, `D-synthesis/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge; route per verdict and classification (owner D-0008 gate, owner trade-off gate, or revision-6 architect) |
