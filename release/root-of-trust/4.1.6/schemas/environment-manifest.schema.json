@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-engineering-os/schemas/environment-manifest/1",
+  "title": "Build environment manifest (unsigned; digest registered as environment_id; RoT-1 revision 6, PROPOSED; 33 §3)",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "target",
+    "supplier_class",
+    "components",
+    "assembly",
+    "environment_tree_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "governance-os.environment-manifest/1"
+    },
+    "target": {
+      "type": "string"
+    },
+    "supplier_class": {
+      "type": "string",
+      "pattern": "^[A-Z]$"
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "version",
+          "sha256",
+          "upstream_checksum_reference"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "upstream_url": {
+            "type": "string"
+          },
+          "upstream_checksum_reference": {
+            "type": "string",
+            "description": "the upstream release's signed checksum file and signature, or under OP-16 (c) the registration of the owner-built component"
+          }
+        }
+      }
+    },
+    "assembly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool",
+        "recipe_digest"
+      ],
+      "properties": {
+        "tool": {
+          "type": "string"
+        },
+        "recipe_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "environment_tree_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "source identity v2 function applied to the assembled environment tree"
+    }
+  }
+}

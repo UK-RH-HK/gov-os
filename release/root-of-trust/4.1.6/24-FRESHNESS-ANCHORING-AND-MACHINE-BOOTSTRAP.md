@@ -1,6 +1,11 @@
 # Output 24 — Freshness anchoring, currency and new-machine trust bootstrap
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments (CR5-B-08, CR5-B-09, RV5-L4, RV5-M8): the clock rule is restated (every ingested non-future
+> statement raises the high-water; a refused future statement makes clock-based proofs unusable) and the witness-only text is
+> withdrawn (§8, §10 RS-2); RS-2b added; §3.5 (3) states the allow list; §4.2 notes that anchoring ceremonies are refused on
+> user-writable installations; §5 parameters are example values, not proposals; §5.3 and §5.7 state the TA-7 dependency; §9's
+> revision-4 proposal is removed.
 > Revision 5: currency proofs name the Trust State they cover (CR4-B-07 option 1, CR4-B-06); the witness service's input
 > and custody are fixed (CR4-B-02); every ingested non-future statement raises a stateful clock high-water and RS-2 is
 > restated (CR4-B-03, RV4-M4); binary acceptance and first admission follow `25` and `31`.
@@ -154,7 +159,10 @@ RV3-D-A12, RV3-D-A15 and the matrix.
    authorises nothing (`TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED`).
 3. **Confined execution.** Every repository-supplied or plugin-supplied command that `gov` executes MUST run under OS
    write confinement. This covers product and test commands, tool install, uninstall and health commands, plugin
-   processes and adapter hooks. The confinement denies writes to:
+   processes and adapter hooks. **The confinement is an allow list** (revision 5, CR4-B-01; restated in revision 6,
+   CR5-B-09): writes are permitted only to the project working tree outside the Protected Path Set, the command's own
+   temporary directory and the paths its registered descriptor names; every other path is denied. The explicit denies below
+   hold even where an allow-list entry would cover them. The confinement denies writes to:
    - the system and account pin locations;
    - the Verifier Trust Store;
    - `governance/trust/**`;
@@ -213,7 +221,7 @@ The compiled T0 is a safety floor. Only OP-7 (d) accepts it for governed use, an
 
 | Class | Commands (examples) |
 |---|---|
-| **C0** diagnostics and knowledge intake | `version`, `doctor`, `status` (without policy-dependent sections), `kernel verify`/`trust`, `trust show`, `trust refresh --from`, `trust confirm-root`/`confirm-state`, trust-gate confirmation (`27`) |
+| **C0** diagnostics and knowledge intake | `version`, `doctor`, `status` (without policy-dependent sections), `kernel verify`/`trust`, `trust show`, `trust refresh --from`, `trust confirm-root`/`confirm-state`, trust-gate confirmation (`27`). **Revision 6 (RV5-M8):** the anchoring ceremonies in this row are C0 by class but refused on a user-writable installation (`31` GB-4′), so such an installation reaches only the classes of `31` §7.1. |
 | **C1** governed read | `context compile`, `memory query`, `continue`, readiness views |
 | **C2** governed mutation | tasks, CIT, non-trust gates, `rebuild-memory`, `plugins register`, `tools install`, adoption batches ≥ 1, `upstream`, checkpoints |
 | **C3** trust ingress | `init`, `adopt migrate --batch 0`, `update --apply`, rollback and restore, `kernel reinstall` with another envelope, recovery exchange, **`trust verify-artifact` acceptance**, profile install, lineage adoption |
@@ -275,8 +283,8 @@ trust-state witness, C3 without a currency proof, writable pins, A7 against the 
 
 ## 5. The machine list (HO-0001 §3.2)
 
-"Local state" means the VTS (§8). Scenario ids refer to `evidence/P4r4-trust-state-model.json`. The assumed parameters
-are proposals only:
+"Local state" means the VTS (§8). Scenario ids refer to `evidence/P4r4-trust-state-model.json`. The parameters below are
+the example values the reference model uses; they are not proposals and decide nothing (revision 6, RV5-L4):
 - `pin_max_validity_days` 30;
 - `c3_currency_window_hours` 168;
 - `max_anchor_age_days` 180;
@@ -331,7 +339,11 @@ are proposals only:
   - Under (a), (c) and (d), C2 runs at the anchored chain, labelled `ANCHORED(5, human, as-of …, age 400d)
     CURRENCY_UNPROVEN`.
 - **Remedy.** `confirm-state` of the current fingerprint (P1), or an in-gate confirmation (P2).
-- **Evidence.** `M3_restored_from_backup`.
+- **Clock (revision 6, CR5-B-08).** The C3 window of the restored anchor rests on TA-7. If the clock is set back into that
+  window and any statement issued after the backup is delivered, the statement is refused as issued in the future and
+  clock-based proofs are unusable: C3 refuses (P4r6 `R6-CLOCK-*`). If every later statement is withheld, the machine cannot
+  distinguish the past: residual RS-2b (§10).
+- **Evidence.** `M3_restored_from_backup`; P4r6 `R6-CLOCK-CR5-B-08_restored_store_clock_back_newer_statements_delivered`.
 
 ### 5.4 Machine with an old trust epoch (M4)
 
@@ -364,6 +376,7 @@ are proposals only:
   - Under every option: C3 refuses without a proof. Under (c), a non-witness anchor follows (a), as §4.3 states.
 - **In-gate confirmation.** Typing the currently published fingerprint into the gate is a clockless proof, but only if
   the machine holds that TSS.
+- **Clock (revision 6).** Every age and window statement above rests on TA-7; the CR5-B-08 rule of §5.3 applies.
 - **Evidence.** `M7_offline_long_absence`, `INGATE_state_fingerprint_currency`.
 
 ## 6. Replay, equivocation, forks and incomplete state
@@ -419,10 +432,11 @@ clock below the high-water fails closed: pins and the C3 window are not honoured
 | `projects/<project_trust_id>.json` | repository paths, highest installed sequence and CI, project-strength vector (`26` §6), **held Trust Policy registration** (`19` §10.6), open transactions, adapter rendering digests | raised only by install transactions or gated confirmation |
 | `confirmations/` | trust-gate confirmations (`27`) | append-only |
 
-**Clock high-water (CR-06, RV3-M3).**
-- Only verified `freshness-witness` statements raise `clock_high_water`.
+**Clock high-water (restated in revision 6; the revision-4 witness-only rule of CR-06 is withdrawn, CR5-B-09).**
+- Every ingested verified non-future statement raises `clock_high_water` (revision 5 rule above).
 - A statement of any purpose whose `issued_at` exceeds the local clock by more than the compiled skew (300 seconds) is
-  refused at ingest (`STATEMENT_ISSUED_IN_FUTURE`) and never recorded.
+  refused at ingest (`STATEMENT_ISSUED_IN_FUTURE`) and never recorded. **Revision 6 (CR5-B-08):** such a refusal also makes
+  clock-based currency proofs (P1 window, pins, witnesses) unusable for that unit of work; in-gate proofs (P2) are unaffected.
 - A root-signed TPS field `bootstrap.clock_reset {reset_to, reason}` lowers the high-water after a witness-key
   compromise.
 - Evidence: `P4r4` `RV3-B-A07_issued_at_high_water`.
@@ -454,10 +468,8 @@ Architecture minima, not owner-selectable:
 - `freshness_witness_threshold`;
 - `clock_reset`.
 
-**Proposal (labelled, not a decision): (a), with `pin_max_validity_days` 30, `c3_currency_window_hours` 168 and a
-witness threshold of 2 if (c) is ever chosen.** (a) adds a clock only for pinned machines and C3 windows. It removes the
-stale-pin, unchained-TSS and minted-witness classes on every machine. The cost is operational: CI pins must be
-re-provisioned at least every 30 days, and C3 on long-idle machines needs a fresh confirmation.
+**No proposal** (revision 6, RV5-L4): OP-7 is presented in `21` with its consequences and is not decided or proposed here.
+The revision-4 labelled proposal that stood here is withdrawn.
 
 ## 10. Residuals, restated exactly
 
@@ -475,7 +487,8 @@ re-provisioned at least every 30 days, and C3 on long-idle machines needs a fres
 | RS-1 | **Core.** A machine anchored before a revocation that never receives later metadata cannot know about the revocation. | C1–C2 at any genuine descendant of its anchor. Shown as `ANCHORED(e, method, as-of t, age) CURRENCY_UNPROVEN`, never `current`. Never C3 without a proof. Under (b), bounded by `max_anchor_age_days`. | `12` RT-80, RT-101; `P4r4` matrix: rows admitting revoked R7 are only the stated core and the (d) residual |
 | RS-1b | A C3 decision whose proof is a recent anchoring event (P1) or a witness (P3) can be stale by up to the window. | `c3_currency_window_hours` (P1) or `witness_max_validity_hours` (P3); zero for an in-gate proof (P2) | RT-101 (c), RT-102 |
 | RS-1c | A valid pin provisioned before a revocation admits the stale descendant for C1–C2. | `pin_max_validity_days` | `P4r4` `PIN_WINDOW_bound`; RT-102 |
-| RS-2 | Pin validity, the C3 window and OP-7 (b)/(c) trust the local clock (TA-7). | Clock rollback below `clock_high_water` makes clock-based proofs and pins unusable (fail closed). Only witnesses raise the high-water. Far-future statements are refused. A root-signed reset exists. | RT-56, RT-98 |
+| RS-2 | Pin validity, the C3 window and OP-7 (b)/(c) trust the local clock (TA-7). | (Restated in revision 6.) Clock rollback below `clock_high_water` makes clock-based proofs and pins unusable (fail closed). Every ingested non-future statement raises the high-water on a machine with a verifier trust store. Far-future statements are refused and make clock-based proofs unusable for that unit of work. A root-signed reset exists. Machines without a verifier trust store: RS-2 core. | RT-56, RT-98, RT-148 |
+| RS-2b | (Revision 6, CR5-B-08.) A verifier trust store restored from a backup, with the clock set back into its anchor's C3 window, and **every** statement issued after the backup withheld | the machine accepts C3 against the restored anchor's Trust State as of that anchor; bound: A13 on the machine plus total withholding; any delivered later statement refuses C3 (§5.3) | RT-178; P4r6 residual demonstration |
 | RS-3 | A3 deletes or rewrites its own VTS. | Deletion leaves the machine `UNANCHORED` (fail closed). A3 can forge a human anchor or confirmation in its own VTS (same-user boundary). Pins and decision pins are outside A3's reach under the predicate, and `gov`-run children are confined. | RT-91, RT-103 |
 | RS-4 | A pin provisioned by a party the repository writer controls, or a CI job that runs repository-controlled steps as a user who can write the pin location before `gov`. | Outside TA-9 as restated (§3.5). | procedural; RT-103 (d) |
 | RS-5 | Compromise of freshness-witness keys (OP-7 (c) only). | §3.3: stale selection on witness-reliant machines until root rotation; no state creation | RT-98, RT-104 |

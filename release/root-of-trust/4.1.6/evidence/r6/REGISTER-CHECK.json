@@ -1,0 +1,66 @@
+{
+ "instrument": "register_check (AR-0015)",
+ "checks": {
+  "C1_schema": {
+   "decisions": 35,
+   "failures": []
+  },
+  "C2_rule_completeness": {
+   "rule_ids_defined_in_scope": 107,
+   "rule_ids_named_by_register": 107,
+   "failures": []
+  },
+  "C3_selectors": {
+   "selectors": 34,
+   "failures": []
+  },
+  "C4_restrictors": {
+   "restrictors": 80,
+   "failures": []
+  },
+  "C5_calculator_coverage": {
+   "cs6_rules": 27,
+   "not_load_bearing_in_model": [
+    "H_PUB_REGISTRATION_RESTRICTORS",
+    "H_REG_CONTENT_FIRST_HAND",
+    "H_SIGN_REPRODUCE",
+    "H_VER_BINDS_CANDIDATE",
+    "H_VER_UPSTREAM",
+    "V_ENV_DIVERSITY",
+    "V_PUBLISHED",
+    "V_REGISTRATION_REFERENCED",
+    "V_REJECTED"
+   ],
+   "failures": []
+  },
+  "C6_tests_exist": {
+   "rt_rows_in_plan": 185,
+   "failures": []
+  },
+  "C7_rendering": {
+   "failures": []
+  },
+  "C8_referenced_instruments": {
+   "instruments": [
+    "ADM6",
+    "ATTR6",
+    "CON6",
+    "CSI6",
+    "DA03r6",
+    "ENV6",
+    "FA6",
+    "LAY6",
+    "P4r5u",
+    "P4r6",
+    "SRC6",
+    "UW6"
+   ],
+   "failures": []
+  }
+ },
+ "summary": {
+  "decisions": 35,
+  "failures": 0,
+  "result": "PASS"
+ }
+}

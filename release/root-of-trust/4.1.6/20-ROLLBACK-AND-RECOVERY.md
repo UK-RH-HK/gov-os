@@ -1,6 +1,9 @@
 # Output 20 — Rollback and recovery model
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: a rollback to a previously admitted binary keeps that binary's admission record (`31` R-ADM-7′,
+> RV5-C-A10); re-admission during recovery keeps the verifier trust store (`31` R-ADM-8′); RR-2 is register row DR-25
+> (`29` §4).
 > Revision 5 amendment: §9 Git-delivered use judges a delivered release against its own registration (E7, `23` §12.3); a
 > higher-sequence final without an effective registration is ineligible at use, with no gate needed (RV4-D-A06, RV4-L8).
 > Downgrade detection (E10) is unchanged. Restores and reinstalls run only on an admitted binary (`31`).
@@ -141,5 +144,5 @@ gate (review RV2-A25). A journal committed by A2 is foreign on every clone.
 | ID | Residual | Bound |
 |---|---|---|
 | RR-1 | Automatic rollback may leave an ineligible installation when the failed update's bundle raised the policy. | Fails closed; remedy: complete an update to an eligible release. |
-| RR-2 | On a machine without a per-project record, an A2-delivered older eligible release is accepted as installed content, and `kernel reinstall` uses the lock identity. | Its content must be registered in the machine's effective TPS (E7), with registered precedence and floors joined. Governed use follows anchors and currency. Under OP-7 (a)–(c) an unanchored machine performs no governed mutation. An anchored machine judges the release in its anchored chain, and statements outside the chain are never effective. C3 needs a currency proof. Under OP-7 (d), unanchored use is bounded by the compiled TSS, labelled `FRESHNESS_UNPROVEN`, and never C3. |
+| RR-2 | On a machine without a per-project record, an A2-delivered older eligible release is accepted as installed content, and `kernel reinstall` uses the lock identity. (Revision 6: this is the stated FD-1 shortfall of decision register row DR-25, release selection among eligible releases under OP-11 (a); it was mislabelled a carrier in revision 5, RV5-M5.) | Its content must be registered in the machine's effective TPS (E7), with registered precedence and floors joined. Governed use follows anchors and currency. Under OP-7 (a)–(c) an unanchored machine performs no governed mutation. An anchored machine judges the release in its anchored chain, and statements outside the chain are never effective. C3 needs a currency proof. Under OP-7 (d), unanchored use is bounded by the compiled TSS, labelled `FRESHNESS_UNPROVEN`, and never C3. |
 | RR-3 | A3 deletes the per-project record or the VTS. | As RR-2 on that machine; `UNANCHORED` (RS-3). |

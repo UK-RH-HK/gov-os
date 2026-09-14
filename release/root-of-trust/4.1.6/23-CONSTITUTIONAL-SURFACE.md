@@ -1,6 +1,10 @@
 # Output 23 — Constitutional Surface, total floor semantics and the Overlay Surface
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **Revision 6** closes blocking class **BC5-3** (review r5 RV5-H3) with `34`: registered content is derived first-hand by
+> the registration authority, verification is bound to exactly the registered candidate and kernel, E7 applies AP-5's
+> restrictors, and registration reductions are computed at the verifier with security-classified changes listed per
+> project (§6.1, §10 CS-2, §12.4, §12.5 amended; checker S71–S77).
 > **Revision 5** closes blocking class **BC4-3** (review r4 RV4-H3: release-scoped registration of non-orderable content)
 > under rule FD-1 (`29`): the registration of each release fixes every non-join unit and the kernel tree (new §12). §3.1,
 > §3.2, §6.3, §7, §7.2 and §10 are amended accordingly. Everything review r4 CD4-0 retained (default deny, closed
@@ -316,7 +320,10 @@ The compiled consumer register (§6.5) remains the build gate for any further ke
 | `check <kernel>` | 0 pass; 2 coverage failure (unclassified, ambiguous, structure, YAML profile, **required missing**); 3 floor, pin, membership, **precedence registration** or **migration-operation** violation, or a value stronger than registered; 4 inventory consistency (class weaker than precedence, catch-all, `project_tunable` not overridable, **presence lint**); 5 inventory malformed (including a missing Overlay Surface) |
 | `check-owner <repo> --registrations F` | 0; 2 a required owner constitutional file absent; 3 unconfirmed or changed (§7.2) |
 | `reductions --old A --new B [--lowering-history H]` | 0; 6 a computed reduction not declared (§7) |
-| `selftest` | 0 iff all **56 cases** (S00–S55) behave as expected (`evidence/CSI-selftest.json`: 56 passed, 0 failed) |
+| `selftest` | 0 iff all cases behave as expected (revision 4: 56 cases; revision 5: 71; **revision 6: 78**, `evidence/r6/CSI6-selftest.json`, 78 passed, the 71 revision-5 cases identical) |
+| `verify-registration --registration R --source-kernel K` (revision 6) | 0 the proposal equals the content derived from the custodian's own kernel build; 3 `REGISTRATION_CONTENT_NOT_ESTABLISHED` (`34` R-CON-1) |
+| `registration-reductions --verifier F --referenced IDS` (revision 6) | 0; 6 `REGISTRATION_UNDECLARED_REDUCTION`; 7 `INCOMPLETE`, a referenced registration not held (`34` R-CON-4) |
+| `registration-changes --held A --new B` (revision 6) | 0 no security-classified change; 8 security-classified changes listed for the per-project gate (`34` R-CON-5) |
 
 ### 6.2 Producer and publisher
 
@@ -454,7 +461,7 @@ Evidence: `csi_check.py check-owner` is the reference; selftest S50–S52 give a
 | ID | Residual | Bound | Test |
 |---|---|---|---|
 | CS-1 | The correctness of each classification, direction and Overlay Surface entry is a root-ceremony review responsibility. | Too strict fails closed. Too weak is limited by: the lint (never weaker than precedence; no catch-alls; no optional control; `immutable` only with `pinned`/`equals`); the consumer register; exact precedence registration; directed joins; and computed reductions in both directions. Any remaining weakness needs a root-threshold signature and appears in the `draft-policy` change list. | selftest S23–S25, S53; RT-73…RT-79, RT-100 |
-| CS-2 | **Replaced in revision 5.** One registration ceremony per release (OP-2) fixes source, inputs, content and final together (`30` R-REG-6). Retention no longer widens what later releases may carry (§12.3 rule 5); whether older releases stay eligible is OP-11. | ceremony frequency (`14` RK-17; `21` OP-2) | REG5; selftest S57–S70 |
+| CS-2 | **Restated in revision 6.** One registration ceremony per release (OP-2) fixes source, inputs, environments, content and final together, and each custodian derives the content first-hand (`30` R-REG-3 (g), `34` R-CON-1); verification is bound to the registered candidate and kernel (`34` R-CON-2). Retention no longer widens what later releases may carry (§12.3 rule 5); whether older releases stay eligible is OP-11. | ceremony frequency (`14` RK-17; `21` OP-2) | REG5; selftest S57–S70 |
 
 ## 11. The Overlay Surface (new; CD3-1 (3); CR-02, RV3-M5)
 
@@ -571,13 +578,22 @@ threshold-1 `release-final` restore superseded content in a higher-sequence rele
 Each needs a cumulative `lowering_history` entry and, for every project whose record holds the stronger registration, the
 per-project `policy_lowering` trust gate (`19` §10.6).
 
+**Revision 6 (CR5-B-04; `34` R-CON-4, R-CON-5).** (a) The **verifier** computes these reductions at ingress and at use over every
+registration the effective Trust State references; if one is not held the result is `INCOMPLETE` and E7 refuses the release
+(`registration_history_incomplete`); an undeclared reduction refuses it. (b) For non-orderable units only exact reversion,
+removal and member narrowing are computed. Every other change of a security-classified unit is selected by the registration
+authority and is listed in the per-project `registration_change` gate package before security-relevant use (`registration-changes`,
+exit 8). Evidence: `evidence/r6/CON6-*` (RV5-B-A09 variant regex and tool command listed; RV5-B-A10 reversion refused, withheld
+intermediate `INCOMPLETE`); selftest S73–S77.
+
 ### 12.5 Enforcement points
 
 | Point | Rule |
 |---|---|
-| `gov release build`, canonical CI | `csi_check.py derive-registration` produces the unit map; `check --registrations --release-id` exits 0 on the release's own kernel |
-| Registration ceremony | `gov trust draft-registration` lists every unit that differs from the previous registration and every computed reduction (§12.4) |
-| Verifier at ingress and at use | E7 as §12.3; `19` §6 |
+| `gov release build`, canonical CI | `csi_check.py derive-registration` produces a **proposal** of the unit map (revision 6: never an input to a signature); `check --registrations --release-id` exits 0 on the release's own kernel |
+| Registration ceremony | each custodian builds the kernel from the source it fetched and runs `verify-registration` against the proposal (`34` R-CON-1); `gov trust draft-registration` lists every unit that differs from the previous registration and every computed reduction (§12.4) |
+| Verifier at ingress and at use | E7 as §12.3 with AP-5's restrictors (`34` R-CON-3); reductions over every referenced registration (`34` R-CON-4); `19` §6 |
+| Recorded projects | `registration-changes` lists security-classified changes for the `registration_change` gate (`34` R-CON-5) |
 | Consumers | effective values as §6.3 |
 
 ### 12.6 Evidence (executed; pack checker as amended, real legacy 4.1.5 as the consumer)

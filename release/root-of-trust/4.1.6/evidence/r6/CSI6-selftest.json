@@ -1,0 +1,1912 @@
+{
+ "base": "<scratch>",
+ "cases": [
+  {
+   "id": "S00",
+   "title": "genuine kernel, genuine inventory",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S01",
+   "title": "future unknown constitutional key SECURITY_POLICY.outbound_hosts_allowlist",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_leaves": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.outbound_hosts_allowlist"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S02",
+   "title": "future unknown constitutional file policies/CAPABILITY_ACCEPTANCE_POLICY.yaml",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_files": [
+     "policies/CAPABILITY_ACCEPTANCE_POLICY.yaml"
+    ]
+   }
+  },
+  {
+   "id": "S03",
+   "title": "unknown nested key inside a known map (HUMAN_GATE_POLICY.agent_resolvable_when.bypass)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_leaves": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.bypass"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S04",
+   "title": "role\u2192authority map: backend-engineer L1 -> L4",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=backend-engineer].level",
+      "class": "floor",
+      "op": "level_at_most",
+      "floor": "L1",
+      "kernel": "L4"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S05",
+   "title": "role\u2192authority map: new role superuser L5",
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_leaves": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].name"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].level"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].minimum_tier"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].default_reasoning"
+     }
+    ],
+    "violations": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id]#members",
+      "class": "members",
+      "op": "ids_equal",
+      "missing": [],
+      "unregistered": [
+       "superuser"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S06",
+   "title": "role\u2192authority map: remove change-controller (answers by that id would count as human)",
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].level"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].minimum_tier"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].default_reasoning"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].name"
+     }
+    ],
+    "violations": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id]#members",
+      "class": "members",
+      "op": "ids_equal",
+      "missing": [
+       "change-controller"
+      ],
+      "unregistered": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "S07",
+   "title": "sensitivity/indexing: never_index_classes -> [secret]",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.never_index_classes",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "secret",
+       "restricted"
+      ],
+      "kernel": [
+       "secret"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S08",
+   "title": "sensitivity/indexing: secret patterns emptied",
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=aws-secret-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=private-key-block].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=github-token].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=generic-api-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=password-assignment].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=slack-token].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=stripe-like-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=jwt].regex"
+     }
+    ],
+    "violations": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_path_patterns",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "**/.env",
+       "**/.env.*",
+       "**/*.pem",
+       "**/*.key",
+       "**/id_rsa*",
+       "**/secrets/**",
+       "**/*secret*.yaml",
+       "**/*secret*.yml",
+       "**/*secret*.json",
+       "**/*credentials*"
+      ],
+      "kernel": []
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id]#members",
+      "class": "members",
+      "op": "ids_superset",
+      "missing": [
+       "aws-access-key",
+       "aws-secret-key",
+       "generic-api-key",
+       "github-token",
+       "jwt",
+       "password-assignment",
+       "private-key-block",
+       "slack-token",
+       "stripe-like-key"
+      ],
+      "unregistered": [
+       "none"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S09",
+   "title": "irreversible gate authority: agent_resolvable_when R5 / 0.0 / irreversible",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+      "class": "floor",
+      "op": "ordered_at_most",
+      "floor": "R1",
+      "kernel": "R5"
+     },
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence",
+      "class": "floor",
+      "op": "decimal_at_least",
+      "floor": "0.8",
+      "kernel": 0.0
+     },
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.reversible",
+      "class": "floor",
+      "op": "bool_toward",
+      "floor": true,
+      "kernel": false
+     }
+    ]
+   }
+  },
+  {
+   "id": "S10",
+   "title": "plugin/tool floor: plugins.min_authority L0 and elevated classes reduced",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/TOOL_POLICY.yaml",
+      "key": "TOOL_POLICY.plugins.min_authority",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L2",
+      "kernel": "L0"
+     },
+     {
+      "file": "policies/TOOL_POLICY.yaml",
+      "key": "TOOL_POLICY.plugins.elevated_permission_classes",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "NETWORK_READ",
+       "NETWORK_WRITE",
+       "PACKAGE_INSTALL",
+       "SYSTEM_INSTALL",
+       "DB_WRITE",
+       "CLOUD_WRITE",
+       "CI_TRIGGER",
+       "SECRET_READ",
+       "DEPLOY_STAGING",
+       "DEPLOY_PRODUCTION"
+      ],
+      "kernel": [
+       "SECRET_READ"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S11",
+   "title": "outbound/export: never_export_classes -> [secret]; upstream.forbidden_paths drops spec/**",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/LEARNING_POLICY.yaml",
+      "key": "LEARNING_POLICY.upstream.forbidden_paths",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "product/**",
+       "spec/**",
+       ".governance-runtime/**",
+       "governance/project/**",
+       "archive/**",
+       "**/.env*",
+       "**/*.db",
+       "**/*.sqlite*"
+      ],
+      "kernel": [
+       "product/**",
+       ".governance-runtime/**",
+       "governance/project/**",
+       "archive/**",
+       "**/.env*",
+       "**/*.db",
+       "**/*.sqlite*"
+      ]
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.never_export_classes",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "kernel": [
+       "secret"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S12",
+   "title": "project override controls: never_index_classes rule additive -> overridable",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 2,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "overridable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S13",
+   "title": "project override controls: new earlier rule makes on_secret_in_export_payload overridable",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 0,
+        "kernel": {
+         "key": "SECURITY_POLICY.on_secret_in_export_payload",
+         "mode": "overridable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 1,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 2,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 3,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 4,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.secret_path_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 5,
+        "kernel": {
+         "key": "SECURITY_POLICY.secret_path_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.secret_content_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 6,
+        "kernel": {
+         "key": "SECURITY_POLICY.secret_content_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 7,
+        "kernel": {
+         "key": "SECURITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.raise_for",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 8,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.raise_for",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "ceiling",
+         "kind": "radius",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 9,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "ceiling",
+         "kind": "radius",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 10,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.reversible",
+         "mode": "strengthen_only_bool",
+         "kind": null,
+         "order": null,
+         "strict_value": true,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 11,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.reversible",
+         "mode": "strengthen_only_bool",
+         "kind": null,
+         "order": null,
+         "strict_value": true,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.batch_low_priority",
+         "mode": "overridable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 86
+     }
+    ]
+   }
+  },
+  {
+   "id": "S14",
+   "title": "project override controls: default_mode immutable -> overridable; layers reordered",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "key": "POLICY_PRECEDENCE.layers",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:e468e320b8c1c91c6fe4fa370ab63e3d4c2e7bd04116803d5ae0a51a8164b84e"
+     },
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "key": "POLICY_PRECEDENCE.default_mode",
+      "class": "floor",
+      "op": "equals",
+      "floor": "immutable",
+      "kernel": "overridable"
+     },
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "field": "default_mode",
+        "kernel": "overridable",
+        "registered": "immutable"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S15",
+   "title": "install/update authority: install_kernel L0, update_apply L1",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.install_kernel",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L0"
+     },
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.update_apply",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L1"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S16",
+   "title": "exception authority: grant_policy_exception L1 and exception_relaxable on authority levels",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L1"
+     },
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 0,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": true
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S17",
+   "title": "tool registry: new descriptor with an install command",
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "tools/registry/TOOLS.yaml",
+      "key": "TOOLS_REGISTRY.tools[tool_id]#members",
+      "class": "members",
+      "op": "ids_subset",
+      "missing": [
+       "TOOL-AST-001",
+       "TOOL-CARGO-001",
+       "TOOL-CARGO-002",
+       "TOOL-CARGO-003",
+       "TOOL-CMAKE-001",
+       "TOOL-FS-001",
+       "TOOL-GIT-001",
+       "TOOL-GO-001",
+       "TOOL-LSP-RUST-001",
+       "TOOL-MAKE-001",
+       "TOOL-MAVEN-001",
+       "TOOL-NPM-001",
+       "TOOL-SECRETS-001",
+       "TOOL-SQLITE-001",
+       "TOOL-TEST-001",
+       "TOOL-WEB-001"
+      ],
+      "unregistered": [
+       "TOOL-EVIL-001"
+      ]
+     },
+     {
+      "file": "tools/registry/TOOLS.yaml",
+      "key": "TOOLS_REGISTRY.tools[tool_id=TOOL-EVIL-001]",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:72fbdba17dbf73c33384de84133d3a14d922271bf027dffe6be06eb6ed8707e3"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S18",
+   "title": "hard invariant statement rewritten with id kept",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "constitution/HARD_INVARIANTS.yaml",
+      "key": "HARD_INVARIANTS.invariants[id=INV-008]",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:a80df501c888f4b4bf0dfc37f96e1d184cb7843ea2019481aba1275dfa2ed7bf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S19",
+   "title": "new schema file under the pinned schemas glob",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "schemas/capability-acceptance.schema.json",
+      "class": "pinned_file",
+      "reason": "file digest not registered",
+      "digest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S20",
+   "title": "agent-facing adapter template edited",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "adapters/generic/template.md",
+      "class": "pinned_file",
+      "reason": "file digest not registered",
+      "digest": "sha256:4541110ac10671949f753d25fd3422932079f86ba2147ab7ec7a8334b97d17cd"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S21",
+   "title": "value stronger than registered (resume_control L4 -> L5) without a Trust Policy raise",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "stronger_than_registered": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L5"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S22",
+   "title": "forward compatibility: new constitutional files and their precedence classified by inventory data only (no new class or operator)",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S23",
+   "title": "inventory lint: catch-all project_tunable rule SECURITY_POLICY.* is refused",
+   "expected_exit": 4,
+   "observed_exit": 4,
+   "pass": true,
+   "evidence": {
+    "consistency": [
+     "SECURITY_POLICY.*: wildcard rule too broad for class project_tunable (catch-alls are forbidden)",
+     "SECURITY_POLICY.*: project_tunable but registered precedence is immutable (SECURITY_POLICY.*)"
+    ]
+   }
+  },
+  {
+   "id": "S24",
+   "title": "inventory lint: never_index_classes misclassified project_tunable",
+   "expected_exit": 4,
+   "observed_exit": 4,
+   "pass": true,
+   "evidence": {
+    "consistency": [
+     "SECURITY_POLICY.never_index_classes: project_tunable but registered precedence is additive (SECURITY_POLICY.never_index_classes)"
+    ]
+   }
+  },
+  {
+   "id": "S25",
+   "title": "inventory lint: default allow is refused",
+   "expected_exit": 5,
+   "observed_exit": 5,
+   "pass": true,
+   "evidence": {
+    "malformed": [
+     "inventory default must be 'deny'"
+    ]
+   }
+  },
+  {
+   "id": "S26",
+   "title": "precedence AUTHORITY_POLICY.authority_levels_required.* floor -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 0,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S27",
+   "title": "precedence HUMAN_GATE_POLICY.agent_resolvable_when.max_radius ceiling -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 8,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "ceiling",
+         "kind": "radius",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S28",
+   "title": "precedence SECURITY_POLICY.never_index_classes additive -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 2,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S29",
+   "title": "precedence TOOL_POLICY.approved_licences shrink_only -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 36,
+        "kernel": {
+         "key": "TOOL_POLICY.approved_licences",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "TOOL_POLICY.approved_licences",
+         "mode": "shrink_only",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S30",
+   "title": "precedence TOOL_POLICY.health_check_required strengthen_only_bool -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 34,
+        "kernel": {
+         "key": "TOOL_POLICY.health_check_required",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "TOOL_POLICY.health_check_required",
+         "mode": "strengthen_only_bool",
+         "kind": null,
+         "order": null,
+         "strict_value": true,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S31",
+   "title": "POLICY_PRECEDENCE.yaml deleted (RV3-D-A10 R07)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "rule": "policies/POLICY_PRECEDENCE.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S32",
+   "title": "registered constitutional file removed: policies/SECURITY_POLICY.yaml (RV3-D-A10 R01)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "rule": "policies/SECURITY_POLICY.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S33",
+   "title": "registered constitutional file removed: constitution/HARD_INVARIANTS.yaml (RV3-D-A10 R02)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "constitution/HARD_INVARIANTS.yaml",
+      "rule": "constitution/HARD_INVARIANTS.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S34",
+   "title": "registered constitutional file removed: policies/ENFORCEMENT_MAP.yaml (RV3-D-A10 R03)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/ENFORCEMENT_MAP.yaml",
+      "rule": "policies/ENFORCEMENT_MAP.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S35",
+   "title": "registered constitutional file removed: schemas/adapter-manifest.schema.json (RV3-D-A10 R04)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "schemas/adapter-manifest.schema.json",
+      "rule": "schemas/*.schema.json"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S36",
+   "title": "registered constitutional file removed: roles/ROLES.yaml (RV3-D-A10 R05)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "roles/ROLES.yaml",
+      "rule": "roles/ROLES.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S37",
+   "title": "registered constitutional file removed: adapters/generic/template.md (RV3-D-A10 R06)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "adapters/generic/template.md",
+      "rule": "adapters/*"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S38",
+   "title": "registered constitutional file removed: policies/HUMAN_GATE_POLICY.yaml (RV3-D-A10 R08)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "rule": "policies/HUMAN_GATE_POLICY.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S39",
+   "title": "registered constitutional file removed: policies/AUTHORITY_POLICY.yaml (RV3-D-A10 R09)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "rule": "policies/AUTHORITY_POLICY.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S40",
+   "title": "registered floor leaf deleted: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius (RV3-B I09)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S41",
+   "title": "YAML 1.1 boolean token `on` for a bool_toward floor (RV3-B-A14)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "structure": [
+     {
+      "file": "policies/TOOL_POLICY.yaml",
+      "problem": "yaml_profile: YAML 1.1 boolean token 'on' at line 32 (a string under the single profile)"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S42",
+   "title": "duplicate mapping key in SECURITY_POLICY.yaml",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "structure": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "problem": "yaml_profile: duplicate mapping key 'never_index_classes' at line 31"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S43",
+   "title": "YAML anchor on a constitutional node",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "structure": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "problem": "yaml_profile: anchor &gate at line 4"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S44",
+   "title": "security decision point key MEMORY_POLICY.embedding.provider changed (RV3-B-A16, CR-07)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/MEMORY_POLICY.yaml",
+      "key": "MEMORY_POLICY.embedding.provider",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:38840f39fef4187d11c7029bcda9adafb944ac49dcad42b617c127733680b5c3"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S45",
+   "title": "precedence rules reordered with identical per-key effect (exact registration)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 2,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 3,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "S46",
+   "title": "migration set_overlay_key TOOL_PERMISSIONS.yaml install_authority_roles (not migration-writable)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "migration",
+      "reason": "migration_operation_not_permitted",
+      "problems": [
+       {
+        "index": 0,
+        "op": "set_overlay_key",
+        "target": "TOOL_PERMISSIONS.yaml:install_authority_roles",
+        "problem": "overlay key not registered as migration-writable",
+        "file": "migrations/M-4.1.5-4.1.6.yaml"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S47",
+   "title": "migration target ../../spec/decisions/HDG-0001.yaml (outside governance/overlay)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "migration",
+      "reason": "migration_operation_not_permitted",
+      "problems": [
+       {
+        "index": 0,
+        "op": "set_overlay_key",
+        "target": "../../spec/decisions/HDG-0001.yaml",
+        "problem": "target does not resolve to a registered file directly inside governance/overlay/",
+        "file": "migrations/M-4.1.5-4.1.6.yaml"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S48",
+   "title": "migration lock operation set_lock_field (R-MIG-3)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "migration",
+      "reason": "migration_operation_not_permitted",
+      "problems": [
+       {
+        "index": 0,
+        "op": "set_lock_field",
+        "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+        "file": "migrations/M-4.1.5-4.1.6.yaml"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S49",
+   "title": "migration with only registered targets (note; set_overlay_rule REPOSITORY_CONTRACT paths; PROJECT_POLICY.governance.overlay_dir)",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S50",
+   "title": "owner constitutional file slot registered by the Trust Policy, file absent",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "missing": [
+     {
+      "path": "spec/contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+      "consumers": [
+       "capability_acceptance_gate"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S51",
+   "title": "owner constitutional file present, digest not confirmed on this machine",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "unconfirmed": [
+     {
+      "path": "spec/contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+      "digest": "sha256:0d06ae58dfe669a115ae9a5c3044cffd191b93d9f1e6dfd95b9c0a04241e25b4",
+      "consumers": [
+       "capability_acceptance_gate"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S52",
+   "title": "owner constitutional file present and confirmed",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S53",
+   "title": "TPS v2 registers never_index_classes immutable (was additive): computed reduction without lowering_history",
+   "expected_exit": 6,
+   "observed_exit": 6,
+   "pass": true,
+   "evidence": {
+    "undeclared": [
+     {
+      "subject": "POLICY_PRECEDENCE:SECURITY_POLICY.never_index_classes",
+      "kind": "precedence_reduction",
+      "direction": "add",
+      "old_mode": "additive",
+      "new_mode": "immutable",
+      "admits_new_weakening": false,
+      "removes_admitted_strengthening": true,
+      "exception_relaxation_added": false
+     }
+    ]
+   }
+  },
+  {
+   "id": "S54",
+   "title": "same reduction declared in the cumulative lowering_history",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S55",
+   "title": "exception_relaxable set on a registered rule in the kernel only (exact registration)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 19,
+        "kernel": {
+         "key": "CHANGE_POLICY.rollback.keep_snapshots",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": true
+        },
+        "registered": {
+         "key": "CHANGE_POLICY.rollback.keep_snapshots",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S56",
+   "title": "revision-4 retention form: two permitted digests for one pinned leaf (RV4-B-A08 shape) is malformed",
+   "expected_exit": 5,
+   "observed_exit": 5,
+   "pass": true,
+   "evidence": {
+    "malformed": [
+     "REGISTRATION_NOT_SINGLE_VALUED: leaf:SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex registers 2 values (23 \u00a712.2)"
+    ]
+   }
+  },
+  {
+   "id": "S57",
+   "title": "registration mode: the registered release's own kernel",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S58",
+   "title": "release not in the effective registration set (e.g. a forged final at a new sequence)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "registration",
+      "reason": "release_unregistered: no registration for this release in the effective registration set (23 \u00a712.3)"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S59",
+   "title": "pinned leaf differs from the value registered for this release (aws-access-key regex)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:d0d907f8e5b18639cd6a2d369b1ad6f3f0d2eb6211f556d15cce79530c3ef924"
+     },
+     {
+      "class": "registration",
+      "reason": "kernel_tree_digest_mismatch: the kernel is not the registered release content (23 \u00a712.3)",
+      "kernel": "sha256:596c895c1d884db6d5f6ae42246d0b1bdc07d001045e41fbd32edeca4bd5c46f",
+      "registered": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S60",
+   "title": "only a project_tunable leaf (ARCHIVE_POLICY.archive_root) changed: kernel tree digest differs from the registered release (release-final selects nothing)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "registration",
+      "reason": "kernel_tree_digest_mismatch: the kernel is not the registered release content (23 \u00a712.3)",
+      "kernel": "sha256:0d775668330ef0f5211e0bca36a6e17f0732e5dad9ae51d36bb4b8b9ab86761a",
+      "registered": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S61",
+   "title": "registration set rewrites a registered release (append-only)",
+   "expected_exit": 5,
+   "observed_exit": 5,
+   "pass": true,
+   "evidence": {
+    "malformed": [
+     "REGISTRATION_REWRITE: {\"release_id\": \"4.1.6\"}"
+    ]
+   }
+  },
+  {
+   "id": "S62",
+   "title": "two release ids registered at one sequence",
+   "expected_exit": 5,
+   "observed_exit": 5,
+   "pass": true,
+   "evidence": {
+    "malformed": [
+     "REGISTRATION_SEQUENCE_EQUIVOCATION: {\"release_ids\": [\"4.1.6\", \"4.1.6-bis\"], \"sequence\": 1600}"
+    ]
+   }
+  },
+  {
+   "id": "S63",
+   "title": "a later registration restores a superseded value (registration_reversion) without lowering_history",
+   "expected_exit": 6,
+   "observed_exit": 6,
+   "pass": true,
+   "evidence": {
+    "undeclared": [
+     {
+      "subject": "registration:4.1.8:leaf:SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+      "kind": "registration_reversion",
+      "release_id": "4.1.8",
+      "reverts_to_value_of": "4.1.6",
+      "supersedes_value_of": "4.1.7"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S64",
+   "title": "the same reversion declared in lowering_history",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S65",
+   "title": "migration file differs from the migration registered for this release",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "migrations/M-099.yaml",
+      "class": "transaction_input",
+      "reason": "migration file digest not registered for this release",
+      "digest": "sha256:736f227c3e86193aa775f274ee1b0e4fc9f89b8127656001ec2e9f6f693c357d"
+     },
+     {
+      "class": "registration",
+      "reason": "kernel_tree_digest_mismatch: the kernel is not the registered release content (23 \u00a712.3)",
+      "kernel": "sha256:4b4e74225a76be586f130829922a93b4e348a9888b9c7503ae053dcde3d7542d",
+      "registered": "sha256:d608dcf94a6e2c886a9a5ac2a9efe75bc07f4748200b6bddb6ac151442b18257"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S66",
+   "title": "owner binding group: contract Markdown v2 with compiled YAML v1, both sets confirmed by valid pins (RV4-L10)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "changed": [
+     {
+      "group": "capability-acceptance-contract",
+      "digest": "sha256:2c6d642c136098f2c6ffb0ec72eca22eb2aa20686a360175c0f09072886b39ab",
+      "confirmed_sets": [
+       "sha256:6abd3d4fcccf3dc84c8e49e3e6e3b0d72b85be1943faa9ad81d747efd1cca0d0",
+       "sha256:3b52aca78c0cb7f6847309fe48336dbdadda2c7038ad11555c98748be2a87a9f"
+      ],
+      "members": [
+       [
+        "spec/contracts/CAC.md",
+        "sha256:91bcba02fe9d79b92a2aca248f2338da13553f1634b6e2d66423e9441ebc8fb9"
+       ],
+       [
+        "spec/contracts/CAC.yaml",
+        "sha256:09bfcc6a14b83e2192b8673677725c84883ee9cd0c70e45c9ec09daa8f2b2847"
+       ]
+      ],
+      "consumers": [
+       "capability_acceptance_gate"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S67",
+   "title": "owner binding group: matching v2 set",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S69",
+   "title": "presence is release-scoped: the older registered release lacks a member the newer release introduced (no required-missing)",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S70",
+   "title": "a later registration removes a unit the previous registration had (registration_unit_removed) without lowering_history",
+   "expected_exit": 6,
+   "observed_exit": 6,
+   "pass": true,
+   "evidence": {
+    "undeclared": [
+     {
+      "subject": "registration:4.1.7:leaf:SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+      "kind": "registration_unit_removed",
+      "release_id": "4.1.7",
+      "present_in": "4.1.6"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S68",
+   "title": "additive collection member added by the kernel but not in the release's registered member-id set",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id]#members",
+      "class": "members",
+      "op": "ids_superset",
+      "missing": [],
+      "unregistered": [
+       "gcp-api-key"
+      ]
+     },
+     {
+      "class": "registration",
+      "reason": "kernel_tree_digest_mismatch: the kernel is not the registered release content (23 \u00a712.3)",
+      "kernel": "sha256:41ea94b05160a2a7d63be98e654e1c369f9dc828866ad3d4e2e4eff763c9d7ff",
+      "registered": "sha256:f6a0e33f3fb359e8376ff4ec38925123202b94fcffd8dd88d08f825dec89bc63"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S71",
+   "title": "verify-registration: proposal equals the content derived first-hand from the fetched source",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S72",
+   "title": "verify-registration: proposal derived by CI from a final whose kernel differs from the fetched source (RV5-D-A01)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S73",
+   "title": "verifier reductions: undeclared exact reversion over the referenced registrations (RV5-B-A10 (i))",
+   "expected_exit": 6,
+   "observed_exit": 6,
+   "pass": true,
+   "evidence": {
+    "undeclared": [
+     {
+      "subject": "registration:4.1.8:leaf:SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+      "kind": "registration_reversion",
+      "release_id": "4.1.8",
+      "reverts_to_value_of": "4.1.6",
+      "supersedes_value_of": "4.1.7"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S74",
+   "title": "verifier reductions: the intermediate registration is referenced but withheld (RV5-B-A10 (ii)) -> INCOMPLETE",
+   "expected_exit": 7,
+   "observed_exit": 7,
+   "pass": true,
+   "evidence": {
+    "missing": [
+     "4.1.7"
+    ]
+   }
+  },
+  {
+   "id": "S75",
+   "title": "registration changes: non-identical weakening of the aws-access-key regex is listed for the gate package (RV5-B-A09)",
+   "expected_exit": 8,
+   "observed_exit": 8,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S76",
+   "title": "registration changes: a tool descriptor (command) change is listed for the gate package (RV5-B-A09 tool command)",
+   "expected_exit": 8,
+   "observed_exit": 8,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S77",
+   "title": "registration changes: identical non-join content (only the kernel tree of tunable leaves may differ) lists nothing",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  }
+ ],
+ "passed": 78,
+ "failed": 0
+}

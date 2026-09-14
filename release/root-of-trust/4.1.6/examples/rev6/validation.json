@@ -1,0 +1,154 @@
+{
+  "first_contact_code_of_example_manifest": "gov-fc:6f67640b:10:a849c31e8dda643fba7c8c67a1727d378e6bfb0deda93cc2543541fd847c373a",
+  "generator": "make_rev6.py (AR-0015)",
+  "instances": {
+    "admission-record.example.json": {
+      "errors": [],
+      "schema": "admission-record.schema.json",
+      "valid": true
+    },
+    "binary-reproduction.payload.example.json": {
+      "errors": [],
+      "schema": "binary-reproduction.schema.json",
+      "valid": true
+    },
+    "environment-manifest.example.json": {
+      "errors": [],
+      "schema": "environment-manifest.schema.json",
+      "valid": true
+    },
+    "environment-reproduction.payload.example.json": {
+      "errors": [],
+      "schema": "environment-reproduction.schema.json",
+      "valid": true
+    },
+    "first-contact-manifest.example.json": {
+      "errors": [],
+      "schema": "first-contact-manifest.schema.json",
+      "valid": true
+    },
+    "input-manifest.example.json": {
+      "errors": [],
+      "schema": "input-manifest.schema.json",
+      "valid": true
+    },
+    "registration-revocation.payload.example.json": {
+      "errors": [],
+      "schema": "registration-revocation.schema.json",
+      "valid": true
+    },
+    "release-registration.payload.example.json": {
+      "errors": [],
+      "schema": "release-registration.schema.json",
+      "valid": true
+    },
+    "verification-attestation.payload.example.json": {
+      "errors": [],
+      "schema": "verification-attestation.schema.json",
+      "valid": true
+    }
+  },
+  "refused_revision5_shapes": {
+    "admission-record v1 shape (state_fingerprint)": {
+      "errors": [
+        "'first_contact_code' is a required property",
+        "'governance-os.admission-record/2' was expected",
+        "Additional properties are not allowed ('state_fingerprint' was unexpected)"
+      ],
+      "schema": "admission-record.schema.json",
+      "valid": false
+    },
+    "binary-reproduction v1 shape (environment_digest)": {
+      "errors": [
+        "'environment_id' is a required property",
+        "'git_tree' is a required property",
+        "'https://agentic-engineering-os/statement/binary-reproduction/v2' was expected",
+        "Additional properties are not allowed ('environment_digest' was unexpected)"
+      ],
+      "schema": "binary-reproduction.schema.json",
+      "valid": false
+    },
+    "first-contact manifest with an extra selector field": {
+      "errors": [
+        "Additional properties are not allowed ('channel_quorum' was unexpected)"
+      ],
+      "schema": "first-contact-manifest.schema.json",
+      "valid": false
+    },
+    "input-manifest v1 shape (build_image_digest, no environments)": {
+      "errors": [
+        "'environments' is a required property",
+        "'governance-os.input-manifest/2' was expected",
+        "Additional properties are not allowed ('build_image_digest' was unexpected)"
+      ],
+      "schema": "input-manifest.schema.json",
+      "valid": false
+    },
+    "registration-revocation with no revoked statement": {
+      "errors": [
+        "[] is too short"
+      ],
+      "schema": "registration-revocation.schema.json",
+      "valid": false
+    },
+    "release-registration v1 shape (no environments, no git_tree)": {
+      "errors": [
+        "'environments' is a required property",
+        "'git_tree' is a required property",
+        "'https://agentic-engineering-os/statement/release-registration/v2' was expected"
+      ],
+      "schema": "release-registration.schema.json",
+      "valid": false
+    },
+    "root purpose with threshold 1 (KS-14)": {
+      "control_threshold_2_valid": true,
+      "errors": [
+        "1 is less than the minimum of 2"
+      ],
+      "valid": false
+    },
+    "verification-attestation without kernel_tree_digest": {
+      "errors": [
+        "'kernel_tree_digest' is a required property"
+      ],
+      "schema": "verification-attestation.schema.json",
+      "valid": false
+    }
+  },
+  "schemas_valid": {
+    "admission-record.schema.json": true,
+    "artifact-statement.schema.json": true,
+    "binary-reproduction.schema.json": true,
+    "build-attestation.schema.json": true,
+    "certification-statement.schema.json": true,
+    "constitutional-surface-inventory.schema.json": true,
+    "dsse-envelope.schema.json": true,
+    "environment-manifest.schema.json": true,
+    "environment-reproduction.schema.json": true,
+    "first-contact-manifest.schema.json": true,
+    "framework-lock-3.0.0.schema.json": true,
+    "freshness-witness.schema.json": true,
+    "input-manifest.schema.json": true,
+    "legacy-identity-statement.schema.json": true,
+    "profile-statement.schema.json": true,
+    "registration-revocation.schema.json": true,
+    "release-registration.schema.json": true,
+    "release-statement.schema.json": true,
+    "revocation-statement.schema.json": true,
+    "trust-base-manifest.schema.json": true,
+    "trust-decision-pin.schema.json": true,
+    "trust-format.schema.json": true,
+    "trust-gate-confirmation.schema.json": true,
+    "trust-policy-statement.schema.json": true,
+    "trust-root.schema.json": true,
+    "trust-state-pin.schema.json": true,
+    "trust-state-statement.schema.json": true,
+    "verification-attestation.schema.json": true
+  },
+  "verdicts": {
+    "every_instance_valid": true,
+    "every_schema_valid": true,
+    "every_withdrawn_shape_refused": true,
+    "root_threshold_2_control_valid": true
+  }
+}

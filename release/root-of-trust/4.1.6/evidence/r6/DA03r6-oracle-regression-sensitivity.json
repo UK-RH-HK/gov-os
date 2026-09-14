@@ -1,0 +1,748 @@
+{
+ "instrument": "revision-6 conformance oracle P4r6 (loads P4r5 and P4r4)",
+ "base": {
+  "revision_6_scenarios": 28,
+  "revision_6_holding": 28,
+  "revision_6_failing": [],
+  "expected_ACCEPTED_rows_that_are_attacks": [],
+  "p4r5_scenarios_under_r6": 65,
+  "p4r5_refusal_or_control_preserved": 65,
+  "p4r5_holding_with_unchanged_expectation": 65
+ },
+ "section1_D_A03_verbatim_on_P4r4": [
+  {
+   "mutant": "D-A8-omits-candidate",
+   "rule": "25 A8: the candidate is in the negative set check",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-A4b-ignores-REJECTED",
+   "rule": "25 A4b: a REJECTED attestation of the candidate refuses",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-A4a-source-not-compared",
+   "rule": "25 A4a: the build attestation's source equals the TBM source",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-A4b-attestation-not-TSS-referenced",
+   "rule": "25 A4b: the ACCEPTED attestation is referenced by the effective TSS",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-A5-reference-not-required",
+   "rule": "25 A5: the effective TSS references the artefact",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-A7-disabled",
+   "rule": "25 A7: TBM below the accepted-TBM high-water refuses",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-A9-not-applied-to-binaries",
+   "rule": "25 A9: binary acceptance needs C3 (anchor + currency proof)",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": true,
+   "scenarios_that_fail": [],
+   "failing_count": 0,
+   "detected": false
+  },
+  {
+   "mutant": "D-inclusion-without-held",
+   "rule": "24 \u00a73.4 rule 1: the anchored statement must be held",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-inclusion-without-held"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-unchained-above-anchor-not-regression",
+   "rule": "24 \u00a73.4 rule 4: unchained statements above the anchor make the state REGRESSION",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-unchained-above-anchor-not-regression"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-below-anchor-allows-C1",
+   "rule": "24 \u00a74.3: BELOW_ANCHOR allows C0 only",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-below-anchor-allows-C1",
+    "p4r5_under_r6:RET-D-inclusion-without-held"
+   ],
+   "failing_count": 2,
+   "detected": true
+  },
+  {
+   "mutant": "D-pin-validity-cap-not-checked",
+   "rule": "24 \u00a73.2: valid_until - provisioned_at <= pin_max_validity_days",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-pin-validity-cap-not-checked"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-witness-for-any-tss",
+   "rule": "24 \u00a73.3: a witness is honoured only when it names the effective TSS",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-witness-for-any-tss"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-witness-replay-not-refused",
+   "rule": "24 \u00a73.3: a witness older than the newest accepted witness is refused",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-witness-replay-not-refused"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-c2-on-incomplete",
+   "rule": "24 \u00a74.3: INCOMPLETE refuses C2",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-c2-on-incomplete"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-admissibility-ignores-artifacts",
+   "rule": "17 S4 (d): a TSS never drops a lower artifacts[] reference",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-admissibility-ignores-artifacts"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-tps-prior-chain-not-checked",
+   "rule": "17 S3: a top TPS must chain every held lower TPS",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-tps-prior-chain-not-checked"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-lift-attestation-not-TSS-referenced",
+   "rule": "17 MS-2: the lifting attestation is referenced by the effective TSS",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-lift-attestation-not-TSS-referenced"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-op7-order-c-above-a",
+   "rule": "19 \u00a710.6: op7_mode order (b) > (a) > (c) > (d)",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-op7-order-c-above-a"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-decision-pin-expiry-not-checked",
+   "rule": "27 \u00a73.2: an expired decision pin authorises nothing",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-decision-pin-expiry-not-checked"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "D-local-terminal-only-ignored",
+   "rule": "27 \u00a73.2: a decision pin never approves a local_terminal_only kind",
+   "target": "P4r4",
+   "occurrences": 1,
+   "superseded_function": false,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:RET-D-local-terminal-only-ignored"
+   ],
+   "failing_count": 1,
+   "detected": true
+  }
+ ],
+ "section2_verify_artifact_rules_re_expressed_on_accept_binary_r6": [
+  {
+   "mutant": "R6-A8-omits-candidate",
+   "re_expresses": "D-A8-omits-candidate",
+   "rule": "25 AP-4: the registered candidate is in the negative-set check",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A8_candidate_revoked",
+    "r6:R6-AP-R2_registered_candidate_revoked"
+   ],
+   "failing_count": 2,
+   "detected": true
+  },
+  {
+   "mutant": "R6-A4b-ignores-REJECTED",
+   "re_expresses": "D-A4b-ignores-REJECTED",
+   "rule": "25 AP-5: a REJECTED attestation of the registered candidate refuses",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A4b_rejected_attestation_held",
+    "p4r5_under_r6:VA5-03_candidate_rejected",
+    "r6:R6-AP5r_trust_state_revocation_does_not_clear_REJECTED"
+   ],
+   "failing_count": 3,
+   "detected": true
+  },
+  {
+   "mutant": "R6-A4a-source-not-compared",
+   "re_expresses": "D-A4a-source-not-compared",
+   "rule": "25 AP-6: reproductions count only for the registered source",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A4a_reproductions_name_another_source"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-A4b-attestation-not-registered",
+   "re_expresses": "D-A4b-attestation-not-TSS-referenced",
+   "rule": "25 AP-5: only attestations the registration lists count",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A4b_attestation_not_listed_by_registration"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-A5-publication-not-required",
+   "re_expresses": "D-A5-reference-not-required",
+   "rule": "25 AP-7: the selected TSS publishes the digest",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A5_registered_reproduced_not_published"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-A7-disabled",
+   "re_expresses": "D-A7-disabled",
+   "rule": "25 AP-8: TBM below the accepted-TBM high-water refuses",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A7_older_binary_after_newer_accepted",
+    "p4r5_under_r6:RV3-D-A13r5_older_binary_after_newer"
+   ],
+   "failing_count": 2,
+   "detected": true
+  },
+  {
+   "mutant": "R6-A9-not-applied",
+   "re_expresses": "D-A9-not-applied-to-binaries",
+   "rule": "25 AP-3: binary acceptance needs C3 and a currency proof covering the selected TSS",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-A9_no_currency_proof_aged_anchor",
+    "p4r5_under_r6:AP-R5_p1_proof_does_not_cover_later_descendant",
+    "p4r5_under_r6:CLOCK-RV4-B-A13_stateful_machine_clock_set_back",
+    "p4r5_under_r6:RV3-D-A15r5_revoked_binary_pinned_ci",
+    "r6:R6-CLOCK-CR5-B-08_restored_store_clock_back_newer_statements_delivered"
+   ],
+   "failing_count": 5,
+   "detected": true
+  }
+ ],
+ "section3_revision_5_rules_on_revision_6_functions": [
+  {
+   "mutant": "R6-registration-not-referenced",
+   "rule": "25 AP-5: registration referenced by the selected TSS",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_registration_not_referenced_by_tss"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-registration-equivocation",
+   "rule": "23 \u00a712.2: two registrations for one release refuse",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_registration_equivocation"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-target",
+   "rule": "25 AP-5: target registered",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_target_not_registered"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-final-restrictor",
+   "rule": "25 AP-5: registered final with the registered source and candidate",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_final_source_differs_from_registration"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-single-signature",
+   "rule": "25 AP-6: one-signature reproductions only",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_one_statement_two_reproducer_signatures"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-count-statements",
+   "rule": "25 AP-6: quorum counts distinct keys",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_one_key_two_statements"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-conflict",
+   "rule": "25 AP-6: a conflicting reproduction refuses",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_conflicting_reproduction",
+    "p4r5_under_r6:VA5-B-prime2_two_reproducer_keys_honest_reproductions_held",
+    "r6:R6-AP5r_trust_state_revocation_does_not_clear_conflict"
+   ],
+   "failing_count": 3,
+   "detected": true
+  },
+  {
+   "mutant": "R6-revoked-reproduction-counted",
+   "rule": "25 AP-4: revoked reproductions never count",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_revoked_reproduction_not_counted"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-revoked-attestation-counted",
+   "rule": "25 AP-4: revoked attestations never count",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_revoked_attestation_not_counted"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-tbm-source",
+   "rule": "25 AP-8: TBM source equals the registration",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_tbm_source_differs"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-ftc",
+   "rule": "05 \u00a73 FTC on every root version",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_ftc_reproducer_key_shared",
+    "p4r5_under_r6:AP-R5_ftc_withdrawn_purpose_granted",
+    "r6:R6-KS14_root_threshold_1"
+   ],
+   "failing_count": 3,
+   "detected": true
+  },
+  {
+   "mutant": "R6-descendant-proof",
+   "rule": "24 \u00a74.4 (CR4-B-07 option 1): a P1 proof covers only the TSS it names",
+   "target": "r5",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:AP-R5_p1_proof_does_not_cover_later_descendant",
+    "r6:R6-OP3-B-RV5-L9_mode_B_update_without_proof_naming_publishing_TSS"
+   ],
+   "failing_count": 2,
+   "detected": true
+  },
+  {
+   "mutant": "R6-decision-pin-max-validity",
+   "rule": "27 \u00a73.2 (CR4-B-09)",
+   "target": "r5",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:GATE-CR4-B-09_decision_pin_beyond_maximum_validity"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-first-run-record",
+   "rule": "25 AP-8 (CR4-B-08)",
+   "target": "r5",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:A7-CR4-B-08_development_binary_does_not_poison_high_water"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-clock-high-water",
+   "rule": "24 \u00a78 (RV4-M4)",
+   "target": "r5",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:CLOCK-RV4-B-A13_stateful_machine_clock_set_back"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-referenced",
+   "rule": "19 E7: registration referenced by the effective TSS",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:E7-stale_machine_without_the_registration"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-units",
+   "rule": "19 E7: units and final equal the release's registration",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "p4r5_under_r6:E7-RV4-B-A08_superseded_unit_under_the_registered_release_id"
+   ],
+   "failing_count": 1,
+   "detected": true
+  }
+ ],
+ "section4_revision_6_rules": [
+  {
+   "mutant": "R6-registration-revocation",
+   "rule": "25 AP-4 r6: the registration is not revoked",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP-R2b_registration_revoked"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-final-revocation",
+   "rule": "25 AP-4 r6: the registered final is not revoked",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP-R1_registered_final_revoked"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-candidate-binding",
+   "rule": "25 AP-5 / 34 R-CON-2: attestations for exactly the registered candidate",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP-R3_attestation_for_another_candidate_same_source"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-kernel-binding",
+   "rule": "25 AP-5 / 34 R-CON-2: attestations for the registered kernel tree",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP-kernel_attestation_for_other_kernel"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-final-kernel",
+   "rule": "25 AP-5 r6: the registered final carries the registered kernel tree",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP-kernel_final_kernel_differs_from_registration"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-min-binary-version",
+   "rule": "25 AP-4: binary version >= min_binary_version",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP-R4_binary_below_min_binary_version"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-revocation-authority-conflict",
+   "rule": "30 R-REP-5' (CR5-B-01 (i))",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP5r_trust_state_revocation_does_not_clear_conflict"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-revocation-authority-REJECTED",
+   "rule": "25 AP-5r (CR5-B-01 (ii))",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-AP5r_trust_state_revocation_does_not_clear_REJECTED"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-ks14",
+   "rule": "05 \u00a73 KS-14 (CR5-B-11)",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-KS14_root_threshold_1"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-restrictors",
+   "rule": "34 R-CON-3: E7 applies AP-5's restrictors",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-E7-B-A06_registration_without_verification_record",
+    "r6:R6-E7-D-A01_attacker_candidate_and_final_weak_kernel",
+    "r6:R6-E7-D-A01_op4_no_one_everyday_key",
+    "r6:R6-E7-D-A01_variant_registration_names_attested_candidate",
+    "r6:R6-E7-REJECTED_held",
+    "r6:R6-E7-candidate_not_held"
+   ],
+   "failing_count": 6,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-verification-count",
+   "rule": "34 R-CON-3: OP-8 attestations for the registered candidate and kernel",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-E7-B-A06_registration_without_verification_record",
+    "r6:R6-E7-D-A01_attacker_candidate_and_final_weak_kernel",
+    "r6:R6-E7-D-A01_op4_no_one_everyday_key"
+   ],
+   "failing_count": 3,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-candidate-held",
+   "rule": "34 R-CON-3: the registered candidate held and verifying (mutant: the registered final stands in for an absent candidate)",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-E7-candidate_not_held"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-final-promoted",
+   "rule": "34 R-CON-3: the final promoted from the registered candidate",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-E7-D-A01_variant_registration_names_attested_candidate"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-E7-REJECTED",
+   "rule": "34 R-CON-3: a held REJECTED attestation refuses",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-E7-REJECTED_held"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-clock-future",
+   "rule": "24 \u00a78 r6 (CR5-B-08): future-refused statements make clock-based proofs unusable",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-CLOCK-CR5-B-08_restored_store_clock_back_newer_statements_delivered"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-ceremony-first-hand-content",
+   "rule": "34 R-CON-1: custodians derive content first-hand",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-CER-D-A01_ceremony_derives_content_first_hand"
+   ],
+   "failing_count": 1,
+   "detected": true
+  },
+  {
+   "mutant": "R6-ceremony-first-hand-records",
+   "rule": "30 R-REG-3 (d) r6: first-hand records for exactly the candidate",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-CER-REJECTED_record_for_candidate",
+    "r6:R6-CER-records_for_another_candidate",
+    "r6:R6-CER-records_not_first_hand"
+   ],
+   "failing_count": 3,
+   "detected": true
+  },
+  {
+   "mutant": "R6-mode-B-currency",
+   "rule": "21 OP-3 mode B (RV5-L9): a proof naming the publishing TSS per update",
+   "target": "r6",
+   "occurrences": 1,
+   "scenarios_that_fail": [
+    "r6:R6-OP3-B-RV5-L9_mode_B_update_without_proof_naming_publishing_TSS"
+   ],
+   "failing_count": 1,
+   "detected": true
+  }
+ ],
+ "summary": {
+  "D_A03_mutants": 20,
+  "retained_rule_mutants_detected": "13/13",
+  "re_expressed_verify_artifact_rules_detected": "7/7",
+  "D_A03_normative_rules_with_a_detecting_scenario": "20/20",
+  "revision_5_rule_mutants_detected_on_revision_6_oracle": "17/17",
+  "revision_6_rule_mutants_detected": "18/18",
+  "not_detected": [],
+  "errors_or_crashes": []
+ }
+}

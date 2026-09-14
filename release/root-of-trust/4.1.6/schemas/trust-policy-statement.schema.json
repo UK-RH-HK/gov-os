@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-policy-statement.schema.json",
   "title": "trust-policy-statement",
-  "description": "PROPOSED (RoT-1 revision 4). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory schema 2 (23: presence, exact precedence registration, Overlay Surface, owner-domain slots), eligibility including historical releases and optional production sources (OP-2 S1), install authority, gating, bootstrap (OP-6, OP-7, pin-currency parameters, clock reset), cumulative prior_policies and lowering_history (computed reductions in both directions and over the non-surface fields, 19 \u00a710.6), unrevocation, optional state chain reset.",
+  "description": "PROPOSED (RoT-1 revision 4). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory schema 2 (23: presence, exact precedence registration, Overlay Surface, owner-domain slots), eligibility including historical releases and optional production sources (OP-2 S1), install authority, gating, bootstrap (OP-6, OP-7, pin-currency parameters, clock reset), cumulative prior_policies and lowering_history (computed reductions in both directions and over the non-surface fields, 19 §10.6), unrevocation, optional state chain reset. Revision 6 (PROPOSED): bootstrap.channel_quorum may only raise the compiled first-contact quorum; bootstrap.admitter_digests is the evaluator binding list; registration.environment_diversity encodes OP-16 (b).",
   "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -340,12 +340,12 @@
         "pin_max_validity_days": {
           "type": "integer",
           "minimum": 1,
-          "description": "maximum valid_until - provisioned_at of a state pin (24 \u00a73.2)"
+          "description": "maximum valid_until - provisioned_at of a state pin (24 §3.2)"
         },
         "c3_currency_window_hours": {
           "type": "integer",
           "minimum": 1,
-          "description": "an anchoring event is a currency proof for C3 within this window (24 \u00a74.4 P1)"
+          "description": "an anchoring event is a currency proof for C3 within this window (24 §4.4 P1)"
         },
         "max_anchor_age_days": {
           "oneOf": [
@@ -412,17 +412,16 @@
         },
         "channel_quorum": {
           "type": "integer",
-          "enum": [
-            1,
-            2
-          ]
+          "minimum": 1,
+          "description": "OP-13; may only raise the admitter's compiled first-contact quorum (32 FC-4)"
         },
         "admitter_digests": {
-          "type": "array",
-          "items": {
+          "type": "object",
+          "additionalProperties": {
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$"
-          }
+          },
+          "description": "target -> digest of the registered gov-admit; the evaluator binding list (32 FC-8)"
         },
         "workstation_record_max_validity_days": {
           "type": [
@@ -484,6 +483,10 @@
         },
         "binary_digests_registered": {
           "type": "boolean"
+        },
+        "environment_diversity": {
+          "type": "boolean",
+          "description": "OP-16 (b) (33 R-BENV-5)"
         }
       }
     }

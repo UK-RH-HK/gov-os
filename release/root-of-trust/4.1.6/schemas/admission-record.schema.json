@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/admission-record/1",
-  "title": "Local admission record (never signed; RoT-1 revision 5, PROPOSED; 31 R-ADM-7)",
-  "x-schema-version": "1.0.0",
+  "$id": "https://agentic-engineering-os/schemas/admission-record/2",
+  "title": "Local admission record v2 (never signed; RoT-1 revision 6, PROPOSED; 31 R-ADM-7′). Held only inside the verifier trust store as vts-<lineage prefix>/admissions/<binary digest>.json; a record anywhere else is ignored (GB-1′).",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -11,7 +11,7 @@
     "target",
     "release_id",
     "lineage",
-    "state_fingerprint",
+    "first_contact_code",
     "admitted_at",
     "admitter_digest",
     "valid_until",
@@ -19,7 +19,7 @@
   ],
   "properties": {
     "schema": {
-      "const": "governance-os.admission-record/1"
+      "const": "governance-os.admission-record/2"
     },
     "binary_digest": {
       "type": "string",
@@ -34,10 +34,6 @@
     "lineage": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
-    },
-    "state_fingerprint": {
-      "type": "string",
-      "pattern": "^gov-state:[0-9a-f]{8}:[0-9]+:[0-9a-f]{32}$"
     },
     "admitted_at": {
       "type": "string",
@@ -56,6 +52,11 @@
     },
     "location_protected": {
       "type": "boolean"
+    },
+    "first_contact_code": {
+      "type": "string",
+      "pattern": "^gov-fc:[0-9a-f]{8}:[0-9]+:[0-9a-f]{64}$",
+      "description": "the code agreed across the OP-13 sources (32 §3)"
     }
   }
 }

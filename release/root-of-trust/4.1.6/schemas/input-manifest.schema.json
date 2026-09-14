@@ -1,21 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/input-manifest/1",
-  "title": "Build-input manifest (unsigned; digest registered; RoT-1 revision 5, PROPOSED; 30 \u00a74.2)",
-  "x-schema-version": "1.0.0",
+  "$id": "https://agentic-engineering-os/schemas/input-manifest/2",
+  "title": "Build-input manifest v2 (unsigned; digest registered; RoT-1 revision 6, PROPOSED; 30 §4.2, 33 §3)",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema",
     "toolchain",
     "lockfile_sha256",
-    "build_image_digest",
     "build_profile",
-    "targets"
+    "targets",
+    "environments"
   ],
   "properties": {
     "schema": {
-      "const": "governance-os.input-manifest/1"
+      "const": "governance-os.input-manifest/2"
     },
     "toolchain": {
       "type": "array",
@@ -47,10 +47,6 @@
       }
     },
     "lockfile_sha256": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
-    },
-    "build_image_digest": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
@@ -92,6 +88,37 @@
       "minItems": 1,
       "items": {
         "type": "string"
+      }
+    },
+    "environments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target",
+          "environment_id",
+          "environment_tree_digest",
+          "supplier_class"
+        ],
+        "properties": {
+          "target": {
+            "type": "string"
+          },
+          "environment_id": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "environment_tree_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "supplier_class": {
+            "type": "string",
+            "pattern": "^[A-Z]$"
+          }
+        }
       }
     }
   }

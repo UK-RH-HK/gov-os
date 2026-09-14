@@ -1,4 +1,33 @@
-# Evidence index (RoT-1 revision 5)
+# Evidence index (RoT-1 revision 6)
+
+## Revision 6 evidence (`r6/`)
+
+**Hygiene.** Every probe ran in this run's scratch root (`…/scratchpad/ar-0015/`) under `env -i`; `GOV_*` removed from
+children; `HOME`, `XDG_*` and `GOV_KERNEL_CACHE` in scratch; `PYTHONDONTWRITEBYTECODE=1`; legacy binaries read-only; no
+forced deletes. Absolute paths in outputs are replaced by `<scratch>`, `<scratchpad>`, `<repo>`, `<export>`, `<home>`. The
+final run executed every instrument from a copy of the work-product tree; commands, exit codes, durations, SHA-256 digests of
+scripts and outputs, determinism comparisons and the re-run of the revision-5 instruments are in
+`r6/EVIDENCE-RUN-LOG-r6.json`. LAY6 and ENV6 were written by helper sessions under the architect's specification; ENV6 was
+re-run in the final run; LAY6's run log is `r6/LAY6/LAY6-RUN-LOG.json` and its changes to reviewer C's harness are
+`r6/LAY6/LAY6-probe-changes.diff`.
+
+| File | Kind | Establishes | Result |
+|---|---|---|---|
+| `r6/CS6-derivation-calculator.{py,json}`, `r6/CS6-results.json.gz` | reference (derivation calculator; FD-3) | minimal capability sets for seven goals and eleven victim classes; strategies for every selector of the decision register; mutation analysis of every rule; generated consequence statements | 1,648 configurations; 38/38 self-checks; 4,840 invariant checks, 0 failures; 0 monotonicity violations |
+| `r6/P4r6-conformance-oracle.{py,json}` | reference (loads P4r5 and P4r4 unmodified) | running-mode admission-predicate/1 and E7 under revision-6 rules; P4r5 scenarios re-run | 28/28; 65/65; 0 expected-`ACCEPTED` attack rows |
+| `r6/DA03r6-oracle-regression-sensitivity.{py,json}` | reference (mutation) | review r4 D-A03, revision-5 and revision-6 rule mutants against P4r6 | 20/20; 17/17; 18/18 |
+| `r6/gov_admit_reference_r6.py`, `r6/FA6-first-admission.{py,json}` | executed (real Ed25519 through OpenSSL; `sha256sum`) | first contact under every OP-13 answer; executed minima versus CS6; shared vectors; records; revision-6 rule mutants | FA5 unchanged; 7/7 answers equal; R1–R5 same codes; every mutant detected |
+| `r6/CON6-first-hand-constitutional-content.{py,json}` | executed (checker; real 4.1.5 consumer) and computed | RV5-D-A01 parts A and B, D-A05 N2–N4, B-A06, B-A09, B-A10 | 17/17 verdicts |
+| `r6/ENV6-build-environment.{py,json}` | executed (real Rust toolchain; helper session) | R-BENV-1…R-BENV-5 and OP-16 (a), (b) | 21/21 verdicts; two runs bit-identical |
+| `r6/SRC6-source-identity-v2.{py,json}` | executed (real Git) | source identity v2 | 11/11; two runs byte-identical |
+| `r6/ADM6-admission-transactions.{py,json}` | executed (reference executor) | first admission, re-admission, rollback, lock, record location | 7/7 |
+| `r6/UW6-user-writable-install.{py,json}` | executed and computed | RV5-M8 restated classes | 4/4 |
+| `r6/ATTR6-gitattributes-condition.{py,json}` | executed (real Git) | the `.gitattributes` member and its override condition | 3/3 |
+| `r6/LAY6/` | executed (reviewer C's harness on the revision-6 layout; helper session) | legacy containment non-regression; LP-1s restated; gitops rows | R2-H4 0 violations over 30,735 rows |
+| `r6/CSI6-selftest.json`, `r6/CSI6-CSI-check-*.json` | executed (checker) | self-test with S71–S77 | 78/78, 71 revision-5 cases identical |
+| `r6/REGISTER-CHECK.json`, `r6/STATEMENTS-CHECK.json` | computed (`../decision-register/`) | register completeness; generated statements | PASS; PASS |
+| `r6/DA07r6-plan-regression-detection.{py,json}` | computed | RV5-D-A07 against the revision-6 plan | every defect detected |
+| `r6/EVIDENCE-RUN-LOG-r6.json` | executed | final run log; revision-5 instruments re-run byte-identical | see file |
 
 ## Revision 5 evidence (`r5/`)
 

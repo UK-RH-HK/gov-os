@@ -1,6 +1,10 @@
 # Output 1 — Root-of-Trust Threat Model
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments (normative; they supersede conflicting rows below): TA-5′ (first-contact procedure over the OP-13
+> sources), TA-7 (clock high-water from every ingested non-future statement; future statements disable clock proofs),
+> TA-10′ extended to environment reproducers, TA-12′, TA-13, TA-14; adversaries A20 restated, A21, A22; goals G23 restated,
+> G24, G25; threats TH-101…TH-110 (§6.4); residuals for the first-contact root, the common-mode environment and RS-2b.
 > Revision 5 amendments (normative; they supersede conflicting rows below):
 > - **Assumptions.** TA-1 restated: the running `gov` was admitted on this machine by an evaluator other than itself
 >   (`31`), or is a binary N+1 accepted by an admitted binary N. TA-5 restated: the operator reads the independent channels
@@ -74,7 +78,9 @@
 | **G20** | **Trust decisions are local**: no repository record authorises a trust decision |
 | **G21** | **Project strength over effective policy**: silent loss of recorded project-owned strength, through any change, is reported before security-relevant mutation resumes |
 | **G22** | **Anchor and approval integrity**: no process the repository writer controls can write an honoured pin or decision pin, and no stale pin or single witness key yields trust ingress |
-| **G23** | **Clock-poisoning resistance**: no statement can move a verifier's clock high-water forward except a verified witness; far-future statements are refused |
+| **G23** | **Clock-poisoning resistance** (restated in revision 6): no statement moves a verifier's clock high-water beyond the local clock plus the compiled skew; a far-future statement is refused at ingest and makes clock-based currency proofs unusable for that unit of work (`24` §8) |
+| **G24** | **First-contact honesty** (revision 6): no first-contact value selects the rule that governs it (lineage, source quorum, evaluator); the first-contact root of the owner's OP-13 answer is stated with its computed minimum (`32`) |
+| **G25** | **First-hand facts** (revision 6): every byte-determining build input and every registered constitutional unit is established first-hand by the registration authority, or is a stated residual (`33`, `34`) |
 
 ## 3. Adversaries
 
@@ -98,6 +104,10 @@
 | **A16** | **Build-host attacker** | controls a build machine or toolchain producing release binaries |
 | **A17** | **Unanchored verifier operator** | runs `gov` on a fresh machine or clean CI runner without provisioning an anchor |
 | **A18** | **Repository-controlled code executed by `gov`** (product and test commands, tool commands, plugins, hooks) | runs as the invoking account unless confined; can write any file that account can write |
+| **A19** | Input-mirror and upstream-toolchain attacker (revision 5) | serves inputs; publishes a malicious upstream toolchain release |
+| **A20** | **First-contact source attacker** (restated in revision 6) | controls one or more first-contact sources: a stale or forged page, a code of a lineage it generated, a manifest naming a substituted admitter |
+| **A21** | **Build-environment supplier** (revision 6) | publishes a malicious environment component with a valid upstream checksum |
+| **A22** | **Second-path signing service** (revision 6; OP-13 (c)) | signs an attacker's admitter package |
 
 ## 4. Trust assumptions (TCB)
 
@@ -107,13 +117,18 @@
 | TA-2 | OS process isolation | always |
 | TA-3 | SHA-256 and Ed25519 (strict) sound | always |
 | TA-4 | Keys under `05` custody; fewer than threshold root keys compromised; compiled whitelist holds | always |
-| TA-5 | A human compared the lineage id and the state fingerprint with a channel independent of the release host | OP-6 (a), (c); human anchors |
+| TA-5′ | (Restated in revision 6.) The operator performs the first-contact procedure over the sources the owner's OP-13 answer names, reading each now (`32` FC-1…FC-3), and types the state fingerprint from an independent channel for human anchors and in-gate proofs | first admission (under the stated first-contact root, `32` §6); OP-6; human anchors |
 | TA-6 | Secure-open, atomic-exchange and locking primitives present | production profile |
-| TA-7 | The local clock is honest | **only** for pin validity, the C3 currency window, OP-3 mode B, OP-7 (b) and (c); the clock high-water is raised only by witnesses |
+| TA-7 | The local clock is honest | **only** for pin validity, the C3 currency window, OP-3 mode B, OP-7 (b) and (c). On a machine with a verifier trust store every ingested non-future statement raises the clock high-water, and a statement refused as issued in the future makes clock-based proofs unusable (revision 6, CR5-B-08; the revision-4 witness-only text is withdrawn, CR5-B-09). Residual RS-2b. |
 | TA-8 | Non-trust Human Decision Gate answers come from humans; the acting role is caller-declared | documented limit (`27` §5) |
 | **TA-9** (restated) | Pins and decision pins are provisioned by an operator the repository writer does not control, **and no process the repository writer controls runs, before `gov`'s trust decision, with an identity that can write the pin location** | whenever pins are used (`24` §3.5 (4)) |
 | **TA-10** | The independent rebuilder's environment is not controlled by the release signers | `build-attestation` (`25`) |
 | **TA-11** | The independent verifier reproduces the candidate from the source it attests, and its process is not controlled by the release signers | binary source legitimacy (`25` TB-4) |
+| **TA-10′** | (Revision 5, extended in revision 6.) Reproducers, environment reproducers and registration custodians are independent of each other and of the pipeline | not verifier-checkable; ceremony record (CR5-B-02) |
+| **TA-12** | The upstream toolchain release that passes the checksum check is not malicious | OP-10 (a) |
+| **TA-12′** | (Revision 6.) The upstream suppliers of registered build-environment components that pass their signed checksums are not malicious | OP-16 (a), (b) (`33`) |
+| **TA-13** | (Revision 6.) The platform or distribution code-signing service of the second authentication path is not compromised | OP-13 (c) only (`32`) |
+| **TA-14** | (Revision 6.) The custody of first-contact provisioning media holds | OP-13 (d) only (`32`) |
 
 ## 5. Out of scope and accepted residuals
 
@@ -130,6 +145,9 @@
 | Legacy binaries on unconverted working copies; occupation removed or pre-migration paths restored by Git (legacy verified install, legacy writes to `governance/trust/**` and the overlay); explicit output paths; fresh clones accept the overlay | by design, or no design stops Git restoring history | LR-1…LR-4; RoT-1 fails closed and strength loss is reported where recorded | `26` §8 |
 | Non-trust gate records forgeable by A2 | TA-8 limit | TG-3 | `27` |
 | Threshold root compromise | anchor compromise | re-bootstrap | `05` §9 |
+| **The first-contact root** (revision 6) | a machine with no prior trust accepts what its designated first-contact sources jointly present | AD-1′: the root sets of the owner's OP-13 answer, computed and executed equal | `32` §6, `31` §9 |
+| **Common-mode build environment** (revision 6) | a malicious upstream component passing its checksum | TB-S2′ per OP-16 | `33` §8 |
+| **Restored store with the clock set back and every newer statement withheld** (revision 6) | the machine cannot distinguish the past | RS-2b | `24` §10 |
 
 ## 6. Threat register
 
@@ -235,3 +253,18 @@
 | TH-86 | **Occupation removal or a Git restore gives a legacy binary a verified install** (RV3-M6; C A04–A06; D-A05, A06) | A2, A14, ordinary user | LR-2 restated; RoT-1 fails closed; strength vector over effective policy | rerun of D-A05…A07; LR2; RT-81, RT-50b |
 | TH-87 | **Untracking ignored files drops the migration occupation** (RV3-D-A07) | ordinary maintainer | ignore-rule negation | rerun of D-A05…A07 on the revision-4 layout; LR2; RT-122 |
 | TH-88 | **An owner-supplied constitutional file is absent or replaced** (RV3-D-A18) | A2 | owner-domain slots; presence; strength vector | CSI S50–S52; RT-120 |
+
+### 6.4 Threats added in revision 6 (review r5 classes and held-out attacks)
+
+| ID | Threat | Adversary | Control | Evidence / tests |
+|---|---|---|---|---|
+| TH-101 | **One first-contact source selects the lineage, the source quorum and the evaluator** (RV5-H1; B-A01, B-A02, D-A02) | A20 | first-contact code and manifest; FC-1…FC-8; the stated first-contact root (OP-13) | FA6 S2, S3, S7; CS6 FC-ROOT; RT-156…RT-159 |
+| TH-102 | **The build environment selects the bytes of every reproducer** (RV5-H2; B-A08) | A16, A21, pipeline | environments registered and reproduced first-hand from upstream-checked components (R-BENV-1…6); OP-16 | ENV6; CS6 G_ENV; RT-160…RT-162 |
+| TH-103 | **CI-derived registered content and attestations reused across candidates** (RV5-H3; D-A01, D-A05, B-A06) | A7 ×2 + pipeline | R-CON-1…R-CON-5; AP-5 binding; E7 restrictors | CON6; P4r6 G; CSI S71–S77; RT-163…RT-167 |
+| TH-104 | **A trust-state key removes restrictors** (RV5-M1; B-A03, B-A07) | A7 | AP-5r; R-REG-11 | P4r6 AP5r; FA6 S5; RT-168 |
+| TH-105 | **Undeclared or non-identical registration changes** (RV5-M2; B-A09, B-A10) | registration authority | R-CON-4 at the verifier; R-CON-5 per-project listing | CON6; CSI S73–S76; RT-166, RT-167 |
+| TH-106 | **Re-admission discards the monotonic store; concurrent admissions** (RV5-M3; C-A09…A11, B-A13) | operator procedure | R-ADM-8′, R-ADM-13 | ADM6; FA6 S6; RT-170, RT-181 |
+| TH-107 | **Ambiguous source identity** (RV5-M4; B-A05) | A1 | source identity v2 | SRC6; RT-172 |
+| TH-108 | **Line-ending conversion and out-of-project ignore sources** (RV5-M6, RV5-M7; C-A05, C-A06) | ordinary user | `.gitattributes` member; stated conditions with detection | LAY6 gitops; ATTR6; RT-173, RT-174 |
+| TH-109 | **Shipped admission record; jobs as root** (CR5-B-07, CR5-B-12; B-A15) | package, A2 | GB-1′, GB-6 | FA6 S6; ADM6 A15; RT-171 |
+| TH-110 | **Restored store with the clock set back** (CR5-B-08; B-A12) | A13 | future statements disable clock proofs; RS-2b | P4r6 CLOCK; RT-178 |

@@ -1,0 +1,440 @@
+{
+ "exit": 2,
+ "kernel_dir": "<export>/release/releases/4.1.3/kernel",
+ "files_classified": 116,
+ "counts": {
+  "structured": 17,
+  "pinned_file": 96,
+  "pinned": 166,
+  "members": 4,
+  "transaction_input": 2,
+  "informational_file": 2,
+  "project_tunable": 51,
+  "floor": 226,
+  "collection_id": 37,
+  "informational": 14
+ },
+ "unclassified_files": [],
+ "ambiguous_files": [],
+ "unclassified_leaves": [],
+ "unclassified_leaf_count": 0,
+ "ambiguous_leaves": [],
+ "structure": [
+  {
+   "file": "KERNEL.yaml",
+   "problem": "yaml_profile: duplicate mapping key 'release-manifest' at line 32"
+  }
+ ],
+ "required_missing": [
+  {
+   "file": "policies/POLICY_PRECEDENCE.yaml",
+   "rule": "policies/POLICY_PRECEDENCE.yaml"
+  },
+  {
+   "file": "schemas/plugin-registry.schema.json",
+   "rule": "schemas/*.schema.json"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.revoke_gate"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.execute_plugin"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.register_plugin"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.descriptor_schema"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.require_valid_descriptor"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.min_authority"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.registry_path"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.registration_binds"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.elevated_permission_classes"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.refuse_on_pin_drift"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.timeout_seconds"
+  }
+ ],
+ "required_missing_count": 15,
+ "violations": [
+  {
+   "file": "policies/ENFORCEMENT_MAP.yaml",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:d226c935cb74d6155e11f942c0ec1050b0fa2bb2ba7a33c7cfc0a65e9e01e139"
+  },
+  {
+   "file": "policies/TEST_POLICY.yaml",
+   "key": "TEST_POLICY.governance_families",
+   "class": "floor",
+   "op": "set_superset",
+   "floor": [
+    "schema_invariants",
+    "graph_integrity",
+    "index_freshness",
+    "memory_retrieval_regression",
+    "authority_role_limits",
+    "mutation_scope",
+    "path_map_compliance",
+    "context_reproducibility",
+    "concurrency_claims",
+    "adapter_portability",
+    "skill_regression",
+    "command_contract_consistency",
+    "secrets_sensitivity_indexing",
+    "recovery_rebuild",
+    "fresh_agent_reconstruction",
+    "product_traceability",
+    "audit_reproducibility",
+    "policy_enforcement_coverage",
+    "policy_precedence",
+    "plugin_governance"
+   ],
+   "kernel": [
+    "schema_invariants",
+    "graph_integrity",
+    "index_freshness",
+    "memory_retrieval_regression",
+    "authority_role_limits",
+    "mutation_scope",
+    "path_map_compliance",
+    "context_reproducibility",
+    "concurrency_claims",
+    "adapter_portability",
+    "skill_regression",
+    "command_contract_consistency",
+    "secrets_sensitivity_indexing",
+    "recovery_rebuild",
+    "fresh_agent_reconstruction",
+    "product_traceability",
+    "audit_reproducibility",
+    "policy_enforcement_coverage"
+   ]
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.permission_classes",
+   "class": "pinned",
+   "reason": "value digest not registered",
+   "digest": "sha256:ecf3f2c8b0e09696c62faafa4e7d3c8ca66deb447cc31ee40c8bb0aa9cc7df56"
+  },
+  {
+   "file": "schemas/adapter-manifest.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:6614e5ead82d97aef37e73c3b144126c40f85488a3f8bfd0c2a69542a0c80734"
+  },
+  {
+   "file": "schemas/adoption-baseline.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:d52c0f2cbcc6efefad0bd610348765fb40891a8755450149b875593455c9086a"
+  },
+  {
+   "file": "schemas/audit.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:c2edc7d04895e1115c731dbc44a6b438d6113b80931f7795e728ef6046036426"
+  },
+  {
+   "file": "schemas/capability-profile.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:e80c94d1c727f70bc3d8e42c294a7cc508abbe5713272993179bee1bf6b499b3"
+  },
+  {
+   "file": "schemas/checkpoint.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:07f49fa4729d06140873a761d27491a748713d66a57e382429046f948efa20e2"
+  },
+  {
+   "file": "schemas/cit.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:00968c998ec46c4cedfce7a9425a26129b9bdde1ccb3b365d8d4541a2fdc1f93"
+  },
+  {
+   "file": "schemas/command-contract.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:5e40d90ade095cd6a7111ba8e34adb7f95e0c2f5ede03b463934022eb6aaae96"
+  },
+  {
+   "file": "schemas/context-packet.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:8939a7c8f0cfcaa457c84aaefcd2628dfbf80665dab2019874c32a4379f889a4"
+  },
+  {
+   "file": "schemas/data-sensitivity.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:6981e533c2c011a1de071e16c1374c33f2da87b849914f0d9295b98b2b45accc"
+  },
+  {
+   "file": "schemas/decision.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:9711a6cc6a677b87535021a67a644e60482412ae47fef77d2fe404e883b6443c"
+  },
+  {
+   "file": "schemas/experiment.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:a066c3bb8a8dd41cf3103955e2d83e9c776f1e4491f75e520d42d7f6b4d12ecf"
+  },
+  {
+   "file": "schemas/feature.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:b2bfb81773ed26d48a254a36bc7c7e59e8e263c754105d42c47617071c8cb1f2"
+  },
+  {
+   "file": "schemas/framework-change-proposal.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:8323f62a7eefb0bfb8f483ab291790728b365de96a574d6649694ec1d1bb88de"
+  },
+  {
+   "file": "schemas/framework-lock.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:9010eaf7542853974693dcb681d06fa422c603304d80b0f7d60547d87eb41fec"
+  },
+  {
+   "file": "schemas/handoff.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:9d102c427574ad7d557372b6b4ee1e903d9322105ede0ee1eed77cd0030f8037"
+  },
+  {
+   "file": "schemas/hard-invariants.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:9e3090e65a592a660b008bd733cf372b7e1961fdf500629421b3915d96485861"
+  },
+  {
+   "file": "schemas/heldout-tests.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:400870126d1c8f4193ed7a1f8335997d1dcbef1c1dbb2119cd1adc66f5157a74"
+  },
+  {
+   "file": "schemas/human-gate.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:a5f4cbfe3bfe2268aae8fdcb2348b68aaf8b3ef24ab3afb9ccd5bdc8e66b8a9e"
+  },
+  {
+   "file": "schemas/index-manifest.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:270053013dc77c2e0a016b1655802156097f75fb7d84b247666f111043d82237"
+  },
+  {
+   "file": "schemas/interface.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:6532831a39e18a5fe168d9648e9168fc894ac73a71820aa89947a9d2ead774f4"
+  },
+  {
+   "file": "schemas/kernel-manifest.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:0b62b0be38864ef30edefc5c2b0479e60e316d3062f3a9b34ef42a84cbbce918"
+  },
+  {
+   "file": "schemas/lesson.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:13ab429b403855c14c012ae6ed911a08263a927f2947387e5f619d8bb2caa7bb"
+  },
+  {
+   "file": "schemas/mcp-registry.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:cf5e62b6e293ae07cdc9e7417a8b519d6f7912d7efe1e2211630b727a0e4e525"
+  },
+  {
+   "file": "schemas/memory-manifest.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:d84ea25a0e89ca97f40a5d45a85ea7da5d2ca69e69cd6c6dfe47c19a6dd2c67c"
+  },
+  {
+   "file": "schemas/migration-catalogue-entry.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:ac4935d16af9e12cd878bd9d2ba8627a3e5148b238017424c5c4b2cb67bf6b23"
+  },
+  {
+   "file": "schemas/migration.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:06e7740cf4a020dbb67ac01cd77a7f71b9ebbae9bc3c3d9d5b1b945633c40182"
+  },
+  {
+   "file": "schemas/model-routing-overrides.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:7eb2a9b66a0d3c69a5c7d2b54fea2973d30a43412cf2dc83f9a1a6e17aaef100"
+  },
+  {
+   "file": "schemas/plugin-descriptor.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:2ed0a34a0d9eb0d8044eaff6b2febe04361332121e17f73992909dd466000e7a"
+  },
+  {
+   "file": "schemas/policy-ARCHIVE_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:fadd50a1869b221dbe8cb6abefb0eaec4d7f54d47fb2eeb2ff0da4381cfa531e"
+  },
+  {
+   "file": "schemas/policy-AUTHORITY_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:ca120b3efff66688458db290193b3a830c06bfc1da3b34ad43568ba045990785"
+  },
+  {
+   "file": "schemas/policy-BUDGET_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:a37d83a2fdc16b063d22855e09e94d1efcd3614ccacb3a939497387a73575c01"
+  },
+  {
+   "file": "schemas/policy-CHANGE_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:0c04f823b61acd5391be50ef2522a6320cb20ab742d20fe7996e1c45487f6258"
+  },
+  {
+   "file": "schemas/policy-CHECKPOINT_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:4d43cb09e7b4f0288a8f667c0acf3174ef85d5816bf3c218610ca380dc40e2c8"
+  },
+  {
+   "file": "schemas/policy-CONTEXT_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:65f57671240fad00ba64c88071df8d3dda3db32b68697c619e5cf23ab9f7f442"
+  },
+  {
+   "file": "schemas/policy-HUMAN_GATE_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:df4d3e2264d2a874efe2d8ae2bcb00a677d743c9a193de78fd534307e24c20df"
+  },
+  {
+   "file": "schemas/policy-LEARNING_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:c534cc280919f8afaa2cfae7cc18516fad5041195d546b44205e001fe1e6b322"
+  },
+  {
+   "file": "schemas/policy-MEMORY_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:aa7130c26f5d361abbb12a2415504f9d0175c83159d2f3efca74df0d2f03e207"
+  },
+  {
+   "file": "schemas/policy-MODEL_ROUTING_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:caa1858d955cc7ff18ec20fb77d789b314cb7a1a56e633adf7c126550a2c7a05"
+  },
+  {
+   "file": "schemas/policy-SECURITY_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:694faa1f068a893e9876fa56ad70672c5cbad296777bb7ccb653d9a6f8252f37"
+  },
+  {
+   "file": "schemas/policy-TEST_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:9945ceb4b91c4f23f2933acd6098f4003616988d60a58ebd9ec28476404c5099"
+  },
+  {
+   "file": "schemas/policy-TOOL_POLICY.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:c6b2dc6cbe712c6afb5bbb831458ed5ed80858ff7d101a9dde2f7f80a737e01d"
+  },
+  {
+   "file": "schemas/project-exceptions.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:953bf3915af56c48a2ef30185c045ab8c759e733543e4219d89e6ce3a418aa54"
+  },
+  {
+   "file": "schemas/project-policy.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:929564edace5806e24554af91b6e4ad0d9fe9747c12f57ccdeb3e93b1be13e97"
+  },
+  {
+   "file": "schemas/project.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:e105c5cfe6b5e9263f98c4a0b9b4edddf5a5cb2c54d533083a2d9618e6ac00d6"
+  },
+  {
+   "file": "schemas/readiness-dimensions.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:981a8344284def355e3bdbb8369c1c8e2a1d94b472e0732ae978ab2f3b39b0a8"
+  },
+  {
+   "file": "schemas/record.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:8b9471f6e0288bd48a504d206a832e3aa086268f8fddb7c5dcf061400421a907"
+  },
+  {
+   "file": "schemas/release-manifest.schema.json",
+   "class": "pinned_file",
+   "reason": "file digest not registered",
+   "digest": "sha256:ce6a5b06e7804dc9fd37b2343d0ff0352ac1b10922fff062447972546e8a0037"
+  }
+ ],
+ "violation_count": 65,
+ "stronger_than_registered": [],
+ "precedence_unregistered_count": 0,
+ "migration_problem_count": 2
+}

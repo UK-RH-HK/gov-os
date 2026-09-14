@@ -1,0 +1,36 @@
+{
+  "build_profile": {
+    "flags": [
+      "--locked",
+      "--offline"
+    ],
+    "profile": "release",
+    "remap_path_prefixes": [
+      "/src=/build/src",
+      "/cargo=/build/cargo",
+      "/rustup=/build/rustup"
+    ],
+    "target_features": []
+  },
+  "environments": [
+    {
+      "environment_id": "sha256:4da641ff4dcd0866f714dba40891bb0991d83fc43d3a5a6b07967fbf0b84c535",
+      "environment_tree_digest": "sha256:f8666b0625d19f94ae9ffe40e862cd4a64fd48a893efd4d460e74f61abc63cc4",
+      "supplier_class": "A",
+      "target": "x86_64-unknown-linux-gnu"
+    }
+  ],
+  "lockfile_sha256": "sha256:13ee4b2252c9e516a0547f2891aa2105c3ca71c6d7a1e682c69be97998dfc87e",
+  "schema": "governance-os.input-manifest/2",
+  "targets": [
+    "x86_64-unknown-linux-gnu"
+  ],
+  "toolchain": [
+    {
+      "archive_sha256": "sha256:7d03a36aa08b33227cede0beebab8bcc38fdbc6d0df7c05cbba8618784807e83",
+      "name": "rustc",
+      "upstream_checksum_reference": "https://static.rust-lang.org/dist/channel-rust-1.98.1.toml (signed)",
+      "version": "1.98.1"
+    }
+  ]
+}

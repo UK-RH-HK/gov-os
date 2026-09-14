@@ -1,6 +1,10 @@
 # Output 2 — Privileged-ingress map
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: new ingress I-75 (first-contact code and manifest, `32`), I-76 (environment manifests and
+> reproductions, `33`), I-77 (registration revocations, `30` R-REG-11), I-78 (CI-proposed registration content, `34`), I-79
+> (Git attribute and ignore sources, `26`); I-68 restated (clock high-water from every ingested non-future statement,
+> CR5-B-09); admission records (I-72) are honoured only inside the verifier trust store (`31` GB-1′).
 > Revision 5 amendments: new ingress **I-69** release registration statements, **I-70** reproduction statements, **I-71**
 > input manifests (all carriers until selected, `30`), **I-72** admission records (local, `31` R-ADM-7), **I-73** the
 > independent executor `gov-admit`, **I-74** the working directory of a RoT-1 command (root discovery, `18` §9.2). Withdrawn:
@@ -112,7 +116,17 @@ revocation, floors, gate requirements or authorisation, currency, binary accepta
 | **I-65** | Owner constitutional files outside the kernel (`23` §7.2) | an absent or replaced constitution treated as present | owner-domain slots; `owner_constitutional_file` confirmation; fail-closed absence; strength vector | R-SURF-12 |
 | **I-66** | Verification attestation v2 (`source`, `lifts_negative_statement_digest`) | choose a binary's source; lift a negative with an old attestation | V8, A4b; custodial stages; MS-2 (`25` §5.1, `17` §2) | R-ART-5, R-CERT-4 |
 | **I-67** | Trust Policy `bootstrap` parameters and `clock_reset`; `eligibility.production_sources` | widen currency windows, reset the clock, register a source | root threshold; computed reductions (CR-10) with a per-project gate | R-TS-6 |
-| **I-68** | Local clock | make pins or windows valid again; poison the high-water | `clock_high_water` raised only by witnesses; SV-11 refuses future statements; a clock below the high-water makes clock-based proofs unusable (`24` §8) | R-TS-10, R-TS-11 |
+| **I-68** | Local clock | make pins or windows valid again; poison the high-water | (restated in revision 6) every ingested non-future statement raises `clock_high_water`; SV-11 refuses future statements at ingest, and a refused future statement makes clock-based proofs unusable for that unit of work; a clock below the high-water makes clock-based proofs unusable (`24` §8) | R-TS-10, R-TS-11 |
+
+## 4c. Ingress added in revision 6
+
+| ID | Route | What it could do without a control | Revision 6 control | Req |
+|---|---|---|---|---|
+| **I-75** | First-contact code and first-contact manifest (typed codes; manifest from any carrier) | select the lineage, the Trust State, the source quorum or the evaluator at first admission (RV5-H1) | FC-1…FC-3 before any evaluator; FC-4…FC-8 in `gov-admit`; the stated first-contact root (`32`) | R-ADM-2′, R-ADM-3′ |
+| **I-76** | Environment manifests and `environment-reproduction` statements | select the build environment of every reproducer (RV5-H2) | R-BENV-1…R-BENV-6 (`33`) | IR-REP-5 |
+| **I-77** | `registration-revocation` statements | remove a restrictor | registration threshold only; AP-5r (`30` R-REG-11) | R-REG-11 |
+| **I-78** | Registration content proposed by CI | select constitutional content (RV5-H3) | a proposal only; custodians derive it first-hand (`34` R-CON-1); `verify-registration` | R-CON-1 |
+| **I-79** | `.git/info/attributes`, user `core.excludesFile`, `.git/info/exclude` | convert kernel line endings; untrack the migration occupation (RV5-M6, RV5-M7) | `governance/trust/.gitattributes` member; stated conditions fail closed with doctor naming the source (`26` §2, §8) | R-ST5-1 |
 
 ## 5. Protected Path Set and file-mutation inventory
 

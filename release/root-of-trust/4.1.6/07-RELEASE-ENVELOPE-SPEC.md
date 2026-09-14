@@ -1,6 +1,11 @@
 # Output 7 — Envelope and statement specification
 
-> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 6 amendments: `release.source` is source identity v2 `{release_commit, git_tree, content_digest}` with
+> `inputs_manifest_digest` (`30` §4.1; RV5-L4 aligned); verification attestation v4 (kernel tree digest), release registration
+> v2 (environments), registration revocation v1, binary reproduction v2 (environment id), environment reproduction v1; the
+> revision-4 artefact and build-attestation rows are marked withdrawn; first-contact and environment manifests are
+> schema-bound documents; the producer interface gains environment reproduction and the first-hand ceremony.
 > Revision 5 amendments: statement types per `05` §2 (new `release-registration.v1`, `binary-reproduction.v1`,
 > `verification-attestation.v3`, `trust-state.v3`, `trust-root.v4`, `trust-policy.v3`; withdrawn `artifact-final.v2`,
 > `build-attestation.v2`). Release statement v3 `release.source` is `{release_commit, content_digest}` with
@@ -55,7 +60,7 @@ payloadType `release-final.v2+json` (`release-final`) or `release-candidate.v2+j
 |---|---|---|---|
 | `_type`, `trust_profile`, `trust_root_id`, `framework`, `manifest_version` (const `3`) | ✓ | as revision 2 | V6–V8 |
 | `release.{version, release_id, sequence, stage, promoted_from_candidate, release_commit, release_tag, released_at}` | ✓ | as revision 2 | V7, V8, E2, E3, E9, E10 |
-| **`release.source {release_commit, source_tree_digest, build_inputs_digest}`** | ✓ | The reproducible source identity. `release_commit` equals `release.release_commit`. `source_tree_digest` is the SHA-256 of `git archive` of the commit. `build_inputs_digest` names the published build inputs (toolchain, lockfiles). A final's `source` equals its candidate's. | **V8** source equality; `25` A4b; custodial rules (`05` §7) |
+| **`release.source {release_commit, git_tree, content_digest}`** and **`inputs_manifest_digest`** (revision 6; revision 5 without `git_tree`) | ✓ | The reproducible source identity (`30` §4.1, source identity v2). `release_commit` equals `release.release_commit`. `content_digest` is computed from Git objects with length-prefixed records; `git_tree` is the commit's tree id. `inputs_manifest_digest` names the input manifest v2 (toolchain, lockfile, environments). A final's source, inputs and kernel tree equal its candidate's. | **V8**; `25` AP-5, AP-8; `05` §7 |
 | `signing.{purpose, algorithm}` | ✓ | as revision 2 | V7 |
 | `trust_references.{root_version, trust_policy_version, trust_state_sequence}` | ✓ | **Release-local requirements** (`17` S7). `trust_policy_version` is the **named TPS** the producer registered the surface under (E7). None of them changes global state. | S7, E7, E8 |
 | `compatibility.*` | ✓ | as revision 2 | V11, E5 |
@@ -72,11 +77,15 @@ payloadType `release-final.v2+json` (`release-final`) or `release-candidate.v2+j
 | Trust root v2 | `trust-root.v2+json` | `root` | `version`, `lineage.trust_root_id`, `keys{}`, `purposes{}` for all **twelve** purposes (adds `freshness-witness`), `revoked_keys[]` | `trust-root.schema.json` (3.0.0) |
 | **Trust Policy v2** | `trust-policy.v2+json` | `trust-policy` | `policy_version`, `supersedes_policy_digest`, `prior_policies[]`, `floor_schema_version` (**3**), `surface` (Constitutional Surface Inventory schema 2: presence, exact precedence, **`overlay_surface`**, **`owner_domain`**; `23`), `eligibility` (with `historical_releases[]` and **`production_sources[]`**), `install_authority`, `gating` (with `local_terminal_only[]`), `bootstrap` (**`op6_mode`, `op7_mode`, `pin_max_validity_days`, `c3_currency_window_hours`, `max_anchor_age_days`, `witness_max_validity_hours`, `freshness_witness_threshold`, `clock_reset`**), `sensitivity_order`, `lowering_history[]`, `unrevokes[]`, `state_chain_reset` | `trust-policy-statement.schema.json` (2.0.0), `constitutional-surface-inventory.schema.json` (2.0.0) |
 | Trust State v2 | `trust-state.v2+json` | `trust-state` | `sequence`, `previous_state_digest`, `prior_states[]`, `references{root_version, root_digest, trust_policy{policy_version, statement_digest}}`, `revocations[]`, `certifications[]`, `attestations[]`, `artifacts[]`, `expires_at` (informational; **never a currency proof in revision 4**) | `trust-state-statement.schema.json` |
-| **Verification attestation v2** | `verification-attestation.v2+json` | `verification-attestation` | as v1, plus **`source {release_commit, source_tree_digest, build_inputs_digest}`** and optional **`lifts_negative_statement_digest`** | `verification-attestation.schema.json` (2.0.0) |
+| **Verification attestation v4** (revision 6) | `verification-attestation.v4+json` | `verification-attestation` | `candidate_statement_digest`, `verdict`, `source {release_commit, git_tree, content_digest}`, `inputs_manifest_digest`, **`kernel_tree_digest`** (reproduced by the verifier), optional `lifts_negative_statement_digest` | `verification-attestation.schema.json` (4.0.0) |
+| **Release registration v2** (revision 6) | `release-registration.v2+json` | `release-registration` | `30` §5 (with `environments[]` and the first-hand `constitution` block) | `release-registration.schema.json` (2.0.0) |
+| **Registration revocation v1** (revision 6) | `registration-revocation.v1+json` | `release-registration` | `revokes[]` statement digests, `reason` (`30` R-REG-11) | `registration-revocation.schema.json` |
+| **Binary reproduction v2** (revision 6) | `binary-reproduction.v2+json` | `reproducer` | `30` §7 (with `environment_id`) | `binary-reproduction.schema.json` (2.0.0) |
+| **Environment reproduction v1** (revision 6) | `environment-reproduction.v1+json` | `reproducer` | `environment_id`, `environment_tree_digest`, `reproduced_at` (`33` R-BENV-2) | `environment-reproduction.schema.json` |
 | **Certification v3** | `certification-status.v2+json` | `certification-status` | as revision 2, plus optional `artifact_statement_digests[]` (informational in mode A) | `certification-statement.schema.json` |
 | Revocation v2 | `revocation.v2+json` | `revocation` | as revision 2; `kind` includes `artifact` and `build-attestation` | `revocation-statement.schema.json` |
-| **Artefact v3** | `artifact-final.v2+json` / `artifact-candidate.v2+json` | **`release-artifact`** / `release-candidate` | `stage`, `release_id`, `release_statement_digest`, `artifacts[]{name, target, digest, size, trust_profile, tbm_digest, tbm}`, `build{toolchain, build_inputs_digest, reproducible: true}` | `artifact-statement.schema.json`, `trust-base-manifest.schema.json` |
-| **Build attestation v2** | `build-attestation.v2+json` | `build-attestation` | `artifact{name, target, digest, size}`, **`source {release_commit, source_tree_digest, build_inputs_digest}`**, `tbm_digest`, `reproduced` (const true), `rebuilder_label`, `method` | `build-attestation.schema.json` (2.0.0) |
+| ~~Artefact v3~~ | withdrawn (revision 5; `release-artifact` never granted, KS-13) | — | — | `artifact-statement.schema.json` (history) |
+| ~~Build attestation v2~~ | withdrawn (revision 5; replaced by the reproduction quorum, KS-13) | — | — | `build-attestation.schema.json` (history) |
 | **Freshness witness v1** | `freshness-witness.v1+json` | `freshness-witness` | `witnessed_state{sequence, statement_digest}`, `issued_at`, `expires_at`, `witness_label` (`24` §3.3) | `freshness-witness.schema.json` |
 | Retrieval profile | `retrieval-profile.v1+json` | `retrieval-profile` | `10` §3 | `profile-statement.schema.json` |
 | ~~Historical identity~~ | withdrawn | — | now TPS `eligibility.historical_releases[]` | `legacy-identity-statement.schema.json` (withdrawn; kept for history) |
@@ -87,6 +96,9 @@ payloadType `release-final.v2+json` (`release-final`) or `release-candidate.v2+j
 - operator decision pin, with mandatory `expires_at` and `approved_under_state` (`trust-decision-pin.schema.json`);
 - trust-gate confirmation v2, with `state_fingerprint` (`trust-gate-confirmation.schema.json`, 2.0.0);
 - lock 3.0.0 (`framework-lock-3.0.0.schema.json`);
+- (revision 6) first-contact manifest (`first-contact-manifest.schema.json`, `32` §3), environment manifest
+  (`environment-manifest.schema.json`, `33` §3), input manifest v2 (`input-manifest.schema.json` 2.0.0), admission record v2
+  (`admission-record.schema.json` 2.0.0);
 - FORMAT (`trust-format.schema.json`).
 
 ## 5. Kernel tree canonical digest (`gov-tree-v2`)
@@ -111,7 +123,11 @@ agentic-engineering-os-<version>/
 ├── trust/policy/<policy_version>.dsse.json
 ├── trust/state/<sequence>.dsse.json
 ├── trust/statements/<digest>.dsse.json  # attestations, certifications, revocations, build attestations referenced by the newest TSS
-├── artifacts/artifact-final.dsse.json   # release-artifact statement; build attestations under trust/statements
+├── trust/registrations/<release_id>.dsse.json            # release registration (revision 5)
+├── trust/reproductions/<release_id>/<target>/<key id>.dsse.json
+├── trust/environments/<environment_id>/<key id>.dsse.json # environment reproductions (revision 6)
+├── trust/manifests/<digest>.json          # input manifests v2, environment manifests (revision 6)
+├── trust/first-contact/<sequence>.json    # first-contact manifest of each Trust State (revision 6; the code is in the channels)
 ├── manifest.json, manifest.yaml         # descriptive only
 └── RELEASE_NOTES.md, ROLLBACK.md
 ```
@@ -129,12 +145,12 @@ agentic-engineering-os-<version>/
 | 7 | external signer (verifier custody) | `verification-attestation.dsse.json` (v2), naming `source` | `verification-attestation` |
 | 8 | `gov release promote --attestation A` | unsigned final statement; refuses unless the tree digest **and `release.source`** equal the attested candidate's | — |
 | 9 | external signer (checks V8 source equality) | `release-final.dsse.json` | `release-final` |
-| 10 | reproducible binary build from `release.source` | binaries with a compiled TBM v2 naming `binary.source` and a TSS that already exists | — |
-| 11 | independent rebuilder: `verify-artifact --stage rebuilder`, then rebuild | `build-attestation.dsse.json` (v2) per binary | `build-attestation` |
-| 12 | two release-artifact custodians: `verify-artifact --stage custodian` | `artifact-final.dsse.json` | `release-artifact` ×2 |
+| 10 | (revision 6) environment reproducers assemble each registered environment from pinned components | `environment-reproduction.dsse.json` per reproducer (`33`) | `reproducer` |
+| 11 | (revision 6) registration ceremony: each custodian checks R-REG-3 (a)–(g), including `csi_check.py verify-registration` on its own kernel build | `release-registration.dsse.json` (v2) | `release-registration` |
+| 12 | (revision 5–6) at least q reproducers build from the registered source in re-assembled registered environments and confirm first-hand to the publisher | `binary-reproduction.dsse.json` (v2) per reproducer | `reproducer` |
 | 13 | external signer (owner) | `certification-status.dsse.json` | `certification-status` |
 | 14 | `gov trust publish --previous <TSS> --stage publisher` | unsigned TSS: admissible; full `prior_states[]`; never drops a lower `artifacts[]` reference; references the certification, attestations and artefacts whose binaries pass A4a/A4b | — |
-| 15 | external signer | `trust-state.dsse.json`; the **state fingerprint published in the independent channels** (`06` §2) | `trust-state` |
+| 15 | external signer | `trust-state.dsse.json`; the **first-contact manifest and code** of the new state (`32` §3) and the state fingerprint published in the independent channels (`06` §2) | `trust-state` |
 | 16 | OP-7 (c) only: scheduled witness service | `freshness-witness.dsse.json` naming the newest TSS, within `witness_max_validity_hours` | `freshness-witness` (≥ 2 keys for C3) |
 | 17 | `gov release verify DIR` / `gov trust verify-artifact` | report mode | — |
 

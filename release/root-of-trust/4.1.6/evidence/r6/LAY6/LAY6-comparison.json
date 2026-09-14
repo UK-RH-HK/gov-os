@@ -1,0 +1,236 @@
+{
+ "LP-1r": {
+  "r5": {
+   "rows": 1335,
+   "violations": 0
+  },
+  "r6": {
+   "rows": 1335,
+   "violations": 0
+  }
+ },
+ "LP-1s_as_stated_r5": {
+  "r5": {
+   "counterexamples": 16,
+   "rows": 18090
+  },
+  "r6": {
+   "counterexamples": 16,
+   "rows": 18090
+  }
+ },
+ "LP-1s_restated_rev6": {
+  "r6": {
+   "counterexamples": 0,
+   "description": "rows touching governance/trust/ or occupation entries with state_after=COMPLETE and kernel_tampered!=true",
+   "rows_touching_trust_or_occupation": 540,
+   "sample": [],
+   "total_active_rows": 30450
+  }
+ },
+ "R2-H4_violations": {
+  "r5": 0,
+  "r6": 0
+ },
+ "check_ignore": {
+  "GLOBALEXCL_WORK": {
+   "rc": 0,
+   "stdout": "<scratch>/gitops/githome-excl/excl:1:.governance-runtime/\t.governance-runtime/migration"
+  },
+  "INFOEXCL_WORK": {
+   "rc": 0,
+   "stdout": ".git/info/exclude:7:.governance-runtime/\t.governance-runtime/migration"
+  },
+  "control_R5": {
+   "rc": 0,
+   "stdout": ".gitignore:2:!/.governance-runtime/migration\t.governance-runtime/migration"
+  }
+ },
+ "classification_lost": {
+  "r5": 0,
+  "r6": 0
+ },
+ "gitop_elevation": {
+  "r5": 216,
+  "r6": 288
+ },
+ "gitop_writes_leaving_COMPLETE": {
+  "r5": 0,
+  "r6": 0
+ },
+ "gitops_per_row": {
+  "ARCHIVE": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "AUTOCRLF": {
+   "changed": true,
+   "r5_reasons": [
+    "kernel_content_mismatch"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "CHECKOUT_BACK": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "CHECKOUT_PRE": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "LEGACY",
+   "r6_reasons": [],
+   "r6_state": "LEGACY"
+  },
+  "CLEAN": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "CLONE": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "GLOBALEXCL": {
+   "changed": false,
+   "r5_reasons": [
+    "occupation"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [
+    "occupation"
+   ],
+   "r6_state": "PARTIAL"
+  },
+  "INFOATTR": {
+   "changed": true,
+   "r5_reasons": [],
+   "r5_state": "NOT_PRESENT",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "INFOEXCL": {
+   "changed": false,
+   "r5_reasons": [
+    "occupation"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [
+    "occupation"
+   ],
+   "r6_state": "PARTIAL"
+  },
+  "PARTIAL_CLONE": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "RESTORE_PRE_GOV": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "LEGACY",
+   "r6_reasons": [],
+   "r6_state": "LEGACY"
+  },
+  "SHALLOW": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "SPARSE_CONE": {
+   "changed": false,
+   "r5_reasons": [
+    "occupation"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [
+    "occupation"
+   ],
+   "r6_state": "PARTIAL"
+  },
+  "SPARSE_NONCONE": {
+   "changed": false,
+   "r5_reasons": [
+    "occupation"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [
+    "occupation"
+   ],
+   "r6_state": "PARTIAL"
+  },
+  "STASH": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "TEXTAUTO_EOLCRLF": {
+   "changed": true,
+   "r5_reasons": [
+    "kernel_content_mismatch"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "UNTRACK_NOSURG": {
+   "changed": false,
+   "r5_reasons": [
+    "occupation"
+   ],
+   "r5_state": "PARTIAL",
+   "r6_reasons": [
+    "occupation"
+   ],
+   "r6_state": "PARTIAL"
+  },
+  "UNTRACK_R5": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  },
+  "WORKTREE": {
+   "changed": false,
+   "r5_reasons": [],
+   "r5_state": "COMPLETE",
+   "r6_reasons": [],
+   "r6_state": "COMPLETE"
+  }
+ },
+ "rows": {
+  "r5": {
+   "active": 29880,
+   "skipped": 285,
+   "total": 30165
+  },
+  "r6": {
+   "active": 30450,
+   "skipped": 285,
+   "total": 30735
+  }
+ },
+ "transaction_area_writes_left_COMPLETE": {
+  "r5": 96,
+  "r6": 96
+ }
+}
