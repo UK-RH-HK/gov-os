@@ -98,3 +98,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on both completions: verify, merge, write HO-0004, spawn synthesis reviewer D |
+
+## L-0006 — 2026-09-14 — reviewer C completed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-reviewer-compat-transaction (`AR-0003`) |
+| Input commit | `83aa822` (architecture `ca77a43`) |
+| Work performed | independent pre-RoT matrix over real 4.1.2–4.1.5 (84 destructive invocations on the intact layout: 0 tree, trust or Git writes); held-out RV3-C-A01…A10 (6 executed); transaction and layout-durability analysis |
+| Report / evidence | `AGENT_RUNS/AR-0003.report.yaml` (on branch); `release/root-of-trust/4.1.6-review-r3/C-compat-transaction/` |
+| Verdict | `NO_BLOCKING_FINDINGS` (role verdict) |
+| Output commit | work `9e013c1`, report `c19fbc1` on `phase1/rot1-r3-review-c`; held unmerged until reviewer B completes |
+| Findings | MEDIUM C-1 (carried): removing the occupation entries lets legacy `init --force` reproduce the R2-H4 harm; RoT-1 fails closed and `governance/trust/**` is untouched; the LR-2 bound and RT-50/RT-81 need occupation-absent assertions. Carried items C-2…C-5. Prior: R2-H4 NARROWED; R2-M7, M8, M9, L2 closed by design; R2-L3 closed. |
+| Next action | await AR-0002; then merge B and C, write HO-0004, spawn synthesis reviewer D |
