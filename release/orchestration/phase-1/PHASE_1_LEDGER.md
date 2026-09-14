@@ -140,3 +140,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0004 |
+
+## L-0009 — 2026-09-14 — synthesis reviewer spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-review-synthesis (`AR-0004`, fresh Opus 5 context) |
+| Input commit | `90efd29` (worktree `wt/review-r3-d`, branch `phase1/rot1-r3-review-d`) |
+| Work performed | spawned on HO-0004; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0004.report.yaml`; `release/root-of-trust/4.1.6-review-r3/{00,10,11}*`, `D-synthesis/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge; route per verdict (revision-4 architect, or owner decision gate GATE-OWNER-D0008) |
