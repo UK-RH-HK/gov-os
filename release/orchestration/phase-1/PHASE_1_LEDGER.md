@@ -714,3 +714,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding this entry |
 | Findings | — |
 | Next action | await AR-0019 completion |
+
+## L-0050 — 2026-09-14 — revision 7 authored (concrete certified profile CP-1)
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | rot-architect (`AR-0019`, resumed once) |
+| Input commit | `4ed71cc` |
+| Work performed | New `35-CERTIFIED-PROFILE.md` and `profile/CP-1.yaml`: every owner selection mapped to its enforcement point, exclusions EX-01…EX-24, option-selecting fields, schemas, commands and calculator axes removed from the certified surface (withdrawn schemas under `schemas/withdrawn-non-production/`). Pack 00–34 amended; decision register over schema fields, procedure inputs and exclusions; new first-contact-authority and environment-lock schemas; `examples/rev7`, `evidence/r7`. D-0008 and ARCH-0002 PROPOSED revision 7 (fields verified). Initial targets `x86_64-unknown-linux-musl` and `aarch64-unknown-linux-musl`, both NOT CERTIFIED pending CC-1…CC-9. |
+| Report / evidence | `AGENT_RUNS/AR-0019.report.yaml`; `release/root-of-trust/4.1.6/evidence/r7/` |
+| Verdict | `ARCHITECTURE_REVISION_READY_FOR_REVIEW` (author's readiness claim; not an acceptance) |
+| Output commit | work `d07d200`, report `a1fb884`, merged `f4b964e` |
+| Findings | Architect-reported claims, to be independently tested: register_check PASS (45 decisions, 578 fields); statements_check PASS (216 atom sets); FA7 13/13; CS7 39 configurations, 0 invariant failures; CUR7 14/14; ADM7 12/12; ENV7 14/14 (real rustc); DA09r7 7/7 held-out register mutations detected; BA12r7 0 accepts with ≤ 1 key over 99,772 subsets; PROF7 24/24 exclusions and 113/113 checks; `matrix6` R2-H4 0 violations over 62,036 rows. **Owner-parameter conflicts surfaced (not decided):** OT-1, offline media versus 24 h freshness (interim: 24 h applies to media); OT-2, OP-10 (b) not evidenced for the current compiler (no target certifiable yet). Five review probes cannot run unmodified because they open withdrawn artefacts; they are re-expressed. |
+| Next action | independent review panel B and C on CP-1 |
+
+## L-0051 — 2026-09-14 — revision-7 review panel handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | orchestrator |
+| Input commit | `f4b964e` |
+| Work performed | Wrote HO-0020 (B) and HO-0021 (C) from the v3 concrete-profile templates. They require attacking CP-1's real combinations and exclusions, flagging deviation from OWNER-DESIGN-REQUIREMENTS-0001, not reopening owner parameters without a genuinely new trade-off, and checking the D-0008 fields; they also carry the transcript prohibition. Claimed AR-0020 and AR-0021. Recorded OT-1 and OT-2 as architect-surfaced owner conflicts pending independent confirmation. |
+| Report / evidence | `HANDOFFS/HO-0020-*.md`, `HANDOFFS/HO-0021-*.md`, `CHECKPOINTS/CP-0016.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0020 and AR-0021 in parallel |
