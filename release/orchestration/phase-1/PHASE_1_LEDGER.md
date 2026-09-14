@@ -84,3 +84,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0002 and AR-0003 in parallel |
+
+## L-0005 — 2026-09-14 — review panel spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-reviewer-trust-security (`AR-0002`) and rot-reviewer-compat-transaction (`AR-0003`), fresh Opus 5 contexts, in parallel |
+| Input commit | `83aa822` (worktrees `wt/review-r3-b`, `wt/review-r3-c`; branches `phase1/rot1-r3-review-b`, `phase1/rot1-r3-review-c`) |
+| Work performed | spawned on HO-0002 and HO-0003; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0002.report.yaml`, `AGENT_RUNS/AR-0003.report.yaml`; `release/root-of-trust/4.1.6-review-r3/{B-trust-security,C-compat-transaction}/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on both completions: verify, merge, write HO-0004, spawn synthesis reviewer D |
