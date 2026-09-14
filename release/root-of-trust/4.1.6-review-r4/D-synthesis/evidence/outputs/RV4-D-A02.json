@@ -1,0 +1,52 @@
+{
+ "probe": "RV4-D-A02",
+ "checker": "csi_check.py run_check / run_reductions (revision 4, unmodified)",
+ "targets": {
+  "T1_tool_descriptor_member": {
+   "registered_key_or_path": "TOOLS_REGISTRY.tools[tool_id=TOOL-GIT-001]",
+   "draft_v1_registered_digests": [
+    "sha256:2a36a740ab03b2fdf715784727854537ef7099996973246c79e5503539d40c21"
+   ],
+   "fixed_digest": "sha256:f749347f067892e2a0a4cbd1c867514c3226732508fa5c75d0e3f5f4f862db2f",
+   "mixed_release_old_content_under_RETAIN (E7 surface check)": 0,
+   "mixed_release_old_content_under_ONLY": 3
+  },
+  "T2_hard_invariant_member": {
+   "registered_key_or_path": "HARD_INVARIANTS.invariants[id=INV-001]",
+   "draft_v1_registered_digests": [
+    "sha256:02b0c1ca8496914e6a5d22f28daa19daad58ee882be46284269ce8144a795ad0"
+   ],
+   "fixed_digest": "sha256:1dcef6a8dc9ccebeb1bf2da5f64cf3453cfe44a584de58ad670950b22d588226",
+   "mixed_release_old_content_under_RETAIN (E7 surface check)": 0,
+   "mixed_release_old_content_under_ONLY": 3
+  },
+  "T3_schema_pinned_file": {
+   "registered_key_or_path": "schemas/adapter-manifest.schema.json",
+   "draft_v1_registered_digests": [
+    "sha256:47190483d9c89061efbb107dfe9bfa77fed52a2bfd71033328071e755c439e2d"
+   ],
+   "fixed_digest": "sha256:62c243e5f2eac989e7d7ab1296b5ddbeb7cccb97af12fa4f51590af36730d193",
+   "mixed_release_old_content_under_RETAIN (E7 surface check)": 0,
+   "mixed_release_old_content_under_ONLY": 3
+  },
+  "T4_skill_pinned_file": {
+   "registered_key_or_path": "skills/SKL-API-CONTRACT-REVIEW.yaml",
+   "draft_v1_registered_digests": [
+    "sha256:842bba2593500798f4799b4a24aedb5a78560914cb17cd1ab14dda0c3b06adba"
+   ],
+   "fixed_digest": "sha256:0431249a62f2e19c0e63977f2b22bfb27389a9e89c0a0bee27fddf2bbb9d8434",
+   "mixed_release_old_content_under_RETAIN (E7 surface check)": 0,
+   "mixed_release_old_content_under_ONLY": 3
+  }
+ },
+ "release_with_every_fix": {
+  "all_fixed_under_RETAIN": 0,
+  "all_fixed_under_ONLY": 0
+ },
+ "reductions": {
+  "v1_to_v2_RETAIN_exit": 0,
+  "v2_ONLY_to_v2_RETAIN_readding_superseded_exit": 0,
+  "v2_ONLY_to_v2_RETAIN_reductions_listed": []
+ },
+ "holds_B_H3_class_breadth": true
+}
