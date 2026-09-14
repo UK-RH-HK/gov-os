@@ -1,0 +1,18 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0008
+trigger: both specialist alternatives completed; before handoff to synthesis architect (HO-0011)
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_R5_AUTHORING
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: fd2eac4b3a8efe8abace0ddc75c9ee948a36330d
+completed_evidence:
+  - {what: review r4 synthesis (REJECTED), commit: 97a554525a4677035b56c10c6ff6f1096c818e6c, path: release/root-of-trust/4.1.6-review-r4}
+  - {what: specialist A alternative (ALTERNATIVE_PROPOSED), commit: afda6635184311f58188a000105f753bce604540, report_commit: 89c6736b0ad8237ae334b171c21f84e341599817, path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a}
+  - {what: specialist B alternative (ALTERNATIVE_PROPOSED), commit: ed079269282748b7e1e464ad395ab85177efb61f, report_commit: d984181161edeb33c2b343e2f24e124f52e107eb, path: release/root-of-trust/4.1.6-alternatives-r5/specialist-b}
+unresolved_findings: {HIGH: [RV4-H1, RV4-H2, RV4-H3], blocking_classes: [BC4-1, BC4-2, BC4-3, BC4-4]}
+escalation: {orchestrated_rejections: 2, materially_new_class_streak: 0, persistent_remainder_streak: 2, pattern: specialists completed, synthesis architect next}
+pending_owner_gates: []
+running_work: [AR-0011 synthesis architect (revision 5)]
+next_deterministic_action: spawn AR-0011 on HO-0011

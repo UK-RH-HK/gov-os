@@ -11,7 +11,17 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r5-specialist-a
 agent_id: a2f59049435bc6b59   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T07:20Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0009.report.yaml
 expected_output_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-a
-outcome: null
+outcome:
+  verdict: ALTERNATIVE_PROPOSED
+  work_commit: afda6635184311f58188a000105f753bce604540
+  report_commit: 89c6736b0ad8237ae334b171c21f84e341599817
+  integration_merge_commit: 1c46100094720ee0459ee76438e194f30feeb84e
+  owner_choices_identified: [OC-1 registration authority, OC-2 reproducer count/quorum, OC-3 upstream-toolchain residual, OC-4 protected install location, OC-5 superseded-content retention, OC-6 revoked running binary, OC-7 OP-7 restated, OC-8 independent executor distribution]
+  scope_deviation: >-
+    Disclosed, assessed non-material: a temporary copy of pack file 24 briefly written to the scratchpad root and moved
+    into ar-0009/; directory listings incidentally showed other handoff file names (incl. HO-0010) and sibling scratch
+    directory names (incl. ar-0010) without opening them; auto-memory index present in context.
+  provenance_checks: [report present and output.commit matches, only allowed paths changed (22 files), no overlap with specialist B, worktree clean incl. ignored]

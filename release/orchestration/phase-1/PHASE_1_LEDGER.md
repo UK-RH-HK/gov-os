@@ -350,3 +350,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | work `ed07926`, report `d984181` on `phase1/rot1-r5-specialist-b`; held unmerged until specialist A completes |
 | Findings | Specialist's claims, not adjudicated. **Common root:** trust judged per input, not per fact (pass-through, selection from a permitted set, evaluator inside the object). **Proposal:** first-hand-fact acceptance predicate with two-verification source legitimacy and a rebuilder quorum q ≥ 2, retiring `release-artifact`; a separate admitter `gov-admit` for first TCB acceptance over measured bytes; single value per release sequence for registrations; an attack-set calculator generating the owner-option consequence table. **Falsification:** r4 blocking probes 9 flipped, 1 flipped with residual, 1 holds, 1 not run; r3 11/11 hold; 32/32 owner configurations need ≥ 2 first-hand establishers. **Owner choices:** OC-1…OC-5. **Costs:** rebuilders, second verifier, admitter maintenance, possible per-release root ceremony. |
 | Next action | await AR-0009; then merge both, write HO-0011, spawn synthesis architect AR-0011 |
+
+## L-0024 — 2026-09-14 — specialist A completed; specialists merged
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | rot-specialist-architect (`AR-0009`, lens A: verifier's minimal trusted inputs) |
+| Input commit | `6ea45a5` |
+| Work performed | Root-cause analysis with a selector audit over 43 decision rows across revisions 1–4. Alternative mechanism. Falsification of 54 items: 15 r4 blocking probes, 9 r3 blocking probes, 30 new attacks. Owner choices. |
+| Report / evidence | `AGENT_RUNS/AR-0009.report.yaml`; `release/root-of-trust/4.1.6-alternatives-r5/specialist-a/` |
+| Verdict | `ALTERNATIVE_PROPOSED` (proposal; not reviewed) |
+| Output commit | work `afda663`, report `89c6736`, merged `1c46100`. Specialist B merged after A completed: `fd2eac4`. |
+| Findings | Specialist's claims, not adjudicated. **Root:** SEL-1 — the selector of a fact must hold at least the authority and currency the fact confers; flags all 18 HIGH rows and none of 12 confirmed-sound mechanisms. **Proposal:** per-release source and input registration by root or a delegated quorum ≥ 2; quorum ≥ 2 first-person reproductions submitted outside the pipeline; an independent first-acceptance executor (Python plus OpenSSL) over one typed state fingerprint, never running the candidate; exact per-release registration of non-join units. **Falsification:** 37 refuted, 14 confirmed as stated residuals, 2 pass, 1 not run. **Owner choices:** OC-1…OC-8. **Scope deviations (non-material):** a temporary file moved from the scratch root; other handoff and scratch names seen in listings, not opened. |
+| Next action | synthesis architect writes revision 5 |
+
+## L-0025 — 2026-09-14 — synthesis architect handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | orchestrator |
+| Input commit | `fd2eac4` |
+| Work performed | Wrote HO-0011 for a fresh synthesis architect: compare A and B, author revision 5 as architect of record, apply review r4 §6 and §7, reconcile owner options into one set without deciding. Claimed AR-0011. Added both specialist directories to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0011-rot-synthesis-architect-r5.md`, `CHECKPOINTS/CP-0008.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0011 |
