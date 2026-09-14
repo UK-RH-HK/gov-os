@@ -1,5 +1,5 @@
 {
- "base": "<scratch>/csi-selftest-of49yip2",
+ "base": "<scratch>",
  "cases": [
   {
    "id": "S00",
@@ -115,10 +115,31 @@
   {
    "id": "S06",
    "title": "role\u2192authority map: remove change-controller (answers by that id would count as human)",
-   "expected_exit": 3,
-   "observed_exit": 3,
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 2,
    "pass": true,
    "evidence": {
+    "required_missing": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].level"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].minimum_tier"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].default_reasoning"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=change-controller].name"
+     }
+    ],
     "violations": [
      {
       "file": "roles/ROLES.yaml",
@@ -160,10 +181,51 @@
   {
    "id": "S08",
    "title": "sensitivity/indexing: secret patterns emptied",
-   "expected_exit": 3,
-   "observed_exit": 3,
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 2,
    "pass": true,
    "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=aws-secret-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=private-key-block].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=github-token].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=generic-api-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=password-assignment].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=slack-token].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=stripe-like-key].regex"
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id=jwt].regex"
+     }
+    ],
     "violations": [
      {
       "file": "policies/SECURITY_POLICY.yaml",
@@ -342,9 +404,27 @@
     "violations": [
      {
       "class": "precedence",
-      "reason": "effective POLICY_PRECEDENCE rule weaker than registered for some keys",
-      "keys": [
-       "SECURITY_POLICY.never_index_classes"
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 2,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "overridable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
       ],
       "count": 1
      }
@@ -361,11 +441,238 @@
     "violations": [
      {
       "class": "precedence",
-      "reason": "effective POLICY_PRECEDENCE rule weaker than registered for some keys",
-      "keys": [
-       "SECURITY_POLICY.on_secret_in_export_payload"
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 0,
+        "kernel": {
+         "key": "SECURITY_POLICY.on_secret_in_export_payload",
+         "mode": "overridable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 1,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 2,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 3,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 4,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.secret_path_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 5,
+        "kernel": {
+         "key": "SECURITY_POLICY.secret_path_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.secret_content_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 6,
+        "kernel": {
+         "key": "SECURITY_POLICY.secret_content_patterns",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 7,
+        "kernel": {
+         "key": "SECURITY_POLICY.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.raise_for",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 8,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.raise_for",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "ceiling",
+         "kind": "radius",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 9,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "ceiling",
+         "kind": "radius",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 10,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.reversible",
+         "mode": "strengthen_only_bool",
+         "kind": null,
+         "order": null,
+         "strict_value": true,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 11,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.reversible",
+         "mode": "strengthen_only_bool",
+         "kind": null,
+         "order": null,
+         "strict_value": true,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.batch_low_priority",
+         "mode": "overridable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
       ],
-      "count": 1
+      "count": 86
      }
     ]
    }
@@ -392,6 +699,18 @@
       "op": "equals",
       "floor": "immutable",
       "kernel": "overridable"
+     },
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "field": "default_mode",
+        "kernel": "overridable",
+        "registered": "immutable"
+       }
+      ],
+      "count": 1
      }
     ]
    }
@@ -441,50 +760,29 @@
      },
      {
       "class": "precedence",
-      "reason": "effective POLICY_PRECEDENCE rule weaker than registered for some keys",
-      "keys": [
-       "AUTHORITY_POLICY.authority_levels_required.answer_gate",
-       "AUTHORITY_POLICY.authority_levels_required.approve_cit_auto",
-       "AUTHORITY_POLICY.authority_levels_required.approve_cit_human",
-       "AUTHORITY_POLICY.authority_levels_required.build_memory",
-       "AUTHORITY_POLICY.authority_levels_required.checkpoint",
-       "AUTHORITY_POLICY.authority_levels_required.claim_task",
-       "AUTHORITY_POLICY.authority_levels_required.close_task",
-       "AUTHORITY_POLICY.authority_levels_required.create_gate",
-       "AUTHORITY_POLICY.authority_levels_required.create_handoff",
-       "AUTHORITY_POLICY.authority_levels_required.create_task",
-       "AUTHORITY_POLICY.authority_levels_required.emergency_control",
-       "AUTHORITY_POLICY.authority_levels_required.execute_cit",
-       "AUTHORITY_POLICY.authority_levels_required.execute_plugin",
-       "AUTHORITY_POLICY.authority_levels_required.force_close_task",
-       "AUTHORITY_POLICY.authority_levels_required.force_release_task",
-       "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception",
-       "AUTHORITY_POLICY.authority_levels_required.install_kernel",
-       "AUTHORITY_POLICY.authority_levels_required.install_tool",
-       "AUTHORITY_POLICY.authority_levels_required.memory_benchmark",
-       "AUTHORITY_POLICY.authority_levels_required.memory_select",
-       "AUTHORITY_POLICY.authority_levels_required.migrate_execute",
-       "AUTHORITY_POLICY.authority_levels_required.mutate_governance_project_overlay",
-       "AUTHORITY_POLICY.authority_levels_required.mutate_product_source",
-       "AUTHORITY_POLICY.authority_levels_required.mutate_spec_decisions",
-       "AUTHORITY_POLICY.authority_levels_required.mutate_spec_other",
-       "AUTHORITY_POLICY.authority_levels_required.mutate_task_status",
-       "AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity",
-       "AUTHORITY_POLICY.authority_levels_required.p3probe",
-       "AUTHORITY_POLICY.authority_levels_required.present_gate",
-       "AUTHORITY_POLICY.authority_levels_required.propose_cit",
-       "AUTHORITY_POLICY.authority_levels_required.read",
-       "AUTHORITY_POLICY.authority_levels_required.readiness_plan",
-       "AUTHORITY_POLICY.authority_levels_required.rebuild_memory",
-       "AUTHORITY_POLICY.authority_levels_required.record_routing_evidence",
-       "AUTHORITY_POLICY.authority_levels_required.recover",
-       "AUTHORITY_POLICY.authority_levels_required.register_plugin",
-       "AUTHORITY_POLICY.authority_levels_required.reject_cit",
-       "AUTHORITY_POLICY.authority_levels_required.release_task",
-       "AUTHORITY_POLICY.authority_levels_required.resume_control",
-       "AUTHORITY_POLICY.authority_levels_required.retire_legacy_mechanism"
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 0,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": true
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
       ],
-      "count": 48
+      "count": 1
      }
     ]
    }
@@ -492,7 +790,10 @@
   {
    "id": "S17",
    "title": "tool registry: new descriptor with an install command",
-   "expected_exit": 3,
+   "expected_exit": [
+    2,
+    3
+   ],
    "observed_exit": 3,
    "pass": true,
    "evidence": {
@@ -606,7 +907,7 @@
   },
   {
    "id": "S22",
-   "title": "forward compatibility: new constitutional files classified by inventory data only (no new class or operator)",
+   "title": "forward compatibility: new constitutional files and their precedence classified by inventory data only (no new class or operator)",
    "expected_exit": 0,
    "observed_exit": 0,
    "pass": true,
@@ -648,8 +949,653 @@
      "inventory default must be 'deny'"
     ]
    }
+  },
+  {
+   "id": "S26",
+   "title": "precedence AUTHORITY_POLICY.authority_levels_required.* floor -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 0,
+        "kernel": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "AUTHORITY_POLICY.authority_levels_required.*",
+         "mode": "floor",
+         "kind": "level",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S27",
+   "title": "precedence HUMAN_GATE_POLICY.agent_resolvable_when.max_radius ceiling -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 8,
+        "kernel": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+         "mode": "ceiling",
+         "kind": "radius",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S28",
+   "title": "precedence SECURITY_POLICY.never_index_classes additive -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 2,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S29",
+   "title": "precedence TOOL_POLICY.approved_licences shrink_only -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 36,
+        "kernel": {
+         "key": "TOOL_POLICY.approved_licences",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "TOOL_POLICY.approved_licences",
+         "mode": "shrink_only",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S30",
+   "title": "precedence TOOL_POLICY.health_check_required strengthen_only_bool -> immutable (removes admitted project strengthening; exact registration refuses)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 34,
+        "kernel": {
+         "key": "TOOL_POLICY.health_check_required",
+         "mode": "immutable",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "TOOL_POLICY.health_check_required",
+         "mode": "strengthen_only_bool",
+         "kind": null,
+         "order": null,
+         "strict_value": true,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S31",
+   "title": "POLICY_PRECEDENCE.yaml deleted (RV3-D-A10 R07)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "rule": "policies/POLICY_PRECEDENCE.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S32",
+   "title": "registered constitutional file removed: policies/SECURITY_POLICY.yaml (RV3-D-A10 R01)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "rule": "policies/SECURITY_POLICY.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S33",
+   "title": "registered constitutional file removed: constitution/HARD_INVARIANTS.yaml (RV3-D-A10 R02)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "constitution/HARD_INVARIANTS.yaml",
+      "rule": "constitution/HARD_INVARIANTS.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S34",
+   "title": "registered constitutional file removed: policies/ENFORCEMENT_MAP.yaml (RV3-D-A10 R03)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/ENFORCEMENT_MAP.yaml",
+      "rule": "policies/ENFORCEMENT_MAP.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S35",
+   "title": "registered constitutional file removed: schemas/adapter-manifest.schema.json (RV3-D-A10 R04)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "schemas/adapter-manifest.schema.json",
+      "rule": "schemas/*.schema.json"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S36",
+   "title": "registered constitutional file removed: roles/ROLES.yaml (RV3-D-A10 R05)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "roles/ROLES.yaml",
+      "rule": "roles/ROLES.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S37",
+   "title": "registered constitutional file removed: adapters/generic/template.md (RV3-D-A10 R06)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "adapters/generic/template.md",
+      "rule": "adapters/*"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S38",
+   "title": "registered constitutional file removed: policies/HUMAN_GATE_POLICY.yaml (RV3-D-A10 R08)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "rule": "policies/HUMAN_GATE_POLICY.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S39",
+   "title": "registered constitutional file removed: policies/AUTHORITY_POLICY.yaml (RV3-D-A10 R09)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "rule": "policies/AUTHORITY_POLICY.yaml"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S40",
+   "title": "registered floor leaf deleted: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius (RV3-B I09)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "required_missing": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S41",
+   "title": "YAML 1.1 boolean token `on` for a bool_toward floor (RV3-B-A14)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "structure": [
+     {
+      "file": "policies/TOOL_POLICY.yaml",
+      "problem": "yaml_profile: YAML 1.1 boolean token 'on' at line 32 (a string under the single profile)"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S42",
+   "title": "duplicate mapping key in SECURITY_POLICY.yaml",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "structure": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "problem": "yaml_profile: duplicate mapping key 'never_index_classes' at line 31"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S43",
+   "title": "YAML anchor on a constitutional node",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "structure": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "problem": "yaml_profile: anchor &gate at line 4"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S44",
+   "title": "security decision point key MEMORY_POLICY.embedding.provider changed (RV3-B-A16, CR-07)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/MEMORY_POLICY.yaml",
+      "key": "MEMORY_POLICY.embedding.provider",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:38840f39fef4187d11c7029bcda9adafb944ac49dcad42b617c127733680b5c3"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S45",
+   "title": "precedence rules reordered with identical per-key effect (exact registration)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 2,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       },
+       {
+        "index": 3,
+        "kernel": {
+         "key": "SECURITY_POLICY.never_index_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        },
+        "registered": {
+         "key": "SECURITY_POLICY.never_export_classes",
+         "mode": "additive",
+         "kind": null,
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "S46",
+   "title": "migration set_overlay_key TOOL_PERMISSIONS.yaml install_authority_roles (not migration-writable)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "migration",
+      "reason": "migration_operation_not_permitted",
+      "problems": [
+       {
+        "index": 0,
+        "op": "set_overlay_key",
+        "target": "TOOL_PERMISSIONS.yaml:install_authority_roles",
+        "problem": "overlay key not registered as migration-writable",
+        "file": "migrations/M-4.1.5-4.1.6.yaml"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S47",
+   "title": "migration target ../../spec/decisions/HDG-0001.yaml (outside governance/overlay)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "migration",
+      "reason": "migration_operation_not_permitted",
+      "problems": [
+       {
+        "index": 0,
+        "op": "set_overlay_key",
+        "target": "../../spec/decisions/HDG-0001.yaml",
+        "problem": "target does not resolve to a registered file directly inside governance/overlay/",
+        "file": "migrations/M-4.1.5-4.1.6.yaml"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S48",
+   "title": "migration lock operation set_lock_field (R-MIG-3)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "migration",
+      "reason": "migration_operation_not_permitted",
+      "problems": [
+       {
+        "index": 0,
+        "op": "set_lock_field",
+        "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+        "file": "migrations/M-4.1.5-4.1.6.yaml"
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S49",
+   "title": "migration with only registered targets (note; set_overlay_rule REPOSITORY_CONTRACT paths; PROJECT_POLICY.governance.overlay_dir)",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S50",
+   "title": "owner constitutional file slot registered by the Trust Policy, file absent",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "missing": [
+     {
+      "path": "spec/contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+      "consumers": [
+       "capability_acceptance_gate"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S51",
+   "title": "owner constitutional file present, digest not confirmed on this machine",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "unconfirmed": [
+     {
+      "path": "spec/contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+      "digest": "sha256:0d06ae58dfe669a115ae9a5c3044cffd191b93d9f1e6dfd95b9c0a04241e25b4",
+      "consumers": [
+       "capability_acceptance_gate"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S52",
+   "title": "owner constitutional file present and confirmed",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S53",
+   "title": "TPS v2 registers never_index_classes immutable (was additive): computed reduction without lowering_history",
+   "expected_exit": 6,
+   "observed_exit": 6,
+   "pass": true,
+   "evidence": {
+    "undeclared": [
+     {
+      "subject": "POLICY_PRECEDENCE:SECURITY_POLICY.never_index_classes",
+      "kind": "precedence_reduction",
+      "direction": "add",
+      "old_mode": "additive",
+      "new_mode": "immutable",
+      "admits_new_weakening": false,
+      "removes_admitted_strengthening": true,
+      "exception_relaxation_added": false
+     }
+    ]
+   }
+  },
+  {
+   "id": "S54",
+   "title": "same reduction declared in the cumulative lowering_history",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S55",
+   "title": "exception_relaxable set on a registered rule in the kernel only (exact registration)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+      "mismatches": [
+       {
+        "index": 19,
+        "kernel": {
+         "key": "CHANGE_POLICY.rollback.keep_snapshots",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": true
+        },
+        "registered": {
+         "key": "CHANGE_POLICY.rollback.keep_snapshots",
+         "mode": "floor",
+         "kind": "number",
+         "order": null,
+         "strict_value": null,
+         "exception_relaxable": false
+        }
+       }
+      ],
+      "count": 1
+     }
+    ]
+   }
   }
  ],
- "passed": 26,
+ "passed": 56,
  "failed": 0
 }

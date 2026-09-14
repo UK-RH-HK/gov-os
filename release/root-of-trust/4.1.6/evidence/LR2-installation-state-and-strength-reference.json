@@ -1,0 +1,1285 @@
+{
+ "inventory_overlay_surface_files": [
+  "DATA_SENSITIVITY.yaml",
+  "REPOSITORY_CONTRACT.yaml",
+  "TOOL_PERMISSIONS.yaml",
+  "PROJECT_EXCEPTIONS.yaml",
+  "PROJECT_POLICY.yaml",
+  "MODEL_ROUTING_OVERRIDES.yaml",
+  "CAPABILITY_PROFILE.yaml",
+  "plugins/*.yaml"
+ ],
+ "trees": {
+  "C-L3_intact_revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [],
+    "PROJECT_STRENGTH_WEAKENED": false
+   }
+  },
+  "L3r4_intact_revision4_layout_delta": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [],
+    "PROJECT_STRENGTH_WEAKENED": false
+   }
+  },
+  "RV3-C-A04_partial_occupation_removal_then_init_force": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-C-A05_full_removal_then_init_force": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     },
+     "spec/audits/GOVERNANCE-ADOPTION": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     ".governance-runtime/migration": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-C-A03_dir_file_merge": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  },
+  "RV3-C-durability/clone_full": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  },
+  "RV3-C-durability/clone_checkout": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  },
+  "RV3-C-durability/clone_clean": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  },
+  "RV3-C-durability/clone_merge": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  },
+  "RV3-C-durability/clone_revert": {
+   "exists": true,
+   "installation_state": {
+    "state": "LEGACY",
+    "governance_trust_present": false,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     },
+     "spec/audits/GOVERNANCE-ADOPTION": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     ".governance-runtime/migration": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-C-durability/clone_sparse": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     ".governance-runtime/migration": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-C-durability/archive_extract": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  },
+  "RV3-D-A05a_checkout_pre_governance/revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.default_class",
+      "op": "ordered_at_least",
+      "recorded": "internal",
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.identifiers_to_strip",
+      "op": "set_superset",
+      "recorded": [],
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.classifications",
+      "op": "classification_superset",
+      "recorded": [
+       {
+        "pattern": "product/restricted-plan.md",
+        "class": "restricted",
+        "reason": "customer terms"
+       },
+       {
+        "pattern": "product/customers/**",
+        "class": "restricted",
+        "reason": "post-migration project classification"
+       }
+      ],
+      "current": []
+     }
+    ],
+    "PROJECT_STRENGTH_WEAKENED": true
+   }
+  },
+  "RV3-D-A05b_checkout_pre_targeted/revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [],
+    "PROJECT_STRENGTH_WEAKENED": false
+   }
+  },
+  "RV3-D-A05c_restore_source_pre/revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "LEGACY",
+    "governance_trust_present": false,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [
+     {
+      "subject": "CAPABILITY_PROFILE.yaml:CAPABILITY_PROFILE.categories",
+      "op": "applicable_superset",
+      "recorded": {
+       "product-outcome": {
+        "applicable": true
+       },
+       "ux": {
+        "applicable": true
+       },
+       "frontend": {
+        "applicable": true
+       },
+       "backend": {
+        "applicable": true
+       },
+       "database-storage": {
+        "applicable": true
+       },
+       "integration-api": {
+        "applicable": true
+       },
+       "devops-infrastructure": {
+        "applicable": true
+       },
+       "security-privacy": {
+        "applicable": true
+       },
+       "testing-quality": {
+        "applicable": true
+       },
+       "data-engineering": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       },
+       "ai-ml-model": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       },
+       "evaluation": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       },
+       "observability-sre": {
+        "applicable": true
+       },
+       "performance-capacity": {
+        "applicable": true
+       },
+       "operations-recovery": {
+        "applicable": true
+       },
+       "scientific-rd": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       }
+      },
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.default_class",
+      "op": "ordered_at_least",
+      "recorded": "internal",
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.identifiers_to_strip",
+      "op": "set_superset",
+      "recorded": [],
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.classifications",
+      "op": "classification_superset",
+      "recorded": [
+       {
+        "pattern": "product/restricted-plan.md",
+        "class": "restricted",
+        "reason": "customer terms"
+       },
+       {
+        "pattern": "product/customers/**",
+        "class": "restricted",
+        "reason": "post-migration project classification"
+       }
+      ],
+      "current": null
+     },
+     {
+      "subject": "PROJECT_POLICY.yaml:PROJECT_POLICY.staleness.on_stale_close",
+      "op": "ordered_at_least",
+      "recorded": "fail",
+      "current": null
+     },
+     {
+      "subject": "PROJECT_POLICY.yaml:PROJECT_POLICY.readiness.enforce_pre_implementation_cells",
+      "op": "bool_toward",
+      "recorded": true,
+      "current": null
+     },
+     {
+      "subject": "REPOSITORY_CONTRACT.yaml:REPOSITORY_CONTRACT.roots",
+      "op": "equal",
+      "recorded": {
+       "governance": "governance/",
+       "spec": "spec/",
+       "product": "product/",
+       "archive": "archive/"
+      },
+      "current": null
+     },
+     {
+      "subject": "REPOSITORY_CONTRACT.yaml:REPOSITORY_CONTRACT.paths",
+      "op": "contract_at_least",
+      "recorded": [
+       {
+        "pattern": "governance/kernel/**",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "prohibited",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/project/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/generated/**",
+        "class": "generated",
+        "owner_role": "orchestrator",
+        "mutation": "generated",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/framework.lock",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/tests/**",
+        "class": "authoritative",
+        "owner_role": "memory-engineer",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "spec/decisions/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/reports/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/lessons/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/research/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/experiments/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/audits/**",
+        "class": "evidence",
+        "owner_role": "independent-auditor",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/**",
+        "class": "authoritative",
+        "owner_role": "product-spec-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "product/tests/**",
+        "class": "test",
+        "owner_role": "independent-test-designer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "product/**",
+        "class": "source",
+        "owner_role": "backend-engineer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "archive/**",
+        "class": "historical",
+        "owner_role": "orchestrator",
+        "default_retrieval": false,
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "archive"
+       },
+       {
+        "pattern": "**/.env*",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "code_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": "**/secrets/**",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": ".governance-runtime/**",
+        "class": "derived",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "runtime"
+       }
+      ],
+      "current": null
+     },
+     {
+      "subject": "TOOL_PERMISSIONS.yaml:TOOL_PERMISSIONS.install_authority_roles",
+      "op": "set_subset",
+      "recorded": [
+       "tooling-engineer",
+       "orchestrator"
+      ],
+      "current": null
+     }
+    ],
+    "PROJECT_STRENGTH_WEAKENED": true
+   }
+  },
+  "RV3-D-A06_full_removal/revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     },
+     "spec/audits/GOVERNANCE-ADOPTION": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     ".governance-runtime/migration": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-D-A06_control_intact/revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [],
+    "PROJECT_STRENGTH_WEAKENED": false
+   }
+  },
+  "RV3-D-A07_fresh_clone/revision3_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {
+     ".governance-runtime/migration": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-D-A05a_checkout_pre_governance/revision4_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.default_class",
+      "op": "ordered_at_least",
+      "recorded": "internal",
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.identifiers_to_strip",
+      "op": "set_superset",
+      "recorded": [],
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.classifications",
+      "op": "classification_superset",
+      "recorded": [
+       {
+        "pattern": "product/restricted-plan.md",
+        "class": "restricted",
+        "reason": "customer terms"
+       },
+       {
+        "pattern": "product/customers/**",
+        "class": "restricted",
+        "reason": "post-migration project classification"
+       }
+      ],
+      "current": []
+     }
+    ],
+    "PROJECT_STRENGTH_WEAKENED": true
+   }
+  },
+  "RV3-D-A05b_checkout_pre_targeted/revision4_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [],
+    "PROJECT_STRENGTH_WEAKENED": false
+   }
+  },
+  "RV3-D-A05c_restore_source_pre/revision4_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "LEGACY",
+    "governance_trust_present": false,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [
+     {
+      "subject": "CAPABILITY_PROFILE.yaml:CAPABILITY_PROFILE.categories",
+      "op": "applicable_superset",
+      "recorded": {
+       "product-outcome": {
+        "applicable": true
+       },
+       "ux": {
+        "applicable": true
+       },
+       "frontend": {
+        "applicable": true
+       },
+       "backend": {
+        "applicable": true
+       },
+       "database-storage": {
+        "applicable": true
+       },
+       "integration-api": {
+        "applicable": true
+       },
+       "devops-infrastructure": {
+        "applicable": true
+       },
+       "security-privacy": {
+        "applicable": true
+       },
+       "testing-quality": {
+        "applicable": true
+       },
+       "data-engineering": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       },
+       "ai-ml-model": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       },
+       "evaluation": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       },
+       "observability-sre": {
+        "applicable": true
+       },
+       "performance-capacity": {
+        "applicable": true
+       },
+       "operations-recovery": {
+        "applicable": true
+       },
+       "scientific-rd": {
+        "applicable": false,
+        "reason": "not yet in scope"
+       }
+      },
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.default_class",
+      "op": "ordered_at_least",
+      "recorded": "internal",
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.identifiers_to_strip",
+      "op": "set_superset",
+      "recorded": [],
+      "current": null
+     },
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.classifications",
+      "op": "classification_superset",
+      "recorded": [
+       {
+        "pattern": "product/restricted-plan.md",
+        "class": "restricted",
+        "reason": "customer terms"
+       },
+       {
+        "pattern": "product/customers/**",
+        "class": "restricted",
+        "reason": "post-migration project classification"
+       }
+      ],
+      "current": null
+     },
+     {
+      "subject": "PROJECT_POLICY.yaml:PROJECT_POLICY.staleness.on_stale_close",
+      "op": "ordered_at_least",
+      "recorded": "fail",
+      "current": null
+     },
+     {
+      "subject": "PROJECT_POLICY.yaml:PROJECT_POLICY.readiness.enforce_pre_implementation_cells",
+      "op": "bool_toward",
+      "recorded": true,
+      "current": null
+     },
+     {
+      "subject": "REPOSITORY_CONTRACT.yaml:REPOSITORY_CONTRACT.roots",
+      "op": "equal",
+      "recorded": {
+       "governance": "governance/",
+       "spec": "spec/",
+       "product": "product/",
+       "archive": "archive/"
+      },
+      "current": null
+     },
+     {
+      "subject": "REPOSITORY_CONTRACT.yaml:REPOSITORY_CONTRACT.paths",
+      "op": "contract_at_least",
+      "recorded": [
+       {
+        "pattern": "governance/kernel/**",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "prohibited",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/project/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/generated/**",
+        "class": "generated",
+        "owner_role": "orchestrator",
+        "mutation": "generated",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/framework.lock",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/tests/**",
+        "class": "authoritative",
+        "owner_role": "memory-engineer",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "spec/decisions/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/reports/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/lessons/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/research/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/experiments/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/audits/**",
+        "class": "evidence",
+        "owner_role": "independent-auditor",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/**",
+        "class": "authoritative",
+        "owner_role": "product-spec-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "product/tests/**",
+        "class": "test",
+        "owner_role": "independent-test-designer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "product/**",
+        "class": "source",
+        "owner_role": "backend-engineer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "archive/**",
+        "class": "historical",
+        "owner_role": "orchestrator",
+        "default_retrieval": false,
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "archive"
+       },
+       {
+        "pattern": "**/.env*",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "code_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": "**/secrets/**",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": ".governance-runtime/**",
+        "class": "derived",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "runtime"
+       }
+      ],
+      "current": null
+     },
+     {
+      "subject": "TOOL_PERMISSIONS.yaml:TOOL_PERMISSIONS.install_authority_roles",
+      "op": "set_subset",
+      "recorded": [
+       "tooling-engineer",
+       "orchestrator"
+      ],
+      "current": null
+     }
+    ],
+    "PROJECT_STRENGTH_WEAKENED": true
+   }
+  },
+  "RV3-D-A06_full_removal/revision4_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "PARTIAL(occupation)",
+    "governance_trust_present": true,
+    "legacy_entries_present": true,
+    "occupation_missing_or_retyped": {
+     "governance/kernel": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/project": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/generated": {
+      "expected": "file",
+      "observed": "dir"
+     },
+     "governance/framework.lock": {
+      "expected": "dir",
+      "observed": "file"
+     },
+     "spec/audits/GOVERNANCE-ADOPTION": {
+      "expected": "file",
+      "observed": "absent"
+     },
+     ".governance-runtime/migration": {
+      "expected": "file",
+      "observed": "absent"
+     }
+    },
+    "stray_legacy_artefacts_named_by_doctor": [
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml"
+    ],
+    "rot1_policy_root": "EmbeddedSnapshot joined with floors (fail closed)",
+    "rot1_mutations": "refused INSTALL_STATE_PARTIAL / INSTALL_STATE_LEGACY; doctor D033 CRITICAL names the mixed layout"
+   }
+  },
+  "RV3-D-A06_control_intact/revision4_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   },
+   "project_strength": {
+    "recorded_on": "the committed overlay at HEAD (the machine's last recorded vector)",
+    "requirements": 14,
+    "failures": [],
+    "PROJECT_STRENGTH_WEAKENED": false
+   }
+  },
+  "RV3-D-A07_fresh_clone/revision4_layout": {
+   "exists": true,
+   "installation_state": {
+    "state": "COMPLETE",
+    "governance_trust_present": true,
+    "legacy_entries_present": false,
+    "occupation_missing_or_retyped": {},
+    "stray_legacy_artefacts_named_by_doctor": [],
+    "rot1_policy_root": "KernelSnapshot if verified and eligible",
+    "rot1_mutations": "per verdict and freshness"
+   }
+  }
+ }
+}

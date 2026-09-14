@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-base-manifest.schema.json",
   "title": "trust-base-manifest",
-  "description": "PROPOSED (RoT-1 revision 3). Trust Base Manifest compiled into every gov binary (25 §4). Signed components are named by digest; compiled code is covered by the build attestation.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Trust Base Manifest v2 compiled into every gov binary (25 §4). Signed components are named by digest; compiled code is covered by the build attestation. binary.source must equal the attested source of the final's candidate (A4b). compiled_rules name floor_schema_version 3 and operator vocabulary floor-ops/3.",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,7 +20,7 @@
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/manifest/trust-base/v1"
+      "const": "https://agentic-engineering-os/manifest/trust-base/v2"
     },
     "framework": {
       "const": "agentic-engineering-os"
@@ -39,8 +39,7 @@
         "version",
         "target",
         "build",
-        "source_commit",
-        "build_inputs_digest",
+        "source",
         "toolchain"
       ],
       "properties": {
@@ -62,13 +61,30 @@
             "development"
           ]
         },
-        "source_commit": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
-        },
-        "build_inputs_digest": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "release_commit",
+            "source_tree_digest",
+            "build_inputs_digest"
+          ],
+          "properties": {
+            "release_commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "source_tree_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
+            },
+            "build_inputs_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "description": "digest of the published build inputs (toolchain, lockfiles)"
+            }
+          }
         },
         "toolchain": {
           "type": "string",
@@ -169,14 +185,15 @@
       ],
       "properties": {
         "floor_schema_version": {
-          "const": 2
+          "const": 3
         },
         "operator_vocabulary": {
-          "const": "floor-ops/2"
+          "const": "floor-ops/3"
         },
         "purpose_table_digest": {
           "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$"
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "digest of the compiled purpose table (twelve purposes) and pairwise whitelist"
         },
         "statement_schemas_digest": {
           "type": "string",

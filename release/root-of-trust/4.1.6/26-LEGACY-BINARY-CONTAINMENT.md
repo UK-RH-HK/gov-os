@@ -1,22 +1,31 @@
-# Output 26 — Legacy-binary damage containment
+# Output 26 — Legacy-binary damage containment and project-owned strength
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> New in revision 3. Closes R2-H4 and R2-L3 as a class and satisfies HO-0001 §3.4. It replaces the sentinel boundary of
-> revision 2 (`13` §3). Normative keywords: MUST, MUST NOT, SHOULD.
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 3 added this file. Review r3 recorded R2-H4 **CLOSED as a class**, with HO-0001 §3.4 SATISFIED. Revision 4
+> keeps the layout and property LP-1 unchanged: P3r3 was re-run unchanged, with results equal to the committed ones.
+> Revision 4 changes three things:
+> - residual LR-2 is restated with its reachable outcome (RV3-M6, C-1);
+> - the migration occupation survives the "untrack ignored files" idiom (RV3-L7);
+> - project-owned strength is evaluated over the effective policy (BC-1 root; rule 20).
+>
+> Normative keywords: MUST, MUST NOT, SHOULD.
 
 ## 1. The class
 
-Revision 2 relied on sentinels that old binaries read only *after* acting. The review showed three things:
-- real 4.1.5 `update --rollback` and `init --force`, and 4.1.2 `update --rollback`, rewrote a RoT-1 project;
-- they deleted a project restricted-classification and reported `verified: true`;
-- no RoT-1 remedy restored the classification (review `evidence/P3`).
+**Revision 2.** It relied on sentinels that old binaries read only after acting. The mistaken equivalence was *sentinel
+read afterwards ⇒ boundary*.
 
-The mistaken equivalence was *sentinel read afterwards ⇒ boundary*.
+**Requirement (unchanged).** A pre-RoT binary MUST NOT be able to silently mutate a RoT-1 project into a state it then
+treats as valid. The defence MUST NOT depend on the old binary understanding RoT-1. The mechanism is structural: every
+path the old binary would use is occupied by an entry of the wrong type, or is outside its vocabulary.
 
-Revision 3 requirement: **a pre-RoT binary MUST NOT be able to silently mutate a RoT-1 project into a state it then
-treats as valid, and the defence MUST NOT depend on the old binary understanding RoT-1.** The mechanism is structural. Old
-binaries find no usable path to write, because every path they would use is occupied by an entry of the wrong type or
-does not exist in their vocabulary.
+**What review r3 confirmed, and what it bounded.**
+- **Confirmed.** On the intact layout no pre-RoT byte is written: P3r3 with 695 invocations and 40 chains, and reviewer C
+  with 84 destructive invocations.
+- **Bounded (RV3-M6).** Once the occupation entries are removed, or pre-migration paths are restored with an ordinary Git
+  command, a legacy binary operates a legacy layout it treats as valid. It can then write `governance/trust/**` and the
+  overlay. No design stops Git restoring pre-migration history. Revision 4 states that outcome exactly (§8 LR-2) and tests
+  it (`12` RT-81, RT-50b).
 
 ## 2. Layout `rot-1/legacy-path-occupation-v1`
 
@@ -27,170 +36,122 @@ governance/
 │   ├── framework.lock             lock 3.0.0 (08 §3)
 │   ├── kernel/**                  installed kernel (no KERNEL_MANIFEST.json)
 │   ├── release.dsse.json · lineage/ · state/ · root/ · profiles/
-├── overlay/                       project overlay (relocated from governance/project); GovernedFs, not PPS
+├── overlay/                       project overlay (relocated from governance/project); GovernedFs; Overlay Surface (23 §11)
 ├── views/                         generated views (relocated from governance/generated); GovernedFs
 ├── kernel                         OCCUPIED: regular file (sentinel text)
 ├── project                        OCCUPIED: regular file
 ├── generated                      OCCUPIED: regular file
 └── framework.lock/                OCCUPIED: directory containing ROT-1-TRUST-FORMAT (sentinel)
 spec/audits/GOVERNANCE-ADOPTION    OCCUPIED: regular file (RoT-1 adoption evidence lives at spec/audits/ADOPTION/)
-.governance-runtime/migration      OCCUPIED: regular file, tracked in Git (force-added despite the runtime ignore rule)
+.governance-runtime/migration      OCCUPIED: regular file, tracked in Git
+.gitignore                         /.governance-runtime/*   and   !/.governance-runtime/migration   (revision 4, RV3-L7)
 ```
 
-- Sentinel text: `ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-operate-this-project`.
-- The occupation entries are **part of the Protected Path Set**: only the install transaction writes them.
-- A missing or retyped occupation entry makes the RoT-1 installation state `PARTIAL(occupation)` (`18` §9), doctor D033
-  CRITICAL. Restoring the entries is a remedy.
+- **Sentinel text:** `ROT-1-TRUST-FORMAT:requires-gov>=4.1.6:this-binary-cannot-operate-this-project`.
+- **Protection.** The occupation entries are part of the Protected Path Set, and only the install transaction writes
+  them. Their type is checked by `st_mode` or `GetFileInformationByHandle`, never by name (C-4).
+- **Ignore rule (RV3-L7).**
+  - **Revision 3.** The whole of `.governance-runtime/` was ignored, and the occupation force-added. `git ls-files -ci
+    --exclude-standard` listed the occupation, so the common "untrack ignored files" idiom removed it from later clones.
+  - **Revision 4.** The installer writes `/.governance-runtime/*` and `!/.governance-runtime/migration` instead. The idiom
+    lists nothing and a fresh clone keeps the occupation. Doctor names an absent or retyped occupation entry (D033).
+  - **Evidence.** `evidence/RV3-D-A05-A07-rerun-r4-layout.json` (the synthesis reviewer's probe, run on the layout with
+    this delta: `tracked_but_ignored_listed: []`, occupation in the fresh clone: `file`) and
+    `evidence/LR2-installation-state-and-strength-reference.json` (fresh clone after the idiom: `COMPLETE`).
+- **Partial state.** A missing or retyped occupation entry makes the RoT-1 installation state `PARTIAL(occupation)`
+  (`18` §9), doctor D033 CRITICAL. Doctor also names stray legacy artefacts left by merges or partial removal (C-3).
 
 ## 3. Why every pre-RoT command fails before its first write (class argument)
 
-The command handlers of 4.1.2 (`8ad06be`), 4.1.3 (`26ab5b6`), 4.1.4 (`47d8394`) and 4.1.5 (`cli/src/main.rs` at base)
-partition into two sets.
-
-**(i) Commands that need an installation.** These call `open_project(cli, true)`, that is `Project::require_installed`,
-which is `lock_path().exists() && kernel_dir().join("KERNEL_MANIFEST.json").exists()`
-(`runtime/src/project.rs:97-99`, identical in 4.1.2).
-- With `governance/kernel` a regular file, `governance/kernel/KERNEL_MANIFEST.json` cannot exist, so every such command
-  returns `NOT_INSTALLED` before it opens the database or writes.
-- This covers `update` including `--rollback` (which reads the legacy snapshot only after the authority check),
-  `kernel reinstall`, `recover`, tasks, CIT, gates, `decide`, `rebuild-memory`, `memory *`, `tools *`, `plugins *`,
-  `upstream *`, checkpoints, handoffs, adapters, `policy *`, `readiness *` and `claims *`.
-
-**(ii) Commands that run without an installation**, each with its own write or restore root:
-
-| Command | Write or restore root | Why it cannot write |
-|---|---|---|
-| `version`, `help`, `mcp` | none | no project write (`MCP_NOT_IMPLEMENTED`) |
-| `init` | `governance/framework.lock` existence check, then `governance/kernel` | `ALREADY_INSTALLED` (the lock path exists as a directory); with `--force`, `install_kernel` into a regular file gives `IO_ERROR` before overlay or lock writes |
-| `doctor` | read-only | — |
-| `adopt`/`migrate` `baseline` | `create_dir_all(spec/audits/GOVERNANCE-ADOPTION)` (`adopt.rs:97-98`) | occupied by a regular file: `IO_ERROR` |
-| `adopt`/`migrate` later stages | read `spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml` | `ADOPTION_NOT_STARTED` |
-| `adopt`/`migrate rollback --batch N` | restores from `.governance-runtime/migration/batch-N/` with no precondition (`migrations/executor.rs:304-350`, identical in 4.1.2) | `.governance-runtime/migration` is a regular file, so nothing is restored |
-| `capabilities ecosystems`/`plugins`/`serve-embed` | read-only, or stdin protocol | — |
-| `capabilities invoke` | plugin descriptors under `governance/project/plugins` | occupied: `PLUGIN_NOT_FOUND` |
-| `lessons cluster` | reads `framework/` or `governance/kernel/policies/LEARNING_POLICY.yaml` under `--root` | kernel path is a file, so it fails |
-| `release build`/`verify` | canonical root from `GOV_CANONICAL_ROOT` only (`kernel.rs:83-92`) | no canonical root in a consumer project, so it fails; `verify` is read-only |
+Unchanged from revision 3. Commands that need an installation return `NOT_INSTALLED`, because
+`governance/kernel/KERNEL_MANIFEST.json` cannot exist when `governance/kernel` is a file. Commands that run without an
+installation meet a wrong-typed entry at their write or restore root.
 
 ### 3.1 Legacy runtime residue
 
-- **`.governance-runtime/update/<v>/`** (legacy update snapshots).
-  - Only consumer: `update --rollback`, which is in set (i) and therefore blocked.
-  - The first RoT-1 install transaction on a machine MUST additionally move it to
-    `.governance-runtime/legacy-quarantine/update-<v>/`.
-  - P3 deliberately leaves it in place and shows the layout alone suffices.
-- **`.governance-runtime/migration/batch-N/`** (legacy adoption snapshots).
-  - Consumer: `adopt rollback`, which is in set (ii).
-  - It is occupied by a **tracked** regular file, so the occupation travels with Git.
-  - Executed Git behaviour (`evidence/G1-git-occupation-behaviour.txt`):
-    - pulling the RoT-1 commit into a working copy whose *ignored* residue directory is in the way removes the residue
-      and checks out the occupation file;
-    - with *unignored* untracked residue, the checkout aborts, and that working copy stays on the legacy layout, which
-      holds no RoT-1 state to damage;
-    - a fresh clone receives the file.
+Unchanged. `.governance-runtime/update/<v>/` is blocked by set (i) and quarantined by the first RoT-1 transaction.
+`.governance-runtime/migration/batch-N/` is occupied by the tracked file, which now also survives untracking (§2).
 
-## 4. Executed property (P3r3)
+## 4. Executed property (LP-1)
 
-**Property LP-1** (replaces LC-1 and LC-2): for every pre-RoT binary 4.1.2, 4.1.3, 4.1.4 and 4.1.5, and every invocation
-derived from its own register (including mode-flag variants, destructive combinations and stateful chains), on a RoT-1
-project carrying a legacy update snapshot and a project restricted-classification:
+**Property LP-1** (unchanged). For every pre-RoT binary 4.1.2–4.1.5, and every invocation derived from its own register,
+on a RoT-1 project carrying a legacy update snapshot and a project restricted classification:
 - no byte outside `.git/` and `.governance-runtime/` changes;
-- Git state (HEAD, refs, index entries, stash) is unchanged;
+- Git state is unchanged;
 - the classification survives.
 
-**Evidence:** `evidence/P3r3-pre-rot-register-matrix.{py,json,stderr}`.
-
-| Binary | Register (from its own `--help`) | Invocations on L3 | Tree changed | Git changed | Classification lost | Chains on L3 (10 each) with any change | Control L0: invocations changing the tree | Ablation L3A: invocations changing the tree |
-|---|---|---|---|---|---|---|---|---|
-| 4.1.2 | 104 leaf commands | 159 | **0** | **0** | **0** | **0** | 36 | 4 |
-| 4.1.3 | 109 | 171 | **0** | **0** | **0** | **0** | 42 | 4 |
-| 4.1.4 | 115 | 180 | **0** | **0** | **0** | **0** | 46 | 4 |
-| 4.1.5 | 119 | 185 | **0** | **0** | **0** | **0** | 47 | 4 |
-
-- **L0** is the positive control: an ordinary legacy project. It shows the synthesized arguments reach mutating code
-  paths.
-- **L3A** is the ablation: the layout without the two adoption occupations, with adoption residue present. Its 4
-  changes per binary are `adopt baseline`, `migrate baseline`, `adopt rollback --batch 1` and
-  `migrate rollback --batch 1`. They show that both occupations are necessary.
-- **Refusal codes on L3 (695 invocations):**
-  - `NOT_INSTALLED` 445;
-  - `ADOPTION_NOT_STARTED` 140;
-  - `IO_ERROR` 30;
-  - `ALREADY_INSTALLED` 16;
-  - `MCP_NOT_IMPLEMENTED` 8;
-  - `PROTOCOL_MISMATCH` 6;
-  - `PLUGIN_NOT_FOUND` 4;
-  - `UNKNOWN_ROLE` 4;
-  - 42 without an error code, 36 of them `ok: true`: `version`, `capabilities ecosystems|plugins`, `release verify`,
-    `adopt|migrate rollback` restoring nothing. None changed anything.
-- **Chains (each on a fresh copy, cumulative digests):**
-  - adoption A0–A11 and batch rollback;
-  - update check → apply → gate present → decide → apply --approve → rollback;
-  - gate create → present → decide → revoke;
-  - CIT propose with a manifest writing `governance/overlay/DATA_SENSITIVITY.yaml`,
-    `governance/trust/kernel/policies/SECURITY_POLICY.yaml` and deleting `governance/trust/framework.lock` → simulate →
-    approve → execute → rollback;
-  - task create → claim → status → close;
-  - `init --force` → verify → rebuild → query;
-  - reinstall → verify → task create;
-  - `recover` twice;
-  - plugins register → invoke → rebuild;
-  - `tools install --execute` → registry → `adapters generate`.
-
-**R2-L3:** the revision-2 F1 probe is superseded. P3r3 writes the exact FORMAT JSON, the lock under
-`governance/trust/framework.lock` and the full layout, and runs every command on its own fresh copy.
+| Evidence | Result |
+|---|---|
+| `evidence/P3r3-pre-rot-register-matrix.{py,json}` (revision 3, unchanged) | 695 invocations, 40 chains, 0 changes; control L0 36/42/46/47; ablation L3A 4 per binary |
+| **`evidence/P3r3-rerun-r4-summary.json`** (re-run unchanged by AR-0005, real 4.1.2–4.1.5; binary SHA-256 recorded) | `summary`, `property_L3`, `chain_summary` and `job_count` **equal** to the committed output |
+| `evidence/rerun-RV3-C-destructive.json` (reviewer C's 84 destructive invocations, re-run) | 0 tree, trust or Git writes |
+| `evidence/rerun-RV3-C-durability.json`, `rerun-RV3-C-occ_removal.json`, `rerun-RV3-C-full_removal_and_merge.json` | as review r3 |
 
 ## 5. Protected paths (HO-0001 §3.4 list)
 
-| Path class | Legacy use | Protection |
-|---|---|---|
-| Kernel paths | `governance/kernel/**` | regular file occupies the directory; RoT-1 kernel under `governance/trust/kernel/` |
-| Legacy lock paths | `governance/framework.lock` | directory occupies the file |
-| Trust paths | none in legacy | `governance/trust/**` is unknown to legacy binaries and is PPS |
-| Rollback paths | `.governance-runtime/update/<v>/`, overlay and generated restore targets | blocked by set (i); quarantine on the transacting machine; overlay and views relocated, legacy names occupied |
-| Reinstall paths | `governance/kernel` | set (i) (`NOT_INSTALLED`) |
-| Init-force paths | `governance/kernel`, `governance/project`, `framework.lock` | `IO_ERROR` before first write; overlay relocated |
-| Migration paths | `spec/audits/GOVERNANCE-ADOPTION/**`, `.governance-runtime/migration/**` | both occupied |
+Unchanged from revision 3: kernel, legacy lock, trust, rollback, reinstall, init-force and migration paths.
 
-## 6. Project-owned strength (new rule 20)
+## 6. Project-owned strength (rule 20; revision 4)
 
-Occupation removes the legacy route. Project-owned strengthening can still be removed by a repository writer or a
-same-user process, because the overlay is T4. That is legitimate project governance when done through a governed
-change. Revision 3 records strength so that silent removal is reported:
+**Revision 3.** It recorded overlay categories and compared overlay bytes. A kernel-side or Trust Policy change removed
+project strengthening while the overlay was unchanged, and the detector was blind (RV3-H1).
 
-1. **Project-strength vector.** Every install transaction and every gated overlay change records, in the VTS per-project
-   record, the digest-bound set of:
-   - sensitivity classifications;
-   - overlay floor raises;
-   - repository-contract exclusions (index, retrieval, export);
-   - non-overridable overlay keys.
-2. **Check.** At every process start, the current overlay is compared with the recorded vector. A computed weakening not
-   recorded through a gated transaction produces `PROJECT_STRENGTH_WEAKENED`. Security-relevant C2 operations (indexing,
-   export, upstream, retrieval of the affected classes) are refused until a trust gate (`27`) accepts the new vector.
+**Revision 4.** It records strength as **requirements over the effective inputs**.
+
+1. **Vector.** Every install transaction and every gated overlay change records, in the VTS per-project record:
+   - **constitutional strength:** for every key where the project layer contributes an admitted strengthening over the
+     root kernel's effective value, a requirement on the **effective** value in the key's registered direction. Examples:
+     `AUTHORITY_POLICY.authority_levels_required.resume_control ≥ L5`, `SECURITY_POLICY.never_index_classes ⊇
+     [confidential]`, `HUMAN_GATE_POLICY.agent_resolvable_when.max_radius ≤ R0`;
+   - **overlay strength:** a requirement for every overlay input with an Overlay Surface direction (`23` §11.2);
+   - **default deny:** every unclassified overlay file by digest; every plugin descriptor set;
+   - **owner constitutional files:** confirmed slot digests (`23` §7.2);
+   - **held registration:** the TPS registration the vector was recorded under.
+2. **Check.** At every unit of work, the recorded requirements are evaluated over the current effective policy and
+   overlay, **whatever changed them**:
+   - a kernel, a Trust Policy or a precedence registration;
+   - a migration, a recovery or a remedy;
+   - an overlay edit, a Git restore, or a legacy binary.
+
+   A failing requirement not accepted through a gated transaction is `PROJECT_STRENGTH_WEAKENED`. Security-relevant C2
+   operations are refused until the `project_strength` trust gate (`27`) accepts the new vector. Those operations are
+   indexing, export, upstream, retrieval of affected classes and plugin execution.
 3. **Remedies do not hide it.** `kernel reinstall`, update and recover restore the PPS and occupation entries, but never
-   the check. Returning to green requires the gate.
-4. **Bound.** A machine with no record (fresh clone) accepts the repository's overlay as the project's current T4
-   configuration. That is A2's normal authority over project configuration, stated as residual LR-4.
+   the check. Only the gate re-records the vector.
+4. **Bound (LR-4).** A machine with no record (a fresh clone) accepts the repository's overlay as the project's current T4
+   configuration.
+
+Evidence:
+- `evidence/P1r4-project-strength-and-absence.json` part C: the vector reports the loss of every revision-3 effective kernel and stays quiet for every
+  revision-4 one. Migration weakenings are reported (`19` §9).
+- `evidence/LR2-installation-state-and-strength-reference.json`: on real trees after the synthesis reviewer's legacy
+  probes:
+  - the checkout-and-legacy-CIT tree (RV3-D-A05a/A06) reports `PROJECT_STRENGTH_WEAKENED` (3 failures);
+  - the `git restore --source` tree (RV3-D-A05c) reports 9;
+  - the targeted checkout that leaves the overlay alone (A05b) reports none.
 
 ## 7. Migration into the layout
 
-The first RoT-1 install transaction on a legacy project MUST, inside one journaled transaction:
-1. quarantine `.governance-runtime/update/*` and `.governance-runtime/migration/*`;
-2. move `governance/kernel` → `governance/trust/kernel` (authenticated content only), `governance/project` →
-   `governance/overlay`, `governance/generated` → `governance/views`, and `spec/audits/GOVERNANCE-ADOPTION` →
-   `spec/audits/ADOPTION`;
+Unchanged, plus one item. The first RoT-1 install transaction on a legacy project MUST, inside one journaled transaction:
+1. quarantine legacy runtime residue;
+2. move the kernel, overlay, views and adoption evidence;
 3. write `governance/trust/**`;
 4. create the occupation entries, force-adding `.governance-runtime/migration`;
-5. record the project-strength vector;
-6. write the ledger entry naming the moves.
-
-Git records the renames. Teammates still on legacy binaries then fail before any write (§4). The release protocol MUST
-tell teams to retire 4.1.2–4.1.5 binaries.
+5. **write the ignore rule of §2;**
+6. record the project-strength vector;
+7. write the ledger entry.
 
 ## 8. Residuals
 
-| ID | Residual | Bound |
-|---|---|---|
-| LR-1 | Legacy binaries on a working copy that has not checked out the RoT-1 layout commit operate on the legacy layout normally. | No RoT-1 state exists there to damage; the checkout itself is the boundary (§3.1). |
-| LR-2 | A same-user process (A3) removes occupation entries. | RoT-1 reports `PARTIAL(occupation)`; the result is not a RoT-1 layout; A3-class. |
-| LR-3 | Explicit operator output paths of producer commands (`release build --canonical <checkout> --out <path inside a project>`) write where the operator points them. | Explicit A14/A10 action, not a data effect; RoT-1 detects PPS changes (`KERNEL_TAMPERED`, `PARTIAL`) and project-strength weakening (§6). |
-| LR-4 | Fresh clones accept the repository overlay as current project configuration. | T4 authority of the repository writer; per-machine detection after the first record (§6). |
+| ID | Residual | Bound | Tests |
+|---|---|---|---|
+| LR-1 | Legacy binaries on a working copy not yet on the RoT-1 layout commit, including after `git revert` of the migration commit, operate on a legacy layout. | No RoT-1 state exists there. `LR2` evaluates reviewer C's revert tree as `LEGACY`: a RoT-1 binary is read-only on it. | RT-50, RT-82 |
+| **LR-2** (restated, RV3-M6) | **Trigger.** Occupation entries are removed, by a person, a non-cone sparse checkout or A3; **or** pre-migration governance paths are restored with an ordinary Git command, such as `git checkout <pre-migration> -- governance` or `git restore --source <pre-migration> -- governance`. **Reachable legacy outcome (executed on the real 4.1.5 binary).** (i) The legacy binary goes from `NOT_INSTALLED` to a `verified: true` legacy install, directly or after `init --force`. (ii) It indexes and retrieves project material without the classifications added after migration; the RoT-1 overlay classifies it, the legacy overlay does not. (iii) A legacy CIT, answered by a caller-declared `decide --by owner`, can rewrite `governance/trust/**` (for example `governance/trust/kernel/policies/SECURITY_POLICY.yaml`), delete `governance/trust/framework.lock`, and remove overlay classifications. | **Only these bounds hold.** (1) A RoT-1 binary never treats the resulting tree as valid: `PARTIAL(occupation)` or `LEGACY` (`LR2`: every restored, removed or merged tree with legacy entries); policy root EmbeddedSnapshot ⊔ floors; mutations refused; doctor D033 CRITICAL names the mixed layout and stray artefacts; an edited trust kernel is `KERNEL_TAMPERED`. (2) Removal of project strength is reported `PROJECT_STRENGTH_WEAKENED` on every machine that recorded the vector (`LR2`: A05a, A05c). (3) LR-4 applies on machines without a record. No RoT-1 mechanism can stop a legacy binary from installing over paths the layout no longer occupies. | RT-81 (harm assertions for C A04–A06 and D A05/A06), RT-50b (occupation-absent register), RT-99 |
+| LR-3 | Explicit operator output paths of producer commands. | Explicit A14/A10 action; PPS changes detected; strength weakening reported | — |
+| LR-4 | Fresh clones accept the repository overlay as current project configuration. | T4 authority of the repository writer; per-machine detection after the first record | RT-99 |
+
+**Carried engineering constraints (review r3 C-2…C-5).** These are specified in `18` §3 and §9, and tested in `12`:
+- cross-device transaction area refusal;
+- doctor naming stray merge and partial-removal artefacts;
+- occupation type by `st_mode`;
+- a full-register RT-50 with type-aware digests on a genuine 4.1.6 install.

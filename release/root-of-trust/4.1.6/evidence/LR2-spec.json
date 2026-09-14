@@ -1,0 +1,98 @@
+{
+ "C-L3_intact_revision3_layout": {
+  "tree": "<scratch>/cchain/run/L3",
+  "recorded_from_head": true
+ },
+ "L3r4_intact_revision4_layout_delta": {
+  "tree": "<scratch>/cchain/run/L3r4b",
+  "recorded_from_head": true
+ },
+ "RV3-C-A04_partial_occupation_removal_then_init_force": {
+  "tree": "<scratch>/cchain/o/wc",
+  "recorded_from_head": false
+ },
+ "RV3-C-A05_full_removal_then_init_force": {
+  "tree": "<scratch>/cchain/f/wcA",
+  "recorded_from_head": false
+ },
+ "RV3-C-A03_dir_file_merge": {
+  "tree": "<scratch>/cchain/f/wcB",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/clone_full": {
+  "tree": "<scratch>/cchain/d/clone_full",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/clone_checkout": {
+  "tree": "<scratch>/cchain/d/clone_checkout",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/clone_clean": {
+  "tree": "<scratch>/cchain/d/clone_clean",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/clone_merge": {
+  "tree": "<scratch>/cchain/d/clone_merge",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/clone_revert": {
+  "tree": "<scratch>/cchain/d/clone_revert",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/clone_sparse": {
+  "tree": "<scratch>/cchain/d/clone_sparse",
+  "recorded_from_head": false
+ },
+ "RV3-C-durability/archive_extract": {
+  "tree": "<scratch>/cchain/d/archive_extract",
+  "recorded_from_head": false
+ },
+ "RV3-D-A05a_checkout_pre_governance/revision3_layout": {
+  "tree": "<scratch>/cchain/git/A05a_checkout_pre_governance",
+  "recorded_from_head": true
+ },
+ "RV3-D-A05b_checkout_pre_targeted/revision3_layout": {
+  "tree": "<scratch>/cchain/git/A05b_checkout_pre_targeted",
+  "recorded_from_head": true
+ },
+ "RV3-D-A05c_restore_source_pre/revision3_layout": {
+  "tree": "<scratch>/cchain/git/A05c_restore_source_pre",
+  "recorded_from_head": true
+ },
+ "RV3-D-A06_full_removal/revision3_layout": {
+  "tree": "<scratch>/cchain/git/A06_full_removal",
+  "recorded_from_head": false
+ },
+ "RV3-D-A06_control_intact/revision3_layout": {
+  "tree": "<scratch>/cchain/git/A06_control_intact",
+  "recorded_from_head": true
+ },
+ "RV3-D-A07_fresh_clone/revision3_layout": {
+  "tree": "<scratch>/cchain/git/A07_fresh_clone",
+  "recorded_from_head": false
+ },
+ "RV3-D-A05a_checkout_pre_governance/revision4_layout": {
+  "tree": "<scratch>/cchain/git-r4c/A05a_checkout_pre_governance",
+  "recorded_from_head": true
+ },
+ "RV3-D-A05b_checkout_pre_targeted/revision4_layout": {
+  "tree": "<scratch>/cchain/git-r4c/A05b_checkout_pre_targeted",
+  "recorded_from_head": true
+ },
+ "RV3-D-A05c_restore_source_pre/revision4_layout": {
+  "tree": "<scratch>/cchain/git-r4c/A05c_restore_source_pre",
+  "recorded_from_head": true
+ },
+ "RV3-D-A06_full_removal/revision4_layout": {
+  "tree": "<scratch>/cchain/git-r4c/A06_full_removal",
+  "recorded_from_head": false
+ },
+ "RV3-D-A06_control_intact/revision4_layout": {
+  "tree": "<scratch>/cchain/git-r4c/A06_control_intact",
+  "recorded_from_head": true
+ },
+ "RV3-D-A07_fresh_clone/revision4_layout": {
+  "tree": "<scratch>/cchain/git-r4c/A07_fresh_clone",
+  "recorded_from_head": false
+ }
+}

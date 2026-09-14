@@ -1,0 +1,223 @@
+{
+ "summary": {
+  "rows": 16,
+  "as_expected": 16,
+  "not_as_expected": [],
+  "refused_attacks": 12,
+  "minimum_capability_sets_accepted": [
+   {
+    "route": "route S: stolen verification-attestation, release-candidate and release-final keys; honest downstream custodians",
+    "capabilities": [
+     "verification-attestation key",
+     "release-candidate key",
+     "release-final key",
+     "pipeline input (A5/A6)"
+    ]
+   },
+   {
+    "route": "route S under OP-4 'no': stolen verification-attestation key and the everyday candidate/final key",
+    "capabilities": [
+     "verification-attestation key",
+     "one OP-4 'no' release key",
+     "pipeline input"
+    ]
+   },
+   {
+    "route": "route B: stolen release-artifact x2, build-attestation and trust-state keys; genuine attested source named",
+    "capabilities": [
+     "release-artifact key 1",
+     "release-artifact key 2",
+     "build-attestation key",
+     "trust-state key"
+    ]
+   }
+  ],
+  "single_key_can_mint_accepted_binary": false
+ },
+ "rows": [
+  {
+   "scenario": "RV3-B-A08 final names commit-evil, promoted from the genuine attested candidate C11",
+   "adversary_capabilities": [
+    "release-final key",
+    "release pipeline input (A5/A6)",
+    "honest rebuilder, artefact custodians and trust-state publisher"
+   ],
+   "expected_revision_4": "RELEASE_IDENTITY_MISMATCH(source)",
+   "observed": "RELEASE_IDENTITY_MISMATCH(source)",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "RV3-B-A08 under the revision-3 rule (source taken from the final's release_commit) \u2014 reproduction of the defect",
+   "adversary_capabilities": [
+    "as above"
+   ],
+   "expected_revision_4": "ACCEPTED",
+   "observed": "ACCEPTED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "RV3-B-A08 variant: final promoted from a candidate the verifier REJECTED",
+   "adversary_capabilities": [
+    "release-candidate key",
+    "release-final key",
+    "pipeline input"
+   ],
+   "expected_revision_4": "ARTIFACT_SOURCE_REJECTED",
+   "observed": "ARTIFACT_SOURCE_REJECTED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "variant: an ACCEPTED attestation exists for the candidate digest but names a different source",
+   "adversary_capabilities": [
+    "verification-attestation for other source",
+    "release keys",
+    "pipeline input"
+   ],
+   "expected_revision_4": "ARTIFACT_SOURCE_UNVERIFIED",
+   "observed": "ARTIFACT_SOURCE_UNVERIFIED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "RV3-D-A03 OP-4 'no': the everyday candidate/final key signs C' and F' naming commit-evil",
+   "adversary_capabilities": [
+    "release-candidate + release-final (one key under OP-4 'no')",
+    "pipeline input"
+   ],
+   "expected_revision_4": "ARTIFACT_SOURCE_UNVERIFIED",
+   "observed": "ARTIFACT_SOURCE_UNVERIFIED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "RV3-D-A03 variant: F' promoted from the genuine attested C11 but naming commit-evil",
+   "adversary_capabilities": [
+    "one OP-4 'no' key",
+    "pipeline input"
+   ],
+   "expected_revision_4": "RELEASE_IDENTITY_MISMATCH(source)",
+   "observed": "RELEASE_IDENTITY_MISMATCH(source)",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "route S: stolen verification-attestation, release-candidate and release-final keys; honest downstream custodians",
+   "adversary_capabilities": [
+    "verification-attestation key",
+    "release-candidate key",
+    "release-final key",
+    "pipeline input (A5/A6)"
+   ],
+   "expected_revision_4": "ACCEPTED",
+   "observed": "ACCEPTED",
+   "as_expected": true,
+   "documents_minimum_set": true
+  },
+  {
+   "scenario": "route S under owner option OP-2 'root-registered production source' (TPS production_sources lists only the attested genuine source)",
+   "adversary_capabilities": [
+    "as route S"
+   ],
+   "expected_revision_4": "ARTIFACT_SOURCE_UNREGISTERED",
+   "observed": "ARTIFACT_SOURCE_UNREGISTERED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "route S under owner option OP-2 'verification-attestation threshold 2' with one stolen verifier key",
+   "adversary_capabilities": [
+    "one of two verification-attestation keys",
+    "release keys",
+    "pipeline input"
+   ],
+   "expected_revision_4": "ARTIFACT_SOURCE_UNVERIFIED",
+   "observed": "ARTIFACT_SOURCE_UNVERIFIED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "route S under OP-4 'no': stolen verification-attestation key and the everyday candidate/final key",
+   "adversary_capabilities": [
+    "verification-attestation key",
+    "one OP-4 'no' release key",
+    "pipeline input"
+   ],
+   "expected_revision_4": "ACCEPTED",
+   "observed": "ACCEPTED",
+   "as_expected": true,
+   "documents_minimum_set": true
+  },
+  {
+   "scenario": "route B: stolen release-artifact x2, build-attestation and trust-state keys; genuine attested source named",
+   "adversary_capabilities": [
+    "release-artifact key 1",
+    "release-artifact key 2",
+    "build-attestation key",
+    "trust-state key"
+   ],
+   "expected_revision_4": "ACCEPTED",
+   "observed": "ACCEPTED",
+   "as_expected": true,
+   "documents_minimum_set": true
+  },
+  {
+   "scenario": "route B with one release-artifact key",
+   "adversary_capabilities": [
+    "release-artifact key 1",
+    "build-attestation key",
+    "trust-state key"
+   ],
+   "expected_revision_4": "THRESHOLD_NOT_MET",
+   "observed": "THRESHOLD_NOT_MET",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "route B without a build attestation",
+   "adversary_capabilities": [
+    "release-artifact x2",
+    "trust-state key"
+   ],
+   "expected_revision_4": "ARTIFACT_BUILD_UNATTESTED",
+   "observed": "ARTIFACT_BUILD_UNATTESTED",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "custodial pre-check at rebuilder (before build-attestation) on the RV3-B-A08 artefact",
+   "adversary_capabilities": [
+    "release-final key",
+    "pipeline input"
+   ],
+   "expected_revision_4": "RELEASE_IDENTITY_MISMATCH(source)",
+   "observed": "RELEASE_IDENTITY_MISMATCH(source)",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "custodial pre-check at release-artifact custodians (before signing) on the RV3-B-A08 artefact",
+   "adversary_capabilities": [
+    "release-final key",
+    "pipeline input"
+   ],
+   "expected_revision_4": "RELEASE_IDENTITY_MISMATCH(source)",
+   "observed": "RELEASE_IDENTITY_MISMATCH(source)",
+   "as_expected": true,
+   "documents_minimum_set": false
+  },
+  {
+   "scenario": "custodial pre-check at trust-state publisher (before referencing) on the RV3-B-A08 artefact",
+   "adversary_capabilities": [
+    "release-final key",
+    "pipeline input"
+   ],
+   "expected_revision_4": "RELEASE_IDENTITY_MISMATCH(source)",
+   "observed": "RELEASE_IDENTITY_MISMATCH(source)",
+   "as_expected": true,
+   "documents_minimum_set": false
+  }
+ ]
+}

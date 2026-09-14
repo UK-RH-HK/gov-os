@@ -1,11 +1,12 @@
 # Output 6 — Bootstrap model
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 3 makes these changes:
-> - binaries are accepted only through `release-artifact` (threshold ≥ 2), independent build attestation, a trust-state
->   reference and a Trust Base Manifest that resolves (`25`, R2-H3);
-> - the first-install ceremony anchors trust state as well as the root (`24`, R2-H2);
-> - state fingerprints are published in the independent channels.
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 4 makes these changes:
+> - binaries are built from **attested source**, and custodians check it (V8, `25` §5.1);
+> - state pins carry mandatory validity and live in the system pin directory or under the integrity predicate
+>   (`24` §3.2, §3.5);
+> - C3 steps need a currency proof; the in-gate typed fingerprint needs no clock (`24` §4.4);
+> - the test lineage covers twelve purposes.
 
 ## 1. The problem
 
@@ -34,18 +35,20 @@ release signer.
 3. **Constitution.** `gov trust draft-policy` produces the next Trust Policy draft: Constitutional Surface, floors,
    eligibility including historical releases, bootstrap block, lowering history. The root ceremony reviews the change list
    and signs (`23` §6.2).
-4. **Release.** Reproducible payload build → surface checker exit 0 against the named TPS → `release-candidate` signature
-   → independent verification → `verification-attestation` → promotion (`release-final`) → `certification-status`.
+4. **Release.** Reproducible payload build with `release.source` → surface checker exit 0 against the named TPS →
+   `release-candidate` signature → independent verification reproducing the candidate from its source →
+   `verification-attestation` v2 naming the source → promotion (`release-final`, V8 source equality) →
+   `certification-status`.
 5. **Binaries.**
-   - Built reproducibly from the final tag. Each compiles a Trust Base Manifest (`25` §4) naming its root chain, TPS, TSS
+   - Built reproducibly from the attested source (`release.source`). Each compiles a Trust Base Manifest v2 (`25` §4) naming its root chain, TPS, TSS, embedded release statement and `binary.source`.
      and embedded release statement.
-   - An independent rebuilder reproduces each binary and its TBM digest and signs a `build-attestation`.
-   - Two `release-artifact` custodians sign `artifact-final.v2`.
+   - An independent rebuilder checks the attested source (`verify-artifact --stage rebuilder`), reproduces each binary and its TBM digest, and signs a `build-attestation` v2 naming the source.
+   - Two `release-artifact` custodians check A1–A4b (`--stage custodian`) and sign `artifact-final.v2`.
    - The next TSS references the artefact statement (`artifacts[]`), and its state fingerprint is published (step 2).
    - A binary cannot embed its own acceptance: the artefact statement, build attestation and TSS ship beside it.
 6. **Verifying the first binary on a machine.** Any one of:
    - (a) with an already trusted `gov`: `gov trust verify-artifact` (`25` §5);
-   - (b) with independent tooling: verify A2–A6 of `25` §5 with public keys from root metadata whose id was compared with
+   - (b) with independent tooling: verify A2–A6 of `25` §5, including the attested-source binding A4b, with public keys from root metadata whose id was compared with
      a step-2 channel. This means the OpenSSL signature checks of the artefact statement and build attestation, the TSS
      reference, and the TBM digests against the published statements; the release protocol documents the command
      sequence;
@@ -59,16 +62,19 @@ release signer.
 | Step | Command | Establishes |
 |---|---|---|
 | 1 | `gov trust confirm-root <trust_root_id>` (typed from the channel) or a root pin | lineage confirmation (TA-5) |
-| 2 | `gov trust confirm-state <state fingerprint>` (typed from the channel) or a state pin | anchor (`24` §3) |
+| 2 | `gov trust confirm-state <state fingerprint>` (typed from the channel), or a protected state pin with `valid_until` | anchor, satisfied by inclusion (`24` §3.2, §3.4) |
 | 3 | `gov trust refresh --from <bundle>` if the machine is `BELOW_ANCHOR` | knowledge at the anchored epoch |
-| 4 | `gov init` / `gov update --apply`, with the local trust gate (`27`) | installation |
+| 4 | `gov init` / `gov update --apply`, with the local trust gate (`27`) and a currency proof: the typed state fingerprint in the gate (no clock), or steps 1–2 within `c3_currency_window_hours` | installation |
 
-**Automation** uses account-database pin files provisioned outside the repository writer's control (TA-9):
-- `<account-home>/.config/gov/trust-root-pins`;
-- `trust-state-pins` (`schemas/trust-state-pin.schema.json`);
-- `approved-trust-decisions`.
+**Automation** uses pin files in the system pin directory (`/etc/gov/`, `/Library/Application Support/gov/`, `%ProgramData%\gov\`), or in the account configuration only where the integrity predicate holds. They are provisioned outside the repository writer's control (TA-9 restated, `24` §3.5):
+- `trust-root-pins`;
+- `trust-state-pins` (`schemas/trust-state-pin.schema.json`, mandatory `valid_until` ≤ `pin_max_validity_days`);
+- `approved-trust-decisions` (`schemas/trust-decision-pin.schema.json`, mandatory `expires_at`).
 
 No environment variable, flag or repository file can confirm a lineage or anchor a state (D-0008 rule 15).
+
+A CI runner image provisions `/etc/gov/trust-state-pins`, owned by root, and runs the job as another user. Pins must be
+re-provisioned before `valid_until`; the proposed maximum validity is 30 days (`21` OP-7).
 
 OP-6 modes and OP-7 options are analysed in `21`.
 
@@ -101,7 +107,7 @@ The new machine's VTS starts empty:
 
 ## 7. Test fixtures
 
-`gov-test-profile` compiles the test lineage with all eleven purposes. Unsigned fixtures are accepted there as
+`gov-test-profile` compiles the test lineage with all twelve purposes. Unsigned fixtures are accepted there as
 `DEVELOPMENT_UNSIGNED`. Shipped binaries report `trust_profile: production` in their TBM.
 
 ## 8. Classification summary
@@ -114,4 +120,4 @@ The new machine's VTS starts empty:
 | Legacy 4.1.2–4.1.5 | listed in TPS `eligibility.historical_releases` (root threshold) | `HISTORICAL_IDENTIFIED` | **never** | no | CRITICAL when installed |
 | Development unsigned | nobody | `DEVELOPMENT_UNSIGNED` | never | never | HIGH |
 | Test | test keys | `TEST` | test profile only | never | — |
-| Production binary | `release-artifact` ×2 + `build-attestation` + TSS reference | accepted by `verify-artifact` | TBM ≥ VTS high-water | informational certification binding | — |
+| Production binary | `release-artifact` ×2 + `build-attestation` + attested source + TSS reference | accepted by `verify-artifact` with a currency proof | TBM ≥ accepted-TBM high-water | informational certification binding (required under OP-2 (S3)) | — |

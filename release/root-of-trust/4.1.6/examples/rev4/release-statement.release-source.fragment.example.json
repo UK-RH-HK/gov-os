@@ -1,0 +1,17 @@
+{
+  "release": {
+    "version": "4.1.6",
+    "release_id": "agentic-engineering-os@4.1.6#0123456789abcdef",
+    "sequence": 6,
+    "stage": "final",
+    "promoted_from_candidate": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "release_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": {
+      "release_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source_tree_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "build_inputs_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "release_tag": "v4.1.6",
+    "released_at": "2026-10-01T09:00:00Z"
+  }
+}

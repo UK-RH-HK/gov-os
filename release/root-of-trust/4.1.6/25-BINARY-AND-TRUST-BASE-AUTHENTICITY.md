@@ -1,136 +1,209 @@
-# Output 25 — Binary and trust-base authenticity
+# Output 25 — Binary, built-source and trust-base authenticity
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> New in revision 3. Closes R2-H3 as a class and satisfies HO-0001 §3.3. Normative keywords: MUST, MUST NOT, SHOULD.
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 3 added this file for R2-H3. Revision 4 closes blocking class **BC-3** (review r3 RV3-H3: built-source
+> legitimacy of production binaries) and carried RV3-M8, and meets HO-0001 §3.3. Normative keywords: MUST, MUST NOT,
+> SHOULD.
 
 ## 1. The class
 
-The `gov` binary carries T0: its compiled root chain, Trust Policy (floors, surface, bootstrap rules, historical
-releases), Trust State, purpose table, schemas, operator semantics and the embedded kernel. It is the trusted computing
-base.
-
-Revision 2 authenticated binaries with an `artifact-final` statement under the threshold-1 `release-final` purpose. It
-required no attestation, certification or trust-state reference, and had no field for the binary's compiled trust base.
-One stolen token could mint a binary with arbitrary roots and floors, and every consumer following the documented upgrade
-would install it. The mistaken equivalence was *release key ⇒ binary authenticity*.
-
-Revision 3 rule: **the authentication of a binary MUST be at least as strong as the authority the binary carries.** A
-binary carries root-threshold authority (compiled roots and floors), so its acceptance MUST require all of the following:
-- a multi-key purpose that holds no other authority;
-- independent reproduction of the exact bytes from the tagged source;
+The `gov` binary carries T0. It is the trusted computing base. Revision 3 set the rule that **the authentication of a
+binary MUST be at least as strong as the authority the binary carries**, and required:
+- `release-artifact` at threshold ≥ 2;
+- an independent build attestation;
 - a trust-state reference;
-- a compiled trust base that resolves to root-signed and trust-state-signed statements.
+- a Trust Base Manifest (TBM) that resolves to root- and trust-state-signed statements.
 
-## 2. Options evaluated (HO-0001 §3.3)
+The review of revision 3 showed that every one of those checks answered one question: **are these bytes a build of the
+named source?** None answered the other: **is the named source the source an independent verification accepted?** The
+name was `release_commit` in the final release statement, signed by threshold-1 `release-final`.
 
-| Option | What it protects | Cost | Adopted? |
+- **The attack.** The thief promotes a final from a genuine attested candidate with an identical kernel tree, but names
+  commit C′. Every downstream signer then faithfully processed C′ (RV3-B-A08).
+- **Under OP-4 "no".** The everyday candidate key is that key (RV3-D-A03).
+- **The mistaken equivalence.** *reproduced from the named commit ⇒ built from verified source.*
+
+`28` §2.3 explains why the remainder survived.
+
+**Revision 4 removes `release-final` from the choice of source.**
+- **Where the source comes from.** The source identity of a production binary is taken from an ACCEPTED verification
+  attestation of the candidate. The effective Trust State references that attestation.
+- **The final names no source of its own.** It must carry the same source as its candidate (V8).
+- **Who checks.** `verify-artifact` and every custodian check both.
+
+## 2. Options evaluated (HO-0001 §3.3; CD3-3)
+
+| Option | What it protects | Cost | Revision 4 |
 |---|---|---|---|
-| Threshold **root** signature on every binary | everything, maximally | root keys (offline, independent custodians) touched for every binary build and target | **Not the default.** Offered in OP-2 as "root co-signature for production binaries". |
-| Separate binary purpose (`release-artifact`) with compiled minimum threshold 2, disjoint from every other purpose | no single key, and no release or candidate key, can accept a binary | a second custodian per binary release | **Adopted** (§3). |
-| Separate **root-bundle attestation** | the compiled root, TPS and TSS identity | — | Adopted as the **Trust Base Manifest** (TBM). Every component is itself a root- or trust-state-signed statement, so no extra signature is needed (§4). |
-| Certification binding | a visible "certified" label for binaries | certification key | Adopted as **informational**: certification may name artifact statement digests. Under OP-3 mode A it relaxes nothing. |
-| Reproducible-build or build-provenance evidence | that the bytes are what the tagged source produces, including the compiled TBM and all compiled rules | an independent rebuilder with its own key | **Adopted and mandatory** (`build-attestation` purpose, §3). |
-| Compiled trust-state digest | that the binary's compiled TSS is a published one | — | Adopted (TBM `trust_state`). |
-| Binary trust-policy digest | that compiled floors, surface and bootstrap rules are root-signed | — | Adopted (TBM `trust_policy`). |
-| Multi-signature | no single-token compromise | custody | Adopted: `release-artifact` threshold ≥ 2, plus build attestation, plus trust-state reference. |
+| Threshold **root** signature on every binary | everything, if root custodians also check the verification record | offline root keys touched per binary per target | OP-2 option (iii), unchanged |
+| Separate binary purpose `release-artifact` (threshold ≥ 2, disjoint) | no single key accepts a binary | a second custodian | **adopted** (unchanged) |
+| Independent build attestation | bytes equal a build of the attested source and build inputs | an independent rebuilder | **adopted**; now bound to the attested source (A4a) |
+| **Attested-source binding** | the TCB's source is one that an independent verification accepted, not one a release key names | none beyond existing statements | **adopted, architecture minimum** (§5.1) |
+| **Root-registered production source** | the TCB's source needs the root threshold | one TPS registration per release that ships binaries (usually merged with the kernel registration of `23` CS-2) | **OP-2 option** (`21`) |
+| **Verification-attestation threshold 2** | source legitimacy needs two independent verifiers | a second verifier | **OP-2 option** |
+| Certification binding (`CERTIFIED_AS_OF` required for binaries) | adds the certification key | certification before binary announcement | evaluated, not required. Under mode A certification relaxes nothing, and the attestation binding already requires the verification result it certifies. Offered as an OP-2 option. |
+| Compiled trust-state and trust-policy digests (TBM) | compiled roots, floors, surface, bootstrap and historical set | — | **adopted** (unchanged) |
+| Multi-signature | no single-token compromise | custody | **adopted** |
 
 ## 3. Purposes (additions to `05`)
 
 | Purpose | Signs | May assert | May never assert | Compiled constraints |
 |---|---|---|---|---|
-| `release-artifact` | `artifact-final.v2+json` | that listed binary digests, each bound to its TBM digest, are the production artefacts of a final release | release authenticity, certification, trust state, build reproduction | **threshold ≥ 2** (compiled minimum; OP-2 may raise it or add a root co-signature); **KS-9:** keys disjoint from every other purpose |
-| `build-attestation` | `build-attestation.v1+json` (schema `schemas/build-attestation.schema.json`) | that an independent rebuild of `source_commit` with `build_inputs_digest` produced the same binary digest and the same TBM digest | release or artefact authenticity, certification | threshold ≥ 1 (OP-2); **KS-10:** keys disjoint from `release-final`, `release-candidate` and `release-artifact` |
+| `release-artifact` | `artifact-final.v2+json` | that listed binary digests, each bound to its TBM digest, are the production artefacts of a final release | release authenticity, certification, trust state, reproduction, source legitimacy | threshold ≥ 2; KS-9 |
+| `build-attestation` | `build-attestation.v2+json` | that an independent rebuild of `source {release_commit, source_tree_digest, build_inputs_digest}` produced the binary digest and TBM digest | release or artefact authenticity; that the source is legitimate | KS-10 |
+| `verification-attestation` | `verification-attestation.v2+json` | the independent verdict for one candidate digest **and the source it verified** (`source`), plus the negative statement a fresh verdict supersedes (`lifts_negative_statement_digest`, CR-01) | certification, authenticity | KS-4, KS-5, KS-6, KS-8 |
 
-- `artifact-candidate.v2+json` stays under `release-candidate`. Candidate binaries are for evaluation only;
-  production `verify-artifact` refuses them.
-- `release-final` no longer signs any artefact statement.
+`artifact-candidate.v2+json` stays under `release-candidate`, for evaluation only. `release-final` signs no artefact
+statement.
 
 ## 4. Trust Base Manifest (TBM)
 
-**Definition.** A canonical GOV-JCS-1 document compiled into every binary (schema
-`schemas/trust-base-manifest.schema.json`). `gov version --trust` prints it together with its digest.
+Schema: `schemas/trust-base-manifest.schema.json`, `x-schema-version` 2.0.0.
 
 | Field | Content |
 |---|---|
-| `binary` | name, version, target, `trust_profile`, `source_commit`, `build_inputs_digest` (toolchain, lockfile, build script digests), toolchain id |
+| `binary` | name, version, target, `trust_profile`, `build`, toolchain id, and **`source {release_commit, source_tree_digest, build_inputs_digest}`**. `source_tree_digest` is the SHA-256 of `git archive` of the commit, so the binding does not rest on SHA-1. |
 | `lineage` | `trust_root_id` |
-| `root_chain[]` | `{version, statement_digest}` for every compiled root version |
-| `trust_policy` | `{policy_version, statement_digest}`. The TPS contains floors, the Constitutional Surface (`23`), eligibility including the historical-release set, install authority, gating, the bootstrap block (OP-6 and OP-7 parameters) and lowering history. |
-| `trust_state` | `{sequence, statement_digest}` |
-| `embedded_release` | `{release_statement_digest, tree_digest}` |
-| `compiled_rules` | `floor_schema_version`, operator vocabulary id (`floor-ops/2`), purpose-table digest, statement-schema-set digest, trust-format readers (`rot-1/legacy-path-occupation-v1`), command register digest |
+| `root_chain[]` | `{version, statement_digest}` |
+| `trust_policy` | `{policy_version, statement_digest}` |
+| `trust_state` | `{sequence, statement_digest}`: a TSS that exists before the build |
+| `embedded_release` | `{release_statement_digest, tree_digest}` of the final whose kernel is embedded |
+| `compiled_rules` | `floor_schema_version` 3; operator vocabulary `floor-ops/3`; purpose-table digest (twelve purposes); statement-schema-set digest; format readers; command-register digest |
 
-**What each part protects:**
-- **Signed components** (root chain, TPS, TSS, embedded release): the TBM names them by digest, so a verifier can check
-  that they are genuine statements of the right purposes.
-- **Compiled code** (purpose table, schemas, operator semantics, command register, bootstrap enforcement): these are
-  protected by the build attestation. A reproduction of `source_commit` yields identical bytes only if the code is the
-  tagged code.
-
-## 5. `gov trust verify-artifact <binary> <artifacts.dsse.json>` (normative; replaces `06` §2 step 6 and R-BOOT-4)
+## 5. `gov trust verify-artifact <binary> <artifacts.dsse.json>` (normative)
 
 | Step | Check | Failure code |
 |---|---|---|
 | A1 | Read the binary once; SHA-256. | `ARTIFACT_DIGEST_MISMATCH` |
-| A2 | The artifact statement verifies under the effective root for `release-artifact` at threshold (≥ 2 distinct keys; KS-9). | `PURPOSE_NOT_GRANTED` / `THRESHOLD_NOT_MET` |
-| A3 | The entry matches: digest, target, `trust_profile: production`, lineage equal to this machine's pin, stage `final`. | `ARTIFACT_IDENTITY_MISMATCH` / `TRUST_ROOT_LINEAGE_MISMATCH` |
-| A4 | At least the threshold of verified `build-attestation` statements (KS-10 keys) name the same artifact digest, the same TBM digest, and a `source_commit` equal to the referenced final release's `release_commit`. | `ARTIFACT_BUILD_UNATTESTED` |
-| A5 | An admissible TSS held in knowledge references the artifact statement digest (`artifacts[]`). This is release-local: supply trust metadata if missing. | `ARTIFACT_UNREFERENCED` |
-| A6 | Every TBM component resolves to a verified statement of the correct purpose with an identical digest: each root version, the TPS, the TSS and the embedded release statement. | `BINARY_T0_UNVERIFIED` |
-| A7 | TBM root version, policy version and state sequence are each ≥ this VTS's high-water. No override. | `BINARY_T0_ROLLBACK` |
-| A8 | The artifact and its statement are not in the negative set; binary version ≥ effective `min_binary_version`. | `ARTIFACT_REVOKED` / `BINARY_BELOW_TRUST_POLICY` |
-| A9 | Freshness: this is trust ingress (C3), so `ANCHORED` or `WITNESSED` is required (`24` §4). | `TRUST_STATE_UNANCHORED` |
-| A10 | Record the accepted TBM in the VTS high-water (§6). | — |
+| A2 | The artefact statement verifies under the effective root for `release-artifact` at threshold (≥ 2 distinct keys; KS-9). | `PURPOSE_NOT_GRANTED` / `THRESHOLD_NOT_MET` |
+| A3 | Entry matches: digest, target, `trust_profile: production`, lineage, stage `final`; the named final release statement verifies under `release-final`. | `ARTIFACT_IDENTITY_MISMATCH` / `TRUST_ROOT_LINEAGE_MISMATCH` |
+| **A4a** | At least the threshold of `build-attestation` statements (KS-10 keys) name the same artefact digest, the same TBM digest, and a `source` equal to the TBM `binary.source`. | `ARTIFACT_BUILD_UNATTESTED` |
+| **A4b** | **Attested source** (§5.1): the final's candidate verifies; V8 holds with source equality; an ACCEPTED verification attestation of that candidate names the same `source`, and the effective TSS references it; no REJECTED attestation of that candidate is held; and, if OP-2 registered production sources, the source is in the effective TPS `eligibility.production_sources[]`. | `RELEASE_IDENTITY_MISMATCH(source)` / `ARTIFACT_SOURCE_UNVERIFIED` / `ARTIFACT_SOURCE_REJECTED` / `ARTIFACT_SOURCE_UNREGISTERED` |
+| A5 | The effective admissible TSS references the artefact statement digest (`artifacts[]`). | `ARTIFACT_UNREFERENCED` |
+| A6 | Every TBM component resolves to a verified statement with an identical digest; `embedded_release` is the final of A3. | `BINARY_T0_UNVERIFIED` |
+| **A7** | TBM root version, policy version and state sequence are each ≥ the **accepted-TBM high-water** of this VTS (`24` §8). They are **not** compared with the TSS knowledge high-water (RV3-M8). | `BINARY_T0_ROLLBACK` |
+| A8 | Neither the artefact, nor the final, nor its candidate is in the negative set (revocation; REJECTED/WITHDRAWN not lifted); binary version ≥ effective `min_binary_version`. | `ARTIFACT_REVOKED` / `BINARY_BELOW_TRUST_POLICY` |
+| **A9** | Trust ingress: freshness `ANCHORED` or `WITNESSED`, and a **currency proof** (`24` §4.4). | `TRUST_STATE_UNANCHORED` / `TRUST_STATE_BELOW_ANCHOR` / `TRUST_STATE_CURRENCY_UNPROVEN` |
+| A10 | Record the accepted TBM components in the VTS `accepted_tbm` high-water. | — |
 
-**Self-check at first run.** A binary whose compiled TBM is below the VTS high-water MUST refuse trusted operations with
-`BINARY_T0_ROLLBACK`. This catches genuine older binaries even when `verify-artifact` was skipped. A malicious binary can
-ignore it, which is why A1–A9 decide acceptance.
+**Self-check at first run.** A binary whose compiled TBM is below the VTS **accepted-TBM** high-water MUST refuse trusted
+operations (`BINARY_T0_ROLLBACK`). A binary at or above it records its TBM. The self-check is never compared with the TSS
+knowledge high-water. A binary compiled at TSS *n* therefore keeps working after TSS *n*+1 is published. Floors and
+revocations of later statements still apply through the effective state.
+
+**Realisable construction** (RV3-M8, D-A13).
+1. The TBM names TSS *n*, which exists before the build.
+2. The build attestation, artefact statement and verification attestation exist after the build.
+3. They are referenced by TSS *m* > *n*.
+
+Nothing is hash-cyclic. `evidence/P4r4-trust-state-model.json` `A_valid_realisable_TBM_t9_reference_t11` accepts this order.
+`RV3-D-A13_realisable_tbm_order` refuses an older binary after a newer one was accepted. The mutant
+`M-a7-against-tss-high-water` fails both.
+
+### 5.1 Attested-source binding (normative; CD3-3 (1), (2))
+
+1. **Candidate statement.** Release statement v3 adds `release.source {release_commit, source_tree_digest,
+   build_inputs_digest}` (`07` §3). The producer fills it from the reproducible build inputs.
+2. **Verification attestation v2.** Adds `source`, equal to the candidate's. The independent verifier attests ACCEPTED
+   only after reproducing the candidate payload from that source with those build inputs (`05` §7 rule 3).
+3. **V8** (`04` §3). A final is authentic only if all of these hold:
+   - `promoted_from_candidate` names a candidate that verifies under `release-candidate`;
+   - `kernel.tree_digest` is equal in final and candidate;
+   - **`release.source` is equal in final and candidate**.
+
+   Otherwise `RELEASE_IDENTITY_MISMATCH(source)`. The check runs at every verifier, not only in `gov release promote`.
+4. **Acceptance (A4b).** The attested source must equal the TBM source and the build-attested source. The effective TSS
+   must reference the attestation. A REJECTED attestation for the candidate, or a negative for final or candidate,
+   refuses.
+5. **Custodial rules** (§9) apply the same check before each signature. `verify-artifact` does not rely on them.
 
 ## 6. Non-circular chain
 
 ```text
 independent channel ──(human, OP-6)──► trust_root_id ──► compiled root chain of the FIRST binary
-   first binary obtained by: (i) build from source at the final tag, or (ii) independent tooling verifying A2–A6
-   with public keys from root metadata whose id was compared on the channel (OpenSSL + an independent rebuild)
+   first binary obtained by (i) build from source at the final tag, (ii) independent tooling verifying A2–A6, or (iii) an
+   already trusted gov running verify-artifact
 
-binary N (trusted) ──verify-artifact──► binary N+1
-   A2 release-artifact ≥2 keys ── A4 build-attestation (independent rebuild) ── A5 trust-state reference
-   A6 TBM components = root-threshold root/TPS, trust-state TSS, release-final embedded release ── A7 ≥ VTS high-water
+candidate C (release-candidate) ── independent verifier reproduces C from source S ──► attestation ACCEPTED(C, S)
+final F (release-final) promoted from C with source S (V8)
+binary N+1 built from S with the TBM naming TSS n ── rebuilder attests (binary, TBM, S)
+release-artifact ×2 sign (binary, TBM) ── TSS m > n references attestation and artefact
+binary N (trusted) ──verify-artifact A1–A10──► binary N+1
 ```
 
-**Why it is not circular:**
+Why it is not circular:
 - Nothing in binary N+1 authenticates binary N+1.
-- Nothing at the release host authenticates the first binary.
-- Ordinary project installs never need to understand build internals: they run `verify-artifact`, and the build evidence
-  is a signed statement.
+- The source is named by the verification attestation, not by any statement that the binary's own build produces.
+- Ordinary installs run `verify-artifact`; they never need build internals.
 
-## 7. What each compromise yields (corrects `05` §1 and review RK-11)
+## 7. What each compromise yields (CD3-3 (3): restated from the corrected rules)
 
-| Compromised | Can mint an accepted malicious binary? | Why |
+Evidence: `evidence/VA4-verify-artifact-source-scenarios.json`. Of its 16 rows, 16 are as expected. Twelve attacks are
+refused, and three minimum capability sets are documented as accepted. Routes:
+- **S** — malicious source through the verification record;
+- **B** — malicious bytes claimed as a build of genuine source;
+- **I** — insider source accepted by an honest verifier.
+
+| Compromised (with honest downstream custodians unless stated) | Accepted malicious binary? | Why |
 |---|---|---|
-| one `release-final` key | no | not granted `release-artifact` (`PURPOSE_NOT_GRANTED`, evidence `A27`) |
-| one `release-artifact` key | no | threshold 2 (`A27b`) |
-| both `release-artifact` keys | no | needs a build attestation (`A27c`) and a trust-state reference (`A27d`) |
-| `release-artifact` ×2 plus `build-attestation` | no | needs a trust-state reference (`A27d`) |
-| `release-artifact` ×2 plus `build-attestation` plus `trust-state` | **yes**, for machines that verify with those keys still granted | This is 4 keys over 3 purposes held by different custodians. Compiled floors or roots other than root-signed ones still fail A6, but the malicious code can ignore its TBM. Remedy: root rotation (`05` §9). |
-| a genuine older binary presented as an upgrade | refused | `BINARY_T0_ROLLBACK` (`A28`) |
-| OP-4 "no" (one key for candidate and final) | no effect on binaries | `release-artifact` is separate (`A29`) |
+| one `release-final` key + pipeline input (RV3-B-A08) | **no** | V8 source equality: `RELEASE_IDENTITY_MISMATCH(source)` |
+| `release-candidate` + `release-final` + pipeline input; candidate REJECTED | **no** | `ARTIFACT_SOURCE_REJECTED` |
+| OP-4 "no" everyday key (candidate + final) + pipeline input (RV3-D-A03) | **no** | no ACCEPTED attestation for the source: `ARTIFACT_SOURCE_UNVERIFIED` |
+| **route S:** `verification-attestation` + `release-candidate` + `release-final` + pipeline input | **yes** | **3 distinct keys over 3 purposes** (KS-4 and KS-6 force distinctness from the verifier) plus control of the build input |
+| **route S under OP-4 "no":** `verification-attestation` + the everyday key + pipeline input | **yes** | **2 distinct keys** plus pipeline input |
+| route S under OP-2 "root-registered production source" | **no** | `ARTIFACT_SOURCE_UNREGISTERED`; needs the root threshold |
+| route S under OP-2 "verification-attestation threshold 2", one verifier key | **no** | `ARTIFACT_SOURCE_UNVERIFIED` |
+| **route B:** `release-artifact` ×2 + `build-attestation` + `trust-state` | **yes** | **4 keys over 3 purposes**, no pipeline control needed (unchanged from revision 3) |
+| route B with one `release-artifact` key | no | `THRESHOLD_NOT_MET` |
+| route B without a build attestation | no | `ARTIFACT_BUILD_UNATTESTED` |
+| **route I:** an insider's malicious commit that the independent verifier accepts | **yes** | no key compromise. Bounded by the verification process (TB-4); root-registered source adds the root ceremony's review |
+| a genuine older binary presented as an upgrade | no | `BINARY_T0_ROLLBACK` against the accepted-TBM high-water |
+| a revoked genuine binary on an aged, expired or bypassed anchor (RV3-D-A15) | no | inclusion anchors, pin validity, currency proof (`24`) |
+
+**True minimum under the architecture minimum.** Two routes remain:
+- **Route S.** Two keys under OP-4 "no", three under OP-4 "yes", in both cases over distinct purposes, plus control of
+  the build input.
+- **Route B.** Four keys over three purposes.
+
+No single key of any purpose, at any threshold, can mint an accepted production binary.
+
+**Under the OP-2 options.**
+- Root-registered production source raises route S to the root threshold. The minimum then becomes route B: four keys
+  over three purposes.
+- Verification threshold 2 raises route S by one key.
+
+`05` §3, TB-3 and `21` OP-2 and OP-4 carry this table.
 
 ## 8. What is protected (HO-0001 §3.3 list)
 
 | Asset | Protection |
 |---|---|
-| The binary | A1–A4 (digest, `release-artifact` threshold, independent reproduction) |
-| Its compiled trust roots | TBM `root_chain` resolves to dual-threshold root statements (A6); high-water (A7) |
-| Compiled minimum floors | inside the root-signed TPS named by the TBM (A6); a floor below high-water is refused (A7) |
+| The binary | A1, A2, A4a |
+| **Its source** | A4b: attested source, V8 source equality, TSS-referenced attestation, no REJECTED attestation; optional root registration |
+| Compiled trust roots | TBM `root_chain` resolves (A6); accepted-TBM high-water (A7) |
+| Compiled minimum floors, surface, precedence registration | the root-signed TPS named by the TBM (A6) |
 | Compiled trust-policy identity | TBM `trust_policy` digest (A6) |
-| Compiled historical-release set | moved into the root-signed TPS `eligibility.historical_releases[]` (the former threshold-1 historical-identity statement is withdrawn, `05` §2) |
-| Compiled trust state and bootstrap rules | TBM `trust_state` (A6); bootstrap block inside the TPS; enforcement code under the build attestation (A4) |
+| Compiled historical-release set | TPS `eligibility.historical_releases[]` (root threshold) |
+| Compiled trust state and bootstrap rules | TBM `trust_state` (A6); bootstrap in the TPS; enforcement code under the build attestation of attested source (A4a, A4b) |
 
-## 9. Residuals
+## 9. Custodial rules (`05` §7 rules 3, 6, 7)
 
-| ID | Residual | Bound |
+| Custodian | Before signing, MUST run | Refuses on |
 |---|---|---|
-| TB-1 | The binary remains the TCB; a user who runs an unverified binary is outside the chain. | TA-1. `verify-artifact` and first-run self-check (§5); documented procedure. |
-| TB-2 | The reproducible-build attestation trusts the rebuilder's environment. | An independent custodian and toolchain; OP-2 may require two rebuilders (threshold 2). |
-| TB-3 | Compromise of release-artifact ×2 plus build-attestation plus trust-state. | §7; root rotation. |
+| Independent verifier (`verification-attestation`) | reproduce the candidate payload from `source` with `build_inputs_digest` | any difference; attests REJECTED on failure |
+| Rebuilder (`build-attestation`) | `gov trust verify-artifact --stage rebuilder`: A3, A4b, A6 against the draft | an unattested, rejected or non-matching source |
+| `release-artifact` custodians | `--stage custodian`: A1, A3, A4a, A4b, A6 | as above |
+| Trust-state publisher (`gov trust publish`) | `--stage publisher`: A1–A4b, A6 before referencing an artefact | as above |
+| Root co-signers (OP-2 (iii)) and root ceremony (production-source registration) | the same, plus comparison with the owner's verification record | as above |
+
+`VA4` rows "custodial pre-check" show each stage refusing the RV3-B-A08 artefact before any signature. These rules
+narrow custodian error. The verifier-side A4b is the enforcement.
+
+## 10. Residuals
+
+| ID | Residual | Bound | Test |
+|---|---|---|---|
+| TB-1 | The binary remains the TCB; a user who runs an unverified binary is outside the chain. | TA-1; `verify-artifact`; first-run self-check against the accepted-TBM high-water (RV3-M8 closed) | RT-92, RT-93 |
+| TB-2 | The build attestation trusts the rebuilder's environment. | Bounds only "bytes equal a build of the attested source"; independent custody (TA-10); OP-2 may require two rebuilders | RT-92 |
+| TB-3 | Compromise of a minimum capability set of §7. | Route S: 3 keys (OP-4 "yes") or 2 keys (OP-4 "no") plus pipeline input; route B: 4 keys over 3 purposes. Raised by the OP-2 options. Remedy: root rotation and revocation (`05` §9). | RT-92 source rows; `VA4` |
+| TB-4 | A malicious commit accepted by an honest but deceived independent verifier (route I). | Procedural: verification scope and harnesses; OP-2 verification threshold 2; root-registered source adds a root review | — (process) |

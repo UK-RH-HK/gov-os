@@ -1,9 +1,10 @@
 # Output 8 — Project layout, `framework.lock` and the project trust record
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 3 replaces the revision-2 in-place layout (sentinels in legacy lock fields, tombstone manifest) with the
-> legacy-path-occupation layout (`26`, R2-H4). The RoT-1 lock 3.0.0 moves inside `governance/trust/`, trust records
-> become unions (R2-M9), and the transaction area moves outside Git.
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 4 keeps the legacy-path-occupation layout; review r3 recorded R2-H4 as CLOSED as a class. It changes the
+> ignore rule, so the tracked migration occupation is not listed by `git ls-files -ci --exclude-standard` (RV3-L7). The
+> held registration, the project-strength vector and the accepted-TBM high-water are VTS records, not lock fields
+> (`24` §8).
 
 ## 1. Principle
 
@@ -36,13 +37,19 @@ governance/
 ├── generated                           occupation: regular file
 └── framework.lock/ROT-1-TRUST-FORMAT   occupation: directory with sentinel file
 spec/audits/ADOPTION/                   RoT-1 adoption evidence;  spec/audits/GOVERNANCE-ADOPTION = occupation (regular file)
-.governance-runtime/migration           occupation: tracked regular file
+.governance-runtime/migration           occupation: tracked regular file, not ignored (.gitignore: /.governance-runtime/* and !/.governance-runtime/migration)
 .governance-runtime/trust-tx/           install transaction area: untracked; journals honoured only if registered in the VTS (18 §5.1)
 ```
 
 **Why tracked.** A second machine authenticates without network access (G5). Every file under `governance/trust/` except
 `FORMAT`, `framework.lock` and `development.json` is signed. Deleting files produces `PARTIAL`, `INCOMPLETE` or
 `BELOW_ANCHOR`, never trust.
+
+**Ignore rule (RV3-L7).** The install transaction writes two `.gitignore` lines: `/.governance-runtime/*` and
+`!/.governance-runtime/migration`. Every other runtime path stays ignored. The occupation file is therefore tracked and not
+ignored, and the common "untrack ignored files" idiom does not list it. Revision 3 ignored the whole directory and
+force-added the file, which that idiom removed from later clones. Evidence:
+`evidence/RV3-D-A05-A07-rerun-r4-layout.json` (`tracked_but_ignored_listed: []`; occupation present in a fresh clone).
 
 ## 3. Lock schema 3.0.0 (`schemas/framework-lock-3.0.0.schema.json`)
 
@@ -107,7 +114,7 @@ spec/audits/ADOPTION/                   RoT-1 adoption evidence;  spec/audits/GO
   "trust_references": {"trust_policy_version_min": 1, "trust_state_sequence_min": 3},
   "anchor_at_install": {"state_sequence": 3, "method": "human"},
   "project_trust_id": "<32 hex>",
-  "verdict_at_install": {"authenticity": "AUTHENTICATED", "eligibility": "ELIGIBLE", "surface": "REGISTERED", "certification_view": "CERTIFIED_AS_OF(3)", "trust_state": "KNOWN(3)", "freshness": "ANCHORED(3,human,0d)"},
+  "verdict_at_install": {"authenticity": "AUTHENTICATED", "eligibility": "ELIGIBLE", "surface": "REGISTERED", "certification_view": "CERTIFIED_AS_OF(3)", "trust_state": "KNOWN(3)", "freshness": "ANCHORED(3,human,as-of 2026-10-01T09:00:00Z,0d)"},
   "source": "release:agentic-engineering-os@4.1.6", "source_reference": "github-release:<owner>/<repo>@v4.1.6",
   "installed_at": "2026-10-01T09:00:00Z", "installed_at_commit": "<consumer HEAD>",
   "installed_by": {"gov_version": "4.1.6", "tbm_digest": "sha256:<64 hex>", "trust_profile": "production", "session": "S-…", "role": "orchestrator", "authority_level": "L4"},

@@ -1,13 +1,12 @@
 # Output 10 — Reference retrieval profile trust integration
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 3 makes these changes:
-> - profile statements live under `governance/trust/profiles/` in the legacy-path-occupation layout (`26`);
-> - a profile install is trust ingress (C3), needing an anchor (`24`);
-> - the registry path moves to `governance/views/`, which requires a pinned kernel change registered in the 4.1.6 Trust
->   Policy (`23`).
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 4 changes profile trust in two ways:
+> - a profile install is C3, so it needs a currency proof (`24` §4.4);
+> - plugin processes run under write confinement (`24` §3.5).
 >
-> The host-side verification of revision 2 is kept.
+> Kept from revision 3: host-side verification, the content-addressed store, and the `governance/views/` registry path
+> registered as a pinned value in TPS v1.
 
 ## 1. Constraints preserved
 
@@ -43,7 +42,7 @@ The fields are unchanged from revision 2:
 3. Verify every plugin, runtime-lock, package and model digest.
 4. Materialise into the content-addressed store `.governance-runtime/profiles/cas/<sha256>`: exclusive creation,
    read-only, fs-verity where available. Build the environment only from hash-verified archives.
-5. **Freshness and authorisation.** Profile install is C3: it requires `ANCHORED` or `WITNESSED` freshness (`24` §4.3) and
+5. **Freshness and authorisation.** Profile install is C3: it requires `ANCHORED` or `WITNESSED` freshness, a currency proof (`24` §4.3–§4.4), and the install authority from the effective policy.
    the install authority from the effective policy.
 6. Register through `gov plugins register`. The registry entry binds `profile_statement_digest` and the CAS digests. The
    registry is written to the kernel-registered `TOOL_POLICY.plugins.registry_path`; for 4.1.6 that is
@@ -66,8 +65,8 @@ The fields are unchanged from revision 2:
 
 - **Project-authored plugins** remain governed by D-0007-style rules, never profile-bound.
 - **Remote embedding APIs** are unsigned project plugins.
-- **Plugin subprocesses** are A3-equivalent (`18` VR-3):
-  - they cannot authorise trust decisions (`27`);
+- **Plugin subprocesses** run under write confinement (`24` §3.5 (3)) and are otherwise A3-equivalent (`18` VR-3):
+  - they cannot write pins, the VTS or trust paths, and cannot authorise trust decisions (`27`);
   - their PPS writes are detected at the next unit of work;
   - their overlay weakenings are reported (`26` §6).
 

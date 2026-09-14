@@ -1,0 +1,47 @@
+{
+ "RV3-D-A01_lattice_soundness": {
+  "pairs_evaluated": 36,
+  "unsound_pairs": [],
+  "verdict": "no unsound pair"
+ },
+ "RV3-D-A02_root_signed_tps_tightening": {
+  "additive": {
+   "TPS_v2_registers_immutable_is_computed_reduction": true,
+   "effective_project_layer_mode": "additive",
+   "needs_lowering_history_and_policy_lowering_gate": true,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": false,
+   "project_strengthening_removed": []
+  },
+  "ceiling": {
+   "TPS_v2_registers_immutable_is_computed_reduction": true,
+   "effective_project_layer_mode": "ceiling",
+   "needs_lowering_history_and_policy_lowering_gate": true,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": false,
+   "project_strengthening_removed": []
+  },
+  "floor": {
+   "TPS_v2_registers_immutable_is_computed_reduction": true,
+   "effective_project_layer_mode": "floor",
+   "needs_lowering_history_and_policy_lowering_gate": true,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": false,
+   "project_strengthening_removed": []
+  },
+  "shrink_only": {
+   "TPS_v2_registers_immutable_is_computed_reduction": true,
+   "effective_project_layer_mode": "shrink_only",
+   "needs_lowering_history_and_policy_lowering_gate": true,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": false,
+   "project_strengthening_removed": []
+  },
+  "strengthen_only_bool": {
+   "TPS_v2_registers_immutable_is_computed_reduction": true,
+   "effective_project_layer_mode": "strengthen_only_bool",
+   "needs_lowering_history_and_policy_lowering_gate": true,
+   "older_v1_kernel_E7_precedence_weakened_under_v2": false,
+   "project_strengthening_removed": []
+  }
+ },
+ "lattice": "release/root-of-trust/4.1.6/constitutional-surface/csi_lib.py rule_ge/rule_join (unmodified)",
+ "probe": "RV3-D precedence lattice",
+ "runtime_reference": "runtime/src/policy_precedence.rs evaluate (4.1.5)"
+}

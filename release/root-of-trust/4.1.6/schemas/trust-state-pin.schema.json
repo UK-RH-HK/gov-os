@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-state-pin.schema.json",
   "title": "trust-state-pin",
-  "description": "PROPOSED (RoT-1 revision 3). One entry of <account-home>/.config/gov/trust-state-pins (24 §3.2): an operator-provisioned anchor (TA-9). Never read from a repository or the environment.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). One entry of trust-state-pins in the system pin directory (/etc/gov/, /Library/Application Support/gov/, %ProgramData%\\gov\\) or, only when the integrity predicate holds, <account-home>/.config/gov/ (24 §3.2, §3.5): an operator-provisioned anchor (TA-9 restated). valid_until is mandatory; valid_until - provisioned_at must not exceed the Trust Policy bootstrap.pin_max_validity_days, and outside [provisioned_at, valid_until] by the local clock the pin is not an anchor (PIN_OUTSIDE_VALIDITY). The anchor is satisfied only by inclusion of (state_sequence, state_digest) in the effective chain (24 §3.4). Never read from a repository or the environment.",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,7 +15,8 @@
     "state_sequence",
     "state_digest",
     "provisioned_by",
-    "provisioned_at"
+    "provisioned_at",
+    "valid_until"
   ],
   "properties": {
     "lineage": {
@@ -56,6 +57,10 @@
       "maxLength": 256
     },
     "provisioned_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "valid_until": {
       "type": "string",
       "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
     },

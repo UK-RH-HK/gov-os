@@ -1,0 +1,2788 @@
+{
+ "summary": {
+  "scenarios": 54,
+  "holding": 54,
+  "failing": [],
+  "oracle_mutants": 9,
+  "mutants_killed": 9,
+  "mutants_not_killed": [],
+  "matrix": {
+   "rows": 132,
+   "R7_C2_rows": 55,
+   "R7_C3_rows": 12,
+   "by_classification": {
+    "refused": 77,
+    "stated_core (anchored before the revocation; R7 never received)": 42,
+    "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)": 13
+   },
+   "rows_labelled_current": 0
+  },
+  "unstated_matrix_rows": 0,
+  "params": {
+   "pin_max_validity_days": 30,
+   "c3_currency_window_hours": 168,
+   "max_anchor_age_days": 180,
+   "witness_max_validity_hours": 168,
+   "witness_c3_min_threshold": 2,
+   "clock_skew_seconds": 300,
+   "root_registered_source": false
+  }
+ },
+ "conformance_oracle": {
+  "M-sequence-anchor": {
+   "rule_changed": {
+    "anchor_semantics": "sequence"
+   },
+   "scenarios_that_fail": [
+    "RV3-B-A12_RV3-D-A12_higher_unchained_tss",
+    "RV3-B-A13_matrix_machine_x_op7_x_adversary",
+    "RV3-D-A15_revoked_binary_pinned_ci"
+   ],
+   "killed": true
+  },
+  "M-pin-without-currency-bound": {
+   "rule_changed": {
+    "pin_validity": false
+   },
+   "scenarios_that_fail": [
+    "B5_fresh_runner_old_binary_A2_swap",
+    "RV3-B-A02_stale_ci_pin",
+    "RV3-B-A13_matrix_machine_x_op7_x_adversary"
+   ],
+   "killed": true
+  },
+  "M-threshold-1-trust-state-witness": {
+   "rule_changed": {
+    "witness_purpose": "trust-state"
+   },
+   "scenarios_that_fail": [
+    "M2_clean_ci_runner",
+    "R2_witness_replay",
+    "RV3-B-A06_witness_authority",
+    "RV3-B-A07_issued_at_high_water",
+    "RV3-B-A13_matrix_machine_x_op7_x_adversary"
+   ],
+   "killed": true
+  },
+  "M-c3-without-currency-proof": {
+   "rule_changed": {
+    "c3_requires_currency": false
+   },
+   "scenarios_that_fail": [
+    "INGATE_state_fingerprint_currency",
+    "M3_restored_from_backup",
+    "M4_old_epoch",
+    "M7_offline_long_absence",
+    "PIN_WINDOW_bound",
+    "RV3-B-A11_op7_c_non_witness_anchor",
+    "RV3-D-A15_revoked_binary_pinned_ci"
+   ],
+   "killed": true
+  },
+  "M-pins-writable-by-governed-account": {
+   "rule_changed": {
+    "pin_integrity": false
+   },
+   "scenarios_that_fail": [
+    "RV3-B-A03_pin_written_by_governed_account",
+    "RV3-B-A04_decision_pin_integrity",
+    "RV3-B-A13_matrix_machine_x_op7_x_adversary"
+   ],
+   "killed": true
+  },
+  "M-a7-against-tss-high-water": {
+   "rule_changed": {
+    "a7_high_water": "tss"
+   },
+   "scenarios_that_fail": [
+    "A_valid_realisable_TBM_t9_reference_t11",
+    "RV3-D-A13_realisable_tbm_order",
+    "RV3-D-A15_revoked_binary_pinned_ci"
+   ],
+   "killed": true
+  },
+  "M-source-from-release-commit": {
+   "rule_changed": {
+    "source_binding": false
+   },
+   "scenarios_that_fail": [
+    "RV3-B-A08_final_names_unverified_source"
+   ],
+   "killed": true
+  },
+  "M-lift-reuses-pre-negative-attestation": {
+   "rule_changed": {
+    "lift_post_dating": false
+   },
+   "scenarios_that_fail": [
+    "RV3-B-A05_lift_requires_post_dating_attestation"
+   ],
+   "killed": true
+  },
+  "M-any-issued-at-raises-clock": {
+   "rule_changed": {
+    "clock_high_water_witness_only": false
+   },
+   "scenarios_that_fail": [
+    "RV3-B-A07_issued_at_high_water"
+   ],
+   "killed": true
+  }
+ },
+ "scenarios": {
+  "B1_candidate_reference_inflation": {
+   "computed": {
+    "trust_state": "KNOWN",
+    "R6_ingress": {
+     "freshness_and_eligibility_ok": true,
+     "reasons": []
+    },
+    "C999_refs_met": false
+   },
+   "claim": "17 S7: references outside the trust-state lineage are release-local",
+   "holds": true
+  },
+  "B2_certification_key_alone_unwithdraws": {
+   "computed": {
+    "R6_negative": true
+   },
+   "claim": "17 MS-2: a certification key alone lifts nothing",
+   "holds": true
+  },
+  "B3_same_sequence_fork": {
+   "computed": {
+    "trust_state": "EQUIVOCATION",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "claim": "17 S4(c): EQUIVOCATION, C0 only",
+   "holds": true
+  },
+  "B4_unresolvable_references": {
+   "computed": {
+    "below": "KNOWN",
+    "effective": "t3",
+    "above": "INCOMPLETE",
+    "allowed_above": [
+     "C0",
+     "C1"
+    ]
+   },
+   "claim": "17 S4(a)/(e): unresolvable TSS never constrains; above the effective sequence INCOMPLETE refuses C2/C3",
+   "holds": true
+  },
+  "B5_fresh_runner_old_binary_A2_swap": {
+   "computed": {
+    "a_no_pin": {
+     "freshness": "UNANCHORED(held 5)",
+     "allowed": [
+      "C0"
+     ],
+     "R7_policy_root_for_C2": false
+    },
+    "a_pin_t9_fresh": {
+     "freshness": "BELOW_ANCHOR(anchored (9,t9) not held in the effective chain)",
+     "allowed": [
+      "C0"
+     ],
+     "R7_policy_root_for_C2": false
+    },
+    "a_pin_t5_stale_400d": {
+     "freshness": "UNANCHORED(held 5)",
+     "allowed": [
+      "C0"
+     ],
+     "R7_policy_root_for_C2": false
+    },
+    "d_no_pin": {
+     "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ],
+     "R7_policy_root_for_C2": true
+    }
+   },
+   "claim": "24 \u00a75.2: no pin, a current pin, and a pin outside validity all refuse R7 as C2 root under (a); (d) is the stated owner residual",
+   "holds": true
+  },
+  "B6_lowering_across_skipped_version": {
+   "computed": {
+    "cumulative": {
+     "accepted": true,
+     "computed_reductions": [
+      "install_authority"
+     ],
+     "per_project_policy_lowering_gate_required": true
+    },
+    "hidden": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "install_authority"
+     ]
+    }
+   },
+   "claim": "19 \u00a710.6: computed against the strongest held; cumulative history; undeclared reduction invalidates",
+   "holds": true
+  },
+  "M1_first_install": {
+   "computed": {
+    "before": [
+     "C0"
+    ],
+    "after_confirm_state_t10": {
+     "axis": "ANCHORED(10, human, as-of 3000, age 0d; held 10) CURRENCY(human anchored within the C3 currency window)",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2",
+      "C3"
+     ],
+     "proof": "human anchored within the C3 currency window",
+     "ignored_pins": []
+    },
+    "source_withholds_t10": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)"
+   },
+   "claim": "24 \u00a75.1: C3 refused until anchored; a fresh human confirmation is a currency proof; a withheld anchored epoch is BELOW_ANCHOR",
+   "holds": true
+  },
+  "M2_clean_ci_runner": {
+   "computed": {
+    "a_no_pin": [
+     "C0"
+    ],
+    "a_pin_t10_2d_intact": {
+     "axis": "ANCHORED(10, pin, as-of 2998, age 2d; held 10) CURRENCY(pin anchored within the C3 currency window)",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2",
+      "C3"
+     ],
+     "proof": "pin anchored within the C3 currency window",
+     "ignored_pins": []
+    },
+    "a_pin_t10_2d_stripped": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+    "c_witness_2_of_2_on_t10": {
+     "axis": "WITNESSED(10, by freshness-witness, 2 signer(s), expires in 20h)",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2",
+      "C3"
+     ],
+     "proof": "freshness witness",
+     "ignored_pins": []
+    },
+    "c_expired_witness": [
+     "C0"
+    ],
+    "d_no_pin": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)"
+   },
+   "claim": "24 \u00a75.2: no pin C0; a valid pin anchors (C3 within the currency window); stripped + pin BELOW_ANCHOR; witnesses at threshold admit (c); (d) labelled",
+   "holds": true
+  },
+  "M3_restored_from_backup": {
+   "computed": {
+    "a": {
+     "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    },
+    "b": {
+     "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1"
+     ]
+    },
+    "d": {
+     "axis": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    },
+    "a_repo_intact": "ANCHORED(5, human, as-of 2600, age 400d; held 10) CURRENCY_UNPROVEN"
+   },
+   "claim": "24 \u00a75.3: never below the restored anchor; (a)/(d) C2 at the anchor with age, never C3 without a fresh proof; (b) refuses C2 by age; intact repository raises knowledge",
+   "holds": true
+  },
+  "M4_old_epoch": {
+   "computed": {
+    "effective_sequence": 5,
+    "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+    "allowed": [
+     "C0",
+     "C1",
+     "C2"
+    ]
+   },
+   "claim": "24 \u00a75.4: effective state never below the retained anchor; no C3 without a fresh proof",
+   "holds": true
+  },
+  "M5_no_epoch": {
+   "computed": {
+    "a": [
+     "C0"
+    ],
+    "b": [
+     "C0"
+    ],
+    "c": [
+     "C0"
+    ],
+    "d": [
+     "C0",
+     "C1",
+     "C2"
+    ]
+   },
+   "claim": "24 \u00a75.5: UNANCHORED; C3 never; C2 only under (d)",
+   "holds": true
+  },
+  "M6_two_machines": {
+   "computed": {
+    "A_t10_after_strip": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+    "B_t5_after_strip": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+    "B_after_pull": "ANCHORED(5, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)"
+   },
+   "claim": "24 \u00a75.6: each machine enforces its own anchor; B learns 10 when the PTR carries it",
+   "holds": true
+  },
+  "M7_offline_long_absence": {
+   "computed": {
+    "a": {
+     "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    },
+    "b": {
+     "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1"
+     ]
+    },
+    "c": {
+     "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    },
+    "d": {
+     "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    }
+   },
+   "claim": "24 \u00a75.7: (a)/(c)/(d) C2 at the anchor with age shown, never C3 without a fresh proof; (b) refuses C2 by age",
+   "holds": true
+  },
+  "INGATE_state_fingerprint_currency": {
+   "computed": {
+    "repo_intact_fingerprint_t10": {
+     "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 10) CURRENCY(in-gate state fingerprint (TA-5, clockless))",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2",
+      "C3"
+     ]
+    },
+    "repo_stripped_fingerprint_t10": {
+     "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    }
+   },
+   "claim": "24 \u00a74.4: a state fingerprint typed into the trust gate that names the effective TSS is a clockless currency proof for that C3 transition; a fingerprint naming a statement the machine does not hold as effective proves nothing",
+   "holds": true
+  },
+  "R1_signed_state_replay": {
+   "computed": {
+    "effective": "t9",
+    "status": "KNOWN"
+   },
+   "claim": "17 MS-4: replayed older genuine statements never lower knowledge",
+   "holds": true
+  },
+  "R2_witness_replay": {
+   "computed": {
+    "fresh_runner": "WITNESSED(10, by freshness-witness, 2 signer(s), expires in 10h)",
+    "runner_saw_newer_witness": [
+     "C0"
+    ]
+   },
+   "claim": "24 \u00a76: an older witness is accepted only by a verifier that never saw a newer one",
+   "holds": true
+  },
+  "R3_gate_record_from_repository": {
+   "computed": {
+    "authorised": false,
+    "code": "TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED"
+   },
+   "claim": "rule (18): repository records never authorise trust decisions",
+   "holds": true
+  },
+  "R4_lock_hint_inflation": {
+   "computed": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ]
+   },
+   "claim": "17 S8: hints never refuse or relax",
+   "holds": true
+  },
+  "R5_pin_digest_mismatch": {
+   "computed": "BELOW_ANCHOR(anchored (10,t10-other) not held in the effective chain)",
+   "claim": "24 \u00a76: an anchored (sequence, digest) not held in the effective chain is BELOW_ANCHOR (C0)",
+   "holds": true
+  },
+  "R6_A3_deletes_VTS": {
+   "computed": [
+    "C0"
+   ],
+   "claim": "RS-3: UNANCHORED; read-only under (a)",
+   "holds": true
+  },
+  "E1_fork_across_a_gap": {
+   "computed": {
+    "status": "REGRESSION",
+    "effective": "t2a"
+   },
+   "claim": "17 S4(d): a higher TSS omitting a held lower one is not admissible (REGRESSION)",
+   "holds": true
+  },
+  "E2_trust_policy_equivocation": {
+   "computed": "EQUIVOCATION",
+   "claim": "17 S3: two TPS of one version -> EQUIVOCATION",
+   "holds": true
+  },
+  "E3_fork_without_and_with_anchor": {
+   "computed": {
+    "no_anchor": "EQUIVOCATION",
+    "anchored_t9": {
+     "status": "KNOWN",
+     "effective": "t9",
+     "orphans": [
+      "t4x"
+     ]
+    }
+   },
+   "claim": "17 S4: unanchored equal-sequence fork is EQUIVOCATION; an anchor on t9 orphans the fork",
+   "holds": true
+  },
+  "K1_trust_state_with_certification": {
+   "computed": {
+    "ok": false,
+    "violations": [
+     {
+      "key": "k1",
+      "pair": [
+       "certification-status",
+       "trust-state"
+      ]
+     }
+    ]
+   },
+   "claim": "05 KS-8: forbidden pair",
+   "holds": true
+  },
+  "K2_release_artifact_with_release_final": {
+   "computed": {
+    "ok": false,
+    "violations": [
+     {
+      "key": "k1",
+      "pair": [
+       "release-artifact",
+       "release-final"
+      ]
+     }
+    ]
+   },
+   "claim": "05 KS-9: release-artifact shares with nothing",
+   "holds": true
+  },
+  "K3_whitelisted_owner_matrix": {
+   "computed": {
+    "ok": true,
+    "violations": []
+   },
+   "claim": "05 \u00a73: the default grants satisfy the whitelist",
+   "holds": true
+  },
+  "K4_freshness_witness_with_trust_state": {
+   "computed": {
+    "ok": false,
+    "violations": [
+     {
+      "key": "k1",
+      "pair": [
+       "freshness-witness",
+       "trust-state"
+      ]
+     }
+    ]
+   },
+   "claim": "05 KS-11: freshness-witness shares with no purpose",
+   "holds": true
+  },
+  "A27_release_final_key_signs_artifact": {
+   "computed": "PURPOSE_NOT_GRANTED",
+   "claim": "25 \u00a75 verify-artifact: PURPOSE_NOT_GRANTED",
+   "holds": true
+  },
+  "A27b_one_release_artifact_key": {
+   "computed": "THRESHOLD_NOT_MET",
+   "claim": "25 \u00a75 verify-artifact: THRESHOLD_NOT_MET",
+   "holds": true
+  },
+  "A27c_no_build_attestation": {
+   "computed": "ARTIFACT_BUILD_UNATTESTED",
+   "claim": "25 \u00a75 verify-artifact: ARTIFACT_BUILD_UNATTESTED",
+   "holds": true
+  },
+  "A27d_not_referenced_by_trust_state": {
+   "computed": "ARTIFACT_UNREFERENCED",
+   "claim": "25 \u00a75 verify-artifact: ARTIFACT_UNREFERENCED",
+   "holds": true
+  },
+  "A27e_compiled_policy_digest_not_signed_policy": {
+   "computed": "BINARY_T0_UNVERIFIED",
+   "claim": "25 \u00a75 verify-artifact: BINARY_T0_UNVERIFIED",
+   "holds": true
+  },
+  "A28_genuine_older_binary_below_accepted_tbm": {
+   "computed": "BINARY_T0_ROLLBACK",
+   "claim": "25 \u00a75 verify-artifact: BINARY_T0_ROLLBACK",
+   "holds": true
+  },
+  "A29_op4_no_candidate_final_key_signs_artifact": {
+   "computed": "PURPOSE_NOT_GRANTED",
+   "claim": "25 \u00a75 verify-artifact: PURPOSE_NOT_GRANTED",
+   "holds": true
+  },
+  "A_valid_realisable_TBM_t9_reference_t11": {
+   "computed": "ACCEPTED",
+   "claim": "25 \u00a75 verify-artifact: ACCEPTED",
+   "holds": true
+  },
+  "RV3-B-A02_stale_ci_pin": {
+   "computed": {
+    "pin_t5_image_400d/a": {
+     "freshness": "UNANCHORED(held 5)",
+     "R7_C2_root": false
+    },
+    "pin_t5_image_400d/b": {
+     "freshness": "UNANCHORED(held 5)",
+     "R7_C2_root": false
+    },
+    "pin_t5_image_400d/c": {
+     "freshness": "UNANCHORED(held 5)",
+     "R7_C2_root": false
+    },
+    "pin_t5_image_400d/d": {
+     "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+     "R7_C2_root": true
+    },
+    "pin_t5_image_100d/a": {
+     "freshness": "UNANCHORED(held 5)",
+     "R7_C2_root": false
+    },
+    "pin_t5_image_100d/b": {
+     "freshness": "UNANCHORED(held 5)",
+     "R7_C2_root": false
+    },
+    "pin_t5_image_100d/c": {
+     "freshness": "UNANCHORED(held 5)",
+     "R7_C2_root": false
+    },
+    "pin_t5_image_100d/d": {
+     "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+     "R7_C2_root": true
+    }
+   },
+   "claim": "24 \u00a73.2 AM-3: a pin outside its validity is not an anchor; only (d) admits R7 unanchored (stated owner residual)",
+   "holds": true
+  },
+  "RV3-B-A03_pin_written_by_governed_account": {
+   "computed": {
+    "owned_by_euid_0644": {
+     "freshness": "UNANCHORED(held 5)",
+     "ignored": [
+      {
+       "pin": 10,
+       "reason": "PIN_WRITABLE_BY_GOVERNED_ACCOUNT"
+      }
+     ]
+    },
+    "root_owned_not_writable": {
+     "freshness": "ANCHORED(5, pin, as-of 2999, age 1d; held 5) CURRENCY(pin anchored within the C3 currency window)",
+     "ignored": []
+    },
+    "read_only_mount": {
+     "freshness": "ANCHORED(5, pin, as-of 2999, age 1d; held 5) CURRENCY(pin anchored within the C3 currency window)",
+     "ignored": []
+    }
+   },
+   "claim": "CR-03: a pin writable by the effective uid is ignored (UNANCHORED); a non-writable or read-only pin anchors",
+   "holds": true
+  },
+  "RV3-B-A04_decision_pin_integrity": {
+   "computed": {
+    "writable": {
+     "framework_update": false,
+     "weakening": false,
+     "project_strength": false,
+     "downgrade": false
+    },
+    "not_writable": {
+     "framework_update": true,
+     "weakening": true,
+     "project_strength": true,
+     "downgrade": false
+    }
+   },
+   "claim": "CR-03/27 \u00a73.2: a decision pin writable by the effective uid authorises nothing; a protected pin never approves local_terminal_only kinds",
+   "holds": true
+  },
+  "RV3-B-A05_lift_requires_post_dating_attestation": {
+   "computed": {
+    "reusing_pre_withdrawal_attestation_negative_remains": true,
+    "new_attestation_naming_the_withdrawal_lifts": true,
+    "distinct_keys_for_the_lift": [
+     "va1 (verification-attestation)",
+     "cs1 (certification-status)",
+     "ts1 (trust-state)"
+    ]
+   },
+   "claim": "17 MS-2 / CR-01: a lift needs an attestation that names the negative statement; three distinct keys",
+   "holds": true
+  },
+  "RV3-B-A06_witness_authority": {
+   "computed": {
+    "trust_state_key_alone_expiring_tss": {
+     "axis": "UNANCHORED(held 100)",
+     "allowed": [
+      "C0"
+     ]
+    },
+    "one_freshness_witness_key_stolen_threshold_2": {
+     "axis": "UNANCHORED(held 5)",
+     "allowed": [
+      "C0"
+     ]
+    },
+    "owner_option_witness_threshold_1_one_key_stolen": {
+     "axis": "WITNESSED(5, by freshness-witness, 1 signer(s), expires in 24h)",
+     "allowed": [
+      "C0",
+      "C1",
+      "C2"
+     ]
+    }
+   },
+   "claim": "24 \u00a73.3 / KS-11: a trust-state key cannot mint currency; one of two witness keys witnesses nothing; under owner threshold 1 a thief reaches C1-C2 only, never C3",
+   "holds": true
+  },
+  "RV3-B-A07_issued_at_high_water": {
+   "computed": {
+    "b_before": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "b_after_future_candidate": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "future_candidate_refused": [
+     {
+      "d": "CP",
+      "reason": "STATEMENT_ISSUED_IN_FUTURE"
+     }
+    ],
+    "c_future_witness_then_honest_witness": "WITNESSED(10, by freshness-witness, 2 signer(s), expires in 20h)",
+    "clock_high_water_after": true
+   },
+   "claim": "CR-06: a future issued_at is refused at ingest and never raises the clock high-water; only witnesses raise it; honest witnesses still verify",
+   "holds": true
+  },
+  "RV3-B-A08_final_names_unverified_source": {
+   "computed": "RELEASE_IDENTITY_MISMATCH(source)",
+   "claim": "25 \u00a75 A4b / 04 V8: a final whose source differs from its attested candidate is refused",
+   "holds": true
+  },
+  "RV3-B-A09_playbook_revokes_never_unreferences": {
+   "computed": {
+    "status": "KNOWN",
+    "effective": "t12a",
+    "A-bad_negative": true
+   },
+   "claim": "05 \u00a79 / CR-04: the remedy keeps artifacts[] and adds a revocation: KNOWN(12) and ARTIFACT_REVOKED",
+   "holds": true
+  },
+  "RV3-B-A10_incomplete_refuses_c2_under_d": {
+   "computed": {
+    "allowed": [
+     "C0",
+     "C1"
+    ]
+   },
+   "claim": "24 \u00a74.3 / CR-05: INCOMPLETE refuses C2 under every option",
+   "holds": true
+  },
+  "RV3-B-A11_op7_c_non_witness_anchor": {
+   "computed": {
+    "axis": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+    "allowed": [
+     "C0",
+     "C1",
+     "C2"
+    ]
+   },
+   "claim": "24 \u00a74.3 and \u00a75.7 (one rule): under (c) a non-witness anchor follows (a): C2 at any age, C3 only with a currency proof",
+   "holds": true
+  },
+  "RV3-B-A12_RV3-D-A12_higher_unchained_tss": {
+   "computed": {
+    "current_pin_t10": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+    "R7_C2_root": false,
+    "first_install_human_t10": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+    "machine_holding_t10": {
+     "status": "REGRESSION",
+     "axis": "REGRESSION"
+    }
+   },
+   "claim": "24 \u00a74.1 inclusion anchors: the anchored statement must be held and in the effective chain; otherwise BELOW_ANCHOR; a machine holding it freezes (REGRESSION)",
+   "holds": true
+  },
+  "RV3-B-A13_matrix_machine_x_op7_x_adversary": {
+   "computed": {
+    "rows": 132,
+    "R7_C2_rows": 55,
+    "R7_C3_rows": 12,
+    "by_classification": {
+     "refused": 77,
+     "stated_core (anchored before the revocation; R7 never received)": 42,
+     "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)": 13
+    },
+    "unstated_rows": [],
+    "rows_labelled_current": 0,
+    "matrix": [
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M1_first_install_after_ceremony_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_no_pin",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 100)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_current_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 100)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M2_ci_runner_pin_t5_image_100d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 100)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M3_restored_backup_anchor_t5_400d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2600, age 400d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M4_old_epoch_anchor_t5_20d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2980, age 20d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 5)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 5)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "UNANCHORED(held 100)",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M5_no_epoch",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "UNANCHORED(FRESHNESS_UNPROVEN; held 100)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_owner_residual_OP7_d (unanchored, compiled TSS t5 older than the newest TSS; never C3)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "REGRESSION",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "REGRESSION",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "REGRESSION",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6A_anchor_t10",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "REGRESSION",
+      "allowed": [
+       "C0"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 5) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 100) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 100) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 100) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M6B_anchor_t5",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 2999, age 1d; held 100) CURRENCY(human anchored within the C3 currency window)",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": true,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_A5_repository_or_transport",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_with_same_account_code_execution",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 5) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "a",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "b",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1"
+      ],
+      "R7_C2_policy_root": false,
+      "R7_C3": false,
+      "classification": "refused",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "c",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     },
+     {
+      "machine": "M7_offline_anchor_t5_1095d",
+      "adversary": "A2_plus_trust_state_key",
+      "op7": "d",
+      "freshness": "ANCHORED(5, human, as-of 1905, age 1095d; held 100) CURRENCY_UNPROVEN",
+      "allowed": [
+       "C0",
+       "C1",
+       "C2"
+      ],
+      "R7_C2_policy_root": true,
+      "R7_C3": false,
+      "classification": "stated_core (anchored before the revocation; R7 never received)",
+      "label_says_current": false
+     }
+    ]
+   },
+   "claim": "CD3-2: only stated-core rows and the stated OP-7 (d) residual admit revoked state; no row is labelled current",
+   "holds": true
+  },
+  "PIN_WINDOW_bound": {
+   "computed": {
+    "pin_t5_provisioned_12d_before_now_valid_30d": {
+     "freshness": "ANCHORED(5, pin, as-of 2988, age 12d; held 5) CURRENCY_UNPROVEN",
+     "R7_C2_root": true,
+     "R7_C3": false
+    },
+    "pin_t9_provisioned_2d_valid_30d": {
+     "freshness": "BELOW_ANCHOR(anchored (9,t9) not held in the effective chain)",
+     "R7_C2_root": false,
+     "R7_C3": false
+    }
+   },
+   "claim": "RS-1b: a valid pin provisioned before a revocation admits the stale descendant for C2 only within its validity (bound pin_max_validity_days); C3 needs a proof within the C3 window",
+   "holds": true
+  },
+  "RV3-D-A04_op7_d_scope": {
+   "computed": {
+    "binary_compiled_t5": true,
+    "binary_compiled_t10_newest_tss": false
+   },
+   "claim": "RV3-L6: the (d) residual exposes binaries whose compiled TSS predates the newest TSS (not the newest TPS)",
+   "holds": true
+  },
+  "RV3-D-A13_realisable_tbm_order": {
+   "computed": {
+    "new_binary": "ACCEPTED",
+    "older_binary_after_newer_accepted": "BINARY_T0_ROLLBACK"
+   },
+   "claim": "25 A7 / RV3-M8: compared with the accepted-TBM high-water; TBM names t9, artefact referenced by t11",
+   "holds": true
+  },
+  "RV3-D-A15_revoked_binary_pinned_ci": {
+   "computed": {
+    "honest_current_pin_t10": "ARTIFACT_REVOKED",
+    "stale_pin_t5_200d_withheld": "TRUST_STATE_UNANCHORED",
+    "valid_pin_t5_20d_withheld": "TRUST_STATE_CURRENCY_UNPROVEN",
+    "current_pin_t10_withheld_plus_t100": "ARTIFACT_SOURCE_UNVERIFIED"
+   },
+   "claim": "CD3-2: a revoked genuine binary is never accepted by an aged, expired or bypassed anchor",
+   "holds": true
+  },
+  "RV3-D-A16_rotation_resigns_retained_statements": {
+   "computed": {
+    "without_resigning": "BELOW_ANCHOR(anchored (10,t10) not held in the effective chain)",
+    "with_resigned_history": "ANCHORED(10, human, as-of 2999, age 1d; held 10) CURRENCY(human anchored within the C3 currency window)"
+   },
+   "claim": "05 \u00a79 / RV3-L8: the playbook re-signs retained statements (same payload digests) before root N+1; anchors stay satisfied",
+   "holds": true
+  },
+  "CR-10_non_surface_tps_reductions": {
+   "computed": {
+    "min_release_sequence": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "eligibility.min_release_sequence"
+     ]
+    },
+    "historical_releases": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "eligibility.historical_releases"
+     ]
+    },
+    "gating_mode": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "gating.mode"
+     ]
+    },
+    "local_terminal_only": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "gating.local_terminal_only"
+     ]
+    },
+    "op7_mode": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "bootstrap.op7_mode"
+     ]
+    },
+    "pin_max_validity_days": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "bootstrap.pin_max_validity_days"
+     ]
+    },
+    "freshness_witness_threshold": {
+     "accepted": false,
+     "code": "TRUST_POLICY_UNDECLARED_LOWERING",
+     "subjects": [
+      "bootstrap.freshness_witness_threshold"
+     ]
+    }
+   },
+   "claim": "19 \u00a710.6: every non-surface TPS field lowering needs a lowering_history entry (else TRUST_POLICY_UNDECLARED_LOWERING)",
+   "holds": true
+  },
+  "TS_KEY_BLAST_RADIUS": {
+   "computed": {
+    "anchored_machine_receives_tss_dropping_revocation": "REGRESSION",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "claim": "17 \u00a715: a trust-state key alone cannot lift a negative on an anchored machine: a descendant dropping a revocation is not admissible (freeze)",
+   "holds": true
+  }
+ }
+}

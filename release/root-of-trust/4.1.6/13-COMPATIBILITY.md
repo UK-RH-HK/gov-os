@@ -1,11 +1,14 @@
 # Output 13 — Legacy-version compatibility model
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 3 makes three replacements:
-> - the sentinel boundary and LC-1/LC-2 give way to the legacy-path-occupation layout and the executed property LP-1
->   (`26`, R2-H4);
-> - historical identities move into the root-signed Trust Policy;
-> - F1 is superseded by P3r3 (R2-L3).
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 4 keeps the compatibility model: the occupation layout, LP-1, and historical releases in the TPS. It changes:
+> - §2: legacy surface results under the revision-4 inventory;
+> - §3: occupation removal and Git restore (LR-2);
+> - §5: currency proof for the first update;
+> - §7: CLI and platform changes (confined commands, system pin directory, directed join);
+> - §8: no reproduction of architect model counts (RV3-M9);
+> - §9: revision-4 statement versions;
+> - §10: the ignore rule, CI pins and re-issued migrations.
 
 ## 1. Legacy artefacts in scope
 
@@ -28,9 +31,14 @@
 - **Withdrawn statement type.** Revision 2's threshold-1 `historical-identity` statement is withdrawn (`05` §2). The set
   is protected at root threshold and named by the Trust Base Manifest (`25` §8).
 - **Status.** `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)`, always.
-- **Independent failure.** Their constitutional surfaces fail the TPS v1 inventory. 4.1.2 has an unclassified
-  `approve_cit` plus 64 registration violations; 4.1.3 and 4.1.4 have 64 and 62 violations
-  (`evidence/CSI-check-legacy-*.json`).
+- **Independent failure.** Their constitutional surfaces fail the revision-4 TPS v1 inventory
+  (`evidence/CSI-check-legacy-*.json`):
+  - 4.1.2 exits 2: 1 unclassified leaf (`approve_cit`), 62 required files or leaves missing, 65 registration violations;
+  - 4.1.3 exits 2: 15 missing, 65 violations;
+  - 4.1.4 exits 2: 6 missing, 64 violations, 44 precedence registration differences.
+
+  The 4.1.5 payload exits 3, because its historical migrations carry `set_lock_field`
+  (`evidence/CSI-check-release-4.1.5.json`). With those operations removed, it exits 0.
 - **Consumer consequence.** A project on a legacy kernel opened by a RoT-1 binary is read-only until updated to an
   eligible signed release. The update performs the layout migration of `26` §7.
 
@@ -57,6 +65,11 @@ The design, class argument and evidence are in `26`. In summary:
   instead of the specified JSON, omitted lock `kernel.*` fields, and ran one destructive command. It supports no claim in
   revision 3.
 
+- **Occupation removed, or pre-migration paths restored by Git.** This is residual LR-2, restated in `26` §8 (RV3-M6).
+  The legacy binary regains a verified legacy install and can write RoT-1 paths. RoT-1 binaries fail closed and report
+  lost project strength where it was recorded. Evidence: `evidence/rerun-RV3-D-legacy-git-restore.json`,
+  `evidence/RV3-D-A05-A07-rerun-r4-layout.json`, `evidence/LR2-installation-state-and-strength-reference.json`.
+
 ## 4. Future format and layout evolution
 
 - `governance/trust/FORMAT` is `{"layout":"legacy-path-occupation-v1","minimum_reader":"4.1.6","trust_format":"rot-1"}`
@@ -71,7 +84,7 @@ The design, class argument and evidence are in `26`. In summary:
 
 | Consumer state | Installation state (`18` §9) | Allowed | Path forward |
 |---|---|---|---|
-| lock 1.1.0 file, `governance/kernel/` directory, kernel equals a historical digest | `LEGACY` + `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)` | read-only; remedies | anchor the machine (`24`), then `gov update --apply --source <signed eligible release>`: `framework_update` trust gate, layout migration (`26` §7), lock 3.0.0 |
+| lock 1.1.0 file, `governance/kernel/` directory, kernel equals a historical digest | `LEGACY` + `HISTORICAL_IDENTIFIED`, `INELIGIBLE(historical)` | read-only; remedies | anchor the machine (`24`), then `gov update --apply --source <signed eligible release>` with a currency proof: `framework_update` trust gate with typed state fingerprint, layout migration (`26` §7) including the ignore rule, lock 3.0.0 |
 | legacy layout, unknown kernel | `LEGACY` | read-only | same |
 | RoT-1 layout, eligible final | `COMPLETE` | per freshness | — |
 | RoT-1 layout, unknown format or layout | `FORMAT_UNSUPPORTED` | `gov version`, `gov doctor` | upgrade `gov` |
@@ -98,6 +111,10 @@ The design, class argument and evidence are in `26`. In summary:
 | `gov update --rollback` to a legacy snapshot | refused |
 | New commands | `gov trust show`, `confirm-root`, **`confirm-state`**, **`confirm <gate>`**, `adopt-lineage`, `refresh --from`, `export`, `publish` (producer), **`verify-artifact`** (`25` §5), **`draft-policy`** (drafts the Constitutional Surface Inventory, `23` §6.2); `gov release attach-signature`, `promote`; `gov kernel export`, **`gov kernel show <path>`** (snapshot bytes with CI, `18` §12) |
 | `gov decide` on a trust gate | `TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED` (`27`) |
+| Repository-supplied commands (`product_test_command`, tool commands, plugins, hooks) | run under OS write confinement; refused where unavailable (`REPOSITORY_COMMAND_CONFINEMENT_UNAVAILABLE`) |
+| Pin locations | system pin directory (`/etc/gov/`, `/Library/Application Support/gov/`, `%ProgramData%\gov\`), or the account location under the integrity predicate; `valid_until` and `expires_at` mandatory |
+| Project overrides | applied as a directed join: a refused weakening component no longer discards the admitted strengthening components of the same override (`OVERRIDE_COMPONENT_REFUSED`) |
+| `gov trust verify-artifact --stage rebuilder|custodian|publisher` | custodial pre-checks (`25` §9) |
 | Paths | overlay `governance/overlay/`, views `governance/views/`, RoT-1 lock `governance/trust/framework.lock`, adoption evidence `spec/audits/ADOPTION/`, transaction area `.governance-runtime/trust-tx/` |
 
 ## 8. Prior harnesses and review evidence — expected results
@@ -117,7 +134,11 @@ anchor on the verifier machine.
 | Review r2 `P1-floor-coverage.py` harm tests (a)–(c) against a release whose unfloored leaves are weakened | **must flip**: E7 ineligible, effective policy genuine (architect evidence `P1r3`) | — |
 | Review r2 `P2-gate-record-forgery.py` | **must flip**: the edited repository record is a request; `TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED` | — |
 | Review r2 `P3-pre-rot-binary-matrix.py` on a genuine 4.1.6 project | **must hold LP-1** for the real 4.1.2–4.1.5 binaries (architect evidence `P3r3`) | — |
-| Review r2 `P4-trust-state-model.py` scenarios | the implementation's trust-state module MUST reproduce `P4r3` (34 of 34) | — |
+| Review r2 `P4-trust-state-model.py` scenarios, and revision-3 and revision-4 architect models | **withdrawn as a reproduction criterion (RV3-M9).** The verifier's harness contains the distinguishing scenarios of `12` §8. P4r3 and P4r4 counts are not expectations. | — |
+| Review r3 `RV3-B-A01-precedence-immutable.py` pointed at 4.1.6 | **must flip**: the precedence-only kernel is `precedence_unregistered`; harms (a)–(c) absent (`12` RT-106) | — |
+| Review r3 `RV3-B-A03-A14-A16-probes.py` | **must flip**: pin writes by a `gov` child are denied or ignored; `on` refused; tunable reclassification refused (`12` RT-103, RT-110, RT-111) | — |
+| Review r3 `RV3-B-CSI-injections.py` against the 4.1.6 inventory | every injection refused (`12` RT-74, RT-79, RT-109) | — |
+| Review r3 `RV3-D-legacy-git-restore.py`, C `occ_removal.py` and `full_removal_and_merge.py` on a genuine 4.1.6 project | legacy outcome as `26` LR-2; RoT-1 bounds of `12` RT-81 and RT-50b | — |
 
 Any other change is a regression, unless the verifier independently classifies it as an intended refusal and re-proves
 the original property.
@@ -133,6 +154,11 @@ the original property.
   - `trust-policy.v2` with `surface`;
   - `trust-state.v2` with `prior_states`, `artifacts` and resolved references.
 - No revision-3 binary accepts the revision-2 draft payloadTypes.
+- **Revision 4 compiles:**
+  - `build-attestation.v2` and `verification-attestation.v2`, both with `source`;
+  - `freshness-witness.v1`;
+  - release statement v3 with `release.source` (schema 3.0.0).
+- Revision 4 withdraws the never-issued revision-3 drafts `build-attestation.v1` and `verification-attestation.v1`.
 
 ## 10. Other compatibility consequences
 
@@ -145,3 +171,7 @@ the original property.
 | Trust gates | local confirmation per machine | operator decision pins for automation (`27` §3.2) |
 | Agents | kernel content through `gov kernel show` and context packets | adapters carry pointers (`18` §12) |
 | Dependencies, platforms, performance | as revision 2, plus a same-filesystem transaction area | `TRUST_PLATFORM_UNSUPPORTED(cross_device_tx)` |
+| Ignore rule | `/.governance-runtime/*` with `!/.governance-runtime/migration` replaces ignoring the whole directory | written by the install transaction (RV3-L7) |
+| Confined repository commands | platforms without OS write confinement cannot run repository-supplied commands under `gov` | `REPOSITORY_COMMAND_CONFINEMENT_UNAVAILABLE`; `14` RK-32 |
+| CI pins | expire within `pin_max_validity_days` | re-provisioning; `14` RK-31 |
+| Migrations | the 4.1.5 chain carries `set_lock_field`; 4.1.6 re-issues it | `11` WP-18 |

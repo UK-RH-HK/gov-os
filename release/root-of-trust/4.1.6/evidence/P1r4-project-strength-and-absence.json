@@ -1,0 +1,4058 @@
+{
+ "binary": "gov 4.1.5",
+ "binary_sha256": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915",
+ "inventory_floor_schema_version": 3,
+ "stand_in": "release/releases/4.1.5 with set_lock_field removed from its historical migrations (reference checks only)",
+ "project_overrides": {
+  "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+  "SECURITY_POLICY.never_index_classes": [
+   "secret",
+   "restricted",
+   "confidential"
+  ],
+  "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+  "TOOL_POLICY.approved_licences": [
+   "MIT",
+   "Apache-2.0"
+  ],
+  "LEARNING_POLICY.upstream.allowed_payload": [
+   "synthetic_fixture"
+  ]
+ },
+ "constructed_bool_override": {
+  "HUMAN_GATE_POLICY.continue_independent_work": false
+ },
+ "project_classifications": [
+  {
+   "pattern": "product/customers/**",
+   "class": "confidential",
+   "reason": "customer data (project-owned classification)"
+  }
+ ],
+ "partA_reference": {
+  "A1_order_soundness": {
+   "combinations": 343,
+   "unsound_pairs": [],
+   "joins_dropping_strengthening_or_adding_weakening": [],
+   "RV3-D-A01_pairs": {
+    "immutable_vs_floor": {
+     "revision_3_order_immutable_ge_registered": true,
+     "revision_4_order_immutable_ge_registered": false,
+     "revision_4_is_a_computed_reduction_registered_to_immutable": true,
+     "revision_4_join_mode": "floor"
+    },
+    "immutable_vs_ceiling": {
+     "revision_3_order_immutable_ge_registered": true,
+     "revision_4_order_immutable_ge_registered": false,
+     "revision_4_is_a_computed_reduction_registered_to_immutable": true,
+     "revision_4_join_mode": "ceiling"
+    },
+    "immutable_vs_additive": {
+     "revision_3_order_immutable_ge_registered": true,
+     "revision_4_order_immutable_ge_registered": false,
+     "revision_4_is_a_computed_reduction_registered_to_immutable": true,
+     "revision_4_join_mode": "additive"
+    },
+    "immutable_vs_shrink_only": {
+     "revision_3_order_immutable_ge_registered": true,
+     "revision_4_order_immutable_ge_registered": false,
+     "revision_4_is_a_computed_reduction_registered_to_immutable": true,
+     "revision_4_join_mode": "shrink_only"
+    },
+    "immutable_vs_strengthen_only_bool": {
+     "revision_3_order_immutable_ge_registered": true,
+     "revision_4_order_immutable_ge_registered": false,
+     "revision_4_is_a_computed_reduction_registered_to_immutable": true,
+     "revision_4_join_mode": "strengthen_only_bool"
+    }
+   }
+  },
+  "A3_RV3-D-A10_removals": {
+   "R01 policies/SECURITY_POLICY.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "rule": "policies/SECURITY_POLICY.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R02 constitution/HARD_INVARIANTS.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "constitution/HARD_INVARIANTS.yaml",
+      "rule": "constitution/HARD_INVARIANTS.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R03 policies/ENFORCEMENT_MAP.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "policies/ENFORCEMENT_MAP.yaml",
+      "rule": "policies/ENFORCEMENT_MAP.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R04 schemas/adapter-manifest.schema.json": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "schemas/adapter-manifest.schema.json",
+      "rule": "schemas/*.schema.json"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R05 roles/ROLES.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "roles/ROLES.yaml",
+      "rule": "roles/ROLES.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R06 adapters/generic/template.md": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "adapters/generic/template.md",
+      "rule": "adapters/*"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R07 policies/POLICY_PRECEDENCE.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "rule": "policies/POLICY_PRECEDENCE.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R08 policies/HUMAN_GATE_POLICY.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "rule": "policies/HUMAN_GATE_POLICY.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   },
+   "R09 policies/AUTHORITY_POLICY.yaml": {
+    "exit": 2,
+    "required_missing": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "rule": "policies/AUTHORITY_POLICY.yaml"
+     }
+    ],
+    "violations": [],
+    "precedence_unregistered_count": 0
+   }
+  }
+ },
+ "partB_consumption_4_1_5": {
+  "RV3-B-A01/floor->immutable": {
+   "world": "genuine registration",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 3,
+     "required_missing": [],
+     "violations": [
+      "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration"
+     ],
+     "precedence_unregistered_count": 1
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "immutable"
+    },
+    "revision_4": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "floor"
+    }
+   },
+   "revision_3_rules_turned_immutable": 1,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L4",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "not_applied_kernel_value_in_force",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": true,
+      "code": null,
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5"
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "a": true
+    },
+    "harm_absent_under_revision_4": {
+     "a": true
+    },
+    "harm_absent_on_genuine": {
+     "a": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-B-A01/ceiling->immutable": {
+   "world": "genuine registration",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 3,
+     "required_missing": [],
+     "violations": [
+      "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration"
+     ],
+     "precedence_unregistered_count": 1
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "immutable"
+    },
+    "revision_4": {
+     "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "ceiling"
+    }
+   },
+   "revision_3_rules_turned_immutable": 1,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R1",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "not_applied_kernel_value_in_force",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": true,
+      "code": null
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0"
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "c": true
+    },
+    "harm_absent_under_revision_4": {
+     "c": true
+    },
+    "harm_absent_on_genuine": {
+     "c": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-B-A01/additive->immutable": {
+   "world": "genuine registration",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 3,
+     "required_missing": [],
+     "violations": [
+      "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration"
+     ],
+     "precedence_unregistered_count": 1
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "SECURITY_POLICY.never_index_classes": "immutable"
+    },
+    "revision_4": {
+     "SECURITY_POLICY.never_index_classes": "additive"
+    }
+   },
+   "revision_3_rules_turned_immutable": 1,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": true,
+      "retrievable": true
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "SECURITY_POLICY.never_index_classes": [
+     "secret",
+     "restricted",
+     "confidential"
+    ]
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "b": true
+    },
+    "harm_absent_under_revision_4": {
+     "b": true
+    },
+    "harm_absent_on_genuine": {
+     "b": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-B-A01/shrink_only->immutable": {
+   "world": "genuine registration",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 3,
+     "required_missing": [],
+     "violations": [
+      "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration"
+     ],
+     "precedence_unregistered_count": 2
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "TOOL_POLICY.approved_licences": "immutable",
+     "LEARNING_POLICY.upstream.allowed_payload": "immutable"
+    },
+    "revision_4": {
+     "TOOL_POLICY.approved_licences": "shrink_only",
+     "LEARNING_POLICY.upstream.allowed_payload": "shrink_only"
+    }
+   },
+   "revision_3_rules_turned_immutable": 2,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "BSD-2-Clause",
+       "BSD-3-Clause",
+       "Apache-2.0",
+       "ISC",
+       "MPL-2.0",
+       "PSF-2.0",
+       "Python-2.0",
+       "Unlicense",
+       "CC0-1.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "packet",
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "not_applied_kernel_value_in_force",
+      "LEARNING_POLICY.upstream.allowed_payload": "not_applied_kernel_value_in_force"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "TOOL_POLICY.approved_licences": [
+     "MIT",
+     "Apache-2.0"
+    ],
+    "LEARNING_POLICY.upstream.allowed_payload": [
+     "synthetic_fixture"
+    ]
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {},
+    "harm_absent_under_revision_4": {},
+    "harm_absent_on_genuine": {},
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-B-A01/strengthen_only_bool->immutable": {
+   "world": "constructed registration: continue_independent_work strengthen_only_bool(false)",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 3,
+     "required_missing": [],
+     "violations": [
+      "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration"
+     ],
+     "precedence_unregistered_count": 1
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "HUMAN_GATE_POLICY.continue_independent_work": "immutable"
+    },
+    "revision_4": {
+     "HUMAN_GATE_POLICY.continue_independent_work": "strengthen_only_bool"
+    }
+   },
+   "revision_3_rules_turned_immutable": 1,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": false
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied",
+      "HUMAN_GATE_POLICY.continue_independent_work": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied",
+      "HUMAN_GATE_POLICY.continue_independent_work": "not_applied_kernel_value_in_force"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": false
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied",
+      "HUMAN_GATE_POLICY.continue_independent_work": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "HUMAN_GATE_POLICY.continue_independent_work": false
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {},
+    "harm_absent_under_revision_4": {},
+    "harm_absent_on_genuine": {},
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-B-A01/review_example_three_rules": {
+   "world": "genuine registration",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 3,
+     "required_missing": [],
+     "violations": [
+      "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration"
+     ],
+     "precedence_unregistered_count": 3
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "immutable",
+     "SECURITY_POLICY.never_index_classes": "immutable",
+     "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "immutable"
+    },
+    "revision_4": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "floor",
+     "SECURITY_POLICY.never_index_classes": "additive",
+     "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "ceiling"
+    }
+   },
+   "revision_3_rules_turned_immutable": 3,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L4",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R1",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "not_applied_kernel_value_in_force",
+      "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "not_applied_kernel_value_in_force",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": true,
+      "code": null,
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": true,
+      "retrievable": true
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": true,
+      "code": null
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+    "SECURITY_POLICY.never_index_classes": [
+     "secret",
+     "restricted",
+     "confidential"
+    ],
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0"
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "a": true,
+     "b": true,
+     "c": true
+    },
+    "harm_absent_under_revision_4": {
+     "a": true,
+     "b": true,
+     "c": true
+    },
+    "harm_absent_on_genuine": {
+     "a": true,
+     "b": true,
+     "c": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": {
+   "world": "genuine registration",
+   "checker": {
+    "attack_kernel_against_its_registration": {
+     "exit": 2,
+     "required_missing": [
+      {
+       "file": "policies/POLICY_PRECEDENCE.yaml",
+       "rule": "policies/POLICY_PRECEDENCE.yaml"
+      }
+     ],
+     "violations": [],
+     "precedence_unregistered_count": 0
+    }
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "immutable",
+     "SECURITY_POLICY.never_index_classes": "immutable",
+     "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "immutable",
+     "TOOL_POLICY.approved_licences": "immutable",
+     "LEARNING_POLICY.upstream.allowed_payload": "immutable"
+    },
+    "revision_4": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "floor",
+     "SECURITY_POLICY.never_index_classes": "additive",
+     "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "ceiling",
+     "TOOL_POLICY.approved_licences": "shrink_only",
+     "LEARNING_POLICY.upstream.allowed_payload": "shrink_only"
+    }
+   },
+   "revision_3_rules_turned_immutable": 66,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L4",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R1",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "BSD-2-Clause",
+       "BSD-3-Clause",
+       "Apache-2.0",
+       "ISC",
+       "MPL-2.0",
+       "PSF-2.0",
+       "Python-2.0",
+       "Unlicense",
+       "CC0-1.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "packet",
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "not_applied_kernel_value_in_force",
+      "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "not_applied_kernel_value_in_force",
+      "TOOL_POLICY.approved_licences": "not_applied_kernel_value_in_force",
+      "LEARNING_POLICY.upstream.allowed_payload": "not_applied_kernel_value_in_force"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": true,
+      "code": null,
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": true,
+      "retrievable": true
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": true,
+      "code": null
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+    "SECURITY_POLICY.never_index_classes": [
+     "secret",
+     "restricted",
+     "confidential"
+    ],
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+    "TOOL_POLICY.approved_licences": [
+     "MIT",
+     "Apache-2.0"
+    ],
+    "LEARNING_POLICY.upstream.allowed_payload": [
+     "synthetic_fixture"
+    ]
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "a": true,
+     "b": true,
+     "c": true
+    },
+    "harm_absent_under_revision_4": {
+     "a": true,
+     "b": true,
+     "c": true
+    },
+    "harm_absent_on_genuine": {
+     "a": true,
+     "b": true,
+     "c": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   }
+  },
+  "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": {
+   "world": "genuine registration",
+   "checker": {
+    "release_registered_under_TPS_v2": {
+     "exit": 0,
+     "required_missing": [],
+     "violations": [],
+     "precedence_unregistered_count": 0
+    },
+    "reductions_v1_to_v2_without_lowering_history": {
+     "exit": 6,
+     "undeclared": [
+      {
+       "subject": "POLICY_PRECEDENCE:SECURITY_POLICY.never_index_classes",
+       "kind": "precedence_reduction",
+       "direction": "add",
+       "old_mode": "additive",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      }
+     ]
+    },
+    "reductions_v1_to_v2_with_lowering_history": {
+     "exit": 0,
+     "undeclared": []
+    },
+    "declared_subject_example": "POLICY_PRECEDENCE:SECURITY_POLICY.never_index_classes"
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "SECURITY_POLICY.never_index_classes": "immutable"
+    },
+    "revision_4": {
+     "SECURITY_POLICY.never_index_classes": "additive"
+    }
+   },
+   "revision_3_rules_turned_immutable": 1,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": true,
+      "retrievable": true
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_after_per_project_policy_lowering_gate": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": true,
+      "retrievable": true
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "SECURITY_POLICY.never_index_classes": [
+     "secret",
+     "restricted",
+     "confidential"
+    ]
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "b": true
+    },
+    "harm_absent_under_revision_4": {
+     "b": true
+    },
+    "harm_absent_on_genuine": {
+     "b": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   },
+   "note_after_gate": "accepted reduction: the per-project policy_lowering trust gate presented the lost strengthening and the vector is re-recorded; not a harm assertion"
+  },
+  "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": {
+   "world": "genuine registration",
+   "checker": {
+    "release_registered_under_TPS_v2": {
+     "exit": 0,
+     "required_missing": [],
+     "violations": [],
+     "precedence_unregistered_count": 0
+    },
+    "reductions_v1_to_v2_without_lowering_history": {
+     "exit": 6,
+     "undeclared": [
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.answer_gate",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.approve_cit_auto",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.approve_cit_human",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.build_memory",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.checkpoint",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.claim_task",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.close_task",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.create_gate",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.create_handoff",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.create_task",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.emergency_control",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.execute_cit",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.execute_plugin",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.force_close_task",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.force_release_task",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.grant_policy_exception",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.install_kernel",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.install_tool",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.memory_benchmark",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.memory_select",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.migrate_execute",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.mutate_governance_project_overlay",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.mutate_product_source",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.mutate_spec_decisions",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.mutate_spec_other",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.mutate_task_status",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.p3probe",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.present_gate",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.propose_cit",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.read",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.readiness_plan",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.rebuild_memory",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.record_routing_evidence",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.recover",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.register_plugin",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.reject_cit",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.release_task",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.resume_control",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.retire_legacy_mechanism",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.return_handoff",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.revoke_gate",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.rollback_cit",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.simulate_cit",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.sweep_claims",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.update_apply",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.upstream_prepare",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      },
+      {
+       "subject": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.upstream_submit",
+       "kind": "precedence_reduction",
+       "direction": "up",
+       "old_mode": "floor",
+       "new_mode": "immutable",
+       "admits_new_weakening": false,
+       "removes_admitted_strengthening": true,
+       "exception_relaxation_added": false
+      }
+     ]
+    },
+    "reductions_v1_to_v2_with_lowering_history": {
+     "exit": 0,
+     "undeclared": []
+    },
+    "declared_subject_example": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.p3probe"
+   },
+   "precedence_mode_for_project_layer": {
+    "revision_3": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "immutable"
+    },
+    "revision_4": {
+     "AUTHORITY_POLICY.authority_levels_required.resume_control": "floor"
+    }
+   },
+   "revision_3_rules_turned_immutable": 1,
+   "consumption": {
+    "genuine": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_3_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L4",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "not_applied_kernel_value_in_force",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": true,
+      "code": null,
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_effective_kernel": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED",
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    },
+    "revision_4_after_per_project_policy_lowering_gate": {
+     "init_ok": true,
+     "init_code": null,
+     "kernel_trust_verified": true,
+     "effective_values": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "L4",
+      "SECURITY_POLICY.never_index_classes": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+      "TOOL_POLICY.approved_licences": [
+       "MIT",
+       "Apache-2.0"
+      ],
+      "LEARNING_POLICY.upstream.allowed_payload": [
+       "synthetic_fixture"
+      ],
+      "HUMAN_GATE_POLICY.continue_independent_work": true
+     },
+     "override_outcomes": {
+      "AUTHORITY_POLICY.authority_levels_required.resume_control": "not_applied_kernel_value_in_force",
+      "SECURITY_POLICY.never_index_classes": "applied",
+      "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+      "TOOL_POLICY.approved_licences": "applied",
+      "LEARNING_POLICY.upstream.allowed_payload": "applied"
+     },
+     "a_orchestrator_L4_resume_under_project_L5": {
+      "ok": true,
+      "code": null,
+      "pause_ok": true
+     },
+     "b_project_confidential_file": {
+      "rebuild_ok": true,
+      "indexed": false,
+      "retrievable": false
+     },
+     "c_L3_agent_answers_R1_gate_under_project_R0": {
+      "ok": false,
+      "code": "AUTHORITY_DENIED"
+     }
+    }
+   },
+   "revision_4_reference_effective": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5"
+   },
+   "verdicts": {
+    "genuine_consumer_verified": true,
+    "revision_3_loses_project_strengthening": true,
+    "revision_4_keeps_project_strengthening": true,
+    "revision_4_reference_matches_binary": true,
+    "harm_present_under_revision_3": {
+     "a": true
+    },
+    "harm_absent_under_revision_4": {
+     "a": true
+    },
+    "harm_absent_on_genuine": {
+     "a": true
+    },
+    "strength_vector_reports_revision_3_loss": true,
+    "strength_vector_quiet_under_revision_4": true
+   },
+   "note_after_gate": "accepted reduction: the per-project policy_lowering trust gate presented the lost strengthening and the vector is re-recorded; not a harm assertion"
+  }
+ },
+ "partC_project_strength": {
+  "RV3-B-A01/floor->immutable": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "op": "level_at_least",
+     "recorded": "L5",
+     "current": "L4"
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-B-A01/ceiling->immutable": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "op": "ordered_at_most",
+     "recorded": "R0",
+     "current": "R1"
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-B-A01/additive->immutable": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "op": "set_superset",
+     "recorded": [
+      "confidential"
+     ],
+     "current": [
+      "secret",
+      "restricted"
+     ]
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-B-A01/shrink_only->immutable": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "op": "set_subset",
+     "recorded": [
+      "synthetic_fixture"
+     ],
+     "current": [
+      "packet",
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "op": "set_subset",
+     "recorded": [
+      "MIT",
+      "Apache-2.0"
+     ],
+     "current": [
+      "MIT",
+      "BSD-2-Clause",
+      "BSD-3-Clause",
+      "Apache-2.0",
+      "ISC",
+      "MPL-2.0",
+      "PSF-2.0",
+      "Python-2.0",
+      "Unlicense",
+      "CC0-1.0"
+     ]
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-B-A01/strengthen_only_bool->immutable": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.continue_independent_work",
+     "source": "effective_policy",
+     "op": "bool_toward",
+     "strict": false,
+     "value": false
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "HUMAN_GATE_POLICY.continue_independent_work",
+     "op": "bool_toward",
+     "recorded": false,
+     "current": true
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-B-A01/review_example_three_rules": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "op": "level_at_least",
+     "recorded": "L5",
+     "current": "L4"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "op": "ordered_at_most",
+     "recorded": "R0",
+     "current": "R1"
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "op": "set_superset",
+     "recorded": [
+      "confidential"
+     ],
+     "current": [
+      "secret",
+      "restricted"
+     ]
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "op": "level_at_least",
+     "recorded": "L5",
+     "current": "L4"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "op": "ordered_at_most",
+     "recorded": "R0",
+     "current": "R1"
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "op": "set_subset",
+     "recorded": [
+      "synthetic_fixture"
+     ],
+     "current": [
+      "packet",
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "op": "set_superset",
+     "recorded": [
+      "confidential"
+     ],
+     "current": [
+      "secret",
+      "restricted"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "op": "set_subset",
+     "recorded": [
+      "MIT",
+      "Apache-2.0"
+     ],
+     "current": [
+      "MIT",
+      "BSD-2-Clause",
+      "BSD-3-Clause",
+      "Apache-2.0",
+      "ISC",
+      "MPL-2.0",
+      "PSF-2.0",
+      "Python-2.0",
+      "Unlicense",
+      "CC0-1.0"
+     ]
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "op": "set_superset",
+     "recorded": [
+      "confidential"
+     ],
+     "current": [
+      "secret",
+      "restricted"
+     ]
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": {
+   "recorded_requirements": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "source": "effective_policy",
+     "op": "level_at_least",
+     "value": "L5",
+     "order": null,
+     "kind": "level"
+    },
+    {
+     "subject": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+     "source": "effective_policy",
+     "op": "ordered_at_most",
+     "value": "R0",
+     "order": [
+      "R0",
+      "R1",
+      "R2",
+      "R3",
+      "R4",
+      "R5"
+     ],
+     "kind": null
+    },
+    {
+     "subject": "LEARNING_POLICY.upstream.allowed_payload",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "synthetic_fixture"
+     ]
+    },
+    {
+     "subject": "SECURITY_POLICY.never_index_classes",
+     "source": "effective_policy",
+     "op": "set_superset",
+     "value": [
+      "confidential"
+     ]
+    },
+    {
+     "subject": "TOOL_POLICY.approved_licences",
+     "source": "effective_policy",
+     "op": "set_subset",
+     "value": [
+      "MIT",
+      "Apache-2.0"
+     ]
+    }
+   ],
+   "failures_on_revision_3_consumer": [
+    {
+     "subject": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+     "op": "level_at_least",
+     "recorded": "L5",
+     "current": "L4"
+    }
+   ],
+   "failures_on_revision_4_consumer": []
+  },
+  "release_signed_migrations": {
+   "M1 set_overlay_key TOOL_PERMISSIONS install_authority_roles widened": {
+    "refused_before_any_write": true,
+    "whitelist_problems": [
+     {
+      "index": 0,
+      "op": "set_overlay_key",
+      "target": "TOOL_PERMISSIONS.yaml:install_authority_roles",
+      "problem": "overlay key not registered as migration-writable"
+     }
+    ],
+    "computed_weakenings": [
+     {
+      "subject": "TOOL_PERMISSIONS.yaml:TOOL_PERMISSIONS.install_authority_roles",
+      "op": "set_subset",
+      "recorded": [
+       "tooling-engineer",
+       "orchestrator"
+      ],
+      "current": [
+       "tooling-engineer",
+       "orchestrator",
+       "backend-engineer"
+      ]
+     }
+    ],
+    "weakening_trust_gate_required": true
+   },
+   "M2 set_overlay_key TOOL_PERMISSIONS roles.backend-engineer gains SECRET_READ": {
+    "refused_before_any_write": true,
+    "whitelist_problems": [
+     {
+      "index": 0,
+      "op": "set_overlay_key",
+      "target": "TOOL_PERMISSIONS.yaml:roles.backend-engineer",
+      "problem": "overlay key not registered as migration-writable"
+     }
+    ],
+    "computed_weakenings": [
+     {
+      "subject": "TOOL_PERMISSIONS.yaml:TOOL_PERMISSIONS.roles",
+      "op": "map_subset",
+      "recorded": {
+       "orchestrator": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "NETWORK_READ"
+       ],
+       "change-controller": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "backend-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "PACKAGE_INSTALL"
+       ],
+       "frontend-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "PACKAGE_INSTALL"
+       ],
+       "data-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "DB_READ"
+       ],
+       "research-agent": [
+        "READ_REPO",
+        "NETWORK_READ"
+       ],
+       "independent-test-designer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "test-execution-agent": [
+        "READ_REPO",
+        "RUN_TESTS"
+       ],
+       "independent-auditor": [
+        "READ_REPO",
+        "RUN_TESTS"
+       ],
+       "memory-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "tooling-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "PACKAGE_INSTALL",
+        "NETWORK_READ"
+       ],
+       "devops-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "CI_TRIGGER",
+        "DEPLOY_STAGING"
+       ],
+       "security-engineer": [
+        "READ_REPO",
+        "RUN_TESTS",
+        "SECRET_READ"
+       ],
+       "release-agent": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "migration-executor": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ]
+      },
+      "current": {
+       "orchestrator": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "NETWORK_READ"
+       ],
+       "change-controller": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "backend-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "PACKAGE_INSTALL",
+        "SECRET_READ"
+       ],
+       "frontend-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "PACKAGE_INSTALL"
+       ],
+       "data-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "DB_READ"
+       ],
+       "research-agent": [
+        "READ_REPO",
+        "NETWORK_READ"
+       ],
+       "independent-test-designer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "test-execution-agent": [
+        "READ_REPO",
+        "RUN_TESTS"
+       ],
+       "independent-auditor": [
+        "READ_REPO",
+        "RUN_TESTS"
+       ],
+       "memory-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "tooling-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "PACKAGE_INSTALL",
+        "NETWORK_READ"
+       ],
+       "devops-engineer": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS",
+        "CI_TRIGGER",
+        "DEPLOY_STAGING"
+       ],
+       "security-engineer": [
+        "READ_REPO",
+        "RUN_TESTS",
+        "SECRET_READ"
+       ],
+       "release-agent": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ],
+       "migration-executor": [
+        "READ_REPO",
+        "WRITE_REPO_SCOPED",
+        "RUN_TESTS"
+       ]
+      }
+     }
+    ],
+    "weakening_trust_gate_required": true
+   },
+   "M3 set_overlay_key PROJECT_EXCEPTIONS exception added": {
+    "refused_before_any_write": true,
+    "whitelist_problems": [
+     {
+      "index": 0,
+      "op": "set_overlay_key",
+      "target": "PROJECT_EXCEPTIONS.yaml:exceptions",
+      "problem": "overlay key not registered as migration-writable"
+     }
+    ],
+    "computed_weakenings": [
+     {
+      "subject": "PROJECT_EXCEPTIONS.yaml:PROJECT_EXCEPTIONS.exceptions",
+      "op": "entries_subset",
+      "recorded": [],
+      "current": [
+       {
+        "id": "EXC-0099",
+        "policy": "MEMORY_POLICY",
+        "key": "freshness.on_stale_close",
+        "value": "degrade",
+        "decision": "D-0007",
+        "expires": "2099-12-31",
+        "reason": "m"
+       }
+      ]
+     }
+    ],
+    "weakening_trust_gate_required": true
+   },
+   "M4 set_overlay_key DATA_SENSITIVITY identifiers_to_strip emptied": {
+    "refused_before_any_write": true,
+    "whitelist_problems": [
+     {
+      "index": 0,
+      "op": "set_overlay_key",
+      "target": "DATA_SENSITIVITY.yaml:identifiers_to_strip",
+      "problem": "overlay key not registered as migration-writable"
+     }
+    ],
+    "computed_weakenings": [
+     {
+      "subject": "DATA_SENSITIVITY.yaml:DATA_SENSITIVITY.identifiers_to_strip",
+      "op": "set_superset",
+      "recorded": [
+       "acme"
+      ],
+      "current": []
+     }
+    ],
+    "weakening_trust_gate_required": true
+   },
+   "M5 set_overlay_rule REPOSITORY_CONTRACT **/.env* semantic_index true (registered target, weakening)": {
+    "refused_before_any_write": false,
+    "whitelist_problems": [],
+    "computed_weakenings": [
+     {
+      "subject": "REPOSITORY_CONTRACT.yaml:REPOSITORY_CONTRACT.paths",
+      "op": "contract_at_least",
+      "recorded": [
+       {
+        "pattern": "governance/kernel/**",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "prohibited",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/project/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/generated/**",
+        "class": "generated",
+        "owner_role": "orchestrator",
+        "mutation": "generated",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/framework.lock",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/tests/**",
+        "class": "authoritative",
+        "owner_role": "memory-engineer",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "spec/decisions/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/reports/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/lessons/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/research/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/experiments/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/audits/**",
+        "class": "evidence",
+        "owner_role": "independent-auditor",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/**",
+        "class": "authoritative",
+        "owner_role": "product-spec-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "product/tests/**",
+        "class": "test",
+        "owner_role": "independent-test-designer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "product/**",
+        "class": "source",
+        "owner_role": "backend-engineer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "archive/**",
+        "class": "historical",
+        "owner_role": "orchestrator",
+        "default_retrieval": false,
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "archive"
+       },
+       {
+        "pattern": "**/.env*",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "code_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": "**/secrets/**",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": ".governance-runtime/**",
+        "class": "derived",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "runtime"
+       }
+      ],
+      "current": [
+       {
+        "pattern": "governance/kernel/**",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "prohibited",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/project/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/generated/**",
+        "class": "generated",
+        "owner_role": "orchestrator",
+        "mutation": "generated",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/framework.lock",
+        "class": "authoritative",
+        "owner_role": "release-agent",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "governance/tests/**",
+        "class": "authoritative",
+        "owner_role": "memory-engineer",
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "governance"
+       },
+       {
+        "pattern": "spec/decisions/**",
+        "class": "authoritative",
+        "owner_role": "change-controller",
+        "mutation": "restricted",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/reports/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/lessons/**",
+        "class": "evidence",
+        "owner_role": "orchestrator",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/research/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/experiments/**",
+        "class": "evidence",
+        "owner_role": "research-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/audits/**",
+        "class": "evidence",
+        "owner_role": "independent-auditor",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "spec/**",
+        "class": "authoritative",
+        "owner_role": "product-spec-agent",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "namespace": "spec"
+       },
+       {
+        "pattern": "product/tests/**",
+        "class": "test",
+        "owner_role": "independent-test-designer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "product/**",
+        "class": "source",
+        "owner_role": "backend-engineer",
+        "semantic_index": true,
+        "lexical_index": true,
+        "graph_index": true,
+        "code_index": true,
+        "namespace": "product"
+       },
+       {
+        "pattern": "archive/**",
+        "class": "historical",
+        "owner_role": "orchestrator",
+        "default_retrieval": false,
+        "mutation": "restricted",
+        "semantic_index": false,
+        "lexical_index": true,
+        "graph_index": false,
+        "namespace": "archive"
+       },
+       {
+        "pattern": "**/.env*",
+        "class": "secret",
+        "semantic_index": true,
+        "lexical_index": false,
+        "graph_index": false,
+        "code_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": "**/secrets/**",
+        "class": "secret",
+        "semantic_index": false,
+        "lexical_index": false,
+        "agent_read": "prohibited",
+        "export": "denied",
+        "namespace": "secret"
+       },
+       {
+        "pattern": ".governance-runtime/**",
+        "class": "derived",
+        "semantic_index": false,
+        "lexical_index": false,
+        "graph_index": false,
+        "namespace": "runtime"
+       }
+      ]
+     }
+    ],
+    "weakening_trust_gate_required": true
+   },
+   "M6 set_overlay_key ../../spec/decisions/HDG-0001.yaml": {
+    "refused_before_any_write": true,
+    "whitelist_problems": [
+     {
+      "index": 0,
+      "op": "set_overlay_key",
+      "target": "../../spec/decisions/HDG-0001.yaml",
+      "problem": "target does not resolve to a registered file directly inside governance/overlay/"
+     }
+    ],
+    "computed_weakenings": [],
+    "weakening_trust_gate_required": false
+   },
+   "M7 set_overlay_key PROJECT_POLICY policy_overrides drops the project never-index class": {
+    "refused_before_any_write": true,
+    "whitelist_problems": [
+     {
+      "index": 0,
+      "op": "set_overlay_key",
+      "target": "PROJECT_POLICY.yaml:policy_overrides",
+      "problem": "overlay key not registered as migration-writable"
+     }
+    ],
+    "computed_weakenings": [
+     {
+      "subject": "SECURITY_POLICY.never_index_classes",
+      "op": "set_superset",
+      "recorded": [
+       "confidential"
+      ],
+      "current": [
+       "secret",
+       "restricted"
+      ]
+     }
+    ],
+    "weakening_trust_gate_required": true
+   },
+   "M8 control: set_overlay_rule REPOSITORY_CONTRACT archive/** lexical_index false (registered target, strengthening)": {
+    "refused_before_any_write": false,
+    "whitelist_problems": [],
+    "computed_weakenings": [],
+    "weakening_trust_gate_required": false
+   }
+  }
+ },
+ "partD_composition": {
+  "raised_never_index_floor": [
+   "secret",
+   "restricted",
+   "internal"
+  ],
+  "revision_4_reference_effective": [
+   "secret",
+   "restricted",
+   "internal",
+   "confidential"
+  ],
+  "reference_applied": [
+   {
+    "key": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+    "components": [
+     "s"
+    ],
+    "rule": "floor"
+   },
+   {
+    "key": "SECURITY_POLICY.never_index_classes",
+    "components": [
+     "s"
+    ],
+    "rule": "additive"
+   },
+   {
+    "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+    "components": [
+     "s"
+    ],
+    "rule": "ceiling"
+   },
+   {
+    "key": "TOOL_POLICY.approved_licences",
+    "components": [
+     "s"
+    ],
+    "rule": "shrink_only"
+   },
+   {
+    "key": "LEARNING_POLICY.upstream.allowed_payload",
+    "components": [
+     "s"
+    ],
+    "rule": "shrink_only"
+   }
+  ],
+  "reference_refused": [
+   {
+    "key": "SECURITY_POLICY.never_index_classes",
+    "components": [
+     "w"
+    ],
+    "rule": "additive"
+   }
+  ],
+  "revision_3_effective_kernel": {
+   "init_ok": true,
+   "init_code": null,
+   "kernel_trust_verified": true,
+   "effective_values": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+    "SECURITY_POLICY.never_index_classes": [
+     "secret",
+     "restricted",
+     "internal"
+    ],
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+    "TOOL_POLICY.approved_licences": [
+     "MIT",
+     "Apache-2.0"
+    ],
+    "LEARNING_POLICY.upstream.allowed_payload": [
+     "synthetic_fixture"
+    ],
+    "HUMAN_GATE_POLICY.continue_independent_work": true
+   },
+   "override_outcomes": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+    "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+    "TOOL_POLICY.approved_licences": "applied",
+    "LEARNING_POLICY.upstream.allowed_payload": "applied"
+   },
+   "a_orchestrator_L4_resume_under_project_L5": {
+    "ok": false,
+    "code": "AUTHORITY_DENIED",
+    "pause_ok": true
+   },
+   "b_project_confidential_file": {
+    "rebuild_ok": true,
+    "indexed": true,
+    "retrievable": true
+   },
+   "c_L3_agent_answers_R1_gate_under_project_R0": {
+    "ok": false,
+    "code": "AUTHORITY_DENIED"
+   }
+  },
+  "revision_4_effective_kernel": {
+   "init_ok": true,
+   "init_code": null,
+   "kernel_trust_verified": true,
+   "effective_values": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+    "SECURITY_POLICY.never_index_classes": [
+     "secret",
+     "restricted",
+     "internal",
+     "confidential"
+    ],
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0",
+    "TOOL_POLICY.approved_licences": [
+     "MIT",
+     "Apache-2.0"
+    ],
+    "LEARNING_POLICY.upstream.allowed_payload": [
+     "synthetic_fixture"
+    ],
+    "HUMAN_GATE_POLICY.continue_independent_work": true
+   },
+   "override_outcomes": {
+    "AUTHORITY_POLICY.authority_levels_required.resume_control": "applied",
+    "SECURITY_POLICY.never_index_classes": "not_applied_kernel_value_in_force",
+    "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "applied",
+    "TOOL_POLICY.approved_licences": "applied",
+    "LEARNING_POLICY.upstream.allowed_payload": "applied"
+   },
+   "a_orchestrator_L4_resume_under_project_L5": {
+    "ok": false,
+    "code": "AUTHORITY_DENIED",
+    "pause_ok": true
+   },
+   "b_project_confidential_file": {
+    "rebuild_ok": true,
+    "indexed": false,
+    "retrievable": false
+   },
+   "c_L3_agent_answers_R1_gate_under_project_R0": {
+    "ok": false,
+    "code": "AUTHORITY_DENIED"
+   }
+  },
+  "verdicts": {
+   "revision_3_replacement_semantics_drop_project_class": true,
+   "revision_4_directed_join_keeps_project_class": true
+  }
+ },
+ "summary": {
+  "order_unsound_pairs": 0,
+  "joins_dropping_strengthening": 0,
+  "removal_checker_exits": {
+   "R01 policies/SECURITY_POLICY.yaml": 2,
+   "R02 constitution/HARD_INVARIANTS.yaml": 2,
+   "R03 policies/ENFORCEMENT_MAP.yaml": 2,
+   "R04 schemas/adapter-manifest.schema.json": 2,
+   "R05 roles/ROLES.yaml": 2,
+   "R06 adapters/generic/template.md": 2,
+   "R07 policies/POLICY_PRECEDENCE.yaml": 2,
+   "R08 policies/HUMAN_GATE_POLICY.yaml": 2,
+   "R09 policies/AUTHORITY_POLICY.yaml": 2
+  },
+  "attack_checker_exits": {
+   "RV3-B-A01/floor->immutable": {
+    "attack_kernel_against_its_registration": 3
+   },
+   "RV3-B-A01/ceiling->immutable": {
+    "attack_kernel_against_its_registration": 3
+   },
+   "RV3-B-A01/additive->immutable": {
+    "attack_kernel_against_its_registration": 3
+   },
+   "RV3-B-A01/shrink_only->immutable": {
+    "attack_kernel_against_its_registration": 3
+   },
+   "RV3-B-A01/strengthen_only_bool->immutable": {
+    "attack_kernel_against_its_registration": 3
+   },
+   "RV3-B-A01/review_example_three_rules": {
+    "attack_kernel_against_its_registration": 3
+   },
+   "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": {
+    "attack_kernel_against_its_registration": 2
+   },
+   "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": {
+    "release_registered_under_TPS_v2": 0,
+    "reductions_v1_to_v2_without_lowering_history": 6,
+    "reductions_v1_to_v2_with_lowering_history": 0,
+    "declared_subject_example": "POLICY_PRECEDENCE:SECURITY_POLICY.never_index_classes"
+   },
+   "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": {
+    "release_registered_under_TPS_v2": 0,
+    "reductions_v1_to_v2_without_lowering_history": 6,
+    "reductions_v1_to_v2_with_lowering_history": 0,
+    "declared_subject_example": "POLICY_PRECEDENCE:AUTHORITY_POLICY.authority_levels_required.p3probe"
+   }
+  },
+  "revision_3_loses_strengthening": {
+   "RV3-B-A01/floor->immutable": true,
+   "RV3-B-A01/ceiling->immutable": true,
+   "RV3-B-A01/additive->immutable": true,
+   "RV3-B-A01/shrink_only->immutable": true,
+   "RV3-B-A01/strengthen_only_bool->immutable": true,
+   "RV3-B-A01/review_example_three_rules": true,
+   "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": true,
+   "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": true,
+   "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": true
+  },
+  "revision_4_keeps_strengthening": {
+   "RV3-B-A01/floor->immutable": true,
+   "RV3-B-A01/ceiling->immutable": true,
+   "RV3-B-A01/additive->immutable": true,
+   "RV3-B-A01/shrink_only->immutable": true,
+   "RV3-B-A01/strengthen_only_bool->immutable": true,
+   "RV3-B-A01/review_example_three_rules": true,
+   "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": true,
+   "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": true,
+   "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": true
+  },
+  "revision_4_reference_matches_binary": {
+   "RV3-B-A01/floor->immutable": true,
+   "RV3-B-A01/ceiling->immutable": true,
+   "RV3-B-A01/additive->immutable": true,
+   "RV3-B-A01/shrink_only->immutable": true,
+   "RV3-B-A01/strengthen_only_bool->immutable": true,
+   "RV3-B-A01/review_example_three_rules": true,
+   "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": true,
+   "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": true,
+   "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": true
+  },
+  "harm_flips": {
+   "RV3-B-A01/floor->immutable": {
+    "a": true
+   },
+   "RV3-B-A01/ceiling->immutable": {
+    "c": true
+   },
+   "RV3-B-A01/additive->immutable": {
+    "b": true
+   },
+   "RV3-B-A01/shrink_only->immutable": {},
+   "RV3-B-A01/strengthen_only_bool->immutable": {},
+   "RV3-B-A01/review_example_three_rules": {
+    "a": true,
+    "b": true,
+    "c": true
+   },
+   "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": {
+    "a": true,
+    "b": true,
+    "c": true
+   },
+   "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": {
+    "b": true
+   },
+   "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": {
+    "a": true
+   }
+  },
+  "strength_vector": {
+   "RV3-B-A01/floor->immutable": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-B-A01/ceiling->immutable": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-B-A01/additive->immutable": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-B-A01/shrink_only->immutable": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-B-A01/strengthen_only_bool->immutable": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-B-A01/review_example_three_rules": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-D-A10-R07/POLICY_PRECEDENCE_deleted": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-D-A02/TPS_tightening_never_index_classes_honest_owner": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   },
+   "RV3-D-A02/TPS_tightening_authority_levels_root_ceremony": {
+    "reports_revision_3_loss": true,
+    "quiet_under_revision_4": true
+   }
+  },
+  "composition": {
+   "revision_3_replacement_semantics_drop_project_class": true,
+   "revision_4_directed_join_keeps_project_class": true
+  },
+  "migrations": {
+   "M1 set_overlay_key TOOL_PERMISSIONS install_authority_roles widened": {
+    "refused_before_any_write": true,
+    "weakening_trust_gate_required": true
+   },
+   "M2 set_overlay_key TOOL_PERMISSIONS roles.backend-engineer gains SECRET_READ": {
+    "refused_before_any_write": true,
+    "weakening_trust_gate_required": true
+   },
+   "M3 set_overlay_key PROJECT_EXCEPTIONS exception added": {
+    "refused_before_any_write": true,
+    "weakening_trust_gate_required": true
+   },
+   "M4 set_overlay_key DATA_SENSITIVITY identifiers_to_strip emptied": {
+    "refused_before_any_write": true,
+    "weakening_trust_gate_required": true
+   },
+   "M5 set_overlay_rule REPOSITORY_CONTRACT **/.env* semantic_index true (registered target, weakening)": {
+    "refused_before_any_write": false,
+    "weakening_trust_gate_required": true
+   },
+   "M6 set_overlay_key ../../spec/decisions/HDG-0001.yaml": {
+    "refused_before_any_write": true,
+    "weakening_trust_gate_required": false
+   },
+   "M7 set_overlay_key PROJECT_POLICY policy_overrides drops the project never-index class": {
+    "refused_before_any_write": true,
+    "weakening_trust_gate_required": true
+   },
+   "M8 control: set_overlay_rule REPOSITORY_CONTRACT archive/** lexical_index false (registered target, strengthening)": {
+    "refused_before_any_write": false,
+    "weakening_trust_gate_required": false
+   }
+  },
+  "consumers_run": 12,
+  "all_consumers_initialised": true
+ }
+}

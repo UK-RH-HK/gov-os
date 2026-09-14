@@ -4,14 +4,14 @@
  "files_classified": 113,
  "counts": {
   "structured": 17,
-  "floor": 186,
+  "floor": 189,
   "release_bound": 29,
-  "pinned": 162,
+  "pinned": 164,
   "pinned_file": 93,
   "members": 4,
   "transaction_input": 1,
   "informational_file": 2,
-  "project_tunable": 53,
+  "project_tunable": 48,
   "collection_id": 37,
   "informational": 14
  },
@@ -26,6 +26,209 @@
  "unclassified_leaf_count": 1,
  "ambiguous_leaves": [],
  "structure": [],
+ "required_missing": [
+  {
+   "file": "policies/POLICY_PRECEDENCE.yaml",
+   "rule": "policies/POLICY_PRECEDENCE.yaml"
+  },
+  {
+   "file": "policies/ENFORCEMENT_MAP.yaml",
+   "rule": "policies/ENFORCEMENT_MAP.yaml"
+  },
+  {
+   "file": "schemas/framework-change-proposal.schema.json",
+   "rule": "schemas/*.schema.json"
+  },
+  {
+   "file": "schemas/plugin-descriptor.schema.json",
+   "rule": "schemas/*.schema.json"
+  },
+  {
+   "file": "schemas/plugin-registry.schema.json",
+   "rule": "schemas/*.schema.json"
+  },
+  {
+   "file": "KERNEL.yaml",
+   "key": "KERNEL.schema_versions.framework-change-proposal"
+  },
+  {
+   "file": "KERNEL.yaml",
+   "key": "KERNEL.schema_versions.plugin-descriptor"
+  },
+  {
+   "file": "KERNEL.yaml",
+   "key": "KERNEL.schema_versions.plugin-registry"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.read"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.rebuild_memory"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.memory_benchmark"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.memory_select"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.create_task"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.mutate_task_status"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.claim_task"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.release_task"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.force_release_task"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.close_task"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.force_close_task"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.readiness_plan"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.checkpoint"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.create_handoff"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.return_handoff"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.create_gate"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.present_gate"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.answer_gate"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.revoke_gate"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.execute_plugin"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.register_plugin"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.propose_cit"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.simulate_cit"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.approve_cit_auto"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.approve_cit_human"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.reject_cit"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.rollback_cit"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.emergency_control"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.resume_control"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.update_apply"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.install_tool"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.migrate_execute"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.build_memory"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.upstream_prepare"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.upstream_submit"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.recover"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.sweep_claims"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.record_routing_evidence"
+  },
+  {
+   "file": "policies/MEMORY_POLICY.yaml",
+   "key": "MEMORY_POLICY.reranker.version"
+  },
+  {
+   "file": "policies/MEMORY_POLICY.yaml",
+   "key": "MEMORY_POLICY.lexical.tokenizer"
+  }
+ ],
+ "required_missing_count": 62,
  "violations": [
   {
    "file": "overlay-templates/REPOSITORY_CONTRACT.yaml",
@@ -370,7 +573,8 @@
    "digest": "sha256:f57b67b3819cd996abf721233576c84c5dfc5cd49d6b7d968c827043c3248f9b"
   }
  ],
- "violation_count": 64,
+ "violation_count": 65,
  "stronger_than_registered": [],
- "precedence_weaker_key_count": 0
+ "precedence_unregistered_count": 0,
+ "migration_problem_count": 1
 }

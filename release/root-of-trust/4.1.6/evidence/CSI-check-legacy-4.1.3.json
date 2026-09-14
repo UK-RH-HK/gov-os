@@ -1,17 +1,16 @@
 {
- "exit": 3,
+ "exit": 2,
  "kernel_dir": "<repo>/release/releases/4.1.3/kernel",
- "files_classified": 117,
+ "files_classified": 116,
  "counts": {
   "structured": 17,
-  "floor": 224,
-  "release_bound": 31,
-  "pinned": 171,
   "pinned_file": 96,
+  "pinned": 166,
   "members": 4,
   "transaction_input": 2,
   "informational_file": 2,
-  "project_tunable": 56,
+  "project_tunable": 51,
+  "floor": 226,
   "collection_id": 37,
   "informational": 14
  },
@@ -20,7 +19,75 @@
  "unclassified_leaves": [],
  "unclassified_leaf_count": 0,
  "ambiguous_leaves": [],
- "structure": [],
+ "structure": [
+  {
+   "file": "KERNEL.yaml",
+   "problem": "yaml_profile: duplicate mapping key 'release-manifest' at line 32"
+  }
+ ],
+ "required_missing": [
+  {
+   "file": "policies/POLICY_PRECEDENCE.yaml",
+   "rule": "policies/POLICY_PRECEDENCE.yaml"
+  },
+  {
+   "file": "schemas/plugin-registry.schema.json",
+   "rule": "schemas/*.schema.json"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.revoke_gate"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.execute_plugin"
+  },
+  {
+   "file": "policies/AUTHORITY_POLICY.yaml",
+   "key": "AUTHORITY_POLICY.authority_levels_required.register_plugin"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.descriptor_schema"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.require_valid_descriptor"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.min_authority"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.registry_path"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.registration_binds"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.elevated_permission_classes"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.refuse_on_pin_drift"
+  },
+  {
+   "file": "policies/TOOL_POLICY.yaml",
+   "key": "TOOL_POLICY.plugins.timeout_seconds"
+  }
+ ],
+ "required_missing_count": 15,
  "violations": [
   {
    "file": "policies/ENFORCEMENT_MAP.yaml",
@@ -366,7 +433,8 @@
    "digest": "sha256:ce6a5b06e7804dc9fd37b2343d0ff0352ac1b10922fff062447972546e8a0037"
   }
  ],
- "violation_count": 64,
+ "violation_count": 65,
  "stronger_than_registered": [],
- "precedence_weaker_key_count": 0
+ "precedence_unregistered_count": 0,
+ "migration_problem_count": 2
 }
