@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T20:52:43Z'
-state_hash: 1cf7f622dc7a56b6ed5842622999ac8243bbb191838fbd948a0854450487bc98
-lifecycle_state: ROT_ARCH_SYNTHESIS
-loop_status: FREEZING_AFTER_REVISION_7   # OWNER-DIRECTIVE-0003: finish in-flight revision-7 work only, then freeze
+updated_at: '2026-09-14T21:48:51Z'
+state_hash: 48bedf8de0dd6b668b485e034b99d87bb20e5472521eb4f7e18daabfc5c5bad3
+lifecycle_state: PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
+loop_status: FROZEN   # OWNER-DIRECTIVE-0003; revision 7 was the final revision; no revision 8
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -40,7 +40,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 1d4d9f3621854e6414b299b0265a4e6dab25428c
+  last_recorded_commit: 3e1442eb8685e8eef26165fad3c1b8cfa2a1fb59
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -71,11 +71,11 @@ architecture:
   decision_paths: [spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md]
   current_revision: 7
   latest_accepted_revision: null
-  latest_rejected_revision: 6
-  orchestrated_rejections: 4                     # Phase-1 revisions rejected so far (revision 3)
-  orchestrated_rejection_streak: 0               # successive rejections on materially NEW HIGH/CRITICAL classes
+  latest_rejected_revision: 7
+  orchestrated_rejections: 5                     # Phase-1 revisions rejected so far (revision 3)
+  orchestrated_rejection_streak: 1               # successive rejections on materially NEW HIGH/CRITICAL classes
   escalation_threshold: 3                        # protocol §5: then two specialist architects + a synthesis architect
-  persistent_remainder_streak: 4                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
+  persistent_remainder_streak: 5                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
   persistent_remainder_escalation_threshold: 2   # orchestrator routing rule: at 2, run the §5 specialist-alternatives pattern before the next revision
   escalation_triggered: {at_revision: 4, rule: persistent_remainder, runs: [AR-0009, AR-0010], synthesis_architect_run: AR-0011}
   post_escalation_trend: revision-5 blocking classes are new, narrower instances (first-contact root, build environment, content derivation, register completeness); R2-H4 closed as a class
@@ -172,7 +172,7 @@ architecture:
       blocking_classes: [BC6-1, BC6-2, BC6-3, BC6-4]
       materially_new_blocking_class: false
     - revision: 7
-      status: UNDER_REVIEW
+      status: REJECTED
       kind: concrete certified profile per OWNER-DESIGN-REQUIREMENTS-0001
       commit: d07d200ac08a52c45071d33074e20cc62fbcc26e
       author_run: AR-0019
@@ -183,34 +183,39 @@ architecture:
         - {run: AR-0021, role: rot-reviewer-compat-transaction, commit: 34633ccc53a4928262b4f38e5d1d018239b7a322, report_commit: d7b08508d090a74c043e7557dafedd4f9fb0f278, verdict: BLOCKING_FINDINGS_PRESENT}
       synthesis_run: AR-0022
       handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0019-rot-architect-r7.md
-      expected_review_path: release/root-of-trust/4.1.6-review-r7
+      review_commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+      review_report_commit: 7c66d660dfbc59b3ac76427d15ffbf265702bd8e
+      review_path: release/root-of-trust/4.1.6-review-r7
+      correction_delta_path: release/root-of-trust/4.1.6-review-r7/11-CORRECTION-DELTA.md
+      verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+      blocking_classes: [BC7-1, BC7-2, BC7-3, BC7-4]
+      materially_new_blocking_class: true   # BC7-4 and the OT-2 criterion part of BC7-3
+      routing: NOT ROUTED — loop frozen by OWNER-DIRECTIVE-0003
 
 unresolved_findings:
-  source_path: release/root-of-trust/4.1.6-review-r6/10-BLOCKING-FINDINGS.md
+  source_path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md
+  routing: NOT ROUTED — loop frozen by OWNER-DIRECTIVE-0003 pending meta-architecture review
   blocking_classes:
-    BC6-1: {findings: [RV6-H1], remainder_of: BC5-1, correction: CD6-1, fix: engineering + owner trade-off F1-a..F1-c (owner requirements apply)}
-    BC6-2: {findings: [RV6-H2], remainder_of: BC5-1 x R2-H2, correction: CD6-2, fix: engineering + owner trade-off C-a..C-c (owner requirements apply)}
-    BC6-3: {findings: [RV6-H3], remainder_of: BC5-2, correction: CD6-3, fix: engineering}
-    BC6-4: {findings: [RV6-M2, RV6-M1], remainder_of: BC5-4, correction: CD6-4, fix: engineering}
+    BC7-1: {findings: [RV7-H1], remainder_of: BC6-2 x BC6-4, correction: CD7-1, fix: engineering}
+    BC7-2: {findings: [RV7-H2], remainder_of: BC6-2 x R2-H2, correction: CD7-2, fix: engineering (owner already decided in OWNER-DESIGN-REQUIREMENTS-0002)}
+    BC7-3: {findings: [RV7-M1, RV7-M2, RV7-M3], remainder_of: BC6-4 x BC6-1 (OT-2 criterion part materially new), correction: CD7-3, fix: engineering; owner confirmation only if a single designation input is kept}
+    BC7-4: {findings: [RV7-M4], remainder_of: none (materially new), correction: CD7-4, fix: engineering; owner confirmation if a provisioned CI selection is chosen (CI-a..CI-c)}
   CRITICAL: []
-  HIGH: [RV6-H1, RV6-H2, RV6-H3]
-  MEDIUM: [RV6-M1, RV6-M2, RV6-M3, RV6-M4, RV6-M5, RV6-M6]
-  LOW: [RV6-L1, RV6-L2, RV6-L3, RV6-L4, RV6-L5, RV6-L6, RV6-L7, RV6-L8, RV6-L9, RV6-L10, RV6-L11, RV6-L12]
-  INFO: [RV6-I1, RV6-I2]
-  owner_requirements_HO_0001: {s3_1: SATISFIED, s3_2: NOT_SATISFIED, s3_3: NOT_SATISFIED, s3_4: SATISFIED, s4: SATISFIED_FOR_CLASSIFICATION}
-  closed_as_class: [R2-H4 (reproduced r6), R2-M4, R2-M6, BC5-3]
-  pending_synthesis_adjudication_r7:
-    source_paths: [release/root-of-trust/4.1.6-review-r7/B-trust-security/01-FINDINGS.md, release/root-of-trust/4.1.6-review-r7/C-compat-transaction/01-FINDINGS.md]
-    HIGH: [RV7-B-H1, RV7-B-H2, RV7-C-H1]
-    MEDIUM: [RV7-B-M1, RV7-C-M1, RV7-C-M2, RV7-C-M3, RV7-C-M4, RV7-C-M5]
-    LOW: [RV7-B-L1, RV7-B-L2, RV7-B-L3, RV7-B-L4, RV7-B-L5, RV7-B-L6, RV7-C-L1, RV7-C-L2, RV7-C-L3, RV7-C-L4]
-    INFO: [RV7-B-I1, RV7-B-I2]
+  HIGH: [RV7-H1, RV7-H2]
+  MEDIUM: [RV7-M1, RV7-M2, RV7-M3, RV7-M4, RV7-M5, RV7-M6, RV7-M7, RV7-M8, RV7-M9, RV7-M10]
+  MEDIUM_blocking: [RV7-M1, RV7-M2, RV7-M3, RV7-M4]
+  LOW: [RV7-L1, RV7-L2, RV7-L3, RV7-L4, RV7-L5, RV7-L6, RV7-L7, RV7-L8, RV7-L9, RV7-L10, RV7-L11, RV7-L12]
+  INFO: [RV7-I1, RV7-I2, RV7-I3, RV7-I4, RV7-I5, RV7-I6]
+  owner_requirements_HO_0001: {s3_1: SATISFIED, s3_2: NOT_SATISFIED, s3_3: SATISFIED_AS_CLASS, s3_4: SATISFIED, s4: SATISFIED}
+  owner_record_conformance: {OWNER-DESIGN-REQUIREMENTS-0001: deviates (OP-4, OP-7a, OP-10b, OP-11b, OP-13b consequence, OP-16b), OWNER-DESIGN-REQUIREMENTS-0002: deviates (OT-1 part B running-machine C3; OT-2 criterion not executable)}
+  closed_as_class: [R2-H4 (matrix7 reproduced in review r7), R2-M4, R2-M6, BC5-3]
 
 known_non_blocking_residuals:
-  determination_path: release/root-of-trust/4.1.6-review-r6/00-REVIEW-REPORT.md   # revision-6 determinations; re-determined per revision
-  accepted_with_condition: [AD-2, environment reproducer quorum, RA-1, TB-L4, RS-3, RS-5, CS-1, RR-2, VR-3, TG-2, LR-2, LR-4]
-  not_accepted: [AD-1'/FC-R1 first-contact root, FC-R2 as stated, FC-R3, FC-R4, RS-B1 stale page, TB-S2' under OP-16 (a)/(b)]
-  accepted: all other residuals named in the revision-6 pack
+  determination_path: release/root-of-trust/4.1.6-review-r7/00-REVIEW-REPORT.md   # revision-7 determinations (final)
+  not_accepted: [FC-R1'/AD-1'' and FC-R3' as stated (M1), CUR-R1 and FC-R5 for revoked binaries (H1), RS-1b and RS-1c for C3 (H2), TB-S2'' and TA-12'' as stated (M2, M3)]
+  accepted_with_condition: [AD-2' (CR7-C-1), RS-2b (CR7-D-02), RS-3 and TG-2 (CR4-B-01), RR-2' and LR-4 (CR7-C-2), CS-1 (CR4-B-05, CR7-D-04), crash recovery and uninstall (CR7-C-3..6), C-2, C-4, RA-1 (RT-198)]
+  removed_by_exclusion: [RS-5]
+  accepted: all other residuals named in the revision-7 pack
 
 owner_gates:
   pending: []
@@ -300,22 +305,20 @@ completed_stages:
   - stage: ROT_ARCH_R7_PANEL_REVIEWED
     commit: 2856bd7605b00b92f5bba9d2bfe6731e91725a21
     note: B (AR-0020) BLOCKING 2 HIGH + 1 blocking MEDIUM, merged 733c2ba; C (AR-0021) BLOCKING 1 HIGH + 5 MEDIUM, merged 2856bd7
+  - stage: ROT_ARCH_R7_REJECTED
+    commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+    note: final synthesis AR-0022 ROOT_OF_TRUST_ARCHITECTURE_REJECTED (BC7-1..BC7-4); merged 3e1442e; not routed (OWNER-DIRECTIVE-0003)
+  - stage: PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
+    commit: 3e1442eb8685e8eef26165fad3c1b8cfa2a1fb59
+    note: Root-of-Trust revision loop frozen after revision 7 per OWNER-DIRECTIVE-0003; final evidence package CP-FINAL-ROT-LOOP-FROZEN
 
-running_work:
-  - run_id: AR-0022
-    role: rot-review-synthesis
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0022.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0022-rot-review-r7-d-synthesis.md
-    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r7-d
-    branch: phase1/rot1-r7-review-d
-    base_commit: 1d4d9f3621854e6414b299b0265a4e6dab25428c
-    status: RUNNING
+running_work: []
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0019, revision 7 (concrete profile CP-1)
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0020, revision 7; 2 HIGH, 1 blocking MEDIUM
   rot-reviewer-compat-transaction: BLOCKING_FINDINGS_PRESENT   # AR-0021, revision 7; 1 HIGH
-  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0018, revision 6
+  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0022, revision 7 (final; loop frozen)
   builder: null
   verifier-a: null
   verifier-b: null
@@ -386,6 +389,16 @@ immutable_evidence:
     commit: 54be694cc6291538fe0901f3d71eb685ce3138d4
   - path: release/root-of-trust/4.1.6-review-r7/C-compat-transaction
     commit: 34633ccc53a4928262b4f38e5d1d018239b7a322
+  - path: release/root-of-trust/4.1.6-review-r7/D-synthesis
+    commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+  - path: release/root-of-trust/4.1.6-review-r7/00-REVIEW-REPORT.md
+    commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+  - path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md
+    commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+  - path: release/root-of-trust/4.1.6-review-r7/11-CORRECTION-DELTA.md
+    commit: 4c7735b652b719f619c776fdb1fda7ad0f708b82
+  - path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md
+    commit: 4fd5ab5
   - path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md
     commit: fbd09d5
   - path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md
@@ -402,11 +415,13 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: >-
-  OWNER-DIRECTIVE-0003 (freeze after revision 7). Spawn the planned synthesis reviewer AR-0022 on HO-0022; await it;
-  verify and merge; record the final revision-7 verdict and all findings WITHOUT routing them; write the final evidence
-  package and frozen checkpoint; set next_deterministic_action to
-  PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW and stop.
+next_deterministic_action: PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
+frozen_context: >-
+  OWNER-DIRECTIVE-0003. The Root-of-Trust architecture loop is frozen after revision 7 (REJECTED, review 4c7735b).
+  No revision 8, no architecture author, no routing of findings, no implementation, key ceremony, Capability Contract,
+  Prompt 2, D-0008 activation or new owner options until a meta-architecture review outcome and explicit owner
+  instruction. Final evidence: release/orchestration/phase-1/CHECKPOINTS/CP-FINAL-ROT-LOOP-FROZEN.yaml and
+  release/orchestration/phase-1/ROT-1-FROZEN-EVIDENCE-PACKAGE.md.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1

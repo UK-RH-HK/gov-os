@@ -6,6 +6,8 @@ gates:
   - id: GATE-ARCH-ACCEPT
     title: Independent acceptance of the root-of-trust architecture
     status: OPEN
+    frozen_by: OWNER-DIRECTIVE-0003
+    last_verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED on revision 7 (review 4c7735b); loop frozen pending meta-architecture review
     satisfier: fresh independent architecture synthesis reviewer (role rot-review-synthesis)
     preconditions:
       - architecture revision committed on release/4.1.6-rc1 with a typed architect report

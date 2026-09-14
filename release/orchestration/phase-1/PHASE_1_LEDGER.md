@@ -854,3 +854,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify and merge; record the verdict and findings without routing; build the frozen evidence package and final checkpoint; set the frozen next action; stop |
+
+## L-0060 — 2026-09-14 — revision 7 REJECTED by final synthesis (recorded, not routed)
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 (final under OWNER-DIRECTIVE-0003) |
+| Role | rot-review-synthesis (`AR-0022`) |
+| Input commit | `1d4d9f3` (architecture `d07d200`; B `54be694`; C `34633cc`; owner records -0001 `fbd09d5`, -0002 `30542e5`) |
+| Work performed | Reproduced the architect's 15 revision-7 instruments byte-identical, B's probes and C's probes and matrix7 (196 position aggregates equal after re-running P-TXN positions with resolved paths). Adjudicated B and C. Authored held-out RV7-D-A01…A10. Assessed conformance with both owner records. |
+| Report / evidence | `AGENT_RUNS/AR-0022.report.yaml`; `release/root-of-trust/4.1.6-review-r7/{00-REVIEW-REPORT,10-BLOCKING-FINDINGS,11-CORRECTION-DELTA}.md`, `D-synthesis/` |
+| Verdict | **`ROOT_OF_TRUST_ARCHITECTURE_REJECTED`** (final revision-7 verdict) |
+| Output commit | review `4c7735b`, report `7c66d66`, merged `3e1442e` |
+| Findings | **HIGH:** RV7-H1 (first-contact listing of restrictive facts), RV7-H2 (running-machine C3 currency of the named state). **MEDIUM:** RV7-M1…M10, of which M1–M4 are blocking. **LOW:** RV7-L1…L12. **INFO:** RV7-I1…I6. **Classes:** BC7-1…BC7-4 (BC7-4 and the OT-2 criterion part are materially new). **HO-0001:** §3.2 NOT SATISFIED; §3.1, §3.3 (as a class), §3.4 and §4 SATISFIED. **Owner records:** deviations from -0001 and -0002. **Routing:** NOT ROUTED — loop frozen. |
+| Next action | freeze and final evidence package |
+
+## L-0061 — 2026-09-14 — Root-of-Trust loop FROZEN; final evidence package
+
+| Field | Value |
+|---|---|
+| Iteration | Phase 1 Root-of-Trust architecture loop — frozen after revision 7 |
+| Role | orchestrator |
+| Input commit | `3e1442e` |
+| Work performed | Per OWNER-DIRECTIVE-0003: recorded the final revision-7 verdict and all findings without routing; set lifecycle_state and next_deterministic_action to `PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW`; emptied running_work; marked GATE-ARCH-ACCEPT frozen with its last verdict; added the review-r7 consolidated files and the directive to immutable evidence. Built the final evidence package with `tools/build_frozen_package.py` from committed records: `CHECKPOINTS/CP-FINAL-ROT-LOOP-FROZEN.yaml` and `ROT-1-FROZEN-EVIDENCE-PACKAGE.md`. No revision 8, no architecture author, no implementation, no D-0008 activation, no new owner options. D-0008 PROVISIONAL / PROPOSED / human_approved false / in_effect false; D-0007 ACTIVE and unchanged since Phase 1 start. |
+| Report / evidence | `CHECKPOINTS/CP-FINAL-ROT-LOOP-FROZEN.yaml`, `ROT-1-FROZEN-EVIDENCE-PACKAGE.md` |
+| Verdict | — (orchestration frozen) |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | `PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW` |
