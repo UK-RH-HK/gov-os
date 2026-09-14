@@ -224,3 +224,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0006 and AR-0007 in parallel |
+
+## L-0015 — 2026-09-14 — revision-4 review panel spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-reviewer-trust-security (`AR-0006`) and rot-reviewer-compat-transaction (`AR-0007`), fresh Opus 5 contexts, in parallel |
+| Input commit | `7a23900` (worktrees `wt/review-r4-b`, `wt/review-r4-c`; branches `phase1/rot1-r4-review-b`, `phase1/rot1-r4-review-c`) |
+| Work performed | spawned on HO-0006 and HO-0007; running. Prompts restrict orchestration reads to the reviewer's own handoff, HO-0001 and `AGENT_RUNS/README.md`, and require disclosure of any out-of-scope read. |
+| Report / evidence | expected `AGENT_RUNS/AR-0006.report.yaml`, `AGENT_RUNS/AR-0007.report.yaml`; `release/root-of-trust/4.1.6-review-r4/{B-trust-security,C-compat-transaction}/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | hold the first completed branch unmerged; on both completions verify, merge, write the synthesis HO, spawn D |
