@@ -1,0 +1,436 @@
+{
+ "scratch": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7",
+ "trees": {
+  "L0": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/L0",
+  "R7": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7",
+  "R7RES": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7RES",
+  "R7CRASH": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7CRASH",
+  "R7OPEN": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7OPEN",
+  "R7V": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7V",
+  "R7WTBASE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7WTBASE",
+  "R7WT": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7WT"
+ },
+ "records": {
+  "R7": {
+   "project_trust_id": "af40472d62069405d5afe2a34246b8cd",
+   "identity": [
+    2096,
+    31684465
+   ],
+   "paths": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7"
+   ],
+   "open_tx": [],
+   "done_tx": [
+    "TX-d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0"
+   ],
+   "highest_sequence": 6
+  },
+  "R7RES": null,
+  "R7CRASH": {
+   "project_trust_id": "af40472d62069405d5afe2a34246b8cd",
+   "identity": [
+    2096,
+    31671609
+   ],
+   "paths": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7CRASH"
+   ],
+   "open_tx": [],
+   "done_tx": [
+    "TX-d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0"
+   ],
+   "highest_sequence": 6
+  },
+  "R7OPEN": {
+   "project_trust_id": "af40472d62069405d5afe2a34246b8cd",
+   "identity": [
+    2096,
+    31668839
+   ],
+   "paths": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7OPEN"
+   ],
+   "open_tx": [
+    "TX-0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e"
+   ],
+   "done_tx": [
+    "TX-d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0"
+   ],
+   "highest_sequence": 6
+  },
+  "R7V": {
+   "project_trust_id": "af40472d62069405d5afe2a34246b8cd",
+   "identity": [
+    2096,
+    31676499
+   ],
+   "paths": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7V"
+   ],
+   "open_tx": [],
+   "done_tx": [
+    "TX-d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0"
+   ],
+   "highest_sequence": 6
+  },
+  "R7WTBASE": {
+   "project_trust_id": "af40472d62069405d5afe2a34246b8cd",
+   "identity": [
+    2096,
+    31695304
+   ],
+   "paths": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7WTBASE"
+   ],
+   "open_tx": [],
+   "done_tx": [],
+   "highest_sequence": 6
+  },
+  "R7WT": {
+   "project_trust_id": "af40472d62069405d5afe2a34246b8cd",
+   "identity": [
+    2096,
+    31695304
+   ],
+   "paths": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7WTBASE",
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/R7WT"
+   ],
+   "open_tx": [],
+   "done_tx": [],
+   "highest_sequence": 6
+  }
+ },
+ "ids": {
+  "TASK": "TASK-0001",
+  "GATE": "HDG-0002",
+  "MANIFEST": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/fixtures/cit-manifest.json",
+  "CIT": "CIT-0001",
+  "HANDOFF": "HND-0001",
+  "PACKET": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/fixtures/packet.yaml",
+  "PLUGIN_DESCRIPTOR": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/fixtures/p-probe.yaml",
+  "TOOL_DESCRIPTOR": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/fixtures/tool.json",
+  "REPORT": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/fixtures/report.json",
+  "RETURN": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/fixtures/return.json"
+ },
+ "base_facts": {
+  "init_4.1.4": true,
+  "update_gate": "HDG-0001",
+  "decide": true,
+  "update_applied": true,
+  "legacy_update_snapshot": true,
+  "cit_simulate": true,
+  "cit_approve": true,
+  "plugin_register": true,
+  "adapters": true,
+  "rebuild": true,
+  "control_hits_AR0021RESTRICTEDMARKER": [],
+  "control_hits_AR0021CUSTOMERMARKER": [],
+  "kernel_trust_verified": true,
+  "gitignore": ".governance-runtime/\n",
+  "vendor_init": true
+ },
+ "R7": {
+  "head": "17174b1abf3d458bc66dd34f2edfae9a8a7dd0de",
+  "pre_migration": "0c4c5c0dfb4bbe79630a256d3852732aaf7465d6",
+  "tracked_but_ignored": [],
+  "tracked_runtime": [
+   ".governance-runtime/migration"
+  ],
+  "project_trust_id": "af40472d62069405d5afe2a34246b8cd"
+ },
+ "states": {
+  "L0": {
+   "state": "LEGACY",
+   "rows": [
+    "LEGACY"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "LEGACY",
+    "ABSENT/type+LMI/broad": "LEGACY",
+    "ABSENT/path+LMI/narrow": "LEGACY",
+    "ABSENT/path+LMI/broad": "LEGACY"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [
+    "legacy_and_rot1_mixed",
+    "occupation",
+    "trust_components"
+   ],
+   "reports": [],
+   "honoured": [],
+   "foreign": [],
+   "legacy_named_dirs": [
+    "governance/project",
+    "governance/generated",
+    ".governance-runtime/update"
+   ],
+   "moved_names": [],
+   "overlay_or_views": false,
+   "nested_under_governance": [],
+   "kernel_tampered": true
+  },
+  "R7": {
+   "state": "COMPLETE",
+   "rows": [
+    "COMPLETE"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/path+LMI/broad": "COMPLETE"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [],
+   "reports": [],
+   "honoured": [],
+   "foreign": [],
+   "legacy_named_dirs": [],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views",
+    ".governance-runtime/legacy-quarantine"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  },
+  "R7RES": {
+   "state": "COMPLETE",
+   "rows": [
+    "COMPLETE"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "LAYOUT_MIGRATION_INCOMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/path+LMI/broad": "LAYOUT_MIGRATION_INCOMPLETE"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": true
+   },
+   "reasons": [],
+   "reports": [],
+   "honoured": [],
+   "foreign": [],
+   "legacy_named_dirs": [
+    ".governance-runtime/update"
+   ],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views",
+    ".governance-runtime/legacy-quarantine"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  },
+  "R7CRASH": {
+   "state": "COMPLETE",
+   "rows": [
+    "COMPLETE"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/path+LMI/broad": "COMPLETE"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [],
+   "reports": [
+    [
+     "FOREIGN_TRANSACTION_ARTEFACT",
+     [
+      ".governance-runtime/trust-tx/TX-c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7/journal.json"
+     ]
+    ]
+   ],
+   "honoured": [],
+   "foreign": [
+    ".governance-runtime/trust-tx/TX-c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7/journal.json"
+   ],
+   "legacy_named_dirs": [],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views",
+    ".governance-runtime/legacy-quarantine"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  },
+  "R7OPEN": {
+   "state": "IN_TRANSACTION",
+   "rows": [
+    "IN_TRANSACTION"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "IN_TRANSACTION",
+    "ABSENT/type+LMI/broad": "IN_TRANSACTION",
+    "ABSENT/path+LMI/narrow": "IN_TRANSACTION",
+    "ABSENT/path+LMI/broad": "IN_TRANSACTION"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [],
+   "reports": [],
+   "honoured": [
+    ".governance-runtime/trust-tx/TX-0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e/journal.json"
+   ],
+   "foreign": [],
+   "legacy_named_dirs": [],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views",
+    ".governance-runtime/legacy-quarantine"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  },
+  "R7V": {
+   "state": "COMPLETE",
+   "rows": [
+    "COMPLETE"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/path+LMI/broad": "COMPLETE"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [],
+   "reports": [
+    [
+     "NESTED_LEGACY_PROJECT",
+     [
+      "vendor/legacypkg/governance"
+     ]
+    ]
+   ],
+   "honoured": [],
+   "foreign": [],
+   "legacy_named_dirs": [],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views",
+    ".governance-runtime/legacy-quarantine"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  },
+  "R7WTBASE": {
+   "state": "COMPLETE",
+   "rows": [
+    "COMPLETE"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/path+LMI/broad": "COMPLETE"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [],
+   "reports": [],
+   "honoured": [],
+   "foreign": [],
+   "legacy_named_dirs": [],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  },
+  "R7WT": {
+   "state": "COMPLETE",
+   "rows": [
+    "COMPLETE"
+   ],
+   "by_reading": {
+    "ABSENT/type+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/path+LMI/broad": "COMPLETE"
+   },
+   "readings": {
+    "ABSENT/type": false,
+    "ABSENT/path": false,
+    "LMI/narrow": false,
+    "LMI/broad": false
+   },
+   "reasons": [],
+   "reports": [],
+   "honoured": [],
+   "foreign": [],
+   "legacy_named_dirs": [],
+   "moved_names": [
+    "governance/overlay",
+    "governance/views"
+   ],
+   "overlay_or_views": true,
+   "nested_under_governance": [],
+   "kernel_tampered": false
+  }
+ },
+ "entries": {
+  "L0": 948,
+  "R7": 1013,
+  "R7RES": 994,
+  "R7CRASH": 1333,
+  "R7OPEN": 1333,
+  "R7V": 1279,
+  "R7WTBASE": 830,
+  "R7WT": 261
+ },
+ "binaries_sha256": {
+  "4.1.2": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7",
+  "4.1.3": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89",
+  "4.1.4": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f",
+  "4.1.5": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+ },
+ "tx": {
+  "done": "TX-d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0",
+  "crash": "TX-c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7c7",
+  "open": "TX-0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e"
+ }
+}

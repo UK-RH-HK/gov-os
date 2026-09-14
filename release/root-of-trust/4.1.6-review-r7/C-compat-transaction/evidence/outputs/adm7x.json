@@ -1,0 +1,67 @@
+{
+ "probe": "adm7x (AR-0021) against gov_admit_reference_r7.py (unmodified; path functions wrapped where the text names no account or machine)",
+ "results": {
+  "X1_multi_account": {
+   "alice_store_after": null,
+   "bob_planted_anchor_confirmation_and_project_record_survive": true,
+   "bob_store_after": [
+    "anchors.json",
+    "confirmations/c1.json",
+    "high-water.json",
+    "projects/P1.json"
+   ],
+   "first_admission": true,
+   "moved_aside": true,
+   "note": "the reference's write_admission takes one account store; `31` R-ADM-8\u2033 and `24` \u00a78 name no account (the invoking user, SUDO_USER, every account, the job account of a CI image)"
+  },
+  "X2_protected_store_lost_account_store_restored": {
+   "account_store_after": null,
+   "account_store_before": [
+    "anchors.json",
+    "confirmations/c1.json",
+    "high-water.json",
+    "projects/P1.json"
+   ],
+   "consequence": "E10 sequence 11, the recorded strength vector with its failing requirement, the pending registration_change obligation and the open transaction registration are never read again; the project is judged as on a machine without a record (LR-4, RR-2\u2032); the open transaction's journal becomes FOREIGN_TRANSACTION_ARTEFACT (`18` \u00a75.1) and is never recovered from",
+   "floors_read_after": {
+    "negatives": [],
+    "security_minimum": 9,
+    "state_sequence": 11
+   },
+   "is_first_admission": true,
+   "moved_aside_to": "7777777777777777777777777777777777777777777777777777777777777777.pre-admission-0",
+   "per_project_record_with_pending_registration_change_and_open_tx_still_read": false
+  },
+  "X3_shared_home_two_machines": {
+   "m1_account_store_after": null,
+   "m1_account_store_before": [
+    "anchors.json",
+    "confirmations/c1.json",
+    "high-water.json",
+    "projects/P1.json"
+   ],
+   "m1_gov_run_C1_with_the_anchor_it_had": "ALLOWED",
+   "m2_first_admission": true,
+   "m2_moved_shared_store_aside": true,
+   "note": "the reference's gov_run takes the anchor as an argument; in `24` \u00a73.2 a retained anchor is read from the account store, which M2 moved aside"
+  },
+  "X4_clock_high_water_from_ordinary_clock_error": {
+   "results": {
+    "correct_clock": "ALLOWED",
+    "event_recorded_10h_ahead_then_clock_corrected": "TRUST_CLOCK_BELOW_HIGH_WATER",
+    "event_recorded_with_rtc_in_2099_then_corrected_one_year_later": "TRUST_CLOCK_BELOW_HIGH_WATER",
+    "same_after_real_time_passes_the_value": "ALLOWED"
+   },
+   "text": "`24` \u00a74.5: the recorded high-water includes 'the time of the anchoring event and of the currency proof in use'; lowering it needs a root-signed Trust Policy bootstrap.clock_reset; no rule bounds an anchoring event's recorded time by the confirmed Trust State's issued_at"
+  },
+  "X5_floors_write_vs_read": {
+   "exception_types": [
+    "JSONDecodeError"
+   ],
+   "exceptions": 1994,
+   "note": "R-ADM-7\u2033 makes the record write atomic; `24` \u00a78 and `31` state no atomicity for floors.json or the account store's high-water.json",
+   "reads": 9896,
+   "reads_below_held_floor": 0
+  }
+ }
+}

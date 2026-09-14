@@ -1,0 +1,69 @@
+{
+ "A02_readmission_applies_store": {
+  "control_readmission_ignores_store_mutant": "ACCEPTED",
+  "readmission_T10_value_B8_store_holds_T11 (within 24 h, state below held)": "READMISSION_STATE_BELOW_HELD",
+  "readmission_T11_B9_store_holds_a_revocation_the_selected_state_lacks": "BINARY_REVOKED_IN_HELD_STATE",
+  "readmission_T7_value_B7x_store_holds_T11": "READMISSION_STATE_BELOW_HELD",
+  "readmission_T7_value_B7x_store_holds_T11_age_rule_on": "FIRST_CONTACT_STATE_TOO_OLD",
+  "readmission_authority_below_held": "FIRST_CONTACT_AUTHORITY_BELOW_HELD",
+  "readmission_current_T11_B9_store_T11": "ACCEPTED",
+  "readmission_release_below_held_security_minimum": "RELEASE_BELOW_SECURITY_MINIMUM",
+  "readmission_store_holds_the_admitter_revoked": "ADMITTER_REVOKED_IN_HELD_STATE"
+ },
+ "A04_accepted_tbm_high_water": {
+  "R9_runs_C2": "ALLOWED",
+  "control_mutant_skip_r_art_2": "ALLOWED",
+  "readmission_older_genuine_R8_tbm_below_high_water (T10 state, store T10 with high-water from B9)": "BINARY_T0_ROLLBACK",
+  "rollback_to_admitted_R8_C0_diagnostics": "ALLOWED",
+  "rollback_to_admitted_R8_runs_C2 (R-ART-2)": "BINARY_T0_ROLLBACK"
+ },
+ "A08_stored_values": {
+  "ci_image_codes_provisioned_at_T10_image_built_48h_later": "FIRST_CONTACT_STATE_TOO_OLD",
+  "control_media_prepared_within_ceiling": "ACCEPTED",
+  "media_prepared_at_T7_used_now": "FIRST_CONTACT_STATE_TOO_OLD",
+  "stored_codes_with_clock_set_back (RS-2, no store)": "ACCEPTED"
+ },
+ "R_replayed_value": {
+  "R1_replayed_T7_value_malicious_B7x": "FIRST_CONTACT_STATE_TOO_OLD",
+  "R2_replayed_T7_value_genuine_revoked_B7": "FIRST_CONTACT_STATE_TOO_OLD",
+  "R3_same_on_a_CI_image_path": "FIRST_CONTACT_STATE_TOO_OLD",
+  "R4_control_rule_off_skip_state_age": "ACCEPTED",
+  "R5_control_current_codes_B7x": "BINARY_REVOKED",
+  "R6_platform_package_route (excluded)": "PROFILE_MODE_EXCLUDED"
+ },
+ "S2_designated_stale_pages": {
+  "designated_pages_show_genuine_T10_codes_B8_revoked_at_T11 (within window)": "ACCEPTED",
+  "designated_pages_show_genuine_T7_codes_genuine_admitter": "FIRST_CONTACT_STATE_TOO_OLD"
+ },
+ "W_stated_window_residual": {
+  "CUR-R1_bound_same_value_after_the_ceiling": "FIRST_CONTACT_STATE_TOO_OLD",
+  "CUR-R1_first_install_both_sources_show_T10_B8_revoked_6h_ago": "ACCEPTED",
+  "CUR-R1_on_a_machine_whose_store_holds_T11": "READMISSION_STATE_BELOW_HELD"
+ },
+ "now": "2026-09-14T06:00:00Z",
+ "openssl_verifications": 50,
+ "probe": "CUR7 first-contact currency and re-admission under CP-1 (AR-0019)",
+ "verdicts": {
+  "A02_control_store_rule_load_bearing": true,
+  "A02_current_value_readmission_accepted": true,
+  "A02_store_applied": true,
+  "A04_R_ART_2_at_use": true,
+  "A04_readmission_below_high_water_refused": true,
+  "A08_clock_set_back_is_the_stated_RS2_residual": true,
+  "A08_stored_values_older_than_ceiling_refused": true,
+  "A08_within_ceiling_control_accepted": true,
+  "R_control_age_rule_load_bearing": true,
+  "R_current_codes_refuse_B7x": true,
+  "R_platform_package_route_excluded": true,
+  "R_replayed_old_values_refused_by_age": true,
+  "S2_designated_old_pages_refused_by_age": true,
+  "W_window_residual_exactly_as_stated": true
+ },
+ "world": {
+  "B7x_revoked_at_T9": true,
+  "B8_revoked_at_T11": true,
+  "T10_issued_at": "2026-09-13T12:00:00Z",
+  "T11_issued_at": "2026-09-14T00:00:00Z",
+  "T7_issued_at": "2026-05-01T00:00:00Z"
+ }
+}

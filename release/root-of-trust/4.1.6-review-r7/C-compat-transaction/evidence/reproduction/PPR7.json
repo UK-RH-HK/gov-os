@@ -1,0 +1,77 @@
+{
+ "identity": {
+  "mutant_id_only": {
+   "bind_mount_downgrade_to_7": "DOWNGRADE_WITHOUT_TRANSACTION",
+   "fork_other_identity_gated_operation": "STRENGTH_REPORT:R1",
+   "moved_checkout_downgrade_to_7": "DOWNGRADE_WITHOUT_TRANSACTION",
+   "original_record_after_clone_and_fork": {
+    "failing": [
+     "R1"
+    ],
+    "seq": 12
+   },
+   "reports": [
+    "PROJECT_PATH_ADDED"
+   ],
+   "second_clone_other_identity_install": "COMMITTED",
+   "worktree_same_identity_downgrade_to_7": "DOWNGRADE_WITHOUT_TRANSACTION"
+  },
+  "mutant_path_keyed": {
+   "bind_mount_downgrade_to_7": "COMMITTED",
+   "fork_other_identity_gated_operation": "NO_RECORD_ALLOWED_AS_NEW_PROJECT",
+   "moved_checkout_downgrade_to_7": "COMMITTED",
+   "original_record_after_clone_and_fork": {
+    "failing": [],
+    "seq": null
+   },
+   "reports": [],
+   "second_clone_other_identity_install": "COMMITTED",
+   "worktree_same_identity_downgrade_to_7": "COMMITTED"
+  },
+  "r7": {
+   "bind_mount_downgrade_to_7": "DOWNGRADE_WITHOUT_TRANSACTION",
+   "fork_other_identity_gated_operation": "PROJECT_IDENTITY_MISMATCH",
+   "moved_checkout_downgrade_to_7": "DOWNGRADE_WITHOUT_TRANSACTION",
+   "original_record_after_clone_and_fork": {
+    "failing": [],
+    "seq": 11
+   },
+   "reports": [
+    "PROJECT_IDENTITY_MISMATCH",
+    "PROJECT_PATH_ADDED"
+   ],
+   "second_clone_other_identity_install": "PROJECT_IDENTITY_MISMATCH",
+   "worktree_same_identity_downgrade_to_7": "DOWNGRADE_WITHOUT_TRANSACTION"
+  }
+ },
+ "probe": "PPR7 per-project record identity and re-record rules (AR-0019)",
+ "rerecord": {
+  "mutant_remedy_rerecords": {
+   "after_completed_update_and_second_unit_of_work": "ALLOWED",
+   "after_init_force": "ALLOWED",
+   "after_kernel_reinstall": "ALLOWED",
+   "after_recover_exchange_back": "ALLOWED",
+   "after_registration_change_gate": "ALLOWED",
+   "after_update_apply_from_PARTIAL": "ALLOWED",
+   "after_weakening_gate_accepts": "ALLOWED"
+  },
+  "r7": {
+   "after_completed_update_and_second_unit_of_work": "GATE_REQUIRED:registration_change",
+   "after_init_force": "GATE_REQUIRED:registration_change",
+   "after_kernel_reinstall": "GATE_REQUIRED:registration_change",
+   "after_recover_exchange_back": "GATE_REQUIRED:registration_change",
+   "after_registration_change_gate": "STRENGTH_REPORT:R-overlay-weakened",
+   "after_update_apply_from_PARTIAL": "GATE_REQUIRED:registration_change",
+   "after_weakening_gate_accepts": "ALLOWED"
+  }
+ },
+ "verdicts": {
+  "clone_and_fork_reported_fail_closed_and_never_overwrite": true,
+  "id_only_mutant_detected": true,
+  "only_gates_clear": true,
+  "path_keyed_mutant_detected": true,
+  "remedies_keep_strength_report_and_pending_gate": true,
+  "remedy_rerecord_mutant_detected": true,
+  "worktree_move_bindmount_keep_E10": true
+ }
+}

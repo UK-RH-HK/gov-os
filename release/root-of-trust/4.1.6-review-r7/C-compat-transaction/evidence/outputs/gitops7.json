@@ -1,0 +1,907 @@
+{
+ "facts": {
+  "ARCHIVE_TAR": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "no .git",
+   "occupation_tracked": null,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "ARCHIVE_ZIP": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "zip extracted with python zipfile",
+   "occupation_tracked": null,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "AUTOCRLF": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "BUNDLE_CLONE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "CHECKOUT_BACK": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "CHECKOUT_PRE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "LEGACY",
+    "ABSENT/path+LMI/narrow": "LEGACY",
+    "ABSENT/type+LMI/broad": "LEGACY",
+    "ABSENT/type+LMI/narrow": "LEGACY"
+   },
+   "classifications": {
+    "governance/project": true
+   },
+   "kernel_crlf": null,
+   "kernel_tampered": true,
+   "note": "",
+   "occupation_tracked": false,
+   "reasons": [
+    "legacy_and_rot1_mixed",
+    "occupation",
+    "trust_components"
+   ],
+   "reports": [],
+   "state": "LEGACY"
+  },
+  "CHERRY_PICK_MIGRATION": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "cherry-pick of the migration commit onto a diverged legacy branch rc=1 'M  .gitignore\\nA  .governance-runtime/migration\\nD  governance/framework.lock\\nA  governance/framework.lock/ROT-1-TRUST-FORMAT\\nA  governance/generated\\nA  governance/kernel\\nD  governance/kernel/KERNEL_MAN'",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "CLEAN_FDX_CLONE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "CLEAN_FDX_MACHINE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "clean -fdx on the installed machine (ignored transaction area, snapshots, legacy quarantine removed)",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "CLONE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "CP_NO_DOTFILES": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "cp -r proj/* dest (no dot-entries at the top level)",
+   "occupation_tracked": null,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "EXPORT_IGNORE_INFO_ARCHIVE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": null,
+   "kernel_tampered": true,
+   "note": ".git/info/attributes governance/trust/** export-ignore, then archive",
+   "occupation_tracked": null,
+   "reasons": [
+    "trust_components",
+    "trust_components(.gitattributes)"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "EXPORT_IGNORE_ROOT_ARCHIVE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "archive after committed export-ignore",
+   "occupation_tracked": null,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "FORMAT_PATCH_AM": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "format-patch/am of the migration commit rc=0",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "GLOBALEXCL": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "idiom listed ['.governance-runtime/migration']",
+   "occupation_tracked": false,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "GLOBAL_ATTRFILE_EOLCRLF": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "core.attributesFile '* text eol=crlf\\n' + autocrlf",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "GLOBAL_ATTRFILE_WTE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": false
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": true,
+   "note": "core.attributesFile '*.yaml working-tree-encoding=UTF-16LE\\n' + autocrlf",
+   "occupation_tracked": true,
+   "reasons": [
+    "kernel_content_mismatch"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "IGNORECASE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "INFOATTR": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": true,
+   "kernel_tampered": true,
+   "note": "'* text\\n'",
+   "occupation_tracked": true,
+   "reasons": [
+    "foreign_trust_entry(.gitattributes_content)",
+    "kernel_content_mismatch"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "INFOATTR_IDENT": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "'* ident\\n'",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "INFOATTR_NOCONV": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "'* text\\n'",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "INFOATTR_WTE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": false
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": true,
+   "note": "'*.yaml working-tree-encoding=UTF-16LE\\n*.md working-tree-encoding=UTF-16LE\\n'",
+   "occupation_tracked": true,
+   "reasons": [
+    "kernel_content_mismatch"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "INFOEXCL": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "idiom listed ['.governance-runtime/migration']",
+   "occupation_tracked": false,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "MERGE_LEGACY_BRANCH": {
+   "branch_classification_reached_overlay": true,
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "merge rc=1 conflicted=True status='M  governance/overlay/DATA_SENSITIVITY.yaml\\nUA governance/overlay/plugins/new.yaml'; branch classification in governance/overlay after merge=True; plugin in overlay=True",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "NONCONE_LEGACY_PROJECT_ONLY": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "ABSENT",
+    "ABSENT/type+LMI/narrow": "ABSENT"
+   },
+   "classifications": {
+    "governance/project": true
+   },
+   "kernel_crlf": null,
+   "kernel_tampered": true,
+   "note": "legacy (pre-migration) commit, only governance/project, product, docs, spec checked out",
+   "occupation_tracked": false,
+   "reasons": [
+    "occupation",
+    "trust_components"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "PARTIAL_CLONE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "RESET_HARD_PRE_BACK_UNTRACKED": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "reset --hard to pre-migration, untracked file under governance/kernel/, reset --hard back",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "RESTORE_PRE_GOV": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "LEGACY",
+    "ABSENT/path+LMI/narrow": "LEGACY",
+    "ABSENT/type+LMI/broad": "LEGACY",
+    "ABSENT/type+LMI/narrow": "LEGACY"
+   },
+   "classifications": {
+    "governance/project": true
+   },
+   "kernel_crlf": null,
+   "kernel_tampered": true,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [
+    "legacy_and_rot1_mixed",
+    "occupation",
+    "trust_components"
+   ],
+   "reports": [],
+   "state": "LEGACY"
+  },
+  "RM_CACHED_ADD_ALL_GLOBALEXCL": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "`git rm -r --cached . && git add .` under core.excludesFile .governance-runtime/",
+   "occupation_tracked": false,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "ROOT_ATTR_WTE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": false
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": true,
+   "note": "committed root .gitattributes *.yaml working-tree-encoding=UTF-16LE",
+   "occupation_tracked": true,
+   "reasons": [
+    "kernel_content_mismatch"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "SHALLOW": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "SKIP_WORKTREE_DELETE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "skip-worktree then local deletion; status shows ''",
+   "occupation_tracked": true,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "SMUDGE_FILTER_OVERLAY": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": false
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "locally configured smudge filter on the overlay",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "SPARSE_CONE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "SPARSE_NONCONE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "STASH_PLAIN": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "occupation edited then stashed (no pop)",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "STASH_U_POP": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "SUBMODULE_RECURSIVE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "superproject clone --recurse-submodules; the RoT-1 project is a submodule",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "SYMLINKS_FALSE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "TEXTAUTO_EOLCRLF": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "TEXTEOL_CRLF": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "UNTRACK": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "idiom listed []",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "UNTRACK_NOSURG": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "PARTIAL",
+    "ABSENT/path+LMI/narrow": "PARTIAL",
+    "ABSENT/type+LMI/broad": "PARTIAL",
+    "ABSENT/type+LMI/narrow": "PARTIAL"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "idiom listed ['.governance-runtime/migration']",
+   "occupation_tracked": false,
+   "reasons": [
+    "occupation"
+   ],
+   "reports": [],
+   "state": "PARTIAL"
+  },
+  "WORKTREE": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "COMPLETE",
+    "ABSENT/path+LMI/narrow": "COMPLETE",
+    "ABSENT/type+LMI/broad": "COMPLETE",
+    "ABSENT/type+LMI/narrow": "COMPLETE"
+   },
+   "classifications": {
+    "governance/overlay": true
+   },
+   "kernel_crlf": false,
+   "kernel_tampered": false,
+   "note": "",
+   "occupation_tracked": true,
+   "reasons": [],
+   "reports": [],
+   "state": "COMPLETE"
+  },
+  "WORKTREE_PREMIGRATION": {
+   "by_reading": {
+    "ABSENT/path+LMI/broad": "LEGACY",
+    "ABSENT/path+LMI/narrow": "LEGACY",
+    "ABSENT/type+LMI/broad": "LEGACY",
+    "ABSENT/type+LMI/narrow": "LEGACY"
+   },
+   "classifications": {
+    "governance/project": true
+   },
+   "kernel_crlf": null,
+   "kernel_tampered": true,
+   "note": "worktree of the pre-migration commit beside a RoT-1 checkout",
+   "occupation_tracked": false,
+   "reasons": [
+    "legacy_and_rot1_mixed",
+    "occupation",
+    "trust_components"
+   ],
+   "reports": [],
+   "state": "LEGACY"
+  }
+ },
+ "trees": {
+  "ARCHIVE_TAR": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/ARCHIVE_TAR",
+  "ARCHIVE_ZIP": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/ARCHIVE_ZIP",
+  "AUTOCRLF": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/AUTOCRLF",
+  "BUNDLE_CLONE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/BUNDLE_CLONE",
+  "CHECKOUT_BACK": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CHECKOUT_BACK",
+  "CHECKOUT_PRE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CHECKOUT_PRE",
+  "CHERRY_PICK_MIGRATION": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CHERRY_PICK_MIGRATION",
+  "CLEAN_FDX_CLONE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CLEAN_FDX_CLONE",
+  "CLEAN_FDX_MACHINE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CLEAN_FDX_MACHINE",
+  "CLONE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CLONE",
+  "CP_NO_DOTFILES": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/CP_NO_DOTFILES",
+  "EXPORT_IGNORE_INFO_ARCHIVE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/EXPORT_IGNORE_INFO_ARCHIVE",
+  "EXPORT_IGNORE_ROOT_ARCHIVE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/EXPORT_IGNORE_ROOT_ARCHIVE",
+  "FORMAT_PATCH_AM": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/FORMAT_PATCH_AM",
+  "GLOBALEXCL": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/GLOBALEXCL",
+  "GLOBAL_ATTRFILE_EOLCRLF": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/GLOBAL_ATTRFILE_EOLCRLF",
+  "GLOBAL_ATTRFILE_WTE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/GLOBAL_ATTRFILE_WTE",
+  "IGNORECASE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/IGNORECASE",
+  "INFOATTR": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/INFOATTR",
+  "INFOATTR_IDENT": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/INFOATTR_IDENT",
+  "INFOATTR_NOCONV": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/INFOATTR_NOCONV",
+  "INFOATTR_WTE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/INFOATTR_WTE",
+  "INFOEXCL": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/INFOEXCL",
+  "MERGE_LEGACY_BRANCH": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/MERGE_LEGACY_BRANCH",
+  "NONCONE_LEGACY_PROJECT_ONLY": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/NONCONE_LEGACY_PROJECT_ONLY",
+  "PARTIAL_CLONE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/PARTIAL_CLONE",
+  "RESET_HARD_PRE_BACK_UNTRACKED": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/RESET_HARD_PRE_BACK_UNTRACKED",
+  "RESTORE_PRE_GOV": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/RESTORE_PRE_GOV",
+  "RM_CACHED_ADD_ALL_GLOBALEXCL": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/RM_CACHED_ADD_ALL_GLOBALEXCL",
+  "ROOT_ATTR_WTE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/ROOT_ATTR_WTE",
+  "SHALLOW": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SHALLOW",
+  "SKIP_WORKTREE_DELETE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SKIP_WORKTREE_DELETE",
+  "SMUDGE_FILTER_OVERLAY": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SMUDGE_FILTER_OVERLAY",
+  "SPARSE_CONE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SPARSE_CONE",
+  "SPARSE_NONCONE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SPARSE_NONCONE",
+  "STASH_PLAIN": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/STASH_PLAIN",
+  "STASH_U_POP": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/STASH_U_POP",
+  "SUBMODULE_RECURSIVE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SUBMODULE_RECURSIVE/proj",
+  "SYMLINKS_FALSE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/SYMLINKS_FALSE",
+  "TEXTAUTO_EOLCRLF": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/TEXTAUTO_EOLCRLF",
+  "TEXTEOL_CRLF": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/TEXTEOL_CRLF",
+  "UNTRACK": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/UNTRACK",
+  "UNTRACK_NOSURG": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/UNTRACK_NOSURG",
+  "WORKTREE": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/WORKTREE",
+  "WORKTREE_PREMIGRATION": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0021/t7/gitops7/WORKTREE_PREMIGRATION"
+ }
+}

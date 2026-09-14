@@ -1,0 +1,58 @@
+{
+ "M1_first_admission_media_within_24h": "ACCEPTED",
+ "M2_readmission_same_media_37_days_later": "FIRST_CONTACT_STATE_TOO_OLD",
+ "M3_running_machine": {
+  "C1_after_confirm_state_with_T10_codes_from_media": "ALLOWED",
+  "C3_within_24h_of_that_confirmation": "ALLOWED",
+  "anchor_fields_read_by_gov_run": [
+   "anchored_at",
+   "class",
+   "currency_at",
+   "names_effective_state"
+  ],
+  "confirm_state_ceremony_itself": "ALLOWED",
+  "effective_state_age_at_C3_hours": 882.0,
+  "gov_run_signature": "(exe_bytes, action, root_dir, lineage, now, held_negatives, listed_admitters, anchor=None, flags=None, protected=True)"
+ },
+ "M4_control_machine_that_holds_T11": "BINARY_REVOKED_SELF",
+ "probe": "cur7x (AR-0021; RV7-C-A25) against the unmodified revision-7 reference executor and world",
+ "text": {
+  "06_air_gapped": [
+   "An **air-gapped machine** uses media carrying the immutable mirror's material; admission refuses a state older than 24 hours"
+  ],
+  "24_R_CUR": [
+   "| **R-CUR-1** | (P1) recent anchoring event naming *n* | a pin provisioning or human confirmation whose two state codes name *n* itself is no older than 24 hours; an event naming an ancestor of *n* is not a proof for *n* | TA-7 |",
+   "| **R-CUR-2** | (P2) in-gate confirmation | the trust-gate confirmation for this transition carries two identical state codes equal to *n*'s code | none |"
+  ],
+  "24_human_confirmation_row": [
+   "| **Human confirmation** | `gov trust confirm-state <state code> <state code>`, the code typed from each source; `gov` never supplies the value. If the confirmed statement is not held, the anchor is recorded and the machine is `BELOW_ANCHOR` until it is supplied. The first confirmation of a verifier trust store also confirms the lineage (OP-6 (a)). | a currency proof for C3 within 24 hours of `confirmed_at`, for the "
+  ],
+  "24_in_gate_row": [
+   "| **In-gate state confirmation** | the trust-gate confirmation of a C3 transition (`27` \u00a73.1) carries the two state codes currently published by the sources (`trust-gate-confirmation` v3 `state_codes`); they must name the effective Trust State | a currency proof **for that transition only**, with no clock | TA-5\u2032 |"
+  ],
+  "31_running_executor": [
+   "| `gov trust verify-artifact` (the admitted binary N) | every later binary | inclusion anchor plus a currency proof of at most 24 hours naming the selected Trust State (`24` \u00a74.4: P1 two-source state codes, P2 in-gate state codes) | never |"
+  ],
+  "32_FC9": [
+   "| **FC-9** | **State age (compiled, 24 hours).** The selected Trust State's `issued_at` is no later than the admission clock plus the compiled skew and no more than 24 hours before it (OP-7 (a)). No Trust Policy field changes the ceiling. | `STATEMENT_ISSUED_IN_FUTURE` / `FIRST_CONTACT_STATE_TOO_OLD` |"
+  ],
+  "32_air_gapped_row": [
+   "| Air-gapped machine | media carrying the immutable mirror's material | FC-9: the state on the media \u2264 24 hours at admission; otherwise refused (owner trade-off OT-1, `35` \u00a76) |",
+   "| Air-gapped machine | media carrying the mirror's material, state \u2264 24 hours | OT-1 |"
+  ],
+  "issued_at_bound_outside_admission": []
+ },
+ "verdicts": {
+  "admission_refuses_the_stale_state": true,
+  "control_only_receipt_of_T11_refuses": true,
+  "decision_has_no_state_age_input": true,
+  "no_issued_at_bound_in_anchoring_or_gate_text": true,
+  "running_machine_allows_C3_on_the_same_stale_state": true
+ },
+ "world": {
+  "R8_revoked_in_T10": false,
+  "R8_revoked_in_T11": true,
+  "T10_issued_at": "2026-09-13T12:00:00Z",
+  "T11_issued_at": "2026-09-14T00:00:00Z"
+ }
+}

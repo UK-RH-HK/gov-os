@@ -1,0 +1,920 @@
+{
+ "control_L0_legacy": {
+  "4.1.2": {
+   "classifications_ok_after": false,
+   "init_force": {
+    "code": null,
+    "ok": true
+   },
+   "kernel_trust": {
+    "code": null,
+    "ok": null,
+    "verified": null
+   },
+   "memory_query": {
+    "code": null,
+    "hits": [
+     "governance/kernel/schemas/skill.schema.json",
+     "governance/project/plugins/p-probe.yaml",
+     "product/customers/acme.md",
+     "product/restricted-plan.md",
+     "spec/lessons/L-0001.yaml",
+     "spec/planning/.gitkeep",
+     "spec/product/.gitkeep",
+     "spec/reports/checkpoints/CKPT-00001.yaml"
+    ],
+    "ok": true
+   },
+   "memory_query_after_init_force": {
+    "code": null,
+    "hits": [
+     "governance/kernel/schemas/skill.schema.json",
+     "governance/project/plugins/p-probe.yaml",
+     "product/customers/acme.md",
+     "product/restricted-plan.md",
+     "spec/lessons/L-0001.yaml",
+     "spec/planning/.gitkeep",
+     "spec/product/.gitkeep",
+     "spec/reports/checkpoints/CKPT-00001.yaml"
+    ],
+    "ok": true
+   },
+   "rebuild_memory": {
+    "code": null,
+    "ok": true
+   },
+   "state_after": "LEGACY",
+   "status": {
+    "code": null,
+    "ok": true
+   },
+   "tree_changed": true
+  },
+  "4.1.5": {
+   "classifications_ok_after": false,
+   "init_force": {
+    "code": null,
+    "ok": true
+   },
+   "kernel_trust": {
+    "code": null,
+    "ok": true,
+    "verified": true
+   },
+   "memory_query": {
+    "code": null,
+    "hits": [],
+    "ok": true
+   },
+   "memory_query_after_init_force": {
+    "code": null,
+    "hits": [
+     "product/restricted-plan.md"
+    ],
+    "ok": true
+   },
+   "rebuild_memory": {
+    "code": null,
+    "ok": true
+   },
+   "state_after": "LEGACY",
+   "status": {
+    "code": null,
+    "ok": true
+   },
+   "tree_changed": true
+  }
+ },
+ "prefixes": {
+  "A-00": {
+   "completed_steps": [],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": []
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-01": {
+   "completed_steps": [
+    "quarantine"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LAYOUT_MIGRATION_INCOMPLETE",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-02": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LAYOUT_MIGRATION_INCOMPLETE",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-03": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LAYOUT_MIGRATION_INCOMPLETE",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-04": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-05": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "generated_to_views",
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-06": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-07": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-08": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "occ_lock_dir"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "occ_lock_dir",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-09": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "occ_lock_dir",
+    "occ_spec_and_migration"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "occ_spec_and_migration",
+     "occ_lock_dir",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-10": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "occ_lock_dir",
+    "occ_spec_and_migration",
+    "ignore_rule"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "ignore_rule",
+     "occ_spec_and_migration",
+     "occ_lock_dir",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "legacy_lock_aside",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "A-11": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "legacy_lock_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "occ_lock_dir",
+    "occ_spec_and_migration",
+    "ignore_rule",
+    "exchange"
+   ],
+   "recovery": {
+    "action": "roll_forward",
+    "legacy_layout_steps_all_done": true,
+    "remaining_steps_after_exchange": [
+     "migrations",
+     "strength_vector",
+     "per_project_record",
+     "ledger"
+    ],
+    "state_after_roll_forward": "COMPLETE (modelled)"
+   },
+   "rot1_init_after_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "COMPLETE (after roll-forward)",
+   "state_journal_honoured": "IN_TRANSACTION"
+  },
+  "B-00": {
+   "completed_steps": [],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": []
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-01": {
+   "completed_steps": [
+    "quarantine"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LAYOUT_MIGRATION_INCOMPLETE",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-02": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_REFUSED_STATE_LAYOUT_MIGRATION_INCOMPLETE",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-03": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-04": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-05": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-06": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-07": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "legacy_lock_aside"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "legacy_lock_aside",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-08": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "legacy_lock_aside",
+    "occ_lock_dir"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "occ_lock_dir",
+     "legacy_lock_aside",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-09": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "legacy_lock_aside",
+    "occ_lock_dir",
+    "occ_spec_and_migration"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "occ_spec_and_migration",
+     "occ_lock_dir",
+     "legacy_lock_aside",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-10": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "legacy_lock_aside",
+    "occ_lock_dir",
+    "occ_spec_and_migration",
+    "ignore_rule"
+   ],
+   "legacy_4.1.5_same_as_control": {
+    "classifications_ok_after": true,
+    "init_force": true,
+    "kernel_trust": true,
+    "memory_query": true,
+    "memory_query_after_init_force": true,
+    "rebuild_memory": true,
+    "state_after": true,
+    "status": true
+   },
+   "recovery": {
+    "action": "roll_back",
+    "undone": [
+     "ignore_rule",
+     "occ_spec_and_migration",
+     "occ_lock_dir",
+     "legacy_lock_aside",
+     "occ_files",
+     "adoption_evidence",
+     "generated_to_views",
+     "project_to_overlay",
+     "kernel_aside",
+     "quarantine"
+    ]
+   },
+   "rot1_init_after_recovery": "INIT_REFUSED_STATE_LEGACY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "LEGACY",
+   "state_journal_honoured": "IN_TRANSACTION",
+   "tree_equal_to_legacy_project": true
+  },
+  "B-11": {
+   "completed_steps": [
+    "quarantine",
+    "kernel_aside",
+    "project_to_overlay",
+    "generated_to_views",
+    "adoption_evidence",
+    "occ_files",
+    "legacy_lock_aside",
+    "occ_lock_dir",
+    "occ_spec_and_migration",
+    "ignore_rule",
+    "exchange"
+   ],
+   "recovery": {
+    "action": "roll_forward",
+    "legacy_layout_steps_all_done": true,
+    "remaining_steps_after_exchange": [
+     "migrations",
+     "strength_vector",
+     "per_project_record",
+     "ledger"
+    ],
+    "state_after_roll_forward": "COMPLETE (modelled)"
+   },
+   "rot1_init_after_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "rot1_init_before_recovery": "INIT_OVER_EXISTING_OVERLAY",
+   "state_after_recovery": "COMPLETE (after roll-forward)",
+   "state_journal_honoured": "IN_TRANSACTION"
+  }
+ },
+ "probe": "crashmig7 (AR-0019; reviewer C crashmig6/c6lib harness, revision-7 rules)",
+ "summary": {
+  "legacy_behaviour_differs_from_control_on_rolled_back_trees": [],
+  "prefixes_ABSENT_after_recovery": [],
+  "prefixes_PARTIAL_after_recovery": [],
+  "rolled_back_prefixes_not_byte_equal_to_legacy_project": [],
+  "rolled_forward_prefixes": [
+   "A-11",
+   "B-11"
+  ],
+  "rot1_init_allowed_on_a_tree_with_overlay": [],
+  "states_after_recovery": [
+   "COMPLETE (after roll-forward)",
+   "LEGACY"
+  ],
+  "states_with_journal_honoured": [
+   "IN_TRANSACTION"
+  ]
+ },
+ "verdicts": {
+  "honoured_journal_always_IN_TRANSACTION": true,
+  "legacy_behaviour_on_rolled_back_trees_equals_control (LR-1)": true,
+  "never_ABSENT_or_PARTIAL_after_recovery": true,
+  "roll_back_restores_exact_legacy_project": true,
+  "rot1_init_never_over_overlay": true
+ }
+}
