@@ -434,3 +434,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0014, spawn synthesis reviewer D |
+
+## L-0030 — 2026-09-14 — revision-5 reviewer B completed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | rot-reviewer-trust-security (`AR-0012`) |
+| Input commit | `bfaa943` (architecture `cdb4e14`) |
+| Work performed | Reproduced the architect's CSI, CS5, P4r5, DA03r5, FA5, REG5 and P1r4, plus the r4 and r3 trust probes. Authored held-out RV5-B-A01…A19 (10 executed, 6 computed, 3 design); A01, A04, A09 and A12 repeated byte-identical. |
+| Report / evidence | `AGENT_RUNS/AR-0012.report.yaml` (on branch); `release/root-of-trust/4.1.6-review-r5/B-trust-security/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `248f12a`, report `9aa5c3f` on `phase1/rot1-r5-review-b`; held unmerged until reviewer C completes |
+| Findings | **HIGH RV5-B-H1:** a tampered channel page alone, with no genuine key, admits a malicious binary on a new machine (the fingerprint selects the lineage, the same page selects the admitter, and the two-channel rule comes from the selected policy); declared minimum sets wrong in 288/288 configurations. **HIGH RV5-B-H2:** the build image decides production bytes and is checked only against an unassigned "owner's image record", so honest and diverse reproducers reproduce the malicious binary. **HIGH RV5-B-H3:** under OP-2 (b), E7 never checks verification records; delegated custodians plus `release-final`, or stolen registration, trust-state and `release-final` keys, make malicious content effective; OP-2 (b), OP-4 and OP-8 consequences false. **MEDIUM:** M1–M5. **LOW:** L1–L6. **Prior:** BC4-1 open (H2); BC4-2 and BC4-3 narrowed (H1, H3); BC4-4 open; RV4-H1…H3 closed as stated. No scope deviation. |
+| Next action | await AR-0013; then merge B and C, write HO-0014, spawn synthesis reviewer D |
