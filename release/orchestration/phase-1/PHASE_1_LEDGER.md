@@ -378,3 +378,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0011 |
+
+## L-0026 — 2026-09-14 — revision-5 synthesis architect spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | rot-synthesis-architect (`AR-0011`, fresh Opus 5 context) |
+| Input commit | `c8cdfac` (worktree `wt/arch-r5`, branch `phase1/rot1-r5-synthesis-architect`) |
+| Work performed | spawned on HO-0011; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0011.report.yaml`; `release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md`; pack `release/root-of-trust/4.1.6/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge, instantiate revision-5 B/C handoffs, spawn B and C in parallel |
