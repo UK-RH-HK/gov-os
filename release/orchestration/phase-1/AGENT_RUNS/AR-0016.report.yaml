@@ -1,0 +1,171 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0016
+role: rot-reviewer-trust-security
+objective: Independent trust and security review (reviewer B) of RoT-1 revision 6 (4106885) against HO-0016 and HO-0001 §3-§4
+agent_model: claude-opus-5
+independence_statement: >-
+  Authored before by this session: nothing (no RoT-1 revision, specialist proposal, prior review or other panel review).
+  Orchestration files opened: HO-0016, HO-0001 and AGENT_RUNS/README.md only; the file names of AGENT_RUNS/ were listed once
+  to place this report, and no other file there was opened. The host context carried the user's auto-memory index (one-line
+  summaries); no memory file was opened. The harness saved two of this session's own command outputs under a tool-results path
+  in ~/.claude/projects and named a background-task output file under .../tasks/; neither was opened. Not inspected: other
+  branches, other worktrees, other scratch directories, transcripts, reviewer C's work. No helper sessions. The architect's
+  response matrix, class-remainder analysis, decision register, CS6, generated statements and evidence were treated as claims
+  and re-run. D-0008 and ARCH-0002 were not modified or approved; no architecture verdict is issued.
+input:
+  base_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
+  release: 4.1.6 (RoT-1 revision 6 at 4106885dadebac55596067a2586cf4d3097fc025)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0016-rot-review-r6-b-trust-security.md
+inspected:
+  - release/root-of-trust/4.1.6/ (00-34, constitutional-surface/, decision-register/, schemas/, examples/, evidence/ incl. r5/ and r6/) at 4106885dadebac55596067a2586cf4d3097fc025
+  - spec/decisions/D-0007.yaml, spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md at 4106885dadebac55596067a2586cf4d3097fc025
+  - release/root-of-trust/4.1.6-review-r5/ (all reports, probes and outputs) at d1228cb77b9253c90406ab0cc3a8c3bd4b480e64
+  - diff cdb4e14009bba60bea9b805563c1b60e84f30b4b..4106885dadebac55596067a2586cf4d3097fc025 for 17, 18, 19, 20, 23, 27
+  - runtime/src/init.rs, runtime/src/tools.rs, runtime/src/adapters.rs, runtime/src/orchestration/intents.rs, runtime/src/verification/mod.rs; framework/ (file list, COMMAND_CONTRACT.yaml, overlay-templates) at 4106885dadebac55596067a2586cf4d3097fc025
+  - release/orchestration/phase-1/HANDOFFS/HO-0016-rot-review-r6-b-trust-security.md, HO-0001-rot-architect-r3.md, AGENT_RUNS/README.md
+  - legacy binaries gov-4.1.2..4.1.5 (read-only; SHA-256 in evidence)
+produced:
+  - release/root-of-trust/4.1.6-review-r6/B-trust-security/00-REPORT.md
+  - release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r6/B-trust-security/02-HELDOUT-ATTACKS.md
+  - release/root-of-trust/4.1.6-review-r6/B-trust-security/03-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r6/B-trust-security/04-CARRIED-REQUIREMENTS.md
+  - release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/
+  - release/orchestration/phase-1/AGENT_RUNS/AR-0016.report.yaml
+tests_or_attacks:
+  - id: RERUN-ARCH-R6
+    description: Architect instruments re-run from scratch exports (CS6, P4r6, DA03r6, DA07r6, FA6 x2, CON6, ENV6 x2, SRC6 x2, UW6, ATTR6, CSI6 selftest, register_check, statements_check) byte-identical; ADM6 identical except reported race counts; CSI checks identical except path
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/rerun/COMPARISON.json
+  - id: RERUN-ARCH-R5
+    description: Retained revision-5 instruments (CS5, P4r5, DA03r5, FA5, REG5, P1r4) re-run byte-identical (FA5 equal leaves)
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/rerun/COMPARISON.json
+  - id: RERUN-REVIEW-R5-PROBES
+    description: Review r5 B-A01/A04/A05/A08/A09/A12 and D-A01/A03/A04/A05/A07 re-run unmodified; byte-identical except time/compiler-dependent digests (A05, A08) and revision-6 text/plan changes (D-A03, D-A07)
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/rerun/review-r5-probes-log.tsv
+  - id: RV6-B-A01
+    description: Publisher-composed first-contact code with honest sources admits a substituted evaluator under OP-13 (a), (b), (c) either, (d)
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A01-first-contact-selectors.json
+  - id: RV6-B-A02
+    description: Pipeline-authored environment manifest in CS6 gives {pipeline} under OP-16 (a)/(b); INV-ENV-PIPELINE fails
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A02-environment-manifest-author.json
+  - id: RV6-B-A03
+    description: Generated CONTENT statements print repo as "1 reproducer key"; statements_check S1 passes
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A03-generated-statement-rendering.json
+  - id: RV6-B-A04
+    description: Re-admission admits and runs an older genuine binary below the kept accepted-TBM high-water
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A04-readmission-rollback.json
+  - id: RV6-B-A05
+    description: Replayed old platform-signed package (no valid_until) admits revoked B7 and malicious B7x under OP-13 (c) either
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A01-first-contact-selectors.json
+  - id: RV6-B-A06
+    description: Honest signing service signs a submitter's substituted admitter; admitted under OP-13 (c) either
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A01-first-contact-selectors.json
+  - id: RV6-B-A07
+    description: Environment recipe injection and component selection (real rustc) registered and accepted under OP-16 (a) and (b)
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A02-environment-manifest-author.json
+  - id: RV6-B-A08
+    description: Supplier class by label under OP-16 (b) accepts one compromised upstream
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A02-environment-manifest-author.json
+  - id: RV6-B-A09
+    description: Upstream checksum key named by the manifest registers injecting components
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A02-environment-manifest-author.json
+  - id: RV6-B-A10
+    description: Surface classes on the revision-6 checker; verify-registration refuses non-first-hand proposals; default deny holds; command contract, template and taxonomy changes not listed
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A10-surface-classes.json
+  - id: RV6-B-A11
+    description: HO-0001 §3.2 machine classes x OP-7 x adversaries under revision-6 rules (352 rows); no current label, no C3 on thief descendant, CLOCK-back no C3
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A11-machine-classes-r6.json
+  - id: RV6-B-A12
+    description: Brute-force key subsets (<=3 keys with pipeline/transport/repo) over 640 configurations; no accept with <=1 key or release/trust-state keys and infrastructure only
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A12-key-subsets-below-threshold.json
+  - id: RV6-B-A13
+    description: P1/CIR/ING_P1 anchors from a publisher-composed fingerprint give {2 reproducer keys, transport, fcpub}; "never on P1" false
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/outputs/RV6-B-A01-first-contact-selectors.json
+  - id: RV6-B-A14
+    description: Verification ordered before environment registration; verifier environment source unstated (design)
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/02-HELDOUT-ATTACKS.md
+  - id: RV6-B-A15
+    description: Derivation-tool provenance at the registration ceremony unstated (design)
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/02-HELDOUT-ATTACKS.md
+  - id: RV6-B-A16
+    description: Register completeness over rule ids misses selectors named by no rule (composition, submission, manifest authoring, supplier class)
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/02-HELDOUT-ATTACKS.md
+findings:
+  - id: RV6-B-H1
+    severity: HIGH
+    title: First-contact code composed by the trust-state publisher and only carried by the sources; one rank-3 party selects lineage, state and evaluator at first contact and P1/P2/CIR currency inputs
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-H2
+    severity: HIGH
+    title: OP-13 (c) either suffices - package submitter and replayed old packages select the first TCB outside the declared root; valid_until not required
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-H3
+    severity: HIGH
+    title: No party establishes the environment manifest (recipe, selection, upstream key, supplier class); its author selects every binary's bytes under OP-16 (a)/(b)
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-M1
+    severity: MEDIUM
+    title: Re-admission keeps but does not apply the verifier trust store; older genuine binary below the accepted-TBM high-water admitted
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-M2
+    severity: MEDIUM
+    title: Generated CONTENT statements print the repository-writer atom as a reproducer key; statements_check S1 cannot detect it
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-M3
+    severity: MEDIUM
+    title: Decision-register completeness checked over rule ids, not selectors
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-L1
+    severity: LOW
+    title: R-CON-5 lists only name-matched security units
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-L2
+    severity: LOW
+    title: Stale revision-5 text in 05 §1-§2
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-L3
+    severity: LOW
+    title: Verification precedes environment registration; verifier environment source unstated
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-L4
+    severity: LOW
+    title: Derivation-tool provenance at the registration ceremony unstated
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+  - id: RV6-B-I1
+    severity: INFO
+    title: RV5-I1 unchanged (acting role caller-declared)
+    path: release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md
+verdict: BLOCKING_FINDINGS_PRESENT
+output:
+  branch: phase1/rot1-r6-review-b
+  commit: 512808695e8f3eb11187a8c70dc07e6783ad8395
+  evidence_path: release/root-of-trust/4.1.6-review-r6/B-trust-security/evidence/
+unresolved:
+  - RV6-B-H1 first-contact value composition (BC5-1 remainder)
+  - RV6-B-H2 OP-13 (c) either platform path (submitter, replay, valid_until)
+  - RV6-B-H3 environment manifest authority (BC5-2 remainder)
+  - RV6-B-M1..M3 and L1..L4 carried (CR6-B-01..07)
+  - HO-0001 §3.4 legacy containment not assessed by this reviewer (compatibility scope)
+  - RS-2b total-withholding variant not reproduced by this review's harness (architect's P4r6 residual demonstration re-run byte-identical)
+recommended_next_action: Synthesis review adjudicates RV6-B-H1..H3 with reviewer C; architect restates first-contact value composition, the OP-13 (c) platform path and environment manifest authority as first-hand selectors with calculator strategies
+completed_at: "2026-09-14T14:44:26Z"
