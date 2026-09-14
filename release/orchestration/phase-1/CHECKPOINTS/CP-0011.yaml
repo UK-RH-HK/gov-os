@@ -1,0 +1,20 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0011
+trigger: independent synthesis verdict on revision 5 (REJECTED); routing decision for owner trade-offs; change of next deterministic action; before handoff HO-0015
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_R6_AUTHORING
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: aad29de491dd1cea440cf6caa229a78e30849f6b
+completed_evidence:
+  - {what: RoT-1 revision 5, commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b, path: release/root-of-trust/4.1.6}
+  - {what: reviewer B r5, commit: 248f12a6b98c939ec2d9c3fef8045d9c19c82aae, path: release/root-of-trust/4.1.6-review-r5/B-trust-security}
+  - {what: reviewer C r5, commit: 840d583273088caff4880c02edec03d2ade83156, path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction}
+  - {what: synthesis D r5 (ROOT_OF_TRUST_ARCHITECTURE_REJECTED), commit: d1228cb77b9253c90406ab0cc3a8c3bd4b480e64, report_commit: ed6ea294abb46dd89e3330cb291f1cbe0ae09c82, path: release/root-of-trust/4.1.6-review-r5}
+unresolved_findings: {HIGH: [RV5-H1, RV5-H2, RV5-H3], blocking_classes: [BC5-1, BC5-2, BC5-3, BC5-4], MEDIUM: 9, LOW: 9}
+routing_decision: owner trade-offs T1-a..T1-d and E-a..E-c follow the reviewer's route (architect presents computed options; owner decides in the single D-0008 gate)
+escalation: {orchestrated_rejections: 3, materially_new_class_streak: 0, persistent_remainder_streak: 3, specialist_escalation: completed}
+pending_owner_gates: []
+running_work: [AR-0015 rot-architect revision 6]
+next_deterministic_action: spawn AR-0015 on HO-0015

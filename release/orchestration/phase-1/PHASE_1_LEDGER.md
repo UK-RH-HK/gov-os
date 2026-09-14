@@ -490,3 +490,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge; route per verdict and classification (owner D-0008 gate, owner trade-off gate, or revision-6 architect) |
+
+## L-0034 — 2026-09-14 — revision 5 REJECTED by synthesis
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | rot-review-synthesis (`AR-0014`) |
+| Input commit | `59c1e5c` (architecture `cdb4e14`; B `248f12a`; C `840d583`) |
+| Work performed | Reproduced the architect's and both panels' decisive probes, including C's 30,165-row `matrix5`. Adjudicated B and C. Authored held-out RV5-D-A01…A08. Classified each blocking class by remainder and by kind of fix. |
+| Report / evidence | `AGENT_RUNS/AR-0014.report.yaml`; `release/root-of-trust/4.1.6-review-r5/{00-REVIEW-REPORT,10-BLOCKING-FINDINGS,11-CORRECTION-DELTA}.md`, `D-synthesis/` |
+| Verdict | **`ROOT_OF_TRUST_ARCHITECTURE_REJECTED`** |
+| Output commit | review `d1228cb`, report `ed6ea29`, merged `aad29de` |
+| Findings | **HIGH RV5-H1:** the first binary is selected by the channels alone (fingerprint selects lineage and quorum rule; one channel selects the admitter). **HIGH RV5-H2:** the build image selects every production binary's bytes, with no assigned authority. **HIGH RV5-H3:** registered constitutional content is not established first-hand (pipeline plus threshold-1 release keys; secret indexed on 4.1.5). **MEDIUM:** RV5-M1…M9. **LOW:** L1–L9. **Classes:** BC5-1 (engineering plus owner trade-off T1-a…T1-d), BC5-2 (engineering plus owner trade-off E-a…E-c), BC5-3 and BC5-4 (engineering). All are remainders, as new instances. **Confirmed closed:** R2-H4 as a class. **HO-0001:** §3.1–§3.3 NOT SATISFIED; §3.4 SATISFIED. |
+| Next action | revision-6 architect |
+
+## L-0035 — 2026-09-14 — routing decision; revision-6 architect handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | orchestrator |
+| Input commit | `aad29de` |
+| Work performed | **Routing decision.** The synthesis review routes BC5-1 and BC5-2 "architect, then owner" and requires (§7 item 4) that T1-a…T1-d and E-a…E-c be presented with computed consequences, without choosing. The orchestrator follows that route: the trade-offs become computed owner options in revision 6 and are decided in the single consolidated D-0008 gate (protocol §7). This supersedes the provisional CP-0010 rule to raise them before another revision, and avoids presenting options without computed consequences or splitting the owner gate. The specialist escalation has already run; no materially new class has appeared (streak 0), so the protocol §5 new-class escalation is not triggered. Wrote HO-0015. Claimed AR-0015. Added the review-r5 consolidated files to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0015-rot-architect-r6.md`, `CHECKPOINTS/CP-0011.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0015 |

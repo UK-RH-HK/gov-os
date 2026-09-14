@@ -1,0 +1,15 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0015
+role: rot-architect
+objective: Author RoT-1 revision 6 (architecture only) closing BC5-1..BC5-4 as classes and presenting T1/E trade-offs as computed owner options
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0015-rot-architect-r6.md
+base_commit: null   # the orchestrator commit adding this record (ledger L-0035)
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r6
+branch: phase1/rot1-r6-architect
+agent_id: null
+status: CLAIMED
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0015.report.yaml
+outcome: null

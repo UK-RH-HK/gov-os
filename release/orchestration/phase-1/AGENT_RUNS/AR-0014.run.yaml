@@ -13,6 +13,23 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r5-review-d
 agent_id: af7a06feda542d65c   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T10:46Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0014.report.yaml
-outcome: null
+outcome:
+  verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+  work_commit: d1228cb77b9253c90406ab0cc3a8c3bd4b480e64
+  report_commit: ed6ea294abb46dd89e3330cb291f1cbe0ae09c82
+  integration_merge_commit: aad29de491dd1cea440cf6caa229a78e30849f6b
+  blocking_classes:
+    - {id: BC5-1, finding: RV5-H1, remainder_of: BC4-2 x BC4-4 (new instance), fix: ENGINEERING_CORRECTION + OWNER_TRADE_OFF (T1-a..T1-d), route: architect then owner}
+    - {id: BC5-2, finding: RV5-H2, remainder_of: BC4-1 (new instance), fix: ENGINEERING_CORRECTION + OWNER_TRADE_OFF (E-a..E-c), route: architect then owner}
+    - {id: BC5-3, finding: RV5-H3, remainder_of: BC4-3 x BC4-1 (new instance), fix: ENGINEERING_CORRECTION, route: architect}
+    - {id: BC5-4, finding: option statements RV5-M5 D-A07, remainder_of: BC4-4, fix: ENGINEERING_CORRECTION, route: architect}
+  materially_new_blocking_class: false
+  closed_as_class_confirmed: [R2-H4 (matrix5 reproduced, 0 violations over 30,165 rows)]
+  scope_deviation: >-
+    Disclosed, assessed non-material: cloned the repository into scratch for a panel script needing git show (all refs
+    copied; only 59c1e5c and four named release commits read); FA5/SRC5 rewrote their own JSON in the scratch export
+    only; three probes first run without arguments; D-A04 probe corrected before its committed run; auto-memory index
+    present in context.
+  provenance_checks: [report present and output.commit matches, only allowed paths changed (24 files), pack alternatives and panel directories untouched, worktree clean incl. ignored]
