@@ -1,0 +1,299 @@
+{
+ "attack": "RV3-B-A01",
+ "binary": "gov 4.1.5",
+ "scratch": "<scratch>",
+ "kernel_change": {
+  "AUTHORITY_POLICY.authority_levels_required.*": "floor -> immutable",
+  "SECURITY_POLICY.never_index_classes": "additive -> immutable",
+  "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "ceiling -> immutable"
+ },
+ "project_overrides": {
+  "AUTHORITY_POLICY.authority_levels_required.resume_control": "L5",
+  "SECURITY_POLICY.never_index_classes": [
+   "secret",
+   "restricted",
+   "confidential"
+  ],
+  "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": "R0"
+ },
+ "project_classifications": [
+  {
+   "pattern": "product/customers/**",
+   "class": "confidential",
+   "reason": "customer data (project-owned classification)"
+  }
+ ],
+ "partA_revision3_reference": {
+  "rules_changed": [
+   "AUTHORITY_POLICY.authority_levels_required.*",
+   "SECURITY_POLICY.never_index_classes",
+   "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius"
+  ],
+  "genuine_4.1.5": {
+   "csi_check_exit": 3,
+   "surface_ok": true,
+   "eligible_surface": false,
+   "violations": [
+    {
+     "class": "migration",
+     "reason": "migration_operation_not_permitted",
+     "problems": [
+      {
+       "index": 5,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.1-4.1.2.yaml"
+      },
+      {
+       "index": 1,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.2-4.1.3.yaml"
+      },
+      {
+       "index": 2,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.3-4.1.4.yaml"
+      },
+      {
+       "index": 2,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.4-4.1.5.yaml"
+      }
+     ],
+     "count": 4
+    }
+   ],
+   "precedence_weaker_key_count": 0
+  },
+  "tampered_precedence": {
+   "csi_check_exit": 3,
+   "surface_ok": true,
+   "eligible_surface": false,
+   "violations": [
+    {
+     "class": "precedence",
+     "reason": "precedence_unregistered: POLICY_PRECEDENCE differs from its Trust Policy registration",
+     "mismatches": [
+      {
+       "index": 0,
+       "kernel": {
+        "key": "AUTHORITY_POLICY.authority_levels_required.*",
+        "mode": "immutable",
+        "kind": null,
+        "order": null,
+        "strict_value": null,
+        "exception_relaxable": false
+       },
+       "registered": {
+        "key": "AUTHORITY_POLICY.authority_levels_required.*",
+        "mode": "floor",
+        "kind": "level",
+        "order": null,
+        "strict_value": null,
+        "exception_relaxable": false
+       }
+      },
+      {
+       "index": 2,
+       "kernel": {
+        "key": "SECURITY_POLICY.never_index_classes",
+        "mode": "immutable",
+        "kind": null,
+        "order": null,
+        "strict_value": null,
+        "exception_relaxable": false
+       },
+       "registered": {
+        "key": "SECURITY_POLICY.never_index_classes",
+        "mode": "additive",
+        "kind": null,
+        "order": null,
+        "strict_value": null,
+        "exception_relaxable": false
+       }
+      },
+      {
+       "index": 8,
+       "kernel": {
+        "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+        "mode": "immutable",
+        "kind": null,
+        "order": null,
+        "strict_value": null,
+        "exception_relaxable": false
+       },
+       "registered": {
+        "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+        "mode": "ceiling",
+        "kind": "radius",
+        "order": null,
+        "strict_value": null,
+        "exception_relaxable": false
+       }
+      }
+     ],
+     "count": 3
+    },
+    {
+     "class": "migration",
+     "reason": "migration_operation_not_permitted",
+     "problems": [
+      {
+       "index": 5,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.1-4.1.2.yaml"
+      },
+      {
+       "index": 1,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.2-4.1.3.yaml"
+      },
+      {
+       "index": 2,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.3-4.1.4.yaml"
+      },
+      {
+       "index": 2,
+       "op": "set_lock_field",
+       "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+       "file": "migrations/M-4.1.4-4.1.5.yaml"
+      }
+     ],
+     "count": 4
+    }
+   ],
+   "precedence_weaker_key_count": 0
+  },
+  "per_key_join_23_s4": {
+   "AUTHORITY_POLICY.authority_levels_required.resume_control": {
+    "kernel_rule": "immutable",
+    "registered_rule": "floor",
+    "lattice_kernel_ge_registered": false,
+    "lattice_registered_ge_kernel": true,
+    "effective_join": "floor"
+   },
+   "SECURITY_POLICY.never_index_classes": {
+    "kernel_rule": "immutable",
+    "registered_rule": "additive",
+    "lattice_kernel_ge_registered": false,
+    "lattice_registered_ge_kernel": true,
+    "effective_join": "additive"
+   },
+   "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius": {
+    "kernel_rule": "immutable",
+    "registered_rule": "ceiling",
+    "lattice_kernel_ge_registered": false,
+    "lattice_registered_ge_kernel": true,
+    "effective_join": "ceiling"
+   },
+   "AUTHORITY_POLICY.authority_levels_required.update_apply": {
+    "kernel_rule": "immutable",
+    "registered_rule": "floor",
+    "lattice_kernel_ge_registered": false,
+    "lattice_registered_ge_kernel": true,
+    "effective_join": "floor"
+   }
+  },
+  "effective_rules_equal_tampered_rules": false,
+  "floor_effective_values_equal_genuine": true,
+  "lattice_reports_immutable_to_floor_as_weaker": false
+ },
+ "partB_consumption_4_1_5": {
+  "genuine": {
+   "init_ok": true,
+   "init_code": null,
+   "kernel_trust_verified": true,
+   "effective_values": {
+    "resume_control": "L5",
+    "never_index_classes": [
+     "secret",
+     "restricted",
+     "confidential"
+    ],
+    "agent_resolvable_when.max_radius": "R0"
+   },
+   "refused_overrides": [],
+   "a_orchestrator_L4_resume_with_project_raise_L5": {
+    "ok": false,
+    "code": "AUTHORITY_DENIED",
+    "pause_ok": true
+   },
+   "b_project_confidential_file": {
+    "rebuild_ok": true,
+    "indexed": [],
+    "excluded": [
+     [
+      "product/customers/acme.md",
+      "sensitivity:confidential"
+     ]
+    ],
+    "retrievable": []
+   },
+   "c_agent_answers_R1_gate_with_project_R0": {
+    "gate": "HDG-0001",
+    "ok": false,
+    "code": "AUTHORITY_DENIED"
+   },
+   "overlay_digest_unchanged_during_run": true,
+   "overlay_digest": "sha256:2d29a0bfc5945a896cacee0ad5fc4b38654dcc5440e7e086ea7eb8c420894d96"
+  },
+  "tampered_precedence_only": {
+   "init_ok": true,
+   "init_code": null,
+   "kernel_trust_verified": true,
+   "effective_values": {
+    "resume_control": "L4",
+    "never_index_classes": [
+     "secret",
+     "restricted"
+    ],
+    "agent_resolvable_when.max_radius": "R1"
+   },
+   "refused_overrides": [],
+   "a_orchestrator_L4_resume_with_project_raise_L5": {
+    "ok": true,
+    "code": null,
+    "pause_ok": true
+   },
+   "b_project_confidential_file": {
+    "rebuild_ok": true,
+    "indexed": [
+     "product/customers/acme.md"
+    ],
+    "excluded": [],
+    "retrievable": [
+     "product/customers/acme.md"
+    ]
+   },
+   "c_agent_answers_R1_gate_with_project_R0": {
+    "gate": "HDG-0001",
+    "ok": true,
+    "code": null
+   },
+   "overlay_digest_unchanged_during_run": true,
+   "overlay_digest": "sha256:2d29a0bfc5945a896cacee0ad5fc4b38654dcc5440e7e086ea7eb8c420894d96"
+  }
+ },
+ "partC_revision3_detectors": {
+  "overlay_identical_between_genuine_and_tampered_consumers": true,
+  "computed_weakening_19_s9_input_changed": false,
+  "strength_vector_26_s6_input_changed": false,
+  "note": "neither detector evaluates effective policy, so neither reports PROJECT_STRENGTH_WEAKENED or a weakening gate"
+ },
+ "verdicts": {
+  "passes_E7_reference_checker": false,
+  "effective_join_is_immutable_for_all_three_keys": false,
+  "a_authority_strengthening_discarded": true,
+  "b_indexing_strengthening_discarded": true,
+  "c_gate_strengthening_discarded": true,
+  "both_policy_roots_verified": true,
+  "revision3_detectors_silent": true
+ }
+}

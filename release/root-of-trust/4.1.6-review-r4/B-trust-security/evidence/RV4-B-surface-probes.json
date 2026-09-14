@@ -1,0 +1,385 @@
+{
+ "probe": "RV4-B surface probes (AR-0006)",
+ "binary": "gov 4.1.5",
+ "checker": "release/root-of-trust/4.1.6/constitutional-surface/csi_check.py (revision 4, unmodified)",
+ "scratch": "<scratch>",
+ "U_unknown_keys_and_files": {
+  "cases": [
+   {
+    "case": "U01",
+    "change": "ROLES.authority_levels.L2.may_answer_trust_gates: true (new key under the wildcard informational rule ROLES.authority_levels.*.*)",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 0
+    },
+    "expectation_under_default_deny": "unclassified (exit 2) unless a rule classifies it"
+   },
+   {
+    "case": "U02",
+    "change": "ROLES.authority_levels.L6: {name: super-orchestrator, mutation: all} (new authority level under the same wildcard)",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 0
+    },
+    "expectation_under_default_deny": "unclassified (exit 2) unless a rule classifies it"
+   },
+   {
+    "case": "U03",
+    "change": "MEMORY_POLICY.namespaces.customers: {sensitivity: public, roles: [all], export: allowed, embed: true} (new namespace)",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 2,
+     "unclassified_leaves": [
+      "{'file': 'policies/MEMORY_POLICY.yaml', 'key': 'MEMORY_POLICY.namespaces.customers.sensitivity'}",
+      "{'file': 'policies/MEMORY_POLICY.yaml', 'key': 'MEMORY_POLICY.namespaces.customers.roles'}",
+      "{'file': 'policies/MEMORY_POLICY.yaml', 'key': 'MEMORY_POLICY.namespaces.customers.export'}",
+      "{'file': 'policies/MEMORY_POLICY.yaml', 'key': 'MEMORY_POLICY.namespaces.customers.embed'}"
+     ]
+    },
+    "expectation_under_default_deny": "exit 2"
+   },
+   {
+    "case": "U04",
+    "change": "KERNEL.trust_bypass: true (new key in KERNEL.yaml)",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 2,
+     "unclassified_leaves": [
+      "{'file': 'KERNEL.yaml', 'key': 'KERNEL.trust_bypass'}"
+     ]
+    },
+    "expectation_under_default_deny": "exit 2"
+   },
+   {
+    "case": "U05",
+    "change": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].flags: 'x' (new field of a registered member)",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 2,
+     "unclassified_leaves": [
+      "{'file': 'policies/SECURITY_POLICY.yaml', 'key': 'SECURITY_POLICY.secret_content_patterns[id=aws-access-key].flags'}"
+     ]
+    },
+    "expectation_under_default_deny": "exit 2"
+   },
+   {
+    "case": "U06",
+    "change": "new member of the additive secret_content_patterns collection {id: never-matches, regex: 'a^'}",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 0
+    },
+    "expectation_under_default_deny": "exit 0 (additive; adds a pattern)"
+   },
+   {
+    "case": "U07",
+    "change": "new constitutional file contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 2,
+     "unclassified_files": [
+      "contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md"
+     ]
+    },
+    "expectation_under_default_deny": "exit 2"
+   },
+   {
+    "case": "U08",
+    "change": "new constitutional file constitution/AMENDMENTS.yaml",
+    "base_kernel": "framework/",
+    "checker": {
+     "exit": 2,
+     "unclassified_files": [
+      "constitution/AMENDMENTS.yaml"
+     ]
+    },
+    "expectation_under_default_deny": "exit 2"
+   },
+   {
+    "case": "U09",
+    "change": "optional file tools/registry/TOOLS.yaml removed",
+    "base_kernel": "release/releases/4.1.5/kernel",
+    "checker": {
+     "exit": 3,
+     "violations": [
+      "{'class': 'migration', 'reason': 'migration_operation_not_permitted', 'problems': [{'index': 5, 'op': 'set_lock_field', 'problem': 'lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lo"
+     ]
+    },
+    "expectation_under_default_deny": "no problem added (declared optional: absence offers no kernel tools)",
+    "checker_on_unmodified_base": {
+     "exit": 3,
+     "violations": [
+      "{'class': 'migration', 'reason': 'migration_operation_not_permitted', 'problems': [{'index': 5, 'op': 'set_lock_field', 'problem': 'lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lo"
+     ]
+    },
+    "problems_added_by_change": []
+   },
+   {
+    "case": "U10",
+    "change": "optional pinned file tools/mcp/registry.yaml removed",
+    "base_kernel": "release/releases/4.1.5/kernel",
+    "checker": {
+     "exit": 3,
+     "violations": [
+      "{'class': 'migration', 'reason': 'migration_operation_not_permitted', 'problems': [{'index': 5, 'op': 'set_lock_field', 'problem': 'lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lo"
+     ]
+    },
+    "expectation_under_default_deny": "no problem added (declared optional)",
+    "checker_on_unmodified_base": {
+     "exit": 3,
+     "violations": [
+      "{'class': 'migration', 'reason': 'migration_operation_not_permitted', 'problems': [{'index': 5, 'op': 'set_lock_field', 'problem': 'lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lo"
+     ]
+    },
+    "problems_added_by_change": []
+   }
+  ],
+  "runtime_readers_of_ROLES_authority_levels_map": [],
+  "runtime_readers_of_kernel_TOOLS_yaml": [
+   "runtime/src/tools.rs:12"
+  ],
+  "runtime_readers_of_mcp_registry": [
+   "runtime/src/tools.rs:39",
+   "runtime/src/tools.rs:44"
+  ]
+ },
+ "T_tunable_only_kernel": {
+  "changed_leaves_and_their_registered_class": {
+   "MEMORY_POLICY.namespaces.governance.embed": "project_tunable",
+   "MEMORY_POLICY.namespaces.spec.embed": "project_tunable",
+   "MEMORY_POLICY.namespaces.product.embed": "project_tunable",
+   "MEMORY_POLICY.namespaces.archive.embed": "project_tunable",
+   "MEMORY_POLICY.namespaces.archive.default_retrieval": "project_tunable",
+   "MEMORY_POLICY.namespaces.archive.retention": "project_tunable",
+   "MEMORY_POLICY.retrieval.default_k": "project_tunable",
+   "ARCHIVE_POLICY.archive_root": "project_tunable",
+   "ARCHIVE_POLICY.unused_code_action": "project_tunable",
+   "CHANGE_POLICY.semantic_candidates_by_radius.R0": "project_tunable",
+   "CHANGE_POLICY.semantic_candidates_by_radius.R1": "project_tunable",
+   "CHANGE_POLICY.semantic_candidates_by_radius.R2": "project_tunable",
+   "CHANGE_POLICY.semantic_candidates_by_radius.R3": "project_tunable",
+   "CHANGE_POLICY.semantic_candidates_by_radius.R4": "project_tunable",
+   "CHANGE_POLICY.semantic_candidates_by_radius.R5": "project_tunable",
+   "CONTEXT_POLICY.retrieved_fields": "project_tunable",
+   "CONTEXT_POLICY.packet_blocks": "project_tunable",
+   "CONTEXT_POLICY.max_retrieved_slices": "project_tunable",
+   "HUMAN_GATE_POLICY.batch_low_priority": "project_tunable",
+   "TOOL_POLICY.plugins.timeout_seconds": "project_tunable",
+   "TEST_POLICY.product_families": "project_tunable"
+  },
+  "all_changed_leaves_project_tunable": true,
+  "checker": {
+   "exit": 0
+  },
+  "runtime_readers": {
+   "retrieved_fields": [
+    "runtime/src/verification/mod.rs:444",
+    "runtime/src/verification/mod.rs:451",
+    "runtime/src/verification/mod.rs:453"
+   ],
+   "packet_blocks": [
+    "runtime/src/verification/mod.rs:456",
+    "runtime/src/verification/mod.rs:458"
+   ],
+   "semantic_candidates_by_radius": [
+    "runtime/src/cit/mod.rs:287"
+   ],
+   "batch_low_priority": [
+    "runtime/src/orchestration/gates.rs:199"
+   ],
+   "archive_root": [
+    "runtime/src/init.rs:163",
+    "runtime/src/init.rs:165",
+    "runtime/src/init.rs:169",
+    "runtime/src/init.rs:183"
+   ],
+   "unused_code_action": [
+    "runtime/src/adopt.rs:277",
+    "runtime/src/adopt.rs:283",
+    "runtime/src/adopt.rs:290",
+    "runtime/src/migrations/planner.rs:42",
+    "runtime/src/migrations/planner.rs:44",
+    "runtime/src/migrations/planner.rs:45"
+   ],
+   "product_families": [
+    "runtime/src/verification/mod.rs:771",
+    "runtime/src/verification/mod.rs:776"
+   ],
+   "timeout_seconds": [
+    "runtime/src/capabilities/governance.rs:387",
+    "runtime/src/capabilities/governance.rs:391"
+   ]
+  },
+  "consumption_4_1_5": {
+   "genuine": {
+    "init_ok": true,
+    "init_code": null,
+    "kernel_trust_verified": true,
+    "a_orchestrator_L4_resume_under_project_L5_raise": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED",
+     "pause_ok": true
+    },
+    "rebuild_ok": true,
+    "rebuild_code": null,
+    "files": {
+     "customers/acme.md": {
+      "indexed": [],
+      "excluded": [
+       [
+        "product/customers/acme.md",
+        "sensitivity:confidential"
+       ]
+      ],
+      "retrievable_by_default_query": []
+     },
+     "old/legacy-plan.md": {
+      "indexed": [
+       "archive/old/legacy-plan.md"
+      ],
+      "excluded": [],
+      "retrievable_by_default_query": []
+     }
+    },
+    "c_L3_agent_answers_R1_gate_under_project_R0": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED"
+    }
+   },
+   "tunable_only": {
+    "init_ok": true,
+    "init_code": null,
+    "kernel_trust_verified": true,
+    "a_orchestrator_L4_resume_under_project_L5_raise": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED",
+     "pause_ok": true
+    },
+    "rebuild_ok": true,
+    "rebuild_code": null,
+    "files": {
+     "customers/acme.md": {
+      "indexed": [],
+      "excluded": [
+       [
+        "product/customers/acme.md",
+        "sensitivity:confidential"
+       ]
+      ],
+      "retrievable_by_default_query": []
+     },
+     "old/legacy-plan.md": {
+      "indexed": [
+       "archive/old/legacy-plan.md"
+      ],
+      "excluded": [],
+      "retrievable_by_default_query": []
+     }
+    },
+    "c_L3_agent_answers_R1_gate_under_project_R0": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED"
+    }
+   }
+  },
+  "verdicts": {
+   "checker_passes_tunable_only_kernel": true,
+   "authority_outcome_equal": true,
+   "confidential_indexing_outcome_equal": true,
+   "archive_default_retrieval_outcome_equal": true,
+   "gate_outcome_equal": true
+  }
+ },
+ "P_pinned_registered_digest_mix": {
+  "pinned_leaf": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+  "old_regex": "AKIA[0-9A-Z]{16}",
+  "fixed_regex": "(AKIA|ASIA)[0-9A-Z]{16}",
+  "digest_old": "sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb",
+  "digest_fixed": "sha256:d0d907f8e5b18639cd6a2d369b1ad6f3f0d2eb6211f556d15cce79530c3ef924",
+  "draft_v1_registered_digests": [
+   "sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb"
+  ],
+  "checker": {
+   "fixed_kernel_under_v1": 3,
+   "fixed_kernel_under_v2_retaining_old": 0,
+   "mixed_kernel_old_regex_plus_new_member_under_v2_retaining_old": {
+    "exit": 0
+   },
+   "mixed_kernel_under_v2_only_new": 3
+  },
+  "reductions": {
+   "v1_to_v2_retaining_old": 0,
+   "v2_only_new_to_v2_retaining_old (re-adding a superseded digest)": {
+    "exit": 0,
+    "reductions": []
+   }
+  },
+  "strength_direction_of_pinned_leaf": "none",
+  "note": "a pinned leaf has no strength direction, so neither the project-strength vector (26 \u00a76) nor computed weakening (19 \u00a79) can report the swap; E10 does not apply to a higher release sequence",
+  "consumption_4_1_5": {
+   "fixed_regex_release": {
+    "init_ok": true,
+    "init_code": null,
+    "kernel_trust_verified": true,
+    "a_orchestrator_L4_resume_under_project_L5_raise": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED",
+     "pause_ok": true
+    },
+    "rebuild_ok": true,
+    "rebuild_code": null,
+    "files": {
+     "notes/deploy.md": {
+      "indexed": [],
+      "excluded": [
+       [
+        "product/notes/deploy.md",
+        "secret_content"
+       ]
+      ],
+      "retrievable_by_default_query": []
+     }
+    },
+    "c_L3_agent_answers_R1_gate_under_project_R0": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED"
+    }
+   },
+   "mixed_release_old_regex": {
+    "init_ok": true,
+    "init_code": null,
+    "kernel_trust_verified": true,
+    "a_orchestrator_L4_resume_under_project_L5_raise": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED",
+     "pause_ok": true
+    },
+    "rebuild_ok": true,
+    "rebuild_code": null,
+    "files": {
+     "notes/deploy.md": {
+      "indexed": [
+       "product/notes/deploy.md"
+      ],
+      "excluded": [],
+      "retrievable_by_default_query": [
+       "product/notes/deploy.md"
+      ]
+     }
+    },
+    "c_L3_agent_answers_R1_gate_under_project_R0": {
+     "ok": false,
+     "code": "AUTHORITY_DENIED"
+    }
+   }
+  },
+  "verdicts": {
+   "checker_accepts_mixed_kernel_when_v2_retains_old_digest": true,
+   "reductions_silent_on_retained_or_readded_digest": true,
+   "fixed_release_keeps_secret_out_of_index": true,
+   "mixed_release_indexes_secret": true,
+   "mixed_release_secret_retrievable": true,
+   "strength_vector_has_no_requirement_for_pinned_leaf": true
+  }
+ }
+}
