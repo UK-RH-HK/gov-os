@@ -7,10 +7,11 @@ agent_model: claude-opus-5
 fresh_context: true
 handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0019-rot-architect-r7.md
 owner_requirements: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md
-base_commit: null   # the orchestrator commit adding this record (ledger L-0047)
+base_commit: 4ed71cc2a4928f0f50490dd4ea496f02b91835de
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r7
 branch: phase1/rot1-r7-architect
-agent_id: null
-status: CLAIMED
+agent_id: a698f7d0e7f7a3218   # orchestrator-session-local handle; not resumable from a fresh session
+started_at: '2026-09-14T16:10Z'
+status: RUNNING
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0019.report.yaml
 outcome: null
