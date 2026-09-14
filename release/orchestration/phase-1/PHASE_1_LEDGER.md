@@ -294,3 +294,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge; route per verdict and novelty (specialist escalation, revision-5 architect, or GATE-OWNER-D0008) |
+
+## L-0020 — 2026-09-14 — revision 4 REJECTED by synthesis
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-review-synthesis (`AR-0008`) |
+| Input commit | `9349d8c` (architecture `bca05a7`; B `152e68e`; C `c6b8ba9`) |
+| Work performed | Reproduced every architect and panel probe, including C's full 10,618-invocation matrix. Adjudicated B and C. Authored held-out RV4-D-A01…A10 (2 executed, 2 computed, 6 design). Classified each blocking class as a narrowed remainder or materially new. |
+| Report / evidence | `AGENT_RUNS/AR-0008.report.yaml`; `release/root-of-trust/4.1.6-review-r4/{00-REVIEW-REPORT,10-BLOCKING-FINDINGS,11-CORRECTION-DELTA}.md`, `D-synthesis/` |
+| Verdict | **`ROOT_OF_TRUST_ARCHITECTURE_REJECTED`** |
+| Output commit | review `97a5545`, report `49ba96b`, merged `15f0a06` |
+| Findings | **HIGH RV4-H1:** threshold-1 build-attestation or verification-attestation key plus pipeline control; a root co-signature does not stop it. **HIGH RV4-H2:** first-binary acceptance is not anchored and compares self-reported values; ceremonies and Phase 4 migration run on the unaccepted binary. **HIGH RV4-H3:** content registration is not release-scoped. **MEDIUM:** RV4-M1…M7 (RV4-C-H1 re-rated to MEDIUM as RV4-M1; C's "R2-H4 not closed" claim refuted as stated). **LOW:** L1–L10. **INFO:** I1. **Classes:** BC4-1…BC4-4, all narrowed remainders, none materially new. **HO-0001:** §3.1–§3.3 NOT SATISFIED; §3.4 SATISFIED with carried items. |
+| Next action | persistent-remainder escalation |
+
+## L-0021 — 2026-09-14 — escalation: specialist alternatives before revision 5
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | orchestrator |
+| Input commit | `15f0a06` |
+| Work performed | Persistent-remainder streak reached 2, the threshold recorded in CP-0004 before revision 4's outcome. Applied the protocol §5 escalation pattern: HO-0009 (specialist A, lens: verifier's minimal trusted inputs) and HO-0010 (specialist B, lens: release, build and custody supply chain), both covering all classes and every HO-0001 §3 requirement. Claimed AR-0009 and AR-0010. Added review-r4 consolidated files to immutable evidence. Added a standing prohibition on writing held-out or in-progress material into the auto-memory, whose index is visible to subagents (disclosed by AR-0008). |
+| Report / evidence | `HANDOFFS/HO-0009-*.md`, `HANDOFFS/HO-0010-*.md`, `CHECKPOINTS/CP-0007.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0009 and AR-0010 in parallel |

@@ -1,0 +1,16 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0010
+role: rot-specialist-architect
+objective: Independent root-cause alternative (specialist B) for persistent classes BC4-1..BC4-3 before RoT-1 revision 5
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0010-rot-specialist-r5-b.md
+base_commit: null   # the orchestrator commit adding this record (ledger L-0021)
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/spec-r5-b
+branch: phase1/rot1-r5-specialist-b
+agent_id: null
+status: CLAIMED
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0010.report.yaml
+expected_output_path: release/root-of-trust/4.1.6-alternatives-r5/specialist-b
+outcome: null

@@ -13,6 +13,15 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r4-review-d
 agent_id: ae1a8a89c6bc9bf32   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T06:40Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0008.report.yaml
-outcome: null
+outcome:
+  verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+  work_commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
+  report_commit: 49ba96b3a49b1f8d3abeca7fb5df5b5c312d0ba4
+  integration_merge_commit: 15f0a063873f0cf4980bcaea7069d5c8d0269927
+  blocking_classes: [BC4-1 (RV4-H1), BC4-2 (RV4-H2), BC4-3 (RV4-H3), BC4-4 (owner option and blast-radius statements)]
+  materially_new_blocking_class: false   # each a narrowed remainder (BC4-1<-R2-H3/BC-3; BC4-2<-R2-H2/BC-2 x R2-H3/BC-3; BC4-3<-R2-H1/BC-1; BC4-4<-BC-4)
+  adjudications_of_note: [RV4-C-H1 re-rated HIGH->MEDIUM as RV4-M1; C claim "R2-H4 not closed as a class" refuted as stated]
+  scope_deviation: none; disclosed that the auto-memory index was present in session context (no memory file opened)
+  provenance_checks: [report present and output.commit matches, only allowed paths changed (22 files), pack and panel directories untouched, worktree clean incl. ignored]

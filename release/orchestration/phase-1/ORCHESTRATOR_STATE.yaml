@@ -4,9 +4,9 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T06:39:48Z'
-state_hash: 2a308bd28498be830c00154d5b1f46cd56cb69061b1a87e28464d2419c6f58c5
-lifecycle_state: ROT_ARCH_SYNTHESIS
+updated_at: '2026-09-14T07:19:09Z'
+state_hash: 2ab34a047292feb4543c67b0f3804adc0e45db99684a627a0e34aa2c4a184320
+lifecycle_state: ROT_ARCH_ESCALATION_SPECIALISTS
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -17,6 +17,7 @@ protocol:
 
 lifecycle_states:
   - ROT_ARCH_R<N>_AUTHORING   # N = architecture.current_revision
+  - ROT_ARCH_ESCALATION_SPECIALISTS   # protocol §5 pattern: two specialist architects, then a synthesis architect authors revision N
   - ROT_ARCH_REVIEW_PANEL
   - ROT_ARCH_SYNTHESIS
   - ROT_ARCH_ACCEPTED
@@ -37,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 9349d8c65c4d4fda06116ec336f0d2dd458d8524
+  last_recorded_commit: 15f0a063873f0cf4980bcaea7069d5c8d0269927
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -62,14 +63,15 @@ architecture:
   target_release: 4.1.6
   pack_path: release/root-of-trust/4.1.6
   decision_paths: [spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md]
-  current_revision: 4
+  current_revision: 5
   latest_accepted_revision: null
-  latest_rejected_revision: 3
-  orchestrated_rejections: 1                     # Phase-1 revisions rejected so far (revision 3)
+  latest_rejected_revision: 4
+  orchestrated_rejections: 2                     # Phase-1 revisions rejected so far (revision 3)
   orchestrated_rejection_streak: 0               # successive rejections on materially NEW HIGH/CRITICAL classes
   escalation_threshold: 3                        # protocol §5: then two specialist architects + a synthesis architect
-  persistent_remainder_streak: 1                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
+  persistent_remainder_streak: 2                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
   persistent_remainder_escalation_threshold: 2   # orchestrator routing rule: at 2, run the §5 specialist-alternatives pattern before the next revision
+  escalation_triggered: {at_revision: 4, rule: persistent_remainder, runs: [AR-0009, AR-0010], synthesis_architect_run: AR-0011}
   revisions:
     - revision: 1
       commit: 676dfcedec84a2436c1f4e46d5dcd137f7eb655e
@@ -101,7 +103,7 @@ architecture:
       blocking_classes: [BC-1, BC-2, BC-3, BC-4]
       materially_new_blocking_class: false
     - revision: 4
-      status: UNDER_REVIEW
+      status: REJECTED
       commit: bca05a7e2c2791126fde1d3d812facdaa45b2e45
       author_run: AR-0005
       author_report_commit: 9c2482177e0caa035f564114c28b824cd1fcee4c
@@ -110,35 +112,39 @@ architecture:
         - {run: AR-0006, role: rot-reviewer-trust-security, commit: 152e68e58655649d97382ac3dca64ea7510f5828, verdict: BLOCKING_FINDINGS_PRESENT}
         - {run: AR-0007, role: rot-reviewer-compat-transaction, commit: c6b8ba9985d195fd18470cfe3ae3d80968d71051, verdict: BLOCKING_FINDINGS_PRESENT}
       synthesis_run: AR-0008
-      handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0005-rot-architect-r4.md
-      expected_review_path: release/root-of-trust/4.1.6-review-r4
+      review_commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
+      review_path: release/root-of-trust/4.1.6-review-r4
+      correction_delta_path: release/root-of-trust/4.1.6-review-r4/11-CORRECTION-DELTA.md
+      verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+      blocking_classes: [BC4-1, BC4-2, BC4-3, BC4-4]
+      materially_new_blocking_class: false
+    - revision: 5
+      status: ESCALATION_SPECIALISTS
+      specialist_runs: [AR-0009, AR-0010]
+      synthesis_architect_run: AR-0011
+      expected_alternatives_path: release/root-of-trust/4.1.6-alternatives-r5
+      expected_review_path: release/root-of-trust/4.1.6-review-r5
 
 unresolved_findings:
-  source_path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md
+  source_path: release/root-of-trust/4.1.6-review-r4/10-BLOCKING-FINDINGS.md
   blocking_classes:
-    BC-1: {findings: [RV3-H1], remainder_of: R2-H1, correction: CD3-1}
-    BC-2: {findings: [RV3-H2], remainder_of: R2-H2, correction: CD3-2}
-    BC-3: {findings: [RV3-H3], remainder_of: R2-H3, correction: CD3-3}
-    BC-4: {findings: [owner option statements OP-2 OP-4 OP-7], correction: CD3-4}
+    BC4-1: {findings: [RV4-H1], remainder_of: R2-H3/BC-3, correction: CD4-1, unestablished_invariant: each TCB fact (faithful build of S; S is the verified source) established by independent parties at a verifier-checked threshold; a signature counts only for a fact its signer established}
+    BC4-2: {findings: [RV4-H2], remainder_of: R2-H2/BC-2 x R2-H3/BC-3, correction: CD4-2, unestablished_invariant: every TCB acceptance incl. the first binary is anchored, revocation-checked and currency-proven over externally measured digests; no ceremony runs before it}
+    BC4-3: {findings: [RV4-H3], remainder_of: R2-H1/BC-1, correction: CD4-3, unestablished_invariant: effective pinned/member/file content fixed per release sequence; superseded content returns only via computed, gated reduction}
+    BC4-4: {findings: [owner option and blast-radius statements OP-2 OP-4 OP-6], remainder_of: BC-4, correction: CD4-4}
   CRITICAL: []
-  HIGH: [RV3-H1, RV3-H2, RV3-H3]
-  MEDIUM: [RV3-M1, RV3-M2, RV3-M3, RV3-M4, RV3-M5, RV3-M6, RV3-M7, RV3-M8, RV3-M9]
-  LOW: [RV3-L1, RV3-L2, RV3-L3, RV3-L4, RV3-L5, RV3-L6, RV3-L7, RV3-L8]
-  INFO: [RV3-I1]
-  owner_requirements_HO_0001: {s3_1: NOT_SATISFIED, s3_2: NOT_SATISFIED, s3_3: NOT_SATISFIED, s3_4: SATISFIED, s4: SATISFIED_FOR_CLASSIFICATION}
-  closed_as_class: [R2-H4, R2-M4, R2-M6]   # per review r3 synthesis; R2-H4 contested by revision-4 reviewer C (pending adjudication)
-  pending_synthesis_adjudication_r4:
-    source_paths: [release/root-of-trust/4.1.6-review-r4/B-trust-security/01-FINDINGS.md, release/root-of-trust/4.1.6-review-r4/C-compat-transaction/01-FINDINGS.md]
-    HIGH: [RV4-B-H1, RV4-B-H2, RV4-B-H3, RV4-C-H1]
-    MEDIUM: [RV4-B-M1, RV4-B-M2, RV4-B-M3, RV4-B-M4, RV4-C-M1]
-    LOW: [RV4-B-L1, RV4-B-L2, RV4-B-L3, RV4-B-L4, RV4-B-L5, RV4-B-L6, RV4-B-L7]
-    INFO: [RV4-B-I1]
+  HIGH: [RV4-H1, RV4-H2, RV4-H3]
+  MEDIUM: [RV4-M1, RV4-M2, RV4-M3, RV4-M4, RV4-M5, RV4-M6, RV4-M7]
+  LOW: [RV4-L1, RV4-L2, RV4-L3, RV4-L4, RV4-L5, RV4-L6, RV4-L7, RV4-L8, RV4-L9, RV4-L10]
+  INFO: [RV4-I1]
+  owner_requirements_HO_0001: {s3_1: NOT_SATISFIED, s3_2: NOT_SATISFIED, s3_3: NOT_SATISFIED, s3_4: SATISFIED_WITH_CARRIED, s4: SATISFIED_FOR_CLASSIFICATION}
+  closed_as_class: [R2-H4, R2-M4, R2-M6, BC-1 (surface soundness as stated in r3)]
 
 known_non_blocking_residuals:
-  determination_path: release/root-of-trust/4.1.6-review-r3/00-REVIEW-REPORT.md   # revision-3 determinations; re-determined per revision
-  accepted: [RS-3 deletion, RS-4, RR-1, RR-3, CS-2, TB-2 scope, VR-1, VR-2, VR-4, LR-1, LR-3, LR-4, TG-1, TG-3]
-  accepted_with_condition: [RS-2, RS-3 forging, TB-1, VR-3 VTS, LR-2, TG-2, OP-7 (d)]
-  not_accepted: [RS-1, RR-2, CS-1, TB-3, VR-3 overlay]
+  determination_path: release/root-of-trust/4.1.6-review-r4/00-REVIEW-REPORT.md   # revision-4 determinations; re-determined per revision
+  accepted: [RS-1, RS-1c, RS-4 scoping, OP-7 (d), TB-2 bounds-only, TB-4, VR-1, VR-2, VR-4, RR-1, RR-2, RR-3, LR-1, LR-3, TG-1, TG-3]
+  accepted_with_condition: [RS-1b, RS-3, RS-5, CS-1, VR-3, LR-2, LR-4, TG-2, TB-1 accepted-TBM part]
+  not_accepted: [TB-1, TB-3, CS-2 as stated, RS-2 as stated]
 
 owner_gates:
   pending: []
@@ -167,8 +173,8 @@ prompt2:
   latest_verdict: null
 
 iteration:
-  architecture_revision_under_work: 4
-  architecture_review_cycle_under_phase_1: 2
+  architecture_revision_under_work: 5
+  architecture_review_cycle_under_phase_1: 3
   implementation_repair_cycle: 0
 
 completed_stages:
@@ -190,22 +196,31 @@ completed_stages:
   - stage: ROT_ARCH_R4_PANEL_REVIEWED
     commit: 5c20d2386d20ecad44f96140135beca883fbec75
     note: B (AR-0006) BLOCKING 3 HIGH, merged 5583571; C (AR-0007) BLOCKING 1 HIGH, merged 5c20d23
+  - stage: ROT_ARCH_R4_REJECTED
+    commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
+    note: synthesis AR-0008 ROOT_OF_TRUST_ARCHITECTURE_REJECTED (BC4-1..BC4-4; narrowed remainders); merged 15f0a06; persistent-remainder escalation triggered
 
 running_work:
-  - run_id: AR-0008
-    role: rot-review-synthesis
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0008.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0008-rot-review-r4-d-synthesis.md
-    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r4-d
-    branch: phase1/rot1-r4-review-d
-    base_commit: 9349d8c65c4d4fda06116ec336f0d2dd458d8524
-    status: RUNNING
+  - run_id: AR-0009
+    role: rot-specialist-architect
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0009.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0009-rot-specialist-r5-a.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/spec-r5-a
+    branch: phase1/rot1-r5-specialist-a
+    status: CLAIMED
+  - run_id: AR-0010
+    role: rot-specialist-architect
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0010.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0010-rot-specialist-r5-b.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/spec-r5-b
+    branch: phase1/rot1-r5-specialist-b
+    status: CLAIMED
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0005, revision 4
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0006, revision 4; 3 HIGH
-  rot-reviewer-compat-transaction: BLOCKING_FINDINGS_PRESENT   # AR-0007, revision 4; HIGH RV4-C-H1
-  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0004, revision 3
+  rot-reviewer-compat-transaction: BLOCKING_FINDINGS_PRESENT   # AR-0007, revision 4; RV4-C-H1 re-rated MEDIUM by synthesis
+  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0008, revision 4
   builder: null
   verifier-a: null
   verifier-b: null
@@ -236,6 +251,14 @@ immutable_evidence:
     commit: 152e68e58655649d97382ac3dca64ea7510f5828
   - path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction
     commit: c6b8ba9985d195fd18470cfe3ae3d80968d71051
+  - path: release/root-of-trust/4.1.6-review-r4/D-synthesis
+    commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
+  - path: release/root-of-trust/4.1.6-review-r4/00-REVIEW-REPORT.md
+    commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
+  - path: release/root-of-trust/4.1.6-review-r4/10-BLOCKING-FINDINGS.md
+    commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
+  - path: release/root-of-trust/4.1.6-review-r4/11-CORRECTION-DELTA.md
+    commit: 97a554525a4677035b56c10c6ff6f1096c818e6c
 
 infrastructure:
   session_scratch_note: absolute scratch paths belong to the orchestrator session that created them; rebuild from the recorded commits when absent
@@ -249,11 +272,12 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Spawn AR-0008 (synthesis reviewer D, revision 4) on HO-0008; await its report. If REJECTED on narrowed
-  remainders of the same classes (persistent_remainder_streak reaches 2): run the specialist-alternatives
-  escalation (two fresh specialist architects in parallel, then a synthesis architect authoring revision 5).
-  If REJECTED on materially new classes: fresh revision-5 architect and increment the new-class streak.
-  If ACCEPTED: build the owner decision package and open GATE-OWNER-D0008.
+  Spawn specialist architects AR-0009 (lens A, verifier minimal trusted inputs) and AR-0010 (lens B,
+  release/build/custody supply chain) in parallel on HO-0009/HO-0010. Hold the first completed branch unmerged
+  until the other completes. Then verify both, merge, write HO-0011 from HO-SYNTHESIS-ARCHITECT template, spawn
+  synthesis architect AR-0011 to author revision 5; then the normal B/C panel and synthesis review. If both
+  specialists surface a genuine product/security trade-off that engineering cannot resolve, raise it to the owner
+  with the D-0008 package rather than deciding it.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1
@@ -272,3 +296,5 @@ forbidden_until_gate:
     until: never
   - action: prompt-3 certification, stable release push, phase 2
     until: never within Phase 1
+  - action: writing held-out verifier test content, in-progress verdicts or unreviewed findings into the user auto-memory (its index is visible to every subagent)
+    until: never
