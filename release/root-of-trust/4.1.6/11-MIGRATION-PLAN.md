@@ -1,6 +1,14 @@
 # Output 11 — Migration plan from 4.1.5
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5: every phase below applies to revision 5 (read "revision 4" as "revision 5"). **Phase 0** adds the
+> registration authority (OP-2), the reproducer set and quorum (OP-9), the verification processes (OP-8), the admitter
+> registration and the publication of its digest in the channels. **Phase 2** adds WP-22 reproducible production builds
+> (IR-REP-1…4: no `git rev-parse HEAD` provenance fallback in the production profile; normative path remapping; per-target
+> cross-OS reproduction), WP-23 `gov-admit` and the shared admission vectors (`31`), WP-24 the compiled decision register and
+> the Fact Threshold Check (`29`), WP-25 registration, reproduction and publication statements and `gov trust
+> draft-registration` (`30`), WP-26 installation-state closed entry sets and root discovery (`18` §9.1–§9.2), WP-27
+> allow-list confinement and the TCB-location rule (CR4-B-01). **Phase 3 step 5 and Phase 4** are replaced below.
 > 4.1.5 stays immutable and REJECTED. Nothing in `release/releases/4.1.2…4.1.5`, or in any verifier or review directory,
 > is edited. No phase below starts before fresh independent reviews accept revision 4 and the owner answers the D-0008
 > gate.
@@ -89,22 +97,23 @@
 4. Verification attestation.
 5. If ACCEPTED:
    1. promote and sign the final;
-   2. build binaries reproducibly from `release.source`;
-   3. independent build attestation after `verify-artifact --stage rebuilder`;
-   4. `artifact-final.v2` signed by two `release-artifact` custodians after `--stage custodian`;
-   5. certification;
-   6. TSS 2 referencing certification, attestation and artefacts;
-   7. publish the state fingerprint.
+   2. (revision 5) the **registration ceremony** checks first-hand verification records, upstream toolchain checksums, its own
+      `content_digest` (and, under OP-9 (d), its own reproduction) and signs the release registration (`30` §5);
+   3. (revision 5) n independent reproducers build every registered target and the admitter from the registered source with
+      inputs by digest, sign one-signature reproductions and confirm first-hand to the publisher (`30` §7);
+   4. certification (optional);
+   5. TSS 2 referencing the registration and exactly one quorum-reproduced digest per target (`30` §8);
+   6. publish the state fingerprint and the admitter digest in the independent channels.
 6. If REJECTED: the attestation and any revocation are referenced in TSS 2, and a new candidate follows.
 
 ## Phase 4 — Consumer transition
 
 | Consumer state | With a 4.1.6 binary | Path |
 |---|---|---|
-| Legacy layout, lock 1.1.0, historical kernel | `LEGACY` + `HISTORICAL_IDENTIFIED`, read-only | `gov trust verify-artifact` for the binary → `confirm-root` + `confirm-state` (or protected pins) → `gov update --apply --source <signed final 4.1.6>` → local `framework_update` trust gate with the typed state fingerprint (currency proof) → layout migration (`26` §7, including the ignore rule) and lock 3.0.0 |
+| Legacy layout, lock 1.1.0, historical kernel | `LEGACY` + `HISTORICAL_IDENTIFIED`, read-only | (revision 5) **`gov-admit` admits the 4.1.6 binary with the typed state fingerprint (the legacy binary never verifies it; `31` §7)** → `confirm-state` on the admitted binary (or protected pins) → `gov update --apply --source <signed final 4.1.6>` → local `framework_update` trust gate with the typed state fingerprint (currency proof) → layout migration (`26` §7, including the ignore rule) and lock 3.0.0 |
 | Legacy layout, unknown kernel | `LEGACY`, read-only | same |
 | RoT-1 layout, eligible | normal, per freshness | — |
-| Clean CI runner | `UNANCHORED` | a protected state pin with `valid_until` in the runner image's system pin directory (OP-7 a), or witnesses at threshold (OP-7 c) |
+| Clean CI runner | `UNANCHORED` | (revision 5) image build runs `gov-admit`, writes a root-owned admission record with `valid_until`, and provisions a protected state pin naming the TSS used for C3 (OP-7 a), or witnesses at threshold (OP-7 c) |
 | Rollback 4.1.6 → 4.1.5 | **refused** (`SNAPSHOT_INELIGIBLE(historical)`) | newer eligible release, or `kernel reinstall` of 4.1.6 |
 | 4.1.2–4.1.5 binary on a 4.1.6 project | fails before any write (LP-1) | retire legacy binaries |
 

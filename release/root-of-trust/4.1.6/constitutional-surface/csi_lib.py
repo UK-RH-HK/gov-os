@@ -978,6 +978,9 @@ def evaluate(inv, kdir, embedded_dir=None, named_policy_inv=None):
             continue
         if mode == "transaction_input":
             res["files"][rel] = {"mode": mode, "digest": fdigest(path)}
+            if fr.get("digests") is not None and fdigest(path) not in (fr["digests"].get(rel) or []):
+                # revision 5 (23 §12): a migration file is a non-join unit registered per release
+                res["violations"].append({"file": rel, "class": "transaction_input", "reason": "migration file digest not registered for this release", "digest": fdigest(path)})
             for p in migration_op_problems(inv, doc):
                 p["file"] = rel
                 res["migration_problems"].append(p)
@@ -1022,6 +1025,8 @@ def evaluate(inv, kdir, embedded_dir=None, named_policy_inv=None):
                 got = v if isinstance(v, list) else []
                 missing, added = sorted(set(reg) - set(got)), sorted(set(got) - set(reg))
                 bad = (lr["op"] in ("ids_equal", "ids_superset") and missing) or (lr["op"] in ("ids_equal", "ids_subset") and added)
+                if inv.get("registration") and (missing or added):
+                    bad = True  # revision 5 (23 §12): the member-id set is a non-join unit fixed exactly per registered release
                 if bad:
                     res["violations"].append({"file": rel, "key": key, "class": "members", "op": lr["op"], "missing": missing, "unregistered": added})
                 eff = sorted(set(got) & set(reg)) if lr["op"] != "ids_superset" else got
@@ -1063,7 +1068,11 @@ def evaluate_owner_domain(inv, repo_root, registrations):
     locally (trust gate `owner_constitutional_file`). Absence of a required slot and an unconfirmed or changed digest are
     fail-closed for the slot's consumers on every machine."""
     res = {"missing": [], "unconfirmed": [], "changed": [], "confirmed": []}
+    groups = {}
     for slot in inv.get("owner_domain") or []:
+        if slot.get("binding_group"):
+            groups.setdefault(slot["binding_group"], []).append(slot)
+            continue
         p = os.path.join(repo_root, slot["path"])
         reg = (registrations or {}).get(slot["path"])
         if not os.path.isfile(p):
@@ -1077,4 +1086,211 @@ def evaluate_owner_domain(inv, repo_root, registrations):
             res["changed"].append({"path": slot["path"], "digest": d, "confirmed": reg, "consumers": slot.get("consumers", [])})
         else:
             res["confirmed"].append(slot["path"])
+    # revision 5 (23 §7.2, RV4-L10): a binding group is confirmed and pinned as one set. Its digest is over the sorted
+    # (path, file digest) pairs of every member; several valid confirmations or decision pins resolve by exact set match only.
+    for name, slots in sorted(groups.items()):
+        members, absent = [], []
+        for slot in sorted(slots, key=lambda x: x["path"]):
+            p = os.path.join(repo_root, slot["path"])
+            if os.path.isfile(p):
+                members.append([slot["path"], fdigest(p)])
+            else:
+                absent.append(slot["path"])
+        consumers = sorted({c for sl in slots for c in sl.get("consumers", [])})
+        if absent:
+            res["missing"].append({"group": name, "paths": absent, "consumers": consumers})
+            continue
+        d = group_digest(members)
+        reg = (registrations or {}).get("group:" + name)
+        regs = [reg] if isinstance(reg, str) else list(reg or [])
+        if not regs:
+            res["unconfirmed"].append({"group": name, "digest": d, "members": members, "consumers": consumers})
+        elif d not in regs:
+            res["changed"].append({"group": name, "digest": d, "confirmed_sets": regs, "members": members, "consumers": consumers})
+        else:
+            res["confirmed"].append("group:" + name)
     return res
+
+
+def group_digest(members):
+    b = json.dumps(sorted([list(m) for m in members]), sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+    return "sha256:" + hashlib.sha256(b).hexdigest()
+
+
+# ------------------------------------------------------------------------------------------------ revision 5: release-scoped registration (23 §12)
+def registration_multi_valued(inv):
+    """Single-valued registration (23 §12.2): a registered digest list with more than one value is malformed
+    (REGISTRATION_NOT_SINGLE_VALUED). Revision 4's retention form, several permitted digests for one key, is this shape."""
+    out = []
+    for f in inv.get("files", []):
+        for p, v in (f.get("digests") or {}).items():
+            if isinstance(v, list) and len(v) > 1:
+                out.append({"unit": "file:" + p, "values": len(v)})
+        for l in f.get("leaves") or []:
+            for k, v in (l.get("digests") or {}).items():
+                if isinstance(v, list) and len(v) > 1:
+                    out.append({"unit": "leaf:" + k, "values": len(v)})
+    return out
+
+
+def tree_digest(kdir):
+    """Reference kernel tree digest over (path, file digest) of every kernel file (stands in for gov-tree-v2, 07 §5)."""
+    h = hashlib.sha256()
+    for rel in kernel_files(kdir):
+        h.update(rel.encode() + b"\0" + fdigest(os.path.join(kdir, rel)).encode() + b"\n")
+    return "sha256:" + h.hexdigest()
+
+
+def derive_registration_units(inv, kdir):
+    """Producer: the non-join units of a kernel under the inventory's classification: every pinned leaf or whole pinned member
+    (leaf:<key>), every member-id set (members:<key>), every pinned_file and transaction_input file (file:<path>)."""
+    units = {}
+    for rel in kernel_files(kdir):
+        fr = match_file_rule(inv, rel)
+        if not isinstance(fr, dict):
+            continue
+        path = os.path.join(kdir, rel)
+        if fr["mode"] in ("pinned_file", "transaction_input"):
+            units["file:" + rel] = fdigest(path)
+            continue
+        if fr["mode"] != "structured":
+            continue
+        try:
+            doc = load_doc(path)
+        except Exception:
+            continue
+        leaves, _ = enumerate_leaves(doc, fr)
+        for key, v in leaves:
+            if key.endswith("#structure"):
+                continue
+            lr = match_leaf_rule(fr, key)
+            if not isinstance(lr, dict):
+                continue
+            if lr["class"] == "pinned":
+                units["leaf:" + key] = vdigest(v)
+            elif lr["class"] == "members":
+                units["members:" + key] = sorted(v) if isinstance(v, list) else v
+    return units
+
+
+def registration_record(inv, kdir, release_id, sequence, final_statement_digest=None, lowering_history=()):
+    return {"release_id": release_id, "sequence": sequence, "final_statement_digest": final_statement_digest,
+            "kernel_tree_digest": tree_digest(kdir), "units": derive_registration_units(inv, kdir), "lowering_history": list(lowering_history)}
+
+
+_REG_CONTENT = ("release_id", "sequence", "final_statement_digest", "kernel_tree_digest", "units")
+
+
+def registration_set_problems(regs):
+    """Append-only, single-valued registration set (23 §12.2): one content per release_id (else REGISTRATION_REWRITE),
+    one release_id per sequence (else REGISTRATION_SEQUENCE_EQUIVOCATION), one value per unit."""
+    probs, by_id, by_seq = [], {}, {}
+    for r in regs:
+        miss = [k for k in ("release_id", "sequence", "kernel_tree_digest", "units") if k not in r]
+        if miss:
+            probs.append({"problem": "REGISTRATION_MALFORMED", "release_id": r.get("release_id"), "missing": miss})
+            continue
+        for u, v in r["units"].items():
+            if u.startswith("members:") and not isinstance(v, list):
+                probs.append({"problem": "REGISTRATION_MALFORMED", "release_id": r["release_id"], "unit": u})
+            if not u.startswith("members:") and not isinstance(v, str):
+                probs.append({"problem": "REGISTRATION_NOT_SINGLE_VALUED", "release_id": r["release_id"], "unit": u})
+        c = canon({k: r.get(k) for k in _REG_CONTENT})
+        if r["release_id"] in by_id and by_id[r["release_id"]] != c:
+            probs.append({"problem": "REGISTRATION_REWRITE", "release_id": r["release_id"]})
+        by_id.setdefault(r["release_id"], c)
+        if r["sequence"] in by_seq and by_seq[r["sequence"]] != r["release_id"]:
+            probs.append({"problem": "REGISTRATION_SEQUENCE_EQUIVOCATION", "sequence": r["sequence"], "release_ids": sorted([by_seq[r["sequence"]], r["release_id"]])})
+        by_seq.setdefault(r["sequence"], r["release_id"])
+    return probs
+
+
+def project_registration(inv, reg):
+    """The surface section with the non-join registrations of exactly one registered release: every pinned leaf, member-id
+    set, pinned file and migration file carries the single value registered for that release, and nothing else is registered.
+    Ranges, unions and 'latest registered' are never used (23 §12.3)."""
+    i = copy.deepcopy(inv)
+    i["registration"] = {k: reg.get(k) for k in ("release_id", "sequence", "final_statement_digest", "kernel_tree_digest")}
+    units = reg["units"]
+    # Presence is release-scoped (23 §12.3 rule 4): a concrete non-join rule whose unit this release does not register is
+    # not required of this release; content present without a registration is still unregistered (violation).
+    for f in i["files"]:
+        if f["mode"] in ("pinned_file", "transaction_input"):
+            if f.get("path") and f["mode"] == "pinned_file":
+                f["digests"] = {f["path"]: []}
+                if "file:" + f["path"] not in units:
+                    f["presence"] = "optional"
+            else:
+                f["digests"] = {}
+        for l in f.get("leaves") or []:
+            if l["class"] == "pinned":
+                l["digests"] = {}
+                if "*" not in l["key"] and "leaf:" + l["key"] not in units:
+                    l["presence"] = "optional"
+            elif l["class"] == "members" and "members:" + l["key"] not in units:
+                l["presence"] = "optional"
+    for u, v in sorted(units.items()):
+        kind, ident = u.split(":", 1)
+        if kind == "file":
+            fr = match_file_rule(i, ident)
+            if isinstance(fr, dict) and fr["mode"] in ("pinned_file", "transaction_input"):
+                fr["digests"][ident] = [v]
+                if fr.get("path") == ident:
+                    fr["presence"] = inv_rule_presence(inv, ident)
+        elif kind in ("leaf", "members"):
+            name = ident.split(".", 1)[0].split("[", 1)[0]
+            for f in i["files"]:
+                if f.get("mode") != "structured" or f.get("name") != name:
+                    continue
+                lr = match_leaf_rule(f, ident)
+                if isinstance(lr, dict) and kind == "leaf" and lr["class"] == "pinned":
+                    lr["digests"][ident] = [v]
+                elif isinstance(lr, dict) and kind == "members" and lr["class"] == "members":
+                    lr["registered"] = list(v)
+    return i
+
+
+def inv_rule_presence(inv, path):
+    fr = match_file_rule(inv, path)
+    return fr.get("presence", "required") if isinstance(fr, dict) else "required"
+
+
+def _member_direction(inv, key):
+    for f in inv.get("files", []) if inv else []:
+        for l in f.get("leaves") or []:
+            if l.get("class") == "members" and l["key"] == key:
+                return l.get("op")
+    return None
+
+
+def registration_reductions(regs, history_subjects=(), inv=None):
+    """Computed reductions over an ordered registration set (23 §12.4): a unit of a later registration whose value equals a
+    value that an intermediate registration superseded is a registration_reversion. Undeclared reversions exit 6."""
+    probs = registration_set_problems(regs)
+    if probs:
+        return {"exit": 5, "malformed": probs, "reductions": [], "undeclared": []}
+    hist, reds = {}, []
+    prev = None
+    for r in sorted(regs, key=lambda x: x["sequence"]):
+        if prev is not None:
+            for u in sorted(set(prev["units"]) - set(r["units"])):
+                reds.append({"subject": f"registration:{r['release_id']}:{u}", "kind": "registration_unit_removed", "release_id": r["release_id"], "present_in": prev["release_id"]})
+            for u in sorted(k for k in set(prev["units"]) & set(r["units"]) if k.startswith("members:")):
+                op = _member_direction(inv, u[len("members:"):])
+                old, new = set(prev["units"][u]), set(r["units"][u])
+                if (op in ("ids_superset", "ids_equal") and old - new) or (op in ("ids_subset", "ids_equal") and new - old):
+                    reds.append({"subject": f"registration:{r['release_id']}:{u}", "kind": "registration_members_reduced", "release_id": r["release_id"],
+                                 "removed": sorted(old - new), "added": sorted(new - old), "op": op})
+        prev = r
+        for u, v in sorted(r["units"].items()):
+            prior = hist.get(u, [])
+            cv = canon(v)
+            if prior and cv != canon(prior[-1][1]):
+                earlier = [x for x in prior[:-1] if canon(x[1]) == cv]
+                if earlier:
+                    reds.append({"subject": f"registration:{r['release_id']}:{u}", "kind": "registration_reversion", "release_id": r["release_id"],
+                                 "reverts_to_value_of": earlier[-1][2], "supersedes_value_of": prior[-1][2]})
+            hist.setdefault(u, []).append((r["sequence"], v, r["release_id"]))
+    declared = set(history_subjects) | {h.get("subject") for r in regs for h in (r.get("lowering_history") or [])}
+    undeclared = [x for x in reds if x["subject"] not in declared]
+    return {"exit": 6 if undeclared else 0, "reductions": reds, "undeclared": undeclared}

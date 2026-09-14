@@ -1,6 +1,12 @@
 # Output 7 — Envelope and statement specification
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments: statement types per `05` §2 (new `release-registration.v1`, `binary-reproduction.v1`,
+> `verification-attestation.v3`, `trust-state.v3`, `trust-root.v4`, `trust-policy.v3`; withdrawn `artifact-final.v2`,
+> `build-attestation.v2`). Release statement v3 `release.source` is `{release_commit, content_digest}` with
+> `inputs_manifest_digest` (`30` §4). Bundle layout adds `registrations/`, `reproductions/<release_id>/<target>/`,
+> `manifests/`. Producer interface adds `gov trust draft-registration` (`30` R-REG-3) and `gov trust draft-policy
+> --derivation` (`29` §5.3); publisher interface follows `30` R-PUB-1…4.
 > Revision 4 changes the statement set:
 > - release statement v3 gains `release.source` (schema 3.0.0; CD3-3);
 > - verification attestation v2 names the verified `source` and, for a lift, the negative it lifts (CR-01);

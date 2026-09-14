@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/build-attestation.schema.json",
-  "title": "build-attestation",
-  "description": "PROPOSED (RoT-1 revision 4). Build attestation v2 (payloadType build-attestation.v2, purpose build-attestation; KS-10): an independent rebuild of source {release_commit, source_tree_digest, build_inputs_digest} produced the same binary and Trust Base Manifest digests (25 §3). The rebuilder runs verify-artifact --stage rebuilder first: the source must be the one an ACCEPTED verification attested (05 §7 rule 6).",
+  "title": "[WITHDRAWN r5] build-attestation",
+  "description": "PROPOSED (RoT-1 revision 4). Build attestation v2 (payloadType build-attestation.v2, purpose build-attestation; KS-10): an independent rebuild of source {release_commit, source_tree_digest, build_inputs_digest} produced the same binary and Trust Base Manifest digests (25 \u00a73). The rebuilder runs verify-artifact --stage rebuilder first: the source must be the one an ACCEPTED verification attested (05 \u00a77 rule 6).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -110,5 +110,6 @@
       "minLength": 1,
       "maxLength": 1024
     }
-  }
+  },
+  "x-status": "WITHDRAWN in RoT-1 revision 5 (05 \u00a72, KS-13); never issued; refused by every revision-5 binary"
 }

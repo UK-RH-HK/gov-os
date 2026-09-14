@@ -1,6 +1,10 @@
 # Output 17 — Monotonic trust-state model (certification, withdrawal, revocation, root rotation)
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments: S4 (d) admissibility covers `registrations[]` and `published_binaries[]` (a TSS never drops either;
+> P4r5 `RET-D-admissibility-ignores-artifacts`). §15 trust-state blast radius restated: on a machine anchored by a pin or
+> confirmation, a descendant the thief issues after the proof carries no C3 (`24` §4.4); it never registers a release,
+> creates reproductions, lifts a negative or witnesses currency. §13 clock: `24` §8 revision-5 rule.
 > Revision 4 changes, with the review r3 finding each closes:
 > - S4 uses **inclusion anchors** (BC-2, RV3-H2; normative definition in `24` §3.4).
 > - Currency comes only from currency proofs (MS-9).

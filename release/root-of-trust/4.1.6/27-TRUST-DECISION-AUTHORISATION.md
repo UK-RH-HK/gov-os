@@ -1,6 +1,8 @@
 # Output 27 — Authorisation of trust decisions
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5: decision-pin maximum validity and binding groups (§3.2); confinement restated as an allow list with the TCB
+> location rule (§3.3). Trust gates run only on admitted binaries (`31` GB-1).
 > Revision 3 added this file. Review r3 recorded R2-M1 as NARROWED to RV3-M2: repository records are requests, but pins,
 > decision pins and confirmations were writable by the governed account. Revision 4 carries RV3-M2 through three changes:
 > - an integrity predicate for pins and decision pins;
@@ -67,6 +69,12 @@ same-user process that allocates a pseudo-terminal (TG-2).
 
 ### 3.2 Operator decision pin (automation; CR-03)
 
+**Revision 5 (CR4-B-09, RV4-L5; RV4-L10).** A decision pin carries `provisioned_at` and `expires_at`, and
+`expires_at − provisioned_at ≤` TPS `gating.decision_pin_max_validity_days`; a pin beyond it authorises nothing for every
+kind (`DECISION_PIN_OUTSIDE_VALIDITY`); an increase of the parameter is a computed reduction. An
+`owner_constitutional_file` pin for a binding group names the group digest; several valid pins resolve by exact set match
+only (`23` §7.2). Evidence: P4r5 `GATE-CR4-B-09_decision_pin_beyond_maximum_validity`; DA03r5 mutant detected.
+
 - **Location.** The system pin directory, or the account location only when the integrity predicate of `24` §3.5 holds:
   the file and every ancestor are not writable by the effective uid, or the file is on a read-only mount. Otherwise the
   pin authorises nothing (`TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED`, detail `DECISION_PIN_WRITABLE_IGNORED`).
@@ -80,6 +88,14 @@ same-user process that allocates a pseudo-terminal (TG-2).
 - **Trust assumption.** TA-9 restated (`24` §3.5 (4)).
 
 ### 3.3 Never agent-resolvable
+
+**Revision 5 restatement (CR4-B-01 (c); RV4-M2).** Write confinement stops **direct** writes only. `confine::spawn`
+enforces an **allow list** (the repository working tree excluding `.git/`, plus a per-command temporary directory) and
+explicitly denies every `PATH` directory, the running `gov` executable and its ancestors, shell and login start-up files, the
+pin locations, the verifier trust store and the Protected Path Set. Code the account later runs unconfined (a planted
+executable, start-up line or hook) is A3 (RS-3, TG-2). C3 operations, confirmations and decision-pin evaluation refuse when
+the running executable or any ancestor is writable by the effective uid (`TCB_WRITABLE_BY_GOVERNED_ACCOUNT`, `31` GB-4).
+Tests: RT-103 (allow list), RT-138 (TCB-location predicate).
 
 A compiled rule, independent of `HUMAN_GATE_POLICY.agent_resolvable_when`:
 1. `gov decide` on a trust gate returns `TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED`.

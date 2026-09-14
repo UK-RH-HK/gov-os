@@ -1,0 +1,12 @@
+{
+  "schema": "governance-os.admission-record/1",
+  "binary_digest": "sha256:b3a12e0a97d0fd16736c8fb1c44eb6e598df2b5ce376aec20938e6b31b44af11",
+  "target": "x86_64-unknown-linux-gnu",
+  "release_id": "4.1.6",
+  "lineage": "sha256:0852b2688e5b5cde345ea0c7c0ab7f1fdbee7648ff1e5410b5b8df518b714e2d",
+  "state_fingerprint": "gov-state:0852b268:2:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "admitted_at": "2026-09-14T02:00:00Z",
+  "admitter_digest": "sha256:8d5b0d381f3f6d9636fda08d2f419d9417b6b743b9587c50d89210bb16420251",
+  "valid_until": "2026-10-14T02:00:00Z",
+  "location_protected": true
+}

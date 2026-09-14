@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Constitutional-surface coverage checker (RoT-1 revision 4, `23` §6). PROPOSED architecture artefact.
+"""Constitutional-surface coverage checker (RoT-1 revision 5, `23` §6, §12). PROPOSED architecture artefact.
 
-  csi_check.py check <kernel-dir> [--inventory FILE] [--json]
+  csi_check.py check <kernel-dir> [--inventory FILE] [--registrations FILE --release-id ID] [--json]
+  csi_check.py registration-reductions --registrations FILE [--lowering-history FILE] [--json]
+  csi_check.py derive-registration <kernel-dir> --release-id ID --sequence N [--inventory FILE]
   csi_check.py check-owner <repo-root> [--inventory FILE] [--registrations FILE] [--json]
   csi_check.py reductions --old FILE --new FILE [--lowering-history FILE] [--json]
   csi_check.py selftest --scratch <dir> [--kernel-dir DIR] [--inventory FILE]
@@ -17,6 +19,13 @@ Exit codes: 0 pass; 2 coverage failure (unclassified, ambiguous, structural, YAM
 4 inventory consistency failure; 5 inventory malformed; 6 (reductions) a computed reduction not declared in the lowering
 history. `check-owner` exits 2 when a required owner constitutional file is absent and 3 when one is unconfirmed or
 changed. `selftest` exits 0 only when every case yields its expected exit class.
+
+Revision 5 (release-scoped registration, `23` §12): a registered digest list with more than one value is malformed (exit 5,
+REGISTRATION_NOT_SINGLE_VALUED). With `--registrations`, E7 judges the kernel against the registration of exactly the
+release named by `--release-id`: an unregistered release exits 3 (`release_unregistered`); every pinned leaf, whole member,
+member-id set, pinned file and migration file must equal that release's registered value, and the kernel tree digest must
+equal the registered one (exit 3). A registration set that rewrites a registered release or gives one sequence two releases
+is malformed (exit 5). `registration-reductions` exits 6 for an undeclared registration_reversion.
 """
 import argparse, copy, json, os, shutil, sys, tempfile
 
@@ -34,6 +43,8 @@ DEFAULT_KERNEL = os.path.abspath(os.path.join(HERE, "..", "..", "..", "..", "fra
 # ------------------------------------------------------------------------------------------------ inventory lint
 def lint(inv):
     malformed, consistency = [], []
+    for mv in L.registration_multi_valued(inv):
+        malformed.append(f"REGISTRATION_NOT_SINGLE_VALUED: {mv['unit']} registers {mv['values']} values (23 §12.2)")
     if inv.get("default") != "deny":
         malformed.append("inventory default must be 'deny'")
     if inv.get("floor_schema_version") != L.FLOOR_SCHEMA_VERSION:
@@ -153,14 +164,26 @@ def lint(inv):
 
 
 # ------------------------------------------------------------------------------------------------ check
-def run_check(kernel_dir, inv, as_json=False, quiet=False, named_inv=None):
+def run_check(kernel_dir, inv, as_json=False, quiet=False, named_inv=None, registrations=None, release_id=None):
     malformed, consistency = lint(inv)
+    reg = None
+    if registrations is not None and not malformed:
+        malformed += [f"{p['problem']}: {json.dumps({k: v for k, v in p.items() if k != 'problem'}, sort_keys=True)}" for p in L.registration_set_problems(registrations)]
+        reg = next((r for r in registrations if r.get("release_id") == release_id), None)
     if malformed:
         rep = {"exit": 5, "malformed": malformed}
     elif consistency:
         rep = {"exit": 4, "consistency": consistency}
+    elif registrations is not None and reg is None:
+        rep = {"exit": 3, "kernel_dir": kernel_dir, "release_id": release_id, "violations": [{"class": "registration", "reason": "release_unregistered: no registration for this release in the effective registration set (23 §12.3)"}],
+               "violation_count": 1}
     else:
-        r = L.evaluate(inv, kernel_dir, named_policy_inv=named_inv)
+        inv_eval = L.project_registration(inv, reg) if reg is not None else inv
+        named_eval = L.project_registration(named_inv, reg) if (reg is not None and named_inv is not None) else named_inv
+        r = L.evaluate(inv_eval, kernel_dir, named_policy_inv=named_eval)
+        if reg is not None and L.tree_digest(kernel_dir) != reg.get("kernel_tree_digest"):
+            r["violations"].append({"class": "registration", "reason": "kernel_tree_digest_mismatch: the kernel is not the registered release content (23 §12.3)",
+                                    "kernel": L.tree_digest(kernel_dir), "registered": reg.get("kernel_tree_digest")})
         code = 0
         if not r["surface_ok"]:
             code = 2
@@ -172,6 +195,8 @@ def run_check(kernel_dir, inv, as_json=False, quiet=False, named_inv=None):
                "required_missing": r["required_missing"][:50], "required_missing_count": len(r["required_missing"]),
                "violations": r["violations"][:50], "violation_count": len(r["violations"]), "stronger_than_registered": r["stronger_than_registered"][:20],
                "precedence_unregistered_count": len(r["precedence_unregistered"]), "migration_problem_count": len(r["migration_problems"])}
+        if reg is not None:
+            rep["release_id"] = release_id
     if not quiet:
         if as_json:
             print(json.dumps(rep, indent=1, default=str))
@@ -240,6 +265,13 @@ def run_reductions(old, new, history_subjects=(), as_json=False, quiet=False):
     rep = {"exit": 6 if undeclared else 0, "reductions": reds, "undeclared": undeclared}
     if not quiet:
         print(json.dumps(rep, indent=1, default=str) if as_json else f"exit {rep['exit']} reductions={len(reds)} undeclared={len(undeclared)}")
+    return rep
+
+
+def run_registration_reductions(regs, history_subjects=(), as_json=False, quiet=False, inv=None):
+    rep = L.registration_reductions(regs, history_subjects, inv=inv)
+    if not quiet:
+        print(json.dumps(rep, indent=1, default=str) if as_json else f"exit {rep['exit']} reductions={len(rep['reductions'])} undeclared={len(rep['undeclared'])}")
     return rep
 
 
@@ -456,6 +488,101 @@ def selftest(scratch, kernel_dir, inv):
     record("S54", "same reduction declared in the cumulative lowering_history", 0, run_reductions(inv, inv2, ["POLICY_PRECEDENCE:SECURITY_POLICY.never_index_classes"], quiet=True))
     case("S55", "exception_relaxable set on a registered rule in the kernel only (exact registration)", 3,
          lambda k: mut(k, "policies/POLICY_PRECEDENCE.yaml", lambda d: [r.__setitem__("exception_relaxable", True) for r in d["rules"] if r["key"] == "CHANGE_POLICY.rollback.keep_snapshots"]))
+    # ---- revision 5: release-scoped registration (23 §12; BC4-3)
+    aws = "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex"
+
+    def retain_patch(i, k):
+        for f in i["files"]:
+            for lr in f.get("leaves") or []:
+                if aws in (lr.get("digests") or {}):
+                    lr["digests"][aws] = sorted(set(lr["digests"][aws]) | {L.vdigest("(AKIA|ASIA)[0-9A-Z]{16}")})
+    case("S56", "revision-4 retention form: two permitted digests for one pinned leaf (RV4-B-A08 shape) is malformed", 5, inv_patch=retain_patch)
+    reg_base = L.registration_record(inv, kernel_dir, "4.1.6", 1600)
+
+    def rcase(cid, title, expect, mutate=None, regs=None, release_id="4.1.6"):
+        k = os.path.join(base, cid)
+        shutil.copytree(kernel_dir, k)
+        if mutate:
+            mutate(k)
+        record(cid, title, expect, run_check(k, copy.deepcopy(inv), quiet=True, registrations=regs if regs is not None else [reg_base], release_id=release_id))
+    rcase("S57", "registration mode: the registered release's own kernel", 0)
+    rcase("S58", "release not in the effective registration set (e.g. a forged final at a new sequence)", 3, release_id="4.1.8")
+    rcase("S59", "pinned leaf differs from the value registered for this release (aws-access-key regex)", 3,
+          lambda k: mut(k, "policies/SECURITY_POLICY.yaml", lambda d: [p.__setitem__("regex", "(AKIA|ASIA)[0-9A-Z]{16}") for p in d["secret_content_patterns"] if p["id"] == "aws-access-key"]))
+    tun = next((f, l["key"]) for f in inv["files"] if f.get("mode") == "structured" and f.get("path")
+               for l in (f.get("leaves") or []) if l["class"] == "project_tunable" and "*" not in l["key"] and "[" not in l["key"])
+
+    def set_tunable(k):
+        fr, key = tun
+
+        def f(d):
+            cur = d
+            parts = key.split(".")[1:]
+            for part in parts[:-1]:
+                cur = cur[part]
+            v = cur[parts[-1]]
+            cur[parts[-1]] = (not v) if isinstance(v, bool) else (v + 1) if isinstance(v, int) else (str(v) + "-r5probe")
+        mut(k, fr["path"], f)
+    rcase("S60", f"only a project_tunable leaf ({tun[1]}) changed: kernel tree digest differs from the registered release (release-final selects nothing)", 3, set_tunable)
+    rewrite = copy.deepcopy(reg_base)
+    rewrite["units"]["leaf:" + aws] = L.vdigest("(AKIA|ASIA)[0-9A-Z]{16}")
+    rcase("S61", "registration set rewrites a registered release (append-only)", 5, regs=[reg_base, rewrite])
+    other = copy.deepcopy(reg_base)
+    other["release_id"] = "4.1.6-bis"
+    rcase("S62", "two release ids registered at one sequence", 5, regs=[reg_base, other])
+    r7 = copy.deepcopy(reg_base)
+    r7.update({"release_id": "4.1.7", "sequence": 1700})
+    r7["units"]["leaf:" + aws] = L.vdigest("(AKIA|ASIA)[0-9A-Z]{16}")
+    r8 = copy.deepcopy(reg_base)
+    r8.update({"release_id": "4.1.8", "sequence": 1800})
+    record("S63", "a later registration restores a superseded value (registration_reversion) without lowering_history", 6, run_registration_reductions([reg_base, r7, r8], quiet=True))
+    record("S64", "the same reversion declared in lowering_history", 0, run_registration_reductions([reg_base, r7, r8], ["registration:4.1.8:leaf:" + aws], quiet=True))
+    mig = "migrations/M-099.yaml"
+
+    def add_mig(k, text):
+        os.makedirs(os.path.join(k, "migrations"), exist_ok=True)
+        open(os.path.join(k, mig), "w").write(text)
+    kmig = os.path.join(base, "S65-registered")
+    shutil.copytree(kernel_dir, kmig)
+    add_mig(kmig, "id: M-099\nfrom_version: 4.1.6\nto_version: 4.1.7\noperations:\n  - {op: note, text: tighten template}\n")
+    reg_mig = L.registration_record(inv, kmig, "4.1.7", 1700)
+    rcase("S65", "migration file differs from the migration registered for this release", 3,
+          lambda k: add_mig(k, "id: M-099\nfrom_version: 4.1.6\nto_version: 4.1.7\noperations:\n  - {op: note, text: weakened template}\n"), regs=[reg_mig], release_id="4.1.7")
+    repo_g = os.path.join(base, "owner-group")
+    os.makedirs(os.path.join(repo_g, "spec/contracts"), exist_ok=True)
+    inv_g = copy.deepcopy(inv)
+    inv_g["owner_domain"] = [{"path": "spec/contracts/CAC.md", "presence": "required", "mode": "pinned_file", "consumers": ["capability_acceptance_gate"], "binding_group": "capability-acceptance-contract"},
+                             {"path": "spec/contracts/CAC.yaml", "presence": "required", "mode": "pinned_file", "consumers": ["capability_acceptance_gate"], "binding_group": "capability-acceptance-contract"}]
+    md, ym = os.path.join(repo_g, "spec/contracts/CAC.md"), os.path.join(repo_g, "spec/contracts/CAC.yaml")
+    sets = {}
+    for ver in ("1", "2"):
+        open(md, "w").write(f"# Contract v{ver}\n")
+        open(ym, "w").write(f"version: {ver}\n")
+        sets[ver] = L.group_digest([["spec/contracts/CAC.md", L.fdigest(md)], ["spec/contracts/CAC.yaml", L.fdigest(ym)]])
+    open(md, "w").write("# Contract v2\n")
+    open(ym, "w").write("version: 1\n")
+    record("S66", "owner binding group: contract Markdown v2 with compiled YAML v1, both sets confirmed by valid pins (RV4-L10)", 3,
+           run_owner(repo_g, inv_g, {"group:capability-acceptance-contract": [sets["1"], sets["2"]]}, quiet=True))
+    open(ym, "w").write("version: 2\n")
+    record("S67", "owner binding group: matching v2 set", 0, run_owner(repo_g, inv_g, {"group:capability-acceptance-contract": [sets["1"], sets["2"]]}, quiet=True))
+    k69 = os.path.join(base, "S69-newer")
+    shutil.copytree(kernel_dir, k69)
+    mut(k69, "policies/SECURITY_POLICY.yaml", lambda d: d["secret_content_patterns"].append({"id": "gcp-api-key", "regex": "AIza[0-9A-Za-z_\\-]{35}"}))
+    inv69 = copy.deepcopy(inv)
+    fr69 = next(f for f in inv69["files"] if f.get("path") == "policies/SECURITY_POLICY.yaml")
+    gk = "SECURITY_POLICY.secret_content_patterns[id=gcp-api-key].regex"
+    fr69["leaves"].append({"key": gk, "class": "pinned", "note": "member introduced by the newer release (TPS classification)", "digests": {gk: [L.vdigest("AIza[0-9A-Za-z_\\-]{35}")]}})
+    reg69 = L.registration_record(inv69, k69, "4.1.7", 1700)
+    k69o = os.path.join(base, "S69")
+    shutil.copytree(kernel_dir, k69o)
+    record("S69", "presence is release-scoped: the older registered release lacks a member the newer release introduced (no required-missing)", 0,
+           run_check(k69o, inv69, quiet=True, registrations=[L.registration_record(inv69, kernel_dir, "4.1.6", 1600), reg69], release_id="4.1.6"))
+    reg70 = copy.deepcopy(reg_base)
+    reg70.update({"release_id": "4.1.7", "sequence": 1700})
+    del reg70["units"]["leaf:" + aws]
+    record("S70", "a later registration removes a unit the previous registration had (registration_unit_removed) without lowering_history", 6, run_registration_reductions([reg_base, reg70], quiet=True, inv=inv))
+    rcase("S68", "additive collection member added by the kernel but not in the release's registered member-id set", 3,
+          lambda k: mut(k, "policies/SECURITY_POLICY.yaml", lambda d: d["secret_content_patterns"].append({"id": "gcp-api-key", "regex": "AIza[0-9A-Za-z_\\-]{35}"})))
     return {"base": "<scratch>", "cases": results, "passed": sum(r["pass"] for r in results), "failed": sum(not r["pass"] for r in results)}
 
 
@@ -471,6 +598,17 @@ def main():
     o.add_argument("--inventory", default=DEFAULT_INV)
     o.add_argument("--registrations")
     o.add_argument("--json", action="store_true")
+    c.add_argument("--registrations")
+    c.add_argument("--release-id")
+    rr = sub.add_parser("registration-reductions")
+    rr.add_argument("--registrations", required=True)
+    rr.add_argument("--lowering-history")
+    rr.add_argument("--json", action="store_true")
+    dr = sub.add_parser("derive-registration")
+    dr.add_argument("kernel_dir")
+    dr.add_argument("--release-id", required=True)
+    dr.add_argument("--sequence", type=int, required=True)
+    dr.add_argument("--inventory", default=DEFAULT_INV)
     rd = sub.add_parser("reductions")
     rd.add_argument("--old", required=True)
     rd.add_argument("--new", required=True)
@@ -481,13 +619,21 @@ def main():
     s.add_argument("--kernel-dir", default=DEFAULT_KERNEL)
     s.add_argument("--inventory", default=DEFAULT_INV)
     a = ap.parse_args()
+    if a.cmd == "registration-reductions":
+        hist = json.load(open(a.lowering_history)) if a.lowering_history else []
+        rep = run_registration_reductions(json.load(open(a.registrations)), [h["subject"] for h in hist], as_json=a.json, inv=yaml.safe_load(open(DEFAULT_INV)))
+        sys.exit(rep["exit"])
+    if a.cmd == "derive-registration":
+        print(json.dumps(L.registration_record(yaml.safe_load(open(a.inventory)), os.path.abspath(a.kernel_dir), a.release_id, a.sequence), indent=1, sort_keys=True))
+        sys.exit(0)
     if a.cmd == "reductions":
         hist = json.load(open(a.lowering_history)) if a.lowering_history else []
         rep = run_reductions(yaml.safe_load(open(a.old)), yaml.safe_load(open(a.new)), [h["subject"] for h in hist], as_json=a.json)
         sys.exit(rep["exit"])
     inv = yaml.safe_load(open(a.inventory))
     if a.cmd == "check":
-        rep = run_check(os.path.abspath(a.kernel_dir), inv, as_json=a.json)
+        regs = json.load(open(a.registrations)) if a.registrations else None
+        rep = run_check(os.path.abspath(a.kernel_dir), inv, as_json=a.json, registrations=regs, release_id=a.release_id)
         sys.exit(rep["exit"])
     if a.cmd == "check-owner":
         regs = json.load(open(a.registrations)) if a.registrations else {}

@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-decision-pin.schema.json",
   "title": "trust-decision-pin",
-  "description": "PROPOSED (RoT-1 revision 4). One entry of an operator decision pin file (27 §3.2): the automation path for a trust gate. Read from the system pin directory, or from the account location only when the integrity predicate holds (the file and every ancestor directory are not writable by the effective uid, or the file is on a read-only mount; CR-03). Otherwise the pin authorises nothing (TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED). expires_at is mandatory. A pin never approves a kind listed in the Trust Policy gating.local_terminal_only. approved_under_state binds the approval to a state fingerprint: the pinned transition proceeds only while that (sequence, digest) is in the effective chain.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). One entry of an operator decision pin file (27 \u00a73.2): the automation path for a trust gate. Read from the system pin directory, or from the account location only when the integrity predicate holds (the file and every ancestor directory are not writable by the effective uid, or the file is on a read-only mount; CR-03). Otherwise the pin authorises nothing (TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED). expires_at is mandatory. A pin never approves a kind listed in the Trust Policy gating.local_terminal_only. approved_under_state binds the approval to a state fingerprint: the pinned transition proceeds only while that (sequence, digest) is in the effective chain.",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -64,7 +64,9 @@
       "maxLength": 256
     },
     "provisioned_at": {
-      "$ref": "#/$defs/timestamp"
+      "type": "string",
+      "format": "date-time",
+      "description": "expires_at - provisioned_at <= TPS gating.decision_pin_max_validity_days (CR4-B-09)"
     },
     "expires_at": {
       "$ref": "#/$defs/timestamp"
@@ -72,6 +74,10 @@
     "note": {
       "type": "string",
       "maxLength": 1024
+    },
+    "binding_group_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
     }
   },
   "$defs": {

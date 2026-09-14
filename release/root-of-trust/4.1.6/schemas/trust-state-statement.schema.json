@@ -2,13 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-state-statement.schema.json",
   "title": "trust-state-statement",
-  "description": "PROPOSED (RoT-1 revision 4). Trust State Statement v2 signed by the trust-state purpose: the published set at a sequence, with cumulative prior_states (fork detection across gaps), resolved references (root and policy digests), revocations, certifications, attestations and artefact statements (17 S4). A TSS never drops a lower artifacts[] reference (revoke instead). expires_at is informational: in revision 4 a TSS is never a currency proof (currency comes from 24 §4.4; witnesses are freshness-witness statements).",
-  "x-schema-version": "1.1.0",
+  "description": "PROPOSED (RoT-1 revision 4). Trust State Statement v2 signed by the trust-state purpose: the published set at a sequence, with cumulative prior_states (fork detection across gaps), resolved references (root and policy digests), revocations, certifications, attestations and artefact statements (17 S4). A TSS never drops a lower artifacts[] reference (revoke instead). expires_at is informational: in revision 4 a TSS is never a currency proof (currency comes from 24 \u00a74.4; witnesses are freshness-witness statements).",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "artifacts",
     "attestations",
     "certifications",
     "expires_at",
@@ -20,7 +19,9 @@
     "revocations",
     "sequence",
     "trust_profile",
-    "trust_root_id"
+    "trust_root_id",
+    "registrations",
+    "published_binaries"
   ],
   "properties": {
     "_type": {
@@ -152,13 +153,23 @@
         }
       }
     },
-    "artifacts": {
+    "registrations": {
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
         "pattern": "^sha256:[0-9a-f]{64}$"
-      }
+      },
+      "description": "cumulative; never dropped (17 S4 (d))"
+    },
+    "published_binaries": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "description": "cumulative; one per release and target (30 R-PUB)"
     }
   },
   "$defs": {

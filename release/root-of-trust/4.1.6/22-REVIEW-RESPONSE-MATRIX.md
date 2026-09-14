@@ -1,198 +1,170 @@
-# Output 22 — Response matrix to the independent review of revision 3
+# Output 22 — Response matrix to the independent review of revision 4
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
-> - **Review answered:** `release/root-of-trust/4.1.6-review-r3/` (synthesis `79a09a1`; panel B `7d8c73a`, C `9e013c1`).
->   It reviewed revision 3 (`ca77a43`) and returned `ROOT_OF_TRUST_ARCHITECTURE_REJECTED`.
-> - **Task:** HO-0005.
-> - **Scope:** every consolidated finding of review r3: RV3-H1…RV3-I1, CR-01…CR-12 and C-1…C-5. Also the correction
->   delta CD3-0…CD3-4, the §7 re-review entry criteria, and the owner requirements of HO-0001 §3–§4.
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> - **Review answered:** `release/root-of-trust/4.1.6-review-r4/` (synthesis `97a5545`; panel B `152e68e`, C `c6b8ba9`),
+>   which reviewed revision 4 (`bca05a7`) and returned `ROOT_OF_TRUST_ARCHITECTURE_REJECTED`.
+> - **Task:** HO-0011 (escalation synthesis of specialist alternatives `afda663` and `ed07926`).
+> - **Scope:** RV4-H1 … RV4-I1; CR4-B-01 … CR4-B-11; reviewer C's requirements (RV4-C-M1, C-1a, C-2 … C-6); CD4-0 … CD4-4
+>   and the §5 rule text; the §6 carried items including the D-A03 oracle mutants; the §7 re-review entry criteria; HO-0001
+>   §3–§4.
 >
 > This matrix claims **no finding as accepted or closed**; acceptance is the next reviewers' decision. Status vocabulary:
-> - **ADDRESSED — executed**: real legacy binaries, real Git or the pack's checker were run against the revision-4 rules;
-> - **ADDRESSED — reference**: a model or checker that encodes the revision-4 rules was run (with conformance-oracle
->   mutants where named);
-> - **ADDRESSED — specification only**: not executable before implementation; the acceptance scenario is named;
-> - **CARRIED — named test**: a bounded residual or engineering constraint, stated with its test;
-> - **RESTATED**: owner-option text, corrected from the revision-4 rules; nothing decided.
->
-> No row is marked addressed on untested evidence. Where revision 4 uses a mechanism other than the one the correction
-> delta suggests, the row says so. `28` explains why each blocking class survived earlier corrections.
+> **ADDRESSED — executed** (real legacy binaries, real Git, real Ed25519 through OpenSSL, or the pack checker were run
+> against the revision-5 rules); **ADDRESSED — reference** (a model or calculator encoding the revision-5 rules was run, with
+> mutants where named); **ADDRESSED — specification only** (not executable before implementation; the RT is named);
+> **CARRIED — named test**; **RESTATED** (text corrected from the revision-5 rules; nothing decided). No row is marked
+> addressed on untested evidence. Where revision 5 uses a mechanism other than the correction delta's suggestion, the row
+> says so.
 
-## 1. Evidence produced by revision 4 (`evidence/`, `constitutional-surface/`, `examples/rev4/`)
+## 1. Evidence produced for revision 5 (`evidence/r5/`)
 
-All runs were scratch-only: `GOV_*` stripped, `HOME` and `GOV_KERNEL_CACHE` in scratch. Commands, times and exit codes are
-in `evidence/EVIDENCE-RUN-LOG.json`.
+All runs scratch-only under `env -i`, `GOV_*` stripped, `HOME` and `GOV_KERNEL_CACHE` in scratch, legacy binaries
+read-only. Commands, digests and comparisons: `evidence/r5/EVIDENCE-RUN-LOG-r5.json`, `ST5-RUN-LOG.json`, `FA5-RUN-LOG.json`.
 
-| ID | Evidence | Result |
-|---|---|---|
-| **CSI** | `CSI-check-*.json` (`csi_check.py check`, revision-4 inventory) | `framework/`: 113 files, exit 0. 4.1.5 payload: 121 files, exit 3 (4 migration problems: historical `set_lock_field`). 4.1.5 with lock operations removed: exit 0. 4.1.2: exit 2 (1 unclassified leaf, 62 required missing, 65 violations). 4.1.3: exit 2 (15 missing, 65 violations). 4.1.4: exit 2 (6 missing, 64 violations, 44 precedence registration differences). |
-| **CSI-ST** | `CSI-selftest.json` | **56 of 56** cases as expected (S00–S55) |
-| **P1r4** | `P1r4-project-strength-and-absence.{py,json}`; executed on the real **4.1.5** binary | **Part A:** 343 order combinations, 0 unsound pairs, 0 joins dropping strengthening; removals R01–R09 all exit 2. **Part B:** 9 attack cases (5 strengthening modes to `immutable`, the review's three-rule example, POLICY_PRECEDENCE deleted, 2 TPS tightenings). In 9/9 the revision-3 effective kernel loses project strengthening and the revision-4 one keeps it; the revision-4 reference equals the binary's `policy effective` in 9/9. Harm assertions flip where observable: (a) authority, (b) indexing and retrieval, (c) gate. Checker: precedence-only kernels exit 3, deletion exit 2; TPS v2 reductions exit 6 without history and 0 with. **Part C:** the strength vector reports every revision-3 loss (9/9) and is quiet for every revision-4 kernel (9/9). Release-signed migrations: M1–M4, M6 and M7 refused before any write; M5 passes the whitelist and needs the weakening gate; M8 control neither. **Part D:** composition; revision-3 replacement semantics lose the project class, the directed join keeps it. 12 consumers initialised. |
-| **P4r4** | `P4r4-trust-state-model.{py,json}` (independent of P4r3) | **54 of 54** scenarios hold. **9 of 9** conformance-oracle mutants detected. Machine × OP-7 × adversary matrix: 132 rows, of which 77 refused, 42 stated core, 13 OP-7 (d) residual; 0 unstated; 0 labelled `current`. No hash-cyclic construction. |
-| **VA4** | `VA4-verify-artifact-source-scenarios.{py,json}` | **16 of 16** as expected. 12 attacks refused. 3 minimum capability sets accepted and documented: route S; route S under OP-4 "no"; route B. |
-| **P3r3** | `P3r3-rerun-r4-summary.json`; the harness unchanged since `ca77a43`; real 4.1.2–4.1.5 | 2085 jobs. `summary`, `property_L3`, `chain_summary` and `job_count` **equal** to the committed revision-3 output. |
-| **LR2** | `LR2-installation-state-and-strength-reference.{py,json}`, `LR2-spec.json` | The installation state machine and the revision-4 strength vector applied to 24 real trees left by reviewer C's and synthesis D's legacy probes. Every tree with legacy entries is `PARTIAL(occupation)` or `LEGACY`; intact trees and clean clones are `COMPLETE`. RV3-D-A07 fresh clone: `PARTIAL(occupation)` on the revision-3 layout, `COMPLETE` on revision 4. `PROJECT_STRENGTH_WEAKENED` on A05a (3 failures) and A05c (9) on both layouts; none on A05b and the controls. |
-| **SCH** | `examples/rev4/validation.json` | every schema valid JSON Schema 2020-12; 9 revision-4 instances validate; the inventory validates against the revision-4 inventory schema; 4 revision-3 instance shapes are refused by the revision-4 schemas |
+| ID | Evidence | Kind | Result |
+|---|---|---|---|
+| **CS5** | `CS5-tcb-capability-sets.{py,json}` | reference (derivation calculator) | 408 configurations (OP-2 × OP-8 × OP-9 (six answers) × four victim classes × four goals, plus OP-10 × OP-9 × two victims for the toolchain goal); exhaustive to size 10; **21/21 self-checks; 1,752 invariant checks, 0 failures; 138,042 monotonicity checks, 0 violations**; 8 controls |
+| **P4r5** | `P4r5-conformance-oracle.{py,json}` (loads P4r4 unmodified) | reference (conformance oracle) | **65/65** revision-5 scenarios; **42/42** retained P4r4 scenarios; **0 expected-`ACCEPTED` attack rows** (7 honest controls); residual demonstration RS-2 reported separately |
+| **DA03r5** | `DA03r5-oracle-regression-sensitivity.{py,json}` | reference (mutation) | D-A03's 20 normative rules: **20/20** have a detecting scenario (13/13 retained rules on P4r4; 7/7 `verify_artifact` rules re-expressed on the admission-predicate lines; 0/7 on the superseded P4r4 copy, as designed); **17/17** revision-5 rule mutants; 0 crashes |
+| **FA5** | `gov_admit_reference.py`, `FA5-first-admission.{py,json}` | executed (real Ed25519 via OpenSSL CLI, 78 verifications; real legacy 4.1.5 register) | **45/45** scenarios, **17/17** conformance vectors, **26/27** single-rule mutants (the undetected `ignore_signer_revocation` is equivalent while KS-7 holds); two runs byte-identical; candidate never executed by the admitter; revision-4 controls: path (b) `PASS` on the revoked and the remediated binary, path (c) `PASS` with the candidate executed |
+| **SRC5** | `SRC5-source-identity.{py,json}` | executed (real Git) | `git archive` of a commit binds the commit id; of a tree is time-stamped; the canonical content digest is equal across repositories and changes on a moved tag (10/10) |
+| **REG5** | `REG5-release-scoped-registration.{py,json}` | executed (pack checker as amended; real 4.1.5 consumer) | all 10 verdicts true: legitimate 4.1.6 and 4.1.7 exit 0; part P and D-A02 T1–T4 mixed releases refused under every claimed identity (15/15 exit 3); revision-4 retention form exit 5; gap, inflation, stale-policy exit 3 (genuine release 0 once registered); rewrite exit 5; reversion exit 6 (0 with history); different migration exit 3; on 4.1.5 the revision-5 effective content keeps the `ASIA…` key file out of index and query, the revision-4 control indexes and serves it |
+| **CSI5** | `CSI5-selftest.json`, `CSI5-CSI-check-*.json` | executed (checker) | self-test **71/71**; the 56 revision-4 cases identical in title, exit and pass; payload checks exit 0/3/2/2/2 with counts equal to revision 4 |
+| **ST5** | `ST5-*` (reviewer C's trees and harness copies; real 4.1.2–4.1.5) | executed | pristine R4, R4RES, R4APP `COMPLETE`, L0 `LEGACY`; **6,292** subdirectory invocations (11 positions × 4 registers, no `--root`): 280 wrote, **112** under `governance/trust/**` or the occupation directory — all `COMPLETE` under revision 4, **none** under `18` §9.1 (P5-1: 0 counterexamples); 200 nested installs all reported (P5-2); discovery refuses exactly the 4 PPS positions (P5-3); D-A01 N1b, N2, N3 `COMPLETE` → `PARTIAL`, control `COMPLETE`; `.gitignore` surgery idempotent, idiom lists nothing, clone `COMPLETE` (control `PARTIAL`) |
+| **P3r3** | `P3r3-rerun-r5-summary.json` | executed (harness unchanged) | 2,085 jobs; `summary`, `property_L3`, `chain_summary`, `job_count` equal to the committed output |
+| **RERUN** | `EVIDENCE-RUN-LOG-r5.json` comparisons | executed | P1r4 on real 4.1.5 against the revision-5 checker: **byte-identical**; reviewer B's copies of the review-r3 probes (RV3-B-A01, A03/A14/A16, CSI injections I01–I09, r2 P2, D lattice, D forward-compat/removal): **6/6 identical** after scratch-path normalisation (4 byte-identical) |
+| **CTL4** | same log | executed / computed on the base snapshot `c8cdfac` | P4r4, VA4, reviewer B's model, AF1–AF3, surface probes (part P on 4.1.5), confinement and first-binary, D-A02, D-A03 (9/20) and D-A03b: all **byte-identical** to their committed outputs, i.e. every attack exists at base |
 
-### 1.1 Review r3 probes re-run against revision 4
+## 2. Blocking classes
 
-| Probe (origin) | Output | Result |
-|---|---|---|
-| RV3-B-A01 precedence to `immutable` (B), real 4.1.5 + revision-4 checker and library | `rerun-RV3-B-A01-precedence-immutable.json` | `passes_E7_reference_checker: false` (exit 3). The 4.1.5 binary still consumes whatever kernel it is given, so B's consumption part still shows the loss. Consumption of the revision-4 effective kernel is P1r4 part B. |
-| RV3-B-A03/A14/A16 (B), real 4.1.5 + revision-4 checker | `rerun-RV3-B-A03-A14-A16-probes.json` | **A03:** the `gov verify product` child still writes both pin files as the invoking account, mode 0644 (legacy behaviour; revision 4 ignores such files and confines the child). **A14:** checker exit 2 for all 10 `bool_toward` leaves written `on`; the runtime reads the string `"on"`. **A16:** checker exit 3. |
-| RV3-B CSI injections I01–I09 (B) | `rerun-RV3-B-CSI-injections.json` | I01–I06 exit 2; I07 exit 3; I08 exit 3; I09 exit 2. I08's exit comes from the base 4.1.5 payload's historical `set_lock_field` operations; the injected migration carries no operation, so it adds no finding. Overlay-writing migration shapes are P1r4 part C. |
-| RV3-D-A01/A02 lattice (D), revision-4 library | `rerun-RV3-D-precedence-lattice.json` | A01: 36 pairs, no unsound pair. A02, each of the 5 modes: a TPS registering `immutable` is a computed reduction needing history and the gate; the effective project-layer mode is unchanged; no strengthening removed. |
-| RV3-D-A09/A10 (D), unmodified | `rerun-RV3-D-surface-forward-compat-and-removal.json` | R01–R09 exit 2. F01/F05/F06/F07/F09 exit 3: the unmodified fixture adds policies without copying their precedence rules into the kernel, which exact registration refuses. The R07 effect uses the revision-3 join formula, which revision 4 no longer uses. |
-| RV3-D-A09/A10 (D), release-consistent copy | `RV3-D-A09-A10-rerun-r4-release-consistent.{py,json}` | F01, F05, F06, F07, F09 exit 0 (forward compatibility by inventory data); F02, F12 exit 2; F03, F04, F08, F10, F11 exit 3; R01–R09 exit 2 |
-| P1r3 (architect r3), real 4.1.5 + revision-4 library | `rerun-P1r3-against-r4-lib.json` | coverage 0 unclassified; every §3.1 case has effective values equal to genuine; harm verdicts (a)–(e) true |
-| C `build_base`, `run_destructive`, `occ_removal`, `full_removal_and_merge`, `durability` (C), real binaries and Git | `rerun-RV3-C-*.json` | **destructive:** 84 runs of 4 binaries, 0 writes, property holds. **Partial removal:** legacy `init --force` fails `IO_ERROR` after creating a legacy kernel manifest; `governance/trust` unchanged; RoT-1 emulation `PARTIAL(occupation)`. **Full removal:** a legacy verified install; `product/restricted-plan.md` retrievable by the legacy binary; `governance/trust` unchanged; RoT-1 `PARTIAL(occupation)`. **Merge:** `CONFLICT`, then `governance/framework.lock~legacy`. **Durability:** clone, archive and `clean -fdx` keep the types; sparse checkout omits the occupation; revert restores the legacy layout. |
-| RV3-D-A05/A06/A07 (D), revision-3 layout | `rerun-RV3-D-legacy-git-restore.json` | A05a/A05c: legacy verified; the post-migration classified file is retrievable. A06: the legacy CIT writes `governance/trust/**` on restored trees; the intact control refuses with `NOT_INSTALLED`. A07: the idiom lists the occupation; a fresh clone lacks it. |
-| RV3-D-A05/A06/A07 (D), revision-4 layout (ignore-rule delta) | `RV3-D-A05-A07-rerun-r4-layout.{py,json}` | A05, A06: the same legacy outcome (documented LR-2). A07: the idiom lists nothing; a fresh clone has the occupation; `COMPLETE`. |
-
-**Not re-run unmodified (stated):**
-- **Reviewer B's `RV3-B-M-reference-model.py`** encodes the revision-3 rules. Its constructions (RV3-B-A02, A05…A13 and the
-  132-row matrix) are re-encoded against the revision-4 rules as named P4r4 scenarios.
-- **Synthesis D's `RV3-D-oracle-anchor-artifact.py`** loads `P4r3`. Its constructions (RV3-D-A11, A12, A13, A15) are P4r4
-  scenarios. Its sensitivity claim (A11) is answered by P4r4's mutant `M-sequence-anchor`, which fails three scenarios.
-- **Review r2 `P2-gate-record-forgery.py`** is unchanged by revision 4 (repository records remain requests). Reviewer B
-  re-ran it on 4.1.5; the reference is P4r4 `R3_gate_record_from_repository`.
-
-## 2. Blocking classes (BC-1 … BC-4)
-
-| Class | Findings | Revision 4 mechanism (removes the input, or adds a condition) | Specified in | D-0008 rules | Evidence | Status |
+| Class | Findings | Revision-5 mechanism (removes the input) | Specified in | D-0008 rules | Evidence | Status |
 |---|---|---|---|---|---|---|
-| **BC-1** constitutional-surface soundness for project-owned strength and absence | RV3-H1; root of RV3-M5; precedence case of RV3-M7 | **Removes the kernel from effective precedence:** POLICY_PRECEDENCE must equal its registration (`precedence_unregistered`); project-layer precedence comes from registrations only, joined with the project's held registration until a per-project gate. **Removes absence as an input:** required presence (`surface_required_missing`); pinned fallback or `SURFACE_VALUE_UNAVAILABLE`. **Sound order** for comparing registrations: two-directional admitted sets; a TPS removing admitted strengthening is a computed reduction. **Directed join:** no refusal discards an admitted component. **Output-based detection:** the project-strength vector over effective policy and every Overlay Surface input. **Migrations** default-deny over root-registered targets. One YAML profile. **Different from CD3-1 (2) in kind:** the delta suggested refusing a differing kernel rule "as unregistered values already are" and otherwise joining; revision 4 also removes the kernel rule from the join entirely. | `23` §3.5, §3.6, §4, §11; `19` §5, §9, §10.6; `26` §6; `09` R-SURF-8…12, R-MIG-5, R-MIG-7 | (3), (6), (20) | P1r4 parts A–D; CSI-ST S22, S26–S40, S45–S49, S53–S55; re-runs of RV3-B-A01, D lattice, D-A09/A10; LR2 strength vector | **ADDRESSED — executed** (harm assertions on real 4.1.5 consuming revision-3 and revision-4 effective kernels; checker) **and reference** (order, reductions). Implementation evaluator and in-binary vector: specification only, RT-106…RT-109, RT-99. |
-| **BC-2** anchor satisfaction and anchor currency | RV3-H2 | **Removes the supplier's sequence number:** anchors are satisfied only by inclusion; statements outside the anchored chain are never effective. **Removes "anchored once" as currency:** mandatory pin validity; a currency proof (P1 anchoring event within the window, P2 in-gate typed fingerprint, P3 witnesses ≥ 2) for C3 and binary acceptance; no `current` label. **Removes the trust-state key from currency:** separate `freshness-witness` purpose (KS-11), C3 threshold ≥ 2. **Removes the governed account from pin writers:** integrity predicate, system pin directory, confined execution, TA-9 restated. One decision rule; witness-only clock high-water; accepted-TBM high-water. **CD3-2 (2):** both a bound and an exact disclaimer. **CD3-2 (3):** a separate purpose plus a threshold, and C3 never on a witness alone below threshold. | `24` §3–§4, §8–§10; `17` S4, §7, §15; `05` §1, §3; `27` §3; `25` A7, A9; `09` R-ANCH-1…9, R-CONF-1…3 | (7), (18), (19), (21) | P4r4 54/54, 9/9 mutants, 132-row matrix; re-run RV3-B-A03 (the writer is real) | **ADDRESSED — reference.** Implementation: specification only, RT-80, RT-101…RT-105, RT-113, RT-116, RT-119. |
-| **BC-3** built-source legitimacy of production binaries | RV3-H3 | **Removes `release-final` from the choice of source:** `release.source` in candidate and final with V8 source equality at every verifier; verification attestation v2 names the source; `verify-artifact` A4a (build attestation source = TBM source) and A4b (ACCEPTED attestation of the candidate, referenced by the effective TSS, same source, no REJECTED attestation or negative); custodial stages at rebuilder, custodians and publisher. Minimum capability sets re-derived (route S: 3 keys + pipeline input, 2 under OP-4 "no"; route B: 4 keys over 3 purposes). Owner option (S1) root-registered production sources. **Extends CD3-3 (1):** source identity includes `source_tree_digest` (SHA-256 of `git archive`), not only the commit id. | `25` §4–§7, §9; `04` V8; `05` §1, §3, §7; `07` §3, §7; `09` R-ART-5…7, R-REL-6, R-REL-9 | (9), (17) | VA4 16/16; P4r4 RV3-B-A08 and mutant `M-source-from-release-commit`; schemas v2 | **ADDRESSED — reference.** Implementation: specification only, RT-115, RT-92. |
-| **BC-4** OP-2, OP-4, OP-7 consequence statements | follows BC-2, BC-3; RV3-D-A08; RV3-L2, RV3-L6 | Restated from the revision-4 rules with evidence per consequence. **OP-7:** (a)–(d) with who selects which state and for how long; pin-currency parameters; witness authority above a single threshold-1 key with custody consequences; (d) scoped to the newest TSS. **OP-2:** binary blast radius per source-authority choice S0–S3; `release-final` threshold and root co-signature relative to CD3-3; `release-final` sentence corrected. **OP-4:** consequences of "no" after CD3-3. **OP-3:** decision-pin integrity. | `21` | — | VA4 routes; P4r4 matrix and `RV3-D-A04_op7_d_scope` | **RESTATED** — proposals labelled; nothing decided; verification RT-127 |
+| **BC4-1** independent decisions for the TCB | RV4-H1 | **Release registration** (root threshold or root-granted quorum ≥ 2, append-only) selects source identity, input manifest, final, targets and verification records, after first-hand records and upstream checksum checks; **≥ 2 first-person reproductions** confirmed first-hand select bytes; `release-artifact` and `build-attestation` withdrawn; verification and final become restrictors; Fact Threshold Check; minima computed (FD-3). **Different from CD4-1's examples:** instead of adding a second build attestation or verifier signature to the same predicate, revision 5 moves source and inputs to the registration authority and bytes to first-hand reproduction, and makes pipeline input, reproducer processes, mirrors and the upstream toolchain explicit atoms. | `29`, `30`, `25`, `05` | (9), (17), (22), (24) | CS5; P4r5 VA5 rows and AP rows; DA03r5; CTL4 (BC and AF1/AF2 at base) | ADDRESSED — reference; implementation RT-128…RT-134 |
+| **BC4-2** anchored, non-circular first TCB | RV4-H2 | **One predicate, two executors**: `gov-admit` (registered, reproduced, digest compared) evaluates admission-predicate/1 with a **fingerprint typed now** as the only state selector, never executes the candidate, **installs from the measured buffer**, starts a fresh verifier trust store; **genuine-binary rule** (C0 only without an admission record); **no ceremony before admission**; Phase 4 and CI images use `gov-admit`; build-from-source is not a trust path. | `31`, `25` §5, `06`, `11` Phase 4 | (8), (16), (19), (23) | FA5 (FB1a/b, FB2a/b/c, FB3, PH4, DA04, CI1, CH1, CH2, ADM1, INS1, INS2, VTS1, K1, K2; vectors; mutants); CTL4 (FB at base) | ADDRESSED — executed (reference executor with real signatures); implementation RT-135…RT-139 |
+| **BC4-3** release-scoped registration | RV4-H3 | **Exact per-release registration** of every non-join unit and the kernel tree digest in the release registration; single-valued and append-only; E7 and effective values use only the registration of the release judged; presence release-scoped; reversion, unit removal and member narrowing are computed reductions; binding groups for owner-domain sets. **Different from CD4-3 (1):** no sequence ranges (ranges admit gap, inflated and stale-policy releases). | `23` §12, `19`, `30` §5 | (6), (24) | REG5; CSI5 S56–S70 | ADDRESSED — executed (checker, real 4.1.5 consumer); binary RT-140…RT-143 |
+| **BC4-4** owner options and blast radius | review r4 §7 | OP-1…OP-15 reconciled from OP-1…OP-7 and both specialists' lists; consequences taken from CS5, REG5, FA5; **no proposal and no default**; `release-final` blast radius: nothing becomes effective | `21`, `05` §1, `25` §7 | — | CS5 table; `21` §0 mapping | RESTATED; RT-127 |
 
-## 3. Findings RV3-H1 … RV3-I1
+## 3. Findings RV4-H1 … RV4-I1
 
-| Finding | Revision 4 change | Specified in | Evidence | Status |
+| Finding | Revision-5 change | Specified in | Evidence | Status |
 |---|---|---|---|---|
-| **RV3-H1** | BC-1 (§2) | §2 | §2 | ADDRESSED — executed and reference; RT-106…RT-109 |
-| **RV3-H2** | BC-2 (§2) | §2 | §2 | ADDRESSED — reference; RT-80, RT-101…RT-105 |
-| **RV3-H3** | BC-3 (§2) | §2 | §2 | ADDRESSED — reference; RT-115 |
-| **RV3-M1** lift reuses the pre-withdrawal attestation | MS-2: a lift needs an ACCEPTED attestation naming the negative (`lifts_negative_statement_digest`); ≥ 3 distinct keys | `17` §2, §3; `05` §3; `schemas/verification-attestation.schema.json` 2.0.0 | P4r4 `RV3-B-A05_lift_requires_post_dating_attestation`; mutant `M-lift-reuses-pre-negative-attestation` | ADDRESSED — reference; RT-112, RT-97 |
-| **RV3-M2** pins and decision pins writable by the governed account | integrity predicate; system pin directory; decision pins with `expires_at` and `approved_under_state`; write confinement of `gov`-run repository and plugin commands; TA-9 and `27` §3.3 restated | `24` §3.5; `27` §3.2–§3.3; `01` TA-9; `09` R-ANCH-6, R-GATE-7, R-CONF-1…3; `schemas/trust-decision-pin.schema.json` | re-run RV3-B-A03 (the real child writes both files as the invoking uid, mode 0644, which the predicate ignores); P4r4 RV3-B-A03, A04; mutant `M-pins-writable-by-governed-account` | ADDRESSED — reference (predicate, model) with the writer observed by execution; confinement and predicate implementation: specification only, RT-103 (a)–(f) |
-| **RV3-M3** `issued_at` poisons the clock high-water | SV-11 refuses statements from the future; only witnesses raise the high-water; root-signed `bootstrap.clock_reset`. **Different from CR-06's wording:** witnesses are `freshness-witness` statements, not TSSs. | `24` §8; `17` §13; `05` SV-11; `19` §3 | P4r4 `RV3-B-A07_issued_at_high_water`; mutant `M-any-issued-at-raises-clock` | ADDRESSED — reference; RT-113 |
-| **RV3-M4** playbook contradicts admissibility | revoke, never un-reference; the next TSS keeps `artifacts[]` and adds revocations | `05` §9; `17` §14 | P4r4 `RV3-B-A09_playbook_revokes_never_unreferences` | ADDRESSED — reference; RT-114 |
-| **RV3-M5** weakening over four overlay categories; ungated migrations | class closed in BC-1 (the vector over effective policy and every Overlay Surface input). CR-02 whitelist: migration-writable targets per Overlay Surface key, default deny, nothing outside `governance/overlay/`. **Different in location from CR-02:** the operation × target registration is root-signed TPS data (compiled default deny), not a compiled list, so it evolves with the kernel templates at root threshold. | `23` §11; `19` §9; `26` §6; `09` R-MIG-5, R-MIG-7 | P1r4 part C (M1–M8; vector over real 4.1.5 effective kernels); CSI-ST S46–S49 | ADDRESSED — executed (vector) and reference (whitelist); RT-109 |
-| **RV3-M6** occupation not robust to removal or Git restore | LR-2 restated with the reachable legacy outcome and the only bounds that hold (RoT-1 fails closed; strength loss reported where recorded; LR-4); doctor names mixed layouts; the ignore rule keeps the occupation through untracking | `26` §2, §8; `18` §9; `09` R-FMT-6 | re-runs of C `occ_removal`, `full_removal_and_merge`; D legacy restore on both layouts; LR2 (24 trees) | **CARRIED — named test.** The legacy outcome is executed; the RoT-1 bounds are reference-evaluated on the resulting trees. RT-81, RT-50b. |
-| **RV3-M7** presence not checked; pinned/members fallback undefined; owner files outside the vector | required presence at E7; `SURFACE_VALUE_UNAVAILABLE` or the registered embedded value; owner-domain slots with `check-owner`, fail-closed absence on confirmed and unconfirmed machines, in the strength vector | `23` §3.5, §7.2; `19` §5.2; `09` R-SURF-9, R-SURF-12 | P1r4 A3 (R01–R09 exit 2) and R07 on real 4.1.5 (harms absent); D-A09/A10 release-consistent R01–R09 exit 2; CSI-ST S31–S40, S50–S52 | ADDRESSED — executed (R07 consumption; checker) and reference; per-decision-point fallback and owner files at run time: specification only, RT-107, RT-120 |
-| **RV3-M8** A7 against an ambiguous high-water | A7 and the first-run self-check compare with the accepted-TBM high-water only | `25` §5 A7; `24` §8; `09` R-ART-2 | P4r4 `A_valid_realisable_TBM_t9_reference_t11`, `RV3-D-A13_realisable_tbm_order`; mutant `M-a7-against-tss-high-water` | ADDRESSED — reference; RT-116, RT-93 |
-| **RV3-M9** plan cannot detect the classes | no expected result from architect evidence; RT-72(vi) withdrawn; a conformance oracle with 9 mutants and named distinguishing scenarios; realisable constructions; RT rows for RV3-B-A01…A18, RV3-C-A01…A10, RV3-D-A01…A18 with binary-observable harm assertions | `12` §1 rules 11, 13–15, §4b, §7b, §8; `13` §8 | P4r4 conformance oracle (executed: 9/9 mutants detected); `12` §7b tables | ADDRESSED — reference (oracle) and specification (plan) |
-| **RV3-L1** decision-table conflicts | one decision rule, most restrictive row wins; `INCOMPLETE` refuses C2 under every option; (c) non-witness anchors follow (a) | `24` §4.3; `17` §7 | P4r4 `RV3-B-A10_incomplete_refuses_c2_under_d`, `RV3-B-A11_op7_c_non_witness_anchor` | ADDRESSED — reference; RT-119 |
-| **RV3-L2** tunable keys at security decision points; `release-final` sentence | `MEMORY_POLICY.embedding.provider`, `reranker.provider` → pinned; `ARCHIVE_POLICY.default_retrieval_for_archive`, `LEARNING_POLICY.upstream.aggregate_metrics_enabled`, `HUMAN_GATE_POLICY.continue_independent_work` → floor; sentence names 52 `project_tunable` and 32 `release_bound` leaves | `23` §5.2; `05` §1; `21` OP-2 | re-run RV3-B-A16 (checker exit 3); CSI-ST S44 | ADDRESSED — executed (checker); consumer-register build: specification only, RT-111 |
-| **RV3-L3** YAML 1.1 versus serde_yaml | one YAML profile: core booleans only; no anchors, aliases, tags, merge keys, duplicate or non-string keys | `23` §3.6; `09` R-SURF-10 | re-run RV3-B-A14 (exit 2 ×10); CSI-ST S41–S43 | ADDRESSED — executed (checker); binary: specification only, RT-110 |
-| **RV3-L4** reinstall identity from the lock | identity from the VTS per-project record; the lock is a hint; downgrade policy relative to the record | `20` §1, §4, §5, §8; `09` R-RI-1 | none executable before implementation | ADDRESSED — specification only; RT-118 |
-| **RV3-L5** non-surface TPS fields outside computed reductions | `min_release_sequence`, `historical_releases[]` removals, `production_sources[]` additions, `install_authority`, `gating.mode`, `local_terminal_only[]` removals, `op7_mode` toward (d), window increases, witness threshold decreases | `19` §10.6; `17` S3 | P4r4 `CR-10_non_surface_tps_reductions` | ADDRESSED — reference; RT-108 |
-| **RV3-L6** OP-7 (d) scope | residual = binaries whose compiled TSS predates the newest TSS, including a revocation-only TSS | `21` OP-7; `24` §9; `17` §8 | P4r4 `RV3-D-A04_op7_d_scope`; matrix (13 (d) rows) | RESTATED — option text with reference evidence; RT-80, RT-127 |
-| **RV3-L7** untracking idiom drops the occupation | ignore rule `/.governance-runtime/*` + `!/.governance-runtime/migration`; doctor names an absent occupation | `26` §2; `08` §2; `09` R-FMT-1 | `RV3-D-A05-A07-rerun-r4-layout.json` (real Git: idiom lists nothing; occupation in fresh clone); LR2 (`COMPLETE`) | ADDRESSED — executed; RT-122 |
-| **RV3-L8** rotation invalidates anchored history | re-sign retained honest statements of the removed key before root N+1 | `05` §8–§9; `17` §9 | P4r4 `RV3-D-A16_rotation_resigns_retained_statements` | ADDRESSED — reference; RT-117 |
-| **RV3-I1** caller-declared role | unchanged and stated: no trust gate depends on the declared role | `27` §5; `19` §8 | — | INFO — stated; RT-89 |
+| **RV4-H1** | BC4-1 (§2). Each pack claim the finding contradicted is replaced: `25` §7 and `05` §3 minimum sets are calculator output; `05` §1 `build-attestation` withdrawn; `21` OP-2 replaced; VA4's route-B row is superseded by P4r5 VA5-11…13 (refused). | `30`, `25`, `05`, `21` | CS5: RV4-B-A01 shape {one reproducer key, pipeline} refused; RV4-B-A02 {one verification key, pipeline} refused; INV-ONE 0 failures; D-A07 re-expressed as the pass-through control | ADDRESSED — reference; RT-131, RT-134 |
+| **RV4-H2** | BC4-2 (§2). `06` §2 step 6 paths (b) and (c) withdrawn; `11` Phase 4 uses `gov-admit`; `21` OP-6 states the dependence of TA-5 on admission; TA-1 and TB-1 restated (`01`, `25` §10). | `31`, `06`, `11`, `01` | FA5: revoked binary with revocation withheld `STATE_NOT_HELD_OR_FINGERPRINT_MISMATCH`, served `BINARY_REVOKED`; remediated compromise refused in three variants; moved tag `RELEASE_UNREGISTERED` with the candidate never executed; unadmitted binary's ceremonies `BINARY_NOT_ADMITTED`; legacy 4.1.5 has no `verify-artifact` | ADDRESSED — executed; RT-135…RT-137 |
+| **RV4-H3** | BC4-3 (§2). The `release-final` blast radius (`05` §1, `21`) now states that no final becomes effective without its registration. | `23` §12, `05`, `21` | REG5 part P with consumption on real 4.1.5; D-A02 T1–T4; legitimate retention eligible | ADDRESSED — executed; RT-140 |
+| RV4-M1 | `18` §9.1 closed entry sets; §9.2 root discovery and refusal inside the PPS; `26` §3 scope, LP-1r/LP-1s and LR-2 restated; D-0008 rules (10), (12) restated | `18`, `26`, `15`, D-0008 | ST5 matrix (6,292 invocations incl. `governance/` and `governance/trust/kernel/`), `subdir_escape`, D-A01 re-run | ADDRESSED — executed (legacy behaviour) and reference (predicate); binary RT-144 |
+| RV4-M2 | CR4-B-01: allow-list confinement with explicit denies; TCB-location rule for C3, confirmations and decision pins; `27` §3.3 and `28` §5 restated; CI `sudo` note in `06` §3 | `27` §3.3, `31` GB-4, `06`, `09` R-CONF-4/5 | FA5 INS2 (the predicate refuses C3 from a user-owned location); confinement itself not executable before implementation | ADDRESSED — specification only (confinement); reference (predicate); RT-103, RT-138 |
+| RV4-M3 | CR4-B-02: witness input from the ceremony or channel only; C3 threshold under two custodians or a flagged consequence | `24` §3.3, `05` §7 rule 10, `21` OP-7 | — | ADDRESSED — specification only; RT-149 |
+| RV4-M4 | CR4-B-03: RS-2 restated; stateful clock high-water raised by every ingested non-future statement | `24` §8, §10; `21` OP-7 | P4r5 `CLOCK-RV4-B-A13` (stateful: refused); residual demonstration (stateless: accepted as RS-2); DA03r5 `R5-clock-high-water` detected | ADDRESSED — reference; RT-148 |
+| RV4-M5 | The selector (`release-final` choosing migration content) is removed: migrations are registered units. CR4-B-04 requirements from pre-transaction inputs on machines without a record. | `23` §12, `19` §9 item 5 | REG5 migrations (registered 0, different 3); CR4-B-04 not executable before implementation | ADDRESSED — executed (selector) and specification only (CR4-B-04); RT-146 |
+| RV4-M6 | RV4-C-M1: `.gitignore` surgery in the install transaction, idempotent | `26` §8, `08` | ST5 `gitignore-surgery` on real Git | ADDRESSED — executed (reference transaction step); RT-145 |
+| RV4-M7 | Conformance oracle with a distinguishing scenario for all 20 D-A03 mutants, including the five with no RT and the two ambiguous ones; no expected-`ACCEPTED` attack row; mutants for every new rule | `12` §4c, §8.1; `29` R-SEL-4 | P4r5; DA03r5 20/20 and 17/17 | ADDRESSED — reference; RT-129 |
+| RV4-L1 | CR4-B-05 carried: the lint refusal of a wildcard non-floor rule admitting unknown keys is specified; the draft inventory keeps `ROLES.authority_levels.*.*` until TPS v1 enumerates its leaves | `12` RT-150 | — (not changed in the reference checker) | CARRIED — specification only; RT-150 |
+| RV4-L2 | CR4-B-06: WITNESSED at the C3 threshold is a currency proof (P3) in both the table and the definition | `24` §4.4 | P4r5 `AP-00b_stateless_witnessed_runner_op7c` | ADDRESSED — reference; RT-154 |
+| RV4-L3 | CR4-B-07 **option 1**: a P1 proof covers only the TSS it names; C3 on a later descendant needs P2 or P3. Chosen under FD-1 (the trust-state key is not a C3 selector); CS5 control shows option 2 admits {reproducer keys, trust-state key, transport} on pinned machines. | `24` §4.4, §10 | P4r5 `AP-R5_p1_proof_does_not_cover_later_descendant`; DA03r5 `R5-descendant-proof`; CS5 `P1_relaxed_control` | ADDRESSED — reference; RT-147 |
+| RV4-L4 | CR4-B-08: first-run recording only for resolving release builds; `accepted_tbm_reset`; stateless scope stated | `25` §5, `24` §8 | P4r5 `A7-CR4-B-08`; DA03r5 `R5-first-run-record` | ADDRESSED — reference; RT-151 |
+| RV4-L5 | CR4-B-09: decision-pin maximum validity; increases are computed reductions | `27` §3.2, `19` §10.6, schema | P4r5 `GATE-CR4-B-09`; DA03r5 detected | ADDRESSED — reference; RT-152 |
+| RV4-L6 | CR4-B-10: revoked attestations and reproductions never count | `25` AP-4, `30` R-REP-6 | P4r5 two rows; DA03r5 two mutants; FA5 vectors | ADDRESSED — reference; RT-153 |
+| RV4-L7 | CR4-B-11: OP-4 restated as one statement; key counts removed (OP-4 affects evaluation candidates only) | `21` OP-4 | CS5 INV-RF | RESTATED; RT-127 |
+| RV4-L8 | `release-final` blast radius: no final becomes effective without its registration; Git-delivered use judged by E7 against the registration | `05` §1, `20` §9, `21` | REG5 unregistered releases exit 3; P4r5 `E7-D-A06` | RESTATED and ADDRESSED — executed; RT-140 |
+| RV4-L9 | `eligibility.production_sources[]` withdrawn; registering a release is not a reduction; reversion, removal and narrowing are | `19` §3, §10.6 | CSI5 S63, S64, S70 | RESTATED (rule re-scoped) and ADDRESSED — executed; RT-141 |
+| RV4-L10 | Owner-domain binding groups; exact set match for several valid pins | `23` §7.2, `27` §3.2, schemas | CSI5 S66 (exit 3), S67 (exit 0) | ADDRESSED — executed (checker); RT-143 |
+| RV4-I1 | unchanged: the acting role remains caller-declared; no trust gate depends on it | `27` §5 | — | INFO — stated |
 
-## 4. Carried requirements CR-01 … CR-12 (review r3 B `04`)
+## 4. Carried requirements CR4-B-01 … CR4-B-11 (review r4 B `04`)
 
-| CR | From | Where revision 4 specifies it | B's acceptance test → revision-4 test and evidence | Status |
+| CR | From | Specified in | Test → evidence | Status |
 |---|---|---|---|---|
-| CR-01 | RV3-M1 | `17` MS-2; `05` §3 | RV3-B-A05 → RT-112; P4r4 `RV3-B-A05` (negative remains with the old attestation; lifted with a new one naming the negative; 3 distinct keys) | ADDRESSED — reference |
-| CR-02 | RV3-M5 | `23` §11.3; `19` §9 | the five migrations and the `../../spec` target → RT-109; P1r4 part C M1–M7 | ADDRESSED — executed and reference |
-| CR-03 | RV3-M2 | `24` §3.5; `27` §3.2–§3.3; `01` TA-9 | (a)–(e) → RT-103 (a)–(f); re-run RV3-B-A03; P4r4 RV3-B-A03, A04 | ADDRESSED — reference; implementation specification only |
-| CR-04 | RV3-M4 | `05` §9; `17` §14 | RV3-B-A09 → RT-114; P4r4 | ADDRESSED — reference |
-| CR-05 | RV3-L1 | `24` §4.3; `17` §7 | RV3-B-A10, A11 → RT-119; P4r4 | ADDRESSED — reference |
-| CR-06 | RV3-M3 | `24` §8; `05` SV-11 | RV3-B-A07 and reset → RT-113; P4r4 | ADDRESSED — reference |
-| CR-07 | RV3-L2 | `23` §5.2; `05` §1; `21` OP-2 | build fails on the draft classification; RV3-B-A16 exit 3 → RT-111; re-run A16 exit 3; CSI-ST S44 | ADDRESSED — executed (checker) |
-| CR-08 | RV3-L3 | `23` §3.6 | RV3-B-A14; duplicate and merge keys → RT-110; re-run A14; CSI-ST S41–S43 | ADDRESSED — executed (checker) |
-| CR-09 | RV3-L4 | `20`; `09` R-RI-1 | RV3-B-A15 → RT-118 | ADDRESSED — specification only |
-| CR-10 | RV3-L5 | `19` §10.6 | RV3-B-A17 → RT-108; P4r4 `CR-10_non_surface_tps_reductions` (`witness_max_validity_days` is `witness_max_validity_hours` in revision 4) | ADDRESSED — reference |
-| CR-11 | R2-M10 / RV3-M9 | `12` §7b | rows for RV3-B-A01…A18 with codes and harm assertions → present | ADDRESSED — specification (plan) |
-| CR-12 | RV3-H2 reference | P4r4 (not P4r3) | the oracle returns `BELOW_ANCHOR` for RV3-B-A12 → P4r4 `RV3-B-A12_RV3-D-A12_higher_unchained_tss` holds; `M-sequence-anchor` fails it | ADDRESSED — reference |
+| CR4-B-01 | M1 | `27` §3.3, `31` GB-4, `06` §3, `09` | (i) RT-103; (ii) RT-138 / FA5 INS2; (iii) platform variants RT-103 | spec only (confinement); reference (predicate) |
+| CR4-B-02 | M2 | `24` §3.3 | RT-149 | spec only |
+| CR4-B-03 | M3 | `24` §8, §10 | RT-148 / P4r5 CLOCK and residual demonstration | reference |
+| CR4-B-04 | M4 | `19` §9 item 5 | RT-146 | spec only |
+| CR4-B-05 | L1 | `12` RT-150 | RT-150 | carried, spec only |
+| CR4-B-06 | L2 | `24` §4.4 | RT-154 / P4r5 AP-00b | reference |
+| CR4-B-07 | L3 | `24` §4.4 (option 1) | RT-147 / P4r5; CS5 control | reference |
+| CR4-B-08 | L4 | `25` §5 | RT-151 / P4r5 | reference |
+| CR4-B-09 | L5 | `27` §3.2 | RT-152 / P4r5 | reference |
+| CR4-B-10 | L6 | `25` AP-4 | RT-153 / P4r5, FA5 | reference |
+| CR4-B-11 | L7 | `21` OP-4 | RT-127 | restated |
 
-**B's acceptance cases for the corrected blocking findings:**
+**B's acceptance cases for the blocking findings:** H1 (a)–(c) → CS5 (no set below the stated minimum; pipeline counted;
+no oracle row expects an attack `ACCEPTED`); H2 (a)–(d) → FA5 (each refused by the documented procedure with the channel
+fingerprint as selector, the negative set, and an externally computed digest; Phase 4 has no self-verification); H3 → REG5
+(E7 refuses; the `ASIA…` file stays excluded on 4.1.5).
 
-| Case | Pass criterion (B) | Revision-4 evidence |
-|---|---|---|
-| H1: RV3-B-A01 for each mode, plus an honest owner tightening | E7 refuses, or project strengthening remains effective; harms absent on the binary; computed strength over effective policy reports any loss | P1r4: each of the 5 modes plus the three-rule example exits 3; the revision-4 effective kernel keeps strengthening on 4.1.5 with harms (a)–(c) absent where observable; TPS tightenings are computed reductions; the vector reports revision-3 losses and is quiet for revision 4 |
-| H2: RV3-B-A02, A06, A12 and the A13 matrix | no stale state as a C2 root or C3 target labelled `ANCHORED`/`WITNESSED`, except the stated core and the (d) residual | P4r4: A02, A06, A12 hold; matrix 77 refused, 42 core, 13 (d), 0 unstated, 0 `current` |
-| H3: RV3-B-A08 and a REJECTED-candidate variant | refused unless an ACCEPTED attestation covers the exact source and the final's commit equals the candidate's | VA4: `RELEASE_IDENTITY_MISMATCH(source)` and `ARTIFACT_SOURCE_REJECTED` |
+## 5. Reviewer C's requirements (review r4 C `04`)
 
-## 5. Carried constraints C-1 … C-5 (review r3 C `04`)
+| Item | Where | Test | Evidence | Status |
+|---|---|---|---|---|
+| RV4-C-M1 | `26` §8 | RT-145 | ST5 gitignore surgery | ADDRESSED — executed (reference) |
+| C-1a | `12` RT-144, RT-50b | subdirectory positions of every register | ST5 matrix (hand-built layout; the genuine-install run needs the implementation) | ADDRESSED — executed (legacy behaviour and predicate); binary run specification only |
+| C-2 | `18` §3, `20` §8 | RT-123 | — | CARRIED — specification only |
+| C-3 | `18` §9 D033 | RT-124 | — | CARRIED — specification only |
+| C-4 | `18` §3, `26` §2 | RT-125 | ST5 uses `lstat` types | CARRIED — specification only |
+| C-5 | `12` RT-50 | full register on a genuine 4.1.6 install | P3r3 re-run equal (hand-built layout) | CARRIED — specification only |
+| C-6 | `18` §9.1 item 5, D039 | RT-155 | — | CARRIED — specification only |
 
-| C | Requirement | Where | Test | Evidence | Status |
-|---|---|---|---|---|---|
-| C-1 | LR-2 restated with harm assertions (broadened as RV3-M6) | `26` §8 | RT-81, RT-50b | re-runs of C `occ_removal`, `full_removal_and_merge`; D legacy restore; LR2 | CARRIED — named test |
-| C-2 | cross-device transaction area refused, typed and before any write; unanchored `PARTIAL` repairable | `18` §3; `20` §8; `09` R-FS-7 | RT-123 | — | CARRIED — specification only |
-| C-3 | doctor names stray merge and partial-removal artefacts | `18` §9; `09` R-FMT-6, D033 | RT-124 | LR2 names `governance/kernel/KERNEL_MANIFEST.json` and `governance/project/DATA_SENSITIVITY.yaml` on the removal trees (reference) | CARRIED — named test |
-| C-4 | occupation type by `st_mode` / `GetFileInformationByHandle` | `18` §3; `26` §2; `09` R-FMT-7 | RT-125 | — | CARRIED — specification only |
-| C-5 | full-register RT-50 on a genuine 4.1.6 install with type-aware digests and a `governance/trust` digest | `12` RT-50; `09` R-FMT-5 | RT-50 | P3r3 re-run unchanged (on the hand-built layout; the genuine-install run needs the implementation) | CARRIED — specification only |
-
-## 6. Correction delta CD3-0 … CD3-4 and rule text (review r3 `11`)
+## 6. Correction delta CD4-0 … CD4-4 and the §5 rule text
 
 | Item | Applied as | Different mechanism? |
 |---|---|---|
-| CD3-0 retain | Retained: authentication core, whitelist and KS-1…KS-10, the constructor, the snapshots, GovernedFs and PPS; CSI as a root-signed TPS section, default deny, closed vocabulary and joins; release-local references, resolution, equivocation, cumulative chains, computed lowering, sticky negatives; no trust ingress without an anchor, unanchored machines read-only under (a)–(c), local confirmations; `release-artifact` ≥ 2, build attestation, TBM and A6; the occupation layout and LP-1; the transaction area, union records, VU-11, VU-12. | Deltas inside retained items: floor vocabulary v2 → v3 (presence, profile, directions); the ignore rule for the migration occupation; the historical 4.1.5 migrations (`set_lock_field`) now fail the checker (`28` A-R4-04); a TSS `expires_at` is no longer a currency witness. |
-| CD3-1 (1) order sound in both directions | the two-directional admitted-set order, used for TPS computed reductions and the held registration | **Yes for the kernel:** kernel rules are compared by equality and never joined |
-| CD3-1 (2) exact precedence registration | `precedence_unregistered`; TPS reductions with `lowering_history` and per-project gate | as proposed, and the kernel rule is removed from effective policy |
-| CD3-1 (3) strength over effective policy; migrations default deny | the vector over effective policy and Overlay Surface inputs; migration-writable targets | the whitelist is root-registered data (see RV3-M5) |
-| CD3-1 (4) absence not neutral | presence required at E7; pinned fallback or typed refusal; POLICY_PRECEDENCE deletion changes nothing | as proposed |
-| CD3-2 (1) inclusion semantics for every anchor kind | `24` §3.4; `17` S4 (b); pin schema; P4r4 | as proposed |
-| CD3-2 (2) currency bounded or disclaimed exactly | **both:** pin validity and C3 windows bound currency, and `CURRENCY_UNPROVEN` with no `current` label disclaims it | combined |
-| CD3-2 (3) no single threshold-1 currency authority | separate purpose (KS-11), C3 threshold ≥ 2, compromise consequence stated | combined the first and third alternatives |
-| CD3-2 (4) anchor and decision-pin integrity | integrity predicate, system pin directory, confined execution, TA-9 | **Adds** the system pin directory and confinement of every `gov`-run repository command |
-| CD3-2 (5) restated blast radius | `17` §15, `05` §1, `25` TB-3, `21` OP-7 | as proposed |
-| CD3-3 (1) bind source to independent verification | `release.source`, attestation v2, V8 at every verifier | **Extends** the source identity with `source_tree_digest` |
-| CD3-3 (2) binding everywhere consumed | A4a, A4b; custodial stages rebuilder, custodian, root co-signer, publisher | as proposed |
-| CD3-3 (3) true minimum capability set | route S, route B, route I in `25` §7, `05` §3, TB-3, `21` OP-2/OP-4 | as proposed; adds the OP-2 source-authority options |
-| CD3-4 owner options | `21` OP-2, OP-3, OP-4, OP-7 restated | as proposed |
-| §5 rule text (3), (6), (7), (9), (19), (20) | revised in `15` §3, §5 and D-0008; also (12), (17), (18) revised and **(21)** added | (21) is new: confined execution |
+| CD4-0 retain | Retained: every CD3-0 item; BC-1 closures (exact precedence registration, registration-only precedence, two-directional order, directed join, required presence — now release-scoped for non-join units — YAML profile, Overlay Surface, strength over effective policy); BC-2 closures (inclusion anchors, pin validity, currency proofs, witness purpose with threshold 2, no `current`, pin integrity); V8 (as a restrictor); root-anchored legacy containment; carried closures RV3-M1, M3, M4, L1, M8, L8. Evidence of non-regression: P1r4 byte-identical; CSI5 56 cases identical; P4r4 retained 42/42; review-r3 probe copies identical; P3r3 equal. | **Replaced:** the BC-3 closure's binary predicate (`release-artifact` ×2, one build attestation, attested source) by admission-predicate/1; the artefact playbook becomes "never drop published references" for `registrations[]` and `published_binaries[]`. |
+| CD4-1 | `30`, `25`, `05`, `29` | **Yes**: registration selects source and inputs; first-hand reproduction quorum selects bytes; the review's "verification threshold ≥ 2" is offered as OP-8 because under registration it bounds process compromise, not key theft (CS5 INV-SRC-KEYS) |
+| CD4-2 | `31`, `25`, `06`, `11` | as proposed, plus installation from the measured buffer, the genuine-binary rule and a fresh verifier trust store (gaps both specialists found in the stated invariant) |
+| CD4-3 | `23` §12 | **Yes**: exact per-release lookup, not sequence ranges; presence scoped; removal and narrowing added as reductions |
+| CD4-4 | `21` | as proposed; no proposals at all |
+| §5 rules (6), (9), (16), (19), (17), (10), (12) | `15` §5, D-0008 | also (7), (8), (21) revised and (22)–(24) added |
 
-## 7. HO-0001 owner requirements
-
-| Requirement | Where | Evidence |
-|---|---|---|
-| §3.1 constitutional-floor closure (review r3: NOT SATISFIED on project override controls and schema evolution through removal) | `23`, `19`, `26` §6 | CSI (113/121 files), CSI-ST 56/56, P1r4 A–D on real 4.1.5, re-runs of RV3-B-A01, D-A01/A02, D-A09/A10 |
-| §3.2 new-machine trust bootstrap (NOT SATISFIED on stale-state currency) | `24`, `17`, `27` | P4r4 M1–M7, B5, RV3-B-A02…A13, RV3-D-A04, A12, A13, A15, INGATE, PIN_WINDOW; 132-row matrix |
-| §3.3 binary and root authenticity (NOT SATISFIED on single lower-threshold key and source) | `25`, `05`, `04` V8 | VA4 16/16; P4r4 A27…A29, A_valid, RV3-B-A08 |
-| §3.4 legacy-binary damage containment (SATISFIED; must not regress) | `26` | P3r3 re-run unchanged (equal); re-run of C destructive (84 runs, 0 writes); LR-2 restated with LR2 |
-| §4 forward compatibility | `23` §7.1 | D-A09 release-consistent F01/F05/F06/F07/F09 exit 0 |
-
-## 8. Re-review entry criteria (review r3 `11` §7)
+## 7. Review r4 §7 re-review entry criteria
 
 | Criterion | State |
 |---|---|
-| 1. CD3-1…CD3-4 closed as classes in pack, schemas, D-0008 and ARCH-0002; both still PROPOSED | §2, §6; `schemas/` (x-schema-versions in `examples/rev4/validation.json`); D-0008 and ARCH-0002 revision 4, PROVISIONAL, `in_effect: false` |
-| 2. P1r4 (executed), P4r4 (reference), `verify-artifact` source scenarios, P3r3 unchanged, every RV3-B/C/D probe against revision 4 | P1r4, P4r4, VA4, P3r3 (§1). Probes: §1.1. B's and D's model probes are re-encoded as P4r4 scenarios, not re-run unmodified, because they model revision-3 functions (stated in §1.1). |
-| 3. Response matrix over RV3-H1…RV3-I1, CR-01…CR-12, C-1…C-5, no untested "resolved" | §3, §4, §5 |
-| 4. Oracle distinguishes anchor semantics with realisable constructions; plan meets RV3-M9 | P4r4 mutant `M-sequence-anchor` fails 3 scenarios; no hash-cyclic construction (`A_valid_realisable_TBM_t9_reference_t11`); `12` §1 rules 11, 13–15, §4b, §7b, §8 |
+| 1. CD4-1 … CD4-4 closed as classes in pack, schemas, D-0008, ARCH-0002; both PROPOSED | §2, §6; schemas `release-registration`, `binary-reproduction`, `input-manifest`, `admission-record` added and eight revised (`examples/rev5/validation.json`: every schema valid, four instances valid, four refused shapes); D-0008 and ARCH-0002 revision 5, PROVISIONAL, `in_effect: false`, no `chosen_option` |
+| 2a. B's BC enumeration, AF1–AF3, FB constructions, D-A07 | BC → CS5 (enumeration under revision-5 rules; controls); AF1 → P4r5 VA5-B-prime/B-prime2 and CS5 self-check; AF2 → P4r5 VA5-07…10; AF3 and FB1/FB2 → FA5 FB1a/b, FB2a/b/c; D-A07 → CS5 pass-through control and OP-9 (d). At base all reproduce (CTL4). |
+| 2b. B's part P on real 4.1.5 and D-A02 T1–T4 | REG5: refused under every identity; on 4.1.5 the effective content excludes the secret file |
+| 2c. C's `subdir_escape`, matrix positions, D-A01 N1–N3 against the corrected predicate | ST5 (§1) |
+| 2d. D-A03 and D-A03b against the next oracle | DA03r5 20/20 normative rules; RET-* scenarios are the D-A03b constructions |
+| 2e. P1r4, P4r4, VA4 and the CSI self-test unchanged in what they refuse | P1r4 byte-identical; P4r4's 42 non-binary scenarios hold inside P4r5 and P4r4 re-runs byte-identical; **VA4:** its refused rows RV3-B-A08, REJECTED candidate, different attested source, RV3-D-A03 (two rows), root-registered source and threshold-2 variants, route B with one key and without attestation stay refused as P4r5 VA5-01, 03, 04, 05, 06, 08, 09, 12, 13; its three documented-`ACCEPTED` attack rows (route S, route S under OP-4 "no", route B) are refused as VA5-07, 10, 11; its three custodial pre-check rows have no revision-5 analogue (custodial stages are replaced by R-REG-3 and R-PUB-1, RT-130); its revision-3-rule reproduction row is a control of a superseded rule. CSI self-test: 56 revision-4 cases identical. |
+| 3. Response matrix over RV4-H1 … RV4-I1, CR4-B-01 … 11, C's requirements, CD4-0 … CD4-4; no untested "resolved" | §3–§6 |
+| 4. No expected-`ACCEPTED` attack row; every oracle mutant, including D-A03's, has a distinguishing scenario | P4r5 summary `expected_ACCEPTED_rows_that_are_attacks: []`; DA03r5 |
 
-## 9. Residuals (explicit; none presented as stronger than it is)
+## 8. Review r3 and review r4 blocking probes re-run against revision 5
 
-| ID | Residual | Defined in |
+| Probe (origin) | How re-run | Result on revision 5 |
 |---|---|---|
-| RS-1, RS-1b, RS-1c, RS-2…RS-5 | core unseen metadata; C3 window; pin validity window; clock; A3 and the VTS; pins controlled by the repository writer; witness-key compromise | `24` §10 |
-| VR-1…VR-4 | same-user modification between units of work; advisory locks; processes outside `gov`; profile runtimes | `18` §11 |
-| RR-1…RR-3 | ineligible state after automatic rollback; machines without a record; A3 deletes records | `20` §10 |
-| CS-1, CS-2 | classification review; ceremony frequency | `23` §10 |
-| TB-1…TB-4 | binary TCB; rebuilder environment; minimum capability sets (route S, route B); insider source accepted by an honest verifier | `25` §10 |
-| LR-1…LR-4 | unconverted working copies; occupation removal or Git restore (restated); explicit output paths; fresh clones accept the overlay | `26` §8 |
-| TG-1…TG-3 | per-machine decisions; A3 with an unconfined shell; non-trust gates forgeable by A2 | `27` §7 |
+| RV4-B-A01, A02, A06 (B) | CS5 enumeration; P4r5 VA5 rows | refused below the computed minimum; 0 invariant failures |
+| RV4-D-A07 (D) | CS5 pass-through control; OP-9 (d) rows | the purpose does not exist; the pass-through shape lowers the minimum, which R-REG-3 (f) forbids |
+| RV4-B-A03 FB1/FB2 (B) | FA5 | refused (state not held; `BINARY_REVOKED`); revision-4 path (b) control `PASS` |
+| RV4-B-A04 (B) and Phase 4 | FA5 FB3, PH4 | refused, candidate never executed; no self-verification; revision-4 path (c) control `PASS` |
+| RV4-D-A04 (D) | FA5 DA04 | `BINARY_NOT_ADMITTED`; after admission in a user-owned scratch location GB-4 refuses (a root-owned location is not creatable in scratch; the predicate is shown on a system path, INS2) |
+| RV4-B-A08 part P (B), RV4-D-A02 (D), RV4-D-A06 (D) | REG5; P4r5 E7 rows | refused; secret excluded on 4.1.5 |
+| RV4-C-A01 (C), RV4-D-A01 (D) | ST5 | no trust-path write left `COMPLETE`; nested installs reported |
+| RV4-D-A03, A03b (D) | DA03r5 | 20/20 |
+| RV3-B-A01 precedence to `immutable` (B) | copy re-run | exit 3; identical |
+| RV3-D-A01/A02 lattice (D) | copy re-run | 0 unsound; identical |
+| RV3-D-A10 removals (D) | copy re-run | R01–R09 exit 2; identical |
+| RV3-B I01–I09 (B) | copy re-run | identical |
+| RV3-B-A02, A06, A12, A13; RV3-D-A11, A12 (B, D) | P4r4 retained scenarios inside P4r5 | 42/42 hold |
+| RV3-D-A15 revoked binary on pinned CI (D) | P4r5 `RV3-D-A15r5` | never accepted; honest current pin `BINARY_REVOKED` |
+| RV3-B-A08, RV3-D-A03 (B, D) | P4r5 VA5-01, 05, 06 | refused |
+| RV3-B-A03/A14/A16 (B); r2 P2 | copy re-run | identical after normalisation |
+
+## 9. HO-0001 owner requirements
+
+| Requirement | Where | Evidence |
+|---|---|---|
+| §3.1 constitutional-floor closure (review r4: NOT SATISFIED on schema evolution and on sensitivity/tool floors under retention) | `23` §12, §7, §7.2; `19` | REG5 (secret pattern consumption on 4.1.5; tool descriptor T1; invariant, schema, skill); CSI5 71/71 |
+| §3.2 new-machine trust bootstrap (NOT SATISFIED on first binary and RS-2) | `31`, `24`, `06` | FA5; P4r5 retained machine scenarios and CLOCK |
+| §3.3 binary and root authenticity (NOT SATISFIED on one key and circular first binary) | `30`, `25`, `31`, `05` | CS5; P4r5; FA5 |
+| §3.4 legacy-binary damage containment (SATISFIED; must not regress) | `26`, `18` §9 | P3r3 equal; ST5 |
+| §4 forward compatibility | `23` §7.1, §7.2, §12.2 | CSI5 S66/S67; new non-join units register with the release that introduces them (S69) |
 
 ## 10. Unresolved or not yet executable
 
-- **Specification only (no implementation exists):**
-  - write confinement and the pin integrity predicate on real platforms;
-  - the currency axis and gate fingerprint UI;
-  - the in-binary surface evaluator, directed join, strength vector and consumer-register build;
-  - `verify-artifact` and its custodial stages on real binaries;
-  - reinstall identity from the VTS record;
-  - cross-device refusal, doctor naming of stray artefacts, and `st_mode` typing;
-  - RT-50 on a genuine 4.1.6 install.
-
-  Each has a named RT in `12`.
-- **Examples.** `examples/rev4/` validates the new record shapes and fragments of the release statement and Trust Policy.
-  No full signed release statement, TPS or TSS example is produced.
-- **Owner decisions pending (not answered here):** OP-1…OP-7, including the OP-2 source authority (S0–S3) and the OP-7
-  parameters.
-- **Independence.** Revision 4 was written by a fresh architect session (AR-0005). That session did not author revisions
-  1–3 or any review. It must be reviewed by fresh reviewers.
+- **No implementation exists.** Every RT-128…RT-155 needs the implementation, including `gov-admit`, the decision register,
+  confinement on real platforms, the TCB-location predicate on root-owned locations, cross-OS reproducibility (IR-REP-3),
+  CR4-B-02, CR4-B-04, CR4-B-05, C-2…C-6 and RT-50 on a genuine install.
+- **Models.** CS5's honest-party rules are this revision's specification (`30` §9); a real process that deviates changes the
+  sets. P4r5 and FA5 are reference executors, not the product.
+- **Owner decisions pending:** OP-1…OP-15 (`21`); none proposed.
+- **Independence.** Revision 5 was written by a fresh synthesis architect session (AR-0011) that authored no earlier
+  revision, review or specialist proposal.

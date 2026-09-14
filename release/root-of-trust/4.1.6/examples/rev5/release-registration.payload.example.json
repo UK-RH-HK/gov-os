@@ -1,0 +1,40 @@
+{
+  "_type": "https://agentic-engineering-os/statement/release-registration/v1",
+  "trust_root_id": "sha256:0852b2688e5b5cde345ea0c7c0ab7f1fdbee7648ff1e5410b5b8df518b714e2d",
+  "release_id": "4.1.6",
+  "sequence": 1600,
+  "final_statement_digest": "sha256:2443630b4620165c8b173e7265e17526fe2787ae594364dd6d839ad58f2fc007",
+  "candidate_statement_digest": "sha256:dda18a0e21ae47c53b4309434cbc02ae8bf764fa83a6defbb719431242722aa7",
+  "source": {
+    "release_commit": "0000000000000000000000000000000000000000",
+    "content_digest": "sha256:dc9c5edb8b2d479e697b4b0b8ab874f32b325138598ce9e7b759eb8292110622"
+  },
+  "inputs_manifest_digest": "sha256:c6dc35cbb761b2599f1ea4a86ff364b23f4dc1df115611bf64b0cf859ad5ef87",
+  "targets": [
+    "x86_64-unknown-linux-gnu"
+  ],
+  "verification_records": [
+    "sha256:070c2edaf283d9def392bffcf2817cbb192d9232506931d81343f9ad269c02f9"
+  ],
+  "constitution": {
+    "kernel_tree_digest": "sha256:6923dd1bc0460082c5d55a831908c24a282860b7f1cd6c2b79cf1bc8857c639c",
+    "units": {
+      "leaf:SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex": "sha256:42d58222b328681b9923634991312932089876a0242f78cf488157aa24969c1a",
+      "members:SECURITY_POLICY.secret_content_patterns[id]#members": [
+        "aws-access-key",
+        "github-token"
+      ],
+      "file:schemas/adapter-manifest.schema.json": "sha256:df0ad6e43880f09c90ebf95f19110178aba6890df0010ebda7485029e2b543b4"
+    }
+  },
+  "migrations": {
+    "migrations/M-017.yaml": "sha256:e5ae0ee4396562d27f2dbe2b425fcc0be740c71c8459b452c653727f1833222c"
+  },
+  "admitter": {
+    "targets": [
+      "x86_64-unknown-linux-gnu"
+    ]
+  },
+  "lowering_history": [],
+  "issued_at": "2026-09-14T00:00:00Z"
+}

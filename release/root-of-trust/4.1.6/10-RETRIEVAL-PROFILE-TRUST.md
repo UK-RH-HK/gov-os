@@ -1,6 +1,8 @@
 # Output 10 — Reference retrieval profile trust integration
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendment: profile install is C3 and needs a currency proof naming the selected Trust State (`24` §4.4); it runs
+> only on an admitted binary (`31` GB-1). The profile model is otherwise unchanged.
 > Revision 4 changes profile trust in two ways:
 > - a profile install is C3, so it needs a currency proof (`24` §4.4);
 > - plugin processes run under write confinement (`24` §3.5).

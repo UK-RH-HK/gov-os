@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-policy-statement.schema.json",
   "title": "trust-policy-statement",
-  "description": "PROPOSED (RoT-1 revision 4). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory schema 2 (23: presence, exact precedence registration, Overlay Surface, owner-domain slots), eligibility including historical releases and optional production sources (OP-2 S1), install authority, gating, bootstrap (OP-6, OP-7, pin-currency parameters, clock reset), cumulative prior_policies and lowering_history (computed reductions in both directions and over the non-surface fields, 19 §10.6), unrevocation, optional state chain reset.",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory schema 2 (23: presence, exact precedence registration, Overlay Surface, owner-domain slots), eligibility including historical releases and optional production sources (OP-2 S1), install authority, gating, bootstrap (OP-6, OP-7, pin-currency parameters, clock reset), cumulative prior_policies and lowering_history (computed reductions in both directions and over the non-surface fields, 19 \u00a710.6), unrevocation, optional state chain reset.",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -125,36 +125,6 @@
             }
           }
         },
-        "production_sources": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "release_commit",
-              "source_tree_digest",
-              "build_inputs_digest"
-            ],
-            "properties": {
-              "release_commit": {
-                "type": "string",
-                "pattern": "^[0-9a-f]{40}$"
-              },
-              "source_tree_digest": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
-              },
-              "build_inputs_digest": {
-                "type": "string",
-                "pattern": "^sha256:[0-9a-f]{64}$",
-                "description": "digest of the published build inputs (toolchain, lockfiles)"
-              }
-            }
-          },
-          "description": "present and enforced only if OP-2 selects root-registered production sources (S1): verify-artifact A4b requires the attested source to be listed (ARTIFACT_SOURCE_UNREGISTERED)"
-        },
         "evaluation_candidates": {
           "enum": [
             "refuse",
@@ -226,6 +196,10 @@
               "owner_constitutional_file"
             ]
           }
+        },
+        "decision_pin_max_validity_days": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     },
@@ -366,12 +340,12 @@
         "pin_max_validity_days": {
           "type": "integer",
           "minimum": 1,
-          "description": "maximum valid_until - provisioned_at of a state pin (24 §3.2)"
+          "description": "maximum valid_until - provisioned_at of a state pin (24 \u00a73.2)"
         },
         "c3_currency_window_hours": {
           "type": "integer",
           "minimum": 1,
-          "description": "an anchoring event is a currency proof for C3 within this window (24 §4.4 P1)"
+          "description": "an anchoring event is a currency proof for C3 within this window (24 \u00a74.4 P1)"
         },
         "max_anchor_age_days": {
           "oneOf": [
@@ -435,6 +409,39 @@
             }
           ],
           "description": "lowers the verifier clock high-water after a witness-key compromise (CR-06)"
+        },
+        "channel_quorum": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "admitter_digests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "workstation_record_max_validity_days": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "revoked_self_scope": {
+          "enum": [
+            "C0_only",
+            "C0_C2"
+          ]
+        },
+        "accepted_tbm_reset": {
+          "type": [
+            "object",
+            "null"
+          ]
         }
       }
     },
@@ -462,6 +469,23 @@
           }
         }
       ]
+    },
+    "registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_verification_records",
+        "binary_digests_registered"
+      ],
+      "properties": {
+        "min_verification_records": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "binary_digests_registered": {
+          "type": "boolean"
+        }
+      }
     }
   },
   "$defs": {

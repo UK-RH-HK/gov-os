@@ -1,6 +1,9 @@
 # Output 8 — Project layout, `framework.lock` and the project trust record
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments: `governance/trust/registration.dsse.json` joins the trust top-level entry set; lock 3.0.0 records
+> the release content set (the kernel file map) and the registration digest, which `18` §9.1 uses for `COMPLETE`. The
+> `.gitignore` surgery of `26` §8 (RV4-M6) is part of every install transaction that writes the ignore rule.
 > Revision 4 keeps the legacy-path-occupation layout; review r3 recorded R2-H4 as CLOSED as a class. It changes the
 > ignore rule, so the tracked migration occupation is not listed by `git ls-files -ci --exclude-standard` (RV3-L7). The
 > held registration, the project-strength vector and the accepted-TBM high-water are VTS records, not lock fields

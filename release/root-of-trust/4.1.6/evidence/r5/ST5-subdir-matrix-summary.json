@@ -1,0 +1,1216 @@
+{
+ "P5_1": {
+  "counterexample_sample": [],
+  "counterexamples": 0,
+  "holds": true
+ },
+ "P5_2": {
+  "counterexample_sample": [],
+  "counterexamples": 0,
+  "holds": true,
+  "total_rows_creating_nested": 200
+ },
+ "P5_3": {
+  "counterexample_details": [],
+  "counterexamples": 0,
+  "holds": true,
+  "non_pps_positions": [
+   "P-CWD:.",
+   "P-CWD:.governance-runtime",
+   "P-CWD:governance",
+   "P-CWD:governance/overlay",
+   "P-CWD:governance/views",
+   "P-CWD:product",
+   "P-CWD:spec"
+  ],
+  "pps_positions": [
+   "P-CWD:governance/framework.lock",
+   "P-CWD:governance/trust",
+   "P-CWD:governance/trust/kernel",
+   "P-CWD:governance/trust/state"
+  ]
+ },
+ "P5_4": {
+  "note": "These are the rows whose r4-COMPLETE status is what the changed r5 predicate flips to non-COMPLETE",
+  "pps_writing_rows_r4_COMPLETE": 112,
+  "pps_writing_rows_r4_not_COMPLETE": 0
+ },
+ "commands_that_wrote": {
+  "adopt baseline": 40,
+  "init": 40,
+  "init --force": 80,
+  "init --skip-index": 40,
+  "init --source": 40,
+  "migrate baseline": 40
+ },
+ "elapsed_seconds": 115.5,
+ "per_position_binary": [
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.governance-runtime",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 136
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.governance-runtime",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 141
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.governance-runtime",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 146
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.governance-runtime",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 149
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 136
+   },
+   "rows": 136,
+   "writing_rows": 0
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 141
+   },
+   "rows": 141,
+   "writing_rows": 0
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 146
+   },
+   "rows": 146,
+   "writing_rows": 0
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:.",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 149
+   },
+   "rows": 149,
+   "writing_rows": 0
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/framework.lock",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "foreign_occupation_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 129,
+    "PARTIAL": 7
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/framework.lock",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "foreign_occupation_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 134,
+    "PARTIAL": 7
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/framework.lock",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "foreign_occupation_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 139,
+    "PARTIAL": 7
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/framework.lock",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "foreign_occupation_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 142,
+    "PARTIAL": 7
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/overlay",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 131,
+    "PARTIAL": 5
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/overlay",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 136,
+    "PARTIAL": 5
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/overlay",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 141,
+    "PARTIAL": 5
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/overlay",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 144,
+    "PARTIAL": 5
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/kernel",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "kernel_content_mismatch": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 129,
+    "PARTIAL": 7
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/kernel",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "kernel_content_mismatch": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 134,
+    "PARTIAL": 7
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/kernel",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "kernel_content_mismatch": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 139,
+    "PARTIAL": 7
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/kernel",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "kernel_content_mismatch": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 142,
+    "PARTIAL": 7
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/state",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 129,
+    "PARTIAL": 7
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/state",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 134,
+    "PARTIAL": 7
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/state",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 139,
+    "PARTIAL": 7
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust/state",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 142,
+    "PARTIAL": 7
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 129,
+    "PARTIAL": 7
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 134,
+    "PARTIAL": 7
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 139,
+    "PARTIAL": 7
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/trust",
+   "pps_writing_rows": 7,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "foreign_trust_entry": 7,
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 142,
+    "PARTIAL": 7
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/views",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 131,
+    "PARTIAL": 5
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/views",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 136,
+    "PARTIAL": 5
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/views",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 141,
+    "PARTIAL": 5
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance/views",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 144,
+    "PARTIAL": 5
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 131,
+    "PARTIAL": 5
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 136,
+    "PARTIAL": 5
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 141,
+    "PARTIAL": 5
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 5,
+   "position": "P-CWD:governance",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {
+    "nested_legacy_install": 5
+   },
+   "r5_states": {
+    "COMPLETE": 144,
+    "PARTIAL": 5
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:product",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 136
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:product",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 141
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:product",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 146
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:product",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 149
+   },
+   "rows": 149,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.2",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:spec",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 136
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 136
+   },
+   "rows": 136,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.3",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:spec",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 141
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 141
+   },
+   "rows": 141,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.4",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:spec",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 146
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 146
+   },
+   "rows": 146,
+   "writing_rows": 7
+  },
+  {
+   "binary": "4.1.5",
+   "commands_writing": [
+    "adopt",
+    "adopt baseline",
+    "init",
+    "init --force",
+    "init --skip-index",
+    "init --source",
+    "migrate",
+    "migrate baseline"
+   ],
+   "nested_legacy_installs": 0,
+   "position": "P-CWD:spec",
+   "pps_writing_rows": 0,
+   "r4_states": {
+    "COMPLETE": 149
+   },
+   "r5_reasons": {},
+   "r5_states": {
+    "COMPLETE": 149
+   },
+   "rows": 149,
+   "writing_rows": 7
+  }
+ ],
+ "total_pps_writing_rows": 112,
+ "total_rows": 6292,
+ "total_writing_rows": 280
+}

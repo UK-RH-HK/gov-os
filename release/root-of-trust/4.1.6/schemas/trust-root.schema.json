@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-root.schema.json",
   "title": "trust-root",
-  "description": "PROPOSED (RoT-1 revision 4). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Twelve purposes (05 §1): freshness-witness is present only if OP-7 (c) is chosen; it shares a key with no other purpose and C3 needs at least two witness keys (KS-11). Purpose sharing is checked against the compiled pairwise whitelist by the binary (05 §3); release-artifact requires threshold >= 2 and at least two keys (KS-9).",
-  "x-schema-version": "3.0.0",
+  "description": "PROPOSED (RoT-1 revision 5). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Twelve purposes (05 \u00a71): release-registration and reproducer added; release-artifact and build-attestation withdrawn (KS-13). The binary applies the compiled pairwise whitelist and the Fact Threshold Check (KS-9\u2032, KS-10\u2032, KS-12, KS-13) to every root version (05 \u00a73).",
+  "x-schema-version": "4.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,7 +15,8 @@
     "keys",
     "purposes",
     "revoked_keys",
-    "issued_at"
+    "issued_at",
+    "quorums"
   ],
   "properties": {
     "_type": {
@@ -97,8 +98,8 @@
         "certification-status",
         "revocation",
         "retrieval-profile",
-        "release-artifact",
-        "build-attestation"
+        "release-registration",
+        "reproducer"
       ],
       "properties": {
         "root": {
@@ -128,10 +129,10 @@
         "retrieval-profile": {
           "$ref": "#/$defs/purpose"
         },
-        "build-attestation": {
+        "freshness-witness": {
           "$ref": "#/$defs/purpose"
         },
-        "release-artifact": {
+        "release-registration": {
           "allOf": [
             {
               "$ref": "#/$defs/purpose"
@@ -140,16 +141,15 @@
               "properties": {
                 "threshold": {
                   "minimum": 2
-                },
-                "key_ids": {
-                  "minItems": 2
                 }
               }
             }
-          ]
+          ],
+          "description": "KS-10\u2032: threshold >= 2; root keys at root threshold (OP-2 (a)) or single-purpose keys (OP-2 (b))"
         },
-        "freshness-witness": {
-          "$ref": "#/$defs/purpose"
+        "reproducer": {
+          "$ref": "#/$defs/purpose",
+          "description": "KS-9\u2032: single-purpose keys; one signature per reproduction statement; quorum in `quorums.reproducer`"
         }
       }
     },
@@ -183,7 +183,21 @@
     },
     "issued_at": {
       "$ref": "#/$defs/timestamp"
-    }
+    },
+    "quorums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reproducer"
+      ],
+      "properties": {
+        "reproducer": {
+          "type": "integer",
+          "minimum": 2
+        }
+      }
+    },
+    "properties": {}
   },
   "$defs": {
     "digest": {
