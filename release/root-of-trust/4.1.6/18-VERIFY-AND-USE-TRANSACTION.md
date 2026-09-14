@@ -1,12 +1,15 @@
 # Output 18 — Verify-and-use transaction model
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 3 keeps the byte-binding proof the review confirmed (review r2 `03` §1) and adds five things:
-> - the legacy-path-occupation layout (`26`);
-> - a transaction area outside Git, with a local registry and union trust records (R2-M9);
-> - unit-of-work generation discipline and bounded snapshot lifetime (R2-M7);
-> - `st_nlink` refusal (R2-L2);
-> - agent consumption of kernel content through `gov` (R2-M8).
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 4 keeps the byte-binding proof, the transaction area, union records, VU-1…VU-13 and the installation state
+> machine (CD3-0). It adds:
+> - VU-14, confined children (CR-03);
+> - a typed, pre-write cross-device refusal (C-2);
+> - doctor naming mixed layouts (C-3);
+> - occupation type by `st_mode` (C-4);
+> - the ignore rule in the layout migration (RV3-L7);
+> - the recorded strength vector over effective policy, and the held registration, in the per-project record;
+> - reinstall identity from the VTS record (CR-09, `20`).
 >
 > Normative keywords: MUST, MUST NOT, SHOULD.
 
@@ -44,6 +47,7 @@ EmbeddedSnapshot bytes and never re-reads a kernel path after digesting it.
 | **VU-11** | **Generation discipline** (R2-M7). Every unit of work (a CLI command, an MCP request, a scheduled job step) that reads policy or performs a governed mutation MUST, under the shared lock, compare its snapshot generation with the installed statement digest, lock and effective trust state (`17` S1–S10). On any difference it MUST reload, if the new state is verified and eligible, or refuse (`SNAPSHOT_GENERATION_STALE`). A long-lived process MUST NOT keep a snapshot beyond `snapshot_max_age` (compiled: 60 seconds, or one unit of work, whichever is shorter) without repeating that comparison. |
 | **VU-12** | **Link count** (R2-L2). Every staged and installed kernel or trust file MUST have `st_nlink == 1` when read and when read back; otherwise `PATH_SUBSTITUTION_DETECTED` before the exchange (staging) or at use. |
 | **VU-13** | **Agent consumption** (R2-M8). Agents receive kernel content only as bytes served by `gov` from the snapshot, with the CI (§12). Direct agent reads of `governance/trust/kernel/**` are T4. |
+| **VU-14** | **Confined children** (CR-03). A repository- or plugin-supplied command runs only through `confine::spawn`, after every trust decision of the unit of work. Its writes to pin locations, the VTS, `governance/trust/**`, occupation entries and the transaction area are denied (`24` §3.5). |
 
 ## 3. Secure reader and secure directory primitives
 
@@ -59,11 +63,11 @@ to the repository root obtained once.
 Refused:
 - a symlink or reparse point on any component, including ancestors;
 - a device, FIFO or socket;
-- an unexpected type, including an occupation entry of the wrong type (§9);
+- an unexpected type, including an occupation entry of the wrong type (§9), decided by `st_mode` or `GetFileInformationByHandle`, never by name or extension (C-4);
 - a link count above 1;
 - a path escaping the root.
 
-A staging directory on a different filesystem from `governance/` gives `TRUST_PLATFORM_UNSUPPORTED(cross_device_tx)`.
+A staging directory on a different filesystem from `governance/` gives `TRUST_PLATFORM_UNSUPPORTED(cross_device_tx)` **before any write** (C-2): `st_dev` of `.governance-runtime/trust-tx` and `governance/` is compared at `prepared`. A `PARTIAL` install on such a machine stays repairable by a same-digest `kernel reinstall` once the runtime directory shares the device.
 
 ## 4. Ingress pipeline (byte flow)
 
@@ -78,11 +82,11 @@ install_tx: exclusive lock; create .governance-runtime/trust-tx/<TX>/ exclusivel
             ARO bundle statements, VTS knowledge)  (never a subset of the current PTR); trust.next/framework.lock last
             fsync                                                                   journal: staged
    ▼  VU-4 read-back + VU-12 link counts                                           journal: verified-staged
-   ▼  first RoT-1 install on a legacy layout only: layout migration steps of 26 §7 (quarantine, moves, occupation entries)
+   ▼  first RoT-1 install on a legacy layout only: layout migration steps of 26 §7 (quarantine, moves, occupation entries, ignore rule)
 RENAME_EXCHANGE governance/trust ↔ trust.next ; fsync governance/                  journal: swapped
-   ▼  migrations from ARO buffers; overlay writes through GovernedFs; computed weakenings (19 §9) → `weakening` trust gate
+   ▼  migrations from ARO buffers: Overlay Surface whitelist first (MIGRATION_OPERATION_NOT_PERMITTED before any write); overlay writes through GovernedFs; recorded strength vector over the post-transaction effective policy (19 §9) → `weakening` trust gate
                                                                                     journal: migrated
-   ▼  KernelSnapshot + CI equality + eligibility + doctor/audit (VU-6); project-strength vector recorded (26 §6)
+   ▼  KernelSnapshot + CI equality + eligibility + doctor/audit (VU-6); strength vector re-recorded over effective policy; held registration recorded (26 §6, 19 §10.6)
                                                                                     journal: verified
 ledger entry (idempotent); VTS per-project record updated; TX deregistered; trust-tx/<TX> moved to trust-tx/done/<TX>
 ```
@@ -143,8 +147,8 @@ ledger entry (idempotent); VTS per-project record updated; TX deregistered; trus
 4. Enumerate `governance/trust/kernel/` through held handles. Refuse non-regular entries, link count > 1 and path-rule
    violations. Read each file once and digest it.
 5. Compare with `RCS(D)` (`KERNEL_TAMPERED` on any difference).
-6. Evaluate trust state and freshness (`17`, `24`), eligibility including E7 (`19` §6), the project-strength vector
-   (`26` §6) and the negative set.
+6. Evaluate trust state, anchors by inclusion, freshness and currency (`17`, `24`); eligibility including E7 (`19` §6); the
+   project-strength vector over the effective policy (`26` §6); and the negative set.
 7. Build `KernelSnapshot {CI, generation, blobs, statement, verdict}`. Release the shared lock.
 
 ### 6.2 Consumers
@@ -191,8 +195,8 @@ It also guards reads of `governance/trust/**`: only `kernel_trust` and `install_
 - **Independent verification:** OS-level tracing by the verifier (`strace -f -e trace=%file,%process`, fanotify or
   eBPF), never an instrumentation layer the builder compiled in (review r2 `07` §2).
 
-Non-`gov` subprocesses (plugins, tools, test commands) remain A3-equivalent (VR-3). Detection is by the next unit of work
-(VU-11).
+Subprocesses `gov` starts (plugins, tool commands, product and test commands) run confined (VU-14). Their remaining writes
+are A3-equivalent (VR-3), and are detected by the next unit of work (VU-11) and by the project-strength vector.
 
 ## 9. Installation state machine
 
@@ -204,10 +208,15 @@ Evaluated first in every process, including commands that need no installation.
 | `LEGACY` | a legacy layout (`governance/framework.lock` is a file or `governance/kernel` is a directory) and no `governance/trust/` | EmbeddedSnapshot ⊔ floor; tree digest checked against `historical_releases` | read-only diagnostics; `update --apply` to an eligible release (layout migration, `26` §7) |
 | `IN_TRANSACTION` | an honoured journal (§5.1) | EmbeddedSnapshot ⊔ floor | read-only diagnostics; `gov recover` |
 | `COMPLETE` | `governance/trust/{FORMAT, framework.lock, kernel/, release.dsse.json or development.json}` present and readable, **every occupation entry present with its exact type**, and no honoured journal | KernelSnapshot if verified and eligible; otherwise EmbeddedSnapshot ⊔ floor | per verdict and freshness (`24` §4.3) |
-| `PARTIAL` | any other combination, including a missing or retyped occupation entry (`PARTIAL(occupation)`), or legacy and RoT-1 entries mixed | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
+| `PARTIAL` | any other combination, including a missing or retyped occupation entry (`PARTIAL(occupation)`), or legacy and RoT-1 entries mixed. Doctor D033 names the mixed layout and stray artefacts such as `governance/framework.lock~legacy` and `governance/kernel/KERNEL_MANIFEST.json` (C-3). | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
 | `FORMAT_UNSUPPORTED` | `governance/trust/FORMAT` names an unimplemented format or layout | none | `gov version`; `gov doctor` |
 
 A foreign transaction artefact (§5.1) is reported and ignored; the state is computed as if it were absent.
+
+Evidence: `evidence/LR2-installation-state-and-strength-reference.json` applies this state machine to the trees left by
+review r3's legacy probes. Every removed, restored, sparse or merged tree with legacy entries is `PARTIAL(occupation)` or
+`LEGACY`. Intact trees, reviewer C's clean clone, checkout, merge and archive trees, and a fresh clone after the
+untracking idiom under the revision-4 ignore rule are `COMPLETE`.
 
 ## 10. Closure table
 
@@ -227,6 +236,9 @@ A foreign transaction artefact (§5.1) is reported and ignored; the state is com
 | Cache replacement | no cache | RT-45 |
 | Derived artefact built under another kernel or policy, or by a legacy binary | VU-8 CI and policy digest | RT-71 |
 | Agent reads kernel or adapter content from disk | VU-13, §12 | RV2-A22 |
+| Repository command writes pins or trust paths before a trust decision | VU-14 | RT-103 |
+| Cross-device transaction area | §3 | RT-123 |
+| Occupation entry presented with the wrong type | §3 | RT-125 |
 
 ## 11. Residuals
 
@@ -234,7 +246,7 @@ A foreign transaction artefact (§5.1) is reported and ignored; the state is com
 |---|---|---|
 | VR-1 | A3 modifies installed files between two units of work. | The current unit is unaffected; the next unit detects it (VU-11). There is no "never re-checked" process. |
 | VR-2 | A3 ignores advisory locks. | Refusals only. |
-| VR-3 | Non-`gov` subprocesses (plugins, tools, tests) write PPS, the overlay, records or the VTS. | PPS: detected by the next unit of work. Overlay: project-strength vector (`26` §6). Records: never authorise trust decisions (`27`). VTS: same-user boundary (RS-3). |
+| VR-3 | Processes outside `gov` (editors, shells, unconfined agents) write PPS, the overlay, records or the VTS; confined children write the overlay or records. | PPS: detected by the next unit of work. Overlay: project-strength vector over effective policy (`26` §6). Records: never authorise trust decisions (`27`). VTS: same-user boundary (RS-3); protected pins are out of reach. |
 | VR-4 | Plugin runtimes and model files consumed by path. | `10` §5. |
 
 ## 12. Agent consumption of kernel content (R2-M8)

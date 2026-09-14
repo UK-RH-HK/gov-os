@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/verification-attestation.schema.json",
   "title": "verification-attestation",
-  "description": "PROPOSED (RoT-1 revision 3). Verification attestation (unchanged shape from revision 2): the independent verifier's verdict for one candidate statement digest.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Verification attestation v2 (payloadType verification-attestation.v2, purpose verification-attestation): the independent verifier's verdict for one candidate statement digest, and the source it reproduced the candidate from (25 §5.1). A final is authentic only if its release.source equals its candidate's (V8); verify-artifact accepts a binary only if an ACCEPTED attestation of that candidate, referenced by the effective TSS, names the same source (A4b). lifts_negative_statement_digest names the REJECTED or WITHDRAWN statement an ACCEPTED verdict lifts (17 MS-2, CR-01).",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,11 +20,12 @@
     "verdict_record",
     "harnesses",
     "findings",
-    "verifier_label"
+    "verifier_label",
+    "source"
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/verification-attestation/v1"
+      "const": "https://agentic-engineering-os/statement/verification-attestation/v2"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -47,11 +48,40 @@
     "version": {
       "$ref": "#/$defs/semver"
     },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_commit",
+        "source_tree_digest",
+        "build_inputs_digest"
+      ],
+      "properties": {
+        "release_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_tree_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
+        },
+        "build_inputs_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "digest of the published build inputs (toolchain, lockfiles)"
+        }
+      }
+    },
     "verdict": {
       "enum": [
         "ACCEPTED",
         "REJECTED"
       ]
+    },
+    "lifts_negative_statement_digest": {
+      "$ref": "#/$defs/digest",
+      "description": "digest of the negative statement this ACCEPTED verdict is issued to lift; an attestation that existed when the negative was issued never lifts it"
     },
     "report": {
       "$ref": "#/$defs/evidence"

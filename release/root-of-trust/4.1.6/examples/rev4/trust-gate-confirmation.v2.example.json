@@ -1,0 +1,16 @@
+{
+  "gate_kind": "framework_update",
+  "gate_id": "HDG-0007",
+  "project_trust_id": "00000000000000000000000000000000",
+  "repository_path": "/home/example/project",
+  "bound_digests": [
+    "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+  ],
+  "presented_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+  "state_fingerprint": "gov-state:cccccccc:2:99999999999999999999999999999999",
+  "method": "interactive_terminal",
+  "confirmed_at": "2026-09-14T00:00:00Z",
+  "operator": "owner",
+  "consumed_by_transaction": null
+}

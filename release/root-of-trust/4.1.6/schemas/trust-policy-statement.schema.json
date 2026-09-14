@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-policy-statement.schema.json",
   "title": "trust-policy-statement",
-  "description": "PROPOSED (RoT-1 revision 3). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory (23; schema constitutional-surface-inventory.schema.json), eligibility including historical releases, install authority, gating, bootstrap (OP-6, OP-7), cumulative prior_policies and lowering_history, unrevocation, optional state chain reset (19 §3).",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory schema 2 (23: presence, exact precedence registration, Overlay Surface, owner-domain slots), eligibility including historical releases and optional production sources (OP-2 S1), install authority, gating, bootstrap (OP-6, OP-7, pin-currency parameters, clock reset), cumulative prior_policies and lowering_history (computed reductions in both directions and over the non-surface fields, 19 §10.6), unrevocation, optional state chain reset.",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -57,7 +57,7 @@
       ]
     },
     "floor_schema_version": {
-      "const": 2
+      "const": 3
     },
     "eligibility": {
       "type": "object",
@@ -124,6 +124,36 @@
               }
             }
           }
+        },
+        "production_sources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "release_commit",
+              "source_tree_digest",
+              "build_inputs_digest"
+            ],
+            "properties": {
+              "release_commit": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              },
+              "source_tree_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
+              },
+              "build_inputs_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "description": "digest of the published build inputs (toolchain, lockfiles)"
+              }
+            }
+          },
+          "description": "present and enforced only if OP-2 selects root-registered production sources (S1): verify-artifact A4b requires the attested source to be listed (ARTIFACT_SOURCE_UNREGISTERED)"
         },
         "evaluation_candidates": {
           "enum": [
@@ -231,7 +261,7 @@
     },
     "surface": {
       "type": "object",
-      "description": "Constitutional Surface Inventory; validated by constitutional-surface-inventory.schema.json",
+      "description": "Constitutional Surface Inventory; validated by constitutional-surface-inventory.schema.json (schema_version 2)",
       "required": [
         "schema",
         "floor_schema_version",
@@ -244,7 +274,7 @@
           "const": "governance-os.constitutional-surface-inventory"
         },
         "floor_schema_version": {
-          "const": 2
+          "const": 3
         },
         "default": {
           "const": "deny"
@@ -310,8 +340,12 @@
       "required": [
         "op6_mode",
         "op7_mode",
+        "pin_max_validity_days",
+        "c3_currency_window_hours",
         "max_anchor_age_days",
-        "witness_max_validity_days"
+        "witness_max_validity_hours",
+        "freshness_witness_threshold",
+        "clock_reset"
       ],
       "properties": {
         "op6_mode": {
@@ -329,6 +363,16 @@
             "compiled_epoch_for_use"
           ]
         },
+        "pin_max_validity_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "maximum valid_until - provisioned_at of a state pin (24 §3.2)"
+        },
+        "c3_currency_window_hours": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "an anchoring event is a currency proof for C3 within this window (24 §4.4 P1)"
+        },
         "max_anchor_age_days": {
           "oneOf": [
             {
@@ -338,9 +382,10 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "OP-7 (b) only"
         },
-        "witness_max_validity_days": {
+        "witness_max_validity_hours": {
           "oneOf": [
             {
               "type": "integer",
@@ -349,7 +394,47 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "OP-7 (c) only: maximum expires_at - issued_at of a freshness witness"
+        },
+        "freshness_witness_threshold": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "OP-7 (c) only; C3 and binary acceptance need at least 2 regardless (compiled)"
+        },
+        "clock_reset": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reset_to",
+                "reason"
+              ],
+              "properties": {
+                "reset_to": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            }
+          ],
+          "description": "lowers the verifier clock high-water after a witness-key compromise (CR-06)"
         }
       }
     },

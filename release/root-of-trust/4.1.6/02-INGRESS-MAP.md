@@ -1,11 +1,17 @@
 # Output 2 — Privileged-ingress map
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 3 updates paths for the legacy-path-occupation layout (`26`) and adds ingress I-48…I-60. The new routes are
-> anchors, pins, trust-gate confirmations, surface registration, binary acceptance, build attestations, legacy residue,
-> occupation entries, long-lived requests and adapter consumption. The mutation inventory gains plugins and tool
-> subprocesses as writers of records and the overlay (R2-M1). Completeness is proven by OS-level tracing over the full
-> command register.
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 4 revises I-18, I-22, I-46, I-47, I-48…I-54 and I-56, and adds I-61…I-68:
+> - the system pin directory and the pin integrity predicate;
+> - in-gate state confirmation;
+> - `gov`-executed repository and plugin commands under confinement;
+> - Overlay Surface migrations;
+> - owner constitutional files;
+> - the attested source of a binary;
+> - the bootstrap parameters, `clock_reset` and production sources;
+> - the local clock.
+>
+> Completeness is proven by OS-level tracing over the full command register.
 
 An **ingress** is any route by which bytes can enter, replace, select or be executed as privileged framework material, or
 by which a fact about such material can be established: identity, eligibility, surface registration, certification,
@@ -32,11 +38,11 @@ revocation, floors, gate requirements or authorisation, currency, binary accepta
 | I-15 | Git delivery (pull, merge, checkout, clone) | none | T4 | evaluated at use: authenticity, integrity, E7, eligibility, floors, trust state, freshness (`24` §4.3), installation state including occupation | R-USE |
 | I-16 | In-place edit or race on installed files | none | T4 | per-unit-of-work snapshot generation (VU-11) | R-USE |
 | I-17 | Use-time readers of kernel content | `context/mod.rs:93-97`, `tools.rs`, `skills.rs`, `adapters.rs`, `orchestration/*`, `verification/mod.rs`, `project.rs:120-139` | T4 | KernelSnapshot API only; GovernedFs read guard | R-USE |
-| I-18 | Migration loading and execution | `update.rs`, `kernel.rs:226-232`, `migrations/framework.rs` | T5 | ARO blobs only; unique chain; no lock operation; `weakening` trust gate | R-MIG |
+| I-18 | Migration loading and execution | `update.rs`, `kernel.rs:226-232`, `migrations/framework.rs` | T5 | ARO blobs only; unique chain; operations only on migration-writable Overlay Surface targets (`23` §11.3), otherwise `MIGRATION_OPERATION_NOT_PERMITTED` before any write; computed weakening over the recorded vector → `weakening` trust gate | R-MIG |
 | I-19 | `gov release build` (producer) | `release.rs:62-228` | T4 | unsigned candidate naming a TPS; the surface checker must exit 0 (`23` §6.1); private-key scan | R-REL, R-SURF |
 | I-20 | `gov release verify DIR` | `release.rs:230-256` | T5 | `authenticate` in report mode | R-REL |
 | I-21 | Certification publication | manual | T5 | attestation → certification → TSS reference | R-CERT |
-| I-22 | Binary build and distribution | `build.rs:40-117` | TCB | TBM compiled; reproducible build; build attestation; `release-artifact` ×2; TSS reference (`25`) | R-EMB, R-ART |
+| I-22 | Binary build and distribution | `build.rs:40-117` | TCB | TBM v2 with `binary.source`; reproducible build from the attested source; custodial stages; build attestation; `release-artifact` ×2; TSS reference (`25`) | R-EMB, R-ART |
 | I-23 | Remote release fetch (future) | none | T5 | transport only | R-NET |
 | I-24 | Release bundle archives (future) | none | T5 | streamed into buffers | R-BUN |
 
@@ -70,26 +76,39 @@ revocation, floors, gate requirements or authorisation, currency, binary accepta
 | I-43 | Trust State, certification, attestation, revocation acceptance | resolution, equivocation, admissibility, MS-2 | R-TS, R-CERT |
 | I-44 | Lineage confirmation and root pins | human command or pin (account database) | R-BOOT |
 | I-45 | `gov`-run git subprocess mutations | GovernedFs argument pre-validation | R-FS |
-| I-46 | Non-`gov` subprocesses (plugins, tools, test commands) | A3-equivalent; detected by the next unit of work (PPS), strength vector (overlay); records never authorise (`27`) | R-USE |
-| I-47 | Candidate → final promotion | `gov release promote` | R-REL |
+| I-46 | Subprocesses `gov` starts (plugins, tool commands, product and test commands, hooks) | run under write confinement (`24` §3.5 (3)); cannot write pins, the VTS, `governance/trust/**`, occupation entries or the transaction area; refused where confinement is unavailable; other writes detected by the next unit of work (PPS) and the strength vector; records never authorise (`27`) | R-USE, R-CONF |
+| I-47 | Candidate → final promotion | `gov release promote`; V8 tree and source equality at every verifier | R-REL |
 
 ## 4. Ingress added in revision 3
 
 | ID | Route | What it could do without a control | Revision 3 control | Req |
 |---|---|---|---|---|
-| **I-48** | `gov trust confirm-state <fingerprint>` | anchor an attacker-chosen epoch | the fingerprint is typed from an independent channel; unheld epochs make the machine `BELOW_ANCHOR`; monotonic (`24` §3) | R-ANCH |
-| **I-49** | State pins (`trust-state-pins`) | anchor from a repository-controlled file | account-database location only; TA-9; digest-bound (`EQUIVOCATION` on mismatch) | R-ANCH |
-| **I-50** | Witness TSS (OP-7 c) | replay old state as fresh | expiry, highest witness `issued_at`, clock rollback detection | R-ANCH |
-| **I-51** | Trust-gate confirmation (`gov trust confirm <gate>`) | authorise a trust decision from an agent or repository | local terminal challenge; VTS record bound to kind, project and digests; never `gov decide` (`27`) | R-GATE |
-| **I-52** | Operator decision pins (`approved-trust-decisions`) | pre-authorise arbitrary transitions | account database; digest-bound; `local_terminal_only[]` kinds excluded | R-GATE |
-| **I-53** | Constitutional Surface registration (`gov trust draft-policy` → TPS) | register weaker constitutional content | root threshold; change list reviewed; lint; computed reductions declared and trust-gated (`23` §6–§7) | R-SURF |
-| **I-54** | `gov trust verify-artifact` and binary replacement | accept a malicious or older binary | A1–A10 (`25` §5) | R-ART |
+| **I-48** | `gov trust confirm-state <fingerprint>` | anchor an attacker-chosen epoch | typed from an independent channel; satisfied only by inclusion; an unheld statement gives `BELOW_ANCHOR`; a currency proof only within `c3_currency_window_hours` (`24` §3.2, §3.4) | R-ANCH |
+| **I-49** | State pins (`trust-state-pins`) | anchor from a repository-controlled or stale file | system pin directory, or the account location under the integrity predicate; mandatory `valid_until` ≤ `pin_max_validity_days`; recomputed per process; inclusion satisfaction; TA-9 restated (`24` §3.2, §3.5) | R-ANCH |
+| **I-50** | Freshness witness (OP-7 c) | replay old state as current; mint currency with one key | separate `freshness-witness` purpose (KS-11); names the effective TSS; C3 needs ≥ 2 keys; validity bound; highest `issued_at`; witness-only clock high-water (`24` §3.3, §8) | R-ANCH |
+| **I-51** | Trust-gate confirmation (`gov trust confirm <gate>`) | authorise a trust decision from an agent or repository | local terminal challenge with typed digest prefix and, for C3 kinds, typed state fingerprint; VTS record bound to kind, project and digests; never `gov decide` (`27`) | R-GATE |
+| **I-52** | Operator decision pins (`approved-trust-decisions`) | pre-authorise arbitrary transitions | system pin directory or the account location under the integrity predicate; digest-bound; mandatory `expires_at`; `approved_under_state` in the effective chain; currency proof for C3 kinds; `local_terminal_only[]` kinds excluded (`27` §3.2) | R-GATE |
+| **I-53** | Constitutional Surface registration (`gov trust draft-policy` → TPS) | register weaker constitutional content | root threshold; change list reviewed; lint; exact precedence registration, presence, Overlay Surface, owner-domain slots; computed reductions in both directions declared and trust-gated (`23` §6–§7, `19` §10.6) | R-SURF |
+| **I-54** | `gov trust verify-artifact` and binary replacement | accept a malicious or older binary | A1–A10 with attested source (A4a, A4b), accepted-TBM high-water (A7) and currency proof (A9) (`25` §5) | R-ART |
 | **I-55** | Build attestations | self-attested reproduction | `build-attestation` purpose, KS-10, independent custody | R-ART |
-| **I-56** | Legacy runtime residue (`.governance-runtime/update/*`, `migration/*`) | legacy rollback source | quarantine; occupation of `.governance-runtime/migration` (tracked) | R-FMT |
+| **I-56** | Legacy runtime residue (`.governance-runtime/update/*`, `migration/*`) | legacy rollback source | quarantine; occupation of `.governance-runtime/migration` (tracked, and re-included by the ignore rule so untracking idioms keep it) | R-FMT |
 | **I-57** | Occupation entries delivered or removed via Git | remove the legacy barrier | PPS; `PARTIAL(occupation)` | R-PART, R-FMT |
 | **I-58** | Long-lived processes (MCP server, scheduler) | enforce a superseded snapshot | VU-11 per request or job step | R-USE |
 | **I-59** | Agent reads of adapter bodies and kernel files | follow A2-rewritten instructions | pointers; `gov kernel show`; VTS rendering record | R-AGENT |
 | **I-60** | Lock and VTS-record hints | refuse or relax | warnings only (`17` S8) | R-LOCK |
+
+## 4b. Ingress added in revision 4
+
+| ID | Route | What it could do without a control | Revision 4 control | Req |
+|---|---|---|---|---|
+| **I-61** | System pin directory (`/etc/gov/`, `/Library/Application Support/gov/`, `%ProgramData%\gov\`) and account pin files | anchor or approve from a location the governed account can write | OS-resolved location; integrity predicate; recomputed per process (`24` §3.5) | R-ANCH-6 |
+| **I-62** | In-gate state confirmation (typed fingerprint in `gov trust confirm`) | fabricate currency | typed from an independent channel; must name the effective TSS; recorded as a human anchor (`24` §3.2, `27` §3.1) | R-GATE-3 |
+| **I-63** | Repository- and plugin-supplied commands executed by `gov` | write pins, the VTS or trust paths before a trust decision (RV3-B-A03) | `confine::spawn`; trust decisions precede children; refusal without confinement (`24` §3.5) | R-CONF-1…3 |
+| **I-64** | Overlay migration operations (`set_overlay_key`, `set_overlay_rule`, `rename_overlay_key`, `add_from_template`) | widen tool permissions, exceptions, identifiers or contract; write any overlay file (RV3-B-A18) | Overlay Surface whitelist per operation and target; computed weakening over the recorded vector (`23` §11.3, `19` §9) | R-MIG-5, R-MIG-7 |
+| **I-65** | Owner constitutional files outside the kernel (`23` §7.2) | an absent or replaced constitution treated as present | owner-domain slots; `owner_constitutional_file` confirmation; fail-closed absence; strength vector | R-SURF-12 |
+| **I-66** | Verification attestation v2 (`source`, `lifts_negative_statement_digest`) | choose a binary's source; lift a negative with an old attestation | V8, A4b; custodial stages; MS-2 (`25` §5.1, `17` §2) | R-ART-5, R-CERT-4 |
+| **I-67** | Trust Policy `bootstrap` parameters and `clock_reset`; `eligibility.production_sources` | widen currency windows, reset the clock, register a source | root threshold; computed reductions (CR-10) with a per-project gate | R-TS-6 |
+| **I-68** | Local clock | make pins or windows valid again; poison the high-water | `clock_high_water` raised only by witnesses; SV-11 refuses future statements; a clock below the high-water makes clock-based proofs unusable (`24` §8) | R-TS-10, R-TS-11 |
 
 ## 5. Protected Path Set and file-mutation inventory
 
@@ -113,12 +132,12 @@ revocation, floors, gate requirements or authorisation, currency, binary accepta
 | 9 | Adapter and registry generation | `adapters.rs`, `tools.rs`, `capabilities/registry.rs` | no | GovernedFs; VTS rendering record |
 | 10 | Tool installer file writes | `tools.rs` | no | GovernedFs |
 | 11 | Upstream packaging, lesson clustering | `upstream.rs`, `lessons.rs` | no | GovernedFs |
-| 12 | **Plugins** (subprocess, cwd = project root, no sandbox) | `capabilities/host.rs:175-190` | outside GovernedFs | A3-equivalent. PPS changes: detected by the next unit of work. Records: never authorise trust. Overlay: strength vector. VTS: RS-3. |
-| 13 | **Tool install and uninstall commands**; product test commands | `tools.rs:458-464, 503`; `verification/` | outside GovernedFs | as row 12; kernel tool commands are content-registered |
+| 12 | **Plugins** (subprocess, cwd = project root) | `capabilities/host.rs:175-190` | outside GovernedFs, **confined** | Confined children (`24` §3.5): no writes to pins, the VTS, PPS or the transaction area. Other writes are A3-equivalent. Records: never authorise trust. Overlay: strength vector. |
+| 13 | **Tool install and uninstall commands**; product test commands | `tools.rs:458-464, 503`; `verification/` | outside GovernedFs, **confined** | as row 12; kernel tool commands are content-registered |
 | 14 | Git operations by users and agents | none | outside | evaluated at use; journals in Git are foreign |
 | 15 | External editors and processes | — | outside | A2/A3 model |
 | 16 | **Pre-RoT binaries 4.1.2–4.1.5** | legacy binaries | cannot (P3r3: 0 of 695 invocations, 0 of 40 chains) | `26` |
-| 17 | VTS, pins, confirmations | `gov`, operator, A3 | n/a | account database; RS-3 |
+| 17 | VTS, pins, confirmations | `gov`, operator, A3 | n/a | pins: system pin directory, or the account location under the integrity predicate; VTS: account database; confined children cannot write either; RS-3 |
 | 18 | Release build output | `release.rs` | canonical repository only | producer rules; LR-3 |
 
 ## 6. Completeness rules (enforced by tests)
@@ -140,3 +159,5 @@ revocation, floors, gate requirements or authorisation, currency, binary accepta
 6. A new `GOV_*` variable selecting kernel material, trust metadata, a trust-store location, an anchor or a decision fails
    the architecture test.
 7. Every ingress in this map names at least one scenario in `12`; `22` checks this.
+8. Every spawn of a repository- or plugin-supplied command goes through `confine::spawn` (R-CONF-1). The architecture test
+   fails on any other spawn of such a command.

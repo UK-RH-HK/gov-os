@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-gate-confirmation.schema.json",
   "title": "trust-gate-confirmation",
-  "description": "PROPOSED (RoT-1 revision 3). Local trust-gate confirmation recorded in the Verifier Trust Store (27 §3). The only authorisation for a trust decision; never a repository record.",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Local trust-gate confirmation recorded in the Verifier Trust Store (27 §3). The only authorisation for a trust decision besides a protected decision pin; never a repository record. For C3 kinds confirmed on the terminal, state_fingerprint is the fingerprint the operator typed from an independent channel; it must name the effective TSS and is a clockless currency proof (24 §4.4 P2).",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -56,6 +56,10 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
+    "state_fingerprint": {
+      "type": "string",
+      "pattern": "^gov-state:[0-9a-f]{8}:[0-9]+:[0-9a-f]{32}$"
+    },
     "method": {
       "enum": [
         "interactive_terminal",
@@ -81,5 +85,34 @@
         }
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "method",
+          "gate_kind"
+        ],
+        "properties": {
+          "method": {
+            "const": "interactive_terminal"
+          },
+          "gate_kind": {
+            "enum": [
+              "init_ack",
+              "framework_update",
+              "downgrade",
+              "evaluation_candidate",
+              "adopt_lineage"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "state_fingerprint"
+        ]
+      }
+    }
+  ]
 }

@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/build-attestation.schema.json",
   "title": "build-attestation",
-  "description": "PROPOSED (RoT-1 revision 3). Build attestation statement (payloadType build-attestation.v1, purpose build-attestation; KS-10): an independent rebuild of source_commit with build_inputs_digest produced the same binary and Trust Base Manifest digests (25 §3).",
-  "x-schema-version": "1.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Build attestation v2 (payloadType build-attestation.v2, purpose build-attestation; KS-10): an independent rebuild of source {release_commit, source_tree_digest, build_inputs_digest} produced the same binary and Trust Base Manifest digests (25 §3). The rebuilder runs verify-artifact --stage rebuilder first: the source must be the one an ACCEPTED verification attested (05 §7 rule 6).",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -13,8 +13,7 @@
     "trust_root_id",
     "issued_at",
     "artifact",
-    "source_commit",
-    "build_inputs_digest",
+    "source",
     "tbm_digest",
     "reproduced",
     "rebuilder_label",
@@ -22,7 +21,7 @@
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/build-attestation/v1"
+      "const": "https://agentic-engineering-os/statement/build-attestation/v2"
     },
     "trust_profile": {
       "enum": [
@@ -69,13 +68,30 @@
         }
       }
     },
-    "source_commit": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
-    },
-    "build_inputs_digest": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_commit",
+        "source_tree_digest",
+        "build_inputs_digest"
+      ],
+      "properties": {
+        "release_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_tree_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
+        },
+        "build_inputs_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "digest of the published build inputs (toolchain, lockfiles)"
+        }
+      }
     },
     "tbm_digest": {
       "type": "string",

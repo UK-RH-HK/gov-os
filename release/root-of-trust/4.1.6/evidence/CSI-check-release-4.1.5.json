@@ -1,17 +1,17 @@
 {
- "exit": 0,
+ "exit": 3,
  "kernel_dir": "<repo>/release/releases/4.1.5/kernel",
  "files_classified": 121,
  "counts": {
   "structured": 18,
-  "floor": 234,
+  "floor": 237,
   "release_bound": 32,
-  "pinned": 177,
+  "pinned": 179,
   "pinned_file": 97,
   "members": 4,
   "transaction_input": 4,
   "informational_file": 2,
-  "project_tunable": 57,
+  "project_tunable": 52,
   "precedence": 1,
   "covered_by_collection": 85,
   "collection_id": 37,
@@ -23,8 +23,43 @@
  "unclassified_leaf_count": 0,
  "ambiguous_leaves": [],
  "structure": [],
- "violations": [],
- "violation_count": 0,
+ "required_missing": [],
+ "required_missing_count": 0,
+ "violations": [
+  {
+   "class": "migration",
+   "reason": "migration_operation_not_permitted",
+   "problems": [
+    {
+     "index": 5,
+     "op": "set_lock_field",
+     "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+     "file": "migrations/M-4.1.1-4.1.2.yaml"
+    },
+    {
+     "index": 1,
+     "op": "set_lock_field",
+     "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+     "file": "migrations/M-4.1.2-4.1.3.yaml"
+    },
+    {
+     "index": 2,
+     "op": "set_lock_field",
+     "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+     "file": "migrations/M-4.1.3-4.1.4.yaml"
+    },
+    {
+     "index": 2,
+     "op": "set_lock_field",
+     "problem": "lock operations are not permitted (R-MIG-3): the install transaction writes the RoT-1 lock",
+     "file": "migrations/M-4.1.4-4.1.5.yaml"
+    }
+   ],
+   "count": 4
+  }
+ ],
+ "violation_count": 1,
  "stronger_than_registered": [],
- "precedence_weaker_key_count": 0
+ "precedence_unregistered_count": 0,
+ "migration_problem_count": 4
 }

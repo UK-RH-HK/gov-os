@@ -1,8 +1,8 @@
 schema: governance-os.constitutional-surface-inventory
-schema_version: 1
-csi_version: 1
-status: PROPOSED (RoT-1 revision 3) - draft surface section of Trust Policy v1; not signed, not active, not approved
-floor_schema_version: 2
+schema_version: 2
+csi_version: 2
+status: PROPOSED (RoT-1 revision 4) - draft surface section of Trust Policy v1; not signed, not active, not approved
+floor_schema_version: 3
 default: deny
 derived_from:
   kernel_dir: framework
@@ -48,20 +48,20 @@ vocabulary:
     - L3
     - L4
     - L5
-    radius: &id001
+    radius:
     - R0
     - R1
     - R2
     - R3
     - R4
     - R5
-    tier: &id004
+    tier:
     - none
     - T0
     - T1
     - T2
     - T3
-    reasoning: &id005
+    reasoning:
     - none
     - low
     - medium
@@ -75,6 +75,26 @@ vocabulary:
   - overridable
   - shrink_only
   - strengthen_only_bool
+  presence:
+  - optional
+  - required
+  overlay_directions:
+  - add
+  - applicable_superset
+  - classification_superset
+  - contract_at_least
+  - down
+  - effective_policy
+  - entries_subset
+  - equal
+  - file_set_subset
+  - map_subset
+  - none
+  - remove
+  - strict_false
+  - strict_true
+  - up
+  operator_vocabulary: floor-ops/3
 precedence:
   default_mode: immutable
   rules:
@@ -483,7 +503,7 @@ precedence:
   - key: MEMORY_POLICY.namespaces.*.sensitivity
     mode: floor
     kind: ordered
-    order: &id002
+    order:
     - public
     - internal
     - confidential
@@ -500,7 +520,7 @@ precedence:
   - key: MEMORY_POLICY.namespaces.*.export
     mode: floor
     kind: ordered
-    order: &id003
+    order:
     - allowed
     - framework-lessons-only
     - denied
@@ -606,11 +626,13 @@ never_exception_relaxable_prefixes:
 rationale:
   project_tunable: 'POLICY_PRECEDENCE marks the key overridable: the project layer may set it freely, so no kernel-lineage floor can be stronger'
   pinned: no order in which a change is provably a strengthening; any change needs a Trust Policy registration signed at root threshold
+  presence: "every registered file and leaf is required (23 \xA73.5); `optional` is declared only where absence removes a capability and never a control, with absent_rationale"
 files:
 - path: policies/ARCHIVE_POLICY.yaml
   mode: structured
   name: ARCHIVE_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: ARCHIVE_POLICY.policy
@@ -644,8 +666,12 @@ files:
     class: project_tunable
     precedence_rule: ARCHIVE_POLICY.*
   - key: ARCHIVE_POLICY.default_retrieval_for_archive
-    class: project_tunable
-    precedence_rule: ARCHIVE_POLICY.*
+    class: floor
+    op: bool_toward
+    strict: false
+    note: 'security decision point (CR-07, review r3 RV3-L2): classified floor or pinned so a kernel cannot change it without a root-signed registration; the project layer keeps the registered precedence;
+      retrieval scope of historical paths (project.rs, paths.rs)'
+    value: false
   - key: ARCHIVE_POLICY.archive_mutation
     class: pinned
     precedence_rule: ARCHIVE_POLICY.archive_mutation
@@ -656,6 +682,7 @@ files:
   mode: structured
   name: AUTHORITY_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: AUTHORITY_POLICY.policy
@@ -1106,6 +1133,7 @@ files:
   mode: structured
   name: BUDGET_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: BUDGET_POLICY.policy
@@ -1161,6 +1189,7 @@ files:
   mode: structured
   name: CHANGE_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: CHANGE_POLICY.policy
@@ -1184,7 +1213,13 @@ files:
   - key: CHANGE_POLICY.auto_approve_max_radius
     class: floor
     op: ordered_at_most
-    order: *id001
+    order:
+    - R0
+    - R1
+    - R2
+    - R3
+    - R4
+    - R5
     precedence_rule: CHANGE_POLICY.auto_approve_max_radius
     value: R1
   - key: CHANGE_POLICY.auto_simulate_triggers
@@ -1342,6 +1377,7 @@ files:
   mode: structured
   name: CHECKPOINT_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: CHECKPOINT_POLICY.policy
@@ -1401,6 +1437,7 @@ files:
   mode: structured
   name: CONTEXT_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: CONTEXT_POLICY.policy
@@ -1459,6 +1496,7 @@ files:
   mode: structured
   name: HUMAN_GATE_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: HUMAN_GATE_POLICY.policy
@@ -1493,7 +1531,13 @@ files:
   - key: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius
     class: floor
     op: ordered_at_most
-    order: *id001
+    order:
+    - R0
+    - R1
+    - R2
+    - R3
+    - R4
+    - R5
     precedence_rule: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius
     value: R1
   - key: HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence
@@ -1526,8 +1570,12 @@ files:
       HUMAN_GATE_POLICY.must_be_presented_in_chat:
       - sha256:b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b
   - key: HUMAN_GATE_POLICY.continue_independent_work
-    class: project_tunable
-    precedence_rule: HUMAN_GATE_POLICY.continue_independent_work
+    class: floor
+    op: bool_toward
+    strict: false
+    note: 'security decision point (CR-07, review r3 RV3-L2): classified floor or pinned so a kernel cannot change it without a root-signed registration; the project layer keeps the registered precedence;
+      work continuation while a gate is pending (status.rs)'
+    value: true
   - key: HUMAN_GATE_POLICY.batch_low_priority
     class: project_tunable
     precedence_rule: HUMAN_GATE_POLICY.batch_low_priority
@@ -1535,6 +1583,7 @@ files:
   mode: structured
   name: LEARNING_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: LEARNING_POLICY.policy
@@ -1586,8 +1635,12 @@ files:
     - packet
     - synthetic_fixture
   - key: LEARNING_POLICY.upstream.aggregate_metrics_enabled
-    class: project_tunable
-    precedence_rule: LEARNING_POLICY.upstream.aggregate_metrics_enabled
+    class: floor
+    op: bool_toward
+    strict: false
+    note: 'security decision point (CR-07, review r3 RV3-L2): classified floor or pinned so a kernel cannot change it without a root-signed registration; the project layer keeps the registered precedence;
+      upstream packet content (upstream.rs)'
+    value: false
   - key: LEARNING_POLICY.upstream.forbidden_paths
     class: floor
     op: set_superset
@@ -1642,6 +1695,7 @@ files:
   mode: structured
   name: MEMORY_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: MEMORY_POLICY.policy
@@ -1669,8 +1723,12 @@ files:
       MEMORY_POLICY.memory_classes:
       - sha256:c5497694bf439a33f146cc0925ef45ed8dfc1bd91f616b80b22dc4ff68588024
   - key: MEMORY_POLICY.embedding.provider
-    class: project_tunable
-    precedence_rule: MEMORY_POLICY.*
+    class: pinned
+    note: 'security decision point (CR-07, review r3 RV3-L2): classified floor or pinned so a kernel cannot change it without a root-signed registration; the project layer keeps the registered precedence;
+      selects the embed plugin that receives indexed text (memory/embedder.rs)'
+    digests:
+      MEMORY_POLICY.embedding.provider:
+      - sha256:a1783439b3cc3e6a60456924d664d6f9f7811a5beb10826307418abf8407b225
   - key: MEMORY_POLICY.embedding.version
     class: project_tunable
     precedence_rule: MEMORY_POLICY.*
@@ -1678,8 +1736,12 @@ files:
     class: project_tunable
     precedence_rule: MEMORY_POLICY.*
   - key: MEMORY_POLICY.reranker.provider
-    class: project_tunable
-    precedence_rule: MEMORY_POLICY.*
+    class: pinned
+    note: 'security decision point (CR-07, review r3 RV3-L2): classified floor or pinned so a kernel cannot change it without a root-signed registration; the project layer keeps the registered precedence;
+      selects the rerank plugin that receives retrieved text (memory/embedder.rs)'
+    digests:
+      MEMORY_POLICY.reranker.provider:
+      - sha256:30a0924a3360be687d1df9fcbbfdff62c01bc0fd14036ab9076cf7f451568666
   - key: MEMORY_POLICY.reranker.version
     class: project_tunable
     precedence_rule: MEMORY_POLICY.*
@@ -1769,7 +1831,12 @@ files:
   - key: MEMORY_POLICY.namespaces.governance.sensitivity
     class: floor
     op: ordered_at_least
-    order: *id002
+    order:
+    - public
+    - internal
+    - confidential
+    - restricted
+    - secret
     precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
     value: internal
   - key: MEMORY_POLICY.namespaces.governance.roles
@@ -1784,7 +1851,10 @@ files:
   - key: MEMORY_POLICY.namespaces.governance.export
     class: floor
     op: ordered_at_least
-    order: *id003
+    order:
+    - allowed
+    - framework-lessons-only
+    - denied
     precedence_rule: MEMORY_POLICY.namespaces.*.export
     value: framework-lessons-only
   - key: MEMORY_POLICY.namespaces.governance.embed
@@ -1793,7 +1863,12 @@ files:
   - key: MEMORY_POLICY.namespaces.spec.sensitivity
     class: floor
     op: ordered_at_least
-    order: *id002
+    order:
+    - public
+    - internal
+    - confidential
+    - restricted
+    - secret
     precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
     value: internal
   - key: MEMORY_POLICY.namespaces.spec.roles
@@ -1808,7 +1883,10 @@ files:
   - key: MEMORY_POLICY.namespaces.spec.export
     class: floor
     op: ordered_at_least
-    order: *id003
+    order:
+    - allowed
+    - framework-lessons-only
+    - denied
     precedence_rule: MEMORY_POLICY.namespaces.*.export
     value: denied
   - key: MEMORY_POLICY.namespaces.spec.embed
@@ -1817,7 +1895,12 @@ files:
   - key: MEMORY_POLICY.namespaces.product.sensitivity
     class: floor
     op: ordered_at_least
-    order: *id002
+    order:
+    - public
+    - internal
+    - confidential
+    - restricted
+    - secret
     precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
     value: internal
   - key: MEMORY_POLICY.namespaces.product.roles
@@ -1832,7 +1915,10 @@ files:
   - key: MEMORY_POLICY.namespaces.product.export
     class: floor
     op: ordered_at_least
-    order: *id003
+    order:
+    - allowed
+    - framework-lessons-only
+    - denied
     precedence_rule: MEMORY_POLICY.namespaces.*.export
     value: denied
   - key: MEMORY_POLICY.namespaces.product.embed
@@ -1841,7 +1927,12 @@ files:
   - key: MEMORY_POLICY.namespaces.archive.sensitivity
     class: floor
     op: ordered_at_least
-    order: *id002
+    order:
+    - public
+    - internal
+    - confidential
+    - restricted
+    - secret
     precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
     value: internal
   - key: MEMORY_POLICY.namespaces.archive.roles
@@ -1856,7 +1947,10 @@ files:
   - key: MEMORY_POLICY.namespaces.archive.export
     class: floor
     op: ordered_at_least
-    order: *id003
+    order:
+    - allowed
+    - framework-lessons-only
+    - denied
     precedence_rule: MEMORY_POLICY.namespaces.*.export
     value: denied
   - key: MEMORY_POLICY.namespaces.archive.embed
@@ -1905,6 +1999,7 @@ files:
   mode: structured
   name: MODEL_ROUTING_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: MODEL_ROUTING_POLICY.policy
@@ -1949,175 +2044,320 @@ files:
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.discovery
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.research
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.experiment
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.specification
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.decision-preparation
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.data
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T1
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.architecture
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.implementation
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.integration
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.test-design
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.test-execution
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T1
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.security
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.devops
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.performance
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.validation
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T1
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.refactor
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.repair
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.documentation
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T1
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.release
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.tooling
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.memory
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.governance
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.migration
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R0
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
     value: T1
   - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R1
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
     value: T1
   - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R2
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R3
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
     value: T2
   - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R4
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R5
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
     value: T3
   - key: MODEL_ROUTING_POLICY.record_evidence
@@ -2138,14 +2378,15 @@ files:
   mode: structured
   name: POLICY_PRECEDENCE
   policy_file: true
+  presence: required
   collections:
   - path: rules
     id_field: key
-    rationale: rules are compared per concrete key of the policy universe through the precedence lattice, so a new, reordered or re-scoped rule cannot weaken any key
+    rationale: "rules are registered exactly (ordered list, default_mode, layers) and the project-layer rule of every key is read from the Trust Policy only (23 \xA74 revision 4)"
   leaves:
   - key: POLICY_PRECEDENCE.rules[key]#members
     class: precedence
-    rationale: rules are compared per concrete key of the policy universe through the precedence lattice, so a new, reordered or re-scoped rule cannot weaken any key
+    rationale: "rules are registered exactly (ordered list, default_mode, layers) and the project-layer rule of every key is read from the Trust Policy only (23 \xA74 revision 4)"
   - key: POLICY_PRECEDENCE.rules[key=*]
     class: covered_by_collection
     subtree: true
@@ -2174,6 +2415,7 @@ files:
   mode: structured
   name: SECURITY_POLICY
   policy_file: true
+  presence: required
   collections:
   - path: secret_content_patterns
     id_field: id
@@ -2322,6 +2564,7 @@ files:
   mode: structured
   name: TEST_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: TEST_POLICY.policy
@@ -2396,6 +2639,7 @@ files:
   mode: structured
   name: TOOL_POLICY
   policy_file: true
+  presence: required
   collections: []
   leaves:
   - key: TOOL_POLICY.policy
@@ -2525,6 +2769,7 @@ files:
 - path: roles/ROLES.yaml
   mode: structured
   name: ROLES
+  presence: required
   collections:
   - path: roles
     id_field: id
@@ -2623,12 +2868,22 @@ files:
   - key: ROLES.roles[id=orchestrator].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=orchestrator].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=orchestrator].name
     class: pinned
@@ -2645,12 +2900,22 @@ files:
   - key: ROLES.roles[id=product-spec-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=product-spec-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=product-spec-agent].name
     class: pinned
@@ -2667,12 +2932,22 @@ files:
   - key: ROLES.roles[id=research-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=research-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=research-agent].name
     class: pinned
@@ -2689,12 +2964,22 @@ files:
   - key: ROLES.roles[id=architecture-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=architecture-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=architecture-agent].name
     class: pinned
@@ -2711,12 +2996,22 @@ files:
   - key: ROLES.roles[id=ux-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=ux-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=ux-agent].name
     class: pinned
@@ -2733,12 +3028,22 @@ files:
   - key: ROLES.roles[id=frontend-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=frontend-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=frontend-engineer].name
     class: pinned
@@ -2755,12 +3060,22 @@ files:
   - key: ROLES.roles[id=backend-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=backend-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=backend-engineer].name
     class: pinned
@@ -2777,12 +3092,22 @@ files:
   - key: ROLES.roles[id=data-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=data-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=data-engineer].name
     class: pinned
@@ -2799,12 +3124,22 @@ files:
   - key: ROLES.roles[id=integration-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=integration-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=integration-engineer].name
     class: pinned
@@ -2821,12 +3156,22 @@ files:
   - key: ROLES.roles[id=ai-ml-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=ai-ml-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=ai-ml-engineer].name
     class: pinned
@@ -2843,12 +3188,22 @@ files:
   - key: ROLES.roles[id=devops-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=devops-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=devops-engineer].name
     class: pinned
@@ -2865,12 +3220,22 @@ files:
   - key: ROLES.roles[id=security-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=security-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=security-engineer].name
     class: pinned
@@ -2887,12 +3252,22 @@ files:
   - key: ROLES.roles[id=performance-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=performance-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=performance-engineer].name
     class: pinned
@@ -2909,12 +3284,22 @@ files:
   - key: ROLES.roles[id=data-author].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T1
   - key: ROLES.roles[id=data-author].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: low
   - key: ROLES.roles[id=data-author].name
     class: pinned
@@ -2931,12 +3316,22 @@ files:
   - key: ROLES.roles[id=independent-test-designer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=independent-test-designer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=independent-test-designer].name
     class: pinned
@@ -2953,12 +3348,22 @@ files:
   - key: ROLES.roles[id=test-execution-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T1
   - key: ROLES.roles[id=test-execution-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: low
   - key: ROLES.roles[id=test-execution-agent].name
     class: pinned
@@ -2975,12 +3380,22 @@ files:
   - key: ROLES.roles[id=integration-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=integration-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=integration-agent].name
     class: pinned
@@ -2997,12 +3412,22 @@ files:
   - key: ROLES.roles[id=change-controller].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=change-controller].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=change-controller].name
     class: pinned
@@ -3019,12 +3444,22 @@ files:
   - key: ROLES.roles[id=memory-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=memory-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=memory-engineer].name
     class: pinned
@@ -3041,12 +3476,22 @@ files:
   - key: ROLES.roles[id=tooling-engineer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=tooling-engineer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=tooling-engineer].name
     class: pinned
@@ -3063,12 +3508,22 @@ files:
   - key: ROLES.roles[id=independent-auditor].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=independent-auditor].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=independent-auditor].name
     class: pinned
@@ -3085,12 +3540,22 @@ files:
   - key: ROLES.roles[id=release-agent].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T2
   - key: ROLES.roles[id=release-agent].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: medium
   - key: ROLES.roles[id=release-agent].name
     class: pinned
@@ -3107,12 +3572,22 @@ files:
   - key: ROLES.roles[id=routine-documentation].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T1
   - key: ROLES.roles[id=routine-documentation].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: low
   - key: ROLES.roles[id=routine-documentation].name
     class: pinned
@@ -3129,12 +3604,22 @@ files:
   - key: ROLES.roles[id=migration-executor].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=migration-executor].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=migration-executor].name
     class: pinned
@@ -3151,12 +3636,22 @@ files:
   - key: ROLES.roles[id=migration-reviewer].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=migration-reviewer].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=migration-reviewer].name
     class: pinned
@@ -3173,12 +3668,22 @@ files:
   - key: ROLES.roles[id=migration-verifier].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=migration-verifier].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=migration-verifier].name
     class: pinned
@@ -3195,12 +3700,22 @@ files:
   - key: ROLES.roles[id=memory-verifier].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: T3
   - key: ROLES.roles[id=memory-verifier].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: high
   - key: ROLES.roles[id=memory-verifier].name
     class: pinned
@@ -3217,12 +3732,22 @@ files:
   - key: ROLES.roles[id=human].minimum_tier
     class: floor
     op: ordered_at_least
-    order: *id004
+    order:
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
     value: none
   - key: ROLES.roles[id=human].default_reasoning
     class: floor
     op: ordered_at_least
-    order: *id005
+    order:
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
     value: none
   - key: ROLES.roles[id=human].name
     class: pinned
@@ -3233,6 +3758,7 @@ files:
 - path: constitution/HARD_INVARIANTS.yaml
   mode: structured
   name: HARD_INVARIANTS
+  presence: required
   collections:
   - path: invariants
     id_field: id
@@ -3302,6 +3828,7 @@ files:
 - path: KERNEL.yaml
   mode: structured
   name: KERNEL
+  presence: required
   collections: []
   leaves:
   - key: KERNEL.framework
@@ -3474,6 +4001,7 @@ files:
 - path: tools/registry/TOOLS.yaml
   mode: structured
   name: TOOLS_REGISTRY
+  presence: optional
   collections:
   - path: tools
     id_field: tool_id
@@ -3543,6 +4071,7 @@ files:
       - sha256:b5e9a61279fe60cbec4db4c9c857f27e74f6b0d56d45ad9133149cbdb73b7cfc
       TOOLS_REGISTRY.tools[tool_id=TOOL-WEB-001]:
       - sha256:c00f37a7aca2e56e5ef3f497a018bd9d9cb9e5e783ace8ac99ffa461f0eb9804
+  absent_rationale: 'absent: no kernel tool descriptors are offered (ids_subset membership; removal is a narrowing)'
 - path: policies/ENFORCEMENT_MAP.yaml
   mode: pinned_file
   digests:
@@ -3567,8 +4096,11 @@ files:
     tools/mcp/registry.yaml:
     - sha256:8b848c6660cef227827ce3df20308ee6f021460b23ca861fe404c962096a3758
   rationale: non-orderable constitutional content (enforcement map, command contract, constitution text, MCP registry)
+  presence: optional
+  absent_rationale: 'absent: no kernel MCP servers are offered'
 - glob: adapters/*
   mode: pinned_file
+  presence: required
   digests:
     adapters/api/adapter.yaml:
     - sha256:349dc1b97fc22fe1407dba473485cf2a83d0b5656104bb23fdc3910889677ba7
@@ -3593,6 +4125,7 @@ files:
   rationale: agent-facing adapter descriptors and templates
 - glob: overlay-templates/*.yaml
   mode: pinned_file
+  presence: required
   digests:
     overlay-templates/CAPABILITY_PROFILE.yaml:
     - sha256:7d8fa1a23a11d73dac3c3c9e329433197204f2ad97e729a1ed0a4deb770e45e1
@@ -3611,6 +4144,7 @@ files:
   rationale: defaults written into every new project overlay
 - glob: schemas/*.schema.json
   mode: pinned_file
+  presence: required
   digests:
     schemas/adapter-manifest.schema.json:
     - sha256:47190483d9c89061efbb107dfe9bfa77fed52a2bfd71033328071e755c439e2d
@@ -3739,6 +4273,7 @@ files:
   rationale: validate records, overlays, exceptions, gates, registries and migrations
 - glob: skills/SKL-*.yaml
   mode: pinned_file
+  presence: required
   digests:
     skills/SKL-API-CONTRACT-REVIEW.yaml:
     - sha256:842bba2593500798f4799b4a24aedb5a78560914cb17cd1ab14dda0c3b06adba
@@ -3767,6 +4302,7 @@ files:
   rationale: agent-facing skill instructions
 - glob: taxonomy/*.yaml
   mode: pinned_file
+  presence: required
   digests:
     taxonomy/CAPABILITY_TAXONOMY.yaml:
     - sha256:30d5109f773c5e17c22bca0bf0dc4f66bb66ae76e961b59652985afee3cfb540
@@ -3775,11 +4311,152 @@ files:
   rationale: readiness and capability vocabularies consumed by readiness gating
 - glob: migrations/M-*.yaml
   mode: transaction_input
-  rationale: "consumed only inside the install transaction from authenticated buffers (04 V10); overlay effects are computed and every weakening needs a trust gate (19 \xA79); cannot change any floor, pin\
-    \ or registration"
+  presence: optional
+  absent_rationale: bound by the release statement's migrations[] (04 V10), not by presence
+  rationale: "consumed only inside the install transaction from authenticated buffers (04 V10); every operation must target a migration-writable Overlay Surface key (23 \xA711); overlay effects are computed\
+    \ over effective policy and every weakening needs a trust gate (19 \xA79); cannot change any floor, pin or registration"
 - path: migrations/README.md
   mode: informational_file
+  presence: optional
+  absent_rationale: documentation; no runtime reader
   rationale: documentation; no runtime reader
 - path: tools/installers/README.md
   mode: informational_file
+  presence: optional
+  absent_rationale: documentation; no runtime reader
   rationale: documentation; no runtime reader
+overlay_surface:
+  default: deny
+  sensitivity_order:
+  - public
+  - internal
+  - confidential
+  - restricted
+  - secret
+  rationale: "project-owned strength is computed over every overlay input with a direction (26 \xA76); migrations write only migration_writable targets (CR-02)"
+  files:
+  - path: DATA_SENSITIVITY.yaml
+    name: DATA_SENSITIVITY
+    keys:
+    - key: DATA_SENSITIVITY.schema_version
+      direction: none
+      migration_writable: true
+    - key: DATA_SENSITIVITY.default_class
+      direction: up
+      order: <sensitivity>
+    - key: DATA_SENSITIVITY.identifiers_to_strip
+      direction: add
+    - key: DATA_SENSITIVITY.classifications
+      direction: classification_superset
+      subtree: true
+  - path: REPOSITORY_CONTRACT.yaml
+    name: REPOSITORY_CONTRACT
+    keys:
+    - key: REPOSITORY_CONTRACT.schema_version
+      direction: none
+      migration_writable: true
+    - key: REPOSITORY_CONTRACT.roots
+      direction: equal
+      subtree: true
+    - key: REPOSITORY_CONTRACT.paths
+      direction: contract_at_least
+      subtree: true
+      migration_writable: true
+  - path: TOOL_PERMISSIONS.yaml
+    name: TOOL_PERMISSIONS
+    keys:
+    - key: TOOL_PERMISSIONS.schema_version
+      direction: none
+      migration_writable: true
+    - key: TOOL_PERMISSIONS.roles
+      direction: map_subset
+      subtree: true
+    - key: TOOL_PERMISSIONS.install_authority_roles
+      direction: remove
+    - key: TOOL_PERMISSIONS.tool_allowlist
+      direction: map_subset
+      subtree: true
+    - key: TOOL_PERMISSIONS.mcp_servers
+      direction: map_subset
+      subtree: true
+  - path: PROJECT_EXCEPTIONS.yaml
+    name: PROJECT_EXCEPTIONS
+    migration_add_from_template: true
+    keys:
+    - key: PROJECT_EXCEPTIONS.schema_version
+      direction: none
+      migration_writable: true
+    - key: PROJECT_EXCEPTIONS.exceptions
+      direction: entries_subset
+      subtree: true
+  - path: PROJECT_POLICY.yaml
+    name: PROJECT_POLICY
+    keys:
+    - key: PROJECT_POLICY.schema_version
+      direction: none
+      migration_writable: true
+    - key: PROJECT_POLICY.project
+      direction: none
+      subtree: true
+    - key: PROJECT_POLICY.governance
+      direction: none
+      subtree: true
+      migration_writable: true
+    - key: PROJECT_POLICY.policy_overrides
+      direction: effective_policy
+      subtree: true
+    - key: PROJECT_POLICY.staleness.on_stale_close
+      direction: up
+      order:
+      - warn
+      - degrade
+      - fail
+    - key: PROJECT_POLICY.readiness.enforce_pre_implementation_cells
+      direction: strict_true
+    - key: PROJECT_POLICY.tests
+      direction: none
+      subtree: true
+    - key: PROJECT_POLICY.gates
+      direction: none
+      subtree: true
+      migration_writable: true
+    - key: PROJECT_POLICY.human_gates
+      direction: none
+      subtree: true
+      migration_writable: true
+  - path: MODEL_ROUTING_OVERRIDES.yaml
+    name: MODEL_ROUTING_OVERRIDES
+    keys:
+    - key: MODEL_ROUTING_OVERRIDES.schema_version
+      direction: none
+      migration_writable: true
+    - key: MODEL_ROUTING_OVERRIDES.providers
+      direction: none
+      subtree: true
+    - key: MODEL_ROUTING_OVERRIDES.role_overrides
+      direction: none
+      subtree: true
+    - key: MODEL_ROUTING_OVERRIDES.task_class_overrides
+      direction: none
+      subtree: true
+    - key: MODEL_ROUTING_OVERRIDES.preferences
+      direction: none
+      subtree: true
+  - path: CAPABILITY_PROFILE.yaml
+    name: CAPABILITY_PROFILE
+    keys:
+    - key: CAPABILITY_PROFILE.schema_version
+      direction: none
+      migration_writable: true
+    - key: CAPABILITY_PROFILE.taxonomy_version
+      direction: none
+      migration_writable: true
+    - key: CAPABILITY_PROFILE.categories
+      direction: applicable_superset
+      subtree: true
+  - glob: plugins/*.yaml
+    name: PLUGIN_DESCRIPTOR
+    file_direction: file_set_subset
+    keys: []
+    rationale: 'a new or changed plugin descriptor executes code under project authority: any addition or change is a weakening candidate'
+owner_domain: []

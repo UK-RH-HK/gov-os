@@ -1,0 +1,13 @@
+{
+  "_type": "https://agentic-engineering-os/statement/freshness-witness/v1",
+  "trust_profile": "test",
+  "framework": "agentic-engineering-os",
+  "trust_root_id": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "witnessed_state": {
+    "sequence": 2,
+    "statement_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  "issued_at": "2026-09-14T00:00:00Z",
+  "expires_at": "2026-09-21T00:00:00Z",
+  "witness_label": "scheduled witness service (illustrative)"
+}

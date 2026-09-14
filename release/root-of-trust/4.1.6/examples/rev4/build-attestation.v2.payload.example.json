@@ -1,0 +1,22 @@
+{
+  "_type": "https://agentic-engineering-os/statement/build-attestation/v2",
+  "trust_profile": "test",
+  "framework": "agentic-engineering-os",
+  "trust_root_id": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "issued_at": "2026-09-14T00:00:00Z",
+  "artifact": {
+    "name": "gov",
+    "target": "x86_64-unknown-linux-gnu",
+    "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+    "size": 11252152
+  },
+  "source": {
+    "release_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_tree_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "build_inputs_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "tbm_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+  "reproduced": true,
+  "rebuilder_label": "independent rebuilder (illustrative)",
+  "method": "verify-artifact --stage rebuilder, then cargo build --release --locked in a clean container from git archive"
+}

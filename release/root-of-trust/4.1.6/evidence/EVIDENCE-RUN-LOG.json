@@ -1,0 +1,371 @@
+{
+ "schema": "rot-1.architect-evidence-run-log",
+ "run_id": "AR-0005",
+ "revision": 4,
+ "base_commit": "f83da03",
+ "environment": {
+  "python": "3.12.3",
+  "pyyaml": "6.0.1",
+  "jsonschema": "4.10.3",
+  "git": "2.43.0",
+  "cores": 20,
+  "child_environment": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 (GOV_* absent; probes that start gov set GOV_KERNEL_CACHE and XDG_* inside scratch)"
+ },
+ "legacy_binaries_sha256": {
+  "4.1.2": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7",
+  "4.1.3": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89",
+  "4.1.4": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f",
+  "4.1.5": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+ },
+ "placeholders": {
+  "<repo>": "this worktree",
+  "<scratch>": "the AR-0005 scratch directory",
+  "<scratchpad>": "the session scratchpad",
+  "<legacy-bin>": "directory holding gov-4.1.2 … gov-4.1.5",
+  "<home>": "the operator home directory"
+ },
+ "hygiene": "Probes ran only in scratch. The repository, the canonical checkout and the review directories were not written. No __pycache__ was left in the worktree. Absolute paths in committed outputs are replaced by the placeholders above.",
+ "runs": [
+  {
+   "id": "CSI-check",
+   "script": "constitutional-surface/csi_check.py",
+   "script_sha256": "ac41a642cf37cda3ccd73e26c506ebad2891835f9e30c1eadc3f8c37417d8a79",
+   "library_sha256": "01f5f0055e8de82c8cca5153abbb627bbbba6a0a3f921bcea11f4dd431596d00",
+   "inventory_sha256": "613ff6b846a49fa9d6931ec485aa043f705a3a876b50141f3fed1d5caae34ca8",
+   "commands": [
+    "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py check --json <repo>/framework",
+    "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py check --json <repo>/release/releases/4.1.5/kernel",
+    "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py check --json <scratch>/standin/kernel-4.1.5-no-lock-ops (release/releases/4.1.5/kernel with set_lock_field removed from its migrations)",
+    "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py check --json <repo>/release/releases/4.1.2/kernel",
+    "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py check --json <repo>/release/releases/4.1.3/kernel",
+    "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py check --json <repo>/release/releases/4.1.4/kernel"
+   ],
+   "finished": "2026-09-14T05:10:34Z",
+   "exits": {
+    "framework": 0,
+    "release-4.1.5": 3,
+    "release-4.1.5-lock-operations-removed": 0,
+    "legacy-4.1.2": 2,
+    "legacy-4.1.3": 2,
+    "legacy-4.1.4": 2
+   },
+   "outputs": [
+    {
+     "file": "evidence/CSI-check-framework.json",
+     "sha256": "16b7429bc10917c561fc9b89f539694fa5dec0253794ef276a8cca7637995844",
+     "bytes": 677
+    },
+    {
+     "file": "evidence/CSI-check-release-4.1.5.json",
+     "sha256": "5981cdc1787069a4a62eb5083c027dcd8eef1afe1acde197290675dc88ba746d",
+     "bytes": 1727
+    },
+    {
+     "file": "evidence/CSI-check-release-4.1.5-lock-operations-removed.json",
+     "sha256": "2f1d6e3ff6e31a888c68e9e30d7f38ad7023e5416fa97056c93cdf2cb9c6dbe9",
+     "bytes": 756
+    },
+    {
+     "file": "evidence/CSI-check-legacy-4.1.2.json",
+     "sha256": "5ebd5429a4ee6b9695e47ca229e9fed12b0369541ad1e1e4f4f137da1a50ba92",
+     "bytes": 18573
+    },
+    {
+     "file": "evidence/CSI-check-legacy-4.1.3.json",
+     "sha256": "17a45706ce413fdce8ae35e098aa479546eb0765de45c10abd5a627ee69f466d",
+     "bytes": 14321
+    },
+    {
+     "file": "evidence/CSI-check-legacy-4.1.4.json",
+     "sha256": "25548b1e39f89674e7d5d63a511a348b3bdf55f7eef465a9d96d4dc4c6d5b578",
+     "bytes": 12210
+    }
+   ]
+  },
+  {
+   "id": "CSI-selftest",
+   "script": "constitutional-surface/csi_check.py",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 csi_check.py selftest --scratch <scratch>/final/selftest-scratch",
+   "finished": "2026-09-14T05:10:50Z",
+   "exit": 0,
+   "result": "56 passed, 0 failed",
+   "outputs": [
+    {
+     "file": "evidence/CSI-selftest.json",
+     "sha256": "91e16d3370432deb6cf05b8b18e3ab586cb46d247c6664c2978a448bbbded519",
+     "bytes": 40183
+    }
+   ]
+  },
+  {
+   "id": "P1r4",
+   "script": "evidence/P1r4-project-strength-and-absence.py",
+   "script_sha256": "b3f85797c5e9b2dd89b40805f5454a4741cef8775eba59abfc9a5fa245b7f9df",
+   "binary": "<legacy-bin>/gov-4.1.5",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 GOV_REVIEW_SCRATCH=<scratch>/p1r4b GOV=<legacy-bin>/gov-4.1.5 python3 P1r4-project-strength-and-absence.py",
+   "finished": "2026-09-14T04:39:39Z",
+   "exit": "not recorded for the final run; stderr empty; output complete (summary present)",
+   "earlier_attempt": {
+    "started": "2026-09-14T04:32:03Z",
+    "finished": "2026-09-14T04:32:10Z",
+    "rc": "rc=0",
+    "note": "first run of the probe; its composition verdict was corrected (the verdict reads effective values, since 4.1.5 `policy effective` reports no refused overrides) and the TPS v2 fixture was made consistent before the final run"
+   },
+   "outputs": [
+    {
+     "file": "evidence/P1r4-project-strength-and-absence.json",
+     "sha256": "15b537a0264a52b123d8cc6c5a138da304f449e7190851c7d588b67f49409295",
+     "bytes": 119768
+    },
+    {
+     "file": "evidence/P1r4-project-strength-and-absence.stderr",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   ]
+  },
+  {
+   "id": "P4r4",
+   "script": "evidence/P4r4-trust-state-model.py",
+   "script_sha256": "f2b55694416c5705139f762b42e8f65bd7014c0a528ec1ffba4a00d6a94c8ed9",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 P4r4-trust-state-model.py",
+   "finished": "2026-09-14T04:43:53Z",
+   "exit": 0,
+   "result": "54 of 54 scenarios hold; 9 of 9 mutants killed; matrix 132 rows (77 refused, 42 stated core, 13 OP-7 (d) residual, 0 unstated, 0 labelled current)",
+   "outputs": [
+    {
+     "file": "evidence/P4r4-trust-state-model.json",
+     "sha256": "bca2012804773d8bfeaf1d8056310d1eeb1503eec42cd9d2fd0a1db87fce05dd",
+     "bytes": 79994
+    },
+    {
+     "file": "evidence/P4r4-trust-state-model.stderr",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   ]
+  },
+  {
+   "id": "VA4",
+   "script": "evidence/VA4-verify-artifact-source-scenarios.py",
+   "script_sha256": "b6aeb936f0e69f6c77ab3d53290e2a89fc6a75e7e6b3ef31876b121a17b32617",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 VA4-verify-artifact-source-scenarios.py",
+   "finished": "2026-09-14T04:26:41Z",
+   "exit": 0,
+   "result": "16 of 16 as expected; 12 attacks refused; 3 minimum capability sets documented",
+   "note": "the final P4r4 re-run changed no rule function used by VA4 (it added the in-gate scenario)",
+   "outputs": [
+    {
+     "file": "evidence/VA4-verify-artifact-source-scenarios.json",
+     "sha256": "573302d4ded4b4c851fdc60d76417d1989b0aa25710430447ba2e4e86865cc07",
+     "bytes": 7074
+    },
+    {
+     "file": "evidence/VA4-verify-artifact-source-scenarios.stderr",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   ]
+  },
+  {
+   "id": "P3r3-rerun",
+   "script": "evidence/P3r3-pre-rot-register-matrix.py (unchanged since ca77a43)",
+   "script_sha256": "d936c9d51f8a06d091b67cec63ee5330e76840c453fe699a7d83c6ee5b2e4da7",
+   "command": "P3_REPO=<repo> P3_LEGACY_BIN=<legacy-bin> env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 P3r3-pre-rot-register-matrix.py <scratch>/p3r3run --workers 12",
+   "started": "2026-09-14T04:20:30Z",
+   "finished": "2026-09-14T04:21:15Z",
+   "exit": "rc=0",
+   "job_count": 2085,
+   "binaries": {
+    "4.1.2": {
+     "path": "<legacy-bin>/gov-4.1.2",
+     "version": "gov 4.1.2",
+     "sha256": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7"
+    },
+    "4.1.3": {
+     "path": "<legacy-bin>/gov-4.1.3",
+     "version": "gov 4.1.3",
+     "sha256": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89"
+    },
+    "4.1.4": {
+     "path": "<legacy-bin>/gov-4.1.4",
+     "version": "gov 4.1.4",
+     "sha256": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f"
+    },
+    "4.1.5": {
+     "path": "<legacy-bin>/gov-4.1.5",
+     "version": "gov 4.1.5",
+     "sha256": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+    }
+   },
+   "result": "summary, property_L3, chain_summary and job_count equal to the committed revision-3 output; the full output (1.86 MB) is not committed, its digest is in the summary",
+   "outputs": [
+    {
+     "file": "evidence/P3r3-rerun-r4-summary.json",
+     "sha256": "fed9a41cc54f981a4affe69ff40197ce235acf9a3f451d6025cfef47d3e05b1f",
+     "bytes": 24549
+    }
+   ]
+  },
+  {
+   "id": "LR2",
+   "script": "evidence/LR2-installation-state-and-strength-reference.py",
+   "script_sha256": "9543bb55be38bc6e5af407faa85ea7f5f2b8d1d571dc38fccdd6ce8c1538ca0b",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 LR2-installation-state-and-strength-reference.py <scratch>/notes/lr2-spec.json <scratch>",
+   "input": "evidence/LR2-spec.json (tree paths shown with <scratch> placeholders)",
+   "finished": "2026-09-14T04:34:16Z",
+   "exit": 0,
+   "outputs": [
+    {
+     "file": "evidence/LR2-installation-state-and-strength-reference.json",
+     "sha256": "10bb41c9d939b259b623c3ef7403d2a9d2602e5527da9fc69eca068a4b1d0e8b",
+     "bytes": 37116
+    },
+    {
+     "file": "evidence/LR2-spec.json",
+     "sha256": "98e98c095c12bc9a5ae3cf4ba3e74b7d83300e5f9e19bca0f8b49e6575eaa018",
+     "bytes": 3080
+    }
+   ]
+  },
+  {
+   "id": "review-r3-probes-B-D-P1r3",
+   "source": "reviewer scripts read from release/root-of-trust/4.1.6-review-r3 at 79a09a1 (not modified; run from the review directory with REVIEW_REPO / repository constants pointing at this worktree, outputs to scratch)",
+   "scripts": [
+    "release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-A01-precedence-immutable.py",
+    "release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-A03-A14-A16-probes.py",
+    "release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/RV3-B-CSI-injections.py",
+    "release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-precedence-lattice.py",
+    "release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-surface-forward-compat-and-removal.py",
+    "release/root-of-trust/4.1.6/evidence/P1r3-floor-coverage.py (revision 3 architect probe, against the revision-4 library)"
+   ],
+   "binary": "<legacy-bin>/gov-4.1.5",
+   "scratch_dirs": [
+    "<scratch>/rp/a01",
+    "<scratch>/rp/a03",
+    "<scratch>/rp/inj",
+    "<scratch>/rp/fc",
+    "<scratch>/rp/p1r3"
+   ],
+   "started": "2026-09-14T04:26:32Z",
+   "finished": "2026-09-14T04:27:02Z",
+   "exits": "a01 0\na03 0\ninj 0\nlattice 0\nsurface 0\np1r3 0",
+   "outputs": [
+    {
+     "file": "evidence/rerun-RV3-B-A01-precedence-immutable.json",
+     "sha256": "abe62b2a4ccd4a25e46fb0a6725a34d7d233541b9518e6c209334b61831d594e",
+     "bytes": 8727
+    },
+    {
+     "file": "evidence/rerun-RV3-B-A03-A14-A16-probes.json",
+     "sha256": "d9c9b7853c69b6ee84e4c7e068762abb2f3a54074faa955832c7631accc2cdbc",
+     "bytes": 5197
+    },
+    {
+     "file": "evidence/rerun-RV3-B-CSI-injections.json",
+     "sha256": "46f267c8deee833b8e07073886296a68b5d2df12aa30bbe32d2535d29fda6497",
+     "bytes": 11624
+    },
+    {
+     "file": "evidence/rerun-RV3-D-precedence-lattice.json",
+     "sha256": "6779d05dc15fad66ff31fc12815340ea095b6d3d687cd2046f2ece6a39cd8317",
+     "bytes": 1854
+    },
+    {
+     "file": "evidence/rerun-RV3-D-surface-forward-compat-and-removal.json",
+     "sha256": "7649ef49783cfc2ba8e9b4ee17c7e344d70cb1a1419b47d9acd9132cf9bb6803",
+     "bytes": 74860
+    },
+    {
+     "file": "evidence/rerun-P1r3-against-r4-lib.json",
+     "sha256": "e268c5acbe9152c0046626ce625a1420456979b52c8eca27158b8d1ff14cfbbf",
+     "bytes": 42373
+    }
+   ]
+  },
+  {
+   "id": "RV3-D-A09-A10-r4-release-consistent",
+   "script": "evidence/RV3-D-A09-A10-rerun-r4-release-consistent.py (copy of release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-surface-forward-compat-and-removal.py with precedence mirrored into the kernel fixture)",
+   "script_sha256": "b411c6ab56465138ac9d8ed5d7f8d92a8723bff2bf6235c6e6400f3690edf914",
+   "command": "REVIEW_REPO=<repo> env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 RV3-D-A09-A10-rerun-r4-release-consistent.py <scratch>/rp/fc4",
+   "finished": "2026-09-14T04:33:15Z",
+   "exit": 0,
+   "outputs": [
+    {
+     "file": "evidence/RV3-D-A09-A10-rerun-r4-release-consistent.json",
+     "sha256": "1c4dfbc174c35bc1cd75852e18adffa40f438fa73fd9e2bf35e9cdea5f07900c",
+     "bytes": 7886
+    }
+   ]
+  },
+  {
+   "id": "review-r3-probes-C-and-D-legacy",
+   "runner": "<scratch>/cchain.sh",
+   "source": "reviewer C scripts copied from release/root-of-trust/4.1.6-review-r3/C-compat-transaction/evidence/ into scratch with only REPO set to this worktree; synthesis D's RV3-D-legacy-git-restore.py run from the review directory",
+   "binaries": "<legacy-bin>/gov-4.1.2 … gov-4.1.5",
+   "started": "2026-09-14T04:26:04Z",
+   "finished": "2026-09-14T04:26:16Z",
+   "exits": "build_base rc=0\ndestructive rc=0\nocc_removal rc=0\nfull_removal rc=0\ndurability rc=0\nd_git_restore rc=0\nL3r4 gitignore replaced_existing_rule=True commit_rc=0\nL3r4 ls-files -ci --exclude-standard: ''\nd_git_restore_r4 rc=1",
+   "note": "the last line of exits (d_git_restore_r4 rc=1) is the first attempt of the revision-4 layout run: the separate ignore-rule commit shifted HEAD~1 and the A07 untracking commit had nothing to commit. It produced no output and is superseded by RV3-D-A05-A07-r4-layout below.",
+   "outputs": [
+    {
+     "file": "evidence/rerun-RV3-C-build_base.json",
+     "sha256": "1200dddc3fdaa6a9e040d20468d09743ba2b04feb4222028f9bf4309ed3990a6",
+     "bytes": 387
+    },
+    {
+     "file": "evidence/rerun-RV3-C-destructive.json",
+     "sha256": "5483a603b0a6a543bb591c0bd181c6fadbb2dba04f02b120f7229f6047a640d5",
+     "bytes": 21190
+    },
+    {
+     "file": "evidence/rerun-RV3-C-occ_removal.json",
+     "sha256": "11297147fd4cb8c22dc34ace621a80ddd915b31001043f3e4ba6ef143a79b596",
+     "bytes": 761
+    },
+    {
+     "file": "evidence/rerun-RV3-C-full_removal_and_merge.json",
+     "sha256": "80aa0d3245729e1aba38722e0e3d7809650b1476ea1512dfc74e5a5fd41d42ee",
+     "bytes": 1324
+    },
+    {
+     "file": "evidence/rerun-RV3-C-durability.json",
+     "sha256": "bec47b38ff26d9ba527f1bbd7b427ca55f4df075fe618102a61859360480694a",
+     "bytes": 9552
+    },
+    {
+     "file": "evidence/rerun-RV3-D-legacy-git-restore.json",
+     "sha256": "ff6b67ad3c300d1ec74698011a224944d31046796c7b68f2ad71f77d2130daf6",
+     "bytes": 8420
+    }
+   ]
+  },
+  {
+   "id": "RV3-D-A05-A07-r4-layout",
+   "script": "evidence/RV3-D-A05-A07-rerun-r4-layout.py (copy of release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-legacy-git-restore.py; the A07 commit tolerates an empty commit)",
+   "script_sha256": "13bac249f08ea37d76efed65464716cc9bab3e44bcaf5e706879ced81a94fa84",
+   "input": "<scratch>/cchain/run/L3r4b: reviewer C's L3 layout with the revision-4 ignore rule applied in the migration commit (amended)",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/<run>/home PYTHONDONTWRITEBYTECODE=1 python3 RV3-D-A05-A07-rerun-r4-layout.py <scratch>/cchain/git-r4c <scratch>/cchain/run/L3r4b <legacy-bin>/gov-4.1.5",
+   "finished": "2026-09-14T04:34:16Z",
+   "exit": 0,
+   "outputs": [
+    {
+     "file": "evidence/RV3-D-A05-A07-rerun-r4-layout.json",
+     "sha256": "4368b2b84168639eabe3bfeca1e6fc2dfa4f50db95623e9bc6135f8e569d568f",
+     "bytes": 8414
+    }
+   ]
+  },
+  {
+   "id": "schemas-and-examples",
+   "script": "<scratch>/patches/schemas_r4.py (schema edits, example generation, jsonschema Draft 2020-12 validation)",
+   "exit": 0,
+   "outputs": [
+    {
+     "file": "examples/rev4/validation.json",
+     "sha256": "ed61d4c96a490c0a91cf3f2bc039911e08664f19c37fa31efcb342996035d8c9"
+    }
+   ]
+  }
+ ]
+}

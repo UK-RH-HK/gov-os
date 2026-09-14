@@ -1,6 +1,6 @@
 id: ARCH-0002
 type: architecture
-title: "PROPOSED (revision 3) — PENDING FRESH INDEPENDENT REVIEW AND OWNER APPROVAL (not active, not approved): Governance OS root-of-trust architecture RoT-1 (purpose-separated signed statements, total constitutional surface, eligibility and joins, anchored freshness, binary acceptance, local trust gates, verify-and-use, legacy-binary containment)"
+title: "PROPOSED (revision 4) — PENDING FRESH INDEPENDENT REVIEW AND OWNER APPROVAL (not active, not approved): Governance OS root-of-trust architecture RoT-1 (purpose-separated signed statements, total and sound constitutional surface, eligibility and joins, inclusion anchors and proven currency, binary acceptance with attested source, local trust gates and confined repository commands, verify-and-use, legacy-binary containment)"
 # The record schema has no PROPOSED status value; PROVISIONAL is the nearest valid lifecycle status. This architecture is
 # a proposal companion to D-0008 (also pending): NOT active, NOT approved, NOT implemented. ARCH-0001 remains ACTIVE.
 status: PROVISIONAL
@@ -9,73 +9,94 @@ approval_state: PENDING_OWNER_HUMAN_DECISION_GATE
 review_state: PENDING_FRESH_INDEPENDENT_REVIEW
 in_effect: false
 state_class: NARRATIVE
-revision: 3
+revision: 4
 created: "2026-09-13"
 updated: "2026-09-14"
-tags: [proposed, pending-fresh-independent-review, pending-owner-approval, not-in-effect, root-of-trust, revision-3]
+tags: [proposed, pending-fresh-independent-review, pending-owner-approval, not-in-effect, root-of-trust, revision-4]
 governed_by: [D-0002]
 depends_on: [D-0008]
 affects: [ARCH-0001, D-0007]
 summary: >
-  PROPOSED (revision 3) — PENDING FRESH INDEPENDENT REVIEWS AND OWNER APPROVAL. Not active, not approved, not
+  PROPOSED (revision 4) — PENDING FRESH INDEPENDENT REVIEWS AND OWNER APPROVAL. Not active, not approved, not
   implemented. Companion architecture to the proposed decision D-0008; it can become ACTIVE only if D-0008 is approved
-  through its Human Decision Gate. Revision 1 (676dfce) was rejected by review 1c6027c; revision 2 (d37b05c) was rejected
-  by review e5a6b8a. Full specification in release/root-of-trust/4.1.6/ (outputs 0-27, constitutional-surface/, schemas,
-  evidence).
+  through its Human Decision Gate. Revision 1 (676dfce) was rejected by review 1c6027c; revision 2 (d37b05c) by review
+  e5a6b8a; revision 3 (ca77a43) by review 79a09a1. Full specification in release/root-of-trust/4.1.6/ (outputs 0-28,
+  constitutional-surface/, schemas, examples/rev4, evidence).
 body: |
   STATUS: PROPOSED / PENDING. Nothing below is in effect.
 
   ## Chain
   independent channels (trust-root id, state fingerprint of every Trust State) -> OP-6 lineage confirmation and a local
-  anchor (state pin, human confirm-state, or witness under OP-7 c)
-  -> gov binary accepted by verify-artifact (release-artifact >= 2, independent build attestation, trust-state
-     reference, Trust Base Manifest resolving to root- and trust-state-signed statements at or above the VTS high-water)
-  -> knowledge set (T0, verifier trust store, project trust record, bundle, refresh; verified statements only; union)
-  -> effective root; Trust Policy (prior_policies, computed lowering); Trust State (resolution, anchored orphans,
-     equivocation, admissibility with cumulative prior_states); negative set; trust_state and freshness axes
-  -> authenticate(source) V0-V12 with the V11s Constitutional Surface evaluation
-  -> eligibility E1-E10 (E7 surface: every file and leaf classified, pinned registered, floors vs the named policy,
-     precedence per key; E8 trust state KNOWN and freshness ANCHORED/WITNESSED)
-  -> local trust-gate confirmation (terminal challenge or operator decision pin; never a repository record)
+  anchor (protected state pin with valid_until, human confirm-state, or in-gate typed state fingerprint)
+  -> gov binary accepted by verify-artifact (release-artifact >= 2; independent build attestation; source equal to the
+     source an ACCEPTED independent verification attested, equal across candidate, final, build attestation and Trust
+     Base Manifest; trust-state reference; Trust Base Manifest resolving at or above the accepted-TBM high-water; currency
+     proof)
+  -> knowledge set (T0, verifier trust store, project trust record, bundle, refresh; verified statements only; union;
+     statements issued in the future refused)
+  -> effective root; Trust Policy (prior_policies, computed reductions in both directions); Trust State (resolution,
+     anchors satisfied by inclusion, orphans and unchained statements never effective, equivocation, admissibility with
+     cumulative prior_states); negative set (lift needs an attestation naming the negative); trust_state, freshness and
+     currency axes
+  -> authenticate(source) V0-V12 (V8 source equality; V11s surface: presence, YAML profile, exact precedence, migration
+     whitelist)
+  -> eligibility E1-E10 (E7 surface; E8 trust state KNOWN, freshness ANCHORED/WITNESSED and a currency proof)
+  -> local trust-gate confirmation (terminal challenge with typed digest and, for C3 kinds, typed state fingerprint; or a
+     protected expiring decision pin; never a repository record)
   -> install transaction (.governance-runtime/trust-tx registered in the VTS; stage from buffers; read-back and link
-     counts; exchange governance/trust with union state; lock last inside trust; legacy-path occupation; strength vector)
-  -> every unit of work: installation state (including occupation) -> KernelSnapshot generation check
+     counts; exchange governance/trust with union state; lock last inside trust; legacy-path occupation and ignore rule;
+     migration whitelist; strength vector over effective policy)
+  -> every unit of work: installation state (including occupation) -> KernelSnapshot generation check -> confined
+     children only after trust decisions
   -> effective policy = eligible installed kernel or embedded snapshot with every floor leaf joined with the effective
-     Trust Policy, pinned leaves only if registered, precedence joined per concrete key, exceptions after the join
-  -> operation class C0-C3 permitted by trust state x freshness x OP-7; consumers and agents read snapshot bytes.
+     Trust Policy, pinned leaves only if registered (else registered embedded value or SURFACE_VALUE_UNAVAILABLE),
+     registered precedence joined with the project's held registration, project layer applied as a directed join,
+     exceptions registered-relaxable only
+  -> operation class C0-C3 permitted by trust state x freshness x currency x OP-7; consumers and agents read snapshot
+     bytes.
 
   ## Proposed modules (runtime/src/trust/)
-  root, purposes, tbm (Trust Base Manifest), jcs, dsse, statement, state (knowledge set, admissibility, views), anchor
-  (pins, confirmations, witnesses, freshness), surface (Constitutional Surface evaluator, precedence lattice, consumer
-  register), floor, eligibility, trust_gate (local confirmations, decision pins), artifact (verify-artifact), secure_fs,
-  governed_fs, authenticate, authorise, install_tx (journal, VTS registry, union, exchange, recovery), snapshot
-  (KernelSnapshot generation, EmbeddedSnapshot, installation state), layout (FORMAT, occupation entries, legacy detection,
-  layout migration), publish and draft_policy (producer); kernel_trust.rs v2; separate gov-test-profile binary crate.
+  root, purposes, tbm (Trust Base Manifest v2 with binary.source), jcs, dsse, statement, state (knowledge set,
+  admissibility, views), anchor (pins with validity and integrity predicate, confirmations, in-gate confirmation,
+  witnesses, inclusion satisfaction, currency proofs), confine (the only spawner of repository- and plugin-supplied
+  commands; OS write confinement), surface (Constitutional Surface evaluator: presence, YAML profile, exact precedence,
+  two-directional order, directed join, Overlay Surface, owner-domain slots, consumer register, strength vector), floor,
+  eligibility, trust_gate (local confirmations, decision pins), artifact (verify-artifact with attested source and custodial
+  stages), secure_fs, governed_fs, authenticate, authorise, install_tx (journal, VTS registry, union, exchange, recovery),
+  snapshot (KernelSnapshot generation, EmbeddedSnapshot, installation state), layout (FORMAT, occupation entries typed by
+  st_mode, ignore rule, legacy detection, layout migration), publish and draft_policy (producer); kernel_trust.rs v2;
+  separate gov-test-profile binary crate.
 
   ## Proposed signing purposes
   root, trust-policy (root keys, root threshold), trust-state, release-final, release-candidate, release-artifact
-  (threshold >= 2, shares with no other purpose), build-attestation (independent rebuilder), verification-attestation,
-  certification-status, revocation, retrieval-profile. A compiled pairwise whitelist permits only root+trust-policy,
+  (threshold >= 2, shares with no other purpose), build-attestation (independent rebuilder), verification-attestation
+  (attests the source), certification-status, revocation, retrieval-profile, freshness-witness (OP-7 (c) only; shares with
+  no other purpose; at least two keys for C3). A compiled pairwise whitelist permits only root+trust-policy,
   release-final+release-candidate (OP-4 no), revocation+certification-status, revocation+trust-state and
-  retrieval-profile+release-final; every other pair is forbidden. Historical releases are part of the root-signed Trust
-  Policy; the historical-identity statement is withdrawn.
+  retrieval-profile+release-final; every other pair is forbidden. Historical releases, production sources (OP-2 S1),
+  bootstrap parameters and clock reset are part of the root-signed Trust Policy.
 
   ## Proposed coupling rules
   - Only install_tx holds InstallTxToken and writes governance/trust, the occupation entries (governance/kernel,
     governance/project, governance/generated as files; governance/framework.lock as a directory;
     spec/audits/GOVERNANCE-ADOPTION; .governance-runtime/migration) and the transaction area; it accepts an
-    AuthenticatedRelease and an Authorisation built only from a consumed local trust-gate confirmation.
+    AuthenticatedRelease and an Authorisation built only from a consumed local trust-gate confirmation or a protected
+    decision pin.
   - GovernedFs is the only file-mutation API; conformance proves no protected-path mutation outside install_tx for every
     command (builder interception; verifier OS-level tracing).
   - Only kernel_trust and install_tx open governance/trust; every other module receives a KernelSnapshot; every unit of
     work compares its snapshot generation with installed identity and trust state.
-  - The policy loader is the only producer of effective policy; security decision points accept only floor, pinned,
-    members or precedence leaves; every consumed key is in a compiled consumer register classified by the compiled Trust
-    Policy.
-  - No decision reads a release manifest, an occupation entry, a repository gate record's answer, or lock hints.
-  - Statement, lock, FORMAT, Trust Base Manifest, pin and confirmation schemas, the floor vocabulary and the purpose table
-    are compiled into the binary.
-  - Anchors and trust-gate confirmations are constructible only from the account database or verified witnesses; C3
-    entry points require an anchor.
-  - Environment variables select sources only; the verifier trust store and pins are located through the OS account
-    database.
+  - The policy loader is the only producer of effective policy; a PrecedenceRule is constructible only from Trust Policy
+    registrations; the kernel's POLICY_PRECEDENCE is parsed only to compare it with the registration; security decision
+    points accept only floor, pinned, members or precedence leaves; every consumed key is in a compiled consumer register
+    classified by the compiled Trust Policy.
+  - An Anchor is constructible only from a protected valid pin, a VTS human or in-gate record or verified witnesses, and is
+    satisfied only by inclusion; a CurrencyProof is required by every C3 entry point and by verify-artifact.
+  - confine::spawn is the only way to run a repository- or plugin-supplied command, and cannot run while an Authorisation
+    is being constructed.
+  - No decision reads a release manifest, an occupation entry, a repository gate record's answer, or lock hints; reinstall
+    identity comes from the VTS per-project record.
+  - Statement, lock, FORMAT, Trust Base Manifest, state-pin, decision-pin, witness and confirmation schemas, the floor
+    vocabulary and the purpose table are compiled into the binary.
+  - Environment variables select sources only; the verifier trust store is located through the OS account database and
+    pins through the system pin directory or the account location under the integrity predicate.

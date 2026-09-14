@@ -1,308 +1,500 @@
-# Output 23 — Constitutional Surface and total floor semantics
+# Output 23 — Constitutional Surface, total floor semantics and the Overlay Surface
 
-> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> New in revision 3. Closes R2-H1 as a class (`../4.1.6-review-r2/10-BLOCKING-FINDINGS.md`) and satisfies HO-0001 §3.1
-> and §4. Normative keywords: MUST, MUST NOT, SHOULD.
+> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 3 added this file for R2-H1. Revision 4 closes blocking class **BC-1** (review r3 RV3-H1: constitutional-surface
+> soundness for project-owned strength and for absence). It absorbs the root of RV3-M5 and the precedence case of RV3-M7,
+> and meets HO-0001 §3.1 and §4. Carried items: RV3-M5 (CR-02), RV3-M7, RV3-L2 (CR-07), RV3-L3 (CR-08), RV3-L5 (CR-10).
+> Normative keywords: MUST, MUST NOT, SHOULD.
 
-## 1. The class, and why no key list can close it
+## 1. The class
 
-Revision 2 registered 145 floor keys. The review executed the gap: every one of those floors held on a kernel that made an
-L1 role act at L4, got an AWS credential indexed and retrievable, and let an agent answer an R5 irreversible gate
-(review `evidence/P1`). The mistaken equivalence was *registered floor keys ⇒ constitutional policy*.
+**Revision 2.** It registered 145 floor keys. The mistaken equivalence was *registered floor keys ⇒ constitutional
+policy*.
 
-Any design whose coverage is a list that someone chooses fails open for whatever the list forgets. That includes a list
-chosen by the producer, by the release statement's `security_critical` field, or by the Trust Policy author picking keys
-one by one. Revision 3 inverts the direction:
+**Revision 3 kept** (review r3 CD3-0 confirms these sound):
+- the whole kernel payload is the surface;
+- its classification is root-signed inside the Trust Policy;
+- unknown content is denied;
+- the floor vocabulary is closed, and floor leaves are joined.
 
-- the **Constitutional Surface** is *everything* the kernel payload contains, plus every key of the policy universe that
-  POLICY_PRECEDENCE governs;
-- every file and every leaf of that surface MUST carry exactly one **floor semantics** from a closed, compiled vocabulary;
-- anything that carries none is **denied** (`UNCLASSIFIED`). It never takes effect as policy.
+**The review of revision 3 found two narrower equivalences (RV3-H1):**
 
-**Different mechanism from CD2-1.** The review proposed defining the surface as the release statement's `security_critical`
-list. Revision 3 does not, because that list is signed under the threshold-1 `release-final` purpose. A lower-trust input
-would then decide which content counts as constitutional, which is the rejection class itself. In revision 3 the surface
-is the whole payload, and its classification is root-signed.
+| Mistaken equivalence | How it failed |
+|---|---|
+| *a rule that refuses more project overrides is at least as strong* | The revision-3 order ranked `immutable` above every mode, and joined incomparable rules to `immutable`. `immutable` also refuses every project **strengthening**. Three routes removed project-owned controls while every check passed: a kernel that moved precedence rules to `immutable` (RV3-B-A01, executed on 4.1.5: authority, indexing and gate harms); a kernel with POLICY_PRECEDENCE deleted (RV3-D-A10 R07, 66 of 85 rules `immutable`); and a root-signed TPS tightening applied without a per-project gate (RV3-D-A02). |
+| *every leaf present is classified ⇒ the registered constitution is in force* | Removing a registered file or leaf passed the checker and E7 (RV3-D-A10 R01–R09). The fallback for missing pinned content was undefined (RV3-M7). |
+
+A third issue shared the root: the project-strength detector (`26` §6) and computed weakening (`19` §9) read the overlay,
+not the effective policy. They were blind to all three routes (RV3-M5 root). `28` §2.1 explains why these survived
+revision 3.
+
+**Revision 4 changes the kernel's role instead of adding conditions to it:**
+1. **Precedence is read from the Trust Policy only.** The kernel's POLICY_PRECEDENCE never enters effective policy. It
+   must equal its registration exactly, or the release is ineligible (§4.1).
+2. **The order is sound in both directions.** It is used only where two root-signed registrations meet (§4.2).
+3. **The project layer is a directed join.** No refusal discards admitted strengthening (§4.5, `19` §5.3).
+4. **Absence is not neutral.** Every registered file and leaf is required (§3.5).
+5. **Project-owned strength is evaluated over the effective policy** and over every classified overlay input. Migrations
+   are default-deny over a root-registered **Overlay Surface** (§11, `26` §6, `19` §9).
 
 ## 2. Definitions
 
 | Term | Definition |
 |---|---|
-| Constitutional Surface | Every file of a release kernel payload admitted by the tree rules (`07` §5.1; `KERNEL_MANIFEST.json` is excluded), every leaf of every structured file, and every concrete key of the policy universe used for precedence (§4). |
-| Constitutional Surface Inventory (CSI) | The machine-readable classification of the surface. It is the **surface section of the Trust Policy Statement** (`19` §3) and is signed with the TPS under the `trust-policy` purpose, which means root keys at root threshold (`05` KS-2). Schema: `schemas/constitutional-surface-inventory.schema.json`. The draft for TPS v1, derived from the current kernel (4.1.5 content standing in for 4.1.6): `constitutional-surface/CONSTITUTIONAL_SURFACE_INVENTORY.yaml`. |
-| Floor semantics | For a file, one mode (§3.1). For a leaf, one class (§3.2) with its operator, registered values or registered digests. |
-| Default deny | A file matching no file rule, or a leaf matching no leaf rule, is `UNCLASSIFIED`. This yields `RELEASE_INELIGIBLE(surface_unclassified)` at ingress, `KERNEL_INELIGIBLE(surface_unclassified)` at use, and `SURFACE_UNCLASSIFIED` at the producer. |
-| Named TPS | The Trust Policy a release statement names in `trust_references.trust_policy_version`, meaning the policy the producer registered the release under. |
-| Effective TPS | The highest admissible TPS the verifier holds (`17` S3). |
+| Constitutional Surface | Every file of a release kernel payload admitted by the tree rules (`07` §5.1; `KERNEL_MANIFEST.json` excluded), every leaf of every structured file, and every concrete key of the policy universe. |
+| Constitutional Surface Inventory (CSI) | The machine-readable classification of the surface. It is the **surface section of the Trust Policy Statement** (`19` §3), signed under `trust-policy` at root threshold (KS-2). Schema: `schemas/constitutional-surface-inventory.schema.json` (schema version 2). The draft for TPS v1 is `constitutional-surface/CONSTITUTIONAL_SURFACE_INVENTORY.yaml`, derived by `csi_derive.py` from the current kernel. |
+| Floor semantics | For a file, one mode and one presence (§3.1, §3.5). For a leaf, one class (§3.2) with its operator, registered values or registered digests, and one presence. |
+| Default deny | A file matching no file rule, or a leaf matching no leaf rule, is `UNCLASSIFIED`. |
+| **Required presence** | Every registered file and leaf is required unless the inventory declares it `optional` under the presence lint (§3.5). |
+| **Registered precedence** | The ordered POLICY_PRECEDENCE rule list, `default_mode` and `layers` registered in a Trust Policy. |
+| **Strength direction** | The direction in which a change to a leaf is a strengthening, read from the leaf's registered classification (§4.2). It is never read from a rule. |
+| **Held registration** | The Trust Policy registration under which a project's strength was last recorded (`24` §8 per-project record). |
+| **Overlay Surface** | The Trust Policy section that gives every overlay input a strength direction and lists the only migration-writable targets (§11). |
+| **Owner constitutional domain** | The Trust Policy slots for owner-supplied constitutional files outside the kernel (§7.2). |
+| Named TPS / Effective TPS | As revision 3: the TPS the release names; the highest admissible TPS the verifier holds (`17` S3). |
 
-The binary never derives a classification from a kernel. It evaluates kernels against the CSI of a verified TPS. The
-derivation script (`constitutional-surface/csi_derive.py`) is producer tooling: it drafts the next CSI for the root
-ceremony to review.
+The binary never derives a classification from a kernel.
 
-## 3. Closed vocabulary (`floor_schema_version: 2`, compiled)
+## 3. Closed vocabulary (`floor_schema_version: 3`, compiled)
+
+Version 3 changes the semantics of the `precedence` class and adds presence and the YAML profile. A binary implementing
+version 2 is `BINARY_BELOW_TRUST_POLICY` (read-only) against a version-3 Trust Policy.
 
 ### 3.1 File modes
 
 | Mode | Meaning | Registration | Violation |
 |---|---|---|---|
 | `structured` | YAML or JSON whose every leaf is enumerated (§3.4) and classified | per leaf | per leaf |
-| `pinned_file` | non-orderable content (schemas, skills, adapters, overlay templates, taxonomies, command contract, constitution text, enforcement map, MCP registry) | SHA-256 of the file bytes, per path | `surface_unregistered` |
-| `transaction_input` | migrations. They are consumed only inside the install transaction, from authenticated buffers (`04` V10). Their overlay effects are computed, and every weakening needs a trust gate (`19` §9, `27`). They can change no floor, pin or registration. | bound by the release statement's `migrations[]` | V10 codes |
-| `informational_file` | documentation with no runtime reader | rationale required | — |
+| `pinned_file` | non-orderable content (schemas, skills, adapters, overlay templates, taxonomies, command contract, constitution text, enforcement map, MCP registry) | SHA-256 per path | `surface_unregistered` |
+| `transaction_input` | migrations, consumed only inside the install transaction from authenticated buffers (`04` V10) | the release statement's `migrations[]`, **and every operation targets a migration-writable Overlay Surface key (§11.3)** | V10 codes; `migration_operation_not_permitted` |
+| `informational_file` | documentation with no runtime reader | rationale | — |
 
 ### 3.2 Leaf classes
 
 | Class | Meaning | Kernel value used? | Violation (E7) |
 |---|---|---|---|
-| `floor` | orderable value with an operator and a registered floor value (§3.3) | joined with the effective TPS floor | weaker than the named TPS → `floor_violation`; stronger than the named TPS → `floor_not_registered` |
-| `pinned` | non-orderable value; the TPS registers the permitted value digests | only when its digest is registered in the effective TPS | `surface_unregistered` |
-| `members` | the member-id set of a declared keyed collection (`roles[id]`, `invariants[id]`, `tools[tool_id]`, `secret_content_patterns[id]`), with `ids_equal`, `ids_subset` or `ids_superset` | registered members only (additive collections keep additions) | `surface_membership` |
-| `precedence` | the POLICY_PRECEDENCE rule list, compared per concrete key (§4) | joined per key | `precedence_weakened` |
-| `release_bound` | must equal a field of the signed release statement (`KERNEL.yaml` version, compatibility, schema versions). It decides compatibility only, never eligibility, floors or gates. | yes | V8/V11 codes |
-| `project_tunable` | a key POLICY_PRECEDENCE marks `overridable`. The project layer may set it freely, so no kernel-lineage floor can be stronger. | yes | — (lint: the registered precedence MUST be `overridable`) |
-| `informational` | no runtime reader. A rationale is required, and the compiled consumer register (§6.5) MUST NOT read it. | yes | — (lint) |
-| `collection_id` | the identity field of a collection member | yes | — |
-| `covered_by_collection` | a member subtree governed by its collection rule: precedence rules, or fields of additional members of an additive collection | per collection | per collection |
+| `floor` | orderable value with an operator and a registered floor | joined with the effective TPS floor | `floor_violation` (weaker than named); `floor_not_registered` (stronger than named) |
+| `pinned` | non-orderable value; the TPS registers permitted digests | only when registered in the effective TPS; otherwise the fallback of §6.3 | `surface_unregistered` |
+| `members` | the member-id set of a declared keyed collection | registered members only (additive collections keep additions) | `surface_membership` |
+| **`precedence`** | the POLICY_PRECEDENCE rule list | **never** (§4.1) | **`precedence_unregistered`** (any difference from the named registration) |
+| `release_bound` | equals a field of the signed release statement | yes | V8/V11 codes |
+| `project_tunable` | a key the registered precedence marks `overridable`, read by no security decision point | yes | — (lint) |
+| `informational` | no runtime reader | yes | — (lint) |
+| `collection_id`, `covered_by_collection` | collection plumbing | per collection | per collection |
 
 ### 3.3 Floor operators
 
-| Operator | Value | Holds when | Join (effective value) |
-|---|---|---|---|
-| `level_at_least` / `level_at_most` | `L0`…`L5` | kernel ≥ / ≤ floor | max / min |
-| `ordered_at_least` / `ordered_at_most` | member of an explicit `order` (radius `R0`…`R5`; tier `none`,`T0`…`T3`; reasoning; sensitivity; export) | later / earlier or equal | max / min in the order |
-| `decimal_at_least` / `decimal_at_most` | fixed-point decimal string (e.g. `"0.8"`), compared exactly | ≥ / ≤ | max / min |
-| `set_superset` | list | contains every floor member | union (kernel order, missing floor members appended) |
-| `set_subset` | list | contains no member outside the floor | intersection |
-| `bool_toward` | boolean with `strict` | kernel = strict, or floor ≠ strict | strict if either is strict |
-| `equals` | scalar | equal | the floor value |
+Unchanged from revision 3. The operators are `level_at_least`/`at_most`, `ordered_at_least`/`at_most`,
+`decimal_at_least`/`at_most`, `set_superset`, `set_subset`, `bool_toward` and `equals`. Each has the join given there.
 
-A leaf missing from the kernel takes the floor value. An unknown operator, class or `floor_schema_version` makes the
-binary `BINARY_BELOW_TRUST_POLICY`, which is read-only. There is no partial evaluation (`19` §4).
+**Revision 4 change.** A registered floor leaf missing from a kernel **no longer takes the floor value**. It is refused
+(§3.5).
 
-**Value canonical form (for pinned digests):**
-- GOV-JCS-1 applies (`07` §2).
-- A YAML float is represented as `{"$decimal": "<shortest round-trip text>"}`.
-- A YAML date is represented as its string.
+### 3.4 Leaf enumeration
 
-The TPS itself carries decimal strings, so it stays within GOV-JCS-1's integer-only numbers.
+Unchanged. Enumeration is inventory-driven, and it never infers structure from the tree under judgement.
 
-### 3.4 Leaf enumeration (inventory-driven)
+### 3.5 Presence: absence is not neutral (CD3-1 (4); RV3-M7)
 
-Enumeration follows only the CSI's declarations. It never infers structure from the tree under judgement:
-- **Mappings** descend key by key into dotted leaves, for example `SECURITY_POLICY.never_index_classes`.
-- **Declared collections** (`path`, `id_field`) produce one membership leaf, `NAME.path[id_field]#members`, plus member
-  leaves, `NAME.path[id_field=<id>].<field>`. A declared collection that is not a list of objects with unique string ids
-  is a structure violation.
-- **Undeclared lists** are a single leaf whose value is the whole list.
-- **Declared subtrees** (`subtree: true`) are one leaf whose value is the whole node.
+1. **Files.**
+   - Every path rule is `required` unless declared `optional`.
+   - Every path named by a glob rule's registered digests is required under the same rule.
+   - A required file missing from a kernel is `surface_required_missing`: coverage failure, checker exit 2, E7
+     ineligible.
+2. **Leaves.** Every concrete leaf rule of a present structured file is required, including collection memberships and
+   registered member content. Wildcard rules, `informational`, `collection_id` and `covered_by_collection` are not. A
+   missing required leaf is `surface_required_missing`.
+3. **Presence lint.**
+   - **Who may be `optional`.** An `optional` file must carry `absent_rationale`, and is permitted only where absence
+     removes a capability and never a control. That means one of:
+     - a `pinned_file`, `informational_file` or `transaction_input` rule; or
+     - a structured file whose leaves are all `pinned`, `informational`, collection plumbing or an `ids_subset`
+       membership.
+   - **Who may not.** A `policy_file` is never optional, and a `floor`, `pinned`, `members` or `precedence` leaf is never
+     optional.
+   - **The draft TPS v1 declares optional** only `tools/registry/TOOLS.yaml` (absence offers no kernel tools),
+     `tools/mcp/registry.yaml`, `migrations/M-*.yaml` (bound by `migrations[]`) and the two README files.
+4. **Changing presence.** `required` → `optional` is a computed reduction (`19` §10.6).
+5. **Consequence for POLICY_PRECEDENCE.**
+   - Deleting the file makes the release ineligible.
+   - Even where a policy root lacks it, the project-layer rule of every key is the registered one (§4.1).
+   - **The absence of POLICY_PRECEDENCE, or of any rule, changes no key's effective project-layer semantics.**
 
-A leaf rule key MAY use `*` for one plain segment, but only below at least two literal segments, and never for
-`project_tunable`. A `[id=*]` segment matches any member. Catch-all rules are refused by the inventory lint (§6.1).
+Evidence:
+- `csi_check.py selftest` S31–S40: every RV3-D-A10 removal, and the deleted floor leaf of RV3-B I09, exit 2.
+- `evidence/P1r4-project-strength-and-absence.json` part A3: R01–R09 all exit 2.
+- `evidence/rerun-RV3-D-surface-forward-compat-and-removal.json`: R01–R09 exit 2 with the reviewer's unmodified script.
 
-## 4. Precedence floor, per concrete key
+### 3.6 One YAML and JSON profile (CR-08; RV3-L3)
 
-POLICY_PRECEDENCE rules are resolved as the runtime resolves them: the first rule whose `key` pattern matches wins
-(`runtime/src/policy_precedence.rs` `rule_for`, `key_matches`), with `default_mode` otherwise. Adding, reordering or
-re-scoping rules can therefore weaken a key without touching any single rule. Revision 3 floors the **effective rule of
-every concrete key** instead of individual rule entries.
+The producer checker, the canonical CI, and the binary's surface evaluator and consumers parse constitutional documents
+with one profile:
+- YAML 1.2 core booleans only (`true`/`false`). A YAML-1.1-only token (`on`, `off`, `yes`, `no`, `y`, `n`) is refused.
+- No anchors, aliases, merge keys or explicit tags.
+- No duplicate or non-string mapping keys.
+- For JSON, no duplicate members.
 
-**Strength lattice for the project layer.**
-- A rule tuple is `(mode, kind, order, strict_value, exception_relaxable)`.
-- `a ≥ b` iff all of the following hold:
-  - `a.exception_relaxable` implies `b.exception_relaxable`;
-  - one of:
-    - `a.mode = immutable`;
-    - `b.mode = overridable`;
-    - the modes are equal and, for `floor`/`ceiling`, kinds and orders are equal, and for `strengthen_only_bool`,
-      strict values are equal.
-- All other pairs are incomparable. The **join** of incomparable rules is `immutable` with `exception_relaxable: false`.
-  That is a flat lattice with safe tops.
+A violation is `SURFACE_STRUCTURE(yaml_profile)`: checker exit 2, E7 ineligible.
 
-**Universe.** Every leaf key of every policy file, plus every rule key pattern (instantiated) from the registered and the
-installed rule lists.
+Evidence:
+- selftest S41–S43;
+- `evidence/rerun-RV3-B-A03-A14-A16-probes.json`: RV3-B-A14 exits 2 for all 10 `bool_toward` leaves written as `on`.
 
-**Check.**
-- For every key in the universe: `effective_rule(installed, key) ≥ effective_rule(registered, key)`; otherwise
-  `precedence_weakened`.
-- At policy loading, the rule applied to the project layer is the join.
+## 4. Precedence
 
-**Exceptions** (`PROJECT_EXCEPTIONS`) are applied after the join, subject to two conditions:
-- effective `exception_relaxable` = registered ∧ installed;
-- regardless of any attribute, no exception relaxes a key whose class is `floor`, `pinned`, `members` or `precedence`,
-  or any key under `SECURITY_POLICY.`, `AUTHORITY_POLICY.`, `HUMAN_GATE_POLICY.`, `TOOL_POLICY.`, `POLICY_PRECEDENCE.`
-  or `ROLES.` (compiled prefix list).
+### 4.1 Exact registration; effective precedence only from registrations (CD3-1 (1), (2))
+
+1. **E7.** A kernel's POLICY_PRECEDENCE MUST equal the named TPS registration: the ordered list of `(key, mode, kind,
+   order, strict_value, exception_relaxable)`, the `default_mode`, and `layers` (a pinned leaf). Any difference, whether
+   a rule moved to `immutable`, a reordering with identical per-key effect, or a changed `exception_relaxable`, is
+   `precedence_unregistered`. Checker exit 3; selftest S12–S14, S16, S26–S30, S45, S55.
+2. **Effective project-layer rule.** For every concrete key *k* of project *p*:
+   ```
+   rule_eff(k) = registered(effective TPS, k)                         if p holds no registration with a pending reduction for k
+               = join( registered(effective TPS, k), registered(held, k) )   otherwise (§4.3)
+   ```
+   The kernel's POLICY_PRECEDENCE, and the EmbeddedSnapshot's, are never inputs.
+3. **Consequences.**
+   - A kernel precedence change is refused, and even an accepted kernel cannot change project-layer semantics.
+   - A deleted file is refused and changes nothing.
+   - A TPS change applies to a project that held a stronger registration only through the per-project gate.
+
+Evidence (`evidence/P1r4-project-strength-and-absence.json`, part B, executed on the real 4.1.5 binary):
+- Each RV3-B-A01 variant (floor, ceiling, additive, shrink_only, strengthen_only_bool, and the review's three-rule
+  example) exits 3.
+- The revision-3 effective kernel loses the project strengthening. The revision-4 effective kernel keeps it: authority
+  (`AUTHORITY_DENIED`), indexing (customer file excluded) and gate (`AUTHORITY_DENIED`) harms flip.
+- RV3-D-A10 R07 exits 2, with all harms flipped.
+
+### 4.2 Strength order, sound in both directions (CD3-1 (1))
+
+**Strength direction of a key.** It comes from its registered classification.
+
+| Classification | Direction |
+|---|---|
+| `floor` `*_at_least` | up |
+| `floor` `*_at_most` | down |
+| `set_superset`, `ids_superset` | add |
+| `set_subset`, `ids_subset` | remove |
+| `bool_toward` strict *v* | toward *v* |
+| every other class | none (no change is a strengthening) |
+
+A pattern key without a concrete leaf takes the direction of its registered mode. The lint keeps modes and
+classifications consistent.
+
+**What a rule admits.** For a key of direction *d*, a rule admits a set *A(rule, d)* ⊆ {**s** (a project strengthening),
+**w** (a project weakening)}:
+
+| Mode | *d* ≠ none | *d* = none |
+|---|---|---|
+| `overridable` | {s, w} | {w} |
+| `immutable` | {} | {} |
+| `floor` / `ceiling` / `additive` / `shrink_only` / `strengthen_only_bool(v)` | {s} if the mode's direction is *d*; otherwise {w} | {w} |
+| unknown mode | {w} | {w} |
+
+**Order.** `a ≥ b` iff all of these hold:
+- w ∈ A(a) ⇒ w ∈ A(b): *a* admits no weakening *b* refuses;
+- s ∈ A(b) ⇒ s ∈ A(a): *a* admits every strengthening *b* admits;
+- `a.exception_relaxable` ⇒ `b.exception_relaxable`;
+- for `floor`/`ceiling` in both, equal kind and order.
+
+**Join.** `A(join) = (A(a) ∩ A(b) ∩ {w}) ∪ ((A(a) ∪ A(b)) ∩ {s})`, and `exception_relaxable` only if both. The join never
+discards admitted strengthening and never admits a weakening either rule refuses.
+
+A change of registration from *b* to *a* is a **computed reduction** iff `a ≱ b`. That includes removing an admitted
+strengthening (for example `additive` → `immutable`), whoever made the change.
+
+Evidence:
+- `evidence/P1r4-project-strength-and-absence.json` part A1: 343 mode × mode × direction combinations; 0 unsound pairs; 0 joins dropping strengthening.
+- The five RV3-D-A01 pairs: the revision-3 order holds `immutable ≥ mode`, and the revision-4 order does not.
+- `evidence/rerun-RV3-D-precedence-lattice.json`, the synthesis reviewer's script unmodified: 0 unsound pairs, and all
+  five RV3-D-A02 tightenings are computed reductions whose join keeps project strengthening.
+
+### 4.3 Where the order is used
+
+It is used only where two **root-signed** registrations meet:
+1. **TPS acceptance** (`17` S3 (c), `19` §10.6). A precedence reduction must appear in the cumulative `lowering_history`.
+   Otherwise the TPS is invalid (`TRUST_POLICY_UNDECLARED_LOWERING`).
+2. **Per project.** Until the per-project `policy_lowering` trust gate accepts the reduction, the project's effective
+   rule is the join with its held registration (§4.1 (2)).
+3. **Lint** (§5.1).
+
+Evidence:
+- `evidence/P1r4-project-strength-and-absence.json` scenarios RV3-D-A02 (honest-owner `never_index_classes` and root-ceremony authority levels):
+  - the reduction is reported (`reductions` exit 6 without history, 0 with);
+  - the project-layer mode is `additive` / `floor` before the gate and `immutable` only after it;
+  - on 4.1.5 the customer file stays excluded and `resume` stays denied until the gate.
+- selftest S53, S54.
+
+### 4.4 Exceptions
+
+Applied after the project layer.
+- Effective `exception_relaxable` is the **registered** value only.
+- No exception relaxes a key of class `floor`, `pinned`, `members` or `precedence`.
+- No exception relaxes a key under the compiled prefixes `SECURITY_POLICY.`, `AUTHORITY_POLICY.`, `HUMAN_GATE_POLICY.`,
+  `TOOL_POLICY.`, `POLICY_PRECEDENCE.` or `ROLES.`.
+
+### 4.5 Project layer
+
+The project layer is a directed join under `rule_eff` (`19` §5.3). A project override is decomposed into its
+strengthening and weakening components in the key's direction:
+- a component the rule admits is applied;
+- a component it refuses is refused;
+- no refusal discards an admitted component.
+
+Evidence: `evidence/P1r4-project-strength-and-absence.json` part D. A TPS raise of the never-index floor refuses the whole project override under the 4.1.5
+semantics that revision 3 kept, so the customer file is indexed. Under the directed join it stays excluded.
 
 ## 5. Classification principle and the TPS v1 draft
 
-### 5.1 Policy files: never weaker than POLICY_PRECEDENCE
+### 5.1 Policy files: never weaker than the registered precedence
 
-For every policy leaf, the CSI class MUST be at least as strong as what the registered precedence already grants the
-project layer. The derivation proposes these classes, and the lint enforces them:
+Unchanged from revision 3:
 
-| Registered effective mode for the key | Permitted classes |
+| Registered effective mode | Permitted classes |
 |---|---|
 | `overridable` | any, including `project_tunable` |
 | `immutable` | `pinned`, or `floor` with `equals` |
-| `floor` (kind level, radius, tier, ordered, number) | `floor` with the matching `*_at_least`, or `pinned` |
-| `ceiling` | `floor` with the matching `*_at_most`, or `pinned` |
+| `floor` | `floor` `*_at_least`, or `pinned` |
+| `ceiling` | `floor` `*_at_most`, or `pinned` |
 | `additive` | `floor` `set_superset`, `members` `ids_superset`, or `pinned` |
 | `shrink_only` | `floor` `set_subset`, or `pinned` |
 | `strengthen_only_bool` | `floor` `bool_toward` with the same strict value, or `pinned` |
 
-### 5.2 Non-policy files (explicit)
+**A consequence revision 4 relies on.** A TPS that registers `immutable` for a key must also reclassify the leaf to
+`pinned` or `equals`, and the lint refuses one that does not (exit 4). A tightening is therefore always visible as both a
+precedence reduction and a direction change (`28` A-R4-03).
 
-| Area | Class | Why |
-|---|---|---|
-| `roles/ROLES.yaml` `roles[id]` | `members` `ids_equal` | Removing an id reclassifies `gov decide --by <id>` answers as human (`gates.rs` `answer`). Adding one creates an authority level. |
-| `ROLES.roles[id=*].level` | `floor` `level_at_most`, per id | the actor level for every authority check (`authority.rs` `level_of`); raising it is a weakening |
-| `ROLES.roles[id=*].minimum_tier`, `.default_reasoning` | `floor` `ordered_at_least` | routing quality floors (`routing.rs`) |
-| `ROLES.roles[id=*].name` | `pinned` | rendered into adapters |
-| `ROLES.groups.<g>` | `floor` `set_subset` | group membership grants memory-namespace access (`authority.rs` `role_in`) |
-| `ROLES.authority_levels.*.*` | `informational` | display vocabulary; no runtime reader in 4.1.5 (only `authority_levels_required` is read) |
-| `constitution/HARD_INVARIANTS.yaml` `invariants[id]` | `members` `ids_equal` plus each member `pinned` | statements are copied verbatim into adapters (review RV2-A06) |
-| `tools/registry/TOOLS.yaml` `tools[tool_id]` | `members` `ids_subset` plus each member `pinned` | descriptors carry executed install and health commands (RV2-A08); removal is a narrowing |
-| `SECURITY_POLICY.secret_content_patterns[id]` | `members` `ids_superset`; registered members' `regex` `pinned`; additional members `covered_by_collection` | an added pattern only classifies more material as secret; a registered pattern cannot be removed or edited |
-| `POLICY_PRECEDENCE.rules[key]` | `precedence` (§4); `layers` `pinned`; `default_mode` `equals immutable` | per-key lattice |
-| `KERNEL.yaml` version, contract, CLI/runtime and schema versions, `supported_from_versions` | `release_bound` | equal to the signed statement |
-| `KERNEL.yaml` `payload_dirs`, `framework_revision`, `adapter_versions` | `pinned` | |
-| `schemas/*.schema.json`, `skills/SKL-*.yaml`, `adapters/*`, `overlay-templates/*.yaml`, `taxonomy/*.yaml`, `commands/COMMAND_CONTRACT.yaml`, `constitution/CONSTITUTION.md`, `policies/ENFORCEMENT_MAP.yaml`, `tools/mcp/registry.yaml` | `pinned_file` | non-orderable constitutional content |
-| `migrations/M-*.yaml` | `transaction_input` | §3.1 |
-| `migrations/README.md`, `tools/installers/README.md` | `informational_file` | documentation |
+### 5.2 Non-policy files and security decision points
 
-### 5.3 Counts (executed, `evidence/CSI-check-*.json`)
+Revision 3's explicit table stands (ROLES, HARD_INVARIANTS, TOOLS registry, secret content patterns, POLICY_PRECEDENCE,
+KERNEL.yaml, pinned files, migrations, documentation).
 
-| Kernel | Files | Leaves by class | Coverage result |
+**Revision 4 reclassifies keys read by security decision points (CR-07; RV3-L2).** Their registered precedence stays
+`overridable`, so the project layer keeps A2's existing authority. A kernel can no longer change them without a
+root-signed registration.
+
+| Key | Revision 3 | Revision 4 | Consumer |
 |---|---|---|---|
-| `framework/` | 113 | floor 234, pinned 160 (plus 96 pinned files), project_tunable 57, release_bound 32, members 3, precedence 1, collection_id 37, covered_by_collection 85, informational 14 | exit 0: no unclassified file or leaf; all floors, pins and memberships hold |
-| `release/releases/4.1.5/kernel` (121 files including migrations and tools) | 121 | floor 234, pinned 177 (plus 97 pinned files), members 4, transaction_input 4, informational_file 2, others as above | exit 0 |
-| `release/releases/4.1.2/kernel` | 113 | — | exit 2: `AUTHORITY_POLICY.authority_levels_required.approve_cit` unclassified; 64 registration violations |
-| `release/releases/4.1.3/kernel`, `4.1.4/kernel` | 117, 119 | — | exit 3: 64 and 62 registration violations |
+| `MEMORY_POLICY.embedding.provider` | `project_tunable` | `pinned` | embedder: which plugin receives indexed text |
+| `MEMORY_POLICY.reranker.provider` | `project_tunable` | `pinned` | reranker: which plugin receives retrieved text |
+| `ARCHIVE_POLICY.default_retrieval_for_archive` | `project_tunable` | `floor` `bool_toward` strict `false` | retrieval scope of historical paths |
+| `LEARNING_POLICY.upstream.aggregate_metrics_enabled` | `project_tunable` | `floor` `bool_toward` strict `false` | upstream packet content |
+| `HUMAN_GATE_POLICY.continue_independent_work` | `project_tunable` | `floor` `bool_toward` strict `false` | work continuation while a gate is pending |
 
-Every one of the 308 leaves the review reported unfloored or partially floored now has a class. The mapping is listed per
-leaf in `evidence/P1r3-floor-coverage.json` part 1.
+Evidence:
+- selftest S44;
+- `evidence/rerun-RV3-B-A03-A14-A16-probes.json`: RV3-B-A16 exits 3.
+
+The compiled consumer register (§6.5) remains the build gate for any further key.
+
+### 5.3 Counts (executed, `evidence/CSI-check-*.json`, draft TPS v1 inventory schema version 2)
+
+| Kernel | Files | Leaves by class | Result |
+|---|---|---|---|
+| `framework/` | 113 | floor 237, pinned 162 (+96 pinned files), project_tunable 52, release_bound 32, members 3, precedence 1, collection_id 37, covered_by_collection 85, informational 14 | **exit 0** |
+| `release/releases/4.1.5/kernel` | 121 | floor 237, pinned 179 (+97 pinned files), members 4, transaction_input 4, informational_file 2, others as above | **exit 3**: its four historical migrations carry `set_lock_field`, which RoT-1 refuses (R-MIG-3). 4.1.6 re-issues the chain without lock operations (`11` WP-18). |
+| the same payload with lock operations removed (stand-in for re-issued migrations) | 121 | as above | **exit 0** |
+| `release/releases/4.1.2/kernel` | 113 | — | exit 2: 1 unclassified leaf, 62 required files or leaves missing (including POLICY_PRECEDENCE), 65 violations |
+| `release/releases/4.1.3/kernel` | 116 | — | exit 2: 15 required missing, 65 violations |
+| `release/releases/4.1.4/kernel` | 119 | — | exit 2: 6 required missing, 64 violations, 44 precedence registration differences |
 
 ## 6. Enforcement points
 
 ### 6.1 Coverage checker (release gate)
 
-`constitutional-surface/csi_check.py check <kernel> [--inventory <csi>]` is the architectural reference for the check the
-producer, the canonical CI and `gov trust draft-policy` MUST run.
+`constitutional-surface/csi_check.py` is the architectural reference for the check the producer, the canonical CI and
+`gov trust draft-policy` MUST run.
 
-**Exit codes:**
-- 0 — pass;
-- 2 — coverage failure: unclassified, ambiguous or structural;
-- 3 — a floor, pin, membership or precedence violation, or a value stronger than registered;
-- 4 — inventory consistency failure: a class weaker than precedence, a catch-all rule, or a `project_tunable` key that is
-  not overridable;
-- 5 — inventory malformed: default other than deny, unknown vocabulary, or missing registrations.
-
-**Self-test:** `csi_check.py selftest --scratch <dir>` injects 25 mutations and verifies the genuine and
-forward-compatible cases pass. Result: 26 of 26 cases as expected (`evidence/CSI-selftest.json`).
+| Command | Exit codes |
+|---|---|
+| `check <kernel>` | 0 pass; 2 coverage failure (unclassified, ambiguous, structure, YAML profile, **required missing**); 3 floor, pin, membership, **precedence registration** or **migration-operation** violation, or a value stronger than registered; 4 inventory consistency (class weaker than precedence, catch-all, `project_tunable` not overridable, **presence lint**); 5 inventory malformed (including a missing Overlay Surface) |
+| `check-owner <repo> --registrations F` | 0; 2 a required owner constitutional file absent; 3 unconfirmed or changed (§7.2) |
+| `reductions --old A --new B [--lowering-history H]` | 0; 6 a computed reduction not declared (§7) |
+| `selftest` | 0 iff all **56 cases** (S00–S55) behave as expected (`evidence/CSI-selftest.json`: 56 passed, 0 failed) |
 
 ### 6.2 Producer and publisher
 
-- `gov release build` MUST run the check against the named TPS. It refuses a release unless the check exits 0, with codes
-  `SURFACE_UNCLASSIFIED`, `SURFACE_UNREGISTERED`, `FLOOR_VIOLATION`, `FLOOR_NOT_REGISTERED` or `PRECEDENCE_WEAKENED`.
-- The canonical repository's CI MUST run the same check on every release commit and fail the release on non-zero.
-- `gov trust draft-policy` MUST derive the next CSI draft and list three things:
+- `gov release build` MUST run `check` against the named TPS, and refuse unless it exits 0.
+- The canonical CI MUST run the same check on every release commit.
+- `gov trust draft-policy` MUST list:
   - every classification change;
-  - every registration change: new, removed or replaced digests and member ids;
-  - every computed reduction (§7).
+  - every registration change;
+  - every **computed reduction** (`reductions`): floor values, classes, memberships, presence, **precedence in both
+    directions**, **newly migration-writable overlay targets**, removed owner-domain slots, and the non-surface TPS
+    fields of `19` §10.6.
 
   The root ceremony signs only after reviewing that list.
-- **Strengthening is mechanical.** Any change of a kernel value that the named TPS does not already register is
-  `FLOOR_NOT_REGISTERED` (floors) or `SURFACE_UNREGISTERED` (pins). The release therefore cannot ship until a TPS
-  registers the new value. No one has to remember to raise anything.
+- **Strengthening is mechanical.** A kernel value stronger than registered is `FLOOR_NOT_REGISTERED`; a pinned value not
+  registered is `SURFACE_UNREGISTERED`. **A precedence rule different from registration is `PRECEDENCE_UNREGISTERED`.**
 
-### 6.3 Eligibility and use
+### 6.3 Eligibility and use (`19` §5–§6)
 
-- E7 (`19` §6) is the surface check at ingress and at use.
-- The effective policy (`19` §5) is:
-  - the eligible installed kernel or, failing that, the EmbeddedSnapshot;
-  - every `floor` leaf joined with the effective TPS;
-  - `pinned` leaves only when registered in the effective TPS;
-  - otherwise the consumer's compiled fail-closed default.
+- E7 is the surface check at ingress and at use: coverage, presence, profile, floors, pins, memberships, exact precedence
+  and migration operations.
+- **Effective values.**
+
+  | Leaf class | Value |
+  |---|---|
+  | `floor` | root kernel joined with the effective TPS |
+  | `pinned` | the root kernel value if registered in the effective TPS |
+  | `precedence` | registered only (§4.1) |
+
+- **Fallback for unregistered or missing pinned and members content (RV3-M7 (c)).** The value used is the EmbeddedSnapshot
+  value, if that value is registered in the effective TPS. Otherwise the dependent decision point refuses with
+  `SURFACE_VALUE_UNAVAILABLE(key, decision_point)`. The consumer register names each decision point's fail-closed
+  meaning, for example:
+  - no secret patterns: indexing and export of the affected scope refuse;
+  - no gate policy: agent answers refuse;
+  - no plugin descriptor set: plugin execution refuses.
+
+  There is no unspecified consumer default.
 
 ### 6.4 Floors raised without a new kernel
 
-Because joins use the effective TPS, a newer TPS can raise a floor over an older eligible kernel that is registered under
-an older TPS. P1r3 demonstrates this with `migration-executor` capped at L2 and `min_confidence` at 0.9 over the genuine
-4.1.5 kernel. On the real 4.1.5 binary, the raised floors refuse `task release --force` by `migration-executor` and an
-agent answer at confidence 0.85 (`evidence/P1r3` part 3 d, e).
+Unchanged. Joins use the effective TPS. Evidence: `evidence/P1r3-floor-coverage.json` part 3 (d, e), re-run against the revision-4 library,
+still enforced (`evidence/rerun-P1r3-against-r4-lib.json`).
 
 ### 6.5 Compiled consumer and decision-point registers
 
-- Every policy key the binary reads MUST appear in a compiled **consumer register** naming its decision point.
-- Decision points flagged security-relevant MUST read only keys of class `floor`, `pinned`, `members` or `precedence`.
-  These are authority, secret and sensitivity classification, indexing and export, gate answering, plugin and tool
-  authorisation and installation, precedence and exceptions, install authority, and upstream export.
-- The build MUST fail (`SURFACE_CONSUMER_UNCLASSIFIED`) when a consumed key has no classification in the compiled TPS,
-  or when a security-relevant decision point reads a `project_tunable` or `informational` key.
-- This connects D-0003 (`ENFORCEMENT_MAP`: every key is enforced or informational) to the surface. A key D-0003 lists as
-  `enforced_by` a security decision point cannot be classified away.
+As revision 3, with two additions:
+1. every **overlay** key the binary reads MUST appear with its Overlay Surface direction (§11). The build fails on an
+   unclassified consumed overlay key (`OVERLAY_CONSUMER_UNCLASSIFIED`);
+2. each security decision point records its fail-closed behaviour for `SURFACE_VALUE_UNAVAILABLE` (§6.3).
 
-## 7. Schema evolution cannot introduce an unfloored setting
+## 7. Schema evolution cannot silently introduce an unfloored setting
 
 | Change | Result |
 |---|---|
-| New key in an existing constitutional file | `UNCLASSIFIED` until a root-signed TPS classifies it (checker S01, S03; P1r3 T9) |
-| New constitutional file | `UNCLASSIFIED` (S02). Under a pinned glob it is `surface_unregistered` (S19). |
-| New member of a keyed collection | `surface_membership` (S05, S17), except in additive collections |
-| New runtime consumer of a key | the build fails unless the key is classified (§6.5) |
-| New floor semantics (class or operator) | `floor_schema_version` bump; older binaries become `BINARY_BELOW_TRUST_POLICY`, read-only |
-| Reclassification toward a weaker class (`floor` → `project_tunable`, `pinned` → `informational`, removal of a floor value, a weaker precedence registration) | a **computed reduction**: it MUST appear in the arriving TPS's cumulative `lowering_history`, or that TPS is invalid, and it needs the per-project trust gate (`19` §10, `27`) |
-| Classification toward a stronger class, or removal of a registered digest | strengthening; no gate |
+| New key in an existing constitutional file | `UNCLASSIFIED` until a root-signed TPS classifies it |
+| New constitutional file | `UNCLASSIFIED`; under a pinned glob, `surface_unregistered` |
+| New member of a keyed collection | `surface_membership`, except in additive collections |
+| New runtime consumer of a key or overlay key | the build fails unless it is classified (§6.5) |
+| New floor semantics (class, operator, presence rule) | `floor_schema_version` bump; older binaries become `BINARY_BELOW_TRUST_POLICY` |
+| Reclassification toward a weaker class; removal of a floor value | computed reduction: cumulative `lowering_history` plus the per-project `policy_lowering` gate |
+| **A precedence registration that admits a new weakening or removes an admitted strengthening** | **computed reduction** (§4.2) |
+| **A registered file or leaf removed from a release** | refused (`surface_required_missing`) unless a TPS unregisters it, which is a computed reduction |
+| **`required` → `optional`** | computed reduction |
+| **A new migration-writable overlay target** | computed reduction |
+| A kernel POLICY_PRECEDENCE differing from registration | refused (`precedence_unregistered`) |
+| Classification toward a stronger class; removal of a registered digest | strengthening; no gate |
 
 ### 7.1 Forward compatibility (HO-0001 §4)
 
-The Capability Acceptance Contract, the Gate W artifact-flow and consumption-integrity policy, and the G0–G6 governance
-health scheduler are classified with the existing vocabulary. They need no new class:
+The Capability Acceptance Contract, the Gate W artifact-flow and consumption-integrity policy and the G0–G6 scheduler are
+classified with existing vocabulary, as revision 3 showed. Revision 4 adds one release-consistency rule: a release adding
+a constitutional policy carries the same precedence rules in its kernel as the TPS registers.
 
-| Future artefact | Classification |
-|---|---|
-| Owner-supplied normative Markdown (hash-bound) | `pinned_file` |
-| Compiled executable YAML | `structured`: acceptance requirements as `floor` (`bool_toward`, `set_superset`, `decimal_at_least`); non-orderable content as `pinned` |
-| Its schema and evidence map | `pinned_file`, or `structured` with `pinned` leaves |
-| Gate W task input manifests, consumption receipts, lineage requirements | `floor` `bool_toward` (required), `set_superset` (required receipt fields), `pinned` (receipt schema) |
-| G0–G6 scheduler | `floor` `decimal_at_most` (maximum intervals), `ordered_at_least` (severity), `project_tunable` only where POLICY_PRECEDENCE makes the key overridable |
+Evidence:
+- selftest S22, updated to that rule: exit 0.
+- `evidence/RV3-D-A09-A10-rerun-r4-release-consistent.json`, the synthesis reviewer's F01–F12 with release-consistent
+  fixtures: F01, F05, F06, F07 and F09 exit 0; the weakening cases F03, F04, F08, F10 and F11 exit 3; F02 (a registered
+  requirement removed) and F12 (an unknown key) exit 2.
+- The unmodified script (`rerun-RV3-D-surface-forward-compat-and-removal.json`) reports exit 3 for its positive cases.
+  Its fixtures add rules to the inventory only, so exact registration refuses them, as designed.
 
-Checker case S22 adds `policies/CAPABILITY_ACCEPTANCE_POLICY.yaml` and `constitution/CAPABILITY_ACCEPTANCE_CONTRACT.md`
-to a kernel. It extends only the inventory data and passes (exit 0).
+### 7.2 Owner constitutional domain (RV3-M7 (d); RV3-D-A18)
 
-**Constitutional files outside the release kernel** (for example an owner-supplied contract under `spec/`) use the same
-vocabulary in a CSI `domain` other than `kernel`. Their registration source MUST be one of:
-- a verified TPS, for release-shipped content;
-- a local trust-gate confirmation of the file digest (`27`), for owner-supplied project content.
+1. The TPS `surface.owner_domain[]` declares **slots** for owner-supplied constitutional files outside the kernel, for
+   example `spec/contracts/CAPABILITY_ACCEPTANCE_CONTRACT.md`. Each slot carries `path`, mode, presence and the consumers
+   that read it.
+2. A slot's digest is registered **per machine** by the `owner_constitutional_file` trust gate (`27`), never by a
+   repository record (rule 18).
+3. **Absence** of a required slot file is fail-closed for its consumers on every machine, confirmed or not
+   (`OWNER_CONSTITUTIONAL_FILE_MISSING`).
+4. **A present file whose digest this machine has not confirmed, or whose digest changed,** is fail-closed for its
+   consumers (`OWNER_CONSTITUTIONAL_FILE_UNCONFIRMED` / `…_CHANGED`). A fresh CI runner therefore refuses the dependent
+   decisions until an operator decision pin or confirmation registers the digest.
+5. The confirmed digest is part of the project-strength vector (`26` §6).
 
-It is never a repository record alone (rule 18).
+Evidence: `csi_check.py check-owner` is the reference; selftest S50–S52 give absent 2, unconfirmed 3 and confirmed 0.
 
 ## 8. HO-0001 §3.1 test list — evidence
 
-| Required test | Mutation | Checker (`evidence/CSI-selftest.json`) | Reference evaluation (`evidence/P1r3` part 2) | Consumption on the real 4.1.5 binary (`evidence/P1r3` part 3) |
-|---|---|---|---|---|
-| Role → authority map | backend-engineer L1→L4; change-controller L3→L5; new role `superuser` L5; role removed | S04 exit 3, S05 exit 2, S06 exit 3 | T1 and the review tamper: ineligible; effective levels equal genuine | L1 `resume`: harm (review tamper consumed directly) → `AUTHORITY_DENIED` (revision-3 effective kernel) |
-| Sensitivity and indexing exclusions | `never_index_classes` → [secret]; secret patterns emptied; `sensitivity_classes` reordered | S07, S08 exit 3 | T2: effective equal genuine | AWS credential indexed and retrievable → excluded, not retrievable |
-| Irreversible Human Gate authority | `agent_resolvable_when` R5 / 0.0 / irreversible; `must_be_presented_in_chat` false; `answer_gate` L1 | S09 exit 3 | T3: effective equal genuine | agent answers R5 irreversible gate → `AUTHORITY_DENIED` |
-| Plugin and tool permission floor | `plugins.min_authority` L0; elevated classes reduced; `auto_install_conditions` reduced; licence added; new tool with install command | S10, S17 exit 3 | T4: effective equal genuine | — |
-| Outbound and export controls | `never_export_classes` → [secret]; `on_secret_in_export_payload` warn; upstream approval policy; `forbidden_paths` reduced; product namespace export allowed | S11 exit 3 | T5: effective equal genuine | — |
-| Project override controls | rule weakened; earlier overridable rule inserted; `SECURITY_POLICY.*` made overridable; `default_mode` and `layers` changed; `exception_relaxable` set on gate rules | S12, S13, S14 exit 3 | T6: effective equal genuine; exception relaxation of `SECURITY_POLICY.never_index_classes` refused | — |
-| Install and update authority | `install_kernel` L0, `update_apply` L0/L1 | S15 exit 3 | T7: effective equal genuine | — |
-| Exception authority | `grant_policy_exception` L1; `exception_relaxable` on authority and security rules | S16 exit 3 | T8: effective equal genuine; exception relaxation false for compiled prefixes, and for registered-false ∧ kernel-true | — |
-| A future unknown constitutional field | `SECURITY_POLICY.outbound_hosts_allowlist: ["*"]`; new policy file | S01, S02, S03 exit 2 | T9: ineligible (unclassified); effective equal genuine | — |
-| Value stronger than registered | `resume_control` L4→L5 without a TPS raise | S21 exit 3 (`FLOOR_NOT_REGISTERED`) | — | — |
-| Agent-facing content | invariant statement rewritten; adapter template edited | S18, S20 exit 3 | — | — |
+| Required test | Checker (`CSI-selftest.json`) | Reference (`P1r3`/`P1r4` part A) | Consumption on the real 4.1.5 binary |
+|---|---|---|---|
+| Role → authority map | S04–S06 | P1r3 T1 (re-run against the revision-4 library) | P1r3 (a): L1 `resume` `AUTHORITY_DENIED` |
+| Sensitivity and indexing exclusions | S07, S08, S28 | P1r3 T2; P1r4 additive | P1r3 (b); **P1r4 additive, three-rule and R07: project `confidential` stays excluded** |
+| Irreversible Human Gate authority | S09, S27 | P1r3 T3; P1r4 ceiling | P1r3 (c); **P1r4 ceiling: agent answer under project R0 `AUTHORITY_DENIED`** |
+| Plugin and tool permission floor | S10, S17, S29, S30 | P1r3 T4; P1r4 shrink_only (`approved_licences`) | P1r4: project narrowing stays applied |
+| Outbound and export controls | S11 | P1r3 T5; P1r4 shrink_only (`upstream.allowed_payload`) | P1r4: project narrowing stays applied |
+| **Project override controls** | S12–S14, S16, **S26–S30, S45, S53–S55** | **P1r4 A1 (0 unsound), A4, all nine scenarios** | **P1r4: every RV3-B-A01 mode, R07 and both RV3-D-A02 tightenings keep project strengthening** |
+| Install and update authority | S15 | P1r3 T7; P1r4 floor (`resume_control`) | P1r4 floor: `resume` `AUTHORITY_DENIED` under the project L5 raise |
+| Exception authority | S16, S55 | P1r3 T8 | — |
+| A future unknown constitutional field | S01–S03, S22 | P1r3 T9; RV3-D-A09 re-run | — |
+| **Absence of registered content** | **S31–S40** | **P1r4 A3** | P1r4 R07 |
+| **YAML profile** | **S41–S43** | RV3-B-A14 re-run | RV3-B-A14 runtime reads `"on"` as a string; the checker now refuses it |
+| Agent-facing content | S18, S20 | — | — |
 
 ## 9. Outside the surface (stated)
 
-- **The binary's code.** It is the TCB. Its authentication is `25`.
-- **Project overlay values within precedence.** The project governs itself as T4. Weakening of recorded project strength
-  is reported by `26` §6 (rule 20).
-- **Agent behaviour within granted permissions.** Enforcement is by `gov`. Agent-facing kernel content is pinned, and
-  its consumption is `18` §12.
+- **The binary's code.** It is the TCB; its authentication, including its source, is `25`.
+- **Project overlay values.** The project governs itself as T4 within registered precedence. The Overlay Surface (§11)
+  and the strength vector (`26` §6) report every weakening against a recorded vector.
+- **Agent behaviour within granted permissions.** Enforcement is by `gov`.
 
 ## 10. Residuals
 
-| ID | Residual | Bound |
+| ID | Residual | Bound | Test |
+|---|---|---|---|
+| CS-1 | The correctness of each classification, direction and Overlay Surface entry is a root-ceremony review responsibility. | Too strict fails closed. Too weak is limited by: the lint (never weaker than precedence; no catch-alls; no optional control; `immutable` only with `pinned`/`equals`); the consumer register; exact precedence registration; directed joins; and computed reductions in both directions. Any remaining weakness needs a root-threshold signature and appears in the `draft-policy` change list. | selftest S23–S25, S53; RT-73…RT-79, RT-100 |
+| CS-2 | Every final that changes pinned, registered or precedence content needs a TPS at root threshold. | Ceremony frequency (`14` RK-17; `21` OP-1) | — |
+
+## 11. The Overlay Surface (new; CD3-1 (3); CR-02, RV3-M5)
+
+### 11.1 Purpose
+
+The project overlay (`governance/overlay/`) is T4 project configuration. Security decision points consume parts of it.
+Revision 3 computed weakenings over four enumerated categories (RV3-M5). Revision 4 classifies **every overlay input the
+binary consumes** in a root-signed TPS section, with default deny.
+
+### 11.2 Directions (draft TPS v1: `CONSTITUTIONAL_SURFACE_INVENTORY.yaml` `overlay_surface`)
+
+| Overlay input | Direction (a strengthening is…) |
+|---|---|
+| `DATA_SENSITIVITY.classifications` | a pattern added or its class raised (sensitivity order) |
+| `DATA_SENSITIVITY.identifiers_to_strip` | an identifier added |
+| `DATA_SENSITIVITY.default_class` | a higher class |
+| `REPOSITORY_CONTRACT.paths` | for every recorded pattern, the effective contract (later rules override; `secret` wins) keeps index flags off, `agent_read: prohibited`, `export: denied`, `default_retrieval: false`, `mutation` at least as restrictive, and `secret` class |
+| `REPOSITORY_CONTRACT.roots` | none: any change counts |
+| `TOOL_PERMISSIONS.roles`, `tool_allowlist`, `mcp_servers` | a subset: no new role, no new permission, tool or server |
+| `TOOL_PERMISSIONS.install_authority_roles` | a subset |
+| `PROJECT_EXCEPTIONS.exceptions` | a subset of recorded entries, each unchanged |
+| `PROJECT_POLICY.policy_overrides` | evaluated over the **effective policy** in each key's registered direction |
+| `PROJECT_POLICY.readiness.enforce_pre_implementation_cells` | toward `true` |
+| `PROJECT_POLICY.staleness.on_stale_close` | toward `fail` |
+| `CAPABILITY_PROFILE.categories` | no applicable category becomes inapplicable |
+| `plugins/*.yaml` | the descriptor set with digests is a subset |
+| name, alias, tests, gates, routing preferences, governance paths | none (not in the strength vector) |
+| any other overlay file | **default deny**: recorded by digest; any change or addition is a weakening candidate |
+
+### 11.3 Migration targets (default deny)
+
+A `transaction_input` migration operation is permitted only if all of these hold:
+- it is `note`, `require_index_rebuild` or `regenerate_adapters`, or it targets a file directly inside
+  `governance/overlay/` (a plain file name, never a path);
+- it writes a key the Overlay Surface registers as `migration_writable`; and
+- it is not a lock operation (R-MIG-3).
+
+Draft TPS v1 marks writable only schema versions, `PROJECT_POLICY.governance` and `PROJECT_POLICY.gates` (path moves and
+template reconciliation), `PROJECT_POLICY.human_gates` (historical rename), `REPOSITORY_CONTRACT.paths` (template
+tightening) and `PROJECT_EXCEPTIONS.yaml` creation from its template.
+- **Refusal.** A violation is `migration_operation_not_permitted`: checker exit 3, and at the transaction
+  `MIGRATION_OPERATION_NOT_PERMITTED` before any write.
+- **Gate.** Every permitted operation is still evaluated by the strength vector over the effective result, and a
+  non-empty weakening needs the `weakening` trust gate (`19` §9).
+
+Evidence (`evidence/P1r4-project-strength-and-absence.json` part C, migrations):
+
+| Migration case (RV3-B-A18 shapes) | Before any write | Computed weakening, `weakening` gate |
 |---|---|---|
-| CS-1 | The correctness of each classification is a root-ceremony review responsibility. | Classifying too strictly fails closed. Classifying too weakly is limited by the lint (never weaker than precedence; no catch-alls; `informational` never read by a security decision point, §6.5), and any remaining weakness needs a root-threshold signature. |
-| CS-2 | Every final release that changes pinned or unregistered content needs a TPS at root threshold. | Ceremony frequency (`14` RK-17; `21` OP-1). |
+| `install_authority_roles` widened | refused | reported |
+| a role granted `SECRET_READ` | refused | reported |
+| a `PROJECT_EXCEPTIONS` entry added | refused | reported |
+| `identifiers_to_strip` emptied | refused | reported |
+| `policy_overrides` dropping the project never-index class | refused | reported |
+| a registered target that weakens (`**/.env*` indexed) | passes the whitelist | reported |
+| target `../../spec/decisions/HDG-0001.yaml` | refused | — |
+| a registered strengthening (control) | passes | none |
+
+Selftest: S46–S48 refused; S49 permitted.
