@@ -1,0 +1,32 @@
+{
+ "probe": "RV6-D-A10 init on ABSENT with an existing overlay (AR-0018)",
+ "18_ABSENT_row": [
+  "| `ABSENT` | no `governance/trust/`, no occupation entries, no legacy entries (`governance/framework.lock` file, `governance/kernel` directory) | EmbeddedSnapshot ⊔ floor | `init`; commands needing no installation |"
+ ],
+ "19_s9_coverage_sentence": [
+  "This covers update, rollback, restore, recovery exchange-back and adoption batch 0."
+ ],
+ "19_s9_item5": [
+  "5. **No record (revision 5; CR4-B-04, RV4-M5).** On a machine with no per-project record, the requirements are first computed"
+ ],
+ "09_R_INIT_rows": [
+  "| R-INIT-1 | `init` MUST authenticate its source and complete authorisation before creating any Protected Path or occupation entry. |",
+  "| R-INIT-2 | Required authority MUST come from the install-authority floor, and the actor level from the effective ROLES (`19` §8), never from the release being installed. |",
+  "| R-INIT-3 | Production `init` MUST require E1–E8: the E7 surface (presence, YAML profile, exact precedence, migration whitelist), freshness `ANCHORED` or `WITNESSED`, and a currency proof (`24` §4.4). |",
+  "| R-INIT-4 | Production `init` MUST require an `init_ack` trust gate confirmed locally (`27`). |",
+  "| R-INIT-5 | `init` MUST create the layout of `26` §2 inside the transaction, lock last. |",
+  "| R-INIT-6 | `init --force` on an installed project MUST be treated as reinstall or update/downgrade. |",
+  "| R-INIT-7 | `init` MUST apply OP-6 confirmation and state anchoring before any trusted write (`06` §3). |",
+  "| R-INIT-8 | `release_commit` and `source` labels MUST come from the statement and `SourceRef.kind`. |"
+ ],
+ "20_recovery_phase_rows": [
+  "| `prepared`, `staged`, `verified-staged` | move `trust-tx/<TX>` to `trust-tx/abandoned/`; deregister |"
+ ],
+ "12_rows_init_over_existing_overlay": [],
+ "verdicts": {
+  "ABSENT_condition_ignores_overlay_and_views": true,
+  "init_not_in_19_s9_coverage_list": true,
+  "no_R_INIT_rule_on_existing_overlay": true,
+  "no_RT_for_init_over_existing_overlay": true
+ }
+}

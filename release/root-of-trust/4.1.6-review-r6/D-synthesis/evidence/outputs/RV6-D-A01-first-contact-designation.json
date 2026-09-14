@@ -1,0 +1,728 @@
+{
+ "C_computed": {
+  "V1_designation_of_sources": {
+   "a": {
+    "computed_no_key_sets": [
+     [
+      "ch1"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "ch1"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "b": {
+    "computed_no_key_sets": [
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "c_all_1": {
+    "computed_no_key_sets": [
+     [
+      "alt",
+      "ch1"
+     ],
+     [
+      "alt",
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "alt",
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt",
+      "ch1"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "alt",
+      "desig"
+     ]
+    ]
+   },
+   "c_all_2": {
+    "computed_no_key_sets": [
+     [
+      "alt",
+      "ch1",
+      "ch2"
+     ],
+     [
+      "alt",
+      "ch1",
+      "op1src"
+     ],
+     [
+      "alt",
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "alt",
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt",
+      "ch1",
+      "ch2"
+     ],
+     [
+      "alt",
+      "ch1",
+      "op1src"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "alt",
+      "desig"
+     ]
+    ]
+   },
+   "c_either_1": {
+    "computed_no_key_sets": [
+     [
+      "alt"
+     ],
+     [
+      "ch1"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt"
+     ],
+     [
+      "ch1"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "c_either_2": {
+    "computed_no_key_sets": [
+     [
+      "alt"
+     ],
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt"
+     ],
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "d": {
+    "computed_no_key_sets": [
+     [
+      "media"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [],
+    "declared_first_contact_root": [
+     [
+      "media"
+     ]
+    ],
+    "outside_declared_root": []
+   }
+  },
+  "V2_designation_of_sources_and_steps": {
+   "a": {
+    "computed_no_key_sets": [
+     [
+      "ch1"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "ch1"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "b": {
+    "computed_no_key_sets": [
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "c_all_1": {
+    "computed_no_key_sets": [
+     [
+      "alt",
+      "ch1"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt",
+      "ch1"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "c_all_2": {
+    "computed_no_key_sets": [
+     [
+      "alt",
+      "ch1",
+      "ch2"
+     ],
+     [
+      "alt",
+      "ch1",
+      "op1src"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt",
+      "ch1",
+      "ch2"
+     ],
+     [
+      "alt",
+      "ch1",
+      "op1src"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "c_either_1": {
+    "computed_no_key_sets": [
+     [
+      "alt"
+     ],
+     [
+      "ch1"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt"
+     ],
+     [
+      "ch1"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "c_either_2": {
+    "computed_no_key_sets": [
+     [
+      "alt"
+     ],
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ],
+     [
+      "desig"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [
+     [
+      "desig"
+     ]
+    ],
+    "declared_first_contact_root": [
+     [
+      "alt"
+     ],
+     [
+      "ch1",
+      "ch2"
+     ],
+     [
+      "ch1",
+      "op1src"
+     ]
+    ],
+    "outside_declared_root": [
+     [
+      "desig"
+     ]
+    ]
+   },
+   "d": {
+    "computed_no_key_sets": [
+     [
+      "media"
+     ]
+    ],
+    "content_no_key_sets_outside_declared_root": [],
+    "declared_first_contact_root": [
+     [
+      "media"
+     ]
+    ],
+    "outside_declared_root": []
+   }
+  },
+  "WR_witness_input_composed_by_publisher": {
+   "G_BYTES WR": {
+    "committed_row": [
+     "| n2q2 | WR | {2 reproducer processes}; {2 reproducer keys, transport, ts, wk1, wk2}; {2 registration keys, 2 reproducer keys, ts, wk1, wk2} |"
+    ],
+    "with_fcpub": [
+     "{2 reproducer processes}",
+     "{2 reproducer keys, transport, fcpub}",
+     "{2 registration keys, 2 reproducer keys, fcpub}",
+     "{2 reproducer keys, transport, ts, wk1, wk2}",
+     "{2 registration keys, 2 reproducer keys, ts, wk1, wk2}"
+    ]
+   },
+   "G_CONTENT ING_WR": {
+    "committed_row": "no generated block for ING_WR",
+    "with_fcpub": [
+     "{insider}",
+     "{1 verification process, pipeline}",
+     "{2 registration custodians, 1 verification key, pipeline}",
+     "{2 registration keys, 1 verification key, pipeline, fcpub}",
+     "{2 registration custodians, 1 verification key, rc, rf}",
+     "{2 registration keys, 1 verification key, rc, rf, fcpub}",
+     "{2 registration keys, 1 verification key, pipeline, ts, wk1, wk2}",
+     "{2 registration keys, 1 verification key, ts, rc, rf, wk1, wk2}"
+    ]
+   }
+  },
+  "control_wrappers_off_reproduce_committed_FC_ROOT": true,
+  "control_wrappers_off_reproduce_committed_OP9_WR_row": true
+ },
+ "D_design": {
+  "01_TA_5_prime": [
+   "| TA-5\u2032 | (Restated in revision 6.) The operator performs the first-contact procedure over the sources the owner's OP-13 answer names, reading each now (`32` FC-1\u2026FC-3), and types the state fingerprint from an independent channel for human anchors and in-gate proofs | first admission (under the stated first-contact root, `32` \u00a76); OP-6; human anchors |"
+  ],
+  "06_s3_step0": [
+   "| 0 | FC-1: read the first-contact code from each OP-13 source; FC-2: `sha256sum` of the manifest equals the code; FC-3: `sha256sum` of `gov-admit` equals the manifest's entry for the target (under (c) also the platform signature) | the operator's platform tools (`gov trust fc-procedure` prints the steps) | evaluator selection through the agreed code (the first-contact root) |"
+  ],
+  "09_header_fc_procedure": [
+   ">   `gov trust fc-procedure` prints the procedure for the owner's OP-13 answer."
+  ],
+  "24_C0_row_names_fc_procedure": false,
+  "31_GB_1_prime_C0_without_record": true,
+  "31_TB_1_prime": [
+   "| TB-1\u2032 | A malicious binary run directly, outside admission, ignores every rule | GB rules bind genuine binaries, including revoked ones; the documented procedure never runs a candidate | FA6 S1 (FA5 `DA04`) |"
+  ],
+  "32_FC_R2_bound": [
+   "| FC-R2 (TA-5/A10) | An operator who types one source's value for every required source | inside FC-R1 (`op1src`); the procedure prints each source's name and requires its page | RT-156 |"
+  ],
+  "32_s4_fc_procedure": [
+   "`certutil -hashfile`) and, under OP-13 (c), the platform's signature verification. `gov trust fc-procedure` prints these steps"
+  ],
+  "any_rule_on_where_the_operator_obtains_the_designation_or_procedure": [],
+  "plan_rows_substituting_the_designation_or_procedure_printer": []
+ },
+ "P_executed": {
+  "a": {
+   "S1_substituted_evaluator|printed_steps=owner": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S1_substituted_evaluator|printed_steps=weakened": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=owner": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=weakened": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "control_current_code_B7x": "BINARY_REVOKED",
+   "control_designation_known_independently_genuine_B8": {
+    "admission": "ACCEPTED",
+    "procedure": "OK"
+   }
+  },
+  "b": {
+   "S1_substituted_evaluator|printed_steps=owner": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S1_substituted_evaluator|printed_steps=weakened": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=owner": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=weakened": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "control_current_code_B7x": "BINARY_REVOKED",
+   "control_designation_known_independently_genuine_B8": {
+    "admission": "ACCEPTED",
+    "procedure": "OK"
+   },
+   "control_one_owner_page_beside_one_attacker_page": "FIRST_CONTACT_DISAGREEMENT"
+  },
+  "c_all_1": {
+   "S1_substituted_evaluator|printed_steps=owner": {
+    "admission": null,
+    "procedure": "PLATFORM_SIGNATURE_INVALID"
+   },
+   "S1_substituted_evaluator|printed_steps=weakened": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=owner": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=weakened": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "control_current_code_B7x": "BINARY_REVOKED",
+   "control_designation_known_independently_genuine_B8": {
+    "admission": "ACCEPTED",
+    "procedure": "OK"
+   }
+  },
+  "c_all_2": {
+   "S1_substituted_evaluator|printed_steps=owner": {
+    "admission": null,
+    "procedure": "PLATFORM_SIGNATURE_INVALID"
+   },
+   "S1_substituted_evaluator|printed_steps=weakened": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=owner": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=weakened": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "control_current_code_B7x": "BINARY_REVOKED",
+   "control_designation_known_independently_genuine_B8": {
+    "admission": "ACCEPTED",
+    "procedure": "OK"
+   },
+   "control_one_owner_page_beside_one_attacker_page": "FIRST_CONTACT_DISAGREEMENT"
+  },
+  "c_either_1": {
+   "S1_substituted_evaluator|printed_steps=owner": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S1_substituted_evaluator|printed_steps=weakened": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=owner": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=weakened": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "control_current_code_B7x": "BINARY_REVOKED",
+   "control_designation_known_independently_genuine_B8": {
+    "admission": "ACCEPTED",
+    "procedure": "OK"
+   }
+  },
+  "c_either_2": {
+   "S1_substituted_evaluator|printed_steps=owner": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S1_substituted_evaluator|printed_steps=weakened": {
+    "admission": "ACCEPTED_BY_SUBSTITUTED_EVALUATOR",
+    "procedure": "OK"
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=owner": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "S2_stale_genuine_state_genuine_admitter|printed_steps=weakened": {
+    "admission": "ACCEPTED",
+    "procedure": "OK",
+    "selected_state": 7
+   },
+   "control_current_code_B7x": "BINARY_REVOKED",
+   "control_designation_known_independently_genuine_B8": {
+    "admission": "ACCEPTED",
+    "procedure": "OK"
+   },
+   "control_one_owner_page_beside_one_attacker_page": "FIRST_CONTACT_DISAGREEMENT"
+  }
+ },
+ "executor_sha256": "272afdafd699a1882d4e311b8c24dae929997445c9057ea8764ab2d4a5603f49",
+ "probe": "RV6-D-A01 first-contact designation and procedure printer (AR-0018)",
+ "verdicts": {
+  "C_V1_sets_outside_declared_root": {
+   "a": [
+    [
+     "desig"
+    ]
+   ],
+   "b": [
+    [
+     "desig"
+    ]
+   ],
+   "c_all_1": [
+    [
+     "alt",
+     "desig"
+    ]
+   ],
+   "c_all_2": [
+    [
+     "alt",
+     "desig"
+    ]
+   ],
+   "c_either_1": [
+    [
+     "desig"
+    ]
+   ],
+   "c_either_2": [
+    [
+     "desig"
+    ]
+   ],
+   "d": []
+  },
+  "C_V2_sets_outside_declared_root": {
+   "a": [
+    [
+     "desig"
+    ]
+   ],
+   "b": [
+    [
+     "desig"
+    ]
+   ],
+   "c_all_1": [
+    [
+     "desig"
+    ]
+   ],
+   "c_all_2": [
+    [
+     "desig"
+    ]
+   ],
+   "c_either_1": [
+    [
+     "desig"
+    ]
+   ],
+   "c_either_2": [
+    [
+     "desig"
+    ]
+   ],
+   "d": []
+  },
+  "C_controls_reproduce_committed_blocks": true,
+  "D_no_plan_row": true,
+  "D_no_rule_on_designation_source": true,
+  "S1_substituted_evaluator_owner_steps_admitted_a_b_c_either": true,
+  "S1_substituted_evaluator_owner_steps_refused_c_all": true,
+  "S1_substituted_evaluator_weakened_steps_admitted_every_code_path_answer": true,
+  "S2_stale_state_B7x_admitted_by_genuine_admitter_every_code_path_answer_owner_steps": true,
+  "control_owner_page_beside_attacker_page_disagreement": true,
+  "controls_current_code_refuses_B7x": true,
+  "controls_genuine_designation_accepted_every_answer": true
+ }
+}

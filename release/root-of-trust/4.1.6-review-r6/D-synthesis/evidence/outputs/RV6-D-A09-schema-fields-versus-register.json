@@ -1,0 +1,1233 @@
+{
+ "focus_fields": {
+  "admission-record": {
+   "admitter_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "first_contact_code": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "location_protected": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "valid_until": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   }
+  },
+  "environment-manifest": {
+   "assembly.recipe_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "assembly.tool": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "components[].upstream_checksum_reference": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "supplier_class": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "first-contact-manifest": {
+   "admitters": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "lineage_id": {
+    "selector_decisions": [
+     "DR-03"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "valid_until": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   }
+  },
+  "input-manifest": {},
+  "release-registration": {
+   "admitter": "field path not found"
+  }
+ },
+ "procedure_inputs": {
+  "DR-06_selector_authority": [
+   "the first-contact root (rank 2 local authority); the admitter digest is registered and reproduced (rank 1 or 2)"
+  ],
+  "DR-13_selector_authority": [
+   "the release registration, established by at least two first-hand environment reproductions (rank 2 quorum under the rank 1 or 2 registration)"
+  ],
+  "register_names_environment_manifest_author": false,
+  "register_names_manifest_composer_or_publisher": false,
+  "register_names_package_submitter": false,
+  "register_names_procedure_text_or_printer": false,
+  "register_names_source_designation": false
+ },
+ "register_check_scope": {
+  "C2_docstring": [
+   "C2  completeness over normative rule ids: every rule id defined in a rule table of the scoped pack files (first table"
+  ],
+  "reads_schemas": false
+ },
+ "schemas": {
+  "admission-record": {
+   "admitted_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "admitter_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "binary_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "first_contact_code": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lineage": {
+    "selector_decisions": [
+     "DR-02",
+     "DR-10"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "location_protected": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "release_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "valid_until": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   }
+  },
+  "binary-reproduction": {
+   "binary_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environment_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "inputs_manifest_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "release_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "reproduced_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "source.content_digest": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "source.git_tree": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "source.release_commit": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "tbm_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "environment-manifest": {
+   "assembly.recipe_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "assembly.tool": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "components[].name": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "components[].sha256": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "components[].upstream_checksum_reference": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "components[].upstream_url": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "components[].version": {
+    "selector_decisions": [
+     "DR-31",
+     "DR-32"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "environment_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "supplier_class": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   }
+  },
+  "environment-reproduction": {
+   "environment_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environment_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "reproduced_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "supplier_class": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "first-contact-manifest": {
+   "admitters": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "lineage_id": {
+    "selector_decisions": [
+     "DR-03"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "state_epoch.policy_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_epoch.policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_epoch.root_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_epoch.root_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_epoch.state_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_epoch.state_sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "valid_until": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   }
+  },
+  "freshness-witness": {
+   "expires_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "framework": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "trust_profile": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "witness_label": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "witnessed_state.sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "witnessed_state.statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "input-manifest": {
+   "build_profile.flags": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "build_profile.profile": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "build_profile.remap_path_prefixes": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "build_profile.target_features": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].environment_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].environment_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].supplier_class": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "lockfile_sha256": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "targets": {
+    "selector_decisions": [
+     "DR-01"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "toolchain[].archive_sha256": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "toolchain[].name": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "toolchain[].upstream_checksum_reference": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "toolchain[].version": {
+    "selector_decisions": [
+     "DR-31",
+     "DR-32"
+    ],
+    "state": "selector_without_establishing_party"
+   }
+  },
+  "registration-revocation": {
+   "evidence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "reason": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "revokes": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "release-registration": {
+   "admitter.targets": {
+    "selector_decisions": [
+     "DR-01"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "binary_digests": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "candidate_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "constitution.kernel_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "constitution.units": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "environments[].environment_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].environment_reproductions": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].environment_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].supplier_class": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "environments[].target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "final_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "inputs_manifest_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "lowering_history[].reason": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lowering_history[].subject": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "migrations": {
+    "selector_decisions": [
+     "DR-16",
+     "DR-30"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "release_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "source.content_digest": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "source.git_tree": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "source.release_commit": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "targets": {
+    "selector_decisions": [
+     "DR-01"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "verification_records": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "trust-base-manifest": {
+   "binary.build": {
+    "selector_decisions": [
+     "DR-35"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "binary.inputs_manifest_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "binary.name": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "binary.source.content_digest": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "binary.source.git_tree": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "binary.source.release_commit": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "binary.target": {
+    "selector_decisions": [
+     "DR-06"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "binary.toolchain": {
+    "selector_decisions": [
+     "DR-12"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "binary.version": {
+    "selector_decisions": [
+     "DR-31",
+     "DR-32"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "compiled_rules.command_register_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "compiled_rules.floor_schema_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "compiled_rules.format_readers": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "compiled_rules.operator_vocabulary": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "compiled_rules.purpose_table_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "compiled_rules.statement_schemas_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "embedded_release.final_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "embedded_release.kernel_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "framework": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lineage": {
+    "selector_decisions": [
+     "DR-02",
+     "DR-10"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "root_chain[].statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "root_chain[].version": {
+    "selector_decisions": [
+     "DR-31",
+     "DR-32"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "trust_policy.policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_policy.statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_profile": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_state.sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_state.statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "trust-decision-pin": {
+   "approved_under_state.sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "approved_under_state.statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "binding_group_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bound_digests": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "expires_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gate_kind": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "note": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "project_trust_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "provisioned_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "provisioned_by": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "trust-gate-confirmation": {
+   "bound_digests": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "confirmed_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "consumed_by_transaction": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gate_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gate_kind": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "method": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "operator": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "presented_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "project_trust_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "repository_path": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_fingerprint": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "trust-policy-statement": {
+   "bootstrap.accepted_tbm_reset": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.admitter_digests": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.c3_currency_window_hours": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.channel_quorum": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.clock_reset": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.freshness_witness_threshold": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.max_anchor_age_days": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.op6_mode": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.op7_mode": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.pin_max_validity_days": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.revoked_self_scope": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.witness_max_validity_hours": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "bootstrap.workstation_record_max_validity_days": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.evaluation_candidates": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.historical_releases[].historical_status": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.historical_releases[].manifest_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.historical_releases[].release_commit": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "eligibility.historical_releases[].release_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.historical_releases[].tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.historical_releases[].verifier_report_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.historical_releases[].version": {
+    "selector_decisions": [
+     "DR-31",
+     "DR-32"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "eligibility.historical_releases_rule": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "eligibility.min_binary_version": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "eligibility.min_release_sequence": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "eligibility.production_stage": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "floor_schema_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "framework": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gating.decision_pin_max_validity_days": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gating.local_terminal_only": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gating.mode": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "gating.refuse_known_rejected": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "gating.refuse_known_withdrawn": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "install_authority": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "lowering_history[].in_policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lowering_history[].new": {
+    "selector_decisions": [
+     "DR-26"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "lowering_history[].previous": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lowering_history[].reason": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lowering_history[].subject": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "prior_policies[].policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "prior_policies[].statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "registration.binary_digests_registered": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "registration.environment_diversity": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "registration.min_verification_records": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "sensitivity_order": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_chain_reset": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "supersedes_policy_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "surface.default": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "surface.floor_schema_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_profile": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "unrevokes[].reason": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "unrevokes[].revocation_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "trust-state-pin": {
+   "fingerprint": {
+    "selector_decisions": [
+     "DR-20",
+     "DR-21"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "lineage": {
+    "selector_decisions": [
+     "DR-02",
+     "DR-10"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "note": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "policy_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "provisioned_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "provisioned_by": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "root_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "root_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "state_sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "valid_until": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   }
+  },
+  "trust-state-statement": {
+   "attestations": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "certifications[].certification_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "certifications[].release_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "expires_at": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "framework": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "previous_state_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "prior_states[].sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "prior_states[].statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "published_binaries": {
+    "selector_decisions": [
+     "DR-18"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "references.root_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "references.root_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "references.trust_policy.policy_version": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "references.trust_policy.statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "registrations": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "revocations": {
+    "selector_decisions": [
+     "DR-18"
+    ],
+    "state": "selector_without_establishing_party"
+   },
+   "sequence": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_profile": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   }
+  },
+  "verification-attestation": {
+   "candidate_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "findings.critical": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "findings.high": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "findings.low": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "findings.medium": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "framework": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "harnesses": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "inputs_manifest_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "issued_at": {
+    "selector_decisions": [],
+    "state": "named_outside_selectors"
+   },
+   "kernel_tree_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "lifts_negative_statement_digest": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "release_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "report": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "source.content_digest": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "source.git_tree": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "source.release_commit": {
+    "selector_decisions": [
+     "DR-11"
+    ],
+    "state": "selector_with_establishing_party"
+   },
+   "trust_profile": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "trust_root_id": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "verdict": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "verdict_record": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "verifier_label": {
+    "selector_decisions": [],
+    "state": "not_named"
+   },
+   "version": {
+    "selector_decisions": [
+     "DR-31",
+     "DR-32"
+    ],
+    "state": "selector_without_establishing_party"
+   }
+  }
+ },
+ "totals": {
+  "fields": 251,
+  "named_in_selector_without_establishing_party": 28,
+  "named_only_outside_selectors": 16,
+  "not_named": 193
+ },
+ "verdicts": {
+  "FCM_valid_until_not_named": false,
+  "fields_named_in_a_selector_without_an_establishing_party": 28,
+  "fields_not_named_in_register": 193,
+  "register_check_does_not_read_schemas": true,
+  "register_has_no_designation_printer_composer_submitter_or_manifest_author": true
+ }
+}

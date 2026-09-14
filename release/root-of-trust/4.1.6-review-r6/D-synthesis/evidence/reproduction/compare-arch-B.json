@@ -1,0 +1,199 @@
+{
+ "architect": {
+  "CSI6-selftest": {
+   "byte_identical": true,
+   "sha256": "416eb901645d78d4af436e0aad156bad2ba2f800b7d730d7f526df612f45e65c"
+  },
+  "CSI6-framework": {
+   "byte_identical": false,
+   "differing_leaves": 1,
+   "examples": [
+    [
+     "/kernel_dir",
+     "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0018/export/framework",
+     "<export>/framework"
+    ]
+   ]
+  },
+  "CSI6-4.1.5": {
+   "byte_identical": false,
+   "differing_leaves": 1,
+   "examples": [
+    [
+     "/kernel_dir",
+     "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0018/export/release/releases/",
+     "<export>/release/releases/4.1.5/kernel"
+    ]
+   ]
+  },
+  "CSI6-4.1.2": {
+   "byte_identical": false,
+   "differing_leaves": 1,
+   "examples": [
+    [
+     "/kernel_dir",
+     "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0018/export/release/releases/",
+     "<export>/release/releases/4.1.2/kernel"
+    ]
+   ]
+  },
+  "CSI6-4.1.3": {
+   "byte_identical": false,
+   "differing_leaves": 1,
+   "examples": [
+    [
+     "/kernel_dir",
+     "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0018/export/release/releases/",
+     "<export>/release/releases/4.1.3/kernel"
+    ]
+   ]
+  },
+  "CSI6-4.1.4": {
+   "byte_identical": false,
+   "differing_leaves": 1,
+   "examples": [
+    [
+     "/kernel_dir",
+     "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/ar-0018/export/release/releases/",
+     "<export>/release/releases/4.1.4/kernel"
+    ]
+   ]
+  },
+  "P4r6": {
+   "byte_identical": true,
+   "sha256": "1687990714f935d27be3a41848534817c93923b4c3ab882aecf6bff1b8a419cb"
+  },
+  "CS6": {
+   "byte_identical": true,
+   "sha256": "ac8e5fd8792d827fcc9f800790819a3d32a74061c6eb35262f1422773c5a6cc6"
+  },
+  "REGISTER-CHECK": {
+   "byte_identical": true,
+   "sha256": "b9ebc9f4f419d0f988e6ac937e5b0009cd1d3b5f9bacbc06168112dc47b4c390"
+  },
+  "STATEMENTS-CHECK": {
+   "byte_identical": true,
+   "sha256": "2d18aeacf40c37a2065dd4d152a9ff54c5f1b02c3f301837b156df901d81d65d"
+  },
+  "DA03r6": {
+   "byte_identical": true,
+   "sha256": "433cc59469d1887c70fe7b792d7ce5c3bed8d648c6aaf7120ac1a9e7e1906b17"
+  },
+  "FA6-run1": {
+   "byte_identical": true,
+   "sha256": "1c09e196e43f157edb72336cee960f0ce1b32505d265914a693a467760bd4a1d"
+  },
+  "FA6-run2": {
+   "byte_identical": true,
+   "sha256": "1c09e196e43f157edb72336cee960f0ce1b32505d265914a693a467760bd4a1d"
+  },
+  "CON6": {
+   "byte_identical": true,
+   "sha256": "11b6f90a51648b350404acb47c59bd156f09731e1ad7ac1cc57978af5b65e1f8"
+  },
+  "SRC6": {
+   "byte_identical": true,
+   "sha256": "91a73253d6df6a647e3dba625083a254b59cafe1e0b88bf5d639e8f73e14fde5"
+  },
+  "ADM6": {
+   "byte_identical": false,
+   "differing_leaves": 4,
+   "examples": [
+    [
+     "/A11_concurrent_first_admissions/mutant_skip_admission_lock_20_trials/first_trial/errors[5]",
+     "FileNotFoundError(2, 'No such file or directory')",
+     "None"
+    ],
+    [
+     "/A11_concurrent_first_admissions/mutant_skip_admission_lock_20_trials/first_trial/errors[6]",
+     "FileNotFoundError(2, 'No such file or directory')",
+     "None"
+    ],
+    [
+     "/A11_concurrent_first_admissions/mutant_skip_admission_lock_20_trials/first_trial/moved_aside_stores_holding_a_record",
+     "1",
+     "2"
+    ],
+    [
+     "/A11_concurrent_first_admissions/mutant_skip_admission_lock_20_trials/trials_with_a_moved_aside_store_holding_a_record",
+     "15",
+     "17"
+    ]
+   ]
+  },
+  "UW6": {
+   "byte_identical": true,
+   "sha256": "cd0acd34eb6f2432507aa99f6143ef23e9b40c22321244a007b7ab5b61a5a731"
+  },
+  "ATTR6": {
+   "byte_identical": true,
+   "sha256": "284b3eea2d037eeb8eccee8374424e23151673971cf2a66db6bd0282280d9774"
+  },
+  "DA07r6": {
+   "byte_identical": true,
+   "sha256": "3a22939960dba1891d9a95349ea8d25eed78deeabbeb6e85da6753f0a266cbbd"
+  },
+  "ENV6": {
+   "byte_identical": true,
+   "sha256": "6d391b4edd080d1925e45477c2385d9deda8963e31f3c31a2f2ee56003e18def"
+  },
+  "P4r5": {
+   "byte_identical": true,
+   "sha256": "7db5dbc13318389beedc344336fbbdd850502d162eaa4b2c4e7f30978373d8f2"
+  },
+  "DA03r5": {
+   "byte_identical": true,
+   "sha256": "c2693af480e611496f49c53b4447f122687fc5dcf1c184b88ce3e04b8c7ce454"
+  },
+  "REG5": {
+   "byte_identical": true,
+   "sha256": "855292a5dbf1040ef69635d158ccef146a48cef24fe1f92e05edfbdc0022aff8"
+  },
+  "P1r4": {
+   "byte_identical": true,
+   "sha256": "15b537a0264a52b123d8cc6c5a138da304f449e7190851c7d588b67f49409295"
+  },
+  "CS5": {
+   "byte_identical": true,
+   "sha256": "795fed9370b8061039c81908ecdc498f99ca632a43deeac41867a00dfb9024a1"
+  },
+  "FA5(json written in export)": {
+   "byte_identical": false,
+   "differing_leaves": 0,
+   "examples": []
+  },
+  "CS6-results(uncompressed)": {
+   "byte_identical": true
+  }
+ },
+ "reviewer_B": {
+  "RV6-B-A01-first-contact-selectors.json": {
+   "byte_identical": true,
+   "sha256": "52a91718bab499463e0233fd5c4c70a7fc353c5ee5cc540f4d431777bedc6c05"
+  },
+  "RV6-B-A02-environment-manifest-author.json": {
+   "byte_identical": true,
+   "sha256": "6e807f6fb99f52b5292b3d4d6acbed5a774d52bc2140d13aaa9c9cb04f5734f1"
+  },
+  "RV6-B-A03-generated-statement-rendering.json": {
+   "byte_identical": true,
+   "sha256": "583415e8618641de5abd31d98944c565d3e2f12c526d8a13b92764c39f630428"
+  },
+  "RV6-B-A04-readmission-rollback.json": {
+   "byte_identical": true,
+   "sha256": "556429b4a2aa46fce469afd760538d061cc88b5e55c4df89a8412af6dc2f0835"
+  },
+  "RV6-B-A10-surface-classes.json": {
+   "byte_identical": true,
+   "sha256": "c6f5eaa1e14989a97e55dd9d3b12f3a51858e8b5d5e4fcdf00fa2c9082c053b0"
+  },
+  "RV6-B-A11-machine-classes-r6.json": {
+   "byte_identical": true,
+   "sha256": "1660e79cf05dc7fa65cce49b39b9677680ec674d98795b12c9715fe92d8fed43"
+  },
+  "RV6-B-A12-key-subsets-below-threshold.json": {
+   "byte_identical": true,
+   "sha256": "2782932f02e3659ccd0e1b498f044c8f57a843e4f12ce3f957e09cd7b466498a"
+  }
+ }
+}

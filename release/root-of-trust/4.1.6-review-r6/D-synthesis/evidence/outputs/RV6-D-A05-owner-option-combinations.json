@@ -1,0 +1,285 @@
+{
+ "E1_pipeline_authored_manifest_under_other_answers": {
+  "OP-2 (b) delegated, victim P1 | OP-16 (a)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "OP-2 (b) delegated, victim P1 | OP-16 (b)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "OP-2 (b) delegated, victim P1 | OP-16 (c)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   }
+  },
+  "OP-8 = 2, victim P1 | OP-16 (a)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "OP-8 = 2, victim P1 | OP-16 (b)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "OP-8 = 2, victim P1 | OP-16 (c)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   }
+  },
+  "OP-9 d_n2q2, victim P1 | OP-16 (a)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "OP-9 d_n2q2, victim P1 | OP-16 (b)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "OP-9 d_n2q2, victim P1 | OP-16 (c)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   }
+  },
+  "victim CIR | OP-16 (a)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "victim CIR | OP-16 (b)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "victim CIR | OP-16 (c)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   }
+  },
+  "victim FA, OP-13 (b) | OP-16 (a)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "victim FA, OP-13 (b) | OP-16 (b)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [
+     "INV-ENV",
+     "INV-ENV-PIPELINE",
+     "INV-ONE"
+    ],
+    "pipeline_alone_minimal": true
+   }
+  },
+  "victim FA, OP-13 (b) | OP-16 (c)": {
+   "control": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   },
+   "pipeline_authored_manifest": {
+    "invariant_failures": [],
+    "pipeline_alone_minimal": false
+   }
+  }
+ },
+ "E2_toolchain_under_OP16_b": {
+  "OP-10=accept with OP-16 (b)": [
+   "{toolchain_up}",
+   "{2 reproducer processes}"
+  ],
+  "OP-10=diverse with OP-16 (b)": [
+   "{2 reproducer processes}",
+   "{1 reproducer process, toolchain_up}",
+   "{1 reproducer process, diverse_tc}",
+   "{toolchain_up, diverse_tc}"
+  ],
+  "OP-10=owner_built with OP-16 (b)": [
+   "{owner_tc}",
+   "{2 reproducer processes}"
+  ]
+ },
+ "combinations": [
+  {
+   "change": "desig selects the evaluator (a), (b), (c) either; the state (and with weakened steps the evaluator) under (c) all",
+   "combination": "OP-13 (a)/(b)/(c) any + who designates the sources and prints the procedure",
+   "evidence": "RV6-D-A01 P, C",
+   "stated_in_21": false
+  },
+  {
+   "change": "revoked (including malicious) binaries admitted as first TCB; no age bound",
+   "combination": "OP-13 (d) + media prepared earlier than the newest revocation",
+   "evidence": "RV6-D-A08",
+   "stated_in_21": false
+  },
+  {
+   "change": "a binary revoked in the kept store is admitted; the store's anchors are ignored",
+   "combination": "OP-14 (b) or OP-15 (a) + any OP-13 answer + an older first-contact value at re-admission",
+   "evidence": "RV6-D-A02",
+   "stated_in_21": false
+  },
+  {
+   "change": "witness-reliant runners accept {2 reproducer keys, transport, fcpub} (witness keys not needed)",
+   "combination": "OP-7 (c) + a compromised trust-state publisher",
+   "evidence": "RV6-D-A01 C WR",
+   "stated_in_21": false
+  },
+  {
+   "change": "{pipeline} stays minimal under each (computed E1)",
+   "combination": "OP-16 (a)/(b) + OP-9 (d), OP-8 = 2, OP-2 (b), victims FA and CIR + a pipeline-authored environment manifest",
+   "evidence": "RV6-D-A05 E1",
+   "stated_in_21": false
+  },
+  {
+   "change": "{toolchain_up} alone still yields malicious bytes; environment diversity does not cover the toolchain archive",
+   "combination": "OP-16 (b) + OP-10 (a)",
+   "evidence": "RV6-D-A05 E2",
+   "stated_in_21": false
+  }
+ ],
+ "design": {
+  "OP13_d_states_media_age": false,
+  "OP13_states_designation_source": false,
+  "OP16_states_manifest_author": false,
+  "OP7_c_states_witness_input_composer": false,
+  "OP9_d_states_environment_author": false,
+  "s17_readmission_row_states_store_not_applied": false,
+  "s17_rows": [
+   "| OP-13 (c) with OP-12 (b) or (c) | no platform code-signing path authenticates an interpreted admitter or a helper-machine hand-over independently of the owner's sources |",
+   "| OP-13 (d) as the only answer when any machine is not provisioned by media | those machines would have no first-contact procedure |",
+   "| OP-16 (b) for a target that does not reproduce bit for bit across the registered supplier classes | the target cannot be registered (`ENVIRONMENT_DIVERSITY_NOT_MET`); the owner answers (a) or (c) for it, or does not register it |",
+   "| OP-10 (a) + OP-16 (a) | both TA-12 and TA-12\u2032 residuals: the toolchain archive supplier alone, or the environment supplier alone, yields malicious bytes |",
+   "| OP-2 (b) + OP-8 = 1 | the delegated quorum with one verification compromise selects source and content (OP-2 blocks) |",
+   "| OP-13 (c) \"either\" + any OP-9 | the signing path is a first-contact root on its own (FC-ROOT) |",
+   "| OP-7 (a) or (b) + workstations without administrator-protected installations | C0 only on those workstations |",
+   "| OP-3 mode B + OP-7 (a) or (b) | each certified update still needs a currency proof naming the publishing Trust State |",
+   "| OP-11 (a) + machines without a per-project record | RR-2: the repository writer selects among eligible registered releases |",
+   "| OP-12 (c) + any | the helper machine is in the first-admission TCB of every machine it serves |",
+   "| OP-14 (b) or OP-15 (a) + OP-13 (b)/(c)/(d) | each re-admission needs the first-contact sources again; the store is kept |"
+  ],
+  "s17_states_OP10a_with_OP16b": false
+ },
+ "probe": "RV6-D-A05 owner-option combinations (AR-0018)",
+ "verdicts": {
+  "E1_OP16_c_unaffected": true,
+  "E1_control_pipeline_never_minimal": true,
+  "E1_pipeline_minimal_under_OP16_a_b_for_every_listed_answer": true,
+  "E2_toolchain_up_alone_under_OP10_accept_with_OP16_b": true,
+  "combinations_not_stated_in_21": [
+   "OP-13 (a)/(b)/(c) any + who designates the sources and prints the procedure",
+   "OP-13 (d) + media prepared earlier than the newest revocation",
+   "OP-14 (b) or OP-15 (a) + any OP-13 answer + an older first-contact value at re-admission",
+   "OP-7 (c) + a compromised trust-state publisher",
+   "OP-16 (a)/(b) + OP-9 (d), OP-8 = 2, OP-2 (b), victims FA and CIR + a pipeline-authored environment manifest",
+   "OP-16 (b) + OP-10 (a)"
+  ]
+ }
+}
