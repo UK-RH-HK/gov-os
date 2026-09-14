@@ -1,0 +1,30 @@
+{
+ "probe": "F4 external measurement (AR-0010)",
+ "git": "git version 2.43.0",
+ "S_source_identity": {
+  "tree_archive_deterministic_over_time": false,
+  "archive_of_commit_deterministic": true,
+  "archive_of_commit_embeds_commit_id_in_pax_header": true,
+  "same_tree_in_other_repository": true,
+  "commit_archive_digest_equal_across_repositories_with_same_tree": false,
+  "tree_archive_digest_equal_across_repositories_with_same_tree": false,
+  "moved_tag_changes_commit_archive_digest": true,
+  "moved_tag_changes_tree_archive_digest": true,
+  "canonical_content_digest_equal_across_repositories_with_same_tree": true,
+  "canonical_content_digest_changes_on_moved_tag": true,
+  "admitter_decision_moved_tag (canonical content digest)": "refuse (content digest differs from the admitted source)",
+  "note": "`git archive <commit>` is deterministic for one commit but binds the commit id (pax comment); `git archive <tree>` stamps the current time. Neither is a content identity a party holding only the tree can recompute; the canonical content digest is (01 M1 F-SRC)."
+ },
+ "B_candidate_bytes": {
+  "planted_binary_would_self_report_genuine_TBM": true,
+  "admitter_decision": "ARTIFACT_BUILD_QUORUM_NOT_MET",
+  "measured_digest_equals_attested": false,
+  "candidate_executed_by_admitter": false,
+  "revision_4_path_c_would_run_candidate": "yes (`gov version --trust` is printed by the candidate, 06 \u00a72 step 6 (c))"
+ },
+ "T_measure_then_install": {
+  "admitter_decision_at_measurement": "ACCEPT_MEASUREMENT",
+  "installed_by_re_reading_path_equals_measured": false,
+  "installed_from_measured_buffer_equals_measured": true
+ }
+}

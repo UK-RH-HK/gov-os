@@ -1,0 +1,256 @@
+{
+ "probe": "F3 release-scoped registration (AR-0010)",
+ "checker": "revision-4 csi_check.py / csi_lib.py, unmodified, run on projections",
+ "binary": "gov 4.1.5",
+ "scratch": "<scratch>",
+ "P_secret_pattern_retention": {
+  "revision_4_list_form_RETAIN (reproduces review r4 B part P)": {
+   "forged_4.1.8_mixed": 0,
+   "reductions_v1_to_RETAIN": 0
+  },
+  "single_valued_lint_on_revision_4_RETAIN": {
+   "exit": 5,
+   "problems": [
+    {
+     "key": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+     "problem": "REGISTRATION_NOT_SINGLE_VALUED: a list of permitted digests lets a lower threshold select"
+    }
+   ],
+   "count": 1
+  },
+  "E2_open": {
+   "lint_v2": 0,
+   "installed_4.1.6_at_seq_6_under_v2 (legitimate retention)": {
+    "exit": 0
+   },
+   "fixed_4.1.7_at_seq_7_under_v2": {
+    "exit": 0
+   },
+   "forged_4.1.8_mixed_old_regex_at_seq_8_under_v2": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'policies/SECURITY_POLICY.yaml', 'key': 'SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:af1fb"
+    ],
+    "violations_count": 1
+   },
+   "forged_4.1.8_mixed_presented_as_seq_7_under_v2": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'policies/SECURITY_POLICY.yaml', 'key': 'SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:af1fb"
+    ],
+    "violations_count": 1
+   },
+   "genuine_4.1.8_same_content_as_4.1.7_at_seq_8_under_v2 (availability)": {
+    "exit": 0
+   },
+   "stale_machine_holding_only_v1: forged_4.1.8_with_4.1.6_content_at_seq_8": {
+    "exit": 0
+   },
+   "stale_machine_holding_only_v1: forged_4.1.8_mixed_at_seq_8 (differs from 4.1.6 only by the additive member)": {
+    "exit": 0
+   },
+   "reductions": {
+    "v2_to_v3_re-registering_superseded_regex_for_seq_8": {
+     "exit": 6,
+     "reductions": [
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "registration_rewritten",
+       "sequence_from": 8
+      },
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "content_reversion",
+       "reverted_to_digest": "sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb",
+       "from_sequence": 8
+      }
+     ],
+     "count": 2,
+     "undeclared": 2
+    },
+    "same_with_lowering_history": {
+     "exit": 0,
+     "reductions": [
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "registration_rewritten",
+       "sequence_from": 8
+      },
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "content_reversion",
+       "reverted_to_digest": "sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb",
+       "from_sequence": 8
+      }
+     ],
+     "count": 2,
+     "undeclared": 0
+    },
+    "v2_to_v3_rewriting_sequence_6": {
+     "exit": 6,
+     "reductions": [
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "registration_rewritten",
+       "sequence_from": 6
+      }
+     ],
+     "count": 1,
+     "undeclared": 1
+    },
+    "pack_reductions_tool_on_projections_v2@7_vs_v3@8 (unmodified: blind to reversion)": 0,
+    "forged_mixed_at_seq_8_after_v3_reversion_declared": 0
+   }
+  },
+  "E2_closed": {
+   "lint_v2": 0,
+   "installed_4.1.6_at_seq_6_under_v2 (legitimate retention)": {
+    "exit": 0
+   },
+   "fixed_4.1.7_at_seq_7_under_v2": {
+    "exit": 0
+   },
+   "forged_4.1.8_mixed_old_regex_at_seq_8_under_v2": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.framework_revision', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:7fd325a3b5756cbcba1d169641f143d459327eacb34a21efbf9a9f96c1ccee",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.generic', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.ide', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120c"
+    ],
+    "violations_count": 50
+   },
+   "forged_4.1.8_mixed_presented_as_seq_7_under_v2": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'policies/SECURITY_POLICY.yaml', 'key': 'SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:af1fb"
+    ],
+    "violations_count": 1
+   },
+   "genuine_4.1.8_same_content_as_4.1.7_at_seq_8_under_v2 (availability)": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.framework_revision', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:7fd325a3b5756cbcba1d169641f143d459327eacb34a21efbf9a9f96c1ccee",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.generic', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.ide', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120c"
+    ],
+    "violations_count": 50
+   },
+   "stale_machine_holding_only_v1: forged_4.1.8_with_4.1.6_content_at_seq_8": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.framework_revision', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:7fd325a3b5756cbcba1d169641f143d459327eacb34a21efbf9a9f96c1ccee",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.generic', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.ide', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120c"
+    ],
+    "violations_count": 50
+   },
+   "stale_machine_holding_only_v1: forged_4.1.8_mixed_at_seq_8 (differs from 4.1.6 only by the additive member)": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.framework_revision', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:7fd325a3b5756cbcba1d169641f143d459327eacb34a21efbf9a9f96c1ccee",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.generic', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d",
+     "{'file': 'KERNEL.yaml', 'key': 'KERNEL.adapter_versions.ide', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120c"
+    ],
+    "violations_count": 50
+   },
+   "after_TPS_v3_registers_seq_8_like_7: genuine_4.1.8_same_content": {
+    "exit": 0
+   },
+   "after_TPS_v3_registers_seq_8_like_7: forged_mixed": {
+    "exit": 3,
+    "violations_first": [
+     "{'file': 'policies/SECURITY_POLICY.yaml', 'key': 'SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex', 'class': 'pinned', 'reason': 'value digest not registered', 'digest': 'sha256:af1fb"
+    ],
+    "violations_count": 1
+   },
+   "reductions": {
+    "v2_to_v3_re-registering_superseded_regex_for_seq_8": {
+     "exit": 6,
+     "reductions": [
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "content_reversion",
+       "reverted_to_digest": "sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb",
+       "from_sequence": 8
+      }
+     ],
+     "count": 1,
+     "undeclared": 1
+    },
+    "same_with_lowering_history": {
+     "exit": 0,
+     "reductions": [
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "content_reversion",
+       "reverted_to_digest": "sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb",
+       "from_sequence": 8
+      }
+     ],
+     "count": 1,
+     "undeclared": 0
+    },
+    "v2_to_v3_rewriting_sequence_6": {
+     "exit": 6,
+     "reductions": [
+      {
+       "subject": "SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex",
+       "kind": "registration_rewritten",
+       "sequence_from": 6
+      }
+     ],
+     "count": 1,
+     "undeclared": 1
+    },
+    "pack_reductions_tool_on_projections_v2@7_vs_v3@8 (unmodified: blind to reversion)": 6,
+    "forged_mixed_at_seq_8_after_v3_reversion_declared": 3
+   }
+  }
+ },
+ "D_A02_breadth": {
+  "fixed_digests_found": {
+   "T1_tool_descriptor_member": true,
+   "T2_hard_invariant_member": true,
+   "T3_schema_pinned_file": true,
+   "T4_skill_pinned_file": true
+  },
+  "E2_open": {
+   "lint": 0,
+   "installed_4.1.6_at_6": 0,
+   "all_fixed_4.1.7_at_7": 0,
+   "mixed_releases_at_seq_8": {
+    "T1_tool_descriptor_member": 3,
+    "T2_hard_invariant_member": 3,
+    "T3_schema_pinned_file": 3,
+    "T4_skill_pinned_file": 3
+   }
+  },
+  "E2_closed": {
+   "lint": 0,
+   "installed_4.1.6_at_6": 0,
+   "all_fixed_4.1.7_at_7": 0,
+   "mixed_releases_at_seq_8": {
+    "T1_tool_descriptor_member": 3,
+    "T2_hard_invariant_member": 3,
+    "T3_schema_pinned_file": 3,
+    "T4_skill_pinned_file": 3
+   }
+  }
+ },
+ "consumption_4_1_5": {
+  "revision_4_RETAIN_selects_forged_4.1.8_mixed (E7 exit 0 above)": {
+   "init_ok": true,
+   "kernel_trust_verified": true,
+   "rebuild_ok": true,
+   "indexed": true,
+   "retrievable_by_default_query": true
+  },
+  "E2_refuses_forged_4.1.8; effective root stays the eligible 4.1.7 content": {
+   "init_ok": true,
+   "kernel_trust_verified": true,
+   "rebuild_ok": true,
+   "indexed": false,
+   "retrievable_by_default_query": false
+  }
+ }
+}
