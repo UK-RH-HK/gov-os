@@ -18,7 +18,7 @@ outcome:
   verdict: BLOCKING_FINDINGS_PRESENT   # role verdict; not the architecture verdict
   work_commit: 512808695e8f3eb11187a8c70dc07e6783ad8395
   report_commit: 0736ad4d95909013d9315e55c2d72b3ba965de53
-  integration_merge_commit: null   # held unmerged until reviewer C (AR-0017) completes, to preserve panel independence
+  integration_merge_commit: b4d6b9aa305b11650902eac3ca0fbfc55658356e   # merged after reviewer C completed
   findings:
     HIGH: [RV6-B-H1, RV6-B-H2, RV6-B-H3]
     MEDIUM: [RV6-B-M1, RV6-B-M2, RV6-B-M3]

@@ -602,3 +602,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | work `5128086`, report `0736ad4` on `phase1/rot1-r6-review-b`; held unmerged until reviewer C completes |
 | Findings | **HIGH RV6-B-H1:** the trust-state publisher composes the first-contact code and the independent sources only carry it, so one party selects lineage, state and evaluator on first install under OP-13 (a), (b), (c)-either and (d); the declared root and the OP-9/OP-13 statements are false. **HIGH RV6-B-H2:** under OP-13 (c)-either, a package submitter or a replayed old signed package (optional `valid_until`) selects the first TCB; FA6 lacks both paths. **HIGH RV6-B-H3:** no party establishes the environment manifest, so its writer selects binary bytes under OP-16 (a) and (b), and (b) counts diversity by label; executed with real `rustc`. **MEDIUM:** M1 (re-admission ignores the stored high-water), M2 (generated CONTENT block misprint), M3 (register completeness checked over rule ids, not selectors). **LOW:** L1–L4. **Prior:** BC5-3 closed as a class within B's attacks; BC5-1, BC5-2 and BC5-4 narrowed; OP-6, OP-9, OP-13 and OP-16 statements false. Non-material scope disclosures recorded; canonical checkout verified clean. |
 | Next action | await AR-0017; then merge B and C, write HO-0018, spawn synthesis reviewer D |
+
+## L-0042 — 2026-09-14 — revision-6 reviewer C completed; panel merged; owner briefed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-reviewer-compat-transaction (`AR-0017`, resumed once); orchestrator |
+| Input commit | `cd4526a` (architecture `4106885`) |
+| Work performed | **C:** independent registers (104/109/115/119 from help and source). Pre-RoT matrix of 62,036 rows (61,520 run, 516 skipped, 0 timeouts) across root, subdirectory, environment-variable, nested and 22 Git-operation trees. Reproduced LAY6 (30,735 rows), ADM6 and UW6. Authored held-out RV6-C-A01…A19. **Orchestrator:** at the owner's request, gave in chat a summary of revision verdicts and the OP-1…OP-16 options, with reviewer B's caveats. The owner said they will answer; answers are to be recorded verbatim as owner-initiated input. |
+| Report / evidence | `AGENT_RUNS/AR-0017.report.yaml`; `release/root-of-trust/4.1.6-review-r6/C-compat-transaction/` |
+| Verdict | `NO_BLOCKING_FINDINGS` (role verdict) |
+| Output commit | work `02bb905`, report `b2c4cbe`, merged `2583388`. Reviewer B merged first: `b4d6b9a`. |
+| Findings | **Carried MEDIUM:** RV6-C-M1 (global or `.git/info` ignore drops the migration occupation; fails closed), M2 (first-install layout migration and exchange-to-journal window not journalled; half-migrated trees, never `COMPLETE`), M3 (per-project record identity under worktree, move, fork or template), M4 (contradictory re-recording rules), M5 (verifier trust-store location specified two ways). **LOW:** L1–L6. **Prior:** R2-H4 CLOSED as a class; RV5-M3 and RV5-M6 closed; RV5-M7 and RV5-L7 narrowed; C-2, C-3 and C-5 open (implementation-only). **Record clarification for L-0041:** the canonical checkout's tracked tree was clean; three ignored Python caches under `capabilities/` date from 2026-09-12, before Phase 1, and were written by no Phase-1 role. |
+| Next action | synthesis reviewer D on revision 6 |
+
+## L-0043 — 2026-09-14 — revision-6 synthesis handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | orchestrator |
+| Input commit | `2583388` |
+| Work performed | Wrote HO-0018 from the v3 synthesis template (classification addendum §2a, transcript prohibition). Claimed AR-0018. Added the review-r6 B and C directories to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0018-rot-review-r6-d-synthesis.md`, `CHECKPOINTS/CP-0013.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0018 |

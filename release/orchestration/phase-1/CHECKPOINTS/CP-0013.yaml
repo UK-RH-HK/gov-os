@@ -1,0 +1,19 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0013
+trigger: independent panel verdicts on revision 6; before handoff to synthesis reviewer (HO-0018); owner informed of options
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_SYNTHESIS
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 2583388b9abf22994b102a797f05bf481fdfc22a
+completed_evidence:
+  - {what: RoT-1 revision 6, commit: 4106885dadebac55596067a2586cf4d3097fc025, path: release/root-of-trust/4.1.6}
+  - {what: reviewer B r6 (BLOCKING_FINDINGS_PRESENT), commit: 512808695e8f3eb11187a8c70dc07e6783ad8395, report_commit: 0736ad4d95909013d9315e55c2d72b3ba965de53, path: release/root-of-trust/4.1.6-review-r6/B-trust-security}
+  - {what: reviewer C r6 (NO_BLOCKING_FINDINGS), commit: 02bb90550342e8bb6d42ba636430ae3394d3a0f7, report_commit: b2c4cbe25653fe162ee2c328feaaf33c45aa27e1, path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction}
+panel_findings_pending_adjudication: {HIGH: [RV6-B-H1, RV6-B-H2, RV6-B-H3], MEDIUM: 8, LOW: 10}
+owner_interaction: owner requested verdict summary and the OP-1..OP-16 list; summary given in chat; owner answers pending (owner-initiated input)
+escalation: {orchestrated_rejections: 3, materially_new_class_streak: 0, persistent_remainder_streak: 3}
+pending_owner_gates: []
+running_work: [AR-0018 synthesis reviewer D (revision 6)]
+next_deterministic_action: spawn AR-0018 on HO-0018; record owner answers verbatim on receipt
