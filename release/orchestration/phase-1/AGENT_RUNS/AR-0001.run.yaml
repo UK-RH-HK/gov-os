@@ -6,10 +6,11 @@ objective: Author RoT-1 revision 3 (architecture only) closing R2-H1..R2-H4, R2-
 agent_model: claude-opus-5
 fresh_context: true
 handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0001-rot-architect-r3.md
-base: the orchestrator commit that adds this file on release/4.1.6-rc1
+base_commit: 71581dc
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r3
 branch: phase1/rot1-r3-architect
-agent_id: null
-status: CLAIMED
+agent_id: aa7ffdbd0fad322e9   # orchestrator-session-local handle; not resumable from a fresh session
+started_at: '2026-09-14T00:29Z'
+status: RUNNING
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0001.report.yaml
 outcome: null

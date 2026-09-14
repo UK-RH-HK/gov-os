@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T00:28:16Z'
-state_hash: c512bc345a1f176acf11adfc921652915e4e78b873c9944be3cfc61542127443
+updated_at: '2026-09-14T00:29:16Z'
+state_hash: 474c1e0fe750369f3e5fcbc9d9c4a902ae2859fbf2aad5cce8f1609a5b91e116
 lifecycle_state: ROT_ARCH_R3_AUTHORING
 
 protocol:
@@ -37,7 +37,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: e5a6b8aa39d2a36311489418506d911df2587722
+  last_recorded_commit: 71581dc
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -142,7 +142,10 @@ running_work:
   - run_id: AR-0001
     role: rot-architect
     run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0001.run.yaml
-    status: CLAIMED
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r3
+    branch: phase1/rot1-r3-architect
+    base_commit: 71581dc
+    status: RUNNING
 
 latest_role_verdicts:
   rot-architect: null
@@ -176,10 +179,11 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Commit the control record and HO-0001 on release/4.1.6-rc1; create worktree
-  <scratch>/wt/arch-r3 on branch phase1/rot1-r3-architect from that commit; spawn a fresh Opus 5
-  RoT architect (AR-0001) on HO-0001; on completion require AR-0001.report.yaml, merge its branch,
-  then spawn reviewers B (trust/security) and C (compatibility/transaction) in parallel.
+  Await AR-0001 completion. Then require AR-0001.report.yaml with verdict
+  ARCHITECTURE_REVISION_READY_FOR_REVIEW (INCOMPLETE -> re-spawn a fresh architect on the committed
+  partial work), merge phase1/rot1-r3-architect into release/4.1.6-rc1, write HO-0002 (reviewer B
+  trust/security) and HO-0003 (reviewer C compatibility/transaction), and spawn both in parallel
+  in separate worktrees at the architecture commit.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1

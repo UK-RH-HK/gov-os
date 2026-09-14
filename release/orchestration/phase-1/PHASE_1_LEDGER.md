@@ -42,3 +42,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding this directory |
 | Findings | none new; R2 findings carried as unresolved |
 | Next action | spawn fresh RoT architect AR-0001 |
+
+## L-0002 — 2026-09-14 — revision-3 architect spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-architect (`AR-0001`, fresh Opus 5 context) |
+| Input commit | `71581dc` (worktree `wt/arch-r3`, branch `phase1/rot1-r3-architect`) |
+| Work performed | spawned on HO-0001; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0001.report.yaml`; pack `release/root-of-trust/4.1.6/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify report, merge, spawn reviewers B and C in parallel |
