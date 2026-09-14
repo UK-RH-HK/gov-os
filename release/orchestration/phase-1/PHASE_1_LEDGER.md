@@ -742,3 +742,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0020 and AR-0021 in parallel |
+
+## L-0052 — 2026-09-14 — revision-7 review panel spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | rot-reviewer-trust-security (`AR-0020`) and rot-reviewer-compat-transaction (`AR-0021`), fresh Opus 5 contexts, in parallel |
+| Input commit | `7e50c6e` (worktrees `wt/review-r7-b`, `wt/review-r7-c`; branches `phase1/rot1-r7-review-b`, `phase1/rot1-r7-review-c`) |
+| Work performed | Spawned on HO-0020 and HO-0021; running. The prompts target concrete profile CP-1, its combinations and exclusions EX-01…EX-24, conformance with OWNER-DESIGN-REQUIREMENTS-0001, the D-0008 fields and the assessment of OT-1 and OT-2. They carry the transcript prohibition and the keep-turn-active instruction. The owner is informed of OT-1 and OT-2 in chat (non-blocking). |
+| Report / evidence | expected `AGENT_RUNS/AR-0020.report.yaml`, `AGENT_RUNS/AR-0021.report.yaml`; `release/root-of-trust/4.1.6-review-r7/{B-trust-security,C-compat-transaction}/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0022 (D v4 template), spawn synthesis reviewer D |

@@ -6,11 +6,12 @@ objective: Independent compatibility/transaction review of RoT-1 revision 7 conc
 agent_model: claude-opus-5
 fresh_context: true
 handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0021-rot-review-r7-c-compat-transaction.md
-base_commit: null   # the orchestrator commit adding this record (ledger L-0051)
+base_commit: 7e50c6e4306e63b07c5c009b0393ef910f420a13
 architecture_commit: d07d200ac08a52c45071d33074e20cc62fbcc26e
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r7-c
 branch: phase1/rot1-r7-review-c
-agent_id: null
-status: CLAIMED
+agent_id: acc5c1a09d842b836   # orchestrator-session-local handle; not resumable from a fresh session
+started_at: '2026-09-14T19:23Z'
+status: RUNNING
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0021.report.yaml
 outcome: null
