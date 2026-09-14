@@ -1,0 +1,107 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0013
+role: rot-reviewer-compat-transaction
+objective: Independent compatibility and transaction review (C) of RoT-1 revision 5 (cdb4e14) against HO-0013 and HO-0001 §3.4.
+agent_model: claude-opus-5
+independence_statement: >-
+  This session authored no RoT-1 revision, no specialist proposal, no prior review and not reviewer B's parallel review.
+  It did not read reviewer B's output, the other panel/synthesis review, other branches, other worktrees or other scratch
+  directories (no `git branch -a`, no `git log --all`, no sibling scratch listing). Under release/orchestration/ it read
+  only HO-0013, HO-0001 (§3-§4) and AGENT_RUNS/README.md. The architect response matrix (22), 28, the ST5 subdirectory
+  matrix, P3r3, FA5, REG5, CS5 and every pack evidence file were treated as claims to test, not findings. The host-supplied
+  context included the user's auto-memory index (one-line summaries of earlier Governance OS reviews); no memory file was
+  opened and nothing here rests on it. No scope deviation.
+input:
+  base_commit: bfaa943
+  release: null
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0013-rot-review-r5-c-compat-transaction.md
+inspected:
+  - release/root-of-trust/4.1.6/ (00-31, constitutional-surface/, schemas/, examples/, evidence/ incl. r5/) at cdb4e14
+  - spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md at cdb4e14
+  - release/root-of-trust/4.1.6-review-r4/ (consolidated review of revision 4; adjudication governs) at 97a5545
+  - runtime/src (project.rs, init.rs, cit/mod.rs, adopt.rs, kernel.rs) and cli/src/main.rs at 8ad06be, 26ab5b6, 47d8394, da9c851
+  - legacy binaries gov-4.1.{2,3,4,5} (read-only)
+produced:
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/00-REPORT.md
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/01-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/02-HELDOUT-ATTACKS.md
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/03-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/04-CARRIED-REQUIREMENTS.md
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/05-PRE-ROT-MATRIX.md
+  - release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/ (probes, outputs, reproduction, REVIEWED-CONTENT-DIGESTS.txt, README)
+tests_or_attacks:
+  - id: registers5
+    description: Each legacy register derived from --help AND from source, cross-checked (104/109/115/119 leaves; empty deltas).
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/registers5.json
+  - id: LP-1r
+    description: 1,335 --root invocations on R5/R5RES/R5NOSURG/R5V write no project byte; classifications survive.
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-summary.json
+  - id: R2-H4-class
+    description: 0 of 30,165 rows leave COMPLETE after a governance/trust or occupation change without KERNEL_TAMPERED (independent 18 §9.1 predicate).
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-summary.json
+  - id: RV5-C-A01
+    description: Subtree escape into the trust PPS on the revision-5 layout; every governance/trust or occupation write is PARTIAL.
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-writing-rows-rot1-layouts.json
+  - id: RV5-C-A05
+    description: core.autocrlf=true / '* text=auto' clone corrupts kernel bytes -> KERNEL_TAMPERED/PARTIAL (fail closed); no .gitattributes ships.
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/gitops.json
+  - id: RV5-C-A06
+    description: Untracking idiom via user core.excludesFile or .git/info/exclude carrying .governance-runtime/ re-drops the migration occupation -> PARTIAL(occupation).
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/gitops.json
+  - id: RV5-C-A03
+    description: Legacy init from .governance-runtime/trust-tx leaves COMPLETE (reported NESTED_LEGACY_PROJECT); §9.1/§9.2 omit the PPS transaction area; recover VTS gate makes it inert.
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-summary.json
+  - id: RV5-C-A04
+    description: 26 §4 LP-1s prose falsified; subtree adopt/migrate baseline write governance/spec, governance/views/spec litter, state COMPLETE (inert).
+    result: FAIL
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-summary.json
+  - id: RV5-C-A08_A11
+    description: gov-admit reference transactional state - crash-after-install C0-only (fail closed); re-run move-asides the monotonic VTS; rollback drops the prior record; concurrent admissions leave stray pre-admission dirs.
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/admit_tx.json
+  - id: repro-prior
+    description: review r4 C subdir_escape/durability/legacy_regain, architect ST5 and P3r3, review r4 C 10,618-invocation matrix reproduced against revision 5.
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/reproduction/REPRODUCTION.json
+findings:
+  - id: RV5-C-M1
+    severity: MEDIUM
+    title: No .gitattributes protects kernel bytes; autocrlf / text=auto clone -> KERNEL_TAMPERED/PARTIAL (fail closed); carried.
+    path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/01-FINDINGS.md
+  - id: RV5-C-M2
+    severity: MEDIUM
+    title: .gitignore surgery reaches only the project file; user global excludes / .git/info/exclude re-drop the occupation (fail closed); carried.
+    path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/01-FINDINGS.md
+  - id: RV5-C-L1
+    severity: LOW
+    title: 26 §4 LP-1s prose overclaims; subtree adopt/migrate baseline leave governance/spec, governance/views litter COMPLETE (inert); carried.
+    path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/01-FINDINGS.md
+  - id: RV5-C-L2
+    severity: LOW
+    title: 18 §9.1/§9.2 omit the PPS transaction area (18 §8); legacy init there leaves COMPLETE (reported, inert via recover VTS gate); carried.
+    path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/01-FINDINGS.md
+  - id: RV5-C-L3
+    severity: LOW
+    title: gov-admit first-admission detection undefined - re-run discards the monotonic VTS; R-ADM-7 record placement inconsistent; carried (cross-scope with B on clock high-water).
+    path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/01-FINDINGS.md
+verdict: NO_BLOCKING_FINDINGS
+output:
+  branch: phase1/rot1-r5-review-c
+  commit: 840d583273088caff4880c02edec03d2ade83156
+  evidence_path: release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence
+unresolved:
+  - RV5-C-M1 (Windows/EOL .gitattributes) - carried to implementation/verification; fail closed
+  - RV5-C-M2 (out-of-project untracking-idiom ignore sources) - carried; fail closed
+  - RV5-C-L1, RV5-C-L2, RV5-C-L3 - carried; inert or operator-triggered
+  - C-2..C-6, RV4-M2/M5 transaction parts - spec-only, unimplemented, carried to verification
+  - RV5-C-L3 clock high-water reset interacts with reviewer B's freshness/RS-2 scope
+recommended_next_action: Synthesis reviewer consolidates B and C; the five carried items need no architecture change and no re-review to accept as bound requirements.
+completed_at: 2026-09-14T11:55:00Z

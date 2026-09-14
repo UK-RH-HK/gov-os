@@ -1,0 +1,102 @@
+{
+ "run": "AR-0013",
+ "reproduced_commit": "cdb4e14009bba60bea9b805563c1b60e84f30b4b",
+ "note": "prior decisive compatibility/transaction probes re-run against revision 5 as written; scratch-only, env -i, GOV_* stripped",
+ "review_r4_C": {
+  "subdir_escape": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    10477,
+    10477
+   ]
+  },
+  "durability": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    13407,
+    13407
+   ]
+  },
+  "legacy_regain": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    5840,
+    5840
+   ]
+  }
+ },
+ "review_r4_D": {
+  "RV4-D-A01_nested_root_escalation": {
+   "byte_identical": false,
+   "normalised_equal": false,
+   "bytes": [
+    12587,
+    12602
+   ]
+  }
+ },
+ "architect_ST5": {
+  "ST5-subdir-escape": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    24695,
+    24695
+   ]
+  },
+  "ST5-gitignore-surgery": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    1517,
+    1517
+   ]
+  },
+  "ST5-subdir-matrix-summary": {
+   "byte_identical": false,
+   "normalised_equal": false,
+   "bytes": [
+    22636,
+    22636
+   ]
+  },
+  "ST5-subdir-matrix-writing-rows": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    716052,
+    716052
+   ]
+  },
+  "ST5-D-A01-rerun": {
+   "byte_identical": true,
+   "normalised_equal": true,
+   "bytes": [
+    15171,
+    15171
+   ]
+  }
+ },
+ "architect_P3r3": {
+  "summary": true,
+  "property_L3": true,
+  "chain_summary": true,
+  "job_count": 2085
+ },
+ "review_r4_C_matrix": {
+  "rows": [
+   10618,
+   10618
+  ],
+  "writes_by_layout_position_equal": true,
+  "states_equal": true,
+  "trust_rows": [
+   56,
+   56
+  ],
+  "writing_commands_equal": true
+ }
+}
