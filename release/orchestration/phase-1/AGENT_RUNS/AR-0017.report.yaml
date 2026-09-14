@@ -1,0 +1,87 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0017
+role: rot-reviewer-compat-transaction
+objective: Independent compatibility and transaction review (reviewer C) of RoT-1 revision 6 at 4106885.
+agent_model: claude-opus-5
+independence_statement: >-
+  Authored no RoT-1 revision, specialist proposal, prior review or the other panel review. Under release/orchestration/
+  read only HO-0017, HO-0001 and AGENT_RUNS/README.md. Did not read reviewer B output, other branches, other worktrees,
+  other scratch directories, transcripts or task-output files. The host context contained the user's memory index (no
+  memory file opened); two large tool outputs saved by the host under ~/.claude/projects/.../tool-results were not opened.
+  A coordinator routing message (resume and finish) changed no scope. Legacy source read with git show at 8ad06be,
+  26ab5b6, 47d8394, da9c851; a scratch git-archive mirror of 4106885 was used for reproductions. No helper sessions.
+  One shell command containing rm -rf was denied and did not run; scratch copies were removed by shutil.rmtree inside
+  matrix6.py, gitops6.py and the reproduced LAY6 matrix5.py (scratch only).
+input:
+  base_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
+  release: RoT-1 revision 6 at 4106885dadebac55596067a2586cf4d3097fc025
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0017-rot-review-r6-c-compat-transaction.md
+inspected:
+  - release/root-of-trust/4.1.6/ at 4106885 (00-34, constitutional-surface, decision-register, schemas, examples, evidence incl. r6 and LAY6)
+  - spec/decisions/D-0008.yaml at 4106885
+  - spec/architecture/ARCH-0002.yaml at 4106885
+  - release/root-of-trust/4.1.6-review-r5/ (00, 10, 11; C-compat-transaction; D-synthesis probes RV5-D-A03)
+  - release/releases/4.1.2-4.1.5 (copied to scratch)
+  - framework/ at 4106885 (installed kernel of the built layout)
+  - cli/src/main.rs and runtime/src/project.rs, runtime/src/lock.rs at 8ad06be, 26ab5b6, 47d8394, da9c851
+  - legacy binaries gov-4.1.2 dc924fb3, gov-4.1.3 baba4e40, gov-4.1.4 85f34cce, gov-4.1.5 9169d7a8
+produced:
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/00-REPORT.md
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/02-HELDOUT-ATTACKS.md
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/03-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/04-CARRIED-REQUIREMENTS.md
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/05-PRE-ROT-MATRIX.md
+  - release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/
+tests_or_attacks:
+  - {id: MATRIX6, description: "Pre-RoT full-register matrix on the revision-6 layout, 62,036 rows; R2-H4 0 violations; LP-1r 2,492 rows 0 writes", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-summary.json}
+  - {id: GITOPS6, description: "Layout durability over 22 Git operations, the .gitattributes member and every ignore source", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/gitops6.json}
+  - {id: STRUCT6, description: "Structural tampering of closed entry sets fails closed", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/struct6.json}
+  - {id: REPRO-LAY6, description: "Architect LAY6 chain re-run; every matrix property and aggregate equal", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/reproduction/LAY6-reproduction.json}
+  - {id: REPRO-ADM6, description: "ADM6 re-run; verdicts equal except nondeterministic unlocked-mutant race", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/reproduction/rerun-ADM6-admission-transactions.json}
+  - {id: REPRO-UW6, description: "UW6 re-run byte-identical", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/reproduction/rerun-UW6-user-writable-install.json}
+  - {id: REPRO-RV5-D-A03, description: "Review r5 D-A03 re-run; behaviour unchanged, C0-C2 overclaim gone from revision-6 text", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/reproduction/rerun-RV5-D-A03.json}
+  - {id: REPRO-R5C-ADMIT_TX, description: "Review r5 C admit_tx re-run; equal except nondeterministic A11 race", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/reproduction/rerun-r5C-admit_tx.json}
+  - {id: RV6-C-A01, description: "Subtree escape into the trust PPS", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-summary.json}
+  - {id: RV6-C-A02, description: "Nested-root legacy edits of installed kernel and lock", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-writing-rows.json.gz}
+  - {id: RV6-C-A03, description: "Full register root-anchored, LP-1r", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-summary.json}
+  - {id: RV6-C-A04, description: "Environment-variable escape", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-summary.json}
+  - {id: RV6-C-A05, description: ".gitattributes member vs autocrlf, text=auto, text eol=crlf", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/gitops6.json}
+  - {id: RV6-C-A06, description: ".git/info/attributes override fails closed", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/gitops6.json}
+  - {id: RV6-C-A07, description: "Out-of-project ignore sources re-drop the occupation (fail closed)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/gitops6.json}
+  - {id: RV6-C-A08, description: "Attribute-precedence override of the member", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/attrprec6.json}
+  - {id: RV6-C-A09, description: "Sparse, shallow, partial, archive, clean, stash, worktree, case-insensitive clone", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/gitops6.json}
+  - {id: RV6-C-A10, description: "Crash between install and record; crash during move-aside", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/admtx6.json}
+  - {id: RV6-C-A11, description: "Re-admission and rollback keep store and records", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/admtx6.json}
+  - {id: RV6-C-A12, description: "Concurrent admissions with lock", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/admtx6.json}
+  - {id: RV6-C-A13, description: "Records outside store; record in another lineage store", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/admtx6.json}
+  - {id: RV6-C-A14, description: "Foreign and crash transaction residue on the layout", result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-summary.json}
+  - {id: RV6-C-A15, description: "Crash at every step of the first-install layout migration; recovery leaves LEGACY/PARTIAL/ABSENT", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/crashmig6.json}
+  - {id: RV6-C-A16, description: "Per-project record identity under worktree, clone, archive, fork", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/ptid-duplication.json}
+  - {id: RV6-C-A17, description: "Strength report and pending gates across remedies (design)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-A18, description: "Admission store vs account VTS on protected and CI installs (design)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-A19, description: "Rollback to a lower-TBM admitted binary (design)", result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+findings:
+  - {id: RV6-C-M1, severity: MEDIUM, title: "Out-of-project ignore sources still re-drop the migration occupation (carried)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-M2, severity: MEDIUM, title: "First-install layout migration and exchange-to-journal window outside the journal phase model (carried)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-M3, severity: MEDIUM, title: "Per-project record identity unsound under ordinary repository duplication (carried)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-M4, severity: MEDIUM, title: "Contradictory re-record rules at commit can discharge pending obligations (carried)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-M5, severity: MEDIUM, title: "Verifier trust store location and owner specified incompatibly (carried)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-L1, severity: LOW, title: ".git/info/attributes overrides the trust .gitattributes member (fail closed)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-L2, severity: LOW, title: "Foreign-artefact scan does not exclude the done/ archive", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-L3, severity: LOW, title: "gov-admit reference edges (record-less store, cross-lineage record)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-L4, severity: LOW, title: "Overlay-directory litter stays COMPLETE unnamed", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-L5, severity: LOW, title: "Evidence and text accuracy (LAY6 INFOATTR row, writing-rows count, props6 input, committed phase, signed-file sentence)", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+  - {id: RV6-C-L6, severity: LOW, title: "Binary rollback vs accepted-TBM high-water unstated", path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md}
+verdict: NO_BLOCKING_FINDINGS
+output:
+  branch: phase1/rot1-r6-review-c
+  commit: 02bb90550342e8bb6d42ba636430ae3394d3a0f7
+  evidence_path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/
+unresolved:
+  - RV6-C-M2 escalates to HIGH if an implementation's init on ABSENT ignores or overwrites an existing governance/overlay (CR6-C-7 forbids it)
+  - "C-2, C-3, C-5 OPEN as implementation requirements (specified, not executable before implementation)"
+  - Transaction, recovery and gov-admit properties proven only on the reference model and the text; must be proven on the implementation
+recommended_next_action: Synthesis reviewer adjudicates RV6-C-M1..M5 and L1..L6 with reviewer B's report and issues the architecture verdict.
+completed_at: 2026-09-14T15:11:36Z
