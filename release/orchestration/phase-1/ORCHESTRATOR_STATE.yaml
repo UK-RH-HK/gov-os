@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T14:39:29Z'
-state_hash: 3d2e25251eb22f4183f9fe61e03495fa7f0887a4c103409f12f118b7dd5fb1ec
+updated_at: '2026-09-14T14:46:49Z'
+state_hash: 1cb77ecef6d5cc9b7b8eb5c8d0378c41e3df0f2d1874401f1a255e31aaf47631
 lifecycle_state: ROT_ARCH_REVIEW_PANEL
 
 protocol:
@@ -252,7 +252,7 @@ running_work:
     worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-b
     branch: phase1/rot1-r6-review-b
     base_commit: cd4526a0265c12180518b54cb0e599e03a63b3dd
-    status: RUNNING
+    status: COMPLETED   # BLOCKING_FINDINGS_PRESENT 3 HIGH; work 5128086, report 0736ad4; unmerged until AR-0017 completes
   - run_id: AR-0017
     role: rot-reviewer-compat-transaction
     run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0017.run.yaml
@@ -264,7 +264,7 @@ running_work:
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0015, revision 6
-  rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0012, revision 5; 3 HIGH
+  rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0016, revision 6; 3 HIGH
   rot-reviewer-compat-transaction: NO_BLOCKING_FINDINGS   # AR-0013, revision 5; 5 carried
   rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0014, revision 5
   builder: null

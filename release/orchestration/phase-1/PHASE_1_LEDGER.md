@@ -588,3 +588,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding this entry |
 | Findings | — |
 | Next action | await AR-0016 and AR-0017 completion |
+
+## L-0041 — 2026-09-14 — revision-6 reviewer B completed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-reviewer-trust-security (`AR-0016`) |
+| Input commit | `cd4526a` (architecture `4106885`) |
+| Work performed | Reproduced every architect instrument (CS6, P4r6, DA03r6, DA07r6, FA6, CON6, ENV6, SRC6, UW6, ATTR6, CSI, `register_check`, `statements_check`) and the retained r5 instruments and probes. Authored held-out RV6-B-A01…A16 (8 executed, 6 computed, 2 design). A11 (352 machine rows) and A12 (246,608 key subsets) hold. |
+| Report / evidence | `AGENT_RUNS/AR-0016.report.yaml` (on branch); `release/root-of-trust/4.1.6-review-r6/B-trust-security/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `5128086`, report `0736ad4` on `phase1/rot1-r6-review-b`; held unmerged until reviewer C completes |
+| Findings | **HIGH RV6-B-H1:** the trust-state publisher composes the first-contact code and the independent sources only carry it, so one party selects lineage, state and evaluator on first install under OP-13 (a), (b), (c)-either and (d); the declared root and the OP-9/OP-13 statements are false. **HIGH RV6-B-H2:** under OP-13 (c)-either, a package submitter or a replayed old signed package (optional `valid_until`) selects the first TCB; FA6 lacks both paths. **HIGH RV6-B-H3:** no party establishes the environment manifest, so its writer selects binary bytes under OP-16 (a) and (b), and (b) counts diversity by label; executed with real `rustc`. **MEDIUM:** M1 (re-admission ignores the stored high-water), M2 (generated CONTENT block misprint), M3 (register completeness checked over rule ids, not selectors). **LOW:** L1–L4. **Prior:** BC5-3 closed as a class within B's attacks; BC5-1, BC5-2 and BC5-4 narrowed; OP-6, OP-9, OP-13 and OP-16 statements false. Non-material scope disclosures recorded; canonical checkout verified clean. |
+| Next action | await AR-0017; then merge B and C, write HO-0018, spawn synthesis reviewer D |
