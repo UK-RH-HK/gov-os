@@ -448,3 +448,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | work `248f12a`, report `9aa5c3f` on `phase1/rot1-r5-review-b`; held unmerged until reviewer C completes |
 | Findings | **HIGH RV5-B-H1:** a tampered channel page alone, with no genuine key, admits a malicious binary on a new machine (the fingerprint selects the lineage, the same page selects the admitter, and the two-channel rule comes from the selected policy); declared minimum sets wrong in 288/288 configurations. **HIGH RV5-B-H2:** the build image decides production bytes and is checked only against an unassigned "owner's image record", so honest and diverse reproducers reproduce the malicious binary. **HIGH RV5-B-H3:** under OP-2 (b), E7 never checks verification records; delegated custodians plus `release-final`, or stolen registration, trust-state and `release-final` keys, make malicious content effective; OP-2 (b), OP-4 and OP-8 consequences false. **MEDIUM:** M1–M5. **LOW:** L1–L6. **Prior:** BC4-1 open (H2); BC4-2 and BC4-3 narrowed (H1, H3); BC4-4 open; RV4-H1…H3 closed as stated. No scope deviation. |
 | Next action | await AR-0013; then merge B and C, write HO-0014, spawn synthesis reviewer D |
+
+## L-0031 — 2026-09-14 — revision-5 reviewer C completed; panel merged
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | rot-reviewer-compat-transaction (`AR-0013`) |
+| Input commit | `bfaa943` (architecture `cdb4e14`) |
+| Work performed | Built independent registers (104/109/115/119). Ran 30,165 rows plus 1,335 `--root` rows over real 4.1.2–4.1.5 on the revision-5 layouts, using an independently encoded installation-state predicate. Reproduced review-r4 C probes, ST5, D-A01 and P3r3. Authored held-out RV5-C-A01…A13 (9 executed, 3 model, 1 design). |
+| Report / evidence | `AGENT_RUNS/AR-0013.report.yaml`; `release/root-of-trust/4.1.6-review-r5/C-compat-transaction/` |
+| Verdict | `NO_BLOCKING_FINDINGS` (role verdict) |
+| Output commit | work `840d583`, report `033e1f2`, merged `7267371`. Reviewer B merged first: `0203580`. |
+| Findings | **Carried (fail-closed or inert):** RV5-C-M1 (no `.gitattributes`; autocrlf clones fail closed), RV5-C-M2 (out-of-project ignore sources drop the occupation; fail closed), RV5-C-L1 (LP-1s prose overclaims; inert litter), RV5-C-L2 (transaction area omitted from the §9.1/§9.2 closure; inert), RV5-C-L3 ("first admission" undefined; re-run discards the monotonic VTS). **Prior:** R2-H4 CLOSED as a class (0 of 30,165 violations); RV4-M1 and RV4-M6 closed for their stated scope, with narrowed residuals. No scope deviation. |
+| Next action | synthesis reviewer D on revision 5 |
+
+## L-0032 — 2026-09-14 — revision-5 synthesis handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5, Phase-1 review cycle 3 |
+| Role | orchestrator |
+| Input commit | `7267371` |
+| Work performed | Wrote HO-0014 for the independent synthesis reviewer. Added §2a asking, for each confirmed blocking class, remainder vs materially new and engineering correction vs genuine owner trade-off (options and consequences, not chosen). Claimed AR-0014. Added the review-r5 B and C directories to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0014-rot-review-r5-d-synthesis.md`, `CHECKPOINTS/CP-0010.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0014 |
