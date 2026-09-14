@@ -798,3 +798,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding this entry |
 | Findings | — |
 | Next action | await AR-0021 |
+
+## L-0056 — 2026-09-14 — owner directive: freeze the RoT loop after revision 7
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 (panel in progress) |
+| Role | product owner (source); orchestrator (recording) |
+| Input commit | `7b86bf3` |
+| Work performed | Recorded OWNER-DIRECTIVE-0003 verbatim. It stops the Root-of-Trust revision loop after revision 7: no revision 8, and no architecture author after the verdict. Only in-flight revision-7 work completes: reviewer B's evidence preserved, reviewer C finishing, the planned synthesis reviewer, and recording of the final verdict. Rejected findings are recorded, not routed; acceptance is recorded without implementation or D-0008 activation. A complete durable checkpoint follows, with next action `PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW`. The state now carries `loop_status: FREEZING_AFTER_REVISION_7` and forbids revision 8, further authors, routing, implementation, key ceremony, the Capability Contract, Prompt 2, D-0008 activation and new owner options. The synthesis handoff template notes that the loop is frozen, without changing the reviewer's method. |
+| Report / evidence | `GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md` (sha256 `b1b3aa1feace9d79…`), `CHECKPOINTS/CP-0018.yaml` |
+| Verdict | — (owner directive) |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | await AR-0021; merge the panel; run synthesis AR-0022; record the verdict; frozen checkpoint; stop |

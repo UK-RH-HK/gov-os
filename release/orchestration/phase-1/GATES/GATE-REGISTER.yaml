@@ -103,3 +103,15 @@ gates:
       - architecture acceptance does not require a certified target, provided that criterion is explicit, executable/testable and non-circular
     satisfaction_evidence: this record's commit
 
+  - id: OWNER-DIRECTIVE-0003
+    title: Freeze the Root-of-Trust revision loop after Revision 7
+    status: RECORDED
+    satisfier: product owner
+    classification: binding orchestration directive; not an architecture verdict, not D-0008 approval, not an owner option
+    record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md
+    record_sha256: b1b3aa1feace9d796373d2b795954fac79e745a86aab725b4b5ad669254df308
+    effects:
+      - complete only in-flight revision-7 work (reviewer B evidence preserved, reviewer C finishes, planned synthesis reviewer runs, final verdict recorded)
+      - no revision 8, no further architecture author; rejected findings recorded but not routed; acceptance recorded but no implementation or D-0008 activation
+      - final durable checkpoint, then next action PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
+    satisfaction_evidence: this record's commit

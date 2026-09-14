@@ -1,0 +1,14 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0018
+trigger: owner directive to freeze the RoT loop after revision 7; change of next deterministic action
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_REVIEW_PANEL
+loop_status: FREEZING_AFTER_REVISION_7
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 7b86bf39f9163eec814a0897a240e1cbd9ae56db
+owner_directive: {id: OWNER-DIRECTIVE-0003, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, sha256: b1b3aa1feace9d796373d2b795954fac79e745a86aab725b4b5ad669254df308}
+in_flight: [AR-0020 reviewer B COMPLETED (branch phase1/rot1-r7-review-b held unmerged), AR-0021 reviewer C RUNNING, AR-0022 synthesis PLANNED]
+d0008_state: {status: PROVISIONAL, proposal_state: PROPOSED, human_approved: false, in_effect: false}
+next_deterministic_action: finish in-flight revision-7 work, record verdict without routing, write the frozen evidence checkpoint, stop
