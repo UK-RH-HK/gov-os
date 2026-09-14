@@ -336,3 +336,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | hold the first completed branch unmerged; on both completions verify, merge, write HO-0011, spawn synthesis architect AR-0011 |
+
+## L-0023 — 2026-09-14 — specialist B completed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 5 (escalation), Phase-1 review cycle 3 |
+| Role | rot-specialist-architect (`AR-0010`, lens B: release, build and custody supply chain) |
+| Input commit | `6ea45a5` (latest rejected revision `bca05a7`; review r4 `97a5545`) |
+| Work performed | Root-cause analysis across revisions 1–4; alternative mechanism; falsification (12 r4 blocking probes, 11 r3 blocking probes, 25 new attacks: 10 executed, 10 computed, 5 design); owner choices |
+| Report / evidence | `AGENT_RUNS/AR-0010.report.yaml` (on branch); `release/root-of-trust/4.1.6-alternatives-r5/specialist-b/` |
+| Verdict | `ALTERNATIVE_PROPOSED` (proposal; not reviewed) |
+| Output commit | work `ed07926`, report `d984181` on `phase1/rot1-r5-specialist-b`; held unmerged until specialist A completes |
+| Findings | Specialist's claims, not adjudicated. **Common root:** trust judged per input, not per fact (pass-through, selection from a permitted set, evaluator inside the object). **Proposal:** first-hand-fact acceptance predicate with two-verification source legitimacy and a rebuilder quorum q ≥ 2, retiring `release-artifact`; a separate admitter `gov-admit` for first TCB acceptance over measured bytes; single value per release sequence for registrations; an attack-set calculator generating the owner-option consequence table. **Falsification:** r4 blocking probes 9 flipped, 1 flipped with residual, 1 holds, 1 not run; r3 11/11 hold; 32/32 owner configurations need ≥ 2 first-hand establishers. **Owner choices:** OC-1…OC-5. **Costs:** rebuilders, second verifier, admitter maintenance, possible per-release root ceremony. |
+| Next action | await AR-0009; then merge both, write HO-0011, spawn synthesis architect AR-0011 |
