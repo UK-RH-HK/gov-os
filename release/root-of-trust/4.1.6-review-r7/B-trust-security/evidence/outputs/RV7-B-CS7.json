@@ -1,0 +1,318 @@
+{
+ "base_P2_G_REVOKED (not computed by the pack)": [
+  "{win}",
+  "{src1, src2}",
+  "{src1, desig2}",
+  "{src1, op1src}",
+  "{src2, desig1}",
+  "{src2, op1src}",
+  "{desig1, desig2}",
+  "{desig1, op1src}",
+  "{desig2, op1src}",
+  "{stored_old, clockback}"
+ ],
+ "calculator_sha256": "919065b0fd0f955ce3247ee44b7a548236bd5f4478b8b80c9ab01c92d3294de4",
+ "control_FA_G_BYTES_first_contact_sets": [
+  "{src1, src2}",
+  "{src1, desig2}",
+  "{src1, op1src}",
+  "{src2, desig1}",
+  "{src2, op1src}",
+  "{desig1, desig2}",
+  "{desig1, op1src}",
+  "{desig2, op1src}"
+ ],
+ "control_equals_committed_CP_FC_ROOT": true,
+ "control_reproduces_committed_CP_REVOKED": {
+  "FA": true,
+  "RA_held": true,
+  "RA_unheld": true
+ },
+ "extensions": {
+  "A01-VA": {
+   "FA": [
+    "{fcpub}",
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ],
+   "P2": [
+    "{win}",
+    "{transport, fcpub}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ],
+   "RA_held": [
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{win, store_admin}",
+    "{stored_old, clockback, store_admin}"
+   ],
+   "RA_unheld": [
+    "{fcpub}",
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ]
+  },
+  "A01-VB": {
+   "FA": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}",
+    "{2 trust-state keys, fcpub}"
+   ],
+   "P2": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}",
+    "{2 trust-state keys, transport, fcpub}"
+   ],
+   "RA_held": [
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{win, store_admin}",
+    "{stored_old, clockback, store_admin}"
+   ],
+   "RA_unheld": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}",
+    "{2 trust-state keys, fcpub}"
+   ]
+  },
+  "A02": {
+   "FA": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ],
+   "P2": [
+    "{win}",
+    "{transport, stored_old}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ],
+   "RA_held": [
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{win, store_admin}",
+    "{stored_old, clockback, store_admin}"
+   ],
+   "RA_unheld": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ]
+  },
+  "A02-FIX": {
+   "FA": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ],
+   "P2": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ],
+   "RA_held": [
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{win, store_admin}",
+    "{stored_old, clockback, store_admin}"
+   ],
+   "RA_unheld": [
+    "{win}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ]
+  },
+  "A03": {
+   "FA_G_BYTES": [
+    "{onboard}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}"
+   ],
+   "FA_G_REVOKED": [
+    "{win}",
+    "{onboard}",
+    "{src1, src2}",
+    "{src1, desig2}",
+    "{src1, op1src}",
+    "{src2, desig1}",
+    "{src2, op1src}",
+    "{desig1, desig2}",
+    "{desig1, op1src}",
+    "{desig2, op1src}",
+    "{stored_old, clockback}"
+   ]
+  }
+ },
+ "new_minimal_sets": {
+  "A01-VA": {
+   "FA": [
+    "{fcpub}"
+   ],
+   "P2": [
+    "{transport, fcpub}"
+   ],
+   "RA_held": [],
+   "RA_unheld": [
+    "{fcpub}"
+   ]
+  },
+  "A01-VB": {
+   "FA": [
+    "{2 trust-state keys, fcpub}"
+   ],
+   "P2": [
+    "{2 trust-state keys, transport, fcpub}"
+   ],
+   "RA_held": [],
+   "RA_unheld": [
+    "{2 trust-state keys, fcpub}"
+   ]
+  },
+  "A02": {
+   "P2": [
+    "{transport, stored_old}"
+   ]
+  },
+  "A02-FIX": {
+   "P2": []
+  },
+  "A03": {
+   "FA_G_BYTES": [
+    "{onboard}"
+   ],
+   "FA_G_REVOKED": [
+    "{onboard}"
+   ]
+  }
+ },
+ "probe": "RV7-B-CS7 extensions (AR-0020)",
+ "verdicts": {
+  "A01_INV7_AGE_would_fail": true,
+  "A01_VA_publication_process_alone_admits_a_revoked_binary_at_FA": true,
+  "A01_VB_trust_state_threshold_with_publication_admits_at_FA": true,
+  "A02_FIX_removes_it": true,
+  "A02_stored_codes_with_transport_admit_at_P2": true,
+  "A03_single_onboarding_record_is_a_minimal_first_contact_root_set": true,
+  "control_equals_committed_block": true
+ }
+}

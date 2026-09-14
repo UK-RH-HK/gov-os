@@ -1,0 +1,56 @@
+{
+ "C_computed_BA11r7": {
+  "as_committed": {
+   "rows_C3_on_state_below_t9": [],
+   "rows_C3_on_state_below_t9_and_anchor_valid": [],
+   "verdicts": {
+    "clock_below_high_water_C0_only": true,
+    "expired_anchors_C0_only": true,
+    "no_C3_on_a_state_below_t9": true,
+    "no_C3_on_thief_descendant": true,
+    "no_errors": true,
+    "no_row_says_current": true,
+    "pins_beyond_7_days_not_anchors": true,
+    "revoked_R7_never_eligible_for_use": true,
+    "unanchored_C0_only": true
+   }
+  },
+  "stored_codes_name_the_effective_state": {
+   "rows_C3_on_state_below_t9": [
+    "M1s|OP-7 (a)|A5-strip"
+   ],
+   "rows_C3_on_state_below_t9_and_anchor_valid": [
+    "M1s|OP-7 (a)|A5-strip"
+   ],
+   "verdicts": {
+    "clock_below_high_water_C0_only": true,
+    "expired_anchors_C0_only": true,
+    "no_C3_on_a_state_below_t9": false,
+    "no_C3_on_thief_descendant": true,
+    "no_errors": true,
+    "no_row_says_current": true,
+    "pins_beyond_7_days_not_anchors": true,
+    "revoked_R7_never_eligible_for_use": true,
+    "unanchored_C0_only": true
+   }
+  }
+ },
+ "E_executed": {
+  "CI_control_pin_as_provisioned_6_days_ago": "TRUST_STATE_CURRENCY_UNPROVEN",
+  "CI_gov_run_C3_pin_restamped_today_naming_the_state_of_image_build_6_days_ago": "ALLOWED",
+  "NOW": "2026-09-14T06:00:00Z",
+  "T7_issued_at": "2026-05-01T00:00:00Z",
+  "control_gov_run_C3_after_T9_held (negative held)": "BINARY_REVOKED_SELF",
+  "control_gov_run_C3_currency_25h_old": "TRUST_STATE_CURRENCY_UNPROVEN",
+  "gov_run_C3_with_stored_T7_codes_typed_now (effective state T7, T9 withheld)": "ALLOWED",
+  "gov_run_signature_has_no_state_issued_at_input": true,
+  "same_codes_at_gov_admit_bootstrap (FC-9)": "FIRST_CONTACT_STATE_TOO_OLD"
+ },
+ "probe": "RV7-B-A02 C3 currency names a state of unbounded age (AR-0020)",
+ "verdicts": {
+  "C3_allowed_with_stored_codes_naming_a_4_month_old_state": true,
+  "committed_BA11r7_shows_no_C3_below_t9": true,
+  "same_codes_refused_at_admission": true,
+  "stored_code_variant_shows_C3_below_t9": true
+ }
+}
