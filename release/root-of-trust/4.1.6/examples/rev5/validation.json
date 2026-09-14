@@ -1,0 +1,56 @@
+{
+ "schemas_valid": {
+  "admission-record.schema.json": true,
+  "artifact-statement.schema.json": true,
+  "binary-reproduction.schema.json": true,
+  "build-attestation.schema.json": true,
+  "certification-statement.schema.json": true,
+  "constitutional-surface-inventory.schema.json": true,
+  "dsse-envelope.schema.json": true,
+  "framework-lock-3.0.0.schema.json": true,
+  "freshness-witness.schema.json": true,
+  "input-manifest.schema.json": true,
+  "legacy-identity-statement.schema.json": true,
+  "profile-statement.schema.json": true,
+  "release-registration.schema.json": true,
+  "release-statement.schema.json": true,
+  "revocation-statement.schema.json": true,
+  "trust-base-manifest.schema.json": true,
+  "trust-decision-pin.schema.json": true,
+  "trust-format.schema.json": true,
+  "trust-gate-confirmation.schema.json": true,
+  "trust-policy-statement.schema.json": true,
+  "trust-root.schema.json": true,
+  "trust-state-pin.schema.json": true,
+  "trust-state-statement.schema.json": true,
+  "verification-attestation.schema.json": true
+ },
+ "instances": {
+  "input-manifest.example.json": {
+   "schema": "input-manifest.schema.json",
+   "valid": true,
+   "errors": []
+  },
+  "release-registration.payload.example.json": {
+   "schema": "release-registration.schema.json",
+   "valid": true,
+   "errors": []
+  },
+  "binary-reproduction.payload.example.json": {
+   "schema": "binary-reproduction.schema.json",
+   "valid": true,
+   "errors": []
+  },
+  "admission-record.example.json": {
+   "schema": "admission-record.schema.json",
+   "valid": true,
+   "errors": []
+  }
+ },
+ "refused_shapes": {
+  "set-valued unit (two digests for one unit)": "valid (list of strings is the members form; the checker lint refuses it for leaf units: REGISTRATION_NOT_SINGLE_VALUED)",
+  "registration without verification records": true,
+  "admission record with a non-fingerprint selector": true,
+  "reproduction without tbm_digest": true
+ }
+}

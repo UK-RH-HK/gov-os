@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-base-manifest.schema.json",
   "title": "trust-base-manifest",
-  "description": "PROPOSED (RoT-1 revision 4). Trust Base Manifest v2 compiled into every gov binary (25 §4). Signed components are named by digest; compiled code is covered by the build attestation. binary.source must equal the attested source of the final's candidate (A4b). compiled_rules name floor_schema_version 3 and operator vocabulary floor-ops/3.",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Trust Base Manifest v2 compiled into every gov binary (25 \u00a74). Signed components are named by digest; compiled code is covered by the build attestation. binary.source must equal the attested source of the final's candidate (A4b). compiled_rules name floor_schema_version 3 and operator vocabulary floor-ops/3.",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -40,7 +40,8 @@
         "target",
         "build",
         "source",
-        "toolchain"
+        "toolchain",
+        "inputs_manifest_digest"
       ],
       "properties": {
         "name": {
@@ -66,29 +67,27 @@
           "additionalProperties": false,
           "required": [
             "release_commit",
-            "source_tree_digest",
-            "build_inputs_digest"
+            "content_digest"
           ],
           "properties": {
             "release_commit": {
               "type": "string",
-              "pattern": "^[0-9a-f]{40}$"
+              "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
             },
-            "source_tree_digest": {
+            "content_digest": {
               "type": "string",
               "pattern": "^sha256:[0-9a-f]{64}$",
-              "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
-            },
-            "build_inputs_digest": {
-              "type": "string",
-              "pattern": "^sha256:[0-9a-f]{64}$",
-              "description": "digest of the published build inputs (toolchain, lockfiles)"
+              "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
             }
           }
         },
         "toolchain": {
           "type": "string",
           "maxLength": 256
+        },
+        "inputs_manifest_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
         }
       }
     },
@@ -158,15 +157,15 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "release_statement_digest",
-        "tree_digest"
+        "final_statement_digest",
+        "kernel_tree_digest"
       ],
       "properties": {
-        "release_statement_digest": {
+        "final_statement_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
         },
-        "tree_digest": {
+        "kernel_tree_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
         }

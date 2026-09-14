@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/constitutional-surface-inventory.schema.json",
   "title": "constitutional-surface-inventory",
-  "description": "PROPOSED (RoT-1 revision 4). Constitutional Surface Inventory: the surface section of the Trust Policy (23). Default deny; closed floor vocabulary (floor_schema_version 3, floor-ops/3); presence (required files and leaves; absence refused, 23 §3.5); exact precedence registration (23 §4.1); the Overlay Surface with directions and migration-writable targets (23 §11); owner constitutional domain slots (23 §7.2).",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Constitutional Surface Inventory: the surface section of the Trust Policy (23). Default deny; closed floor vocabulary (floor_schema_version 3, floor-ops/3); presence (required files and leaves; absence refused, 23 \u00a73.5); exact precedence registration (23 \u00a74.1); the Overlay Surface with directions and migration-writable targets (23 \u00a711); owner constitutional domain slots (23 \u00a77.2).",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -550,6 +550,11 @@
           },
           "rationale": {
             "type": "string"
+          },
+          "binding_group": {
+            "type": "string",
+            "minLength": 1,
+            "description": "owner-domain binding group confirmed and pinned as one set (23 \u00a77.2)"
           }
         }
       }

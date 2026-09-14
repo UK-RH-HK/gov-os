@@ -1,0 +1,127 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0011
+role: rot-synthesis-architect
+objective: Judge specialist alternatives A (afda663) and B (ed07926) against the complete review evidence and author RoT-1 revision 5 closing BC4-1..BC4-4 at the root; D-0008 and ARCH-0002 PROPOSED revision 5, not approved.
+agent_model: claude-opus-5
+independence_statement: >
+  Authored before by this session: nothing (no RoT-1 revision, no review, no specialist proposal). Under release/orchestration/
+  read only HANDOFFS/HO-0011-rot-synthesis-architect-r5.md, HANDOFFS/HO-0001-rot-architect-r3.md and AGENT_RUNS/README.md;
+  no state, ledger, checkpoint, run record, other handoff or report was opened. The host-supplied auto-memory index was
+  present in context; no memory file was opened and nothing rests on it. No other branch or worktree was inspected; the
+  scratch directories ar-0001..ar-0010 were listed once by name and never opened. Two helper sessions ran under this run's
+  instructions in scratch ar-0011 and wrote only evidence/r5/ST5-* and evidence/r5/{FA5-*,SRC5-*,gov_admit_reference.py};
+  this run specified the predicates they encoded, verified their outputs and corrected the FA5 install-mutant hook before
+  recording results. Specialist and review claims were treated as claims and re-run where revision 5 relies on them
+  (4.1.6-alternatives-r5/SYNTHESIS.md §5).
+input:
+  base_commit: c8cdfac82a9b2932e00fc8f7a544faa7e0758507
+  release: null
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0011-rot-synthesis-architect-r5.md
+inspected:
+  - release/root-of-trust/4.1.6-alternatives-r5/specialist-a/ (afda663; 00-03 in full, evidence scripts in part)
+  - release/root-of-trust/4.1.6-alternatives-r5/specialist-b/ (ed07926; 00-03 in full, evidence scripts in part)
+  - release/root-of-trust/4.1.6/ at bca05a7 (00, 05, 06, 19, 21, 22, 23, 25, 28 in full; 18, 24, 26 and the remaining files in the parts amended)
+  - release/root-of-trust/4.1.6-review-r4/ (00, 10, 11 in full; B 02, 03, 04, evidence README; C 01, 02, 04, 05, evidence README; D 01, 03, 04, 05, evidence README; probe scripts reused)
+  - release/root-of-trust/4.1.6-review-r3/, 4.1.6-review-r2/, 4.1.6-review/ (probe copies re-run; findings referenced)
+  - spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md at c8cdfac
+  - runtime/build.rs (line 73), cli/src/main.rs (lines 709-747), runtime/src/security/secrets.rs (per-pattern compile)
+  - legacy binaries gov-4.1.2..gov-4.1.5 (read-only)
+produced:
+  - release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md
+  - release/root-of-trust/4.1.6/29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md
+  - release/root-of-trust/4.1.6/30-RELEASE-REGISTRATION-AND-REPRODUCTION.md
+  - release/root-of-trust/4.1.6/31-INDEPENDENT-ADMISSION.md
+  - release/root-of-trust/4.1.6/{00,05,06,21,22,25,28} (rewritten) and {01-04,07-20,23,24,26,27} (amended in place)
+  - release/root-of-trust/4.1.6/constitutional-surface/{csi_lib.py,csi_check.py,README.md} (release-scoped registration; self-test S56-S70)
+  - release/root-of-trust/4.1.6/schemas/ (added release-registration, binary-reproduction, input-manifest, admission-record; revised trust-root, trust-state, trust-policy, trust-base-manifest, verification-attestation, release-statement, revocation, trust-decision-pin, constitutional-surface-inventory; artifact-statement and build-attestation marked withdrawn)
+  - release/root-of-trust/4.1.6/examples/rev5/
+  - release/root-of-trust/4.1.6/evidence/r5/ (CS5, P4r5, DA03r5, FA5, SRC5, REG5, CSI5, ST5, P3r3 re-run summary, run logs)
+  - release/root-of-trust/4.1.6/evidence/README.md
+  - spec/decisions/D-0008.yaml (PROPOSED revision 5; status PROVISIONAL; in_effect false; no chosen_option)
+  - spec/architecture/ARCH-0002.yaml (PROPOSED revision 5; status PROVISIONAL; in_effect false)
+  - docs/DECISIONS.md (D-0008 and ARCH-0002 rows only)
+tests_or_attacks:
+  - id: CS5
+    description: derivation calculator, 408 configurations x 5 goals x 4 victims, exhaustive to size 10; 21 self-checks; 1,752 invariant checks; 138,042 monotonicity checks; 8 controls
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/CS5-tcb-capability-sets.json
+  - id: RV4-B-A01/A02/A06 and RV4-D-A07 under revision 5
+    description: one reproducer or verification key plus pipeline; every capability subset; pass-through co-signature control
+    result: FLIPPED
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/CS5-tcb-capability-sets.json
+  - id: P4r5
+    description: revision-5 conformance oracle; 65 scenarios; 42 retained P4r4 scenarios; expected-ACCEPTED attack rows
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/P4r5-conformance-oracle.json
+  - id: DA03r5
+    description: review r4 D-A03 twenty mutants (20/20 normative rules detected) and 17 revision-5 rule mutants (17/17)
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/DA03r5-oracle-regression-sensitivity.json
+  - id: FA5
+    description: first admission with real Ed25519; 45 scenarios incl. RV4-B-A03 FB1/FB2, RV4-B-A04, Phase 4, RV4-D-A04, CI image, channels, install swap; 17 vectors; 26/27 mutants (1 equivalent under KS-7)
+    result: FLIPPED
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/FA5-first-admission.json
+  - id: REG5
+    description: RV4-B-A08 part P and RV4-D-A02 T1-T4 against release-scoped registration with consumption on real 4.1.5; ranges, rewrite, reversion, migration (10/10 verdicts)
+    result: FLIPPED
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/REG5-release-scoped-registration.json
+  - id: ST5
+    description: RV4-C-A01 and RV4-D-A01 against the corrected installation-state predicate; 6,292 subdirectory invocations of the real 4.1.2-4.1.5 registers; P5-1..P5-3 with 0 counterexamples; gitignore surgery
+    result: FLIPPED
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/ST5-subdir-matrix-summary.json
+  - id: CSI5
+    description: checker self-test 71/71 (56 revision-4 cases identical); payload checks exits 0/3/2/2/2 with equal counts
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/CSI5-selftest.json
+  - id: P1r4-rerun
+    description: P1r4 on real 4.1.5 against the revision-5 checker
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/EVIDENCE-RUN-LOG-r5.json
+  - id: r3-probe-copies-rerun
+    description: RV3-B-A01, RV3-B-A03/A14/A16, RV3-B CSI injections, r2 P2, RV3-D lattice, RV3-D forward-compat/removal against revision 5 (6/6 identical after path normalisation)
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/EVIDENCE-RUN-LOG-r5.json
+  - id: P3r3-rerun
+    description: pre-RoT register matrix, 2,085 jobs, harness unchanged; summary, property and chains equal to committed
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/P3r3-rerun-r5-summary.json
+  - id: r4-controls-at-base
+    description: P4r4, VA4, reviewer B model, AF1-AF3, surface probes, first-binary probe, D-A02, D-A03, D-A03b on the base snapshot (attacks exist at base)
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/EVIDENCE-RUN-LOG-r5.json
+  - id: SRC5
+    description: canonical content digest versus git archive digests (10/10)
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6/evidence/r5/SRC5-source-identity.json
+findings:
+  - id: AR11-I1
+    severity: INFO
+    title: CR4-B-07 decided as option 1 under rule FD-1 (a P1 proof covers only the TSS it names); CS5 control shows option 2 admits reproducer keys plus trust-state key plus transport on pinned machines
+    path: release/root-of-trust/4.1.6/24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md
+  - id: AR11-I2
+    severity: INFO
+    title: Release-global presence refuses legitimate older registered releases; revision 5 scopes presence to the release's registration and adds unit removal and member narrowing as computed reductions
+    path: release/root-of-trust/4.1.6/23-CONSTITUTIONAL-SURFACE.md
+  - id: AR11-I3
+    severity: INFO
+    title: FA5 helper harness did not evaluate the install mutant on the swap scenario; corrected by AR-0011 before recording (26/27 detected)
+    path: release/root-of-trust/4.1.6/evidence/r5/EVIDENCE-RUN-LOG-r5.json
+  - id: AR11-I4
+    severity: INFO
+    title: runtime/build.rs falls back to git rev-parse HEAD for provenance; carried as implementation requirement IR-REP-1 (product source not changed)
+    path: release/root-of-trust/4.1.6/30-RELEASE-REGISTRATION-AND-REPRODUCTION.md
+verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW
+output:
+  branch: phase1/rot1-r5-synthesis-architect
+  commit: cdb4e14009bba60bea9b805563c1b60e84f30b4b
+  evidence_path: release/root-of-trust/4.1.6/evidence/r5/
+unresolved:
+  - No implementation exists; RT-128..RT-155 (including gov-admit, decision register, allow-list confinement, TCB-location predicate on root-owned locations) are specification only
+  - IR-REP-3 cross-OS and cross-distribution reproducibility not shown; specialist B F5 (path-remapped builds) not re-run
+  - CR4-B-02 witness input and custody, CR4-B-04 pre-transaction requirements, CR4-B-05 wildcard informational lint are specification only
+  - C-2..C-6 and RT-50 on a genuine 4.1.6 install are carried, specification only
+  - CS5 honest-party rules are this revision's specification; a real process deviating from them changes the minimal sets
+  - Owner options OP-1..OP-15 pending; none decided or proposed
+recommended_next_action: Fresh independent reviewers B (trust/security) and C (compatibility/transactions), then a synthesis reviewer, review RoT-1 revision 5 at cdb4e14 against HO-0001 §3-§4 and review r4 §7.
+completed_at: "2026-09-14T09:41:05Z"

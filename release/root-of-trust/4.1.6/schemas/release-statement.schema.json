@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/release-statement.schema.json",
   "title": "release-statement",
-  "description": "PROPOSED (RoT-1 revision 4). Release statement payload (07 §3). payloadType release-final.v2 (purpose release-final, stage final) or release-candidate.v2 (purpose release-candidate, stage candidate). trust_references are release-local requirements (17 S7); trust_policy_version names the Trust Policy the surface was registered under (E7). security_critical is removed: the Constitutional Surface is root-signed (23). Revision 4: release.source {release_commit, source_tree_digest, build_inputs_digest} is required; a final's source must equal its candidate's (V8).",
-  "x-schema-version": "3.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Release statement payload (07 \u00a73). payloadType release-final.v2 (purpose release-final, stage final) or release-candidate.v2 (purpose release-candidate, stage candidate). trust_references are release-local requirements (17 S7); trust_policy_version names the Trust Policy the surface was registered under (E7). security_critical is removed: the Constitutional Surface is root-signed (23). Revision 4: release.source {release_commit, source_tree_digest, build_inputs_digest} is required; a final's source must equal its candidate's (V8).",
+  "x-schema-version": "4.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -89,23 +89,17 @@
           "additionalProperties": false,
           "required": [
             "release_commit",
-            "source_tree_digest",
-            "build_inputs_digest"
+            "content_digest"
           ],
           "properties": {
             "release_commit": {
               "type": "string",
-              "pattern": "^[0-9a-f]{40}$"
+              "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
             },
-            "source_tree_digest": {
+            "content_digest": {
               "type": "string",
               "pattern": "^sha256:[0-9a-f]{64}$",
-              "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
-            },
-            "build_inputs_digest": {
-              "type": "string",
-              "pattern": "^sha256:[0-9a-f]{64}$",
-              "description": "digest of the published build inputs (toolchain, lockfiles)"
+              "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
             }
           }
         },
@@ -115,6 +109,10 @@
         },
         "released_at": {
           "$ref": "#/$defs/timestamp"
+        },
+        "inputs_manifest_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
         }
       }
     },

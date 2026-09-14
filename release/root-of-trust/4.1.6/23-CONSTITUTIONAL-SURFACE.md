@@ -1,6 +1,11 @@
 # Output 23 — Constitutional Surface, total floor semantics and the Overlay Surface
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **Revision 5** closes blocking class **BC4-3** (review r4 RV4-H3: release-scoped registration of non-orderable content)
+> under rule FD-1 (`29`): the registration of each release fixes every non-join unit and the kernel tree (new §12). §3.1,
+> §3.2, §6.3, §7, §7.2 and §10 are amended accordingly. Everything review r4 CD4-0 retained (default deny, closed
+> vocabulary, exact precedence registration, required presence, one YAML profile, the directed join, the Overlay Surface,
+> strength over effective policy) is unchanged.
 > Revision 3 added this file for R2-H1. Revision 4 closes blocking class **BC-1** (review r3 RV3-H1: constitutional-surface
 > soundness for project-owned strength and for absence). It absorbs the root of RV3-M5 and the precedence case of RV3-M7,
 > and meets HO-0001 §3.1 and §4. Carried items: RV3-M5 (CR-02), RV3-M7, RV3-L2 (CR-07), RV3-L3 (CR-08), RV3-L5 (CR-10).
@@ -65,8 +70,8 @@ version 2 is `BINARY_BELOW_TRUST_POLICY` (read-only) against a version-3 Trust P
 | Mode | Meaning | Registration | Violation |
 |---|---|---|---|
 | `structured` | YAML or JSON whose every leaf is enumerated (§3.4) and classified | per leaf | per leaf |
-| `pinned_file` | non-orderable content (schemas, skills, adapters, overlay templates, taxonomies, command contract, constitution text, enforcement map, MCP registry) | SHA-256 per path | `surface_unregistered` |
-| `transaction_input` | migrations, consumed only inside the install transaction from authenticated buffers (`04` V10) | the release statement's `migrations[]`, **and every operation targets a migration-writable Overlay Surface key (§11.3)** | V10 codes; `migration_operation_not_permitted` |
+| `pinned_file` | non-orderable content (schemas, skills, adapters, overlay templates, taxonomies, command contract, constitution text, enforcement map, MCP registry) | **the one SHA-256 registered for this path by the registration of the release (§12)** | `surface_unregistered_for_release` |
+| `transaction_input` | migrations, consumed only inside the install transaction from authenticated buffers (`04` V10) | the digest registered for this release (§12) and the release statement's `migrations[]`, **and every operation targets a migration-writable Overlay Surface key (§11.3)** | V10 codes; `migration_operation_not_permitted`; `surface_unregistered_for_release` |
 | `informational_file` | documentation with no runtime reader | rationale | — |
 
 ### 3.2 Leaf classes
@@ -74,8 +79,8 @@ version 2 is `BINARY_BELOW_TRUST_POLICY` (read-only) against a version-3 Trust P
 | Class | Meaning | Kernel value used? | Violation (E7) |
 |---|---|---|---|
 | `floor` | orderable value with an operator and a registered floor | joined with the effective TPS floor | `floor_violation` (weaker than named); `floor_not_registered` (stronger than named) |
-| `pinned` | non-orderable value; the TPS registers permitted digests | only when registered in the effective TPS; otherwise the fallback of §6.3 | `surface_unregistered` |
-| `members` | the member-id set of a declared keyed collection | registered members only (additive collections keep additions) | `surface_membership` |
+| `pinned` | non-orderable value (a leaf or a whole keyed-collection member); **the registration of the release fixes exactly one digest (§12)** | only the value registered for the policy-root release; otherwise the fallback of §6.3 | `surface_unregistered_for_release` |
+| `members` | the member-id set of a declared keyed collection | **the set registered for the release (§12), additions included**; a project-layer addition follows the directed join | `surface_membership` |
 | **`precedence`** | the POLICY_PRECEDENCE rule list | **never** (§4.1) | **`precedence_unregistered`** (any difference from the named registration) |
 | `release_bound` | equals a field of the signed release statement | yes | V8/V11 codes |
 | `project_tunable` | a key the registered precedence marks `overridable`, read by no security decision point | yes | — (lint) |
@@ -337,12 +342,12 @@ The compiled consumer register (§6.5) remains the build gate for any further ke
   | Leaf class | Value |
   |---|---|
   | `floor` | root kernel joined with the effective TPS |
-  | `pinned` | the root kernel value if registered in the effective TPS |
+  | `pinned`, `members`, `pinned_file` | the value registered **for the policy-root release** (§12.3); the kernel of an eligible release carries exactly that value |
   | `precedence` | registered only (§4.1) |
 
-- **Fallback for unregistered or missing pinned and members content (RV3-M7 (c)).** The value used is the EmbeddedSnapshot
-  value, if that value is registered in the effective TPS. Otherwise the dependent decision point refuses with
-  `SURFACE_VALUE_UNAVAILABLE(key, decision_point)`. The consumer register names each decision point's fail-closed
+- **Fallback for unregistered or missing pinned and members content (RV3-M7 (c); revision 5).** The value used is the
+  EmbeddedSnapshot value, if the registration of **the running binary's embedded release** is held and registers it.
+  Otherwise the dependent decision point refuses with `SURFACE_VALUE_UNAVAILABLE(key, decision_point)`. The consumer register names each decision point's fail-closed
   meaning, for example:
   - no secret patterns: indexing and export of the affected scope refuse;
   - no gate policy: agent answers refuse;
@@ -368,7 +373,7 @@ As revision 3, with two additions:
 |---|---|
 | New key in an existing constitutional file | `UNCLASSIFIED` until a root-signed TPS classifies it |
 | New constitutional file | `UNCLASSIFIED`; under a pinned glob, `surface_unregistered` |
-| New member of a keyed collection | `surface_membership`, except in additive collections |
+| New member of a keyed collection | registered with the release that introduces it (§12); otherwise `surface_membership` |
 | New runtime consumer of a key or overlay key | the build fails unless it is classified (§6.5) |
 | New floor semantics (class, operator, presence rule) | `floor_schema_version` bump; older binaries become `BINARY_BELOW_TRUST_POLICY` |
 | Reclassification toward a weaker class; removal of a floor value | computed reduction: cumulative `lowering_history` plus the per-project `policy_lowering` gate |
@@ -377,7 +382,11 @@ As revision 3, with two additions:
 | **`required` → `optional`** | computed reduction |
 | **A new migration-writable overlay target** | computed reduction |
 | A kernel POLICY_PRECEDENCE differing from registration | refused (`precedence_unregistered`) |
-| Classification toward a stronger class; removal of a registered digest | strengthening; no gate |
+| Classification toward a stronger class | strengthening; no gate |
+| **A later registration whose unit value equals a value an intermediate registration superseded** (revision 5) | **computed reduction** `registration_reversion` (§12.4) |
+| **A later registration omitting a unit the previous registration had, or narrowing a member-id set against its direction** (revision 5) | **computed reduction** `registration_unit_removed` / `registration_members_reduced` (§12.4) |
+| **A registration that changes an already registered release, or two releases at one sequence** (revision 5) | malformed and refused (`REGISTRATION_REWRITE`, `REGISTRATION_SEQUENCE_EQUIVOCATION`) |
+| **A set-valued registration** (several permitted digests for one unit) (revision 5) | malformed (`REGISTRATION_NOT_SINGLE_VALUED`) |
 
 ### 7.1 Forward compatibility (HO-0001 §4)
 
@@ -406,6 +415,13 @@ Evidence:
    consumers (`OWNER_CONSTITUTIONAL_FILE_UNCONFIRMED` / `…_CHANGED`). A fresh CI runner therefore refuses the dependent
    decisions until an operator decision pin or confirmation registers the digest.
 5. The confirmed digest is part of the project-strength vector (`26` §6).
+6. **Binding groups (revision 5; RV4-L10).** A slot may declare `binding_group`. The group (for example the Capability
+   Acceptance Contract Markdown, compiled YAML, schema and evidence map) is confirmed, pinned and consumed only as a set:
+   the confirmation or decision pin names the **group digest**, SHA-256 over the sorted `(path, file digest)` pairs of every
+   member. Any member absent is `OWNER_CONSTITUTIONAL_FILE_MISSING`; a computed group digest that equals no confirmed or
+   valid pinned group digest is `OWNER_CONSTITUTIONAL_GROUP_UNCONFIRMED`. Several valid decision pins resolve by exact set
+   match only; per-path registrations of grouped slots are ignored. Evidence: selftest S66 (Markdown v2 with YAML v1 while
+   both sets are pinned: exit 3) and S67 (matching v2 set: exit 0).
 
 Evidence: `csi_check.py check-owner` is the reference; selftest S50–S52 give absent 2, unconfirmed 3 and confirmed 0.
 
@@ -438,7 +454,7 @@ Evidence: `csi_check.py check-owner` is the reference; selftest S50–S52 give a
 | ID | Residual | Bound | Test |
 |---|---|---|---|
 | CS-1 | The correctness of each classification, direction and Overlay Surface entry is a root-ceremony review responsibility. | Too strict fails closed. Too weak is limited by: the lint (never weaker than precedence; no catch-alls; no optional control; `immutable` only with `pinned`/`equals`); the consumer register; exact precedence registration; directed joins; and computed reductions in both directions. Any remaining weakness needs a root-threshold signature and appears in the `draft-policy` change list. | selftest S23–S25, S53; RT-73…RT-79, RT-100 |
-| CS-2 | Every final that changes pinned, registered or precedence content needs a TPS at root threshold. | Ceremony frequency (`14` RK-17; `21` OP-1) | — |
+| CS-2 | **Replaced in revision 5.** One registration ceremony per release (OP-2) fixes source, inputs, content and final together (`30` R-REG-6). Retention no longer widens what later releases may carry (§12.3 rule 5); whether older releases stay eligible is OP-11. | ceremony frequency (`14` RK-17; `21` OP-2) | REG5; selftest S57–S70 |
 
 ## 11. The Overlay Surface (new; CD3-1 (3); CR-02, RV3-M5)
 
@@ -498,3 +514,78 @@ Evidence (`evidence/P1r4-project-strength-and-absence.json` part C, migrations):
 | a registered strengthening (control) | passes | none |
 
 Selftest: S46–S48 refused; S49 permitted.
+
+## 12. Release-scoped registration of non-join units (revision 5; BC4-3)
+
+### 12.1 Root cause accepted
+
+Revision 4 registered **permitted digests** per pinned key, member and file: a domain, not a function of the release.
+For orderable leaves the floor join made any member of the domain safe; for non-orderable units nothing did. Retention of a
+superseded digest for installed releases (forced by `SURFACE_VALUE_UNAVAILABLE` and by release-global presence) let a
+threshold-1 `release-final` restore superseded content in a higher-sequence release with no reduction, gate or detector
+(RV4-B-A08 on real 4.1.5; D-A02 T1–T4). Under FD-1 the lower-trust final was the selector of effective content.
+
+### 12.2 Units and single-valued registration
+
+1. **Non-join units** are: every `pinned` leaf and whole pinned member (`leaf:<key>`); every member-id set
+   (`members:<key>`); every `pinned_file` and `transaction_input` file (`file:<path>`); every owner-domain binding group
+   (§7.2). **Join units** (floors, registered precedence) stay in the Trust Policy and are joined as §4 and §6.4 state.
+2. The **registration of release *R*** (`30` §5: `constitution {kernel_tree_digest, units}`) maps every non-join unit
+   present in *R* to **exactly one value** and fixes *R*'s kernel tree digest. A set-valued registration is malformed
+   (`REGISTRATION_NOT_SINGLE_VALUED`); revision 4's retention form is that shape (REG5, selftest S56: exit 5).
+3. Registrations are **append-only** (`30` R-REG-4): rewriting a registered release, or registering two releases at one
+   sequence, is malformed (selftest S61, S62; REG5 rewrite row: exit 5).
+4. The classification of units (which rule, which class, which presence) stays in the root-signed Constitutional Surface.
+   The draft inventory's per-key `digests` maps are the projection of one registration (the draft release) and carry one
+   value each (179 pinned keys, 97 pinned files, 0 multi-valued).
+
+### 12.3 Eligibility and effective values (E7 at ingress and at use)
+
+1. **Exact lookup.** *R* is eligible only if a registration for *R*'s release id is effective on the machine (referenced by
+   the effective Trust State, `30` R-REG-2), names *R*'s final statement, and every non-join unit of *R*'s kernel and its tree
+   digest equal that registration. Otherwise `release_unregistered` or `surface_unregistered_for_release`. **Ranges,
+   unions and "latest registered" are never used.**
+2. A registration of a release is never evidence for another release: content registered for 4.1.6 is ineligible when
+   presented as 4.1.8, as a gap sequence or at an inflated sequence (REG5 `ranges_excluded`: exit 3 each).
+3. **Presence is release-scoped.** Required presence (§3.5) of a non-join unit is evaluated against *R*'s registration: a
+   member introduced for 4.1.7 is not required of 4.1.6 (selftest S69: exit 0; REG5 legitimate 4.1.6 under the set that
+   registers 4.1.7: exit 0).
+4. **Knowledge follows state.** A machine that holds no effective registration for *R* treats *R* as unregistered and never
+   falls back to an earlier release's content (REG5: a machine holding only 4.1.6's registration refuses genuine 4.1.7 with
+   exit 3, and accepts it with exit 0 once it holds the 4.1.7 registration).
+5. **Legitimate retention does not widen.** An installed release remains eligible at its own registration while later
+   releases carry their own; no later registration makes superseded content eligible under another release. Whether older
+   releases stay eligible at all is OP-11.
+6. `release_bound`, `project_tunable` and `informational` leaves are fixed too, because the kernel tree digest is registered:
+   `release-final` selects nothing (selftest S60: one tunable leaf changed, exit 3).
+
+### 12.4 Computed reductions over registrations
+
+`csi_check.py registration-reductions` computes, over the ordered registration set:
+- `registration_reversion`: a unit value equal to a value an intermediate registration superseded (selftest S63 exit 6,
+  S64 with `lowering_history` exit 0; REG5: the owner registering the superseded `aws-access-key` regex for 4.1.8 exits 6
+  without history, 0 with);
+- `registration_unit_removed`: a unit the previous registration had and the new one omits (selftest S70 exit 6);
+- `registration_members_reduced`: a member-id set narrowed against its collection direction.
+
+Each needs a cumulative `lowering_history` entry and, for every project whose record holds the stronger registration, the
+per-project `policy_lowering` trust gate (`19` §10.6).
+
+### 12.5 Enforcement points
+
+| Point | Rule |
+|---|---|
+| `gov release build`, canonical CI | `csi_check.py derive-registration` produces the unit map; `check --registrations --release-id` exits 0 on the release's own kernel |
+| Registration ceremony | `gov trust draft-registration` lists every unit that differs from the previous registration and every computed reduction (§12.4) |
+| Verifier at ingress and at use | E7 as §12.3; `19` §6 |
+| Consumers | effective values as §6.3 |
+
+### 12.6 Evidence (executed; pack checker as amended, real legacy 4.1.5 as the consumer)
+
+`evidence/r5/REG5-release-scoped-registration.json`: part P and D-A02 T1–T4 — each mixed release refused under every
+claimed identity (5 targets × 3 identities, exit 3); legitimate 4.1.6 and 4.1.7 eligible (exit 0); revision-4 retention
+form malformed (exit 5); gap, inflation and stale-policy releases refused; rewrite malformed; reversion reported; a
+different migration under the same release refused (exit 3). On real 4.1.5, the content revision 5 makes effective keeps
+the `ASIA…` key file out of the index and out of query results, while the revision-4 effective content indexes and serves
+it (control). Checker self-test: `evidence/r5/CSI5-selftest.json`, 71 of 71, the 56 revision-4 cases unchanged.
+

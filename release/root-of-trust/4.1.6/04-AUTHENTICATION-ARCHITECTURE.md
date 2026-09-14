@@ -1,6 +1,11 @@
 # Output 4 — Canonical release-authentication architecture (RoT-1)
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments: V8 (final source equals candidate source) stays at every verifier and becomes part of AP-5 (the
+> registered final must carry the registered source and candidate). A final authenticates content only; it is a policy root
+> only with its registration (E7, `23` §12). API rules added: (13) a `RegisteredRelease` is constructible only from a
+> registration referenced by the effective Trust State; (14) an `AdmittedBinary` only from admission-predicate/1 run by an
+> evaluator other than the candidate; (15) every selector is a `Selected<T>` from the compiled decision register (`29` R-SEL-2).
 > Revision 4 keeps what review r3 confirmed (CD3-0): the anchor, the purposes, the single authentication boundary,
 > verify-and-use, the surface check, local trust gates, binary acceptance and the layout. It changes five things:
 > - **V8** binds a final to its candidate's **source** (CD3-3; `25` §5.1);

@@ -1,6 +1,8 @@
 # Output 18 — Verify-and-use transaction model
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5: §9 gains closed entry sets and RoT-1 root discovery (carried RV4-M1); the transaction and snapshot model is
+> otherwise unchanged. The release registration is installed as `governance/trust/registration.dsse.json` (`30`, `23` §12).
 > Revision 4 keeps the byte-binding proof, the transaction area, union records, VU-1…VU-13 and the installation state
 > machine (CD3-0). It adds:
 > - VU-14, confined children (CR-03);
@@ -207,11 +209,45 @@ Evaluated first in every process, including commands that need no installation.
 | `ABSENT` | no `governance/trust/`, no occupation entries, no legacy entries (`governance/framework.lock` file, `governance/kernel` directory) | EmbeddedSnapshot ⊔ floor | `init`; commands needing no installation |
 | `LEGACY` | a legacy layout (`governance/framework.lock` is a file or `governance/kernel` is a directory) and no `governance/trust/` | EmbeddedSnapshot ⊔ floor; tree digest checked against `historical_releases` | read-only diagnostics; `update --apply` to an eligible release (layout migration, `26` §7) |
 | `IN_TRANSACTION` | an honoured journal (§5.1) | EmbeddedSnapshot ⊔ floor | read-only diagnostics; `gov recover` |
-| `COMPLETE` | `governance/trust/{FORMAT, framework.lock, kernel/, release.dsse.json or development.json}` present and readable, **every occupation entry present with its exact type**, and no honoured journal | KernelSnapshot if verified and eligible; otherwise EmbeddedSnapshot ⊔ floor | per verdict and freshness (`24` §4.3) |
-| `PARTIAL` | any other combination, including a missing or retyped occupation entry (`PARTIAL(occupation)`), or legacy and RoT-1 entries mixed. Doctor D033 names the mixed layout and stray artefacts such as `governance/framework.lock~legacy` and `governance/kernel/KERNEL_MANIFEST.json` (C-3). | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
+| `COMPLETE` | `governance/trust/{FORMAT, framework.lock, kernel/, release.dsse.json or development.json}` present and readable, **every occupation entry present with its exact type**, no honoured journal, **and the closed entry sets of §9.1 hold** (revision 5, RV4-M1) | KernelSnapshot if verified and eligible; otherwise EmbeddedSnapshot ⊔ floor | per verdict and freshness (`24` §4.3) |
+| `PARTIAL` | any other combination, including a missing or retyped occupation entry (`PARTIAL(occupation)`), a foreign entry (`PARTIAL(foreign_trust_entry)`, `PARTIAL(foreign_occupation_entry)`), a kernel differing from its release content set (`PARTIAL(kernel_content_mismatch)`), a nested legacy install under `governance/` (`PARTIAL(nested_legacy_install)`), or legacy and RoT-1 entries mixed. Doctor D033 names the mixed layout and stray artefacts such as `governance/framework.lock~legacy` and `governance/kernel/KERNEL_MANIFEST.json` (C-3). | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
 | `FORMAT_UNSUPPORTED` | `governance/trust/FORMAT` names an unimplemented format or layout | none | `gov version`; `gov doctor` |
 
 A foreign transaction artefact (§5.1) is reported and ignored; the state is computed as if it were absent.
+
+### 9.1 Closed entry sets (revision 5; RV4-M1 (a))
+
+`COMPLETE` additionally requires, by `st_mode` (never by name) and with no symbolic link anywhere below `governance/trust/`:
+1. the entries of `governance/trust/` ⊆ {`FORMAT` (file), `framework.lock` (file), `kernel` (directory), `release.dsse.json`
+   or `development.json` (file), `registration.dsse.json` (file), `lineage`, `state`, `root`, `profiles` (directories)};
+2. the path set of `governance/trust/kernel/` equals the release content set recorded by the install transaction (the lock's
+   file map), every file digest equal;
+3. `governance/trust/{state,root,lineage,profiles}/` contain only regular files named `*.dsse.json`;
+4. the occupation directory `governance/framework.lock/` contains exactly its sentinel file;
+5. no legacy project marker (a `governance` directory holding `framework.lock` as a file, or `kernel/KERNEL_MANIFEST.json`)
+   exists under the project's `governance/` other than the root layout. A legacy marker elsewhere in the project leaves the
+   state unchanged and is reported (`NESTED_LEGACY_PROJECT`, doctor D039 HIGH).
+
+Otherwise the state is `PARTIAL` with the reasons above, and doctor D033 CRITICAL names every foreign entry.
+
+### 9.2 RoT-1 root discovery (revision 5; RV4-M1 (b), RV4-D-A09)
+
+1. The project root of a RoT-1 command is the nearest ancestor of the working directory (or of `--root`) that holds
+   `governance/trust/FORMAT` as a regular file.
+2. When the resolved working directory is inside that project's Protected Path Set (`governance/trust/**`, the occupation
+   directory, an occupation file), every command except `version` and `doctor` refuses with
+   `WORKING_DIRECTORY_IN_PROTECTED_PATH`.
+3. A legacy marker between the working directory and that root is reported and never operated as a separate project.
+
+**Evidence** (`evidence/r5/ST5-*`, real legacy 4.1.2–4.1.5 binaries, reviewer C's trees): the three pristine layouts are
+`COMPLETE` under §9.1 and L0 is `LEGACY`. Across 6,292 invocations of every binary's register from eleven working
+directories with no `--root` (`.`, `product`, `spec`, `governance`, `governance/overlay`, `governance/views`,
+`governance/trust`, `governance/trust/kernel`, `governance/trust/state`, `governance/framework.lock`, `.governance-runtime`),
+280 wrote, 112 of them under `governance/trust/**` or the occupation directory; all 112 were `COMPLETE` under revision 4 and
+none is `COMPLETE` under §9.1 (P5-1: 0 counterexamples); every one of the 200 invocations that created a nested legacy
+install is reported (P5-2: 0 counterexamples); §9.2 refuses in exactly the four positions inside the Protected Path Set
+(P5-3). Review r4 D-A01 re-run: N1b, N2 and N3, `COMPLETE` under revision 4, are `PARTIAL` (nested_legacy_install;
+foreign_trust_entry and kernel_content_mismatch; kernel_content_mismatch); the root-level control stays `COMPLETE`.
 
 Evidence: `evidence/LR2-installation-state-and-strength-reference.json` applies this state machine to the trees left by
 review r3's legacy probes. Every removed, restored, sparse or merged tree with legacy entries is `PARTIAL(occupation)` or

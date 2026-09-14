@@ -1,6 +1,10 @@
 # Output 3 — Trust-chain diagram
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendment: the chain of record is `25` §6 (registration selects source, inputs, content and final; a first-hand
+> reproduction quorum establishes bytes; the selected Trust State selects publication and negatives; `gov-admit` or an
+> admitted `gov` evaluates over measured bytes). Rows below that name `release-artifact`, build attestations or first-binary
+> tooling paths are superseded by `25`, `30` and `31`.
 > Revision 4 changes the chain in five places:
 > - anchors are satisfied by inclusion, and trust ingress needs a currency proof (`24`);
 > - a binary's source is the source an independent verification attested (`25` §5.1);

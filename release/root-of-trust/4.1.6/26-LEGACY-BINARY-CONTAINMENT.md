@@ -1,6 +1,8 @@
 # Output 26 — Legacy-binary damage containment and project-owned strength
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5: §3 scope, §4 LP-1 and §8 LR-2 restated for subdirectory-rooted invocations (carried RV4-M1, RV4-M6); the
+> layout is unchanged.
 > Revision 3 added this file. Review r3 recorded R2-H4 **CLOSED as a class**, with HO-0001 §3.4 SATISFIED. Revision 4
 > keeps the layout and property LP-1 unchanged: P3r3 was re-run unchanged, with results equal to the committed ones.
 > Revision 4 changes three things:
@@ -63,9 +65,23 @@ spec/audits/GOVERNANCE-ADOPTION    OCCUPIED: regular file (RoT-1 adoption eviden
 
 ## 3. Why every pre-RoT command fails before its first write (class argument)
 
-Unchanged from revision 3. Commands that need an installation return `NOT_INSTALLED`, because
-`governance/kernel/KERNEL_MANIFEST.json` cannot exist when `governance/kernel` is a file. Commands that run without an
-installation meet a wrong-typed entry at their write or restore root.
+For invocations rooted at the project root, unchanged from revision 3: commands that need an installation return
+`NOT_INSTALLED`, because `governance/kernel/KERNEL_MANIFEST.json` cannot exist when `governance/kernel` is a file; commands
+that run without an installation meet a wrong-typed entry at their write or restore root.
+
+**Scope restated (revision 5; RV4-M1 (c)).** The argument does **not** cover invocations rooted in a subdirectory. Legacy
+`init`, `adopt baseline` and `migrate baseline` root at the working directory and skip `require_installed`
+(`cli/src/main.rs` lines 729, 747). From any subdirectory they install a nested legacy project, and legacy commands then
+operate beneath it, including inside the Protected Path Set. The reachable outcome and its bound:
+- a nested install or litter under `governance/trust/**`, under the occupation directory, or anywhere under `governance/`
+  makes the RoT-1 state `PARTIAL` (`18` §9.1) and doctor names every entry;
+- a nested-root legacy CIT that edits the installed kernel is `KERNEL_TAMPERED` and `PARTIAL(kernel_content_mismatch)`;
+  one that deletes the trust lock is `PARTIAL`;
+- a nested install outside `governance/` (for example `product/`) leaves the state unchanged and is reported
+  (`NESTED_LEGACY_PROJECT`); its own legacy index is legacy-binary behaviour outside RoT-1 (LR-3 class);
+- an overlay rewrite through a nested root leaves `governance/governance/…` behind, so the state is `PARTIAL`; the overlay
+  change itself is reported where the strength vector was recorded (LR-4 elsewhere).
+RoT-1 commands refuse to run with a working directory inside the Protected Path Set (`18` §9.2).
 
 ### 3.1 Legacy runtime residue
 
@@ -73,6 +89,15 @@ Unchanged. `.governance-runtime/update/<v>/` is blocked by set (i) and quarantin
 `.governance-runtime/migration/batch-N/` is occupied by the tracked file, which now also survives untracking (§2).
 
 ## 4. Executed property (LP-1)
+
+**Restated (revision 5).** LP-1 is two properties. **LP-1r (root-anchored):** every invocation of each binary's own register
+with `--root <project>` writes nothing (P3r3 re-run on revision 5: 2,085 jobs, summary, property and chain results equal to
+the committed output, `evidence/r5/P3r3-rerun-r5-summary.json`; reviewer C's 2,504 root-anchored rows). **LP-1s
+(subdirectory-rooted):** invocations with no `--root` from any working directory may write; every write under
+`governance/**` other than the overlay files leaves a state that is not `COMPLETE`, and every nested legacy install is
+reported (`evidence/r5/ST5-subdir-matrix-summary.json`: 6,292 invocations, P5-1 and P5-2 hold with 0 counterexamples).
+RT-50 and RT-50b run both (`12`).
+
 
 **Property LP-1** (unchanged). For every pre-RoT binary 4.1.2–4.1.5, and every invocation derived from its own register,
 on a RoT-1 project carrying a legacy update snapshot and a project restricted classification:
@@ -142,6 +167,15 @@ Unchanged, plus one item. The first RoT-1 install transaction on a legacy projec
 7. write the ledger entry.
 
 ## 8. Residuals
+
+**Revision 5 restatement of LR-2 (RV4-M1 (c)).** LR-2's bounds apply to every trigger that removes occupation entries or
+restores pre-migration paths **and** to the subdirectory trigger on the intact layout: after any of them RoT-1 binaries fail
+closed (`PARTIAL`, `LEGACY` or `KERNEL_TAMPERED`) and report lost project strength where it was recorded; the subdirectory
+trigger can no longer leave `COMPLETE` (`18` §9.1). **RV4-M6:** the install transaction removes every pre-existing
+`.governance-runtime/` directory-ignore line (with or without leading or trailing slash) before writing the child-glob
+rules, preserving all other lines, idempotently (`evidence/r5/ST5-gitignore-surgery.json`: second run changes no byte; the
+untracking idiom lists nothing; a fresh clone is `COMPLETE`; control without the surgery: `PARTIAL`).
+
 
 | ID | Residual | Bound | Tests |
 |---|---|---|---|

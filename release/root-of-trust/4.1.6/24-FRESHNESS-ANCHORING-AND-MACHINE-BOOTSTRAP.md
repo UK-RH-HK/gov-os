@@ -1,6 +1,9 @@
 # Output 24 — Freshness anchoring, currency and new-machine trust bootstrap
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5: currency proofs name the Trust State they cover (CR4-B-07 option 1, CR4-B-06); the witness service's input
+> and custody are fixed (CR4-B-02); every ingested non-future statement raises a stateful clock high-water and RS-2 is
+> restated (CR4-B-03, RV4-M4); binary acceptance and first admission follow `25` and `31`.
 > Revision 3 added this file for R2-H2. Revision 4 closes blocking class **BC-2** (review r3 RV3-H2: anchor satisfaction
 > and anchor currency), carried RV3-M2 (CR-03), RV3-M3 (CR-06), RV3-L1 (CR-05) and RV3-L6, and HO-0001 §3.2. OP-7 is
 > presented in `21` and is not decided here. Normative keywords: MUST, MUST NOT, SHOULD.
@@ -83,6 +86,12 @@ controller (A1) and the transport (A5).
 therefore cannot outlive its validity through the VTS.
 
 ### 3.3 Witness authority (OP-7 (c); CD3-2 (3))
+
+**Revision 5 (CR4-B-02, RV4-M3).** **Input:** the witness service takes the `(sequence, digest)` to witness only from the
+owner's signing ceremony or the independent channel, never from the repository, a Git host, a bundle or an unauthenticated
+transport. **Custody:** the C3 witness threshold is met by keys under at least two independent custodians; a ceremony record
+with both keys in one service is flagged by `gov trust draft-policy`, and `21` OP-7 states the one-custody consequence.
+Tests: RT-104 (i) a service whose Git host serves TSS 5 while TSS 9 is published refuses to witness TSS 5; (ii) the flag.
 
 - **Purpose.** `freshness-witness` is a separate signing purpose (`05` §1). KS-11 forbids sharing its keys with any other
   purpose.
@@ -246,12 +255,13 @@ upgrade).
 
 ### 4.4 Currency proof (normative; CD3-2 (2))
 
-A **currency proof** for effective TSS *n* exists iff the machine is `ANCHORED` and `KNOWN`, the local clock passes the
-rollback check (§8), and one of these holds:
+A **currency proof** for effective TSS *n* exists iff the machine is `KNOWN`, is `ANCHORED` or (OP-7 (c)) `WITNESSED` at the
+C3 witness threshold (CR4-B-06: the §4.3 row and this definition now agree), the local clock passes the rollback check (§8),
+and one of these holds:
 
 | Proof | Condition | Clock |
 |---|---|---|
-| (P1) recent anchoring event | the latest pin provisioning or human confirmation is no older than `bootstrap.c3_currency_window_hours` | TA-7 |
+| (P1) recent anchoring event **naming *n*** (revision 5) | a pin provisioning or human confirmation **whose anchored statement is *n* itself** is no older than `bootstrap.c3_currency_window_hours`; an anchoring event naming an ancestor of *n* is not a proof for *n* (CR4-B-07 option 1) | TA-7 |
 | (P2) in-gate confirmation | the trust-gate confirmation for this transition carries a typed fingerprint equal to `(n, digest(n))` | none |
 | (P3) witnesses | witnesses on *n* at the C3 threshold (§3.3) | TA-7 |
 
@@ -389,6 +399,15 @@ Unchanged. A repository gate record never authorises a trust decision (`27`). Re
 
 ## 8. Monotonic local state (Verifier Trust Store)
 
+**Revision 5 clock rule (RV4-M4, CR4-B-03).** SV-11 refuses statements issued in the future at ingest, so on a machine with a
+verifier trust store **every ingested verified non-future statement raises `clock_high_water`** (not only witnesses). A local
+clock below the high-water fails closed: pins and the C3 window are not honoured (`CLOCK_BELOW_HIGH_WATER`). A root-signed
+`bootstrap.clock_reset` lowers it. On a machine without a verifier trust store there is no high-water (RS-2). Evidence: P4r5
+`CLOCK-RV4-B-A13_stateful_machine_clock_set_back` (refused); DA03r5 mutant `R5-clock-high-water` (witness-only) detected.
+
+**Revision 5 accepted-TBM rule (CR4-B-08).** Only a `build: release` binary whose TBM resolves records into `accepted_tbm`;
+`bootstrap.accepted_tbm_reset` resets it (`25` §5).
+
 **Location:** `<account-home>/.local/state/gov/trust/<trust_root_id>/`, resolved from the account database.
 
 | Record | Content | Rule |
@@ -441,6 +460,15 @@ stale-pin, unchained-TSS and minted-witness classes on every machine. The cost i
 re-provisioned at least every 30 days, and C3 on long-idle machines needs a fresh confirmation.
 
 ## 10. Residuals, restated exactly
+
+**Revision 5 restatements.**
+- **RS-2 (CR4-B-03).** Under OP-7 (a), (b) and (d), and on any machine without a verifier trust store, a clock set back is not
+  detected: pin validity and the C3 window rest entirely on TA-7, so an expired pin becomes valid and yields a P1 proof for the
+  TSS it names (P4r5 residual demonstration on a stateless runner). On machines with a verifier trust store, a clock set back
+  below the high-water fails closed (§8). Test: RT-56 with RV4-B-A13 on a clean runner and on a stateful machine.
+- **RS-1b (CR4-B-07).** A P1 proof covers only the anchored statement; C3 on a later descendant needs P2 or P3, so the label
+  "published as of *t*" is exact. Test: RT-101 with RV4-B-A12 (i).
+- **RS-5 (CR4-B-02).** The key-compromise bound holds with the witness input and custody rules of §3.3.
 
 | ID | Residual | Bound | Test that fails if exceeded |
 |---|---|---|---|

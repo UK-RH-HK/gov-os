@@ -1,4 +1,27 @@
-# Evidence index (RoT-1 revision 4)
+# Evidence index (RoT-1 revision 5)
+
+## Revision 5 evidence (`r5/`)
+
+**Hygiene.** Every probe ran in `…/scratchpad/ar-0011/` under `env -i`; `GOV_*` removed from children; `HOME`, `XDG_*` and
+`GOV_KERNEL_CACHE` in scratch; `PYTHONDONTWRITEBYTECODE=1`; legacy binaries read-only; no forced deletes. Absolute paths in
+outputs are replaced by `<scratch>`, `<worktree>`, `<legacy-bin>`. Commands, SHA-256 digests and every comparison:
+`r5/EVIDENCE-RUN-LOG-r5.json`, `r5/ST5-RUN-LOG.json`, `r5/FA5-RUN-LOG.json`. Revision-4 controls ran on a `git archive`
+snapshot of the base commit `c8cdfac` in scratch.
+
+| File | Kind | Establishes | Result |
+|---|---|---|---|
+| `r5/CS5-tcb-capability-sets.{py,json}` | reference (derivation calculator; FD-3) | minimal capability sets for five attack goals under every OP-2, OP-8, OP-9, OP-10 answer and four victim classes; controls for R-REP-2, R-REP-3, OP-9 (d) pass-through, CR4-B-07 option 2 | 408 configurations; 21/21 self-checks; 1,752 invariant checks, 0 failures; 138,042 monotonicity checks, 0 violations |
+| `r5/P4r5-conformance-oracle.{py,json}` | reference (conformance oracle; loads `P4r4-trust-state-model.py` unmodified) | admission-predicate/1 running mode; E7 under registration; carried CR4-B rules; distinguishing scenarios for D-A03's mutants; VA4 rows and P4r4 binary scenarios re-expressed | 65/65; retained P4r4 42/42; 0 expected-`ACCEPTED` attack rows |
+| `r5/DA03r5-oracle-regression-sensitivity.{py,json}` | reference (mutation) | review r4 D-A03 re-run against P4r5; new-rule mutants | D-A03 normative rules 20/20; revision-5 rules 17/17 |
+| `r5/gov_admit_reference.py`, `r5/FA5-first-admission.{py,json}` | executed (real Ed25519 through OpenSSL; real 4.1.5 register) | bootstrap-mode admission, installation, admission records, genuine-binary rule; revision-4 paths (b), (c) as controls | 45/45 scenarios; 17/17 vectors; 26/27 mutants (1 equivalent under KS-7); deterministic |
+| `r5/SRC5-source-identity.{py,json}` | executed (real Git) | canonical content digest versus `git archive` digests | 10/10 |
+| `r5/REG5-release-scoped-registration.{py,json}` | executed (checker as amended; real 4.1.5 consumer) | part P, D-A02 T1–T4, ranges, rewrite, reversion, migration, consumption | 10/10 verdicts |
+| `r5/CSI5-selftest.json`, `r5/CSI5-CSI-check-*.json` | executed (checker) | self-test and payload checks against the revision-5 checker | 71/71 (56 revision-4 cases identical); exits 0/3/2/2/2 with equal counts |
+| `r5/ST5-*` | executed (reviewer C's trees and harness copies, attributed; real 4.1.2–4.1.5) | `18` §9.1–§9.2 predicate; subdirectory matrix; `subdir_escape`; D-A01 re-run; `.gitignore` surgery | P5-1…P5-3 hold, 0 counterexamples over 6,292 invocations |
+| `r5/P3r3-rerun-r5-summary.json` | executed (harness unchanged) | root-anchored legacy containment | 2,085 jobs; equal to committed |
+
+## Revision 4 evidence (history; retained instruments re-run in revision 5)
+
 
 **Scope and hygiene.**
 - **Scratch only.** Every probe ran in a scratch directory given by the operator. The repository, the canonical checkout

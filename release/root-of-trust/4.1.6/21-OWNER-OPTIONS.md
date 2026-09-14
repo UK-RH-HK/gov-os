@@ -1,216 +1,217 @@
-# Output 21 — Owner options OP-1 … OP-7 (revision 4 analysis)
+# Output 21 — Owner options OP-1 … OP-15 (revision 5)
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved.**
-> This page asks the owner for nothing yet, and no option is decided here. For each option it records:
-> - the choices and their consequences, computed from the revision-4 rules;
-> - whether the choice is security-material;
-> - where the answer will be encoded;
-> - a **proposal**, labelled as such, where one is stated.
->
-> Revision 4 closes blocking class **BC-4** (review r3 CD3-4). The review found the OP-2, OP-4 and OP-7 consequence
-> statements of revision 3 materially incorrect. Each is restated from the corrected rules of `23`, `24` and `25`, and the
-> evidence is named.
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved.**
+> Rewritten in revision 5 for blocking class **BC4-4** (review r4 CD4-4). This page asks the owner for nothing yet and
+> **decides nothing. Revision 5 states no proposal and no default for any option** (revision 4's labelled proposals are
+> withdrawn). For each option it records the choices, the consequences derived from the revision-5 rules, the evidence
+> (the derivation calculator `evidence/r5/CS5-tcb-capability-sets.json` wherever a capability set is stated), whether the
+> choice is security-material, and where the answer is encoded.
 
-## Summary
+## 0. One option set
 
-| Option | Revision 3 proposal | Revision 4 proposal (not a decision) | Changed in revision 4 | Security-material? | Encoded in |
-|---|---|---|---|---|---|
-| OP-1 Root keys, threshold, custodians | 3 keys, threshold 2 | same; the ceremony also registers exact precedence, the Overlay Surface, owner-domain slots and, under OP-2 (S1), production sources | ceremony scope | **yes** | root v1; TPS |
-| OP-2 Custody per purpose | eleven purposes; `release-final` threshold 1; `release-artifact` (i) | **twelve purposes** (adds `freshness-witness`). **Binary source authority: (S1) root-registered production sources.** `release-final` threshold 1 with standby; `release-artifact` (i); `verification-attestation` threshold 1 | **restated** (binary blast radius from CD3-3; new source-authority choice; witness custody) | **yes** | root grants and thresholds; TPS `eligibility.production_sources` |
-| OP-3 Gating | mode A | mode A | **restated** (decision-pin integrity; in-gate state confirmation) | **yes** | TPS `gating` |
-| OP-4 Separate candidate key | yes | yes | **restated** (what "no" costs after CD3-3) | **yes** | root grants |
-| OP-5 Metadata-age warning | 180 days, informational | 180 days, informational; also shown with `CURRENCY_UNPROVEN` | display | no | binary default |
-| OP-6 Trust-root confirmation | confirm once per VTS | confirm once per VTS, with state anchoring | unchanged | **yes** | TPS `bootstrap.op6_mode` |
-| OP-7 Currency for machines without a current proof | (a) | **(a), `pin_max_validity_days` 30, `c3_currency_window_hours` 168; witness threshold 2 if (c)** | **restated** (inclusion anchors; pin-currency parameter; witness authority; (d) scope) | **yes** | TPS `bootstrap` |
+Revision 4 had OP-1 … OP-7. Specialist A listed OC-1 … OC-8 and specialist B OC-1 … OC-5, with overlapping numbers. They
+are reconciled here into one set. An item is an owner option only if every choice satisfies rule FD-1 (`29`) and HO-0001
+§3, and the choices differ in security margin, availability or cost.
+
+| Revision 5 | Revision 4 | Specialist A | Specialist B | Subject |
+|---|---|---|---|---|
+| **OP-1** | OP-1 | retained | retained | root keys, threshold, custodians |
+| **OP-2** | OP-2 source authority (S0–S3), `release-artifact` (i)–(iii) — replaced | OC-1 | OC-1 L1 (registration part) | who registers each release |
+| **OP-3** | OP-3 | retained | retained | gating for adoption, update, rollback |
+| **OP-4** | OP-4 and the custody rows of OP-2 | retained | OP-4 restated | separate candidate key; custody of the remaining purposes |
+| **OP-5** | OP-5 | retained | retained | trust-metadata age warning |
+| **OP-6** | OP-6 (b) removed | R-CER-2 | OP-6 restated | lineage confirmation after admission |
+| **OP-7** | OP-7 | OC-7 | OP-7 restated | currency for machines without a current proof |
+| **OP-8** | OP-2 verification threshold | TA-11 | OC-1 (verification count) | independent verification records per registration |
+| **OP-9** | OP-2 rebuilder count | OC-2 | OC-2 | reproducer set and whether the registration names binary digests |
+| **OP-10** | — | OC-3 | TB-2′ | common-mode toolchain |
+| **OP-11** | — | OC-5 | — | retention of releases whose non-orderable content was superseded |
+| **OP-12** | — | OC-8 | OC-4 | form of the independent admitter |
+| **OP-13** | — | RS-B1 | two channels (M2) | channel agreement for typed state fingerprints |
+| **OP-14** | — | R-SUB-3 | OC-5 | admission-record validity on workstations |
+| **OP-15** | — | OC-6 | genuine-binary rule | what a genuine but revoked running binary may do |
+
+**Not owner options (architecture minima), with the reason:**
+
+| Item | Reason |
+|---|---|
+| Revision 4 OP-2 (S0) attested source only; (S2) verification threshold 2 without registration; (S3) certification binding; `release-artifact` (i)–(iii) | each leaves the source, inputs or bytes selected below the TCB's authority (RV4-H1; CS5 controls) |
+| Specialist B OC-1 L2 (two verification attestations counted by machines instead of a registration) | the pipeline still names the build inputs and constitutional content; dominated by OP-2 (b), which gives the same "no per-release root ceremony" without a lower selector |
+| Specialist B OC-3 E2-open (open-ended registration ranges) | a `release-final` key selects sequence position: gap, inflation and stale-policy releases become eligible (specialist A E4; REG5 `ranges_excluded`) |
+| Specialist B OC-3 E1 versus E2-closed | both are exact per-release registration, which revision 5 adopts (`23` §12) |
+| Specialist A OC-4 (b)/(c) (C3 from a user-writable install) | carried requirement CR4-B-01 (b) refuses C3 there (`31` GB-4) |
+| Specialist B OC-5 (c) (no validity on CI image admission records) | unbounded exposure of a runner that never receives a revocation; the image record expires with the pin (`31` R-ADM-7) |
+| Trust on first use for production (revision 4 OP-6 (b)) | first admission requires a typed fingerprint, which commits to the lineage (`31` R-CER-2) |
+| Distribution channel of the admitter (package manager versus owner site) | a carrier: the digest comparison selects the admitter (`31` R-ADM-2) |
+
+## 1. Summary
+
+| Option | Choices | Security-material | Encoded in |
+|---|---|---|---|
+| OP-1 | key count, threshold, custodians | yes | root v1 |
+| OP-2 | (a) root threshold; (b) delegated `release-registration` quorum ≥ 2 | yes | root grants |
+| OP-3 | mode A `always_gate`; mode B | yes | TPS `gating` |
+| OP-4 | separate candidate key yes/no; custody of trust-state, certification, revocation, retrieval-profile, witness keys | yes (evaluation candidates, negatives, witnesses) | root grants |
+| OP-5 | warning age | no (informational) | binary default |
+| OP-6 | (a) once per verifier trust store; (c) on every `init` | yes | TPS `bootstrap.op6_mode` |
+| OP-7 | (a) anchored only; (b) maximum anchor age; (c) expiring witnesses; (d) compiled epoch; parameters | yes | TPS `bootstrap` |
+| OP-8 | number of independent verification records: 1 or 2 (or more) | yes | TPS `registration.min_verification_records` |
+| OP-9 | (a) n=2, q=2; (b) n=3, q=2; (c) n=3, q=3; each with or without (d) the registration naming binary digests after the custodians' own reproduction | yes | root grants (`quorums.reproducer`), TPS `registration.binary_digests_registered` |
+| OP-10 | (a) accept TA-12; (b) diverse reproducer; (c) owner-built toolchain | yes | ceremony record; input manifest |
+| OP-11 | (a) keep older releases eligible; (b) raise `min_release_sequence` on security-relevant change; (c) grace period | yes | TPS `eligibility` |
+| OP-12 | (a) separate compiled program; (b) auditable script over platform tools; (c) helper machine | yes | release protocol; registration `admitter` |
+| OP-13 | (a) one channel; (b) two agreeing channels | yes | TPS `bootstrap.channel_quorum` |
+| OP-14 | (a) validity on image records only; (b) on every record | yes | TPS `bootstrap.workstation_record_max_validity_days` |
+| OP-15 | (a) C0 only; (b) C0–C2 | yes | TPS `bootstrap.revoked_self_scope` |
+
+Every TPS field above changes only through a computed reduction when moved in the weaker direction (`19` §10.6).
 
 ## OP-1 — Root role
 
-- **Options.** Key count and threshold (3 keys, threshold 2 recommended); custodian independence; hardware and locations.
-- **What the root threshold signs in revision 4.** Every Trust Policy. That includes:
-  - the Constitutional Surface, with exact precedence registration and presence (`23` §3.5, §4.1);
-  - the Overlay Surface directions and migration-writable targets (`23` §11);
-  - owner constitutional domain slots (`23` §7.2);
-  - historical releases;
-  - bootstrap parameters, including the pin-currency parameters and `clock_reset`;
-  - the cumulative `lowering_history`;
-  - under OP-2 (S1), production sources.
-- **Frequency.** Expect one root ceremony per final release that changes the kernel. Under OP-2 (S1), also one per release
-  that ships binaries; it is normally the same ceremony.
-- **The owner must know:**
-  1. The property protected is custodian and device independence.
-  2. Losing two keys means a new lineage and reconfirmation everywhere.
-  3. Moving any of the above to a non-root key set would let a lower threshold register weaker constitutional content or
-     choose production source. That is the rejection class, so it would be an architecture change.
-- **Security-material:** yes.
+- **Choices.** Key count and threshold; custodian independence; hardware and locations.
+- **What the root threshold signs in revision 5.** Every Trust Policy (Constitutional Surface classification, floors,
+  precedence registration, Overlay Surface, owner-domain slots and binding groups, eligibility, bootstrap and registration
+  parameters, lowering history) and every root version (grants, including the reproducer quorum and, under OP-2 (b), the
+  delegated registration keys). Under OP-2 (a) it also signs every release registration.
+- **Consequences.** Losing the threshold means a new lineage and re-admission everywhere. Root-threshold compromise (A8) is
+  outside TA-4; CS5 labels every minimal set that needs it.
 
-## OP-2 — Signing custody per purpose (restated)
+## OP-2 — Who registers each release
 
-### Purposes and custody
-
-| Purpose | Choices | Proposal |
+| Choice | Minimal sets that involve the registration authority (CS5) | Operational consequence |
 |---|---|---|
-| `release-final` | threshold 1 with equal-custody standby, or threshold 2 | threshold 1 with standby |
-| `release-candidate` | own key (OP-4) or shared with `release-final` | own key |
-| `release-artifact` | (i) 2 keys, threshold 2; (ii) 3 keys, threshold 2; (iii) (i) plus a root co-signature per production binary, where root custodians run `verify-artifact --stage custodian` **and** compare the attested source with the owner's verification record | (i) |
-| `build-attestation` | 1 independent rebuilder, or 2 (threshold 2) | 1 rebuilder, independent of the release signers (KS-10) |
-| `verification-attestation` | threshold 1 (one independent verifier), or threshold 2 (two) | threshold 1 |
-| `certification-status` | owner token distinct from `release-final` | as revision 3 |
-| `revocation` | may share with `certification-status` or `trust-state` | shared with `certification-status` |
-| `trust-state` | offline owner key | offline owner key |
-| **`freshness-witness`** (only if OP-7 (c)) | keys and threshold; the C3 use needs ≥ 2 keys (compiled minimum). Threshold 1 admits C1–C2 only. Scheduled-signing custody, disjoint from every other purpose (KS-11). | not applicable under the proposed OP-7 (a) |
-| `retrieval-profile` | may share with `release-final` | shared |
+| (a) root threshold | malicious source or inputs: {cust1, cust2, OP-8 verification keys} = root threshold compromise (A8); key theft: {root keys ×2, OP-8 verification keys, q reproducer keys, trust-state key, the victim's channel(s)} | a root ceremony per release (the same ceremony registers source, inputs, content, final and targets; `30` R-REG-6); a security fix waits for it; root custodians perform R-REG-3 themselves |
+| (b) delegated `release-registration` quorum (compiled threshold ≥ 2; keys hold no other purpose; root grants and rotates) | the same sets with two delegated custodians or keys in place of the root threshold: two delegated custodians plus OP-8 verification keys register malicious source, inputs or non-orderable content for new releases, accepted everywhere | root keys stay offline between rotations; the delegated quorum is the concentrated target; remedy: root rotation and revocation of its registrations. Floors and registered precedence (root) still bound constitutional content |
 
-### Binary source authority (new choice)
+Neither choice changes the verifier. Both choices refuse one stolen key plus pipeline input.
 
-| Choice | What decides a production binary's source | Minimum capability set for an accepted malicious binary (`25` §7; `evidence/VA4-verify-artifact-source-scenarios.json`) | Cost |
-|---|---|---|---|
-| **(S0) attested source only** (architecture minimum) | an ACCEPTED verification attestation of the candidate, referenced by the effective TSS; V8 source equality | route S: `verification-attestation` + `release-candidate` + `release-final` + control of the build input (**3 keys**; **2 keys** under OP-4 "no"). Route B: `release-artifact` ×2 + `build-attestation` + `trust-state` (**4 keys over 3 purposes**) | none beyond existing statements |
-| **(S1) root-registered production sources** | S0, and the source must be listed in the effective TPS `eligibility.production_sources[]` | route S needs the **root threshold**; the minimum becomes route B (**4 keys over 3 purposes**) | a root-signed TPS entry per release that ships binaries, normally merged with the kernel registration ceremony |
-| **(S2) S0 plus verification-attestation threshold 2** | two independent verifiers attest the source | route S: **4 keys** (3 under OP-4 "no") + pipeline input; route B unchanged | a second verification operator |
-| **(S3) S0 plus `CERTIFIED_AS_OF` required for binaries** | the certification key must also sign | route S: **4 keys** (3 under OP-4 "no") + pipeline input; route B unchanged | certification before a binary is announced |
+## OP-3 — Gating for adoption, update and rollback
 
-**Proposal (labelled, not a decision): (S1).** It removes both release keys and the verification key from the choice of
-TCB source. That is the same authority that already registers constitutional content. The cost is ceremony timing.
+Unchanged from revision 4 (review r4 found OP-3 accurate), with one restatement from carried RV4-M2: mode A's "never
+answerable by any agent path" holds for `gov decide` and every `gov`-executed child under allow-list confinement
+(CR4-B-01); an agent with an unconfined shell in the same account is A3. Decision pins now have a maximum validity
+(CR4-B-09). Mode B adds TA-7 for currency.
 
-**Why the release-final threshold matters.**
-- Under (S0), (S2) and (S3), `release-final` is one of route S's keys, so threshold 2 adds one key to route S.
-- Under (S1) it does not affect binary acceptance.
-- It also bounds forged finals (next section).
+## OP-4 — Separate candidate key; custody of the remaining purposes
 
-**The owner must know (corrected statements):**
-1. **One `release-final` key** forges authentic finals. It **cannot choose a binary's source**: V8 source equality refuses
-   (`RELEASE_IDENTITY_MISMATCH(source)`, RV3-B-A08 flips). A forged final becomes a policy root only if all of these
-   hold:
-   - its whole surface is registered in a root-signed TPS (E7);
-   - its precedence equals the registration;
-   - it passes a local trust gate at ingress.
-
-   Within that registration it sets the kernel value of **52 `project_tunable` and 32 `release_bound` leaves**; the
-   project layer can already set the tunables. Revision 3's "only root-registered content becomes a policy root" was
-   inexact (RV3-L2). Keys read by security decision points are reclassified so they cannot be tunable (`23` §5.2).
-2. **An accepted malicious production binary** needs, at minimum, the capability set of the chosen row above. Revision 3's
-   "four keys over three purposes" was false (RV3-B-A08). It is true only for route B, or under (S1).
-3. The whitelist forbids `trust-state` with certification or attestation, `release-artifact` with anything, and
-   `freshness-witness` with anything (`05` §3).
-4. A registered standby key needs the same custody as the active key.
-5. The verifier in this programme is an AI session run by the owner. The independence of verification and rebuilding
-   comes from the process record, not the key; route I (`25` TB-4) is procedural.
-
-**Security-material:** yes.
-
-## OP-3 — Gating for adoption, update and rollback (restated)
-
-| Mode | Behaviour | Uses the local clock? |
-|---|---|---|
-| **A `always_gate`** | Every production `init`, `adopt migrate --batch 0`, `update --apply`, rollback and downgrade requires a trust gate confirmed locally (`27`): an interactive terminal with a typed digest prefix and **typed state fingerprint**, or a protected, expiring operator decision pin plus a currency proof. | only for decision-pin expiry and the C3 currency window |
-| B `fresh_certified_may_skip_update_gate` | as A, but `update --apply` may skip the gate when the view is `CERTIFIED_AS_OF(n) WITH CURRENCY` (`17` §6) and there is no computed weakening, declared breaking change or declared gate | **yes** (TA-7), for currency |
-
-**Restatement from the revision-4 rules (CD3-4; RV3-M2):**
-- **What mode A bounds.** Mode A bounds **ingress** against a repository writer, because answers are local.
-- **Decision pins.** Decision pins are honoured only when the governed account cannot write them, and only until
-  `expires_at`, while their approved state is in the effective chain. `gov`-executed children are confined, so no
-  `gov`-run repository or plugin command can create an approval.
-- **"Never answerable by any agent path".** It holds for `gov decide` and every `gov`-executed child. An agent with an
-  unconfined shell in the same account can drive a pseudo-terminal and write its own VTS (TG-2); it cannot write
-  protected pins.
-- **What mode A does not bound.** Mode A does **not** bound Git-delivered use. That class is bounded by E7, floors,
-  eligibility, inclusion anchors and currency (`24`), and OP-7 decides unanchored use.
-- **Common to both modes.** Computed weakenings need the `weakening` gate. Trust gates are never agent-resolvable. Revoked
-  and ineligible releases are refused.
-- **Sub-parameters:** `refuse_known_rejected` and `refuse_known_withdrawn` (proposal: true); `local_terminal_only[]`
-  (proposal: `downgrade`, `policy_lowering`, `adopt_lineage`, `override_kernel_integrity`).
-
-**Proposal:** mode A. **Security-material:** yes.
-
-## OP-4 — Separate candidate signing key (restated)
-
-- **Options.** **Yes:** a dedicated `release-candidate` key. **No:** one key holds both purposes (whitelisted pair).
-- **Consequences of "no" after CD3-3 (corrects revision 3's "'no' no longer exposes binaries", RV3-D-A03):**
-  - **That key alone** yields authentic finals and candidates with any source. It **cannot** get a binary accepted: no
-    ACCEPTED verification attestation names that source (`ARTIFACT_SOURCE_UNVERIFIED`), and a final promoted from a
-    genuine candidate with another source fails V8 (`VA4` RV3-D-A03 rows).
-  - **That key plus a stolen `verification-attestation` key**, with control of the build input, yields an accepted malicious binary under (S0): **two keys** instead of three. Under (S2) the attacker also needs the second verifier key; under (S3), the certification key.
-    malicious binary under (S0), (S2 with one verifier key stolen: no) and (S3 without the certification key: no). Under
-    (S0) that is **two keys** instead of three.
-  - Under **(S1)**, OP-4 does not affect binary acceptance.
-- **What "no" also costs.** A compromise of the most frequently used key yields authentic finals. Those remain bounded by
-  E7, exact precedence registration, eligibility and local trust gates.
-- **Proposal:** yes. **Security-material:** yes.
+- **Separate candidate key (yes/no).** Under revision 5 neither `release-candidate` nor `release-final` selects a
+  production binary or a policy root; they appear in no minimal set (CS5 INV-RF). "No" lets the everyday key forge
+  evaluation candidates for gated evaluation projects, and a final whose registration does not exist. The revision-4 key
+  counts that depended on OP-4 no longer apply (RV4-L7).
+- **Custody and sharing** of `trust-state`, `certification-status`, `revocation`, `retrieval-profile` and
+  `freshness-witness` within the compiled whitelist (`05` §3). The trust-state key's reach is `17` §15; on pinned machines
+  it no longer carries C3 to a later descendant (`24` §4.4).
 
 ## OP-5 — Trust-metadata age warning
 
-- **Proposal:** 180 days, informational only (doctor D032 MEDIUM).
-- **Measurement.** Age is measured from the latest anchoring event. The warning is always shown when the machine is
-  `UNANCHORED` or `CURRENCY_UNPROVEN`.
-- **Security-material:** no, while informational. Enforced limits belong to OP-7.
+Informational only; measured from the latest anchoring event; always shown when `UNANCHORED` or `CURRENCY_UNPROVEN`.
 
-## OP-6 — First-install trust-root user verification
+## OP-6 — Lineage confirmation after admission
 
-| Mode | Behaviour | Effect |
+| Choice | Consequence |
+|---|---|
+| (a) once per verifier trust store | the lineage is confirmed by the admission fingerprint (`31` R-CER-2) and not asked again on this machine |
+| (c) on every `init` | the operator re-types the lineage id per project; more friction; no additional protection against a transport adversary once admitted |
+
+TA-5 ceremonies establish nothing on a binary that has not been admitted (`31` GB-1; D-A04).
+
+## OP-7 — Currency for machines without a current proof
+
+Choices and parameters as revision 4 `24` §9. Restated consequences:
+- **(a), (b), (d) and stateless runners (RV4-M4, CR4-B-03).** On a machine with a verifier trust store, every ingested
+  non-future statement raises the clock high-water, so a clock set back below it fails closed (P4r5
+  `CLOCK-RV4-B-A13`). On a machine without one, pin validity and the C3 window rest entirely on TA-7: a clock set back makes
+  an expired pin valid (P4r5 residual demonstration).
+- **(c) (RV4-M3, CR4-B-02).** The witness service takes the fingerprint to witness only from the owner's ceremony or the
+  independent channel, and the C3 witness threshold is met by keys under at least two custodians. If one service holds
+  both keys, compromise of that service alone presents any genuine older TSS as latest on witness-reliant machines
+  (one-custody consequence).
+- **First admission** does not depend on OP-7 (typed fingerprint, no clock).
+- **Pinned machines (all choices):** a pin proves currency only for the TSS it names (CR4-B-07 option 1); C3 against a
+  later TSS needs a new pin, a typed fingerprint or witnesses.
+
+## OP-8 — Independent verification records per registration
+
+| Choice | Malicious source (CS5 G_SRC) | Cost |
 |---|---|---|
-| **(a) confirm once per VTS** | first sight of a lineage refuses trusted operations until `gov trust confirm-root <id>`, a flag, or a root pin | TA-5 per machine |
-| (b) trust on first use, labelled | pinned as `unconfirmed`; doctor D034 MEDIUM | TA-5 does not hold |
-| (c) confirm on every `init` | as (a), per project | more friction |
+| 1 | {pipeline, vp1}; {cust1, cust2, va1}; key theft {ch…, reg keys ×2, rep×q, ts, va1} | one verifier |
+| 2 | {pipeline, vp1, vp2}; {cust1, cust2, va1, va2}; key theft adds `va2` | a second, independent verification process |
 
-- **Proposal:** (a). **Security-material:** yes.
+`vpN` is compromise of a verification *process* (a verifier that lies), not key theft; under either choice stolen
+verification keys alone register nothing (INV-SRC-KEYS). Route I (an insider change honest verification accepts) is TB-4 under
+both.
 
-## OP-7 — Currency for machines without a current proof (restated; CD3-4)
+## OP-9 — Reproducer set; registration of binary digests
 
-**What the option decides.** What a machine may do for governed read and mutation (C1, C2) when it has no anchor, or has
-an anchor but no current proof.
+| Choice | Malicious bytes for a genuine registration (CS5 G_BYTES) | Availability and cost |
+|---|---|---|
+| (a) n=2, q=2 | processes {rp1, rp2}; key theft (P2/FA1) {ch1, rep×2, ts, transport} or {ch1, reg keys ×2, rep×2, ts}; FA2 adds `ch2`; P1: none | one unavailable reproducer blocks a binary release; one stolen key blocks a release by conflict |
+| (b) n=3, q=2 | processes {rp1, rp2, rp3}; key theft with any 2 reproducer keys as in (a) | tolerates one unavailable reproducer; a third independent environment and custodian |
+| (c) n=3, q=3 | processes {rp1, rp2, rp3}; key theft with all 3 reproducer keys | any one unavailable blocks a release |
+| (d) added to (a) | {cust1, cust2, rp1, rp2}; key theft {ch1, reg keys ×2, rep×2, ts} (FA2 adds `ch2`) | a registration ceremony after every build, on reproduction hardware |
+| (d) added to (b) or (c) | {cust1, cust2, rp1, rp2, rp3}; key theft with 2 or 3 reproducer keys | as above |
 
-**Architecture minima the option cannot change** (`24` §9):
-- inclusion anchors;
-- no C3 or binary acceptance without a currency proof;
-- mandatory pin validity;
-- a separate witness purpose, with ≥ 2 keys for C3;
-- pin and decision-pin integrity with confined execution;
-- no `current` label.
+Reproducer keys are online more often than root keys; the quorum counts keys and processes, not custody strength. Every
+choice needs bit-for-bit reproducibility under the normative build profile (IR-REP-1…3).
 
-| Option | Unanchored machine | Anchored machine | Adds | Who can select which state, and for how long (from the revision-4 rules) |
-|---|---|---|---|---|
-| **(a) anchored only** | C0 | C1–C2 at the anchored chain at any age of a human or retained anchor; pins only within `pin_max_validity_days`; C3 only with a currency proof | TA-9; TA-7 for pins and the C3 window | **A2/A5** select any genuine descendant of a machine's anchor for C1–C2, on machines anchored before a revocation. Duration: while the machine receives no later statement (human anchors; RS-1 core), or at most `pin_max_validity_days` (pins). For C3: staleness of at most `c3_currency_window_hours`, or none with an in-gate proof. A stale CI pin (100 or 400 days) is not an anchor: the runner refuses (RV3-B-A02 flips). A trust-state key cannot bypass an anchor (RV3-B-A12 flips). |
-| (b) anchored with maximum age | C0 | as (a), but C2 refused once the latest anchoring event is older than `max_anchor_age_days` | TA-7 | as (a), with every machine's C1–C2 exposure bounded by `max_anchor_age_days`. Needs honest clocks and periodic re-confirmation; restored backups refuse governed mutation until re-anchored. |
-| (c) expiring witnesses | C1–C2 with witnesses at the purpose threshold; C3 with ≥ 2 witness keys | as (a), plus witnesses | TA-7; scheduled witness custody (`freshness-witness`) | Anchored machines: as (a). Stateless runners: A2/A5 within `witness_max_validity_hours` of the newest honest witness. **Witness-key compromise:** keys at the C3 threshold let an attacker present any genuine older TSS as latest on witness-reliant machines, for C1–C3, until root rotation; with threshold 1 registered, for C1–C2. A trust-state key alone cannot witness (RV3-B-A06 flips). |
-| (d) compiled epoch accepted for use | C1–C2 labelled `FRESHNESS_UNPROVEN`; C3 never | as (a) | none | **A2/A5** select any genuine state at or above the running binary's **compiled TSS**, for C1–C2 on unanchored machines, indefinitely. That exposes every binary whose compiled TSS predates the newest TSS, including a revocation-only TSS with no TPS raise (RV3-L6; `P4r4` `RV3-D-A04_op7_d_scope`). |
+## OP-10 — Common-mode toolchain
 
-**Pin-currency parameters** (TPS `bootstrap`, all changed only through computed reductions):
+| Choice | Consequence (CS5 G_TOOLCHAIN) | Cost |
+|---|---|---|
+| (a) accept TA-12 | {toolchain_up}: a compromised upstream toolchain release that passes the checksum check yields identical malicious bytes from every honest reproducer | none |
+| (b) diverse reproducer (one reproducer uses an independently bootstrapped compiler and must match) | {toolchain_up, diverse_tc} or {toolchain_up, rp1} | high engineering and build-time cost; may restrict compiler features |
+| (c) owner-built toolchain archive registered as an input | {owner_tc} (the owner's toolchain build) | the owner's toolchain build is itself registered and reproduced |
 
-| Parameter | Proposal |
+## OP-11 — Retention of releases whose non-orderable content was superseded
+
+Exact per-release registration guarantees that a later release never carries superseded content without a gated reduction
+(`23` §12). It does not decide whether older releases stay eligible at their own registration.
+
+| Choice | Consequence |
 |---|---|
-| `pin_max_validity_days` | 30 |
-| `c3_currency_window_hours` | 168 |
-| `max_anchor_age_days` (b) | 180 |
-| `witness_max_validity_hours` (c) | 168 |
-| `freshness_witness_threshold` (c) | 2 |
+| (a) keep eligible | installed projects keep working; on machines without a per-project record, a repository writer can deliver an older eligible release with its older content (RR-2); machines with a record refuse the downgrade (E10) |
+| (b) raise `min_release_sequence` in the ceremony of every security-relevant content change | older releases become ineligible where the Trust Policy reaches; installed projects fall back to the embedded snapshot or refuse at decision points until they update; the classification of "security-relevant" is a ceremony judgement |
+| (c) grace period (`eligible_until` on the older registration) | as (a) before the date, (b) after it; adds TA-7 to eligibility |
 
-**Proposal (labelled, not a decision): (a)** with the parameters above. Under (a):
-- no stale pin anchors a CI runner, no trust-state key bypasses an anchor, and no binary is accepted on an aged anchor;
-- the clock is used only for pins and the C3 window;
-- the costs are re-provisioning CI pins at least every 30 days, and a fresh confirmation for C3 on long-idle machines.
+## OP-12 — Form of the independent admitter
 
-**Evidence:** `evidence/P4r4-trust-state-model.json`, the machine × OP-7 × adversary matrix of 132 rows:
-- 77 refuse revoked R7;
-- 42 admit it only on machines anchored before the revocation (the stated core);
-- 13 admit it only under (d) on unanchored machines, never C3 (the stated owner residual);
-- 0 unstated rows; 0 rows labelled `current`.
+| Choice | Trust added | Cost |
+|---|---|---|
+| (a) separate compiled program, registered and reproduced, digest in the channels | the platform hash tool; TA-5 | a second implementation of the predicate and a differential conformance suite |
+| (b) auditable script over platform tools (hash, Ed25519 verification, canonical JSON), digest in the channels | those tools and interpreter (TA-1b) | the tools must implement GOV-JCS-1 and DSSE PAE exactly; weaker on Windows |
+| (c) an admitted `gov` on another machine performs the predicate and hands over the binary and record | that machine and the transfer channel become part of the new machine's first-admission TCB | none extra; concentrates risk on helper machines |
 
-**Security-material:** yes.
-- (b) and (c) add TA-7 for governed use.
-- (c) adds witness custody.
-- (d) accepts its residual.
+## OP-13 — Channel agreement for typed state fingerprints
 
-**Where the answer lives:** the root-signed TPS `bootstrap` block, compiled into binaries and named by the TBM. A project
-cannot select a weaker option.
-
-## Options that materially change the security architecture
-
-| Question | Options |
+| Choice | Consequence |
 |---|---|
-| Security-material | OP-1, OP-2 (including the binary source authority), OP-3, OP-4, OP-6 and OP-7. OP-5 is not, while informational. |
-| Add a clock assumption beyond pins and the C3 window | OP-3 mode B, OP-7 (b), OP-7 (c) |
-| Remove an assumption | OP-6 (b) removes TA-5 |
-| Accept a residual the architecture otherwise removes | OP-7 (d) |
-| Change the binary blast radius | OP-2 source authority (S0–S3); OP-2 `release-final` threshold (under S0, S2, S3); OP-2 `release-artifact` (iii); OP-4 "no" (under S0, S2, S3) |
+| (a) one channel | a stale or compromised channel selects the state it names for first admission (RS-B1); malicious-bytes key-theft sets need `ch1` (CS5 FA1 rows) |
+| (b) two agreeing channels | a single stale or compromised channel gives `CHANNEL_DISAGREEMENT`; key-theft sets need `ch1` and `ch2` (FA2 rows); first install is unavailable while either channel is unreachable |
+
+## OP-14 — Admission-record validity on workstations
+
+| Choice | Consequence |
+|---|---|
+| (a) validity on CI image records only | a workstation binary revoked after admission that never receives the revocation keeps working: RS-1 core |
+| (b) validity on every record | also bounded on workstations; periodic re-admission, unavailable while offline past the validity |
+
+## OP-15 — What a genuine but revoked running binary may do
+
+| Choice | Consequence |
+|---|---|
+| (a) C0 only | strongest; incident response needs a new binary admitted first |
+| (b) C0–C2, C3 refused | governed work continues while a replacement is obtained; a binary revoked for a C1–C2 enforcement defect keeps enforcing with that defect until replaced |
+
+## Combinations that change security (computed)
+
+| Combination | Consequence |
+|---|---|
+| OP-2 (b) + OP-8 = 1 | {two delegated custodians, one verification key} registers malicious source, inputs or non-orderable content for new releases, accepted everywhere |
+| OP-8 = 1 + any OP-9 | one compromised verification process plus pipeline input yields a malicious source faithfully built (TB-4′) |
+| OP-9 (a) + OP-13 (a) | first admission: {ch1, 2 reproducer keys, trust-state key, transport} |
+| OP-9 (c) or (d) + OP-13 (b) | first admission key-theft sets need both channels and all three reproducer keys, or the registration keys |
+| OP-10 (a) + any | {toolchain_up} yields identical malicious bytes (TA-12) |
+| OP-7 (c) + one witness service holding both keys | stale state witnessed by one service compromise (CR4-B-02 consequence) |
+| OP-12 (c) + any | the helper machine is in the TCB of every first admission it serves |
 
 No option is approved by this document.

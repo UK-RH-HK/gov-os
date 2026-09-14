@@ -1,0 +1,74 @@
+{
+ "summary": {
+  "all_hold": true,
+  "failing": [],
+  "passing": 10,
+  "total": 10
+ },
+ "tests": {
+  "T10_commit_metadata_independence": {
+   "digest_a": "sha256:99704924046895309c56518542d89cf6ff16d79f540c13e8e7e6cb6c38a0ff3b",
+   "digest_b": "sha256:99704924046895309c56518542d89cf6ff16d79f540c13e8e7e6cb6c38a0ff3b",
+   "equal": true,
+   "holds": true,
+   "note": "git archive is tree-content-only; commit message does not affect archive"
+  },
+  "T1_archive_determinism": {
+   "digest_1": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a",
+   "digest_2": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a",
+   "equal": true,
+   "holds": true
+  },
+  "T2_archive_time_independent": {
+   "digest": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a",
+   "holds": true,
+   "matches_T1": true
+  },
+  "T3_cross_repo_equality": {
+   "clone_digest": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a",
+   "equal": true,
+   "holds": true,
+   "source_digest": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a"
+  },
+  "T4_content_change": {
+   "different": true,
+   "holds": true,
+   "v1_0": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a",
+   "v1_1": "sha256:9ec1d956608bfb6dda8c8e914b11843d458ba4c0bfb74f8e71eed3c284925249"
+  },
+  "T5_moved_tag_detection": {
+   "after_move": "sha256:9ec1d956608bfb6dda8c8e914b11843d458ba4c0bfb74f8e71eed3c284925249",
+   "before_move": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a",
+   "holds": true,
+   "move_detected": true,
+   "restore_correct": true,
+   "restored": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a"
+  },
+  "T6_bitflip_detection": {
+   "different": true,
+   "flipped": "sha256:8a8585d1dbc97b1f62c377850093772d77e1381bc1e8e88f884be1e4cf7ffd81",
+   "holds": true,
+   "original_v10": "sha256:e990398289be7ee27a609ba27d2ada094a93159ca1b8deb2788d36f59021773a"
+  },
+  "T7_archive_byte_stability": {
+   "byte_equal": true,
+   "holds": true,
+   "length": 10240
+  },
+  "T8_empty_tree": {
+   "digest": "sha256:84ff92691f909a05b224e1c56abb4864f01b4f8e3c854e4bb4c7baf1d3f6d652",
+   "holds": true,
+   "non_null": true
+  },
+  "T9_subdir_rename": {
+   "after": "sha256:66e28e70972bd7de179d71171c63624953cd6dbce3c3635b6e5da5808792483e",
+   "before": "sha256:2d9786612987552ae18c33bb56b8234ece010e6b1f023572234480ab0a9b9c3a",
+   "different": true,
+   "holds": true
+  }
+ },
+ "tool_versions": {
+  "git": "git version 2.43.0",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)"
+ }
+}

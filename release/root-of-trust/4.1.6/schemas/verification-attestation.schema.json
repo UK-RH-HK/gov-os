@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/verification-attestation.schema.json",
   "title": "verification-attestation",
-  "description": "PROPOSED (RoT-1 revision 4). Verification attestation v2 (payloadType verification-attestation.v2, purpose verification-attestation): the independent verifier's verdict for one candidate statement digest, and the source it reproduced the candidate from (25 §5.1). A final is authentic only if its release.source equals its candidate's (V8); verify-artifact accepts a binary only if an ACCEPTED attestation of that candidate, referenced by the effective TSS, names the same source (A4b). lifts_negative_statement_digest names the REJECTED or WITHDRAWN statement an ACCEPTED verdict lifts (17 MS-2, CR-01).",
-  "x-schema-version": "2.0.0",
+  "description": "PROPOSED (RoT-1 revision 4). Verification attestation v2 (payloadType verification-attestation.v2, purpose verification-attestation): the independent verifier's verdict for one candidate statement digest, and the source it reproduced the candidate from (25 \u00a75.1). A final is authentic only if its release.source equals its candidate's (V8); verify-artifact accepts a binary only if an ACCEPTED attestation of that candidate, referenced by the effective TSS, names the same source (A4b). lifts_negative_statement_digest names the REJECTED or WITHDRAWN statement an ACCEPTED verdict lifts (17 MS-2, CR-01).",
+  "x-schema-version": "3.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,8 @@
     "harnesses",
     "findings",
     "verifier_label",
-    "source"
+    "source",
+    "inputs_manifest_digest"
   ],
   "properties": {
     "_type": {
@@ -53,23 +54,17 @@
       "additionalProperties": false,
       "required": [
         "release_commit",
-        "source_tree_digest",
-        "build_inputs_digest"
+        "content_digest"
       ],
       "properties": {
         "release_commit": {
           "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
+          "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
         },
-        "source_tree_digest": {
+        "content_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "SHA-256 of git archive of release_commit (source binding does not rest on SHA-1)"
-        },
-        "build_inputs_digest": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "digest of the published build inputs (toolchain, lockfiles)"
+          "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
         }
       }
     },
@@ -127,6 +122,10 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 256
+    },
+    "inputs_manifest_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
     }
   },
   "$defs": {

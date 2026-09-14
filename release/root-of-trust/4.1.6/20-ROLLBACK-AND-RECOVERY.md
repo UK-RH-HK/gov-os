@@ -1,6 +1,9 @@
 # Output 20 — Rollback and recovery model
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendment: §9 Git-delivered use judges a delivered release against its own registration (E7, `23` §12.3); a
+> higher-sequence final without an effective registration is ineligible at use, with no gate needed (RV4-D-A06, RV4-L8).
+> Downgrade detection (E10) is unchanged. Restores and reinstalls run only on an admitted binary (`31`).
 > Revision 4 keeps revision 3's restoring paths (CD3-0). It makes four changes:
 > - reinstall and every PPS remedy take the identity to restore from the VTS per-project record (CR-09, RV3-L4);
 > - restoring paths that are C3 need anchors satisfied by inclusion and a currency proof (`24`);

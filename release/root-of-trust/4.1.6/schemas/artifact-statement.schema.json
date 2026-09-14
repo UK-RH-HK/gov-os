@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/artifact-statement.schema.json",
-  "title": "artifact-statement",
-  "description": "PROPOSED (RoT-1 revision 3). Binary artefact statement v3. payloadType artifact-final.v2 (purpose release-artifact, threshold >= 2) or artifact-candidate.v2 (purpose release-candidate, evaluation only). Each artefact is bound to its Trust Base Manifest digest (25 §4); acceptance also needs build attestations and a Trust State reference (25 §5).",
+  "title": "[WITHDRAWN r5] artifact-statement",
+  "description": "PROPOSED (RoT-1 revision 3). Binary artefact statement v3. payloadType artifact-final.v2 (purpose release-artifact, threshold >= 2) or artifact-candidate.v2 (purpose release-candidate, evaluation only). Each artefact is bound to its Trust Base Manifest digest (25 \u00a74); acceptance also needs build attestations and a Trust State reference (25 \u00a75).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -133,5 +133,6 @@
         "test"
       ]
     }
-  }
+  },
+  "x-status": "WITHDRAWN in RoT-1 revision 5 (05 \u00a72, KS-13); never issued; refused by every revision-5 binary"
 }

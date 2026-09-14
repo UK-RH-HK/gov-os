@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-engineering-os/schemas/binary-reproduction/1",
+  "title": "Binary reproduction statement payload (RoT-1 revision 5, PROPOSED; 30 \u00a77). Exactly one reproducer signature per envelope.",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_type",
+    "trust_root_id",
+    "release_id",
+    "source",
+    "inputs_manifest_digest",
+    "target",
+    "binary_digest",
+    "tbm_digest",
+    "environment_digest",
+    "reproduced_at"
+  ],
+  "properties": {
+    "_type": {
+      "const": "https://agentic-engineering-os/statement/binary-reproduction/v1"
+    },
+    "trust_root_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "release_id": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_commit",
+        "content_digest"
+      ],
+      "properties": {
+        "release_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "SHA-256 over sorted '<mode> <path> <sha256 of blob>' lines of the whole tree (30 \u00a74.1)"
+        }
+      }
+    },
+    "inputs_manifest_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "target": {
+      "type": "string"
+    },
+    "binary_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "tbm_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "environment_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "reproduced_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,6 +1,8 @@
 # Output 19 — Current-policy eligibility, effective policy and the non-downgradable security floor
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5: E7 judges a release against its own registration (`23` §12); `production_sources[]` withdrawn and the
+> reduction list re-scoped (RV4-L9); CR4-B-04 for machines without a record (§9); new TPS fields for OP-8, OP-13…OP-15.
 > Revision 4 changes, with the review r3 findings each closes:
 > - effective precedence comes from registrations only, and the project layer is a directed join (§5; BC-1, RV3-H1);
 > - absence resolves to a defined value or a typed refusal (§5.2; RV3-M7);
@@ -42,10 +44,11 @@ Schema: `schemas/trust-policy-statement.schema.json` (`x-schema-version` 2.0.0).
 | `floor_schema_version` | **3** (`23` §3) |
 | `surface` | Constitutional Surface Inventory: file and leaf rules with presence; floors; registered digests and member ids; **exact precedence registration**; **Overlay Surface** (`23` §11); **owner-domain slots** (`23` §7.2) |
 | `eligibility.min_release_sequence`, `.min_binary_version`, `.production_stage`, `.evaluation_candidates`, `.historical_releases[]` | as revision 3 |
-| **`eligibility.production_sources[]`** | `{release_commit, source_tree_digest, build_inputs_digest}`; present and enforced only if OP-2 selects root-registered production sources (`25` A4b) |
+| ~~`eligibility.production_sources[]`~~ | **withdrawn in revision 5**: sources are selected by release registrations (`30` §5), which are statements referenced by the Trust State, not Trust Policy additions |
+| **`registration`** (revision 5) | `{min_verification_records (OP-8, ≥ 1), binary_digests_registered (OP-9 (d))}`; the reproducer quorum is a root grant (`05` §3) |
 | `install_authority {operation: level}` | minimum authority for install-class operations (§8) |
 | `gating.mode`, `.refuse_known_rejected`, `.refuse_known_withdrawn`, `.local_terminal_only[]` | OP-3; trust-gate kinds a decision pin cannot approve |
-| **`bootstrap`** | `{op6_mode, op7_mode, pin_max_validity_days, c3_currency_window_hours, max_anchor_age_days, witness_max_validity_hours, freshness_witness_threshold, clock_reset}` (`24` §9) |
+| **`bootstrap`** | `{op6_mode, op7_mode, pin_max_validity_days, c3_currency_window_hours, max_anchor_age_days, witness_max_validity_hours, freshness_witness_threshold, clock_reset}` (`24` §9) and, in revision 5, `{channel_quorum (OP-13), admitter_digests[], workstation_record_max_validity_days (OP-14), revoked_self_scope (OP-15), accepted_tbm_reset}`; `gating.decision_pin_max_validity_days` (CR4-B-09) |
 | `sensitivity_order` | used by the Overlay Surface directions |
 | `lowering_history[]` | cumulative `{subject, previous, new, in_policy_version, reason}` for every computed reduction ever published (§10.6) |
 | `unrevokes[]`, `state_chain_reset` | as revision 3 |
@@ -71,8 +74,8 @@ root_kernel = KernelSnapshot    if the installed release is verified ∧ eligibl
 | Leaf class | Effective value |
 |---|---|
 | `floor` | `op_join(effective TPS floor, root_kernel value)`. A registered floor leaf missing from a kernel makes the kernel ineligible (E7), so the EmbeddedSnapshot value is joined instead. |
-| `pinned` | the root-kernel value if its digest is registered in the effective TPS; else the EmbeddedSnapshot value if registered; else **`SURFACE_VALUE_UNAVAILABLE(key, decision point)`**, and the dependent decision point refuses per the consumer register (`23` §6.3) |
-| `members` | registered members only (additive collections keep additions); the missing-content fallback is as for `pinned` |
+| `pinned` | **the value registered for the policy-root release** (the kernel of an eligible release carries exactly it, `23` §12.3); else the EmbeddedSnapshot value if the registration of the running binary's embedded release is held and registers it; else **`SURFACE_VALUE_UNAVAILABLE(key, decision point)`**, and the dependent decision point refuses per the consumer register (`23` §6.3) |
+| `members` | the member-id set registered for the policy-root release (additions included); a project-layer addition follows the directed join; the missing-content fallback is as for `pinned` |
 | `precedence` | **per concrete key: the registered rule of the effective TPS, joined (`23` §4.2) with the project's held registration while a reduction for that key awaits the project's `policy_lowering` gate. Never the kernel's rule.** |
 | `release_bound`, `project_tunable`, `informational`, `collection_id` | the root-kernel value |
 
@@ -112,7 +115,7 @@ iff every applicable condition holds:
 | E4 | D and R's `release_id` ∉ N | both | `revoked` |
 | E5 | binary version ≥ `min_binary_version`; contract, `floor_schema_version` and CLI compatible | both | `binary_below_policy` / `incompatible` |
 | E6 | `R.trust_root_id` = binary lineage = pinned lineage | both | `lineage_mismatch` |
-| **E7** | **Surface check** of R's kernel against P_eff's surface, with floors, pins and precedence registration judged against P_named: every file and leaf classified; **every registered file and leaf present**; **single YAML profile**; pinned digests and members registered; floors neither weaker nor stronger than P_named; **POLICY_PRECEDENCE equal to P_named's registration**; **every migration operation on a migration-writable Overlay Surface target** | both | `surface_unclassified` / **`surface_required_missing`** / **`surface_structure`** / `surface_unregistered` / `surface_membership` / `floor_violation` / `floor_not_registered` / **`precedence_unregistered`** / **`migration_operation_not_permitted`** |
+| **E7** | **Surface check** (revision 5: first, **the registration of R** is effective on this machine — referenced by the effective TSS — and R's kernel tree digest and every non-join unit equal it, `23` §12.3: `release_unregistered` / `surface_unregistered_for_release`) of R's kernel against P_eff's surface, with floors, pins and precedence registration judged against P_named: every file and leaf classified; **every registered file and leaf present**; **single YAML profile**; pinned digests and members registered; floors neither weaker nor stronger than P_named; **POLICY_PRECEDENCE equal to P_named's registration**; **every migration operation on a migration-writable Overlay Surface target** | both | `surface_unclassified` / **`surface_required_missing`** / **`surface_structure`** / `surface_unregistered` / `surface_membership` / `floor_violation` / `floor_not_registered` / **`precedence_unregistered`** / **`migration_operation_not_permitted`** |
 | E8 | trust state `KNOWN`; freshness `ANCHORED` or `WITNESSED`; **a currency proof** (`24` §4.4); R's release-local requirements met | ingress | `trust_state_unanchored` / `below_anchor` / **`currency_unproven`** / `incomplete` / `equivocation` / `regression` / `references_unknown_state` |
 | E9 | if R.sequence < the installed eligible release's sequence: a consumed `downgrade` trust-gate confirmation | ingress | `downgrade_not_authorised` |
 | E10 | R.sequence ≥ the VTS per-project record; `project_trust_id` unchanged | use | `downgrade_without_transaction` / `project_trust_id_changed` |
@@ -173,6 +176,10 @@ This covers update, rollback, restore, recovery exchange-back and adoption batch
 3. A non-empty failure list needs the `weakening` trust gate, bound to the statement digest and the failure-list digest
    (`27`). This applies in every OP-3 mode. Signer declarations can add gates, never remove them.
 4. After commit, the vector is re-recorded from the committed effective inputs.
+5. **No record (revision 5; CR4-B-04, RV4-M5).** On a machine with no per-project record, the requirements are first computed
+   from the **pre-transaction** effective policy and overlay and then evaluated over the post-migration inputs; a non-empty
+   failure list needs the `weakening` trust gate before commit (`OVERLAY_WEAKENING_GATE_REQUIRED`). Migration content itself
+   is selected by the release registration (`23` §12). Test: RT-146 (the P1r4 M5 migration on a fresh clone).
 
 Evidence: `evidence/P1r4-project-strength-and-absence.json` part C.
 - **Release-signed migrations.**
@@ -203,7 +210,8 @@ Evidence: `evidence/P1r4-project-strength-and-absence.json` part C.
    - **non-surface fields (CR-10, RV3-L5):**
      - `eligibility.min_release_sequence` lowered;
      - `eligibility.historical_releases[]` removals;
-     - `eligibility.production_sources[]` additions;
+     - (revision 5) `eligibility.production_sources[]` is withdrawn; registering a new release is **not** a reduction (RV4-L9 re-scoped); a registration reversion, a unit removed or a member-id set narrowed is (`23` §12.4);
+     - (revision 5) increases of `gating.decision_pin_max_validity_days` or `bootstrap.workstation_record_max_validity_days`; decreases of `registration.min_verification_records` or `bootstrap.channel_quorum`; `bootstrap.revoked_self_scope` from C0 only to C0–C2; a root version lowering `quorums.reproducer` is refused by the Fact Threshold Check, not reduced;
      - `install_authority` levels lowered;
      - `gating.mode` from `always_gate`;
      - `gating.local_terminal_only[]` removals;

@@ -1,6 +1,23 @@
 # Output 9 — Integration requirements
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments (normative requirements; codes in `25` §5, `31` §4–§5, `23` §12, `18` §9):
+> - **R-REG-1…10, R-VER-1…4, R-REP-1…9, R-PUB-1…4** (`30`); **IR-REP-1…4** implementation requirements (`30` §11).
+> - **R-ADM-1…12, GB-1…5, R-CER-1…4** (`31`); admission-predicate/1 for `verify-artifact` (`25` §5).
+> - **R-SEL-1…4** and the Fact Threshold Check (`29` §5).
+> - **R-ST5-1** `COMPLETE` closed entry sets; **R-ST5-2** root discovery and refusal inside the Protected Path Set;
+>   **R-ST5-3** doctor D039 `NESTED_LEGACY_PROJECT` (`18` §9.1–§9.2).
+> - **R-CONF-4** allow-list confinement with explicit denies; **R-CONF-5** TCB-location rule (CR4-B-01, `27` §3.3).
+> - New error codes: `ROOT_VERSION_INVALID`, `CHANNEL_DISAGREEMENT`, `CHANNEL_QUORUM_NOT_MET`,
+>   `STATE_NOT_HELD_OR_FINGERPRINT_MISMATCH`, `RELEASE_UNREGISTERED`, `REGISTRATION_EQUIVOCATION`, `TARGET_NOT_REGISTERED`,
+>   `RELEASE_FINAL_UNVERIFIED`, `VERIFICATION_RECORDS_BELOW_MINIMUM`, `REPRODUCTION_QUORUM_NOT_MET`, `REPRODUCTION_CONFLICT`,
+>   `BINARY_NOT_REGISTERED`, `BINARY_NOT_PUBLISHED`, `BINARY_REVOKED`, `SELF_EVALUATION_REFUSED`, `BINARY_NOT_ADMITTED`,
+>   `ADMISSION_RECORD_EXPIRED`, `BINARY_REVOKED_SELF`, `TCB_WRITABLE_BY_GOVERNED_ACCOUNT`, `ADMITTER_DIGEST_MISMATCH`,
+>   `REGISTRATION_NOT_SINGLE_VALUED`, `REGISTRATION_REWRITE`, `REGISTRATION_SEQUENCE_EQUIVOCATION`,
+>   `surface_unregistered_for_release`, `release_unregistered`, `kernel_tree_digest_mismatch`,
+>   `OWNER_CONSTITUTIONAL_GROUP_UNCONFIRMED`, `WORKING_DIRECTORY_IN_PROTECTED_PATH`, `DECISION_PIN_OUTSIDE_VALIDITY`,
+>   `CLOCK_BELOW_HIGH_WATER`, `OVERLAY_WEAKENING_GATE_REQUIRED`. Withdrawn: `ARTIFACT_BUILD_UNATTESTED`,
+>   `ARTIFACT_SOURCE_UNVERIFIED`, `ARTIFACT_SOURCE_UNREGISTERED`, `ARTIFACT_UNREFERENCED`.
 > Normative keywords: MUST, MUST NOT, SHOULD. Requirement IDs are referenced by `02` and `12`. Mechanisms are in `04`,
 > `05`, `17`–`20` and `23`–`27`. This file states obligations per ingress and catalogues codes.
 >

@@ -1,6 +1,13 @@
 # Output 14 — Risks and trade-offs
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 risks added: **RK-38** bit-for-bit reproducibility across operating systems and distributions not yet shown
+> (IR-REP-3; a target is not registered until shown); **RK-39** reproducer availability blocks releases (OP-9 (a), (c));
+> **RK-40** one registration ceremony per release (OP-2 (a) touches root keys per release); **RK-41** a second implementation of
+> the admission predicate must stay conformant (shared vectors; OP-12); **RK-42** first install unavailable while a channel is
+> unreachable (OP-13 (b)); **RK-43** CI image rebuild cadence tied to pin and record validity; **RK-44** a delegated
+> registration quorum concentrates source and content selection (OP-2 (b)); **RK-45** CR4-B-07 option 1 refuses C3 on pinned
+> runners against a TSS published after the pin until re-provisioned.
 > Revision 4 restates RK-01, RK-02, RK-11, RK-24, RK-25 and RK-29, and adds RK-31…RK-37.
 
 | ID | Risk / trade-off | Likelihood | Impact | Mitigation | Residual |

@@ -1,0 +1,849 @@
+{
+ "summary": {
+  "retained_p4r4_scenarios": 42,
+  "retained_holding": 42,
+  "retained_failing": [],
+  "superseded_p4r4_binary_scenarios": [
+   "A27_release_final_key_signs_artifact",
+   "A27b_one_release_artifact_key",
+   "A27c_no_build_attestation",
+   "A27d_not_referenced_by_trust_state",
+   "A27e_compiled_policy_digest_not_signed_policy",
+   "A28_genuine_older_binary_below_accepted_tbm",
+   "A29_op4_no_candidate_final_key_signs_artifact",
+   "A_valid_realisable_TBM_t9_reference_t11",
+   "K2_release_artifact_with_release_final",
+   "RV3-B-A08_final_names_unverified_source",
+   "RV3-D-A13_realisable_tbm_order",
+   "RV3-D-A15_revoked_binary_pinned_ci"
+  ],
+  "revision_5_scenarios": 65,
+  "revision_5_holding": 65,
+  "revision_5_failing": [],
+  "expected_ACCEPTED_rows_that_are_attacks": [],
+  "honest_controls": [
+   "A7-CR4-B-08_development_binary_does_not_poison_high_water",
+   "AP-00_honest_registered_reproduced_published",
+   "AP-00b_stateless_witnessed_runner_op7c",
+   "AP-R5_p2_in_gate_fingerprint_covers_descendant",
+   "E7-00_registered_release_eligible",
+   "E7-stale_machine_without_the_registration",
+   "RV3-D-A13r5_realisable_order_new_binary"
+  ],
+  "scenarios_naming_a_mutant": 37,
+  "params": {
+   "min_verification_records": 1,
+   "q": 2,
+   "decision_pin_max_validity_days": 90,
+   "clock_skew_seconds": 300
+  }
+ },
+ "scenarios": {
+  "AP-00_honest_registered_reproduced_published": {
+   "section": "A",
+   "computed": "ACCEPTED",
+   "expected": "ACCEPTED",
+   "claim": "25 \u00a75: an honest release binary is accepted",
+   "attack": false,
+   "holds": true
+  },
+  "AP-00b_stateless_witnessed_runner_op7c": {
+   "section": "A",
+   "computed": "ACCEPTED",
+   "expected": "ACCEPTED",
+   "claim": "24 \u00a74.4 revision 5 (CR4-B-06): WITNESSED at the C3 threshold is a currency proof (P3), as the decision table states",
+   "attack": false,
+   "holds": true
+  },
+  "AP-A8_candidate_revoked": {
+   "section": "A",
+   "computed": "BINARY_REVOKED",
+   "expected": "BINARY_REVOKED",
+   "claim": "25 AP-4 (D-A03 A8): a revoked candidate refuses the binary",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A8-omits-candidate"
+  },
+  "AP-A4b_rejected_attestation_held": {
+   "section": "A",
+   "computed": "ARTIFACT_SOURCE_REJECTED",
+   "expected": "ARTIFACT_SOURCE_REJECTED",
+   "claim": "25 AP-5 (D-A03 A4b REJECTED): a REJECTED verification attestation for the registered candidate refuses",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A4b-ignores-REJECTED"
+  },
+  "AP-A4a_reproductions_name_another_source": {
+   "section": "A",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "25 AP-6 (D-A03 A4a): reproductions count only for the registered source",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A4a-source-not-compared"
+  },
+  "AP-A4b_attestation_not_listed_by_registration": {
+   "section": "A",
+   "computed": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+   "expected": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+   "claim": "25 AP-5 (D-A03 A4b reference): only attestations the TSS-referenced registration lists count",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A4b-attestation-not-registered"
+  },
+  "AP-A5_registered_reproduced_not_published": {
+   "section": "A",
+   "computed": "BINARY_NOT_PUBLISHED",
+   "expected": "BINARY_NOT_PUBLISHED",
+   "claim": "25 AP-7 (D-A03 A5): the selected TSS must publish the digest",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A5-publication-not-required"
+  },
+  "AP-A7_older_binary_after_newer_accepted": {
+   "section": "A",
+   "computed": "BINARY_T0_ROLLBACK",
+   "expected": "BINARY_T0_ROLLBACK",
+   "claim": "25 AP-8 (D-A03 A7): TBM below the accepted-TBM high-water refuses",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A7-disabled"
+  },
+  "AP-A9_no_currency_proof_aged_anchor": {
+   "section": "A",
+   "computed": "TRUST_STATE_CURRENCY_UNPROVEN",
+   "expected": "TRUST_STATE_CURRENCY_UNPROVEN",
+   "claim": "25 AP-3 (D-A03 A9): binary acceptance needs C3 with a currency proof",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-A9-not-applied"
+  },
+  "AP-R5_registration_not_referenced_by_tss": {
+   "section": "A",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "25 AP-5: the registration must be referenced by the selected TSS",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-registration-not-referenced"
+  },
+  "AP-R5_registration_one_key": {
+   "section": "A",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "05 \u00a73: release-registration threshold >= 2; one stolen key registers nothing",
+   "attack": true,
+   "holds": true
+  },
+  "AP-R5_registration_equivocation": {
+   "section": "A",
+   "computed": "REGISTRATION_EQUIVOCATION",
+   "expected": "REGISTRATION_EQUIVOCATION",
+   "claim": "23 \u00a712.2: two registrations for one release refuse",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-registration-equivocation"
+  },
+  "AP-R5_target_not_registered": {
+   "section": "A",
+   "computed": "TARGET_NOT_REGISTERED",
+   "expected": "TARGET_NOT_REGISTERED",
+   "claim": "25 AP-5: the target must be registered",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-target"
+  },
+  "AP-R5_final_source_differs_from_registration": {
+   "section": "A",
+   "computed": "RELEASE_FINAL_UNVERIFIED",
+   "expected": "RELEASE_FINAL_UNVERIFIED",
+   "claim": "25 AP-5: the registered final must verify with the registered source and candidate (restrictor)",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-final-restrictor"
+  },
+  "AP-R5_one_statement_two_reproducer_signatures": {
+   "section": "A",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "25 AP-6: a reproduction is first-person; a statement with two signatures counts for none",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-single-signature"
+  },
+  "AP-R5_one_key_two_statements": {
+   "section": "A",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "25 AP-6: the quorum counts distinct keys, not statements",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-count-statements"
+  },
+  "AP-R5_conflicting_reproduction": {
+   "section": "A",
+   "computed": "REPRODUCTION_CONFLICT",
+   "expected": "REPRODUCTION_CONFLICT",
+   "claim": "25 AP-6: any valid reproduction of another digest for the same release and target refuses (availability, not acceptance)",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-conflict"
+  },
+  "AP-R5_revoked_reproduction_not_counted": {
+   "section": "A",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "25 AP-4 (CR4-B-10): a revoked reproduction counts for nothing",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-revoked-reproduction-counted"
+  },
+  "AP-R5_revoked_attestation_not_counted": {
+   "section": "A",
+   "computed": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+   "expected": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+   "claim": "25 AP-4 (CR4-B-10, RV4-L6): a revoked verification attestation counts for nothing",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-revoked-attestation-counted"
+  },
+  "AP-R5_tbm_source_differs": {
+   "section": "A",
+   "computed": "BINARY_T0_UNVERIFIED",
+   "expected": "BINARY_T0_UNVERIFIED",
+   "claim": "25 AP-8: the TBM source must equal the registration",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-tbm-source"
+  },
+  "AP-R5_tbm_policy_digest_forged": {
+   "section": "A",
+   "computed": "BINARY_T0_UNVERIFIED",
+   "expected": "BINARY_T0_UNVERIFIED",
+   "claim": "25 AP-8 (P4r4 A27e): every TBM component resolves",
+   "attack": true,
+   "holds": true
+  },
+  "AP-R5_binary_revoked": {
+   "section": "A",
+   "computed": "BINARY_REVOKED",
+   "expected": "BINARY_REVOKED",
+   "claim": "25 AP-4: a revoked binary refuses",
+   "attack": true,
+   "holds": true
+  },
+  "AP-R5_op9d_registration_names_other_digest": {
+   "section": "A",
+   "computed": "BINARY_NOT_REGISTERED",
+   "expected": "BINARY_NOT_REGISTERED",
+   "claim": "25 AP-6 under OP-9 (d): the digest must equal the registered digest",
+   "attack": true,
+   "holds": true
+  },
+  "AP-R5_ftc_reproducer_key_shared": {
+   "section": "A",
+   "computed": "ROOT_VERSION_INVALID",
+   "expected": "ROOT_VERSION_INVALID",
+   "claim": "05 \u00a73 FTC: a reproducer key holding another purpose invalidates the root version",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-ftc"
+  },
+  "AP-R5_ftc_withdrawn_purpose_granted": {
+   "section": "A",
+   "computed": "ROOT_VERSION_INVALID",
+   "expected": "ROOT_VERSION_INVALID",
+   "claim": "05 \u00a73 FTC: granting a withdrawn purpose invalidates the root version",
+   "attack": true,
+   "holds": true
+  },
+  "AP-R5_p1_proof_does_not_cover_later_descendant": {
+   "section": "A",
+   "computed": "TRUST_STATE_CURRENCY_UNPROVEN",
+   "expected": "TRUST_STATE_CURRENCY_UNPROVEN",
+   "claim": "24 \u00a74.4 revision 5 (CR4-B-07 option 1): C3 on a descendant issued after the P1 proof needs P2 or P3",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-descendant-proof"
+  },
+  "AP-R5_p2_in_gate_fingerprint_covers_descendant": {
+   "section": "A",
+   "computed": "ACCEPTED",
+   "expected": "ACCEPTED",
+   "claim": "24 \u00a74.4: an in-gate typed fingerprint of the descendant is a currency proof for it (honest owner-published descendant)",
+   "attack": false,
+   "holds": true
+  },
+  "VA5-01_RV3-B-A08_final_names_commit_evil_as_new_release": {
+   "section": "B",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "VA4 row 1: a release-final key names another source: no registration",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-01b_RV3-B-A08_binary_claims_the_registered_release": {
+   "section": "B",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "VA4 row 1 variant: claiming the registered release: no reproduction quorum for the malicious digest",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-03_candidate_rejected": {
+   "section": "B",
+   "computed": "ARTIFACT_SOURCE_REJECTED",
+   "expected": "ARTIFACT_SOURCE_REJECTED",
+   "claim": "VA4 row 3",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-04_attestation_names_different_source": {
+   "section": "B",
+   "computed": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+   "expected": "VERIFICATION_RECORDS_BELOW_MINIMUM",
+   "claim": "VA4 row 4: the listed attestation names another source",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-05_RV3-D-A03_op4_no_everyday_key": {
+   "section": "B",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "VA4 row 5",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-06_RV3-D-A03_final_promoted_from_genuine_candidate": {
+   "section": "B",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "VA4 row 6",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-07_route_S_verification_candidate_final_keys": {
+   "section": "B",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "VA4 row 7 (was a documented ACCEPTED minimum): source selection needs the registration authority",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-08_route_S_root_registered_source": {
+   "section": "B",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "VA4 row 8: source selection needs the registration authority",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-09_route_S_verification_threshold_2_one_key": {
+   "section": "B",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "VA4 row 9: source selection needs the registration authority",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-10_route_S_op4_no": {
+   "section": "B",
+   "computed": "RELEASE_UNREGISTERED",
+   "expected": "RELEASE_UNREGISTERED",
+   "claim": "VA4 row 10 (was a documented ACCEPTED minimum): source selection needs the registration authority",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-11_route_B_artifact_x2_build_attestation_trust_state": {
+   "section": "B",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "VA4 row 11 (was a documented ACCEPTED minimum): withdrawn purposes count for nothing; no reproduction quorum",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-12_route_B_one_artifact_key": {
+   "section": "B",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "VA4 row 12: withdrawn purposes count for nothing; no reproduction quorum",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-13_route_B_no_build_attestation": {
+   "section": "B",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "VA4 row 13: withdrawn purposes count for nothing; no reproduction quorum",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-B-prime_one_reproducer_key_trust_state_key_honest_statements_held": {
+   "section": "B",
+   "computed": "REPRODUCTION_QUORUM_NOT_MET",
+   "expected": "REPRODUCTION_QUORUM_NOT_MET",
+   "claim": "RV4-B-A01 re-expressed: one stolen reproducer key",
+   "attack": true,
+   "holds": true
+  },
+  "VA5-B-prime2_two_reproducer_keys_honest_reproductions_held": {
+   "section": "B",
+   "computed": "REPRODUCTION_CONFLICT",
+   "expected": "REPRODUCTION_CONFLICT",
+   "claim": "CS5 G_BYTES: two stolen reproducer keys with the honest reproductions visible",
+   "attack": true,
+   "holds": true
+  },
+  "RV3-D-A13r5_realisable_order_new_binary": {
+   "section": "B",
+   "computed": "ACCEPTED",
+   "expected": "ACCEPTED",
+   "claim": "25 AP-8 realisable construction: TBM names t9; t11 publishes",
+   "attack": false,
+   "holds": true
+  },
+  "RV3-D-A13r5_older_binary_after_newer": {
+   "section": "B",
+   "computed": "BINARY_T0_ROLLBACK",
+   "expected": "BINARY_T0_ROLLBACK",
+   "claim": "RV3-M8 / A7",
+   "attack": true,
+   "holds": true
+  },
+  "RV3-D-A15r5_revoked_binary_pinned_ci": {
+   "section": "B",
+   "computed": {
+    "honest_current_pin_t10": "BINARY_REVOKED",
+    "stale_pin_t5_200d_withheld": "TRUST_STATE_UNANCHORED",
+    "valid_pin_t5_20d_withheld": "TRUST_STATE_CURRENCY_UNPROVEN",
+    "current_pin_t10_withheld_plus_t100": "RELEASE_UNREGISTERED"
+   },
+   "expected": "predicate (see claim)",
+   "claim": "CD3-2 under AP: a revoked genuine binary is never accepted by an aged, expired or bypassed anchor",
+   "attack": true,
+   "holds": true
+  },
+  "E7-00_registered_release_eligible": {
+   "section": "C",
+   "computed": {
+    "eligible": true,
+    "reason": null
+   },
+   "expected": {
+    "eligible": true,
+    "reason": null
+   },
+   "claim": "23 \u00a712: the registered release is eligible",
+   "attack": false,
+   "holds": true
+  },
+  "E7-D-A06_git_delivered_forged_final_unregistered": {
+   "section": "C",
+   "computed": {
+    "eligible": false,
+    "reason": "release_unregistered"
+   },
+   "expected": {
+    "eligible": false,
+    "reason": "release_unregistered"
+   },
+   "claim": "D-A06: a Git-delivered higher-sequence final without a registration is ineligible at use",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-E7-referenced"
+  },
+  "E7-RV4-B-A08_superseded_unit_under_the_registered_release_id": {
+   "section": "C",
+   "computed": {
+    "eligible": false,
+    "reason": "surface_unregistered_for_release"
+   },
+   "expected": {
+    "eligible": false,
+    "reason": "surface_unregistered_for_release"
+   },
+   "claim": "RV4-H3: content differing from the release's registration is ineligible",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-E7-units"
+  },
+  "E7-stale_machine_without_the_registration": {
+   "section": "C",
+   "computed": {
+    "eligible": false,
+    "reason": "release_unregistered"
+   },
+   "expected": {
+    "eligible": false,
+    "reason": "release_unregistered"
+   },
+   "claim": "23 \u00a712.3 rule 7: knowledge of registrations follows state; the genuine release is ineligible until the referencing TSS is held",
+   "attack": false,
+   "holds": true
+  },
+  "GATE-CR4-B-09_decision_pin_beyond_maximum_validity": {
+   "section": "D",
+   "computed": false,
+   "expected": false,
+   "claim": "27 \u00a73.2 (CR4-B-09): a decision pin whose validity exceeds the maximum authorises nothing",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-decision-pin-max-validity"
+  },
+  "A7-CR4-B-08_development_binary_does_not_poison_high_water": {
+   "section": "D",
+   "computed": "ACCEPTED",
+   "expected": "ACCEPTED",
+   "claim": "25 AP-8 (CR4-B-08): development builds and non-resolving TBMs are never recorded; a later genuine binary is accepted",
+   "attack": false,
+   "holds": true,
+   "mutant": "R5-first-run-record"
+  },
+  "CLOCK-RV4-B-A13_stateful_machine_clock_set_back": {
+   "section": "D",
+   "computed": "TRUST_STATE_UNANCHORED",
+   "expected": "TRUST_STATE_UNANCHORED",
+   "claim": "24 \u00a78 revision 5 (RV4-M4): on a machine with a verifier trust store every ingested non-future statement raises the clock high-water; a clock set back below it fails closed",
+   "attack": true,
+   "holds": true,
+   "mutant": "R5-clock-high-water"
+  },
+  "RET-D-inclusion-without-held": {
+   "section": "E",
+   "computed": {
+    "trust_state": "KNOWN",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "expected": {
+    "trust_state": "KNOWN",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "claim": "24 \u00a73.4 rule 1: the anchored statement must be held",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-inclusion-without-held"
+  },
+  "RET-D-unchained-above-anchor-not-regression": {
+   "section": "E",
+   "computed": "REGRESSION",
+   "expected": "REGRESSION",
+   "claim": "24 \u00a73.4 rule 4: unchained statements above the anchor make the state REGRESSION",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-unchained-above-anchor-not-regression"
+  },
+  "RET-D-below-anchor-allows-C1": {
+   "section": "E",
+   "computed": [
+    "C0"
+   ],
+   "expected": [
+    "C0"
+   ],
+   "claim": "24 \u00a74.3: BELOW_ANCHOR allows C0 only",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-below-anchor-allows-C1"
+  },
+  "RET-D-pin-validity-cap-not-checked": {
+   "section": "E",
+   "computed": [
+    "C0"
+   ],
+   "expected": [
+    "C0"
+   ],
+   "claim": "24 \u00a73.2: a pin beyond pin_max_validity_days is not an anchor",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-pin-validity-cap-not-checked"
+  },
+  "RET-D-witness-for-any-tss": {
+   "section": "E",
+   "computed": [
+    "C0"
+   ],
+   "expected": [
+    "C0"
+   ],
+   "claim": "24 \u00a73.3: a witness counts only when it names the effective TSS",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-witness-for-any-tss"
+  },
+  "RET-D-witness-replay-not-refused": {
+   "section": "E",
+   "computed": [
+    "C0"
+   ],
+   "expected": [
+    "C0"
+   ],
+   "claim": "24 \u00a73.3: a witness older than the newest accepted witness is refused",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-witness-replay-not-refused"
+  },
+  "RET-D-c2-on-incomplete": {
+   "section": "E",
+   "computed": {
+    "state": "INCOMPLETE",
+    "allowed": [
+     "C0",
+     "C1"
+    ]
+   },
+   "expected": {
+    "state": "INCOMPLETE",
+    "allowed": [
+     "C0",
+     "C1"
+    ]
+   },
+   "claim": "24 \u00a74.3: INCOMPLETE refuses C2",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-c2-on-incomplete"
+  },
+  "RET-D-admissibility-ignores-artifacts": {
+   "section": "E",
+   "computed": {
+    "trust_state": "REGRESSION",
+    "effective_tss": "t10a"
+   },
+   "expected": {
+    "trust_state": "REGRESSION",
+    "effective_tss": "t10a"
+   },
+   "claim": "17 S4 (d): a TSS never drops a published reference (registrations[], published_binaries[])",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-admissibility-ignores-artifacts"
+  },
+  "RET-D-tps-prior-chain-not-checked": {
+   "section": "E",
+   "computed": "EQUIVOCATION",
+   "expected": "EQUIVOCATION",
+   "claim": "17 S3: a top TPS must chain every held lower TPS",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-tps-prior-chain-not-checked"
+  },
+  "RET-D-lift-attestation-not-TSS-referenced": {
+   "section": "E",
+   "computed": true,
+   "expected": true,
+   "claim": "17 MS-2: the lifting attestation must be referenced by the effective TSS",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-lift-attestation-not-TSS-referenced"
+  },
+  "RET-D-op7-order-c-above-a": {
+   "section": "E",
+   "computed": false,
+   "expected": false,
+   "claim": "19 \u00a710.6: op7_mode (a) -> (c) is a computed reduction",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-op7-order-c-above-a"
+  },
+  "RET-D-decision-pin-expiry-not-checked": {
+   "section": "E",
+   "computed": false,
+   "expected": false,
+   "claim": "27 \u00a73.2: an expired decision pin authorises nothing",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-decision-pin-expiry-not-checked"
+  },
+  "RET-D-local-terminal-only-ignored": {
+   "section": "E",
+   "computed": false,
+   "expected": false,
+   "claim": "27 \u00a73.2: a decision pin never approves a local_terminal_only kind",
+   "attack": true,
+   "holds": true,
+   "mutant": "D-local-terminal-only-ignored"
+  }
+ },
+ "retained_p4r4_scenarios": {
+  "B1_candidate_reference_inflation": {
+   "holds": true,
+   "claim": "17 S7: references outside the trust-state lineage are release-local"
+  },
+  "B2_certification_key_alone_unwithdraws": {
+   "holds": true,
+   "claim": "17 MS-2: a certification key alone lifts nothing"
+  },
+  "B3_same_sequence_fork": {
+   "holds": true,
+   "claim": "17 S4(c): EQUIVOCATION, C0 only"
+  },
+  "B4_unresolvable_references": {
+   "holds": true,
+   "claim": "17 S4(a)/(e): unresolvable TSS never constrains; above the effective sequence INCOMPLETE refuses C2/C3"
+  },
+  "B5_fresh_runner_old_binary_A2_swap": {
+   "holds": true,
+   "claim": "24 \u00a75.2: no pin, a current pin, and a pin outside validity all refuse R7 as C2 root under (a); (d) is the stated owner residual"
+  },
+  "B6_lowering_across_skipped_version": {
+   "holds": true,
+   "claim": "19 \u00a710.6: computed against the strongest held; cumulative history; undeclared reduction invalidates"
+  },
+  "M1_first_install": {
+   "holds": true,
+   "claim": "24 \u00a75.1: C3 refused until anchored; a fresh human confirmation is a currency proof; a withheld anchored epoch is BELOW_ANCHOR"
+  },
+  "M2_clean_ci_runner": {
+   "holds": true,
+   "claim": "24 \u00a75.2: no pin C0; a valid pin anchors (C3 within the currency window); stripped + pin BELOW_ANCHOR; witnesses at threshold admit (c); (d) labelled"
+  },
+  "M3_restored_from_backup": {
+   "holds": true,
+   "claim": "24 \u00a75.3: never below the restored anchor; (a)/(d) C2 at the anchor with age, never C3 without a fresh proof; (b) refuses C2 by age; intact repository raises knowledge"
+  },
+  "M4_old_epoch": {
+   "holds": true,
+   "claim": "24 \u00a75.4: effective state never below the retained anchor; no C3 without a fresh proof"
+  },
+  "M5_no_epoch": {
+   "holds": true,
+   "claim": "24 \u00a75.5: UNANCHORED; C3 never; C2 only under (d)"
+  },
+  "M6_two_machines": {
+   "holds": true,
+   "claim": "24 \u00a75.6: each machine enforces its own anchor; B learns 10 when the PTR carries it"
+  },
+  "M7_offline_long_absence": {
+   "holds": true,
+   "claim": "24 \u00a75.7: (a)/(c)/(d) C2 at the anchor with age shown, never C3 without a fresh proof; (b) refuses C2 by age"
+  },
+  "INGATE_state_fingerprint_currency": {
+   "holds": true,
+   "claim": "24 \u00a74.4: a state fingerprint typed into the trust gate that names the effective TSS is a clockless currency proof for that C3 transition; a fingerprint naming a statement the machine does not hold as effective proves nothing"
+  },
+  "R1_signed_state_replay": {
+   "holds": true,
+   "claim": "17 MS-4: replayed older genuine statements never lower knowledge"
+  },
+  "R2_witness_replay": {
+   "holds": true,
+   "claim": "24 \u00a76: an older witness is accepted only by a verifier that never saw a newer one"
+  },
+  "R3_gate_record_from_repository": {
+   "holds": true,
+   "claim": "rule (18): repository records never authorise trust decisions"
+  },
+  "R4_lock_hint_inflation": {
+   "holds": true,
+   "claim": "17 S8: hints never refuse or relax"
+  },
+  "R5_pin_digest_mismatch": {
+   "holds": true,
+   "claim": "24 \u00a76: an anchored (sequence, digest) not held in the effective chain is BELOW_ANCHOR (C0)"
+  },
+  "R6_A3_deletes_VTS": {
+   "holds": true,
+   "claim": "RS-3: UNANCHORED; read-only under (a)"
+  },
+  "E1_fork_across_a_gap": {
+   "holds": true,
+   "claim": "17 S4(d): a higher TSS omitting a held lower one is not admissible (REGRESSION)"
+  },
+  "E2_trust_policy_equivocation": {
+   "holds": true,
+   "claim": "17 S3: two TPS of one version -> EQUIVOCATION"
+  },
+  "E3_fork_without_and_with_anchor": {
+   "holds": true,
+   "claim": "17 S4: unanchored equal-sequence fork is EQUIVOCATION; an anchor on t9 orphans the fork"
+  },
+  "K1_trust_state_with_certification": {
+   "holds": true,
+   "claim": "05 KS-8: forbidden pair"
+  },
+  "K3_whitelisted_owner_matrix": {
+   "holds": true,
+   "claim": "05 \u00a73: the default grants satisfy the whitelist"
+  },
+  "K4_freshness_witness_with_trust_state": {
+   "holds": true,
+   "claim": "05 KS-11: freshness-witness shares with no purpose"
+  },
+  "RV3-B-A02_stale_ci_pin": {
+   "holds": true,
+   "claim": "24 \u00a73.2 AM-3: a pin outside its validity is not an anchor; only (d) admits R7 unanchored (stated owner residual)"
+  },
+  "RV3-B-A03_pin_written_by_governed_account": {
+   "holds": true,
+   "claim": "CR-03: a pin writable by the effective uid is ignored (UNANCHORED); a non-writable or read-only pin anchors"
+  },
+  "RV3-B-A04_decision_pin_integrity": {
+   "holds": true,
+   "claim": "CR-03/27 \u00a73.2: a decision pin writable by the effective uid authorises nothing; a protected pin never approves local_terminal_only kinds"
+  },
+  "RV3-B-A05_lift_requires_post_dating_attestation": {
+   "holds": true,
+   "claim": "17 MS-2 / CR-01: a lift needs an attestation that names the negative statement; three distinct keys"
+  },
+  "RV3-B-A06_witness_authority": {
+   "holds": true,
+   "claim": "24 \u00a73.3 / KS-11: a trust-state key cannot mint currency; one of two witness keys witnesses nothing; under owner threshold 1 a thief reaches C1-C2 only, never C3"
+  },
+  "RV3-B-A07_issued_at_high_water": {
+   "holds": true,
+   "claim": "CR-06: a future issued_at is refused at ingest and never raises the clock high-water; only witnesses raise it; honest witnesses still verify"
+  },
+  "RV3-B-A09_playbook_revokes_never_unreferences": {
+   "holds": true,
+   "claim": "05 \u00a79 / CR-04: the remedy keeps artifacts[] and adds a revocation: KNOWN(12) and ARTIFACT_REVOKED"
+  },
+  "RV3-B-A10_incomplete_refuses_c2_under_d": {
+   "holds": true,
+   "claim": "24 \u00a74.3 / CR-05: INCOMPLETE refuses C2 under every option"
+  },
+  "RV3-B-A11_op7_c_non_witness_anchor": {
+   "holds": true,
+   "claim": "24 \u00a74.3 and \u00a75.7 (one rule): under (c) a non-witness anchor follows (a): C2 at any age, C3 only with a currency proof"
+  },
+  "RV3-B-A12_RV3-D-A12_higher_unchained_tss": {
+   "holds": true,
+   "claim": "24 \u00a74.1 inclusion anchors: the anchored statement must be held and in the effective chain; otherwise BELOW_ANCHOR; a machine holding it freezes (REGRESSION)"
+  },
+  "RV3-B-A13_matrix_machine_x_op7_x_adversary": {
+   "holds": true,
+   "claim": "CD3-2: only stated-core rows and the stated OP-7 (d) residual admit revoked state; no row is labelled current"
+  },
+  "PIN_WINDOW_bound": {
+   "holds": true,
+   "claim": "RS-1b: a valid pin provisioned before a revocation admits the stale descendant for C2 only within its validity (bound pin_max_validity_days); C3 needs a proof within the C3 window"
+  },
+  "RV3-D-A04_op7_d_scope": {
+   "holds": true,
+   "claim": "RV3-L6: the (d) residual exposes binaries whose compiled TSS predates the newest TSS (not the newest TPS)"
+  },
+  "RV3-D-A16_rotation_resigns_retained_statements": {
+   "holds": true,
+   "claim": "05 \u00a79 / RV3-L8: the playbook re-signs retained statements (same payload digests) before root N+1; anchors stay satisfied"
+  },
+  "CR-10_non_surface_tps_reductions": {
+   "holds": true,
+   "claim": "19 \u00a710.6: every non-surface TPS field lowering needs a lowering_history entry (else TRUST_POLICY_UNDECLARED_LOWERING)"
+  },
+  "TS_KEY_BLAST_RADIUS": {
+   "holds": true,
+   "claim": "17 \u00a715: a trust-state key alone cannot lift a negative on an anchored machine: a descendant dropping a revocation is not admissible (freeze)"
+  }
+ },
+ "residual_demonstrations_not_oracle_rows": {
+  "RS-2_stateless_runner_clock_set_back_pin_honoured": {
+   "accept_revoked_binary_on_stateless_runner": "ACCEPTED",
+   "note": "TA-7 residual restated (CR4-B-03): without a verifier trust store only the local clock bounds pin validity and the C3 window"
+  }
+ }
+}

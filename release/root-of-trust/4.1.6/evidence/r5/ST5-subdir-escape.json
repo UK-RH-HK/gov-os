@@ -1,0 +1,865 @@
+{
+ "1_exposure_subdir_init": {
+  "governance": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "..",
+    "refuse": false
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "nested_rebuild_ok": true,
+   "nested_restricted_retrievable": [],
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust/kernel": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/kernel",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "nested_rebuild_ok": true,
+   "nested_restricted_retrievable": [],
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/trust/kernel/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "kernel_content_mismatch",
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/kernel/.gitignore",
+    "governance/trust/kernel/.governance-runtime",
+    "governance/trust/kernel/.governance-runtime/claims.db",
+    "governance/trust/kernel/.governance-runtime/telemetry",
+    "governance/trust/kernel/.governance-runtime/telemetry/events.jsonl",
+    "governance/trust/kernel/archive",
+    "governance/trust/kernel/archive/code-reference",
+    "governance/trust/kernel/archive/code-reference/.gitkeep",
+    "governance/trust/kernel/archive/governance",
+    "governance/trust/kernel/archive/governance/.gitkeep",
+    "governance/trust/kernel/archive/research",
+    "governance/trust/kernel/archive/research/.gitkeep"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "product": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "product",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "..",
+    "refuse": false
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "nested_rebuild_ok": true,
+   "nested_restricted_retrievable": [],
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [
+    "product/governance"
+   ],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "spec": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "spec",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "..",
+    "refuse": false
+   },
+   "n_work_writes": 227,
+   "nested_governance_created": "file",
+   "nested_rebuild_ok": true,
+   "nested_restricted_retrievable": [],
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [
+    "spec/governance"
+   ],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  }
+ },
+ "2_pps_write_from_inside_governance": {
+  "governance/framework.lock::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/framework.lock",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_occupation_entry"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/framework.lock::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/framework.lock",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": true
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/framework.lock/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_occupation_entry",
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/framework.lock::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/framework.lock",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_occupation_entry"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/overlay::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/overlay",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": false
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": [
+    "governance/overlay/spec",
+    "governance/overlay/spec/audits",
+    "governance/overlay/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/overlay/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ]
+  },
+  "governance/overlay::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/overlay",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": false
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/overlay/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": [
+    "governance/overlay/.gitignore",
+    "governance/overlay/.governance-runtime",
+    "governance/overlay/.governance-runtime/claims.db",
+    "governance/overlay/.governance-runtime/telemetry",
+    "governance/overlay/.governance-runtime/telemetry/events.jsonl",
+    "governance/overlay/archive"
+   ]
+  },
+  "governance/overlay::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/overlay",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": false
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": [
+    "governance/overlay/spec",
+    "governance/overlay/spec/audits",
+    "governance/overlay/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/overlay/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ]
+  },
+  "governance/trust/kernel::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/kernel",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "kernel_content_mismatch"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/kernel/spec",
+    "governance/trust/kernel/spec/audits",
+    "governance/trust/kernel/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/trust/kernel/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust/kernel::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/kernel",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/trust/kernel/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "kernel_content_mismatch",
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/kernel/.gitignore",
+    "governance/trust/kernel/.governance-runtime",
+    "governance/trust/kernel/.governance-runtime/claims.db",
+    "governance/trust/kernel/.governance-runtime/telemetry",
+    "governance/trust/kernel/.governance-runtime/telemetry/events.jsonl",
+    "governance/trust/kernel/archive",
+    "governance/trust/kernel/archive/code-reference",
+    "governance/trust/kernel/archive/code-reference/.gitkeep",
+    "governance/trust/kernel/archive/governance",
+    "governance/trust/kernel/archive/governance/.gitkeep",
+    "governance/trust/kernel/archive/research",
+    "governance/trust/kernel/archive/research/.gitkeep"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust/kernel::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/kernel",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "kernel_content_mismatch"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/kernel/spec",
+    "governance/trust/kernel/spec/audits",
+    "governance/trust/kernel/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/trust/kernel/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust/state::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/state",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_trust_entry"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/state/spec",
+    "governance/trust/state/spec/audits",
+    "governance/trust/state/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/trust/state/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust/state::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/state",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/trust/state/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_trust_entry",
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/state/.gitignore",
+    "governance/trust/state/.governance-runtime",
+    "governance/trust/state/.governance-runtime/claims.db",
+    "governance/trust/state/.governance-runtime/telemetry",
+    "governance/trust/state/.governance-runtime/telemetry/events.jsonl",
+    "governance/trust/state/archive",
+    "governance/trust/state/archive/code-reference",
+    "governance/trust/state/archive/code-reference/.gitkeep",
+    "governance/trust/state/archive/governance",
+    "governance/trust/state/archive/governance/.gitkeep",
+    "governance/trust/state/archive/research",
+    "governance/trust/state/archive/research/.gitkeep"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust/state::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust/state",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_trust_entry"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/state/spec",
+    "governance/trust/state/spec/audits",
+    "governance/trust/state/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/trust/state/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_trust_entry"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/spec",
+    "governance/trust/spec/audits",
+    "governance/trust/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/trust/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": true
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/trust/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_trust_entry",
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/.gitignore",
+    "governance/trust/.governance-runtime",
+    "governance/trust/.governance-runtime/claims.db",
+    "governance/trust/.governance-runtime/telemetry",
+    "governance/trust/.governance-runtime/telemetry/events.jsonl",
+    "governance/trust/archive",
+    "governance/trust/archive/code-reference",
+    "governance/trust/archive/code-reference/.gitkeep",
+    "governance/trust/archive/governance",
+    "governance/trust/archive/governance/.gitkeep",
+    "governance/trust/archive/research",
+    "governance/trust/archive/research/.gitkeep"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/trust::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/trust",
+   "discovery_r5": {
+    "code": "WORKING_DIRECTORY_IN_PROTECTED_PATH",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": true
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "foreign_trust_entry"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [
+    "governance/trust/spec",
+    "governance/trust/spec/audits",
+    "governance/trust/spec/audits/GOVERNANCE-ADOPTION",
+    "governance/trust/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+   ],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/views::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/views",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": false
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/views::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance/views",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": false
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/views/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance/views::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance/views",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "../..",
+    "refuse": false
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance::adopt_baseline": {
+   "argv": [
+    "adopt",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "..",
+    "refuse": false
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance::init": {
+   "argv": [
+    "init",
+    "--skip-index"
+   ],
+   "code": null,
+   "cwd_sub": "governance",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "..",
+    "refuse": false
+   },
+   "n_work_writes": 228,
+   "nested_governance_created": "file",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [
+    "governance/governance"
+   ],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [
+    "nested_legacy_install"
+   ],
+   "r5_state_after": "PARTIAL",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  },
+  "governance::migrate_baseline": {
+   "argv": [
+    "migrate",
+    "baseline"
+   ],
+   "code": null,
+   "cwd_sub": "governance",
+   "discovery_r5": {
+    "code": "OK",
+    "nested_markers_on_path": [],
+    "project_root": "..",
+    "refuse": false
+   },
+   "n_work_writes": 4,
+   "nested_governance_created": "absent",
+   "ok": true,
+   "outer_occupation_intact": true,
+   "outer_rot1_state_after_r4": "COMPLETE",
+   "r5_nested_inside_governance": [],
+   "r5_nested_legacy_projects": [],
+   "r5_reasons_after": [],
+   "r5_state_after": "COMPLETE",
+   "r5_state_before": "COMPLETE",
+   "work_changed": true,
+   "writes_inside_PPS_governance_trust": [],
+   "writes_inside_governance_overlay": []
+  }
+ },
+ "binary_sha256": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915",
+ "control_outer_intact": {
+  "outer_legacy": {
+   "kernel_trust_code": "NOT_INSTALLED",
+   "kernel_trust_ok": false,
+   "query_code": "NOT_INSTALLED",
+   "query_ok": false,
+   "rebuild_code": "NOT_INSTALLED",
+   "rebuild_ok": false,
+   "restricted_hits": [],
+   "verified": null
+  },
+  "state_r4": "COMPLETE",
+  "state_r5": "COMPLETE"
+ },
+ "note": "intact revision-4 R4 layout; legacy 4.1.5; no --root; r5 state added"
+}

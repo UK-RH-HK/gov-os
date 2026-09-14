@@ -1,0 +1,53 @@
+{
+ "clone_control_migration_kind": "absent",
+ "clone_control_occupation": {
+  ".governance-runtime/migration": "absent",
+  "governance/framework.lock": "dir",
+  "governance/generated": "file",
+  "governance/kernel": "file",
+  "governance/project": "file",
+  "spec/audits/GOVERNANCE-ADOPTION": "file"
+ },
+ "clone_control_r5_reasons": [
+  "r4_state_PARTIAL"
+ ],
+ "clone_control_state_r4": "PARTIAL",
+ "clone_control_state_r5": "PARTIAL",
+ "clone_surgery_occupation": {
+  ".governance-runtime/migration": "file",
+  "governance/framework.lock": "dir",
+  "governance/generated": "file",
+  "governance/kernel": "file",
+  "governance/project": "file",
+  "spec/audits/GOVERNANCE-ADOPTION": "file"
+ },
+ "clone_surgery_r5_reasons": [],
+ "clone_surgery_state_r4": "COMPLETE",
+ "clone_surgery_state_r5": "COMPLETE",
+ "control_gitignore": ".governance-runtime/\n/.governance-runtime/*\n!/.governance-runtime/migration\n",
+ "control_ls_files_ci": [
+  ".governance-runtime/migration"
+ ],
+ "control_untrack_commit": {
+  "returncode": 0,
+  "stderr": ""
+ },
+ "ls_files_ci_after_surgery": [],
+ "original_gitignore": ".governance-runtime/\n/.governance-runtime/*\n!/.governance-runtime/migration\n",
+ "pass1": {
+  "changed": true,
+  "gitignore_after": "/.governance-runtime/*\n!/.governance-runtime/migration\n",
+  "removed_lines": [
+   ".governance-runtime/"
+  ]
+ },
+ "pass2_idempotent": {
+  "changed": false,
+  "idempotent": true,
+  "removed_lines": []
+ },
+ "untrack_commit": {
+  "note": "nothing to untrack",
+  "returncode": null
+ }
+}

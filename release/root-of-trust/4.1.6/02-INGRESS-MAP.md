@@ -1,6 +1,10 @@
 # Output 2 — Privileged-ingress map
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments: new ingress **I-69** release registration statements, **I-70** reproduction statements, **I-71**
+> input manifests (all carriers until selected, `30`), **I-72** admission records (local, `31` R-ADM-7), **I-73** the
+> independent executor `gov-admit`, **I-74** the working directory of a RoT-1 command (root discovery, `18` §9.2). Withdrawn:
+> artefact statements and build attestations (`05` §2). `governance/trust/registration.dsse.json` is in the Protected Path Set.
 > Revision 4 revises I-18, I-22, I-46, I-47, I-48…I-54 and I-56, and adds I-61…I-68:
 > - the system pin directory and the pin integrity predicate;
 > - in-gate state confirmation;

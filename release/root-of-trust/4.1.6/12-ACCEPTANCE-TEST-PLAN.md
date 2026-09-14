@@ -1,6 +1,9 @@
 # Output 12 — Independent acceptance-test plan
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 adds §4c (RT-128…RT-155), §7c (every review-r4 held-out attack mapped to an RT) and §8.1 (the revision-5
+> conformance oracle). RT-50, RT-50b, RT-56, RT-91, RT-92, RT-93, RT-101, RT-104, RT-115, RT-116, RT-122 and RT-127 are
+> revised there. RT-92 and RT-115 no longer test `release-artifact` or build attestations, which are withdrawn.
 > This plan says **what** the independent verifier of 4.1.6 must prove; the verifier authors its harness independently.
 > Revision 4 answers RV3-M9 (with CR-11, CR-12) and C-1…C-5:
 > - **No expected result is defined by architect evidence.** Revision 3 required the implementation to reproduce P4r3
@@ -207,6 +210,64 @@ defect. The matching oracle mutant is named in §8.
 | RT-126 | RV3-D-A14 | the interaction rows of review r3 D-A14 under revision-4 rules: surface × containment; freshness × binary; containment × trust gates; surface × trust gates | a kernel-side precedence change is ineligible and the vector reports no loss (RT-106, RT-99); a revoked binary on pinned CI is refused (RT-102, RT-105, RT-115); legacy CIT outcomes stay bounded (RT-81); owner-file absence fails closed (RT-120) | as in the referenced rows |
 | RT-127 [OP7] | RV3-D-A08, BC-4 | for each OP-2 source-authority choice, OP-2 `release-final` threshold, OP-4 answer and OP-7 option, run RT-80, RT-101…RT-105 and RT-115 | the observed exposure equals the `21` row for that choice, and nothing beyond it | as in the referenced rows |
 
+
+## 4c. Scenarios added in revision 5 (RT-128 … RT-155)
+
+Rule 13 applies: every RT names the refusal code and a harm assertion observable on the binary. [D] marks a distinguishing
+scenario required by §8.1.
+
+| RT | Scenario | Expected | Covers |
+|---|---|---|---|
+| RT-128 | Decision register compiled; each decision of `29` §4 present; compile-fail tests for a selector read from an unregistered source (R-SEL-1…3) | build fails on the unregistered source | FD-1 |
+| RT-129 [D] | For every registered selector, the next-lower-authority substitution is detected by the harness (R-SEL-4); includes the 20 D-A03 shapes and the 17 revision-5 rule shapes of `evidence/r5/DA03r5-*` | each mutant fails ≥ 1 scenario | RV4-M7 |
+| RT-130 | `gov trust draft-registration` with each of R-REG-3 (a)…(f) missing | refused; nothing signed | BC4-1 |
+| RT-131 | Derivation calculator on the implementation's release-process model: invariants INV-BYTES, INV-SRC, INV-SRC-KEYS, INV-INPUTS, INV-MIRROR, INV-ONE hold; the three controls reproduce | 0 invariant failures | BC4-1, BC4-4 |
+| RT-132 [D] | Root versions violating KS-9′, KS-10′, KS-12, KS-13 | `ROOT_VERSION_INVALID` in `gov`, `gov-admit` and `draft-policy` | FTC |
+| RT-133 | Reproducibility: `git archive` builds without `.git`; four paths and homes; each registered target on two OS images | bit-identical; no build path strings | IR-REP-1…3 |
+| RT-134 [D] | `verify-artifact` on every running-mode shape of `evidence/r5/P4r5-conformance-oracle.json` sections A and B (registration, quorum, conflict, one-signature, distinct keys, revoked statements, final restrictor, target, TBM, publication, A7, currency naming the TSS, VA5 rows) | the named codes; malicious binaries never installed | RV4-H1 |
+| RT-135 [D] | `gov-admit` on every bootstrap shape of `evidence/r5/FA5-first-admission.json` (revoked and remediated binaries, moved tag, stale or disagreeing channels, attacker lineage, stolen reproducer keys); shared vectors give identical results in `gov` and `gov-admit` | the named codes; candidate never executed (OS tracing shows no exec of the candidate) | RV4-H2 |
+| RT-136 | Phase 4: legacy consumer 4.1.2–4.1.5 obtains its first RoT-1 binary only through `gov-admit`; the candidate evaluating itself | `SELF_EVALUATION_REFUSED`; no self-verification path exists | RV4-B-A04 |
+| RT-137 [D] | Genuine unadmitted binary: C1, C2, C3, `confirm-root`, `confirm-state`, trust-gate confirmation; expired image record; own revocation held under OP-15 (a) and (b) | `BINARY_NOT_ADMITTED`; `ADMISSION_RECORD_EXPIRED`; `BINARY_REVOKED_SELF` per scope | RV4-D-A04 |
+| RT-138 | User-writable install: `update --apply`, `trust confirm`, decision-pin evaluation | `TCB_WRITABLE_BY_GOVERNED_ACCOUNT`; C0–C2 still available | CR4-B-01 (b) |
+| RT-139 | Swap the candidate file between measurement and install; pre-existing verifier trust store with a forged anchor at first admission | installed digest = measured; the forged anchor is moved aside and never read | R-ADM-6, R-ADM-8 |
+| RT-140 [D] | On a RoT-1 binary: RV4-B-A08 (superseded `aws-access-key` regex) and D-A02 T1–T4 presented as a new release, as the fixed release and as the older release; gap, inflated and stale-policy releases; Git-delivered higher-sequence final (D-A06) | `release_unregistered` / `surface_unregistered_for_release`; the `ASIA…` key file is never indexed or returned; legitimate 4.1.6 and 4.1.7 stay eligible | RV4-H3 |
+| RT-141 [D] | Registration reversion, unit removal and member-set narrowing without and with `lowering_history`; per-project `policy_lowering` gate | refused without history; gated per project with it | `23` §12.4 |
+| RT-142 [D] | A registration rewriting a registered release; two releases at one sequence; a set-valued registration | malformed; both registrations refused | `30` R-REG-4 |
+| RT-143 [D] | Capability Acceptance Contract Markdown v2 with compiled YAML v1 on a confirmed machine and on a machine with two valid group pins | `OWNER_CONSTITUTIONAL_GROUP_UNCONFIRMED` | RV4-L10 |
+| RT-144 [D] | On a genuine 4.1.6 install: every register of 4.1.2–4.1.5 from `product/`, `spec/`, `governance/`, `governance/overlay/`, `governance/views/`, `governance/trust/`, `governance/trust/kernel/`, `governance/trust/state/`, `governance/framework.lock/`, `.governance-runtime/` with no `--root`; RoT-1 commands from inside the PPS | no change under `governance/trust/**` is left `COMPLETE`; every nested install reported; `WORKING_DIRECTORY_IN_PROTECTED_PATH` | RV4-M1, C-1a |
+| RT-145 | RT-122 revised: migrated project from a real legacy `.gitignore` (legacy line retained) | the idiom lists nothing; a fresh clone is `COMPLETE`; re-running the transaction changes no byte | RV4-M6 |
+| RT-146 | P1r4 M5 migration on a fresh clone with no record | `OVERLAY_WEAKENING_GATE_REQUIRED` before commit | RV4-M5 |
+| RT-147 [D] | RT-101 revised: pin at t10 two days old; trust-state thief issues descendant t11x a minute ago | C3 refused (`TRUST_STATE_CURRENCY_UNPROVEN`); label names t10 only | CR4-B-07 |
+| RT-148 [D] | RT-56 revised: RV4-B-A13 on a clean runner and on a stateful machine | stateful: fails closed; stateless: the restated RS-2 outcome | CR4-B-03, RV4-M4 |
+| RT-149 | RT-104 revised: witness service fed by a Git host serving TSS 5 while TSS 9 is published; both witness keys in one service | refuses to witness TSS 5; `draft-policy` flags custody | CR4-B-02 |
+| RT-150 | Wildcard `informational` rule admitting unknown keys (RV4-B-A09 U01, U02) | inventory lint exit 4 or `surface_unclassified` | CR4-B-05, RV4-L1 (specification only; the draft inventory keeps the rule until TPS v1 enumerates it) |
+| RT-151 [D] | RV4-B-A11: development binary naming TSS 1,000,000 runs first; genuine binary later | not recorded; genuine binary accepted | CR4-B-08 |
+| RT-152 [D] | Protected decision pin with `expires_at` beyond `decision_pin_max_validity_days`, every kind | `DECISION_PIN_OUTSIDE_VALIDITY` | CR4-B-09 |
+| RT-153 [D] | Revoke the verification attestation or one reproduction of an accepted binary without revoking the binary | `VERIFICATION_RECORDS_BELOW_MINIMUM` / `REPRODUCTION_QUORUM_NOT_MET` | CR4-B-10 |
+| RT-154 | RV4-B-A12 (ii): stateless OP-7 (c) runner with witnesses at the C3 threshold: `verify-artifact` and `update --apply` | the same result as the decision table (C3 allowed) | CR4-B-06 |
+| RT-155 | Cone-mode `sparse-checkout set governance`; subtree pre-RoT install | `PARTIAL`; doctor names missing roots and the nested lock | C-6 |
+
+RT-127 (revised): the owner-option text of `21` equals the calculator output for each OP-2, OP-8, OP-9, OP-10 and OP-13 answer.
+
+## 7c. Coverage of review r4 held-out attacks
+
+| Attack | RT | Attack | RT | Attack | RT |
+|---|---|---|---|---|---|
+| RV4-B-A01 | RT-134, RT-131 | RV4-B-A13 | RT-148 | RV4-C-A07 | RT-122 |
+| RV4-B-A02 | RT-134, RT-131 | RV4-B-A14 | RT-149 | RV4-C-A08 | RT-123 (foreign journal), `18` §5.1 |
+| RV4-B-A03 | RT-135 | RV4-B-A15 | RT-146 | RV4-C-A09 | RT-123 |
+| RV4-B-A04 | RT-135, RT-136 | RV4-B-A16 | RT-152 | RV4-C-A10 | RT-98 (VU-11), RT-120 |
+| RV4-B-A05 | RT-103, RT-138 | RV4-B-A17 | RT-153 | RV4-D-A01 | RT-144 |
+| RV4-B-A06 | RT-131 | RV4-C-A01 | RT-144, RT-50b | RV4-D-A02 | RT-140 |
+| RV4-B-A07 | RT-80, RT-101…RT-105 | RV4-C-A02 | RT-145 | RV4-D-A03, A03b | RT-129, §8.1 |
+| RV4-B-A08 | RT-140 | RV4-C-A03 | RT-125 | RV4-D-A04 | RT-137 |
+| RV4-B-A09 | RT-150, RT-74 | RV4-C-A04 | RT-144 | RV4-D-A05 | RT-127, RT-141 |
+| RV4-B-A10 | RT-111 | RV4-C-A05 | RT-124, RT-155 | RV4-D-A06 | RT-140 |
+| RV4-B-A11 | RT-151, RT-116 | RV4-C-A06 | RT-81 | RV4-D-A07 | RT-131 |
+| RV4-B-A12 | RT-147, RT-154 | | | RV4-D-A08 | RT-143 |
+| | | | | RV4-D-A09 | RT-144 |
+| | | | | RV4-D-A10 | RT-140 |
+
 ## 5. Coverage of the owner-required cases
 
 | Requirement | Scenarios |
@@ -359,6 +420,21 @@ implementation has that defect.
 | `evidence/VA4-verify-artifact-source-scenarios.py` | the pattern for RT-115 | the revision-3 source rule reproduces RV3-B-A08 `ACCEPTED` |
 | `evidence/LR2-installation-state-and-strength-reference.py` | the pattern for the RoT-1 bounds of RT-81 and RT-122 | the revision-3 ignore rule gives `PARTIAL(occupation)` after the untracking idiom |
 | `evidence/P3r3-pre-rot-register-matrix.py` | the pattern for RT-50 and RT-50b | control L0 and ablation L3A show the register reaches mutating paths |
+
+
+### 8.1 Revision-5 conformance oracle (replaces the VA4 row and the P4r4 binary scenarios)
+
+| Oracle | Scope | Result recorded | Mutation sensitivity |
+|---|---|---|---|
+| `evidence/r5/P4r5-conformance-oracle.py` | running-mode admission-predicate/1; release eligibility under registration; carried CR4-B rules; 13 retained P4r4 rules; P4r4's 42 non-binary scenarios | 65 of 65 and 42 of 42 hold; **no expected-`ACCEPTED` attack row** (only honest controls expect `ACCEPTED`) | `evidence/r5/DA03r5-*`: D-A03's 20 normative rules 20 of 20 (13 retained on P4r4; 7 re-expressed on the AP lines; the 7 superseded P4r4 lines unreachable by design); 17 of 17 revision-5 rule mutants |
+| `evidence/r5/FA5-first-admission.py` with `gov_admit_reference.py` | bootstrap-mode admission-predicate/1 over real Ed25519 | see `22` §1 | its own single-rule mutants |
+| `evidence/r5/CS5-tcb-capability-sets.py` | minimum capability sets (FD-3) | 408 configurations; 0 invariant failures | controls for R-REP-2, R-REP-3 and first-hand custodial reproduction |
+| `constitutional-surface/csi_check.py selftest` | surface evaluator including release-scoped registration | 71 of 71 (S00–S55 unchanged; S56–S70 new) | S56–S70 each a rule of `23` §12 |
+| `evidence/r5/ST5-installation-state-r5.py` | `18` §9.1–§9.2 | pristine layouts `COMPLETE`; P5-1…P5-3 hold | subdirectory matrix of 6,292 invocations |
+
+The oracle mutants of the revision-4 table above that re-introduce review-r3 defects remain required: each still has a
+detecting scenario among P4r4's retained scenarios or P4r5's re-expressions (`M-source-from-release-commit` →
+`AP-R5_registration_not_referenced_by_tss`; `M-a7-against-tss-high-water` → `AP-A7_older_binary_after_newer_accepted`).
 
 ## 9. Evidence to record
 

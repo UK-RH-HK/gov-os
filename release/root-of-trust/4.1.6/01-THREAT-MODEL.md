@@ -1,6 +1,23 @@
 # Output 1 — Root-of-Trust Threat Model
 
-> **RoT-1 revision 4 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 5 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 5 amendments (normative; they supersede conflicting rows below):
+> - **Assumptions.** TA-1 restated: the running `gov` was admitted on this machine by an evaluator other than itself
+>   (`31`), or is a binary N+1 accepted by an admitted binary N. TA-5 restated: the operator reads the independent channels
+>   now, types the state fingerprint (OP-13) and compares the admitter digest. New: **TA-1b** the platform hash tool (and,
+>   under OP-12 (b), interpreter) on the first machine is genuine; **TA-10′** reproducers and registration custodians are
+>   independent of each other and of the pipeline (not verifier-checkable); **TA-11** verification processes are honest
+>   (OP-8 sets how many); **TA-12** the upstream toolchain release that passes the checksum check is not malicious (OP-10).
+> - **Adversaries.** A16 (build host) includes reproducer environments; **A19** input-mirror and upstream-toolchain
+>   attacker; **A20** independent-channel attacker (stale or forged channel page).
+> - **Threats added:** TH-89 one attestation key plus pipeline (RV4-B-A01, A02, A06, D-A07) → `30`; TH-90 first binary
+>   selected by transport or source host (RV4-B-A03, A04) → `31`; TH-91 ceremonies on an unadmitted binary (D-A04) → `31`
+>   GB-1; TH-92 superseded non-orderable content restored by a later final (RV4-B-A08, D-A02, D-A06) → `23` §12; TH-93
+>   subdirectory-rooted legacy writes (RV4-C-A01, D-A01, D-A09) → `18` §9; TH-94 persistence from confined children
+>   (RV4-B-A05) → `27` §3.3; TH-95 witness input (RV4-B-A14) → `24` §3.3; TH-96 clock set back (RV4-B-A13) → `24` §8; TH-97
+>   poisoned mirror / malicious named toolchain → `30` §4; TH-98 measured bytes differ from installed bytes → `31` R-ADM-6;
+>   TH-99 reproduction laundering by rotation re-signing → `05` §8; TH-100 hash-bound owner contract set mixed across
+>   versions (D-A08) → `23` §7.2.
 > Revision 4 restates goals and assumptions from the review-r3 findings, and adds threats TH-67…TH-88 for every review-r3
 > finding and held-out attack class:
 > - G17, G18, G19 and G21 restated; G22 (anchor and approval integrity) and G23 (clock-poisoning resistance) added;

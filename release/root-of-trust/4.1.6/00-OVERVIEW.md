@@ -1,112 +1,87 @@
-# Governance OS Root-of-Trust Architecture (RoT-1) — revision 4
+# Governance OS Root-of-Trust Architecture (RoT-1) — revision 5
 
 | | |
 |---|---|
 | **Status** | PROPOSED — `ARCHITECTURE_REVISION_READY_FOR_REVIEW`. Not approved, not implemented, not accepted. |
-| Revision | **4**, amending revision 3 (`ca77a43`) after the independent review `79a09a1` returned `ROOT_OF_TRUST_ARCHITECTURE_REJECTED` |
-| Author role | Root-of-Trust architect, run AR-0005 (Phase 1, handoff HO-0005). **Independence:** this session did not author revisions 1–3 or any review of them. It is not a reviewer and does not claim acceptance. |
+| Revision | **5**, the escalation synthesis amending revision 4 (`bca05a7`) after review `97a5545` returned `ROOT_OF_TRUST_ARCHITECTURE_REJECTED` |
+| Author role | Synthesis architect, run AR-0011 (Phase 1, handoff HO-0011). **Independence:** this session did not author revisions 1–4, any review, or either specialist proposal; it judged specialist A (`afda663`, AR-0009) and specialist B (`ed07926`, AR-0010) against the reviews and re-ran what revision 5 relies on. It does not claim acceptance. |
 | Date | 2026-09-14 |
-| Base | branch `phase1/rot1-r4-architect` from `f83da03` on `release/4.1.6-rc1` |
+| Base | branch `phase1/rot1-r5-synthesis-architect` from `c8cdfac` |
 | Rejected release baseline | `release/4.1.5-rc1`, tag `v4.1.5-rc1`, `da9c8518d3fddba6f37bafb4d046ca313335ec1f` |
-| Not modified | runtime, CLI, kernel (`framework/`), migrations, tests, fixtures, capabilities, Cargo files, released payloads, verifier artefacts, review directories, D-0001…D-0007. D-0008 and ARCH-0002 are amended in place and remain PROPOSED (record status `PROVISIONAL`, `in_effect: false`, no `chosen_option`). |
+| Not modified | runtime, CLI, kernel (`framework/`), migrations, tests, fixtures, capabilities, Cargo files, released payloads, verifier artefacts, review and specialist directories, D-0001…D-0007. D-0008 and ARCH-0002 are amended in place and remain PROPOSED (record status `PROVISIONAL`, `in_effect: false`, no `chosen_option`). |
 
 ## Document map
 
-| # | Output | File | Revision 4 |
+| # | Output | File | Revision 5 |
 |---|---|---|---|
 | — | Summary | `00-OVERVIEW.md` | rewritten |
-| 1 | Threat model | `01-THREAT-MODEL.md` | revised: G17–G19, G21 restated; G22, G23; A18; TA-7, TA-9 restated; TA-11; TH-67…TH-88 |
-| 2 | Ingress map | `02-INGRESS-MAP.md` | revised: I-61…I-68; confined children |
-| 3 | Trust chain | `03-TRUST-CHAIN.md` | revised |
-| 4 | Authentication architecture | `04-AUTHENTICATION-ARCHITECTURE.md` | revised: V8 source equality; V11s presence, profile, exact precedence, migration whitelist; API rules 8–12 |
-| 5 | Key purposes | `05-KEY-MANAGEMENT.md` | rewritten: twelve purposes; KS-11; SV-11; minimum keys re-derived; custodial rules; playbooks |
-| 6 | Bootstrap | `06-BOOTSTRAP.md` | revised: attested source; protected pins; currency proof |
-| 7 | Statements | `07-RELEASE-ENVELOPE-SPEC.md` | revised: `release.source`; attestation v2; build attestation v2; freshness witness; TPS schema 2.0.0 |
-| 8 | Layout and lock | `08-FRAMEWORK-LOCK.md` | revised: ignore rule |
-| 9 | Integration requirements | `09-INTEGRATION-REQUIREMENTS.md` | revised: R-ANCH-1…9, R-SURF-8…12, R-ART-5…7, R-CONF, R-FMT-6…7; codes; D038 |
-| 10 | Retrieval-profile trust | `10-RETRIEVAL-PROFILE-TRUST.md` | revised: currency; confined plugins |
-| 11 | Migration plan | `11-MIGRATION-PLAN.md` | revised: WP-20, WP-21; WP-18 re-issued migrations |
-| 12 | Acceptance-test plan | `12-ACCEPTANCE-TEST-PLAN.md` | revised: property assertions only; RT-101…RT-127, RT-50b; every review-r3 attack mapped; conformance oracle with mutants |
-| 13 | Legacy compatibility | `13-COMPATIBILITY.md` | revised |
-| 14 | Risks | `14-RISKS.md` | revised: RK-31…RK-37 |
-| 15 | D-0007 supersession and rules | `15-D-0007-SUPERSESSION.md` | revised: rules (1)–(21) |
-| 16 | ADR summary | `16-ADR-D-0008.md` | rewritten |
-| 17 | Monotonic trust state | `17-MONOTONIC-TRUST-STATE.md` | rewritten: inclusion anchors in S4; MS-2 lift attestation; MS-9 currency; clock; playbooks; blast radius |
-| 18 | Verify-and-use transaction | `18-VERIFY-AND-USE-TRANSACTION.md` | revised: VU-14; C-2…C-4 |
-| 19 | Eligibility and floor | `19-ELIGIBILITY-AND-SECURITY-FLOOR.md` | rewritten: registered precedence; directed join; E7/E8; weakening over effective policy; reductions in both directions |
-| 20 | Rollback and recovery | `20-ROLLBACK-AND-RECOVERY.md` | revised: reinstall identity from the VTS record; RR-2 |
-| 21 | Owner options | `21-OWNER-OPTIONS.md` | rewritten: OP-2 (source authority), OP-3, OP-4, OP-7 restated from corrected rules |
-| 22 | Response matrix | `22-REVIEW-RESPONSE-MATRIX.md` | rewritten for review r3 |
-| 23 | Constitutional Surface | `23-CONSTITUTIONAL-SURFACE.md` | rewritten: presence, YAML profile, exact precedence, two-directional order, Overlay Surface, owner domain |
-| 24 | Freshness, anchoring and currency | `24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md` | rewritten: inclusion, pin validity and integrity, currency proof, witness purpose, confinement |
-| 25 | Binary, built-source and trust-base authenticity | `25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md` | rewritten: attested source, A4a/A4b, A7, custodial stages, minimum capability sets |
-| 26 | Legacy-binary containment | `26-LEGACY-BINARY-CONTAINMENT.md` | revised: LR-2 restated; ignore rule; strength over effective policy |
-| 27 | Trust-decision authorisation | `27-TRUST-DECISION-AUTHORISATION.md` | revised: protected expiring decision pins; typed state fingerprint; confinement |
-| **28** | **Class remainder analysis** | `28-CLASS-REMAINDER-ANALYSIS.md` | **new**: why BC-1…BC-3 survived; removal versus condition; architect self-attacks A-R4-01…A-R4-08 |
-| — | Inventory and checker | `constitutional-surface/` | rewritten: `floor_schema_version` 3; `check`, `check-owner`, `reductions`, `selftest` (56 cases) |
-| — | Schemas, examples, evidence | `schemas/`, `examples/rev4/`, `evidence/` | schemas revised and added; revision-4 examples validated; P1r4, P4r4, VA4, LR2, P3r3 re-run, review-probe re-runs |
+| 1 | Threat model | `01-THREAT-MODEL.md` | amended: TA-1, TA-5 restated; TA-1b, TA-10′, TA-11, TA-12; A19, A20; TH-89…TH-100 |
+| 2–4 | Ingress map, trust chain, authentication architecture | `02`–`04` | amended: I-69…I-74; chain of record `25` §6; API rules 13–15 |
+| 5 | Key purposes | `05-KEY-MANAGEMENT.md` | **rewritten**: `release-registration`, `reproducer`; `release-artifact` and `build-attestation` withdrawn; KS-9′, KS-10′, KS-12, KS-13; Fact Threshold Check; computed minima |
+| 6 | Bootstrap | `06-BOOTSTRAP.md` | **rewritten**: registration, reproduction, independent admission only |
+| 7–10 | Statements, layout, integration requirements, retrieval profiles | `07`–`10` | amended |
+| 11 | Migration plan | `11-MIGRATION-PLAN.md` | amended: WP-22…WP-27; Phase 3 release flow; Phase 4 via `gov-admit` |
+| 12 | Acceptance-test plan | `12-ACCEPTANCE-TEST-PLAN.md` | amended: §4c RT-128…RT-155; §7c review-r4 attacks; §8.1 oracle |
+| 13–14 | Compatibility, risks | `13`, `14` | amended; RK-38…RK-45 |
+| 15–16 | D-0007 supersession, ADR | `15`, `16` | rules (5)–(24) |
+| 17–20 | Trust state, verify-and-use, eligibility, rollback | `17`–`20` | amended: admissibility of registrations and published binaries; `18` §9.1–§9.2; E7 against the release's registration; CR4-B-04 |
+| 21 | Owner options | `21-OWNER-OPTIONS.md` | **rewritten**: OP-1…OP-15, reconciled, no proposals |
+| 22 | Response matrix | `22-REVIEW-RESPONSE-MATRIX.md` | **rewritten** for review r4 |
+| 23 | Constitutional Surface | `23-CONSTITUTIONAL-SURFACE.md` | amended: **§12 release-scoped registration**; binding groups; CS-2 replaced |
+| 24 | Freshness, anchoring, currency | `24-…` | amended: proofs name the state; witness input and custody; stateful clock high-water; RS-2 |
+| 25 | Binary and trust-base authenticity | `25-…` | **rewritten**: admission-predicate/1 |
+| 26–27 | Legacy containment, trust-decision authorisation | `26`, `27` | amended: subdirectory scope, LP-1r/LP-1s, LR-2; decision-pin maximum validity; allow-list confinement |
+| 28 | Class remainder analysis | `28-…` | **updated**: accepted root cause; A-R5-01…13 |
+| **29** | **Fact derivation and selection authority** | `29-…` | **new**: rule FD-1; decision register; mechanical checks |
+| **30** | **Release registration and reproduction** | `30-…` | **new** (BC4-1) |
+| **31** | **Independent admission** | `31-…` | **new** (BC4-2) |
+| — | Checker | `constitutional-surface/` | release-scoped registration; self-test 71 cases |
+| — | Schemas, examples, evidence | `schemas/`, `examples/rev5/`, `evidence/r5/` | four schemas added, eight revised; CS5, P4r5, DA03r5, FA5, SRC5, REG5, ST5, re-runs |
+| — | Synthesis of the specialist alternatives | `../4.1.6-alternatives-r5/SYNTHESIS.md` | new |
 
 ## 1. Executive summary
 
-**The class.** One class has rejected 4.1.3, 4.1.4, 4.1.5 and RoT-1 revisions 1, 2 and 3: **a lower-trust input
-yielding a current, higher-trust fact.**
+**The class.** Seven rejections (4.1.3, 4.1.4, 4.1.5, revisions 1–4) share one class: **a lower-trust input yielding a
+current, higher-trust fact.** Review r4 found three narrowed remainders (BC4-1…BC4-3) and incorrect owner-option statements
+(BC4-4).
 
-**Why revision 3 fell short.** Its three HIGH findings were narrowed remainders of the revision-2 classes. Each earlier
-revision had added correct conditions downstream of a choice that a lower-trust party still made (`28`).
+**Root cause accepted** (`28` §3). No rule classified, per trust decision, which inputs may *select* the effective fact and
+at what authority and currency, and no mechanism computed the resulting minimum. Each revision therefore checked that a
+lower-trust value belonged to an authorised set, or counted signatures per purpose, while a lower-trust party still chose
+the member, supplied the fact a higher signer passed through, or evaluated itself.
 
-**Revision 4's approach.** It removes those inputs from the decision instead of adding conditions over them:
+**Revision 5** states that rule — **FD-1** (`29`) — and applies it to the three decisions that kept failing:
 
-| Class | Mistaken equivalence (review r3) | Revision 4 answer: the input removed | Evidence |
+| Class | Selector removed | Revision-5 selector | Evidence |
 |---|---|---|---|
-| **BC-1** (RV3-H1) | *a rule that refuses more project overrides is at least as strong; every present leaf classified means the constitution is in force* | **The kernel no longer takes part in effective precedence:** POLICY_PRECEDENCE must equal its root-signed registration, and the project layer's rule comes only from registrations. **Absence no longer changes semantics:** registered content must be present. The project layer is a **directed join**, and a sound two-directional order makes a TPS removal of strengthening a gated reduction. **Project strength is evaluated over effective policy**, not overlay bytes. Migrations write only root-registered targets. | **P1r4 on real 4.1.5:** all 9 attack cases (5 modes, the review example, deletion, 2 TPS tightenings) lose strengthening under revision 3 and keep it under revision 4; harms (a) authority, (b) indexing, (c) gate flip; 0 unsound order pairs; the strength vector reports every revision-3 loss. Checker: framework exit 0, precedence-only kernels exit 3, deletions exit 2. **CSI self-test 56/56.** |
-| **BC-2** (RV3-H2) | *an anchor number is met, so the anchored state is in force; anchored once means current* | **The supplier's sequence number** no longer satisfies an anchor: satisfaction is by inclusion only. **"Anchored once"** is no longer currency: pins expire, and every trust ingress and binary acceptance needs a currency proof (recent anchoring event, in-gate typed fingerprint, or ≥ 2 witness keys). **The trust-state key** cannot witness (a separate purpose). **The governed account** cannot write honoured pins (integrity predicate, confined repository commands). No surface says `current`. | **P4r4: 54/54 scenarios; 9/9 conformance-oracle mutants detected** (sequence anchors fail 3 scenarios); matrix of 132 rows: 77 refused, 42 stated core, 13 OP-7 (d) residual, 0 unstated, 0 labelled `current` |
-| **BC-3** (RV3-H3) | *reproduced from the named commit, therefore built from verified source* | **`release-final` no longer chooses the binary's source:** the source is the one an independent verification attested for the candidate, and it must be equal in candidate, final (V8), build attestation and Trust Base Manifest. `verify-artifact` A4a/A4b and every custodian check it. | **VA4: 16/16** as expected. RV3-B-A08, its REJECTED variant and RV3-D-A03 are refused. Minimum sets stated: route S needs 3 keys + pipeline input (2 under OP-4 "no"); route B needs 4 keys over 3 purposes. |
-| **BC-4** | OP-2, OP-4 and OP-7 consequence statements materially incorrect | Restated from the corrected rules, with evidence per consequence. OP-2 gains the binary source-authority choice (S0–S3). OP-7 gains pin-currency parameters, a witness authority above one key, and (d) scoped to the newest TSS. | `21`; VA4 routes; P4r4 matrix |
+| **BC4-1** (RV4-H1) | one `build-attestation` key + pipeline (bytes); one `verification-attestation` key (source); the release process (inputs); custodians passing through | **release registration** at root threshold or a root-granted quorum ≥ 2 (source identity, input manifest, final, targets, verification records, constitutional units) and **≥ 2 first-person reproductions confirmed first-hand** (bytes) (`30`) | **CS5**: 408 configurations, 0 invariant failures, no set with one key plus pipeline; **P4r5** VA5 rows refused; **DA03r5** |
+| **BC4-2** (RV4-H2) | independent tooling A2–A6; values the candidate prints; Phase 4 self-verification; ceremonies on the unaccepted binary | **one admission predicate** run by `gov-admit` with a **fingerprint typed now**, over **measured bytes installed from the buffer**; **genuine-binary rule**; ceremonies only after admission (`31`, `25` §5) | **FA5** (real Ed25519): 45/45 scenarios, 17/17 vectors, 26/27 mutants; revision-4 paths (b) and (c) pass as controls |
+| **BC4-3** (RV4-H3) | threshold-1 `release-final` choosing among registered digests | the **registration of exactly that release** fixes every non-join unit and the kernel tree; append-only; reversion, removal, narrowing are computed reductions (`23` §12) | **REG5** on real 4.1.5: the `ASIA…` file stays excluded; 15/15 mixed identities refused; legitimate releases eligible; **CSI5** 71/71 |
+| **BC4-4** | hand-written consequences | OP-1…OP-15 from the calculator; no proposals (`21`) | CS5 table |
 
-**Legacy containment is not regressed.** P3r3 was re-run unchanged on the real 4.1.2–4.1.5 binaries, and its summary,
-property and chain results equal the committed ones. Reviewer C's 84 destructive invocations write nothing. Residual
-LR-2 is restated with its reachable outcome after occupation removal or a Git restore; RoT-1 fails closed on all 24
-resulting trees (`LR2`). The untracking idiom no longer drops the migration occupation.
+**Legacy containment is not regressed and is tightened** (carried RV4-M1): P3r3 re-run equal (2,085 jobs); across 6,292
+subdirectory invocations of the real 4.1.2–4.1.5 registers, 112 wrote into the trust paths — all `COMPLETE` under revision 4,
+none under `18` §9.1.
 
-**Medium and low findings** are addressed or carried with named tests in `17`, `19`, `20`, `23`–`27` and `12`:
-- lift attestation (RV3-M1);
-- pin integrity and confinement (RV3-M2);
-- clock high-water (RV3-M3);
-- artefact playbook (RV3-M4);
-- migration whitelist (RV3-M5);
-- LR-2 (RV3-M6);
-- presence and owner files (RV3-M7);
-- accepted-TBM high-water (RV3-M8);
-- acceptance plan (RV3-M9);
-- RV3-L1…L8, CR-01…CR-12 and C-1…C-5.
+**Carried items** RV4-M2…M7, RV4-L1…L10, CR4-B-01…11 and C-2…C-6 are addressed or carried with named tests (`22` §3–§5).
 
-`22` maps every item to its change, file and evidence.
+**Kept from revision 4** (review r4 CD4-0): the authentication core; BC-1 closures; BC-2 closures; V8 (now a restrictor);
+root-anchored containment; the carried closures. **Replaced:** revision 4's binary predicate and custodial stages.
 
-**Kept from revision 3** (CD3-0):
-- the authentication core;
-- the CSI as a root-signed section with default deny;
-- release-local references, equivocation and computed lowering;
-- no trust ingress without an anchor;
-- local confirmations;
-- `release-artifact` ≥ 2 with build attestation and TBM;
-- the occupation layout and LP-1;
-- the transaction area and union records.
-
-## 2. Chain (summary; full diagram `03`)
+## 2. Chain (summary; full statement `25` §6)
 
 ```text
-independent channels (root id, state fingerprints) ─► OP-6 + anchor (protected valid pin / human / in-gate fingerprint)
-compiled TBM v2 (root chain · TPS with Constitutional Surface · TSS · embedded release · binary.source), accepted by
-  verify-artifact (A4a/A4b attested source · A7 accepted-TBM high-water · A9 currency proof)
-  → knowledge (union; future statements refused) → effective root · TPS (reductions both directions) · TSS (anchors by
-    INCLUSION; unchained never effective) · negatives (lift attestation) · freshness · currency
-  → authenticate (V0–V12; V8 source equality; V11s presence, YAML profile, exact precedence, migration whitelist)
-  → eligibility E1–E10 (E7 surface; E8 KNOWN + ANCHORED/WITNESSED + currency proof) → local trust gate (typed fingerprint
-    or protected expiring decision pin) → authority → confined children only after decisions
-  → install transaction (trust-tx, union record, occupation layout + ignore rule, strength vector over effective policy)
-  → every unit of work: installation state → snapshot generation → effective policy (floor joins; registered precedence
-    ⊔ held registration; directed project join; registered-relaxable exceptions only)
-  → operation class C0–C3 allowed by trust state × freshness × currency × OP-7
+independent channels ── root id · state fingerprints · admitter digest
+release registration (root threshold | root-granted quorum ≥ 2; append-only) ── source {commit, content digest} · input manifest
+    · final · targets · verification records (first-hand) · constitutional units + kernel tree digest
+reproducers (≥ q, one signature each, inputs by digest) ── confirm first-hand ──► trust-state publisher ── TSS (registrations[],
+    published_binaries[], revocations)
+first binary: gov-admit (typed fingerprint; never executes the candidate) ── admission-predicate/1 ──► install from buffer ·
+    admission record · fresh VTS
+later binaries: admitted gov (inclusion anchor + currency proof naming the TSS) ── admission-predicate/1 ──► binary N+1
+every process: root discovery (refuse inside PPS) → installation state (closed entry sets) → admission record of self (GB)
+    → knowledge → effective root (FTC) · TPS · TSS · negatives → authenticate → eligibility (E7 against the release's own
+    registration) → local trust gate → effective policy → C0–C3
 ```
 
 ## 3. Vocabulary — properties kept separate
@@ -114,61 +89,31 @@ compiled TBM v2 (root chain · TPS with Constitutional Surface · TSS · embedde
 | Property | Question | Mechanism | Never implies |
 |---|---|---|---|
 | Integrity | Are these bytes identical to a reference digest? | file map, tree digest | who chose the digest |
-| Authenticity | Was the reference issued by a key granted this purpose? | purpose-bound signatures | goodness, currency, certification |
-| Surface registration | Is every constitutional file and leaf classified, present and registered, with precedence equal to its registration? | CSI, E7 (`23`) | currency |
-| Eligibility | May this authentic release be the policy root given what this machine holds? | E1–E10 | freshness; certification |
-| **Anchoring** | Does the effective TSS chain through what was confirmed out of band? | inclusion (`24` §3.4) | currency |
-| **Currency** | Is there a proof that this was the published state as of a stated time? | P1/P2/P3 (`24` §4.4) | "current" beyond the bound |
-| Byte binding | Are the enforced bytes the verified bytes, in this unit of work? | `18` | — |
-| Binary acceptance | Is this binary the reproducible production binary of a final release, **built from attested source**? | `25` | project eligibility |
-| Authorisation | May this trust transition happen on this machine now? | local trust gates, protected pins, confinement, authority floor (`27`, `24` §3.5, `19` §8) | authenticity |
+| Authenticity | Was the reference issued by a key granted this purpose? | purpose-bound signatures | selection, currency |
+| **Registration** | Did the registration authority fix this release's source, inputs, final and constitutional units? | release registration (`30` §5) | that the source is benign (TB-4) |
+| **Reproduction** | Did ≥ q independent reproducers obtain these bytes from the registered source and inputs? | first-person quorum (`30` §7) | that the toolchain is benign (TA-12) |
+| Eligibility | May this registered release be the policy root here? | E1–E10 | currency |
+| Anchoring | Does the effective TSS chain through what was confirmed out of band? | inclusion (`24` §3.4) | currency |
+| Currency | Is there a proof naming this TSS as published as of a stated time? | P1 naming it, P2, P3 (`24` §4.4) | "current" beyond the bound |
+| **Admission** | Was this binary accepted on this machine by an evaluator other than itself? | admission-predicate/1, admission record (`31`) | protection against A3 |
+| Byte binding | Are the enforced bytes the verified bytes? | `18`; installation from the buffer | — |
+| Authorisation | May this trust transition happen here now? | local trust gates, protected pins, confinement | authenticity |
 
 ## 4. Root cause
 
-`28` has the full account. In summary:
-- Revision 1 fixed *authenticity*.
-- Revision 2 fixed *authenticity ⇒ currency* for registered keys and retained machines.
-- Revision 3 made each mechanism total over its class, but evaluated the checks over values a lower-trust party chose:
-  - the kernel's precedence rules;
-  - the supplier's sequence numbers;
-  - the release signer's commit name;
-  - files the governed account could write.
+`28` has the full account; `../4.1.6-alternatives-r5/SYNTHESIS.md` §1 gives each specialist's diagnosis and the synthesis.
 
-Revision 4 moves every such decision onto inputs that party cannot choose:
-- registrations signed at root threshold;
-- inclusion of an out-of-band anchor;
-- proofs of currency with stated bounds;
-- the source an independent verification attested;
-- pins outside the governed account's reach.
+## 5. Owner parameters (analysed in `21`; none decided, none proposed)
 
-It lists what still enters from outside the root threshold, and how each is bounded (`28` §3).
-
-## 5. Owner parameters (analysed in `21`; none decided)
-
-| ID | Revision 4 proposal (labelled, not a decision) | Security-material |
-|---|---|---|
-| OP-1 | 3 root keys, threshold 2. Root also signs the Constitutional Surface, exact precedence, the Overlay Surface, owner-domain slots, bootstrap parameters and, under (S1), production sources. | yes |
-| OP-2 | Twelve purposes; `release-artifact` 2 of 2; independent rebuilder; `release-final` threshold 1 with standby; `verification-attestation` threshold 1. **Binary source authority (S1), root-registered production sources.** | yes |
-| OP-3 | mode A: local trust gates with typed state fingerprint; protected expiring decision pins | yes |
-| OP-4 | separate candidate key | yes |
-| OP-5 | 180-day warning from the latest anchoring event, informational | no |
-| OP-6 | confirm once per VTS, in the same ceremony as state anchoring | yes |
-| OP-7 | **(a) anchored only**, `pin_max_validity_days` 30, `c3_currency_window_hours` 168; witness threshold 2 if (c) | yes |
+OP-1 root keys; OP-2 registration authority; OP-3 gating; OP-4 candidate key and remaining custody; OP-5 age warning; OP-6
+lineage confirmation after admission; OP-7 currency without a current proof; OP-8 verification records per registration;
+OP-9 reproducer set and registered binary digests; OP-10 common-mode toolchain; OP-11 retention of superseded releases;
+OP-12 admitter form; OP-13 channel agreement; OP-14 workstation admission-record validity; OP-15 revoked running binary scope.
 
 ## 6. Unresolved and not yet executable
 
-- **Not claimed resolved.** No finding is claimed accepted. Rows whose only evidence is specification are marked so in
-  `22`, with acceptance scenarios named:
-  - write confinement and the pin integrity predicate on real platforms;
-  - the in-binary surface evaluator, directed join, strength vector and consumer-register build;
-  - `verify-artifact` and its custodial stages;
-  - reinstall identity from the VTS record;
-  - C-2, C-4 and C-5.
-- **Model probes.** Reviewer B's reference model and synthesis D's oracle probe model revision-3 functions. Their
-  constructions are re-encoded as P4r4 scenarios, not re-run unmodified (`22` §1.1).
-- **Examples.** Examples cover the new record shapes and statement fragments. No full signed release, TPS or TSS example
-  is produced.
-- **Owner decisions.** OP-1…OP-7 are pending and are answered only after fresh reviews accept revision 4.
+`22` §10: no implementation exists; RT-128…RT-155 need it; CS5, P4r5 and FA5 are reference instruments; CR4-B-02, CR4-B-04,
+CR4-B-05, C-2…C-6, cross-OS reproducibility and root-owned install locations are specification only.
 
 ## 7. Verdict of this amendment
 

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-engineering-os/schemas/admission-record/1",
+  "title": "Local admission record (never signed; RoT-1 revision 5, PROPOSED; 31 R-ADM-7)",
+  "x-schema-version": "1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "binary_digest",
+    "target",
+    "release_id",
+    "lineage",
+    "state_fingerprint",
+    "admitted_at",
+    "admitter_digest",
+    "valid_until",
+    "location_protected"
+  ],
+  "properties": {
+    "schema": {
+      "const": "governance-os.admission-record/1"
+    },
+    "binary_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "target": {
+      "type": "string"
+    },
+    "release_id": {
+      "type": "string"
+    },
+    "lineage": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "state_fingerprint": {
+      "type": "string",
+      "pattern": "^gov-state:[0-9a-f]{8}:[0-9]+:[0-9a-f]{32}$"
+    },
+    "admitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "admitter_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "valid_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "location_protected": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+ "run_log": "FA5-RUN-LOG.json (AR-0011, RoT-1 revision 5)",
+ "tool_versions": {
+  "python": "Python 3.12.3",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "git": "git version 2.43.0",
+  "cryptography": "41.0.7"
+ },
+ "environment": {
+  "command_prefix": "env -i PATH=/usr/bin:/bin HOME=<scratch>/home PYTHONDONTWRITEBYTECODE=1",
+  "python_flags": "-B",
+  "git_flags": "GIT_CONFIG_NOSYSTEM=1",
+  "gov_variables": "none (no GOV_* variables)"
+ },
+ "commands": [
+  {
+   "step": 1,
+   "description": "Run FA5-first-admission.py (run 1)",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/home PYTHONDONTWRITEBYTECODE=1 python3 -B <evidence>/FA5-first-admission.py",
+   "exit_code": 0,
+   "output_file": "FA5-first-admission.json"
+  },
+  {
+   "step": 2,
+   "description": "Run FA5-first-admission.py (run 2, determinism check)",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/home PYTHONDONTWRITEBYTECODE=1 python3 -B <evidence>/FA5-first-admission.py",
+   "exit_code": 0,
+   "determinism": "cmp confirms byte-identical output"
+  },
+  {
+   "step": 3,
+   "description": "Run SRC5-source-identity.py (run 1)",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/home PYTHONDONTWRITEBYTECODE=1 GIT_CONFIG_NOSYSTEM=1 python3 -B <evidence>/SRC5-source-identity.py",
+   "exit_code": 0,
+   "output_file": "SRC5-source-identity.json"
+  },
+  {
+   "step": 4,
+   "description": "Run SRC5-source-identity.py (run 2, determinism check)",
+   "command": "env -i PATH=/usr/bin:/bin HOME=<scratch>/home PYTHONDONTWRITEBYTECODE=1 GIT_CONFIG_NOSYSTEM=1 python3 -B <evidence>/SRC5-source-identity.py",
+   "exit_code": 0,
+   "determinism": "cmp confirms byte-identical output"
+  }
+ ],
+ "output_sha256": {
+  "gov_admit_reference.py": "635c133a54b3005263c26ffdbb9be6f78137f9247b6417c968eed3575ef08bba",
+  "FA5-first-admission.py": "2066f83e29eeb230bdc98aa7b541adda3fa164398528ea7d04311d2943bfb31f",
+  "FA5-first-admission.json": "3fa0fc74483e5aee3f1509cdf001cf5bf0a3ad1cfd6cad465e853efd715a4cbf",
+  "SRC5-source-identity.py": "dd56f58c5db614c3a50756a1a4b1130246ef5f55e278b8a1326bf81b6a64cf0e",
+  "SRC5-source-identity.json": "2bbb289dffb4b9304cc289a6c214b8b52298875ce1245dd7b785329c35eb8ea5",
+  "FA5-RUN-LOG.json": "(this file)"
+ },
+ "determinism_results": {
+  "FA5-first-admission.json": "PASS (two runs byte-identical)",
+  "SRC5-source-identity.json": "PASS (two runs byte-identical)"
+ }
+}
