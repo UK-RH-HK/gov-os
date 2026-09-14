@@ -1,0 +1,322 @@
+{
+ "1_fresh_clone": {
+  "types": {
+   "governance/kernel": "file",
+   "governance/project": "file",
+   "governance/generated": "file",
+   "governance/framework.lock": "dir",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "file",
+   "spec/audits/GOVERNANCE-ADOPTION": "file",
+   ".governance-runtime/migration": "file",
+   "governance/trust": "dir",
+   "governance/trust/kernel": "dir",
+   "governance/trust/framework.lock": "file",
+   "governance/overlay": "dir",
+   "governance/kernel/KERNEL_MANIFEST.json": "absent"
+  },
+  "legacy_is_installed_pred": false,
+  "remedies": {
+   "update_rollback": {
+    "ok": false,
+    "code": "NOT_INSTALLED",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   },
+   "init_force": {
+    "ok": false,
+    "code": "IO_ERROR",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   },
+   "kernel_reinstall": {
+    "ok": false,
+    "code": "NOT_INSTALLED",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   }
+  }
+ },
+ "2_git_archive": {
+  "types": {
+   "governance/kernel": "file",
+   "governance/project": "file",
+   "governance/generated": "file",
+   "governance/framework.lock": "dir",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "file",
+   "spec/audits/GOVERNANCE-ADOPTION": "file",
+   ".governance-runtime/migration": "file",
+   "governance/trust": "dir",
+   "governance/trust/kernel": "dir",
+   "governance/trust/framework.lock": "file",
+   "governance/overlay": "dir",
+   "governance/kernel/KERNEL_MANIFEST.json": "absent"
+  },
+  "note": "no .git; is_installed pred still checked",
+  "legacy_is_installed_pred": false
+ },
+ "3_checkout_across_migration": {
+  "at_legacy_commit_types": {
+   "governance/kernel": "dir",
+   "governance/project": "dir",
+   "governance/generated": "dir",
+   "governance/framework.lock": "file",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "absent",
+   "spec/audits/GOVERNANCE-ADOPTION": "absent",
+   ".governance-runtime/migration": "absent",
+   "governance/trust": "absent",
+   "governance/trust/kernel": "absent",
+   "governance/trust/framework.lock": "absent",
+   "governance/overlay": "absent",
+   "governance/kernel/KERNEL_MANIFEST.json": "file"
+  },
+  "at_legacy_run": {
+   "legacy_is_installed_pred": true,
+   "remedies": {
+    "update_rollback": {
+     "ok": false,
+     "code": "SNAPSHOT_MISSING",
+     "tree_changed": false,
+     "trust_changed": false,
+     "changed": []
+    },
+    "init_force": {
+     "ok": true,
+     "code": null,
+     "tree_changed": true,
+     "trust_changed": false,
+     "changed": [
+      "governance/framework.lock",
+      "governance/generated/adapter-manifest.json",
+      "governance/generated/adapters/api/system-instruction.txt",
+      "governance/generated/adapters/cli/bootstrap-packet.json",
+      "governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md",
+      "governance/generated/tool-registry.json",
+      "governance/kernel/KERNEL_MANIFEST.json",
+      "governance/project/DATA_SENSITIVITY.yaml",
+      "governance/project/PROJECT_POLICY.yaml",
+      "spec/audits/AUD-0002.yaml"
+     ]
+    },
+    "kernel_reinstall": {
+     "ok": true,
+     "code": null,
+     "tree_changed": true,
+     "trust_changed": false,
+     "changed": [
+      "governance/kernel/KERNEL_MANIFEST.json"
+     ]
+    }
+   }
+  },
+  "back_to_rot1_types": {
+   "governance/kernel": "file",
+   "governance/project": "file",
+   "governance/generated": "file",
+   "governance/framework.lock": "dir",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "file",
+   "spec/audits/GOVERNANCE-ADOPTION": "file",
+   ".governance-runtime/migration": "file",
+   "governance/trust": "dir",
+   "governance/trust/kernel": "dir",
+   "governance/trust/framework.lock": "file",
+   "governance/overlay": "dir",
+   "governance/kernel/KERNEL_MANIFEST.json": "absent"
+  }
+ },
+ "4_case_collisions": [],
+ "5_dirfile_merge": {
+  "merge_rc": 0,
+  "merge_out": "Already up to date.\n",
+  "types_after_merge": {
+   "governance/kernel": "file",
+   "governance/project": "file",
+   "governance/generated": "file",
+   "governance/framework.lock": "dir",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "file",
+   "spec/audits/GOVERNANCE-ADOPTION": "file",
+   ".governance-runtime/migration": "file",
+   "governance/trust": "dir",
+   "governance/trust/kernel": "dir",
+   "governance/trust/framework.lock": "file",
+   "governance/overlay": "dir",
+   "governance/kernel/KERNEL_MANIFEST.json": "absent"
+  },
+  "legacy_run_after_merge": {
+   "legacy_is_installed_pred": false,
+   "remedies": {
+    "update_rollback": {
+     "ok": false,
+     "code": "NOT_INSTALLED",
+     "tree_changed": false,
+     "trust_changed": false,
+     "changed": []
+    },
+    "init_force": {
+     "ok": false,
+     "code": "IO_ERROR",
+     "tree_changed": false,
+     "trust_changed": false,
+     "changed": []
+    },
+    "kernel_reinstall": {
+     "ok": false,
+     "code": "NOT_INSTALLED",
+     "tree_changed": false,
+     "trust_changed": false,
+     "changed": []
+    }
+   }
+  }
+ },
+ "6_sparse_omit_occupation": {
+  "types": {
+   "governance/kernel": "absent",
+   "governance/project": "absent",
+   "governance/generated": "absent",
+   "governance/framework.lock": "dir",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "file",
+   "spec/audits/GOVERNANCE-ADOPTION": "file",
+   ".governance-runtime/migration": "absent",
+   "governance/trust": "dir",
+   "governance/trust/kernel": "dir",
+   "governance/trust/framework.lock": "file",
+   "governance/overlay": "dir",
+   "governance/kernel/KERNEL_MANIFEST.json": "absent"
+  },
+  "legacy_is_installed_pred": false,
+  "remedies": {
+   "update_rollback": {
+    "ok": false,
+    "code": "NOT_INSTALLED",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   },
+   "init_force": {
+    "ok": false,
+    "code": "IO_ERROR",
+    "tree_changed": true,
+    "trust_changed": false,
+    "changed": [
+     "governance/kernel/",
+     "governance/kernel/KERNEL.yaml",
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/kernel/adapters/",
+     "governance/kernel/adapters/api/",
+     "governance/kernel/adapters/api/adapter.yaml",
+     "governance/kernel/adapters/api/template.txt",
+     "governance/kernel/adapters/cli/",
+     "governance/kernel/adapters/cli/adapter.yaml",
+     "governance/kernel/adapters/cli/template.json",
+     "governance/kernel/adapters/generic/",
+     "governance/kernel/adapters/generic/adapter.yaml"
+    ]
+   },
+   "kernel_reinstall": {
+    "ok": false,
+    "code": "NOT_INSTALLED",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   }
+  }
+ },
+ "7_git_clean_fdx": {
+  "types": {
+   "governance/kernel": "file",
+   "governance/project": "file",
+   "governance/generated": "file",
+   "governance/framework.lock": "dir",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "file",
+   "spec/audits/GOVERNANCE-ADOPTION": "file",
+   ".governance-runtime/migration": "file",
+   "governance/trust": "dir",
+   "governance/trust/kernel": "dir",
+   "governance/trust/framework.lock": "file",
+   "governance/overlay": "dir",
+   "governance/kernel/KERNEL_MANIFEST.json": "absent"
+  },
+  "legacy_is_installed_pred": false,
+  "remedies": {
+   "update_rollback": {
+    "ok": false,
+    "code": "NOT_INSTALLED",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   },
+   "init_force": {
+    "ok": false,
+    "code": "IO_ERROR",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   },
+   "kernel_reinstall": {
+    "ok": false,
+    "code": "NOT_INSTALLED",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   }
+  }
+ },
+ "8_git_revert_migration": {
+  "revert_rc": 0,
+  "revert_out": " => project}/TOOL_PERMISSIONS.yaml (100%)\n delete mode 100644 governance/trust/FORMAT\n delete mode 100644 governance/trust/framework.lock\n delete mode 100644 governance/trust/release.dsse.json\n delete mode 100644 governance/trust/state/1.dsse.json\n delete mode 100644 spec/audits/GOVERNANCE-ADOPTION\n",
+  "types": {
+   "governance/kernel": "dir",
+   "governance/project": "dir",
+   "governance/generated": "dir",
+   "governance/framework.lock": "file",
+   "governance/framework.lock/ROT-1-TRUST-FORMAT": "absent",
+   "spec/audits/GOVERNANCE-ADOPTION": "absent",
+   ".governance-runtime/migration": "absent",
+   "governance/trust": "absent",
+   "governance/trust/kernel": "absent",
+   "governance/trust/framework.lock": "absent",
+   "governance/overlay": "absent",
+   "governance/kernel/KERNEL_MANIFEST.json": "file"
+  },
+  "legacy_is_installed_pred": true,
+  "remedies": {
+   "update_rollback": {
+    "ok": false,
+    "code": "SNAPSHOT_MISSING",
+    "tree_changed": false,
+    "trust_changed": false,
+    "changed": []
+   },
+   "init_force": {
+    "ok": true,
+    "code": null,
+    "tree_changed": true,
+    "trust_changed": false,
+    "changed": [
+     "governance/framework.lock",
+     "governance/generated/adapter-manifest.json",
+     "governance/generated/adapters/api/system-instruction.txt",
+     "governance/generated/adapters/cli/bootstrap-packet.json",
+     "governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md",
+     "governance/generated/tool-registry.json",
+     "governance/kernel/KERNEL_MANIFEST.json",
+     "governance/project/DATA_SENSITIVITY.yaml",
+     "governance/project/PROJECT_POLICY.yaml",
+     "spec/audits/AUD-0002.yaml"
+    ]
+   },
+   "kernel_reinstall": {
+    "ok": true,
+    "code": null,
+    "tree_changed": true,
+    "trust_changed": false,
+    "changed": [
+     "governance/kernel/KERNEL_MANIFEST.json"
+    ]
+   }
+  }
+ }
+}
