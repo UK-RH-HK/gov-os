@@ -770,3 +770,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | work `54be694`, report `44858be` on `phase1/rot1-r7-review-b`; held unmerged until reviewer C completes |
 | Findings | **HIGH RV7-B-H1:** a revocation counts at first contact only if a Trust State lists it, and no party must list it; a revoked binary was admitted on 11 daily states with its revocation up to 342 h old. **HIGH RV7-B-H2:** C3 checks only the age of the confirmation or pin, not of the named state; C3 was allowed on a 4-month-old state and on a re-stamped CI pin. **MEDIUM RV7-B-M1 (blocking per B):** one onboarding record names both first-contact sources. **LOW:** L1–L6. **INFO:** I1, I2. **Prior:** BC6-3 closed within B's attacks; BC6-1, BC6-2 and BC6-4 narrowed; RV6-H1, H2, H3 closed as stated. **Owner conformance:** exclusions EX-01…EX-24 conform; deviations via H1 (OP-4), H2 (OP-7 (a)) and M1 (OP-13 (b) stated consequence); D-0008 fields conform. **OT-1:** genuine owner trade-off, understated. **OT-2:** real, but already answered by the owner's "not certified" rule. |
 | Next action | await AR-0021; then merge B and C, write HO-0022 (D v4), spawn synthesis reviewer D |
+
+## L-0054 — 2026-09-14 — product-owner resolutions of OT-1 and OT-2 recorded
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 (panel in progress) |
+| Role | product owner (source); orchestrator (recording and routing) |
+| Input commit | `7c8415d` |
+| Work performed | Recorded the owner's message verbatim as OWNER-DESIGN-REQUIREMENTS-0002, binding resolutions clarifying OP-7, OP-10 and OP-13 (not D-0008 activation). **OT-1:** both OP-13 (b) channels independently provide matching immutable first-contact identity material (offline media allowed as the second identity source); current trust state stays under OP-7 (a) at 24 h with no media window and no grace period; without fresh state the machine may only inspect immutable material at the bounded diagnostic/bootstrap level and never reaches production admission or C1–C3; the high-water is never lowered. **OT-2:** no interim certification exception and no upstream-archive fallback; the criterion targets the trusting-trust class with a practical, independent, non-circular evidence route; distributions or mirrors are not independence, and byte-identity across different compilers is not required as a ritual; an unmet target is labelled "NOT CERTIFIED — TOOLCHAIN ASSURANCE INCOMPLETE"; architecture acceptance does not require a certified target if the criterion is explicit, executable/testable and non-circular. **Routing:** gate register and state updated, forbidden actions added, handoff templates for synthesis D, later reviewers and later architects patched to carry both owner records. Reviewer B's completed OT-1 assessment is superseded by the resolution; its H1/H2/M1 findings stand for adjudication. Running reviewer C will be informed of the record. |
+| Report / evidence | `GATES/OWNER-DESIGN-REQUIREMENTS-0002.md` (verbatim, sha256 `914720488a63e121…`), `GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml`, `CHECKPOINTS/CP-0017.yaml` |
+| Verdict | — (owner input; not a verdict and not a ratification) |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | message AR-0021 with the record; await it; synthesis D with both owner records |

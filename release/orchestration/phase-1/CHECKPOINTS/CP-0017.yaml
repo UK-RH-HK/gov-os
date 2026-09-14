@@ -1,0 +1,17 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0017
+trigger: owner answer (resolutions of OT-1 and OT-2) during the revision-7 review panel; change of next deterministic action
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_REVIEW_PANEL
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 7c8415dbd198939742860557716aaca2eed64c07
+owner_input:
+  id: OWNER-DESIGN-REQUIREMENTS-0002
+  record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md
+  record_sha256: 914720488a63e121146a3b335ecb06282cb7795802aa33da11de223af775918d
+  classification: binding resolutions of OT-1 and OT-2; not D-0008 approval
+panel: [AR-0020 reviewer B COMPLETED (branch held unmerged), AR-0021 reviewer C RUNNING (to be informed of -0002)]
+d0008_state: {status: PROVISIONAL, proposal_state: PROPOSED, human_approved: false}
+next_deterministic_action: message reviewer C with the -0002 commit and path; then await C; then synthesis D with -0001 and -0002

@@ -89,3 +89,17 @@ gates:
       - D-0008 keeps status PROVISIONAL, proposal_state PROPOSED, human_approved false; D-0007 stays ACTIVE until GATE-OWNER-D0008 ratification
       - selected parameters are not reopened unless an independent reviewer identifies a genuinely new owner trade-off
     satisfaction_evidence: this record's commit
+
+  - id: OWNER-DESIGN-REQUIREMENTS-0002
+    title: Product-owner resolutions of OT-1 (offline media vs 24-hour freshness) and OT-2 (toolchain assurance) for CP-1 / revision 7
+    status: RECORDED
+    satisfier: product owner
+    classification: binding owner resolutions clarifying OP-7, OP-10, OP-13 of OWNER-DESIGN-REQUIREMENTS-0001; NOT approval, activation or ratification of D-0008
+    record_paths: [release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml]
+    effects:
+      - OT-1 and OT-2 are resolved owner requirements; reviewers B, C and synthesis attack the resulting concrete design
+      - immutable first-contact identity (both channels, media allowed) is distinct from mutable trust-state freshness, which stays OP-7(a) 24h and fail-closed to the bounded diagnostic level
+      - all targets stay NOT CERTIFIED until an explicit, executable, non-circular trusting-trust evidence criterion is met; no interim exception, no upstream-archive fallback
+      - architecture acceptance does not require a certified target, provided that criterion is explicit, executable/testable and non-circular
+    satisfaction_evidence: this record's commit
+
