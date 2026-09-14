@@ -1,0 +1,9 @@
+{
+ "mutant_executor_statement_in_bundle": "BINARY_REVOKED",
+ "mutant_executor_statement_withheld_by_transport": "ACCEPTED",
+ "mutant_is_the_loaded_executor": true,
+ "verdicts": {
+  "executor_fix_does_not_close_the_class_when_withheld": true,
+  "executor_fix_refuses_when_the_statement_is_delivered": true
+ }
+}

@@ -1,0 +1,233 @@
+{
+ "probe": "RV7-B-A09 exclusion schema sweep (AR-0020)",
+ "rows": {
+  "admission-record.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "artifact-statement.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "binary-reproduction.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "build-attestation.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "certification-statement.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "constitutional-surface-inventory.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "dsse-envelope.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "environment-lock.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "environment-manifest.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "environment-reproduction.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "first-contact-authority.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "framework-lock-3.0.0.schema.json": {
+   "excluded_identifiers": {
+    "freshness": {
+     "keys": [
+      "<property-name>",
+      "required"
+     ],
+     "only_in_description_or_title": false
+    }
+   },
+   "external_refs": [],
+   "open_objects": []
+  },
+  "input-manifest.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "legacy-identity-statement.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "profile-statement.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "registration-revocation.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "release-registration.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "release-statement.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "revocation-statement.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-base-manifest.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-decision-pin.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-format.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-gate-confirmation.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-policy-statement.schema.json": {
+   "excluded_identifiers": {
+    "channel_quorum": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    },
+    "max_anchor_age": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    },
+    "op6_mode": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    },
+    "op7_mode": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    },
+    "revoked_self_scope": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    },
+    "witness": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    }
+   },
+   "external_refs": [],
+   "open_objects": [
+    {
+     "additionalProperties": "<absent>",
+     "path": "/properties/surface"
+    }
+   ]
+  },
+  "trust-root.schema.json": {
+   "excluded_identifiers": {
+    "freshness": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    },
+    "witness": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    }
+   },
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-state-pin.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  },
+  "trust-state-statement.schema.json": {
+   "excluded_identifiers": {
+    "witness": {
+     "keys": [
+      "description"
+     ],
+     "only_in_description_or_title": true
+    }
+   },
+   "external_refs": [],
+   "open_objects": []
+  },
+  "verification-attestation.schema.json": {
+   "excluded_identifiers": {},
+   "external_refs": [],
+   "open_objects": []
+  }
+ },
+ "schemas": 28,
+ "verdicts": {
+  "no_excluded_identifier_outside_descriptions": false,
+  "no_external_refs": true,
+  "open_objects": {
+   "trust-policy-statement.schema.json": [
+    {
+     "additionalProperties": "<absent>",
+     "path": "/properties/surface"
+    }
+   ]
+  }
+ },
+ "withdrawn": [
+  "README.md",
+  "first-contact-manifest.schema.json",
+  "freshness-witness.schema.json"
+ ]
+}
