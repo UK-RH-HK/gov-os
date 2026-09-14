@@ -1,0 +1,7490 @@
+{
+ "model": "RV4-B-M independent reference model of RoT-1 revision 4 (AR-0006)",
+ "params_default": {
+  "pin_max_validity_days": 30,
+  "c3_window_hours": 168,
+  "max_anchor_age_days": 180,
+  "witness_validity_hours": 168
+ },
+ "R_review_r3_constructions": [
+  {
+   "id": "RV3-B-A02 (100d)",
+   "construction": "CI pin at t5 provisioned 100 days ago; stripped repository",
+   "revision_4_result": {
+    "a": [
+     "C0"
+    ],
+    "b": [
+     "C0"
+    ],
+    "c": [
+     "C0"
+    ],
+    "d": [
+     "C0",
+     "C1",
+     "C2"
+    ]
+   },
+   "secure_expectation": "no C2 policy root under (a)-(c); (d) C1-C2 labelled",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A02 (400d)",
+   "construction": "CI pin at t5 provisioned 400 days ago; stripped repository",
+   "revision_4_result": {
+    "a": [
+     "C0"
+    ],
+    "b": [
+     "C0"
+    ],
+    "c": [
+     "C0"
+    ],
+    "d": [
+     "C0",
+     "C1",
+     "C2"
+    ]
+   },
+   "secure_expectation": "no C2 policy root under (a)-(c); (d) C1-C2 labelled",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A03",
+   "construction": "pin at t10 written by a process of the job's uid (mode 0644)",
+   "revision_4_result": {
+    "freshness": "UNANCHORED",
+    "ignored": [
+     "PIN_WRITABLE_IGNORED"
+    ]
+   },
+   "secure_expectation": "UNANCHORED",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A04",
+   "construction": "decision pins for framework_update/weakening/project_strength/downgrade: writable vs protected",
+   "revision_4_result": {
+    "writable": {
+     "framework_update": false,
+     "weakening": false,
+     "project_strength": false,
+     "downgrade": false
+    },
+    "protected": {
+     "framework_update": true,
+     "weakening": true,
+     "project_strength": true,
+     "downgrade": false
+    }
+   },
+   "secure_expectation": "writable: none; protected: never local_terminal_only kinds",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A05",
+   "construction": "lift of WITHDRAWN wd1 with a CERTIFIED and TSS referencing the pre-withdrawal attestation (no lifts_negative_statement_digest)",
+   "revision_4_result": {
+    "pre_negative_attestation_lifts": false,
+    "attestation_naming_wd1_lifts": true,
+    "distinct_keys_for_lift": 3
+   },
+   "secure_expectation": "negative remains; a new attestation naming the negative is needed; >= 3 keys",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A06",
+   "construction": "OP-7 (c): trust-state key signs an admissible TSS 100 (chains t1, t5, keeps t5's references) and a witness-shaped statement naming it, on a stateless runner",
+   "revision_4_result": {
+    "effective": "t100",
+    "freshness": "UNANCHORED",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "secure_expectation": "not WITNESSED (purpose); C0 only",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A07",
+   "construction": "release candidate with issued_at 100 years ahead",
+   "revision_4_result": {
+    "ingested": false
+   },
+   "secure_expectation": "refused at ingest (SV-11)",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A08",
+   "construction": "release-final names commit-evil, promoted from the genuine attested candidate",
+   "revision_4_result": "RELEASE_IDENTITY_MISMATCH(source)",
+   "secure_expectation": "RELEASE_IDENTITY_MISMATCH(source)",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A09",
+   "construction": "artefact playbook: TSS 12 keeps artifacts[] and adds revocation; control drops the reference",
+   "revision_4_result": {
+    "keeps": "KNOWN",
+    "drops": "REGRESSION"
+   },
+   "secure_expectation": "KNOWN / REGRESSION",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A10",
+   "construction": "OP-7 (d) unanchored with an unresolved higher TSS (INCOMPLETE)",
+   "revision_4_result": [
+    "C0",
+    "C1"
+   ],
+   "secure_expectation": "C2 refused",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A11",
+   "construction": "OP-7 (c) with a 1095-day human anchor, no witness",
+   "revision_4_result": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "secure_expectation": "C2 allowed, C3 refused (non-witness anchor follows (a))",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A12 / RV3-D-A12 (pin t10, t9/t10 withheld)",
+   "construction": "trust-state key presents TSS 100 chaining only t1, t5",
+   "revision_4_result": {
+    "trust_state": "BELOW_ANCHOR",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "secure_expectation": "BELOW_ANCHOR, or REGRESSION when the anchored statement is held",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A12 / RV3-D-A12 (human t10, t9/t10 withheld)",
+   "construction": "trust-state key presents TSS 100 chaining only t1, t5",
+   "revision_4_result": {
+    "trust_state": "BELOW_ANCHOR",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "secure_expectation": "BELOW_ANCHOR, or REGRESSION when the anchored statement is held",
+   "holds": true
+  },
+  {
+   "id": "RV3-B-A12 / RV3-D-A12 (machine holds t10)",
+   "construction": "trust-state key presents TSS 100 chaining only t1, t5",
+   "revision_4_result": {
+    "trust_state": "REGRESSION",
+    "allowed": [
+     "C0"
+    ]
+   },
+   "secure_expectation": "BELOW_ANCHOR, or REGRESSION when the anchored statement is held",
+   "holds": true
+  },
+  {
+   "id": "RV3-D-A04",
+   "construction": "OP-7 (d) unpinned runner, revocation-only TSS t9 withheld",
+   "revision_4_result": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2"
+    ],
+    "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)"
+   },
+   "secure_expectation": "C1-C2 labelled FRESHNESS_UNPROVEN (the stated (d) residual); never C3",
+   "holds": true
+  },
+  {
+   "id": "RV3-D-A13",
+   "construction": "TBM names t10, artefact referenced by t11 (realisable); then an older genuine binary after the newer was accepted",
+   "revision_4_result": {
+    "new_binary": "ACCEPTED",
+    "older_binary_after_newer": "BINARY_T0_ROLLBACK"
+   },
+   "secure_expectation": "ACCEPTED / BINARY_T0_ROLLBACK (or revoked)",
+   "holds": true
+  },
+  {
+   "id": "RV3-D-A15 (i) stale pin t5 400d",
+   "construction": "revoked genuine binary B7 via verify-artifact on pinned CI",
+   "revision_4_result": "TRUST_STATE_NOT_C3",
+   "secure_expectation": "refused",
+   "holds": true
+  },
+  {
+   "id": "RV3-D-A15 (ii) current pin t10 + trust-state key t100",
+   "construction": "revoked genuine binary B7 via verify-artifact on pinned CI",
+   "revision_4_result": "ARTIFACT_SOURCE_UNVERIFIED",
+   "secure_expectation": "refused",
+   "holds": true
+  }
+ ],
+ "MX_matrix_summary": {
+  "rows": 336,
+  "classification_counts": {
+   "REFUSED": 163,
+   "STATED RS-4 (outside TA-9)": 31,
+   "STATED RS-5 (witness keys at threshold)": 9,
+   "STATED OP-7 (d) residual": 16,
+   "STATED RS-2 / TA-7 (clock)": 23,
+   "STATED RS-3 (same-account VTS forgery)": 27,
+   "STATED CORE RS-1 / RS-1c": 67
+  },
+  "unstated_rows": [],
+  "rows_where_surface_says_current": 0
+ },
+ "MX_matrix": [
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M1_first_install_human_confirms_t10",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "WITNESSED(5,2 keys)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2a_ci_no_pin",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2b_ci_pin_t10_1d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "BELOW_ANCHOR",
+   "freshness": "BELOW_ANCHOR",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_SOURCE_UNVERIFIED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 5d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 5d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "WITNESSED(5,2 keys)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 5d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 5d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2c_ci_pin_t5_400d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2d_ci_pin_t5_20d_pre_revocation",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "WITNESSED(5,2 keys)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M2e_ci_pin_writable_by_job",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,pin,age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M3_restored_backup_human_t5_400d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 400d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M4_old_epoch_human_t5_20d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 20d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "WITNESSED(5,2 keys)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED OP-7 (d) residual"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M5_no_epoch",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "UNANCHORED(FRESHNESS_UNPROVEN)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "REGRESSION",
+   "freshness": "REGRESSION",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "REGRESSION",
+   "freshness": "REGRESSION",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "REGRESSION",
+   "freshness": "REGRESSION",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "REGRESSION",
+   "freshness": "REGRESSION",
+   "allowed": [
+    "C0"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6A_holds_t10_human_t10_1d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(10,human,age 1d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human within window",
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "ARTIFACT_REVOKED",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M6B_human_t5_30d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 30d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "a",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "b",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": false,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "REFUSED"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P3 witnesses",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-5 (witness keys at threshold)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "c",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip+trust_state_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip+witness_keys_at_threshold",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip+one_witness_key",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED CORE RS-1 / RS-1c"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip+clock_A13",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-2 / TA-7 (clock)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip+same_account_code_A3",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human(forged by A3 in its own VTS),age 0d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 human(forged by A3 in its own VTS) within window",
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": true,
+   "revoked_B7_verify_artifact": "ACCEPTED",
+   "surface_says_current": false,
+   "classification": "STATED RS-3 (same-account VTS forgery)"
+  },
+  {
+   "machine": "M7_offline_human_t5_1095d",
+   "op7": "d",
+   "adversary": "strip+pin_by_repo_job_TA9_violated",
+   "trust_state": "KNOWN",
+   "freshness": "ANCHORED(5,human,age 1095d)",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2"
+   ],
+   "proof": null,
+   "revoked_R7_c2_policy_root": true,
+   "revoked_R7_c3_ingress": false,
+   "revoked_B7_verify_artifact": "TRUST_STATE_NOT_C3",
+   "surface_says_current": false,
+   "classification": "STATED RS-4 (outside TA-9)"
+  }
+ ],
+ "PS_parameter_sweep": [
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 719,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 719,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 719,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 4296,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 0,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 0,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 167,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 30,
+    "c3_window_hours": 168,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 167,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 167,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 167,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 4296,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 23,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 0,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 0,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 167,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 7,
+    "c3_window_hours": 24,
+    "max_anchor_age_days": 180,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 2136,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 719,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 2136,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "pinned_CI_pin_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 719,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "human_anchor_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 719,
+   "C2_unbounded_on_grid": true
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "a",
+   "max_staleness_hours_on_grid_C2": 0,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "b",
+   "max_staleness_hours_on_grid_C2": 0,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "c",
+   "max_staleness_hours_on_grid_C2": 167,
+   "max_staleness_hours_on_grid_C3": 167,
+   "C2_unbounded_on_grid": false
+  },
+  {
+   "params": {
+    "pin_max_validity_days": 90,
+    "c3_window_hours": 720,
+    "max_anchor_age_days": 30,
+    "witness_validity_hours": 168
+   },
+   "class": "stateless_c_replayed_honest_witness_1h_before_revocation",
+   "op7": "d",
+   "max_staleness_hours_on_grid_C2": 24000,
+   "max_staleness_hours_on_grid_C3": 0,
+   "C2_unbounded_on_grid": true
+  }
+ ],
+ "BC_binary_capability_sets": {
+  "rows": [
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_bytes",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": null,
+    "minimal_capability_sets": [
+     [
+      "ba",
+      "ba2",
+      "pipeline"
+     ],
+     [
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rc",
+      "rf",
+      "va",
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rc",
+      "rf",
+      "va",
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rf",
+      "va",
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S0",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rf",
+      "va",
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S1",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "va2",
+      "pipeline"
+     ],
+     [
+      "rc",
+      "rf",
+      "va",
+      "va2",
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "va2",
+      "pipeline"
+     ],
+     [
+      "rc",
+      "rf",
+      "va",
+      "va2",
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "va2",
+      "pipeline"
+     ],
+     [
+      "rf",
+      "va",
+      "va2",
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S2",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "va2",
+      "pipeline"
+     ],
+     [
+      "rf",
+      "va",
+      "va2",
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 2
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": false,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rc",
+      "rf",
+      "va",
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": false,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rc",
+      "rf",
+      "va",
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": true,
+    "rebuilders": 1,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rf",
+      "va",
+      "ba",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": true,
+    "minimal_capability_sets": [],
+    "min_stolen_keys_in_any_minimal_set": null
+   },
+   {
+    "goal": "evil_source",
+    "OP-2_source_authority": "S3",
+    "OP-4_no": true,
+    "rebuilders": 2,
+    "verifier_REJECTED_reaches_signers_and_publisher": false,
+    "minimal_capability_sets": [
+     [
+      "va",
+      "pipeline"
+     ],
+     [
+      "rf",
+      "va",
+      "ba",
+      "ba2",
+      "ra1",
+      "ra2",
+      "ts"
+     ]
+    ],
+    "min_stolen_keys_in_any_minimal_set": 1
+   }
+  ],
+  "trace_build_attestation_key_plus_pipeline_S0": {
+   "result": "ACCEPTED",
+   "trace": [
+    "genuine candidate, ACCEPTED attestation and final",
+    "build attestation for the malicious digest signed with stolen key(s) ['ba1']",
+    "honest release-artifact custodians: stage custodian PASS; signed",
+    "TSS 11 references the artefact (honest publisher, stage PASS)"
+   ]
+  },
+  "trace_verification_attestation_key_plus_pipeline_S0_rejected_not_delivered": {
+   "result": "ACCEPTED",
+   "trace": [
+    "honest candidate signer reproduced the pipeline commit and signed",
+    "ACCEPTED attestation forged",
+    "honest promoter and final signer saw an ACCEPTED attestation and signed",
+    "honest rebuilder: stage rebuilder PASS; reproduced the attested source; attested",
+    "honest release-artifact custodians: stage custodian PASS; signed",
+    "TSS 11 references the artefact (honest publisher, stage PASS)"
+   ]
+  },
+  "pack_claims": {
+   "25 \u00a77 route B": "release-artifact x2 + build-attestation + trust-state (4 keys over 3 purposes), no pipeline control needed",
+   "25 \u00a77 route S": "verification-attestation + release-candidate + release-final + build input (3 keys; 2 under OP-4 'no')",
+   "25 \u00a77 / 05 \u00a73": "No single key of any purpose, at any threshold, can mint an accepted production binary",
+   "21 OP-2 (S1)": "route S needs the root threshold; the minimum becomes route B (4 keys over 3 purposes)"
+  }
+ },
+ "FB_first_binary": [
+  {
+   "id": "FB1",
+   "scenario": "B7 genuine, revoked in t9 (security defect). A5 serves root v1, TPS, t1, t5 and B7's statements; t9, t10, rv9 withheld.",
+   "path_b_independent_tooling_A2_A6": "PASS",
+   "path_iii_verify_artifact_on_machine_holding_t10": "ARTIFACT_REVOKED",
+   "path_iii_verify_artifact_machine_anchored_by_channel_fingerprint_t10_stripped": "ARTIFACT_SOURCE_UNVERIFIED"
+  },
+  {
+   "id": "FB2",
+   "scenario": "B7 stands for a malicious binary accepted through stolen release-artifact x2 + build-attestation keys; remediation: root v2 removes the keys, rv9 revokes B7, t9/t10 keep artifacts[] (05 \u00a79). A5 serves root v1 only and the pre-remediation statements.",
+   "path_b_independent_tooling_with_root_v1_keys (lineage id equals the channel's)": "PASS",
+   "path_b_with_root_v2": "ARTIFACT_BUILD_UNATTESTED",
+   "path_iii_on_machine_holding_root_v2_and_t10": "THRESHOLD_NOT_MET"
+  },
+  {
+   "id": "FB3",
+   "scenario": "11 Phase 4: a legacy consumer runs `gov trust verify-artifact` for its first 4.1.6 binary. No earlier RoT-1 binary exists, so the verifier is the binary under verification.",
+   "result": "the outcome is whatever the binary under verification reports (self-validation; 15 rule (16))"
+  },
+  {
+   "id": "FB4",
+   "scenario": "06 \u00a72 step 6 (c): compare `gov version --trust` (lineage, TBM digest) of a binary built from the tag",
+   "result": "executed in RV4-B-confinement-and-first-binary.json part B: a planted binary reports the genuine TBM digest; the TBM has no code digest"
+  }
+ ],
+ "AT_LB": [
+  {
+   "id": "AT1",
+   "scenario": "clean CI runner (empty VTS, valid current pin): verify-artifact of an older genuine unrevoked binary after the newer one exists",
+   "older_binary_on_stateless_runner": "ACCEPTED",
+   "older_binary_on_machine_with_accepted_tbm_(1,2,10)": "BINARY_T0_ROLLBACK",
+   "pack_claim_25_s7": "a genuine older binary presented as an upgrade: no (BINARY_T0_ROLLBACK against the accepted-TBM high-water)"
+  },
+  {
+   "id": "AT2",
+   "reading_of_24_s8_and_25_first_run": "record any TBM at first run",
+   "first_run_binary": "development or unverified build whose TBM names TSS sequence 1,000,000",
+   "later_genuine_binary_result": "BINARY_T0_ROLLBACK"
+  },
+  {
+   "id": "AT2",
+   "reading_of_24_s8_and_25_first_run": "record only a TBM that resolves (A6) against held verified statements",
+   "first_run_binary": "development or unverified build whose TBM names TSS sequence 1,000,000",
+   "later_genuine_binary_result": "ACCEPTED"
+  },
+  {
+   "id": "LB1",
+   "scenario": "pin at t10 provisioned 2 days ago; a trust-state key thief issues t11x (descendant of t10, issued 1 minute ago)",
+   "effective": "t11x",
+   "proof": "P1 pin within window",
+   "proof_time_days_ago": 2.0,
+   "effective_statement_issued_days_ago": 0.0006944444444444445,
+   "pack_text_24_s4_4": "A proof establishes that n was the published state as of the proof time",
+   "statement_existed_at_proof_time": false,
+   "C3_allowed": true
+  },
+  {
+   "id": "LB2",
+   "scenario": "OP-7 (c), stateless runner, honest witnesses on t10 at the C3 threshold",
+   "decision_table_24_s4_3_reading": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "currency_proof_definition_24_s4_4_reading": "no currency proof (not ANCHORED) -> A9 TRUST_STATE_CURRENCY_UNPROVEN",
+   "consistent": false
+  },
+  {
+   "id": "LB3",
+   "scenario": "OP-7 (a); runner clock set 395 days back; pin at t5 provisioned 400 days before true now; no witnesses exist under (a), so clock_high_water stays 0",
+   "allowed": [
+    "C0",
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "proof": "P1 pin within window",
+   "pack_bound_RS_2": "Clock rollback below clock_high_water makes clock-based proofs and pins unusable (fail closed)",
+   "bound_applies": false
+  }
+ ],
+ "R_summary": {
+  "constructions": 18,
+  "hold": 18
+ }
+}
