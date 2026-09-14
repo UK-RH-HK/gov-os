@@ -1,0 +1,28 @@
+{
+ "after_deletion": {
+  "trust_present": true,
+  "trust_digest": "acdb6fd3425b53c8",
+  "legacy_is_installed": false
+ },
+ "legacy_init_force": {
+  "ok": false,
+  "code": "IO_ERROR",
+  "governance_trust_mutated": false,
+  "legacy_is_installed_after": true,
+  "kernel_manifest_created": true,
+  "fresh_overlay_DATA_SENSITIVITY_present": false
+ },
+ "legacy_operates_after": {
+  "rebuild_ok": false,
+  "memory_query_ok": true,
+  "restricted_plan_retrievable_by_legacy": [],
+  "legacy_kernel_trust_verified": false,
+  "rot1_overlay_still_has_restriction": true,
+  "legacy_overlay_has_restriction": null
+ },
+ "rot1_state_machine_emulation": {
+  "occupation_all_present": false,
+  "governance_trust_present": true,
+  "verdict": "PARTIAL(occupation)->fail-closed"
+ }
+}
