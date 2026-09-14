@@ -18,7 +18,7 @@ outcome:
   verdict: BLOCKING_FINDINGS_PRESENT   # role verdict; not the architecture verdict
   work_commit: c6b8ba9985d195fd18470cfe3ae3d80968d71051
   report_commit: 0b5320b9cecb158cc9af5d88b67ed68c8397674c
-  integration_merge_commit: null   # held unmerged until reviewer B (AR-0006) completes, to preserve panel independence
+  integration_merge_commit: 5c20d2386d20ecad44f96140135beca883fbec75   # merged after reviewer B completed
   findings: [{id: RV4-C-H1, severity: HIGH}, {id: RV4-C-M1, severity: MEDIUM, carried: true}]
   scope_deviation: none disclosed
   provenance_checks: [report present and output.commit matches, only allowed paths changed (24 files), worktree clean incl. ignored]

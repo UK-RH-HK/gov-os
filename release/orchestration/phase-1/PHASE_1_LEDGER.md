@@ -252,3 +252,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | work `c6b8ba9`, report `0b5320b` on `phase1/rot1-r4-review-c`; held unmerged until reviewer B completes |
 | Findings | **HIGH RV4-C-H1:** the occupation protects only the project root. Pre-RoT `init`, `adopt baseline` and `migrate baseline` run from a subdirectory without `--root` write inside `governance/trust/**`, and the RoT-1 state machine still computes `COMPLETE`. 336 subdirectory rows wrote, 56 of them into trust paths; rooted invocations: 2,504 rows, 0 writes. **MEDIUM RV4-C-M1 (carried):** a retained legacy `.gitignore` line lets the untrack idiom drop the migration occupation. **Prior findings:** R2-H4 NOT CLOSED as a class (narrowed); RV3-M6 open residual with correct bound; RV3-L7 narrowed; C-1 addressed; C-2…C-5 carried and specification-only. No scope deviation. |
 | Next action | await AR-0006; then merge B and C, write the synthesis HO, spawn D |
+
+## L-0017 — 2026-09-14 — revision-4 reviewer B completed; panel merged
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-reviewer-trust-security (`AR-0006`) |
+| Input commit | `7a23900` (architecture `bca05a7`) |
+| Work performed | Reproduced the architect's checker, P4r4, VA4 and P1r4 byte-identical. Re-ran review r3 probes. Built an independent 336-row machine × OP-7 × adversary matrix. Authored held-out RV4-B-A01…A17 (5 executed, 8 computed, 4 design). |
+| Report / evidence | `AGENT_RUNS/AR-0006.report.yaml`; `release/root-of-trust/4.1.6-review-r4/B-trust-security/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `152e68e`, report `d18cbcc`, merged `5583571`. Reviewer C's branch merged after B completed: `5c20d23`. |
+| Findings | **HIGH RV4-B-H1:** one build-attestation key plus pipeline control yields an accepted malicious production binary, because downstream signers never rebuild; also via one verification-attestation key when a REJECTED verdict does not reach the publisher. **HIGH RV4-B-H2:** the first binary on a machine bypasses revocation, anchor and currency checks, and build-from-source compares a self-reported digest. **HIGH RV4-B-H3:** per-leaf content registration lets one `release-final` key ship a newer release carrying old registered content; a secret was indexed on 4.1.5. **MEDIUM:** M1–M4. **LOW:** L1–L7. **INFO:** I1. **Prior status:** BC-1 closed (but §3.1 open via H3); BC-2 narrowed (H2); BC-3 open (H1); BC-4 open. No scope deviation. |
+| Next action | synthesis reviewer D |
+
+## L-0018 — 2026-09-14 — revision-4 synthesis handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | orchestrator |
+| Input commit | `5c20d23` |
+| Work performed | Wrote HO-0008 for the independent synthesis reviewer (sole architecture verdict). Claimed AR-0008. Added the review-r4 B and C directories to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0008-rot-review-r4-d-synthesis.md`, `CHECKPOINTS/CP-0006.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0008 |
