@@ -1,0 +1,136 @@
+{
+  "_type": "https://agentic-engineering-os/statement/trust-policy/v4",
+  "bootstrap": {
+    "accepted_tbm_reset": null,
+    "admission_ceilings": {
+      "admission_state_hours": 24,
+      "ci_anchor_days": 7,
+      "production_currency_hours": 24,
+      "workstation_anchor_days": 90
+    },
+    "clock_reset": null
+  },
+  "certified_targets": [
+    {
+      "criteria_evidence_digest": "sha256:328eca835125e37dc5eff136e79f62cf4e5755b5de601c5ba26824d0574d31e3",
+      "status": "CERTIFIED",
+      "target": "x86_64-unknown-linux-musl"
+    }
+  ],
+  "eligibility": {
+    "evaluation_candidates": "refuse",
+    "historical_releases": [],
+    "min_binary_version": "4.1.6",
+    "min_release_sequence": 1600,
+    "production_stage": "final"
+  },
+  "floor_schema_version": 3,
+  "framework": "agentic-engineering-os",
+  "gating": {
+    "local_terminal_only": [
+      "init_ack",
+      "project_first_use",
+      "framework_update",
+      "downgrade",
+      "rollback",
+      "recovery_exchange",
+      "adopt_lineage"
+    ],
+    "mode": "always_gate",
+    "refuse_known_rejected": true,
+    "refuse_known_withdrawn": true
+  },
+  "install_authority": {
+    "allow_unsigned_development": "L4",
+    "install_evaluation_candidate": "L4",
+    "install_kernel": "L4",
+    "override_kernel_integrity": "L4",
+    "recover": "L4",
+    "rollback_apply": "L4",
+    "trust_confirm_root": "L4",
+    "trust_confirm_state": "L4",
+    "trust_refresh": "L4",
+    "update_apply": "L4"
+  },
+  "issued_at": "2026-09-14T00:00:00Z",
+  "lowering_history": [],
+  "policy_version": 2,
+  "prior_policies": [
+    {
+      "policy_version": 1,
+      "statement_digest": "sha256:b9b11f4056bb4550d16f9b3e22a9c2d84c25c428675c64e17792c0f04d357603"
+    }
+  ],
+  "profile_id": "governance-os.rot1/CP-1",
+  "registration": {
+    "min_verification_records": 2
+  },
+  "sensitivity_order": [
+    "public",
+    "internal",
+    "confidential",
+    "restricted"
+  ],
+  "state_chain_reset": null,
+  "supersedes_policy_digest": "sha256:b9b11f4056bb4550d16f9b3e22a9c2d84c25c428675c64e17792c0f04d357603",
+  "supply_chain": {
+    "suppliers": [
+      {
+        "checksum_keys": [
+          "ed25519:6846fa458afa4f0e3c598683ae509093f6e7abbda61723846280cc16e518d55a"
+        ],
+        "provenance": {
+          "base_image_lineage": "debian-bookworm-images",
+          "build_system": "debian-buildd",
+          "package_source": "deb.debian.org",
+          "signing_infrastructure": "debian-archive-keyring"
+        },
+        "supplier_id": "sup-A"
+      },
+      {
+        "checksum_keys": [
+          "ed25519:f3c37561897bd333542d081cab81dd861638bf2454bb6f28d7017df64f12dcac"
+        ],
+        "provenance": {
+          "base_image_lineage": "alpine-3.20-images",
+          "build_system": "alpine-builders",
+          "package_source": "dl-cdn.alpinelinux.org",
+          "signing_infrastructure": "alpine-keys"
+        },
+        "supplier_id": "sup-B"
+      }
+    ],
+    "toolchains": [
+      {
+        "archive_sha256": "sha256:d96586a628596564b28a212b86a494b3749cb31c74c96b53f5502103c7d2b79a",
+        "provenance": {
+          "bootstrap_root": "upstream-binary-stage0",
+          "build_system": "rust-ci",
+          "package_source": "static.rust-lang.org",
+          "signing_infrastructure": "rust-release-key"
+        },
+        "toolchain_id": "tc-up"
+      },
+      {
+        "bootstrap_registration": "sha256:5092a65968fa9e7958e9324eed6cd0c9982789281561f650c8b918b645e2d4c7",
+        "provenance": {
+          "bootstrap_root": "mrustc-source-bootstrap",
+          "build_system": "owner-bootstrap-builders",
+          "package_source": "owner-source-mirror",
+          "signing_infrastructure": "owner-registration-quorum"
+        },
+        "toolchain_id": "tc-boot"
+      }
+    ]
+  },
+  "surface": {
+    "default": "deny",
+    "files": [],
+    "floor_schema_version": 3,
+    "precedence": {},
+    "schema": "governance-os.constitutional-surface-inventory"
+  },
+  "trust_profile": "production",
+  "trust_root_id": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04",
+  "unrevokes": []
+}

@@ -1,4 +1,40 @@
-# Evidence index (RoT-1 revision 6)
+# Evidence index (RoT-1 revision 7)
+
+## Revision 7 evidence (`r7/`; certified profile CP-1)
+
+**Hygiene.** Every probe ran in this run's scratch root (`…/scratchpad/ar-0019/`) under `env -i`; `GOV_*` removed from
+children; `HOME`, `XDG_*` and `GOV_KERNEL_CACHE` in scratch; `PYTHONDONTWRITEBYTECODE=1`; legacy binaries read-only; no forced
+deletes; no helper sessions. Absolute paths in outputs are replaced by `<scratch>`, `<scratchpad>`, `<export>`, `<worktree>` and
+`<home>`; reviewer C's harness writes `<ar17>`. The final runs executed every instrument from a copy of the work-product tree,
+in two passes with different hash seeds. `r7/EVIDENCE-RUN-LOG-r7.json` records:
+- commands, exit codes, durations and SHA-256 digests;
+- the determinism comparisons;
+- the re-runs of the retained revision-6 and revision-5 instruments against their committed outputs;
+- the unmodified review r6 and r5 probes;
+- reviewer C's chain;
+- the corrections made during the final run.
+
+The run scripts are in `r7/run/`. Counts and their interpretation are in `22` §1, §7 and §8.
+
+| File | Kind | Establishes | Result |
+|---|---|---|---|
+| `r7/PROF7-profile-conformance.{py,json}` | executed (reference executor) and computed | every CP-1 exclusion absent or refused under each declared mechanism (`35` §4); the profile file; normative text | 24/24 exclusions; 113/113 checks; 0 unmarked lines |
+| `r7/CS7-derivation-calculator.{py,json}`, `r7/CS7-results.json.gz` | reference (derivation calculator) | CP-1 minimal sets, invariants and generated statements; the labelled revision-6 control | 39 configurations; 26/26 self-checks; 177 invariant checks, 0 failures |
+| `r7/gov_admit_reference_r7.py`, `r7/w7world.py` | reference executor and world builder | the CP-1 admitter and running-binary rules used by FA7, CUR7, ADM7 and PROF7 | — |
+| `r7/FA7-first-contact-authority.{py,json}` | executed (real Ed25519 through OpenSSL) | BC6-1: authority record, custodians, designation, excluded answers, executed minima, shared vectors, mutants | 13/13 verdicts |
+| `r7/CUR7-first-contact-currency.{py,json}` | executed | BC6-2: age, replay, media and CI codes, re-admission over held state, the CUR-R1 window | 14/14 verdicts |
+| `r7/ADM7-admission-stores.{py,json}` | executed | RV6-M6, RV6-L9, OP-14 (b), OP-15 (a), the OP-7 (a) decision rule, R-CLK-1 | 12/12 verdicts |
+| `r7/ENV7-environment-authority.{py,json}` | executed (real Rust toolchain) and computed | BC6-3: derived manifests, pinned keys, provenance classes and lineages | 14/14 verdicts |
+| `r7/BA11r7-machine-classes.{py,json}`, `r7/BA12r7-key-subsets-below-threshold.{py,json}` | computed | machine classes under OP-7 (a); key subsets below the CP-1 thresholds | 9/9; 0 accepts with ≤ 1 key |
+| `r7/PPR7-project-records.{py,json}` | computed | RV6-M4, RV6-M5 | 7/7 verdicts |
+| `r7/DA04r7-*`, `r7/DA05r7-*`, `r7/DA06r7-*`, `r7/DA09r7-*` | computed (after review r6 D-A04, A05, A06, A09) | plan detection, combinations, renderer vocabulary, schema fields versus the register | 15/15; 6/6; 7/7; 6/6 |
+| `r7/LAY7/crashmig7.{py,json}` | executed (real legacy binaries; reviewer C's harness) | RV6-M3, CR6-C-7: crash at every layout-migration step; `init` over an overlay | 5/5 verdicts |
+| `r7/REGISTER-CHECK.json`, `r7/STATEMENTS-CHECK.json` | computed (`../decision-register/`) | register complete over inputs; statements at atom level | PASS; PASS |
+| `r7/r6-probes/`, `r7/r5-probes/` | executed (unmodified review probes) | review r6 B and D probes and review r5 decisive probes against revision 7; `NOT-RUNNABLE.json` lists the probes that open withdrawn artefacts | `22` §8 |
+| `r7/retained/DA07r6-plan-regression-detection.on-revision-7-plan.json` | computed | the revision-6 plan-detection instrument on the revision-7 plan | `22` §8 |
+| `r7/C/matrix6-summary.*.json` | executed (reviewer C's `matrix6`, unmodified) | legacy containment on reviewer C's trees, earlier and rebuilt from the final export | R2-H4 0 violations (`22` §1) |
+
+The revision-6 and earlier evidence below is history: it models the option tree of revision 6 and earlier, not CP-1.
 
 ## Revision 6 evidence (`r6/`)
 

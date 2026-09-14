@@ -1,6 +1,12 @@
 # Output 26 — Legacy-binary damage containment and project-owned strength
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 (CP-1; review r6 carried items): §6 re-records never drop a failing requirement and pending gate obligations
+> survive remedies (CR6-C-9, RV6-M5); §7 the first-install layout migration is journaled step by step with redo and undo
+> records and an intent phase before the exchange, and R-INIT-9 governs `init` over an existing overlay (CR6-C-7, RV6-M3); §8
+> remedies force-add the migration occupation (CR6-C-2), doctor names `governance/overlay/spec` litter (CR6-C-3), and LR-2's
+> triggers include a crash during the first install transaction (CR6-C-7 (e)). The layout is otherwise unchanged; reviewer C's
+> `matrix6` re-run: property R2-H4 0 violations.
 > Revision 6: the `.gitattributes` member and its stated override condition (§2; RV5-M6); LP-1s restated to what holds (§4;
 > RV5-L7); the ignore-source condition with detection (§8; RV5-M7); legacy containment re-run on the revision-6 layout
 > (LAY6: property R2-H4 0 violations). The layout is otherwise unchanged.
@@ -159,7 +165,9 @@ project strengthening while the overlay was unchanged, and the detector was blin
    operations are refused until the `project_strength` trust gate (`27`) accepts the new vector. Those operations are
    indexing, export, upstream, retrieval of affected classes and plugin execution.
 3. **Remedies do not hide it.** `kernel reinstall`, update and recover restore the PPS and occupation entries, but never
-   the check. Only the gate re-records the vector.
+   the check. Only the gate re-records the vector. **Revision 7 (CR6-C-9):** a re-record never drops a failing requirement unless the
+   `weakening` or `project_strength` gate accepted it; pending `policy_lowering` and `registration_change` obligations are
+   per-project record fields that no install transaction clears (`evidence/r7/PPR7-project-records.json`).
 4. **Bound (LR-4).** A machine with no record (a fresh clone) accepts the repository's overlay as the project's current T4
    configuration.
 
@@ -183,7 +191,25 @@ Unchanged, plus one item. The first RoT-1 install transaction on a legacy projec
 6. record the project-strength vector;
 7. write the ledger entry.
 
+**Revision 7 (CR6-C-7 (a), (d), (e); RV6-M3).** Each step above is a journal phase (`18` §5.3) with an idempotent redo record and
+an undo record written before the step, including where the legacy kernel, lock and residue were moved; an intent phase
+precedes `RENAME_EXCHANGE`; recovery rolls the layout forward only when every redo record is complete and the exchange happened,
+and otherwise undoes to exactly the pre-transaction legacy layout. No recovered prefix is `ABSENT` or `PARTIAL` (`18` §9).
+
+| ID | Rule |
+|---|---|
+| R-INIT-9 | RoT-1 `init` on a tree holding `governance/overlay` or `governance/views` refuses (`INIT_OVER_EXISTING_OVERLAY`) unless it evaluates `19` §9 item 5 over the pre-transaction overlay before commit and obtains the `weakening` trust gate for a non-empty failure list. |
+
+Evidence: `evidence/r7/LAY7/crashmig7.json`: 24 crash prefixes in both lock orders; 22 rolled back to the legacy layout, byte-equal
+to the legacy project; 2 rolled forward; never `ABSENT` or `PARTIAL` after recovery; legacy behaviour on rolled-back trees equals
+the control; RoT-1 `init` never runs over an overlay. Test: RT-195.
+
 ## 8. Residuals
+
+**Revision 7 (CR6-C-2, CR6-C-3, CR6-C-7 (e)).** Every remedy that recreates the occupation (`kernel reinstall`, `update --apply`,
+`recover`, `init --force`) force-adds `.governance-runtime/migration`. Doctor names stray `governance/spec`, `governance/views/spec`
+and `governance/overlay/spec` trees and distinguishes overlay litter from a genuine overlay change. LR-2's triggers include a crash
+during the first install transaction; its bound is the recovery of §7.
 
 **Revision 6 (RV5-M7, RV5-C-M2): ignore sources.** The `.gitignore` surgery reaches only the project file. The occupation's
 survival of the "untrack ignored files" idiom **requires that no active ignore source matches `.governance-runtime/`**: not

@@ -1,43 +1,46 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-state-statement.schema.json",
+  "$id": "https://agentic-engineering-os/schemas/trust-state-statement/4",
   "title": "trust-state-statement",
-  "description": "PROPOSED (RoT-1 revision 4). Trust State Statement v2 signed by the trust-state purpose: the published set at a sequence, with cumulative prior_states (fork detection across gaps), resolved references (root and policy digests), revocations, certifications, attestations and artefact statements (17 S4). A TSS never drops a lower artifacts[] reference (revoke instead). expires_at is informational: in revision 4 a TSS is never a currency proof (currency comes from 24 \u00a74.4; witnesses are freshness-witness statements).",
-  "x-schema-version": "3.0.0",
+  "x-schema-version": "4.0.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). Trust State Statement v4 signed by 2 of 3 dedicated trust-state keys (05 KS-17): the published set at a sequence with cumulative prior_states, registrations and published binaries; the first-contact authority record in force; revocations, each backed by a revocation statement at the revocation threshold or root threshold that the statement lists. issued_at is the only time a first admission's age is computed from (32 FC-9). A Trust State is never a witness.",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "attestations",
-    "certifications",
-    "expires_at",
     "framework",
     "issued_at",
     "previous_state_digest",
     "prior_states",
+    "published_binaries",
     "references",
+    "registrations",
+    "revocation_statements",
     "revocations",
     "sequence",
     "trust_profile",
-    "trust_root_id",
-    "registrations",
-    "published_binaries"
+    "trust_root_id"
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/trust-state/v2"
+      "const": "https://agentic-engineering-os/statement/trust-state/v4"
     },
     "trust_profile": {
-      "$ref": "#/$defs/profile"
+      "enum": [
+        "production",
+        "test"
+      ]
     },
     "framework": {
       "const": "agentic-engineering-os"
     },
     "trust_root_id": {
-      "$ref": "#/$defs/digest"
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
     },
     "issued_at": {
-      "$ref": "#/$defs/timestamp"
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
     },
     "sequence": {
       "type": "integer",
@@ -46,86 +49,8 @@
     "previous_state_digest": {
       "oneOf": [
         {
-          "$ref": "#/$defs/digest"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "references": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "root_digest",
-        "root_version",
-        "trust_policy"
-      ],
-      "properties": {
-        "root_version": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "trust_policy": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "policy_version",
-            "statement_digest"
-          ],
-          "properties": {
-            "policy_version": {
-              "type": "integer",
-              "minimum": 1
-            },
-            "statement_digest": {
-              "$ref": "#/$defs/digest"
-            }
-          }
-        },
-        "root_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
-        }
-      }
-    },
-    "revocations": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/digest"
-      }
-    },
-    "certifications": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "release_statement_digest",
-          "certification_statement_digest"
-        ],
-        "properties": {
-          "release_statement_digest": {
-            "$ref": "#/$defs/digest"
-          },
-          "certification_statement_digest": {
-            "$ref": "#/$defs/digest"
-          }
-        }
-      }
-    },
-    "attestations": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/digest"
-      }
-    },
-    "expires_at": {
-      "oneOf": [
-        {
-          "$ref": "#/$defs/timestamp"
         },
         {
           "type": "null"
@@ -153,14 +78,78 @@
         }
       }
     },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first_contact_authority",
+        "root",
+        "trust_policy"
+      ],
+      "properties": {
+        "root": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "digest",
+            "version"
+          ],
+          "properties": {
+            "version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        },
+        "trust_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "digest",
+            "version"
+          ],
+          "properties": {
+            "version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        },
+        "first_contact_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "digest",
+            "fca_sequence"
+          ],
+          "properties": {
+            "fca_sequence": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
     "registrations": {
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
         "pattern": "^sha256:[0-9a-f]{64}$"
-      },
-      "description": "cumulative; never dropped (17 S4 (d))"
+      }
     },
     "published_binaries": {
       "type": "array",
@@ -168,56 +157,49 @@
       "items": {
         "type": "string",
         "pattern": "^sha256:[0-9a-f]{64}$"
-      },
-      "description": "cumulative; one per release and target (30 R-PUB)"
-    }
-  },
-  "$defs": {
-    "digest": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+      }
     },
-    "timestamp": {
-      "type": "string",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    "revocations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
     },
-    "profile": {
-      "enum": [
-        "production",
-        "test"
-      ]
-    }
-  },
-  "allOf": [
-    {
-      "if": {
+    "revocation_statements": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "attestation_digests",
+          "release_statement_digest"
+        ],
         "properties": {
-          "sequence": {
-            "const": 1
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "previous_state_digest": {
-            "type": "null"
-          },
-          "prior_states": {
-            "maxItems": 0
-          }
-        }
-      },
-      "else": {
-        "properties": {
-          "previous_state_digest": {
+          "release_statement_digest": {
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$"
           },
-          "prior_states": {
-            "minItems": 1
+          "attestation_digests": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
           }
         }
       }
     }
-  ]
+  }
 }

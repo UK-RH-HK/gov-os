@@ -1,0 +1,11 @@
+{
+ "configurations": 39,
+ "one_key_accepts": [],
+ "probe": "BA12r7 key subsets below the CP-1 thresholds (AR-0019; after RV6-B-A12)",
+ "release_and_trust_state_keys_only_accepts": [],
+ "subsets_tried": 99772,
+ "verdicts": {
+  "no_accept_with_at_most_one_key": true,
+  "no_accept_with_release_and_trust_state_keys_and_infrastructure_only": true
+ }
+}

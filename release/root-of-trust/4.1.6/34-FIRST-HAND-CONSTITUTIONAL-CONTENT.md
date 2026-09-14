@@ -1,11 +1,11 @@
-# Output 34 — Registered constitutional content established first-hand (BC5-3)
+# Output 34 — Registered constitutional content established first-hand (CP-1)
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
-> New in revision 6. It closes blocking class **BC5-3** (review r5 RV5-H3) under rule FD-1 (`29`). The registered content of a
-> release is derived first-hand by the registration authority. Verification is bound to exactly the registered candidate and
-> kernel. E7 applies admission-predicate/1's restrictors, and registration reductions are computed at the verifier.
-> Amended to match: `23` §12, `19` E7, `25` AP-4/AP-5, `30` R-REG-3, R-VER-1/2, R-PUB-1′, `04` V8, `05` §1. Closing it
-> requires **no owner trade-off** (review r5 `11` CD5-3). Normative keywords: MUST, MUST NOT, SHOULD.
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **Revision 7** concretises this file to CP-1 (`35`): the registration authority is the 2-of-3 delegated quorum (OP-2 (b)),
+> content needs two verification records (OP-8), the release-final key threshold is 2 (OP-4), attestations name their
+> environments (RV6-L3), derivation tools are registered (RV6-L4, CR6-B-07), and the consequence block is CS7's for CP-1 with an
+> injective renderer (RV6-M1). RV6-L1 (security classification as explicit per-unit inventory data) is carried with a named test
+> (§3 R-CON-5, RT-198). New in revision 6 for BC5-3. Normative keywords: MUST, MUST NOT, SHOULD.
 
 ## 1. The class
 
@@ -14,120 +14,85 @@ established it.*
 
 | Revision-5 rule | What it let a lower-trust input do |
 |---|---|
-| `23` §12.5: canonical CI (`derive-registration`) produces the unit map; the ceremony lists differences | the pipeline chose the unit map and kernel tree digest that the custodians signed |
+| `23` §12.5: canonical CI produces the unit map; the ceremony lists differences | the pipeline chose the unit map and kernel tree digest that the custodians signed |
 | R-REG-3 (d), R-VER-2, AP-5: ACCEPTED attestations "for this `source` and `inputs_manifest_digest`" | a verification of candidate C (kernel K_fix) was reused for a candidate C′ (kernel K_weak) with the same source |
 | `19` E7 / `23` §12.3: registration referenced, final named, units and tree equal | no verification, candidate or revocation condition on the policy root |
 
-RV5-D-A01 executed the route. The pipeline, plus the threshold-1 `release-candidate` and `release-final` keys (one everyday key
-under OP-4 "no"), got a weakened `aws-access-key` regex registered and eligible. On the real 4.1.5 binary a temporary AWS key
-file was then indexed and served. Under OP-2 (b), two delegated custodians plus `release-final` sufficed with no verification
-compromise (RV5-B-H3).
+RV5-D-A01 executed the route on the real 4.1.5 binary (a weakened `aws-access-key` regex registered and eligible; a temporary AWS
+key file indexed and served). Revision 6 closed it; review r6 confirmed the closure at the registration (CD6-0).
 
 ## 2. Invariant
 
-1. The effective constitutional content of a release is established first-hand at the registration's authority. That content
-   is the kernel tree digest, every non-join unit value and every migration digest.
-2. It is bound to OP-8 verification records for **exactly the registered candidate**. That candidate's kernel equals the
-   registered kernel, and the registered final is promoted from it.
+1. The effective constitutional content of a release (kernel tree digest, every non-join unit value, every migration digest) is
+   established first-hand by 2 of 3 registration custodians.
+2. It is bound to **two** verification records for exactly the registered candidate, whose kernel equals the registered kernel and
+   from which the registered final (threshold 2) is promoted.
 3. E7 (policy-root eligibility, at ingress and at use) applies the same restrictors as admission-predicate/1 AP-4 and AP-5.
-4. No threshold-1 release key, alone or with pipeline input, selects content.
+4. No release key, alone or with pipeline input, selects content; neither does the release-final threshold with the candidate
+   key without the registration threshold.
 
 ## 3. Rules (R-CON)
 
 | ID | Rule | Refusal |
 |---|---|---|
-| **R-CON-1** | **First-hand derivation.** Each registration custodian (OP-2 (a) root custodian or (b) delegated custodian) builds the kernel payload from the source it fetched (`30` R-REG-3 (e)) with the registered input manifest, under the normative packaging profile (`gov release build --kernel-only`, deterministic). From that payload it derives the kernel tree digest, the unit map and the migration digests (`csi_check.py verify-registration --registration <proposal> --source-kernel <own build>`). It signs only when the proposal equals its derivation in every field. CI output is a proposal, never an input to the signature. | `REGISTRATION_CONTENT_NOT_ESTABLISHED` (checker exit 3; `draft-registration` refuses) |
-| **R-CON-2** | **Verification bound to what is registered.** A `verification-attestation.v4+json` names `{candidate_statement_digest, verdict, source, inputs_manifest_digest, kernel_tree_digest}`. `kernel_tree_digest` is the digest of the kernel payload the verifier itself reproduced from the source (R-VER-1). R-REG-3 (d), R-VER-2 and AP-5 count an ACCEPTED attestation only when all four hold: its candidate is the registered candidate; its kernel tree digest is the registered one; it is listed by the registration; it is unrevoked. The registered final MUST be promoted from the registered candidate and carry the registered kernel tree digest. The registered candidate MUST carry the registered kernel tree digest and source. | `VERIFICATION_RECORDS_BELOW_MINIMUM` / `RELEASE_FINAL_UNVERIFIED` |
-| **R-CON-3** | **E7 applies AP-5's restrictors.** A release R is an eligible policy root only if every condition below holds on the statements the machine holds, at ingress and at use. The registration of R is referenced by the effective TSS and not revoked. The registered final and candidate are held, verify, are not revoked, and the final is promoted from the registered candidate. Both carry the registered kernel tree digest and source. No held REJECTED attestation names the registered candidate, unless it is removed by the registration authority (AP-5r). At least OP-8 ACCEPTED attestations by distinct keys meet R-CON-2. | E7 reasons `registration_revoked`, `release_final_unverified`, `final_not_promoted_from_registered_candidate`, `kernel_tree_digest_mismatch`, `registered_candidate_unverified`, `candidate_kernel_or_source_mismatch`, `revoked`, `artifact_source_rejected`, `verification_records_below_minimum` |
-| **R-CON-4** | **Reductions computed at the verifier** (CR5-B-04 (a)). At ingress and at use, the verifier computes registration reductions (`23` §12.4) over every registration the effective TSS references. If any referenced registration is not held, the result is `INCOMPLETE` and E7 refuses the release. An undeclared reduction refuses the release. | `registration_history_incomplete` (checker exit 7); `REGISTRATION_UNDECLARED_REDUCTION` (exit 6) |
-| **R-CON-5** | **Changes listed per project** (CR5-B-04 (b), (c)). For non-orderable units only exact reversion, removal and member narrowing are computable reductions. Any other change of a security-classified non-orderable unit is selected by the registration authority. Such a change is listed in the per-project `registration_change` gate package on every machine whose per-project record holds an earlier registration, and security-relevant use of the new release waits for that gate. Security-classified units are those of the security, authority, gate, tool, role, hard-invariant, tool-registry and MCP-registry files (`csi_lib.SECURITY_CLASSIFIED_NAMES`). | checker exit 8 (listed); `REGISTRATION_CHANGE_GATE_REQUIRED` |
-| **R-PUB-1′** | **The publisher applies E7's restrictors** before referencing a registration in `registrations[]`, on the statements it holds first-hand (`30` §8). It is defence in depth: the verifier-side R-CON-3 is load-bearing. | the publisher does not reference |
+| **R-CON-1** | **First-hand derivation.** Each signing registration custodian builds the kernel payload from the source it fetched (`30` R-REG-3 (e)) with the registered input manifest, under the normative packaging profile (`gov release build --kernel-only`, deterministic), in its own derived environment. From that payload it derives the kernel tree digest, the unit map and the migration digests (`csi_check.py verify-registration --registration <proposal> --source-kernel <own build>`), using an admitted `gov` and the checker from the registered source (`33` R-BENV-9). It signs only when the proposal equals its derivation in every field. CI output is a proposal, never an input to the signature. | `REGISTRATION_CONTENT_NOT_ESTABLISHED` (checker exit 3); `DERIVATION_TOOL_UNREGISTERED` |
+| **R-CON-2** | **Verification bound to what is registered.** A `verification-attestation.v5+json` names `{candidate_statement_digest, verdict, source, inputs_manifest_digest, kernel_tree_digest, environment_ids, toolchain_ids, verifier_execution_id, verification_report_digest}`. `kernel_tree_digest` is the digest of the kernel payload the verifier reproduced. R-REG-3 (d), R-VER-2′ and AP-5 count an ACCEPTED attestation only when its candidate and kernel are the registered ones, it names the registered environments, it is listed by the registration and unrevoked, and it is one of two from distinct keys, executions and reports. The registered final MUST be promoted from the registered candidate and carry the registered kernel tree digest; the registered candidate MUST carry the registered kernel tree digest and source. | `VERIFICATION_RECORDS_BELOW_MINIMUM` / `RELEASE_FINAL_UNVERIFIED` |
+| **R-CON-3** | **E7 applies AP-5's restrictors.** A release R is an eligible policy root only if, on the statements the machine holds, at ingress and at use: the registration of R is referenced by the effective TSS and not revoked; the registered final and candidate are held, verify (final at threshold 2), are not revoked, and the final is promoted from the registered candidate; both carry the registered kernel tree digest and source; no held REJECTED attestation names the registered candidate (unless removed by the registration authority, AP-5r); two ACCEPTED attestations meet R-CON-2; R's sequence is at least the computed security minimum (`19` E3′). | E7 reasons `registration_revoked`, `release_final_unverified`, `final_not_promoted_from_registered_candidate`, `kernel_tree_digest_mismatch`, `registered_candidate_unverified`, `candidate_kernel_or_source_mismatch`, `revoked`, `artifact_source_rejected`, `verification_records_below_minimum`, `below_security_minimum` |
+| **R-CON-4** | **Reductions computed at the verifier.** At ingress and at use, the verifier computes registration reductions (`23` §12.4) over every registration the effective TSS references. If any referenced registration is not held, the result is `INCOMPLETE` and E7 refuses the release. An undeclared reduction refuses the release. | `registration_history_incomplete` (checker exit 7); `REGISTRATION_UNDECLARED_REDUCTION` (exit 6) |
+| **R-CON-5** | **Changes listed per project.** For non-orderable units only exact reversion, removal and member narrowing are computable reductions. Any other change of a security-classified non-orderable unit is selected by the registration authority; it is listed in the per-project `registration_change` gate package on every machine whose per-project record holds an earlier registration, and security-relevant use of the new release waits for that gate. A registration with such a change sets `security_relevant_change` (OP-11 (b)). **Carried (RV6-L1, CR6-B-04):** the classification is inventory data per unit: every non-orderable unit row MUST carry `security_classified` explicitly (at least `commands/COMMAND_CONTRACT.yaml` and `overlay-templates/*` true), and the checker MUST refuse a row without it. The revision-6 checker still falls back to a compiled name and prefix list; the implementation requirement and test are RT-198. | checker exit 8 (listed); `REGISTRATION_CHANGE_GATE_REQUIRED`; `INVENTORY_ROW_SECURITY_CLASSIFICATION_MISSING` (RT-198) |
+| **R-PUB-1′** | **The publisher applies E7's restrictors** before referencing a registration in `registrations[]`, on the statements it holds first-hand (`30` §8). Defence in depth: the verifier-side R-CON-3 is load-bearing. | the publisher does not reference |
 
-**What "down" means for non-orderable units** (D-0008 rule (6) as restated): a value equal to one an intermediate
-registration superseded (reversion), a unit removed, or a member set narrowed against its direction. Every other difference
-is a change the registration authority selects. It is never computed as safe, and R-CON-5 lists it before security-relevant
-use on recorded machines.
+**What "down" means for non-orderable units** (D-0008 rule (6)): a value equal to one an intermediate registration superseded
+(reversion), a unit removed, or a member set narrowed against its direction. Every other difference is a change the registration
+authority selects; it is never computed as safe, and R-CON-5 lists it before security-relevant use on recorded machines.
 
-## 4. Who selects content under each owner answer (computed)
+## 4. Who selects content in CP-1 (computed)
 
-Atoms: `rc` and `rf` are the `release-candidate` and `release-final` keys. `kc` is one everyday key holding both (OP-4 "no").
-`cust`/`regk` are registration custodians and keys; `vp`/`va` are verification processes and keys. Victims: `USE` is use of a
-Git-delivered release (C1–C2); `ING_P1` and `ING_P2k1` are ingress with a P1 proof or an in-gate fingerprint.
+Atoms: `rck` is the release-candidate key; `rfk1`, `rfk2` the release-final keys; `cust`/`regk` registration custodians and keys;
+`vp`/`va` verification processes and keys; `repo` the repository writer delivering a release (rendered as `repo`, never as a
+key; RV6-M1); `tsk` trust-state keys. Victims: `USE` is use of a Git-delivered release (C1–C2); `ING_P1` and `ING_P2` are
+ingress with a P1 proof or in-gate state codes; `FA` is first admission.
 
-<!-- CS6:BEGIN CONTENT -->
+<!-- CS7:BEGIN CP-CONTENT -->
 Process compromise of a party implies its key; a set is not shown when the same set with a key in place of a process is also minimal (every minimal set: `minimal_sets_table`).
 
-| OP-2 | OP-4 | OP-8 | Victim | Minimal sets: malicious non-orderable constitutional content effective |
-|---|---|---|---|---|
-| root | sep | 1 | USE | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, rc, rf}; {2 registration keys, 1 verification key, 1 reproducer key, pipeline, ts}; {2 registration keys, 1 verification key, 1 reproducer key, ts, rc, rf} |
-| root | sep | 1 | ING_P1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, rc, rf} |
-| root | sep | 1 | ING_P2k1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, rc, rf}; {2 registration keys, 1 verification key, pipeline, ts, ch1}; {2 registration keys, 1 verification key, ts, rc, rf, ch1} |
-| root | sep | 2 | USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, rc, rf}; {2 registration keys, 2 verification keys, 1 reproducer key, pipeline, ts}; {2 registration keys, 2 verification keys, 1 reproducer key, ts, rc, rf} |
-| root | sep | 2 | ING_P1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, rc, rf} |
-| root | sep | 2 | ING_P2k1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, rc, rf}; {2 registration keys, 2 verification keys, pipeline, ts, ch1}; {2 registration keys, 2 verification keys, ts, rc, rf, ch1} |
-| root | shared | 1 | USE | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, kc}; {2 registration keys, 1 verification key, 1 reproducer key, pipeline, ts}; {2 registration keys, 1 verification key, 1 reproducer key, ts, kc} |
-| root | shared | 1 | ING_P1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, kc} |
-| root | shared | 1 | ING_P2k1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, kc}; {2 registration keys, 1 verification key, pipeline, ts, ch1}; {2 registration keys, 1 verification key, ts, kc, ch1} |
-| root | shared | 2 | USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, kc}; {2 registration keys, 2 verification keys, 1 reproducer key, pipeline, ts}; {2 registration keys, 2 verification keys, 1 reproducer key, ts, kc} |
-| root | shared | 2 | ING_P1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, kc} |
-| root | shared | 2 | ING_P2k1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, kc}; {2 registration keys, 2 verification keys, pipeline, ts, ch1}; {2 registration keys, 2 verification keys, ts, kc, ch1} |
-| delegated | sep | 1 | USE | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, rc, rf}; {2 registration keys, 1 verification key, 1 reproducer key, pipeline, ts}; {2 registration keys, 1 verification key, 1 reproducer key, ts, rc, rf} |
-| delegated | sep | 1 | ING_P1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, rc, rf} |
-| delegated | sep | 1 | ING_P2k1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, rc, rf}; {2 registration keys, 1 verification key, pipeline, ts, ch1}; {2 registration keys, 1 verification key, ts, rc, rf, ch1} |
-| delegated | sep | 2 | USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, rc, rf}; {2 registration keys, 2 verification keys, 1 reproducer key, pipeline, ts}; {2 registration keys, 2 verification keys, 1 reproducer key, ts, rc, rf} |
-| delegated | sep | 2 | ING_P1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, rc, rf} |
-| delegated | sep | 2 | ING_P2k1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, rc, rf}; {2 registration keys, 2 verification keys, pipeline, ts, ch1}; {2 registration keys, 2 verification keys, ts, rc, rf, ch1} |
-| delegated | shared | 1 | USE | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, kc}; {2 registration keys, 1 verification key, 1 reproducer key, pipeline, ts}; {2 registration keys, 1 verification key, 1 reproducer key, ts, kc} |
-| delegated | shared | 1 | ING_P1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, kc} |
-| delegated | shared | 1 | ING_P2k1 | {insider}; {1 verification process, pipeline}; {2 registration custodians, 1 verification key, pipeline}; {2 registration custodians, 1 verification key, kc}; {2 registration keys, 1 verification key, pipeline, ts, ch1}; {2 registration keys, 1 verification key, ts, kc, ch1} |
-| delegated | shared | 2 | USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, kc}; {2 registration keys, 2 verification keys, 1 reproducer key, pipeline, ts}; {2 registration keys, 2 verification keys, 1 reproducer key, ts, kc} |
-| delegated | shared | 2 | ING_P1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, kc} |
-| delegated | shared | 2 | ING_P2k1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, kc}; {2 registration keys, 2 verification keys, pipeline, ts, ch1}; {2 registration keys, 2 verification keys, ts, kc, ch1} |
-<!-- CS6:END CONTENT -->
-
-**Statements that follow from the computed sets** (every set above; checked by `decision-register/statements_check.py`):
-- No set consists of `rc`, `rf`, `kc`, `pipeline`, `ts`, transport or repository atoms only (invariant INV-RF).
-- Every set that is not a residual contains either (i) the registration threshold, as custodians or keys, with at least OP-8
-  verification compromises, or (ii) pipeline input with at least OP-8 verification processes: route TB-4′ (INV-CONTENT).
-- Under OP-2 (b) the delegated quorum, restricted by OP-8 verification, is the selector of content. This is a stated
-  consequence of OP-2, not a new trade-off.
-- OP-4 "no" adds no set.
-
-On a first-admission machine the first-contact root also selects content (`32` §7):
-
-<!-- CS6:BEGIN FC-CONTENT -->
-| OP-13 answer | First-contact root sets for content on a first-admission machine |
+| Victim | Minimal sets: malicious non-orderable constitutional content effective (CP-1) |
 |---|---|
-| a | {ch1} |
-| b | {ch1, ch2}; {ch1, op1src} |
-| c_all_1 | {ch1, alt} |
-| c_all_2 | {ch1, ch2, alt}; {ch1, op1src, alt} |
-| c_either_1 | {ch1}; {alt} |
-| c_either_2 | {alt}; {ch1, ch2}; {ch1, op1src} |
-| d | {media} |
-<!-- CS6:END FC-CONTENT -->
+| USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, repo}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, repo} |
+| ING_P1 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck} |
+| ING_P2 | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, fcpub}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, src1, src2}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, src1, desig2}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, src1, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, src2, desig1}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, src2, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, desig1, desig2}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, desig1, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, desig2, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, fcpub}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, src1, src2}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, src1, desig2}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, src1, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, src2, desig1}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, src2, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, desig1, desig2}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, desig1, op1src}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, desig2, op1src} |
+| FA | {insider}; {src1, src2}; {src1, desig2}; {src1, op1src}; {src2, desig1}; {src2, op1src}; {desig1, desig2}; {desig1, op1src}; {desig2, op1src}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck}; {2 registration keys, 2 verification keys, 2 trust-state keys, pipeline, fcpub}; {2 registration keys, 2 verification keys, 2 trust-state keys, 2 release-final keys, rck, fcpub} |
+<!-- CS7:END CP-CONTENT -->
+
+**Statements that follow from the computed sets** (checked by `decision-register/statements_check.py`):
+- No set consists of release keys, pipeline, trust-state keys, transport or repository atoms only (INV-RF).
+- Every set that is not a residual or a first-contact root set contains either the registration threshold (custodians or keys)
+  with two verification compromises, or pipeline input with two verification processes: route TB-4′ (INV-CONTENT).
+- The delegated 2-of-3 quorum, restricted by two verification records, is the selector of content (OP-2 (b)).
 
 ## 5. Forward compatibility (HO-0001 §4)
 
-A new constitutional file shipped in a kernel (for example the Capability Acceptance Contract Markdown and compiled YAML) is
-classified by inventory data (`23` §7.1). Its content is fixed per release by R-CON-1 like every other non-join unit, and its
-effective value needs R-CON-3. RV5-I2 (derivation between members of an owner-domain binding group) is carried to the
-capability-contract phase as RT-182.
+A new constitutional file shipped in a kernel (for example the Capability Acceptance Contract Markdown and compiled YAML, the
+Gate W artifact-flow policy, or the G0–G6 health scheduler) is classified by inventory data (`23` §7.1). Its content is fixed per
+release by R-CON-1 like every other non-join unit, and its effective value needs R-CON-3. Default deny holds for an unclassified
+file. With the carried R-CON-5 requirement, its per-project listing also comes from inventory data (`security_classified`), not
+from its path. RV5-I2 (derivation between members of an owner-domain binding group) is carried to the capability-contract phase
+as RT-182.
 
 ## 6. Residuals
 
 | ID | Residual | Bound | Test |
 |---|---|---|---|
-| TB-4 (route I) | an insider change accepted by honest verification | process; OP-8 | — |
-| TB-4′ (TA-11) | OP-8 compromised verification processes plus pipeline input | §4 sets | CS6 `G_CONTENT` |
-| RA-1 | the registration authority at threshold with OP-8 verification compromises (OP-2 (a): root threshold, A8; (b): delegated quorum) | §4 sets; R-CON-5 lists non-reduction changes on recorded machines | CS6; CON6 |
+| TB-4 (route I) | an insider change accepted by honest verification | process; two independent records | — |
+| TB-4′ (TA-11) | two compromised verification processes plus pipeline input | §4 sets | CS7 `G_CONTENT` |
+| RA-1 | 2 of 3 registration custodians with two verification compromises | §4 sets; R-CON-5 lists non-reduction changes on recorded machines | CS7; CON6 |
 
 ## 7. Evidence
 
 | Evidence | Kind | Result |
 |---|---|---|
-| `evidence/r6/CON6-first-hand-constitutional-content.{py,json}` part B (pack checker as amended; real legacy 4.1.5 as the consumer) | executed | RV5-D-A01: the ceremony refuses the CI-derived proposal (exit 3, kernel tree and the `aws-access-key` unit not established); signs the first-hand proposal (0); E7 refuses the attacker kernel under the only registration the ceremony signs (3); the genuine kernel is eligible (0); the genuine 4.1.8 regex change is listed for recorded projects (exit 8). RV5-B-A09: variant regex and tool command listed (8, 8). RV5-B-A10: undeclared reversion refused at the verifier (6); intermediate registration withheld `INCOMPLETE` (7). RV5-D-A05: N3 ceremony refuses the attacker contract (3); N4 E7 refuses it (3); N2 genuine (0). On 4.1.5 the content revision 6 makes effective keeps the `ASIA…` file out of index and query; the refused content indexes and serves it (harm control). 17/17 verdicts. |
-| `evidence/r6/P4r6-conformance-oracle.{py,json}` section G | computed | RV5-D-A01 part A: attacker candidate and final (`verification_records_below_minimum`); a variant registration naming the attested candidate (`final_not_promoted_from_registered_candidate`); OP-4 "no" (`verification_records_below_minimum`); RV5-B-A06 registration without a verification record; held REJECTED; candidate not held; ceremony refusals for non-first-hand content, records for another candidate, a REJECTED record and non-first-hand records; the genuine release eligible |
-| `constitutional-surface/csi_check.py selftest` S71–S77 | executed | `verify-registration` 0/3; `registration-reductions --verifier` 6 and 7 (INCOMPLETE); `registration-changes` 8 for a regex variant and a tool command, 0 for unchanged units |
-| `evidence/r6/CS6-derivation-calculator.json` goal `G_CONTENT` | computed | INV-CONTENT and INV-RF hold in every configuration; rules `V_CANDIDATE_BINDING` and `V_E7_RESTRICTORS` load-bearing (mutation analysis) |
-| `evidence/r6/DA03r6-oracle-regression-sensitivity.json` section 4 | computed | every revision-6 E7 and ceremony rule mutant detected |
+| `evidence/r6/CON6-first-hand-constitutional-content.{py,json}` (retained; the rules R-CON-1…R-CON-4 are unchanged in substance) | executed (pack checker; real legacy 4.1.5 as the consumer) | ceremony refuses the CI-derived proposal (exit 3); signs the first-hand proposal (0); E7 refuses the attacker kernel (3); genuine kernel eligible (0); changes listed (8); undeclared reversion refused (6); withheld intermediate registration `INCOMPLETE` (7); harm control on 4.1.5 |
+| `evidence/r6/P4r6-conformance-oracle.{py,json}` section G | computed (retained) | E7 restrictor scenarios |
+| `constitutional-surface/csi_check.py selftest` | executed | S71–S77 and the full self-test (`22` §1) |
+| `evidence/r7/CS7-derivation-calculator.json` goal `G_CONTENT` | computed | INV-CONTENT and INV-RF hold for CP-1; `V_CANDIDATE_BINDING`, `V_E7_RESTRICTORS`, `V_VERIFICATION_COUNT` load-bearing |
+| `evidence/r7/r6-probes/` B-A10 and D-A03 re-runs | executed | the RV6-L1 behaviour as carried (unflagged unlisted-path changes are not listed; listed with the flag) |

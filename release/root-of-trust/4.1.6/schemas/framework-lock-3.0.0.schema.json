@@ -212,7 +212,6 @@
           "enum": [
             "pin",
             "human",
-            "witness",
             "retained"
           ]
         }

@@ -1,6 +1,11 @@
 # Output 17 — Monotonic trust-state model (certification, withdrawal, revocation, root rotation)
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 amendments: the clock rule is `24` §8 as restated in revision 6 (every ingested non-future statement raises the
 > high-water; a refused future statement disables clock-based proofs for the unit of work); the witness-only text of the
 > revision-4 header, S11 and §13 is withdrawn (CR5-B-09). Registration revocations (`30` R-REG-11) are held like other

@@ -1,0 +1,346 @@
+{
+ "probe": "DA07r6 plan regression detection (AR-0015)",
+ "calculator_goals": [
+  "G_BYTES",
+  "G_CONTENT",
+  "G_ENV",
+  "G_INPUTS",
+  "G_MIRROR",
+  "G_SRC",
+  "G_TOOLCHAIN"
+ ],
+ "plan_rt_rows": 199,
+ "register_decisions": 45,
+ "defects": {
+  "RV5-H1 attacker lineage, quorum and evaluator at first contact": {
+   "plan_rows": [
+    "RT-135"
+   ],
+   "register_rows": [
+    "DR-03",
+    "DR-05",
+    "DR-06"
+   ],
+   "reference_detection": {
+    "FA6 S2 one-page attacker lineage refused under OP-13 (b)": true,
+    "FA6 S7 quorum_from_selected_state": true,
+    "FA6 S7 skip_evaluator_binding": true,
+    "FA6 S3 executed minima equal CS6 (7 answers)": true
+   },
+   "calculator": {
+    "first_contact_atoms": [
+     "alt",
+     "ch1",
+     "ch2",
+     "media"
+    ],
+    "FA victim configured": true
+   },
+   "detected": true
+  },
+  "RV5-H2 build environment selects bytes": {
+   "plan_rows": [
+    "RT-160",
+    "RT-186"
+   ],
+   "register_rows": [
+    "DR-13",
+    "DR-40",
+    "DR-41"
+   ],
+   "reference_detection": {
+    "ENV6 E1 pipeline image refused": true,
+    "ENV6 E2 component refused": true,
+    "CS6 mutation H_REG_ENV_QUORUM load-bearing": true
+   },
+   "calculator": {
+    "goal_G_ENV": true,
+    "environment_atoms": [
+     "env_up_a",
+     "env_up_b",
+     "owner_env"
+    ]
+   },
+   "detected": true
+  },
+  "RV5-H3 registered content not first-hand; E7 without restrictors": {
+   "plan_rows": [
+    "RT-163",
+    "RT-164"
+   ],
+   "register_rows": [
+    "DR-16",
+    "DR-23"
+   ],
+   "reference_detection": {
+    "CON6 ceremony refuses CI-derived registration": true,
+    "CON6 E7 refuses attacker kernel": true,
+    "P4r6 E7 D-A01 attacker": true,
+    "DA03r6 R6-E7-restrictors detected": true
+   },
+   "calculator": {
+    "goal_G_CONTENT": true
+   },
+   "detected": true
+  },
+  "RV5-M1 trust-state key removes restrictors": {
+   "plan_rows": [
+    "RT-168"
+   ],
+   "register_rows": [
+    "DR-19"
+   ],
+   "reference_detection": {
+    "P4r6 AP5r conflict kept": true,
+    "FA6 S7 trust_state_revokes_restrictors": true,
+    "DA03r6 R6-revocation-authority-conflict": true
+   },
+   "detected": true
+  },
+  "RV5-M2 reductions only ceremony-side; non-identical weakening unreported": {
+   "plan_rows": [
+    "RT-141",
+    "RT-166",
+    "RT-167"
+   ],
+   "register_rows": [
+    "DR-23",
+    "DR-26"
+   ],
+   "reference_detection": {
+    "CSI S73 reversion at verifier": true,
+    "CSI S74 INCOMPLETE": true,
+    "CSI S76 tool command listed": true,
+    "CON6 B-A09/B-A10": true
+   },
+   "detected": true
+  },
+  "RV5-M3 re-admission discards the store; concurrent admissions": {
+   "plan_rows": [
+    "RT-139",
+    "RT-170",
+    "RT-188",
+    "RT-191",
+    "RT-181"
+   ],
+   "register_rows": [
+    "DR-10"
+   ],
+   "reference_detection": {
+    "ADM6 A09 keeps store": true,
+    "ADM6 A11 lock": true,
+    "FA6 S7 move_aside_every_run": true
+   },
+   "detected": true
+  },
+  "RV5-M4 ambiguous source identity": {
+   "plan_rows": [
+    "RT-172"
+   ],
+   "register_rows": [
+    "DR-11"
+   ],
+   "reference_detection": {
+    "SRC6 refuses carrier tree": true,
+    "SRC6 encoding distinguishes": true
+   },
+   "detected": true
+  },
+  "RV5-M5 partial register": {
+   "plan_rows": [
+    "RT-128"
+   ],
+   "register_rows": [
+    "DR-01"
+   ],
+   "reference_detection": {
+    "register has every review-r5 decision (DR-03…DR-06, DR-10, DR-13, DR-15, DR-16, DR-19, DR-25)": true
+   },
+   "detected": true
+  },
+  "RV5-M6 line-ending conversion": {
+   "plan_rows": [
+    "RT-122",
+    "RT-173"
+   ],
+   "register_rows": [
+    "DR-28"
+   ],
+   "reference_detection": {
+    "LAY6 AUTOCRLF COMPLETE (18 §9.1 evidence)": true,
+    "ATTR6 verdicts": true
+   },
+   "detected": true
+  },
+  "RV5-M7 out-of-project ignore sources": {
+   "plan_rows": [
+    "RT-174"
+   ],
+   "register_rows": [
+    "DR-28"
+   ],
+   "reference_detection": {
+    "LAY6 check-ignore names the source": true
+   },
+   "detected": true
+  },
+  "RV5-M8 user-writable installation classes": {
+   "plan_rows": [],
+   "register_rows": [],
+   "reference_detection": {
+    "UW6 stated rows equal computed": true,
+    "RT-138 no longer expects C0-C2 unconditionally": true
+   },
+   "detected": false
+  },
+  "RV5-M9 executors disagree (R1–R4)": {
+   "plan_rows": [
+    "RT-165",
+    "RT-169"
+   ],
+   "register_rows": [
+    "DR-02"
+   ],
+   "reference_detection": {
+    "FA6 S4 same codes": true,
+    "P4r6 R1": true,
+    "P4r6 R3": true,
+    "P4r6 R4": true
+   },
+   "detected": true
+  },
+  "RV5-L1 bundle order": {
+   "plan_rows": [
+    "RT-158"
+   ],
+   "register_rows": [
+    "DR-03"
+   ],
+   "reference_detection": {
+    "FA6 S7 lineage_from_bundle_order": true
+   },
+   "detected": true
+  },
+  "RV5-L2 shipped admission record": {
+   "plan_rows": [
+    "RT-171"
+   ],
+   "register_rows": [],
+   "reference_detection": {
+    "FA6 S7 record_anywhere": true,
+    "ADM6 A15": true
+   },
+   "detected": false
+  },
+  "RV5-L3 restored store, clock set back": {
+   "plan_rows": [
+    "RT-178"
+   ],
+   "register_rows": [],
+   "reference_detection": {
+    "P4r6 CLOCK": true,
+    "DA03r6 R6-clock-future": true
+   },
+   "detected": false
+  },
+  "RV5-L4 stale text (witness-only clock, proposals)": {
+   "plan_rows": [],
+   "register_rows": [
+    "(text; statements_check S2)"
+   ],
+   "reference_detection": {
+    "24 §9 proposal removed": true,
+    "24 §8 witness-only rule withdrawn": true
+   },
+   "detected": false
+  },
+  "RV5-L5 victim classes": {
+   "plan_rows": [
+    "RT-131"
+   ],
+   "register_rows": [
+    "DR-21",
+    "DR-22"
+   ],
+   "reference_detection": {
+    "CS6 victims WR and CIR configured": true
+   },
+   "detected": true
+  },
+  "RV5-L6 root threshold 1": {
+   "plan_rows": [
+    "RT-177"
+   ],
+   "register_rows": [
+    "DR-31"
+   ],
+   "reference_detection": {
+    "P4r6 KS14": true,
+    "FA6 S7 skip_min_root_threshold": true,
+    "DA03r6 R6-ks14": true
+   },
+   "detected": true
+  },
+  "RV5-L7 LP-1s over-scoped": {
+   "plan_rows": [
+    "RT-176"
+   ],
+   "register_rows": [
+    "DR-28"
+   ],
+   "reference_detection": {
+    "LAY6 LP-1s restated 0 counterexamples": true
+   },
+   "detected": true
+  },
+  "RV5-L8 transaction area": {
+   "plan_rows": [
+    "RT-175"
+   ],
+   "register_rows": [
+    "DR-29"
+   ],
+   "reference_detection": {
+    "stated in 18 §9.2": true
+   },
+   "detected": true
+  },
+  "RV5-L9 OP-3 mode B currency": {
+   "plan_rows": [
+    "RT-35",
+    "RT-113",
+    "RT-179"
+   ],
+   "register_rows": [
+    "DR-22"
+   ],
+   "reference_detection": {
+    "P4r6 mode B": true,
+    "DA03r6 R6-mode-B-currency": true
+   },
+   "detected": true
+  },
+  "RV5-I2 binding-group derivation (capability-contract phase)": {
+   "plan_rows": [
+    "RT-182"
+   ],
+   "register_rows": [
+    "DR-27"
+   ],
+   "reference_detection": {
+    "carried to the capability-contract phase (no instrument before that phase)": true
+   },
+   "detected": true
+  }
+ },
+ "summary": {
+  "defects": 22,
+  "detected": 18,
+  "not_detected": [
+   "RV5-M8 user-writable installation classes",
+   "RV5-L2 shipped admission record",
+   "RV5-L3 restored store, clock set back",
+   "RV5-L4 stale text (witness-only clock, proposals)"
+  ]
+ }
+}

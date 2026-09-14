@@ -1,6 +1,11 @@
 # Output 11 — Migration plan from 4.1.5
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 amendments: **Phase 0** also records the owner's OP-13 answer (first-contact sources and custody, the second
 > path or media) and OP-16 answer, the environment reproducers, and publishes the first-contact manifest and code of every
 > Trust State. **Phase 2** adds WP-28 first-contact procedure and admitter rules FC-1…FC-8 with the shared vectors R1–R5

@@ -1,6 +1,11 @@
 # Output 20 — Rollback and recovery model
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 (CP-1, `35`; review r6 carried items): §5 recovery phases equal `18` §5.3, including the journaled layout-migration
+> phases (CR6-C-7; the revision-6 `committed` row is withdrawn, CR6-C-11); §8 remedies retain failing strength requirements and
+> pending obligations (CR6-C-9) and force-add the migration occupation (CR6-C-2); §9 the per-project record is keyed by
+> `project_trust_id` and a locally recorded repository identity (CR6-C-8), and a rollback to an admitted binary whose TBM is below
+> the accepted-TBM high-water gains no trusted operation (CR6-C-12); RR-2 becomes RR-2′ (the local trust gate selects, OP-11 (b)).
 > Revision 6 amendments: a rollback to a previously admitted binary keeps that binary's admission record (`31` R-ADM-7′,
 > RV5-C-A10); re-admission during recovery keeps the verifier trust store (`31` R-ADM-8′); RR-2 is register row DR-25
 > (`29` §4).
@@ -91,7 +96,7 @@ the journal is untracked (`18` §5.1). Otherwise it is `FOREIGN_TRANSACTION_ARTE
 |---|---|
 | `prepared`, `staged`, `verified-staged` | move `trust-tx/<TX>` to `trust-tx/abandoned/`; deregister |
 | `swapped`, `migrated` | Evaluate the exchange-back target (`trust.prev`) through the restore pipeline (§2). The downgrade policy applies relative to the VTS per-project record; the lock is a hint. If eligible: exchange back with union `state/` and `root/`. **The `overlay.prev` restore runs the computed-weakening check of `19` §9 against the current overlay. A non-empty list needs the `weakening` trust gate.** Otherwise leave `PARTIAL` and report. |
-| `committed` (lock written) | Evaluate the installed state; if verified and eligible, finish; otherwise evaluate `trust.prev` as above. |
+| `layout-*`, `exchange-intent` (revision 7, `18` §5.3) | roll forward when every redo record is complete and the exchange happened (decided from the tree when the intent is present); otherwise apply the undo records in reverse to reach exactly the pre-transaction legacy layout (`26` §7) |
 | `verified` | clean up |
 
 A forged journal or `.prev` planted by A3 is honoured only if A3 also forged the VTS registry entry (same-user boundary,
@@ -121,23 +126,32 @@ gate (review RV2-A25). A journal committed by A2 is foreign on every clone.
 2. Mutations are refused (`INSTALL_STATE_PARTIAL`), and doctor D033 reports CRITICAL with the observed components,
    including `occupation`.
 3. Remedies (authority from the floor; freshness per `24` §4.3):
-   - `gov kernel reinstall --source <S>`: S authenticates to the identity in the VTS per-project record or, on a machine with no record, to the lock-recorded identity if that is eligible (RR-2). Occupation entries are recreated. A same-digest reinstall needs no freshness, so an unanchored `PARTIAL` install stays repairable (C-2, RV3-C-A08).
+   - `gov kernel reinstall --source <S>`: S authenticates to the identity in the VTS per-project record or, on a machine with no record, to the lock-recorded identity if that is eligible and confirmed at the local trust gate (RR-2′). Occupation entries are recreated and `.governance-runtime/migration` is force-added (revision 7, CR6-C-2). A same-digest reinstall needs no freshness, so an unanchored `PARTIAL` install stays repairable (C-2, RV3-C-A08).
    - `gov update --apply --source <eligible release>`;
    - `gov recover`;
    - `gov init --force`, treated as reinstall or update.
 4. Each remedy is an install transaction. It restores PPS and occupation entries, never project strength: the strength
-   check (`26` §6) remains until its trust gate.
+   check (`26` §6) remains until its trust gate. **Revision 7 (CR6-C-9):** a remedy commits with failing requirements and pending
+   `policy_lowering` / `registration_change` obligations retained.
 
 ## 9. Git-delivered changes and use-time downgrade detection
 
 - Git can deliver any combination of files. That is evaluated, not restored: authenticity, integrity, E7, eligibility,
   floors, trust state and freshness.
-- The VTS per-project record holds, per `(repository path, project_trust_id)`, the highest installed eligible sequence
-  and CI, the anchor epoch at install, and the project-strength vector.
+- **Record identity (revision 7, CR6-C-8).** The per-project record is keyed by `project_trust_id` and a locally recorded
+  repository identity (the Git common-directory identity recorded by the first install on this machine, never committed). It
+  holds the repository paths, the highest installed eligible sequence and CI, the anchor epoch at install, the project-strength
+  vector and pending gate obligations. A known id at a new path with the same identity (worktree, moved checkout, bind-mount)
+  inherits the strongest vector and highest sequence and is reported; the same id with another identity (second clone, fork,
+  template copy) is reported (`PROJECT_IDENTITY_MISMATCH`), fails closed for gated operations and never overwrites the original
+  record (`evidence/r7/PPR7-project-records.json`).
 - A verified, eligible installed release whose sequence is **lower** than that record → `INELIGIBLE`
   (`downgrade_without_transaction`). Remedy: an authorised rollback (trust gate) or an update.
 - A changed `project_trust_id` at a known path → `KERNEL_INELIGIBLE(project_trust_id_changed)`.
-- A machine without a record (fresh clone) cannot detect a downgrade. §10 RR-2 bounds it.
+- **Rollback of the binary (revision 7, CR6-C-12).** A rollback to an admitted binary whose TBM is below the accepted-TBM
+  high-water keeps its record but runs C0-R only (`BINARY_T0_ROLLBACK`, `31` GB-7) until a root-signed `accepted_tbm_reset`.
+- A machine without a record (fresh clone) cannot detect a downgrade. §10 RR-2′ bounds it: the local trust gate confirms the
+  release at first use (`27` `project_first_use`).
 
 ## 10. Residuals (restated)
 

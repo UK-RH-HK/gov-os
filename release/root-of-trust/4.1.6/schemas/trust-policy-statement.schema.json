@@ -2,13 +2,38 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-policy-statement.schema.json",
   "title": "trust-policy-statement",
-  "description": "PROPOSED (RoT-1 revision 4). Trust Policy Statement v2 signed by the trust-policy purpose (root keys, root threshold): Constitutional Surface Inventory schema 2 (23: presence, exact precedence registration, Overlay Surface, owner-domain slots), eligibility including historical releases and optional production sources (OP-2 S1), install authority, gating, bootstrap (OP-6, OP-7, pin-currency parameters, clock reset), cumulative prior_policies and lowering_history (computed reductions in both directions and over the non-surface fields, 19 §10.6), unrevocation, optional state chain reset. Revision 6 (PROPOSED): bootstrap.channel_quorum may only raise the compiled first-contact quorum; bootstrap.admitter_digests is the evaluator binding list; registration.environment_diversity encodes OP-16 (b).",
-  "x-schema-version": "3.0.0",
+  "x-schema-version": "4.0.0",
   "type": "object",
   "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "level": {
+      "type": "string",
+      "pattern": "^L[0-5]$"
+    },
+    "profile": {
+      "enum": [
+        "production",
+        "test"
+      ]
+    }
+  },
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). Trust Policy Statement v4 signed at root threshold. Option-selecting fields of revision 6 are absent: every CP-1 parameter is compiled, and the fields that remain can only tighten.",
   "required": [
     "_type",
     "bootstrap",
+    "certified_targets",
     "eligibility",
     "floor_schema_version",
     "framework",
@@ -18,9 +43,12 @@
     "lowering_history",
     "policy_version",
     "prior_policies",
+    "profile_id",
+    "registration",
     "sensitivity_order",
     "state_chain_reset",
     "supersedes_policy_digest",
+    "supply_chain",
     "surface",
     "trust_profile",
     "trust_root_id",
@@ -28,7 +56,7 @@
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/trust-policy/v2"
+      "const": "https://agentic-engineering-os/statement/trust-policy/v4"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -63,22 +91,29 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "min_release_sequence",
-        "min_binary_version",
-        "production_stage",
         "evaluation_candidates",
-        "historical_releases"
+        "historical_releases",
+        "min_binary_version",
+        "min_release_sequence",
+        "production_stage"
       ],
       "properties": {
         "min_release_sequence": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "OP-11 (b); the verifier's effective minimum is the maximum of this value and the sequence of every referenced registration with security_relevant_change (19 E3′). No grace period exists (EX-07)."
         },
         "min_binary_version": {
           "$ref": "#/$defs/semver"
         },
         "production_stage": {
           "const": "final"
+        },
+        "evaluation_candidates": {
+          "enum": [
+            "refuse",
+            "flag_and_gate"
+          ]
         },
         "historical_releases": {
           "type": "array",
@@ -125,12 +160,6 @@
             }
           }
         },
-        "evaluation_candidates": {
-          "enum": [
-            "refuse",
-            "flag_and_gate"
-          ]
-        },
         "historical_releases_rule": {
           "const": "never_eligible"
         }
@@ -168,16 +197,14 @@
       ],
       "properties": {
         "mode": {
-          "enum": [
-            "always_gate",
-            "fresh_certified_may_skip_update_gate"
-          ]
+          "const": "always_gate",
+          "description": "OP-3 Mode A; mode B is excluded (EX-06)"
         },
         "refuse_known_rejected": {
-          "type": "boolean"
+          "const": true
         },
         "refuse_known_withdrawn": {
-          "type": "boolean"
+          "const": true
         },
         "local_terminal_only": {
           "type": "array",
@@ -185,21 +212,26 @@
           "items": {
             "enum": [
               "init_ack",
+              "project_first_use",
               "framework_update",
               "downgrade",
+              "rollback",
+              "recovery_exchange",
               "weakening",
               "policy_lowering",
               "project_strength",
               "evaluation_candidate",
               "override_kernel_integrity",
               "adopt_lineage",
+              "registration_change",
               "owner_constitutional_file"
             ]
           }
         },
         "decision_pin_max_validity_days": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "maximum": 7
         }
       }
     },
@@ -312,77 +344,11 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "op6_mode",
-        "op7_mode",
-        "pin_max_validity_days",
-        "c3_currency_window_hours",
-        "max_anchor_age_days",
-        "witness_max_validity_hours",
-        "freshness_witness_threshold",
+        "accepted_tbm_reset",
+        "admission_ceilings",
         "clock_reset"
       ],
       "properties": {
-        "op6_mode": {
-          "enum": [
-            "confirm_once_per_vts",
-            "trust_on_first_use_labelled",
-            "confirm_every_init"
-          ]
-        },
-        "op7_mode": {
-          "enum": [
-            "anchored_only",
-            "anchored_max_age",
-            "expiring_witness",
-            "compiled_epoch_for_use"
-          ]
-        },
-        "pin_max_validity_days": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "maximum valid_until - provisioned_at of a state pin (24 §3.2)"
-        },
-        "c3_currency_window_hours": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "an anchoring event is a currency proof for C3 within this window (24 §4.4 P1)"
-        },
-        "max_anchor_age_days": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "OP-7 (b) only"
-        },
-        "witness_max_validity_hours": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "OP-7 (c) only: maximum expires_at - issued_at of a freshness witness"
-        },
-        "freshness_witness_threshold": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "OP-7 (c) only; C3 and binary acceptance need at least 2 regardless (compiled)"
-        },
         "clock_reset": {
           "oneOf": [
             {
@@ -408,41 +374,49 @@
               }
             }
           ],
-          "description": "lowers the verifier clock high-water after a witness-key compromise (CR-06)"
-        },
-        "channel_quorum": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "OP-13; may only raise the admitter's compiled first-contact quorum (32 FC-4)"
-        },
-        "admitter_digests": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "pattern": "^sha256:[0-9a-f]{64}$"
-          },
-          "description": "target -> digest of the registered gov-admit; the evaluator binding list (32 FC-8)"
-        },
-        "workstation_record_max_validity_days": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "minimum": 1
-        },
-        "revoked_self_scope": {
-          "enum": [
-            "C0_only",
-            "C0_C2"
-          ]
+          "description": "root threshold only: lowers the verifier clock high-water after a wrong future clock raised it (24 R-CLK-1)"
         },
         "accepted_tbm_reset": {
           "type": [
             "object",
             "null"
           ]
+        },
+        "admission_ceilings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "admission_state_hours",
+            "ci_anchor_days",
+            "production_currency_hours",
+            "workstation_anchor_days"
+          ],
+          "properties": {
+            "workstation_anchor_days": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 90
+            },
+            "ci_anchor_days": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7
+            },
+            "production_currency_hours": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24
+            },
+            "admission_state_hours": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24
+            }
+          },
+          "description": "OP-7 (a) and OP-14 (b) values; each may only be lowered below the compiled ceiling (90 d, 7 d, 24 h, 24 h)"
         }
-      }
+      },
+      "description": "CP-1: no op6_mode, op7_mode, max_anchor_age_days, witness, channel_quorum, admitter list or revoked_self_scope field (compiled; EX-01, EX-04, EX-07, EX-11, EX-12, EX-20)"
     },
     "state_chain_reset": {
       "oneOf": [
@@ -473,46 +447,174 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "min_verification_records",
-        "binary_digests_registered"
+        "min_verification_records"
       ],
       "properties": {
         "min_verification_records": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "binary_digests_registered": {
-          "type": "boolean"
-        },
-        "environment_diversity": {
-          "type": "boolean",
-          "description": "OP-16 (b) (33 R-BENV-5)"
+          "const": 2
         }
-      }
-    }
-  },
-  "$defs": {
-    "digest": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "description": "OP-8 = 2; OP-9 (d) and OP-16 (b) are compiled (EX-13, EX-14, EX-21)"
     },
-    "semver": {
-      "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z.-]+)?$"
+    "profile_id": {
+      "const": "governance-os.rot1/CP-1"
     },
-    "timestamp": {
-      "type": "string",
-      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    "supply_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suppliers",
+        "toolchains"
+      ],
+      "properties": {
+        "suppliers": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "checksum_keys",
+              "provenance",
+              "supplier_id"
+            ],
+            "properties": {
+              "supplier_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "base_image_lineage",
+                  "build_system",
+                  "package_source",
+                  "signing_infrastructure"
+                ],
+                "properties": {
+                  "base_image_lineage": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "package_source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "build_system": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "signing_infrastructure": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                }
+              },
+              "checksum_keys": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^ed25519:[0-9a-f]{64}$"
+                }
+              }
+            }
+          }
+        },
+        "toolchains": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provenance",
+              "toolchain_id"
+            ],
+            "properties": {
+              "toolchain_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "bootstrap_root",
+                  "build_system",
+                  "package_source",
+                  "signing_infrastructure"
+                ],
+                "properties": {
+                  "bootstrap_root": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "package_source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "build_system": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "signing_infrastructure": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  }
+                }
+              },
+              "archive_sha256": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "bootstrap_registration": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      },
+      "description": "Root-signed registries (33 §3): supplier-class and toolchain-lineage independence is computed from provenance, pinned keys and component digests, never from ids or labels"
     },
-    "level": {
-      "type": "string",
-      "pattern": "^L[0-5]$"
-    },
-    "profile": {
-      "enum": [
-        "production",
-        "test"
-      ]
+    "certified_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "criteria_evidence_digest",
+          "status",
+          "target"
+        ],
+        "properties": {
+          "target": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+-[a-z0-9_]+-[a-z0-9_]+(-[a-z0-9_]+)?$"
+          },
+          "status": {
+            "const": "CERTIFIED"
+          },
+          "criteria_evidence_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      },
+      "description": "35 §5: only targets meeting CC-1…CC-9; absent targets are not certified"
     }
   }
 }

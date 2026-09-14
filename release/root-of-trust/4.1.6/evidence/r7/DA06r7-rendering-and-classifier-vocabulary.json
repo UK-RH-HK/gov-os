@@ -1,0 +1,38 @@
+{
+ "atoms": 42,
+ "control_reproduces_committed_statements": true,
+ "misrendered_atoms": {},
+ "prefix_classifiers_in_functions": {
+  "class_counts": [],
+  "compact": [],
+  "control_statements": [],
+  "invariants": [],
+  "statements": []
+ },
+ "prefix_renderer_changed_statements": {
+  "CP-CONTENT": {
+   "example_after": "| USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck}; {2 reg",
+   "example_before": "| USE | {insider}; {2 verification processes, pipeline}; {2 registration custodians, 2 verification keys, pipeline}; {2 registration custodians, 2 verification keys, 2 release-final keys, rck}; {2 reg",
+   "rows_changed": 1
+  }
+ },
+ "prefix_renderer_changes_undetected_at_atom_level": [],
+ "probe": "DA06r7 rendering and classifier vocabulary (AR-0019; after RV6-D-A06, RV6-B-A03)",
+ "renderer_injective": {
+  "every_atom_classified_or_named": true,
+  "injective": true,
+  "named_atoms_equal_to_class_words": [],
+  "tokens_with_several_classes": {}
+ },
+ "repo_render": "{2 registration keys, 2 verification keys, 2 trust-state keys, repo, pipeline}",
+ "reproducer_key_render": "{2 registration keys, 2 verification keys, 1 reproducer key, 2 trust-state keys, pipeline}",
+ "verdicts": {
+  "control_reproduces_committed_statements": true,
+  "every_changed_set_detected_at_atom_level": true,
+  "no_misrendered_atom": true,
+  "no_prefix_classifier_in_invariants_or_statements": true,
+  "prefix_renderer_changes_rows": true,
+  "renderer_injective": true,
+  "repo_and_reproducer_key_render_differently": true
+ }
+}

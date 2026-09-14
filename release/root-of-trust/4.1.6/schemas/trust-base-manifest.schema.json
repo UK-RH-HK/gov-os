@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-base-manifest.schema.json",
   "title": "trust-base-manifest",
-  "description": "PROPOSED (RoT-1 revision 6). Trust Base Manifest v3 compiled into every gov binary (25 §4): binary.source is source identity v2; binary.version is required (AP-4); signed components are named by digest.",
-  "x-schema-version": "3.0.0",
+  "description": "PROPOSED (RoT-1 revision 7, CP-1). Trust Base Manifest v4 compiled into gov and gov-admit: adds compiled_rules.profile_id and the decision-register digest; binary.name is gov or gov-admit.",
+  "x-schema-version": "4.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -45,8 +45,10 @@
       ],
       "properties": {
         "name": {
-          "type": "string",
-          "maxLength": 64
+          "enum": [
+            "gov",
+            "gov-admit"
+          ]
         },
         "version": {
           "type": "string",
@@ -180,12 +182,14 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "command_register_digest",
+        "decision_register_digest",
         "floor_schema_version",
-        "operator_vocabulary",
-        "purpose_table_digest",
-        "statement_schemas_digest",
         "format_readers",
-        "command_register_digest"
+        "operator_vocabulary",
+        "profile_id",
+        "purpose_table_digest",
+        "statement_schemas_digest"
       ],
       "properties": {
         "floor_schema_version": {
@@ -197,7 +201,7 @@
         "purpose_table_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "digest of the compiled purpose table (twelve purposes) and pairwise whitelist"
+          "description": "digest of the compiled CP-1 purpose table and pairwise whitelist"
         },
         "statement_schemas_digest": {
           "type": "string",
@@ -212,6 +216,13 @@
           }
         },
         "command_register_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "profile_id": {
+          "const": "governance-os.rot1/CP-1"
+        },
+        "decision_register_digest": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{64}$"
         }

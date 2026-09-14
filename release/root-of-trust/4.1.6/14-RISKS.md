@@ -1,6 +1,11 @@
 # Output 14 — Risks and trade-offs
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 risks added: **RK-46** first install needs the OP-13 sources (availability; custody of two sources under (b));
 > **RK-47** dependence on a platform signing service under OP-13 (c); **RK-48** per-machine media ceremonies under OP-13 (d);
 > **RK-49** environment reproduction per environment change (two first-hand reproductions) and, under OP-16 (b), per-target

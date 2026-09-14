@@ -1,0 +1,42 @@
+{
+  "admitter_evidence": {
+    "registration_digest": "sha256:a76df5b46bffaf5eb59be89398b50e6076e9e7d24f23c591406f2e30fd3a85ca",
+    "reproduction_digests": [
+      "sha256:2348e1925abbca5a33aef64b749ad63c96d1857361805364b08ea65358f40674",
+      "sha256:d91842e186ce2a2071b3535ecd99daa8a6f6f8f3896b98496cffedc0abf36426"
+    ],
+    "verification_records": [
+      "sha256:c43d31e0496e18053d2d5b81eee56a7d20964e633325f6affe4936558abcb8f9",
+      "sha256:aa64a95b1ed06ec75775780570a831f60b08383a7e21cf9288e2b64007808158"
+    ]
+  },
+  "admitters": {
+    "x86_64-unknown-linux-musl": "sha256:2d8e99ec78725cdbbc620ac6d79ebed6e18e9b9477897da85bd29a02a96dc46f"
+  },
+  "certified_targets": [
+    "x86_64-unknown-linux-musl"
+  ],
+  "fca_sequence": 2,
+  "issued_at": "2026-09-14T00:00:00Z",
+  "lineage": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04",
+  "procedure_digest": "sha256:79433e0bdbfe77c3f1204466aea580de466864b77dbc3a5ae8f3ce20b49c097f",
+  "profile_id": "governance-os.rot1/CP-1",
+  "root_version": 2,
+  "sources": [
+    {
+      "custodian_role": "release-channel-custodian",
+      "custody_domain": "owner-release-operations",
+      "kind": "authenticated-private-release-channel",
+      "locator": "https://releases.owner.invalid/private",
+      "source_id": "src-private"
+    },
+    {
+      "custodian_role": "archive-custodian",
+      "custody_domain": "owner-archive-trust",
+      "kind": "immutable-release-mirror",
+      "locator": "https://mirror.owner-archive.invalid/immutable",
+      "source_id": "src-mirror"
+    }
+  ],
+  "supersedes_fca_digest": "sha256:d73d247400b3fc0ab8c80678b56846e92756cc8700dfcdeb4a544f8f41f2beb5"
+}

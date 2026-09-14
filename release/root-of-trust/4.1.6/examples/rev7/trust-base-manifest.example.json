@@ -1,0 +1,49 @@
+{
+  "_type": "https://agentic-engineering-os/manifest/trust-base/v2",
+  "binary": {
+    "build": "release",
+    "inputs_manifest_digest": "sha256:32381523e63197c929b67f793a8098bed0ae3a6fa902634fdbcc6fa4567f3346",
+    "name": "gov-admit",
+    "source": {
+      "content_digest": "sha256:ebc0a9b053c0d14e11d89425b47b27f7d1ed71f81b1fad76bdfd408f98464b27",
+      "git_tree": "2222222222222222222222222222222222222222",
+      "release_commit": "1111111111111111111111111111111111111111"
+    },
+    "target": "x86_64-unknown-linux-musl",
+    "toolchain": "tc-up",
+    "version": "4.1.6"
+  },
+  "compiled_rules": {
+    "command_register_digest": "sha256:8b02cfddd75b5c34a6fb26a52e74b7a0ce731a21f0153eee075b5418cea5089b",
+    "decision_register_digest": "sha256:3a8cf69dc920795e6f564fca447e4c416126d9f1e2043c684dff260523b78064",
+    "floor_schema_version": 3,
+    "format_readers": [
+      "rot-1"
+    ],
+    "operator_vocabulary": "floor-ops/3",
+    "profile_id": "governance-os.rot1/CP-1",
+    "purpose_table_digest": "sha256:a910416793630880062dcf5450d8ffb5a32b01660f16ba451d11e23cd348a800",
+    "statement_schemas_digest": "sha256:3cb73d1f1f33e99b0605c38be10821fae18006841d235ef83935343dc926c566"
+  },
+  "embedded_release": {
+    "final_statement_digest": "sha256:2443630b4620165c8b173e7265e17526fe2787ae594364dd6d839ad58f2fc007",
+    "kernel_tree_digest": "sha256:6923dd1bc0460082c5d55a831908c24a282860b7f1cd6c2b79cf1bc8857c639c"
+  },
+  "framework": "agentic-engineering-os",
+  "lineage": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04",
+  "root_chain": [
+    {
+      "statement_digest": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04",
+      "version": 1
+    }
+  ],
+  "trust_policy": {
+    "policy_version": 2,
+    "statement_digest": "sha256:167f8dbc75a9f2e3687f11fa77ce618e1147879a4380024cd774df48119d86c4"
+  },
+  "trust_profile": "production",
+  "trust_state": {
+    "sequence": 10,
+    "statement_digest": "sha256:f9d2a0ee21bc8f6f0efab65138c42a90336d3802369e9df11802010f8ec43304"
+  }
+}

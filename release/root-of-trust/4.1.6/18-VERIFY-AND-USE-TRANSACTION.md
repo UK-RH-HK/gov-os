@@ -1,6 +1,13 @@
 # Output 18 — Verify-and-use transaction model
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 (certified profile CP-1, `35`; review r6 carried items): §5.1 a journal is honoured only for the per-project
+> record's repository identity, and the foreign-artefact scan excludes completed `done/` archives (CR6-C-6, CR6-C-8); §5.3 the
+> first-install layout migration is a sequence of journaled phases with redo and undo records and an intent phase before the
+> exchange (CR6-C-7 (a), (d)); §9 `IN_TRANSACTION` takes precedence, an interrupted layout migration is
+> `LAYOUT_MIGRATION_INCOMPLETE`, and `ABSENT` requires no `governance/overlay` or `governance/views` (CR6-C-7 (b), (c)).
+> Anchoring and currency follow `24` (OP-7 (a)). Evidence: `evidence/r7/LAY7/crashmig7.json`; reviewer C's `matrix6` re-run
+> (property R2-H4: 0 violations).
 > Revision 6: §9.1 adds the `governance/trust/.gitattributes` member (`* -text`, RV5-M6); §9.2 extends the working-directory
 > refusal to the transaction area and states the containment of legacy litter there (RV5-L8); evidence re-run on the
 > revision-6 layout (LAY6).
@@ -109,9 +116,13 @@ ledger entry (idempotent); VTS per-project record updated; TX deregistered; trus
 ```
 
 - `.governance-runtime/` is ignored by the installer's `.gitignore` entry.
-- A journal is honoured **only if** (a) the VTS per-project record lists `<TX>` as an open transaction for this
-  `project_trust_id` and repository path, and (b) the journal path is not tracked by Git.
+- A journal is honoured **only if** (a) the per-project record lists `<TX>` as an open transaction for this
+  `project_trust_id`, repository path and locally recorded repository identity (`20` §9; revision 7, CR6-C-8), and (b) the
+  journal path is not tracked by Git.
 - Anything else is `FOREIGN_TRANSACTION_ARTEFACT`: reported (doctor HIGH), never `IN_TRANSACTION`, never recovered from.
+- **Scan scope (revision 7; CR6-C-6).** The foreign-artefact scan covers `trust-tx/<TX>/` directories and journals. A completed
+  `trust-tx/done/<TX>` archive written by a transaction this machine registered is not reported on a healthy machine. A journal
+  at `trust-tx/<TX>/journal.json` that the per-project record does not register is reported and never `IN_TRANSACTION`.
 - A committed or copied journal therefore affects no clone (review RV2-A24).
 
 ### 5.2 Union trust record
@@ -134,6 +145,14 @@ ledger entry (idempotent); VTS per-project record updated; TX deregistered; trus
 | `swapped` | new `governance/trust` with lock inside; the VTS registry marks the TX open → `IN_TRANSACTION` | evaluate the exchange-back target; exchange back with union state |
 | `migrated` | as `swapped`, plus overlay changes | as `swapped`, plus the `overlay.prev` restore through the computed-weakening check and `weakening` trust gate |
 | `verified` | new | clean up |
+
+**First-install layout migration (revision 7; CR6-C-7 (a), (d)).** On a legacy project the install transaction records the
+layout steps of `26` §7 as phases `layout-intent`, `layout-quarantine-residue`, `layout-move-kernel`, `layout-move-lock`,
+`layout-occupation`, `layout-ignore-rule`, each with an idempotent redo record and an undo record written before the step
+(including where the legacy kernel, lock and residue were moved). An `exchange-intent` phase precedes `RENAME_EXCHANGE`; when
+the intent is present, recovery decides from the tree whether the exchange happened. Recovery rolls forward only when every
+redo record is complete and the exchange happened, and otherwise applies the undo records in reverse to reach exactly the
+pre-transaction legacy layout (`20` §5). Evidence: `evidence/r7/LAY7/crashmig7.json`.
 
 ### 5.4 Locking
 
@@ -209,14 +228,17 @@ Evaluated first in every process, including commands that need no installation.
 
 | State | Condition | Policy root | Allowed |
 |---|---|---|---|
-| `ABSENT` | no `governance/trust/`, no occupation entries, no legacy entries (`governance/framework.lock` file, `governance/kernel` directory) | EmbeddedSnapshot ⊔ floor | `init`; commands needing no installation |
+| `ABSENT` | no `governance/trust/`, no occupation entries, no legacy entries (`governance/framework.lock` file, `governance/kernel` directory), and (revision 7, CR6-C-7 (c)) no `governance/overlay` and no `governance/views` | EmbeddedSnapshot ⊔ floor | `init` (`26` R-INIT-9); commands needing no installation |
 | `LEGACY` | a legacy layout (`governance/framework.lock` is a file or `governance/kernel` is a directory) and no `governance/trust/` | EmbeddedSnapshot ⊔ floor; tree digest checked against `historical_releases` | read-only diagnostics; `update --apply` to an eligible release (layout migration, `26` §7) |
 | `IN_TRANSACTION` | an honoured journal (§5.1) | EmbeddedSnapshot ⊔ floor | read-only diagnostics; `gov recover` |
+| `LAYOUT_MIGRATION_INCOMPLETE` (revision 7) | a layout-migration phase is recorded without a completed install, or moved and legacy entries coexist in the pattern of an interrupted migration | EmbeddedSnapshot ⊔ floor | read-only diagnostics; `gov recover` (roll forward, or undo to the exact legacy layout, §5.3); never `ABSENT` or `LEGACY` |
 | `COMPLETE` | `governance/trust/{FORMAT, framework.lock, kernel/, release.dsse.json or development.json}` present and readable, **every occupation entry present with its exact type**, no honoured journal, **and the closed entry sets of §9.1 hold** (revision 5, RV4-M1) | KernelSnapshot if verified and eligible; otherwise EmbeddedSnapshot ⊔ floor | per verdict and freshness (`24` §4.3) |
 | `PARTIAL` | any other combination, including a missing or retyped occupation entry (`PARTIAL(occupation)`), a foreign entry (`PARTIAL(foreign_trust_entry)`, `PARTIAL(foreign_occupation_entry)`), a kernel differing from its release content set (`PARTIAL(kernel_content_mismatch)`), a nested legacy install under `governance/` (`PARTIAL(nested_legacy_install)`), or legacy and RoT-1 entries mixed. Doctor D033 names the mixed layout and stray artefacts such as `governance/framework.lock~legacy` and `governance/kernel/KERNEL_MANIFEST.json` (C-3). | EmbeddedSnapshot ⊔ floor | read-only diagnostics; remedies (`20` §8) |
 | `FORMAT_UNSUPPORTED` | `governance/trust/FORMAT` names an unimplemented format or layout | none | `gov version`; `gov doctor` |
 
-A foreign transaction artefact (§5.1) is reported and ignored; the state is computed as if it were absent.
+A foreign transaction artefact (§5.1) is reported and ignored; the state is computed as if it were absent. `IN_TRANSACTION`
+takes precedence over every other row, and `LAYOUT_MIGRATION_INCOMPLETE` over `ABSENT`, `LEGACY` and `PARTIAL` (revision 7,
+CR6-C-7 (b)).
 
 ### 9.1 Closed entry sets (revision 5; RV4-M1 (a))
 

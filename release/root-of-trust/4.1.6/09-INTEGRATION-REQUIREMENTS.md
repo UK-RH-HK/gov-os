@@ -1,6 +1,11 @@
 # Output 9 — Integration requirements
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 amendments (normative requirements; codes in `25` §5, `31`, `32`, `33`, `34`, `18` §9):
 > - **FC-1…FC-8** first contact (`32`); **R-ADM-2′, R-ADM-3′, R-ADM-7′, R-ADM-8′, R-ADM-13, R-ADM-14**, **GB-1′, GB-4′, GB-6** (`31`);
 >   `gov trust fc-procedure` prints the procedure for the owner's OP-13 answer.
@@ -83,6 +88,7 @@ Every trust failure MUST return `ok: false` (API-0002 exit code 1) with a code f
 | R-INIT-6 | `init --force` on an installed project MUST be treated as reinstall or update/downgrade. |
 | R-INIT-7 | `init` MUST apply OP-6 confirmation and state anchoring before any trusted write (`06` §3). |
 | R-INIT-8 | `release_commit` and `source` labels MUST come from the statement and `SourceRef.kind`. |
+| R-INIT-9 | (Revision 7; CR6-C-7 (c), RV6-M3; also `26` §7.) RoT-1 `init` on a tree holding `governance/overlay` or `governance/views` refuses (`INIT_OVER_EXISTING_OVERLAY`) unless it evaluates `19` §9 item 5 over the pre-transaction overlay before commit and obtains the `weakening` trust gate for a non-empty failure list. |
 
 ### adopt — I-03, I-30, I-34, I-36
 

@@ -1,6 +1,11 @@
 # Output 7 — Envelope and statement specification
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7: the certified production profile CP-1 (`35`) governs this file. Where the text below names an owner option
+> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6
+> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters
+> are the CP-1 values (`35` §2); consequence statements are the CS7 blocks of `21`, `30`, `32`–`34`.
+> (Revision 6 banner follows.)
 > Revision 6 amendments: `release.source` is source identity v2 `{release_commit, git_tree, content_digest}` with
 > `inputs_manifest_digest` (`30` §4.1; RV5-L4 aligned); verification attestation v4 (kernel tree digest), release registration
 > v2 (environments), registration revocation v1, binary reproduction v2 (environment id), environment reproduction v1; the

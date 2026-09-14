@@ -1,0 +1,41 @@
+{
+  "_type": "https://agentic-engineering-os/statement/trust-state/v4",
+  "framework": "agentic-engineering-os",
+  "issued_at": "2026-09-14T00:00:00Z",
+  "previous_state_digest": "sha256:f9d2a0ee21bc8f6f0efab65138c42a90336d3802369e9df11802010f8ec43304",
+  "prior_states": [
+    {
+      "sequence": 10,
+      "statement_digest": "sha256:f9d2a0ee21bc8f6f0efab65138c42a90336d3802369e9df11802010f8ec43304"
+    }
+  ],
+  "published_binaries": [
+    "sha256:b3a12e0a97d0fd16736c8fb1c44eb6e598df2b5ce376aec20938e6b31b44af11"
+  ],
+  "references": {
+    "first_contact_authority": {
+      "digest": "sha256:5d57413af2b296c7febbc3c730d923dfeb479f2a07e05ab664219ca8e209e6e6",
+      "fca_sequence": 2
+    },
+    "root": {
+      "digest": "sha256:cb39f0b61a586ba5d862ed6332d4b0c1ad7d387d1cda02ce8726c2e4f5b562c0",
+      "version": 2
+    },
+    "trust_policy": {
+      "digest": "sha256:167f8dbc75a9f2e3687f11fa77ce618e1147879a4380024cd774df48119d86c4",
+      "version": 2
+    }
+  },
+  "registrations": [
+    "sha256:25c83856684d08d1ced87100e277df30237fca34dfbc96559a4af197102a31d5"
+  ],
+  "revocation_statements": [
+    "sha256:fcf7b8d88f3facde996ea79972b64fa1906b5c65823d7f3bd656f1145080b37f"
+  ],
+  "revocations": [
+    "sha256:fe622c43aac9d3cdcdb76c8d3625b1f47391d8e2a7a77e9d08eccc4f585faecd"
+  ],
+  "sequence": 11,
+  "trust_profile": "production",
+  "trust_root_id": "sha256:6f67640b993d802751a0cf6bbaa954bcf1eda1a69e85e3fa90be24a352d1ed04"
+}

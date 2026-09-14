@@ -1,6 +1,10 @@
 # Output 19 — Current-policy eligibility, effective policy and the non-downgradable security floor
 
-> **RoT-1 revision 6 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> **RoT-1 revision 7 — PROPOSED, pending fresh independent reviews; not approved, not implemented.**
+> Revision 7 (CP-1, `35`): E3 is the computed security minimum (OP-11 (b)); E8 requires anchoring within validity and a
+> currency proof of at most 24 hours (OP-7 (a); the witnessed axis is excluded, EX-01); §9 item 4 never drops a failing
+> requirement on re-record (CR6-C-9) and item 6 covers RoT-1 `init` over an existing overlay (CR6-C-7 (c), RV6-M3); Trust
+> Policy fields of unselected options are removed (EX-04, EX-07, EX-11, EX-20, EX-21).
 > Revision 6: E7 applies admission-predicate/1's restrictors and verifier-side registration reductions (`34` R-CON-3,
 > R-CON-4; BC5-3); Trust Policy fields for OP-13 (raise-only quorum, admitter list) and OP-16; `min_binary_version` fails closed
 > for a binary whose TBM names no version (`25` AP-4).
@@ -114,12 +118,12 @@ iff every applicable condition holds:
 |---|---|---|---|
 | E1 | R is a release statement, not in `P_eff.eligibility.historical_releases` | both | `historical` |
 | E2 | `stage = final`, or a candidate in a gated evaluation project | both | `candidate` |
-| E3 | `R.sequence ≥ P_eff.eligibility.min_release_sequence` | both | `below_min_release_sequence` |
+| E3 | (Revision 7, OP-11 (b).) `R.sequence ≥` the computed security minimum: the maximum of `P_eff.eligibility.min_release_sequence`, the sequence of every registration the effective Trust State references with `security_relevant_change`, and the minimum held by the stores; no grace period (EX-07) | both | `below_min_release_sequence` / `below_security_minimum` |
 | E4 | D and R's `release_id` ∉ N | both | `revoked` |
 | E5 | binary version ≥ `min_binary_version`; contract, `floor_schema_version` and CLI compatible | both | `binary_below_policy` / `incompatible` |
 | E6 | `R.trust_root_id` = binary lineage = pinned lineage | both | `lineage_mismatch` |
 | **E7** | **Surface check** (revision 5: first, **the registration of R** is effective on this machine — referenced by the effective TSS — and R's kernel tree digest and every non-join unit equal it, `23` §12.3: `release_unregistered` / `surface_unregistered_for_release`; **revision 6: then AP-5's restrictors hold (`34` R-CON-3: registration not revoked; registered final and candidate held, verifying, not revoked, final promoted from the registered candidate, both with the registered kernel and source; no REJECTED attestation for the candidate; OP-8 ACCEPTED attestations for exactly that candidate and kernel: `registration_revoked` / `release_final_unverified` / `final_not_promoted_from_registered_candidate` / `kernel_tree_digest_mismatch` / `registered_candidate_unverified` / `candidate_kernel_or_source_mismatch` / `revoked` / `artifact_source_rejected` / `verification_records_below_minimum`), and registration reductions over every referenced registration are declared (`34` R-CON-4: `registration_history_incomplete`)**) of R's kernel against P_eff's surface, with floors, pins and precedence registration judged against P_named: every file and leaf classified; **every registered file and leaf present**; **single YAML profile**; pinned digests and members registered; floors neither weaker nor stronger than P_named; **POLICY_PRECEDENCE equal to P_named's registration**; **every migration operation on a migration-writable Overlay Surface target** | both | `surface_unclassified` / **`surface_required_missing`** / **`surface_structure`** / `surface_unregistered` / `surface_membership` / `floor_violation` / `floor_not_registered` / **`precedence_unregistered`** / **`migration_operation_not_permitted`** |
-| E8 | trust state `KNOWN`; freshness `ANCHORED` or `WITNESSED`; **a currency proof** (`24` §4.4); R's release-local requirements met | ingress | `trust_state_unanchored` / `below_anchor` / **`currency_unproven`** / `incomplete` / `equivocation` / `regression` / `references_unknown_state` |
+| E8 | trust state `KNOWN`; freshness `ANCHORED` within validity; **a currency proof of at most 24 hours** (`24` §4.4; the witnessed axis is excluded, EX-01); R's release-local requirements met | ingress | `trust_state_unanchored` / `below_anchor` / **`currency_unproven`** / `incomplete` / `equivocation` / `regression` / `references_unknown_state` |
 | E9 | if R.sequence < the installed eligible release's sequence: a consumed `downgrade` trust-gate confirmation | ingress | `downgrade_not_authorised` |
 | E10 | R.sequence ≥ the VTS per-project record; `project_trust_id` unchanged | use | `downgrade_without_transaction` / `project_trust_id_changed` |
 
@@ -165,7 +169,8 @@ effective inputs**, before commit:
 - the migrated overlay;
 - the result of any `overlay.prev` restore or remedy.
 
-This covers update, rollback, restore, recovery exchange-back and adoption batch 0.
+This covers update, rollback, restore, recovery exchange-back, adoption batch 0 and RoT-1 `init` on a tree with an existing
+overlay or views directory (revision 7, item 6; CR6-C-7 (c)).
 
 1. **Migration operations** are first checked against the Overlay Surface whitelist (`23` §11.3). A violation refuses the
    transaction before any write: `MIGRATION_OPERATION_NOT_PERMITTED`.
@@ -178,11 +183,18 @@ This covers update, rollback, restore, recovery exchange-back and adoption batch
    - unclassified overlay files by digest.
 3. A non-empty failure list needs the `weakening` trust gate, bound to the statement digest and the failure-list digest
    (`27`). This applies in every OP-3 mode. Signer declarations can add gates, never remove them.
-4. After commit, the vector is re-recorded from the committed effective inputs.
+4. After commit, the vector is re-recorded from the committed effective inputs. **Revision 7 (CR6-C-9, RV6-M5):** a re-record
+   never drops a failing requirement unless the `weakening` or `project_strength` gate accepted it; every remedy commits with
+   failing requirements retained; pending `policy_lowering` and `registration_change` obligations are per-project record fields
+   cleared only by their gates (`evidence/r7/PPR7-project-records.json`).
 5. **No record (revision 5; CR4-B-04, RV4-M5).** On a machine with no per-project record, the requirements are first computed
    from the **pre-transaction** effective policy and overlay and then evaluated over the post-migration inputs; a non-empty
    failure list needs the `weakening` trust gate before commit (`OVERLAY_WEAKENING_GATE_REQUIRED`). Migration content itself
    is selected by the release registration (`23` §12). Test: RT-146 (the P1r4 M5 migration on a fresh clone).
+6. **RoT-1 `init` over an existing overlay (revision 7; CR6-C-7 (c), RV6-M3).** `init` on a tree holding `governance/overlay` or
+   `governance/views` evaluates item 5 over the pre-transaction overlay before commit and needs the `weakening` trust gate for a
+   non-empty failure list; such a tree is never `ABSENT` (`18` §9, `09` and `26` R-INIT-9). Test: RT-195; evidence:
+   `evidence/r7/LAY7/crashmig7.json` (`rot1_init_never_over_overlay`).
 
 Evidence: `evidence/P1r4-project-strength-and-absence.json` part C.
 - **Release-signed migrations.**

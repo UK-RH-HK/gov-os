@@ -1,22 +1,23 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentic-engineering-os/schemas/environment-reproduction/1",
-  "title": "Environment reproduction statement payload (purpose reproducer; exactly one signature; RoT-1 revision 6, PROPOSED; 33 R-BENV-2)",
-  "x-schema-version": "1.0.0",
+  "$id": "https://agentic-engineering-os/schemas/environment-reproduction/2",
+  "title": "Environment reproduction statement payload v2 (purpose reproducer; exactly one signature; RoT-1 revision 7, CP-1, PROPOSED; 33 R-BENV-3″)",
+  "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "trust_root_id",
     "environment_id",
     "environment_tree_digest",
+    "lock_digest",
+    "reproduced_at",
+    "supplier_id",
     "target",
-    "supplier_class",
-    "reproduced_at"
+    "trust_root_id"
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/environment-reproduction/v1"
+      "const": "https://agentic-engineering-os/statement/environment-reproduction/v2"
     },
     "trust_root_id": {
       "type": "string",
@@ -30,12 +31,18 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
-    "target": {
-      "type": "string"
-    },
-    "supplier_class": {
+    "lock_digest": {
       "type": "string",
-      "pattern": "^[A-Z]$"
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "target": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+-[a-z0-9_]+-[a-z0-9_]+(-[a-z0-9_]+)?$"
+    },
+    "supplier_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
     },
     "reproduced_at": {
       "type": "string",

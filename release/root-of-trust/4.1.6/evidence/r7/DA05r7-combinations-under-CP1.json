@@ -1,0 +1,73 @@
+{
+ "E1_pipeline_selected_environment": {
+  "CIR": {
+   "CP-1": {
+    "invariant_failures": [],
+    "minimal_sets": 143,
+    "pipeline_alone_minimal": false
+   },
+   "revision_6_control": {
+    "invariant_failures": [],
+    "minimal_sets": 152,
+    "pipeline_alone_minimal": true
+   }
+  },
+  "FA": {
+   "CP-1": {
+    "invariant_failures": [],
+    "minimal_sets": 91,
+    "pipeline_alone_minimal": false
+   },
+   "revision_6_control": {
+    "invariant_failures": [],
+    "minimal_sets": 18,
+    "pipeline_alone_minimal": true
+   }
+  },
+  "P1": {
+   "CP-1": {
+    "invariant_failures": [],
+    "minimal_sets": 23,
+    "pipeline_alone_minimal": false
+   },
+   "revision_6_control": {
+    "invariant_failures": [],
+    "minimal_sets": 8,
+    "pipeline_alone_minimal": true
+   }
+  }
+ },
+ "E2_toolchain": {
+  "CP-1": {
+   "rendered": [
+    "{tc_src}",
+    "{toolchain_up, diverse_tc}",
+    "{2 registration custodians, 3 reproducer processes}"
+   ],
+   "toolchain_up_alone_minimal": false
+  },
+  "control_V_TOOLCHAIN_DIVERSITY_off": {
+   "rendered": [
+    "{toolchain_up}",
+    "{tc_src}",
+    "{2 registration custodians, 3 reproducer processes}"
+   ],
+   "toolchain_up_alone_minimal": true
+  }
+ },
+ "E3_design": {
+  "21_cites_RV6_L12": true,
+  "21_states_every_other_pair_excluded": true,
+  "21_states_the_one_OP10_OP16_combination": true,
+  "35_exclusion_rows_EX15_EX21": true
+ },
+ "probe": "DA05r7 combinations under CP-1 (AR-0019; after RV6-D-A05)",
+ "verdicts": {
+  "E1_CP1_invariants_hold": true,
+  "E1_control_reproduces_review_r6_pipeline_selection": true,
+  "E1_pipeline_never_minimal_under_CP1": true,
+  "E2_control_toolchain_up_alone_minimal": true,
+  "E2_toolchain_up_alone_not_minimal_under_CP1": true,
+  "E3_design_states_the_combination": true
+ }
+}
