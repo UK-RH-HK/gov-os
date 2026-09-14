@@ -518,3 +518,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0015 |
+
+## L-0036 — 2026-09-14 — revision-6 architect spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-architect (`AR-0015`, fresh Opus 5 context) |
+| Input commit | `17acb8b` (worktree `wt/arch-r6`, branch `phase1/rot1-r6-architect`) |
+| Work performed | spawned on HO-0015; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0015.report.yaml`; pack `release/root-of-trust/4.1.6/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge, instantiate revision-6 B/C handoffs, spawn B and C in parallel |
