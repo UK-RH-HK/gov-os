@@ -4,9 +4,9 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T02:49:02Z'
-state_hash: aecf8bdbbedf4f666ffc64028381deeedca29596a726f34d75132161e615221d
-lifecycle_state: ROT_ARCH_SYNTHESIS
+updated_at: '2026-09-14T03:34:33Z'
+state_hash: ef9e5e6e5842b9e13a37c5a36eadc47eab45492554a5e3a3fa12f4ab7856e037
+lifecycle_state: ROT_ARCH_R4_AUTHORING
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -16,7 +16,7 @@ protocol:
   agent_model: claude-opus-5
 
 lifecycle_states:
-  - ROT_ARCH_R3_AUTHORING
+  - ROT_ARCH_R<N>_AUTHORING   # N = architecture.current_revision
   - ROT_ARCH_REVIEW_PANEL
   - ROT_ARCH_SYNTHESIS
   - ROT_ARCH_ACCEPTED
@@ -37,7 +37,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 90efd29dca56c8344fb80b5a9556ae5a52cccac7
+  last_recorded_commit: e4627489620ddc4c54560571af96eec8e652957b
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -62,11 +62,14 @@ architecture:
   target_release: 4.1.6
   pack_path: release/root-of-trust/4.1.6
   decision_paths: [spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md]
-  current_revision: 3
+  current_revision: 4
   latest_accepted_revision: null
-  latest_rejected_revision: 2
-  orchestrated_rejection_streak: 0   # successive Phase-1 revisions rejected for materially new HIGH/CRITICAL classes
-  escalation_threshold: 3            # protocol §5: then two specialist architects + a synthesis architect
+  latest_rejected_revision: 3
+  orchestrated_rejections: 1                     # Phase-1 revisions rejected so far (revision 3)
+  orchestrated_rejection_streak: 0               # successive rejections on materially NEW HIGH/CRITICAL classes
+  escalation_threshold: 3                        # protocol §5: then two specialist architects + a synthesis architect
+  persistent_remainder_streak: 1                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
+  persistent_remainder_escalation_threshold: 2   # orchestrator routing rule: at 2, run the §5 specialist-alternatives pattern before the next revision
   revisions:
     - revision: 1
       commit: 676dfcedec84a2436c1f4e46d5dcd137f7eb655e
@@ -82,7 +85,7 @@ architecture:
       correction_delta_path: release/root-of-trust/4.1.6-review-r2/11-CORRECTION-DELTA.md
       verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
     - revision: 3
-      status: UNDER_REVIEW
+      status: REJECTED
       commit: ca77a431418bd6b349f465aa2521ca43bccfd5a6
       author_run: AR-0001
       author_report_commit: b795a6b10f2c42bde46b68cfe6f1d4ee9b0e67b2
@@ -91,28 +94,38 @@ architecture:
         - {run: AR-0002, role: rot-reviewer-trust-security, commit: 7d8c73a91a7c5fc7912427c59314d9259fbe25c9, verdict: BLOCKING_FINDINGS_PRESENT}
         - {run: AR-0003, role: rot-reviewer-compat-transaction, commit: 9e013c161210f6fec0a9869cb3387fd57f033ebb, verdict: NO_BLOCKING_FINDINGS}
       synthesis_run: AR-0004
-      handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0001-rot-architect-r3.md
-      expected_review_path: release/root-of-trust/4.1.6-review-r3
+      review_commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+      review_path: release/root-of-trust/4.1.6-review-r3
+      correction_delta_path: release/root-of-trust/4.1.6-review-r3/11-CORRECTION-DELTA.md
+      verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+      blocking_classes: [BC-1, BC-2, BC-3, BC-4]
+      materially_new_blocking_class: false
+    - revision: 4
+      status: AUTHORING
+      author_run: AR-0005
+      handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0005-rot-architect-r4.md
+      expected_review_path: release/root-of-trust/4.1.6-review-r4
 
 unresolved_findings:
-  source_path: release/root-of-trust/4.1.6-review-r2/10-BLOCKING-FINDINGS.md
+  source_path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md
+  blocking_classes:
+    BC-1: {findings: [RV3-H1], remainder_of: R2-H1, correction: CD3-1}
+    BC-2: {findings: [RV3-H2], remainder_of: R2-H2, correction: CD3-2}
+    BC-3: {findings: [RV3-H3], remainder_of: R2-H3, correction: CD3-3}
+    BC-4: {findings: [owner option statements OP-2 OP-4 OP-7], correction: CD3-4}
   CRITICAL: []
-  HIGH: [R2-H1, R2-H2, R2-H3, R2-H4]
-  MEDIUM: [R2-M1, R2-M2, R2-M3, R2-M4, R2-M5, R2-M6, R2-M7, R2-M8, R2-M9, R2-M10]
-  LOW: [R2-L1, R2-L2, R2-L3]
-  pending_synthesis_adjudication:
-    source_paths: [release/root-of-trust/4.1.6-review-r3/B-trust-security/01-FINDINGS.md, release/root-of-trust/4.1.6-review-r3/C-compat-transaction/01-FINDINGS.md]
-    HIGH: [RV3-B-H1, RV3-B-H2, RV3-B-H3]
-    MEDIUM: [RV3-B-M1, RV3-B-M2, RV3-B-M3, RV3-B-M4, RV3-B-M5, C-1]
-    LOW: [RV3-B-L1, RV3-B-L2, RV3-B-L3, RV3-B-L4, RV3-B-L5]
+  HIGH: [RV3-H1, RV3-H2, RV3-H3]
+  MEDIUM: [RV3-M1, RV3-M2, RV3-M3, RV3-M4, RV3-M5, RV3-M6, RV3-M7, RV3-M8, RV3-M9]
+  LOW: [RV3-L1, RV3-L2, RV3-L3, RV3-L4, RV3-L5, RV3-L6, RV3-L7, RV3-L8]
+  INFO: [RV3-I1]
+  owner_requirements_HO_0001: {s3_1: NOT_SATISFIED, s3_2: NOT_SATISFIED, s3_3: NOT_SATISFIED, s3_4: SATISFIED, s4: SATISFIED_FOR_CLASSIFICATION}
+  closed_as_class: [R2-H4, R2-M4, R2-M6]
 
 known_non_blocking_residuals:
-  - id: RS-residual-1-core
-    statement: a machine that never receives newer metadata cannot know it exists (unavoidable core only; bound restated per R2-H2)
-    determination_path: release/root-of-trust/4.1.6-review-r2/09-RESIDUAL-DETERMINATION.md
-  - id: RS-residual-2-short-lived
-    statement: same-user modification after snapshot detected by next process — accepted for short-lived CLI processes only
-    determination_path: release/root-of-trust/4.1.6-review-r2/09-RESIDUAL-DETERMINATION.md
+  determination_path: release/root-of-trust/4.1.6-review-r3/00-REVIEW-REPORT.md   # revision-3 determinations; re-determined per revision
+  accepted: [RS-3 deletion, RS-4, RR-1, RR-3, CS-2, TB-2 scope, VR-1, VR-2, VR-4, LR-1, LR-3, LR-4, TG-1, TG-3]
+  accepted_with_condition: [RS-2, RS-3 forging, TB-1, VR-3 VTS, LR-2, TG-2, OP-7 (d)]
+  not_accepted: [RS-1, RR-2, CS-1, TB-3, VR-3 overlay]
 
 owner_gates:
   pending: []
@@ -141,8 +154,8 @@ prompt2:
   latest_verdict: null
 
 iteration:
-  architecture_revision_under_work: 3
-  architecture_review_cycle_under_phase_1: 1
+  architecture_revision_under_work: 4
+  architecture_review_cycle_under_phase_1: 2
   implementation_repair_cycle: 0
 
 completed_stages:
@@ -155,22 +168,24 @@ completed_stages:
   - stage: ROT_ARCH_R3_PANEL_REVIEWED
     commit: 5741b515a4734f99adb76d3f8d32582a40663dd0
     note: B (AR-0002) BLOCKING_FINDINGS_PRESENT 3 HIGH, merged a945f4d; C (AR-0003) NO_BLOCKING_FINDINGS 1 MEDIUM carried, merged 5741b51
+  - stage: ROT_ARCH_R3_REJECTED
+    commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+    note: synthesis AR-0004 ROOT_OF_TRUST_ARCHITECTURE_REJECTED (BC-1..BC-4; not materially new); merged e462748
 
 running_work:
-  - run_id: AR-0004
-    role: rot-review-synthesis
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0004.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0004-rot-review-r3-d-synthesis.md
-    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r3-d
-    branch: phase1/rot1-r3-review-d
-    base_commit: 90efd29dca56c8344fb80b5a9556ae5a52cccac7
-    status: RUNNING
+  - run_id: AR-0005
+    role: rot-architect
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0005.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0005-rot-architect-r4.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r4
+    branch: phase1/rot1-r4-architect
+    status: CLAIMED
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0001, revision 3
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0002, revision 3; 3 HIGH
   rot-reviewer-compat-transaction: NO_BLOCKING_FINDINGS   # AR-0003, revision 3; carried MEDIUM C-1
-  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # revision 2, single fresh reviewer (pre-Phase-1 pattern)
+  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0004, revision 3
   builder: null
   verifier-a: null
   verifier-b: null
@@ -189,6 +204,14 @@ immutable_evidence:
     commit: 7d8c73a91a7c5fc7912427c59314d9259fbe25c9
   - path: release/root-of-trust/4.1.6-review-r3/C-compat-transaction
     commit: 9e013c161210f6fec0a9869cb3387fd57f033ebb
+  - path: release/root-of-trust/4.1.6-review-r3/D-synthesis
+    commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+  - path: release/root-of-trust/4.1.6-review-r3/00-REVIEW-REPORT.md
+    commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+  - path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md
+    commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+  - path: release/root-of-trust/4.1.6-review-r3/11-CORRECTION-DELTA.md
+    commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
 
 infrastructure:
   session_scratch_note: absolute scratch paths belong to the orchestrator session that created them; rebuild from the recorded commits when absent
@@ -202,12 +225,11 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Await AR-0004 (synthesis reviewer D). On its report: verify paths and report, merge. If
-  ROOT_OF_TRUST_ARCHITECTURE_REJECTED: commit evidence, increment orchestrated_rejection_streak if the
-  blocking classes are materially new HIGH/CRITICAL, write HO for a fresh revision-4 architect with the
-  completed consolidated findings only, spawn it. If ACCEPTED: build the single consolidated owner
-  decision package (D-0008, OP-1..OP-7, key custody/ceremony, first-machine, candidate behaviour,
-  install gating, usability) and open GATE-OWNER-D0008 in chat.
+  Spawn fresh RoT architect AR-0005 on HO-0005 (worktree wt/arch-r4, branch phase1/rot1-r4-architect).
+  On completion: verify report and allowed paths, merge, instantiate reviewer B/C handoffs for revision 4
+  (review path release/root-of-trust/4.1.6-review-r4), spawn B and C in parallel, then synthesis D.
+  If revision 4 is rejected on remainders of BC-1..BC-3 again (persistent_remainder_streak reaches 2),
+  run the specialist-alternatives pattern (two fresh specialist architects + synthesis architect) before revision 5.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1

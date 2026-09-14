@@ -154,3 +154,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge; route per verdict (revision-4 architect, or owner decision gate GATE-OWNER-D0008) |
+
+## L-0010 — 2026-09-14 — revision 3 REJECTED by synthesis
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-review-synthesis (`AR-0004`) |
+| Input commit | `90efd29` (architecture `ca77a43`; B `7d8c73a`; C `9e013c1`) |
+| Work performed | Reproduced 14 panel and architect probes, all reproduced. Adjudicated B and C. Authored held-out RV3-D-A01…A18 (5 executed, 7 computed, 6 design). Determined HO-0001 §3 status and residuals. |
+| Report / evidence | `AGENT_RUNS/AR-0004.report.yaml`; `release/root-of-trust/4.1.6-review-r3/{00-REVIEW-REPORT,10-BLOCKING-FINDINGS,11-CORRECTION-DELTA}.md`, `D-synthesis/` |
+| Verdict | **`ROOT_OF_TRUST_ARCHITECTURE_REJECTED`** |
+| Output commit | review `79a09a1`, report `d3d4154`, merged `e462748` |
+| Findings | **HIGH:** RV3-H1 (precedence counts only refusals, so project strength is lost), RV3-H2 (anchor satisfied by sequence number, non-expiring pins, witness with a single threshold-1 key), RV3-H3 (built source not bound to verified source). **MEDIUM:** RV3-M1…M9. **LOW:** RV3-L1…L8. **INFO:** RV3-I1. **Classes:** BC-1…BC-4, not materially new (remainders of R2-H1…H3). **Closed as class:** R2-H4. **HO-0001:** §3.1–§3.3 NOT SATISFIED; §3.4 SATISFIED. |
+| Next action | revision-4 architect on CD3-1…CD3-4 |
+
+## L-0011 — 2026-09-14 — revision-4 architect handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | orchestrator |
+| Input commit | `e462748` |
+| Work performed | Wrote HO-0005 (routing to BC-1…BC-4, §6 carried items, §7 entry criteria). Claimed AR-0005. Recorded escalation counters: rejections 1, materially-new streak 0, persistent-remainder streak 1 (threshold 2 triggers the specialist-alternatives pattern). Added the review-r3 consolidated files to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0005-rot-architect-r4.md`, `CHECKPOINTS/CP-0004.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0005 |

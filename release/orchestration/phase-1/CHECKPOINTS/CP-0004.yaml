@@ -1,0 +1,19 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0004
+trigger: independent synthesis verdict on revision 3 (REJECTED); change of next deterministic action; before handoff HO-0005
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_R4_AUTHORING
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: e4627489620ddc4c54560571af96eec8e652957b
+completed_evidence:
+  - {what: RoT-1 revision 3, commit: ca77a431418bd6b349f465aa2521ca43bccfd5a6, path: release/root-of-trust/4.1.6}
+  - {what: reviewer B, commit: 7d8c73a91a7c5fc7912427c59314d9259fbe25c9, path: release/root-of-trust/4.1.6-review-r3/B-trust-security}
+  - {what: reviewer C, commit: 9e013c161210f6fec0a9869cb3387fd57f033ebb, path: release/root-of-trust/4.1.6-review-r3/C-compat-transaction}
+  - {what: synthesis D (ROOT_OF_TRUST_ARCHITECTURE_REJECTED), commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8, report_commit: d3d4154557e032e6eaf99360202b3e9c8669e85c, path: release/root-of-trust/4.1.6-review-r3}
+unresolved_findings: {HIGH: [RV3-H1, RV3-H2, RV3-H3], blocking_classes: [BC-1, BC-2, BC-3, BC-4], MEDIUM: 9, LOW: 8}
+escalation: {orchestrated_rejections: 1, materially_new_class_streak: 0, persistent_remainder_streak: 1}
+pending_owner_gates: []
+running_work: [AR-0005 rot-architect revision 4]
+next_deterministic_action: spawn AR-0005 on HO-0005

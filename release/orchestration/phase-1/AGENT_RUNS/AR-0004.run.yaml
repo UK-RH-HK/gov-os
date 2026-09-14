@@ -13,6 +13,13 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r3-review-d
 agent_id: ac3dbf27df401e039   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T02:49Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0004.report.yaml
-outcome: null
+outcome:
+  verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+  work_commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+  report_commit: d3d4154557e032e6eaf99360202b3e9c8669e85c
+  integration_merge_commit: e4627489620ddc4c54560571af96eec8e652957b
+  blocking_classes: [BC-1 (RV3-H1), BC-2 (RV3-H2), BC-3 (RV3-H3), BC-4 (owner option statements)]
+  materially_new_blocking_class: false   # narrowed remainders of R2-H1..R2-H3 per synthesis
+  provenance_checks: [report present, only allowed paths changed (24 files), pack and panel directories untouched, worktree clean incl. ignored]
