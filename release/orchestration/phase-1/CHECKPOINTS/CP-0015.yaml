@@ -1,0 +1,21 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0015
+trigger: independent synthesis verdict on revision 6 (REJECTED); routing to revision 7 per owner design requirements; before handoff HO-0019
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_R7_AUTHORING
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 248c635ac5787b4e8ddcb688055e81e4bdb8f0a0
+completed_evidence:
+  - {what: RoT-1 revision 6, commit: 4106885dadebac55596067a2586cf4d3097fc025, path: release/root-of-trust/4.1.6}
+  - {what: reviewer B r6, commit: 512808695e8f3eb11187a8c70dc07e6783ad8395, path: release/root-of-trust/4.1.6-review-r6/B-trust-security}
+  - {what: reviewer C r6, commit: 02bb90550342e8bb6d42ba636430ae3394d3a0f7, path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction}
+  - {what: synthesis D r6 (ROOT_OF_TRUST_ARCHITECTURE_REJECTED), commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd, report_commit: 57af7ee5c65b7fad5339c6aba7f03154e7d17f9d, path: release/root-of-trust/4.1.6-review-r6}
+  - {what: owner design requirements, commit: fbd09d5, path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md}
+unresolved_findings: {HIGH: [RV6-H1, RV6-H2, RV6-H3], blocking_classes: [BC6-1, BC6-2, BC6-3, BC6-4], MEDIUM: 6, LOW: 12}
+escalation: {orchestrated_rejections: 4, materially_new_class_streak: 0, persistent_remainder_streak: 4, lever: owner concretisation (single certified profile)}
+d0008_state: {status: PROVISIONAL, proposal_state: PROPOSED, human_approved: false}
+pending_owner_gates: []
+running_work: [AR-0019 rot-architect revision 7]
+next_deterministic_action: spawn AR-0019 on HO-0019

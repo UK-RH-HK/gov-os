@@ -1,0 +1,16 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0019
+role: rot-architect
+objective: Author RoT-1 revision 7 as one concrete certified profile per OWNER-DESIGN-REQUIREMENTS-0001, closing BC6-1..BC6-4 as classes (architecture only)
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0019-rot-architect-r7.md
+owner_requirements: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md
+base_commit: null   # the orchestrator commit adding this record (ledger L-0047)
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r7
+branch: phase1/rot1-r7-architect
+agent_id: null
+status: CLAIMED
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0019.report.yaml
+outcome: null

@@ -4,9 +4,9 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T15:25:45Z'
-state_hash: 702fbcf851f2fd9f7e508d931089149cedd67e4d64dc19a9e8489d59ad227fff
-lifecycle_state: ROT_ARCH_SYNTHESIS
+updated_at: '2026-09-14T16:09:41Z'
+state_hash: 71532d140ff9e459140e68f19b166c182a116004c9799b72d14e818f5a6bc810
+lifecycle_state: ROT_ARCH_R7_AUTHORING
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -38,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 9dcbf7aff67088deb14e695c4e5e7d987166371f
+  last_recorded_commit: 248c635ac5787b4e8ddcb688055e81e4bdb8f0a0
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -66,13 +66,13 @@ architecture:
   target_release: 4.1.6
   pack_path: release/root-of-trust/4.1.6
   decision_paths: [spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md]
-  current_revision: 6
+  current_revision: 7
   latest_accepted_revision: null
-  latest_rejected_revision: 5
-  orchestrated_rejections: 3                     # Phase-1 revisions rejected so far (revision 3)
+  latest_rejected_revision: 6
+  orchestrated_rejections: 4                     # Phase-1 revisions rejected so far (revision 3)
   orchestrated_rejection_streak: 0               # successive rejections on materially NEW HIGH/CRITICAL classes
   escalation_threshold: 3                        # protocol §5: then two specialist architects + a synthesis architect
-  persistent_remainder_streak: 3                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
+  persistent_remainder_streak: 4                 # successive rejections on narrowed remainders of the same classes (BC-1..BC-3)
   persistent_remainder_escalation_threshold: 2   # orchestrator routing rule: at 2, run the §5 specialist-alternatives pattern before the next revision
   escalation_triggered: {at_revision: 4, rule: persistent_remainder, runs: [AR-0009, AR-0010], synthesis_architect_run: AR-0011}
   post_escalation_trend: revision-5 blocking classes are new, narrower instances (first-contact root, build environment, content derivation, register completeness); R2-H4 closed as a class
@@ -81,6 +81,12 @@ architecture:
     (§7 item 4: options presented with computed consequences). Orchestrator follows that route: the trade-offs are
     presented as computed owner options in revision 6 and decided in the single consolidated D-0008 gate (protocol §7),
     superseding the provisional CP-0010 rule to raise them before another revision.
+  owner_requirements_mapping_r6: >-
+    Review r6 routes BC6-1 (F1-a..F1-c) and BC6-2 (C-a..C-c) architect-then-owner. OWNER-DESIGN-REQUIREMENTS-0001 already
+    selects the governing parameters (root 2-of-3 approves the first-contact trust base and admitter, the trust-state
+    publisher never composes it; OP-7(a) 24h/7d/90d windows; OP-13(b) with an offline media channel; OP-14(b) high-water).
+    Revision 7 applies them with the stricter reading; any residual not covered is surfaced by the architect as a precise
+    owner trade-off and not decided. No specialist re-escalation: the owner's concretisation is the chosen lever.
   revisions:
     - revision: 1
       commit: 676dfcedec84a2436c1f4e46d5dcd137f7eb655e
@@ -147,7 +153,7 @@ architecture:
       blocking_classes: [BC5-1, BC5-2, BC5-3, BC5-4]
       materially_new_blocking_class: false
     - revision: 6
-      status: UNDER_REVIEW
+      status: REJECTED
       commit: 4106885dadebac55596067a2586cf4d3097fc025
       author_run: AR-0015
       author_report_commit: 0175b0cc83c47d0520869197b5d97663643a5590
@@ -156,35 +162,39 @@ architecture:
         - {run: AR-0016, role: rot-reviewer-trust-security, commit: 512808695e8f3eb11187a8c70dc07e6783ad8395, verdict: BLOCKING_FINDINGS_PRESENT}
         - {run: AR-0017, role: rot-reviewer-compat-transaction, commit: 02bb90550342e8bb6d42ba636430ae3394d3a0f7, verdict: NO_BLOCKING_FINDINGS}
       synthesis_run: AR-0018
-      handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0015-rot-architect-r6.md
-      expected_review_path: release/root-of-trust/4.1.6-review-r6
-      next_revision_after_synthesis: 7   # mandatory per OWNER-DESIGN-REQUIREMENTS-0001 (concrete single certified profile) unless accepted r6 is proven to implement them exactly without architectural change
+      review_commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd
+      review_path: release/root-of-trust/4.1.6-review-r6
+      correction_delta_path: release/root-of-trust/4.1.6-review-r6/11-CORRECTION-DELTA.md
+      verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+      blocking_classes: [BC6-1, BC6-2, BC6-3, BC6-4]
+      materially_new_blocking_class: false
+    - revision: 7
+      status: AUTHORING
+      kind: concrete certified profile per OWNER-DESIGN-REQUIREMENTS-0001
+      author_run: AR-0019
+      handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0019-rot-architect-r7.md
+      expected_review_path: release/root-of-trust/4.1.6-review-r7
 
 unresolved_findings:
-  source_path: release/root-of-trust/4.1.6-review-r5/10-BLOCKING-FINDINGS.md
+  source_path: release/root-of-trust/4.1.6-review-r6/10-BLOCKING-FINDINGS.md
   blocking_classes:
-    BC5-1: {findings: [RV5-H1], remainder_of: BC4-2 x BC4-4, correction: CD5-1, fix: engineering + owner trade-off T1-a..T1-d}
-    BC5-2: {findings: [RV5-H2], remainder_of: BC4-1, correction: CD5-2, fix: engineering + owner trade-off E-a..E-c}
-    BC5-3: {findings: [RV5-H3], remainder_of: BC4-3 x BC4-1, correction: CD5-3, fix: engineering}
-    BC5-4: {findings: [option statements, RV5-M5, D-A07], remainder_of: BC4-4, correction: CD5-4, fix: engineering}
+    BC6-1: {findings: [RV6-H1], remainder_of: BC5-1, correction: CD6-1, fix: engineering + owner trade-off F1-a..F1-c (owner requirements apply)}
+    BC6-2: {findings: [RV6-H2], remainder_of: BC5-1 x R2-H2, correction: CD6-2, fix: engineering + owner trade-off C-a..C-c (owner requirements apply)}
+    BC6-3: {findings: [RV6-H3], remainder_of: BC5-2, correction: CD6-3, fix: engineering}
+    BC6-4: {findings: [RV6-M2, RV6-M1], remainder_of: BC5-4, correction: CD6-4, fix: engineering}
   CRITICAL: []
-  HIGH: [RV5-H1, RV5-H2, RV5-H3]
-  MEDIUM: [RV5-M1, RV5-M2, RV5-M3, RV5-M4, RV5-M5, RV5-M6, RV5-M7, RV5-M8, RV5-M9]
-  LOW: [RV5-L1, RV5-L2, RV5-L3, RV5-L4, RV5-L5, RV5-L6, RV5-L7, RV5-L8, RV5-L9]
-  INFO: [RV5-I1, RV5-I2]
-  owner_requirements_HO_0001: {s3_1: NOT_SATISFIED, s3_2: NOT_SATISFIED, s3_3: NOT_SATISFIED, s3_4: SATISFIED, s4: SATISFIED_FOR_CLASSIFICATION}
-  closed_as_class: [R2-H4 (reproduced r5), R2-M4, R2-M6]
-  pending_synthesis_adjudication_r6:
-    source_paths: [release/root-of-trust/4.1.6-review-r6/B-trust-security/01-FINDINGS.md, release/root-of-trust/4.1.6-review-r6/C-compat-transaction/01-FINDINGS.md]
-    HIGH: [RV6-B-H1, RV6-B-H2, RV6-B-H3]
-    MEDIUM: [RV6-B-M1, RV6-B-M2, RV6-B-M3, RV6-C-M1, RV6-C-M2, RV6-C-M3, RV6-C-M4, RV6-C-M5]
-    LOW: [RV6-B-L1, RV6-B-L2, RV6-B-L3, RV6-B-L4, RV6-C-L1, RV6-C-L2, RV6-C-L3, RV6-C-L4, RV6-C-L5, RV6-C-L6]
+  HIGH: [RV6-H1, RV6-H2, RV6-H3]
+  MEDIUM: [RV6-M1, RV6-M2, RV6-M3, RV6-M4, RV6-M5, RV6-M6]
+  LOW: [RV6-L1, RV6-L2, RV6-L3, RV6-L4, RV6-L5, RV6-L6, RV6-L7, RV6-L8, RV6-L9, RV6-L10, RV6-L11, RV6-L12]
+  INFO: [RV6-I1, RV6-I2]
+  owner_requirements_HO_0001: {s3_1: SATISFIED, s3_2: NOT_SATISFIED, s3_3: NOT_SATISFIED, s3_4: SATISFIED, s4: SATISFIED_FOR_CLASSIFICATION}
+  closed_as_class: [R2-H4 (reproduced r6), R2-M4, R2-M6, BC5-3]
 
 known_non_blocking_residuals:
-  determination_path: release/root-of-trust/4.1.6-review-r5/00-REVIEW-REPORT.md   # revision-5 determinations; re-determined per revision
-  accepted: [RS-1, RS-1b, RS-1c, RS-4 scoping, RS-5, OP-7 (d), RS-B1 stale page, TB-S2 toolchain archive, TB-S3, TB-4, TB-4' binaries, AV-S1, TB-L4, VR-1, VR-2, VR-4, RR-1, RR-3, TG-1, TG-3, LR-1, LR-2, sparse checkout]
-  accepted_with_condition: [RS-2, RS-3, AD-2, TB-1', VR-B1, TB-S1, CS-1, VR-3, RR-2, TG-2, LR-3, LR-4, layout durability (line endings, ignore sources)]
-  not_accepted: [AD-1, TB-S2 as covering build environment, TB-4' for constitutional content, CS-2]
+  determination_path: release/root-of-trust/4.1.6-review-r6/00-REVIEW-REPORT.md   # revision-6 determinations; re-determined per revision
+  accepted_with_condition: [AD-2, environment reproducer quorum, RA-1, TB-L4, RS-3, RS-5, CS-1, RR-2, VR-3, TG-2, LR-2, LR-4]
+  not_accepted: [AD-1'/FC-R1 first-contact root, FC-R2 as stated, FC-R3, FC-R4, RS-B1 stale page, TB-S2' under OP-16 (a)/(b)]
+  accepted: all other residuals named in the revision-6 pack
 
 owner_gates:
   pending: []
@@ -216,8 +226,8 @@ prompt2:
   latest_verdict: null
 
 iteration:
-  architecture_revision_under_work: 6
-  architecture_review_cycle_under_phase_1: 4
+  architecture_revision_under_work: 7
+  architecture_review_cycle_under_phase_1: 5
   implementation_repair_cycle: 0
 
 completed_stages:
@@ -260,22 +270,24 @@ completed_stages:
   - stage: ROT_ARCH_R6_PANEL_REVIEWED
     commit: 2583388b9abf22994b102a797f05bf481fdfc22a
     note: B (AR-0016) BLOCKING 3 HIGH, merged b4d6b9a; C (AR-0017) NO_BLOCKING_FINDINGS (5 MEDIUM carried), merged 2583388
+  - stage: ROT_ARCH_R6_REJECTED
+    commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd
+    note: synthesis AR-0018 ROOT_OF_TRUST_ARCHITECTURE_REJECTED (BC6-1..BC6-4; remainders); merged 248c635; revision 7 per owner design requirements
 
 running_work:
-  - run_id: AR-0018
-    role: rot-review-synthesis
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0018.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0018-rot-review-r6-d-synthesis.md
-    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-d
-    branch: phase1/rot1-r6-review-d
-    base_commit: b9bed32b9143f5cf793958ee0e375d7406c2d6dd
-    status: RUNNING
+  - run_id: AR-0019
+    role: rot-architect
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0019.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0019-rot-architect-r7.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r7
+    branch: phase1/rot1-r7-architect
+    status: CLAIMED
 
 latest_role_verdicts:
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0015, revision 6
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0016, revision 6; 3 HIGH
   rot-reviewer-compat-transaction: NO_BLOCKING_FINDINGS   # AR-0017, revision 6; 5 MEDIUM carried
-  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0014, revision 5
+  rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0018, revision 6
   builder: null
   verifier-a: null
   verifier-b: null
@@ -334,6 +346,16 @@ immutable_evidence:
     commit: 512808695e8f3eb11187a8c70dc07e6783ad8395
   - path: release/root-of-trust/4.1.6-review-r6/C-compat-transaction
     commit: 02bb90550342e8bb6d42ba636430ae3394d3a0f7
+  - path: release/root-of-trust/4.1.6-review-r6/D-synthesis
+    commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd
+  - path: release/root-of-trust/4.1.6-review-r6/00-REVIEW-REPORT.md
+    commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd
+  - path: release/root-of-trust/4.1.6-review-r6/10-BLOCKING-FINDINGS.md
+    commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd
+  - path: release/root-of-trust/4.1.6-review-r6/11-CORRECTION-DELTA.md
+    commit: ab6b1f8fab5f9f54261a01e5a0df431a13e9ddcd
+  - path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md
+    commit: fbd09d5
 
 infrastructure:
   session_scratch_note: absolute scratch paths belong to the orchestrator session that created them; rebuild from the recorded commits when absent
@@ -347,15 +369,12 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Let AR-0018 (revision-6 synthesis) finish; verify, merge and preserve its evidence. Then, whatever its verdict,
-  author RoT-1 revision 7 with a fresh architect on: all revision-6 panel and synthesis findings, and
-  OWNER-DESIGN-REQUIREMENTS-0001 (verbatim text governs) as binding requirements, producing one concrete certified
-  production profile (Option C / RoT-1; OP-1..OP-16 as selected; excluded paths out of the certified executable
-  surface) and an updated D-0008 package that keeps status PROVISIONAL, proposal_state PROPOSED, human_approved false.
-  Skip revision 7 only if the orchestrator proves an accepted revision 6 already implements the exact requirements
-  without architectural change (not expected: revision 6 is an option tree). Then fresh B/C panel and synthesis on
-  the concrete configuration, combinations and exclusions. Only after ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED present the
-  final D-0008 package for formal owner ratification (GATE-OWNER-D0008).
+  Spawn fresh RoT architect AR-0019 on HO-0019 (worktree wt/arch-r7, branch phase1/rot1-r7-architect) to author
+  revision 7 as one concrete certified profile per OWNER-DESIGN-REQUIREMENTS-0001. On completion: verify report, allowed
+  paths and D-0008 fields (PROVISIONAL, PROPOSED, human_approved false, in_effect false; D-0007 ACTIVE), merge, then fresh
+  B/C panel and synthesis attacking the concrete configuration, combinations and exclusions. If the architect surfaces a
+  genuine owner trade-off the requirements do not answer, present it to the owner (single question, options verbatim).
+  Only after ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED present the final D-0008 package for ratification.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1

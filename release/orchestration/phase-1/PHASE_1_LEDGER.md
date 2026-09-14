@@ -658,3 +658,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | await AR-0018; then revision-7 architect on revision-6 findings plus owner requirements |
+
+## L-0046 — 2026-09-14 — revision 6 REJECTED by synthesis
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-review-synthesis (`AR-0018`) |
+| Input commit | `b9bed32` (architecture `4106885`; B `5128086`; C `02bb905`) |
+| Work performed | Reproduced all of B's probes, the architect's revision-6 and retained revision-5 instruments, C's 62,036-row matrix and C's probes, and review r5's decisive probes. Adjudicated B and C. Authored held-out RV6-D-A01…A10. Classified the blocking classes. |
+| Report / evidence | `AGENT_RUNS/AR-0018.report.yaml`; `release/root-of-trust/4.1.6-review-r6/{00-REVIEW-REPORT,10-BLOCKING-FINDINGS,11-CORRECTION-DELTA}.md`, `D-synthesis/` |
+| Verdict | **`ROOT_OF_TRUST_ARCHITECTURE_REJECTED`** |
+| Output commit | review `ab6b1f8`, report `57af7ee`, merged `248c635` |
+| Findings | **HIGH:** RV6-H1 (first-contact values selected outside the declared root: publisher-composed manifest and code, source list printed by an unadmitted binary, platform package submitter); RV6-H2 (first-contact values have no age limit; replay selects an old state, including on re-admission); RV6-H3 (no party establishes the environment manifest). **MEDIUM:** RV6-M1…M6; M2 needs an architecture change. **LOW:** L1–L12. **INFO:** I1–I2. **Adjudications:** B's OP-11 claim refuted; B-M1 re-rated LOW; C's R2-H4 CLOSED confirmed. **HO-0001:** §3.1 and §3.4 SATISFIED; §3.2 and §3.3 NOT SATISFIED. **Classes:** BC6-1 (engineering plus owner trade-off F1-a…c), BC6-2 (engineering plus owner trade-off C-a…c), BC6-3 and BC6-4 (engineering); all remainders. |
+| Next action | revision 7 per owner design requirements |
+
+## L-0047 — 2026-09-14 — revision-7 architect handed off (concrete certified profile)
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | orchestrator |
+| Input commit | `248c635` |
+| Work performed | **Routing.** Per OWNER-DESIGN-REQUIREMENTS-0001, revision 7 follows the revision-6 verdict. The requirements already select the parameters governing the synthesis trade-offs: F1 is answered by root 2-of-3 approval of the first-contact trust base and admitter, with the publisher never composing it; C is answered by the OP-7 (a) windows, the OP-13 (b) offline media channel and the OP-14 (b) high-water. The architect applies the stricter reading and must surface any uncovered residual as a precise owner trade-off, not decide it. No specialist re-escalation: the owner's concretisation is the lever. **Actions:** wrote HO-0019 from the revision-7 template; claimed AR-0019; added the review-r6 consolidated files and the owner requirements record to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0019-rot-architect-r7.md`, `CHECKPOINTS/CP-0015.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0019 |
