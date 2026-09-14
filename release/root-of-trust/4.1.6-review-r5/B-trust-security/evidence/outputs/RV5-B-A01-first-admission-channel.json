@@ -1,0 +1,190 @@
+{
+ "A02_executor_source_references": {
+  "admitter_digests_referenced": false,
+  "channel_quorum_read_from_selected_trust_policy": true,
+  "compiled_or_typed_root_id_input": false,
+  "evaluator_digest_used_only_for_self_evaluation": true,
+  "lineage_taken_from_first_self_verifying_root_v1_in_the_bundle": true,
+  "revocations_taken_from_selected_tss_list": true
+ },
+ "A03_stolen_genuine_keys": [
+  "genuine-owner-q1:p1",
+  "genuine-owner-q1:p2",
+  "genuine-owner-q1:ts"
+ ],
+ "architect_CS5_minimal_sets_for_the_same_victims (committed, read-only)": {
+  "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA1": [
+   "rp1 + rp2",
+   "ch1 + rep1 + rep2 + transport + ts",
+   "ch1 + regk1 + regk2 + rep1 + rep2 + ts"
+  ],
+  "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|FA2": [
+   "rp1 + rp2",
+   "ch1 + ch2 + rep1 + rep2 + transport + ts",
+   "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + ts"
+  ],
+  "G_BYTES|OP-2=root|OP-8=1|OP-9=n2q2|OP-10=accept|P2": [
+   "rp1 + rp2",
+   "ch1 + rep1 + rep2 + transport + ts",
+   "ch1 + regk1 + regk2 + rep1 + rep2 + ts"
+  ],
+  "G_BYTES|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": [
+   "cust1 + cust2 + rp1 + rp2 + rp3",
+   "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+  ],
+  "G_BYTES|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": [
+   "cust1 + cust2 + rp1 + rp2 + rp3",
+   "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+  ],
+  "G_BYTES|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|P2": [
+   "cust1 + cust2 + rp1 + rp2 + rp3",
+   "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts"
+  ],
+  "G_SRC|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA1": [
+   "insider",
+   "pipeline + vp1 + vp2",
+   "cust1 + cust2 + va1 + va2",
+   "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+  ],
+  "G_SRC|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|FA2": [
+   "insider",
+   "pipeline + vp1 + vp2",
+   "cust1 + cust2 + va1 + va2",
+   "ch1 + ch2 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+  ],
+  "G_SRC|OP-2=root|OP-8=2|OP-9=d_n3q3|OP-10=accept|P2": [
+   "insider",
+   "pipeline + vp1 + vp2",
+   "cust1 + cust2 + va1 + va2",
+   "ch1 + regk1 + regk2 + rep1 + rep2 + rep3 + ts + va1 + va2"
+  ]
+ },
+ "attacker_uses_genuine_keys_in_A01": [],
+ "instrument": "evidence/r5/gov_admit_reference.py (architect, unmodified; sha256 bb94c44a690566c8245c13aefb0d5d40bbcf62c0e3ab117d670d9177d8412ba1)",
+ "openssl_verifications": 48,
+ "probe": "RV5-B-A01/A02/A03 first admission, evaluator selector, restrictor revocation (AR-0012)",
+ "rows": {
+  "A01a OP-13 (a): the one channel shows the attacker lineage's fingerprint; attacker bundle": {
+   "binary_digest": "sha256:66456e9dc2cdb41b4a7575a71b44cb8ab3608adee0268acbf477a3e0aa1d09c2",
+   "lineage": "sha256:0cc1ec08fc3439c2bef46ed0fa8597c5b572cac09c80fad873e02e54111ceb29",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:9721f6c64b663b4e729185104f6a3510896b9b243fb8a1c0843b0c8c991c7298",
+    "ed25519:fe199121cb86bbfd3f94ba9fd92e6c6bf5d786275fba0ef93f9b57b2919551ba"
+   ],
+   "result": "ACCEPTED"
+  },
+  "A01b OP-13 (b): both channels show the attacker lineage's fingerprint; attacker bundle": {
+   "binary_digest": "sha256:66456e9dc2cdb41b4a7575a71b44cb8ab3608adee0268acbf477a3e0aa1d09c2",
+   "lineage": "sha256:0cc1ec08fc3439c2bef46ed0fa8597c5b572cac09c80fad873e02e54111ceb29",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:9721f6c64b663b4e729185104f6a3510896b9b243fb8a1c0843b0c8c991c7298",
+    "ed25519:fe199121cb86bbfd3f94ba9fd92e6c6bf5d786275fba0ef93f9b57b2919551ba"
+   ],
+   "result": "ACCEPTED"
+  },
+  "A01c OP-13 (b) owner; one compromised channel; operator types the one value shown": {
+   "binary_digest": "sha256:66456e9dc2cdb41b4a7575a71b44cb8ab3608adee0268acbf477a3e0aa1d09c2",
+   "lineage": "sha256:0cc1ec08fc3439c2bef46ed0fa8597c5b572cac09c80fad873e02e54111ceb29",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:9721f6c64b663b4e729185104f6a3510896b9b243fb8a1c0843b0c8c991c7298",
+    "ed25519:fe199121cb86bbfd3f94ba9fd92e6c6bf5d786275fba0ef93f9b57b2919551ba"
+   ],
+   "result": "ACCEPTED"
+  },
+  "A02 evaluator that skips negatives (substituted, or a genuine but defective admitter version the channel lists)": {
+   "binary_digest": "sha256:79328787b624fb7d86726155fe26517244fc0a0e02d46bff5bfc87f44f47a399",
+   "lineage": "sha256:3b1da9291311f2f0159a1ab3b1160e9523a058f3ba0fb5cfc00a298094b3d974",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:79e514c4b74a0c19e5ae8fd1796f0b9180a63cc0ffb92d8d8aade1c383480523",
+    "ed25519:851bd05989e10839046243a30d347fc23bb9162ddc325a28c67139e4d012cb1b"
+   ],
+   "result": "ACCEPTED"
+  },
+  "A02-control genuine admitter; genuine fingerprints; binary revoked in the selected state": {
+   "binary_digest": "sha256:79328787b624fb7d86726155fe26517244fc0a0e02d46bff5bfc87f44f47a399",
+   "lineage": "sha256:3b1da9291311f2f0159a1ab3b1160e9523a058f3ba0fb5cfc00a298094b3d974",
+   "result": "BINARY_REVOKED"
+  },
+  "A03 same, t11x also lists the honest reproductions in revocations (no transport)": {
+   "binary_digest": "sha256:f7186a634e57dd1a1429032ab7c835c9cd194ea7671ff9e2fa8d972e549b0be2",
+   "lineage": "sha256:dca2538fec52f5a2ec223e3e9df2740dea612b8cf6288032c51972219a50221e",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:13b595ef93accf7cf4123bb96d3cdbe5936c5e42c59a1373a257a98394126f20",
+    "ed25519:61eb5d9087267f0dc39459fc999fe9aa71ed5a9e56458ad25ced6e11c532e960"
+   ],
+   "result": "ACCEPTED"
+  },
+  "A03-control stolen p1 p2 ts; channel shows t11x publishing the malicious digest; honest reproductions held": {
+   "binary_digest": "sha256:f7186a634e57dd1a1429032ab7c835c9cd194ea7671ff9e2fa8d972e549b0be2",
+   "conflicting": "sha256:32a08281e978a4c48cfbe252538210053da0e4617194b29d6f1d3ae5ed7c1411",
+   "lineage": "sha256:dca2538fec52f5a2ec223e3e9df2740dea612b8cf6288032c51972219a50221e",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:13b595ef93accf7cf4123bb96d3cdbe5936c5e42c59a1373a257a98394126f20",
+    "ed25519:61eb5d9087267f0dc39459fc999fe9aa71ed5a9e56458ad25ced6e11c532e960"
+   ],
+   "result": "REPRODUCTION_CONFLICT"
+  },
+  "A03-genuine binary under the thief's t11x (availability side)": {
+   "binary_digest": "sha256:32a08281e978a4c48cfbe252538210053da0e4617194b29d6f1d3ae5ed7c1411",
+   "lineage": "sha256:dca2538fec52f5a2ec223e3e9df2740dea612b8cf6288032c51972219a50221e",
+   "result": "RELEASE_UNREGISTERED"
+  },
+  "CTL-G1 genuine OP-13 (b): two genuine fingerprints": {
+   "binary_digest": "sha256:b72734780e1009639f397fc34a815680d96eba60418989b05ac5cd3c2b4349da",
+   "lineage": "sha256:556eb9f9e5a10ffccd9a1379fa49fea7592c83a1497a8d49c980507d68b58b11",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:619da5aa6e76a78b313736e1c7560aa17eb78048b255545ad66171c7cdf4652f",
+    "ed25519:68025f7ed20ec558484f0c653228580f1d0c4da1bb49c74b0b0d66b2f7819082"
+   ],
+   "result": "ACCEPTED"
+  },
+  "CTL-G2 genuine OP-13 (b): one genuine fingerprint (quorum read from the selected Trust Policy)": {
+   "binary_digest": "sha256:b72734780e1009639f397fc34a815680d96eba60418989b05ac5cd3c2b4349da",
+   "lineage": "sha256:556eb9f9e5a10ffccd9a1379fa49fea7592c83a1497a8d49c980507d68b58b11",
+   "result": "CHANNEL_QUORUM_NOT_MET"
+  },
+  "CTL-G3 architect CH2 shape: attacker bundle, genuine fingerprint typed": {
+   "binary_digest": "sha256:66456e9dc2cdb41b4a7575a71b44cb8ab3608adee0268acbf477a3e0aa1d09c2",
+   "lineage": "sha256:0cc1ec08fc3439c2bef46ed0fa8597c5b572cac09c80fad873e02e54111ceb29",
+   "result": "STATE_NOT_HELD_OR_FINGERPRINT_MISMATCH"
+  },
+  "CTL-G4 one channel compromised, operator types both values": {
+   "binary_digest": "sha256:66456e9dc2cdb41b4a7575a71b44cb8ab3608adee0268acbf477a3e0aa1d09c2",
+   "result": "CHANNEL_DISAGREEMENT"
+  },
+  "ORD-1 genuine fingerprint; bundle = attacker root first, then genuine statements (availability)": {
+   "binary_digest": "sha256:32a08281e978a4c48cfbe252538210053da0e4617194b29d6f1d3ae5ed7c1411",
+   "lineage": "sha256:0cc1ec08fc3439c2bef46ed0fa8597c5b572cac09c80fad873e02e54111ceb29",
+   "result": "STATE_NOT_HELD_OR_FINGERPRINT_MISMATCH"
+  },
+  "ORD-2 genuine fingerprint; bundle = genuine statements first, then attacker root (control)": {
+   "binary_digest": "sha256:32a08281e978a4c48cfbe252538210053da0e4617194b29d6f1d3ae5ed7c1411",
+   "lineage": "sha256:dca2538fec52f5a2ec223e3e9df2740dea612b8cf6288032c51972219a50221e",
+   "release_id": "4.1.6",
+   "reproducer_keys": [
+    "ed25519:13b595ef93accf7cf4123bb96d3cdbe5936c5e42c59a1373a257a98394126f20",
+    "ed25519:61eb5d9087267f0dc39459fc999fe9aa71ed5a9e56458ad25ced6e11c532e960"
+   ],
+   "result": "ACCEPTED"
+  }
+ },
+ "verdicts": {
+  "A01_zero_genuine_keys_used": true,
+  "A01a_one_channel_admits_malicious_binary_OP13a": true,
+  "A01b_two_channels_admit_malicious_binary_OP13b": true,
+  "A01c_OP13b_enforced_only_if_operator_types_two": true,
+  "A02_executor_never_consults_admitter_digests": true,
+  "A02_negative_skipping_evaluator_admits_revoked_binary": true,
+  "A03_control_conflict_refuses": true,
+  "A03_trust_state_revocation_removes_conflict_without_transport": true,
+  "ORD_executor_root_selection_depends_on_bundle_order": true,
+  "genuine_controls_behave": true
+ }
+}
