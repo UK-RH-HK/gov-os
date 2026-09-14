@@ -1,0 +1,85 @@
+{
+ "T1_crash_after_install_before_record": {
+  "C0": "ALLOWED",
+  "C2": "BINARY_NOT_ADMITTED",
+  "C3": "BINARY_NOT_ADMITTED",
+  "reread_equal": true
+ },
+ "T2_readmission_keeps_store": {
+  "earlier_record_kept": true,
+  "is_first_admission": false,
+  "kept": {
+   "anchors.json": true,
+   "high-water.json": true,
+   "projects/P1.json": true
+  },
+  "moved_aside": null,
+  "new_record_added": true
+ },
+ "T3a_store_with_anchors_no_record_is_first_admission": {
+  "after": {
+   "anchors_in_new_store": false,
+   "moved_aside": "t3a/rec/vts-sha256:a1a1a1a1a.pre-admission-0"
+  },
+  "is_first_admission": true
+ },
+ "T3b_store_with_legacy_form_record_is_not_first": {
+  "after": {
+   "high_water_kept": true,
+   "moved_aside": null
+  },
+  "is_first_admission": false
+ },
+ "T4_rollback_keeps_record": {
+  "moved_on_second_admission": null,
+  "v1_rollback_C2": "ALLOWED",
+  "v2_C2": "ALLOWED"
+ },
+ "T5_concurrent_first_admissions_lock": {
+  "errors": [],
+  "moved_aside": 0,
+  "moved_aside_holding_a_record": 0,
+  "stores": [
+   "vts-sha256:a1a1a1a1a"
+  ]
+ },
+ "T6_record_outside_store_not_honoured": {
+  "mutant_record_anywhere": "ALLOWED",
+  "r6": "BINARY_NOT_ADMITTED"
+ },
+ "T7_crash_during_move_aside": {
+  "gov_run_after": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT",
+  "next_run": {
+   "moved_aside": null,
+   "new_store_has_no_anchor": true
+  },
+  "next_run_is_first_admission": true,
+  "stale_anchor_in_pre_admission": true
+ },
+ "T8_record_in_other_lineage_store": {
+  "C2_honoured_by_digest_across_lineage_stores": "ALLOWED",
+  "note": "gov_run matches binary_digest across every vts-<16> store under the protected record root; it does not bind the record's lineage to the binary's own lineage. Planting requires write to the protected VTS root (A3/RS-3).",
+  "store_name_len": 20
+ },
+ "T9_readmission_race_record_present": {
+  "errors": [],
+  "moved_aside": 0,
+  "moved_aside_holding_a_record": 0,
+  "stores": [
+   "vts-sha256:a1a1a1a1a"
+  ]
+ },
+ "probe": "AR-0017 admtx6 admission/transaction (reference model)",
+ "verdicts": {
+  "T1_fail_closed": true,
+  "T2_readmission_keeps_store": true,
+  "T3a_store_with_anchors_but_no_record_moved_aside": true,
+  "T3b_legacy_form_record_not_first": true,
+  "T4_rollback_keeps_record": true,
+  "T5_lock_one_store_no_record_moved": true,
+  "T6_outside_store_not_honoured": true,
+  "T7_fresh_store_no_stale_anchor": true,
+  "T8_cross_lineage_record_honoured_within_protected_root": true,
+  "T9_readmission_race_no_record_moved": true
+ }
+}

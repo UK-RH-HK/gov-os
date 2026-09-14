@@ -1,0 +1,118 @@
+{
+ "probe": "AR-0017 struct6 closed-entry-set tamper",
+ "results": {
+  "baseline_R6": {
+   "kernel_tampered": false,
+   "reasons": [],
+   "state": "COMPLETE"
+  },
+  "foreign_in_state_dir": {
+   "kernel_tampered": false,
+   "reasons": [
+    "foreign_trust_entry(state/)"
+   ],
+   "state": "PARTIAL"
+  },
+  "foreign_toplevel_in_trust": {
+   "kernel_tampered": false,
+   "reasons": [
+    "foreign_trust_entry(backup.tar)"
+   ],
+   "state": "PARTIAL"
+  },
+  "gitattributes_content_changed": {
+   "kernel_tampered": false,
+   "reasons": [
+    "foreign_trust_entry(.gitattributes_content)"
+   ],
+   "state": "PARTIAL"
+  },
+  "gitattributes_deleted": {
+   "kernel_tampered": false,
+   "reasons": [
+    "trust_components(.gitattributes)"
+   ],
+   "state": "PARTIAL"
+  },
+  "kernel_edited": {
+   "kernel_tampered": true,
+   "reasons": [
+    "kernel_content_mismatch"
+   ],
+   "state": "PARTIAL"
+  },
+  "kernel_file_added": {
+   "kernel_tampered": true,
+   "reasons": [
+    "kernel_content_mismatch"
+   ],
+   "state": "PARTIAL"
+  },
+  "kernel_file_removed": {
+   "kernel_tampered": true,
+   "reasons": [
+    "kernel_content_mismatch"
+   ],
+   "state": "PARTIAL"
+  },
+  "migration_occupation_removed": {
+   "kernel_tampered": false,
+   "reasons": [
+    "occupation"
+   ],
+   "state": "PARTIAL"
+  },
+  "note_hardlink": "the installation-state predicate does not check st_nlink; VU-12/\u00a73 SecureDir enforce link count at use-time (unimplemented). The hard-linked occupation entry stays COMPLETE in the state machine (C-4/VU-12 carried).",
+  "occ_dir_extra_file": {
+   "kernel_tampered": false,
+   "reasons": [
+    "foreign_occupation_entry"
+   ],
+   "state": "PARTIAL"
+  },
+  "occ_fwlockdir_to_file": {
+   "kernel_tampered": false,
+   "reasons": [
+    "legacy_and_rot1_mixed",
+    "occupation"
+   ],
+   "state": "PARTIAL"
+  },
+  "occ_hardlinked_nlink2": {
+   "kernel_tampered": false,
+   "nlink": 2,
+   "reasons": [],
+   "state": "COMPLETE"
+  },
+  "occ_kernel_removed": {
+   "kernel_tampered": false,
+   "reasons": [
+    "occupation"
+   ],
+   "state": "PARTIAL"
+  },
+  "occ_kernel_to_symlink": {
+   "kernel_tampered": false,
+   "reasons": [
+    "occupation"
+   ],
+   "state": "PARTIAL"
+  },
+  "occ_project_to_dir": {
+   "kernel_tampered": false,
+   "reasons": [
+    "occupation"
+   ],
+   "state": "PARTIAL"
+  },
+  "property_every_trust_or_occupation_or_member_tamper_not_COMPLETE": true,
+  "symlink_in_kernel": {
+   "kernel_tampered": true,
+   "reasons": [
+    "foreign_trust_entry(symlink)",
+    "kernel_content_mismatch"
+   ],
+   "state": "PARTIAL"
+  }
+ }
+}

@@ -1,0 +1,35 @@
+{
+ "probe": "RV6-D-A10 init on ABSENT with an existing overlay (AR-0018)",
+ "18_ABSENT_row": [
+  "| `ABSENT` | no `governance/trust/`, no occupation entries, no legacy entries (`governance/framework.lock` file, `governance/kernel` directory), and (revision 7, CR6-C-7 (c)) no `governance/overlay` and no `governance/views` | EmbeddedSnapshot ⊔ floor | `init` (`26` R-INIT-9); commands needing no installation |"
+ ],
+ "19_s9_coverage_sentence": [
+  "This covers update, rollback, restore, recovery exchange-back, adoption batch 0 and RoT-1 `init` on a tree with an existing"
+ ],
+ "19_s9_item5": [
+  "5. **No record (revision 5; CR4-B-04, RV4-M5).** On a machine with no per-project record, the requirements are first computed"
+ ],
+ "09_R_INIT_rows": [
+  "| R-INIT-1 | `init` MUST authenticate its source and complete authorisation before creating any Protected Path or occupation entry. |",
+  "| R-INIT-2 | Required authority MUST come from the install-authority floor, and the actor level from the effective ROLES (`19` §8), never from the release being installed. |",
+  "| R-INIT-3 | Production `init` MUST require E1–E8: the E7 surface (presence, YAML profile, exact precedence, migration whitelist), freshness `ANCHORED` or `WITNESSED`, and a currency proof (`24` §4.4). |",
+  "| R-INIT-4 | Production `init` MUST require an `init_ack` trust gate confirmed locally (`27`). |",
+  "| R-INIT-5 | `init` MUST create the layout of `26` §2 inside the transaction, lock last. |",
+  "| R-INIT-6 | `init --force` on an installed project MUST be treated as reinstall or update/downgrade. |",
+  "| R-INIT-7 | `init` MUST apply OP-6 confirmation and state anchoring before any trusted write (`06` §3). |",
+  "| R-INIT-8 | `release_commit` and `source` labels MUST come from the statement and `SourceRef.kind`. |",
+  "| R-INIT-9 | (Revision 7; CR6-C-7 (c), RV6-M3; also `26` §7.) RoT-1 `init` on a tree holding `governance/overlay` or `governance/views` refuses (`INIT_OVER_EXISTING_OVERLAY`) unless it evaluates `19` §9 item 5 over the pre-transaction overlay before commit and obtains the `weakening` trust gate for a non-empty failure list. |"
+ ],
+ "20_recovery_phase_rows": [
+  "| `prepared`, `staged`, `verified-staged` | move `trust-tx/<TX>` to `trust-tx/abandoned/`; deregister |"
+ ],
+ "12_rows_init_over_existing_overlay": [
+  "RT-195"
+ ],
+ "verdicts": {
+  "ABSENT_condition_ignores_overlay_and_views": false,
+  "init_not_in_19_s9_coverage_list": false,
+  "no_R_INIT_rule_on_existing_overlay": false,
+  "no_RT_for_init_over_existing_overlay": false
+ }
+}
