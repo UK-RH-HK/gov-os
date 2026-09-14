@@ -1,0 +1,1349 @@
+{
+ "binaries_sha256": {
+  "4.1.2": "dc924fb3293b3fdafbcfd1d87827a37315de8de75ed7f27431bee0aa74a767b7",
+  "4.1.3": "baba4e403dc23fe975ee2a277d0d2908e2aa7a54e4bd88dd2a323a2cb7d0fd89",
+  "4.1.4": "85f34cce2b43877f01da720c84ab3854b253b7959c26cac957e725d7d4e5b67f",
+  "4.1.5": "9169d7a8be41324a76c540ad440d4d7692e12cfedf3530a3f9895886021de915"
+ },
+ "by_kind_layout_position": {
+  "P-CWD|R5|P-CWD:.": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:.governance-runtime": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_runtime_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:.governance-runtime/legacy-quarantine/update": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_runtime_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:.governance-runtime/snapshots/ci-previous": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_runtime_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:.governance-runtime/trust-tx": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_txarea": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:.governance-runtime/trust-tx/done/TX-0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_txarea": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:docs": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:governance": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_governance_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 440,
+   "state_after_PARTIAL": 40
+  },
+  "P-CWD|R5|P-CWD:governance/framework.lock": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_occupation": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/overlay": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_overlay": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 440,
+   "state_after_PARTIAL": 40
+  },
+  "P-CWD|R5|P-CWD:governance/overlay/plugins": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_overlay": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 440,
+   "state_after_PARTIAL": 40
+  },
+  "P-CWD|R5|P-CWD:governance/trust": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_trust": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/trust/kernel": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_trust": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/trust/kernel/policies": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_trust": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/trust/lineage": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_trust": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/trust/root": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_trust": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/trust/state": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_pps_trust": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 432,
+   "state_after_PARTIAL": 48
+  },
+  "P-CWD|R5|P-CWD:governance/views": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_governance_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 440,
+   "state_after_PARTIAL": 40
+  },
+  "P-CWD|R5|P-CWD:product": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:product/customers": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:spec": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_spec": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:spec/audits": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_spec": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-CWD|R5|P-CWD:spec/now": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_spec": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-ENV|R5|P-ENV:ALL@.": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:ALL@governance/trust": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_pps_trust": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 261,
+   "state_after_PARTIAL": 24
+  },
+  "P-ENV|R5|P-ENV:ALL@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:CACHE_IN_PROJECT@.": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 3,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 3,
+   "rows_writing_work": 3,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:CACHE_IN_PROJECT@governance/trust": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 6,
+   "rows_pps_trust": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 261,
+   "state_after_PARTIAL": 24
+  },
+  "P-ENV|R5|P-ENV:CACHE_IN_PROJECT@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:CANON@.": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:CANON@governance/trust": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_pps_trust": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 261,
+   "state_after_PARTIAL": 24
+  },
+  "P-ENV|R5|P-ENV:CANON@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:KSRC@.": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:KSRC@governance/trust": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_pps_trust": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 261,
+   "state_after_PARTIAL": 24
+  },
+  "P-ENV|R5|P-ENV:KSRC@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:PLUGDIR@.": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:PLUGDIR@governance/trust": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_pps_trust": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 261,
+   "state_after_PARTIAL": 24
+  },
+  "P-ENV|R5|P-ENV:PLUGDIR@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:ROLESESS@.": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ENV|R5|P-ENV:ROLESESS@governance/trust": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_pps_trust": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 261,
+   "state_after_PARTIAL": 24
+  },
+  "P-ENV|R5|P-ENV:ROLESESS@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|ARCHIVE|P-GIT:ARCHIVE@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|ARCHIVE|P-GIT:ARCHIVE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|AUTOCRLF|P-GIT:AUTOCRLF@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|AUTOCRLF|P-GIT:AUTOCRLF@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|CHECKOUT_BACK|P-GIT:CHECKOUT_BACK@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|CHECKOUT_BACK|P-GIT:CHECKOUT_BACK@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|CHECKOUT_PRE|P-GIT:CHECKOUT_PRE@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_governance_other": 37,
+   "rows_other": 24,
+   "rows_runtime_other": 263,
+   "rows_spec": 33,
+   "rows_writing_git": 0,
+   "rows_writing_home": 4,
+   "rows_writing_project": 279,
+   "rows_writing_work": 77,
+   "state_after_LEGACY": 285
+  },
+  "P-GIT|CHECKOUT_PRE|P-GIT:CHECKOUT_PRE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_governance_other": 45,
+   "rows_other": 8,
+   "rows_pps_occupation": 16,
+   "rows_runtime_other": 279,
+   "rows_spec": 47,
+   "rows_writing_git": 0,
+   "rows_writing_home": 4,
+   "rows_writing_project": 279,
+   "rows_writing_work": 69,
+   "state_after_LEGACY": 285
+  },
+  "P-GIT|CLEAN|P-GIT:CLEAN@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|CLEAN|P-GIT:CLEAN@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|CLONE|P-GIT:CLONE@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|CLONE|P-GIT:CLONE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|GLOBALEXCL|P-GIT:GLOBALEXCL@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|GLOBALEXCL|P-GIT:GLOBALEXCL@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|INFOEXCL|P-GIT:INFOEXCL@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|INFOEXCL|P-GIT:INFOEXCL@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|PARTIAL_CLONE|P-GIT:PARTIAL_CLONE@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|PARTIAL_CLONE|P-GIT:PARTIAL_CLONE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|RESTORE_PRE_GOV|P-GIT:RESTORE_PRE_GOV@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_governance_other": 37,
+   "rows_other": 24,
+   "rows_runtime_other": 263,
+   "rows_spec": 33,
+   "rows_writing_git": 0,
+   "rows_writing_home": 4,
+   "rows_writing_project": 279,
+   "rows_writing_work": 77,
+   "state_after_LEGACY": 285
+  },
+  "P-GIT|RESTORE_PRE_GOV|P-GIT:RESTORE_PRE_GOV@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_governance_other": 45,
+   "rows_other": 8,
+   "rows_pps_occupation": 8,
+   "rows_runtime_other": 279,
+   "rows_spec": 39,
+   "rows_writing_git": 0,
+   "rows_writing_home": 4,
+   "rows_writing_project": 279,
+   "rows_writing_work": 61,
+   "state_after_LEGACY": 285
+  },
+  "P-GIT|SHALLOW|P-GIT:SHALLOW@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|SHALLOW|P-GIT:SHALLOW@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|SPARSE_CONE|P-GIT:SPARSE_CONE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 8,
+   "rows_pps_occupation": 8,
+   "rows_spec": 8,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 8,
+   "rows_writing_work": 8,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|SPARSE_NONCONE|P-GIT:SPARSE_NONCONE@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|SPARSE_NONCONE|P-GIT:SPARSE_NONCONE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_governance_other": 8,
+   "rows_pps_occupation": 8,
+   "rows_runtime_other": 8,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 8,
+   "rows_writing_work": 8,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|STASH|P-GIT:STASH@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|STASH|P-GIT:STASH@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|TEXTAUTO_EOLCRLF|P-GIT:TEXTAUTO_EOLCRLF@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|TEXTAUTO_EOLCRLF|P-GIT:TEXTAUTO_EOLCRLF@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|UNTRACK_NOSURG|P-GIT:UNTRACK_NOSURG@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|UNTRACK_NOSURG|P-GIT:UNTRACK_NOSURG@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_PARTIAL": 285
+  },
+  "P-GIT|UNTRACK_R5|P-GIT:UNTRACK_R5@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|UNTRACK_R5|P-GIT:UNTRACK_R5@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|WORKTREE|P-GIT:WORKTREE@product": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_other": 24,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 24,
+   "rows_writing_work": 24,
+   "state_after_COMPLETE": 285
+  },
+  "P-GIT|WORKTREE|P-GIT:WORKTREE@root": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ROOT|L0|P-ROOT": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_governance_other": 68,
+   "rows_other": 12,
+   "rows_pps_occupation": 26,
+   "rows_runtime_other": 474,
+   "rows_spec": 69,
+   "rows_writing_git": 0,
+   "rows_writing_home": 4,
+   "rows_writing_project": 474,
+   "rows_writing_work": 97,
+   "state_after_LEGACY": 480
+  },
+  "P-ROOT|R5NOSURG|P-ROOT": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ROOT|R5RES|P-ROOT": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ROOT|R5V|P-ROOT": {
+   "classification_lost": 0,
+   "rows": 285,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 285
+  },
+  "P-ROOT|R5|P-ROOT": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 0,
+   "rows_writing_work": 0,
+   "state_after_COMPLETE": 480
+  },
+  "P-VEND|R5V|P-VEND:vendor": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 48,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 48,
+   "rows_writing_work": 48,
+   "state_after_COMPLETE": 480
+  },
+  "P-VEND|R5V|P-VEND:vendor/legacypkg": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 474,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 474,
+   "rows_writing_work": 474,
+   "state_after_COMPLETE": 480
+  },
+  "P-VEND|R5V|P-VEND:vendor/legacypkg/governance/project": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 474,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 474,
+   "rows_writing_work": 474,
+   "state_after_COMPLETE": 480
+  },
+  "P-VEND|R5V|P-VEND:vendor/legacypkg/product": {
+   "classification_lost": 0,
+   "rows": 480,
+   "rows_other": 474,
+   "rows_writing_git": 0,
+   "rows_writing_home": 0,
+   "rows_writing_project": 474,
+   "rows_writing_work": 474,
+   "state_after_COMPLETE": 480
+  }
+ },
+ "elapsed_seconds": 603.2,
+ "properties": {
+  "LP-1r_root_anchored_no_project_write": {
+   "rows": 1335,
+   "sample": [],
+   "violations": 0
+  },
+  "LP-1s_as_stated_26_s4": {
+   "counterexamples": 16,
+   "rows": 18090,
+   "sample": [
+    [
+     "P-CWD:governance",
+     "adopt baseline",
+     [
+      "governance/spec",
+      "governance/spec/audits",
+      "governance/spec/audits/GOVERNANCE-ADOPTION"
+     ]
+    ],
+    [
+     "P-CWD:governance",
+     "migrate baseline",
+     [
+      "governance/spec",
+      "governance/spec/audits",
+      "governance/spec/audits/GOVERNANCE-ADOPTION"
+     ]
+    ],
+    [
+     "P-CWD:governance/views",
+     "adopt baseline",
+     [
+      "governance/views/spec",
+      "governance/views/spec/audits",
+      "governance/views/spec/audits/GOVERNANCE-ADOPTION"
+     ]
+    ],
+    [
+     "P-CWD:governance/views",
+     "migrate baseline",
+     [
+      "governance/views/spec",
+      "governance/views/spec/audits",
+      "governance/views/spec/audits/GOVERNANCE-ADOPTION"
+     ]
+    ]
+   ]
+  },
+  "R2-H4_trust_kernel_occupation_change_not_left_COMPLETE": {
+   "sample": [],
+   "violations": 0
+  },
+  "classification_lost_on_rot1_layouts": {
+   "rows": 0,
+   "sample": []
+  },
+  "gitop_trees_writes_leaving_COMPLETE": {
+   "rows": 0,
+   "sample": []
+  },
+  "gitop_trees_writes_while_COMPLETE_before": {
+   "rows": 216,
+   "sample": [
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/state.db",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "adopt",
+      "baseline"
+     ],
+     [
+      "product/spec",
+      "product/spec/audits",
+      "product/spec/audits/GOVERNANCE-ADOPTION",
+      "product/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "migrate",
+      "baseline"
+     ],
+     [
+      "product/spec",
+      "product/spec/audits",
+      "product/spec/audits/GOVERNANCE-ADOPTION",
+      "product/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl",
+      "product/archive"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init",
+      "--force",
+      "--source"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl",
+      "product/archive"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init",
+      "--source",
+      "<wt>/release/releases/4.1.2"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl",
+      "product/archive"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/claims.db",
+      "product/.governance-runtime/state.db",
+      "product/.governance-runtime/telemetry"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "adopt",
+      "baseline"
+     ],
+     [
+      "product/spec",
+      "product/spec/audits",
+      "product/spec/audits/GOVERNANCE-ADOPTION",
+      "product/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "migrate",
+      "baseline"
+     ],
+     [
+      "product/spec",
+      "product/spec/audits",
+      "product/spec/audits/GOVERNANCE-ADOPTION",
+      "product/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init",
+      "--force",
+      "--skip-index"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/claims.db",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init",
+      "--force",
+      "--source"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/claims.db",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl"
+     ],
+     "COMPLETE"
+    ],
+    [
+     "ARCHIVE",
+     "P-GIT:ARCHIVE@product",
+     [
+      "init",
+      "--source",
+      "<wt>/release/releases/4.1.2"
+     ],
+     [
+      "product/.gitignore",
+      "product/.governance-runtime",
+      "product/.governance-runtime/claims.db",
+      "product/.governance-runtime/telemetry",
+      "product/.governance-runtime/telemetry/events.jsonl"
+     ],
+     "COMPLETE"
+    ]
+   ]
+  },
+  "legacy_writes_in_transaction_area_18_s8": {
+   "rows": 96,
+   "sample": [
+    [
+     "R5",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry"
+     ]
+    ],
+    [
+     "R5",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--source",
+      "<wt>/release/releases/4.1.2"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry"
+     ]
+    ],
+    [
+     "R5",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--name",
+      "ar13"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry"
+     ]
+    ],
+    [
+     "R5",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--alias",
+      "ar13-alias"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry"
+     ]
+    ],
+    [
+     "R5",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--intent",
+      "ar13 intent"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry"
+     ]
+    ],
+    [
+     "R5",
+     "P-CWD:.governance-runtime/trust-tx",
+     [
+      "init",
+      "--force"
+     ],
+     [
+      ".governance-runtime/trust-tx/.gitignore",
+      ".governance-runtime/trust-tx/.governance-runtime",
+      ".governance-runtime/trust-tx/.governance-runtime/state.db",
+      ".governance-runtime/trust-tx/.governance-runtime/telemetry"
+     ]
+    ]
+   ],
+   "states_after": {
+    "COMPLETE": 96
+   }
+  },
+  "nested_marker_rows_reported": {
+   "by_state": {
+    "COMPLETE": 2885,
+    "LEGACY": 32,
+    "PARTIAL": 632
+   },
+   "rows": 3549
+  }
+ },
+ "rows": 30165,
+ "skipped": 285,
+ "writing_commands_rot1_layouts": {
+  "P-CWD|adopt baseline": 68,
+  "P-CWD|init": 68,
+  "P-CWD|init --alias": 68,
+  "P-CWD|init --force": 204,
+  "P-CWD|init --intent": 68,
+  "P-CWD|init --name": 68,
+  "P-CWD|init --skip-index": 68,
+  "P-CWD|init --source": 136,
+  "P-CWD|migrate baseline": 68,
+  "P-ENV|adopt baseline": 48,
+  "P-ENV|init": 48,
+  "P-ENV|init --force": 99,
+  "P-ENV|init --source": 48,
+  "P-ENV|migrate baseline": 48,
+  "P-GIT|adapters generate": 16,
+  "P-GIT|adopt baseline": 76,
+  "P-GIT|audit": 12,
+  "P-GIT|checkpoint create": 16,
+  "P-GIT|cit execute": 16,
+  "P-GIT|decide HDG-0002": 32,
+  "P-GIT|init": 68,
+  "P-GIT|init --force": 160,
+  "P-GIT|init --source": 68,
+  "P-GIT|kernel reinstall": 28,
+  "P-GIT|memory heldout-starter": 12,
+  "P-GIT|migrate baseline": 76,
+  "P-GIT|plugins register": 8,
+  "P-GIT|rebuild-memory": 16,
+  "P-GIT|recover": 12,
+  "P-GIT|tools install": 32,
+  "P-GIT|verify": 12,
+  "P-VEND|adapters generate": 12,
+  "P-VEND|adopt audit": 24,
+  "P-VEND|adopt baseline": 16,
+  "P-VEND|adopt build-memory": 12,
+  "P-VEND|adopt classify": 12,
+  "P-VEND|adopt extract-legacy": 12,
+  "P-VEND|adopt inventory": 12,
+  "P-VEND|adopt map": 12,
+  "P-VEND|adopt migrate": 84,
+  "P-VEND|adopt plan": 12,
+  "P-VEND|adopt review": 48,
+  "P-VEND|adopt rollback": 24,
+  "P-VEND|adopt status": 12,
+  "P-VEND|adopt test-design": 12,
+  "P-VEND|adopt verify-memory": 36,
+  "P-VEND|adopt verify-migration": 36,
+  "P-VEND|audit": 12,
+  "P-VEND|audit --deep": 12,
+  "P-VEND|audit --family": 12,
+  "P-VEND|audit --no-persist": 12,
+  "P-VEND|capabilities invoke": 12,
+  "P-VEND|checkpoint create": 12,
+  "P-VEND|cit execute": 12,
+  "P-VEND|cit rollback": 24,
+  "P-VEND|context compile": 12,
+  "P-VEND|decide HDG-0002": 36,
+  "P-VEND|doctor": 12,
+  "P-VEND|init": 16,
+  "P-VEND|init --alias": 16,
+  "P-VEND|init --force": 48,
+  "P-VEND|init --intent": 16,
+  "P-VEND|init --name": 16,
+  "P-VEND|init --skip-index": 16,
+  "P-VEND|init --source": 32,
+  "P-VEND|kernel override": 6,
+  "P-VEND|kernel reinstall": 24,
+  "P-VEND|kernel trust": 3,
+  "P-VEND|kernel verify": 12,
+  "P-VEND|lessons cluster": 9,
+  "P-VEND|memory heldout-starter": 9,
+  "P-VEND|memory query": 48,
+  "P-VEND|migrate audit": 24,
+  "P-VEND|migrate baseline": 16,
+  "P-VEND|migrate build-memory": 12,
+  "P-VEND|migrate classify": 12,
+  "P-VEND|migrate extract-legacy": 12,
+  "P-VEND|migrate inventory": 12,
+  "P-VEND|migrate map": 12,
+  "P-VEND|migrate migrate": 84,
+  "P-VEND|migrate plan": 12,
+  "P-VEND|migrate review": 48,
+  "P-VEND|migrate rollback": 24,
+  "P-VEND|migrate status": 12,
+  "P-VEND|migrate test-design": 12,
+  "P-VEND|migrate verify-memory": 36,
+  "P-VEND|migrate verify-migration": 36,
+  "P-VEND|plugins register": 6,
+  "P-VEND|rebuild-memory": 12,
+  "P-VEND|rebuild-memory --incremental": 12,
+  "P-VEND|recover": 12,
+  "P-VEND|recover --dry-run": 12,
+  "P-VEND|status": 12,
+  "P-VEND|tools install": 24,
+  "P-VEND|update": 12,
+  "P-VEND|update --apply": 45,
+  "P-VEND|update --approve": 12,
+  "P-VEND|update --by": 12,
+  "P-VEND|update --check": 12,
+  "P-VEND|update --reason": 6,
+  "P-VEND|update --rollback": 18,
+  "P-VEND|update --source": 12,
+  "P-VEND|upstream submit": 24,
+  "P-VEND|verify": 12,
+  "P-VEND|verify governance": 12,
+  "P-VEND|verify product": 12,
+  "P-VEND|version": 12
+ }
+}
