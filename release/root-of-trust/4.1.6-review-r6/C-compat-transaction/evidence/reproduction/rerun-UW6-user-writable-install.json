@@ -1,0 +1,205 @@
+{
+ "classes_reachable": {
+  "OP-7 (a)": [
+   "C0"
+  ],
+  "OP-7 (b)": [
+   "C0"
+  ],
+  "OP-7 (c) no witnesses held": [
+   "C0"
+  ],
+  "OP-7 (c) witnesses at threshold held": [
+   "C0",
+   "C1",
+   "C2"
+  ],
+  "OP-7 (d)": [
+   "C0",
+   "C1",
+   "C2"
+  ],
+  "administrator-protected system pin, OP-7 (a)": [
+   "C0",
+   "C1",
+   "C2"
+  ]
+ },
+ "decision_rule_by_anchoring_option": {
+  "account_location_pin_writable_by_euid": {
+   "a": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "b": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "c": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "d": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2"
+    ],
+    "axis": "UNANCHORED"
+   }
+  },
+  "administrator_protected_system_pin": {
+   "a": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "axis": "ANCHORED"
+   },
+   "b": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "axis": "ANCHORED"
+   },
+   "c": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "axis": "ANCHORED"
+   },
+   "d": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "axis": "ANCHORED"
+   }
+  },
+  "fresh_store_no_anchor": {
+   "a": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "b": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "c": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "d": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2"
+    ],
+    "axis": "UNANCHORED"
+   }
+  },
+  "witnesses_at_threshold_held": {
+   "a": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "b": {
+    "allowed": [
+     "C0"
+    ],
+    "axis": "UNANCHORED"
+   },
+   "c": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "axis": "WITNESSED"
+   },
+   "d": {
+    "allowed": [
+     "C0",
+     "C1",
+     "C2"
+    ],
+    "axis": "UNANCHORED"
+   }
+  }
+ },
+ "euid": 1000,
+ "gov_run_on_admitted_user_writable_binary": {
+  "C0": "ALLOWED",
+  "C1": "ALLOWED",
+  "C2": "ALLOWED",
+  "C3": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT",
+  "confirm-root": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT",
+  "confirm-state": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT",
+  "trust-gate-confirm": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT"
+ },
+ "install_location_protected": false,
+ "phase4_legacy_consumer_user_writable": {
+  "confirm-state": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT",
+  "gov-admit installs into the user location": true,
+  "stated outcome": "project stays LEGACY; C0 only under OP-7 (a)/(b); remedy: administrator-protected installation or system pin",
+  "update --apply (C3) by the admitted binary": "TCB_WRITABLE_BY_GOVERNED_ACCOUNT"
+ },
+ "probe": "UW6 user-writable installation classes (AR-0015)",
+ "stated_revision_6": {
+  "OP-7 (a)": [
+   "C0"
+  ],
+  "OP-7 (b)": [
+   "C0"
+  ],
+  "OP-7 (c) no witnesses held": [
+   "C0"
+  ],
+  "OP-7 (c) witnesses at threshold held": [
+   "C0",
+   "C1",
+   "C2"
+  ],
+  "OP-7 (d)": [
+   "C0",
+   "C1",
+   "C2"
+  ],
+  "administrator-protected system pin, OP-7 (a)": [
+   "C0",
+   "C1",
+   "C2"
+  ]
+ },
+ "verdicts": {
+  "C0_C2_not_refused_by_GB_rules": true,
+  "ceremonies_refused_on_user_writable_install": true,
+  "every_stated_row_equals_computed": true,
+  "phase4_C3_refused_on_user_writable_install": true
+ }
+}
