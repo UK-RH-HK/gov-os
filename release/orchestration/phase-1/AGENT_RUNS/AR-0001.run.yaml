@@ -1,0 +1,15 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0001
+role: rot-architect
+objective: Author RoT-1 revision 3 (architecture only) closing R2-H1..R2-H4, R2-M1..M10, R2-L1..L3 as classes
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0001-rot-architect-r3.md
+base: the orchestrator commit that adds this file on release/4.1.6-rc1
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r3
+branch: phase1/rot1-r3-architect
+agent_id: null
+status: CLAIMED
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0001.report.yaml
+outcome: null

@@ -1,0 +1,78 @@
+# Phase 1 hard gates. A gate advances only when every precondition holds and the satisfaction evidence is committed.
+# status: NOT_OPEN (preconditions unmet) | OPEN (awaiting its satisfier) | SATISFIED | REFUSED
+schema: governance-os.phase-1.gate-register
+schema_version: 1
+gates:
+  - id: GATE-ARCH-ACCEPT
+    title: Independent acceptance of the root-of-trust architecture
+    status: OPEN
+    satisfier: fresh independent architecture synthesis reviewer (role rot-review-synthesis)
+    preconditions:
+      - architecture revision committed on release/4.1.6-rc1 with a typed architect report
+      - reviewer B (trust/security) and reviewer C (compatibility/transaction) reports committed, authored independently
+      - synthesis reviewer authored additional held-out architecture attacks
+    satisfied_when: synthesis verdict ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED on an exact architecture commit
+    on_refusal: commit evidence; hand completed findings to a fresh architect for the next revision
+    satisfaction_evidence: null
+
+  - id: GATE-OWNER-D0008
+    title: Human Decision Gate — D-0008 root of trust and owner options
+    status: NOT_OPEN
+    satisfier: product owner (never an agent, never the orchestrator)
+    preconditions: [GATE-ARCH-ACCEPT]
+    decision_package_scope:
+      - proposed D-0008 and ARCH-0002
+      - OP-1..OP-6 and OP-7 (stateless verifier currency) and any later options
+      - key custody and key ceremony
+      - first-machine trust behaviour
+      - uncertified and candidate behaviour
+      - production update and install gating
+      - material usability consequences
+    satisfied_when: owner answers recorded verbatim in GATES/ and the approved decision recorded in a separate commit
+    satisfaction_evidence: null
+
+  - id: GATE-OWNER-KEY-CEREMONY
+    title: Trust-anchor and key-ceremony actions that cannot be delegated
+    status: NOT_OPEN
+    satisfier: product owner / key custodians
+    preconditions: [GATE-OWNER-D0008]
+    constraint: private key material never enters the repository, an agent context or a log; only public anchors, fingerprints and ceremony transcripts
+    satisfaction_evidence: null
+
+  - id: GATE-OWNER-CAC-UPLOAD
+    title: AWAITING_PRODUCT_OWNER_CAPABILITY_CONTRACT_UPLOAD
+    status: NOT_OPEN
+    satisfier: product owner copies the approved file
+    preconditions: [builder scaffolding for contract source, executable YAML, source lock, schema, evidence map and generated view committed]
+    destination: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+    owner_source_file: Governance_OS_Capability_Acceptance_Contract_v3.md
+    satisfied_when: owner confirms upload in chat and the file exists at the destination; digest recorded
+    satisfaction_evidence: null
+
+  - id: GATE-BUILDER-READY
+    title: READY_FOR_INDEPENDENT_OS_VERIFICATION
+    status: NOT_OPEN
+    satisfier: builder (declares readiness only; never acceptance)
+    preconditions: [GATE-OWNER-D0008, GATE-OWNER-CAC-UPLOAD]
+    satisfied_when: exact candidate commit and tag recorded; full builder regression (unit, certification, plugin, migration, trust, capability, Gate W, G0-G6) evidence committed
+    satisfaction_evidence: null
+
+  - id: GATE-P2-ACCEPT
+    title: Independent Prompt 2 verification
+    status: NOT_OPEN
+    satisfier: fresh Prompt 2 synthesis verifier (role prompt2-synthesis) only
+    preconditions:
+      - GATE-BUILDER-READY
+      - verifier A (architecture/security) and verifier B (capability/memory/workflow) reports committed with fresh held-out tests
+      - prior verifier harnesses rerun unchanged
+    satisfied_when: synthesis verdict OS_RELEASE_CANDIDATE_ACCEPTED for one exact immutable candidate
+    on_refusal: commit evidence; classify; fresh repair builder; next patch candidate; fresh verifiers; architectural HIGH/CRITICAL class routes back to GATE-ARCH-ACCEPT loop
+    satisfaction_evidence: null
+
+  - id: GATE-PHASE1-COMPLETE
+    title: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
+    status: NOT_OPEN
+    satisfier: orchestrator, after GATE-P2-ACCEPT, by writing the final checkpoint
+    preconditions: [GATE-P2-ACCEPT]
+    note: does not certify, push, or start Phase 2; the owner runs an external acceptance audit
+    satisfaction_evidence: null
