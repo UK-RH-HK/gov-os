@@ -1,0 +1,89 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0007
+role: rot-reviewer-compat-transaction
+objective: Independent compatibility and transaction review (C) of RoT-1 revision 4 (bca05a7)
+agent_model: claude-opus-5
+independence_statement: >
+  This session authored no RoT-1 revision, no prior review, and did not read reviewer B's output, other branches or
+  other worktrees (no git branch -a, no git log --all, no other scratch directories). Under release/orchestration/ it
+  read only HO-0007, HO-0001 (§3-§4) and AGENT_RUNS/README.md. The architect's response matrix (22), 28, P1r4, the P3r3
+  re-run, P4r4, LR2 and all pack evidence were treated as claims to test. No scope deviation.
+input:
+  base_commit: 7a23900def8b233cd04ae08a5eb2820b3cad0a86
+  release: 4.1.6-rc1
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0007-rot-review-r4-c-compat-transaction.md
+inspected:
+  - bca05a7e2c2791126fde1d3d812facdaa45b2e45 (revision 4 under review)
+  - release/root-of-trust/4.1.6/ (00-28, constitutional-surface/, schemas/, examples/, evidence/)
+  - spec/decisions/D-0008.yaml
+  - spec/architecture/ARCH-0002.yaml
+  - release/root-of-trust/4.1.6-review-r3/ (consolidated review r3 79a09a1; C and D directories)
+  - runtime/ cli/ framework/ migrations/ at 8ad06be 26ab5b6 47d8394 da9c851 (legacy sources via git show)
+  - legacy binaries gov-4.1.{2,3,4,5}
+produced:
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/00-REPORT.md
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/01-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/02-HELDOUT-ATTACKS.md
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/03-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/04-CARRIED-REQUIREMENTS.md
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/05-PRE-ROT-MATRIX.md
+  - release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/
+tests_or_attacks:
+  - id: RV4-C-A01
+    description: init/adopt-baseline/migrate-baseline from a subdirectory (no --root) escape the occupation and write inside governance/trust while RoT-1 reports COMPLETE
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/subdir_escape.json
+  - id: PRE-ROT-MATRIX-ROOTED
+    description: 2504 rooted (--root) invocations on three intact-layout variants write nothing to work tree or Git (reproduces P3r3)
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/matrix-rows.jsonl
+  - id: RV4-C-A02
+    description: RV3-L7 reopens when the migrated .gitignore retains the legacy .governance-runtime/ line; the untracking idiom drops the migration occupation
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/durability.json
+  - id: RV4-C-A03
+    description: symlinked occupation entry caught as wrong type by the 18 s9 model; legacy binary NOT_INSTALLED
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/legacy_regain.json
+  - id: RV4-C-A05
+    description: cone and non-cone sparse checkout drop occupation entries at other tree roots -> PARTIAL; legacy init --force fails at the framework.lock directory
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/durability.json
+  - id: RV4-C-A06
+    description: LR-2 / RV3-M6 reproduced on the revision-4 layout (occupation removal, git checkout/restore of pre-migration paths, legacy CIT); RoT-1 fails closed everywhere
+    result: CONFIRMED
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/legacy_regain.json
+  - id: RV4-C-A07
+    description: layout durability through fresh/shallow clone, git archive, clean -fdx, stash/pop, checkout-across-migration, revert
+    result: PASS
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/durability.json
+  - id: RV4-C-A08-A10
+    description: transaction-machine attacks (foreign journal, cross-device, concurrent/crash) assessed as sound-but-unimplemented (design only)
+    result: NOT_RUN
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/02-HELDOUT-ATTACKS.md
+  - id: R2-H4-class
+    description: confirm R2-H4 CLOSED as a class
+    result: REFUTED
+    evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/matrix-rows.jsonl
+findings:
+  - id: RV4-C-H1
+    severity: HIGH
+    title: Occupation protects only the project root; a pre-RoT init/adopt-baseline/migrate-baseline from a subdirectory writes inside governance/trust while RoT-1 reports COMPLETE; R2-H4 not closed as a class
+    path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/01-FINDINGS.md
+  - id: RV4-C-M1
+    severity: MEDIUM
+    title: RV3-L7 fix depends on the migrated .gitignore holding only the replace-form rule; a real migrated project retains the legacy line and the untracking idiom drops the occupation
+    path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/01-FINDINGS.md
+verdict: BLOCKING_FINDINGS_PRESENT
+output:
+  branch: phase1/rot1-r4-review-c
+  commit: c6b8ba9985d195fd18470cfe3ae3d80968d71051
+  evidence_path: release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence
+unresolved:
+  - RV4-C-H1 (HIGH, blocking) requires an architecture change (18 s9 COMPLETE and the 26 s3 class argument)
+  - RV4-C-M1 carried; the install transaction must remove the pre-existing legacy .gitignore line (RT-122)
+  - Transaction machinery (18/20) is unimplemented; foreign-journal, cross-device, concurrent, crash attacks are spec-only
+  - Exposure sub-vector of RV4-C-H1 (nested install indexing project material without RoT-1 classifications) plausible but retrieval not reproduced in the tree layouts tried
+recommended_next_action: Synthesis reviewer to adjudicate RV4-C-H1 (R2-H4 class) and RV4-C-M1 against B's findings and issue the architecture verdict
+completed_at: 2026-09-14T00:00:00Z
