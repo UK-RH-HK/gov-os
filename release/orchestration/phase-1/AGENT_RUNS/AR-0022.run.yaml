@@ -1,0 +1,17 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0022
+role: rot-review-synthesis
+objective: Independent architecture synthesis review of RoT-1 revision 7 concrete profile CP-1 (d07d200); sole issuer of the final revision-7 verdict (loop frozen after it per OWNER-DIRECTIVE-0003)
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0022-rot-review-r7-d-synthesis.md
+base_commit: null   # the orchestrator commit adding this record (ledger L-0058)
+architecture_commit: d07d200ac08a52c45071d33074e20cc62fbcc26e
+panel_inputs: {B: 54be694cc6291538fe0901f3d71eb685ce3138d4, C: 34633ccc53a4928262b4f38e5d1d018239b7a322}
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r7-d
+branch: phase1/rot1-r7-review-d
+agent_id: null
+status: CLAIMED
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0022.report.yaml
+outcome: null

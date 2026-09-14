@@ -812,3 +812,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | await AR-0021; merge the panel; run synthesis AR-0022; record the verdict; frozen checkpoint; stop |
+
+## L-0057 — 2026-09-14 — revision-7 reviewer C completed; panel merged
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | rot-reviewer-compat-transaction (`AR-0021`) |
+| Input commit | `7e50c6e` (architecture `d07d200`); received OWNER-DESIGN-REQUIREMENTS-0002 mid-run (disclosed) |
+| Work performed | Reproduced review-r6 C's `matrix6` (62,036 rows) and 11 probes byte-identical. Ran an independent matrix7 of 118,732 rows over real 4.1.2–4.1.5 with its own registers and predicate. Authored held-out RV7-C-A01…A25 (15 executed, 6 on the reference executor, 3+ design). |
+| Report / evidence | `AGENT_RUNS/AR-0021.report.yaml`; `release/root-of-trust/4.1.6-review-r7/C-compat-transaction/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `34633cc`, report `d7b0850`, merged `2856bd7`. Reviewer B merged first: `733c2ba`. |
+| Findings | **HIGH RV7-C-H1:** the running-mode C3 currency proof bounds the anchoring event age (≤ 24 h), not the Trust State's age; an air-gapped admitted machine performs production C3 on a state up to 90 days stale (executed: 882 h). This contradicts RS-1b and OWNER-DESIGN-REQUIREMENTS-0002 OT-1. **MEDIUM:** M1 (protected-store loss makes the next admission a first admission that discards the account-store high-water), M2 (per-project record identity not realizable), M3 (first-install journal never honoured), M4 (untracked in-migration overlay removable by `git clean`), M5 (roll-forward relies on in-memory state; stubbed in crashmig7). **LOW:** L1–L4. **Prior:** R2-H4 CLOSED as a class (0 violations over 118,732 rows); RV6-M3 and RV6-M4 narrowed; RV6-M5 closed. **Conformance:** OP-3, OP-15 and the exclusions conform; OT-1 conforms at admission and deviates at use; OP-14 (b) deviates on protected-store loss; D-0008 and D-0007 states hold. |
+| Next action | planned synthesis reviewer AR-0022 (final under freeze) |
+
+## L-0058 — 2026-09-14 — revision-7 synthesis handed off (final under freeze)
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | orchestrator |
+| Input commit | `2856bd7` |
+| Work performed | Wrote HO-0022 from the v4 synthesis template. It carries owner records -0001 and -0002 as binding, the acceptance rule's owner-conformance clause (no certified target required if the criterion is explicit, testable and non-circular), the panel-timing fact and the freeze context note (findings are recorded as evidence, not routed). Claimed AR-0022. Added the review-r7 B and C directories to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0022-rot-review-r7-d-synthesis.md`, `CHECKPOINTS/CP-0019.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0022 |

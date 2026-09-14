@@ -1,0 +1,17 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0019
+trigger: independent panel verdicts on revision 7; before handoff to the planned synthesis reviewer (HO-0022); loop freezing per OWNER-DIRECTIVE-0003
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_SYNTHESIS
+loop_status: FREEZING_AFTER_REVISION_7
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 2856bd7605b00b92f5bba9d2bfe6731e91725a21
+completed_evidence:
+  - {what: RoT-1 revision 7 concrete profile CP-1, commit: d07d200ac08a52c45071d33074e20cc62fbcc26e, path: release/root-of-trust/4.1.6}
+  - {what: reviewer B r7 (BLOCKING_FINDINGS_PRESENT), commit: 54be694cc6291538fe0901f3d71eb685ce3138d4, report_commit: 44858be50197f8f3467097419211c5d139ce8971, path: release/root-of-trust/4.1.6-review-r7/B-trust-security}
+  - {what: reviewer C r7 (BLOCKING_FINDINGS_PRESENT), commit: 34633ccc53a4928262b4f38e5d1d018239b7a322, report_commit: d7b08508d090a74c043e7557dafedd4f9fb0f278, path: release/root-of-trust/4.1.6-review-r7/C-compat-transaction}
+panel_findings_pending_adjudication: {HIGH: [RV7-B-H1, RV7-B-H2, RV7-C-H1], MEDIUM: 6, LOW: 10, INFO: 2}
+running_work: [AR-0022 synthesis reviewer D (revision 7; final)]
+next_deterministic_action: spawn AR-0022; record the final verdict without routing; frozen checkpoint; stop

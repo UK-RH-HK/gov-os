@@ -18,7 +18,7 @@ outcome:
   verdict: BLOCKING_FINDINGS_PRESENT   # role verdict; not the architecture verdict
   work_commit: 54be694cc6291538fe0901f3d71eb685ce3138d4
   report_commit: 44858be50197f8f3467097419211c5d139ce8971
-  integration_merge_commit: null   # held unmerged until reviewer C (AR-0021) completes, to preserve panel independence
+  integration_merge_commit: 733c2ba8ed6e0cb077eb31b9728299849505a1b6   # merged after reviewer C completed
   findings:
     HIGH: [RV7-B-H1, RV7-B-H2]
     MEDIUM: [RV7-B-M1]   # blocking under handoff §4 per reviewer (needs architecture text change)
