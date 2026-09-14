@@ -644,3 +644,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge, route per verdict. Owner OP answers pending; record them verbatim on receipt. |
+
+## L-0045 — 2026-09-14 — product-owner design requirements recorded
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6 synthesis (running); revision 7 planned |
+| Role | product owner (source); orchestrator (recording and routing) |
+| Input commit | `9dcbf7a` |
+| Work performed | Recorded the owner's message verbatim as OWNER-DESIGN-REQUIREMENTS-0001: binding design inputs for RoT-1 revision 7, **not** D-0008 approval. **Direction:** Option C / RoT-1; A, B, D, E and F unsupported as production alternatives. **Selections:** OP-1 3 keys 2-of-3 with three custodial roles; OP-2 (b) 2-of-3; OP-3 mode A; OP-4 separate candidate key plus purpose-separated 2-of-3 authorities; OP-5 30 days; OP-6 (a); OP-7 (a) with 90d/7d/24h limits; OP-8 2; OP-9 (b)+(d); OP-10 (b); OP-11 (b); OP-12 (a); OP-13 (b); OP-14 (b); OP-15 (a); OP-16 (b). First-contact trust base approved by root 2-of-3, never by the trust-state publisher. The environment manifest is deterministic and authoritative only with reproducer agreement plus registration 2-of-3. Initial certified profile only, with exclusions. Registered in the gate register; state updated: revision 7 is mandatory after the revision-6 synthesis, D-0008 fields are kept, D-0007 stays ACTIVE, and selected parameters are not reopened without a genuinely new trade-off. AR-0018 continues unaffected. |
+| Report / evidence | `GATES/OWNER-DESIGN-REQUIREMENTS-0001.md` (verbatim, sha256 `c85d80c2402b94bf…`), `GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml` (derived index), `CHECKPOINTS/CP-0014.yaml` |
+| Verdict | — (owner input; not a verdict and not a ratification) |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | await AR-0018; then revision-7 architect on revision-6 findings plus owner requirements |

@@ -30,6 +30,7 @@ gates:
       - material usability consequences
     satisfied_when: owner answers recorded verbatim in GATES/ and the approved decision recorded in a separate commit
     satisfaction_evidence: null
+    owner_design_requirements: OWNER-DESIGN-REQUIREMENTS-0001 (binding design inputs pre-selecting OP-1..OP-16 and scope; formal ratification still required here)
 
   - id: GATE-OWNER-KEY-CEREMONY
     title: Trust-anchor and key-ceremony actions that cannot be delegated
@@ -76,3 +77,15 @@ gates:
     preconditions: [GATE-P2-ACCEPT]
     note: does not certify, push, or start Phase 2; the owner runs an external acceptance audit
     satisfaction_evidence: null
+
+  - id: OWNER-DESIGN-REQUIREMENTS-0001
+    title: Product-owner design requirements for RoT-1 revision 7 (owner-initiated)
+    status: RECORDED
+    satisfier: product owner
+    classification: binding design inputs; NOT approval, activation or ratification of D-0008
+    record_paths: [release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml]
+    effects:
+      - revision 7 (single concrete certified profile) follows the revision-6 synthesis whatever its verdict, unless the orchestrator proves accepted revision 6 already implements these exact requirements without architectural change
+      - D-0008 keeps status PROVISIONAL, proposal_state PROPOSED, human_approved false; D-0007 stays ACTIVE until GATE-OWNER-D0008 ratification
+      - selected parameters are not reopened unless an independent reviewer identifies a genuinely new owner trade-off
+    satisfaction_evidence: this record's commit

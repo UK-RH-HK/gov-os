@@ -1,0 +1,18 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0014
+trigger: owner answer (owner-initiated design requirements); change of next deterministic action
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_SYNTHESIS
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 9dcbf7aff67088deb14e695c4e5e7d987166371f
+owner_input:
+  id: OWNER-DESIGN-REQUIREMENTS-0001
+  record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md
+  record_sha256: c85d80c2402b94bfa691a1cdca5aae18ebe6dfd15e867c72b6f75544b391a960
+  classification: binding design inputs for revision 7; not D-0008 approval
+d0008_state_required: {status: PROVISIONAL, proposal_state: PROPOSED, human_approved: false}
+d0007: ACTIVE
+running_work: [AR-0018 synthesis reviewer D (revision 6), unaffected]
+next_deterministic_action: finish revision-6 synthesis; then revision 7 (concrete certified profile) on revision-6 findings plus OWNER-DESIGN-REQUIREMENTS-0001

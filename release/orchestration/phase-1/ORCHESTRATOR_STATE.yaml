@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T15:14:26Z'
-state_hash: 388dd37d81d376aa3be1946a522765552cda175ccacf4a34990a70de6df81b35
+updated_at: '2026-09-14T15:25:45Z'
+state_hash: 702fbcf851f2fd9f7e508d931089149cedd67e4d64dc19a9e8489d59ad227fff
 lifecycle_state: ROT_ARCH_SYNTHESIS
 
 protocol:
@@ -38,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: b9bed32b9143f5cf793958ee0e375d7406c2d6dd
+  last_recorded_commit: 9dcbf7aff67088deb14e695c4e5e7d987166371f
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -56,6 +56,9 @@ governing_decisions:
   active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, CIT-0001, ARCH-0001]
   superseded: [D-0001]
   proposed_not_active: [D-0008, ARCH-0002]   # file status PROVISIONAL; never described as active or approved before GATE-OWNER-D0008
+  d0008_fields_required_until_ratification: {status: PROVISIONAL, proposal_state: PROPOSED, human_approved: false}   # owner, OWNER-DESIGN-REQUIREMENTS-0001
+  d0007_active_until: GATE-OWNER-D0008 formal ratification of an independently accepted D-0008 package
+  owner_design_direction: {selected_design_target: Option C — RoT-1, not_supported_production_alternatives: [A, B, D, E, F], record: OWNER-DESIGN-REQUIREMENTS-0001}
   owner_approved_in_phase_1: []
 
 architecture:
@@ -155,6 +158,7 @@ architecture:
       synthesis_run: AR-0018
       handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0015-rot-architect-r6.md
       expected_review_path: release/root-of-trust/4.1.6-review-r6
+      next_revision_after_synthesis: 7   # mandatory per OWNER-DESIGN-REQUIREMENTS-0001 (concrete single certified profile) unless accepted r6 is proven to implement them exactly without architectural change
 
 unresolved_findings:
   source_path: release/root-of-trust/4.1.6-review-r5/10-BLOCKING-FINDINGS.md
@@ -185,7 +189,9 @@ known_non_blocking_residuals:
 owner_gates:
   pending: []
   planned: [GATE-OWNER-D0008, GATE-OWNER-KEY-CEREMONY, GATE-OWNER-CAC-UPLOAD]
-  deferred_to_GATE-OWNER-D0008: [first-contact root composition T1-a..T1-d (BC5-1), common-mode build environment E-a..E-c (BC5-2)]
+  deferred_to_GATE-OWNER-D0008: [first-contact root composition T1-a..T1-d (BC5-1), common-mode build environment E-a..E-c (BC5-2)]   # now pre-selected by OWNER-DESIGN-REQUIREMENTS-0001 (OP-13(b), OP-16(b)); ratification still at GATE-OWNER-D0008
+  owner_inputs_recorded:
+    - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
   answers: []
   register_path: release/orchestration/phase-1/GATES/GATE-REGISTER.yaml
 
@@ -341,11 +347,15 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Spawn AR-0018 (synthesis reviewer D, revision 6) on HO-0018; await its report. Owner has been given the OP-1..OP-16
-  summary in chat (2026-09-14) and said they will answer; on receipt record the answers verbatim in
-  GATES/OWNER-INPUT-0001.answer.md (owner-initiated input, not GATE-OWNER-D0008 approval). ACCEPTED: build the D-0008
-  package incorporating recorded owner input. REJECTED: fresh revision-7 architect on D's correction delta plus the
-  recorded owner answers as binding requirements.
+  Let AR-0018 (revision-6 synthesis) finish; verify, merge and preserve its evidence. Then, whatever its verdict,
+  author RoT-1 revision 7 with a fresh architect on: all revision-6 panel and synthesis findings, and
+  OWNER-DESIGN-REQUIREMENTS-0001 (verbatim text governs) as binding requirements, producing one concrete certified
+  production profile (Option C / RoT-1; OP-1..OP-16 as selected; excluded paths out of the certified executable
+  surface) and an updated D-0008 package that keeps status PROVISIONAL, proposal_state PROPOSED, human_approved false.
+  Skip revision 7 only if the orchestrator proves an accepted revision 6 already implements the exact requirements
+  without architectural change (not expected: revision 6 is an option tree). Then fresh B/C panel and synthesis on
+  the concrete configuration, combinations and exclusions. Only after ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED present the
+  final D-0008 package for formal owner ratification (GATE-OWNER-D0008).
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1
@@ -364,6 +374,12 @@ forbidden_until_gate:
     until: never
   - action: prompt-3 certification, stable release push, phase 2
     until: never within Phase 1
+  - action: setting D-0008 status ACTIVE, human_approved true, or superseding D-0007
+    until: GATE-OWNER-D0008 formal ratification of an independently accepted D-0008 package (owner, OWNER-DESIGN-REQUIREMENTS-0001)
+  - action: reopening owner-selected parameters of OWNER-DESIGN-REQUIREMENTS-0001 (OP-1..OP-16, first-contact composer, environment manifest, certified scope)
+    until: an independent reviewer identifies a genuinely new owner trade-off (then raise it to the owner)
+  - action: implementing excluded paths (witness service, helper-machine or script admission, OP-13(c) either, platform package signing root, Mode B, clock/grace trust, unanchored governed mutation) in the initial certified profile
+    until: a separately governed and verified later release
   - action: writing held-out verifier test content, in-progress verdicts or unreviewed findings into the user auto-memory (its index is visible to every subagent)
     until: never
   - action: any role agent reading, listing or searching session/agent transcripts or task-output files (/tmp/claude-1000/<project>/*/tasks/, ~/.claude/projects/)
