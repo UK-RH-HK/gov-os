@@ -182,3 +182,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0005 |
+
+## L-0012 — 2026-09-14 — revision-4 architect spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-architect (`AR-0005`, fresh Opus 5 context) |
+| Input commit | `f83da03` (worktree `wt/arch-r4`, branch `phase1/rot1-r4-architect`) |
+| Work performed | spawned on HO-0005; running |
+| Report / evidence | expected `AGENT_RUNS/AR-0005.report.yaml`; pack `release/root-of-trust/4.1.6/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge, instantiate revision-4 B/C handoffs, spawn B and C in parallel |
