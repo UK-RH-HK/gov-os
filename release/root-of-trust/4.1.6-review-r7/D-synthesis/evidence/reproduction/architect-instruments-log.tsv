@@ -1,0 +1,23 @@
+CS7	0	91	e655e22e821e8c72b34c8d1c7b30f9237a23148a43d2b8ecdb01aff7cead755d	<scratch>/out/arch/CS7-derivation-calculator.json
+FA7-run1	0	0	33e3eef20553e332b315b73ba29235cb7c902666de57500baed698220f439d23	<scratch>/out/arch/FA7-first-contact-authority.json
+FA7-run2	0	1	33e3eef20553e332b315b73ba29235cb7c902666de57500baed698220f439d23	<scratch>/out/arch/FA7-first-contact-authority.run2.json
+CUR7	0	0	c54c3ed050140a68dd17591205e3377dee304b970fa2f177006d52c15246df2d	<scratch>/out/arch/CUR7-first-contact-currency.json
+ADM7	0	0	8f112fa27451ad09ae8a6bb2840724d0485cea30940817f58c53b9a355429aa1	<scratch>/out/arch/ADM7-admission-stores.json
+BA11r7	0	0	74c03fa00d7aa4de005d747588ecb52282d1a25126440cb351f9e26b26784713	<scratch>/out/arch/BA11r7-machine-classes.json
+BA12r7	0	1	89c543d79cfc3623f2c106ad5299abc18f363abbfbe9738cf467f6b32d41372e	<scratch>/out/arch/BA12r7-key-subsets-below-threshold.json
+PPR7	0	0	b7521d696c67f53b1bb90622c8abb929741190fc99eeced758bbf581e88798a6	<scratch>/out/arch/PPR7-project-records.json
+DA05r7	0	1	539e699d1ac3387a3cbcea2c2ff4104a2219596bcbe28c99c48bb02d76693b52	<scratch>/out/arch/DA05r7-combinations-under-CP1.json
+DA06r7	0	0	9ad05000ed51e6fdb786acbcc8b31b6f41cbabd74db438fd860f12e5688f8ae4	<scratch>/out/arch/DA06r7-rendering-and-classifier-vocabulary.json
+STATEMENTS-CHECK	0	0	90f871790edc12edb5bf7a4a575a1507996a1d299dbf2282d200f8afd2685614	<scratch>/out/arch/STATEMENTS-CHECK.json
+PROF7	0	1	e32f4c4d03164929b270b18472da5f63ed547aa7efc1b66ecd8c98cd80ede32e	<scratch>/out/arch/PROF7-profile-conformance.json
+REGISTER-CHECK	0	0	cf5fc25291cac7ff221b3df468cff7df9fa2062a7e882798715fff6ea0ae0fa3	<scratch>/out/arch/REGISTER-CHECK.json
+DA09r7	0	3	f7c21c6990dd5c763ed62593e5913b052851d0751c75a7a567d606ad2a108ad9	<scratch>/out/arch/DA09r7-schema-fields-versus-register.json
+DA04r7	0	0	39c11e7da69d64830d0852813a617affb25a4886d5731a274d8531f96cc14db5	<scratch>/out/arch/DA04r7-plan-regression-detection.json
+CSI-selftest	0	20	416eb901645d78d4af436e0aad156bad2ba2f800b7d730d7f526df612f45e65c	<scratch>/out/arch/CSI-selftest.json
+CSI-framework	0	1	2b6956c2bf74f5e20f176582e82c389bc7d05dc77a9d61aa253b3fa9c8369766	<scratch>/out/arch/CSI-check-framework.json
+CSI-4.1.5	3	1	6c1f526b4bd1e86f291850f11b6e00d9b8af307bf44a58259099c5924e11557c	<scratch>/out/arch/CSI-check-release-4.1.5.json
+CSI-4.1.2	2	0	607b33b333946844ef7e3a194df2fb1479b1fdb622ed3eb00bd6ac4fee26ced8	<scratch>/out/arch/CSI-check-legacy-4.1.2.json
+CSI-4.1.3	2	0	6c6311e72e0de4e606403813861e44bdcc630a45996d0e1e179d59036431d502	<scratch>/out/arch/CSI-check-legacy-4.1.3.json
+CSI-4.1.4	2	1	776e00802205bb1fee918d8e679ec0dd445a2e1090aa3e0a3dccd41521c72df3	<scratch>/out/arch/CSI-check-legacy-4.1.4.json
+ENV7	0	4	b08e5df2233cd1da14cfd2adb00fa3af2410bb84b9aa9dceb21046090c417a3d	<scratch>/out/arch/ENV7-environment-authority.json
+DONE

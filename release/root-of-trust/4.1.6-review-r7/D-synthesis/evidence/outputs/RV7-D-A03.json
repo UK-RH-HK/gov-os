@@ -1,0 +1,42 @@
+{
+ "code": {
+  "executor_checks_one_lineage_not_upstream_archive": false,
+  "executor_reads_archive_sha256": false,
+  "executor_reads_bootstrap_registration": false,
+  "executor_toolchain_attrs": [
+   "bootstrap_root",
+   "package_source",
+   "build_system",
+   "signing_infrastructure"
+  ]
+ },
+ "labels": {
+  "CC3_text": "diverse double-compilation agreement: the registered compiler rebuilt through at least two toolchain lineages independent by provenance (at least one not rooted in an upstream binary compiler archive) yields bit-identical gov and gov-admit (OP-10 (b))",
+  "owner_required_label_present_in_35": false,
+  "profile_initial_target_statuses": [
+   "NOT_CERTIFIED_PENDING_CRITERIA"
+  ]
+ },
+ "probe": "RV7-D-A03 toolchain lineage independence by distribution strings (AR-0022)",
+ "results": {
+  "control_honest_bootstrapped_lineage": "ACCEPTED",
+  "control_relabelled_identical_strings": "TOOLCHAIN_DIVERSITY_NOT_MET",
+  "two_distributions_distinct_strings_no_bootstrap_registration": "ACCEPTED"
+ },
+ "schema": {
+  "bootstrap_registration_required": false,
+  "provenance_fields_are_free_strings": true,
+  "toolchain_required_fields": [
+   "provenance",
+   "toolchain_id"
+  ]
+ },
+ "verdicts": {
+  "control_honest_accepted": true,
+  "control_identical_strings_refused": true,
+  "not_rooted_in_upstream_archive_is_not_checked_by_the_verifier": true,
+  "owner_label_not_adopted": true,
+  "schema_does_not_require_bootstrap_evidence": true,
+  "two_distributions_accepted_as_independent_lineages": true
+ }
+}

@@ -1,0 +1,238 @@
+{
+ "control_equals_committed_verdicts": {
+  "ADM7": true,
+  "CUR7": true,
+  "FA7": true,
+  "PROF7": true
+ },
+ "instruments": [
+  "FA7",
+  "CUR7",
+  "ADM7",
+  "PROF7"
+ ],
+ "mutants": {
+  "M01": {
+   "description": "C3 proof need not name the effective state (24 R-CUR-1/2)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M02": {
+   "description": "C3 currency window 30 days instead of 24 h (R-ANC-4)",
+   "detected": true,
+   "detected_by": {
+    "ADM7": [
+     "/X7_decision_rule"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M03": {
+   "description": "admission state age 7 days instead of 24 h (FC-9)",
+   "detected": true,
+   "detected_by": {
+    "CUR7": [
+     "/A08_stored_values_older_than_ceiling_refused",
+     "/W_window_residual_exactly_as_stated"
+    ],
+    "FA7": [
+     "/S7_every_mutant_detected"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M04": {
+   "description": "re-admission ignores a held negative for the candidate binary only (AP-R4)",
+   "detected": true,
+   "detected_by": {
+    "CUR7": [
+     "/A02_store_applied"
+    ]
+   }
+  },
+  "M05": {
+   "description": "security minimum ignores security_relevant_change registrations (OP-11 (b), AP-SEC)",
+   "detected": true,
+   "detected_by": {
+    "FA7": [
+     "/S4_every_vector_refused_control_accepted",
+     "/S7_every_mutant_detected"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M06": {
+   "description": "custodian publishes a descendant that drops revocations (R-FCS-2 (d))",
+   "detected": true,
+   "detected_by": {
+    "FA7": [
+     "/S2_P_descendant_dropping_revocation_not_published"
+    ]
+   }
+  },
+  "M07": {
+   "description": "floors read from the protected store only (account-store restrictors ignored, 24 \u00a78)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M08": {
+   "description": "state codes of the two sources need not agree (FC-4\u2032)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M09": {
+   "description": "admission record expiry ignored at use (OP-14 (b), GB-2\u2032)",
+   "detected": true,
+   "detected_by": {
+    "ADM7": [
+     "/X14_all_records_expire"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M10": {
+   "description": "revoked binary still runs C1\u2013C2 (OP-15 (a), GB-3\u2032)",
+   "detected": true,
+   "detected_by": {
+    "ADM7": [
+     "/X15_revoked_self_C0_R_only"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M11": {
+   "description": "publication of the digest not required (AP-7)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M12": {
+   "description": "first-contact authority below the held sequence accepted (AP-R3)",
+   "detected": true,
+   "detected_by": {
+    "CUR7": [
+     "/A02_store_applied"
+    ]
+   }
+  },
+  "M13": {
+   "description": "CI anchors get the workstation 90-day validity (R-ANC-3)",
+   "detected": true,
+   "detected_by": {
+    "ADM7": [
+     "/X7_decision_rule"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M14": {
+   "description": "FCA root threshold checked under any chain version, not the one it names (FC-5\u2032)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M15": {
+   "description": "clock skew 30 days (R-CLK-1)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M16": {
+   "description": "admitter revoked in the selected state not refused (FC-8\u2032)",
+   "detected": false,
+   "detected_by": {}
+  },
+  "M17": {
+   "description": "TCB-location predicate not applied to C3 and ceremonies (GB-4\u2032)",
+   "detected": true,
+   "detected_by": {
+    "ADM7": [
+     "/X7_decision_rule"
+    ]
+   }
+  },
+  "M18": {
+   "description": "two verification records need only distinct keys (OP-8, AP-5)",
+   "detected": true,
+   "detected_by": {
+    "FA7": [
+     "/S4_every_vector_refused_control_accepted",
+     "/S7_every_mutant_detected"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M19": {
+   "description": "first-admission marker never written (every admission moves the account store aside)",
+   "detected": true,
+   "detected_by": {
+    "ADM7": [
+     "/A09_floors_never_lowered",
+     "/A11_one_first_admission_all_records"
+    ]
+   }
+  },
+  "M20": {
+   "description": "evaluator binding not enforced (FC-8\u2032 ADMITTER_NOT_LISTED)",
+   "detected": true,
+   "detected_by": {
+    "FA7": [
+     "/S7_every_mutant_detected"
+    ],
+    "PROF7": [
+     "/every_exclusion_holds_under_every_declared_mechanism"
+    ]
+   }
+  },
+  "M21": {
+   "description": "trust-state threshold 1 in the custodian's verification only (R-FCS-2 (a))",
+   "detected": true,
+   "detected_by": {
+    "FA7": [
+     "/S2_P_custodians_never_publish_a_composed_or_below_threshold_authority_or_state"
+    ]
+   }
+  },
+  "M22": {
+   "description": "registration equivocation not refused (AP-5)",
+   "detected": false,
+   "detected_by": {}
+  }
+ },
+ "probe": "RV7-D-A06 conformance-vector mutation sensitivity (AR-0022)",
+ "summary": {
+  "detected": 14,
+  "mutants": 22,
+  "surviving": [
+   "M01",
+   "M07",
+   "M08",
+   "M11",
+   "M14",
+   "M15",
+   "M16",
+   "M22"
+  ],
+  "surviving_descriptions": {
+   "M01": "C3 proof need not name the effective state (24 R-CUR-1/2)",
+   "M07": "floors read from the protected store only (account-store restrictors ignored, 24 \u00a78)",
+   "M08": "state codes of the two sources need not agree (FC-4\u2032)",
+   "M11": "publication of the digest not required (AP-7)",
+   "M14": "FCA root threshold checked under any chain version, not the one it names (FC-5\u2032)",
+   "M15": "clock skew 30 days (R-CLK-1)",
+   "M16": "admitter revoked in the selected state not refused (FC-8\u2032)",
+   "M22": "registration equivocation not refused (AP-5)"
+  }
+ }
+}

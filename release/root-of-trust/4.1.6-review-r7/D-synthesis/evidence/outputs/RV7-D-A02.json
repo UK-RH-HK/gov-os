@@ -1,0 +1,132 @@
+{
+ "C_computed_CS7": {
+  "control_committed_CP_TOOLCHAIN_P1": {
+   "committed": [
+    "{2 registration custodians, 3 reproducer processes}",
+    "{tc_src}",
+    "{toolchain_up, diverse_tc}"
+   ],
+   "computed": [
+    "{2 registration custodians, 3 reproducer processes}",
+    "{diverse_tc, toolchain_up}",
+    "{tc_src}"
+   ],
+   "equal": true
+  },
+  "coordinated_full_matrix (calculator assumption)": {
+   "cross_pairs_minimal": [],
+   "minimal_sets": [
+    "{2 registration custodians, 3 reproducer processes}",
+    "{diverse_tc, toolchain_up}",
+    "{env_common}",
+    "{env_up_a, env_up_b}",
+    "{tc_src}"
+   ]
+  },
+  "coordinated_one_combination_per_party (text-permitted), every assignment": {
+   "assignments": 256,
+   "assignments_meeting_AP6_coverage": 144,
+   "cross_pair_absent_iff_every_combination_covered": true,
+   "example": {
+    "reps=Aup/Bboot/Bup cust=Aup": {
+     "cross_pairs_minimal": [
+      [
+       "env_up_b",
+       "toolchain_up"
+      ]
+     ],
+     "plan_meets_AP6_coverage": true,
+     "reproducers_and_custodian_cover_every_combination": false
+    }
+   },
+   "of_those_covering_every_combination": 24,
+   "of_those_with_a_cross_pair_minimal_set": 120
+  },
+  "fix_example_custodian_reproduces_the_uncovered_combination": {
+   "cross_pairs_minimal": [],
+   "minimal_sets": [
+    "{1 reproducer process, diverse_tc, env_up_a}",
+    "{1 reproducer process, diverse_tc, env_up_b}",
+    "{1 reproducer process, env_up_a, toolchain_up}",
+    "{2 registration custodians, 1 reproducer process, env_up_b}",
+    "{2 registration custodians, 1 reproducer process, toolchain_up}",
+    "{2 registration custodians, 3 reproducer processes}",
+    "{2 registration custodians, env_up_b, toolchain_up}",
+    "{2 reproducer processes, diverse_tc}",
+    "{2 reproducer processes, env_up_a}",
+    "{diverse_tc, toolchain_up}",
+    "{env_common}",
+    "{env_up_a, env_up_b}",
+    "{tc_src}"
+   ]
+  }
+ },
+ "E_executed_reference": {
+  "control_both_reproductions_in_one_class": "ENVIRONMENT_DIVERSITY_NOT_MET",
+  "control_honest_reproduction_in_uncovered_combination": "REPRODUCTION_CONFLICT",
+  "custodian_publishes_T12": true,
+  "diagonal_reproductions_only": "ACCEPTED",
+  "reproductions_counted": [
+   [
+    "sup-A",
+    "tc-up"
+   ],
+   [
+    "sup-B",
+    "tc-boot"
+   ]
+  ]
+ },
+ "R_executed_real_toolchain": {
+  "A_boot_is_clean_and_differs": true,
+  "B_up_equals_diagonal": true,
+  "builds": {
+   "A,boot": {
+    "digest": "sha256:dc4560a38804ec0f224925593639af4d79ffec7c5d43587e41c2faa346e6bfdf",
+    "status": "OK",
+    "stdout": [
+     "gov reproduction probe"
+    ]
+   },
+   "A,up": {
+    "digest": "sha256:f788149473878bc82ed374952cd967048d6fa01e40461a0e295bf5621a1f53d9",
+    "status": "OK",
+    "stdout": [
+     "gov reproduction probe",
+     "INJECTED"
+    ]
+   },
+   "B,boot": {
+    "digest": "sha256:f788149473878bc82ed374952cd967048d6fa01e40461a0e295bf5621a1f53d9",
+    "status": "OK",
+    "stdout": [
+     "gov reproduction probe",
+     "INJECTED"
+    ]
+   },
+   "B,up": {
+    "digest": "sha256:f788149473878bc82ed374952cd967048d6fa01e40461a0e295bf5621a1f53d9",
+    "status": "OK",
+    "stdout": [
+     "gov reproduction probe",
+     "INJECTED"
+    ]
+   }
+  },
+  "cc": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "diagonal_A_up_equals_B_boot": true,
+  "diagonal_output_injected": true,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)"
+ },
+ "probe": "RV7-D-A02 cross-axis reproduction (AR-0022)",
+ "verdicts": {
+  "C_control_equals_committed_block": true,
+  "C_cross_pair_absent_exactly_when_every_combination_is_covered": true,
+  "C_fix_example_removes_cross_pairs": true,
+  "C_full_matrix_assumption_has_no_cross_pair": true,
+  "C_text_permitted_assignments_meeting_AP6_with_a_cross_pair": "120 of 144",
+  "E_control_honest_uncovered_combination_conflicts": true,
+  "E_reference_accepts_diagonal_reproductions": true,
+  "R_two_different_injection_points_give_bit_identical_bytes": true
+ }
+}

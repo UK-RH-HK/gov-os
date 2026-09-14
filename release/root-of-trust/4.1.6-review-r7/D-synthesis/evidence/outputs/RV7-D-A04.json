@@ -1,0 +1,665 @@
+{
+ "17_excluded_mode_rows": {
+  "banner": [
+   [
+    "17-MONOTONIC-TRUST-STATE.md:6",
+    "> first-contact manifest, that text is non-production history: the mode is excluded and absent or refused (`35` §4). Parameters"
+   ]
+  ],
+  "rows": [
+   [
+    "17-MONOTONIC-TRUST-STATE.md:5",
+    "> other than the CP-1 selection, the freshness-witness purpose, a platform signing path, OP-3 mode B or the revision-6"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:61",
+    "| **Freshness witness** | **`freshness-witness`** (new) | `issued_at`, `expires_at` | that `(sequence, digest)` was the latest TSS as of `issued_at` | any state |"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:118",
+    "| `CERTIFIED_AS_OF(n) WITH CURRENCY(proof)` | the above ∧ trust state `KNOWN` ∧ a currency proof (`24` §4.4) | only under OP-3 mode B, and only to skip the update gate |"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:130",
+    "| C3 `init`, `adopt migrate --batch 0` | `KNOWN`; release-local requirement met | `ANCHORED` or `WITNESSED` **and a currency proof** | `init_ack` |"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:147",
+    "- **Revocation-only TSS (RV3-L6).** When no TPS raise accompanies a revocation, the OP-7 (d) exposure covers every"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:209",
+    "- OP-3 mode B;"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:210",
+    "- OP-7 (b) and (c)."
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:218",
+    "Evidence: `P4r4` `RV3-B-A07_issued_at_high_water`. A candidate issued 100 years ahead is refused at ingest; OP-7 (b)"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:239",
+    "| `freshness-witness` (one key, threshold 2) | nothing |"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:240",
+    "| `freshness-witness` (keys at threshold) | stale selection of genuine existing TSSs for witness-reliant machines until rotation (`24` §3.3); no state creation |"
+   ]
+  ]
+ },
+ "A02_reproduction_coverage": {
+  "21_s4_combinations": [
+   [
+    "21-OWNER-OPTIONS.md:96",
+    "**Combinations (RV6-L12).** CP-1 has one combination of OP-10 and OP-16: (b) with (b). Every other pair is excluded (EX-15,"
+   ]
+  ],
+  "25_AP6": [
+   [
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md:74",
+    "| AP-6 | **Reproduction quorum:** at least 2 distinct unrevoked `reproducer` keys, each on a one-signature statement naming the measured digest, the registered source and input manifest, an environment and a toolchain registered for the target, the target and the TBM digest; among those, environments of at least two supplier classes independent by provenance and toolchains of at least two lineages independent by provenance (`33` R-BENV-5″, R-BENV-6″); no valid reproduction of another digest for the same release and target (subject to AP-5r); the digest equals the registered `binary_digests[target]`. | `REPRODUCTION_QUORUM_NOT_MET` / `ENVIRONMENT_DIVERSITY_NOT_MET` / `TOOLCHAIN_DIVERSITY_NOT_"
+   ]
+  ],
+  "30_R_REG_3_f": [
+   [
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md:86",
+    "| **R-REG-3** | **The ceremony checks, before signing (every signing custodian itself):** **(a)** each toolchain lineage against the root-signed toolchain registry: the archive digest against the upstream signed checksum under the registry's key, or the bootstrap registration of an independently boo"
+   ]
+  ],
+  "30_R_REP_4": [
+   [
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md:114",
+    "| **R-REP-4′** | Acceptance needs at least 2 distinct unrevoked reproducer keys on the same `(release_id, source, inputs_manifest_digest, target, binary_digest, tbm_digest)`, each under an `environment_id` and a `toolchain_id` registered for the target; among them, two supplier classes and two toolchain lineages independent by provenance (`33` R-BENV-5″, R-BENV-6″); the digest equals the registered `binary_digests[target]`. |"
+   ]
+  ],
+  "CS7_claims_every_combo": [
+   [
+    "evidence/r7/CS7-derivation-calculator.py:326",
+    "for c, t in combos():"
+   ],
+   [
+    "evidence/r7/CS7-derivation-calculator.py:352",
+    "outs = {build(rel, 0, c, t, C, R) for c, t in combos()}"
+   ],
+   [
+    "evidence/r7/CS7-derivation-calculator.py:367",
+    "conf = [(j, c, t, X) for j in range(1, N_REP + 1) for c, t in combos() if f\"repk{j}\" in C]"
+   ]
+  ],
+  "ENV7_acceptance_docstring": [
+   [
+    "evidence/r7/ENV7-environment-authority.py:231",
+    "\"\"\"Every reproducer builds in every (registered environment, registered toolchain) pair; acceptance needs one digest from >= 2"
+   ]
+  ],
+  "coverage_of_every_combination_required": {
+   "absent": true,
+   "files_searched": [
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md",
+    "33-BUILD-ENVIRONMENT.md",
+    "35-CERTIFIED-PROFILE.md"
+   ],
+   "hits": [],
+   "pattern": "every (registered )?(environment|supplier class).{0,40}(and|x|×).{0,40}(toolchain|lineage)|each combination|every combination"
+  }
+ },
+ "A04_ci_runner_first_use": {
+  "06_ci_image_paragraph": [
+   [
+    "06-BOOTSTRAP.md:75",
+    "A **CI runner image** runs steps 0 and 1 at image build, within 24 hours of the state it admits. It writes a root-owned"
+   ]
+  ],
+  "24_ci_row_C1_C2": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:223",
+    "| valid pin, intact repository | `ANCHORED`; C1–C2; C3 only within 24 hours of provisioning, for the Trust State the pin names |"
+   ]
+  ],
+  "27_local_terminal_only_includes": [
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:99",
+    "always includes `init_ack`, `project_first_use`, `framework_update`, `downgrade`, `rollback`, `recovery_exchange` and"
+   ]
+  ],
+  "27_needs_terminal": [
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:76",
+    "- refuses when there is no controlling terminal (`TRUST_GATE_NEEDS_TERMINAL`)."
+   ]
+  ],
+  "27_project_first_use_row": [
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:35",
+    "| `project_first_use` (revision 7) | first governed use of a project on a machine without a per-project record | the eligible release statement digest the repository requests, shown with the newest eligible release known (OP-11 (b)) |"
+   ]
+  ],
+  "27_state_codes_C3_kinds": [
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:60",
+    "| **`state_codes`** (revision 7) | for C3 kinds (`init_ack`, `project_first_use`, `framework_update`, `downgrade`, `rollback`, `recovery_exchange`, `evaluation_candidate`, `adopt_lineage`): the two state codes the operator read from both first-contact sources; identical and naming the effective Trust State (`24` §4.4 R-CUR-2) |"
+   ]
+  ],
+  "29_DR25": [
+   [
+    "29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md:136",
+    "| DR-25 | Release selection among eligible releases (OP-11 (b)) (which eligible registered release a project uses on a machine without a per-project record) | **the release confirmed at the local trust gate (project_first_use), at or above the computed security minimum**: rank 2 local authority; now; established by the operator at the local trust gate, shown the newest eligible release known; the repository only requ"
+   ]
+  ],
+  "per_project_record_provisioned_into_ci_images": {
+   "absent": true,
+   "files_searched": [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md",
+    "06-BOOTSTRAP.md",
+    "31-INDEPENDENT-ADMISSION.md",
+    "27-TRUST-DECISION-AUTHORISATION.md",
+    "20-ROLLBACK-AND-RECOVERY.md",
+    "35-CERTIFIED-PROFILE.md"
+   ],
+   "hits": [],
+   "pattern": "(per-project record|project_first_use).{0,120}(\\bCI\\b|runner image|CI image|\\brunner\\b)|(\\bCI\\b|runner image|CI image|\\brunner\\b).{0,120}(per-project record|project_first_use)"
+  },
+  "pin_enum_contains_project_first_use": false,
+  "pin_schema_gate_kind_enum": [
+   "weakening",
+   "policy_lowering",
+   "project_strength",
+   "registration_change",
+   "owner_constitutional_file"
+  ]
+ },
+ "A05_clock_reset": {
+  "17_s13": [
+   [
+    "17-MONOTONIC-TRUST-STATE.md:59",
+    "| Trust Policy Statement (TPS) | `trust-policy` | `policy_version`; cumulative `prior_policies[]` and `lowering_history[]` | Constitutional Surface (with exact precedence registration, presence, Overlay Surface and owner-domain slots, `23`); eligibility (historical releases; OP-2 production sources); install authority; gating; bootstrap (OP-6, OP-7 parameters, `clock_reset`); `unrevokes[]`; optional `state_chain_reset` | authenticity, certification |"
+   ],
+   [
+    "17-MONOTONIC-TRUST-STATE.md:216",
+    "- A root-signed TPS `bootstrap.clock_reset {reset_to}` lowers it."
+   ]
+  ],
+  "24_s4_5": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:197",
+    "recorded. A root-signed Trust Policy `bootstrap.clock_reset {reset_to, reason}` lowers the high-water after a wrong future clock"
+   ],
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:287",
+    "- **Never backwards.** No component decreases, except `clock_high_water` by a root-signed `clock_reset` and `accepted_tbm` by a"
+   ]
+  ],
+  "24_s8_never_backwards": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:287",
+    "- **Never backwards.** No component decreases, except `clock_high_water` by a root-signed `clock_reset` and `accepted_tbm` by a"
+   ]
+  ],
+  "one_shot_or_effective_policy_semantics_stated": {
+   "absent": true,
+   "files_searched": [
+    "00-OVERVIEW.md",
+    "01-THREAT-MODEL.md",
+    "02-INGRESS-MAP.md",
+    "03-TRUST-CHAIN.md",
+    "04-AUTHENTICATION-ARCHITECTURE.md",
+    "05-KEY-MANAGEMENT.md",
+    "06-BOOTSTRAP.md",
+    "07-RELEASE-ENVELOPE-SPEC.md",
+    "08-FRAMEWORK-LOCK.md",
+    "09-INTEGRATION-REQUIREMENTS.md",
+    "10-RETRIEVAL-PROFILE-TRUST.md",
+    "11-MIGRATION-PLAN.md",
+    "12-ACCEPTANCE-TEST-PLAN.md",
+    "13-COMPATIBILITY.md",
+    "14-RISKS.md",
+    "15-D-0007-SUPERSESSION.md",
+    "16-ADR-D-0008.md",
+    "17-MONOTONIC-TRUST-STATE.md",
+    "18-VERIFY-AND-USE-TRANSACTION.md",
+    "19-ELIGIBILITY-AND-SECURITY-FLOOR.md",
+    "20-ROLLBACK-AND-RECOVERY.md",
+    "21-OWNER-OPTIONS.md",
+    "22-REVIEW-RESPONSE-MATRIX.md",
+    "23-CONSTITUTIONAL-SURFACE.md",
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md",
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md",
+    "26-LEGACY-BINARY-CONTAINMENT.md",
+    "27-TRUST-DECISION-AUTHORISATION.md",
+    "28-CLASS-REMAINDER-ANALYSIS.md",
+    "29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md",
+    "31-INDEPENDENT-ADMISSION.md",
+    "32-FIRST-CONTACT-ROOT.md",
+    "33-BUILD-ENVIRONMENT.md",
+    "34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md",
+    "35-CERTIFIED-PROFILE.md"
+   ],
+   "hits": [],
+   "pattern": "clock_reset.{0,200}(once|one-shot|effective (Trust Policy|TPS)|policy_version|replay)"
+  },
+  "reference_r7_implements_clock_reset": false,
+  "schema_description": "root threshold only: lowers the verifier clock high-water after a wrong future clock raised it (24 R-CLK-1)"
+ },
+ "A08_air_gapped_second_channel": {
+  "06": [
+   [
+    "06-BOOTSTRAP.md:80",
+    "An **air-gapped machine** uses media carrying the immutable mirror's material; admission refuses a state older than 24 hours"
+   ]
+  ],
+  "27_in_gate_codes": [
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:72",
+    "- **for C3 kinds, the state code currently published by each of the two first-contact sources** (`24` §3.2 in-gate"
+   ]
+  ],
+  "32_FC1": [
+   [
+    "32-FIRST-CONTACT-ROOT.md:101",
+    "| **FC-1′** | Read the trust code, the state code and the procedure digest from **both** sources named at onboarding. Continue only if all three are identical across both. | `FIRST_CONTACT_SOURCES_BELOW_QUORUM` / `FIRST_CONTACT_DISAGREEMENT` |"
+   ]
+  ],
+  "32_s8": [
+   [
+    "32-FIRST-CONTACT-ROOT.md:132",
+    "| Air-gapped machine | media carrying the immutable mirror's material | FC-9: the state on the media ≤ 24 hours at admission; otherwise refused (owner trade-off OT-1, `35` §6) |"
+   ],
+   [
+    "32-FIRST-CONTACT-ROOT.md:203",
+    "| Air-gapped machine | media carrying the mirror's material, state ≤ 24 hours | OT-1 |"
+   ]
+  ],
+  "private_channel_read_independently_of_media": {
+   "absent": true,
+   "files_searched": [
+    "00-OVERVIEW.md",
+    "01-THREAT-MODEL.md",
+    "02-INGRESS-MAP.md",
+    "03-TRUST-CHAIN.md",
+    "04-AUTHENTICATION-ARCHITECTURE.md",
+    "05-KEY-MANAGEMENT.md",
+    "06-BOOTSTRAP.md",
+    "07-RELEASE-ENVELOPE-SPEC.md",
+    "08-FRAMEWORK-LOCK.md",
+    "09-INTEGRATION-REQUIREMENTS.md",
+    "10-RETRIEVAL-PROFILE-TRUST.md",
+    "11-MIGRATION-PLAN.md",
+    "12-ACCEPTANCE-TEST-PLAN.md",
+    "13-COMPATIBILITY.md",
+    "14-RISKS.md",
+    "15-D-0007-SUPERSESSION.md",
+    "16-ADR-D-0008.md",
+    "17-MONOTONIC-TRUST-STATE.md",
+    "18-VERIFY-AND-USE-TRANSACTION.md",
+    "19-ELIGIBILITY-AND-SECURITY-FLOOR.md",
+    "20-ROLLBACK-AND-RECOVERY.md",
+    "21-OWNER-OPTIONS.md",
+    "22-REVIEW-RESPONSE-MATRIX.md",
+    "23-CONSTITUTIONAL-SURFACE.md",
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md",
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md",
+    "26-LEGACY-BINARY-CONTAINMENT.md",
+    "27-TRUST-DECISION-AUTHORISATION.md",
+    "28-CLASS-REMAINDER-ANALYSIS.md",
+    "29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md",
+    "31-INDEPENDENT-ADMISSION.md",
+    "32-FIRST-CONTACT-ROOT.md",
+    "33-BUILD-ENVIRONMENT.md",
+    "34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md",
+    "35-CERTIFIED-PROFILE.md"
+   ],
+   "hits": [],
+   "pattern": "(air-gapped|media).{0,200}(authenticated private release channel|private channel|online source|read .{0,40}separately|independently of the media)"
+  }
+ },
+ "A09_ot1_c1_c2_reading": {
+  "24_RS1": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:313",
+    "| RS-1 | **Core (owner text).** A machine anchored before a revocation that never receives later metadata cannot know about it. | C1–C2 at any genuine descendant of its anchor, within the anchor's validity (90 days; CI 7 days); shown `ANCHORED(e, method, as-of t, age) CURRENCY_UNPROVEN`, never `current`; never C3 without a proof of at most 24 hours; C0 after expiry | RT-80, RT-101, RT-189; BA11r7 |"
+   ]
+  ],
+  "24_anchored_row": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:158",
+    "| `ANCHORED`, `KNOWN`, within validity | yes | yes | yes | yes | **only with a currency proof of at most 24 hours naming the effective state** (R-ANC-4) |"
+   ]
+  ],
+  "35_s3_running": [
+   [
+    "35-CERTIFIED-PROFILE.md:69",
+    "- **Running machines.** A workstation anchored within 90 days (CI: 7 days) runs C1–C2 at its anchored chain; it never shows the"
+   ]
+  ]
+ },
+ "A10_c3_without_gate": {
+  "17_s7_verify_artifact_row": [
+   [
+    "17-MONOTONIC-TRUST-STATE.md:133",
+    "| C3 `trust verify-artifact` acceptance | as above | as above | — (`25` A9) |"
+   ]
+  ],
+  "24_c3_list": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:146",
+    "| **C3** trust ingress | `init`, `adopt migrate --batch 0`, `update --apply`, rollback and restore, `kernel reinstall` with another envelope, recovery exchange, `trust verify-artifact` acceptance, profile install, lineage adoption |"
+   ]
+  ],
+  "24_pin_currency_row": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:67",
+    "| **Pin** | `trust-state-pin` v3 (`schemas/trust-state-pin.schema.json`: `machine_class` `workstation` or `ci`, `state_code`, `provisioned_at`, `valid_until`) in the system pin directory (§3.5). `valid_until − provisioned_at` ≤ 90 days (workstation) or ≤ 7 days (CI). A pin outside `[provisioned_at, valid_until]` is **not an anchor** (`PIN_OUTSIDE_VALIDITY`). | a currency proof for C3 only within 24 hours of `provisioned_at`, and only for the Trust State it names | TA-9 (§3.5); TA-7 |"
+   ]
+  ],
+  "27_gate_kinds": [
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:33",
+    "| `init_ack` | `init`, `adopt migrate --batch 0` | statement digest, project_trust_id |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:34",
+    "| `framework_update` | `update --apply` (OP-3 mode A always) | current and target statement digests |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:35",
+    "| `project_first_use` (revision 7) | first governed use of a project on a machine without a per-project record | the eligible release statement digest the repository requests, shown with the newest eligible release known (OP-11 (b)) |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:36",
+    "| `rollback` (revision 7) | rollback of the installed release | both statement digests |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:37",
+    "| `recovery_exchange` (revision 7) | recovery exchange-back | both statement digests and the journal digest |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:38",
+    "| `registration_change` (revision 6) | security-classified changes of a new registration on a recorded project (`34` R-CON-5) | held and new registration digests, change-list digest |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:39",
+    "| `downgrade` | rollback, restore, downgrading recovery | both statement digests |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:40",
+    "| `weakening` | computed weakenings over effective policy (`19` §9); `overlay.prev` restore | statement digest, failure-list digest |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:41",
+    "| `policy_lowering` | a TPS computed reduction that affects a project's held registration (`19` §10.6) | TPS digest, reduction-list digest |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:42",
+    "| `project_strength` | `PROJECT_STRENGTH_WEAKENED` (`26` §6) | recorded and new vector digests |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:43",
+    "| `evaluation_candidate` | evaluation-candidate installs | candidate digest |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:44",
+    "| `override_kernel_integrity` | `kernel override` | observed kernel-state fingerprint |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:45",
+    "| `adopt_lineage` | re-rooting | new lineage id |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:46",
+    "| `owner_constitutional_file` | registering an owner constitutional file digest (`23` §7.2) | path and digest |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:59",
+    "| `presented_digest` | digest of the decision package `gov` rendered |"
+   ],
+   [
+    "27-TRUST-DECISION-AUTHORISATION.md:61",
+    "| `method` | `interactive_terminal` or `operator_decision_pin` |"
+   ]
+  ]
+ },
+ "H1_listing_and_cadence": {
+  "17_s8_delivered_alone": [
+   [
+    "17-MONOTONIC-TRUST-STATE.md:142",
+    "- Revocations accumulate (S5). A revocation delivered alone is effective immediately. Unrevocation exists only as a TPS"
+   ]
+  ],
+  "25_AP4": [
+   [
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md:70",
+    "| AP-4 | **Negatives** of the selected state (its `revocations` and the revocation statements it lists, at the revocation or root threshold) and, in bootstrap mode, of the stores (AP-R4): the binary digest, its registration, the registered final and candidate, and the admitter are not revoked. Revoked reproductions, attestations and keys count for nothing below. **Binary floor:** when the Trust Policy sets `eligibility.min_binary_version`, the TBM's version MUST be present and at least it. | `BINARY_REVOKED` / `BINARY_REVOKED_IN_HELD_STATE` / `ADMITTER_REVOKED_IN_HELD_STATE` / `BINARY_BELOW_TRUST_POLICY` |"
+   ]
+  ],
+  "32_CUR_R1": [
+   [
+    "32-FIRST-CONTACT-ROOT.md:215",
+    "| **CUR-R1** | A revocation issued within the 24 hours before admission, not yet in the state both sources show | `{win}`; 24 hours; any machine whose store holds the newer state refuses | CUR7 W; RT-191 |"
+   ]
+  ],
+  "32_R_FCS_2": [
+   [
+    "32-FIRST-CONTACT-ROOT.md:79",
+    "| **R-FCS-2** | **State verified first-hand, monotonic.** It publishes a state code only for a Trust State that (a) verifies at the trust-state threshold within that chain, (b) references the FCA it publishes, (c) is newer than the last state it published and lists it in `prior_states`, and (d) drops no revocation, registration or published binary of that state. | `TRUST_STATE_UNVERIFIED`, `FIRST_CONTACT_AUTHORITY_MISMATCH`, `STATE_NOT_NEWER_THAN_PUBLISHED`, `STATE_NOT_DESCENDANT`, `STATE_DROPS_REVOCATIONS` / `…_REGISTRATIONS` / `…_PUBLISHED_BINARIES` |"
+   ]
+  ],
+  "cadence_rule": {
+   "absent": false,
+   "files_searched": [
+    "00-OVERVIEW.md",
+    "01-THREAT-MODEL.md",
+    "02-INGRESS-MAP.md",
+    "03-TRUST-CHAIN.md",
+    "04-AUTHENTICATION-ARCHITECTURE.md",
+    "05-KEY-MANAGEMENT.md",
+    "06-BOOTSTRAP.md",
+    "07-RELEASE-ENVELOPE-SPEC.md",
+    "08-FRAMEWORK-LOCK.md",
+    "09-INTEGRATION-REQUIREMENTS.md",
+    "10-RETRIEVAL-PROFILE-TRUST.md",
+    "11-MIGRATION-PLAN.md",
+    "12-ACCEPTANCE-TEST-PLAN.md",
+    "13-COMPATIBILITY.md",
+    "14-RISKS.md",
+    "15-D-0007-SUPERSESSION.md",
+    "16-ADR-D-0008.md",
+    "17-MONOTONIC-TRUST-STATE.md",
+    "18-VERIFY-AND-USE-TRANSACTION.md",
+    "19-ELIGIBILITY-AND-SECURITY-FLOOR.md",
+    "20-ROLLBACK-AND-RECOVERY.md",
+    "21-OWNER-OPTIONS.md",
+    "22-REVIEW-RESPONSE-MATRIX.md",
+    "23-CONSTITUTIONAL-SURFACE.md",
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md",
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md",
+    "26-LEGACY-BINARY-CONTAINMENT.md",
+    "27-TRUST-DECISION-AUTHORISATION.md",
+    "28-CLASS-REMAINDER-ANALYSIS.md",
+    "29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md",
+    "31-INDEPENDENT-ADMISSION.md",
+    "32-FIRST-CONTACT-ROOT.md",
+    "33-BUILD-ENVIRONMENT.md",
+    "34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md",
+    "35-CERTIFIED-PROFILE.md"
+   ],
+   "hits": [
+    [
+     "35-CERTIFIED-PROFILE.md:167",
+     "| OT-1a keep CP-1 as is | CUR-R1 bounded by 24 hours | air-gapped admission needs a courier cycle under 24 hours and a Trust State re-issued at least daily |"
+    ]
+   ],
+   "pattern": "(issu|publish)\\w* .{0,60}(at least daily|every 24 hours|within 24 hours of the previous|cadence)"
+  },
+  "listing_completeness_rule": {
+   "absent": true,
+   "files_searched": [
+    "00-OVERVIEW.md",
+    "01-THREAT-MODEL.md",
+    "02-INGRESS-MAP.md",
+    "03-TRUST-CHAIN.md",
+    "04-AUTHENTICATION-ARCHITECTURE.md",
+    "05-KEY-MANAGEMENT.md",
+    "06-BOOTSTRAP.md",
+    "07-RELEASE-ENVELOPE-SPEC.md",
+    "08-FRAMEWORK-LOCK.md",
+    "09-INTEGRATION-REQUIREMENTS.md",
+    "10-RETRIEVAL-PROFILE-TRUST.md",
+    "11-MIGRATION-PLAN.md",
+    "12-ACCEPTANCE-TEST-PLAN.md",
+    "13-COMPATIBILITY.md",
+    "14-RISKS.md",
+    "15-D-0007-SUPERSESSION.md",
+    "16-ADR-D-0008.md",
+    "17-MONOTONIC-TRUST-STATE.md",
+    "18-VERIFY-AND-USE-TRANSACTION.md",
+    "19-ELIGIBILITY-AND-SECURITY-FLOOR.md",
+    "20-ROLLBACK-AND-RECOVERY.md",
+    "21-OWNER-OPTIONS.md",
+    "22-REVIEW-RESPONSE-MATRIX.md",
+    "23-CONSTITUTIONAL-SURFACE.md",
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md",
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md",
+    "26-LEGACY-BINARY-CONTAINMENT.md",
+    "27-TRUST-DECISION-AUTHORISATION.md",
+    "28-CLASS-REMAINDER-ANALYSIS.md",
+    "29-FACT-DERIVATION-AND-SELECTION-AUTHORITY.md",
+    "30-RELEASE-REGISTRATION-AND-REPRODUCTION.md",
+    "31-INDEPENDENT-ADMISSION.md",
+    "32-FIRST-CONTACT-ROOT.md",
+    "33-BUILD-ENVIRONMENT.md",
+    "34-FIRST-HAND-CONSTITUTIONAL-CONTENT.md",
+    "35-CERTIFIED-PROFILE.md"
+   ],
+   "hits": [],
+   "pattern": "(list|include|reference)\\w* every (verified )?revocation|revocation.{0,40}(complete|completeness)"
+  }
+ },
+ "H2_currency_proofs": {
+  "24_RS1b": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:314",
+    "| RS-1b | A C3 decision whose proof is a recent anchoring event (P1) can be stale by up to 24 hours. | 24 hours; zero for an in-gate proof (P2) | RT-101, RT-102 |"
+   ]
+  ],
+  "24_R_CUR": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:180",
+    "| **R-CUR-1** | (P1) recent anchoring event naming *n* | a pin provisioning or human confirmation whose two state codes name *n* itself is no older than 24 hours; an event naming an ancestor of *n* is not a proof for *n* | TA-7 |"
+   ],
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:181",
+    "| **R-CUR-2** | (P2) in-gate confirmation | the trust-gate confirmation for this transition carries two identical state codes equal to *n*'s code | none |"
+   ]
+  ],
+  "24_s6_replayed_codes": [
+   [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md:263",
+    "| Replayed first-contact or anchoring codes older than 24 hours | refused (`32` FC-9; R-CUR-1) | CUR7 R |"
+   ]
+  ],
+  "28_A_R7_08": [
+   [
+    "28-CLASS-REMAINDER-ANALYSIS.md:151",
+    "| A-R7-08 | A human confirmation naming an old state while the sources publish a newer one (the revision-6 oracle allowed C3) | no C3: currency is the state both sources publish | BA11r7 |"
+   ]
+  ],
+  "issued_at_bound_on_running_c3": {
+   "absent": true,
+   "files_searched": [
+    "24-FRESHNESS-ANCHORING-AND-MACHINE-BOOTSTRAP.md",
+    "27-TRUST-DECISION-AUTHORISATION.md",
+    "25-BINARY-AND-TRUST-BASE-AUTHENTICITY.md",
+    "31-INDEPENDENT-ADMISSION.md"
+   ],
+   "hits": [],
+   "pattern": "(C3|currency proof|R-CUR).{0,160}issued_at|issued_at.{0,160}(C3|currency proof)"
+  }
+ },
+ "M1_designation": {
+  "06_step1": [
+   [
+    "06-BOOTSTRAP.md:30",
+    "toolchain provenance registry, and the certified targets. Operators receive the source identities and the procedure from the"
+   ]
+  ],
+  "32_R_FCD_2": [
+   [
+    "32-FIRST-CONTACT-ROOT.md:90",
+    "| **R-FCD-2** | Operators receive the two source identities and the procedure at onboarding, from the organisation's copy of the root ceremony record, outside every release carrier. No unadmitted binary prints anything an operator uses to select. The certified command register has no `gov trust fc-procedure` (excluded, EX-24). |"
+   ]
+  ]
+ },
+ "OT2": {
+  "33_R_BENV_6": [
+   [
+    "33-BUILD-ENVIRONMENT.md:70",
+    "| **R-BENV-6″** | **Toolchain lineages (OP-10 (b)).** The Trust Policy lists each toolchain `{toolchain_id, provenance {bootstrap_root, package_source, build_system, signing_infrastructure}, archive_sha256 or bootstrap_registration}`. Two lineages are independent only when all four attributes differ. At least one lineage's `bootstrap_root` is not an upstream binary compiler archive, and its compiler is itself a registered, reproduced bootstrap release. Acceptance requires matching reproductions from at least two independent lineages. A target without them is not certified (CC-3); there is no fallback to an upstream archive alone (EX-15). | `TOOLCHAIN_DIVERSITY_NOT_MET` |"
+   ]
+  ],
+  "35_CC3": [
+   [
+    "35-CERTIFIED-PROFILE.md:131",
+    "| **CC-3** | Diverse double-compilation agreement: the registered compiler rebuilt through at least two toolchain lineages independent by provenance, at least one not rooted in an upstream binary compiler archive, yields bit-identical `gov` and `gov-admit` (OP-10 (b)) | `33` R-BENV-6″ | toolchain bootstrap registration; reproductions per lineage |"
+   ]
+  ],
+  "35_targets": [
+   [
+    "35-CERTIFIED-PROFILE.md:143",
+    "| `x86_64-unknown-linux-musl` | **NOT CERTIFIED — pending criteria** | static musl target with the toolchain's self-contained CRT and linker; no CC-1…CC-9 evidence can exist before implementation, and CC-3 depends on OT-2 |"
+   ],
+   [
+    "35-CERTIFIED-PROFILE.md:144",
+    "| `aarch64-unknown-linux-musl` | **NOT CERTIFIED — pending criteria** | as above |"
+   ]
+  ],
+  "ENV7_honesty_note": [
+   [
+    "evidence/r7/ENV7-environment-authority.py:24",
+    "a linker argument injected for that lineage's builds; diverse double-compilation over two real bootstrap chains is not executed here"
+   ]
+  ]
+ },
+ "decision_records": {
+  "ARCH-0002": {
+   "human_approved": "<absent>",
+   "in_effect": false,
+   "proposal_state": "PROPOSED",
+   "revision": 7,
+   "status": "PROVISIONAL"
+  },
+  "D-0007": {
+   "status": "ACTIVE",
+   "superseded_by": null
+  },
+  "D-0008": {
+   "approval_state": "PENDING_OWNER_HUMAN_DECISION_GATE",
+   "chosen_option": null,
+   "human_approved": false,
+   "in_effect": false,
+   "proposal_state": "PROPOSED",
+   "revision": 7,
+   "status": "PROVISIONAL"
+  },
+  "DECISIONS_rows": [
+   [
+    "docs/DECISIONS.md:19",
+    "| [D-0007](../spec/decisions/D-0007.yaml) | ACTIVE | Trust classes: a lower-trust input may never manufacture a higher-trust fact (kernel trust root, plugin registry, governed exceptions) |"
+   ],
+   [
+    "docs/DECISIONS.md:20",
+    "| [D-0008](../spec/decisions/D-0008.yaml) | **PROPOSED (revision 7) — pending fresh independent reviews and the owner approval gate; not active, not approved** (record status field PROVISIONAL, the nearest schema value; human_approved false; in_effect false) |"
+   ],
+   [
+    "docs/DECISIONS.md:21",
+    "| [ARCH-0002](../spec/architecture/ARCH-0002.yaml) | **PROPOSED (revision 7) — pending D-0008 review and approval; not active** (record status field PROVISIONAL) | Proposed root-of-trust architecture companion to D-0008 (revision 7, certified profile CP-1) |"
+   ]
+  ]
+ },
+ "probe": "RV7-D-A04 design extractions (AR-0022)"
+}
