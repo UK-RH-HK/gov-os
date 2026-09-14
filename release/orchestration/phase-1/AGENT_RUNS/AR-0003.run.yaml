@@ -18,6 +18,6 @@ outcome:
   verdict: NO_BLOCKING_FINDINGS   # role verdict; not the architecture verdict
   work_commit: 9e013c161210f6fec0a9869cb3387fd57f033ebb
   report_commit: c19fbc1496e63cbfc75c717701c0254f8aa2c54e
-  integration_merge_commit: null   # held unmerged until reviewer B (AR-0002) completes, to preserve panel independence
+  integration_merge_commit: 5741b515a4734f99adb76d3f8d32582a40663dd0   # merged after reviewer B completed
   findings: [{id: C-1, severity: MEDIUM, carried: true}]
   provenance_checks: [report present, only allowed paths changed (19 files), worktree clean]

@@ -112,3 +112,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | work `9e013c1`, report `c19fbc1` on `phase1/rot1-r3-review-c`; held unmerged until reviewer B completes |
 | Findings | MEDIUM C-1 (carried): removing the occupation entries lets legacy `init --force` reproduce the R2-H4 harm; RoT-1 fails closed and `governance/trust/**` is untouched; the LR-2 bound and RT-50/RT-81 need occupation-absent assertions. Carried items C-2…C-5. Prior: R2-H4 NARROWED; R2-M7, M8, M9, L2 closed by design; R2-L3 closed. |
 | Next action | await AR-0002; then merge B and C, write HO-0004, spawn synthesis reviewer D |
+
+## L-0007 — 2026-09-14 — reviewer B completed; panel merged
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-reviewer-trust-security (`AR-0002`) |
+| Input commit | `83aa822` (architecture `ca77a43`) |
+| Work performed | Re-executed r2 P1, P2 and P4. Ran the architect's checker and P4r3. Authored held-out RV3-B-A01…A18 and injections I01–I09. Built a 132-row machine-class × OP-7 × adversary matrix. |
+| Report / evidence | `AGENT_RUNS/AR-0002.report.yaml`; `release/root-of-trust/4.1.6-review-r3/B-trust-security/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `7d8c73a`, report `d7282e9`, merged `a945f4d`. Reviewer C's branch merged after B completed: `5741b51`. |
+| Findings | HIGH RV3-B-H1 (precedence mode order lets a surface-passing kernel discard project strengthening; executed on 4.1.5); HIGH RV3-B-H2 (freshness anchoring lets attacker-selected stale state become anchored-current on CI and first-install machines); HIGH RV3-B-H3 (binary acceptance does not bind compiled source to verified source; `release_commit` chosen by threshold-1 `release-final`). MEDIUM M1–M5, LOW L1–L5, INFO I1. Prior: R2-M4 and R2-M6 closed; R2-H1, H2, H3 and others narrowed. |
+| Next action | synthesis reviewer D |
+
+## L-0008 — 2026-09-14 — synthesis handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | orchestrator |
+| Input commit | `5741b51` |
+| Work performed | Wrote HO-0004 for the independent synthesis reviewer (sole architecture verdict). Claimed AR-0004. Added B and C directories to immutable evidence. |
+| Report / evidence | `HANDOFFS/HO-0004-rot-review-r3-d-synthesis.md`, `CHECKPOINTS/CP-0003.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0004 |
