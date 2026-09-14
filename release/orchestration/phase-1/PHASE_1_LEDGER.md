@@ -700,3 +700,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, including the D-0008 fields; merge; spawn the revision-7 B/C panel with concrete-profile handoffs |
+
+## L-0049 — 2026-09-14 — revision-7 architect stopped early; same run resumed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 7, Phase-1 review cycle 5 |
+| Role | orchestrator (routing), concerning rot-architect `AR-0019` |
+| Input commit | `4f2bed1` |
+| Work performed | AR-0019's turn ended while its own matrix6 re-run was still executing in its scratch root. It had 67 uncommitted entries and no commits or report, so the run was INCOMPLETE at that point and advanced no gate. The orchestrator checked only Git and process state, not the transcript. It then resumed the same run by message: wait for the probes itself, finish the remaining steps, commit and report. No findings content was exchanged. |
+| Report / evidence | `AGENT_RUNS/AR-0019.run.yaml` (interruptions) |
+| Verdict | — |
+| Output commit | the commit adding this entry |
+| Findings | — |
+| Next action | await AR-0019 completion |
