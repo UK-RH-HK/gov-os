@@ -4,9 +4,9 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T11:43:43Z'
-state_hash: 96eeb5fcfe458f1be9bfbe94dcc263551ab040437d88a7376a31ad95c9a17972
-lifecycle_state: ROT_ARCH_R6_AUTHORING
+updated_at: '2026-09-14T13:54:04Z'
+state_hash: f62b270c6876ca78cd36e532c6d0830208f150bdeacafcb79ca19dc17db9b970
+lifecycle_state: ROT_ARCH_REVIEW_PANEL
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -38,7 +38,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 17acb8bebd0f74f2c8447f4f3a9b5c57af43d797
+  last_recorded_commit: 208025590dcd0182ccb0272ed762319eb1a961b9
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -144,8 +144,12 @@ architecture:
       blocking_classes: [BC5-1, BC5-2, BC5-3, BC5-4]
       materially_new_blocking_class: false
     - revision: 6
-      status: AUTHORING
+      status: UNDER_REVIEW
+      commit: 4106885dadebac55596067a2586cf4d3097fc025
       author_run: AR-0015
+      author_report_commit: 0175b0cc83c47d0520869197b5d97663643a5590
+      integration_merge_commit: 208025590dcd0182ccb0272ed762319eb1a961b9
+      review_panel: [AR-0016, AR-0017]
       handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0015-rot-architect-r6.md
       expected_review_path: release/root-of-trust/4.1.6-review-r6
 
@@ -236,19 +240,28 @@ completed_stages:
   - stage: ROT_ARCH_R5_REJECTED
     commit: d1228cb77b9253c90406ab0cc3a8c3bd4b480e64
     note: synthesis AR-0014 ROOT_OF_TRUST_ARCHITECTURE_REJECTED (BC5-1..BC5-4; remainders, new instances); merged aad29de; owner trade-offs routed architect-then-owner
+  - stage: ROT_ARCH_R6_AUTHORED
+    commit: 4106885dadebac55596067a2586cf4d3097fc025
+    note: AR-0015 ARCHITECTURE_REVISION_READY_FOR_REVIEW; report 0175b0c; merged 2080255; OP-1..OP-16 presented
 
 running_work:
-  - run_id: AR-0015
-    role: rot-architect
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0015.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0015-rot-architect-r6.md
-    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/arch-r6
-    branch: phase1/rot1-r6-architect
-    base_commit: 17acb8bebd0f74f2c8447f4f3a9b5c57af43d797
-    status: RUNNING
+  - run_id: AR-0016
+    role: rot-reviewer-trust-security
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0016.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0016-rot-review-r6-b-trust-security.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-b
+    branch: phase1/rot1-r6-review-b
+    status: CLAIMED
+  - run_id: AR-0017
+    role: rot-reviewer-compat-transaction
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0017.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0017-rot-review-r6-c-compat-transaction.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-ad8d-4050-bd73-d14eea9b9c18/scratchpad/wt/review-r6-c
+    branch: phase1/rot1-r6-review-c
+    status: CLAIMED
 
 latest_role_verdicts:
-  rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0011 (escalation synthesis architect), revision 5
+  rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0015, revision 6
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0012, revision 5; 3 HIGH
   rot-reviewer-compat-transaction: NO_BLOCKING_FINDINGS   # AR-0013, revision 5; 5 carried
   rot-review-synthesis: ROOT_OF_TRUST_ARCHITECTURE_REJECTED   # AR-0014, revision 5
@@ -319,10 +332,9 @@ infrastructure:
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
 next_deterministic_action: >-
-  Spawn fresh RoT architect AR-0015 on HO-0015 (worktree wt/arch-r6, branch phase1/rot1-r6-architect). On completion:
-  verify report and allowed paths, merge, instantiate B/C v2 reviewer handoffs for revision 6 (prior review r5 d1228cb;
-  review path release/root-of-trust/4.1.6-review-r6), spawn B and C in parallel, then synthesis D (HO-REVIEW-D.v2 with
-  the §2a classification addendum). Owner trade-offs T1/E stay deferred to the consolidated GATE-OWNER-D0008.
+  Await AR-0016 (reviewer B) and AR-0017 (reviewer C) on revision 6, running in parallel. Hold the first completed panel
+  branch unmerged until the other completes. Then verify both, merge, instantiate HO-0018 for synthesis reviewer D from
+  HO-REVIEW-D.v3 (prior review r5 d1228cb; review path release/root-of-trust/4.1.6-review-r6), spawn D.
 
 forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1
@@ -343,3 +355,7 @@ forbidden_until_gate:
     until: never within Phase 1
   - action: writing held-out verifier test content, in-progress verdicts or unreviewed findings into the user auto-memory (its index is visible to every subagent)
     until: never
+  - action: any role agent reading, listing or searching session/agent transcripts or task-output files (/tmp/claude-1000/<project>/*/tasks/, ~/.claude/projects/)
+    until: never (disclosed by AR-0015; every role prompt and template carries the prohibition)
+  - action: running a builder concurrently with an independent verifier whose held-out tests are not yet committed with a verdict
+    until: that verifier's verdict is committed

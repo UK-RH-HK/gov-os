@@ -532,3 +532,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify, merge, instantiate revision-6 B/C handoffs, spawn B and C in parallel |
+
+## L-0037 — 2026-09-14 — revision 6 authored
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-architect (`AR-0015`) |
+| Input commit | `17acb8b` |
+| Work performed | New `32` first-contact root, `33` build environment, `34` first-hand constitutional content, and `decision-register/` (35 decisions; `register_check`, `statements_check`). Rewrote 00, 06, 21, 22, 25 and 28–31; amended the rest. Schemas 4 new, 8 revised. `examples/rev6`, `evidence/r6`. D-0008 and ARCH-0002 PROPOSED revision 6. Owner options OP-1…OP-16, with T1 mapped to OP-13 (a)–(d) and E mapped to OP-16 (a)–(c). |
+| Report / evidence | `AGENT_RUNS/AR-0015.report.yaml`; `release/root-of-trust/4.1.6/evidence/r6/` |
+| Verdict | `ARCHITECTURE_REVISION_READY_FOR_REVIEW` (author's readiness claim; not an acceptance) |
+| Output commit | work `4106885`, report `0175b0c`, merged `2080255` |
+| Findings | Architect-reported claims, to be independently tested: FA6 refuses every attack outside the stated root for 7 OP-13 answers, and executed minimal sets equal CS6 for 7/7; ENV6 21/21 bit-identical; CON6 17/17; CSI self-test 78/78; DA07r6 22/22; 2(e) instruments byte-identical; reviewer C's matrix on the r6 layout 30,735 rows with R2-H4 at 0 violations; CS6 1,648 configurations, 0 invariant or monotonicity failures. Unsupported combinations stated. **Disclosures:** stray scratch file; helper sessions LAY6 and ENV6. The architect searched the session transcript for path strings; the results showed names of other orchestration files (none opened). |
+| Next action | independent review panel B and C on revision 6 |
+
+## L-0038 — 2026-09-14 — independence control added; revision-6 review panel handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | orchestrator |
+| Input commit | `2080255` |
+| Work performed | **Independence control.** Subagent transcripts and task-output files hold other roles' work, including the orchestrator's tool calls. Reading them could let parallel reviewers see each other's findings, or a builder see held-out verifier tests. Added a standing prohibition on reading, listing or searching them to every role template (patched in scratch drafts) and to `forbidden_until_gate`, together with a rule that no builder runs concurrently with a verifier before its verdict is committed. Assessed AR-0015's search as non-material for an architect, which may read completed evidence. Wrote HO-0016 (B) and HO-0017 (C) with the prohibition. Claimed AR-0016 and AR-0017. |
+| Report / evidence | `HANDOFFS/HO-0016-*.md`, `HANDOFFS/HO-0017-*.md`, `CHECKPOINTS/CP-0012.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0016 and AR-0017 in parallel |
