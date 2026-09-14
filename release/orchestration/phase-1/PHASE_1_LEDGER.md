@@ -630,3 +630,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | spawn AR-0018 |
+
+## L-0044 — 2026-09-14 — revision-6 synthesis reviewer spawned
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 6, Phase-1 review cycle 4 |
+| Role | rot-review-synthesis (`AR-0018`, fresh Opus 5 context) |
+| Input commit | `b9bed32` (worktree `wt/review-r6-d`, branch `phase1/rot1-r6-review-d`) |
+| Work performed | spawned on HO-0018; running. The prompt carries the transcript prohibition, the §2a classification requirement and an instruction to keep its turn active while its own probes run. |
+| Report / evidence | expected `AGENT_RUNS/AR-0018.report.yaml`; `release/root-of-trust/4.1.6-review-r6/{00,10,11}*`, `D-synthesis/` |
+| Verdict | pending |
+| Output commit | pending |
+| Findings | — |
+| Next action | on completion: verify, merge, route per verdict. Owner OP answers pending; record them verbatim on receipt. |
