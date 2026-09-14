@@ -1,0 +1,107 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0004
+role: rot-review-synthesis
+objective: Independent architecture synthesis review of RoT-1 revision 3 (ca77a43) - verify reviewers B and C, author held-out attacks, issue the architecture verdict
+agent_model: claude-opus-5
+independence_statement: >
+  This run authored no RoT-1 revision, neither reviewer B's nor reviewer C's review, and no prior review. Under
+  release/orchestration/ it read only HO-0004, HO-0001 and AGENT_RUNS/README.md; it did not read orchestrator state,
+  ledger, checkpoints, run records, any AGENT_RUNS report, other branches, other worktrees or other scratch directories.
+  The architect's evidence and the panel's reports were treated as claims and every decisive probe was re-run in
+  scratch (GOV_* stripped; HOME, XDG_* and GOV_KERNEL_CACHE in scratch). Reviewer C's scripts were copied to scratch
+  with only their hard-coded repository constant set to this worktree. D-0008 and ARCH-0002 remain PROPOSED; nothing
+  was approved.
+input:
+  base_commit: 90efd29dca56c8344fb80b5a9556ae5a52cccac7
+  release: 4.1.6 (RoT-1 revision 3, ca77a431418bd6b349f465aa2521ca43bccfd5a6)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0004-rot-review-r3-d-synthesis.md
+inspected:
+  - release/root-of-trust/4.1.6/ (00-27, constitutional-surface/, schemas/, evidence/) at ca77a431418bd6b349f465aa2521ca43bccfd5a6
+  - spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, spec/decisions/D-0007.yaml, docs/DECISIONS.md
+  - release/root-of-trust/4.1.6-review-r3/B-trust-security/ at 7d8c73a91a7c5fc7912427c59314d9259fbe25c9
+  - release/root-of-trust/4.1.6-review-r3/C-compat-transaction/ at 9e013c161210f6fec0a9869cb3387fd57f033ebb
+  - release/root-of-trust/4.1.6-review-r2/ (09, 10, 11) at e5a6b8aa39d2a36311489418506d911df2587722
+  - runtime/src/policy_precedence.rs, runtime/src/policy.rs (4.1.5, unchanged since da9c851)
+  - legacy binaries gov-4.1.2, gov-4.1.3, gov-4.1.4, gov-4.1.5 (sha256 in D-synthesis/evidence/REPRODUCTION-LOG.json)
+  - release/orchestration/phase-1/HANDOFFS/HO-0001-rot-architect-r3.md, HO-0004-rot-review-r3-d-synthesis.md, AGENT_RUNS/README.md
+produced:
+  - release/root-of-trust/4.1.6-review-r3/00-REVIEW-REPORT.md
+  - release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md
+  - release/root-of-trust/4.1.6-review-r3/11-CORRECTION-DELTA.md
+  - release/root-of-trust/4.1.6-review-r3/D-synthesis/01-REPRODUCTION.md
+  - release/root-of-trust/4.1.6-review-r3/D-synthesis/02-ADJUDICATION.md
+  - release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md
+  - release/root-of-trust/4.1.6-review-r3/D-synthesis/04-OWNER-REQUIREMENTS-AND-OPTIONS.md
+  - release/root-of-trust/4.1.6-review-r3/D-synthesis/05-RESIDUALS.md
+  - release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/ (README, REVIEWED-CONTENT-DIGESTS.txt, REPRODUCTION-LOG.json, four RV3-D probes with outputs)
+  - release/orchestration/phase-1/AGENT_RUNS/AR-0004.report.yaml
+tests_or_attacks:
+  - {id: REPRO-P4r3, description: architect trust-state model re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-P1r3, description: architect floor coverage on real 4.1.5 re-run (byte-identical), result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-P3r3, description: architect pre-RoT register matrix on real 4.1.2-4.1.5 re-run (695 invocations and 40 chains, 0 changes), result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-CSI, description: coverage checker exits and self-test 26/26 re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-RV3-B-M, description: reviewer B reference model re-run (H2, H3, M1, M3, M4, L1), result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-RV3-B-A01, description: reviewer B precedence-to-immutable probe on real 4.1.5 re-run (H1), result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-RV3-B-A03-A14-A16, description: reviewer B same-account pin writer, YAML profile and project_tunable probes re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-RV3-B-CSI, description: reviewer B surface injections I01-I09 re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-r2-P2, description: review r2 gate-record forgery on real 4.1.5 re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-r2-P4, description: review r2 trust-state model under revision-2 rules re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-C-destructive, description: reviewer C 84 destructive invocations of 4 real binaries re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-C-occ-removal, description: reviewer C partial occupation removal re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-C-full-removal-merge, description: reviewer C full removal and dir/file merge re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: REPRO-C-durability, description: reviewer C layout durability re-run, result: CONFIRMED, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/REPRODUCTION-LOG.json}
+  - {id: RV3-D-A01, description: soundness of the 23 s4 precedence order against runtime strengthening semantics (5 unsound pairs), result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-precedence-lattice.json}
+  - {id: RV3-D-A02, description: root-signed TPS tightening to immutable is not a computed reduction and removes project strengthening, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-precedence-lattice.json}
+  - {id: RV3-D-A03, description: OP-4 no makes the everyday candidate key the binary-source key (design), result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md}
+  - {id: RV3-D-A04, description: OP-7 (d) residual not limited to binaries older than the newest TPS, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md}
+  - {id: RV3-D-A05, description: one git checkout of pre-migration governance paths gives real 4.1.5 a verified install serving post-migration-classified material, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-legacy-git-restore.json}
+  - {id: RV3-D-A06, description: after restoration or removal a legacy CIT writes governance/trust and the overlay (intact control refuses), result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-legacy-git-restore.json}
+  - {id: RV3-D-A07, description: untracking ignored files drops the .governance-runtime/migration occupation from clones, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-legacy-git-restore.json}
+  - {id: RV3-D-A08, description: owner-option combination matrix against the pack consequence statements, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/04-OWNER-REQUIREMENTS-AND-OPTIONS.md}
+  - {id: RV3-D-A09, description: forward compatibility for Capability Contract, Gate W and G0-G6 files classified by inventory data only, result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-surface-forward-compat-and-removal.json}
+  - {id: RV3-D-A10, description: removal of nine registered constitutional files passes the checker; POLICY_PRECEDENCE deletion joins 66 of 85 rules to immutable, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-surface-forward-compat-and-removal.json}
+  - {id: RV3-D-A11, description: P4r3 conformance oracle passes 34/34 under both sequence and chain-inclusion anchor semantics, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-oracle-anchor-artifact.json}
+  - {id: RV3-D-A12, description: anchor bypass by a higher unchained TSS re-derived with the architect functions, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-oracle-anchor-artifact.json}
+  - {id: RV3-D-A13, description: verify-artifact A7 with a realisable construction refuses every genuine binary under the TSS high-water reading, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-oracle-anchor-artifact.json}
+  - {id: RV3-D-A14, description: interaction matrix of the four R2 closures, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md}
+  - {id: RV3-D-A15, description: revoked genuine binary re-accepted by verify-artifact on a pinned CI runner, result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/RV3-D-oracle-anchor-artifact.json}
+  - {id: RV3-D-A16, description: key rotation playbook invalidates honest statements of the removed key (design), result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md}
+  - {id: RV3-D-A17, description: named-TPS selection by release-final yields no weaker effective value (design), result: PASS, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md}
+  - {id: RV3-D-A18, description: non-kernel owner constitutional file absence not specified fail-closed (design), result: FAIL, evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/03-HELDOUT-ATTACKS-RV3-D.md}
+findings:
+  - {id: RV3-H1, severity: HIGH, title: "Precedence order is refusal-only; kernel change, deleted POLICY_PRECEDENCE or TPS tightening silently discards project-owned strengthening (B, confirmed and extended)", path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-H2, severity: HIGH, title: "Stale state becomes anchored-current: sequence-satisfied anchors, pins without currency, threshold-1 witness (B, confirmed and extended)", path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-H3, severity: HIGH, title: "Binary acceptance never binds built source to verified source; threshold-1 release-final chooses the TCB source (B, confirmed)", path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M1, severity: MEDIUM, title: Lifting WITHDRAWN/REJECTED needs two keys by reusing the pre-withdrawal attestation, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M2, severity: MEDIUM, title: Pins, decision pins and confirmations are writable by the governed account, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M3, severity: MEDIUM, title: Any verified issued_at raises the clock high-water permanently, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M4, severity: MEDIUM, title: Artefact compromise playbook contradicts TSS admissibility, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M5, severity: MEDIUM, title: Computed weakening covers four overlay categories; release-signed migrations write other keys ungated, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M6, severity: MEDIUM, title: Occupation defence not robust to removal or a Git restore; legacy binary regains verified install and writes RoT-1 paths (C, broadened), path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M7, severity: MEDIUM, title: Removal of registered constitutional content passes E7; fallback undefined; non-kernel owner files, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M8, severity: MEDIUM, title: verify-artifact A7 and self-check high-water ambiguity refuses every realisable genuine binary, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-M9, severity: MEDIUM, title: Acceptance plan oracle cannot detect the blocking classes, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L1, severity: LOW, title: Decision-table conflicts (OP-7 d with INCOMPLETE; OP-7 c with non-witness anchor), path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L2, severity: LOW, title: project_tunable leaves read by security decision points; release-final blast-radius sentence inexact, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L3, severity: LOW, title: Checker and runtime YAML boolean profiles differ, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L4, severity: LOW, title: Reinstall identity taken from the A2-writable lock, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L5, severity: LOW, title: TPS non-surface fields outside computed reduction, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L6, severity: LOW, title: OP-7 (d) consequence scoped to TPS instead of TSS, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L7, severity: LOW, title: Untracking ignored files drops the migration occupation from clones, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-L8, severity: LOW, title: Rotation playbooks do not re-sign honest statements of a removed key, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+  - {id: RV3-I1, severity: INFO, title: Acting role remains caller-declared, path: release/root-of-trust/4.1.6-review-r3/10-BLOCKING-FINDINGS.md}
+verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+output:
+  branch: phase1/rot1-r3-review-d
+  commit: 79a09a12e34fd883192efd9f9e529cecbee9a6c8
+  evidence_path: release/root-of-trust/4.1.6-review-r3/D-synthesis/evidence/
+unresolved:
+  - "BC-1 (RV3-H1): constitutional-surface soundness for project-owned strength and for absence - CD3-1"
+  - "BC-2 (RV3-H2): anchor satisfaction and anchor currency - CD3-2"
+  - "BC-3 (RV3-H3): built-source legitimacy of production binaries - CD3-3"
+  - "BC-4: OP-2, OP-4, OP-7 consequence statements - CD3-4"
+  - "HO-0001 3.1, 3.2, 3.3 NOT SATISFIED"
+  - "Carried non-blocking: RV3-M1..M9, RV3-L1..L8, CR-01..CR-12, C-2..C-5 (11-CORRECTION-DELTA.md section 6)"
+recommended_next_action: RoT-1 revision 4 closing CD3-1..CD3-4 as classes with P1r4/P4r4 evidence, then fresh independent review per 11-CORRECTION-DELTA.md section 7
+completed_at: "2026-09-14T03:31:36Z"
