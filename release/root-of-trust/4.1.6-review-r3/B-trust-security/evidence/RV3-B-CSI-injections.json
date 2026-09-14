@@ -1,0 +1,95 @@
+{
+ "cases": [
+  {
+   "case": "I01 unknown key in TOOL_POLICY.plugins",
+   "expected": "exit 2",
+   "exit": 2,
+   "unclassified_files": [],
+   "unclassified_leaves": [
+    "TOOL_POLICY.plugins.allow_unsigned_descriptors"
+   ],
+   "violations": []
+  },
+  {
+   "case": "I02 new policy file policies/GATE_W_POLICY.yaml",
+   "expected": "exit 2",
+   "exit": 2,
+   "unclassified_files": [
+    "policies/GATE_W_POLICY.yaml"
+   ],
+   "unclassified_leaves": [],
+   "violations": []
+  },
+  {
+   "case": "I03 new top-level directory hooks/pre-index.sh",
+   "expected": "exit 2",
+   "exit": 2,
+   "unclassified_files": [
+    "hooks/pre-index.sh"
+   ],
+   "unclassified_leaves": [],
+   "violations": []
+  },
+  {
+   "case": "I04 stray file under migrations/ not matching M-*.yaml",
+   "expected": "exit 2",
+   "exit": 2,
+   "unclassified_files": [
+    "migrations/notes.yaml"
+   ],
+   "unclassified_leaves": [],
+   "violations": []
+  },
+  {
+   "case": "I05 empty mapping replaces agent_resolvable_when",
+   "expected": "exit 2",
+   "exit": 2,
+   "unclassified_files": [],
+   "unclassified_leaves": [
+    "HUMAN_GATE_POLICY.agent_resolvable_when"
+   ],
+   "violations": []
+  },
+  {
+   "case": "I06 new policy file as JSON policies/EXPORT_POLICY.json",
+   "expected": "exit 2",
+   "exit": 2,
+   "unclassified_files": [
+    "policies/EXPORT_POLICY.json"
+   ],
+   "unclassified_leaves": [],
+   "violations": []
+  },
+  {
+   "case": "I07 new skill under pinned glob skills/SKL-999.yaml",
+   "expected": "exit 3",
+   "exit": 3,
+   "unclassified_files": [],
+   "unclassified_leaves": [],
+   "violations": [
+    {
+     "file": "skills/SKL-999.yaml",
+     "class": "pinned_file",
+     "reason": "file digest not registered",
+     "digest": "sha256:a033b668be0ca02de4635e16e4ebbd5b793a3915cb7269c29b984edfa276ed01"
+    }
+   ]
+  },
+  {
+   "case": "I08 new migration under transaction_input glob migrations/M-999.yaml",
+   "expected": "observe",
+   "exit": 0,
+   "unclassified_files": [],
+   "unclassified_leaves": [],
+   "violations": []
+  },
+  {
+   "case": "I09 floor leaf deleted (agent_resolvable_when.max_radius)",
+   "expected": "observe (missing leaf takes the floor value)",
+   "exit": 0,
+   "unclassified_files": [],
+   "unclassified_leaves": [],
+   "violations": []
+  }
+ ]
+}

@@ -1,0 +1,71 @@
+{
+  "B1_inflated_reference_by_candidate_key": {
+    "status_after": "STALE",
+    "RM_state": 9007199254740991,
+    "status_after_revoking_that_candidate": "STALE",
+    "pack_claim": "05 \u00a71: release-candidate theft = candidates only, never production-eligible; 17 \u00a77: no override for STALE at ingress",
+    "agrees": false
+  },
+  "B2_certification_key_alone_unwithdraws": {
+    "R6_in_negative_set_before": true,
+    "R6_in_negative_set_after": false,
+    "highest_cert_after": {
+      "R6": [
+        "CERTIFIED",
+        3
+      ]
+    },
+    "pack_claim": "17 MS-2 negative facts sticky; 17 \u00a73 a visible CERTIFIED needs three signatures; refuse_known_withdrawn refuses",
+    "agrees": false
+  },
+  "B3_same_sequence_fork": {
+    "effective_tss": [
+      "t2a",
+      "t2b"
+    ],
+    "status": "CURRENT_KNOWN(2)",
+    "fork_reported": false,
+    "pack_claim": "17 \u00a73 hash-chained trust state; S4 'Effective TSS = the highest admissible' (singular)",
+    "agrees": false
+  },
+  "B4_trust_state_key_inflates_references": {
+    "status": "REGRESSION",
+    "regressions": [
+      [
+        "t3",
+        "c:root_version"
+      ]
+    ],
+    "pack_claim": "05 \u00a71: trust-state theft = withholding (freeze) only; regressions rejected",
+    "agrees": false
+  },
+  "B5_fresh_old_binary_after_A2_swap": {
+    "honest_project": {
+      "tps": 3,
+      "floor_ROLE_FLOOR.x": 5,
+      "min_binary_version": "4.1.8",
+      "R6_eligible": false
+    },
+    "fresh_verifier_after_swap": {
+      "tps": 1,
+      "status": "CURRENT_KNOWN(1)",
+      "R6_eligible_policy_root": true,
+      "floor_ROLE_FLOOR.x": 4,
+      "min_binary_version_enforced": "4.1.6",
+      "gate_at_use": false
+    },
+    "pack_claim": "20 RR-2: 'Floors and install authority are unaffected'; 19 \u00a710: restoring an older eligible kernel yields floors at least as strong as the newest registered ones; 17 RS-1 bound: 'cannot produce a relaxation (mode A)'",
+    "agrees": false
+  },
+  "B6_lowering_across_skipped_version": {
+    "verifier_holds": 2,
+    "arrives": 4,
+    "computed_lowered_keys": [
+      "AUTH.update_apply"
+    ],
+    "declared_lowers_in_arriving_tps": [],
+    "gate_required_by_text": false,
+    "pack_claim": "19 \u00a710 step 6: a project holding the stronger policy keeps it until a gate bound to the lowering TPS digest",
+    "agrees": false
+  }
+}
