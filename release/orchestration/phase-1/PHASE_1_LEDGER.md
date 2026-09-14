@@ -238,3 +238,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | hold the first completed branch unmerged; on both completions verify, merge, write the synthesis HO, spawn D |
+
+## L-0016 — 2026-09-14 — revision-4 reviewer C completed
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 4, Phase-1 review cycle 2 |
+| Role | rot-reviewer-compat-transaction (`AR-0007`) |
+| Input commit | `7a23900` (architecture `bca05a7`) |
+| Work performed | Derived registers independently (104/109/115/119 leaves). Ran 10,618 invocations and 168 chains on real 4.1.2–4.1.5. Authored held-out RV4-C-A01…A10 (7 executed, 3 design). |
+| Report / evidence | `AGENT_RUNS/AR-0007.report.yaml` (on branch); `release/root-of-trust/4.1.6-review-r4/C-compat-transaction/` |
+| Verdict | `BLOCKING_FINDINGS_PRESENT` (role verdict) |
+| Output commit | work `c6b8ba9`, report `0b5320b` on `phase1/rot1-r4-review-c`; held unmerged until reviewer B completes |
+| Findings | **HIGH RV4-C-H1:** the occupation protects only the project root. Pre-RoT `init`, `adopt baseline` and `migrate baseline` run from a subdirectory without `--root` write inside `governance/trust/**`, and the RoT-1 state machine still computes `COMPLETE`. 336 subdirectory rows wrote, 56 of them into trust paths; rooted invocations: 2,504 rows, 0 writes. **MEDIUM RV4-C-M1 (carried):** a retained legacy `.gitignore` line lets the untrack idiom drop the migration occupation. **Prior findings:** R2-H4 NOT CLOSED as a class (narrowed); RV3-M6 open residual with correct bound; RV3-L7 narrowed; C-1 addressed; C-2…C-5 carried and specification-only. No scope deviation. |
+| Next action | await AR-0006; then merge B and C, write the synthesis HO, spawn D |
