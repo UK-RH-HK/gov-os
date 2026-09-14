@@ -1,92 +1,92 @@
 # Output 17 — Monotonic trust-state model (certification, withdrawal, revocation, root rotation)
 
-> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> New in revision 2. Addresses RV-H2 (CD-2) and the certification half of RV-M5 (CD-9). Normative keywords: MUST,
-> MUST NOT, SHOULD.
+> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 3 addresses:
+> - R2-M2: minimums come only from the trust-state lineage; references elsewhere are release-local;
+> - R2-M3: lifting a negative certification needs two purposes plus a trust-state reference;
+> - R2-M4: equivocation, cumulative chains, anchored fork resolution;
+> - R2-M5 with `19` §10: cumulative lowering history;
+> - R2-H2 and R2-L1 together with `24`: the freshness axis, anchors and `CURRENT_KNOWN` withdrawn.
+>
+> Normative keywords: MUST, MUST NOT, SHOULD.
 
 ## 1. The problem
 
-A signature proves who said something. It does not prove that it is the latest thing they said.
+A signature proves who said something. It does not prove that it is the latest thing they said, nor that the verifier has
+seen the latest thing they said. Revision 2 made omission and replay useless for **relaxation**. The review showed three
+remaining defects:
+- non-trust-state purposes and unresolvable references could force global minimums (B1, B4);
+- a certification key alone could lift a negative fact (B2);
+- equivocation was undefined (B3).
 
-Revision 1 accepted “the highest sequence among the statements presented”, so whoever controls presentation controls
-freshness: a mirror (A1), a repository writer (A2), or an environment manipulator redirecting the store (A4). The
-independent review derived three consequences:
-- a stale CERTIFIED replayed without the later WITHDRAWN;
-- a REJECTED statement omitted;
-- revocations and root rotations stripped.
-
-An offline verifier cannot learn what it was never given, so this model does not try to make omission impossible. It
-makes omission **useless**. Nothing an attacker omits or replays produces a relaxation, and nothing already known can
-be forgotten through the attacker's channel.
+Revision 3 closes those. It also moves every claim of **currency** to anchors (`24`), because a stateless verifier's
+knowledge is chosen by whoever supplies it.
 
 ## 2. Principles (normative)
 
 | ID | Principle |
 |---|---|
-| MS-1 | **Absence is never positive.** Missing certification, revocation, attestation or trust state never yields a state less restrictive than the corresponding negative fact would. |
-| MS-2 | **Negative facts are sticky.** A verified revocation, REJECTED or WITHDRAWN statement known to any consulted knowledge source stays effective. It is lifted only by a root-signed Trust Policy `unrevokes` entry (revocation) or by a higher-sequence certification statement from the certification owner (certification). |
-| MS-3 | **Relaxation requires proven freshness.** A positive lifecycle fact (CERTIFIED) may relax a control only with a freshness proof (§13). Without one, certification is informational. Under the recommended OP-3 mode A, no control is relaxable by certification at all. |
-| MS-4 | **Monotonic acceptance.** Root versions, Trust Policy versions, Trust State sequences, revocation sequences and per-release certification sequences are accepted only if they do not regress against anything already known. A signed regression is a security event (`TRUST_STATE_REGRESSION`), not a fresher truth. |
-| MS-5 | **Availability is untrusted; content is signed.** Which statements are present is attacker-influenced; what each says is not. Decisions use only the latter. |
-| MS-6 | **Offline use is always possible.** Using an installed, eligible, authenticated release needs no network and no fresh trust state. |
-| MS-7 | **The latest file in a repository is never freshness.** Repository- and bundle-supplied trust metadata is knowledge that can add facts. It never proves that no newer facts exist. |
+| MS-1 | **Absence is never positive.** Missing certification, revocation, attestation or trust state never yields a less restrictive state than the corresponding negative fact would. |
+| MS-2 | **Negative facts are sticky.** A verified revocation stays effective until a root-signed TPS `unrevokes` it. A verified REJECTED or WITHDRAWN certification stays effective until a higher-sequence CERTIFIED that the effective admissible TSS references, and that references a verified ACCEPTED attestation which the same TSS references (S5). A certification key alone lifts nothing. |
+| MS-3 | **Relaxation requires proven freshness.** A positive lifecycle fact relaxes a control only with a freshness proof (§13). Under OP-3 mode A nothing is relaxable by certification. |
+| MS-4 | **Monotonic acceptance.** Root versions, TPS versions, TSS sequences and per-release certification sequences are accepted only if they regress nothing already known. Signed regressions and equivocations are security events, not fresher truths. |
+| MS-5 | **Availability is untrusted; content is signed.** |
+| MS-6 | **Offline use is always possible** for an installed eligible release. The permitted operation classes depend on freshness (`24` §4.3). |
+| MS-7 | **The latest file in a repository is never freshness.** |
+| MS-8 | **Minimums come only from the trust-state lineage.** Required minimums (state sequence, policy version, root version) are taken only from TSS, TPS and root statements. References inside release, candidate, certification or artefact statements are **release-local requirements**: they constrain only that statement's own ingress or visibility (S7). |
+| MS-9 | **Currency comes only from anchors.** A trust state is presented or used as current only when a pin, a human confirmation or a verified witness (OP-7 c) establishes it (`24`). |
 
 ## 3. Statement types and their counters
 
-| Statement | Purpose (`05`) | Monotonic counter | Asserts | Can never assert |
+| Statement | Purpose (`05`) | Monotonic counter and chain | Asserts | Can never assert |
 |---|---|---|---|---|
-| Trust root vN | `root` | `version` | keys, purpose grants, thresholds, revoked keys | anything about a release |
-| **Trust Policy Statement (TPS)** | `trust-policy` | `policy_version` | floors, eligibility, install-authority floor, gating mode, lowering, unrevocation (`19`) | authenticity, certification |
-| **Trust State Statement (TSS)** | `trust-state` | `sequence`, hash-chained | “these separately signed revocation, certification, verification-attestation and policy statements are the published state at sequence N”; optional expiry | any certification or revocation that is not itself a separately signed statement |
-| Certification status | `certification-status` | `certification_sequence` per final statement digest | CERTIFIED / REJECTED / WITHDRAWN for one final statement digest | authenticity; CERTIFIED without an ACCEPTED attestation |
-| Verification attestation | `verification-attestation` | bound by candidate digest | the independent verifier's verdict (ACCEPTED / REJECTED) for one candidate statement digest | certification |
-| Revocation | `revocation` | `revocation_sequence` | `refuse_install` / `refuse_operation` for digests of releases, candidates, artifacts, profiles, attestations or certification statements | new trust |
+| Trust root vN | `root` | `version`, dual-threshold chain | keys, purpose grants, thresholds, revoked keys | anything about a release |
+| **Trust Policy Statement (TPS)** | `trust-policy` | `policy_version`; `prior_policies[]` cumulative `{policy_version, statement_digest}`; `lowering_history[]` cumulative | Constitutional Surface (`23`), eligibility (including `historical_releases[]`), install authority, gating (OP-3), bootstrap (OP-6, OP-7), `unrevokes[]`, optional `state_chain_reset` | authenticity, certification |
+| **Trust State Statement (TSS)** | `trust-state` | `sequence`; `previous_state_digest`; **`prior_states[]`** cumulative `{sequence, statement_digest}` | the published set at `sequence`: `references{root_version, root_digest, trust_policy{policy_version, statement_digest}}`, `revocations[]`, `certifications[]`, `attestations[]`, **`artifacts[]`** (binary artefact statements, `25`); optional `expires_at` (OP-3 mode B or OP-7 c witness) | any fact not itself separately signed |
+| Certification status | `certification-status` | `certification_sequence` per final statement digest | CERTIFIED / REJECTED / WITHDRAWN; optional `artifact_statement_digests[]` | authenticity; CERTIFIED without an ACCEPTED attestation |
+| Verification attestation | `verification-attestation` | bound by candidate digest | ACCEPTED / REJECTED for one candidate | certification |
+| Build attestation | `build-attestation` (`25`) | bound by artefact digest and TBM digest | independent reproduction | authenticity |
+| Revocation | `revocation` | `revocation_sequence` | `refuse_install` / `refuse_operation` for digests | new trust |
 
-**Why trust state is its own purpose.** The TSS is the only statement saying “this is the published set”. Separating it
-from certification means:
-- a stolen certification key cannot make its certification *referenced*, and therefore visible as CERTIFIED;
-- a stolen trust-state key cannot create a certification; it can only reference existing signed ones.
-
-A visible CERTIFIED therefore needs three independent signatures: verification attestation, certification status and a
-trust-state reference.
+**Why a visible CERTIFIED needs three distinct keys:**
+- the attestation, certification and trust-state purposes are pairwise non-shareable (compiled whitelist, `05` §3, KS-8);
+- so a visible CERTIFIED, and any lift of a negative fact, needs three keys.
 
 ## 4. Knowledge sources
 
-| Source | Location | Who can write | Who can withhold | Role |
-|---|---|---|---|---|
-| **T0** | compiled into the binary: root chain, newest TPS, newest TSS with every statement it references, historical-identity registry | nobody at run time | nobody | knowledge + hard-minimum references |
-| **Verifier Trust Store (VTS)** | per OS account, resolved from the account database — `getpwuid(getuid())` home on POSIX, the Known Folder API on Windows — **never** from `HOME`, `XDG_*` or `GOV_*`. Path: `<account-home>/.local/state/gov/trust/<trust_root_id>/` (platform equivalent elsewhere). | the same OS user (A3) | A3 | knowledge; lineage pin and confirmation (`06`); per-project installed-identity record (`20` §9) |
-| **Project Trust Record (PTR)** | `governance/trust/state/` (Git-tracked, protected path) | repository writers (A2) | A2 | cross-machine knowledge |
-| **Lock references** | `framework.lock` `trust_references` | A2 | A2 | hints only |
-| **Bundle** | `trust/` inside a release bundle | the source (A1) | A1 | knowledge |
-| **Refresh** | `gov trust refresh --from <file\|url>` | the supplier (A1/A5) | A1/A5 | knowledge |
+| Source | Location | Writer | Role |
+|---|---|---|---|
+| **T0** | compiled into the binary (TBM, `25` §4) | nobody at run time | knowledge; safety floor |
+| **Verifier Trust Store (VTS)** | `<account-home>/.local/state/gov/trust/<trust_root_id>/`, resolved from the account database, never from `HOME`, `XDG_*` or `GOV_*` | same OS user (A3) | knowledge; anchors; high-water; per-project records; trust-gate confirmations (`24` §8) |
+| **Pins** | `<account-home>/.config/gov/trust-state-pins`, `trust-root-pins`, `approved-trust-decisions` | the operator (TA-9) | anchors (`24` §3); operator decisions (`27` §3.2) |
+| **Project Trust Record (PTR)** | `governance/trust/state/`, `root/` (Git-tracked, PPS) | repository writers (A2) | cross-machine knowledge only |
+| **Lock references** | `governance/trust/framework.lock` `trust_references` | A2 | hints (warnings only) |
+| **Bundle** | `trust/` in a release bundle | A1 | knowledge |
+| **Refresh** | `gov trust refresh --from <file>` | A1/A5 | knowledge |
 
-Every statement from every source is verified (`05` SV-1…SV-10) before it enters the knowledge set **K**. Files that
-do not verify are ignored with a typed warning and never counted. A source's writer can add only statements it
-genuinely holds, delete, and withhold. It cannot forge.
+Every statement from every source is verified (`05` SV-1…SV-10) before it enters knowledge **K**. A source's writer can
+add genuine statements, delete them or withhold them. It cannot forge statements, and it cannot anchor.
 
 ## 5. Effective state algorithm (normative)
 
-Runs in every process that makes a trust decision: once per ingress operation, and once per process at use time
-together with the kernel snapshot (`18` §6).
+Runs in every process that makes a trust decision, and in every unit of work of a long-lived process (`18` §6.3).
 
 | Step | Rule |
 |---|---|
-| S1 | Collect **K** = verified statements from T0 ∪ VTS ∪ PTR ∪ bundle ∪ refresh, as present for the operation. |
-| S2 | **Root.** Effective root = the highest version reachable from the compiled chain by dual-threshold links. Links that do not chain are ignored (`TRUST_ROOT_INVALID` warning). |
-| S3 | **Trust policy.** Effective TPS = the highest `policy_version` in K verifying under the effective root for `trust-policy`. A TPS whose `floor_schema_version` or any floor operator is unknown to this binary makes the binary `BINARY_BELOW_TRUST_POLICY` (read-only, `19` §4). |
-| S4 | **Trust state.** A TSS T is *admissible* iff, for every lower-sequence TSS L in K: (a) `T.revocations ⊇ L.revocations`; (b) for every release digest in `L.certifications`, T has an entry whose certification statement's `certification_sequence` ≥ L's; (c) `T.references.root_version ≥ L.references.root_version`; (d) `T.references.trust_policy.policy_version ≥ L`'s; (e) `T.attestations ⊇ L.attestations`; (f) if `T.previous_state_digest` names a TSS in K, that TSS has sequence `T.sequence − 1`. Effective TSS = the highest admissible. A higher non-admissible TSS is a signed regression → `TRUST_STATE_REGRESSION`: not used, doctor CRITICAL, governed mutations refused until corrected. |
-| S5 | **Negative set N** = every verified revocation target in K (standalone or referenced), ∪ every verified REJECTED/WITHDRAWN certification whose `certification_sequence` is the highest known for its digest, − targets named by any verified TPS `unrevokes`. |
-| S6 | **Certification view** per final release digest (§6). |
-| S7 | **Signed required minimums.** `RM_state` = max(T0 TSS sequence; every TSS sequence in K; every `trust_references.trust_state_sequence` in release statements in K; every `issued_under.trust_state_sequence` in certification statements in K). `RM_policy` and `RM_root` are formed the same way from policy and root references. |
-| S8 | **Hint minimums.** `RH_state`, `RH_policy`, `RH_root` = max of the lock `trust_references` and the VTS per-project record. |
-| S9 | **Staleness.** `STALE` if effective TSS sequence < `RM_state`, effective TPS version < `RM_policy`, or effective root version < `RM_root`. `HINT_MISMATCH` if not stale but effective < any `RH`. `REGRESSION` if S4 found one. Otherwise `CURRENT_KNOWN(sequence)`. |
-| S10 | **Persist.** Newly verified statements from bundle, refresh or PTR are copied into the VTS. Statements the project lacks are written into the PTR **only** inside an install transaction or `gov trust refresh` (the PTR is a protected path, `18` §8). |
+| S1 | **Collect** K = verified statements from T0 ∪ VTS ∪ PTR ∪ bundle ∪ refresh. |
+| S2 | **Root.** Effective root = the highest version reachable from the compiled chain by dual-threshold links. |
+| S3 | **Trust policy.** (a) Two verified TPS with the same `policy_version` and different digests → `TRUST_POLICY_EQUIVOCATION`. (b) The highest TPS MUST list every held lower TPS in `prior_policies[]`, otherwise `TRUST_POLICY_EQUIVOCATION` (fork). (c) Computed reductions against the strongest values held (VTS, PTR, T0) MUST each appear in the arriving TPS's `lowering_history[]` with `in_policy_version` above the held version, otherwise the arriving TPS is invalid (`TRUST_POLICY_UNDECLARED_LOWERING`) and not used. Explained reductions need the per-project trust gate before they apply to a project that held the stronger value (`19` §10, `27`). (d) An unknown `floor_schema_version`, class or operator → `BINARY_BELOW_TRUST_POLICY` (read-only). |
+| S4 | **Trust state.** (a) *Resolution:* a TSS is resolved iff its referenced root version is ≤ the effective root and its referenced TPS (version and digest) is held. Unresolved TSSs are never effective and never constrain. (b) *Anchored forks:* if an anchor (`24` §3) names a held resolved TSS A, resolved TSSs with sequence ≤ A.sequence outside A's `prior_states[]` ∪ {A} are **orphans**: reported (`TRUST_STATE_FORK_ORPHANS`, doctor CRITICAL), never effective, never constraints. (c) *Equivocation:* two resolved, non-orphan TSSs with equal sequence and different digests → `TRUST_STATE_EQUIVOCATION`. (d) *Admissibility:* in sequence order, T is admissible iff for every admissible lower L: `T.revocations ⊇ L.revocations`, `T.attestations ⊇ L.attestations`, `T.artifacts ⊇ L.artifacts`, certification sequences per release do not decrease, `T.references.root_version ≥ L's`, `T.references.trust_policy.policy_version ≥ L's`, and `(L.sequence, digest(L)) ∈ T.prior_states`. (e) Effective TSS = the highest admissible. A higher non-admissible resolved TSS → `TRUST_STATE_REGRESSION`. An unresolved TSS with sequence above the effective one → `TRUST_STATE_INCOMPLETE`. |
+| S5 | **Negative set N** = every verified revocation target in K − TPS `unrevokes` ∪ every release with a verified REJECTED or WITHDRAWN certification **not lifted** per MS-2. |
+| S6 | **Certification view** per final release (§6). |
+| S7 | **Release-local requirements.** A release, candidate or artefact statement's `trust_references` (state sequence, policy version, root version) and a certification's `issued_under` are requirements for that statement only. Its ingress (or visibility) needs the effective state to meet them; otherwise that ingress refuses with `RELEASE_REFERENCES_UNKNOWN_STATE` (remedy: refresh). They never change global status. |
+| S8 | **Hints.** The lock's `trust_references` and the VTS per-project record's last state → `TRUST_STATE_HINT_MISMATCH` when above the effective state. Warning only. |
+| S9 | **Trust-state axis** = `EQUIVOCATION` \| `REGRESSION` \| `INCOMPLETE(n′)` \| `KNOWN(n)`. |
+| S10 | **Freshness axis** (`24` §4.1): `ANCHORED` \| `WITNESSED` \| `BELOW_ANCHOR` \| `UNANCHORED`, from anchors and OP-7. |
+| S11 | **Persist.** Newly verified statements are copied into the VTS (union). High-water components rise monotonically. The PTR is written only inside an install transaction or `gov trust refresh`, as the **union** of the current PTR, the target's statements and VTS knowledge (`18` §5.2). A verified statement is never removed from `governance/trust/`. |
+| S12 | **Chain reset.** A TSS chain can be restarted only by a root-signed TPS `state_chain_reset {after_sequence, genesis_digest}`. It is used after a trust-state key compromise with a forked history. |
 
-Staleness appears through signed references. Example: the installed release statement was signed when TSS 14 was
-current (`trust_references.trust_state_sequence: 14`), but this verifier holds only TSS 12. An attacker cannot remove
-that reference without replacing the release, and a replaced release is judged on its own references and on
-eligibility (`19`).
+Evidence: `evidence/P4r3-trust-state-model.json`, 34 scenarios, all agree.
 
 ## 6. Certification view
 
@@ -94,136 +94,119 @@ For a final release statement digest X:
 
 | View | Condition | May it relax a control? |
 |---|---|---|
-| `REVOKED` | X ∈ N (any effect) | no; refuse per effect |
-| `WITHDRAWN` / `REJECTED` | the highest-`certification_sequence` verified certification for X has that status | no; refused outright if TPS `gating.refuse_known_withdrawn` / `refuse_known_rejected` |
-| `CERTIFICATION_UNREFERENCED` | a verified CERTIFIED statement for X exists in K, but no admissible TSS references it | no |
-| `CERTIFIED_AS_OF(n)` | effective TSS n references verified CERTIFIED statement C for X; C references a verified ACCEPTED attestation for X's `promoted_from_candidate`; no negative fact for X | **no** |
-| `CERTIFIED_CURRENT(n)` | `CERTIFIED_AS_OF(n)` ∧ freshness proof (§13) ∧ trust state `CURRENT_KNOWN` | only under OP-3 mode B, and only to skip the update gate (§7) |
+| `REVOKED` | X ∈ N | no; refuse per effect |
+| `WITHDRAWN` / `REJECTED` | a verified negative certification for X not lifted per MS-2 | no; refused outright when TPS `gating.refuse_known_*` |
+| `CERTIFICATION_UNREFERENCED` | a verified CERTIFIED for X exists, but no admissible TSS references it | no |
+| `CERTIFIED_AS_OF(n)` | effective TSS n references CERTIFIED C for X; C references an ACCEPTED attestation for X's `promoted_from_candidate`, itself referenced by TSS n; no negative fact | **no** |
+| `CERTIFIED_CURRENT(n)` | `CERTIFIED_AS_OF(n)` ∧ freshness proof (§13) ∧ trust state `KNOWN` ∧ freshness `ANCHORED` or `WITNESSED` | only under OP-3 mode B, and only to skip the update gate |
 | `NOT_CERTIFIED` | none of the above | no |
 
-For a candidate digest: `CANDIDATE_UNATTESTED`, `CANDIDATE_ATTESTED_ACCEPTED` or `CANDIDATE_ATTESTED_REJECTED`
-(informational; candidates are never production-eligible, `19` §7).
+## 7. Trust-state and freshness requirement by operation
 
-Every surface — `gov status`, context packets, lock `verdict_at_install`, doctor, gate text — shows the view with its
-`n`.
+The operation classes and the decision table are in `24` §4. In summary:
 
-## 7. Trust-state requirement by operation
-
-| Operation | Trust state required | Role of certification | Negative facts |
+| Operation | Trust state required | Freshness required | Gate |
 |---|---|---|---|
-| Read-only diagnostics | none | displayed | displayed |
-| Governed use of the installed release (including project-state mutations) | none. `STALE` → doctor D032 HIGH; `REGRESSION` → CRITICAL and mutations refused | displayed | `refuse_operation` → `KERNEL_INELIGIBLE` |
-| `init`, `adopt migrate --batch 0` | not `STALE`; `HINT_MISMATCH` → gate | a Human Decision Gate (or init acknowledgement) bound to the statement digest is always required; init is never unattended | refuse `refuse_install`; refuse known REJECTED/WITHDRAWN when the TPS says so |
-| `update --apply` | not `STALE`; `HINT_MISMATCH` → gate | mode A (recommended): gate always. Mode B: `CERTIFIED_CURRENT`, no computed weakening (`19` §9), no declared breaking change and no declared gate ⇒ the gate may be skipped | as above |
-| `update --rollback`, snapshot restore, journal recovery that downgrades | not `STALE` | gate always (`20` §4) | as above |
-| `kernel reinstall` (same statement digest) or re-attestation | none | none | `refuse_install` → refused |
-| Evaluation-candidate install | not `STALE` | gate + explicit flag always | revoked candidates refused |
+| C0 diagnostics, refresh, confirmations | none | none | — |
+| C1 governed read | not `EQUIVOCATION`/`REGRESSION` | per OP-7 | — |
+| C2 governed mutation (including project-state mutation under the installed release) | `KNOWN` | per OP-7 (`24` §4.3) | non-trust gates as policy |
+| C3 `init`, `adopt migrate --batch 0` | `KNOWN`; release-local requirement met | `ANCHORED` or `WITNESSED` | `init_ack` trust gate (`27`) |
+| C3 `update --apply` | as above | as above | mode A: `framework_update` trust gate always |
+| C3 rollback, restore, downgrading recovery | as above | as above | `downgrade` trust gate |
+| C3 `kernel reinstall` (same statement digest) | not `EQUIVOCATION`/`REGRESSION` | none (integrity remedy; identity unchanged) | — |
+| C3 evaluation-candidate install | as above | as above | `evaluation_candidate` trust gate plus flag |
 
-`STALE` is resolved only by supplying the missing signed metadata. `gov trust refresh --from <file>` works offline with
-a copied file. **There is no override for `STALE` at ingress**: an override would let whoever strips metadata choose
-the outcome.
+There is no override for `INCOMPLETE`, `REGRESSION`, `EQUIVOCATION`, `BELOW_ANCHOR` or `UNANCHORED` at ingress. The
+remedies are supplying the missing signed metadata, re-anchoring, or a root rotation.
 
 ## 8. Revocation state
 
-- Revocations accumulate (S5). Nothing an attacker supplies removes one: an admissible TSS must contain every revocation
-  that any lower known TSS contained.
-- A revocation delivered alone, before any TSS references it, is effective immediately (MS-2). Restricting needs no
-  freshness.
-- Unrevocation exists only as a root-signed TPS `unrevokes` entry naming the revocation statement digest. It is
-  permanent; re-revocation needs a new revocation statement.
-- Effects:
-  - `refuse_install` applies at ingress, rollback and restore;
-  - `refuse_operation` also applies at use time: the release is `INELIGIBLE`, policy comes from the embedded baseline
-    joined with the floor, and mutations are refused except remedies.
-- A security-relevant revocation of a final release SHOULD come with a TPS raising `eligibility.min_release_sequence`.
-  Binaries compiled afterwards then refuse the release even where no revocation statement ever arrives.
+- Revocations accumulate (S5); an admissible TSS must contain every revocation of every admissible lower TSS.
+- A revocation delivered alone is effective immediately (MS-2).
+- Unrevocation exists only as a root-signed TPS `unrevokes`.
+- `refuse_install` applies at ingress, rollback and restore. `refuse_operation` also applies at use: the release becomes
+  `INELIGIBLE` and the policy root falls back to the EmbeddedSnapshot ⊔ floor.
+- A security-relevant revocation SHOULD come with a TPS raising `eligibility.min_release_sequence`. Binaries compiled
+  afterwards refuse the release even where the revocation never arrives, and anchored machines refuse it once they hold
+  that TPS.
 
 ## 9. Root-rotation state
 
-- Root versions are monotonic and dual-threshold chained (unchanged from rev 1).
-- Every release, TSS, TPS and certification statement carries `trust_references.root_version`, the root version
-  current at signing. A verifier whose effective root is lower is `STALE` for ingress (`TRUST_ROOT_STALE`) and cannot
-  verify keys introduced later.
-- Key revocation protects a verifier once it holds the root version that removes the key. Statements signed only by a
-  removed key are invalid whatever their references say; genuine ones are re-attested (`05` §8).
-- **Residual RS-1** (§15): a thief of a later-removed key can sign statements referencing an old root version. A
-  verifier that never received the removing root version cannot tell them apart. What still holds there:
-  - the stolen key is purpose-limited (`05`);
-  - ingress still needs a gate (mode A);
-  - eligibility floors come from at least the compiled TPS;
-  - certification cannot be manufactured, because it needs three purposes.
+- A root version N+1 is known once its dual-threshold link is held.
+- A TSS referencing an unheld root version is unresolved (S4 a). Above the effective sequence it makes the state
+  `INCOMPLETE`: C2 and C3 refuse until the link is supplied.
+- A key removed in N+1 is `SIGNER_REVOKED` on every verifier holding N+1.
+- **RS-1:** a thief of a later-removed key can sign statements referencing only old roots, and a machine that never
+  receives N+1 cannot tell. Such a machine is bounded as in `24` §10. Under OP-7 (a)–(c) it performs no governed mutation
+  unless anchored at or above a state that includes N+1; a pin or human anchor naming a TSS that references N+1 makes it
+  `BELOW_ANCHOR` or `INCOMPLETE`.
 
 ## 10. Replay protection
 
 | Replay | Binding that defeats it |
 |---|---|
-| Statement of lineage X presented to lineage Y | `trust_root_id` in every payload (`05` SV-10) |
-| Test statement presented to production | `trust_profile` in every payload |
-| Statement of one type presented as another | payloadType ↔ purpose ↔ `_type` fixed in the binary; PAE binds the payloadType |
-| Certification for release A applied to release B | full `release_statement_digest`, plus `release_id` and `version` equality |
-| Attestation for candidate A applied to candidate B | full `candidate_statement_digest` |
-| Final promoted from a different candidate | `promoted_from_candidate` must equal the attestation's candidate digest, and the candidate's `kernel.tree_digest` must equal the final's (`04` V8) |
-| Older TSS presented as current | admissibility (S4) plus signed required minimums (S7) |
-| Older TPS presented to lower floors | monotonic `policy_version`; lowering needs a higher version (`19` §10) |
-| Older root presented | dual-threshold chain plus monotonic version |
-| Gate answered for digest A reused for digest B | gate records bind `release_statement_digest`, and both digests for a rollback |
-| CERTIFIED reused after WITHDRAWN | per-digest `certification_sequence` ordering (S5) |
-| Release statement reused for other content | V9 full file map; `release_id` derived from the tree digest |
+| cross-lineage or cross-profile | `trust_root_id`, `trust_profile` (`05` SV-10) |
+| cross-type | payloadType ↔ purpose ↔ `_type` compiled; PAE |
+| certification or attestation for another release | full digests plus `release_id` equality |
+| older TSS or TPS presented as current | knowledge union; admissibility; `prior_states[]`/`prior_policies[]`; anchors (never below) |
+| forked TSS history across missing intermediates | cumulative `prior_states[]` (S4 d) |
+| older witness (OP-7 c) | highest witness `issued_at` in the VTS; expiry window (`24` §6) |
+| gate answer reused for another digest or project | trust-gate confirmation bound to kind, `project_trust_id` and digests; consumed once (`27` §3) |
+| CERTIFIED after WITHDRAWN | MS-2 lifting rule |
+| older binary as upgrade | TBM high-water (`25` §5 A7) |
 
 ## 11. Rollback of trust metadata
 
 | Attack | Result |
 |---|---|
-| A1 serves an older TSS, TPS or root | knowledge only; the effective state is the highest admissible known; staleness is detected wherever a signed reference is higher |
-| A1 omits the newest TSS | if no signed reference is higher, the older state is used. `CERTIFIED_AS_OF(n)` relaxes nothing in mode A; negatives already known remain. Residual RS-1. |
-| A2 deletes `governance/trust/state/` | no effect on machines with a VTS or a newer T0. Fresh clones fall back to T0 plus references in the signed statements still present; they are `STALE` whenever the installed release was signed under newer state than T0 holds. |
-| A2 edits lock `trust_references` | hints only: can cause `HINT_MISMATCH` (a gate); cannot hide anything signed |
-| A3 deletes or rewrites the VTS | forgetting on that machine only; rewritten files that do not verify are ignored |
-| A4 sets `HOME`, `XDG_CONFIG_HOME` or `GOV_*` | no effect; the VTS location comes from the account database |
-| A trust-state key thief publishes a higher TSS that omits revocations | non-admissible on every verifier knowing the lower TSS (S4) → `TRUST_STATE_REGRESSION`. Verifiers knowing nothing lower see only the freeze residual. |
+| A1 serves an older TSS, TPS or root | knowledge only; effective state unchanged on machines holding more; below-anchor on anchored machines |
+| A2 deletes `governance/trust/state/` | no effect on VTS-holding or anchored machines. Fresh machines are `UNANCHORED`: read-only under OP-7 (a)–(c); labelled under (d). |
+| A2 swaps in an older eligible release | judged at the machine's effective state (floors joined, revocations and minimum sequence held); refused at ingress without a trust gate; per-project record downgrade detection (`20` §9) |
+| A2 edits lock references | warning (S8) |
+| A3 deletes or rewrites the VTS | the machine becomes `UNANCHORED` (RS-3) |
+| A4 redirects `HOME`, `XDG_*`, `GOV_*` | no effect; account database |
+| Trust-state key thief publishes a TSS that omits revocations, or forks | `REGRESSION` or `EQUIVOCATION` on verifiers holding the lower TSS; anchored verifiers orphan the fork (S4 b) |
 
 ## 12. Offline operation
 
-- **Using an installed eligible release:** no network, no fresh state (MS-6).
-- **Installing from a local bundle:** works offline; the bundle carries TSS, TPS and root links; gates required (mode A).
-- **Air-gapped propagation:** `gov trust export` writes a signed-metadata bundle (statements only); `gov trust refresh
-  --from <file>` imports it.
-- **Mode B offline:** gate-free updates cannot be used offline beyond the TSS expiry. By design, freshness is exactly what
-  is being proven.
+- **Using an installed eligible release:** no network. The permitted classes depend on the anchor (`24` §4.3).
+- **Installing from a local bundle:** works offline when the machine is anchored (a pin or confirmation needs no network)
+  and the bundle carries the anchored epoch's statements.
+- **Air-gapped propagation:** `gov trust export` and `gov trust refresh --from`.
+- **Under OP-7 (c):** stateless use beyond witness expiry refuses governed mutation.
 
-## 13. Freshness proof (OP-3 mode B only)
+## 13. Freshness proof (OP-3 mode B; OP-7 (c) witness)
 
 A freshness proof exists for effective TSS n iff all of these hold:
-- (a) TSS n has a non-null `expires_at`;
+- (a) `expires_at` is non-null;
 - (b) the local clock is earlier than `expires_at`;
-- (c) the local clock is later than the highest `issued_at` of any verified statement in K (coarse clock-rollback
-  detection);
-- (d) the trust state is `CURRENT_KNOWN`.
+- (c) the local clock is later than the highest verified `issued_at` recorded in the VTS high-water;
+- (d) TSS n's `issued_at` is not older than the newest witness this VTS has accepted;
+- (e) the trust state is `KNOWN`.
 
-Mode B trusts the local clock for exactly one decision: whether the update gate may be skipped. A3 or A4 controlling the
-clock can defeat it, which is why mode B is owner-optional and not recommended (`21` OP-3).
-
-Time never removes trust: expiry of a TSS never invalidates an installed release, authenticity or a revocation.
+The clock is trusted (TA-7) only for this decision. Time never removes trust: expiry never invalidates an installed
+release, authenticity or a revocation.
 
 ## 14. Recovery semantics
 
 | Situation | Recovery |
 |---|---|
-| VTS missing or corrupt | Rebuilt from T0 ∪ PTR ∪ bundles; corrupt files ignored; lineage confirmation re-requested per OP-6. |
-| PTR deleted (A2 or accident) | The next install transaction or `gov trust refresh` rewrites it from VTS, T0 or a bundle. Until then, fresh clones may be `STALE`, which fails closed for ingress only. |
-| `STALE` on a machine | Supply metadata that meets the required minimum (`gov trust refresh --from`). Read-only and governed use continue. |
-| `TRUST_STATE_REGRESSION` observed | Mutations refused (possible trust-state key compromise). The owner rotates the `trust-state` purpose and publishes a correcting admissible TSS with a sequence above the regressive one. |
-| Erroneous TSS publication (e.g., revocation omitted at sequence n) | Verifiers that saw n−1 reject n. The publisher issues a correct n+1; verifiers that saw only n accept it because it is a superset. |
-| Trust-state key lost | Root grants a new key; the next TSS continues the sequence and chains to the last published digest. |
-| Certification key stolen | Root removes the key; the publisher stops referencing forged certifications; forged certification digests are revoked. A forged CERTIFIED would already have needed two further keys. |
-| Verification-attestation key stolen | Root removes the key; attestations alone certify nothing. |
-| Revocation key stolen | Attacker can only revoke (denial of service). Root removes the key; a TPS `unrevokes` the forged revocations. |
-| Release-final key stolen | `05` §9. |
+| VTS missing or corrupt | Rebuilt from T0 ∪ PTR ∪ bundles; the machine is `UNANCHORED` until re-anchored (OP-6 and OP-7 ceremony). |
+| PTR deleted | The next install transaction or refresh rewrites it as a union. |
+| `INCOMPLETE` / `BELOW_ANCHOR` | Supply the statements (`gov trust refresh --from`). |
+| `REGRESSION` / `EQUIVOCATION` | Governed mutation and ingress refused. The owner rotates the `trust-state` purpose (root N+1) and, if histories forked, issues a TPS `state_chain_reset`. Anchored machines already orphan the fork. |
+| Erroneous TSS publication | Publish a correct n+1 that includes every lower revocation and the full `prior_states[]`. |
+| Certification key stolen | Root removes the key. A forged CERTIFIED is visible only with an attestation and a trust-state reference, and a forged lift needs both (MS-2). |
+| Build-attestation or release-artifact keys stolen | `25` §7. |
 
-## 15. Accepted residuals (explicit)
+## 15. Purpose blast radius (trust-state and certification; corrects revision 2)
 
-| ID | Residual | Why accepted | Bound |
-|---|---|---|---|
-| RS-1 | A verifier that never received a newer TSS, root version or revocation cannot know it exists (fresh machine, stripped repository, older binary, no refresh). | Offline verification (G5) forbids requiring an online oracle. | It cannot produce a relaxation (mode A), remove a known negative fact, lower floors below the compiled TPS, or certify. |
-| RS-2 | Mode B trusts the local clock to skip an update gate. | Owner-optional automation convenience. | Disabled by default; exploitable only by A3/A4. |
-| RS-3 | A3 can delete the VTS on its own machine. | Same-user code execution is inside the account boundary. | Forgetting on that machine only; no forging. |
+| Stolen alone | Worst case |
+|---|---|
+| `trust-state` | Freeze of C2 and C3 on verifiers that receive an unresolvable, forked or regressive statement above their effective state. It lasts until the next honest TSS supersedes it or a root rotation removes the key. It cannot lift negatives, create certification, or regress honest successors. |
+| `certification-status` | Publishes CERTIFIED or negatives. Negatives take effect (denial of service). CERTIFIED stays unreferenced; it can neither lift a negative nor become visible. |
+| `release-candidate` | Candidate statements with inflated references constrain only their own ingress (S7). |
+
+## 16. Residuals
+
+RS-1…RS-4 are stated exactly in `24` §10.

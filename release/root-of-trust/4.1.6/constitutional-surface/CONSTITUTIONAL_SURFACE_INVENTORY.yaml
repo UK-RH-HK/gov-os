@@ -1,0 +1,3785 @@
+schema: governance-os.constitutional-surface-inventory
+schema_version: 1
+csi_version: 1
+status: PROPOSED (RoT-1 revision 3) - draft surface section of Trust Policy v1; not signed, not active, not approved
+floor_schema_version: 2
+default: deny
+derived_from:
+  kernel_dir: framework
+  kernel_version: 4.1.5
+  file_count: 113
+  tree_digest_of_classified_files: sha256:8ada29cccef0e3733a64b1b38eb3b42a6a0b3034df65ab3a9c06c98d8363df1b
+vocabulary:
+  file_modes:
+  - informational_file
+  - pinned_file
+  - structured
+  - transaction_input
+  leaf_classes:
+  - collection_id
+  - covered_by_collection
+  - floor
+  - informational
+  - members
+  - pinned
+  - precedence
+  - project_tunable
+  - release_bound
+  floor_ops:
+  - bool_toward
+  - decimal_at_least
+  - decimal_at_most
+  - equals
+  - level_at_least
+  - level_at_most
+  - ordered_at_least
+  - ordered_at_most
+  - set_subset
+  - set_superset
+  member_ops:
+  - ids_equal
+  - ids_subset
+  - ids_superset
+  orders:
+    level:
+    - L0
+    - L1
+    - L2
+    - L3
+    - L4
+    - L5
+    radius: &id001
+    - R0
+    - R1
+    - R2
+    - R3
+    - R4
+    - R5
+    tier: &id004
+    - none
+    - T0
+    - T1
+    - T2
+    - T3
+    reasoning: &id005
+    - none
+    - low
+    - medium
+    - high
+    - extra_high
+  precedence_modes:
+  - additive
+  - ceiling
+  - floor
+  - immutable
+  - overridable
+  - shrink_only
+  - strengthen_only_bool
+precedence:
+  default_mode: immutable
+  rules:
+  - key: AUTHORITY_POLICY.authority_levels_required.*
+    mode: floor
+    kind: level
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: AUTHORITY_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: SECURITY_POLICY.never_index_classes
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: SECURITY_POLICY.never_export_classes
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: SECURITY_POLICY.secret_path_patterns
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: SECURITY_POLICY.secret_content_patterns
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: SECURITY_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.raise_for
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius
+    mode: ceiling
+    kind: radius
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.agent_resolvable_when.reversible
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.batch_low_priority
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.continue_independent_work
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: HUMAN_GATE_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.auto_approve_max_radius
+    mode: ceiling
+    kind: radius
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.auto_simulate_triggers
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.human_gate_triggers
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.verification_required
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.rollback.snapshot_before_execute
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: CHANGE_POLICY.rollback.keep_snapshots
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.propagation.*
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.*
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHANGE_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TEST_POLICY.independent_test_author_required_for
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TEST_POLICY.implementation_task_requires
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TEST_POLICY.task_close_requires_tests_status
+    mode: shrink_only
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TEST_POLICY.governance_families
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TEST_POLICY.product_families
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TEST_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHECKPOINT_POLICY.mandatory_triggers
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CHECKPOINT_POLICY.watchdog.context_utilisation_threshold
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: CHECKPOINT_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.health_check_required
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: TOOL_POLICY.auto_install_conditions
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.approved_licences
+    mode: shrink_only
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.min_authority
+    mode: floor
+    kind: level
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.require_valid_descriptor
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.refuse_on_pin_drift
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.elevated_permission_classes
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.registry_path
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.registration_binds
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.descriptor_schema
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.plugins.timeout_seconds
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: TOOL_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: BUDGET_POLICY.defaults.*
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: BUDGET_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.corroboration_min_sources
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.upstream.forbidden_paths
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.upstream.forbidden_content
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.upstream.max_code_lines_unless_synthetic
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.upstream.allowed_payload
+    mode: shrink_only
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.upstream.aggregate_metrics_enabled
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.upstream.ledger
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: LEARNING_POLICY.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.regression.min_queries
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: MEMORY_POLICY.regression.min_recall_at_k
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: MEMORY_POLICY.regression.min_mrr
+    mode: floor
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: MEMORY_POLICY.regression.max_stale_hit_rate
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: MEMORY_POLICY.regression.max_superseded_hit_rate
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: true
+  - key: MEMORY_POLICY.regression.heldout_file
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.freshness.on_stale_close
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.freshness.max_index_age_hours
+    mode: ceiling
+    kind: number
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.rebuild.must_reproduce_manifest_hash
+    mode: strengthen_only_bool
+    kind: null
+    order: null
+    strict_value: true
+    exception_relaxable: false
+  - key: MEMORY_POLICY.namespaces.secret.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.namespaces.*.sensitivity
+    mode: floor
+    kind: ordered
+    order: &id002
+    - public
+    - internal
+    - confidential
+    - restricted
+    - secret
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.namespaces.*.roles
+    mode: shrink_only
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.namespaces.*.export
+    mode: floor
+    kind: ordered
+    order: &id003
+    - allowed
+    - framework-lessons-only
+    - denied
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.namespaces.*.*
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.runtime_dir
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.memory_classes
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MEMORY_POLICY.*
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MODEL_ROUTING_POLICY.record_evidence
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    mode: floor
+    kind: tier
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    mode: floor
+    kind: tier
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: MODEL_ROUTING_POLICY.*
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CONTEXT_POLICY.reproducibility
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CONTEXT_POLICY.deterministic_authority_fields
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: CONTEXT_POLICY.*
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: ARCHIVE_POLICY.archive_mutation
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: ARCHIVE_POLICY.do_not_archive
+    mode: additive
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: ARCHIVE_POLICY.*
+    mode: overridable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+  - key: POLICY_PRECEDENCE.*
+    mode: immutable
+    kind: null
+    order: null
+    strict_value: null
+    exception_relaxable: false
+never_exception_relaxable_prefixes:
+- SECURITY_POLICY.
+- AUTHORITY_POLICY.
+- HUMAN_GATE_POLICY.
+- TOOL_POLICY.
+- POLICY_PRECEDENCE.
+- ROLES.
+rationale:
+  project_tunable: 'POLICY_PRECEDENCE marks the key overridable: the project layer may set it freely, so no kernel-lineage floor can be stronger'
+  pinned: no order in which a change is provably a strengthening; any change needs a Trust Policy registration signed at root threshold
+files:
+- path: policies/ARCHIVE_POLICY.yaml
+  mode: structured
+  name: ARCHIVE_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: ARCHIVE_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      ARCHIVE_POLICY.policy:
+      - sha256:20cb5fa7fcf85e4839331d773c849632dd193f64b181ddf82374fbe7e48f7481
+  - key: ARCHIVE_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      ARCHIVE_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: ARCHIVE_POLICY.archive_root
+    class: project_tunable
+    precedence_rule: ARCHIVE_POLICY.*
+  - key: ARCHIVE_POLICY.archive_subdirs
+    class: project_tunable
+    precedence_rule: ARCHIVE_POLICY.*
+  - key: ARCHIVE_POLICY.archive_when
+    class: project_tunable
+    precedence_rule: ARCHIVE_POLICY.*
+  - key: ARCHIVE_POLICY.do_not_archive
+    class: floor
+    op: set_superset
+    precedence_rule: ARCHIVE_POLICY.do_not_archive
+    value:
+    - dead_source_files_without_reference_value
+  - key: ARCHIVE_POLICY.unused_code_action
+    class: project_tunable
+    precedence_rule: ARCHIVE_POLICY.*
+  - key: ARCHIVE_POLICY.default_retrieval_for_archive
+    class: project_tunable
+    precedence_rule: ARCHIVE_POLICY.*
+  - key: ARCHIVE_POLICY.archive_mutation
+    class: pinned
+    precedence_rule: ARCHIVE_POLICY.archive_mutation
+    digests:
+      ARCHIVE_POLICY.archive_mutation:
+      - sha256:cd28dab5321c1d3031e52e50cf1d8a3f5db1f8b1088046c8025efb84bd02ba03
+- path: policies/AUTHORITY_POLICY.yaml
+  mode: structured
+  name: AUTHORITY_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: AUTHORITY_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      AUTHORITY_POLICY.policy:
+      - sha256:6366c809742f2cf189bdcbb6cd4d584ae0e91505626d11c3d87fbc34f7ced767
+  - key: AUTHORITY_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      AUTHORITY_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: AUTHORITY_POLICY.precedence
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.precedence:
+      - sha256:2d75ccf7fedafea9bbb703816b60e474416232519ab1e68b4560871361ac0602
+  - key: AUTHORITY_POLICY.state_classes
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.state_classes:
+      - sha256:7ec117f8ecf584fbfdedb4a4d001c7424dd5fb2b7008856dcd8c867071534df5
+  - key: AUTHORITY_POLICY.lifecycle_statuses
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.lifecycle_statuses:
+      - sha256:0f2616a19ac549200f7f544be3174e299817bad47d23b3fcc098295d4b3f3cb7
+  - key: AUTHORITY_POLICY.default_state_class_by_type.project
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.project:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.feature
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.feature:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.requirement
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.requirement:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.decision
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.decision:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.interface
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.interface:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.scenario
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.scenario:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.architecture
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.architecture:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.workflow
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.workflow:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.task
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.task:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.test-obligation
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.test-obligation:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.human-gate
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.human-gate:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.cit
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.cit:
+      - sha256:b91b6efb5c466f3dc172f68a17c653e7ac0a06d232c7bdae393dc79fe4efa86f
+  - key: AUTHORITY_POLICY.default_state_class_by_type.handoff
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.handoff:
+      - sha256:b40fc5620b33a73df92bba1327a35bdf14daaf0a3f4ec8f37778752a5c00c426
+  - key: AUTHORITY_POLICY.default_state_class_by_type.checkpoint
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.checkpoint:
+      - sha256:72085cab455bca97330f9b5f4bd5243a4bd0b674ba25f7c6e9b46765c9977e29
+  - key: AUTHORITY_POLICY.default_state_class_by_type.report
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.report:
+      - sha256:72085cab455bca97330f9b5f4bd5243a4bd0b674ba25f7c6e9b46765c9977e29
+  - key: AUTHORITY_POLICY.default_state_class_by_type.research
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.research:
+      - sha256:72085cab455bca97330f9b5f4bd5243a4bd0b674ba25f7c6e9b46765c9977e29
+  - key: AUTHORITY_POLICY.default_state_class_by_type.experiment
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.experiment:
+      - sha256:72085cab455bca97330f9b5f4bd5243a4bd0b674ba25f7c6e9b46765c9977e29
+  - key: AUTHORITY_POLICY.default_state_class_by_type.lesson
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.lesson:
+      - sha256:72085cab455bca97330f9b5f4bd5243a4bd0b674ba25f7c6e9b46765c9977e29
+  - key: AUTHORITY_POLICY.default_state_class_by_type.audit
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.audit:
+      - sha256:72085cab455bca97330f9b5f4bd5243a4bd0b674ba25f7c6e9b46765c9977e29
+  - key: AUTHORITY_POLICY.default_state_class_by_type.legacy
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.legacy:
+      - sha256:50b8fa9796581fcfd227a09bf10aada19a46fb4d39ead84890d3327e78d4d615
+  - key: AUTHORITY_POLICY.default_state_class_by_type.narrative
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.default_state_class_by_type.narrative:
+      - sha256:e84651b62a5950fd0d68e10b87febbab69ce40bf3f32195bd49968f1e6722988
+  - key: AUTHORITY_POLICY.retrieval_default_excludes_statuses
+    class: pinned
+    precedence_rule: AUTHORITY_POLICY.*
+    digests:
+      AUTHORITY_POLICY.retrieval_default_excludes_statuses:
+      - sha256:f40d1cd21d9340e864e4e236db60ca1abbd8104e17f8fab4b79269c840fd7c14
+  - key: AUTHORITY_POLICY.authority_levels_required.read
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L0
+  - key: AUTHORITY_POLICY.authority_levels_required.rebuild_memory
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L0
+  - key: AUTHORITY_POLICY.authority_levels_required.memory_benchmark
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.memory_select
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.create_task
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.mutate_task_status
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.claim_task
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.release_task
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.force_release_task
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.close_task
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.force_close_task
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.readiness_plan
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.checkpoint
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.create_handoff
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.return_handoff
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.create_gate
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.present_gate
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.answer_gate
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.revoke_gate
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L4
+  - key: AUTHORITY_POLICY.authority_levels_required.grant_policy_exception
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L4
+  - key: AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L4
+  - key: AUTHORITY_POLICY.authority_levels_required.execute_plugin
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.register_plugin
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.propose_cit
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.simulate_cit
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.approve_cit_auto
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.approve_cit_human
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.reject_cit
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.execute_cit
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.rollback_cit
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.emergency_control
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.resume_control
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L4
+  - key: AUTHORITY_POLICY.authority_levels_required.install_kernel
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L4
+  - key: AUTHORITY_POLICY.authority_levels_required.update_apply
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L4
+  - key: AUTHORITY_POLICY.authority_levels_required.install_tool
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.migrate_execute
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.build_memory
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.upstream_prepare
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.upstream_submit
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.recover
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.sweep_claims
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.record_routing_evidence
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+  - key: AUTHORITY_POLICY.authority_levels_required.retire_legacy_mechanism
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.mutate_governance_project_overlay
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.mutate_spec_decisions
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L3
+  - key: AUTHORITY_POLICY.authority_levels_required.mutate_spec_other
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L2
+  - key: AUTHORITY_POLICY.authority_levels_required.mutate_product_source
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: AUTHORITY_POLICY.authority_levels_required.*
+    value: L1
+- path: policies/BUDGET_POLICY.yaml
+  mode: structured
+  name: BUDGET_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: BUDGET_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      BUDGET_POLICY.policy:
+      - sha256:f27030d822691f7e84d582e79c19f3771a1e489fd31490380a6cf271e8883122
+  - key: BUDGET_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      BUDGET_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: BUDGET_POLICY.governed
+    class: pinned
+    precedence_rule: BUDGET_POLICY.*
+    digests:
+      BUDGET_POLICY.governed:
+      - sha256:561ee759355d776ecd0e164e1636fef859fe42667cf53257c81109796f791a46
+  - key: BUDGET_POLICY.defaults.max_parallel_agents
+    class: floor
+    op: decimal_at_most
+    precedence_rule: BUDGET_POLICY.defaults.*
+    value: 4
+  - key: BUDGET_POLICY.defaults.max_task_cost_usd
+    class: floor
+    op: decimal_at_most
+    precedence_rule: BUDGET_POLICY.defaults.*
+    value: 25
+  - key: BUDGET_POLICY.defaults.max_daily_spend_usd
+    class: floor
+    op: decimal_at_most
+    precedence_rule: BUDGET_POLICY.defaults.*
+    value: 200
+  - key: BUDGET_POLICY.defaults.max_install_cost_usd
+    class: floor
+    op: decimal_at_most
+    precedence_rule: BUDGET_POLICY.defaults.*
+    value: 0
+  - key: BUDGET_POLICY.defaults.max_network_calls_per_task
+    class: floor
+    op: decimal_at_most
+    precedence_rule: BUDGET_POLICY.defaults.*
+    value: 200
+  - key: BUDGET_POLICY.on_threshold_exceeded
+    class: pinned
+    precedence_rule: BUDGET_POLICY.*
+    digests:
+      BUDGET_POLICY.on_threshold_exceeded:
+      - sha256:cc902959591f840b3a137f01dc1569cfe782a2634251d699bb8df1f3333c3c0d
+- path: policies/CHANGE_POLICY.yaml
+  mode: structured
+  name: CHANGE_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: CHANGE_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      CHANGE_POLICY.policy:
+      - sha256:7911d2ada38e8e643a2739d36b004a91342ee344bfef0dcfba2b32062e607654
+  - key: CHANGE_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      CHANGE_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: CHANGE_POLICY.impact_radii
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.impact_radii:
+      - sha256:4b85202a7b8f3e9e08e76a1e56594d81e95defde8630875c0e2c22130c2ac247
+  - key: CHANGE_POLICY.auto_approve_max_radius
+    class: floor
+    op: ordered_at_most
+    order: *id001
+    precedence_rule: CHANGE_POLICY.auto_approve_max_radius
+    value: R1
+  - key: CHANGE_POLICY.auto_simulate_triggers
+    class: floor
+    op: set_superset
+    precedence_rule: CHANGE_POLICY.auto_simulate_triggers
+    value:
+    - architecture_change
+    - behaviour_change
+    - interface_change
+    - security_change
+    - governance_change
+    - infrastructure_cost
+    - acceptance_criteria_change
+    - data_migration
+  - key: CHANGE_POLICY.human_gate_triggers
+    class: floor
+    op: set_superset
+    precedence_rule: CHANGE_POLICY.human_gate_triggers
+    value:
+    - architecture_change
+    - security_change
+    - governance_change
+    - infrastructure_cost
+    - data_migration
+    - acceptance_criteria_change
+  - key: CHANGE_POLICY.radius_rules.governance_paths_radius
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.radius_rules.governance_paths_radius:
+      - sha256:c9a0c312ef6c5bdeabdef52e9924db7a0e62779e61c0136800ad01811c137fe8
+  - key: CHANGE_POLICY.radius_rules.cross_feature_threshold
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.radius_rules.cross_feature_threshold:
+      - sha256:4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce
+  - key: CHANGE_POLICY.radius_rules.cross_module_threshold
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.radius_rules.cross_module_threshold:
+      - sha256:d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35
+  - key: CHANGE_POLICY.radius_rules.interface_or_behaviour_radius
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.radius_rules.interface_or_behaviour_radius:
+      - sha256:85bd79b38a3e0897c5ad9341ccbc1f3849bf83273bb68ba12783fae76a287669
+  - key: CHANGE_POLICY.radius_rules.single_artifact_radius
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.radius_rules.single_artifact_radius:
+      - sha256:5521d24b8cf3e07b14fc0809677f011541551f586aa45b3c2b902d3c3f1ead0f
+  - key: CHANGE_POLICY.radius_rules.editorial_radius
+    class: pinned
+    precedence_rule: CHANGE_POLICY.*
+    digests:
+      CHANGE_POLICY.radius_rules.editorial_radius:
+      - sha256:94c89e73816dd083cfe9cec35974ea0ba8153bad6e121fef100909491c55fb70
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.R0
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    value: 0
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.R1
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    value: 1
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.R2
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    value: 2
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.R3
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    value: 3
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.R4
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    value: 4
+  - key: CHANGE_POLICY.graph_traversal_depth_by_radius.R5
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.graph_traversal_depth_by_radius.*
+    value: 5
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.R0
+    class: project_tunable
+    precedence_rule: CHANGE_POLICY.semantic_candidates_by_radius.*
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.R1
+    class: project_tunable
+    precedence_rule: CHANGE_POLICY.semantic_candidates_by_radius.*
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.R2
+    class: project_tunable
+    precedence_rule: CHANGE_POLICY.semantic_candidates_by_radius.*
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.R3
+    class: project_tunable
+    precedence_rule: CHANGE_POLICY.semantic_candidates_by_radius.*
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.R4
+    class: project_tunable
+    precedence_rule: CHANGE_POLICY.semantic_candidates_by_radius.*
+  - key: CHANGE_POLICY.semantic_candidates_by_radius.R5
+    class: project_tunable
+    precedence_rule: CHANGE_POLICY.semantic_candidates_by_radius.*
+  - key: CHANGE_POLICY.propagation.mark_affected_tasks_retest
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: CHANGE_POLICY.propagation.*
+    value: true
+  - key: CHANGE_POLICY.propagation.mark_affected_tests_stale
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: CHANGE_POLICY.propagation.*
+    value: true
+  - key: CHANGE_POLICY.propagation.regenerate_derived_views
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: CHANGE_POLICY.propagation.*
+    value: true
+  - key: CHANGE_POLICY.propagation.refresh_index
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: CHANGE_POLICY.propagation.*
+    value: true
+  - key: CHANGE_POLICY.verification_required
+    class: floor
+    op: set_superset
+    precedence_rule: CHANGE_POLICY.verification_required
+    value:
+    - schema_validation
+    - graph_integrity
+    - index_freshness
+  - key: CHANGE_POLICY.rollback.snapshot_before_execute
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: CHANGE_POLICY.rollback.snapshot_before_execute
+    value: true
+  - key: CHANGE_POLICY.rollback.keep_snapshots
+    class: floor
+    op: decimal_at_least
+    precedence_rule: CHANGE_POLICY.rollback.keep_snapshots
+    value: 20
+- path: policies/CHECKPOINT_POLICY.yaml
+  mode: structured
+  name: CHECKPOINT_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: CHECKPOINT_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      CHECKPOINT_POLICY.policy:
+      - sha256:c958be02c2dfef8755956f7f78cb97afd7750828eb08e3724c554ffe0d5e44ab
+  - key: CHECKPOINT_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      CHECKPOINT_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: CHECKPOINT_POLICY.fields
+    class: pinned
+    precedence_rule: CHECKPOINT_POLICY.*
+    digests:
+      CHECKPOINT_POLICY.fields:
+      - sha256:7704caaf7593206eb8345a964db7fdd60d0c93cba41c0901a8b6e47601860a72
+  - key: CHECKPOINT_POLICY.mandatory_triggers
+    class: floor
+    op: set_superset
+    precedence_rule: CHECKPOINT_POLICY.mandatory_triggers
+    value:
+    - task_transition
+    - material_decision
+    - accepted_cit
+    - significant_mutation
+    - before_handoff
+    - before_model_switch
+    - before_session_close
+    - before_compaction
+  - key: CHECKPOINT_POLICY.watchdog.context_utilisation_threshold
+    class: floor
+    op: decimal_at_most
+    precedence_rule: CHECKPOINT_POLICY.watchdog.context_utilisation_threshold
+    value: '0.75'
+  - key: CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints
+    class: floor
+    op: decimal_at_most
+    precedence_rule: CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints
+    value: 25
+  - key: CHECKPOINT_POLICY.location
+    class: pinned
+    precedence_rule: CHECKPOINT_POLICY.*
+    digests:
+      CHECKPOINT_POLICY.location:
+      - sha256:07412e7ddbc4ac3b838a2ff4ee8c375d1d2d380aa97bbb9856a497a03f36f8ea
+  - key: CHECKPOINT_POLICY.prose_summary_as_checkpoint
+    class: pinned
+    precedence_rule: CHECKPOINT_POLICY.*
+    digests:
+      CHECKPOINT_POLICY.prose_summary_as_checkpoint:
+      - sha256:472e701dff8f7bce2da6fa2d58e6eab005f9ae142926b4a3da6a22558d121341
+- path: policies/CONTEXT_POLICY.yaml
+  mode: structured
+  name: CONTEXT_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: CONTEXT_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      CONTEXT_POLICY.policy:
+      - sha256:06f15123e85b30168df703b7011521221088903766d23c7a014ac6ccbd4f8ae3
+  - key: CONTEXT_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      CONTEXT_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: CONTEXT_POLICY.packet_blocks
+    class: project_tunable
+    precedence_rule: CONTEXT_POLICY.*
+  - key: CONTEXT_POLICY.deterministic_authority_fields
+    class: floor
+    op: set_superset
+    precedence_rule: CONTEXT_POLICY.deterministic_authority_fields
+    value:
+    - task
+    - objective
+    - project_state
+    - governing_requirements
+    - active_decisions
+    - architecture
+    - interfaces
+    - scenarios
+    - acceptance_criteria
+    - allowed_writes
+    - prohibited_writes
+    - required_skills
+    - required_tools
+    - dependency_state
+  - key: CONTEXT_POLICY.retrieved_fields
+    class: project_tunable
+    precedence_rule: CONTEXT_POLICY.*
+  - key: CONTEXT_POLICY.max_packet_chars
+    class: project_tunable
+    precedence_rule: CONTEXT_POLICY.*
+  - key: CONTEXT_POLICY.max_retrieved_slices
+    class: project_tunable
+    precedence_rule: CONTEXT_POLICY.*
+  - key: CONTEXT_POLICY.fresh_agent_read_budget_files
+    class: project_tunable
+    precedence_rule: CONTEXT_POLICY.*
+  - key: CONTEXT_POLICY.reproducibility
+    class: pinned
+    precedence_rule: CONTEXT_POLICY.reproducibility
+    digests:
+      CONTEXT_POLICY.reproducibility:
+      - sha256:b9e209916b063d5d1e6011297e91a415f0f9b6cbcee45a8b21750beea4cb9731
+- path: policies/HUMAN_GATE_POLICY.yaml
+  mode: structured
+  name: HUMAN_GATE_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: HUMAN_GATE_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      HUMAN_GATE_POLICY.policy:
+      - sha256:f60167f4c4d31f5cb743d6c8d669c3f08a349ddfeb538e22c8b3f69ba11eda53
+  - key: HUMAN_GATE_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      HUMAN_GATE_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: HUMAN_GATE_POLICY.raise_for
+    class: floor
+    op: set_superset
+    precedence_rule: HUMAN_GATE_POLICY.raise_for
+    value:
+    - product_direction
+    - expensive_or_irreversible_architecture
+    - privacy_security_legal
+    - major_data_migration
+    - destructive_data_action
+    - vendor_choice
+    - ux_direction
+    - commercial_assumption
+    - high_cost_infrastructure
+    - material_acceptance_criterion
+    - low_confidence_critical_path
+    - governance_change
+  - key: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius
+    class: floor
+    op: ordered_at_most
+    order: *id001
+    precedence_rule: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius
+    value: R1
+  - key: HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence
+    class: floor
+    op: decimal_at_least
+    precedence_rule: HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence
+    value: '0.8'
+  - key: HUMAN_GATE_POLICY.agent_resolvable_when.reversible
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: HUMAN_GATE_POLICY.agent_resolvable_when.reversible
+    value: true
+  - key: HUMAN_GATE_POLICY.decision_package_fields
+    class: pinned
+    precedence_rule: HUMAN_GATE_POLICY.*
+    digests:
+      HUMAN_GATE_POLICY.decision_package_fields:
+      - sha256:f6aeb41702577bd4b2bb30795923a9523b737b24597f13079b0cf77ce9de5e14
+  - key: HUMAN_GATE_POLICY.prioritisation
+    class: pinned
+    precedence_rule: HUMAN_GATE_POLICY.*
+    digests:
+      HUMAN_GATE_POLICY.prioritisation:
+      - sha256:96d598def6e2f2b2389a4da72acc0b0f161b0705e9794f7e3eee18ba65d8b185
+  - key: HUMAN_GATE_POLICY.must_be_presented_in_chat
+    class: pinned
+    precedence_rule: HUMAN_GATE_POLICY.*
+    digests:
+      HUMAN_GATE_POLICY.must_be_presented_in_chat:
+      - sha256:b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b
+  - key: HUMAN_GATE_POLICY.continue_independent_work
+    class: project_tunable
+    precedence_rule: HUMAN_GATE_POLICY.continue_independent_work
+  - key: HUMAN_GATE_POLICY.batch_low_priority
+    class: project_tunable
+    precedence_rule: HUMAN_GATE_POLICY.batch_low_priority
+- path: policies/LEARNING_POLICY.yaml
+  mode: structured
+  name: LEARNING_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: LEARNING_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      LEARNING_POLICY.policy:
+      - sha256:b7d49ec9134e54980ce7d1c1e3503592b5030b25e0df25bfcc56b99ecc23626a
+  - key: LEARNING_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      LEARNING_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: LEARNING_POLICY.lesson_scopes
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.lesson_scopes:
+      - sha256:fdfd4ba0831207f9e9284ffa67a7e2b6817c9bf6ce3f105203e484f6e0a7eabc
+  - key: LEARNING_POLICY.lesson_lifecycle
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.lesson_lifecycle:
+      - sha256:a1092492ccf4cda3bec0a06e530bbc976525c1779a4deb3f810ad3f8500ec46e
+  - key: LEARNING_POLICY.corroboration_min_sources
+    class: floor
+    op: decimal_at_least
+    precedence_rule: LEARNING_POLICY.corroboration_min_sources
+    value: 1
+  - key: LEARNING_POLICY.upstream_eligible_scopes
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.upstream_eligible_scopes:
+      - sha256:7efe23227c2b57a4e2f9cdb4839a09f10f8217a38bb31f2f7284724f88ee4fc9
+  - key: LEARNING_POLICY.upstream.approval
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.upstream.approval:
+      - sha256:11e25bab0df4bb9f63c6dde985fea5de0ef16abdb2ec640dc08e7e97ec6b1d15
+  - key: LEARNING_POLICY.upstream.allowed_payload
+    class: floor
+    op: set_subset
+    precedence_rule: LEARNING_POLICY.upstream.allowed_payload
+    value:
+    - packet
+    - synthetic_fixture
+  - key: LEARNING_POLICY.upstream.aggregate_metrics_enabled
+    class: project_tunable
+    precedence_rule: LEARNING_POLICY.upstream.aggregate_metrics_enabled
+  - key: LEARNING_POLICY.upstream.forbidden_paths
+    class: floor
+    op: set_superset
+    precedence_rule: LEARNING_POLICY.upstream.forbidden_paths
+    value:
+    - product/**
+    - spec/**
+    - .governance-runtime/**
+    - governance/project/**
+    - archive/**
+    - '**/.env*'
+    - '**/*.db'
+    - '**/*.sqlite*'
+  - key: LEARNING_POLICY.upstream.forbidden_content
+    class: floor
+    op: set_superset
+    precedence_rule: LEARNING_POLICY.upstream.forbidden_content
+    value:
+    - secrets
+    - customer_identifiers
+    - project_identifiers
+    - raw_product_code
+    - raw_spec
+    - vector_index
+  - key: LEARNING_POLICY.upstream.max_code_lines_unless_synthetic
+    class: floor
+    op: decimal_at_most
+    precedence_rule: LEARNING_POLICY.upstream.max_code_lines_unless_synthetic
+    value: 0
+  - key: LEARNING_POLICY.upstream.ledger
+    class: project_tunable
+    precedence_rule: LEARNING_POLICY.upstream.ledger
+  - key: LEARNING_POLICY.release_triggers.critical_defect
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.release_triggers.critical_defect:
+      - sha256:12967e73125b0d959cf9056b0ed02954fe7dece6d433949dcd8e907b5ee8d7ec
+  - key: LEARNING_POLICY.release_triggers.cross_project_repeat
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.release_triggers.cross_project_repeat:
+      - sha256:7a55802802a4e52936cdf1a10abe771925b1b25a1c76bb2a05991ea892e75d11
+  - key: LEARNING_POLICY.release_triggers.repeated_low_level
+    class: pinned
+    precedence_rule: LEARNING_POLICY.*
+    digests:
+      LEARNING_POLICY.release_triggers.repeated_low_level:
+      - sha256:322482270b1b78a1993c4ef7fbd14a223cc9cbbb2a45e49e869274af00c4fb95
+- path: policies/MEMORY_POLICY.yaml
+  mode: structured
+  name: MEMORY_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: MEMORY_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      MEMORY_POLICY.policy:
+      - sha256:e35f0f1c727f959d3e6d1fe0714aa46e2a12101e3b828a71428415fe77886a4c
+  - key: MEMORY_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      MEMORY_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: MEMORY_POLICY.runtime_dir
+    class: pinned
+    precedence_rule: MEMORY_POLICY.runtime_dir
+    digests:
+      MEMORY_POLICY.runtime_dir:
+      - sha256:710a1e5db3fa861cb27b22f851c29195eb95afdec19b17104c6989dc99784058
+  - key: MEMORY_POLICY.memory_classes
+    class: pinned
+    precedence_rule: MEMORY_POLICY.memory_classes
+    digests:
+      MEMORY_POLICY.memory_classes:
+      - sha256:c5497694bf439a33f146cc0925ef45ed8dfc1bd91f616b80b22dc4ff68588024
+  - key: MEMORY_POLICY.embedding.provider
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.embedding.version
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.embedding.dimensions
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.reranker.provider
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.reranker.version
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.lexical.tokenizer
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.chunking.max_chars
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.chunking.overlap_chars
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.chunking.levels
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.default_k
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.fusion
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.rrf_k
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.parent_expansion_top_n
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.graph_neighbour_depth
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.max_slice_chars
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.retrieval.rerank_candidates
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.*
+  - key: MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close
+    class: floor
+    op: decimal_at_most
+    precedence_rule: MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close
+    value: 0
+  - key: MEMORY_POLICY.freshness.on_stale_close
+    class: pinned
+    precedence_rule: MEMORY_POLICY.freshness.on_stale_close
+    digests:
+      MEMORY_POLICY.freshness.on_stale_close:
+      - sha256:34e382cfb94027bb2ebfad2bcd3affd03b843b3d285b73bc2760d19b65abd85f
+  - key: MEMORY_POLICY.freshness.max_index_age_hours
+    class: floor
+    op: decimal_at_most
+    precedence_rule: MEMORY_POLICY.freshness.max_index_age_hours
+    value: 168
+  - key: MEMORY_POLICY.regression.heldout_file
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.regression.heldout_file
+  - key: MEMORY_POLICY.regression.min_queries
+    class: floor
+    op: decimal_at_least
+    precedence_rule: MEMORY_POLICY.regression.min_queries
+    value: 5
+  - key: MEMORY_POLICY.regression.min_recall_at_k
+    class: floor
+    op: decimal_at_least
+    precedence_rule: MEMORY_POLICY.regression.min_recall_at_k
+    value: '0.8'
+  - key: MEMORY_POLICY.regression.min_mrr
+    class: floor
+    op: decimal_at_least
+    precedence_rule: MEMORY_POLICY.regression.min_mrr
+    value: '0.5'
+  - key: MEMORY_POLICY.regression.max_stale_hit_rate
+    class: floor
+    op: decimal_at_most
+    precedence_rule: MEMORY_POLICY.regression.max_stale_hit_rate
+    value: '0.0'
+  - key: MEMORY_POLICY.regression.max_superseded_hit_rate
+    class: floor
+    op: decimal_at_most
+    precedence_rule: MEMORY_POLICY.regression.max_superseded_hit_rate
+    value: '0.0'
+  - key: MEMORY_POLICY.rebuild.must_reproduce_manifest_hash
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: MEMORY_POLICY.rebuild.must_reproduce_manifest_hash
+    value: true
+  - key: MEMORY_POLICY.namespaces.governance.sensitivity
+    class: floor
+    op: ordered_at_least
+    order: *id002
+    precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
+    value: internal
+  - key: MEMORY_POLICY.namespaces.governance.roles
+    class: floor
+    op: set_subset
+    precedence_rule: MEMORY_POLICY.namespaces.*.roles
+    value:
+    - all
+  - key: MEMORY_POLICY.namespaces.governance.retention
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.governance.export
+    class: floor
+    op: ordered_at_least
+    order: *id003
+    precedence_rule: MEMORY_POLICY.namespaces.*.export
+    value: framework-lessons-only
+  - key: MEMORY_POLICY.namespaces.governance.embed
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.spec.sensitivity
+    class: floor
+    op: ordered_at_least
+    order: *id002
+    precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
+    value: internal
+  - key: MEMORY_POLICY.namespaces.spec.roles
+    class: floor
+    op: set_subset
+    precedence_rule: MEMORY_POLICY.namespaces.*.roles
+    value:
+    - all
+  - key: MEMORY_POLICY.namespaces.spec.retention
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.spec.export
+    class: floor
+    op: ordered_at_least
+    order: *id003
+    precedence_rule: MEMORY_POLICY.namespaces.*.export
+    value: denied
+  - key: MEMORY_POLICY.namespaces.spec.embed
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.product.sensitivity
+    class: floor
+    op: ordered_at_least
+    order: *id002
+    precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
+    value: internal
+  - key: MEMORY_POLICY.namespaces.product.roles
+    class: floor
+    op: set_subset
+    precedence_rule: MEMORY_POLICY.namespaces.*.roles
+    value:
+    - engineering
+  - key: MEMORY_POLICY.namespaces.product.retention
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.product.export
+    class: floor
+    op: ordered_at_least
+    order: *id003
+    precedence_rule: MEMORY_POLICY.namespaces.*.export
+    value: denied
+  - key: MEMORY_POLICY.namespaces.product.embed
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.archive.sensitivity
+    class: floor
+    op: ordered_at_least
+    order: *id002
+    precedence_rule: MEMORY_POLICY.namespaces.*.sensitivity
+    value: internal
+  - key: MEMORY_POLICY.namespaces.archive.roles
+    class: floor
+    op: set_subset
+    precedence_rule: MEMORY_POLICY.namespaces.*.roles
+    value:
+    - all
+  - key: MEMORY_POLICY.namespaces.archive.retention
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.archive.export
+    class: floor
+    op: ordered_at_least
+    order: *id003
+    precedence_rule: MEMORY_POLICY.namespaces.*.export
+    value: denied
+  - key: MEMORY_POLICY.namespaces.archive.embed
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.archive.default_retrieval
+    class: project_tunable
+    precedence_rule: MEMORY_POLICY.namespaces.*.*
+  - key: MEMORY_POLICY.namespaces.secret.sensitivity
+    class: pinned
+    precedence_rule: MEMORY_POLICY.namespaces.secret.*
+    digests:
+      MEMORY_POLICY.namespaces.secret.sensitivity:
+      - sha256:c1980264fc223a890afae83c91bd2d438ef2ad0dae751fdea3660c3e556b1396
+  - key: MEMORY_POLICY.namespaces.secret.roles
+    class: pinned
+    precedence_rule: MEMORY_POLICY.namespaces.secret.*
+    digests:
+      MEMORY_POLICY.namespaces.secret.roles:
+      - sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+  - key: MEMORY_POLICY.namespaces.secret.retention
+    class: pinned
+    precedence_rule: MEMORY_POLICY.namespaces.secret.*
+    digests:
+      MEMORY_POLICY.namespaces.secret.retention:
+      - sha256:fc1da59e80561a4646db2a8172254fbb5151e533992ccec5579159be3883e14c
+  - key: MEMORY_POLICY.namespaces.secret.export
+    class: pinned
+    precedence_rule: MEMORY_POLICY.namespaces.secret.*
+    digests:
+      MEMORY_POLICY.namespaces.secret.export:
+      - sha256:e5532718eccbf3b707efcf5696a3347b6ac2fad00fe3417fbcf4fe6786394821
+  - key: MEMORY_POLICY.namespaces.secret.embed
+    class: pinned
+    precedence_rule: MEMORY_POLICY.namespaces.secret.*
+    digests:
+      MEMORY_POLICY.namespaces.secret.embed:
+      - sha256:fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa
+  - key: MEMORY_POLICY.namespaces.secret.default_retrieval
+    class: pinned
+    precedence_rule: MEMORY_POLICY.namespaces.secret.*
+    digests:
+      MEMORY_POLICY.namespaces.secret.default_retrieval:
+      - sha256:fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa
+- path: policies/MODEL_ROUTING_POLICY.yaml
+  mode: structured
+  name: MODEL_ROUTING_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: MODEL_ROUTING_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      MODEL_ROUTING_POLICY.policy:
+      - sha256:09375fcc7fa64f4b5ad933eeba4c66bba8a05a57c200ec359217c57112054f36
+  - key: MODEL_ROUTING_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      MODEL_ROUTING_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: MODEL_ROUTING_POLICY.tiers.T0.name
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T0.description
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T1.name
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T1.description
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T2.name
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T2.description
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T3.name
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.tiers.T3.description
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.reasoning_levels
+    class: project_tunable
+    precedence_rule: MODEL_ROUTING_POLICY.*
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.discovery
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.research
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.experiment
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.specification
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.decision-preparation
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.data
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T1
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.architecture
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.implementation
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.integration
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.test-design
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.test-execution
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T1
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.security
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.devops
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.performance
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.validation
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T1
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.refactor
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.repair
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.documentation
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T1
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.release
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.tooling
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.memory
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.governance
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.task_class_minimum_tier.migration
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.task_class_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R0
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    value: T1
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R1
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    value: T1
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R2
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R3
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    value: T2
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R4
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.radius_minimum_tier.R5
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    precedence_rule: MODEL_ROUTING_POLICY.radius_minimum_tier.*
+    value: T3
+  - key: MODEL_ROUTING_POLICY.record_evidence
+    class: floor
+    op: set_superset
+    precedence_rule: MODEL_ROUTING_POLICY.record_evidence
+    value:
+    - model
+    - provider
+    - task_class
+    - reasoning_effort
+    - cost
+    - latency
+    - pass_fail
+    - repair_count
+    - reviewer_findings
+- path: policies/POLICY_PRECEDENCE.yaml
+  mode: structured
+  name: POLICY_PRECEDENCE
+  policy_file: true
+  collections:
+  - path: rules
+    id_field: key
+    rationale: rules are compared per concrete key of the policy universe through the precedence lattice, so a new, reordered or re-scoped rule cannot weaken any key
+  leaves:
+  - key: POLICY_PRECEDENCE.rules[key]#members
+    class: precedence
+    rationale: rules are compared per concrete key of the policy universe through the precedence lattice, so a new, reordered or re-scoped rule cannot weaken any key
+  - key: POLICY_PRECEDENCE.rules[key=*]
+    class: covered_by_collection
+    subtree: true
+  - key: POLICY_PRECEDENCE.policy
+    class: pinned
+    note: document header
+    digests:
+      POLICY_PRECEDENCE.policy:
+      - sha256:fa52610c711960b69139ee95d65f236fabebbbe2bc44281e884d7bd0442a10d6
+  - key: POLICY_PRECEDENCE.version
+    class: pinned
+    note: document header
+    digests:
+      POLICY_PRECEDENCE.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: POLICY_PRECEDENCE.layers
+    class: pinned
+    digests:
+      POLICY_PRECEDENCE.layers:
+      - sha256:8dfb2f908cd2e9d98891aa2cb997684669e1573c750c6586f440e796a5f50cce
+  - key: POLICY_PRECEDENCE.default_mode
+    class: floor
+    op: equals
+    value: immutable
+- path: policies/SECURITY_POLICY.yaml
+  mode: structured
+  name: SECURITY_POLICY
+  policy_file: true
+  collections:
+  - path: secret_content_patterns
+    id_field: id
+    rationale: a new content pattern only classifies more material as secret; registered patterns cannot be removed or edited
+  leaves:
+  - key: SECURITY_POLICY.secret_content_patterns[id]#members
+    class: members
+    op: ids_superset
+    registered:
+    - aws-access-key
+    - aws-secret-key
+    - generic-api-key
+    - github-token
+    - jwt
+    - password-assignment
+    - private-key-block
+    - slack-token
+    - stripe-like-key
+    rationale: a new content pattern only classifies more material as secret; registered patterns cannot be removed or edited
+  - key: SECURITY_POLICY.secret_content_patterns[id=*].id
+    class: collection_id
+  - key: SECURITY_POLICY.secret_content_patterns[id=*].regex
+    class: covered_by_collection
+    rationale: 'field of an additional (unregistered) member of an additive collection: a new content pattern only classifies more material as secret; registered patterns cannot be removed or edited'
+  - key: SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=aws-access-key].regex:
+      - sha256:af1fb3419048499c723a474146d133aef90a1e480a1bce9690c5f7a82ba2b7cb
+  - key: SECURITY_POLICY.secret_content_patterns[id=aws-secret-key].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=aws-secret-key].regex:
+      - sha256:1d641ea6d0448ccd409e504c9e292e289d04eebb7b4adca1f912d1e99b6544ae
+  - key: SECURITY_POLICY.secret_content_patterns[id=private-key-block].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=private-key-block].regex:
+      - sha256:fbebc1ee4db673750c11a65229eb90de4ede2972876a41c55effc028374fa332
+  - key: SECURITY_POLICY.secret_content_patterns[id=github-token].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=github-token].regex:
+      - sha256:78dfba26847482c25e79cdeb2a86e14ab752d009d934e2d02bc5253a6fe40171
+  - key: SECURITY_POLICY.secret_content_patterns[id=generic-api-key].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=generic-api-key].regex:
+      - sha256:70aa255416b4582479fdc675bb59bf241e7df5f844a1c2aa4ebd0ce887de0a3d
+  - key: SECURITY_POLICY.secret_content_patterns[id=password-assignment].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=password-assignment].regex:
+      - sha256:f100ef92994380d3559f29f67b864117152d2f63b3d9ff8fe83a56fcae5a34a9
+  - key: SECURITY_POLICY.secret_content_patterns[id=slack-token].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=slack-token].regex:
+      - sha256:09a21e814e6854523f2690106e83be6959ab9ca1e0e58713a7fbfec17589d703
+  - key: SECURITY_POLICY.secret_content_patterns[id=stripe-like-key].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=stripe-like-key].regex:
+      - sha256:b5c67335890a245df44e6afa1d23a59255eec342798c49ca1d3a642da4a9f20c
+  - key: SECURITY_POLICY.secret_content_patterns[id=jwt].regex
+    class: pinned
+    note: registered member content
+    digests:
+      SECURITY_POLICY.secret_content_patterns[id=jwt].regex:
+      - sha256:777790114723ee44034839d5c0e64dd1fe1d389f819d27fb5b312e899996f880
+  - key: SECURITY_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      SECURITY_POLICY.policy:
+      - sha256:923926150abd0ed25f843ea84eff2c93d36424f6f10311642e6b4f99efc1372f
+  - key: SECURITY_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      SECURITY_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: SECURITY_POLICY.sensitivity_classes
+    class: pinned
+    precedence_rule: SECURITY_POLICY.*
+    digests:
+      SECURITY_POLICY.sensitivity_classes:
+      - sha256:585ccd0dc42d1ed17ac17c06814f5483db1aa6a1c9ab6e521623cac96bd963b1
+  - key: SECURITY_POLICY.never_index_classes
+    class: floor
+    op: set_superset
+    precedence_rule: SECURITY_POLICY.never_index_classes
+    value:
+    - secret
+    - restricted
+  - key: SECURITY_POLICY.never_export_classes
+    class: floor
+    op: set_superset
+    precedence_rule: SECURITY_POLICY.never_export_classes
+    value:
+    - secret
+    - restricted
+    - confidential
+  - key: SECURITY_POLICY.secret_path_patterns
+    class: floor
+    op: set_superset
+    precedence_rule: SECURITY_POLICY.secret_path_patterns
+    value:
+    - '**/.env'
+    - '**/.env.*'
+    - '**/*.pem'
+    - '**/*.key'
+    - '**/id_rsa*'
+    - '**/secrets/**'
+    - '**/*secret*.yaml'
+    - '**/*secret*.yml'
+    - '**/*secret*.json'
+    - '**/*credentials*'
+  - key: SECURITY_POLICY.on_secret_outside_secret_class
+    class: pinned
+    precedence_rule: SECURITY_POLICY.*
+    digests:
+      SECURITY_POLICY.on_secret_outside_secret_class:
+      - sha256:e2602cac58bcc5d74290df0c322ad206ec9fce0074568cf8a3e3005f94bca7c6
+  - key: SECURITY_POLICY.on_secret_in_export_payload
+    class: pinned
+    precedence_rule: SECURITY_POLICY.*
+    digests:
+      SECURITY_POLICY.on_secret_in_export_payload:
+      - sha256:76d85c2e901cd2f2ee2debce85f2ec66eb52eae37cd4b6e9194532beca100b32
+  - key: SECURITY_POLICY.agent_read_default_for_secret_class
+    class: pinned
+    precedence_rule: SECURITY_POLICY.*
+    digests:
+      SECURITY_POLICY.agent_read_default_for_secret_class:
+      - sha256:472e701dff8f7bce2da6fa2d58e6eab005f9ae142926b4a3da6a22558d121341
+- path: policies/TEST_POLICY.yaml
+  mode: structured
+  name: TEST_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: TEST_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      TEST_POLICY.policy:
+      - sha256:2eb33734915045713cd54cb988a1c5fb07e7ebf85cef94321741b58805c23ca6
+  - key: TEST_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      TEST_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: TEST_POLICY.product_families
+    class: project_tunable
+    precedence_rule: TEST_POLICY.product_families
+  - key: TEST_POLICY.governance_families
+    class: floor
+    op: set_superset
+    precedence_rule: TEST_POLICY.governance_families
+    value:
+    - schema_invariants
+    - graph_integrity
+    - index_freshness
+    - memory_retrieval_regression
+    - authority_role_limits
+    - mutation_scope
+    - path_map_compliance
+    - context_reproducibility
+    - concurrency_claims
+    - adapter_portability
+    - skill_regression
+    - command_contract_consistency
+    - secrets_sensitivity_indexing
+    - recovery_rebuild
+    - fresh_agent_reconstruction
+    - product_traceability
+    - audit_reproducibility
+    - policy_enforcement_coverage
+    - policy_precedence
+    - plugin_governance
+  - key: TEST_POLICY.independent_test_author_required_for
+    class: floor
+    op: set_superset
+    precedence_rule: TEST_POLICY.independent_test_author_required_for
+    value:
+    - acceptance
+    - scenario
+    - system
+  - key: TEST_POLICY.implementation_task_requires
+    class: floor
+    op: set_superset
+    precedence_rule: TEST_POLICY.implementation_task_requires
+    value:
+    - scenarios_present
+    - acceptance_tests_declared
+  - key: TEST_POLICY.green_record_currency
+    class: pinned
+    precedence_rule: TEST_POLICY.*
+    digests:
+      TEST_POLICY.green_record_currency:
+      - sha256:e8605061a580df8915d8af123f11e173fea14ad927fd5d9a7021988c300fbb96
+  - key: TEST_POLICY.task_close_requires_tests_status
+    class: floor
+    op: set_subset
+    precedence_rule: TEST_POLICY.task_close_requires_tests_status
+    value:
+    - passed
+    - not_applicable_with_reason
+- path: policies/TOOL_POLICY.yaml
+  mode: structured
+  name: TOOL_POLICY
+  policy_file: true
+  collections: []
+  leaves:
+  - key: TOOL_POLICY.policy
+    class: pinned
+    note: document header
+    digests:
+      TOOL_POLICY.policy:
+      - sha256:4a84fc88f28d1d068186ad78fca712a1f8888c1744156f80017e6248b87d367f
+  - key: TOOL_POLICY.version
+    class: pinned
+    note: document header
+    digests:
+      TOOL_POLICY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: TOOL_POLICY.permission_classes
+    class: pinned
+    precedence_rule: TOOL_POLICY.*
+    digests:
+      TOOL_POLICY.permission_classes:
+      - sha256:ee51c74b6f02c0e4027935ad54922c6bb2dc0e1bd90a9e94fa76d5c5d9f0ed86
+  - key: TOOL_POLICY.tool_types
+    class: pinned
+    precedence_rule: TOOL_POLICY.*
+    digests:
+      TOOL_POLICY.tool_types:
+      - sha256:d1a4a01c8483032f044e980562416590e1b86b28677b4dfee8ce46a10617c3ec
+  - key: TOOL_POLICY.auto_install_conditions
+    class: floor
+    op: set_superset
+    precedence_rule: TOOL_POLICY.auto_install_conditions
+    value:
+    - role_has_install_authority
+    - installation_reversible
+    - cost_within_budget
+    - no_privilege_escalation
+    - licence_and_security_satisfied
+    - version_pinned_and_recorded
+    - tool_registered
+    - environment_reproducible
+  - key: TOOL_POLICY.approved_licences
+    class: floor
+    op: set_subset
+    precedence_rule: TOOL_POLICY.approved_licences
+    value:
+    - MIT
+    - BSD-2-Clause
+    - BSD-3-Clause
+    - Apache-2.0
+    - ISC
+    - MPL-2.0
+    - PSF-2.0
+    - Python-2.0
+    - Unlicense
+    - CC0-1.0
+  - key: TOOL_POLICY.health_check_required
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: TOOL_POLICY.health_check_required
+    value: true
+  - key: TOOL_POLICY.mcp.registry_path
+    class: pinned
+    precedence_rule: TOOL_POLICY.*
+    digests:
+      TOOL_POLICY.mcp.registry_path:
+      - sha256:7cb9ccd91e6ac8c0b9c7eebe76a27e9eac436e7ed4c37c4cb7b6886ae4861576
+  - key: TOOL_POLICY.mcp.scope
+    class: pinned
+    precedence_rule: TOOL_POLICY.*
+    digests:
+      TOOL_POLICY.mcp.scope:
+      - sha256:e0c643cead12fc4625ae2a7ad7ab7c03ec0408f7e90d6efb40e3056802962ac4
+  - key: TOOL_POLICY.plugins.descriptor_schema
+    class: pinned
+    precedence_rule: TOOL_POLICY.plugins.descriptor_schema
+    digests:
+      TOOL_POLICY.plugins.descriptor_schema:
+      - sha256:69702235fce4060161e55afc759d0e773f3eeff2e8ba6a93b3c7db6f8a8a7df9
+  - key: TOOL_POLICY.plugins.require_valid_descriptor
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: TOOL_POLICY.plugins.require_valid_descriptor
+    value: true
+  - key: TOOL_POLICY.plugins.min_authority
+    class: floor
+    op: level_at_least
+    kind: level
+    precedence_rule: TOOL_POLICY.plugins.min_authority
+    value: L2
+  - key: TOOL_POLICY.plugins.registry_path
+    class: pinned
+    precedence_rule: TOOL_POLICY.plugins.registry_path
+    digests:
+      TOOL_POLICY.plugins.registry_path:
+      - sha256:b67bf2310eb8fc1e7e9bc01b1720a9a86337bf3e576243931b29708853e0bddb
+  - key: TOOL_POLICY.plugins.registration_binds
+    class: pinned
+    precedence_rule: TOOL_POLICY.plugins.registration_binds
+    digests:
+      TOOL_POLICY.plugins.registration_binds:
+      - sha256:02e651d681f1ae7d5fd60f4379ee071effd3a175dd8c1fc0335974ee32881374
+  - key: TOOL_POLICY.plugins.elevated_permission_classes
+    class: floor
+    op: set_superset
+    precedence_rule: TOOL_POLICY.plugins.elevated_permission_classes
+    value:
+    - NETWORK_READ
+    - NETWORK_WRITE
+    - PACKAGE_INSTALL
+    - SYSTEM_INSTALL
+    - DB_WRITE
+    - CLOUD_WRITE
+    - CI_TRIGGER
+    - SECRET_READ
+    - DEPLOY_STAGING
+    - DEPLOY_PRODUCTION
+  - key: TOOL_POLICY.plugins.refuse_on_pin_drift
+    class: floor
+    op: bool_toward
+    strict: true
+    precedence_rule: TOOL_POLICY.plugins.refuse_on_pin_drift
+    value: true
+  - key: TOOL_POLICY.plugins.timeout_seconds
+    class: project_tunable
+    precedence_rule: TOOL_POLICY.plugins.timeout_seconds
+- path: roles/ROLES.yaml
+  mode: structured
+  name: ROLES
+  collections:
+  - path: roles
+    id_field: id
+    rationale: removing a role id reclassifies `--by <id>` gate answers as human (gates.rs answer); adding a role grants a new authority level
+  leaves:
+  - key: ROLES.version
+    class: pinned
+    note: document header
+    digests:
+      ROLES.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: ROLES.authority_levels.*.*
+    class: informational
+    rationale: 'display vocabulary for levels; no runtime reader (grep runtime/src 4.1.5: only authority_levels_required is read); levels are parsed from roles[].level'
+  - key: ROLES.groups.engineering
+    class: floor
+    op: set_subset
+    value:
+    - orchestrator
+    - architecture-agent
+    - frontend-engineer
+    - backend-engineer
+    - data-engineer
+    - integration-engineer
+    - ai-ml-engineer
+    - devops-engineer
+    - security-engineer
+    - performance-engineer
+    - independent-test-designer
+    - test-execution-agent
+    - integration-agent
+    - change-controller
+    - memory-engineer
+    - tooling-engineer
+    - independent-auditor
+    - release-agent
+    - migration-executor
+    - migration-reviewer
+    - migration-verifier
+    - memory-verifier
+    - human
+    rationale: group membership grants memory-namespace access (authority.rs role_in); adding a member widens access
+  - key: ROLES.groups.product
+    class: floor
+    op: set_subset
+    value:
+    - orchestrator
+    - product-spec-agent
+    - ux-agent
+    - research-agent
+    - data-author
+    - routine-documentation
+    - human
+    rationale: group membership grants memory-namespace access (authority.rs role_in); adding a member widens access
+  - key: ROLES.roles[id]#members
+    class: members
+    op: ids_equal
+    registered:
+    - ai-ml-engineer
+    - architecture-agent
+    - backend-engineer
+    - change-controller
+    - data-author
+    - data-engineer
+    - devops-engineer
+    - frontend-engineer
+    - human
+    - independent-auditor
+    - independent-test-designer
+    - integration-agent
+    - integration-engineer
+    - memory-engineer
+    - memory-verifier
+    - migration-executor
+    - migration-reviewer
+    - migration-verifier
+    - orchestrator
+    - performance-engineer
+    - product-spec-agent
+    - release-agent
+    - research-agent
+    - routine-documentation
+    - security-engineer
+    - test-execution-agent
+    - tooling-engineer
+    - ux-agent
+    rationale: role ids are the authority map's domain
+  - key: ROLES.roles[id=*].id
+    class: collection_id
+  - key: ROLES.roles[id=orchestrator].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L4
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=orchestrator].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=orchestrator].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=orchestrator].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=orchestrator].name:
+      - sha256:0b37200e3f8c0ba5d1c1d47732c99dca7865023d4d6ce8a32f451986993c860e
+  - key: ROLES.roles[id=product-spec-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=product-spec-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=product-spec-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=product-spec-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=product-spec-agent].name:
+      - sha256:7e383d3c47f74de8af9ea607c6e4a3831c71533cdab7dbf0333f2ce68cda68ed
+  - key: ROLES.roles[id=research-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=research-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=research-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=research-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=research-agent].name:
+      - sha256:5629b1bfdaa7e7b3b4fb09f47d0aa5172ff0cf5efcee472600a246bc1b613fb7
+  - key: ROLES.roles[id=architecture-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=architecture-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=architecture-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=architecture-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=architecture-agent].name:
+      - sha256:738253359a7e478a91d128b6a657b52f1614dffb14963630548a2f5587082dfe
+  - key: ROLES.roles[id=ux-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=ux-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=ux-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=ux-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=ux-agent].name:
+      - sha256:a8e61b1a35a57f475a28a7c2ae40255a974a37e2644d922dbafd32919ae049a5
+  - key: ROLES.roles[id=frontend-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=frontend-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=frontend-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=frontend-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=frontend-engineer].name:
+      - sha256:dbacec123740d4ca313c33304a1929a3002b3ef847591c0352c290f15308f6ad
+  - key: ROLES.roles[id=backend-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=backend-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=backend-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=backend-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=backend-engineer].name:
+      - sha256:d66a95c2c93ba12c58acc42951f5183361f03864c34e1519dd308d1a6f62a1d6
+  - key: ROLES.roles[id=data-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=data-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=data-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=data-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=data-engineer].name:
+      - sha256:d75d0cf921589629eef7b6d8e6a1e57a8eea9c147d394014fcf91a0bbb552cd5
+  - key: ROLES.roles[id=integration-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=integration-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=integration-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=integration-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=integration-engineer].name:
+      - sha256:3e5cb84cf299166285484d1b3718e6b8293d7eb588ca5a765f7d167da1c94917
+  - key: ROLES.roles[id=ai-ml-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=ai-ml-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=ai-ml-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=ai-ml-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=ai-ml-engineer].name:
+      - sha256:4f3fe3fc8589aae61dc4168148dcaa78cd5f7bcd354b2faa69e287270e9a3642
+  - key: ROLES.roles[id=devops-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=devops-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=devops-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=devops-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=devops-engineer].name:
+      - sha256:75af2184b3ec1fa532da16632d2ee4607d6b7136da5ce99f6129b9d675049cfa
+  - key: ROLES.roles[id=security-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=security-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=security-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=security-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=security-engineer].name:
+      - sha256:ddcc2025c75955fb75c8200639a11f68173dabfadfd16400e2ee6811ada95258
+  - key: ROLES.roles[id=performance-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=performance-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=performance-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=performance-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=performance-engineer].name:
+      - sha256:90038bc7bbe05d2b686f75b875f809973543ebee1d519163b102cce7c32e4633
+  - key: ROLES.roles[id=data-author].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=data-author].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T1
+  - key: ROLES.roles[id=data-author].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: low
+  - key: ROLES.roles[id=data-author].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=data-author].name:
+      - sha256:d59fd13f10ecc25fd61cbbf15b9f308d89636894dc71fe2d821ba0d2d6f7e1c4
+  - key: ROLES.roles[id=independent-test-designer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=independent-test-designer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=independent-test-designer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=independent-test-designer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=independent-test-designer].name:
+      - sha256:d340c9fa698eee04011daa243d95c538e699f48991b66e8b4201048e3c88a912
+  - key: ROLES.roles[id=test-execution-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=test-execution-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T1
+  - key: ROLES.roles[id=test-execution-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: low
+  - key: ROLES.roles[id=test-execution-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=test-execution-agent].name:
+      - sha256:b8b7e1c5d459c3b1029af0092bfa69f70c4f852081be8f6ee21e79518f5d0148
+  - key: ROLES.roles[id=integration-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=integration-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=integration-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=integration-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=integration-agent].name:
+      - sha256:c23012355869e230540613f4eef25c8413ac06e322f37634dd8a3d41ed0b3e77
+  - key: ROLES.roles[id=change-controller].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L3
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=change-controller].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=change-controller].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=change-controller].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=change-controller].name:
+      - sha256:7ac95d4de010dcd11e900d85c04aff1d5e3fd1fa276f0b54e8147f9e43258404
+  - key: ROLES.roles[id=memory-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=memory-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=memory-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=memory-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=memory-engineer].name:
+      - sha256:7f6a6bc4f3440ca9a1c7906ab8b2e682c9b1811074442613539c2c69eefb84ff
+  - key: ROLES.roles[id=tooling-engineer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=tooling-engineer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=tooling-engineer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=tooling-engineer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=tooling-engineer].name:
+      - sha256:4a90307d1a054cbcee94886174d203511c5eb5bfc4f697e82961b62d18d47d2a
+  - key: ROLES.roles[id=independent-auditor].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L0
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=independent-auditor].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=independent-auditor].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=independent-auditor].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=independent-auditor].name:
+      - sha256:a646bcf1430ab5c951f0806acf136e1b2ca98d3bec7f135fbefcf62264c76e98
+  - key: ROLES.roles[id=release-agent].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L2
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=release-agent].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T2
+  - key: ROLES.roles[id=release-agent].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: medium
+  - key: ROLES.roles[id=release-agent].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=release-agent].name:
+      - sha256:ed69378a98255c65a2fa2afcab4f64fbe3812e92ddc994d7b4650c69d24b8c06
+  - key: ROLES.roles[id=routine-documentation].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L1
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=routine-documentation].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T1
+  - key: ROLES.roles[id=routine-documentation].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: low
+  - key: ROLES.roles[id=routine-documentation].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=routine-documentation].name:
+      - sha256:5b0c078addffb493e2924bf11c9988142812a06fc0e13c135751b877d5cba513
+  - key: ROLES.roles[id=migration-executor].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L3
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=migration-executor].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=migration-executor].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=migration-executor].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=migration-executor].name:
+      - sha256:e556153924798602746190218cef29d2761860f6e73932d77ad50c3ac14fb192
+  - key: ROLES.roles[id=migration-reviewer].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L0
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=migration-reviewer].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=migration-reviewer].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=migration-reviewer].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=migration-reviewer].name:
+      - sha256:269dbaf880412e15e85b66e42c322d1d1c45747a867a76d7234f8d718d3a4eca
+  - key: ROLES.roles[id=migration-verifier].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L0
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=migration-verifier].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=migration-verifier].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=migration-verifier].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=migration-verifier].name:
+      - sha256:94d1d55dd3dc73814a3ed7481f4e1411a07903744437422e3d7c076718f8381d
+  - key: ROLES.roles[id=memory-verifier].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L0
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=memory-verifier].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: T3
+  - key: ROLES.roles[id=memory-verifier].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: high
+  - key: ROLES.roles[id=memory-verifier].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=memory-verifier].name:
+      - sha256:0033c89e38b36beb7d1045439dc09f6f9c3db907ee1061f3bcc90026ddd97090
+  - key: ROLES.roles[id=human].level
+    class: floor
+    op: level_at_most
+    kind: level
+    value: L5
+    rationale: the actor's authority level for every authority check (authority.rs level_of); raising it is a weakening
+  - key: ROLES.roles[id=human].minimum_tier
+    class: floor
+    op: ordered_at_least
+    order: *id004
+    value: none
+  - key: ROLES.roles[id=human].default_reasoning
+    class: floor
+    op: ordered_at_least
+    order: *id005
+    value: none
+  - key: ROLES.roles[id=human].name
+    class: pinned
+    note: rendered into agent adapters
+    digests:
+      ROLES.roles[id=human].name:
+      - sha256:cd8e40ff809593f24f2e65294ebd29e3aca0f23c35bc31e4da4f91530a505730
+- path: constitution/HARD_INVARIANTS.yaml
+  mode: structured
+  name: HARD_INVARIANTS
+  collections:
+  - path: invariants
+    id_field: id
+    rationale: invariant text is copied verbatim into agent adapters; ids and statements are registered
+  leaves:
+  - key: HARD_INVARIANTS.version
+    class: pinned
+    note: document header
+    digests:
+      HARD_INVARIANTS.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: HARD_INVARIANTS.invariants[id]#members
+    class: members
+    op: ids_equal
+    registered:
+    - INV-001
+    - INV-002
+    - INV-003
+    - INV-004
+    - INV-005
+    - INV-006
+    - INV-007
+    - INV-008
+    - INV-009
+    - INV-010
+    - INV-011
+    - INV-012
+    - INV-013
+    - INV-014
+    - INV-015
+    rationale: invariant text is copied verbatim into agent adapters; ids and statements are registered
+  - key: HARD_INVARIANTS.invariants[id=*]
+    class: pinned
+    subtree: true
+    note: each registered member is content-registered as a whole
+    digests:
+      HARD_INVARIANTS.invariants[id=INV-001]:
+      - sha256:02b0c1ca8496914e6a5d22f28daa19daad58ee882be46284269ce8144a795ad0
+      HARD_INVARIANTS.invariants[id=INV-002]:
+      - sha256:04d39ec00c28bf505cc42d3827b6fe0c2da8745161d7627114f203292907bf10
+      HARD_INVARIANTS.invariants[id=INV-003]:
+      - sha256:6c694418d3aaf7dddbd7f67869639ecce505c0313399cd45caa049e34040719e
+      HARD_INVARIANTS.invariants[id=INV-004]:
+      - sha256:adc01fb6c82278fb1a84dfaceb2c5a574ce5d754affe53842e674f62dc461483
+      HARD_INVARIANTS.invariants[id=INV-005]:
+      - sha256:5310596ddd8b89ba2ae62f1a6ca29f5a935172a219dfc119c26f51a9d65b2b19
+      HARD_INVARIANTS.invariants[id=INV-006]:
+      - sha256:024c421b58ca89185f6a90b03339f24f49f2297eed9166cf0f5d17e7d2c517f0
+      HARD_INVARIANTS.invariants[id=INV-007]:
+      - sha256:e6dadcbc0d323a3315ede7e6794f1be08c30d7d9b9577a91cca9f9b0c814d438
+      HARD_INVARIANTS.invariants[id=INV-008]:
+      - sha256:ddf79279c6d9b006c93fddbd657184a09a051e395075445293965d6f437e28fd
+      HARD_INVARIANTS.invariants[id=INV-009]:
+      - sha256:92f6406ba8d779da888fd469a053a6594378372a82b7577803f460fa4d744782
+      HARD_INVARIANTS.invariants[id=INV-010]:
+      - sha256:fc630149bc91cb119ccdcc1f9f4831d550be0c362246834ecf73670b2f62a9ce
+      HARD_INVARIANTS.invariants[id=INV-011]:
+      - sha256:ca5eb5c25e95991d0793852b3d83487d1209051a2c42f835643b24b20b5dfe86
+      HARD_INVARIANTS.invariants[id=INV-012]:
+      - sha256:e2f140fbd807dca374c944802dfc176f1a8dbe18ba46f6a8011b7b35f14eeae0
+      HARD_INVARIANTS.invariants[id=INV-013]:
+      - sha256:76c1d22be4a65e32bda38e9f87c4f6159defc3957ac3a9fbf13309a7c6067c2c
+      HARD_INVARIANTS.invariants[id=INV-014]:
+      - sha256:80dc3076f9bd77c268f352115ecacb4511b203ed1629e46cffdc8b25875c939d
+      HARD_INVARIANTS.invariants[id=INV-015]:
+      - sha256:e2112e245473ea08bc0ec32e51917afbaa2215f7217bd6f2de3ef606193f775b
+- path: KERNEL.yaml
+  mode: structured
+  name: KERNEL
+  collections: []
+  leaves:
+  - key: KERNEL.framework
+    class: floor
+    op: equals
+    value: agentic-engineering-os
+  - key: KERNEL.version
+    class: release_bound
+    statement_field: release.version
+    rationale: must equal the signed release statement (04 V8/V11); decides compatibility only, never eligibility, floors or gates
+  - key: KERNEL.kernel_contract_version
+    class: release_bound
+    statement_field: compatibility.kernel_contract_version
+    rationale: must equal the signed release statement (04 V8/V11); decides compatibility only, never eligibility, floors or gates
+  - key: KERNEL.cli_version
+    class: release_bound
+    statement_field: compatibility.cli
+    rationale: must equal the signed release statement (04 V8/V11); decides compatibility only, never eligibility, floors or gates
+  - key: KERNEL.runtime_version
+    class: release_bound
+    statement_field: compatibility.runtime
+    rationale: must equal the signed release statement (04 V8/V11); decides compatibility only, never eligibility, floors or gates
+  - key: KERNEL.supported_from_versions
+    class: release_bound
+    statement_field: compatibility.supported_from_versions
+    rationale: must equal the signed release statement (04 V8/V11); decides compatibility only, never eligibility, floors or gates
+  - key: KERNEL.schema_versions.framework-lock
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.kernel-manifest
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.repository-contract
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.project-policy
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.capability-profile
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.tool-permissions
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.model-routing-overrides
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.data-sensitivity
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.project-exceptions
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.record
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.task
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.decision
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.feature
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.cit
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.checkpoint
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.handoff
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.lesson
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.upstream-packet
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.migration
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.context-packet
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.index-manifest
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.skill
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.tool
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.release-manifest
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.framework-change-proposal
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.plugin-descriptor
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.schema_versions.plugin-registry
+    class: release_bound
+    statement_field: compatibility.schema_versions
+    rationale: must equal the signed release statement; selects record-schema versions, validated against the pinned schemas
+  - key: KERNEL.framework_revision
+    class: pinned
+    digests:
+      KERNEL.framework_revision:
+      - sha256:7fd325a3b5756cbcba1d169641f143d459327eacb34a21efbf9a9f96c1cceeb3
+  - key: KERNEL.payload_dirs
+    class: pinned
+    digests:
+      KERNEL.payload_dirs:
+      - sha256:31613c1eeac7e59f257fb509d9ee0f9ab6e16aa8996ad65819ac848d0b7b9809
+  - key: KERNEL.adapter_versions.generic
+    class: pinned
+    digests:
+      KERNEL.adapter_versions.generic:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: KERNEL.adapter_versions.ide
+    class: pinned
+    digests:
+      KERNEL.adapter_versions.ide:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: KERNEL.adapter_versions.cli
+    class: pinned
+    digests:
+      KERNEL.adapter_versions.cli:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: KERNEL.adapter_versions.api
+    class: pinned
+    digests:
+      KERNEL.adapter_versions.api:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: KERNEL.adapter_versions.mcp
+    class: pinned
+    digests:
+      KERNEL.adapter_versions.mcp:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+- path: tools/registry/TOOLS.yaml
+  mode: structured
+  name: TOOLS_REGISTRY
+  collections:
+  - path: tools
+    id_field: tool_id
+    rationale: tool descriptors carry executed install and health commands; a new or edited descriptor needs registration, removal is a narrowing
+  leaves:
+  - key: TOOLS_REGISTRY.version
+    class: pinned
+    note: document header
+    digests:
+      TOOLS_REGISTRY.version:
+      - sha256:39fe4a40977d0585fd5704359e3685b0ada5cf5ee061e5d97385601d120cd0ec
+  - key: TOOLS_REGISTRY.tools[tool_id]#members
+    class: members
+    op: ids_subset
+    registered:
+    - TOOL-AST-001
+    - TOOL-CARGO-001
+    - TOOL-CARGO-002
+    - TOOL-CARGO-003
+    - TOOL-CMAKE-001
+    - TOOL-FS-001
+    - TOOL-GIT-001
+    - TOOL-GO-001
+    - TOOL-LSP-RUST-001
+    - TOOL-MAKE-001
+    - TOOL-MAVEN-001
+    - TOOL-NPM-001
+    - TOOL-SECRETS-001
+    - TOOL-SQLITE-001
+    - TOOL-TEST-001
+    - TOOL-WEB-001
+    rationale: tool descriptors carry executed install and health commands; a new or edited descriptor needs registration, removal is a narrowing
+  - key: TOOLS_REGISTRY.tools[tool_id=*]
+    class: pinned
+    subtree: true
+    note: each registered member is content-registered as a whole
+    digests:
+      TOOLS_REGISTRY.tools[tool_id=TOOL-FS-001]:
+      - sha256:ddd4f92f264bec9b92967c6e449eba6eb6d412999176eda6fcd493ec92d825b5
+      TOOLS_REGISTRY.tools[tool_id=TOOL-GIT-001]:
+      - sha256:2a36a740ab03b2fdf715784727854537ef7099996973246c79e5503539d40c21
+      TOOLS_REGISTRY.tools[tool_id=TOOL-TEST-001]:
+      - sha256:439b4c0bbca7b0938a386e057f2fb00b6198a610c4166fbb680e413cda461011
+      TOOLS_REGISTRY.tools[tool_id=TOOL-AST-001]:
+      - sha256:4bc3e031137e52fe86e49b17dad0b41b0df4b769de45544fda0eb32221a4f7c4
+      TOOLS_REGISTRY.tools[tool_id=TOOL-CARGO-001]:
+      - sha256:12afcf13c294c4eb76b647f072014a20573d89964e52dfaa1c8737e715fbb30f
+      TOOLS_REGISTRY.tools[tool_id=TOOL-CARGO-002]:
+      - sha256:c1cf7dc1451d77f23fe0b560f2ceaf743c847850404f34c9c0d2f807d0d4e6f1
+      TOOLS_REGISTRY.tools[tool_id=TOOL-CARGO-003]:
+      - sha256:ab66ed284bc71f73c4fa950edb1064bede698a210df04f6940c5e5e20574498c
+      TOOLS_REGISTRY.tools[tool_id=TOOL-LSP-RUST-001]:
+      - sha256:e20fb61183499cc8fbe5382c13f953ebe4e8f9d28bb2b119c19e92e395d289fa
+      TOOLS_REGISTRY.tools[tool_id=TOOL-NPM-001]:
+      - sha256:6f93bf9b5fae013f9edbd075478ccdc6d17f83e7425cba3dc2be8e67a34f6639
+      TOOLS_REGISTRY.tools[tool_id=TOOL-GO-001]:
+      - sha256:13430fa4211660e9ee5e6b3e3599201c3352d5df458596d147f048df594fcade
+      TOOLS_REGISTRY.tools[tool_id=TOOL-CMAKE-001]:
+      - sha256:913ea9cdced8be32bb5af6cf82fdba5264119636ce11c10aca1c4cfc8c79c485
+      TOOLS_REGISTRY.tools[tool_id=TOOL-MAKE-001]:
+      - sha256:82f29642d51558129dd5914f8cab9ba2e8c7211ec8971ac74dff05c3804d3342
+      TOOLS_REGISTRY.tools[tool_id=TOOL-MAVEN-001]:
+      - sha256:822df02cc836f1359c7d174d1095aa66453d1f7755c144ed6dc9d1dfefd5e1cd
+      TOOLS_REGISTRY.tools[tool_id=TOOL-SQLITE-001]:
+      - sha256:151e13a361ceeea827a033746b52ff643ec87f52a4be2f03599c32e6e16bf68f
+      TOOLS_REGISTRY.tools[tool_id=TOOL-SECRETS-001]:
+      - sha256:b5e9a61279fe60cbec4db4c9c857f27e74f6b0d56d45ad9133149cbdb73b7cfc
+      TOOLS_REGISTRY.tools[tool_id=TOOL-WEB-001]:
+      - sha256:c00f37a7aca2e56e5ef3f497a018bd9d9cb9e5e783ace8ac99ffa461f0eb9804
+- path: policies/ENFORCEMENT_MAP.yaml
+  mode: pinned_file
+  digests:
+    policies/ENFORCEMENT_MAP.yaml:
+    - sha256:2a91b6ebc620884685e6304011567d75f7e708c5a7e60cd21393825725d0ae94
+  rationale: non-orderable constitutional content (enforcement map, command contract, constitution text, MCP registry)
+- path: commands/COMMAND_CONTRACT.yaml
+  mode: pinned_file
+  digests:
+    commands/COMMAND_CONTRACT.yaml:
+    - sha256:2112d08f3f69403df30d0f8ae8e3cd519207527c8c5697c4eba4882107371bb0
+  rationale: non-orderable constitutional content (enforcement map, command contract, constitution text, MCP registry)
+- path: constitution/CONSTITUTION.md
+  mode: pinned_file
+  digests:
+    constitution/CONSTITUTION.md:
+    - sha256:42b51ef6b4b854ae54beae91f6cc8aec8696964d1746b3ae14fb44490eef889a
+  rationale: non-orderable constitutional content (enforcement map, command contract, constitution text, MCP registry)
+- path: tools/mcp/registry.yaml
+  mode: pinned_file
+  digests:
+    tools/mcp/registry.yaml:
+    - sha256:8b848c6660cef227827ce3df20308ee6f021460b23ca861fe404c962096a3758
+  rationale: non-orderable constitutional content (enforcement map, command contract, constitution text, MCP registry)
+- glob: adapters/*
+  mode: pinned_file
+  digests:
+    adapters/api/adapter.yaml:
+    - sha256:349dc1b97fc22fe1407dba473485cf2a83d0b5656104bb23fdc3910889677ba7
+    adapters/api/template.txt:
+    - sha256:d0375120f1f644c9e81571c95afdaa4d307a1b12aaee70ce60a7cbfd9499d43e
+    adapters/cli/adapter.yaml:
+    - sha256:213ed3431046548ba3d23c76149f95e23935886e5bd9d7192dde61e7c7e1df82
+    adapters/cli/template.json:
+    - sha256:5dde7411f6ce9d88af9c0b9a72c9030bafe12a63886b6b2237ddf6e6b3cc9397
+    adapters/generic/adapter.yaml:
+    - sha256:fbcfcbfcce4898a81e001ccfad54106ecf99b3b1f39a8d7454a98f6e9ba1a026
+    adapters/generic/template.md:
+    - sha256:816f63f27a25db8d8232eba0eb19a015e7739423c09ca74f0bff06886baf1fdb
+    adapters/ide/adapter.yaml:
+    - sha256:b1df123015595ed38a5954a1717aed7763be8576bbb238fb8d718b0901ba3fc6
+    adapters/ide/template.md:
+    - sha256:c24056c99a0d207f6282fc3c8989d7bfcd958f1b72e4bedb4c4cad7cbf6376db
+    adapters/mcp/adapter.yaml:
+    - sha256:7af3b0315a33ff692ab26c52d7f00498557951bd68fbee6ace9b53d13a9c39a8
+    adapters/mcp/template.json:
+    - sha256:8065407e0b535458b76bfec8bac80377093a584dad91d0dc3d12c593881d9b73
+  rationale: agent-facing adapter descriptors and templates
+- glob: overlay-templates/*.yaml
+  mode: pinned_file
+  digests:
+    overlay-templates/CAPABILITY_PROFILE.yaml:
+    - sha256:7d8fa1a23a11d73dac3c3c9e329433197204f2ad97e729a1ed0a4deb770e45e1
+    overlay-templates/DATA_SENSITIVITY.yaml:
+    - sha256:8d9cae75908924890639a2082c7a957b9819db092a1916882aea56aa4baa4a5e
+    overlay-templates/MODEL_ROUTING_OVERRIDES.yaml:
+    - sha256:e1236acd1c2de7a2f55219074dde69c4e366d7f0f10e77c7ac90573ce7b4477f
+    overlay-templates/PROJECT_EXCEPTIONS.yaml:
+    - sha256:5ee22dd12b8e688a7e204a2f87dd5c1a3b35e033d199309688c8c4dddac7d71d
+    overlay-templates/PROJECT_POLICY.yaml:
+    - sha256:635f5cb885b80cd3d0522305a782190bf30bfdd8d3f2069b8ebd14251e4b6973
+    overlay-templates/REPOSITORY_CONTRACT.yaml:
+    - sha256:7f5d5dc08f951f421000ccfb3c022e8efbf4ecef263388247af17becd2106416
+    overlay-templates/TOOL_PERMISSIONS.yaml:
+    - sha256:653b32a81fbfc89cd059cbdb02861878a1682322836501cec820aaf1adfba203
+  rationale: defaults written into every new project overlay
+- glob: schemas/*.schema.json
+  mode: pinned_file
+  digests:
+    schemas/adapter-manifest.schema.json:
+    - sha256:47190483d9c89061efbb107dfe9bfa77fed52a2bfd71033328071e755c439e2d
+    schemas/adoption-baseline.schema.json:
+    - sha256:a6b78d342f029bf6565629929a243389ce838e0cc14f400e31d79747945ecb85
+    schemas/audit.schema.json:
+    - sha256:db35e5978cb5de39a337dc99eb97f1c551c5e60db92c5c043447fb23cc0bca51
+    schemas/capability-profile.schema.json:
+    - sha256:f39a38a4f38ec3d7787c38d3362ce55599c87bbcac44c38c7d0650aa8e90e75e
+    schemas/checkpoint.schema.json:
+    - sha256:9846b0a980b41c9ee03fb73378d2a3fe0eefba0698353901701c31405117c729
+    schemas/cit.schema.json:
+    - sha256:edfe7ac66d49a841b63a46e2a527c3141c0e41279c989f43ede808e1d39561f1
+    schemas/command-contract.schema.json:
+    - sha256:331c65fecb25ca36320bd13e623c59e57cbbedf667c57680435acf6210f53a1a
+    schemas/context-packet.schema.json:
+    - sha256:34e55f1448010d85b79a098b6d14f786a2b3a9d9383966b7547b4a56aa91ac56
+    schemas/data-sensitivity.schema.json:
+    - sha256:73d2f880e85c4742ad8e54e5595ebdb1b49205d869d4316d803a325e17363559
+    schemas/decision.schema.json:
+    - sha256:9b838970e0ef91ae3a4a04c30ead49ee4641ef45dcfcd755331ff1973650b6d9
+    schemas/experiment.schema.json:
+    - sha256:cb177851adac594180f24117cd155165a830646d3d345a48dd9d43f5422eeb1b
+    schemas/feature.schema.json:
+    - sha256:8e80c327fbce34525242056a71b79527a588d147f7dccd09b6f4da2475e82f81
+    schemas/framework-change-proposal.schema.json:
+    - sha256:96d3c9282da8ac074d4a83ad9db175b263fda768d74c09672ac0cb1896e03744
+    schemas/framework-lock.schema.json:
+    - sha256:18ee2a4f9eaec8e60d7466de211430b0015388e0f72569366d730790547376f7
+    schemas/handoff.schema.json:
+    - sha256:c32c6f6ba8ea695f70015ad41e54eb024554500181fc09d74406566db7741307
+    schemas/hard-invariants.schema.json:
+    - sha256:524aebb663757d0cee08cf8b455f523b0c14583e68340845381b2ff6705409bc
+    schemas/heldout-tests.schema.json:
+    - sha256:e5d6c02bf74f71f98d67f522b44acc64ecd8e4a699d9ea70a208dcc3545e1b0b
+    schemas/human-gate.schema.json:
+    - sha256:b8acb1108a05398c263feab907680550253502b38c7c512b685c06cddf489f15
+    schemas/index-manifest.schema.json:
+    - sha256:25bc54e826938250faa5bd0ed08fa7e8cc83519efbf471263feb9fea890b93cf
+    schemas/interface.schema.json:
+    - sha256:e92008a53df637806bdb664692e7d670bdcc4709f74a53d611ccbc406f1a5d8d
+    schemas/kernel-manifest.schema.json:
+    - sha256:dbd8c7c94beeeec70b767fbd8fd8ff25c745fe446598f8906f37ddf6ff78612d
+    schemas/lesson.schema.json:
+    - sha256:97cec3a263185d43a174b992cc6468eaf4076a7de82e748a75084d0179634211
+    schemas/mcp-registry.schema.json:
+    - sha256:7d188d7391c7e388e874f32a41093627dde18f5a10aed7e70302ac87564d660c
+    schemas/memory-manifest.schema.json:
+    - sha256:b6ad21e7e1ba794e01e31b88fa74dc2d996cfb815cfccbdec6d268731634f7b9
+    schemas/migration-catalogue-entry.schema.json:
+    - sha256:855e9fd15acde2753abe2f0f020f7583cde9f13ad12ea7061f795c7ef9792a22
+    schemas/migration.schema.json:
+    - sha256:8898acb43f4945f2a17880c8afbf834751b8b1e290707c41100e084a2fe717fd
+    schemas/model-routing-overrides.schema.json:
+    - sha256:3491d26cd31a095f3583ef7fe88dd02c441fb89186929801249acc37508ee9be
+    schemas/plugin-descriptor.schema.json:
+    - sha256:ae601fd1798421ed4882968937dc286f96d0fc92ac281c69196495899bd95265
+    schemas/plugin-registry.schema.json:
+    - sha256:e50ea7a05022ba04a850b7c677cce083d304384f914c2b52d99f9717505c9124
+    schemas/policy-ARCHIVE_POLICY.schema.json:
+    - sha256:e994d39e58f67c5c6a55383204c60f6dcad4bc2548c5a2fc6237da01d4f3ce5d
+    schemas/policy-AUTHORITY_POLICY.schema.json:
+    - sha256:57ca6b3731fccb1202de424317b596f2d7742b277888bb481420e1557a6aeb9f
+    schemas/policy-BUDGET_POLICY.schema.json:
+    - sha256:b6973ffcf0a4b9241daaf6fe4481af333d911b576910bd7e86c33819c27acf14
+    schemas/policy-CHANGE_POLICY.schema.json:
+    - sha256:ed6e1a2f0672b693444fce1c4da10fa7685e14c92f5a1ac417cda87243a3cf2a
+    schemas/policy-CHECKPOINT_POLICY.schema.json:
+    - sha256:b701ffc0c0a84b12f4acb9360c86dff9795de857d72cee47b5ac781bd8db7650
+    schemas/policy-CONTEXT_POLICY.schema.json:
+    - sha256:bf6e2eb1b549f8c90d9a8e1417187c06760b70a1775966628448be76b06354ff
+    schemas/policy-HUMAN_GATE_POLICY.schema.json:
+    - sha256:18c6664dc8bb3a9f6530b4f34f5a8dc054ed8ed527aa1a36aa796aaccd3abb97
+    schemas/policy-LEARNING_POLICY.schema.json:
+    - sha256:c842b2e35f5767e75f7b18b33906788594de72db8d3f419a549f92ddd83658ba
+    schemas/policy-MEMORY_POLICY.schema.json:
+    - sha256:2255a17d172a3d3ec34d81455dcf0f21a64561a676a47b2a722038e890a90d89
+    schemas/policy-MODEL_ROUTING_POLICY.schema.json:
+    - sha256:9a2a8ade11eb9fa46159b6e6507f9a0e648a40f3e6f853428b6a482d02d5603c
+    schemas/policy-SECURITY_POLICY.schema.json:
+    - sha256:1d748b7255315162014f0a58eeea984ecad5e7d8dd1a4b7fe6e3fc1cf7019d3d
+    schemas/policy-TEST_POLICY.schema.json:
+    - sha256:1dbc8ec20651eb9b7688137d2e5d81304974e2d6083dd9eb091d4475fe429b8c
+    schemas/policy-TOOL_POLICY.schema.json:
+    - sha256:e38e223d5dde5edc874724e83a7f83a69cc7aa52228dab46b8d0d5890f94a9d4
+    schemas/project-exceptions.schema.json:
+    - sha256:82d6f43bcfedd92ee91492b4b63af02f3d8495d76cb18164bb7979f72392fa21
+    schemas/project-policy.schema.json:
+    - sha256:275dfdc37b5460e77d31908f311632678b3c37739edfe460d3db8bfe992ae951
+    schemas/project.schema.json:
+    - sha256:e1e2c00990ded3f94a6f018303bbf19946edc761135933eb4fd71083dfbd7ce3
+    schemas/readiness-dimensions.schema.json:
+    - sha256:12000ca2971c582476a7b99029a378e64fab79726137c1dc60acd99c9a793061
+    schemas/record.schema.json:
+    - sha256:c6513ecdf4e4386f91705be2a895be3a5776c7842bd45d11270e9d3d82db3df6
+    schemas/release-manifest.schema.json:
+    - sha256:52e3ade526798e08aba293729ba6073ca9a773a385d26ab35fffd83a75924070
+    schemas/report.schema.json:
+    - sha256:ca337399defc9f1ac79516c9cdd515e10e928bbe5d755407a82eac9fd720ccf4
+    schemas/repository-contract.schema.json:
+    - sha256:b4ea338f4ee304cc3914ffa6fd240193148b2a83518d64d0ae71b736af2432c7
+    schemas/requirement.schema.json:
+    - sha256:518731b30db5378787885872a0cb0eb16339af54707bc632198b027a69dd6094
+    schemas/research.schema.json:
+    - sha256:b8ff4a0b9ddc04af5831a9126a8892bcd346deeebc6975a57a98af17fd13c777
+    schemas/roles.schema.json:
+    - sha256:683c9efff80d34789f1009310cfc4600d796cc48aedef112867148857e5cac03
+    schemas/scenario.schema.json:
+    - sha256:fa583d529153e455852a2833b85c58e02098234ae13cd351b80baab3d17403c9
+    schemas/skill.schema.json:
+    - sha256:50934d7982bc91cfab51cff88505a91267734adf797e5774ec340c5f748f7e2c
+    schemas/task.schema.json:
+    - sha256:f5361d1647f5dd2fe6b7b3003475152ca547f8873a917ab42f9e43e797461c55
+    schemas/test-obligation.schema.json:
+    - sha256:2f23aff2d6e39ec69eab5661ac717a3af1bcbd6fff6d9d98b932c0ed3076f7fb
+    schemas/tool-permissions.schema.json:
+    - sha256:93152a8306eda91951319a2edd25aec122c4478977897ff05af219cedf24d9ae
+    schemas/tool-registry.schema.json:
+    - sha256:35b3361444e88cf287a37bc924ffd8e92607e1406ff8435f9343377ef003b8f3
+    schemas/tool.schema.json:
+    - sha256:0c2ecb506a8b52eafb00563188f36b62d69dfb622d0feb616947e0b799b71509
+    schemas/upstream-packet.schema.json:
+    - sha256:124721d0c884513308156e72b788304293304a1e594061ceda926f6e300a73b9
+    schemas/worker-return.schema.json:
+    - sha256:949c34283454b5af8477a970b1eed0719336476a55d266647b4b94057655a709
+  rationale: validate records, overlays, exceptions, gates, registries and migrations
+- glob: skills/SKL-*.yaml
+  mode: pinned_file
+  digests:
+    skills/SKL-API-CONTRACT-REVIEW.yaml:
+    - sha256:842bba2593500798f4799b4a24aedb5a78560914cb17cd1ab14dda0c3b06adba
+    skills/SKL-BACKEND-IMPL.yaml:
+    - sha256:5b5f94794999e975ab68e5797b24864fd08f3ffde2fb4823819ef71bc145208a
+    skills/SKL-DB-MIGRATION.yaml:
+    - sha256:d97b1eeab664f83b4878c9d5b9012da012fbb6eba62c6508ba04302aedbc8953
+    skills/SKL-IMPACT-ANALYSIS.yaml:
+    - sha256:a7aa1f6d3e443aa07ede7a51c908f5f547e2d12bfceaf11cd8b24681d3549125
+    skills/SKL-LIVE-MIGRATION.yaml:
+    - sha256:d54923a946940c553195204f353987be3fa33b2033c4a362aaaae4795204ecc4
+    skills/SKL-MEMORY-RECONSTRUCTION.yaml:
+    - sha256:431a6c09cefcee2888578fdba4117d4163f79254aa5aabc30511c323aa2a9b30
+    skills/SKL-REPO-ADOPTION.yaml:
+    - sha256:057cdc038a0f068427f7894244c84833d134cd723d922b30c17055b2500a7d3a
+    skills/SKL-RESEARCH-BENCHMARK.yaml:
+    - sha256:fe63fe288a05896bcda1ca865ea17d1bfeeb14b65803b5e5ccca3fc8efe3bc73
+    skills/SKL-TASK-CLOSE.yaml:
+    - sha256:512f8c980f692ed533bd6d75bfdf01a821f8ac76f5809a981c66f8887fa32b33
+    skills/SKL-TEST-DESIGN.yaml:
+    - sha256:18abcfb9bf210abe18a06d91748e6e700c76ef856d9c69e03382f9f8e0fb778a
+    skills/SKL-THREAT-MODEL.yaml:
+    - sha256:347090b60af203931d92eaff87ea24fd25a94504298648ef276c79b5e6ee4567
+    skills/SKL-TOOL-INSTALL.yaml:
+    - sha256:7e28f0c698a7e9f873892629fc46d604341bbc1d1b2f1a36d0c61078096f5481
+  rationale: agent-facing skill instructions
+- glob: taxonomy/*.yaml
+  mode: pinned_file
+  digests:
+    taxonomy/CAPABILITY_TAXONOMY.yaml:
+    - sha256:30d5109f773c5e17c22bca0bf0dc4f66bb66ae76e961b59652985afee3cfb540
+    taxonomy/READINESS_DIMENSIONS.yaml:
+    - sha256:5f223b94bad87dea17d2f4c904fcac4eb886f7f8f6e89d9247f052067869f6e4
+  rationale: readiness and capability vocabularies consumed by readiness gating
+- glob: migrations/M-*.yaml
+  mode: transaction_input
+  rationale: "consumed only inside the install transaction from authenticated buffers (04 V10); overlay effects are computed and every weakening needs a trust gate (19 \xA79); cannot change any floor, pin\
+    \ or registration"
+- path: migrations/README.md
+  mode: informational_file
+  rationale: documentation; no runtime reader
+- path: tools/installers/README.md
+  mode: informational_file
+  rationale: documentation; no runtime reader

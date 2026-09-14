@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/verification-attestation.schema.json",
   "title": "verification-attestation",
-  "description": "PROPOSED (RoT-1 revision 2). Independent verification verdict for one candidate statement digest, signed by the verification-attestation purpose. Certifies nothing by itself.",
+  "description": "PROPOSED (RoT-1 revision 3). Verification attestation (unchanged shape from revision 2): the independent verifier's verdict for one candidate statement digest.",
   "x-schema-version": "1.0.0",
   "type": "object",
   "additionalProperties": false,

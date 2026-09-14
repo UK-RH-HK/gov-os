@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/dsse-envelope.schema.json",
   "title": "dsse-envelope",
-  "description": "PROPOSED (RoT-1 revision 2). Structural envelope checks only; purpose, signature, canonical form, lineage, profile and source context are 05 SV-1..SV-10.",
+  "description": "PROPOSED (RoT-1 revision 3). DSSE envelope (unchanged from revision 2; 05 SV-1).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,

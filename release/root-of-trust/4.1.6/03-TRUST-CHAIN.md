@@ -1,109 +1,113 @@
 # Output 3 — Trust-chain diagram
 
-> **RoT-1 revision 2 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
-> Revision 2 adds currency (eligibility and floors), monotonic trust state, purpose separation, byte binding, the
-> protected-path writer rule and the trust-format boundary.
+> **RoT-1 revision 3 — PROPOSED, pending a fresh independent review; not approved, not implemented.**
+> Revision 3 adds:
+> - the Constitutional Surface (`23`);
+> - freshness anchoring (`24`);
+> - binary and trust-base authentication (`25`);
+> - legacy-path occupation (`26`);
+> - local trust-gate authorisation (`27`).
 
 ## 1. The chain
 
 ```text
- ═══════════════════════ OFFLINE / OUTSIDE EVERY REPOSITORY (private keys) ═══════════════════════
-  root (k-of-n) ── trust-policy (root keys) ── trust-state ── release-final ── release-candidate
-  verification-attestation ── certification-status ── revocation ── retrieval-profile          (05 §1)
-        │ sign: each purpose signs only its own statement types (05 §2), key sets constrained (05 KS-1…KS-7)
+ ═══════════════════════ OFFLINE / OUTSIDE EVERY REPOSITORY (private keys) ════════════════════════════════════════════
+  root (k-of-n) ── trust-policy (root keys) ── trust-state ── release-final ── release-candidate ── release-artifact (≥2)
+  build-attestation ── verification-attestation ── certification-status ── revocation ── retrieval-profile      (05 §1)
+        │ each purpose signs only its own types; compiled pairwise whitelist (05 §3)
         ▼
-  trust-root vN · Trust Policy (floors, eligibility, install authority, gating) · Trust State (published set)
-  release (final|candidate) · attestation · certification · revocation · profile       — public, signed
- ═══════╪═════════════════════════════════════════════════════════════════════════════════════════
-        │ carried by: binaries (compiled) · bundles · governance/trust/ (PTR) · Verifier Trust Store · refresh
+  trust-root vN · Trust Policy v2 (Constitutional Surface, eligibility + historical releases, bootstrap, lowering history)
+  Trust State v2 (prior_states, artifacts) · release (final|candidate) · artefact · build attestation · attestation ·
+  certification · revocation · profile                                                          — public, signed
+  independent channels: trust_root_id + state fingerprint of every TSS                          — public, unsigned (06 §2)
+ ═══════╪══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+        │ binaries: reproducible build → build-attestation → artifact-final (release-artifact ×2) → TSS reference (25)
         ▼
-  T0  gov binary — compiled: root chain, newest TPS, newest TSS + referenced statements, historical-identity
-      registry, purpose table + separation constraints, statement schemas, floor operators,
-      EmbeddedSnapshot + its statement, trust-format reader versions
+  T0  gov binary — compiled Trust Base Manifest names: root chain, TPS (surface, floors, bootstrap), TSS, embedded release;
+      compiled code: purpose table, schemas, floor-ops/2, precedence lattice, command register, layout reader
+        │   accepted only by verify-artifact A1–A10 or built from source at a verified tag; first run: TBM ≥ VTS high-water
         │
-        │  knowledge set K = T0 ∪ VTS ∪ PTR ∪ bundle ∪ refresh     (verified statements only; availability untrusted)
-        │  effective root · effective TPS · admissible TSS · negative set N · required minimums      (17 §5)
+        │  knowledge K = T0 ∪ VTS ∪ PTR ∪ bundle ∪ refresh   (verified only; union; availability untrusted)
+        │  anchors  = pin (TA-9) · human confirm-state (TA-5) · witness (OP-7 c, TA-7) · retained        (24 §3)
+        │  effective root · TPS (prior_policies, computed lowering) · TSS (resolution → orphans → equivocation → admissibility)
+        │  negative set (MS-2) · trust_state axis · freshness axis                                     (17 §5, 24 §4)
         ▼
-  authenticate(SourceRef)        ← the only constructor of T1 release material                        (04)
-     secure reader: read once → VerifiedBlobs (18 §1)
-     SV-1…SV-10 purpose-bound signature checks (05 §4)
-     V8 identity + lineage + stage · V9 every blob digest = RCS(D) · V10 migration chain · V11 compatibility
+  authenticate(SourceRef): read once → SV-1…SV-10 → V8 identity → V9 content → V10 migrations → V11 compatibility
         ▼
-  T1  AuthenticatedRelease (memory only; CI = (D, tree_digest))
-        │
-        │  currency   (19 §6)  E1 release purpose · E2 stage · E3 min sequence · E4 not revoked · E5 binary
-        │                      E6 lineage · E7 floors registered · E8 trust state not STALE · E9 downgrade authorised
-        │  authorise  (19 §8, 17 §7, 21 OP-3) authority floor from T0/TPS ⊔ current eligible kernel (never the target)
-        │                      gate bound to D (mode A: always) · computed weakenings gated (19 §9)
+  T1  AuthenticatedRelease (memory only; CI)
+        │  E7 surface: every file/leaf classified · pinned registered · floors vs named TPS · precedence per key   (23, 19 §6)
+        │  E1–E6, E8 trust state KNOWN + freshness ANCHORED/WITNESSED + release-local references, E9 downgrade
+        │  authorise: install-authority and actor levels from joined policy (never the target) · trust gate confirmed LOCALLY
+        │             (terminal challenge or operator decision pin; never a repository record) · computed weakenings gated (27)
         ▼
-  install transaction (18 §5): exclusive lock · stage from blobs · read-back re-digest · atomic exchange
-        │                      · migrations from blobs · lock last (commit point) · post-commit snapshot CI equality
+  install transaction (.governance-runtime/trust-tx, VTS-registered): stage from blobs → read-back + nlink → exchange
+        governance/trust (union state/root) → migrations → lock last (inside trust) → layout occupation → snapshot CI
+        equality → strength vector recorded
         ▼
-  PPS  governance/kernel/** · governance/trust/** · governance/framework.lock · governance/.tx/**
-       writable only with InstallTxToken (GovernedFs, 18 §8); lock = record; KERNEL_MANIFEST.json = tombstone
-        │
-        │  every process: installation state machine (18 §9) → KernelSnapshot (18 §6)
-        │    read once through secure reader · files ≡ statement (integrity) · statement under T0 (authenticity)
-        │    eligibility E1–E7, E10 (currency) · trust-state view (17 §6) · lock ≡ statement (record)
+  PPS  governance/trust/** · occupation entries (governance/kernel, project, generated = files; framework.lock = dir;
+       spec/audits/GOVERNANCE-ADOPTION; .governance-runtime/migration) · trust-tx
+        │  every unit of work: installation state (incl. occupation) → KernelSnapshot generation check (VU-11)
         ▼
-  POLICY ROOT = KernelSnapshot            if verified ∧ eligible
-              = EmbeddedSnapshot           otherwise (read-only except remedies)
-  EFFECTIVE FLOOR = TPS_effective ⊔ policy root ⊔ overlay-strengthening                         (19 §5)
+  POLICY ROOT = KernelSnapshot if verified ∧ eligible (incl. E7), else EmbeddedSnapshot
+  EFFECTIVE POLICY = root kernel with every floor leaf ⊔ effective TPS · pinned only if registered · precedence joined per
+                     key · overlay after join · exceptions never relax floor/pinned/members/precedence or compiled prefixes
         ▼
-  USE  consumers read snapshot bytes only; derived artefacts bound to CI (18 VU-7, VU-8)
+  USE  operation class C0–C3 permitted by trust_state × freshness × OP-7 (24 §4.3); consumers read snapshot bytes;
+       agents get content from gov (18 §12); derived artefacts bound to CI + policy digest
 ```
 
 ## 2. Where each attack class is stopped
 
 ```text
- ─────────────────────────────── before any trusted write ───────────────────────────────
- tampered source, stale or regenerated manifests (V-H3, E1)    V9 blob digests ≠ RCS              RELEASE_DIGEST_MISMATCH
- self-labelled CERTIFIED manifest (E2)                         manifests never read; gate mode A  (no effect)
- forged statement / unknown key                                SV-6                               SIGNER_UNKNOWN
- wrong-purpose key (cert key signs a release)                  SV-6                               PURPOSE_NOT_GRANTED
- historical identity supplied by a bundle or repository        SV-2                               STATEMENT_SOURCE_NOT_PERMITTED
- statement of another lineage / test profile                   SV-10                              STATEMENT_LINEAGE_MISMATCH / TRUST_PROFILE_MISMATCH
- replay under another version / mixed releases                 V8, V9                             RELEASE_IDENTITY_MISMATCH / RELEASE_DIGEST_MISMATCH
- genuine older release below policy                            E3                                 RELEASE_INELIGIBLE(below_min_release_sequence)
- revoked genuine release                                       E4 (sticky N)                      RELEASE_INELIGIBLE(revoked)
- stale CERTIFIED without WITHDRAWN / omitted REJECTED          17 §6–§7: no view relaxes (mode A)  HUMAN_GATE_REQUIRED
- stripped TSS/TPS/root link referenced by signed statements    17 S7–S9                           TRUST_STATE_STALE / TRUST_ROOT_STALE
- signed trust-state regression                                 17 S4                              TRUST_STATE_REGRESSION
- incoming release lowers install authority                     19 §8                              AUTHORITY_DENIED (from floor)
- signed migration removes project strengthening                19 §9                              OVERLAY_WEAKENING_GATE_REQUIRED
- source swapped after verification / symlinks / races          18 VU-1…VU-4, §3                   STAGED_CONTENT_CHANGED / RELEASE_TREE_INVALID
- poisoned or substituted cache (E3)                            no cache on any trust path          (nothing read)
- tampered or ineligible snapshot (E5)                          20 §2–§4                           SNAPSHOT_UNAUTHENTICATED / SNAPSHOT_INELIGIBLE
- forged journal planting an older genuine release              20 §5                              RELEASE_INELIGIBLE / HUMAN_GATE_REQUIRED
- CIT / adoption / recovery write to protected paths            18 §8 GovernedFs                   PROTECTED_PATH_WRITE_REFUSED / CIT_PROTECTED_PATH
- ─────────────────────────────── trusted write boundary ───────────────────────────────
- post-install static edit (V-H2)                               18 §6 step 5                       KERNEL_TAMPERED
- post-verification byte swap (review R2b)                      snapshot bytes only (VU-7)          (swap has no effect on this process)
- Git-delivered forged or regenerated set (E4)                  18 §6 step 3                       KERNEL_UNAUTHENTICATED
- Git-delivered genuine legacy kernel (review R1)               E1 / installation state             KERNEL_INELIGIBLE(historical) / INSTALL_STATE_PARTIAL
- Git-delivered genuine older eligible release                  floors from TPS; E10 on known machines  KERNEL_INELIGIBLE(downgrade_without_transaction)
- partial deletion of protected paths                           18 §9                              INSTALL_STATE_PARTIAL
- edited framework.lock                                         record cross-check                  LOCK_IDENTITY_MISMATCH
- pre-RoT binary opens a RoT-1 project                          13 §3 format boundary               4.1.5: KERNEL_TAMPERED (sentinel text)
+ ─────────────────────────────── before any trusted write ─────────────────────────────────────────────────────────
+ tampered or regenerated source (V-H3, E1)                  V9                                    RELEASE_DIGEST_MISMATCH
+ forged / wrong-purpose / historical-type statement           SV-2, SV-6                            STATEMENT_TYPE_UNKNOWN / PURPOSE_NOT_GRANTED
+ authentic release with weakened unfloored content (R2-H1)    E7 surface                            RELEASE_INELIGIBLE(floor_violation | surface_*)
+ unknown constitutional key or file                           E7 default deny                       RELEASE_INELIGIBLE(surface_unclassified)
+ precedence reorder / exception_relaxable on security keys    E7 precedence lattice                 RELEASE_INELIGIBLE(precedence_weakened)
+ genuine older release below policy / revoked                 E3 / E4                               RELEASE_INELIGIBLE(...)
+ stateless verifier fed older genuine state (R2-H2)           E8 freshness                          TRUST_STATE_UNANCHORED / BELOW_ANCHOR
+ candidate-key reference inflation (R2-M2)                    S7 release-local                      RELEASE_REFERENCES_UNKNOWN_STATE (that release only)
+ unresolvable / forked / equivocating trust state             S4                                    TRUST_STATE_INCOMPLETE / EQUIVOCATION / REGRESSION
+ certification-key-only un-withdraw (R2-M3)                   S5 MS-2                               (negative remains)
+ skipped-version lowering (R2-M5)                             S3 computed reductions                TRUST_POLICY_UNDECLARED_LOWERING / policy_lowering gate
+ A2-committed or plugin-written gate record (R2-M1)           27 local confirmation                 TRUST_GATE_LOCAL_CONFIRMATION_REQUIRED
+ malicious or older binary (R2-H3)                            25 A2–A7                              PURPOSE_NOT_GRANTED / ARTIFACT_BUILD_UNATTESTED /
+                                                                                                    ARTIFACT_UNREFERENCED / BINARY_T0_UNVERIFIED / BINARY_T0_ROLLBACK
+ source swap, symlink, hard link, race                        18 §3, VU-1…VU-4, VU-12               STAGED_CONTENT_CHANGED / PATH_SUBSTITUTION_DETECTED
+ incoming release lowers install authority or actor levels    19 §8 (joined ROLES)                  AUTHORITY_DENIED
+ signed migration or overlay.prev removes strengthening       19 §9, 20 §5                          weakening trust gate
+ ─────────────────────────────── trusted write boundary ────────────────────────────────────────────────────────────
+ post-install edit / race                                     snapshot per unit of work             KERNEL_TAMPERED / SNAPSHOT_GENERATION_STALE
+ Git-delivered forged set                                     use-time authentication               KERNEL_UNAUTHENTICATED
+ Git-delivered legacy kernel or layout                        installation state LEGACY; E1         KERNEL_INELIGIBLE(historical)
+ Git-delivered older eligible release                         E7 + joins; E10; freshness (OP-7)     KERNEL_INELIGIBLE(downgrade_without_transaction) / TRUST_STATE_UNANCHORED
+ occupation entry removed                                     installation state                    INSTALL_STATE_PARTIAL(occupation)
+ committed install journal                                    VTS registry                          FOREIGN_TRANSACTION_ARTEFACT (ignored)
+ pre-RoT binary on a RoT-1 project (R2-H4)                    legacy-path occupation                (legacy) NOT_INSTALLED / IO_ERROR / ADOPTION_NOT_STARTED; no byte written
+ overlay weakened outside a transaction                       strength vector                       PROJECT_STRENGTH_WEAKENED
+ long-lived process after an update or revocation (R2-M7)     VU-11                                 SNAPSHOT_GENERATION_STALE → reload / refuse
+ agent follows rewritten adapter (R2-M8)                      18 §12                                ADAPTER_BODY_MODIFIED
 ```
 
 ## 3. What each artefact may and may not establish
 
 | Artefact | May establish | May never establish |
 |---|---|---|
-| Trust root (compiled or chained) | keys, purpose grants, thresholds, key revocation | anything about a release; freshness |
-| Trust Policy Statement | floors, eligibility, install-authority floor, gating mode, lowering, unrevocation | authenticity; certification |
-| Trust State Statement | which separately signed statements form the published state at sequence n | a certification or revocation not separately signed; freshness beyond its own sequence (except mode B expiry) |
-| Release statement (final/candidate) | content identity, compatibility, migrations, signed references to root/policy/state current at signing | eligibility; certification; authority to install itself |
-| Verification attestation | an independent verdict for one candidate digest | certification; authenticity |
-| Certification status | CERTIFIED / REJECTED / WITHDRAWN for one final digest (visible as CERTIFIED only with attestation + TSS reference) | authenticity; freshness |
-| Revocation | refusal of named digests | new trust |
-| Historical-identity registry (compiled only) | that a tree digest is a known legacy release | eligibility; policy-root status |
-| `governance/trust/**` in a repository | nothing by presence; its statements once verified | freshness; eligibility on its own |
-| Verifier Trust Store | verified knowledge; lineage confirmation; per-project high-water | anything unverifiable; trust against A3 |
-| `framework.lock` | a record of the installed identity; hints about required metadata | authenticity, integrity reference, eligibility, freshness |
-| `KERNEL_MANIFEST.json` | nothing (compatibility tombstone for pre-RoT binaries) | any decision |
-| `manifest.json`, `manifest.yaml`, release notes | human-readable description | any decision |
-| Update ledger, gate records (Git-tracked T2) | evidence; authorisation against A1/A3/A5 | currency, freshness or downgrade decisions against a repository writer (D-0008 rule 18) |
-| Journal, `.tx/*.prev`, snapshots | hints about which candidate states to evaluate | any trust without re-authentication and eligibility |
-| Environment variables, CLI flags | source selection; opting into a lower labelled state; narrowing (lineage pin) | anchors, keys, identity, certification, freshness |
+| Trust root | keys, grants, thresholds, key revocation | anything about a release; freshness |
+| Trust Policy Statement | Constitutional Surface, floors, eligibility including historical releases, install authority, gating, bootstrap, lowering, unrevocation, chain reset | authenticity; certification; currency on a machine |
+| Trust State Statement | the published set at its sequence, including artefact references | a fact not separately signed; currency on a machine (except as an OP-7 (c) witness) |
+| Release statement | content identity, compatibility, migrations, release-local references | eligibility; surface registration; certification; binaries; global minimums |
+| Artefact statement (`release-artifact` ×2) | binary digests bound to TBM digests | acceptance without build attestation and TSS reference |
+| Build attestation | independent reproduction of a binary and its TBM | authenticity |
+| Verification attestation | a verdict for one candidate | certification |
+| Certification status | CERTIFIED / REJECTED / WITHDRAWN (visible only with attestation and TSS) | authenticity; freshness; lifting a negative alone |
+| Revocation | refusal | new trust |
+| Anchor (pin, human confirmation, witness) in the VTS | "the published state was at least epoch e at time t" on this machine | anything on another machine; authenticity |
+| Trust-gate confirmation in the VTS | authorisation of one trust transition for one project on this machine | anything else |
+| `governance/trust/**` in a repository | nothing by presence; its statements once verified | freshness; anchors; authorisation |
+| Lock 3.0.0 | a record of the installed identity; hints | authenticity, eligibility, freshness, authorisation |
+| Occupation entries | nothing (a barrier for legacy binaries) | any decision |
+| Gate records under `spec/decisions/` | T2 evidence; a request for trust gates | any trust decision |
+| Journals, `.prev` directories, snapshots | hints, only when VTS-registered | any trust without re-authentication |
+| Environment variables, CLI flags | source selection; narrowing | anchors, keys, identity, certification, freshness, authorisation |

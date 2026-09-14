@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/profile-statement.schema.json",
   "title": "retrieval-profile-statement",
-  "description": "PROPOSED (RoT-1 revision 2). Reference retrieval profile statement signed by the retrieval-profile purpose (10 \u00a73). Provenance and integrity only; use-time integrity is verified host-side (10 \u00a75).",
+  "description": "PROPOSED (RoT-1 revision 3). Retrieval profile statement (unchanged shape from revision 2; 10 §3).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,

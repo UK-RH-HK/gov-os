@@ -1,0 +1,12 @@
+{
+  "lineage": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "root_version": 1,
+  "root_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "policy_version": 1,
+  "policy_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "state_sequence": 2,
+  "state_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "fingerprint": "gov-state:cccccccc:2:99999999999999999999999999999999",
+  "provisioned_by": "ci-image-operator (illustrative)",
+  "provisioned_at": "2026-09-14T00:00:00Z"
+}

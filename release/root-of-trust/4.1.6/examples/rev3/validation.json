@@ -1,0 +1,54 @@
+{
+  "schemas": {
+    "artifact-statement.schema.json": "valid JSON Schema 2020-12",
+    "build-attestation.schema.json": "valid JSON Schema 2020-12",
+    "certification-statement.schema.json": "valid JSON Schema 2020-12",
+    "constitutional-surface-inventory.schema.json": "valid JSON Schema 2020-12",
+    "dsse-envelope.schema.json": "valid JSON Schema 2020-12",
+    "framework-lock-3.0.0.schema.json": "valid JSON Schema 2020-12",
+    "legacy-identity-statement.schema.json": "valid JSON Schema 2020-12",
+    "profile-statement.schema.json": "valid JSON Schema 2020-12",
+    "release-statement.schema.json": "valid JSON Schema 2020-12",
+    "revocation-statement.schema.json": "valid JSON Schema 2020-12",
+    "trust-base-manifest.schema.json": "valid JSON Schema 2020-12",
+    "trust-format.schema.json": "valid JSON Schema 2020-12",
+    "trust-gate-confirmation.schema.json": "valid JSON Schema 2020-12",
+    "trust-policy-statement.schema.json": "valid JSON Schema 2020-12",
+    "trust-root.schema.json": "valid JSON Schema 2020-12",
+    "trust-state-pin.schema.json": "valid JSON Schema 2020-12",
+    "trust-state-statement.schema.json": "valid JSON Schema 2020-12",
+    "verification-attestation.schema.json": "valid JSON Schema 2020-12"
+  },
+  "examples": {
+    "trust-base-manifest.example.json": {
+      "schema": "trust-base-manifest.schema.json",
+      "errors": []
+    },
+    "build-attestation.payload.example.json": {
+      "schema": "build-attestation.schema.json",
+      "errors": []
+    },
+    "trust-state-pin.example.json": {
+      "schema": "trust-state-pin.schema.json",
+      "errors": []
+    },
+    "trust-gate-confirmation.example.json": {
+      "schema": "trust-gate-confirmation.schema.json",
+      "errors": []
+    },
+    "FORMAT.example.json": {
+      "schema": "trust-format.schema.json",
+      "errors": []
+    },
+    "framework-lock-3.0.0.example.json": {
+      "schema": "framework-lock-3.0.0.schema.json",
+      "errors": []
+    }
+  },
+  "inventory": {
+    "file": "constitutional-surface/CONSTITUTIONAL_SURFACE_INVENTORY.yaml",
+    "schema": "constitutional-surface-inventory.schema.json",
+    "error_count": 0,
+    "errors": []
+  }
+}

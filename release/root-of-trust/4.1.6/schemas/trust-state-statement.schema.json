@@ -2,27 +2,29 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-state-statement.schema.json",
   "title": "trust-state-statement",
-  "description": "PROPOSED (RoT-1 revision 2). Trust State Statement signed by the trust-state purpose: the published set of separately signed revocation, certification, attestation and policy statements at a sequence. Admissibility against lower known sequences is 17 S4.",
+  "description": "PROPOSED (RoT-1 revision 3). Trust State Statement v2 signed by the trust-state purpose: the published set at a sequence, with cumulative prior_states (fork detection across gaps), resolved references (root and policy digests), revocations, certifications, attestations and artefact statements (17 S4). expires_at only for owner-selected freshness proofs (OP-3 mode B, OP-7 c).",
   "x-schema-version": "1.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "_type",
-    "trust_profile",
+    "artifacts",
+    "attestations",
+    "certifications",
+    "expires_at",
     "framework",
-    "trust_root_id",
     "issued_at",
-    "sequence",
     "previous_state_digest",
+    "prior_states",
     "references",
     "revocations",
-    "certifications",
-    "attestations",
-    "expires_at"
+    "sequence",
+    "trust_profile",
+    "trust_root_id"
   ],
   "properties": {
     "_type": {
-      "const": "https://agentic-engineering-os/statement/trust-state/v1"
+      "const": "https://agentic-engineering-os/statement/trust-state/v2"
     },
     "trust_profile": {
       "$ref": "#/$defs/profile"
@@ -54,6 +56,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "root_digest",
         "root_version",
         "trust_policy"
       ],
@@ -78,6 +81,10 @@
               "$ref": "#/$defs/digest"
             }
           }
+        },
+        "root_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
         }
       }
     },
@@ -123,6 +130,35 @@
           "type": "null"
         }
       ]
+    },
+    "prior_states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "statement_digest"
+        ],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "statement_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      }
     }
   },
   "$defs": {
@@ -154,13 +190,20 @@
         "properties": {
           "previous_state_digest": {
             "type": "null"
+          },
+          "prior_states": {
+            "maxItems": 0
           }
         }
       },
       "else": {
         "properties": {
           "previous_state_digest": {
-            "$ref": "#/$defs/digest"
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "prior_states": {
+            "minItems": 1
           }
         }
       }

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.6/trust-root.schema.json",
   "title": "trust-root",
-  "description": "PROPOSED (RoT-1 revision 2). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Purpose separation KS-1..KS-7 and key-id recomputation are enforced by the verifier (05 \u00a73-\u00a74).",
+  "description": "PROPOSED (RoT-1 revision 3). Trust-root metadata signed by the root purpose (threshold of the previous and new root key sets for version > 1). Eleven purposes (05 §1). Purpose sharing is checked against the compiled pairwise whitelist by the binary (05 §3); release-artifact requires threshold >= 2 and at least two keys (KS-9).",
   "x-schema-version": "2.0.0",
   "type": "object",
   "additionalProperties": false,
@@ -96,7 +96,9 @@
         "verification-attestation",
         "certification-status",
         "revocation",
-        "retrieval-profile"
+        "retrieval-profile",
+        "release-artifact",
+        "build-attestation"
       ],
       "properties": {
         "root": {
@@ -125,6 +127,26 @@
         },
         "retrieval-profile": {
           "$ref": "#/$defs/purpose"
+        },
+        "build-attestation": {
+          "$ref": "#/$defs/purpose"
+        },
+        "release-artifact": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/purpose"
+            },
+            {
+              "properties": {
+                "threshold": {
+                  "minimum": 2
+                },
+                "key_ids": {
+                  "minItems": 2
+                }
+              }
+            }
+          ]
         }
       }
     },

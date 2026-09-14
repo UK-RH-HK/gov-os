@@ -1,0 +1,655 @@
+{
+ "base": "<scratch>/csi-selftest-of49yip2",
+ "cases": [
+  {
+   "id": "S00",
+   "title": "genuine kernel, genuine inventory",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S01",
+   "title": "future unknown constitutional key SECURITY_POLICY.outbound_hosts_allowlist",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_leaves": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.outbound_hosts_allowlist"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S02",
+   "title": "future unknown constitutional file policies/CAPABILITY_ACCEPTANCE_POLICY.yaml",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_files": [
+     "policies/CAPABILITY_ACCEPTANCE_POLICY.yaml"
+    ]
+   }
+  },
+  {
+   "id": "S03",
+   "title": "unknown nested key inside a known map (HUMAN_GATE_POLICY.agent_resolvable_when.bypass)",
+   "expected_exit": 2,
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_leaves": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.bypass"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S04",
+   "title": "role\u2192authority map: backend-engineer L1 -> L4",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=backend-engineer].level",
+      "class": "floor",
+      "op": "level_at_most",
+      "floor": "L1",
+      "kernel": "L4"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S05",
+   "title": "role\u2192authority map: new role superuser L5",
+   "expected_exit": [
+    2,
+    3
+   ],
+   "observed_exit": 2,
+   "pass": true,
+   "evidence": {
+    "unclassified_leaves": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].name"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].level"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].minimum_tier"
+     },
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id=superuser].default_reasoning"
+     }
+    ],
+    "violations": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id]#members",
+      "class": "members",
+      "op": "ids_equal",
+      "missing": [],
+      "unregistered": [
+       "superuser"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S06",
+   "title": "role\u2192authority map: remove change-controller (answers by that id would count as human)",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "roles/ROLES.yaml",
+      "key": "ROLES.roles[id]#members",
+      "class": "members",
+      "op": "ids_equal",
+      "missing": [
+       "change-controller"
+      ],
+      "unregistered": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "S07",
+   "title": "sensitivity/indexing: never_index_classes -> [secret]",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.never_index_classes",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "secret",
+       "restricted"
+      ],
+      "kernel": [
+       "secret"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S08",
+   "title": "sensitivity/indexing: secret patterns emptied",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_path_patterns",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "**/.env",
+       "**/.env.*",
+       "**/*.pem",
+       "**/*.key",
+       "**/id_rsa*",
+       "**/secrets/**",
+       "**/*secret*.yaml",
+       "**/*secret*.yml",
+       "**/*secret*.json",
+       "**/*credentials*"
+      ],
+      "kernel": []
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.secret_content_patterns[id]#members",
+      "class": "members",
+      "op": "ids_superset",
+      "missing": [
+       "aws-access-key",
+       "aws-secret-key",
+       "generic-api-key",
+       "github-token",
+       "jwt",
+       "password-assignment",
+       "private-key-block",
+       "slack-token",
+       "stripe-like-key"
+      ],
+      "unregistered": [
+       "none"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S09",
+   "title": "irreversible gate authority: agent_resolvable_when R5 / 0.0 / irreversible",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius",
+      "class": "floor",
+      "op": "ordered_at_most",
+      "floor": "R1",
+      "kernel": "R5"
+     },
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence",
+      "class": "floor",
+      "op": "decimal_at_least",
+      "floor": "0.8",
+      "kernel": 0.0
+     },
+     {
+      "file": "policies/HUMAN_GATE_POLICY.yaml",
+      "key": "HUMAN_GATE_POLICY.agent_resolvable_when.reversible",
+      "class": "floor",
+      "op": "bool_toward",
+      "floor": true,
+      "kernel": false
+     }
+    ]
+   }
+  },
+  {
+   "id": "S10",
+   "title": "plugin/tool floor: plugins.min_authority L0 and elevated classes reduced",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/TOOL_POLICY.yaml",
+      "key": "TOOL_POLICY.plugins.min_authority",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L2",
+      "kernel": "L0"
+     },
+     {
+      "file": "policies/TOOL_POLICY.yaml",
+      "key": "TOOL_POLICY.plugins.elevated_permission_classes",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "NETWORK_READ",
+       "NETWORK_WRITE",
+       "PACKAGE_INSTALL",
+       "SYSTEM_INSTALL",
+       "DB_WRITE",
+       "CLOUD_WRITE",
+       "CI_TRIGGER",
+       "SECRET_READ",
+       "DEPLOY_STAGING",
+       "DEPLOY_PRODUCTION"
+      ],
+      "kernel": [
+       "SECRET_READ"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S11",
+   "title": "outbound/export: never_export_classes -> [secret]; upstream.forbidden_paths drops spec/**",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/LEARNING_POLICY.yaml",
+      "key": "LEARNING_POLICY.upstream.forbidden_paths",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "product/**",
+       "spec/**",
+       ".governance-runtime/**",
+       "governance/project/**",
+       "archive/**",
+       "**/.env*",
+       "**/*.db",
+       "**/*.sqlite*"
+      ],
+      "kernel": [
+       "product/**",
+       ".governance-runtime/**",
+       "governance/project/**",
+       "archive/**",
+       "**/.env*",
+       "**/*.db",
+       "**/*.sqlite*"
+      ]
+     },
+     {
+      "file": "policies/SECURITY_POLICY.yaml",
+      "key": "SECURITY_POLICY.never_export_classes",
+      "class": "floor",
+      "op": "set_superset",
+      "floor": [
+       "secret",
+       "restricted",
+       "confidential"
+      ],
+      "kernel": [
+       "secret"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "S12",
+   "title": "project override controls: never_index_classes rule additive -> overridable",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "effective POLICY_PRECEDENCE rule weaker than registered for some keys",
+      "keys": [
+       "SECURITY_POLICY.never_index_classes"
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S13",
+   "title": "project override controls: new earlier rule makes on_secret_in_export_payload overridable",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "class": "precedence",
+      "reason": "effective POLICY_PRECEDENCE rule weaker than registered for some keys",
+      "keys": [
+       "SECURITY_POLICY.on_secret_in_export_payload"
+      ],
+      "count": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "S14",
+   "title": "project override controls: default_mode immutable -> overridable; layers reordered",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "key": "POLICY_PRECEDENCE.layers",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:e468e320b8c1c91c6fe4fa370ab63e3d4c2e7bd04116803d5ae0a51a8164b84e"
+     },
+     {
+      "file": "policies/POLICY_PRECEDENCE.yaml",
+      "key": "POLICY_PRECEDENCE.default_mode",
+      "class": "floor",
+      "op": "equals",
+      "floor": "immutable",
+      "kernel": "overridable"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S15",
+   "title": "install/update authority: install_kernel L0, update_apply L1",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.install_kernel",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L0"
+     },
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.update_apply",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L1"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S16",
+   "title": "exception authority: grant_policy_exception L1 and exception_relaxable on authority levels",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception",
+      "class": "floor",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L1"
+     },
+     {
+      "class": "precedence",
+      "reason": "effective POLICY_PRECEDENCE rule weaker than registered for some keys",
+      "keys": [
+       "AUTHORITY_POLICY.authority_levels_required.answer_gate",
+       "AUTHORITY_POLICY.authority_levels_required.approve_cit_auto",
+       "AUTHORITY_POLICY.authority_levels_required.approve_cit_human",
+       "AUTHORITY_POLICY.authority_levels_required.build_memory",
+       "AUTHORITY_POLICY.authority_levels_required.checkpoint",
+       "AUTHORITY_POLICY.authority_levels_required.claim_task",
+       "AUTHORITY_POLICY.authority_levels_required.close_task",
+       "AUTHORITY_POLICY.authority_levels_required.create_gate",
+       "AUTHORITY_POLICY.authority_levels_required.create_handoff",
+       "AUTHORITY_POLICY.authority_levels_required.create_task",
+       "AUTHORITY_POLICY.authority_levels_required.emergency_control",
+       "AUTHORITY_POLICY.authority_levels_required.execute_cit",
+       "AUTHORITY_POLICY.authority_levels_required.execute_plugin",
+       "AUTHORITY_POLICY.authority_levels_required.force_close_task",
+       "AUTHORITY_POLICY.authority_levels_required.force_release_task",
+       "AUTHORITY_POLICY.authority_levels_required.grant_policy_exception",
+       "AUTHORITY_POLICY.authority_levels_required.install_kernel",
+       "AUTHORITY_POLICY.authority_levels_required.install_tool",
+       "AUTHORITY_POLICY.authority_levels_required.memory_benchmark",
+       "AUTHORITY_POLICY.authority_levels_required.memory_select",
+       "AUTHORITY_POLICY.authority_levels_required.migrate_execute",
+       "AUTHORITY_POLICY.authority_levels_required.mutate_governance_project_overlay",
+       "AUTHORITY_POLICY.authority_levels_required.mutate_product_source",
+       "AUTHORITY_POLICY.authority_levels_required.mutate_spec_decisions",
+       "AUTHORITY_POLICY.authority_levels_required.mutate_spec_other",
+       "AUTHORITY_POLICY.authority_levels_required.mutate_task_status",
+       "AUTHORITY_POLICY.authority_levels_required.override_kernel_integrity",
+       "AUTHORITY_POLICY.authority_levels_required.p3probe",
+       "AUTHORITY_POLICY.authority_levels_required.present_gate",
+       "AUTHORITY_POLICY.authority_levels_required.propose_cit",
+       "AUTHORITY_POLICY.authority_levels_required.read",
+       "AUTHORITY_POLICY.authority_levels_required.readiness_plan",
+       "AUTHORITY_POLICY.authority_levels_required.rebuild_memory",
+       "AUTHORITY_POLICY.authority_levels_required.record_routing_evidence",
+       "AUTHORITY_POLICY.authority_levels_required.recover",
+       "AUTHORITY_POLICY.authority_levels_required.register_plugin",
+       "AUTHORITY_POLICY.authority_levels_required.reject_cit",
+       "AUTHORITY_POLICY.authority_levels_required.release_task",
+       "AUTHORITY_POLICY.authority_levels_required.resume_control",
+       "AUTHORITY_POLICY.authority_levels_required.retire_legacy_mechanism"
+      ],
+      "count": 48
+     }
+    ]
+   }
+  },
+  {
+   "id": "S17",
+   "title": "tool registry: new descriptor with an install command",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "tools/registry/TOOLS.yaml",
+      "key": "TOOLS_REGISTRY.tools[tool_id]#members",
+      "class": "members",
+      "op": "ids_subset",
+      "missing": [
+       "TOOL-AST-001",
+       "TOOL-CARGO-001",
+       "TOOL-CARGO-002",
+       "TOOL-CARGO-003",
+       "TOOL-CMAKE-001",
+       "TOOL-FS-001",
+       "TOOL-GIT-001",
+       "TOOL-GO-001",
+       "TOOL-LSP-RUST-001",
+       "TOOL-MAKE-001",
+       "TOOL-MAVEN-001",
+       "TOOL-NPM-001",
+       "TOOL-SECRETS-001",
+       "TOOL-SQLITE-001",
+       "TOOL-TEST-001",
+       "TOOL-WEB-001"
+      ],
+      "unregistered": [
+       "TOOL-EVIL-001"
+      ]
+     },
+     {
+      "file": "tools/registry/TOOLS.yaml",
+      "key": "TOOLS_REGISTRY.tools[tool_id=TOOL-EVIL-001]",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:72fbdba17dbf73c33384de84133d3a14d922271bf027dffe6be06eb6ed8707e3"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S18",
+   "title": "hard invariant statement rewritten with id kept",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "constitution/HARD_INVARIANTS.yaml",
+      "key": "HARD_INVARIANTS.invariants[id=INV-008]",
+      "class": "pinned",
+      "reason": "value digest not registered",
+      "digest": "sha256:a80df501c888f4b4bf0dfc37f96e1d184cb7843ea2019481aba1275dfa2ed7bf"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S19",
+   "title": "new schema file under the pinned schemas glob",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "schemas/capability-acceptance.schema.json",
+      "class": "pinned_file",
+      "reason": "file digest not registered",
+      "digest": "sha256:a2c799262a3ce3c19ef5cdd983bf3d12b43ab3c426227091b909dcb7054738c0"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S20",
+   "title": "agent-facing adapter template edited",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "violations": [
+     {
+      "file": "adapters/generic/template.md",
+      "class": "pinned_file",
+      "reason": "file digest not registered",
+      "digest": "sha256:4541110ac10671949f753d25fd3422932079f86ba2147ab7ec7a8334b97d17cd"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S21",
+   "title": "value stronger than registered (resume_control L4 -> L5) without a Trust Policy raise",
+   "expected_exit": 3,
+   "observed_exit": 3,
+   "pass": true,
+   "evidence": {
+    "stronger_than_registered": [
+     {
+      "file": "policies/AUTHORITY_POLICY.yaml",
+      "key": "AUTHORITY_POLICY.authority_levels_required.resume_control",
+      "op": "level_at_least",
+      "floor": "L4",
+      "kernel": "L5"
+     }
+    ]
+   }
+  },
+  {
+   "id": "S22",
+   "title": "forward compatibility: new constitutional files classified by inventory data only (no new class or operator)",
+   "expected_exit": 0,
+   "observed_exit": 0,
+   "pass": true,
+   "evidence": {}
+  },
+  {
+   "id": "S23",
+   "title": "inventory lint: catch-all project_tunable rule SECURITY_POLICY.* is refused",
+   "expected_exit": 4,
+   "observed_exit": 4,
+   "pass": true,
+   "evidence": {
+    "consistency": [
+     "SECURITY_POLICY.*: wildcard rule too broad for class project_tunable (catch-alls are forbidden)",
+     "SECURITY_POLICY.*: project_tunable but registered precedence is immutable (SECURITY_POLICY.*)"
+    ]
+   }
+  },
+  {
+   "id": "S24",
+   "title": "inventory lint: never_index_classes misclassified project_tunable",
+   "expected_exit": 4,
+   "observed_exit": 4,
+   "pass": true,
+   "evidence": {
+    "consistency": [
+     "SECURITY_POLICY.never_index_classes: project_tunable but registered precedence is additive (SECURITY_POLICY.never_index_classes)"
+    ]
+   }
+  },
+  {
+   "id": "S25",
+   "title": "inventory lint: default allow is refused",
+   "expected_exit": 5,
+   "observed_exit": 5,
+   "pass": true,
+   "evidence": {
+    "malformed": [
+     "inventory default must be 'deny'"
+    ]
+   }
+  }
+ ],
+ "passed": 26,
+ "failed": 0
+}
