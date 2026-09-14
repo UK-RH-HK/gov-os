@@ -1,0 +1,17 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0002
+trigger: architecture revision committed; before handoff to review panel (HO-0002, HO-0003)
+date: 2026-09-14
+lifecycle_state: ROT_ARCH_REVIEW_PANEL
+repository:
+  integration_branch: release/4.1.6-rc1
+  integration_head_before_checkpoint_commit: 5f6a83b7deae3e325aa6a0ee347a1f6dd51d689a
+completed_evidence:
+  - {what: RoT-1 revision 3 (AR-0001), commit: ca77a431418bd6b349f465aa2521ca43bccfd5a6, path: release/root-of-trust/4.1.6}
+  - {what: AR-0001 typed report, commit: b795a6b10f2c42bde46b68cfe6f1d4ee9b0e67b2, path: release/orchestration/phase-1/AGENT_RUNS/AR-0001.report.yaml}
+architect_verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW (not an acceptance)
+unresolved_findings: R2-H1..H4, R2-M1..M10, R2-L1..L3 remain open until an independent synthesis verdict
+pending_owner_gates: []
+running_work: [AR-0002 reviewer B trust/security, AR-0003 reviewer C compatibility/transaction]
+next_deterministic_action: spawn AR-0002 and AR-0003 in parallel; then synthesis reviewer D

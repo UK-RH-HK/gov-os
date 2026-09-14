@@ -56,3 +56,31 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | pending |
 | Findings | — |
 | Next action | on completion: verify report, merge, spawn reviewers B and C in parallel |
+
+## L-0003 — 2026-09-14 — revision 3 authored
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | rot-architect (`AR-0001`) |
+| Input commit | `71581dc` |
+| Work performed | Pack `release/root-of-trust/4.1.6/` rewritten (00–22) plus new 23 constitutional surface, 24 freshness anchoring and machine bootstrap, 25 binary and trust-base authenticity, 26 legacy-binary containment, 27 trust-decision authorisation. Machine-readable constitutional surface inventory and checker. Schemas revised or added. D-0008 and ARCH-0002 PROPOSED revision 3. OP-7 added; OP-2, OP-3 and OP-4 restated. |
+| Report / evidence | `AGENT_RUNS/AR-0001.report.yaml`; `release/root-of-trust/4.1.6/evidence/` (CSI checks, P1r3, P3r3, P4r3, G1) |
+| Verdict | `ARCHITECTURE_REVISION_READY_FOR_REVIEW` (author's readiness claim; not an acceptance) |
+| Output commit | work `ca77a43`, report `b795a6b`, merged into `release/4.1.6-rc1` as `5f6a83b` |
+| Findings | Architect-reported (claims, to be independently tested): coverage checker passes on framework/ and 4.1.5 payload, 26/26 self-test; P1r3 three harms flipped; P3r3 695 invocations and 40 chains over real 4.1.2–4.1.5 with 0 tracked-byte changes; P4r3 34/34. INFO AR1-F1 (V3 layout alone insufficient; adoption and migration occupations added), AR1-F2 (ROLES role ids registered), AR1-F3 (mechanisms that are specification-only until implementation). |
+| Next action | independent review panel B and C |
+
+## L-0004 — 2026-09-14 — review panel handed off
+
+| Field | Value |
+|---|---|
+| Iteration | architecture revision 3, Phase-1 review cycle 1 |
+| Role | orchestrator |
+| Input commit | `5f6a83b` |
+| Work performed | Wrote HO-0002 (reviewer B, trust and security) and HO-0003 (reviewer C, compatibility and transactions). Claimed AR-0002 and AR-0003. Created separate worktrees and branches. |
+| Report / evidence | `HANDOFFS/HO-0002-*.md`, `HANDOFFS/HO-0003-*.md`, `CHECKPOINTS/CP-0002.yaml` |
+| Verdict | — |
+| Output commit | the commit adding these records |
+| Findings | — |
+| Next action | spawn AR-0002 and AR-0003 in parallel |

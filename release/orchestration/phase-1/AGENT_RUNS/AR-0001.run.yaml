@@ -11,6 +11,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/fc4fea1b-a
 branch: phase1/rot1-r3-architect
 agent_id: aa7ffdbd0fad322e9   # orchestrator-session-local handle; not resumable from a fresh session
 started_at: '2026-09-14T00:29Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0001.report.yaml
-outcome: null
+outcome:
+  verdict: ARCHITECTURE_REVISION_READY_FOR_REVIEW
+  work_commit: ca77a431418bd6b349f465aa2521ca43bccfd5a6
+  report_commit: b795a6b10f2c42bde46b68cfe6f1d4ee9b0e67b2
+  integration_merge_commit: 5f6a83b7deae3e325aa6a0ee347a1f6dd51d689a
+  report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0001.report.yaml
+  provenance_checks: [report present, only allowed paths changed, worktree clean, D-0008 status PROVISIONAL in_effect false]
