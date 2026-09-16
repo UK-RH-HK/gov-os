@@ -1,0 +1,3996 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Governance OS Build, Capability, Qualification &amp; Adoption Control Panel — V5</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing:border-box; }
+  body { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin:0; }
+  main { max-width:1050px; margin:0 auto; padding:28px 20px 70px; }
+  h1 { margin-bottom:6px; }
+  h2 { margin-top:4px; }
+  .muted { opacity:.72; }
+  .card { border:1px solid color-mix(in srgb,currentColor 35%,transparent); border-radius:14px; padding:18px; margin:18px 0; }
+  .top { position:sticky; top:0; backdrop-filter:blur(14px); background:color-mix(in srgb,Canvas 88%,transparent); padding:8px 0; z-index:10; }
+  .grid { display:grid; grid-template-columns:1fr auto; gap:14px; align-items:center; }
+  progress { width:100%; height:20px; }
+  button { padding:8px 12px; border-radius:9px; border:1px solid currentColor; background:transparent; cursor:pointer; font:inherit; }
+  button:hover { opacity:.8; }
+  .row-wrap { padding:2px 0 10px; border-bottom:1px solid color-mix(in srgb,currentColor 16%,transparent); }
+  .row-wrap:last-child { border-bottom:0; }
+  .row { display:flex; gap:12px; align-items:flex-start; padding:10px 0; cursor:pointer; }
+  input[type=checkbox] { width:20px; height:20px; margin-top:3px; flex:0 0 auto; }
+  .step { flex:1; }
+  .step b { display:block; margin-bottom:3px; }
+  .done > .row .step { opacity:.5; text-decoration:line-through; }
+  .prompt-box { margin:0 0 8px 32px; border:1px solid color-mix(in srgb,currentColor 22%,transparent); border-radius:10px; padding:8px 10px; }
+  .prompt-box summary { cursor:pointer; font-weight:600; }
+  .prompt-head { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:12px 0 8px; }
+  pre { white-space:pre-wrap; word-break:break-word; max-height:460px; overflow:auto; padding:14px; border-radius:10px; background:color-mix(in srgb,currentColor 7%,Canvas); border:1px solid color-mix(in srgb,currentColor 15%,transparent); font:13px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; }
+  .copy-btn.copied { font-weight:700; }
+  textarea { width:100%; min-height:100px; border-radius:10px; padding:10px; font:inherit; }
+  .legend { display:flex; flex-wrap:wrap; gap:10px 18px; margin:12px 0; }
+  .pill { border:1px solid color-mix(in srgb,currentColor 24%,transparent); border-radius:999px; padding:5px 9px; font-size:.9rem; }
+  .warning { border-left:4px solid currentColor; padding-left:12px; }
+  @media(max-width:650px) {
+    .prompt-head { align-items:flex-start; flex-direction:column; }
+    .prompt-box { margin-left:0; }
+  }
+</style>
+</head>
+<body>
+<main>
+<h1>Governance OS Build, Capability, Qualification &amp; Adoption Control Panel — V5</h1>
+<p class="muted"><strong>Architecture update:</strong> Rust-first deterministic Governance OS core; polyglot governed projects and capability plugins.</p>
+<p class="muted">Tick each step when complete. Open any prompt dropdown, copy it, and paste it into the correct session. Progress and notes are saved locally in this browser.</p>
+<div class="legend">
+<span class="pill">Prompts file stays outside the clean Governance OS repo</span>
+<span class="pill">Independent roles require fresh sessions</span>
+<span class="pill">Legacy recovery prompt is Product A/B only</span>
+</div>
+<section class="card" id="final-audit-banner"><h2>Final control-panel audit — V5 artifact-flow + operator-owned contract architecture</h2><p>V5 adds explicit root-of-trust escalation/review/implementation steps; requires the product owner to upload the approved normative Capability Contract rather than allowing an IDE agent to recreate it; and adds Gate W Artifact Flow &amp; Consumption Integrity so downstream tasks must actually receive and consume the correct current upstream outputs. Gate W is exercised by Prompt 2, capability baseline, sophisticated hidden-oracle qualification, adoption, and ongoing health.</p></section><section class="card" id="v5-gate-map"><h2>V5 capability + artifact-flow pre-certification gate map</h2><pre>CURRENT: ROOT-OF-TRUST ARCHITECTURE DESIGN
+  ↓ ROOT_OF_TRUST_ARCHITECTURE_READY_FOR_INDEPENDENT_REVIEW
+Fresh independent architecture review
+  ↓ ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED
+Builder implements trust architecture
+  ↓
+IDE creates Capability Contract destination and STOPS
+  ↓ AWAITING_PRODUCT_OWNER_CAPABILITY_CONTRACT_UPLOAD
+PRODUCT OWNER uploads approved Contract v3
+  ↓
+Builder compiles/integrates contract + Gate W + G0–G6 scheduler
+  ↓ READY_FOR_INDEPENDENT_OS_VERIFICATION
+Prompt 2 fresh independent verification/repair
+  ↓ OS_RELEASE_CANDIDATE_ACCEPTED
+Full capability-baseline audit incl. Artifact Flow
+  ↓ GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+Provisional strong retrieval bootstrap
+  ↓ PROVISIONAL_RETRIEVAL_PROFILE_READY
+Two sophisticated repos + hidden qualification oracle
+  ↓ ADVANCED_QUALIFICATION_ACCEPTED
+Final retrieval bake-off using realistic repos
+  ↓ REFERENCE_RETRIEVAL_PROFILE_SELECTED
+Package + clean-install retrieval verification
+  ↓ REFERENCE_RETRIEVAL_PROFILE_ACCEPTED
+Prompt 3 final certification
+  ↓ CERTIFIED_FOR_RELEASE
+Private GitHub + remote clean-clone smoke
+  ↓ PRIVATE_REMOTE_RELEASE_READY
+Product A/B adoption
+  ↓ PROJECT_GOVERNANCE_CAPABILITIES_ACCEPTED
+Continuous G0–G5 health + periodic capability audit</pre></section><div class="top">
+<div class="card">
+<div class="grid">
+<div>
+<b id="pct">0% complete</b>
+<progress id="progress" max="100" value="0"></progress>
+</div>
+<button id="reset" type="button">Reset</button>
+</div>
+</div>
+</div>
+<section class="card">
+<h2>Phase 1 — Build, harden and independently verify the Governance OS core</h2>
+<div class="row-wrap" data-step="phase1_0">
+<label class="row">
+<input data-stepbox="phase1_0" type="checkbox"/>
+<div class="step">
+<b>Create clean Governance OS repo</b>
+<span class="muted">Create a new local Git repo; do not include Product A/B.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase1_1">
+<label class="row">
+<input data-stepbox="phase1_1" type="checkbox"/>
+<div class="step">
+<b>Add 3 governing documents only</b>
+<span class="muted">Keep the Stage Prompts file outside the repo.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase1_2">
+<label class="row">
+<input data-stepbox="phase1_2" type="checkbox"/>
+<div class="step">
+<b>Commit architecture baseline</b>
+<span class="muted">Create the initial immutable baseline commit.</span>
+</div>
+</label>
+</div>
+<div class="card warning" id="current-run-status">Current workflow: finish the Prompt 2 independent verification/repair loop first. After OS_RELEASE_CANDIDATE_ACCEPTED, do NOT jump straight to Prompt 3: run advanced two-repository qualification, then retrieval-model qualification/integration, then final release certification.</div><div class="row-wrap" data-step="phase1_3">
+<label class="row">
+<input data-stepbox="phase1_3" type="checkbox"/>
+<div class="step">
+<b>Prompt 1 — original primary builder (ALREADY ISSUED — do not rerun)</b>
+<span class="muted">Historical reference only. The original build began under Prompt 1 and later incorporated the Rust-first/polyglot amendment. Current and future sessions may use any sufficiently capable model.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show archived Prompt 1 + Rust amendment (reference only)</summary>
+<div class="prompt-head">
+<strong>Prompt 1 — Build the canonical Governance OS in a fresh clean repository</strong>
+<button class="copy-btn" data-copy="p1" disabled="disabled" type="button">Already issued — reference only</button>
+</div>
+<p class="muted current-run-note">CURRENT RUN: Do not paste this again. The builder is already operating under Prompt 1 plus the Rust-first/polyglot follow-up.</p><pre id="prompt-p1">Act as the CTO/Principal Architect and implementation lead for the canonical Governance OS repository.
+
+Read:
+1. DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+2. GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md
+3. GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md
+
+This repository is the upstream source product for the company OS. It must be model-agnostic and reusable across many product repositories.
+
+Implement the framework as real software, not only documents:
+- constitution/policy schemas;
+- project/kernel separation;
+- gov CLI operations including init, adopt, update/check, doctor, rebuild-memory, upstream prepare/submit and rollback/recovery primitives;
+- Development Knowledge Fabric runtime;
+- path/repository-contract machinery;
+- migration catalogue/planner;
+- CIT;
+- task/DAG/control primitives;
+- skills/tools/MCP registries;
+- adapters;
+- checkpoints;
+- model routing;
+- observability;
+- release manifests/migrations.
+
+Build synthetic certification fixtures:
+1. greenfield project;
+2. deliberately dirty brownfield project;
+3. path-migration fixture;
+4. framework-update fixture;
+5. upstream-learning/export-security fixture;
+6. multi-machine/rebuild fixture;
+7. failure-injection fixture.
+
+The brownfield fixture must contain legacy rules, old chat memory, contradictory specs, stale indexes, misplaced files, code/spec disagreement, missing tests and secrets that must never be indexed/exported.
+
+Do not certify your own release. Build implementer tests and evidence, then finish with:
+READY_FOR_INDEPENDENT_OS_VERIFICATION
+
+Record architecture, commands, manifests, fixture descriptions and test evidence in the canonical repository.
+Ask me in chat only for genuine product/architecture decisions that are high-impact or irreversible.
+
+ARCHITECTURAL AMENDMENT — RUST-FIRST CORE, POLYGLOT GOVERNANCE
+
+Treat this as a binding architecture decision for the Governance OS implementation:
+
+1. Prefer Rust for the deterministic Governance OS control plane/core where it materially improves reliability, portability, type safety, concurrency and single-binary distribution. This normally includes the gov CLI, policy/authority engine, repository inventory/path mapping, migration/adoption engine, CIT, task DAG, checkpoint/recovery, Git integration, release/update logic, hashing/manifests, tool/permission registry, process execution, structured state access and core orchestration primitives.
+
+2. Do NOT impose Rust on governed projects. The Governance OS must remain language-agnostic and capable of governing Rust, Python, C/C++, JavaScript/TypeScript, scientific software, compilers, operating systems and mixed-language repositories.
+
+3. Specialised AI/ML/scientific/retrieval capabilities may use Python, local model runtimes, MCP servers, external CLIs, APIs or other languages where materially better, behind stable language-neutral interfaces such as MCP, JSON-RPC, HTTP, structured stdin/stdout or governed CLI contracts.
+
+4. The Development Knowledge Fabric is implementation-neutral. Embedding model, inference runtime, vector store, reranker and generative model remain separate replaceable concerns.
+
+5. Record this formally as an architecture/decision record in the repository, update workstreams/tasks/interfaces/tests accordingly, preserve valid work already completed, and do not restart the project.
+
+6. Add architecture/conformance tests proving that:
+   - the deterministic core does not require a Python runtime merely to operate;
+   - governed project language is independent of Governance OS implementation language;
+   - at least one synthetic governed fixture uses a language/runtime different from the Governance OS core;
+   - language-specific tools are resolved through the capability/tool registry rather than hard-coded assumptions.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="prior_ready_invalidated"><label class="row"><input data-stepbox="prior_ready_invalidated" type="checkbox"/><div class="step"><b>4.1.5 rejection invalidates the previous READY/Prompt 2 progress</b><span class="muted">Treat the old READY_FOR_INDEPENDENT_OS_VERIFICATION tick as historical. The new candidate must pass root-of-trust redesign, contract integration and builder suites before READY can be ticked again.</span></div></label></div><div class="row-wrap" data-step="root_arch_current"><label class="row"><input data-stepbox="root_arch_current" type="checkbox"/><div class="step"><b>Root-of-trust architecture escalation — CURRENT STEP</b><span class="muted">Fresh Opus 5 architecture session is designing the non-circular trust root. You already issued this prompt; wait for ROOT_OF_TRUST_ARCHITECTURE_READY_FOR_INDEPENDENT_REVIEW.</span></div></label></div><div class="row-wrap" data-step="root_arch_review"><label class="row"><input data-stepbox="root_arch_review" type="checkbox"/><div class="step"><b>Independent root-of-trust architecture review</b><span class="muted">FRESH session. Attack the proposed trust architecture before implementation. No source changes.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Independent Root-of-Trust Architecture Review</strong><button class="copy-btn" data-copy="root-review" type="button">Copy Prompt</button></div><pre id="prompt-root-review">You are the Fresh Independent Governance OS Root-of-Trust Architecture Reviewer.
+
+A separate fresh architect has already produced:
+
+ROOT_OF_TRUST_ARCHITECTURE_READY_FOR_INDEPENDENT_REVIEW
+
+Do not implement the architecture.
+
+Read the architect's threat model, ingress map, trust-chain design, release-envelope/signature design, bootstrap/key-management design, D-0007 amendment/supersession, migration plan, acceptance-test plan, and all 4.1.2–4.1.5 trust-related verifier findings.
+
+Independently attack the proposed architecture. Verify there is a genuinely non-circular root of trust; source authenticity is established before staging/installation; installed-kernel integrity remains separate; every privileged ingress is covered; source directories cannot regenerate their own trust; framework.lock records but does not create trust; dev/test modes cannot masquerade as production; offline verification works where designed; key rotation/revocation/recovery is coherent; signing keys are not in repo/payload; downgrade/replay/wrong-key/stale-manifest/modified-migration/tampered-policy cases fail closed; future retrieval profiles can join the same supply-chain trust model; and prior V-H1/V-H2/V-M1 fixes remain intact.
+
+Author new adversarial architecture cases.
+
+Return exactly one:
+ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED
+or
+ROOT_OF_TRUST_ARCHITECTURE_REJECTED
+
+If rejected, give architectural correction delta only; do not implement.</pre></details></div><div class="row-wrap" data-step="root_arch_gate"><label class="row"><input data-stepbox="root_arch_gate" type="checkbox"/><div class="step"><b>Gate — ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED</b><span class="muted">Do not return to the builder until the trust design survives independent architecture review.</span></div></label></div><div class="row-wrap" data-step="root_arch_impl"><label class="row"><input data-stepbox="root_arch_impl" type="checkbox"/><div class="step"><b>Builder — implement accepted root-of-trust architecture</b><span class="muted">Implement the reviewed architecture across every privileged ingress as the next immutable patch candidate.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Builder — Root-of-Trust Implementation</strong><button class="copy-btn" data-copy="root-impl" type="button">Copy Prompt</button></div><pre id="prompt-root-impl">You are the Governance OS Builder implementing the independently accepted Root-of-Trust architecture.
+
+Proceed only after ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED. Implement the accepted design as the next immutable patch candidate across every privileged ingress identified by the architecture review, not only the previous V-H3 example. Preserve all prior confirmed repairs.
+
+Implement authentic source/release verification before staging/install, separate installed-kernel integrity verification, canonical release-envelope/signature verification, trusted-key/key-ID handling, bootstrap/dev/test separation, framework.lock binding to authenticated identity, init/adopt/update/reinstall/recovery/rollback/migration coverage, fail-closed wrong-key/stale/forged/tampered/downgrade/replay cases, migration from the rejected previous candidate, and tests for every reviewed ingress/threat.
+
+Do not certify or self-accept. Before finalising the candidate, follow the operator-owned Capability Acceptance Contract upload/integration steps in this control panel. Stop when the complete candidate is ready for fresh Prompt 2.</pre></details></div><div class="row-wrap" data-step="contract_scaffold_upload"><label class="row"><input data-stepbox="contract_scaffold_upload" type="checkbox"/><div class="step"><b>Create contract path and STOP for product-owner upload</b><span class="muted">IDE agent creates the repository path but must not recreate the checklist. It stops at AWAITING_PRODUCT_OWNER_CAPABILITY_CONTRACT_UPLOAD.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Prepare repository and request authoritative checklist upload</strong><button class="copy-btn" data-copy="contract-upload" type="button">Copy Prompt</button></div><pre id="prompt-contract-upload">You are preparing the Governance OS repository to receive the PRODUCT-OWNER-APPROVED Governance Capability Acceptance Contract.
+
+Do NOT recreate the checklist from memory. Do NOT invent, summarize, rewrite or semantically alter it.
+
+Create/verify these destinations:
+framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+framework/contracts/governance-capability-acceptance.yaml
+framework/contracts/contract-source.lock
+framework/schemas/governance-capability-acceptance.schema.json
+tests/governance/capability-evidence-map.yaml
+docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+
+Create only directories/scaffolding needed to receive the source, verify no conflicting normative contract exists, report the exact repository-relative destination, and STOP. Do not compile YAML, generate docs or continue release work until the product owner confirms the approved file is present.
+
+Stop exactly with:
+AWAITING_PRODUCT_OWNER_CAPABILITY_CONTRACT_UPLOAD</pre></details></div><div class="row-wrap" data-step="contract_owner_upload"><label class="row"><input data-stepbox="contract_owner_upload" type="checkbox"/><div class="step"><b>PRODUCT OWNER — upload approved Capability Contract v3</b><span class="muted">You manually place the provided Contract v3 content at framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md. Do not let the IDE invent a replacement.</span></div></label></div><div class="row-wrap" data-step="contract_integrate_uploaded"><label class="row"><input data-stepbox="contract_integrate_uploaded" type="checkbox"/><div class="step"><b>Builder — compile and integrate the uploaded contract</b><span class="muted">Only after your upload: bind the human-approved source to executable YAML, evidence map, generated view, G0–G6 scheduler and Gate W tests.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Integrate product-owner-uploaded Capability Contract</strong><button class="copy-btn" data-copy="contract-integrate-uploaded" type="button">Copy Prompt</button></div><pre id="prompt-contract-integrate-uploaded">The product owner has placed the approved Governance Capability Acceptance Contract at:
+framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+
+Treat it as the human-approved normative source. Do NOT rewrite its semantics.
+
+Hash/record the exact source; validate it; compile the machine-executable governance-capability-acceptance.yaml; create contract-source.lock binding it to the exact source hash; validate schema; build capability-evidence-map.yaml; generate the derived Markdown view; prove source↔compiled semantic equivalence; implement/verify G0–G6 mappings; implement Gate W Artifact Flow &amp; Consumption Integrity evidence/checks; add drift/tampering tests; and ensure runtime refuses an executable contract whose source binding is invalid.
+
+For every capability map stable ID, requirement class, applicability, evidence owners, freshness triggers, G0–G6 tier, qualification challenge, adoption obligation and periodic-audit obligation.
+
+Do not mark capabilities PRESENT_AND_SUBSTANTIAL merely because the contract says they exist. The candidate may proceed to Prompt 2 only when integration is complete and the product-owner source remains unchanged.</pre></details></div><div class="row-wrap" data-step="phase1_4">
+<label class="row">
+<input data-stepbox="phase1_4" type="checkbox"/>
+<div class="step">
+<b>Reach READY_FOR_INDEPENDENT_OS_VERIFICATION on the COMPLETE candidate</b>
+<span class="muted">Only after root-of-trust implementation + product-owner Capability Contract upload/integration + builder suites are complete. This means ready to run Prompt 2, not accepted/certified.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase1_5">
+<label class="row">
+<input data-stepbox="phase1_5" type="checkbox"/>
+<div class="step">
+<b>Prompt 2 — fresh independent verifier</b>
+<span class="muted">FRESH independent session. Run the comprehensive architecture, Rust/polyglot, memory-stack and model/retrieval-selection verification. Must end ACCEPTED or REJECTED with a repair delta.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 2 — Fresh independent Governance OS verifier/test author</strong>
+<button class="copy-btn" data-copy="p2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p2">You are the Independent Governance OS Verifier and Test Author.
+
+You are operating in a FRESH session and must not trust the builder's self-assessment.
+
+Read the governing documents and inspect the actual implementation, repository state, tests, fixtures, manifests, interfaces and evidence.
+
+Your role is independent verification, not continuation of the builder role.
+
+Do not certify based on documentation claims alone. Require implementation and test evidence.
+
+Your target verdict is one of:
+
+OS_RELEASE_CANDIDATE_ACCEPTED
+
+or
+
+OS_RELEASE_CANDIDATE_REJECTED
+
+If rejected, produce a precise repair delta for the builder. Do not perform broad implementation yourself unless explicitly required by the verification protocol.
+
+## Core independent verification responsibilities
+
+Independently verify at minimum:
+
+- framework/runtime/CLI coherence;
+- governance authority and policy enforcement;
+- deterministic state and rebuildability;
+- migration/adoption behaviour;
+- update and rollback behaviour;
+- memory/retrieval architecture;
+- task/DAG behaviour;
+- model-routing and tool-routing behaviour;
+- checkpoint/recovery;
+- secrets and sensitivity boundaries;
+- upstream export controls;
+- synthetic greenfield behaviour;
+- deliberately dirty brownfield behaviour;
+- migration fixtures;
+- update fixtures;
+- multi-machine clone/rebuild behaviour;
+- failure-injection behaviour;
+- provider/model adapter independence;
+- fresh-agent reconstruction;
+- release evidence and reproducibility.
+
+Author and run additional held-out tests that the builder did not rely on.
+
+INDEPENDENT TEST AUTHORSHIP AND EXECUTION
+
+All release-critical, held-out, migration, memory, security, recovery and architecture-conformance tests used as independent acceptance evidence must be designed/authored independently of the primary builder. They must also be executed and results reviewed by an independent verification/testing role that did not implement the functionality under test. Where practical, separate the test-author and test-executor/reviewer contexts as additional independent roles. Builder-authored tests remain useful regression evidence, but they are not sufficient by themselves for independent certification.
+
+Do not merely rerun the builder's own happy-path suite.
+
+# ADDITIONAL VERIFICATION DIRECTIVE — ARCHITECTURE COMPLETENESS AND MODEL-SELECTION REVIEW
+
+In addition to the base responsibilities above, perform a strict architecture-completeness and implementation-choice audit.
+
+Your task is not only to test whether the system works, but to verify whether it fully and faithfully implements the intended Governance OS architecture.
+
+## 1. Architecture-completeness checklist
+
+Independently verify whether the Governance OS implementation includes, in substance, all major architectural pillars expected from the governing documents and decisions.
+
+For each item below classify it as:
+
+PRESENT_AND_SUBSTANTIAL
+PARTIAL
+ABSENT
+UNCLEAR
+
+Do not silently assume PRESENT from documentation alone. Look for actual implementation, interfaces, executable behaviour and test evidence.
+
+### A. Governance / deterministic control plane
+
+Verify:
+
+- deterministic Governance OS core;
+- Rust-first control-plane implementation where materially appropriate;
+- explicit justification for any important deterministic-core component not implemented in Rust;
+- portable `gov` CLI architecture;
+- authority / policy engine;
+- canonical constitution / policy precedence;
+- framework/kernel vs project-overlay separation;
+- framework.lock or equivalent release pinning;
+- checkpoint / recovery capability;
+- CIT-P / CIT-E;
+- dynamic task DAG / orchestration machinery;
+- Human Decision Gate handling;
+- model-routing policy;
+- reasoning-tier support;
+- tool / capability / permission registry;
+- release / install / update / rollback machinery;
+- immutable release manifest / hashes / provenance;
+- observability and execution evidence.
+
+### B. Repository intelligence and adoption / migration
+
+Verify:
+
+- cold deterministic repository inventory;
+- material artefact classification;
+- authority classification;
+- target canonical path-map design;
+- repository contract;
+- governed migration/adoption engine;
+- dependency-aware migration batches;
+- independent migration-test hooks;
+- rollback / recovery support;
+- legacy governance retirement support;
+- legacy memory inspection/extraction before retirement;
+- greenfield initialization support (`gov init` or equivalent);
+- brownfield adoption support (`gov adopt` or equivalent);
+- framework update support (`gov update` or equivalent);
+- preservation of healthy native product/package layouts where appropriate.
+
+### C. Development Knowledge Fabric / memory architecture
+
+Verify all separable memory/retrieval concerns rather than treating “vector DB” as the whole memory system.
+
+Check for:
+
+- authoritative Git/project records as source of truth;
+- structured deterministic state, normally SQLite or justified equivalent;
+- lexical retrieval such as FTS/BM25-class capability;
+- semantic/vector retrieval;
+- graph relationships / dependency memory;
+- temporal / supersession awareness;
+- episodic / execution evidence where specified;
+- code intelligence;
+- AST / LSP / symbol / reference / import / call awareness where applicable;
+- retrieval router;
+- exact retrieval;
+- lexical retrieval;
+- semantic retrieval;
+- graph retrieval;
+- code-structural retrieval;
+- candidate fusion;
+- hierarchical / parent-child retrieval;
+- graph-neighbour expansion;
+- reranking;
+- authority filtering;
+- provenance handling;
+- stale / superseded-state filtering;
+- context compiler;
+- bounded authoritative context;
+- rebuildability of all derived indexes from tracked authoritative state;
+- deletion-and-rebuild tests;
+- retrieval regression tests / golden queries;
+- Recall@K or equivalent recall metrics;
+- MRR or equivalent ranking metrics;
+- precision / stale-hit analysis;
+- latency / context-size / token-efficiency metrics.
+
+A vector index alone is NOT sufficient evidence of a valid Development Knowledge Fabric.
+
+### D. Memory component separation
+
+Verify that the implementation treats these as distinct replaceable concerns:
+
+- embedding model;
+- embedding inference runtime;
+- vector/index store;
+- lexical engine;
+- graph implementation;
+- code-intelligence implementation;
+- reranker;
+- retrieval router;
+- generative LLM;
+- context compiler.
+
+Reject architectural coupling that makes one provider/model/runtime a constitutional dependency without an approved rationale.
+
+### E. Rust-first core / polyglot project independence
+
+Independently verify that the Rust-first/polyglot architecture is real, not merely documented.
+
+Verify:
+
+- deterministic control-plane components intended by the architecture are implemented in Rust or have an explicitly justified exception;
+- running the deterministic Governance OS core does not require a Python runtime merely because the core was built around Python;
+- specialised non-Rust capabilities sit behind stable governed interfaces;
+- governed-project language is not hard-coded to Rust;
+- Governance OS implementation language does not dictate product implementation language;
+- the capability/tool registry can resolve native tooling for materially different project languages;
+- at least one synthetic governed fixture uses a language/runtime different from the Governance OS core;
+- mixed-language repositories are not architecturally excluded.
+
+Where appropriate, verify language-native tooling patterns, for example:
+
+Rust:
+- Cargo metadata/build/test
+- rust-analyzer / LSP
+- Clippy
+- rustfmt
+- benchmark tooling
+
+Other languages:
+- equivalent compiler/build/test/LSP/formatter/linter/static-analysis capabilities selected through the registry.
+
+Do not require these exact tools when a better project-native alternative is justified.
+
+### F. Agent organisation / orchestration
+
+Verify:
+
+- role separation;
+- authority levels;
+- task contracts;
+- mutation manifests;
+- worktree/task-claim or equivalent collision controls where needed;
+- typed subagent results;
+- checkpointing before handoff / session close / model switch;
+- fresh-session independence for verification roles;
+- ability to continue independent DAG branches while non-global Human Decision Gates are pending;
+- durable promotion of material agent results into project state.
+
+### G. Tools / interfaces / extensibility
+
+Verify:
+
+- stable interfaces for specialised capabilities;
+- MCP support where appropriate;
+- A2A separation from memory and tool execution;
+- CLI / JSON-RPC / HTTP / structured stdin-stdout or equivalent governed interfaces;
+- capability discovery;
+- tool registration;
+- tool health checks;
+- missing-tool acquisition / approval process;
+- version pinning;
+- secrets handling;
+- privilege / destructive-action gates;
+- loose coupling between deterministic core and external AI/ML/scientific/retrieval services.
+
+### H. Model routing / reasoning policy
+
+Verify:
+
+- model selection is capability-tier based rather than provider-name based;
+- minimum reasoning level can be declared by task;
+- strong models are not replaced by weak defaults on critical tasks;
+- deterministic/no-LLM paths are available where appropriate;
+- routing evidence can record model/provider/task/reasoning/cost/latency/pass/failure/repair;
+- routing policy remains replaceable and empirical.
+
+### I. Synthetic certification fixtures
+
+Verify substantive fixtures/tests for:
+
+- greenfield project;
+- deliberately dirty brownfield project;
+- migration;
+- framework update;
+- upstream learning / export security;
+- multi-machine clone / rebuild;
+- failure injection;
+- model/provider adapter conformance;
+- secrets / outbound negative controls.
+
+The brownfield fixture should contain realistic defects such as:
+
+- legacy provider rules;
+- stale indexes;
+- duplicate/superseded decisions;
+- code/spec disagreement;
+- misplaced files;
+- missing requirements/tests;
+- broken graph links;
+- secrets that must not be indexed or exported.
+
+### J. Security / safety / outbound controls
+
+Verify:
+
+- secret detection/exclusion;
+- sensitive-path handling;
+- outbound allowlist / default-deny behaviour;
+- project/customer data separation from governance memory;
+- upstream lesson sanitisation;
+- synthetic reproducer preference;
+- destructive-action controls;
+- privilege boundaries;
+- auditable security decisions.
+
+### K. Learning / upstream framework improvement
+
+Verify:
+
+- PROJECT / PRODUCT / FRAMEWORK lesson scoping;
+- local lesson capture;
+- sanitised framework-candidate preparation;
+- Upstream Export Gate;
+- no whole-project export;
+- clustering/deduplication of framework lessons;
+- Framework Change Proposal mechanism;
+- central framework release path;
+- downstream update mechanism.
+
+### L. Observability / governance health
+
+Verify that the system can measure or report, where appropriate:
+
+- task traceability;
+- feature/capability readiness;
+- unresolved contradictions;
+- graph orphans;
+- retrieval quality;
+- stale/superseded retrieval;
+- context size;
+- token usage;
+- latency;
+- cost;
+- handoff failure;
+- retries/repair;
+- tests;
+- decisions;
+- human interventions;
+- rebuild/fresh-agent reconstruction.
+
+## 2. Model and retrieval component-selection review
+
+Independently determine whether the implementation has made explicit choices, or has implemented a controlled benchmark-based selection mechanism, for the following separable concerns:
+
+- generative/orchestrator model(s);
+- specialist/worker model tiers;
+- embedding model(s);
+- embedding inference runtime;
+- vector store/index engine;
+- lexical retrieval engine;
+- graph implementation;
+- reranker model(s);
+- code-intelligence tooling;
+- optional local query-planning / rewrite / compression model if used.
+
+For every relevant choice, answer:
+
+1. What was chosen?
+2. Where is the choice recorded?
+3. What alternatives were considered?
+4. Was the choice benchmarked?
+5. Why was it chosen?
+6. What evidence supports the decision?
+7. Is the version / model revision pinned?
+8. Is it replaceable without architectural rewrite?
+9. Does the choice preserve model/provider independence?
+10. Does it satisfy privacy, reproducibility, latency and cost requirements?
+
+If no final model/component has yet been chosen, verify that the system contains a valid benchmark-and-selection mechanism and that the absence of a final choice is appropriate for the release stage.
+
+## 3. Embedding and reranker selection quality
+
+Do NOT require any named model.
+
+However, verify that the selected embedding/reranking solution, or the benchmark mechanism intended to select it, evaluates realistic Governance OS retrieval tasks.
+
+Where feasible, require comparison against multiple credible candidates rather than accepting the first working model.
+
+The benchmark should cover representative queries such as:
+
+- exact decision retrieval;
+- semantic paraphrase retrieval;
+- superseded-vs-current authority;
+- graph impact traversal;
+- code symbol / reference retrieval;
+- cross-file architectural dependency retrieval;
+- historical evidence retrieval;
+- feature/capability readiness retrieval;
+- mixed prose/code contexts.
+
+Evaluate using suitable metrics such as:
+
+- Recall@K;
+- MRR;
+- precision;
+- stale/superseded hit rate;
+- graph coverage;
+- symbol recall;
+- reranking lift;
+- latency;
+- memory footprint;
+- indexing cost;
+- query cost;
+- context/token impact.
+
+Ask explicitly:
+
+- What embedding model was chosen, if any?
+- What reranker was chosen, if any?
+- Why?
+- What alternatives were evaluated?
+- What benchmark evidence supports the choice?
+- Why is the chosen pair suitable for this repository/governance workload?
+- Is the choice locally runnable where required?
+- Can the model be swapped and the indexes rebuilt deterministically?
+
+The verifier must NOT reject the release merely because a particular model family was not chosen.
+
+Reject if selection is unjustified, hidden, tightly coupled, unpinned where pinning is required, or lacks a credible future selection mechanism.
+
+## 4. SQLite / structured-state verification
+
+Explicitly verify that structured deterministic state is not being incorrectly replaced by vector retrieval.
+
+Check:
+
+- what authoritative state is stored in Git-tracked records;
+- what structured derived state is stored in SQLite or equivalent;
+- schema/versioning;
+- migrations;
+- integrity constraints;
+- rebuild behaviour;
+- graph-edge representation if applicable;
+- FTS integration if applicable;
+- transaction boundaries;
+- crash/recovery behaviour;
+- whether the structured DB can be deleted and regenerated from authoritative tracked state where required.
+
+Verify that vector/semantic indexes remain derived indexes rather than becoming hidden sources of truth.
+
+## 5. Context compiler verification
+
+Verify the final context assembly mechanism, not only retrieval.
+
+Check:
+
+- authority ordering;
+- hard-invariant precedence;
+- project-policy precedence;
+- active decision/spec precedence;
+- task contract / mutation manifest;
+- role/skill context;
+- retrieved supplementary context;
+- model inference last;
+- bounded context size;
+- duplicate suppression;
+- current-vs-historical separation;
+- provenance/citations;
+- contradictory evidence handling.
+
+Test whether a fresh agent can reconstruct enough project state to act correctly without relying on prior conversation history.
+
+## 6. Feature / capability readiness verification
+
+Verify that the Feature/Capability Readiness Contract exists in executable or enforceable form.
+
+Check whether missing dimensions can generate work automatically, including:
+
+- intent;
+- actors;
+- workflows;
+- scenarios;
+- inputs;
+- representative test data;
+- algorithm;
+- outputs;
+- functional requirements;
+- non-functional requirements;
+- UX where applicable;
+- backend;
+- DB/data;
+- interfaces;
+- security/privacy;
+- integrations;
+- DevOps/runtime;
+- observability;
+- performance/capacity;
+- cost;
+- recovery/fallback;
+- success/failure criteria;
+- independent tests;
+- documentation/operations.
+
+Verify statuses such as:
+
+PRESENT
+MISSING
+PROVISIONAL
+BLOCKED
+N/A_WITH_REASON
+
+and verify that missing cells can create appropriate task types rather than simply being reported.
+
+## 7. Dynamic task DAG verification
+
+Verify that one dependency-aware DAG can represent more than coding.
+
+It must be capable of expressing, where relevant:
+
+- discovery;
+- research;
+- experiment;
+- specification;
+- decision preparation;
+- architecture;
+- data work;
+- implementation;
+- integration;
+- test design;
+- test execution;
+- security;
+- DevOps;
+- performance;
+- validation;
+- repair;
+- refactor;
+- documentation;
+- release;
+- tooling;
+- memory;
+- governance.
+
+Verify that dependencies can represent chains such as:
+
+research
+→ experiment
+→ decision
+→ scenario
+→ dataset
+→ success criteria
+→ independent test design
+→ architecture
+→ implementation
+→ integration
+→ validation
+
+## 8. Specific questions the verifier MUST answer
+
+The final report must explicitly answer:
+
+1. Is the Governance OS architecture substantially complete relative to the governing documents?
+2. Which major architectural pillars are PARTIAL, ABSENT or UNCLEAR?
+3. What is the deterministic core implemented in?
+4. Where are Rust-first exceptions, if any, and are they justified?
+5. Can the core operate without Python merely to run governance?
+6. Can the OS govern non-Rust and mixed-language projects without architectural changes?
+7. What structured-state database was chosen and why?
+8. What lexical search implementation was chosen and why?
+9. What vector/index implementation was chosen and why?
+10. What graph implementation was chosen and why?
+11. What code-intelligence mechanisms were chosen and why?
+12. What embedding model was chosen, if any, and why?
+13. What reranker was chosen, if any, and why?
+14. What alternatives were benchmarked?
+15. What retrieval metrics support those choices?
+16. What generative/orchestrator model-routing mechanism exists?
+17. Are model/tool choices pinned and replaceable?
+18. Can all derived memory/index state be deleted and rebuilt?
+19. Can a fresh independent agent reconstruct authoritative project context?
+20. What are the top critical architectural gaps preventing release?
+
+## 9. Required report outputs
+
+In addition to normal Prompt 2 outputs, produce:
+
+### Architecture Completeness Matrix
+
+For every major pillar:
+
+- requirement;
+- status;
+- implementation location;
+- test/evidence location;
+- verifier notes;
+- severity if incomplete.
+
+Use:
+
+PRESENT_AND_SUBSTANTIAL
+PARTIAL
+ABSENT
+UNCLEAR
+
+### Model / Retrieval Selection Matrix
+
+For every relevant component:
+
+- component category;
+- selected implementation/model;
+- version;
+- alternatives considered;
+- benchmark/evidence;
+- rationale;
+- pinned: yes/no;
+- replaceable: yes/no;
+- privacy/locality implications;
+- verifier verdict.
+
+### Critical Gap Register
+
+List all:
+
+- CRITICAL;
+- HIGH;
+- MEDIUM;
+- LOW
+
+gaps, with:
+
+- evidence;
+- affected architecture;
+- risk;
+- required repair;
+- acceptance test.
+
+### Independent Test Additions
+
+List all held-out tests you added that were not part of the builder's own acceptance evidence.
+
+## 10. Release-candidate decision rule
+
+Reject the release candidate if any of the following are true:
+
+- a critical architectural pillar is absent;
+- memory is effectively only a vector DB without the required structured/lexical/graph/code/context layers;
+- authoritative truth depends on opaque derived indexes;
+- model/component choices are hidden, unjustified or tightly coupled;
+- there is no credible benchmark/selection mechanism for unresolved retrieval-model choices;
+- derived indexes cannot be rebuilt from authoritative state;
+- the OS is unintentionally tied to one governed-project language;
+- the deterministic core materially contradicts the Rust-first architecture without an approved decision record;
+- security/export boundaries are materially incomplete;
+- independent held-out tests expose unresolved critical/high defects.
+
+If defects are repairable, return:
+
+OS_RELEASE_CANDIDATE_REJECTED
+
+with a precise builder repair delta.
+
+Only return:
+
+OS_RELEASE_CANDIDATE_ACCEPTED
+
+when the implementation is materially complete, independently evidenced and suitable to proceed to release certification.
+
+GOVERNANCE CAPABILITY ACCEPTANCE CONTRACT VERIFICATION
+
+The release candidate must now contain the versioned Governance Capability Acceptance Contract, its schema, evidence map and Governance Health Scheduler.
+
+Treat the contract as an executable acceptance contract, not documentation.
+
+Independently verify:
+
+- every required capability has a stable ID and applicability rule;
+- every required capability maps to appropriate executable/independent evidence;
+- no required capability is satisfied merely by a policy/schema/file existing;
+- every automated capability is linked to a real check/test path;
+- every non-automatable capability identifies its required independent/human/release evidence;
+- evidence freshness invalidates correctly when relevant inputs change;
+- G0–G5 event-triggered health scheduling works;
+- impacted checks can run selectively/parallel where safe;
+- cached evidence is reused only when all relevant hashes/inputs remain valid;
+- RED/YELLOW/GREEN/hard-block semantics are mechanically enforced;
+- failed/missing capability states can create remediation work;
+- capability status survives deletion/rebuild of derived runtime memory;
+- init/adopt/update can consume the same contract;
+- the future G6 qualification layer can map every applicable capability to a sophisticated-repository challenge.
+
+Produce a Suite-to-Contract Coverage Matrix:
+
+capability ID
+→ requirement
+→ status
+→ evidence class
+→ implementation location
+→ automated check/test
+→ independent evidence requirement
+→ freshness trigger
+→ G0–G6 tier
+→ advanced qualification challenge
+→ adoption obligation
+→ verifier verdict
+
+Reject the candidate if a required capability has no credible evidence path, if the health scheduler can falsely report stale evidence as green, or if the contract is merely descriptive rather than operational.
+
+ARTIFACT FLOW &amp; CONSUMPTION INTEGRITY — GATE W
+
+Verify stable artefact IDs/version/hash/authority/lifecycle; typed output→input contracts; mandatory task-input manifests; deterministic resolution of mandatory inputs before supplementary retrieval; context-packet proof of exact required inputs; separation of authoritative inputs from retrieved context; consumption receipts mapping inputs→outputs→requirements/tests; task-close refusal when traceability is absent; upstream-change staleness propagation; orphan/dead-output detection; unexplained implementation detection; forward/reverse lineage; and mandatory-input continuity across checkpoint/handoff/model switch/fresh agent.
+
+Held-out cases must include: current spec absent from semantic index but required by task; superseded spec ranks higher semantically; spec changes after implementation; spec moves path with stable ID; task omits a known dependency; worker returns code without traceability; mandatory inputs contradict; context flooding/token pressure; model/session switch; orphan authoritative output.
+
+A system that stores DAG edges but cannot prove current authoritative input delivery/consumption does NOT satisfy Gate W.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase1_6">
+<label class="row">
+<input data-stepbox="phase1_6" type="checkbox"/>
+<div class="step">
+<b>Repair until OS_RELEASE_CANDIDATE_ACCEPTED</b>
+<span class="muted">If rejected, send the verifier-generated repair delta back to the builder; then run Prompt 2 again in a NEW fresh verifier session. Repeat until accepted.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="core_accept"><label class="row"><input data-stepbox="core_accept" type="checkbox"/><div class="step"><b>Gate — OS_RELEASE_CANDIDATE_ACCEPTED</b><span class="muted">Do not proceed to advanced qualification until a FRESH independent Prompt 2 verifier accepts the exact core candidate. Any later source/kernel/runtime repair invalidates this gate and requires Prompt 2 again.</span></div></label></div></section>
+<section class="card" id="capability-baseline"><h2>Phase 2 — Full Governance Capability Baseline acceptance</h2><div class="muted">This is the hard checkpoint you requested: before sophisticated testing, prove that the full governance capability set from the original design actually exists and has evidence.</div><div class="row-wrap" data-step="cap_0"><label class="row"><input data-stepbox="cap_0" type="checkbox"/><div class="step"><b>Gate — OS_RELEASE_CANDIDATE_ACCEPTED</b><span class="muted">The exact core candidate must first pass the fresh Prompt 2 gate, including its Capability Contract and health-scheduler verification.</span></div></label></div><div class="row-wrap" data-step="cap_1"><label class="row"><input data-stepbox="cap_1" type="checkbox"/><div class="step"><b>CAP-1 — independent full capability-baseline audit</b><span class="muted">FRESH independent auditor. Walk every capability in the original contract, verify evidence and suite coverage, and map each capability into advanced qualification.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>CAP-1 — Independent Governance Capability Baseline Auditor</strong><button class="copy-btn" data-copy="cap-baseline" type="button">Copy Prompt</button></div><pre id="prompt-cap-baseline">You are the Fresh Independent Governance Capability Baseline Auditor.
+
+Run this stage only after the exact Governance OS candidate has received:
+
+OS_RELEASE_CANDIDATE_ACCEPTED
+
+Do not modify implementation/runtime/kernel source.
+
+Read:
+
+- the three governing documents;
+- the machine-readable Governance Capability Acceptance Contract;
+- its generated human-readable view;
+- Suite-to-Contract Coverage Matrix from Prompt 2;
+- accepted Prompt 2 architecture/evidence matrices;
+- all current release evidence.
+
+Your task is to establish whether the FULL Governance OS originally agreed is present and evidentially operational before sophisticated qualification begins.
+
+## Audit every capability
+
+For every capability ID in the contract classify:
+
+PRESENT_AND_SUBSTANTIAL
+PARTIAL
+ABSENT
+UNCLEAR
+N/A_WITH_REASON
+
+Do not use documentation existence as proof of executable behaviour.
+
+For each item record:
+
+- governing source;
+- requirement class: ORIGINAL / POST_VERIFICATION_HARDENING / EXECUTION_REFINEMENT;
+- implementation evidence;
+- automated suite/check evidence;
+- independent evidence;
+- current freshness;
+- health-scheduler tier(s);
+- advanced qualification challenge(s);
+- adoption/post-adoption obligation;
+- residual risk.
+
+## Suite-to-contract audit
+
+Prove that the governance suite can satisfy the contract as an evidence system.
+
+For each capability determine whether proof comes from:
+
+- G0 deterministic guard;
+- G1 mutation check;
+- G2 task-close check;
+- G3 checkpoint/handoff check;
+- G4 milestone check;
+- G5 full suite;
+- G6 qualification;
+- independent held-out verification;
+- Human Decision Gate evidence;
+- release/clean-clone evidence.
+
+No required capability may have zero evidence owner.
+
+Check that changing a relevant implementation/policy/spec/tool/model/index/path-map input invalidates prior green evidence rather than leaving a stale green status.
+
+## Health scheduler audit
+
+Challenge:
+
+- impacted-test selection;
+- parallel execution of independent checks;
+- safe isolation;
+- cache reuse;
+- cache invalidation;
+- stale evidence;
+- RED/YELLOW/GREEN aggregation;
+- hard-block semantics;
+- remediation/task generation.
+
+Verify that the system does NOT serially run the entire governance suite for every trivial mutation.
+
+## Pre-qualification coverage plan
+
+Produce a Qualification Coverage Matrix mapping every applicable capability ID to:
+
+- Repo A challenge;
+- Repo B challenge;
+- hidden-oracle fault class;
+- chaos/scale/soak challenge where relevant;
+- retrieval challenge where relevant.
+
+Any capability not meaningfully challengeable in the synthetic repos must state why and identify another independent evidence route.
+
+## Acceptance rule
+
+Do not accept if:
+
+- any required capability is ABSENT or UNCLEAR;
+- a required PARTIAL capability could invalidate sophisticated qualification;
+- suite evidence is stale or self-attested where independence is required;
+- capability → evidence mapping is incomplete;
+- capability → qualification coverage is materially incomplete;
+- the candidate does not implement the Governance Health Scheduler sufficiently to observe advanced qualification.
+
+If acceptable, write the baseline matrices and stop with exactly:
+
+GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+
+Otherwise stop with:
+
+GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+
+and provide a precise repair delta.
+
+Any source/kernel/runtime repair after rejection creates a new candidate and requires Prompt 2 again before this audit is rerun.
+
+GATE W BASELINE AUDIT
+
+Create an Artifact Flow Coverage Matrix: producer artefact → stable ID/version → relationship type → downstream consumer/task → mandatory/optional → task input manifest → context-packet evidence → consumption receipt → output traceability → invalidation trigger → qualification challenge. Reject if semantic retrieval is relied upon to rediscover mandatory inputs, stale versions can silently satisfy downstream work, or completion cannot be traced to upstream evidence.
+</pre></details></div><div class="row-wrap" data-step="cap_2"><label class="row"><input data-stepbox="cap_2" type="checkbox"/><div class="step"><b>Gate — GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED</b><span class="muted">No required ABSENT/UNCLEAR capabilities; any PARTIAL item is explicitly justified and cannot undermine qualification. Suite-to-contract and qualification-coverage matrices are accepted.</span></div></label></div></section><section class="card" id="provisional-retrieval"><h2>Phase 3 — Provisional retrieval bootstrap for sophisticated qualification</h2><div class="muted">This solves the chicken-and-egg problem: use good retrieval during advanced testing, but postpone the final production bake-off until realistic synthetic repositories exist.</div><div class="row-wrap" data-step="prov_0"><label class="row"><input data-stepbox="prov_0" type="checkbox"/><div class="step"><b>Gate — GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED</b><span class="muted">The full capability baseline must be accepted before establishing the provisional retrieval profile.</span></div></label></div><div class="row-wrap" data-step="prov_1"><label class="row"><input data-stepbox="prov_1" type="checkbox"/><div class="step"><b>PR-1 — benchmark/select a strong provisional retrieval profile</b><span class="muted">Use current Qwen/BGE-class candidates and the OS's own benchmark/select mechanism so advanced qualification is not run on a deliberately weak semantic baseline.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>PR-1 — Provisional retrieval profile</strong><button class="copy-btn" data-copy="provisional-retrieval" type="button">Copy Prompt</button></div><pre id="prompt-provisional-retrieval">You are the Independent Provisional Retrieval Profile Engineer.
+
+Run this only after:
+
+GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+
+The sophisticated qualification repositories must not be tested using an intentionally inadequate semantic baseline.
+
+Your task is therefore to establish a STRONG PROVISIONAL retrieval profile for qualification.
+
+This is not yet the final production/reference model selection.
+
+## Candidate set
+
+Benchmark a small but credible set available at execution time, including where compatible:
+
+- a current Qwen embedding candidate;
+- a current BGE embedding candidate;
+- suitable reranker candidates if the current architecture supports them;
+- the built-in baseline for comparison.
+
+Use current stable model IDs/revisions rather than hard-coding historical names.
+
+## Benchmark corpus
+
+Before the sophisticated repos exist, use:
+
+- Governance OS architecture/spec/decision records;
+- generic golden queries;
+- code/prose mixed queries;
+- paraphrase queries;
+- supersession/current-authority queries;
+- graph/code-intelligence interaction queries.
+
+Measure enough to prevent choosing an obviously inadequate semantic profile.
+
+At minimum report:
+
+- Recall@K;
+- MRR where meaningful;
+- paraphrase recall;
+- stale/superseded hit behaviour;
+- latency;
+- memory/resource footprint;
+- index compatibility;
+- reranking lift where used.
+
+## Selection
+
+Use the Governance OS benchmark/select machinery.
+
+Record:
+
+- candidate alternatives;
+- exact model/revision/runtime;
+- evidence;
+- selection decision;
+- hardware requirements;
+- index compatibility;
+- rebuild/replacement procedure.
+
+Pin the selected profile as:
+
+QUALIFICATION_PROVISIONAL
+
+not as the final constitutional/default production model.
+
+## Boundary
+
+Do not modify core/runtime/kernel source.
+
+If the accepted Governance OS cannot use a stronger model through its existing replaceable capability architecture, stop with:
+
+PROVISIONAL_RETRIEVAL_REQUIRES_CORE_CHANGE
+
+Any core change invalidates Prompt 2 and the capability-baseline gate.
+
+Otherwise install/use the provisional profile in the qualification environment and verify exact + semantic retrieval.
+
+Stop with:
+
+PROVISIONAL_RETRIEVAL_PROFILE_READY</pre></details></div><div class="row-wrap" data-step="prov_2"><label class="row"><input data-stepbox="prov_2" type="checkbox"/><div class="step"><b>Gate — PROVISIONAL_RETRIEVAL_PROFILE_READY</b><span class="muted">A strong, pinned qualification-only profile works without changing the verified core. Final production selection still happens after the sophisticated repos generate realistic benchmark data.</span></div></label></div></section><section class="card" id="advanced-qualification"><h2>Phase 4 — Advanced qualification on two sophisticated synthetic repositories</h2><div class="muted">This is the second verification layer: it proves the OS can govern realistic, scattered, research-heavy programmes—not merely pass mechanism-level fixtures.</div><div class="row-wrap" data-step="aq_0"><label class="row"><input data-stepbox="aq_0" type="checkbox"/><div class="step"><b>Gate — Core Prompt 2 accepted</b><span class="muted">Exact Governance OS core candidate has OS_RELEASE_CANDIDATE_ACCEPTED. If source/kernel/runtime later changes, this gate becomes stale.</span></div></label></div><div class="row-wrap" data-step="aq_1"><label class="row"><input data-stepbox="aq_1" type="checkbox"/><div class="step"><b>AQ-1 — build two sophisticated independent qualification repositories</b><span class="muted">FRESH independent scenario/test-author session. Create two deterministic, large, polyglot, research-heavy qualification repos/generators without modifying the candidate.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>AQ-1 — Advanced qualification scenario architect/test author</strong><button class="copy-btn" data-copy="aq1" type="button">Copy Prompt</button></div><pre id="prompt-aq1">You are the Advanced Governance OS Qualification Scenario Architect and Independent Test Author.
+
+Operate in a FRESH session after the exact Governance OS core candidate has already reached:
+
+OS_RELEASE_CANDIDATE_ACCEPTED
+
+Your job is NOT to modify the Governance OS implementation.
+
+Your job is to create a permanent, deterministic, sophisticated qualification pack that tests whether the accepted Governance OS can actually govern realistic R&amp;D/software programmes rather than only passing mechanism-level fixtures.
+
+Do not read or imitate builder implementation assumptions when designing behavioural acceptance tests. Derive tests from the three governing documents, the certified architecture requirements, and realistic engineering/R&amp;D behaviour.
+
+Create TWO materially different synthetic qualification repositories or deterministic repository generators.
+
+The qualification assets must be separate from the immutable Governance OS candidate payload. They may live in a qualification/evidence worktree or dedicated qualification area, but must not alter runtime/kernel/source code.
+
+## Qualification Repository A — advanced greenfield scientific/compiler programme
+
+Create a synthetic but realistic programme such as:
+
+ORION — Experimental Physics Computation and Compiler Platform
+
+It should include, at minimum:
+
+- Rust compiler/parser/IR/optimiser/codegen or equivalent deterministic systems core;
+- Rust scientific/physics runtime;
+- Python numerical reference implementation and scientific validation;
+- TypeScript or another distinct language for visualisation/control tooling;
+- mathematical specifications;
+- language/compiler specifications;
+- architecture decisions;
+- research notes/papers/evidence;
+- generated datasets;
+- performance requirements;
+- security/privacy constraints where appropriate;
+- incomplete Feature/Capability Readiness dimensions;
+- intentionally missing benchmark/test data that should generate work;
+- superseded decisions;
+- terminology differences between research prose and implementation;
+- multiple modules and cross-language interfaces.
+
+The project must require the Governance OS to execute a genuine workflow such as:
+
+research
+→ experiment
+→ decision
+→ scenarios
+→ dataset
+→ success criteria
+→ independent test design
+→ architecture
+→ implementation
+→ integration
+→ performance validation
+→ release
+
+Include at least one material Human Decision Gate where two technically defensible alternatives have different performance/reliability/scientific trade-offs. The OS must surface the gate and remain blocked only on the dependent branch until an authoritative answer exists.
+
+Include at least one mid-programme specification change requiring CIT-P/CIT-E and impact propagation.
+
+## Qualification Repository B — advanced brownfield/scattered research platform
+
+Create a separate synthetic programme such as:
+
+ARGUS — Legacy Multi-Language Scientific Research Platform
+
+It must be deliberately scattered and difficult, including:
+
+- multiple source roots/packages;
+- Rust plus at least two non-Rust languages;
+- legacy provider-specific rule files;
+- stale chat/session memory;
+- stale vector/index state;
+- duplicated and superseded decisions;
+- contradictory specifications;
+- code/spec disagreement;
+- stale and missing tests;
+- broken graph relationships;
+- renamed/moved modules;
+- dead code;
+- undocumented dependencies;
+- old migration artefacts;
+- sensitivity-classified content;
+- secrets that must never be indexed/exported;
+- realistic plugin/tool descriptors;
+- old project exceptions;
+- inconsistent repository paths;
+- historic research that is useful but not authoritative.
+
+The Governance OS must have to inventory, classify, map, adopt, migrate, rebuild memory, preserve unique knowledge, retire legacy authority, recover tool/code intelligence and reach a valid governed state.
+
+## Scale
+
+Do not make these toy repositories.
+
+Use deterministic generators where necessary rather than committing huge repetitive corpora.
+
+Qualification scale should support at least a realistic medium/large tier, targeting approximately:
+
+- 1,000+ material files/artifacts per qualification repository OR an equivalent generated corpus;
+- 10,000+ retrievable records/chunks per repository at the qualification tier;
+- meaningful cross-file dependency and graph density;
+- enough records to expose retrieval, freshness and performance failures.
+
+Also provide a smaller fast-development tier and an optional larger stress tier if practical.
+
+Record actual generated scale.
+
+## Hidden/adversarial qualification scenarios
+
+Create held-out tests/disturbances that the implementation builder did not know in advance, covering at minimum:
+
+- concurrent task claims;
+- mutation-scope violation;
+- stale/superseded authority retrieval;
+- semantic paraphrase retrieval;
+- graph-impact traversal;
+- symbol/reference retrieval;
+- repository rename/move;
+- deletion of derived indexes followed by rebuild;
+- interrupted session/checkpoint recovery;
+- model/provider switch between sessions;
+- missing/unavailable tool;
+- plugin descriptor tampering;
+- policy/kernel tampering attempt;
+- secret/sensitivity injection;
+- unanswered Human Decision Gate;
+- declined Human Decision Gate;
+- stale/revoked Human Decision Gate;
+- CIT impact propagation;
+- index/model pin change;
+- multi-machine/fresh-clone reconstruction;
+- update and rollback;
+- network/model-service unavailability where relevant;
+- performance/scale degradation;
+- context-size pressure;
+- long-running/soak behaviour.
+
+## Independent test authorship
+
+Qualification acceptance tests must be independently authored from the Governance OS builder.
+
+Where practical use separate independent test-author roles/subagents for Repository A and Repository B so both scenarios do not share one author's blind spots.
+
+Do not modify the Governance OS to accommodate the tests.
+
+## Required outputs
+
+Produce:
+
+1. qualification repository/generator A;
+2. qualification repository/generator B;
+3. deterministic seeds/configuration;
+4. qualification scenario specifications;
+5. hidden/held-out behavioural tests;
+6. expected authoritative decisions and forbidden outcomes;
+7. performance/scale targets;
+8. security/sensitivity assertions;
+9. recovery/chaos scenarios;
+10. qualification execution instructions;
+11. provenance showing the exact Governance OS candidate these tests were designed to challenge.
+
+Stop with:
+
+ADVANCED_QUALIFICATION_PACK_READY
+
+FULL CAPABILITY-CONTRACT COVERAGE REQUIREMENT
+
+The two qualification repositories and hidden oracle must collectively challenge EVERY applicable capability in the accepted Governance Capability Acceptance Contract.
+
+Consume the accepted Qualification Coverage Matrix from CAP-1.
+
+For every capability ID, map at least one of:
+
+- Repo A scenario;
+- Repo B injected fault;
+- hidden path-map oracle;
+- hidden memory/index oracle;
+- chaos/recovery scenario;
+- scale/soak scenario;
+- Human Decision Gate scenario;
+- retrieval scenario;
+- separate independent evidence if synthetic challenge is genuinely inappropriate.
+
+Do not leave important capabilities untested merely because the repos are complex.
+
+## Required sophisticated fault families
+
+The repositories must intentionally include, with hidden ground truth where applicable:
+
+### Contradictions
+- active decision vs active decision;
+- active vs superseded decision;
+- spec vs code;
+- spec vs test;
+- architecture vs implementation;
+- research conclusion vs evidence;
+- numerical/scientific tolerance/unit discrepancy.
+
+### Readiness/specification gaps
+- missing scenarios;
+- missing actors/workflows;
+- missing representative data;
+- missing algorithm/processing definition;
+- missing NFRs;
+- missing performance target;
+- missing security analysis;
+- missing recovery/fallback;
+- missing success/failure criteria;
+- missing independent tests;
+- implementation task marked ready despite prerequisites missing.
+
+### Task/DAG defects
+- missing dependency;
+- orphan task;
+- circular dependency;
+- completed task without evidence;
+- implementation before required research/decision;
+- stale blocked/runnable state.
+
+### Repository/path defects
+- no initial path map in Repo B;
+- misplaced specs/code/tests/generated files;
+- duplicate authority systems;
+- provider-specific legacy rules in active locations;
+- stale references after move/rename;
+- unknown material artefacts;
+- healthy native package layout that must NOT be cosmetically rewritten.
+
+### Memory/index defects
+- authoritative files omitted from indexing;
+- wrong material indexed;
+- archive/superseded material indexed as current;
+- duplicate chunks/records;
+- stale deleted record retrievable;
+- renamed file indexed twice;
+- wrong embedding/index pin;
+- stale graph edge;
+- orphan graph node;
+- stale symbol/reference index;
+- sensitive content in wrong namespace;
+- missing provenance;
+- derived state inconsistent with Git truth.
+
+### Session/checkpoint/concurrency defects
+- stale checkpoint before handoff;
+- significant mutation after checkpoint;
+- lost claim;
+- double claim;
+- interrupted session;
+- model/provider switch;
+- fresh-agent continuation without prior chat.
+
+### Gates/CIT/policy defects
+- unanswered gate;
+- declined/revoked/stale gate;
+- unrelated gate;
+- incomplete CIT impact map;
+- affected tests omitted;
+- project-policy weakening attempt;
+- invalid exception;
+- destructive action without gate.
+
+### Tool/plugin defects
+- unavailable tool;
+- wrong tool version;
+- tampered/unregistered/unpinned plugin;
+- capability hash drift;
+- unavailable model service;
+- permission/authority mismatch.
+
+### Migration/recovery defects
+- partial migration;
+- broken import/reference;
+- rollback incomplete;
+- deleted/corrupt derived DB;
+- failed index rebuild;
+- interrupted update.
+
+### Research/scientific defects
+- unsupported conclusion;
+- irreproducible experiment;
+- decision before evidence;
+- contradictory reference dataset;
+- unit/precision/boundary-condition mismatch.
+
+### Performance/scale defects
+- pathological retrieval latency;
+- excessive context expansion;
+- graph/index growth;
+- repeated rebuild inefficiency;
+- checkpoint/state leakage during soak.
+
+## Hidden Qualification Oracle
+
+Each injected fault must include verifier-owned ground truth:
+
+fault ID
+→ class
+→ hidden authoritative truth
+→ injected state
+→ expected detection
+→ expected severity
+→ expected impacted artefacts/nodes
+→ expected governed action
+→ forbidden outcomes
+
+Repo B must also include a hidden expected path-map oracle.
+
+Both repos must include hidden memory/index-coverage oracles specifying:
+
+- what MUST be indexed;
+- what MUST NOT be indexed;
+- expected namespace/authority;
+- current vs superseded state;
+- expected graph relationships;
+- expected code symbols/references;
+- expected retrieval results.
+
+## Size tiers
+
+Build deterministic generators/support for approximately:
+
+FAST:
+200–400 material artefacts and 3k–7k retrievable records per repo.
+
+QUALIFICATION:
+1,500–4,000 material artefacts and 20k–60k retrievable records per repo.
+
+STRESS:
+8k–20k files and 100k–300k retrievable records per repo where hardware/time permit.
+
+Do not inflate size with meaningless filler. The qualification tier must contain meaningful code/spec/research/dependency structure.
+
+## Governance Health Scheduler qualification
+
+The qualification must prove that G0–G6 scheduling itself behaves correctly.
+
+Examples:
+
+- wrong-path mutation should make the relevant capability health red without waiting for a full audit;
+- stale index evidence should invalidate affected retrieval health;
+- stale checkpoint should surface before handoff/session close;
+- task close should run impacted checks, not the entire release qualification;
+- independent checks should run concurrently where safe;
+- cache reuse should occur only when relevant hashes remain unchanged.
+
+Measure scheduler latency and evidence freshness behaviour.
+
+## Quantitative qualification scoring
+
+Report:
+
+- injected-defect detection recall;
+- false positives;
+- severity accuracy;
+- impact-map accuracy;
+- path-map accuracy;
+- authoritative-artifact indexing coverage;
+- wrong-indexing count;
+- stale-index count;
+- readiness/task correctness;
+- Human Gate correctness;
+- recovery/chaos pass rate;
+- capability-contract coverage percentage.
+
+A complicated demo is not sufficient; qualification must be objectively scoreable.
+
+GATE W — HIDDEN ARTIFACT-FLOW FAULTS
+
+The generator/oracle must include: current completed spec omitted from semantic index; superseded spec semantically favoured; required decision/spec exists but task omits dependency; spec/decision changes after implementation; file moves while stable ID remains; context packet lacks mandatory input; worker claims completion without consumption receipt; implementation has no active lineage; completed upstream artefact has no consumer; contradictory mandatory inputs; token pressure; session/model switch; checkpoint predating required-input change. The hidden oracle states exact authoritative input ID/version/hash and downstream staleness propagation.
+</pre></details></div><div class="row-wrap" data-step="aq_2"><label class="row"><input data-stepbox="aq_2" type="checkbox"/><div class="step"><b>AQ-2 — run advanced end-to-end qualification</b><span class="muted">FRESH independent qualification verifier. Run both repositories, chaos/scale/soak tests and NEW held-out scenarios against the exact accepted candidate.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>AQ-2 — Fresh advanced qualification verifier</strong><button class="copy-btn" data-copy="aq2" type="button">Copy Prompt</button></div><pre id="prompt-aq2">You are the Fresh Independent Advanced Governance OS Qualification Verifier.
+
+Operate in a FRESH session.
+
+The Governance OS core candidate must already have:
+
+OS_RELEASE_CANDIDATE_ACCEPTED
+
+Verify the exact accepted candidate. Do not silently move to another commit.
+
+Use the independently authored advanced qualification pack containing TWO sophisticated synthetic repositories/generators.
+
+Do not modify Governance OS implementation/runtime/kernel source code.
+
+Your job is to prove whether the accepted Governance OS can govern both programmes end-to-end under realistic complexity, scale, failure and change.
+
+## Independence requirements
+
+- Do not trust builder claims.
+- Do not trust scenario-author conclusions.
+- Execute the scenarios yourself.
+- Rerun the scenario-author tests unchanged.
+- Add NEW held-out scenarios of your own.
+- Where practical use separate independent test-author and test-executor/reviewer contexts.
+- Builder-authored tests are regression evidence only, not qualification evidence.
+
+## Repository A — end-to-end greenfield R&amp;D qualification
+
+Drive the Governance OS through the full programme, exercising:
+
+- `gov init` or equivalent;
+- repository contract creation;
+- Feature/Capability Readiness;
+- research/discovery;
+- experiments;
+- evidence capture;
+- task DAG generation;
+- specialist-agent role separation;
+- independent test authorship;
+- Human Decision Gates;
+- CIT-P/CIT-E;
+- tool/capability acquisition;
+- code intelligence;
+- memory/retrieval;
+- checkpoint/handoff;
+- implementation/integration;
+- security/performance work;
+- release preparation;
+- fresh-agent continuation.
+
+Verify the system can distinguish research evidence from authoritative decisions and can correctly resolve superseded decisions/specifications.
+
+## Repository B — end-to-end brownfield/scattered qualification
+
+Drive the Governance OS through:
+
+- cold inventory;
+- classification;
+- target path mapping;
+- migration planning;
+- independent migration tests;
+- controlled adoption/migration;
+- legacy governance retirement;
+- legacy memory extraction;
+- Development Knowledge Fabric rebuild;
+- independent memory verification;
+- full audit/remediation behaviour;
+- update/rollback where applicable.
+
+Verify that healthy native product/package layouts are preserved rather than cosmetically rewritten.
+
+## Adversarial/chaos execution
+
+Actively inject and test:
+
+- task-claim collisions;
+- out-of-scope mutation attempts;
+- index deletion/corruption;
+- stale index state;
+- embedding/model pin change;
+- file rename/move;
+- secrets/restricted/confidential content;
+- plugin hash/descriptor drift;
+- policy weakening attempts;
+- Human Gate unanswered/declined/revoked paths;
+- interrupted session recovery;
+- fresh clone on another path;
+- tool/service unavailable;
+- model/provider switch;
+- network interruption where relevant;
+- long-context pressure;
+- performance/load pressure;
+- rollback after partial change;
+- recovery from failed migration/update.
+
+Verify that lower-trust inputs cannot manufacture higher-trust facts.
+
+## Memory and retrieval qualification
+
+Across both repositories test:
+
+- exact retrieval;
+- lexical retrieval;
+- semantic paraphrase retrieval;
+- graph impact;
+- code symbol/reference/import/call retrieval;
+- parent/child expansion;
+- reranking;
+- stale/superseded filtering;
+- authority filtering;
+- context compilation;
+- fresh-agent reconstruction.
+
+Report suitable metrics including Recall@K, MRR, precision, stale-hit rate, graph coverage, symbol recall, latency and context/token impact.
+
+Do not fail merely because the baseline embedder is not the final reference model if the certified benchmark/select mechanism works correctly; retrieval-model quality will undergo a separate bake-off after this qualification. But fail if the mechanism is structurally incapable of supporting a stronger selected model.
+
+## Scale/soak qualification
+
+Run the qualification tier of the synthetic generators and report:
+
+- files/artifacts;
+- retrievable records;
+- index size;
+- build/rebuild time;
+- query latency distribution;
+- memory footprint;
+- longest/representative workflow duration;
+- failures/retries;
+- context/token pressure where measurable.
+
+Run a reasonable soak/long workflow sufficient to expose state leaks, claim loss, stale indexes, unbounded growth or checkpoint problems.
+
+## Required verdict
+
+Produce:
+
+- Advanced Qualification Matrix;
+- Repository A execution report;
+- Repository B execution report;
+- new held-out test register;
+- retrieval/scale metrics;
+- chaos/recovery results;
+- Human Decision Gate results;
+- security/sensitivity results;
+- all CRITICAL/HIGH/MEDIUM/LOW findings;
+- precise repair delta if rejected.
+
+Return exactly one of:
+
+ADVANCED_QUALIFICATION_ACCEPTED
+
+or
+
+ADVANCED_QUALIFICATION_REJECTED
+
+## Repair-loop rule
+
+If qualification finds a defect requiring any Governance OS runtime/kernel/policy/source change:
+
+1. preserve/commit qualification evidence only;
+2. return the repair delta to the builder;
+3. create a new immutable patch candidate;
+4. rerun a FRESH full Prompt 2 verification on that new candidate;
+5. only after OS_RELEASE_CANDIDATE_ACCEPTED again, rerun this advanced qualification on the new exact candidate.
+
+Do not waive this loop merely because a qualification defect seems small.
+
+CAPABILITY-CONTRACT ACCEPTANCE DURING EXECUTION
+
+Use the accepted Governance Capability Acceptance Contract and CAP-1 Qualification Coverage Matrix as mandatory qualification inputs.
+
+During the end-to-end runs:
+
+- observe G0–G6 health events as work happens;
+- verify expected RED/YELLOW/GREEN transitions;
+- verify failed capability states block or generate remediation according to policy;
+- verify repaired state can return health to green only after fresh evidence;
+- score every applicable capability against the hidden oracle and observed evidence;
+- report any capability that was never meaningfully exercised.
+
+The final Advanced Qualification Matrix must include capability ID → scenario/fault → expected result → actual result → evidence → verdict.
+
+Do not return ADVANCED_QUALIFICATION_ACCEPTED if material capability-contract coverage is missing, even if both repositories appear operational.
+
+GATE W — ARTIFACT-FLOW EXECUTION METRICS
+
+Measure required-input delivery accuracy, current-version selection, superseded-input leakage, missing-input detection, staleness propagation, requirement→code and requirement→test traceability, orphan-output detection, unexplained implementation detection, and fresh-agent mandatory-input reconstruction. Demonstrate at least one case where semantic retrieval fails but deterministic dependency resolution still supplies the required authoritative input. Do not accept qualification if Gate W is materially untested or self-attested.
+</pre></details></div><div class="row-wrap" data-step="aq_3"><label class="row"><input data-stepbox="aq_3" type="checkbox"/><div class="step"><b>Qualification repair loop if rejected</b><span class="muted">If any source/kernel/runtime repair is required: commit evidence only, return repair delta to builder, produce a new patch, rerun full Prompt 2, then rerun AQ-2.</span></div></label></div><div class="row-wrap" data-step="aq_4"><label class="row"><input data-stepbox="aq_4" type="checkbox"/><div class="step"><b>Gate — ADVANCED_QUALIFICATION_ACCEPTED</b><span class="muted">Both sophisticated repositories pass end-to-end qualification on the exact candidate with no unresolved CRITICAL/HIGH findings.</span></div></label></div></section><section class="card" id="retrieval-qualification"><h2>Phase 5 — Final retrieval bake-off and production reference profile</h2><div class="muted">This stage resolves the remaining embedding/reranker choice without hard-coding it into the constitution. The selected profile becomes a certified release companion/default dependency.</div><div class="row-wrap" data-step="ret_0"><label class="row"><input data-stepbox="ret_0" type="checkbox"/><div class="step"><b>Gate — Core + advanced qualification accepted</b><span class="muted">Proceed only when OS_RELEASE_CANDIDATE_ACCEPTED and ADVANCED_QUALIFICATION_ACCEPTED both apply to the exact core candidate.</span></div></label></div><div class="row-wrap" data-step="ret_1"><label class="row"><input data-stepbox="ret_1" type="checkbox"/><div class="step"><b>R-1 — embedding/reranker bake-off and reference-profile selection</b><span class="muted">FRESH independent retrieval qualification. Include current Qwen and BGE families plus baseline and at least one other credible candidate; select by evidence, not brand.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>R-1 — Retrieval qualification and reference-profile selection</strong><button class="copy-btn" data-copy="r1" type="button">Copy Prompt</button></div><pre id="prompt-r1">You are the Independent Retrieval Qualification and Reference-Profile Selection Engineer.
+
+Run this stage only after BOTH gates are true for the exact Governance OS candidate:
+
+OS_RELEASE_CANDIDATE_ACCEPTED
+ADVANCED_QUALIFICATION_ACCEPTED
+
+Do not modify the Governance OS deterministic core.
+
+Your job is to use the certified retrieval architecture to select the default production/reference retrieval profile that new governed projects will receive, so Product A/B do not begin with an unresolved embedding/reranking choice.
+
+The constitutional architecture remains model/provider agnostic. This stage selects a RELEASE REFERENCE PROFILE, not a constitutional dependency.
+
+## Candidate discovery
+
+Benchmark multiple credible current candidates.
+
+The candidate set must include, when available and licence/security compatible:
+
+- a current Qwen embedding model family candidate;
+- a current Qwen reranker family candidate;
+- a current BGE embedding/reranker family candidate;
+- the built-in/baseline implementation;
+- at least one other credible current local or approved alternative.
+
+Do not hard-code stale historical version names. At execution time identify current stable candidate model IDs/revisions, sources and licences.
+
+If web/repository research is available, use it and record sources. If not, state the limitation and benchmark the strongest locally available candidates.
+
+## Benchmark corpus
+
+Use BOTH:
+
+1. Governance OS generic golden retrieval queries; and
+2. held-out queries derived from the two advanced qualification repositories.
+
+The benchmark must include:
+
+- exact decision/spec retrieval;
+- paraphrase/semantic retrieval;
+- current-vs-superseded authority;
+- graph-impact retrieval;
+- code symbol/reference retrieval;
+- cross-language queries;
+- mixed code/prose queries;
+- long technical queries;
+- rare terminology;
+- research-evidence retrieval;
+- feature/readiness retrieval;
+- security/sensitivity exclusion checks.
+
+## Candidate dimensions
+
+Evaluate embedding and reranker as separate replaceable components and test meaningful combinations.
+
+Measure, where applicable:
+
+- Recall@K;
+- MRR;
+- precision;
+- stale/superseded hit rate;
+- graph/code retrieval interaction;
+- reranking lift;
+- latency p50/p95;
+- indexing throughput;
+- memory/RAM/VRAM footprint;
+- index size;
+- context/token impact;
+- supported context length;
+- CPU viability;
+- GPU benefit/requirement;
+- privacy/locality;
+- reproducibility;
+- multilingual capability if useful;
+- licence/redistribution conditions;
+- maintenance/source stability.
+
+Do not choose solely on one quality metric.
+
+## Reference hardware/profile
+
+Define a supported baseline hardware envelope for the DEFAULT profile.
+
+Prefer a local/private profile that can operate without sending project content to an external model provider.
+
+If useful, you may also define an optional accelerated/high-quality profile, but there must be one unambiguous certified DEFAULT reference profile.
+
+## Governance selection
+
+Use the Governance OS's own benchmark/select mechanism.
+
+The winning choice must create governed evidence:
+
+benchmark
+→ research/evidence record
+→ alternatives
+→ decision
+→ pinned component identities/revisions
+→ required index migration/rebuild rules.
+
+## Required reference-profile specification
+
+Produce a machine-readable Reference Retrieval Profile containing at minimum:
+
+- profile ID/version;
+- embedding model ID and exact revision/digest;
+- embedding runtime and version;
+- embedding dimension/config;
+- reranker model ID and exact revision/digest;
+- reranker runtime and version;
+- vector/index configuration;
+- lexical configuration if profile-dependent;
+- chunking/index settings that materially affect compatibility;
+- source/provenance;
+- licence;
+- redistribution status;
+- integrity hash/digest where available;
+- expected cache/storage location;
+- minimum/recommended RAM/VRAM/CPU/GPU;
+- benchmark evidence;
+- selection decision ID;
+- replacement/reindex procedure;
+- fallback behaviour.
+
+## Important integration boundary
+
+Do NOT modify runtime/kernel/source merely to integrate the selected model.
+
+If the existing Governance OS release cannot install, pin, verify and use the selected profile through its existing capability/plugin/dependency architecture, stop with:
+
+RETRIEVAL_INTEGRATION_REQUIRES_CORE_CHANGE
+
+and provide the exact required core change.
+
+A core change invalidates the previous Prompt 2 and advanced qualification gates and must go back through those gates before retrieval qualification continues.
+
+If the architecture already supports the selected profile without core changes, stop with:
+
+REFERENCE_RETRIEVAL_PROFILE_SELECTED
+
+PROVISIONAL-TO-FINAL REQUIREMENT
+
+A QUALIFICATION_PROVISIONAL retrieval profile was used during the sophisticated repository runs.
+
+Do not automatically promote it.
+
+Use the rich held-out queries, contradictions, path-map cases, code/research mixtures and hidden memory oracle from BOTH sophisticated repositories as part of the FINAL model bake-off.
+
+The final winning profile may differ from the provisional profile.
+
+If it differs:
+- record why;
+- run the required deterministic reindex/rebuild;
+- rerun retrieval-dependent advanced qualification scenarios;
+- confirm capability-contract retrieval/health statuses remain accepted.
+</pre></details></div><div class="row-wrap" data-step="ret_2"><label class="row"><input data-stepbox="ret_2" type="checkbox"/><div class="step"><b>R-2 — package the selected reference retrieval profile</b><span class="muted">Package the winning model/runtime as a governed companion dependency/profile without modifying the deterministic core.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>R-2 — Reference retrieval profile packager</strong><button class="copy-btn" data-copy="r2" type="button">Copy Prompt</button></div><pre id="prompt-r2">You are the Governance OS Release-Profile Packager.
+
+Run this only after:
+
+REFERENCE_RETRIEVAL_PROFILE_SELECTED
+
+Your task is to package the selected reference retrieval profile as a governed companion dependency/profile for the Governance OS release WITHOUT changing deterministic core/runtime/kernel source.
+
+The goal is that Product A, Product B and new projects do not begin by asking which embedding/reranker is missing.
+
+## Package the profile
+
+Create the release companion/profile assets needed for deterministic installation and verification, including:
+
+- reference-profile manifest/lock;
+- exact model IDs/revisions/digests;
+- exact inference runtime dependency versions;
+- model/source provenance;
+- licence/third-party notices;
+- model BOM / dependency inventory;
+- checksums/integrity data;
+- install/bootstrap instructions or machine-readable installer configuration;
+- cache/storage location policy;
+- hardware requirements;
+- offline-after-install expectations;
+- rebuild/reindex requirements;
+- fallback behaviour;
+- `gov doctor` checks;
+- clean uninstall/replacement procedure.
+
+Do not copy large model weights into Git merely for convenience unless licence, repository policy and size make that explicitly appropriate.
+
+If redistribution of the selected model is permitted and release-asset packaging is practical, it may be bundled as a release asset.
+
+Otherwise use a deterministic governed fetch/install path that:
+
+- pins the exact revision;
+- verifies integrity;
+- records provenance;
+- fails closed on mismatch;
+- leaves the model locally available after successful setup where the profile requires local operation.
+
+## New-project behaviour
+
+The certified release bundle must make the DEFAULT reference retrieval profile available through an unambiguous governed setup path.
+
+A new `gov init`, `gov adopt`, or documented release bootstrap must not require the operator to invent an embedding/reranker choice.
+
+If a required profile dependency is absent, `gov doctor` or equivalent must report exactly what is missing and the governed installation action.
+
+## Core-change prohibition
+
+Do not modify core/runtime/kernel source in this stage.
+
+If packaging exposes a missing core capability, stop with:
+
+RETRIEVAL_INTEGRATION_REQUIRES_CORE_CHANGE
+
+and specify the required repair. Any such repair must return through full Prompt 2 verification and advanced qualification.
+
+Otherwise produce the companion package and stop with:
+
+REFERENCE_RETRIEVAL_PROFILE_PACKAGED</pre></details></div><div class="row-wrap" data-step="ret_3"><label class="row"><input data-stepbox="ret_3" type="checkbox"/><div class="step"><b>R-3 — independently verify clean installation and retrieval quality</b><span class="muted">FRESH independent verifier. Test clean-machine install, model integrity/licensing/provenance, offline/local behaviour, failure modes and held-out retrieval quality.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>R-3 — Fresh reference retrieval profile integration verifier</strong><button class="copy-btn" data-copy="r3" type="button">Copy Prompt</button></div><pre id="prompt-r3">You are the Fresh Independent Reference Retrieval Profile Integration Verifier.
+
+Operate in a FRESH session after:
+
+REFERENCE_RETRIEVAL_PROFILE_PACKAGED
+
+Do not trust the selector or packager.
+
+Do not modify Governance OS implementation/runtime/kernel source.
+
+Independently verify the exact Governance OS candidate plus the packaged DEFAULT reference retrieval profile.
+
+## Clean-machine installation test
+
+From a clean clone/environment with no pre-existing model cache:
+
+1. verify release identity;
+2. install/bootstrap the reference profile using only the documented/governed mechanism;
+3. verify model/runtime source and integrity;
+4. build/rebuild memory;
+5. run `gov doctor` or equivalent;
+6. prove the system reaches retrieval-ready healthy state without ad-hoc model choice.
+
+If the model cannot legally/practically be bundled, verify deterministic pinned fetch and integrity checking.
+
+After successful installation, verify the intended local/offline behaviour where applicable.
+
+## Independent retrieval tests
+
+Rerun the benchmark suite and author NEW held-out retrieval queries across:
+
+- generic Governance OS records;
+- advanced qualification Repository A;
+- advanced qualification Repository B.
+
+Test:
+
+- exact retrieval;
+- paraphrase;
+- supersession;
+- graph impact;
+- code references;
+- cross-language queries;
+- reranking lift;
+- long/rare technical terms;
+- fresh-agent context reconstruction;
+- sensitivity exclusions.
+
+Confirm observed metrics remain within the accepted benchmark envelope.
+
+## Failure and supply-chain tests
+
+Test at minimum:
+
+- missing model;
+- corrupted/tampered model;
+- wrong model revision;
+- wrong embedding dimension;
+- wrong reranker revision;
+- runtime version mismatch;
+- interrupted download/install;
+- cache relocation;
+- offline execution after complete install where expected;
+- model source unavailable;
+- manifest/hash mismatch;
+- licence/provenance metadata missing;
+- attempted silent fallback to another embedder;
+- index created with another embedder;
+- replacement/reindex flow.
+
+## Release dependency checks
+
+Verify:
+
+- reference-profile lock is complete;
+- model/runtime dependencies are reproducible;
+- model BOM/dependency inventory exists;
+- licence/third-party notices are sufficient;
+- supported hardware envelope is documented;
+- profile remains replaceable and is not constitutional;
+- new projects receive an unambiguous default profile;
+- `gov doctor` detects missing/incompatible profile state.
+
+## Regression boundary
+
+Run key memory/retrieval and advanced-qualification smoke tests to ensure profile integration did not invalidate the previously accepted Governance OS behaviour.
+
+If this stage discovers that runtime/kernel/source must change, reject and require a new patch candidate followed by full Prompt 2 and advanced qualification again.
+
+Return exactly one of:
+
+REFERENCE_RETRIEVAL_PROFILE_ACCEPTED
+
+or
+
+REFERENCE_RETRIEVAL_PROFILE_REJECTED
+
+CAPABILITY-CONTRACT REVALIDATION
+
+After installing the final reference retrieval profile, rerun every Governance Capability Acceptance Contract item whose evidence is invalidated by a change in embedding model, reranker, inference runtime, vector/index compatibility or retrieval configuration.
+
+The profile integration is not accepted while relevant capability evidence remains STALE.
+</pre></details></div><div class="row-wrap" data-step="ret_4"><label class="row"><input data-stepbox="ret_4" type="checkbox"/><div class="step"><b>Gate — REFERENCE_RETRIEVAL_PROFILE_ACCEPTED</b><span class="muted">The default retrieval profile is selected, pinned, reproducibly installable, independently verified and ready to travel with the Governance OS release.</span></div></label></div><div class="row-wrap" data-step="ret_5"><label class="row"><input data-stepbox="ret_5" type="checkbox"/><div class="step"><b>Core-change escape rule</b><span class="muted">If retrieval packaging requires any runtime/kernel/source change, STOP: create a new patch candidate and return through Prompt 2 + advanced qualification before continuing.</span></div></label></div></section><section class="card" id="final-certification"><h2>Phase 6 — Final release certification and private GitHub publication</h2><div class="muted">Prompt 3 is deliberately last: it certifies the exact Governance OS core, advanced qualification evidence and the selected retrieval dependency/profile as one adoption-ready release bundle.</div><div class="row-wrap" data-step="cert_0"><label class="row"><input data-stepbox="cert_0" type="checkbox"/><div class="step"><b>Gate — all pre-certification qualifications accepted</b><span class="muted">Core Prompt 2, advanced two-repo qualification and reference retrieval profile must all be accepted before Prompt 3.</span></div></label></div><div class="row-wrap" data-step="phase1_7">
+<label class="row">
+<input data-stepbox="phase1_7" type="checkbox"/>
+<div class="step">
+<b>Prompt 3 — final independent release certification</b>
+<span class="muted">FRESH independent release-auditor session. Certifies the exact core candidate plus advanced-qualification evidence and the independently accepted reference retrieval profile.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 3 — Final independent release certification</strong>
+<button class="copy-btn" data-copy="p3" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p3">
+Act as the Fresh Independent Governance OS Final Release Auditor.
+
+This is Prompt 3 — FINAL RELEASE CERTIFICATION.
+
+Do not modify implementation/runtime/kernel source.
+
+The exact Governance OS core candidate must already have passed:
+
+1. OS_RELEASE_CANDIDATE_ACCEPTED
+2. ADVANCED_QUALIFICATION_ACCEPTED
+3. REFERENCE_RETRIEVAL_PROFILE_ACCEPTED
+
+If any runtime/kernel/source code changed after either accepted verification, treat the relevant prior acceptance as stale and refuse certification until the required verification/qualification gates are rerun.
+
+## Governing evidence
+
+Read and verify:
+
+- the three governing documents;
+- exact core candidate commit/tag/payload;
+- accepted Prompt 2 verification evidence;
+- Prompt 2 Architecture Completeness Matrix;
+- Prompt 2 Model / Retrieval Selection Matrix;
+- Prompt 2 Critical Gap Register and held-out tests;
+- advanced qualification reports for both sophisticated repositories;
+- advanced qualification new held-out test register;
+- scale/soak/chaos/recovery evidence;
+- retrieval bake-off evidence;
+- reference retrieval profile selection decision;
+- independent retrieval-profile integration-verification evidence.
+
+Do not trust summaries alone. Check underlying artefacts and hashes.
+
+## Core release completeness
+
+Audit:
+
+- immutable payload;
+- semantic version;
+- release manifest;
+- release commit/hash;
+- schema versions;
+- runtime/CLI versions;
+- supported migration paths;
+- rollback paths;
+- release notes;
+- Rust-first/polyglot conformance;
+- provider/model independence;
+- policy/kernel trust-root evidence;
+- Human Decision Gate integrity;
+- plugin/capability trust boundary;
+- security/outbound controls;
+- clean rebuild/recovery;
+- multi-machine/fresh-clone evidence;
+- independent test provenance.
+
+## Advanced qualification completeness
+
+Confirm both sophisticated qualification repositories passed on the exact core candidate and exercised, at minimum:
+
+- greenfield R&amp;D;
+- brownfield/scattered adoption;
+- multi-language tooling;
+- research/experiments/decisions;
+- dynamic task DAG;
+- Feature/Capability Readiness;
+- independent tests;
+- Human Decision Gates;
+- CIT-P/CIT-E;
+- memory/retrieval;
+- concurrency;
+- checkpoint/recovery;
+- scale/soak;
+- failure/chaos;
+- security/sensitivity;
+- fresh clone/rebuild;
+- update/rollback.
+
+Do not certify unresolved CRITICAL/HIGH qualification findings.
+
+## Reference retrieval profile completeness
+
+Confirm the DEFAULT reference retrieval profile is a release companion, not a constitutional hard-code.
+
+Verify:
+
+- exact embedding model ID/revision/digest;
+- exact reranker model ID/revision/digest;
+- inference runtime versions;
+- vector/index compatibility metadata;
+- benchmark evidence;
+- selection decision;
+- model/runtime integrity hashes;
+- source/provenance;
+- licence and redistribution status;
+- model BOM/dependency inventory;
+- third-party notices;
+- hardware requirements;
+- cache/storage policy;
+- install/bootstrap mechanism;
+- `gov doctor` compatibility checks;
+- replacement/reindex procedure;
+- clean-machine installation evidence;
+- missing/corrupt/wrong-model failure behaviour;
+- intended local/offline operation after installation where applicable.
+
+A clean new project must not require the operator to invent an embedding/reranker choice.
+
+If model weights are not stored in Git, confirm the release provides a deterministic pinned and integrity-verified installation/fetch mechanism.
+
+## Supply-chain / packaging checks
+
+Verify the release bundle contains or references, as appropriate:
+
+- `gov` binaries/build instructions for supported platforms;
+- kernel/framework payload;
+- migrations;
+- capability/plugin schemas;
+- reference retrieval profile;
+- runtime/dependency locks;
+- SBOM or equivalent software dependency inventory;
+- model BOM;
+- licence/notice material;
+- hashes/digests;
+- installation/bootstrap documentation;
+- recovery/rebuild instructions.
+
+No undeclared runtime dependency may be required for the certified default path.
+
+## Clean release installation
+
+From a clean environment using the release bundle rather than the developer tree:
+
+1. install/verify the Governance OS;
+2. install/bootstrap the DEFAULT retrieval profile;
+3. run `gov doctor`;
+4. run release verification;
+5. create a small clean governed project;
+6. build/rebuild memory;
+7. perform representative exact + semantic retrieval;
+8. prove the resulting project records the exact release/profile pins.
+
+## Supported-platform statement
+
+State exactly which OS/architecture/hardware environments are certified or tested.
+
+Do not imply support for an untested platform.
+
+## Final verdict
+
+If acceptable, write the release certification record and return:
+
+CERTIFIED_FOR_RELEASE
+
+State the exact stable version/tag and exact release/profile bundle that may be published.
+
+Otherwise return:
+
+NOT_CERTIFIED_FOR_RELEASE
+
+with the blocking delta.
+
+Do NOT push to the private remote yourself unless explicitly asked after certification.
+
+GOVERNANCE CAPABILITY CONTRACT CERTIFICATION
+
+Final certification must also verify:
+
+- GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED exists for the exact core candidate;
+- every required capability remains PRESENT_AND_SUBSTANTIAL or otherwise legitimately resolved;
+- no capability evidence is STALE after advanced qualification or final retrieval-profile integration;
+- sophisticated qualification coverage maps back to the full contract;
+- G0–G6 Governance Health Scheduler is release-ready;
+- the release bundle includes the machine-readable capability contract, schema, evidence map and generated human-readable view.
+
+A release with unresolved ABSENT/UNCLEAR required capability or stale material evidence is NOT_CERTIFIED_FOR_RELEASE.
+</pre>
+</details>
+</div><div class="row-wrap" data-step="phase1_8">
+<label class="row">
+<input data-stepbox="phase1_8" type="checkbox"/>
+<div class="step">
+<b>Push certified stable release to private GitHub</b>
+<span class="muted">Only after CERTIFIED_FOR_RELEASE: push the certified source/tag/release bundle and reference retrieval profile/dependency metadata to the private remote.</span>
+</div>
+</label>
+</div><div class="row-wrap" data-step="cert_remote_smoke"><label class="row"><input data-stepbox="cert_remote_smoke" type="checkbox"/><div class="step"><b>Post-push private-remote clean-clone smoke</b><span class="muted">FRESH session. Clone from the private remote, install the certified release + default retrieval profile from published artefacts only, and prove it is adoption-ready.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Private-remote release smoke verification</strong><button class="copy-btn" data-copy="remote-smoke" type="button">Copy Prompt</button></div><pre id="prompt-remote-smoke">You are the Fresh Private-Remote Release Smoke Verifier.
+
+Run this only AFTER Prompt 3 returned:
+
+CERTIFIED_FOR_RELEASE
+
+and the certified stable tag/release bundle has been pushed to the private GitHub remote.
+
+Do not use the local development checkout as your source.
+
+From a fresh directory/environment:
+
+1. clone the private remote;
+2. checkout the exact certified stable tag;
+3. verify commit/tag/release hashes;
+4. obtain the certified release bundle;
+5. install/verify the Governance OS using only published instructions;
+6. bootstrap/install the certified DEFAULT reference retrieval profile;
+7. verify model/runtime integrity and pins;
+8. run `gov doctor`;
+9. run release verification;
+10. create a disposable greenfield governed project;
+11. rebuild memory;
+12. run representative exact, lexical and semantic retrieval;
+13. verify the reference profile is recorded in project memory/index manifests;
+14. verify no ad-hoc dependency/model choice is required;
+15. verify no local-only path from the builder machine leaked into release state.
+
+If CI is configured on the private remote, confirm the certified tag's required checks are green.
+
+Do not modify or retag the certified release.
+
+Return exactly one of:
+
+PRIVATE_REMOTE_RELEASE_READY
+
+or
+
+PRIVATE_REMOTE_RELEASE_NOT_READY</pre></details></div><div class="row-wrap" data-step="cert_remote_ready"><label class="row"><input data-stepbox="cert_remote_ready" type="checkbox"/><div class="step"><b>Gate — PRIVATE_REMOTE_RELEASE_READY</b><span class="muted">Only after this gate should Product A/B adoption begin. The remote release is independently reproducible, retrieval-ready and free of local-machine assumptions.</span></div></label></div></section><section class="card">
+<h2>Phase 7 — Freeze legacy live repositories</h2>
+<div class="row-wrap" data-step="phase2_0">
+<label class="row">
+<input data-stepbox="phase2_0" type="checkbox"/>
+<div class="step">
+<b>Recover/freeze Product A if interrupted</b>
+<span class="muted">Use the temporary legacy recovery prompt only if Product A has interrupted pre-v4.1 work.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Legacy interrupted repository recovery prompt — Astra only</strong>
+<button class="copy-btn" data-copy="legacy-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-legacy-1">Resume this repository session only to recover it to a safe governed checkpoint.
+
+Do NOT continue broad memory/governance implementation.
+
+If the new Governance OS governing documents are already available in this repository, read them first. Otherwise this recovery task is still limited to restoring observable repository consistency and freezing further broad governance work.
+
+Reconstruct:
+- current branch/worktree;
+- git status;
+- staged/unstaged diffs;
+- latest commits/checkpoints;
+- files changed in this interrupted effort;
+- partial migrations/index builds;
+- tests/commands already completed.
+
+Classify each interrupted mutation:
+COMPLETE_AND_VERIFIED,
+COMPLETE_UNVERIFIED,
+PARTIAL_SAFE_TO_FINISH,
+PARTIAL_SHOULD_ROLL_BACK,
+UNKNOWN.
+
+Finish only the current atomic mutation if that is the safest path to consistency; otherwise roll it back.
+
+Run the minimum integrity/smoke tests needed to establish a safe repository state.
+
+Persist a structured recovery report/checkpoint recording:
+- exact current commit/worktree state;
+- remaining uncommitted changes;
+- changes already made by the interrupted governance/memory work;
+- tests already completed and their result;
+- partial artefacts that may later be useful evidence during formal Governance OS adoption.
+
+Then STOP broad Governance OS, path-migration or memory refactoring in this live repository.
+
+Do not attempt to build or certify the canonical Governance OS here.
+
+This repository will later consume a certified Governance OS release through the formal brownfield `gov adopt` process.
+
+At completion tell me:
+1. the exact safe commit/worktree state;
+2. any remaining uncommitted changes;
+3. which prior edits may be useful evidence during adoption;
+4. whether the repository is SAFE_AND_FROZEN_FOR_LATER_GOV_ADOPT.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase2_1">
+<label class="row">
+<input data-stepbox="phase2_1" type="checkbox"/>
+<div class="step">
+<b>Recover/freeze Product B if interrupted</b>
+<span class="muted">Use the temporary legacy recovery prompt only if Product B has interrupted pre-v4.1 work.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Legacy interrupted repository recovery prompt — Astra only</strong>
+<button class="copy-btn" data-copy="legacy-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-legacy-2">Resume this repository session only to recover it to a safe governed checkpoint.
+
+Do NOT continue broad memory/governance implementation.
+
+If the new Governance OS governing documents are already available in this repository, read them first. Otherwise this recovery task is still limited to restoring observable repository consistency and freezing further broad governance work.
+
+Reconstruct:
+- current branch/worktree;
+- git status;
+- staged/unstaged diffs;
+- latest commits/checkpoints;
+- files changed in this interrupted effort;
+- partial migrations/index builds;
+- tests/commands already completed.
+
+Classify each interrupted mutation:
+COMPLETE_AND_VERIFIED,
+COMPLETE_UNVERIFIED,
+PARTIAL_SAFE_TO_FINISH,
+PARTIAL_SHOULD_ROLL_BACK,
+UNKNOWN.
+
+Finish only the current atomic mutation if that is the safest path to consistency; otherwise roll it back.
+
+Run the minimum integrity/smoke tests needed to establish a safe repository state.
+
+Persist a structured recovery report/checkpoint recording:
+- exact current commit/worktree state;
+- remaining uncommitted changes;
+- changes already made by the interrupted governance/memory work;
+- tests already completed and their result;
+- partial artefacts that may later be useful evidence during formal Governance OS adoption.
+
+Then STOP broad Governance OS, path-migration or memory refactoring in this live repository.
+
+Do not attempt to build or certify the canonical Governance OS here.
+
+This repository will later consume a certified Governance OS release through the formal brownfield `gov adopt` process.
+
+At completion tell me:
+1. the exact safe commit/worktree state;
+2. any remaining uncommitted changes;
+3. which prior edits may be useful evidence during adoption;
+4. whether the repository is SAFE_AND_FROZEN_FOR_LATER_GOV_ADOPT.</pre>
+</details>
+</div>
+</section>
+<section class="card">
+<h2>Phase 8 — Adopt into Product A</h2>
+<div class="row-wrap" data-step="phase3_0">
+<label class="row">
+<input data-stepbox="phase3_0" type="checkbox"/>
+<div class="step">
+<b>Prompt 4 — adoption auditor/planner</b>
+<span class="muted">Inventory, classify, target path map and migration plan. No moves yet.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 4 — Existing project: adoption auditor/planner after certified release exists</strong>
+<button class="copy-btn" data-copy="p4-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p4-1">You are the Brownfield Governance OS Adoption Auditor/Planner.
+
+Read the three governing documents and the certified Governance OS release manifest that this project intends to adopt.
+
+Do NOT migrate files yet and do NOT rebuild the new semantic/vector memory yet.
+
+Perform:
+A0. Pin safety baseline/branch/worktree and current product/governance test state.
+A1. Cold deterministic full-repository inventory.
+A2. Classify every material artefact and legacy mechanism, including old governance and all memory stores.
+A3. Produce the complete target path map.
+A4. Produce the Governance OS adoption/migration plan in dependency-aware batches.
+
+For each artefact record current path, classification, authority, target path, action, references/imports/consumers, sensitivity, indexing policy, rollback and verification.
+
+Preserve good native product/package layouts where justified. Standardise governance/spec paths strongly, but do not move product code purely cosmetically.
+
+Inventory old DB/chat/vector/graph memory now so unique knowledge is not lost, but defer construction of the new v4 indexes until canonical paths are accepted.
+
+Write all adoption evidence under spec/audits/GOVERNANCE-ADOPTION/.
+
+Stop before migration execution and finish with:
+READY_FOR_INDEPENDENT_MIGRATION_PLAN_REVIEW
+
+LANGUAGE/CAPABILITY DISCOVERY DURING ADOPTION
+
+During inventory and target-path planning, detect the repository's actual language/runtime/toolchain composition rather than assuming it matches the Governance OS core. Record required native capabilities (for example compiler/build/test/LSP/formatter/linter/benchmark/debugging tools) in the project Capability Profile and Tool Registry. Preserve healthy native package/module layouts where appropriate.
+
+CERTIFIED RELEASE + REFERENCE PROFILE REQUIREMENT
+
+Adopt only from the stable private-remote release that passed PRIVATE_REMOTE_RELEASE_READY.
+
+Verify the installed Governance OS release and the certified DEFAULT reference retrieval profile are both pinned. Do not reopen embedding/reranker selection during ordinary project adoption unless project-specific evidence demonstrates that the certified default is unsuitable and a governed replacement benchmark/decision is required.
+
+GOVERNANCE CAPABILITY CONTRACT DURING ADOPTION
+
+The certified Governance Capability Acceptance Contract is mandatory adoption input.
+
+Build a Project Capability Adoption Matrix mapping every applicable capability ID to:
+
+- certified kernel capability;
+- project-specific integration point;
+- project overlay/configuration;
+- repository/path-map dependency;
+- project memory/index dependency;
+- required health-scheduler checks;
+- adoption evidence;
+- post-adoption acceptance test;
+- N/A_WITH_REASON where legitimately inapplicable.
+
+Do not treat successful kernel installation as proof that the capability works in this repository.
+
+The adopted project must eventually pass a dedicated post-adoption capability acceptance audit.
+
+ARTIFACT FLOW DURING ADOPTION
+
+For project specs, decisions, scenarios, architecture, datasets, tests, code and releases, verify stable identity/current authority, expected consumers, mandatory task-input rules, lineage and staleness propagation. Detect completed artefacts never consumed and implementation lacking current authoritative justification.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_1">
+<label class="row">
+<input data-stepbox="phase3_1" type="checkbox"/>
+<div class="step">
+<b>Prompt 5 — independent migration reviewer/test author</b>
+<span class="muted">FRESH independent session. Review Product A's migration plan and author acceptance tests before execution.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 5 — Fresh independent migration reviewer and test author</strong>
+<button class="copy-btn" data-copy="p5-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p5-1">You are the Independent Governance OS Migration Reviewer and Test Author.
+
+Fresh session. Do not rely on the Adoption Planner's reasoning.
+
+Read the governing documents, certified release manifest, cold inventory, classification, target path map and migration plan.
+
+Do NOT execute migration.
+
+Independently challenge:
+- classifications;
+- target paths;
+- move/split/merge/delete/retire actions;
+- good product layouts that should remain;
+- imports/references/citations;
+- legacy authority retirement;
+- old memory stores requiring knowledge extraction;
+- rollback design.
+
+Author independent migration acceptance tests BEFORE execution:
+- path integrity;
+- no accidental duplicates;
+- references/citations;
+- imports/build/entry points;
+- baseline product behaviour;
+- governance authority;
+- legacy-rule negative tests;
+- secrets/sensitivity;
+- rollback/recovery.
+
+Write 06-INDEPENDENT-MIGRATION-TEST-DESIGN.md and a plan-review verdict:
+MIGRATION_PLAN_APPROVED
+MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS
+or
+MIGRATION_PLAN_REJECTED
+
+If amendments are required, provide an exact revision prompt.
+
+LANGUAGE-AWARE MIGRATION TESTING
+
+The independent migration test design must include build/module/import/toolchain checks appropriate to the governed repository's actual languages and runtimes. Do not use Rust-specific assumptions unless the product itself is Rust-based.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_2">
+<label class="row">
+<input data-stepbox="phase3_2" type="checkbox"/>
+<div class="step">
+<b>Prompt 6 — execute approved migration</b>
+<span class="muted">Controlled batches with checkpoints and independent-authored tests.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 6 — Execute approved Governance OS adoption/migration</strong>
+<button class="copy-btn" data-copy="p6-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p6-1">Act as the CTO/Adoption Migration Executor.
+
+Read the certified Governance OS release, governing documents, approved adoption/migration plan and independent migration-test design.
+
+Execute only the approved plan on the dedicated adoption branch/worktree.
+
+Install/pin the Governance OS kernel and project overlay according to the release protocol.
+
+Execute path/governance migration in dependency-aware batches.
+
+For every batch:
+1. checkpoint;
+2. execute moves/renames/splits/merges/retirements;
+3. update imports/references/citations/generated adapters;
+4. run independent-authored tests plus affected product tests;
+5. record evidence;
+6. commit/checkpoint before continuing.
+
+Do not build the final new vector/semantic/code memory until path migration has passed its migration verification gate.
+Do not weaken tests.
+
+When execution is complete, write 07-MIGRATION-EXECUTION-REPORT.md and stop for independent migration verification.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_3">
+<label class="row">
+<input data-stepbox="phase3_3" type="checkbox"/>
+<div class="step">
+<b>Prompt 7 — independent migration verifier</b>
+<span class="muted">FRESH independent session. Verify actual Product A repository state before allowing memory rebuild.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 7 — Fresh independent migration verifier</strong>
+<button class="copy-btn" data-copy="p7-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p7-1">You are the Independent Migration Verifier.
+
+Fresh session.
+
+Read the approved migration plan, independent migration tests and execution report, but do not trust the report as proof.
+
+Verify actual repository state:
+- every mapped path/action;
+- imports/references/citations;
+- product behaviour baseline;
+- v4 kernel version/hash;
+- project overlay separation;
+- provider adapters;
+- no accidental active legacy governance;
+- no unintended duplicate authoritative artefacts;
+- sensitive paths;
+- rollback/recovery evidence.
+
+Run the independent migration suite and add adversarial/spot tests where useful.
+
+End with:
+MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+or
+MIGRATION_REJECTED_NEEDS_REPAIR
+
+If rejected, provide a repair-delta prompt. Do not repair the repository yourself.
+
+LANGUAGE/CAPABILITY VERIFICATION
+
+Also verify the adopted project's Capability Profile and Tool Registry against the actual repository. Confirm that build/test/LSP/static-analysis/code-intelligence tooling is appropriate to the governed project's language/runtime composition and that no Rust-first Governance OS implementation assumption has leaked into product migration.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_4">
+<label class="row">
+<input data-stepbox="phase3_4" type="checkbox"/>
+<div class="step">
+<b>Prompt 8 — build/rebuild project memory</b>
+<span class="muted">Build Product A memory only after migration acceptance; benchmark/pin any project-selectable memory components and record the memory manifest.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 8 — Build/rebuild project memory after migration acceptance</strong>
+<button class="copy-btn" data-copy="p8-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p8-1">Act as the Memory Foundation Engineer for the adopted repository.
+
+Proceed only if the independent migration verdict is MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD.
+
+First audit the old memory stores against the now-stable canonical paths:
+- structured DBs;
+- chat/session stores;
+- decisions/lessons;
+- old vector/graph/index state;
+- checkpoints.
+
+Extract unique durable knowledge with provenance. Do not import raw chats wholesale into active semantic memory.
+
+Then build/rebuild the v4 Development Knowledge Fabric against the stable canonical repository:
+- deterministic structured state;
+- lexical retrieval;
+- semantic/vector retrieval;
+- graph;
+- code intelligence;
+- hierarchical parent-child retrieval;
+- fusion/reranking;
+- provenance/supersession;
+- context compiler;
+- capability/tool memory.
+
+Run implementer tests and rebuild tests.
+
+Do not self-certify memory.
+
+Finish with:
+READY_FOR_INDEPENDENT_MEMORY_VERIFICATION
+
+LANGUAGE-AWARE CODE INTELLIGENCE
+
+When rebuilding project memory, use language-appropriate code intelligence (AST/LSP/symbol/reference/import tooling) selected through the Tool Capability Registry. The Governance OS core language must not constrain code understanding for the governed repository.
+
+MEMORY-STACK IMPLEMENTATION AND COMPONENT-SELECTION REQUIREMENT
+
+Build the project memory layer as a complete Development Knowledge Fabric, not as a vector database alone.
+
+At minimum preserve the separable concerns required by the certified Governance OS:
+- authoritative Git/project truth;
+- structured deterministic state (SQLite or the certified justified equivalent);
+- lexical retrieval;
+- semantic/vector retrieval;
+- graph relationships;
+- code intelligence;
+- retrieval routing;
+- hierarchical parent/child expansion;
+- graph-neighbour expansion;
+- fusion/reranking;
+- provenance/supersession;
+- authority filtering;
+- bounded context compilation.
+
+If the certified Governance OS intentionally leaves any project-level model/index component selectable, use its benchmark-and-selection mechanism against representative project golden queries before pinning the choice.
+
+Record a project memory/component manifest that answers, where applicable:
+- structured-state implementation and version;
+- lexical engine and version;
+- vector/index implementation and version;
+- graph implementation and version;
+- code-intelligence adapters;
+- embedding model and exact revision;
+- embedding inference runtime;
+- reranker and exact revision;
+- why each choice was made;
+- benchmark/evidence location;
+- rebuild procedure;
+- replacement procedure.
+
+Do not select a named embedding or reranking model merely because it was discussed historically. Select through evidence and keep the architecture replaceable.
+
+CERTIFIED RELEASE + REFERENCE PROFILE REQUIREMENT
+
+Adopt only from the stable private-remote release that passed PRIVATE_REMOTE_RELEASE_READY.
+
+Verify the installed Governance OS release and the certified DEFAULT reference retrieval profile are both pinned. Do not reopen embedding/reranker selection during ordinary project adoption unless project-specific evidence demonstrates that the certified default is unsuitable and a governed replacement benchmark/decision is required.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_5">
+<label class="row">
+<input data-stepbox="phase3_5" type="checkbox"/>
+<div class="step">
+<b>Prompt 9 — independent memory verifier</b>
+<span class="muted">FRESH independent session. Verify the full memory stack, component/model choices, golden-query metrics and deterministic rebuildability.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 9 — Fresh independent memory verifier</strong>
+<button class="copy-btn" data-copy="p9-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p9-1">You are the Independent Memory Verifier/Test Author.
+
+Fresh session. Do not rely on the Memory Engineer's reasoning.
+
+Author additional held-out retrieval tests and independently verify:
+- deterministic ID/path recall;
+- lexical recall;
+- semantic paraphrase recall;
+- graph dependency/impact traversal;
+- active-vs-superseded authority;
+- stale-index controls;
+- hierarchical parent expansion;
+- code symbol/reference/call/import retrieval;
+- secret/sensitive exclusions;
+- deletion/rebuild of derived runtime;
+- fresh-agent reconstruction.
+
+Do not repair failures.
+
+End with:
+MEMORY_ACCEPTED_FOR_V4_AUDIT
+or
+MEMORY_REJECTED_NEEDS_REPAIR
+
+If rejected, produce a precise repair-delta prompt.
+
+FULL MEMORY-ARCHITECTURE AND MODEL-SELECTION VERIFICATION
+
+Treat the certified Prompt 2 memory architecture checklist as the minimum baseline and verify it against this project's actual memory implementation.
+
+Explicitly determine:
+1. What is the authoritative source of truth?
+2. What structured-state database is used and why?
+3. What lexical engine is used and why?
+4. What vector/index engine is used and why?
+5. What graph implementation is used and why?
+6. What code-intelligence mechanisms are used for this project's languages?
+7. What embedding model/revision is used, if any, and why?
+8. What embedding runtime is used?
+9. What reranker/revision is used, if any, and why?
+10. What alternatives were evaluated?
+11. What benchmark evidence supports the choices?
+12. Are choices pinned and replaceable?
+13. Can all derived state be deleted and deterministically rebuilt?
+14. Can a fresh agent reconstruct authoritative context without prior chat history?
+
+Add held-out golden queries and report suitable metrics, including where applicable:
+- Recall@K;
+- MRR;
+- precision;
+- stale/superseded hit rate;
+- graph coverage;
+- symbol/reference recall;
+- reranking lift;
+- latency;
+- context/token impact.
+
+Reject the memory layer if it is effectively only semantic/vector retrieval, if opaque indexes have become sources of truth, if important component choices are hidden or unjustified, or if derived memory cannot be rebuilt.
+
+Write a Memory Architecture Verification Matrix covering:
+PRESENT_AND_SUBSTANTIAL / PARTIAL / ABSENT / UNCLEAR
+for structured state, lexical, semantic/vector, graph, code intelligence, hierarchy, reranking/fusion, provenance, authority filtering, context compilation, rebuildability, security exclusions and fresh-agent reconstruction.
+
+CERTIFIED RELEASE + REFERENCE PROFILE REQUIREMENT
+
+Adopt only from the stable private-remote release that passed PRIVATE_REMOTE_RELEASE_READY.
+
+Verify the installed Governance OS release and the certified DEFAULT reference retrieval profile are both pinned. Do not reopen embedding/reranker selection during ordinary project adoption unless project-specific evidence demonstrates that the certified default is unsuitable and a governed replacement benchmark/decision is required.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_6">
+<label class="row">
+<input data-stepbox="phase3_6" type="checkbox"/>
+<div class="step">
+<b>Prompt 10 — full v4 project audit</b>
+<span class="muted">FRESH independent session. Inherit the certified Prompt 2 architecture baseline and audit Product A end-to-end.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 10 — Fresh comprehensive v4 project auditor</strong>
+<button class="copy-btn" data-copy="p10-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p10-1">You are the Independent v4 Project Auditor.
+
+Proceed only if:
+MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+and
+MEMORY_ACCEPTED_FOR_V4_AUDIT
+exist.
+
+Fresh session.
+
+Read the governing documents, certified framework release, adoption evidence and memory verification evidence.
+
+Pin current commit/runtime/test baseline.
+
+Audit:
+- framework conformance;
+- project overlay;
+- repository contract/path map;
+- governance authority;
+- legacy retirement;
+- memory;
+- agents/A2A;
+- tools/MCP/permissions;
+- natural-language control;
+- model routing;
+- checkpoints;
+- feature/capability readiness;
+- spec/data/scenarios;
+- task DAG;
+- architecture;
+- product;
+- interfaces;
+- security;
+- DevOps;
+- observability;
+- tests/traceability;
+- CIT;
+- learning/upstream lesson mechanics;
+- human gates.
+
+Remain read-only except audit evidence.
+
+Create findings and the operator remediation prompt.
+
+POLYGLOT CONFORMANCE AUDIT
+
+Audit that the adopted project is using language-appropriate native tooling through the capability registry and that the Governance OS has not imposed its own implementation language on project structure, build, testing or code intelligence.
+
+INHERIT THE CERTIFIED PROMPT-2 ARCHITECTURE BASELINE
+
+Treat the Governance OS release's accepted Prompt 2 Architecture Completeness Matrix, Model / Retrieval Selection Matrix, Rust-first/polyglot conformance evidence and Critical Gap Register as part of the certified baseline.
+
+For every applicable architecture pillar, verify that this project adoption has not bypassed, disabled, duplicated or contradicted the certified mechanism.
+
+In particular audit:
+- kernel vs project-overlay boundaries;
+- model/tool replaceability;
+- structured + lexical + semantic/vector + graph + code memory layers;
+- retrieval/context compiler behaviour;
+- language-native tooling through the Capability Registry;
+- release pinning and framework.lock;
+- derived-index rebuildability;
+- security/export boundaries;
+- Human Decision Gate surfacing;
+- dynamic DAG and Feature/Capability Readiness behaviour.
+
+Any project-level deviation from the certified architecture must have an explicit governed decision, impact analysis, tests and acceptance evidence. Otherwise raise an audit finding.
+
+PROJECT CAPABILITY-CONTRACT AUDIT
+
+During the comprehensive project audit, assess the certified Governance Capability Acceptance Contract against the ACTUAL adopted repository.
+
+Verify that refactoring/adoption did not merely install files but made the capabilities operational against this project's path map, memory, tools, languages, tasks, policies, checkpoints and health scheduler.
+
+Produce/update the Project Capability Adoption Matrix and identify any project-specific capability degradation requiring remediation.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_7">
+<label class="row">
+<input data-stepbox="phase3_7" type="checkbox"/>
+<div class="step">
+<b>Prompt 11 — operator remediation plan</b>
+<span class="muted">Create the remediation plan only; stop for independent review.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 11 — Operator remediation plan</strong>
+<button class="copy-btn" data-copy="p11-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p11-1">Act as the normal CTO/Senior Full-Stack Orchestrator.
+
+Read the latest independent v4 audit.
+
+Do not execute yet.
+
+Create a dependency-ordered remediation plan covering every material finding, including CIT impact, tasks/DAG, specialists, skills/tools, model tiers, tests, rollback and Human Decision Gates.
+
+Resolve only low-impact, high-confidence, reversible contradictions autonomously.
+
+Save the plan in the audit iteration folder and stop for independent review.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_8">
+<label class="row">
+<input data-stepbox="phase3_8" type="checkbox"/>
+<div class="step">
+<b>Prompt 12 — independent remediation-plan review</b>
+<span class="muted">FRESH independent session. Review Product A remediation plan; do not execute it.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 12 — Independent remediation-plan review</strong>
+<button class="copy-btn" data-copy="p12-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p12-1">Act as the Independent v4 Auditor.
+
+Review the operator remediation plan against all findings and v4 constraints.
+
+Do not execute it.
+
+Write:
+APPROVED
+APPROVED_WITH_REQUIRED_AMENDMENTS
+or
+REJECTED
+
+State exact required amendments or, if approved, the exact execution instruction.
+
+SESSION INDEPENDENCE
+
+Run this review in a fresh independent session. Do not reuse the operator/remediation execution context. Judge the plan from governing documents, audit evidence and repository state rather than the operator's narrative.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_9">
+<label class="row">
+<input data-stepbox="phase3_9" type="checkbox"/>
+<div class="step">
+<b>Prompt 13 — execute approved remediation</b>
+<span class="muted">Execute only the independently approved remediation plan.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 13 — Execute approved remediation</strong>
+<button class="copy-btn" data-copy="p13-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p13-1">Act as CTO/Senior Full-Stack Orchestrator.
+
+Execute only the independently approved remediation plan.
+
+Use CIT-P for consequential unresolved choices and surface Human Decision Gates in chat. After approval, use CIT-E.
+
+Use bounded specialist agents, appropriate model tiers, tools and mutation scopes.
+
+Run governance, memory and product tests continuously.
+
+Write EXECUTION-REPORT.md and stop for independent re-audit.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase3_10">
+<label class="row">
+<input data-stepbox="phase3_10" type="checkbox"/>
+<div class="step">
+<b>Prompt 14 — independent re-audit</b>
+<span class="muted">FRESH independent session. Verify fixes from repository/test evidence; max three ordinary remediation iterations.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 14 — Independent re-audit</strong>
+<button class="copy-btn" data-copy="p14-1" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p14-1">Act as the Independent v4 Auditor.
+
+Pin the new state and independently verify every material claimed fix.
+
+Write POST-AUDIT.md.
+
+If healthy, write FINAL-HEALTH-REPORT.md.
+
+If material findings remain and fewer than three remediation iterations have completed, generate the next operator prompt.
+
+After three failed ordinary iterations, stop and produce ROOT-CAUSE-ESCALATION.md.
+
+SESSION INDEPENDENCE AND BASELINE INHERITANCE
+
+Run this re-audit in a fresh independent session. Re-check material fixes against the governing documents, the certified Prompt 2 architecture baseline, the latest project audit findings and actual repository/test evidence. Do not accept EXECUTION-REPORT.md as proof by itself.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="post_adopt_a"><label class="row"><input data-stepbox="post_adopt_a" type="checkbox"/><div class="step"><b>Product A — independent post-adoption capability acceptance</b><span class="muted">FRESH independent session. Re-run the full certified capability contract against the actual adopted project before declaring the repository governance-healthy.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Product A — independent post-adoption capability acceptance</strong><button class="copy-btn" data-copy="post-adopt-a" type="button">Copy Prompt</button></div><pre id="prompt-post-adopt-a">You are the Fresh Independent Post-Adoption Governance Capability Auditor.
+
+Run this after the project's migration, memory verification, comprehensive audit and remediation/re-audit cycle are complete.
+
+Do not modify project implementation or Governance OS kernel.
+
+Read:
+
+- certified Governance Capability Acceptance Contract;
+- certified release/profile pins;
+- Project Capability Adoption Matrix;
+- adoption/migration evidence;
+- memory verification;
+- comprehensive audit/re-audit;
+- current governance health state.
+
+For EVERY applicable capability ID verify it is actually operational in THIS project.
+
+Do not infer success from the fact that the certified kernel contained the capability.
+
+Check project integration including:
+
+- repository/path contract;
+- project overlay;
+- language-native tools;
+- memory/index coverage;
+- retrieval profile;
+- claims/concurrency;
+- task DAG/readiness;
+- CIT/Human Gates;
+- checkpoints;
+- suite scheduling;
+- security/sensitivity;
+- plugin/tool permissions;
+- observability;
+- lessons/upstream controls;
+- update/rollback readiness.
+
+Run/observe the appropriate G0–G5 checks.
+
+Verify no relevant capability evidence is STALE.
+
+For any N/A_WITH_REASON, independently validate the reason.
+
+Produce:
+
+Project Governance Capability Acceptance Matrix
+capability ID
+→ applicability
+→ status
+→ project evidence
+→ suite/health evidence
+→ freshness
+→ residual risk
+→ verifier verdict.
+
+Return exactly one of:
+
+PROJECT_GOVERNANCE_CAPABILITIES_ACCEPTED
+
+or
+
+PROJECT_GOVERNANCE_CAPABILITIES_REJECTED
+
+If rejected, provide a precise project-level remediation delta. Do not alter the certified kernel to hide a project adoption failure.
+
+GATE W POST-ADOPTION ACCEPTANCE
+Independently sample output→input flows in the adopted project. Prove exact current upstream artefacts reach dependent tasks and changes invalidate downstream evidence.
+</pre></details></div><div class="row-wrap" data-step="phase3_11">
+<label class="row">
+<input data-stepbox="phase3_11" type="checkbox"/>
+<div class="step">
+<b>Product A reaches healthy adoption verdict</b>
+<span class="muted">Final healthy-adoption verdict requires PROJECT_GOVERNANCE_CAPABILITIES_ACCEPTED in addition to migration, memory and audit acceptance.</span>
+</div>
+</label>
+</div>
+</section>
+<section class="card">
+<h2>Phase 9 — Adopt into Product B</h2>
+<div class="row-wrap" data-step="phase4_0">
+<label class="row">
+<input data-stepbox="phase4_0" type="checkbox"/>
+<div class="step">
+<b>Prompt 4 — adoption auditor/planner</b>
+<span class="muted">New Product B-specific inventory and target path map.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 4 — Existing project: adoption auditor/planner after certified release exists</strong>
+<button class="copy-btn" data-copy="p4-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p4-2">You are the Brownfield Governance OS Adoption Auditor/Planner.
+
+Read the three governing documents and the certified Governance OS release manifest that this project intends to adopt.
+
+Do NOT migrate files yet and do NOT rebuild the new semantic/vector memory yet.
+
+Perform:
+A0. Pin safety baseline/branch/worktree and current product/governance test state.
+A1. Cold deterministic full-repository inventory.
+A2. Classify every material artefact and legacy mechanism, including old governance and all memory stores.
+A3. Produce the complete target path map.
+A4. Produce the Governance OS adoption/migration plan in dependency-aware batches.
+
+For each artefact record current path, classification, authority, target path, action, references/imports/consumers, sensitivity, indexing policy, rollback and verification.
+
+Preserve good native product/package layouts where justified. Standardise governance/spec paths strongly, but do not move product code purely cosmetically.
+
+Inventory old DB/chat/vector/graph memory now so unique knowledge is not lost, but defer construction of the new v4 indexes until canonical paths are accepted.
+
+Write all adoption evidence under spec/audits/GOVERNANCE-ADOPTION/.
+
+Stop before migration execution and finish with:
+READY_FOR_INDEPENDENT_MIGRATION_PLAN_REVIEW
+
+CERTIFIED RELEASE + REFERENCE PROFILE REQUIREMENT
+
+Adopt only from the stable private-remote release that passed PRIVATE_REMOTE_RELEASE_READY.
+
+Verify the installed Governance OS release and the certified DEFAULT reference retrieval profile are both pinned. Do not reopen embedding/reranker selection during ordinary project adoption unless project-specific evidence demonstrates that the certified default is unsuitable and a governed replacement benchmark/decision is required.
+
+GOVERNANCE CAPABILITY CONTRACT DURING ADOPTION
+
+The certified Governance Capability Acceptance Contract is mandatory adoption input.
+
+Build a Project Capability Adoption Matrix mapping every applicable capability ID to:
+
+- certified kernel capability;
+- project-specific integration point;
+- project overlay/configuration;
+- repository/path-map dependency;
+- project memory/index dependency;
+- required health-scheduler checks;
+- adoption evidence;
+- post-adoption acceptance test;
+- N/A_WITH_REASON where legitimately inapplicable.
+
+Do not treat successful kernel installation as proof that the capability works in this repository.
+
+The adopted project must eventually pass a dedicated post-adoption capability acceptance audit.
+
+ARTIFACT FLOW DURING ADOPTION
+
+For project specs, decisions, scenarios, architecture, datasets, tests, code and releases, verify stable identity/current authority, expected consumers, mandatory task-input rules, lineage and staleness propagation. Detect completed artefacts never consumed and implementation lacking current authoritative justification.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_1">
+<label class="row">
+<input data-stepbox="phase4_1" type="checkbox"/>
+<div class="step">
+<b>Prompt 5 — independent migration reviewer/test author</b>
+<span class="muted">FRESH independent session. Review Product B's migration plan and author acceptance tests before execution.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 5 — Fresh independent migration reviewer and test author</strong>
+<button class="copy-btn" data-copy="p5-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p5-2">You are the Independent Governance OS Migration Reviewer and Test Author.
+
+Fresh session. Do not rely on the Adoption Planner's reasoning.
+
+Read the governing documents, certified release manifest, cold inventory, classification, target path map and migration plan.
+
+Do NOT execute migration.
+
+Independently challenge:
+- classifications;
+- target paths;
+- move/split/merge/delete/retire actions;
+- good product layouts that should remain;
+- imports/references/citations;
+- legacy authority retirement;
+- old memory stores requiring knowledge extraction;
+- rollback design.
+
+Author independent migration acceptance tests BEFORE execution:
+- path integrity;
+- no accidental duplicates;
+- references/citations;
+- imports/build/entry points;
+- baseline product behaviour;
+- governance authority;
+- legacy-rule negative tests;
+- secrets/sensitivity;
+- rollback/recovery.
+
+Write 06-INDEPENDENT-MIGRATION-TEST-DESIGN.md and a plan-review verdict:
+MIGRATION_PLAN_APPROVED
+MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS
+or
+MIGRATION_PLAN_REJECTED
+
+If amendments are required, provide an exact revision prompt.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_2">
+<label class="row">
+<input data-stepbox="phase4_2" type="checkbox"/>
+<div class="step">
+<b>Prompt 6 — execute approved migration</b>
+<span class="muted">Controlled migration.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 6 — Execute approved Governance OS adoption/migration</strong>
+<button class="copy-btn" data-copy="p6-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p6-2">Act as the CTO/Adoption Migration Executor.
+
+Read the certified Governance OS release, governing documents, approved adoption/migration plan and independent migration-test design.
+
+Execute only the approved plan on the dedicated adoption branch/worktree.
+
+Install/pin the Governance OS kernel and project overlay according to the release protocol.
+
+Execute path/governance migration in dependency-aware batches.
+
+For every batch:
+1. checkpoint;
+2. execute moves/renames/splits/merges/retirements;
+3. update imports/references/citations/generated adapters;
+4. run independent-authored tests plus affected product tests;
+5. record evidence;
+6. commit/checkpoint before continuing.
+
+Do not build the final new vector/semantic/code memory until path migration has passed its migration verification gate.
+Do not weaken tests.
+
+When execution is complete, write 07-MIGRATION-EXECUTION-REPORT.md and stop for independent migration verification.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_3">
+<label class="row">
+<input data-stepbox="phase4_3" type="checkbox"/>
+<div class="step">
+<b>Prompt 7 — independent migration verifier</b>
+<span class="muted">FRESH independent session. Verify actual Product B repository state before allowing memory rebuild.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 7 — Fresh independent migration verifier</strong>
+<button class="copy-btn" data-copy="p7-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p7-2">You are the Independent Migration Verifier.
+
+Fresh session.
+
+Read the approved migration plan, independent migration tests and execution report, but do not trust the report as proof.
+
+Verify actual repository state:
+- every mapped path/action;
+- imports/references/citations;
+- product behaviour baseline;
+- v4 kernel version/hash;
+- project overlay separation;
+- provider adapters;
+- no accidental active legacy governance;
+- no unintended duplicate authoritative artefacts;
+- sensitive paths;
+- rollback/recovery evidence.
+
+Run the independent migration suite and add adversarial/spot tests where useful.
+
+End with:
+MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+or
+MIGRATION_REJECTED_NEEDS_REPAIR
+
+If rejected, provide a repair-delta prompt. Do not repair the repository yourself.
+
+LANGUAGE/CAPABILITY VERIFICATION
+
+Also verify the adopted project's Capability Profile and Tool Registry against the actual repository. Confirm that build/test/LSP/static-analysis/code-intelligence tooling is appropriate to the governed project's language/runtime composition and that no Rust-first Governance OS implementation assumption has leaked into product migration.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_4">
+<label class="row">
+<input data-stepbox="phase4_4" type="checkbox"/>
+<div class="step">
+<b>Prompt 8 — build/rebuild Product B memory</b>
+<span class="muted">Build Product B memory only after migration acceptance; benchmark/pin any project-selectable memory components and record the memory manifest.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 8 — Build/rebuild project memory after migration acceptance</strong>
+<button class="copy-btn" data-copy="p8-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p8-2">Act as the Memory Foundation Engineer for the adopted repository.
+
+Proceed only if the independent migration verdict is MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD.
+
+First audit the old memory stores against the now-stable canonical paths:
+- structured DBs;
+- chat/session stores;
+- decisions/lessons;
+- old vector/graph/index state;
+- checkpoints.
+
+Extract unique durable knowledge with provenance. Do not import raw chats wholesale into active semantic memory.
+
+Then build/rebuild the v4 Development Knowledge Fabric against the stable canonical repository:
+- deterministic structured state;
+- lexical retrieval;
+- semantic/vector retrieval;
+- graph;
+- code intelligence;
+- hierarchical parent-child retrieval;
+- fusion/reranking;
+- provenance/supersession;
+- context compiler;
+- capability/tool memory.
+
+Run implementer tests and rebuild tests.
+
+Do not self-certify memory.
+
+Finish with:
+READY_FOR_INDEPENDENT_MEMORY_VERIFICATION
+
+MEMORY-STACK IMPLEMENTATION AND COMPONENT-SELECTION REQUIREMENT
+
+Build the project memory layer as a complete Development Knowledge Fabric, not as a vector database alone.
+
+At minimum preserve the separable concerns required by the certified Governance OS:
+- authoritative Git/project truth;
+- structured deterministic state (SQLite or the certified justified equivalent);
+- lexical retrieval;
+- semantic/vector retrieval;
+- graph relationships;
+- code intelligence;
+- retrieval routing;
+- hierarchical parent/child expansion;
+- graph-neighbour expansion;
+- fusion/reranking;
+- provenance/supersession;
+- authority filtering;
+- bounded context compilation.
+
+If the certified Governance OS intentionally leaves any project-level model/index component selectable, use its benchmark-and-selection mechanism against representative project golden queries before pinning the choice.
+
+Record a project memory/component manifest that answers, where applicable:
+- structured-state implementation and version;
+- lexical engine and version;
+- vector/index implementation and version;
+- graph implementation and version;
+- code-intelligence adapters;
+- embedding model and exact revision;
+- embedding inference runtime;
+- reranker and exact revision;
+- why each choice was made;
+- benchmark/evidence location;
+- rebuild procedure;
+- replacement procedure.
+
+Do not select a named embedding or reranking model merely because it was discussed historically. Select through evidence and keep the architecture replaceable.
+
+CERTIFIED RELEASE + REFERENCE PROFILE REQUIREMENT
+
+Adopt only from the stable private-remote release that passed PRIVATE_REMOTE_RELEASE_READY.
+
+Verify the installed Governance OS release and the certified DEFAULT reference retrieval profile are both pinned. Do not reopen embedding/reranker selection during ordinary project adoption unless project-specific evidence demonstrates that the certified default is unsuitable and a governed replacement benchmark/decision is required.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_5">
+<label class="row">
+<input data-stepbox="phase4_5" type="checkbox"/>
+<div class="step">
+<b>Prompt 9 — independent memory verifier</b>
+<span class="muted">FRESH independent session. Verify the full memory stack, component/model choices, golden-query metrics and deterministic rebuildability.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 9 — Fresh independent memory verifier</strong>
+<button class="copy-btn" data-copy="p9-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p9-2">You are the Independent Memory Verifier/Test Author.
+
+Fresh session. Do not rely on the Memory Engineer's reasoning.
+
+Author additional held-out retrieval tests and independently verify:
+- deterministic ID/path recall;
+- lexical recall;
+- semantic paraphrase recall;
+- graph dependency/impact traversal;
+- active-vs-superseded authority;
+- stale-index controls;
+- hierarchical parent expansion;
+- code symbol/reference/call/import retrieval;
+- secret/sensitive exclusions;
+- deletion/rebuild of derived runtime;
+- fresh-agent reconstruction.
+
+Do not repair failures.
+
+End with:
+MEMORY_ACCEPTED_FOR_V4_AUDIT
+or
+MEMORY_REJECTED_NEEDS_REPAIR
+
+If rejected, produce a precise repair-delta prompt.
+
+FULL MEMORY-ARCHITECTURE AND MODEL-SELECTION VERIFICATION
+
+Treat the certified Prompt 2 memory architecture checklist as the minimum baseline and verify it against this project's actual memory implementation.
+
+Explicitly determine:
+1. What is the authoritative source of truth?
+2. What structured-state database is used and why?
+3. What lexical engine is used and why?
+4. What vector/index engine is used and why?
+5. What graph implementation is used and why?
+6. What code-intelligence mechanisms are used for this project's languages?
+7. What embedding model/revision is used, if any, and why?
+8. What embedding runtime is used?
+9. What reranker/revision is used, if any, and why?
+10. What alternatives were evaluated?
+11. What benchmark evidence supports the choices?
+12. Are choices pinned and replaceable?
+13. Can all derived state be deleted and deterministically rebuilt?
+14. Can a fresh agent reconstruct authoritative context without prior chat history?
+
+Add held-out golden queries and report suitable metrics, including where applicable:
+- Recall@K;
+- MRR;
+- precision;
+- stale/superseded hit rate;
+- graph coverage;
+- symbol/reference recall;
+- reranking lift;
+- latency;
+- context/token impact.
+
+Reject the memory layer if it is effectively only semantic/vector retrieval, if opaque indexes have become sources of truth, if important component choices are hidden or unjustified, or if derived memory cannot be rebuilt.
+
+Write a Memory Architecture Verification Matrix covering:
+PRESENT_AND_SUBSTANTIAL / PARTIAL / ABSENT / UNCLEAR
+for structured state, lexical, semantic/vector, graph, code intelligence, hierarchy, reranking/fusion, provenance, authority filtering, context compilation, rebuildability, security exclusions and fresh-agent reconstruction.
+
+CERTIFIED RELEASE + REFERENCE PROFILE REQUIREMENT
+
+Adopt only from the stable private-remote release that passed PRIVATE_REMOTE_RELEASE_READY.
+
+Verify the installed Governance OS release and the certified DEFAULT reference retrieval profile are both pinned. Do not reopen embedding/reranker selection during ordinary project adoption unless project-specific evidence demonstrates that the certified default is unsuitable and a governed replacement benchmark/decision is required.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_6">
+<label class="row">
+<input data-stepbox="phase4_6" type="checkbox"/>
+<div class="step">
+<b>Prompt 10 — full v4 project audit</b>
+<span class="muted">FRESH independent session. Inherit the certified Prompt 2 architecture baseline and audit Product B end-to-end.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 10 — Fresh comprehensive v4 project auditor</strong>
+<button class="copy-btn" data-copy="p10-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p10-2">You are the Independent v4 Project Auditor.
+
+Proceed only if:
+MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+and
+MEMORY_ACCEPTED_FOR_V4_AUDIT
+exist.
+
+Fresh session.
+
+Read the governing documents, certified framework release, adoption evidence and memory verification evidence.
+
+Pin current commit/runtime/test baseline.
+
+Audit:
+- framework conformance;
+- project overlay;
+- repository contract/path map;
+- governance authority;
+- legacy retirement;
+- memory;
+- agents/A2A;
+- tools/MCP/permissions;
+- natural-language control;
+- model routing;
+- checkpoints;
+- feature/capability readiness;
+- spec/data/scenarios;
+- task DAG;
+- architecture;
+- product;
+- interfaces;
+- security;
+- DevOps;
+- observability;
+- tests/traceability;
+- CIT;
+- learning/upstream lesson mechanics;
+- human gates.
+
+Remain read-only except audit evidence.
+
+Create findings and the operator remediation prompt.
+
+INHERIT THE CERTIFIED PROMPT-2 ARCHITECTURE BASELINE
+
+Treat the Governance OS release's accepted Prompt 2 Architecture Completeness Matrix, Model / Retrieval Selection Matrix, Rust-first/polyglot conformance evidence and Critical Gap Register as part of the certified baseline.
+
+For every applicable architecture pillar, verify that this project adoption has not bypassed, disabled, duplicated or contradicted the certified mechanism.
+
+In particular audit:
+- kernel vs project-overlay boundaries;
+- model/tool replaceability;
+- structured + lexical + semantic/vector + graph + code memory layers;
+- retrieval/context compiler behaviour;
+- language-native tooling through the Capability Registry;
+- release pinning and framework.lock;
+- derived-index rebuildability;
+- security/export boundaries;
+- Human Decision Gate surfacing;
+- dynamic DAG and Feature/Capability Readiness behaviour.
+
+Any project-level deviation from the certified architecture must have an explicit governed decision, impact analysis, tests and acceptance evidence. Otherwise raise an audit finding.
+
+PROJECT CAPABILITY-CONTRACT AUDIT
+
+During the comprehensive project audit, assess the certified Governance Capability Acceptance Contract against the ACTUAL adopted repository.
+
+Verify that refactoring/adoption did not merely install files but made the capabilities operational against this project's path map, memory, tools, languages, tasks, policies, checkpoints and health scheduler.
+
+Produce/update the Project Capability Adoption Matrix and identify any project-specific capability degradation requiring remediation.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_7">
+<label class="row">
+<input data-stepbox="phase4_7" type="checkbox"/>
+<div class="step">
+<b>Prompt 11 — operator remediation plan</b>
+<span class="muted">Create remediation plan.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 11 — Operator remediation plan</strong>
+<button class="copy-btn" data-copy="p11-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p11-2">Act as the normal CTO/Senior Full-Stack Orchestrator.
+
+Read the latest independent v4 audit.
+
+Do not execute yet.
+
+Create a dependency-ordered remediation plan covering every material finding, including CIT impact, tasks/DAG, specialists, skills/tools, model tiers, tests, rollback and Human Decision Gates.
+
+Resolve only low-impact, high-confidence, reversible contradictions autonomously.
+
+Save the plan in the audit iteration folder and stop for independent review.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_8">
+<label class="row">
+<input data-stepbox="phase4_8" type="checkbox"/>
+<div class="step">
+<b>Prompt 12 — independent plan review</b>
+<span class="muted">FRESH independent session. Review Product B remediation plan; do not execute it.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 12 — Independent remediation-plan review</strong>
+<button class="copy-btn" data-copy="p12-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p12-2">Act as the Independent v4 Auditor.
+
+Review the operator remediation plan against all findings and v4 constraints.
+
+Do not execute it.
+
+Write:
+APPROVED
+APPROVED_WITH_REQUIRED_AMENDMENTS
+or
+REJECTED
+
+State exact required amendments or, if approved, the exact execution instruction.
+
+SESSION INDEPENDENCE
+
+Run this review in a fresh independent session. Do not reuse the operator/remediation execution context. Judge the plan from governing documents, audit evidence and repository state rather than the operator's narrative.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_9">
+<label class="row">
+<input data-stepbox="phase4_9" type="checkbox"/>
+<div class="step">
+<b>Prompt 13 — execute approved remediation</b>
+<span class="muted">Execute approved remediation.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 13 — Execute approved remediation</strong>
+<button class="copy-btn" data-copy="p13-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p13-2">Act as CTO/Senior Full-Stack Orchestrator.
+
+Execute only the independently approved remediation plan.
+
+Use CIT-P for consequential unresolved choices and surface Human Decision Gates in chat. After approval, use CIT-E.
+
+Use bounded specialist agents, appropriate model tiers, tools and mutation scopes.
+
+Run governance, memory and product tests continuously.
+
+Write EXECUTION-REPORT.md and stop for independent re-audit.</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="phase4_10">
+<label class="row">
+<input data-stepbox="phase4_10" type="checkbox"/>
+<div class="step">
+<b>Prompt 14 — independent re-audit</b>
+<span class="muted">FRESH independent session. Verify fixes from repository/test evidence; max three ordinary remediation iterations.</span>
+</div>
+</label>
+<details class="prompt-box">
+<summary>Show prompt</summary>
+<div class="prompt-head">
+<strong>Prompt 14 — Independent re-audit</strong>
+<button class="copy-btn" data-copy="p14-2" type="button">Copy Prompt</button>
+</div>
+<pre id="prompt-p14-2">Act as the Independent v4 Auditor.
+
+Pin the new state and independently verify every material claimed fix.
+
+Write POST-AUDIT.md.
+
+If healthy, write FINAL-HEALTH-REPORT.md.
+
+If material findings remain and fewer than three remediation iterations have completed, generate the next operator prompt.
+
+After three failed ordinary iterations, stop and produce ROOT-CAUSE-ESCALATION.md.
+
+SESSION INDEPENDENCE AND BASELINE INHERITANCE
+
+Run this re-audit in a fresh independent session. Re-check material fixes against the governing documents, the certified Prompt 2 architecture baseline, the latest project audit findings and actual repository/test evidence. Do not accept EXECUTION-REPORT.md as proof by itself.
+</pre>
+</details>
+</div>
+<div class="row-wrap" data-step="post_adopt_b"><label class="row"><input data-stepbox="post_adopt_b" type="checkbox"/><div class="step"><b>Product B — independent post-adoption capability acceptance</b><span class="muted">FRESH independent session. Re-run the full certified capability contract against the actual adopted project before declaring the repository governance-healthy.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Product B — independent post-adoption capability acceptance</strong><button class="copy-btn" data-copy="post-adopt-b" type="button">Copy Prompt</button></div><pre id="prompt-post-adopt-b">You are the Fresh Independent Post-Adoption Governance Capability Auditor.
+
+Run this after the project's migration, memory verification, comprehensive audit and remediation/re-audit cycle are complete.
+
+Do not modify project implementation or Governance OS kernel.
+
+Read:
+
+- certified Governance Capability Acceptance Contract;
+- certified release/profile pins;
+- Project Capability Adoption Matrix;
+- adoption/migration evidence;
+- memory verification;
+- comprehensive audit/re-audit;
+- current governance health state.
+
+For EVERY applicable capability ID verify it is actually operational in THIS project.
+
+Do not infer success from the fact that the certified kernel contained the capability.
+
+Check project integration including:
+
+- repository/path contract;
+- project overlay;
+- language-native tools;
+- memory/index coverage;
+- retrieval profile;
+- claims/concurrency;
+- task DAG/readiness;
+- CIT/Human Gates;
+- checkpoints;
+- suite scheduling;
+- security/sensitivity;
+- plugin/tool permissions;
+- observability;
+- lessons/upstream controls;
+- update/rollback readiness.
+
+Run/observe the appropriate G0–G5 checks.
+
+Verify no relevant capability evidence is STALE.
+
+For any N/A_WITH_REASON, independently validate the reason.
+
+Produce:
+
+Project Governance Capability Acceptance Matrix
+capability ID
+→ applicability
+→ status
+→ project evidence
+→ suite/health evidence
+→ freshness
+→ residual risk
+→ verifier verdict.
+
+Return exactly one of:
+
+PROJECT_GOVERNANCE_CAPABILITIES_ACCEPTED
+
+or
+
+PROJECT_GOVERNANCE_CAPABILITIES_REJECTED
+
+If rejected, provide a precise project-level remediation delta. Do not alter the certified kernel to hide a project adoption failure.
+
+GATE W POST-ADOPTION ACCEPTANCE
+Independently sample output→input flows in the adopted project. Prove exact current upstream artefacts reach dependent tasks and changes invalidate downstream evidence.
+</pre></details></div><div class="row-wrap" data-step="phase4_11">
+<label class="row">
+<input data-stepbox="phase4_11" type="checkbox"/>
+<div class="step">
+<b>Product B reaches healthy adoption verdict</b>
+<span class="muted">Final healthy-adoption verdict requires PROJECT_GOVERNANCE_CAPABILITIES_ACCEPTED in addition to migration, memory and audit acceptance.</span>
+</div>
+</label>
+</div>
+</section>
+<section class="card">
+<h2>Phase 10 — Ongoing governance health, framework learning and upgrades</h2>
+<div class="muted" id="phase5-note">Phase 5 is intentionally command/governance driven rather than a fixed prompt sequence: use the certified OS's lesson classification, upstream-export, Framework Change Proposal, release and gov update mechanisms.</div><div class="row-wrap" data-step="ops_health_2"><label class="row"><input data-stepbox="ops_health_2" type="checkbox"/><div class="step"><b>Gate — GOVERNANCE_CAPABILITY_HEALTHY</b><span class="muted">No unresolved material capability degradation or stale critical evidence; degraded findings create governed remediation/upgrade work.</span></div></label></div><div class="row-wrap" data-step="ops_health_1"><label class="row"><input data-stepbox="ops_health_1" type="checkbox"/><div class="step"><b>Periodic / post-change capability health audit</b><span class="muted">FRESH independent audit on project-policy cadence and after major updates/security/memory/retrieval/tooling changes. Uses the same certified capability contract as a second maintenance layer.</span></div></label><details class="prompt-box"><summary>Show prompt</summary><div class="prompt-head"><strong>Operational Governance Capability Health Audit</strong><button class="copy-btn" data-copy="operational-health" type="button">Copy Prompt</button></div><pre id="prompt-operational-health">You are the Fresh Independent Operational Governance Capability Health Auditor.
+
+Use the certified Governance Capability Acceptance Contract as the second-layer operational maintenance baseline.
+
+This audit may be invoked:
+
+- on a configured periodic cadence;
+- after `gov update`;
+- after major architecture/security/memory/retrieval/tool changes;
+- after major migration/refactor;
+- when Governance Health Scheduler reports broad/stale degradation;
+- before a major release/milestone.
+
+Do not rerun expensive independent qualification unnecessarily when incremental evidence remains valid.
+
+## Continuous evidence
+
+Review the accumulated G0–G5 scheduler evidence since the previous accepted audit.
+
+Verify:
+
+- failed checks were not ignored;
+- stale evidence was refreshed;
+- repeated warnings did not silently become normal;
+- cache reuse was legitimate;
+- impacted checks ran after material changes;
+- checkpoint/claim/memory/path/security health remained valid.
+
+## Full capability delta audit
+
+For every capability whose evidence changed or became stale:
+
+- verify current implementation/project integration;
+- verify current suite evidence;
+- verify independent evidence when required;
+- update status.
+
+Also perform sentinel sampling across unchanged capability families to detect silent drift.
+
+## Upgrade/maintenance output
+
+Produce:
+
+- current Capability Health Matrix;
+- changed capabilities;
+- stale/repaired capabilities;
+- regressions;
+- repeated failure patterns;
+- candidates for framework lesson/upstream improvement;
+- recommended remediation/upgrades.
+
+Return:
+
+GOVERNANCE_CAPABILITY_HEALTHY
+
+or
+
+GOVERNANCE_CAPABILITY_DEGRADED
+
+A degraded verdict must create governed remediation work according to severity.
+
+The audit cadence is project-policy configurable. Event-triggered G0–G5 checks remain continuous regardless of periodic audit cadence.
+
+ARTIFACT-FLOW PERIODIC HEALTH
+Include sentinel checks for orphan authoritative outputs, untraceable implementation, stale downstream consumers after upstream changes, required-input manifest drift, lineage breaks, and checkpoint/context packets bound to obsolete input versions. Use impact/freshness data to avoid full rescans when nothing relevant changed.
+</pre></details></div><div class="row-wrap" data-step="ops_health_0"><label class="row"><input data-stepbox="ops_health_0" type="checkbox"/><div class="step"><b>Continuous G0–G5 Governance Health Scheduler active</b><span class="muted">Event-driven impacted checks run throughout normal work; full expensive qualification is not run after every task.</span></div></label></div><div class="row-wrap" data-step="phase5_0">
+<label class="row">
+<input data-stepbox="phase5_0" type="checkbox"/>
+<div class="step">
+<b>Classify lessons locally</b>
+<span class="muted">PROJECT / PRODUCT / FRAMEWORK.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_1">
+<label class="row">
+<input data-stepbox="phase5_1" type="checkbox"/>
+<div class="step">
+<b>Prepare sanitised framework lesson packet</b>
+<span class="muted">No raw product code/spec/customer data/runtime DBs.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_2">
+<label class="row">
+<input data-stepbox="phase5_2" type="checkbox"/>
+<div class="step">
+<b>Pass Upstream Export Gate</b>
+<span class="muted">Secret/sensitivity/path allowlist checks; prefer synthetic reproducer.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_3">
+<label class="row">
+<input data-stepbox="phase5_3" type="checkbox"/>
+<div class="step">
+<b>Submit framework lesson to canonical OS repo</b>
+<span class="muted">Lesson inbox only after approval policy.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_4">
+<label class="row">
+<input data-stepbox="phase5_4" type="checkbox"/>
+<div class="step">
+<b>Create/cluster Framework Change Proposal</b>
+<span class="muted">Use repeated/severe lessons to justify a change.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_5">
+<label class="row">
+<input data-stepbox="phase5_5" type="checkbox"/>
+<div class="step">
+<b>Develop and independently verify framework update</b>
+<span class="muted">Run synthetic and regression fixtures again.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_6">
+<label class="row">
+<input data-stepbox="phase5_6" type="checkbox"/>
+<div class="step">
+<b>Publish new certified Governance OS release</b>
+<span class="muted">Patch/minor/major depending on change.</span>
+</div>
+</label>
+</div>
+<div class="row-wrap" data-step="phase5_7">
+<label class="row">
+<input data-stepbox="phase5_7" type="checkbox"/>
+<div class="step">
+<b>Run gov update --check in Product A/B</b>
+<span class="muted">CIT-P, authenticated kernel update, migrations, preserved overlay, affected index rebuild, then invalidate/re-run every Capability Contract item whose evidence depends on the changed framework/profile.</span>
+</div>
+</label>
+</div>
+</section>
+<section class="card">
+<h2>Working notes</h2>
+<textarea id="notes" placeholder="Release tags, decisions, blockers, machine names, verifier verdicts, etc."></textarea>
+</section>
+<section class="card warning">
+<h2>Operating rule</h2>
+<p>Only paste the prompt for the stage currently executing. Keep this operator control panel outside the canonical Governance OS repo. The Capability Acceptance Contract itself belongs inside the certified Governance OS kernel/framework as machine-readable contract data. Do not skip acceptance gates. Any core/runtime/kernel repair invalidates downstream Prompt 2/capability/qualification evidence as defined by dependency freshness.</p>
+</section>
+</main>
+<script>
+const stateKey = "governance_os_control_panel_v5";
+const previousStateKey = "governance_os_control_panel_v4";
+const notesKey = stateKey + "_notes";
+let state = JSON.parse(localStorage.getItem(stateKey) || "null");
+if (!state) {
+  state = JSON.parse(localStorage.getItem(previousStateKey) || "{}");
+  // 4.1.5 was rejected after the previous READY/Prompt 2 cycle. Those states are stale for the next candidate.
+  ["phase1_4", "phase1_5", "phase1_6", "core_accept"].forEach(k => state[k] = false);
+  localStorage.setItem(stateKey, JSON.stringify(state));
+}
+
+function updateProgress() {
+  const boxes = [...document.querySelectorAll("[data-stepbox]")];
+  const done = boxes.filter(x => x.checked).length;
+  const pct = boxes.length ? Math.round(done / boxes.length * 100) : 0;
+  document.getElementById("progress").value = pct;
+  document.getElementById("pct").textContent = `${pct}% complete (${done}/${boxes.length})`;
+}
+
+document.querySelectorAll("[data-stepbox]").forEach(cb => {
+  const id = cb.dataset.stepbox;
+  cb.checked = !!state[id];
+  const wrap = document.querySelector(`[data-step="${id}"]`);
+  wrap.classList.toggle("done", cb.checked);
+  cb.addEventListener("change", () => {
+    state[id] = cb.checked;
+    localStorage.setItem(stateKey, JSON.stringify(state));
+    wrap.classList.toggle("done", cb.checked);
+    updateProgress();
+  });
+});
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (_) {}
+    ta.remove();
+    return ok;
+  }
+}
+
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = btn.dataset.copy;
+    const pre = document.getElementById(`prompt-${id}`);
+    const ok = await copyText(pre.innerText);
+    const old = btn.textContent;
+    btn.textContent = ok ? "Copied ✓" : "Select & copy manually";
+    btn.classList.add("copied");
+    setTimeout(() => {
+      btn.textContent = old;
+      btn.classList.remove("copied");
+    }, 1800);
+  });
+});
+
+const notes = document.getElementById("notes");
+notes.value = localStorage.getItem(notesKey) || "";
+notes.addEventListener("input", () => localStorage.setItem(notesKey, notes.value));
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (confirm("Reset all checklist progress and notes?")) {
+    localStorage.removeItem(stateKey);
+    localStorage.removeItem(notesKey);
+    location.reload();
+  }
+});
+
+updateProgress();
+</script>
+</body>
+</html>

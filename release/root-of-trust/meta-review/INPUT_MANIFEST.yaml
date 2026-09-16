@@ -1,0 +1,203 @@
+schema_version: "1.0"
+assessment: Governance OS root-of-trust forensic meta-review
+captured_at: "2026-09-16T11:14:14+01:00"
+repository:
+  path: /home/usain/Dynamic-Agentic-Engineering-OS
+  branch: release/4.1.6-rc1
+  reviewed_head: d1b79c83aa6b1cbbbc2632e86461ee14c705e852
+  reviewed_head_subject: "Phase 1: RoT-1 revision 7 rejected (AR-0022, final); Root-of-Trust loop FROZEN pending meta-architecture review"
+  initial_worktree: "clean tracked tree; two untracked owner-supplied files listed below"
+hash_algorithm: sha256
+authority_rule: >-
+  ORIGINAL_BASELINE sources establish historical product intent. The CURRENT_ACCEPTANCE_CONTRACT
+  establishes the current owner-approved target. Later decisions and review evidence do not silently
+  rewrite either source class.
+
+inputs:
+  - file: DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    path: DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    git_commit: 5118d4078411b025876f73484ae3421ffc6f81b3
+    sha256: 66bfd86fca1f587000ce2e5c559653cd3d837121e62db5c60dea3b90946af8ca
+    role: ORIGINAL_BASELINE
+    version: "4.1.2"
+    disposition: authoritative_historical_baseline
+  - file: GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md
+    path: GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md
+    git_commit: 5118d4078411b025876f73484ae3421ffc6f81b3
+    sha256: 4fee2e00359cd2e1cee5e506d9e982fb020e2bb32c2b4c71091b417b20530efc
+    role: ORIGINAL_BASELINE
+    version: "1.2"
+    disposition: authoritative_historical_baseline
+  - file: GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md
+    path: GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md
+    git_commit: 5118d4078411b025876f73484ae3421ffc6f81b3
+    sha256: de908bc282c78e8c60ea697355a44ef7c3de808c7f3fe2b194ffae35d09c62c5
+    role: ORIGINAL_BASELINE
+    version: "3.0"
+    disposition: authoritative_historical_baseline
+  - file: Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v5.html
+    path: Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v5.html
+    git_commit: null
+    supplied_identity: owner-supplied untracked file present at review start
+    sha256: 0aa818fff5f293936df606e227d3e1579179e4ee174fc8bcb268c375fc743507
+    role: ORCHESTRATION_STATE
+    version: "V5"
+    disposition: historical_and_current_workflow_evidence
+    note: "Read in full, including prompts, stage order, repair-loop rules, Gate W, G0-G6, qualification and adoption steps. It is not treated as an original baseline document."
+  - file: Governance_OS_Capability_Acceptance_Contract_v3.md
+    path: Governance_OS_Capability_Acceptance_Contract_v3.md
+    git_commit: null
+    supplied_identity: owner-supplied untracked file present at review start
+    sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+    role: CURRENT_ACCEPTANCE_CONTRACT
+    version: "v3"
+    disposition: authoritative_current_owner_target
+
+  - file: D-0007.yaml
+    path: spec/decisions/D-0007.yaml
+    git_commit: 25dac6efcc4a0d8149d12b619b1776788f34dcaf
+    sha256: 7ff5e9904bd735b503276d229d4c2573d7f732f9571399c08c9cf02ba01b1db3
+    role: DECISION
+    version: "ACTIVE"
+    disposition: authoritative_current_decision
+  - file: D-0008.yaml
+    path: spec/decisions/D-0008.yaml
+    git_commit: d07d200ac08a52c45071d33074e20cc62fbcc26e
+    sha256: f6173f4a846ae5588845454c2f1f3cc7f1c4c93f40ebd1bffa933f5f8f7bcb15
+    role: DECISION
+    version: "revision 7"
+    disposition: proposed_not_approved_not_in_effect
+  - file: ARCH-0002.yaml
+    path: spec/architecture/ARCH-0002.yaml
+    git_commit: d07d200ac08a52c45071d33074e20cc62fbcc26e
+    sha256: 95756e98a5610bba36b75c745502729efe9e8ff44739c4dd241495cf5048c160
+    role: ARCHITECTURE
+    version: "revision 7 / CP-1"
+    disposition: proposed_not_approved_not_implemented
+  - file: ARCHITECTURE.md
+    path: docs/ARCHITECTURE.md
+    git_commit: 25dac6efcc4a0d8149d12b619b1776788f34dcaf
+    sha256: befb47a46435485794dd13268c6e572e0db328e1874544ccf4d4c91f6fef9508
+    role: ARCHITECTURE
+    version: "4.1.5 implementation narrative"
+    disposition: current_implementation_description
+  - file: DECISIONS.md
+    path: docs/DECISIONS.md
+    git_commit: d07d200ac08a52c45071d33074e20cc62fbcc26e
+    sha256: 73639dc291cfd364a78f23370c9d954e36e86112d26dc65228761c5ea94816e2
+    role: DECISION
+    version: "revision 7 index"
+    disposition: narrative_index_evidence_only
+
+  - file: OWNER-DESIGN-REQUIREMENTS-0001.md
+    path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md
+    git_commit: fbd09d50b07e679f66d35035bba6ab042a5cacb8
+    sha256: c85d80c2402b94bfa691a1cdca5aae18ebe6dfd15e867c72b6f75544b391a960
+    role: DECISION
+    version: "0001 / OP-1 through OP-16"
+    disposition: authoritative_owner_design_input_not_d0008_approval
+  - file: OWNER-DESIGN-REQUIREMENTS-0002.md
+    path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md
+    git_commit: 30542e5a9450c260c9eee424104c4b41aba5ec08
+    sha256: 914720488a63e121146a3b335ecb06282cb7795802aa33da11de223af775918d
+    role: DECISION
+    version: "0002 / OT-1 and OT-2"
+    disposition: authoritative_owner_clarification_not_d0008_approval
+  - file: OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md
+    path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md
+    git_commit: 4fd5ab56524f894034102aab0f5b513aa12185e7
+    sha256: b1b3aa1feace9d796373d2b795954fac79e745a86aab725b4b5ad669254df308
+    role: DECISION
+    version: "0003"
+    disposition: authoritative_orchestration_freeze
+  - file: ROT-1-FROZEN-EVIDENCE-PACKAGE.md
+    path: release/orchestration/phase-1/ROT-1-FROZEN-EVIDENCE-PACKAGE.md
+    git_commit: d1b79c83aa6b1cbbbc2632e86461ee14c705e852
+    sha256: fe58b3a30076a1a58565505b7a622cf863411b4215181b86e50cf4097f5cdaa8
+    role: ORCHESTRATION_STATE
+    version: "final revision-loop checkpoint"
+    disposition: authoritative_state_summary_derived_from_source_records
+
+  - file: 4.1.2 independent verification
+    path: release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md
+    git_commit: 9563192623115b8e6023b10ff666640214b20d70
+    sha256: 9105e29c5321c6f7a03d96487946a9df54f257ab68c0e0d2456947aff08f5164
+    role: REVIEW_EVIDENCE
+    version: "4.1.2"
+    disposition: evidence_only
+  - file: 4.1.3 independent reverification
+    path: release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md
+    git_commit: 9cb05d892bbf9367b6fc192f0d3f78a119439e1b
+    sha256: 68ccf621c68bb358cec5bedc1e535a666095b785a89fe3dd3f003be1dd322918
+    role: REVIEW_EVIDENCE
+    version: "4.1.3"
+    disposition: evidence_only
+  - file: 4.1.4 independent reverification
+    path: release/verification/4.1.4/INDEPENDENT_REVERIFICATION_REPORT.md
+    git_commit: f4b34299d89ed61fc2a2e4d8c0ce083ce058d44c
+    sha256: 0ec7413838d6806aedf37836dbf0aa4735977af0c580d454fe5f6d0fde60032b
+    role: REVIEW_EVIDENCE
+    version: "4.1.4"
+    disposition: evidence_only
+  - file: 4.1.5 independent reverification
+    path: release/verification/4.1.5/INDEPENDENT_REVERIFICATION_REPORT.md
+    git_commit: c8a138f98844ac30f6619b5b98b33dba4657b161
+    sha256: 2e17a320600c7f779e15273187ac2afcbbbaf33f65cebd6275952d333ee30d5b
+    role: REVIEW_EVIDENCE
+    version: "4.1.5"
+    disposition: evidence_only
+
+  - file: RoT architecture package
+    path: release/root-of-trust/4.1.6/
+    git_tree: 4cc221fc5aac1b28bae1869e3464925eaee18717
+    role: ARCHITECTURE
+    version: "revision 7 / CP-1, outputs 00-35 plus schemas, profile, examples and evidence"
+    disposition: proposed_evidence_only
+  - file: RoT review revision 1
+    path: release/root-of-trust/4.1.6-review/
+    git_tree: 9da2cea9bce43d5e66c5d27a27f4b4fa0dfd41bf
+    role: REVIEW_EVIDENCE
+    version: "revision 1"
+    disposition: evidence_only
+  - file: RoT review revision 2
+    path: release/root-of-trust/4.1.6-review-r2/
+    git_tree: 71e96ce3d82bc4e6745e70fd03750fd96b75263e
+    role: REVIEW_EVIDENCE
+    version: "revision 2"
+    disposition: evidence_only
+  - file: RoT review revision 3
+    path: release/root-of-trust/4.1.6-review-r3/
+    git_tree: 55f18880b5dac5e0ad40938b3412cfe640dcaf1d
+    role: REVIEW_EVIDENCE
+    version: "revision 3"
+    disposition: evidence_only
+  - file: RoT review revision 4
+    path: release/root-of-trust/4.1.6-review-r4/
+    git_tree: a37d4c72f2156e93a10b621c929a75e87459351a
+    role: REVIEW_EVIDENCE
+    version: "revision 4"
+    disposition: evidence_only
+  - file: RoT review revision 5
+    path: release/root-of-trust/4.1.6-review-r5/
+    git_tree: 15352df1c27305e0e66c3cf77709007f8c79f895
+    role: REVIEW_EVIDENCE
+    version: "revision 5"
+    disposition: evidence_only
+  - file: RoT review revision 6
+    path: release/root-of-trust/4.1.6-review-r6/
+    git_tree: 279821a069e9c63fea48cd83a0a6b6cf7949079b
+    role: REVIEW_EVIDENCE
+    version: "revision 6"
+    disposition: evidence_only
+  - file: RoT review revision 7
+    path: release/root-of-trust/4.1.6-review-r7/
+    git_tree: ed907ad23ece9150b6810e1776dde5e1d3e2dcda
+    role: REVIEW_EVIDENCE
+    version: "revision 7"
+    disposition: evidence_only
+
+scope_exclusions:
+  - No runtime, kernel, CLI, framework, migration, release payload, prior architecture, decision, or prior review file was modified.
+  - No Revision 8 was created.
+  - D-0007 was not superseded and D-0008 was not activated.
+  - The review did not independently rerun every historical probe; it relied on immutable reports and sampled their committed evidence where stated.
