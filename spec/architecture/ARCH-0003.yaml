@@ -5,6 +5,7 @@ status: PROVISIONAL
 proposal_state: R0_REVIEW_CANDIDATE
 approval_state: OWNER_DIRECTION_APPROVED
 review_state: PENDING_FRESH_R0_ARCHITECTURE_REVIEW
+correction_state: R0_CORRECTION_1_APPLIED_PENDING_FRESH_R0_RE_REVIEW
 in_effect: false
 state_class: NARRATIVE
 created: "2026-09-17"
@@ -16,6 +17,22 @@ tags: [root-of-trust, signed-release-root, tuf-style, r0-candidate, private-loca
 governed_by: [D-0002, D-0007, D-0009, OWNER-DIRECTIVE-0004]
 depends_on: [ARCH-0001]
 affects: [ARCH-0001, API-0001, API-0002]
+corrections:
+  - id: R0-CORRECTION-1
+    applied: "2026-09-17"
+    corrects_verdict: ROT_ARCHITECTURE_REJECTED_R0
+    corrects_run: AR-0023
+    corrects_work_commit: 2dc08c20bacdc3dd4c28592c58a21d27b6e96d12
+    reviewed_candidate_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+    closes_findings: [SRR-R0-H1, SRR-R0-M1]
+    correction_delta: release/root-of-trust/signed-release-root-v1-review-r0/11-CORRECTION-DELTA.md
+    owner_inputs: [OWNER-DECISION-0005, OWNER-DECISION-0006]
+    correction_record: release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md
+    sections_changed: ["body §1", "body §7", "body §7.1", "body §7.2"]
+    self_graded: false
+    note: >
+      Bounded R0 correction cycle 1 of 1. Applies CD-R0-1 and CD-R0-2 only. Asserts no R0 acceptance; a fresh
+      independent R0 reviewer grades this corrected candidate.
 summary: >
   New architecture lineage, separate from RoT-1/CP-1. A trusted platform or administrator installs a small verifier and
   public root metadata; standard signed root/delegation and release/targets metadata authenticate every privileged
@@ -27,9 +44,18 @@ body: |
 
   This architecture protects, and does not replace, the Governance OS defined by ARCH-0001 and Contract v3. Phase 1 is
   private, locally hosted and operated by the product owner on controlled machines and private repositories. R0 assumes
-  the local OS, administrator and bootstrap installation boundary are uncompromised. It does not claim protection from
-  a hostile administrator/OS, public multi-tenant isolation, absolute compiler correctness or knowledge of revocations
-  that an offline machine has never received.
+  the local OS, administrator, bootstrap installation boundary and local time source are uncompromised. The local clock
+  is declared inside the trusted local boundary, on the same side of the line as the OS and administrator and not on
+  the untrusted network side; no signed, attested, monotonic or network-supplied time is assumed, required or provided.
+
+  It does not claim protection from a hostile administrator/OS, public multi-tenant isolation, absolute compiler
+  correctness or knowledge of revocations that an offline machine has never received, and it claims no knowledge of
+  future revocations that do not yet exist. It does not claim correct expiry, staleness or currency determinations when
+  the local clock is materially wrong: expiry, staleness and currency are evaluated by comparing signed expiry fields
+  to that clock, so a clock set behind may accept expired metadata as unexpired and report currency as current when it
+  is not, and a clock set ahead may treat current metadata as expired and refuse trust-changing operations the profile
+  would otherwise permit. Neither case lowers a signed floor, admits an unauthorised release or breaks the
+  verified-byte binding; the failure is confined to freshness.
 
   ## 2. Trust domains
 
@@ -81,16 +107,71 @@ body: |
   crash must produce the old valid installation or the complete new valid installation, never a trusted mixed state.
   Detailed filesystem mechanisms and tests belong to R1; the invariant is R0-normative.
 
-  ## 7. Rollback, freshness and revocation
+  ## 7. Ingress floors, freshness and revocation
 
-  Clients persist the highest valid root/metadata versions and minimum secure release they have observed. Rollback below
-  those floors is refused. Root has long expiry; release/targets moderate expiry; snapshot shorter expiry; timestamp short
+  Clients persist the highest valid root/metadata versions and minimum secure release they have observed. Those floors
+  are a property of the machine, not of one operation: no privileged lifecycle ingress — init, adopt, update, reinstall,
+  rollback or recovery — may place the machine on a release below its protected local high-water or below the signed
+  minimum secure release. The rule is scoped over the ingress set; `rollback` is the name of one governed ingress, not
+  the name of the rule, and the floor check is part of the one verification policy of section 3 that every ingress
+  calls. Root has long expiry; release/targets moderate expiry; snapshot shorter expiry; timestamp short
   refresh/expiry appropriate to trust-changing operations. Durations are profile parameters, not constitutional values.
 
+  The recovery ingress admits two objects and they establish different things. An authenticated recovery target is
+  established by signed release/targets metadata. An installed local recovery path is established as *intact* by the
+  separate D-0007 installed-integrity records — an installed payload matching `KERNEL_MANIFEST.json` and a manifest
+  matching `framework.lock.kernel_manifest_hash`. Those records establish only that the local copy is unmodified. They
+  do not establish that it is authentic, and they do not establish that it is admissible. Where no current metadata is
+  reachable, the authenticity of an installed local recovery path derives from this machine's own protected record of
+  the release identity it previously verified and installed, never from the manifest, the lock, the repository or
+  mutually consistent files delivered with the copy; this preserves OWNER-DIRECTIVE-0004's rule that the manifest and
+  lock are not a first-install authenticity root. Admissibility remains the floor check above, which recovery performs
+  like every other ingress.
+
+  ## 7.1 Below-floor break-glass recovery
+
+  A machine whose only complete local state is below its own floor is the one case the floor rule cannot silently
+  decide. OWNER-DECISION-0006 selects break-glass, authorised and recorded. Below-floor recovery is therefore refused by
+  default and is admissible only as an explicit owner-authorised emergency recovery mode with all of the following
+  architectural properties.
+
+  The restored release must still be an authentic Governance OS release. Break-glass relaxes the floor check only; it
+  never relaxes the authenticity check and never admits arbitrary or unsigned code. The authority to enter break-glass
+  must come from an owner-controlled local or out-of-band recovery mechanism and must not be manufacturable by
+  repository content, environment variables, caller fields, plugins or model output — the D-0007 trust direction of
+  section 8 applied to this mode. Network or repository-hosting reachability is not that authority and is not a
+  precondition of it: recovery must remain possible with no network or code-hosting access. Entry must be durably
+  recorded with, where available, the machine identity, the current signed security floor and protected high-water, the
+  recovery release identity, the reason and a timestamp/evidence reference. While below floor the machine must be
+  explicitly marked `DEGRADED — RECOVERY ONLY` and must report that state rather than presenting the below-floor
+  release as current or fully trusted.
+
+  In that state the permitted activities are inspection, backup/export, diagnosis, repair, uninstall/reinstall and
+  restoration of an authenticated Governance OS release. Normal privileged Governance OS operation, creation or approval
+  of Human Gates, release certification, trust-policy mutation and privileged plugin/profile acquisition are refused.
+  The signed security floor and the protected high-water are never lowered, reset or forgotten by break-glass: the mode
+  records that the machine is knowingly operating beneath them, it does not move them. Normal governed operation
+  resumes only once an authenticated release at or above the signed minimum secure release is installed and verified,
+  at which point the marking is cleared.
+
+  The mechanism of the break-glass authority — its storage format, its operator surface, its identifiers and its
+  tests — is an R1 matter and is deliberately not fixed here. The properties above are R0-normative.
+
+  ## 7.2 Expiry, revocation and currency
+
   Expired/stale metadata blocks trust-changing lifecycle operations according to policy. It does not automatically brick
-  an already authenticated installed Governance OS. A known revoked binary is limited to inspection, export, recovery
-  and uninstall and cannot perform privileged governance work. Offline clients report currency stale/unknown and never
-  claim knowledge of unseen revocations.
+  an already authenticated installed Governance OS. A known revoked binary is limited to inspection, export, diagnosis,
+  repair, uninstall and participation in restoring an admissible release, and cannot perform privileged governance work.
+  That recovery allowance is a path back to an admissible state, not an authority to re-establish the revoked release
+  itself: a revoked or below-floor release is not an admissible recovery object under the floor check, and placing the
+  machine back onto one requires the break-glass authorisation of section 7.1, which a revoked binary cannot issue to
+  itself and which leaves the machine marked `DEGRADED — RECOVERY ONLY` with privileged governance work withheld.
+
+  Given an authentic bootstrap verifier/root set, an uncompromised local OS/admin boundary and a local time source
+  inside that boundary as declared in section 1, offline clients report currency stale/unknown and never claim
+  knowledge of unseen revocations. Expiry, staleness and currency are determined against that declared local clock; the
+  honesty claim holds while the clock is materially correct, and section 1 states what is and is not promised when it is
+  not.
 
   ## 8. Local authority, CI and multiple machines
 
