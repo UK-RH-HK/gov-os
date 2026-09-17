@@ -1,0 +1,68 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0027
+trigger: R1 candidate 1 rejected by AR-0027; bounded repair 1 (AR-0028) dispatched; two owner questions open
+date: 2026-09-18
+lifecycle_state: R1_REPAIR
+loop_status: R1_REPAIR_1_RUNNING_AFTER_CANDIDATE_1_REJECTED
+repository:
+  integration_branch: release/4.1.6-rc1
+  head: 7a2ebcfad6cd54375dd0b2b214e51d94ce48ebdc
+rejected_candidate:
+  id: srr1-r1-candidate-1
+  commit: 229d1543be0357b52f7c7e6405918171bc8e6631
+  tag: srr1-r1-candidate-1
+  verdict: BLOCKING_FINDINGS_PRESENT
+  verification_run: AR-0027
+  verification_work_commit: 26c2dc53968cf218fe9a0c4c45b973e16ff5832c
+  evidence_path: release/verification/4.1.6-r1/
+  frozen_r1_items: 11 of 12 SATISFIED
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+active_r1_repair_queue:
+  blocking: [AR27-B1]
+  same_gate_authorised: [AR27-N1, AR27-N2, AR27-N4]
+removed_from_active_queue:
+  later_lifecycle_R2: [AR27-N3, AR27-N5, AR27-N6, AR27-N7]
+  owner_adjudication: [AR27-OD1]
+owner_gates_open_non_blocking:
+  - id: GATE-OWNER-R1-BREAK-GLASS-EXIT
+    finding: SRR2-R1-C1
+    interim: stricter both-floors reading implemented at one flippable policy point (breakglass::exit_satisfied, EXIT_POLICY)
+  - id: GATE-OWNER-R1-MACHINE-STATE-ANCHOR
+    finding: AR27-OD1
+    classification: REQUIRES_R0_OR_OWNER_ADJUDICATION
+    interim: no change; current derivation from XDG_STATE_HOME/HOME stands; repair roles are forbidden to touch machine-state path resolution
+blocker_class_history:
+  iterations:
+    - {iteration: 1, verifier: AR-0027, classes: [BC-R1-1], materially_new: [BC-R1-1], closed: []}
+  consecutive_new_class_count: 1
+  escalation_threshold: 3
+  escalation_token: PHASE_CONVERGENCE_ESCALATION_REQUIRED
+running_work:
+  - run_id: AR-0028
+    role: repair-builder
+    handoff: release/orchestration/phase-1/HANDOFFS/HO-0028-r1-repair-1.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-repair-1
+    branch: phase1/srr1-r1-repair-1
+    worktree_base_commit: 7a2ebcfad6cd54375dd0b2b214e51d94ce48ebdc
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0028.report.yaml
+    expected_evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-1/
+state_pin_correction: >-
+  The broad release/verification immutability pin predated this phase adding release/verification/4.1.6-r1 and produced
+  a correct ORCHESTRATION_STATE_CONFLICT. It is narrowed to the four historical packs, each verified unchanged since
+  e5a6b8a, plus the new R1 pack pinned at its own merge commit. No historical evidence was rewritten.
+resume_rule: >-
+  If AR-0028 has a committed AR-0028.report.yaml on branch phase1/srr1-r1-repair-1, verify its scope (nothing outside the
+  authorised queue, machine-state path resolution untouched) and its regression claims, merge, mint candidate 2, and
+  dispatch a NEW fresh independent verifier that reruns AR-0027's held-out tests plus fresh ones. If the report is absent
+  the run is INCOMPLETE and advances no gate: re-dispatch a fresh repair role with the same HO-0028 scope. Never infer
+  readiness or acceptance from conversation.
+next_deterministic_action: COMPLETE_AR_0028_BOUNDED_R1_REPAIR__THEN_MINT_CANDIDATE_2_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R1_VERIFIER_RERUNNING_AR_0027_HELD_OUT_TESTS_PLUS_FRESH_ONES
+prohibitions:
+  - repair role must not touch AR27-OD1 or machine-state path resolution
+  - repair role must not widen SRR2-R1-C1 beyond its single policy point
+  - no R2-lifecycle findings repaired in this cycle
+  - no RoT-1 Revision 8, no CP-1 resumption, no D-0008/ARCH-0002 activation
+  - no amendment of D-0007, D-0009, the accepted ARCH-0003 body, the frozen boundary or any owner record
+  - repair role does not grade its own repair; the next verifier is fresh and independent
+  - no Phase 2, no certification, no stable release push, no merge to main
