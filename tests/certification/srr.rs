@@ -1060,3 +1060,180 @@ fn a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target
     );
     assert_eq!(e.details()["acquisition_class"], "REMOTELY_ACQUIRED");
 }
+
+/// `AR27-B1` — while a machine is marked `DEGRADED — RECOVERY ONLY`, refusal is the **structural default**.
+///
+/// `OWNER-DECISION-0006` §6 bullet 1 names a class — "normal privileged Governance OS operation" — and a class
+/// cannot be enforced by a list of operation names: whatever nobody listed proceeds. This test enters genuine
+/// break-glass and then checks the *whole* refusal surface rather than a sample. Every operation label the product
+/// passes to `guard_write`, plus labels that do not exist at all, must be refused unless a §5 activity covers it.
+#[test]
+fn below_floor_refusal_is_default_refuse_across_the_whole_operation_surface() {
+    let (root, proj, g) = project("srr-belowfloor-class");
+    let p = Publisher::new();
+    provision(&root, &g, &p, 1, &far_future());
+
+    let hi = root.join("rel-hi");
+    make_release(&hi);
+    p.publish(&hi, 20, 100, "stable", &far_future(), "4.0.0", 50);
+    g.ok(&[
+        "init",
+        "--source",
+        hi.join("kernel").to_str().unwrap(),
+        "--name",
+        "x",
+        "--alias",
+        "fx-x",
+    ]);
+
+    let lo = root.join("rel-lo");
+    make_release(&lo);
+    p.publish(&lo, 21, 60, "stable", &far_future(), "4.0.0", 50);
+
+    // Genuine break-glass entry: an owner-signed authorisation, out of band, through the real `admit` path.
+    let bg = g.ok(&["trust", "break-glass"]);
+    let inbox = PathBuf::from(bg["inbox"].as_str().unwrap());
+    let (_, payload_hash, kmh, ver) = measure(&lo.join("kernel"));
+    let tok = break_glass_doc(
+        &machine_id(&g),
+        "nonce-class-1",
+        "restore after a bad release",
+        &far_future(),
+        &ver,
+        &payload_hash,
+        &kmh,
+    );
+    std::fs::write(inbox.join("auth.json"), envelope(&tok, &[&p.recovery])).unwrap();
+    let r = g.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        lo.join("kernel").to_str().unwrap(),
+        "--break-glass",
+    ]);
+    assert_eq!(r["release_authenticity"]["below_floor"], true);
+
+    let ms = gov_runtime::srr::state::MachineState::at(&machine_state_dir(&proj))
+        .expect("the simulated machine's protected state");
+    assert!(gov_runtime::srr::breakglass::is_degraded(
+        &ms,
+        gov_runtime::FRAMEWORK_NAME
+    ));
+
+    // Every operation label the product passes to a below-floor guard, plus labels that do not exist.
+    let labels = [
+        "upstream submit",
+        "upstream export",
+        "memory select",
+        "checkpoint",
+        "gate create",
+        "gate answer",
+        "gate revoke",
+        "gate present",
+        "decide",
+        "update --apply",
+        "update --rollback",
+        "tools install",
+        "replan",
+        "plugins register",
+        "plugins unregister",
+        "handoff create",
+        "handoff return",
+        "readiness plan",
+        "cit propose",
+        "cit simulate",
+        "cit approve",
+        "cit reject",
+        "cit execute",
+        "adopt migrate",
+        "adopt extract-legacy",
+        "adopt build-memory",
+        "task create",
+        "task status",
+        "task claim",
+        "task close",
+        "kernel reinstall",
+        "release build",
+        "release certify",
+        "trust provision",
+        "trust root-update",
+        "skills install",
+        // labels that did not exist when the guard was written: the class test
+        "an operation invented after this repair",
+        "quorum override",
+        "cit approve --force",
+        "KERNEL REINSTALL",
+    ];
+    let mut permitted: Vec<&str> = vec![];
+    let mut refused: Vec<&str> = vec![];
+    for l in labels {
+        match gov_runtime::srr::breakglass::guard(&ms, gov_runtime::FRAMEWORK_NAME, l) {
+            Ok(()) => permitted.push(l),
+            Err(e) => {
+                assert_eq!(e.code, "SRR_BELOW_FLOOR_REFUSED", "'{l}' refused for the wrong reason");
+                refused.push(l);
+            }
+        }
+    }
+    permitted.sort_unstable();
+    assert_eq!(
+        permitted,
+        vec![
+            "checkpoint",
+            "kernel reinstall",
+            "update --apply",
+            "update --rollback"
+        ],
+        "only the OWNER-DECISION-0006 §5 recovery activities may proceed below floor; everything else is §6"
+    );
+    assert_eq!(refused.len(), labels.len() - 4);
+
+    // The seven AR-0027 measured as permitted with no §5 cover are each refused now.
+    for must in [
+        "cit approve",
+        "cit reject",
+        "gate revoke",
+        "handoff return",
+        "plugins unregister",
+        "adopt extract-legacy",
+        "adopt build-memory",
+    ] {
+        assert!(refused.contains(&must), "§6 bullet 1 must refuse '{must}'");
+    }
+    // And every permitted label carries the §5 activity that justifies it.
+    for l in &permitted {
+        assert!(
+            gov_runtime::srr::breakglass::permitted_activity(l).is_some(),
+            "'{l}' proceeds below floor without naming a §5 activity"
+        );
+    }
+
+    // The hot-path guard inside `guard_write` agrees, end to end through the real binary. `cit approve` is the
+    // sharpest case: an approval-class decision on a change-intent transaction.
+    for args in [
+        vec!["cit", "approve", "CIT-0001"],
+        vec!["cit", "reject", "CIT-0001"],
+        vec!["gate", "revoke", "G-0001"],
+    ] {
+        let e = g.err(&args);
+        assert_eq!(
+            e.error_code(),
+            "SRR_BELOW_FLOOR_REFUSED",
+            "{args:?} must be refused while the machine is marked DEGRADED — RECOVERY ONLY"
+        );
+        assert_eq!(e.details()["marking"], "DEGRADED — RECOVERY ONLY");
+        assert_eq!(e.details()["refusal_policy"], "allow_list_default_refuse");
+    }
+
+    // §5/§7/§10 are not collateral damage: inspection still works and the recovery exit still clears the marking.
+    assert!(g.run(&["trust", "status"]).ok());
+    p.publish(&hi, 30, 100, "stable", &far_future(), "4.0.0", 50);
+    let r = g.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        hi.join("kernel").to_str().unwrap(),
+    ]);
+    assert_eq!(r["protected_state"]["break_glass_exit"]["cleared"], true);
+    assert!(g.ok(&["trust", "status"])["degraded"].is_null());
+}

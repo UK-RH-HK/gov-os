@@ -8,8 +8,8 @@
 //! | 2 | owner-controlled, non-manufacturable authority | [`authorise`] + [`super::metadata::BreakGlassToken`] |
 //! | 3 | durable entry record | [`enter`] → `degraded/<product>.json` in protected machine state |
 //! | 4 | explicit `DEGRADED — RECOVERY ONLY` marking | [`DEGRADED_TOKEN`] |
-//! | 5 | permitted activities | [`PERMITTED_ACTIVITIES`] |
-//! | 6 | refused activities | [`REFUSED_ACTIVITIES`] + [`guard`] |
+//! | 5 | permitted activities | [`PERMITTED_ACTIVITIES`] (the §5 text) and [`PERMITTED_OPERATIONS`] (the operation labels that realise it) |
+//! | 6 | refused activities | [`guard`] / [`guard_light`] — a **default-refuse allow-list** ([`REFUSAL_POLICY`]): every operation outside [`PERMITTED_OPERATIONS`] is refused, so §6 bullet 1 is enforced as a class rather than as an enumeration. [`REFUSED_ACTIVITIES`] and [`REFUSAL_CLASSES`] only name which bullet a refusal is reported under |
 //! | 7 | exit condition | [`exit_satisfied`] — the single `SRR2-R1-C1` policy point |
 //! | 8 | the floor itself is never lowered | [`enter`] writes no floor; `Floors::raise_*` are monotonic-only |
 //! | 9 | ingress consistency | the floor check lives in the one verifier every ingress calls |
@@ -52,10 +52,66 @@ pub const REFUSED_ACTIVITIES: &[&str] = &[
     "present_below_floor_release_as_current",
 ];
 
-/// Concrete operation names that are refused while the machine is marked `DEGRADED — RECOVERY ONLY`, mapped to the
-/// OWNER-DECISION-0006 §6 bullet they come from. Matching is by substring on the operation label the caller passes,
-/// which is the same label convention `kernel_trust::guard` already uses.
-pub const REFUSED_OPERATIONS: &[(&str, &str)] = &[
+/// **The allow-list.** The operation labels permitted while the machine is marked `DEGRADED — RECOVERY ONLY`,
+/// each mapped to the `OWNER-DECISION-0006` §5 activity that covers it.
+///
+/// Matching is **exact**, never substring: an operation proceeds only when its label appears here verbatim.
+/// Everything else is refused — including an operation added to the product tomorrow, and one nobody anticipated.
+/// This table is the *only* exception to a structural default of refusal, which is what §6 bullet 1 requires:
+/// "normal privileged Governance OS operation" is a **class**, and a class cannot be enforced by enumerating its
+/// members.
+///
+/// Why each entry is a §5 activity and not §6 bullet 1:
+///
+/// | operation | §5 activity | why it is recovery, not normal governed operation |
+/// |---|---|---|
+/// | `checkpoint` | backup/export | captures resumable state; advances no governed record's lifecycle, decides nothing and grants no authority |
+/// | `kernel reinstall` | uninstall/reinstall | the ingress break-glass exists to serve; the release it installs is still authenticity- and floor-checked inside `admit` |
+/// | `update --apply` | restoration of an authenticated release | same, and independently floor-checked inside `admit` |
+/// | `update --rollback` | restoration of an authenticated release | restores a previously installed release, whose target is admitted through `admit` like every other ingress (§9) |
+///
+/// The admission criterion applied to this table: an operation belongs here only when it realises a §5 activity
+/// **and** it neither advances the lifecycle of a governed record nor changes trust, authority or policy state.
+/// That criterion deliberately excludes two labels a reader might expect to find here, because both mutate
+/// governed state despite read-sounding names: `task status` is [`crate::orchestration::tasks::set_status`], a
+/// lifecycle mutation behind `mutate_task_status`, and `cit simulate` writes `cit_status = SIMULATED` back to the
+/// transaction. Both are §6 bullet 1.
+///
+/// §5's "inspection" and "diagnosis" need no entry here: read-only commands (`gov trust status`, `gov doctor`,
+/// `gov recover --dry-run`, the `list`/`show` surfaces) never call
+/// [`crate::orchestration::control::guard_write`], so they never reach this guard. §5's "repair" is realised by
+/// the three installation entries above.
+///
+/// §5 is permissive — "Permitted activities **may** include" — so a narrower allow-list satisfies it, while §6 is
+/// a MUST NOT. When a mapping is arguable the entry is left out: erring narrow can only cost availability, erring
+/// wide breaks the decision.
+pub const PERMITTED_OPERATIONS: &[(&str, &str)] = &[
+    ("checkpoint", "backup_export"),
+    ("kernel reinstall", "uninstall_reinstall"),
+    ("update --apply", "restore_authenticated_release"),
+    ("update --rollback", "restore_authenticated_release"),
+];
+
+/// The shape of the §6 control, named in one checkable place: an allow-list whose default is refusal.
+pub const REFUSAL_POLICY: &str = "allow_list_default_refuse";
+
+/// The `OWNER-DECISION-0006` §5 activity that permits `operation` below floor, or `None` when nothing does.
+///
+/// This is the whole of the §6 decision procedure. `None` means refuse.
+pub fn permitted_activity(operation: &str) -> Option<&'static str> {
+    PERMITTED_OPERATIONS
+        .iter()
+        .find(|(label, _)| *label == operation)
+        .map(|(_, activity)| *activity)
+}
+
+/// Which `OWNER-DECISION-0006` §6 bullet a refusal is *reported* under.
+///
+/// **This table is not the policy and refusal never depends on it.** An operation absent from it is refused
+/// exactly as one present in it is, and is reported under §6 bullet 1, `normal_privileged_operation` — the class
+/// the decision names for privileged governed work in general. The table exists only so that an operation the
+/// decision names specifically is refused with that specific bullet quoted back to the operator.
+pub const REFUSAL_CLASSES: &[(&str, &str)] = &[
     ("gate create", "human_gate_create"),
     ("gate present", "human_gate_create"),
     ("gate answer", "human_gate_approve"),
@@ -65,65 +121,127 @@ pub const REFUSED_OPERATIONS: &[(&str, &str)] = &[
     ("certify", "release_certification"),
     ("trust provision", "trust_policy_mutation"),
     ("trust root-update", "trust_policy_mutation"),
+    ("trust revoke", "trust_policy_mutation"),
     ("policy set", "trust_policy_mutation"),
     ("plugin install", "privileged_plugin_acquisition"),
     ("plugin acquire", "privileged_plugin_acquisition"),
     ("plugins register", "privileged_plugin_acquisition"),
     ("tools install", "privileged_plugin_acquisition"),
     ("skills install", "privileged_plugin_acquisition"),
-    ("upstream submit", "normal_privileged_operation"),
-    ("upstream export", "normal_privileged_operation"),
-    ("cit propose", "normal_privileged_operation"),
-    ("cit execute", "normal_privileged_operation"),
-    ("task create", "normal_privileged_operation"),
-    ("task claim", "normal_privileged_operation"),
-    ("task close", "normal_privileged_operation"),
-    ("handoff create", "normal_privileged_operation"),
-    ("readiness plan", "normal_privileged_operation"),
-    ("replan", "normal_privileged_operation"),
-    ("adopt migrate", "normal_privileged_operation"),
-    ("memory select", "normal_privileged_operation"),
+    ("floor", "floor_lower_or_reset"),
 ];
+
+/// The §6 bullet a refusal of `operation` is reported under. Bullet 1 is the default for everything else.
+pub fn refusal_class(operation: &str) -> &'static str {
+    for (needle, class) in REFUSAL_CLASSES {
+        if operation.contains(needle) {
+            return class;
+        }
+    }
+    "normal_privileged_operation"
+}
+
+/// The permitted set rendered for an operator-facing refusal message.
+fn permitted_summary() -> String {
+    PERMITTED_OPERATIONS
+        .iter()
+        .map(|(label, activity)| format!("`{label}` ({activity})"))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+/// The single refusal, shared by [`guard`] and [`guard_light`] so the two can never drift apart.
+fn refuse(operation: &str, entered_at: &str, record: &Value) -> GovError {
+    let class = refusal_class(operation);
+    GovError::new(
+        "SRR_BELOW_FLOOR_REFUSED",
+        format!(
+            "'{operation}' is refused: this machine is marked `{DEGRADED_TOKEN}`. Below-floor recovery permits only the OWNER-DECISION-0006 §5 recovery activities and refuses everything else (§6); '{operation}' is refused as {class}. Permitted while below floor: {}. To leave break-glass, {}.",
+            permitted_summary(),
+            exit_condition_description()
+        ),
+    )
+    .with_details(json!({
+        "marking": DEGRADED_TOKEN,
+        "operation": operation,
+        "refused_class": class,
+        "refusal_policy": REFUSAL_POLICY,
+        "entered_at": entered_at,
+        "permitted": PERMITTED_ACTIVITIES,
+        "permitted_operations": PERMITTED_OPERATIONS
+            .iter()
+            .map(|(l, a)| json!({"operation": l, "section_5_activity": a}))
+            .collect::<Vec<_>>(),
+        "exit_condition": exit_condition_description(),
+        "break_glass_record": record,
+    }))
+}
+
+/// A three-valued read of the marking record, so that "present but unreadable" is never silently "not marked".
+enum Marking {
+    /// No marking record at all, or one whose `active` is explicitly `false` (a cleared exit).
+    NotMarked,
+    /// The machine is marked `DEGRADED — RECOVERY ONLY`.
+    Marked(Value),
+    /// A marking record exists but cannot be read as one. Refusal is the structural default here too: a machine
+    /// whose marking cannot be read is not thereby unmarked. Recovery is unaffected, because every
+    /// [`PERMITTED_OPERATIONS`] entry is allowed before this is ever consulted, so the exit path stays open.
+    Unreadable,
+}
+
+fn read_marking(path: &std::path::Path) -> Marking {
+    if !path.exists() {
+        return Marking::NotMarked;
+    }
+    let Ok(v) = crate::util::read_json(path) else {
+        return Marking::Unreadable;
+    };
+    match v.get("active").and_then(|x| x.as_bool()) {
+        Some(true) => Marking::Marked(v),
+        Some(false) => Marking::NotMarked,
+        None => Marking::Unreadable,
+    }
+}
+
+fn entered_at_of(record: &Value) -> String {
+    record
+        .get("entered_at")
+        .and_then(|x| x.as_str())
+        .unwrap_or("")
+        .to_string()
+}
 
 /// Cheap `DEGRADED — RECOVERY ONLY` check for the hot path: it resolves the protected state root and reads one
 /// file, without creating the state layout. Used by [`crate::orchestration::control::guard_write`], which every
 /// mutating governed operation already calls, so `OWNER-DECISION-0006` §6 is enforced at the same chokepoint as
 /// `FREEZE_WRITES` rather than at a new one that a code path could forget.
+///
+/// Identical policy to [`guard`]: both consult [`permitted_activity`] and both refuse through the same private
+/// `refuse`, so the hot-path guard and the state-carrying guard cannot diverge.
 pub fn guard_light(product: &str, operation: &str) -> Result<()> {
+    // The §5 allow-list is consulted first, so a recovery operation needs no state read at all and can never be
+    // blocked by a failure to read state.
+    if permitted_activity(operation).is_some() {
+        return Ok(());
+    }
     let Ok(root) = crate::srr::state::resolve_state_root() else {
+        // No protected machine state resolves here, so there is no marking on this machine to enforce: the
+        // ungoverned/unprovisioned case, not a degraded one. `resolve_state_root` is used exactly as it stands;
+        // this repair does not change how machine-state paths are resolved (AR27-OD1 is out of scope).
         return Ok(());
     };
     let path = root
         .join("degraded")
         .join(format!("{}.json", product.replace(['/', '\\'], "_")));
-    if !path.exists() {
-        return Ok(());
+    match read_marking(&path) {
+        Marking::NotMarked => Ok(()),
+        Marking::Marked(v) => Err(refuse(operation, &entered_at_of(&v), &v)),
+        Marking::Unreadable => Err(refuse(
+            operation,
+            "",
+            &json!({"unreadable_marking_record": path.display().to_string()}),
+        )),
     }
-    let Ok(v) = crate::util::read_json(&path) else {
-        return Ok(());
-    };
-    if !v.get("active").and_then(|x| x.as_bool()).unwrap_or(false) {
-        return Ok(());
-    }
-    for (needle, class) in REFUSED_OPERATIONS {
-        if operation.contains(needle) {
-            return Err(GovError::new(
-                "SRR_BELOW_FLOOR_REFUSED",
-                format!(
-                    "'{operation}' is refused: this machine is marked `{DEGRADED_TOKEN}` and below-floor recovery does not permit {class} (OWNER-DECISION-0006 §6). Permitted while below floor: {}.",
-                    PERMITTED_ACTIVITIES.join(", ")
-                ),
-            )
-            .with_details(json!({
-                "marking": DEGRADED_TOKEN, "operation": operation, "refused_class": class,
-                "entered_at": v.get("entered_at").cloned().unwrap_or(Value::Null),
-                "permitted": PERMITTED_ACTIVITIES,
-                "exit_condition": exit_condition_description(),
-                "break_glass_record": v,
-            })));
-        }
-    }
-    Ok(())
 }
 
 /// The durable break-glass entry record and current marking for one product.
@@ -165,31 +283,25 @@ pub fn is_degraded(ms: &MachineState, product: &str) -> bool {
 
 /// Refuse an operation while the machine is marked `DEGRADED — RECOVERY ONLY` (OWNER-DECISION-0006 §6).
 ///
-/// The default is **refuse**: an operation is allowed only when it matches nothing in [`REFUSED_OPERATIONS`], which
-/// keeps the permitted set (§5: inspection, backup/export, diagnosis, repair, uninstall/reinstall, restoration)
-/// working while every §6 bullet is blocked.
+/// **The default is refuse, structurally.** The decision procedure is [`permitted_activity`]: an operation
+/// proceeds only when its label appears verbatim in [`PERMITTED_OPERATIONS`] alongside the §5 activity that
+/// covers it. Everything else is refused, whether or not anyone anticipated it — which is what it means to refuse
+/// "normal privileged Governance OS operation" (§6 bullet 1) as a class rather than as a list of strings.
+/// [`REFUSAL_CLASSES`] chooses only which §6 bullet the refusal is *reported* under; it decides nothing.
 pub fn guard(ms: &MachineState, product: &str, operation: &str) -> Result<()> {
-    let Some(d) = Degraded::load(ms, product) else {
+    if permitted_activity(operation).is_some() {
         return Ok(());
-    };
-    for (needle, class) in REFUSED_OPERATIONS {
-        if operation.contains(needle) {
-            return Err(GovError::new(
-                "SRR_BELOW_FLOOR_REFUSED",
-                format!(
-                    "'{operation}' is refused: this machine is marked `{DEGRADED_TOKEN}` and below-floor recovery does not permit {class} (OWNER-DECISION-0006 §6). Permitted while below floor: {}.",
-                    PERMITTED_ACTIVITIES.join(", ")
-                ),
-            )
-            .with_details(json!({
-                "marking": DEGRADED_TOKEN, "operation": operation, "refused_class": class,
-                "entered_at": d.entered_at, "permitted": PERMITTED_ACTIVITIES,
-                "exit_condition": exit_condition_description(),
-                "break_glass_record": d.record,
-            })));
-        }
     }
-    Ok(())
+    let path = ms.degraded_path(product);
+    match read_marking(&path) {
+        Marking::NotMarked => Ok(()),
+        Marking::Marked(v) => Err(refuse(operation, &entered_at_of(&v), &v)),
+        Marking::Unreadable => Err(refuse(
+            operation,
+            "",
+            &json!({"unreadable_marking_record": path.display().to_string()}),
+        )),
+    }
 }
 
 // ------------------------------------------------------------------- SRR2-R1-C1 : the single exit policy point
@@ -307,8 +419,8 @@ pub fn authorise(
             rejected.push(json!({"path": path.display().to_string(), "reason": "binds a different machine_id"}));
             continue;
         }
-        if token.envelope.is_expired(now) {
-            rejected.push(json!({"path": path.display().to_string(), "reason": format!("expired at {}", token.expires)}));
+        if let Some(fault) = token.envelope.expiry_fault(now) {
+            rejected.push(json!({"path": path.display().to_string(), "reason": fault}));
             continue;
         }
         // Single use: a spent nonce cannot be replayed into a second entry.
@@ -401,6 +513,11 @@ pub fn enter(
             "kernel_manifest_hash": kernel_manifest_hash,
         },
         "permitted_activities": PERMITTED_ACTIVITIES,
+        "permitted_operations": PERMITTED_OPERATIONS
+            .iter()
+            .map(|(l, a)| json!({"operation": l, "section_5_activity": a}))
+            .collect::<Vec<_>>(),
+        "refusal_policy": REFUSAL_POLICY,
         "refused_activities": REFUSED_ACTIVITIES,
         "exit_condition": exit_condition_description(),
         "exit_policy": EXIT_POLICY,
@@ -478,6 +595,78 @@ mod tests {
             "must not be an en dash"
         );
         assert_eq!(DEGRADED_TOKEN.len(), 26); // 24 chars, em dash is 3 bytes
+    }
+
+    /// `AR27-B1` — §6 bullet 1 names a CLASS, so refusal must be the structural default. Anything not on the
+    /// §5 allow-list is refused, including labels nobody enumerated when this was written.
+    #[test]
+    fn below_floor_refusal_is_structural_not_an_enumeration() {
+        assert_eq!(REFUSAL_POLICY, "allow_list_default_refuse");
+        for label in [
+            // the seven AR-0027 measured as permitted with no §5 cover
+            "cit approve",
+            "cit reject",
+            "gate revoke",
+            "handoff return",
+            "plugins unregister",
+            "adopt extract-legacy",
+            "adopt build-memory",
+            // two more that mutate governed state despite read-sounding names
+            "task status",
+            "cit simulate",
+            // labels that did not exist when this table was written
+            "an operation invented after this repair",
+            "",
+            "quorum override",
+            // near-misses on allow-listed labels: exact match, never substring or case folding
+            "kernel reinstall --force",
+            "KERNEL REINSTALL",
+            "checkpoint delete",
+            "update --apply-unverified",
+        ] {
+            assert!(
+                permitted_activity(label).is_none(),
+                "'{label}' must not be permitted while the machine is marked `{DEGRADED_TOKEN}`"
+            );
+        }
+    }
+
+    #[test]
+    fn every_permitted_operation_names_a_real_section_5_activity() {
+        for (label, activity) in PERMITTED_OPERATIONS {
+            assert!(
+                PERMITTED_ACTIVITIES.contains(activity),
+                "'{label}' claims §5 activity '{activity}', which OWNER-DECISION-0006 §5 does not name"
+            );
+            assert_eq!(permitted_activity(label), Some(*activity));
+        }
+        // §7 and §10: the way out of break-glass must stay open, offline, on a marked machine.
+        for must in ["kernel reinstall", "update --apply", "update --rollback"] {
+            assert!(
+                permitted_activity(must).is_some(),
+                "'{must}' is how a machine restores an authenticated release and leaves break-glass"
+            );
+        }
+    }
+
+    #[test]
+    fn refusal_classes_report_a_section_6_bullet_but_decide_nothing() {
+        // A specifically named operation is reported under its own bullet ...
+        assert_eq!(refusal_class("gate create"), "human_gate_create");
+        assert_eq!(refusal_class("release certify"), "release_certification");
+        assert_eq!(refusal_class("trust root-update"), "trust_policy_mutation");
+        // ... and everything else under §6 bullet 1, which is why membership cannot be load-bearing.
+        assert_eq!(
+            refusal_class("an operation invented after this repair"),
+            "normal_privileged_operation"
+        );
+        assert_eq!(refusal_class("cit approve"), "normal_privileged_operation");
+        for (_, class) in REFUSAL_CLASSES {
+            assert!(
+                REFUSED_ACTIVITIES.contains(class),
+                "'{class}' is not an OWNER-DECISION-0006 §6 activity"
+            );
+        }
     }
 
     #[test]
