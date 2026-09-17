@@ -293,7 +293,43 @@ pub fn locate_metadata(candidate: &Path) -> Option<PathBuf> {
 
 // ---------------------------------------------------------------------------------------------- the verifier
 
+/// **The R1 root-expiry profile, stated once.**
+///
+/// 00-ARCHITECTURE, "Freshness and revocation": "Expired/stale metadata blocks trust-changing lifecycle operations
+/// **according to the profile**". `AR27-N2` found the profile asserted in a comment but implemented nowhere — a
+/// branch on `is_expired` whose two arms were identical. The claim is removed and the profile is named here
+/// instead, so what is enforced can be read off one place.
+///
+/// **Enforced, fail-closed:**
+/// * first provisioning refuses an expired root — [`super::metadata::parse_self_signed_root`];
+/// * root succession refuses an expired **candidate** root — [`super::metadata::accept_root_succession`] step 5;
+/// * release metadata expiry is a hard refusal at admission (`SRR_METADATA_EXPIRED`);
+/// * timestamp/snapshot expiry downgrades reported currency to `STALE`;
+/// * a break-glass authorisation token's expiry refuses the token;
+/// * and after `AR27-N1`, "expired" includes an absent or non-canonical `expires`.
+///
+/// **Not enforced, deliberately and stated rather than implied:** an expired *installed* trust anchor does not bar
+/// release admission, and does not bar authorising its own successor. Two reasons, both about not creating a worse
+/// failure than the one being prevented:
+///
+/// 1. TUF walks the root succession chain and applies the expiry check to the *final* root, precisely so that an
+///    expired root can still sign its successor. Barring it would leave root rotation permanently impossible on a
+///    machine whose root has expired, because [`super::provision::provision`] refuses to re-anchor a provisioned
+///    machine (`SRR_ALREADY_PROVISIONED`) — an expired root would brick trust rotation rather than protect it.
+/// 2. Making anchor expiry an admission bar would disable an already authenticated installed system, which
+///    ARCH-0003 §7 declines to do.
+///
+/// The state is **reported, never overclaimed**: `gov trust status` carries
+/// `trust_anchor.expired_against_local_clock`, and nothing in the implementation or its documentation claims an
+/// expired anchor is refused. Requiring short-lived freshness for trust-changing ingresses — together with making
+/// the timestamp and snapshot roles mandatory — is R2 work, recorded as `AR27-N3`.
+pub const ROOT_EXPIRY_PROFILE: &str = "reported_not_admission_blocking_r1";
+
 /// Load the machine's trusted root anchor, if one is provisioned.
+///
+/// Root expiry is verified here and reported by `gov trust status`; see [`ROOT_EXPIRY_PROFILE`] for what that does
+/// and does not bar. There is deliberately **no branch on expiry in this function**: a branch whose arms are
+/// identical asserts a control that does not exist.
 pub fn trusted_root(ms: &MachineState, now: &str) -> Result<Option<Root>> {
     if !ms.is_provisioned() {
         return Ok(None);
@@ -309,10 +345,10 @@ pub fn trusted_root(ms: &MachineState, now: &str) -> Result<Option<Root>> {
     let root = Root::parse(env)?;
     // The anchor is re-checked against itself on every load: a tampered protected file is refused rather than used.
     root.verify_role(ROLE_ROOT, &root.envelope)?;
-    if root.envelope.is_expired(now) {
-        // An expired root does not brick an installed system, but it cannot authorise a trust change.
-        return Ok(Some(root));
-    }
+    // ROOT_EXPIRY_PROFILE = "reported_not_admission_blocking_r1": expiry is reported by `gov trust status`, and is
+    // a hard refusal at first provisioning and for a succession candidate. It is not an admission bar here, and no
+    // comment in this function claims otherwise.
+    let _ = now;
     Ok(Some(root))
 }
 
@@ -703,7 +739,7 @@ fn verify_metadata_chain(
         }
         if ts.envelope.is_expired(now) {
             currency = Currency::Stale;
-            notes.push(format!("timestamp metadata expired at {} against the declared local clock {now}; currency is STALE", ts.envelope.expires()));
+            notes.push(format!("timestamp metadata is not current ({}); currency is STALE", ts.envelope.expiry_fault(now).unwrap_or_default()));
         }
         Some(ts)
     } else {
@@ -785,7 +821,7 @@ fn verify_metadata_chain(
     if release.envelope.is_expired(now) {
         return Err(GovError::new(
             "SRR_METADATA_EXPIRED",
-            format!("release metadata for {} expired at {} against the declared local clock {now}; trust-changing lifecycle operations are refused (ARCH-0003 §7.2). An already authenticated installed system is not disabled by this.", release.release_version, release.expires),
+            format!("release metadata for {}: {}; trust-changing lifecycle operations are refused (ARCH-0003 §7.2). An already authenticated installed system is not disabled by this.", release.release_version, release.envelope.expiry_fault(now).unwrap_or_default()),
         ));
     }
     // Advance the metadata high-water only after every check above has passed, and only upward.

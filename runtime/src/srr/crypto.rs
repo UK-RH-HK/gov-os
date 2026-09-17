@@ -11,10 +11,17 @@
 //! 1. **`gov` verifies; `gov` never signs.** No signing key type is constructed anywhere in this crate outside
 //!    `#[cfg(test)]`. There is no "sign" entry point on the production surface, so no dev/test signing mode can be
 //!    reached from the shipped binary (`SRR-R0-L4`).
-//! 2. **Strict verification.** `verify_strict` rejects the small-order/non-canonical signatures that the permissive
-//!    `verify` accepts, which is the correct choice for a distribution root where signatures are also identities.
+//! 2. **Strict verification, with no permissive path on the surface.** [`verify_strict`] rejects the
+//!    small-order/non-canonical signatures that `ed25519_dalek`'s own permissive `verify` accepts, which is the
+//!    correct choice for a distribution root where signatures are also identities. `AR27-N4`: this module used to
+//!    expose a [`verify`] that retried permissively whenever the strict check refused. That fallback is gone —
+//!    [`verify`] now *is* [`verify_strict`] — so no caller, present or future, can reach the permissive verifier
+//!    through this module.
 use crate::{GovError, Result};
-use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+// `Verifier` — the trait that carries `ed25519_dalek`'s permissive `verify` — is deliberately NOT imported.
+// `verify_strict` is an inherent method on `VerifyingKey`, so the permissive verifier is not in scope anywhere in
+// this crate and cannot be called by accident (`AR27-N4`).
+use ed25519_dalek::{Signature, VerifyingKey};
 
 pub const KEYTYPE: &str = "ed25519";
 pub const SCHEME: &str = "ed25519";
@@ -55,26 +62,14 @@ pub fn parse_public_key(public_hex: &str) -> Result<VerifyingKey> {
 }
 
 /// Verify one detached signature over `message`. Any failure is a refusal, never a warning.
+///
+/// `AR27-N4` — this is [`verify_strict`], and nothing else. It previously carried an
+/// `.or_else(|_| key.verify(...))` fallback that retried with the *permissive* verifier exactly when the strict one
+/// refused, defeating the property the surrounding comment claimed. It had no product call sites, but it was public
+/// API and therefore a trap for a future caller. There is now one verification behaviour in this module, so
+/// choosing the wrong entry point cannot weaken a signature check.
 pub fn verify(public_hex: &str, sig_hex: &str, message: &[u8]) -> Result<()> {
-    let key = parse_public_key(public_hex)?;
-    let raw = decode_hex(sig_hex, "signature")?;
-    let bytes: [u8; 64] = raw.as_slice().try_into().map_err(|_| {
-        GovError::new(
-            "SRR_MALFORMED_SIGNATURE",
-            format!("ed25519 signature must be 64 bytes, got {}", raw.len()),
-        )
-    })?;
-    let sig = Signature::from_bytes(&bytes);
-    // `verify_strict` additionally rejects small-order public keys and non-canonical encodings, so a signature
-    // cannot be made to verify under more than one identity.
-    key.verify_strict(message, &sig)
-        .or_else(|_| key.verify(message, &sig))
-        .map_err(|e| {
-            GovError::new(
-                "SRR_SIGNATURE_INVALID",
-                format!("ed25519 signature verification failed: {e}"),
-            )
-        })
+    verify_strict(public_hex, sig_hex, message)
 }
 
 /// Strict-only verification (no permissive fallback). Used for every role signature.
