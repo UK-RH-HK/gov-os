@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "governance-os.capability-acceptance-contract",
+  "title": "Governance Capability Acceptance Contract — compiled representation",
+  "description": "Machine-executable compiled form of the human-approved Governance Capability Acceptance Contract v3. It is valid only while framework/contracts/contract-source.lock proves it was compiled from the exact approved source hash; any semantic difference between source and compiled representation is a hard failure.",
+  "type": "object",
+  "required": ["schema", "schema_version", "contract_version", "compiled_from", "capability_count", "capabilities"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": { "const": "governance-os.capability-acceptance-contract" },
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "contract_version": { "type": "string", "minLength": 1 },
+    "compiled_from": {
+      "type": "object",
+      "required": ["owner_source", "canonical_import", "source_sha256"],
+      "properties": {
+        "owner_source": { "type": "string", "minLength": 1 },
+        "canonical_import": { "type": "string", "minLength": 1 },
+        "source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "compiler": { "type": "object" },
+    "capability_count": { "type": "integer", "minimum": 1 },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "requirement_class", "source_reference", "family", "status"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[A-Z]+[0-9]+$" },
+          "title": { "type": "string", "minLength": 1 },
+          "requirement_class": { "enum": ["ORIGINAL", "POST_VERIFICATION_HARDENING", "EXECUTION_REFINEMENT"] },
+          "source_reference": { "type": "string", "minLength": 1 },
+          "family": { "type": "string", "pattern": "^[A-Z]+$" },
+          "status": { "enum": ["DECLARED", "EVIDENCED", "N/A_WITH_REASON"] }
+        }
+      }
+    }
+  }
+}

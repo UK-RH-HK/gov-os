@@ -11,6 +11,31 @@ pub fn recover(p: &Project, dry_run: bool) -> Result<Value> {
     let mut items = vec![];
     let mut actions = vec![];
     let mut unknown = 0;
+    // Signed Release Root v1: recovery is a privileged lifecycle ingress. Two things belong here and nowhere else.
+    //
+    // 1. Replay any interrupted install transaction, so the machine comes back to one complete valid installation
+    //    (ARCH-0003 §6 step 8). The floors are NOT advanced by a replay: a crashed transaction never proved its
+    //    post-commit verification (`SRR-R0-L5`).
+    // 2. Report the `DEGRADED — RECOVERY ONLY` marking if this machine is below its floors. Diagnosis and repair
+    //    are permitted activities while below floor (OWNER-DECISION-0006 §5), so `recover` itself is never refused.
+    let srr_machine = crate::srr::state::MachineState::open()?;
+    let replayed = if dry_run {
+        vec![]
+    } else {
+        crate::srr::staging::recover(&srr_machine)?
+    };
+    for r in &replayed {
+        items.push(json!({"kind": "install_transaction", "journal": r["journal"], "classification": "PARTIAL_SHOULD_ROLL_BACK"}));
+        actions.push(r.clone());
+    }
+    let degraded = crate::srr::breakglass::Degraded::load(&srr_machine, crate::FRAMEWORK_NAME);
+    if let Some(d) = degraded.as_ref() {
+        items.push(
+            json!({"kind": "below_floor_marking", "marking": d.marking, "entered_at": d.entered_at,
+                          "classification": "COMPLETE_UNVERIFIED",
+                          "exit_condition": crate::srr::breakglass::exit_condition_description()}),
+        );
+    }
     // 1. interrupted CITs
     for c in crate::cit::interrupted(p) {
         let id = c["id"].as_str().unwrap_or("").to_string();
@@ -142,6 +167,12 @@ pub fn recover(p: &Project, dry_run: bool) -> Result<Value> {
         save_record(&p.root, &rec)?;
     }
     Ok(
-        json!({"items": items, "actions": actions, "unknown": unknown, "writes_frozen": frozen, "checkpoint": checkpoint["id"], "dry_run": dry_run}),
+        json!({"items": items, "actions": actions, "unknown": unknown, "writes_frozen": frozen, "checkpoint": checkpoint["id"], "dry_run": dry_run,
+        "release_trust": {
+            "marking": degraded.as_ref().map(|d| d.marking.clone()),
+            "below_floor": degraded.is_some(),
+            "install_transactions_replayed": replayed,
+            "exit_condition": degraded.as_ref().map(|_| crate::srr::breakglass::exit_condition_description()),
+        }}),
     )
 }

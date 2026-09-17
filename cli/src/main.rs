@@ -42,6 +42,12 @@ enum Cmd {
         force: bool,
         #[arg(long)]
         skip_index: bool,
+        /// Requested release channel (matched against the signed `channel` field; it cannot create authority)
+        #[arg(long)]
+        channel: Option<String>,
+        /// Request below-floor admission; the authority is an owner-signed token in protected machine state
+        #[arg(long)]
+        break_glass: bool,
     },
     /// Reconstruct current governed project state (no prior conversation needed)
     Status,
@@ -116,6 +122,12 @@ enum Cmd {
         apply: bool,
         #[arg(long)]
         rollback: bool,
+        /// Requested release channel (matched against the signed `channel` field; it cannot create authority)
+        #[arg(long)]
+        channel: Option<String>,
+        /// Request below-floor admission; the authority is an owner-signed token in protected machine state
+        #[arg(long)]
+        break_glass: bool,
         #[arg(long)]
         source: Option<String>,
         #[arg(long)]
@@ -214,6 +226,16 @@ enum Cmd {
     Kernel {
         #[command(subcommand)]
         op: KernelCmd,
+    },
+    /// Signed Release Root: machine trust anchor, protected floors, break-glass recovery (ARCH-0003)
+    Trust {
+        #[command(subcommand)]
+        op: TrustCmd,
+    },
+    /// Capability Acceptance Contract v3: verify the hash-bound source chain, or recompile it
+    Contract {
+        #[command(subcommand)]
+        op: ContractCmd,
     },
     /// Capability ecosystem: ecosystems, plugins, invoke
     Capabilities {
@@ -634,6 +656,9 @@ enum KernelCmd {
     Reinstall {
         #[arg(long)]
         source: Option<String>,
+        /// Request below-floor admission; the authority is an owner-signed token in protected machine state
+        #[arg(long)]
+        break_glass: bool,
     },
     /// Trust verdict for the installed kernel (what constitutional policy is being read from)
     Trust,
@@ -643,6 +668,35 @@ enum KernelCmd {
         reason: Option<String>,
     },
 }
+#[derive(Subcommand)]
+enum ContractCmd {
+    /// Fail closed unless the canonical import, the source lock and the compiled form all bind the approved source
+    Verify,
+    /// Regenerate the compiled form, source lock, evidence map and generated view from the approved source
+    Compile,
+}
+
+#[derive(Subcommand)]
+enum TrustCmd {
+    /// Posture, trust anchor, protected floors, currency and any `DEGRADED — RECOVERY ONLY` marking
+    Status,
+    /// Administrator: install this machine's first trust anchor from the platform/admin domain
+    Provision {
+        /// Path to the public root metadata, supplied from the administrator domain (never from the repository)
+        #[arg(long)]
+        anchor: String,
+    },
+    /// Accept a successor root (one version at a time, outgoing and incoming quorums both required)
+    RootUpdate {
+        #[arg(long)]
+        anchor: String,
+    },
+    /// Where an owner-signed break-glass authorisation must be placed, and what it must bind
+    BreakGlass,
+    /// Replay any interrupted install transaction and report what was done
+    RecoverTransactions,
+}
+
 #[derive(Subcommand)]
 enum CapCmd {
     Ecosystems,
@@ -725,11 +779,11 @@ fn run(cli: &Cli) -> Result<Value> {
     let name = command_name(&cli.cmd);
     match &cli.cmd {
         Cmd::Version => Ok(json!({"framework": gov_runtime::FRAMEWORK_NAME, "version": gov_runtime::VERSION, "cli_version": gov_runtime::CLI_VERSION, "runtime_version": gov_runtime::RUNTIME_VERSION, "index_version": gov_runtime::INDEX_VERSION})),
-        Cmd::Init { source, name: pname, alias, intent, force, skip_index } => {
+        Cmd::Init { source, name: pname, alias, intent, force, skip_index, channel, break_glass } => {
             let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
             let pn = pname.clone().unwrap_or_else(|| root.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or("project".into()));
             let al = alias.clone().unwrap_or_else(|| format!("project-{}", &gov_runtime::util::sha256_text(&pn)[..6]));
-            gov_runtime::init::init(&root, gov_runtime::init::InitOptions { source: source.clone(), project_name: pn, alias: al, mode: "init".into(), force: *force, intent: intent.clone(), skip_index: *skip_index })
+            gov_runtime::init::init(&root, gov_runtime::init::InitOptions { source: source.clone(), project_name: pn, alias: al, mode: "init".into(), force: *force, intent: intent.clone(), skip_index: *skip_index, channel: channel.clone(), break_glass: *break_glass })
         }
         Cmd::Status => { let p = open_project(cli, true)?; gov_runtime::status::status(&p) }
         Cmd::Continue { claim } => { let p = open_project(cli, true)?; let d = db(&p)?; gov_runtime::status::continue_work(&p, &d, *claim) }
@@ -757,11 +811,37 @@ fn run(cli: &Cli) -> Result<Value> {
                 AdoptCmd::Audit { accept_exceptions } => a::a11_audit(&root, *accept_exceptions), AdoptCmd::Status => a::status(&root), AdoptCmd::Rollback { batch } => a::rollback_batch(&root, *batch),
             }
         }
-        Cmd::Update { check, apply, rollback, source, approve, by, reason } => {
+        Cmd::Update { check, apply, rollback, channel, break_glass, source, approve, by, reason } => {
             let mut p = open_project(cli, true)?;
-            if *rollback { return gov_runtime::update::rollback(&mut p, None, reason.as_deref()); }
-            if *apply { return gov_runtime::update::apply_update(&mut p, source.as_deref(), *approve, by); }
+            if *rollback { return gov_runtime::update::rollback_opts(&mut p, None, reason.as_deref(), *break_glass); }
+            if *apply { return gov_runtime::update::apply_update_opts(&mut p, source.as_deref(), *approve, by, channel.clone(), *break_glass); }
             let _ = check; gov_runtime::update::check(&p, source.as_deref())
+        }
+        Cmd::Trust { op } => {
+            let project_root = cli.root.clone().or_else(|| std::env::current_dir().ok());
+            match op {
+                TrustCmd::Status => gov_runtime::srr::status(),
+                TrustCmd::Provision { anchor } => gov_runtime::srr::provision::provision(Path::new(anchor), project_root.as_deref()),
+                TrustCmd::RootUpdate { anchor } => gov_runtime::srr::provision::root_update(Path::new(anchor), project_root.as_deref()),
+                TrustCmd::BreakGlass => gov_runtime::srr::provision::break_glass_status(),
+                TrustCmd::RecoverTransactions => {
+                    let ms = gov_runtime::srr::state::MachineState::open()?;
+                    let r = gov_runtime::srr::staging::recover(&ms)?;
+                    Ok(json!({"replayed": r}))
+                }
+            }
+        }
+        Cmd::Contract { op } => {
+            let repo = cli
+                .root
+                .clone()
+                .or_else(gov_runtime::kernel::canonical_root)
+                .or_else(|| std::env::current_dir().ok())
+                .ok_or_else(|| GovError::new("USAGE", "no repository root"))?;
+            match op {
+                ContractCmd::Verify => gov_runtime::contracts::verify(&repo),
+                ContractCmd::Compile => gov_runtime::contracts::generate(&repo),
+            }
         }
         Cmd::Upstream { op } => { let p = open_project(cli, true)?; match op { UpstreamCmd::Prepare { lesson } => gov_runtime::upstream::prepare(&p, lesson), UpstreamCmd::Submit { packet, destination, approved_by } => gov_runtime::upstream::submit(&p, packet, destination, approved_by.as_deref()) } }
         Cmd::Task { op } => {
@@ -850,7 +930,23 @@ fn run(cli: &Cli) -> Result<Value> {
         },
         Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => { let v = serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?; let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"ok": v["ok"], "modified": v["modified"], "missing": v["missing"], "added": v["added"], "payload_hash": v["payload_hash"], "version": v["version"], "trust": t.to_value()})) }
             KernelCmd::Trust => { let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"verified": t.verified, "summary": t.summary(), "trust": t.to_value()})) }
-            KernelCmd::Override { reason } => gov_runtime::kernel_trust::request_override(&p, reason.as_deref()), KernelCmd::Reinstall { source } => { gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?; gov_runtime::authority::require(&p, "install_kernel")?; let lock = p.lock()?.clone(); let src = source.clone().or_else(|| lock["source"].as_str().filter(|s| Path::new(s).exists()).map(|s| s.to_string())); let m = gov_runtime::kernel::install_kernel(src.as_deref().map(Path::new), &p.governance_dir())?; if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); } p.invalidate(); Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"]})) } } }
+            KernelCmd::Override { reason } => gov_runtime::kernel_trust::request_override(&p, reason.as_deref()), KernelCmd::Reinstall { source, break_glass } => {
+                gov_runtime::orchestration::control::guard_write(&p, "kernel reinstall")?;
+                gov_runtime::authority::require(&p, "install_kernel")?;
+                let lock = p.lock()?.clone();
+                // Privileged lifecycle ingress `reinstall`: the one verification policy (ARCH-0003 §3.6).
+                let src = gov_runtime::kernel::resolve_kernel_source(source.as_deref().map(Path::new).or_else(|| lock["source"].as_str().filter(|s| Path::new(s).exists()).map(Path::new)))?;
+                let auth = gov_runtime::srr::admit(
+                    gov_runtime::srr::AdmissionRequest::new(gov_runtime::srr::Ingress::Reinstall, &src)
+                        .with_break_glass(*break_glass)
+                        .with_reason(Some("gov kernel reinstall".into())),
+                )?;
+                let m = gov_runtime::kernel::install_kernel(&auth, &p.governance_dir())?;
+                if m["payload_hash"] != lock["release_hash"] { return Err(GovError::new("KERNEL_MISMATCH", "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change")); }
+                p.invalidate();
+                let protected = gov_runtime::srr::record_installed(&auth)?;
+                Ok(json!({"reinstalled": true, "version": m["version"], "payload_hash": m["payload_hash"], "release_authenticity": auth.to_value(), "protected_state": protected}))
+            } } }
         Cmd::Capabilities { op: CapCmd::ServeEmbed { reverse, id } } => {
             use std::io::Read; let mut raw = String::new(); std::io::stdin().read_to_string(&mut raw)?;
             let req: Value = serde_json::from_str(&raw).unwrap_or(json!({}));
@@ -933,6 +1029,8 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Adopt { .. } => "adopt",
         Cmd::Migrate { .. } => "migrate",
         Cmd::Update { .. } => "update",
+        Cmd::Trust { .. } => "trust",
+        Cmd::Contract { .. } => "contract",
         Cmd::Upstream { .. } => "upstream",
         Cmd::Task { .. } => "task",
         Cmd::Cit { .. } => "cit",

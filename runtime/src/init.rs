@@ -38,6 +38,11 @@ pub struct InitOptions {
     pub force: bool,
     pub intent: Option<String>,
     pub skip_index: bool,
+    /// Requested release channel. A request matched against the bound `channel` metadata field (`SRR-R0-L2`);
+    /// it cannot create authority for a channel the metadata does not name.
+    pub channel: Option<String>,
+    /// Request below-floor admission. The authority itself is the owner-signed token in protected machine state.
+    pub break_glass: bool,
 }
 
 pub fn write_overlay(
@@ -227,8 +232,16 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
         }
     }
     let src = resolve_kernel_source(opts.source.as_deref().map(Path::new))?;
+    // Privileged lifecycle ingress `init`: the one verification policy (ARCH-0003 §3.6, §6). The floors bind this
+    // ingress like every other one — they are a property of the machine, not of one operation.
+    let auth = crate::srr::admit(
+        crate::srr::AdmissionRequest::new(crate::srr::Ingress::Init, &src)
+            .with_channel(opts.channel.clone())
+            .with_break_glass(opts.break_glass)
+            .with_reason(Some("gov init".into())),
+    )?;
     std::fs::create_dir_all(&gov)?;
-    let manifest = install_kernel(Some(&src), &gov)?;
+    let manifest = install_kernel(&auth, &gov)?;
     let consumer_commit = Project::open(root).git_commit();
     let release_commit = crate::kernel::release_commit_for_source(&src);
     let lock = write_lock(
@@ -314,7 +327,9 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
         )?;
     }
     let doctor = crate::doctor::run(&p)?; // reported on the final, fresh state
+                                          // Transaction step (9): the protected floors advance only now, after the atomic commit and its verification.
+    let floors = crate::srr::record_installed(&auth)?;
     Ok(
-        json!({"root": root.display().to_string(), "version": lock["version"], "release_hash": lock["release_hash"], "source": lock["source"], "kernel_files": manifest["files"].as_object().map(|m| m.len()).unwrap_or(0), "overlay_written": overlay, "tools": registry["tools"].as_array().map(|a| a.len()).unwrap_or(0), "adapters": adapters["adapters"].as_object().map(|m| m.len()).unwrap_or(0), "index": index, "heldout_generated": heldout_generated, "doctor": doctor.verdict, "conformance": {"audit": conformance["audit"], "verdict": conformance["verdict"]}}),
+        json!({"root": root.display().to_string(), "version": lock["version"], "release_hash": lock["release_hash"], "source": lock["source"], "kernel_files": manifest["files"].as_object().map(|m| m.len()).unwrap_or(0), "overlay_written": overlay, "tools": registry["tools"].as_array().map(|a| a.len()).unwrap_or(0), "adapters": adapters["adapters"].as_object().map(|m| m.len()).unwrap_or(0), "index": index, "heldout_generated": heldout_generated, "doctor": doctor.verdict, "conformance": {"audit": conformance["audit"], "verdict": conformance["verdict"]}, "release_authenticity": auth.to_value(), "protected_state": floors}),
     )
 }

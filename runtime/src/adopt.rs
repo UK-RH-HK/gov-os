@@ -628,10 +628,20 @@ pub fn a6_migrate(
             let src = resolve_kernel_source(source.map(Path::new))?;
             let gov = root.join("governance");
             std::fs::create_dir_all(&gov)?;
+            // Privileged lifecycle ingress `adopt`: the one verification policy. Brownfield adoption installs a
+            // kernel exactly like `init` does, so it is admitted through the same verifier and bound by the same
+            // floors (ARCH-0003 §3.6; OWNER-DECISION-0006 §9).
+            let mut adopt_auth: Option<crate::srr::AuthenticatedRelease> = None;
             let manifest = if root.join("governance/framework.lock").exists() {
                 crate::kernel::read_manifest(&gov.join("kernel"))?
             } else {
-                install_kernel(Some(&src), &gov)?
+                let a = crate::srr::admit(
+                    crate::srr::AdmissionRequest::new(crate::srr::Ingress::Adopt, &src)
+                        .with_reason(Some("gov adopt migrate (batch 0)".into())),
+                )?;
+                let m = install_kernel(&a, &gov)?;
+                adopt_auth = Some(a);
+                m
             };
             if !root.join("governance/framework.lock").exists() {
                 let consumer_commit = Project::open(root).git_commit();
@@ -653,6 +663,8 @@ pub fn a6_migrate(
                 force: false,
                 intent: None,
                 skip_index: true,
+                channel: None,
+                break_glass: false,
             };
             let written =
                 crate::init::write_overlay(root, &gov.join("kernel"), &opts, Some(contract))?;
@@ -662,7 +674,12 @@ pub fn a6_migrate(
             crate::tools::generate_registry(&p)?;
             crate::adapters::generate(&p)?;
             let gates_created = ensure_destructive_gates(root, &mut catalogue)?;
-            entry["installed"] = json!({"version": manifest["version"], "overlay_written": written, "destructive_gates_created": gates_created});
+            // Transaction step (9): floors advance only after the install is committed and verified (SRR-R0-L5).
+            let protected = match adopt_auth.as_ref() {
+                Some(a) => crate::srr::record_installed(a)?,
+                None => Value::Null,
+            };
+            entry["installed"] = json!({"version": manifest["version"], "overlay_written": written, "destructive_gates_created": gates_created, "release_authenticity": adopt_auth.as_ref().map(|a| a.to_value()), "protected_state": protected});
         } else {
             if n >= 6 && unknown > 0 {
                 return Err(GovError::new(

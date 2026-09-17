@@ -1,0 +1,611 @@
+schema: governance-os.capability-acceptance-contract
+schema_version: 1
+contract_version: v3
+compiled_from:
+  owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md
+  canonical_import: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+  source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+compiler:
+  note: Mechanically derived from the approved source headings. No contract semantics are authored here; the normative text is the source, and this file is valid only while contract-source.lock proves it was compiled from that exact source hash.
+capability_count: 100
+capabilities:
+- id: A1
+  title: Canonical authority and policy precedence
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:132
+  family: A
+  status: DECLARED
+- id: A2
+  title: Authentic root of trust
+  requirement_class: POST_VERIFICATION_HARDENING
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:142
+  family: A
+  status: DECLARED
+- id: A3
+  title: Security, sensitivity and permissions
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:156
+  family: A
+  status: DECLARED
+- id: A4
+  title: Budget/resource governance
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:166
+  family: A
+  status: DECLARED
+- id: A5
+  title: Emergency controls
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:172
+  family: A
+  status: DECLARED
+- id: B1
+  title: Standard repository contract
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:184
+  family: B
+  status: DECLARED
+- id: B2
+  title: Path map
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:190
+  family: B
+  status: DECLARED
+- id: B3
+  title: Authoritative vs derived state
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:199
+  family: B
+  status: DECLARED
+- id: C1
+  title: Deterministic structured memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:209
+  family: C
+  status: DECLARED
+- id: C2
+  title: Relationship/graph memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:229
+  family: C
+  status: DECLARED
+- id: C3
+  title: Semantic memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:234
+  family: C
+  status: DECLARED
+- id: C4
+  title: Lexical memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:243
+  family: C
+  status: DECLARED
+- id: C5
+  title: Code-structural memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:251
+  family: C
+  status: DECLARED
+- id: C6
+  title: Temporal memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:261
+  family: C
+  status: DECLARED
+- id: C7
+  title: Episodic execution memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:268
+  family: C
+  status: DECLARED
+- id: C8
+  title: Failure memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:276
+  family: C
+  status: DECLARED
+- id: C9
+  title: Working memory/context packet
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:285
+  family: C
+  status: DECLARED
+- id: C10
+  title: Capability memory
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:294
+  family: C
+  status: DECLARED
+- id: D1
+  title: Incremental indexing/freshness
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:307
+  family: D
+  status: DECLARED
+- id: D2
+  title: Retrieval router
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:315
+  family: D
+  status: DECLARED
+- id: D3
+  title: Hierarchical retrieval
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:323
+  family: D
+  status: DECLARED
+- id: D4
+  title: Component separation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:329
+  family: D
+  status: DECLARED
+- id: D5
+  title: Evidence-driven retrieval model selection
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:342
+  family: D
+  status: DECLARED
+- id: D6
+  title: Rebuild guarantee
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:350
+  family: D
+  status: DECLARED
+- id: E1
+  title: Authority levels
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:362
+  family: E
+  status: DECLARED
+- id: E2
+  title: Representative roles
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:368
+  family: E
+  status: DECLARED
+- id: E3
+  title: Typed A2A handoffs
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:377
+  family: E
+  status: DECLARED
+- id: E4
+  title: Concurrency/task claims
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:387
+  family: E
+  status: DECLARED
+- id: F1
+  title: Skill lifecycle
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:398
+  family: F
+  status: DECLARED
+- id: F2
+  title: Tool Capability Registry
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:404
+  family: F
+  status: DECLARED
+- id: F3
+  title: Missing-tool acquisition
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:414
+  family: F
+  status: DECLARED
+- id: F4
+  title: Plugin trust boundary
+  requirement_class: POST_VERIFICATION_HARDENING
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:425
+  family: F
+  status: DECLARED
+- id: F5
+  title: MCP/A2A/tool separation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:433
+  family: F
+  status: DECLARED
+- id: G1
+  title: Natural-language intent
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:443
+  family: G
+  status: DECLARED
+- id: G2
+  title: Small explicit human control set
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:448
+  family: G
+  status: DECLARED
+- id: H1
+  title: SPEC lineage
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:460
+  family: H
+  status: DECLARED
+- id: H2
+  title: 26-dimension Feature/Capability Readiness Contract
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:480
+  family: H
+  status: DECLARED
+- id: H3
+  title: Readiness generates work
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:517
+  family: H
+  status: DECLARED
+- id: H4
+  title: Scenarios drive data/tests
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:524
+  family: H
+  status: DECLARED
+- id: I1
+  title: Unified task DAG
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:535
+  family: I
+  status: DECLARED
+- id: I2
+  title: Task contract
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:560
+  family: I
+  status: DECLARED
+- id: I3
+  title: Dynamic generation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:571
+  family: I
+  status: DECLARED
+- id: I4
+  title: Parallel execution
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:585
+  family: I
+  status: DECLARED
+- id: J1
+  title: Research becomes evidence
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:596
+  family: J
+  status: DECLARED
+- id: J2
+  title: Experiment lifecycle
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:607
+  family: J
+  status: DECLARED
+- id: K1
+  title: CIT-P
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:622
+  family: K
+  status: DECLARED
+- id: K2
+  title: CIT-E
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:628
+  family: K
+  status: DECLARED
+- id: K3
+  title: Automatic impact simulation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:638
+  family: K
+  status: DECLARED
+- id: K4
+  title: Impact radius
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:649
+  family: K
+  status: DECLARED
+- id: L1
+  title: Contradiction resolution
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:656
+  family: L
+  status: DECLARED
+- id: L2
+  title: Human Decision Gate package
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:662
+  family: L
+  status: DECLARED
+- id: L3
+  title: Gate presentation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:674
+  family: L
+  status: DECLARED
+- id: L4
+  title: Non-global blocking
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:681
+  family: L
+  status: DECLARED
+- id: M1
+  title: T0-T3 or equivalent capability tiers
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:689
+  family: M
+  status: DECLARED
+- id: M2
+  title: Reasoning requirement
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:695
+  family: M
+  status: DECLARED
+- id: M3
+  title: Role defaults
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:698
+  family: M
+  status: DECLARED
+- id: M4
+  title: Empirical routing
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:702
+  family: M
+  status: DECLARED
+- id: N1
+  title: Structured checkpoint
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:717
+  family: N
+  status: DECLARED
+- id: N2
+  title: Mandatory triggers
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:729
+  family: N
+  status: DECLARED
+- id: N3
+  title: Provider-independent checkpoint watchdog
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:739
+  family: N
+  status: DECLARED
+- id: N4
+  title: Worker return contract
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:744
+  family: N
+  status: DECLARED
+- id: O1
+  title: Product test families
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:751
+  family: O
+  status: DECLARED
+- id: O2
+  title: Governance test families
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:763
+  family: O
+  status: DECLARED
+- id: O3
+  title: Independent test authorship
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:782
+  family: O
+  status: DECLARED
+- id: O4
+  title: Governance suite currency
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:787
+  family: O
+  status: DECLARED
+- id: O5
+  title: Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:791
+  family: O
+  status: DECLARED
+- id: P1
+  title: Execution telemetry
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:814
+  family: P
+  status: DECLARED
+- id: P2
+  title: Organisational questions
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:829
+  family: P
+  status: DECLARED
+- id: Q1
+  title: Lesson lifecycle
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:844
+  family: Q
+  status: DECLARED
+- id: Q2
+  title: Decision vs lesson
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:854
+  family: Q
+  status: DECLARED
+- id: Q3
+  title: PROJECT/PRODUCT/FRAMEWORK scope
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:858
+  family: Q
+  status: DECLARED
+- id: Q4
+  title: Upstream Export Gate
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:861
+  family: Q
+  status: DECLARED
+- id: R1
+  title: Legacy Governance Retirement
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:872
+  family: R
+  status: DECLARED
+- id: R2
+  title: Chat-memory retirement
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:881
+  family: R
+  status: DECLARED
+- id: R3
+  title: Archive policy
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:887
+  family: R
+  status: DECLARED
+- id: S1
+  title: Canonical OS repo
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:896
+  family: S
+  status: DECLARED
+- id: S2
+  title: Immutable releases
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:900
+  family: S
+  status: DECLARED
+- id: S3
+  title: '`gov init`'
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:913
+  family: S
+  status: DECLARED
+- id: S4
+  title: '`gov adopt`'
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:921
+  family: S
+  status: DECLARED
+- id: S5
+  title: '`gov update`'
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:936
+  family: S
+  status: DECLARED
+- id: S6
+  title: Cross-machine mechanics
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:947
+  family: S
+  status: DECLARED
+- id: T1
+  title: Role separation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:956
+  family: T
+  status: DECLARED
+- id: T2
+  title: Fresh-session independence
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:967
+  family: T
+  status: DECLARED
+- id: T3
+  title: Adoption evidence tree
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:971
+  family: T
+  status: DECLARED
+- id: V1
+  title: Fault manifest
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1016
+  family: V
+  status: DECLARED
+- id: V2
+  title: Hidden path-map oracle
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1028
+  family: V
+  status: DECLARED
+- id: V3
+  title: Hidden memory oracle
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1038
+  family: V
+  status: DECLARED
+- id: V4
+  title: Quantitative qualification scoring
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1047
+  family: V
+  status: DECLARED
+- id: W1
+  title: Stable artefact identity
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1068
+  family: W
+  status: DECLARED
+- id: W2
+  title: Typed output → input contracts
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1082
+  family: W
+  status: DECLARED
+- id: W3
+  title: Mandatory task-input manifest
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1092
+  family: W
+  status: DECLARED
+- id: W4
+  title: Context compiler delivery proof
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1106
+  family: W
+  status: DECLARED
+- id: W5
+  title: Consumption receipt and implementation traceability
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1114
+  family: W
+  status: DECLARED
+- id: W6
+  title: Upstream-change staleness propagation
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1128
+  family: W
+  status: DECLARED
+- id: W7
+  title: Orphan/dead-output and unexplained-output detection
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1138
+  family: W
+  status: DECLARED
+- id: W8
+  title: Forward and reverse lineage
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1146
+  family: W
+  status: DECLARED
+- id: W9
+  title: Session/handoff continuity of mandatory inputs
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1154
+  family: W
+  status: DECLARED
+- id: W10
+  title: Deterministic mandatory inputs outrank retrieval
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1162
+  family: W
+  status: DECLARED
+- id: W11
+  title: Artifact-flow quantitative health
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1173
+  family: W
+  status: DECLARED
+- id: W12
+  title: Health-scheduler integration
+  requirement_class: ORIGINAL
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1185
+  family: W
+  status: DECLARED

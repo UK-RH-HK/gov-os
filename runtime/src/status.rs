@@ -75,8 +75,32 @@ pub fn status(p: &Project) -> Result<Value> {
     } else {
         "no runnable tasks: run readiness planning or discovery".into()
     };
+    // Signed Release Root v1: report the machine's release-trust posture honestly here too, so state
+    // reconstruction never presents a below-floor or unauthenticated installation as simply "installed".
+    // `framework.*` describes what the LOCK says; `release_trust.*` describes what was actually VERIFIED. Those
+    // are different predicates and are never merged (frozen R0 item 11).
+    let release_trust = crate::srr::state::MachineState::open()
+        .ok()
+        .map(|ms| {
+            let installed = crate::srr::state::InstalledRecord::load(&ms, crate::FRAMEWORK_NAME);
+            let degraded = crate::srr::breakglass::Degraded::load(&ms, crate::FRAMEWORK_NAME);
+            json!({
+                "posture": if ms.is_provisioned() { "PROVISIONED" } else { "UNPROVISIONED" },
+                "authenticity": installed.as_ref().map(|i| i.authenticity.clone())
+                    .unwrap_or_else(|| "UNKNOWN".into()),
+                "verified_release": installed.as_ref().map(|i| i.release_version.clone()),
+                "verified_payload_hash": installed.as_ref().map(|i| i.payload_hash.clone()),
+                "currency": "UNKNOWN_BETWEEN_INGRESSES",
+                "revocation_knowledge": "only revocations this machine has received; no claim about unseen or future revocations",
+                "marking": degraded.as_ref().map(|d| d.marking.clone()),
+                "below_floor": degraded.is_some(),
+                "detail": "gov trust status",
+            })
+        })
+        .unwrap_or(Value::Null);
     Ok(json!({
         "framework": {"name": lock["framework"], "version": lock["version"], "release_hash": lock["release_hash"], "cli_version": crate::CLI_VERSION, "installed_at": lock["installed_at"]},
+        "release_trust": release_trust,
         "project": {"name": p.project_name(), "alias": p.project_alias(), "root": p.root.display().to_string(), "commit": p.git_commit(), "branch": p.git_branch()},
         "control": ctl, "session": p.session_id, "role": p.role,
         "memory": {"runtime_present": p.db_path().exists(), "index_fresh": fr.fresh, "index_manifest_present": fr.manifest_present, "stale": fr.stale.len(), "added": fr.added.len(), "removed": fr.removed.len()},

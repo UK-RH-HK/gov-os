@@ -25,3 +25,10 @@ jsonschema.workspace = true
 thiserror.workspace = true
 anyhow.workspace = true
 libc = "0.2"
+ed25519-dalek.workspace = true
+hex.workspace = true
+
+[dev-dependencies]
+# TEST MATERIAL ONLY: signing capability for unit-test fixtures. `gov` itself never signs.
+ed25519-dalek = { version = "2", default-features = false, features = ["std", "rand_core"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
