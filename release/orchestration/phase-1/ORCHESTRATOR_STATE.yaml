@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T20:08:22Z'
-state_hash: 5eacea23eb0f697c0c29a6a6af91cbafa80e56540cb2edcc92bd39f70b1707af
+updated_at: '2026-09-17T20:46:09Z'
+state_hash: 0092e80d1c563e3d6cc940f62e4663a04d9d662f84457cfeb2e2d3bd1a0e7ceb
 lifecycle_state: AWAITING_OWNER_R0_TRADE_OFF
 loop_status: R0_REJECTED_CYCLE_0__AWAITING_OWNER_ANSWER_BEFORE_BOUNDED_CORRECTION   # CP-1 remains frozen
 
@@ -264,6 +264,11 @@ r0_findings_arch_0003:
       normative source and lifecycle are R0 under the frozen boundary 70977d11. The orchestrator issued no verdict and
       reclassified no finding; it verified the reviewer's own lifecycle labels against the frozen boundary.
     active_r0_repair_queue: [SRR-R0-H1, SRR-R0-M1]
+    owner_answered:
+      SRR-R0-L6: {answer: DEFER_TO_R1, record: OWNER-DECISION-0005, effect: stays non-blocking R1/R2; at R1 distinguish remotely acquired privileged plugins/tools from built-in/local tools; must not be raised as an R0 blocker}
+      SRR-R0-L7: {answer: NOT_NEEDED, record: OWNER-DECISION-0005, effect: offline/air-gapped install out of scope for the private/local profile; closed without architecture edit}
+      SRR-R0-H1: {answer: PENDING, gate: GATE-OWNER-R0-BELOW-FLOOR-RECOVERY}
+    owner_standing_direction: do not convert optional later-lifecycle assurance into an architecture blocker (OWNER-DECISION-0005)
     removed_from_active_queue_as_later_lifecycle:
       R1: [SRR-R0-L1, SRR-R0-L2, SRR-R0-L3, SRR-R0-L4, SRR-R0-L5, SRR-R0-L7]
       R1_R2: [SRR-R0-L6]
@@ -311,6 +316,7 @@ owner_gates:
     - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
     - {id: OWNER-DESIGN-REQUIREMENTS-0002, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml, classification: binding resolutions of OT-1 and OT-2 clarifying OP-7/OP-10/OP-13, not D-0008 approval}
     - {id: OWNER-DIRECTIVE-0003, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, classification: binding orchestration directive — freeze the RoT loop after the revision-7 verdict}
+    - {id: OWNER-DECISION-0005, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md, classification: binding answers to SRR-R0-L6 (defer to R1) and SRR-R0-L7 (not needed); SRR-R0-H1 trade-off still PENDING; not an R0 acceptance}
     - {id: OWNER-DIRECTIVE-0004, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md, classification: binding current owner decision — separate Signed Release Root lineage and R0/R1/R2/R3 boundary}
   architect_surfaced_owner_conflicts_r7:   # RESOLVED by the owner: OWNER-DESIGN-REQUIREMENTS-0002 (2026-09-14)
     - {id: OT-1, conflict: OP-13(b) offline media channel vs OP-7(a) 24-hour freshness for production install/update/rollback, interim: CP-1 applies the 24-hour bound to media}

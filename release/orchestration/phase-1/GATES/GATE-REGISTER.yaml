@@ -50,6 +50,22 @@ gates:
       not promote R1/R2/R3 hardening into R0 without owner approval
     satisfaction_evidence: null
 
+  - id: OWNER-DECISION-0005
+    title: Owner answers to the AR-0023 R0 review questions (SRR-R0-L6 deferred, SRR-R0-L7 not needed)
+    status: RECORDED
+    satisfier: product owner
+    classification: >-
+      binding owner answers to two non-blocking later-lifecycle questions; not an R0 acceptance and not an
+      implementation authorisation. The blocking SRR-R0-H1 trade-off is NOT answered by this record.
+    record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md
+    record_sha256: 3831cbf51d6f663299a3a338d85bd07bed662fd33e5392502d4f270ce87e36fa
+    effects:
+      - SRR-R0-L6 stays a non-blocking R1/R2 condition; at R1 the design distinguishes remotely acquired privileged plugins/tools from built-in/local tools
+      - SRR-R0-L7 closed as out of scope for the Phase-1 private/local profile; no architecture edit required
+      - standing direction - do not convert optional later-lifecycle assurance into an architecture blocker
+      - neither answer is routed into the bounded R0 correction delta
+    satisfaction_evidence: this record's commit
+
   - id: GATE-OWNER-R0-BELOW-FLOOR-RECOVERY
     title: Owner trade-off inside SRR-R0-H1 — below-floor recovery behaviour
     status: OPEN
