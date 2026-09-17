@@ -1,0 +1,215 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0026
+role: builder
+objective: >-
+  Implement the R0-accepted Signed Release Root architecture (ARCH-0003) at R1: signed metadata verified by a mature
+  reviewed cryptographic library, one verification policy across every privileged ingress, verified-byte binding with
+  atomic crash-safe staging and commit, durable monotonic high-water plus the signed minimum secure release enforced at
+  every backward-capable ingress, break-glass below-floor recovery per OWNER-DECISION-0006, the Contract v3 hash-bound
+  scaffolding and the carried R1 conditions - preserving D-0007 and every valid pre-RoT Governance OS capability.
+agent_model: claude-opus-5
+independence_statement: >-
+  Fresh isolated builder context. This run authored none of the prior Phase-1 records: not ARCH-0003, not the frozen
+  acceptance boundary, not OWNER-DECISION-0005 or 0006, not OWNER-DIRECTIVE-0004, not D-0007 or D-0009, and not the
+  AR-0023, AR-0024 or AR-0025 review or correction packs. It read, as normative input, the HO-0026 handoff, the frozen
+  boundary's R1 section, the accepted ARCH-0003 body, 00-ARCHITECTURE.md, 04-R0-CORRECTION-1.md, OWNER-DECISION-0006,
+  the R0 review packs (for the wording of the carried conditions only), the AGENT_RUNS README, the gate register and
+  the existing Rust workspace. Every digest named in HO-0026 was verified before use and all matched. It did not read,
+  list or search any session or agent transcript or task-output store, did not open or write user auto-memory, and did
+  not contact the product owner. It did not author, inspect or attempt to anticipate the independent R1 verifier's
+  held-out tests. It declares readiness only and issues no acceptance token.
+input:
+  base_commit: 1e31f6b5cb4e112d4ec86b45839e093c7b50d687
+  release: null
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0026-r1-signed-release-root-builder.md
+inspected:
+  - release/orchestration/phase-1/HANDOFFS/HO-0026-r1-signed-release-root-builder.md
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+  - release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md
+  - spec/architecture/ARCH-0003.yaml
+  - spec/architecture/ARCH-0003.yaml @ 2b36b440915f0052d92153748cea914846955418
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+  - release/orchestration/phase-1/GATES/GATE-REGISTER.yaml
+  - release/orchestration/phase-1/AGENT_RUNS/README.md
+  - release/orchestration/phase-1/AGENT_RUNS/AR-0026.run.yaml
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - release/root-of-trust/signed-release-root-v1-review-r0/00-REVIEW-REPORT.md
+  - release/root-of-trust/signed-release-root-v1-review-r0-2/00-REVIEW-REPORT.md
+  - runtime/src/ (kernel, kernel_trust, lock, init, adopt, update, recovery, release, authority, tools, capabilities)
+  - cli/src/main.rs
+  - tests/certification/
+produced:
+  - runtime/src/srr/mod.rs
+  - runtime/src/srr/crypto.rs
+  - runtime/src/srr/metadata.rs
+  - runtime/src/srr/state.rs
+  - runtime/src/srr/staging.rs
+  - runtime/src/srr/verifier.rs
+  - runtime/src/srr/breakglass.rs
+  - runtime/src/srr/plugins.rs
+  - runtime/src/srr/provision.rs
+  - runtime/src/contracts.rs
+  - framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+  - framework/contracts/governance-capability-acceptance.yaml
+  - framework/contracts/contract-source.lock
+  - framework/schemas/governance-capability-acceptance.schema.json
+  - tests/governance/capability-evidence-map.yaml
+  - docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+  - tests/certification/srr.rs
+  - tests/certification/srr_material.rs
+  - release/root-of-trust/signed-release-root-v1-r1-build/00-BUILD-REPORT.md
+  - release/root-of-trust/signed-release-root-v1-r1-build/01-REQUIREMENT-TO-CODE-MAP.md
+  - release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - release/root-of-trust/signed-release-root-v1-r1-build/REVIEWED-CONTENT-DIGESTS.txt
+tests_or_attacks:
+  - id: SRR-T01
+    description: A signed release is verified end to end; the installed bytes are the verified bytes and both floors advance.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T02
+    description: An unsigned source is refused once a trust anchor is provisioned (SRR_RELEASE_UNVERIFIED).
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T03
+    description: Wrong key, wrong product and wrong channel each fail closed.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T04
+    description: >-
+      Modified metadata, a signature made over a different document, a modified payload file, an unauthorised extra
+      payload file and a modified migration all fail closed.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T05
+    description: Expired metadata fails closed against the declared local clock.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T06
+    description: Replaying older metadata is refused by the protected high-water, and the refusal disturbs nothing.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T07
+    description: >-
+      The floor binds reinstall as well as rollback; a CLI flag alone is not break-glass authority; an owner-signed
+      recovery token admits the below-floor release, marks the machine DEGRADED - RECOVERY ONLY byte-exactly, lowers
+      no floor, refuses task/gate creation, permits inspection and repair, is single-use, and the marking clears only
+      on a release at or above both floors.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T08
+    description: >-
+      Break-glass never admits an inauthentic release, refuses a token signed by a non-recovery key, refuses a token
+      bound to different payload digests (SRR2-R1-C2) or to another machine, and consults no network.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T09
+    description: >-
+      Authority-bearing environment variables are refused; the protected-state override cannot relocate a provisioned
+      machine; a trust anchor inside the repository is refused; rewriting framework.lock cannot change the verified
+      release identity.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T10
+    description: >-
+      Root succession requires both the outgoing and incoming quorums, forbids version gaps and replays, and revokes
+      keys absent from the successor (SRR-R0-L1).
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T11
+    description: Protected floors survive governance/ deletion and whole-project deletion, and are still enforced (SRR2-R1-C3).
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T12
+    description: >-
+      Intact, authentic and admissible stay three separate predicates: D-0007 still detects installed-payload
+      tampering and still refuses mutating work, and the authenticity record neither changes nor excuses it.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T13
+    description: >-
+      An install interrupted inside the two-rename window is replayed to one complete valid version, and the replay
+      advances no protected floor (SRR-R0-L5).
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T14
+    description: >-
+      The Capability Contract v3 chain is hash-bound; an edited canonical import and a hand-edited compiled
+      representation are both hard failures.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-T15
+    description: >-
+      A privileged capability acquired from outside the verified payload and outside the governed project is refused
+      without a delegated signed target; a local-project capability is not (SRR-R0-L6).
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-U01
+    description: The DEGRADED - RECOVERY ONLY token is byte-exact with U+2014, asserted against its literal bytes.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: SRR-U02
+    description: The SRR2-R1-C1 exit policy requires both floors under the stricter reading (b).
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: REG-UNIT
+    description: Runtime unit suite (cargo test --lib) - 26 tests.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+  - id: REG-CERT
+    description: >-
+      Certification suite (cargo test --test certification) - 64 tests, of which the 49 pre-existing scenarios run
+      unmodified. No pre-existing failure existed or was introduced.
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/TEST-OUTPUT.txt
+findings:
+  - id: SRR-B1
+    severity: INFO
+    title: >-
+      Release floors are advanced only from a verified signed release, so a machine that has never been provisioned
+      enforces no release floor and makes no authenticity claim. Stated as an implementation choice with its residual.
+    path: release/root-of-trust/signed-release-root-v1-r1-build/00-BUILD-REPORT.md
+  - id: SRR-B2
+    severity: INFO
+    title: >-
+      The protected-state override is refused on a provisioned machine, but a process running as the owner can still
+      relocate HOME/XDG_STATE_HOME and move the default. ARCH-0003 section 1 places that process inside the trusted
+      boundary; recorded as a residual rather than concealed.
+    path: release/root-of-trust/signed-release-root-v1-r1-build/00-BUILD-REPORT.md
+  - id: SRR-B3
+    severity: INFO
+    title: >-
+      Expiry is a lexicographic comparison of RFC-3339 UTC strings at second precision against the declared local
+      clock. Correct for the emitted format; a producer using another offset or precision would need a real date parse.
+    path: release/root-of-trust/signed-release-root-v1-r1-build/00-BUILD-REPORT.md
+  - id: SRR-B4
+    severity: INFO
+    title: >-
+      Delegated signed targets are verified and enforced, but publisher-side tooling to issue one is not built, so a
+      privileged remotely acquired capability currently has no admission path. Deliberate scope limit, stated openly.
+    path: release/root-of-trust/signed-release-root-v1-r1-build/00-BUILD-REPORT.md
+  - id: SRR-B5
+    severity: INFO
+    title: >-
+      tests/certification/common.rs now gives each scenario its own XDG_STATE_HOME so each simulated machine has its
+      own protected state. Test isolation for a machine-scoped control; no assertion was weakened and no pre-existing
+      test was modified to make it pass.
+    path: release/root-of-trust/signed-release-root-v1-r1-build/00-BUILD-REPORT.md
+verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+output:
+  branch: phase1/srr1-r1-build
+  commit: 949c4d343a6d5f203534afa6e3363992fee12488
+  evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/
+unresolved:
+  - SRR2-R1-C1 / GATE-OWNER-R1-BREAK-GLASS-EXIT remains an open OWNER question. Implemented at the orchestrator's
+    interim stricter reading (b) as one isolated policy point in runtime/src/srr/breakglass.rs; adopting reading (a)
+    is a two-line change plus the EXIT_POLICY constant.
+  - SRR-R0-L7 (offline/air-gapped first install) is owner-closed and deliberately not implemented.
+  - Publisher-side issuance of delegated signed targets is not built (finding SRR-B4).
+  - R2 production signing and key custody are out of scope and were not performed (GATE-OWNER-KEY-CEREMONY).
+recommended_next_action: >-
+  Dispatch the fresh independent R1 candidate verifier against commit 949c4d343a6d5f203534afa6e3363992fee12488 on
+  branch phase1/srr1-r1-build, graded under the frozen R1 section, with independently authored held-out tests. Route
+  SRR2-R1-C1 to the product owner as a bounded yes/no question in parallel; it is non-blocking for R1 verification.
+completed_at: '2026-09-17T23:40:00Z'
