@@ -1,0 +1,36 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0020
+trigger: OWNER-DIRECTIVE-0004 adopts Signed Release Root rebase and opens fresh R0 architecture review
+date: 2026-09-17
+lifecycle_state: R0_ARCHITECTURE_READY_FOR_FRESH_REVIEW
+loop_status: REBASED_R0_REVIEW_PENDING
+repository:
+  integration_branch: release/4.1.6-rc1
+  head_before_rebase_record_commit: 09f8b4f13b76e19acef4612a0b985a14cfed350b
+owner_direction:
+  record: OWNER-DIRECTIVE-0004
+  record_sha256: 26243019d09e07617a63cf575c3e5e59cad307a7ac38100116dbbb3300f2a1ba
+  decision: D-0009
+  architecture: ARCH-0003
+  direction_token: ADOPT_A_TUF_STYLE_SIGNED_RELEASE_ROOT_WITH_PLATFORM_TRUSTED_BOOTSTRAP__KEEP_D0007_TRUST_DIRECTION__SEPARATE_PHASE1_RELEASE_CERTIFICATION_AND_OPTIONAL_HIGH_ASSURANCE_QUALIFICATION__RETIRE_CP1_AS_THE_PHASE1_TARGET
+current_state:
+  D-0007: ACTIVE
+  D-0008: PROVISIONAL / PROPOSED / not active / unchanged
+  ARCH-0002: PROVISIONAL / not active / unchanged
+  ARCH-0003: PROVISIONAL R0 candidate / not implemented
+  cp1: retained historical and high-assurance research; not Phase-1 target
+  runtime_kernel_cli_capabilities: unchanged from head_before_rebase_record_commit
+active_gate: GATE-R0-ARCH-ACCEPT
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+review_handoff: release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
+running_work: []
+next_deterministic_action: FRESH_R0_ARCHITECTURE_REVIEW_OF_ARCH_0003_AT_COMMITTED_REBASE_CANDIDATE
+prohibitions:
+  - no implementation before separately authorised post-R0 work
+  - no RoT-1 Revision 8 or CP-1 repair loop
+  - no D-0008/ARCH-0002 activation or mutation
+  - no D-0007 supersession/amendment during R0
+  - no historical evidence rewrite

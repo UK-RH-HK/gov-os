@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-14T21:48:51Z'
-state_hash: 48bedf8de0dd6b668b485e034b99d87bb20e5472521eb4f7e18daabfc5c5bad3
-lifecycle_state: PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
-loop_status: FROZEN   # OWNER-DIRECTIVE-0003; revision 7 was the final revision; no revision 8
+updated_at: '2026-09-17T17:09:10Z'
+state_hash: 02ad50b7d875c9e204a8e6be1f6bc83b89c83cebdde7c426d03c9dd2fdbca8f6
+lifecycle_state: R0_ARCHITECTURE_READY_FOR_FRESH_REVIEW
+loop_status: REBASED_R0_REVIEW_PENDING   # CP-1 remains frozen; separate ARCH-0003 lineage awaits fresh R0 review
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -35,12 +35,20 @@ lifecycle_states:
   - OS_RELEASE_CANDIDATE_ACCEPTED
   - PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
   - PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW   # terminal for this orchestration run per OWNER-DIRECTIVE-0003
+  - R0_ARCHITECTURE_READY_FOR_FRESH_REVIEW
+  - R0_ARCHITECTURE_REVIEW
+  - R0_ARCHITECTURE_ACCEPTED
+  - R1_IMPLEMENTATION
+  - R1_CANDIDATE_VERIFICATION
+  - R1_CANDIDATE_ACCEPTED
+  - R2_STANDARD_RELEASE_CERTIFICATION
+  - R3_OPTIONAL_HIGH_ASSURANCE_QUALIFICATION
 
 repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 3e1442eb8685e8eef26165fad3c1b8cfa2a1fb59
+  last_recorded_commit: 09f8b4f13b76e19acef4612a0b985a14cfed350b
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -55,17 +63,38 @@ baseline_rejected_release:
   evidence_path: release/verification/4.1.5
 
 governing_decisions:
-  active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, CIT-0001, ARCH-0001]
+  active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001]
   superseded: [D-0001]
-  proposed_not_active: [D-0008, ARCH-0002]   # file status PROVISIONAL; never described as active or approved before GATE-OWNER-D0008
-  d0008_fields_required_until_ratification: {status: PROVISIONAL, proposal_state: PROPOSED, human_approved: false}   # owner, OWNER-DESIGN-REQUIREMENTS-0001
-  d0007_active_until: GATE-OWNER-D0008 formal ratification of an independently accepted D-0008 package
-  owner_design_direction: {selected_design_target: Option C — RoT-1, not_supported_production_alternatives: [A, B, D, E, F], record: OWNER-DESIGN-REQUIREMENTS-0001}
-  architecture_acceptance_without_certified_target: allowed if the certification criterion is explicit, executable/testable and non-circular (OWNER-DESIGN-REQUIREMENTS-0002)
-  owner_approved_in_phase_1: []
+  proposed_not_active: [D-0008, ARCH-0002, ARCH-0003]
+  d0008_disposition: non-active CP-1 research evidence; unchanged; never owner-activated; no Revision 8
+  d0007_active_until: ARCH-0003 passes R0 and a later explicit transition record authorises amendment or supersession
+  owner_design_direction:
+    selected_design_target: compact TUF-style Signed Release Root with trusted platform/admin bootstrap
+    record: OWNER-DIRECTIVE-0004
+    token: ADOPT_A_TUF_STYLE_SIGNED_RELEASE_ROOT_WITH_PLATFORM_TRUSTED_BOOTSTRAP__KEEP_D0007_TRUST_DIRECTION__SEPARATE_PHASE1_RELEASE_CERTIFICATION_AND_OPTIONAL_HIGH_ASSURANCE_QUALIFICATION__RETIRE_CP1_AS_THE_PHASE1_TARGET
+  assurance_boundary: [R0 architecture, R1 implementation candidate, R2 standard release certification, R3 optional high-assurance qualification]
+  owner_approved_in_phase_1: [D-0009, OWNER-DIRECTIVE-0004]
+
+active_architecture_lineage:
+  name: Signed Release Root
+  short_name: SRR-1
+  decision: D-0009
+  architecture: ARCH-0003
+  status: PROVISIONAL_R0_REVIEW_CANDIDATE
+  in_effect: false
+  implemented: false
+  pack_path: release/root-of-trust/signed-release-root-v1
+  acceptance_boundary_path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  acceptance_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  op_disposition_path: release/root-of-trust/signed-release-root-v1/02-OP-1-OP-16-DISPOSITION.md
+  transition_map_path: release/root-of-trust/signed-release-root-v1/03-TRANSITION-MAP.md
+  review_handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
+  active_gate: GATE-R0-ARCH-ACCEPT
+  support_envelope: private/local owner-operated controlled machines and private repositories; trusted local OS/admin/bootstrap boundary
 
 architecture:
-  name: RoT-1
+  name: RoT-1 (historical CP-1 lineage; retired as Phase-1 target)
+  status: HISTORICAL_HIGH_ASSURANCE_RESEARCH
   target_release: 4.1.6
   pack_path: release/root-of-trust/4.1.6
   decision_paths: [spec/decisions/D-0008.yaml, spec/architecture/ARCH-0002.yaml, docs/DECISIONS.md]
@@ -194,7 +223,9 @@ architecture:
 
 unresolved_findings:
   source_path: release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md
-  routing: NOT ROUTED — loop frozen by OWNER-DIRECTIVE-0003 pending meta-architecture review
+  routing: >-
+    RETAINED AS CP-1/HIGH-ASSURANCE RESEARCH. Not automatically blocking for ARCH-0003; a fresh R0 reviewer may cite a
+    finding only after mapping it to the frozen R0 normative source and lifecycle.
   blocking_classes:
     BC7-1: {findings: [RV7-H1], remainder_of: BC6-2 x BC6-4, correction: CD7-1, fix: engineering}
     BC7-2: {findings: [RV7-H2], remainder_of: BC6-2 x R2-H2, correction: CD7-2, fix: engineering (owner already decided in OWNER-DESIGN-REQUIREMENTS-0002)}
@@ -219,12 +250,13 @@ known_non_blocking_residuals:
 
 owner_gates:
   pending: []
-  planned: [GATE-OWNER-D0008, GATE-OWNER-KEY-CEREMONY, GATE-OWNER-CAC-UPLOAD]
-  deferred_to_GATE-OWNER-D0008: [first-contact root composition T1-a..T1-d (BC5-1), common-mode build environment E-a..E-c (BC5-2)]   # now pre-selected by OWNER-DESIGN-REQUIREMENTS-0001 (OP-13(b), OP-16(b)); ratification still at GATE-OWNER-D0008
+  planned: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD, GATE-OWNER-KEY-CEREMONY, GATE-R1-CANDIDATE-ACCEPT, GATE-R2-STANDARD-RELEASE, GATE-R3-HIGH-ASSURANCE]
+  historical_refused: [GATE-ARCH-ACCEPT, GATE-OWNER-D0008]
   owner_inputs_recorded:
     - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
     - {id: OWNER-DESIGN-REQUIREMENTS-0002, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml, classification: binding resolutions of OT-1 and OT-2 clarifying OP-7/OP-10/OP-13, not D-0008 approval}
     - {id: OWNER-DIRECTIVE-0003, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, classification: binding orchestration directive — freeze the RoT loop after the revision-7 verdict}
+    - {id: OWNER-DIRECTIVE-0004, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md, classification: binding current owner decision — separate Signed Release Root lineage and R0/R1/R2/R3 boundary}
   architect_surfaced_owner_conflicts_r7:   # RESOLVED by the owner: OWNER-DESIGN-REQUIREMENTS-0002 (2026-09-14)
     - {id: OT-1, conflict: OP-13(b) offline media channel vs OP-7(a) 24-hour freshness for production install/update/rollback, interim: CP-1 applies the 24-hour bound to media}
     - {id: OT-2, conflict: OP-10(b) diverse bootstrapped compiler agreement not evidenced for the current compiler version, consequence: no target certifiable until evidenced}
@@ -252,8 +284,11 @@ prompt2:
   latest_verdict: null
 
 iteration:
-  architecture_revision_under_work: 7
+  architecture_revision_under_work: null
+  active_architecture_lineage: ARCH-0003
+  active_gate: R0
   architecture_review_cycle_under_phase_1: 5
+  signed_release_root_r0_review_cycle: 0
   implementation_repair_cycle: 0
 
 completed_stages:
@@ -311,10 +346,17 @@ completed_stages:
   - stage: PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
     commit: 3e1442eb8685e8eef26165fad3c1b8cfa2a1fb59
     note: Root-of-Trust revision loop frozen after revision 7 per OWNER-DIRECTIVE-0003; final evidence package CP-FINAL-ROT-LOOP-FROZEN
+  - stage: FORENSIC_META_REVIEW_COMPLETED
+    commit: 09f8b4f13b76e19acef4612a0b985a14cfed350b
+    note: Forensic meta-review completed; owner subsequently selected its Signed Release Root recommendation
+  - stage: R0_ARCHITECTURE_READY_FOR_FRESH_REVIEW
+    commit: this_governance_rebase_commit
+    note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
 running_work: []
 
 latest_role_verdicts:
+  signed-release-root-r0-reviewer: null
   rot-architect: ARCHITECTURE_REVISION_READY_FOR_REVIEW   # AR-0019, revision 7 (concrete profile CP-1)
   rot-reviewer-trust-security: BLOCKING_FINDINGS_PRESENT   # AR-0020, revision 7; 2 HIGH, 1 blocking MEDIUM
   rot-reviewer-compat-transaction: BLOCKING_FINDINGS_PRESENT   # AR-0021, revision 7; 1 HIGH
@@ -403,6 +445,8 @@ immutable_evidence:
     commit: fbd09d5
   - path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md
     commit: 30542e5a9450c260c9eee424104c4b41aba5ec08
+  - path: release/root-of-trust/meta-review
+    commit: 09f8b4f13b76e19acef4612a0b985a14cfed350b
 
 infrastructure:
   session_scratch_note: absolute scratch paths belong to the orchestrator session that created them; rebuild from the recorded commits when absent
@@ -415,15 +459,41 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
-frozen_context: >-
-  OWNER-DIRECTIVE-0003. The Root-of-Trust architecture loop is frozen after revision 7 (REJECTED, review 4c7735b).
-  No revision 8, no architecture author, no routing of findings, no implementation, key ceremony, Capability Contract,
-  Prompt 2, D-0008 activation or new owner options until a meta-architecture review outcome and explicit owner
-  instruction. Final evidence: release/orchestration/phase-1/CHECKPOINTS/CP-FINAL-ROT-LOOP-FROZEN.yaml and
-  release/orchestration/phase-1/ROT-1-FROZEN-EVIDENCE-PACKAGE.md.
+next_deterministic_action: FRESH_R0_ARCHITECTURE_REVIEW_OF_ARCH_0003_AT_COMMITTED_REBASE_CANDIDATE
+rebase_context: >-
+  OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
+  at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0
+  architecture review under the frozen boundary; implementation, key ceremony, R1 and D-0007 transition are not authorised.
 
-forbidden_until_gate:
+current_prohibitions:
+  - action: runtime, kernel, CLI, capability, migration or test implementation of ARCH-0003
+    until: GATE-R0-ARCH-ACCEPT is satisfied and the owner separately authorises R1 implementation
+  - action: creating RoT-1 revision 8 or resuming the CP-1 repair loop
+    until: never under OWNER-DIRECTIVE-0004
+  - action: activating or mutating D-0008/ARCH-0002, or rewriting RoT-1/review evidence
+    until: never under OWNER-DIRECTIVE-0004
+  - action: superseding or amending D-0007
+    until: ARCH-0003 passes R0 and a later explicit transition record authorises the exact change
+  - action: treating R1 implementation detail, R2 certification evidence or R3 high-assurance criteria as an R0 blocker
+    until: an exact R0 normative source applies or the product owner adopts the expansion
+  - action: selecting constitutional expiry durations
+    until: the applicable operational profile is selected and qualified at the proper later gate
+  - action: production private-key creation or key ceremony
+    until: GATE-OWNER-KEY-CEREMONY at R2
+  - action: reconstructing or inventing Capability Acceptance Contract content
+    until: never (owner upload only, GATE-OWNER-CAC-UPLOAD)
+  - action: orchestrator or builder issuing an independent R0/R1/R2 verdict
+    until: never
+  - action: exposing held-out verifier tests to a builder before verdict
+    until: that verifier's verdict is committed
+  - action: modifying release/verification/**, release/root-of-trust/*-review*/**, release/releases/** or prior kernel payloads
+    until: never
+  - action: writing held-out verifier test content, in-progress verdicts or unreviewed findings into user auto-memory
+    until: never
+  - action: any role reading/listing/searching session or agent transcript/task-output stores
+    until: never
+
+historical_cp1_forbidden_until_gate:
   - action: runtime, kernel, CLI, migration or test implementation of RoT-1
     until: GATE-OWNER-D0008
   - action: describing D-0008 or ARCH-0002 as active, approved or accepted

@@ -1,0 +1,135 @@
+id: ARCH-0003
+type: architecture
+title: "PROVISIONAL R0 CANDIDATE — Signed Release Root v1 (TUF-style metadata, platform/admin bootstrap, uniform lifecycle verification)"
+status: PROVISIONAL
+proposal_state: R0_REVIEW_CANDIDATE
+approval_state: OWNER_DIRECTION_APPROVED
+review_state: PENDING_FRESH_R0_ARCHITECTURE_REVIEW
+in_effect: false
+state_class: NARRATIVE
+created: "2026-09-17"
+updated: "2026-09-17"
+owner_role: human
+human_approved: false
+direction_human_approved: true
+tags: [root-of-trust, signed-release-root, tuf-style, r0-candidate, private-local-profile, not-implemented]
+governed_by: [D-0002, D-0007, D-0009, OWNER-DIRECTIVE-0004]
+depends_on: [ARCH-0001]
+affects: [ARCH-0001, API-0001, API-0002]
+summary: >
+  New architecture lineage, separate from RoT-1/CP-1. A trusted platform or administrator installs a small verifier and
+  public root metadata; standard signed root/delegation and release/targets metadata authenticate every privileged
+  lifecycle ingress; verified bytes move through private staging into an atomic install with protected monotonic
+  high-water; installed-kernel integrity remains a separate D-0007 control. This record is owner-directed but not yet
+  R0-accepted, active or implemented.
+body: |
+  ## 1. Mission and support envelope
+
+  This architecture protects, and does not replace, the Governance OS defined by ARCH-0001 and Contract v3. Phase 1 is
+  private, locally hosted and operated by the product owner on controlled machines and private repositories. R0 assumes
+  the local OS, administrator and bootstrap installation boundary are uncompromised. It does not claim protection from
+  a hostile administrator/OS, public multi-tenant isolation, absolute compiler correctness or knowledge of revocations
+  that an offline machine has never received.
+
+  ## 2. Trust domains
+
+  Release authenticity, local installation authority, post-install integrity, build provenance, release certification,
+  project policy, plugins/retrieval profiles and organizational custody are separate domains. Evidence may connect
+  domains by digest, but no domain silently substitutes for another.
+
+  ## 3. Trust chain
+
+  1. An already trusted OS/admin boundary installs the bootstrap package.
+  2. The bootstrap package contains the verifier, public root metadata and publisher/product identity; no private key.
+  3. Root metadata defines trusted public keys, thresholds, roles, version and expiry.
+  4. Root delegates standard release/targets, snapshot and timestamp roles.
+  5. Release/targets metadata binds the exact release identity and payloads.
+  6. One verifier evaluates the same policy for init, adopt, update, reinstall, rollback and recovery.
+  7. Verified bytes are held in private staging and installed atomically from the measured representation.
+  8. Protected local state records the highest valid metadata and minimum secure release observed.
+  9. Post-install D-0007 integrity checks verify the installed kernel separately from source authenticity.
+
+  ## 4. Metadata and identity
+
+  Use a mature TUF-style metadata model and reviewed cryptographic library. R0 fixes the semantics, not a particular
+  library version, algorithm or expiry duration; those are selected and qualified at R1/R2.
+
+  Signed release/targets metadata binds at minimum product/repository identity, release version and monotonic sequence,
+  supported platform/architecture, exact kernel/CLI/payload digests, schema and migration identities, minimum secure
+  release, metadata version/expiry and optional digest references to provenance, SBOM, verification and certification
+  evidence. Snapshot metadata binds one consistent metadata set. Timestamp metadata supplies short-lived freshness for
+  trust-changing operations. Root metadata authorises delegation, threshold, rotation and revocation.
+
+  The distribution-root target retains three offline root keys at 2-of-3. Standard delegated release/targets threshold
+  signing replaces the bespoke registration protocol. Snapshot and timestamp keys are restricted to their standard
+  purposes and cannot authorise new target bytes. Exact production custody and signing services are R2 matters.
+
+  ## 5. Bootstrap
+
+  Bootstrap authenticity comes from the pre-existing controlled platform/admin installation boundary. It is not derived
+  from the candidate source, its manifest, its lock, its Git repository or mutually consistent files delivered with it.
+  Alternative enterprise/MDM/manual-fingerprint/high-assurance profiles may be added later; their absence does not block
+  this private/local R0 profile.
+
+  ## 6. Uniform ingress and verified-byte transaction
+
+  Every privileged lifecycle adapter must call one verification policy and receive a typed authenticated-release value,
+  never a raw source directory. Project records and CLI/environment claims are inputs or requests, never authority.
+
+  The future installer must open/read into private staging, verify the exact staged representation, install from that
+  representation, commit atomically, verify the committed bytes and durably update high-water/journal state. Failure or
+  crash must produce the old valid installation or the complete new valid installation, never a trusted mixed state.
+  Detailed filesystem mechanisms and tests belong to R1; the invariant is R0-normative.
+
+  ## 7. Rollback, freshness and revocation
+
+  Clients persist the highest valid root/metadata versions and minimum secure release they have observed. Rollback below
+  those floors is refused. Root has long expiry; release/targets moderate expiry; snapshot shorter expiry; timestamp short
+  refresh/expiry appropriate to trust-changing operations. Durations are profile parameters, not constitutional values.
+
+  Expired/stale metadata blocks trust-changing lifecycle operations according to policy. It does not automatically brick
+  an already authenticated installed Governance OS. A known revoked binary is limited to inspection, export, recovery
+  and uninstall and cannot perform privileged governance work. Offline clients report currency stale/unknown and never
+  claim knowledge of unseen revocations.
+
+  ## 8. Local authority, CI and multiple machines
+
+  Interactive trust changes use local administrator/Human Gate authority. Repository gate records remain requests.
+  Headless CI and additional machines are provisioned outside the project repository with the verifier, public root
+  metadata and protected machine/workload policy. Ephemeral runners verify their pinned release and obtain current
+  metadata before privileged lifecycle work. Persistent machines maintain protected local high-water. Environment
+  variables, repository files and caller/model/plugin claims cannot manufacture trust or approval.
+
+  ## 9. Project, plugin and retrieval boundaries
+
+  A project may pin the authenticated release identity it requires and may strengthen protected policy floors. It cannot
+  establish or weaken the distribution root. Plugins and retrieval profiles remain governed executables: their bytes and
+  descriptor identity are bound through kernel-owned registration/policy and may additionally be distributed through
+  delegated signed targets. Descriptors cannot self-authorise. Gate W, G0-G6 and the Development Knowledge Fabric are
+  unchanged product capabilities.
+
+  ## 10. Assurance separation
+
+  R0 accepts this architecture and its stated assumptions. R1 tests an exact implementation candidate. R2 certifies an
+  exact standard release. R3 optionally evaluates reproducible-build quorum, DDC/diverse bootstrap, multiple first-contact
+  sources, supplier independence and enhanced ceremonies. Build provenance and certification evidence inform release
+  eligibility but do not replace release signatures as the client distribution root.
+
+  ## 11. D-0007 and CP-1 transition
+
+  D-0007 remains ACTIVE through R0 and transition. Its trust-direction, policy-precedence, Human Gate, plugin/exception,
+  post-install integrity and typed-refusal rules are preserved. Its manifest/lock cannot establish first-install
+  authenticity. D-0008, ARCH-0002 and RoT-1 revisions 1-7 are retained unchanged as historical/high-assurance research,
+  not incorporated by reference as Phase-1 requirements.
+
+  ## 12. R0 review object
+
+  The R0 reviewer evaluates this record together with D-0009 and the frozen acceptance boundary in
+  release/root-of-trust/signed-release-root-v1/. R0 acceptance does not activate implementation. A blocking finding must
+  trace to a matching R0 normative source and lifecycle; stronger assurance proposals are non-blocking until owner-adopted.
+
+  ## 13. Non-goals
+
+  No RoT-1 Revision 8; no universal mutable Trust State; no bespoke first-install admitter; no C0-C3 calculus; no complete
+  selector/establishing-party register; no R0 DDC, supplier-diversity or reproduction quorum; no public/cloud hostile-admin
+  assurance; no redesign of unrelated Governance OS capabilities.

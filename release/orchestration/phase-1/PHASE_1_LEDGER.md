@@ -882,3 +882,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit adding these records |
 | Findings | — |
 | Next action | `PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW` |
+
+## L-0062 — 2026-09-17 — owner adopts Signed Release Root rebase; fresh R0 review opened
+
+| Field | Value |
+|---|---|
+| Iteration | new Signed Release Root lineage, before R0 review |
+| Role | product owner (decision); governance recorder (records only) |
+| Input commit | `09f8b4f13b76e19acef4612a0b985a14cfed350b` (completed forensic meta-review) |
+| Work performed | Recorded OWNER-DIRECTIVE-0004 and active owner decision D-0009. Created separate provisional architecture lineage ARCH-0003 and `release/root-of-trust/signed-release-root-v1/`, including frozen R0/R1/R2/R3 boundary, owner OP-1…OP-16 dispositions and transition map. Retired CP-1 as the Phase-1 target without changing D-0008/ARCH-0002 or creating Revision 8. Preserved D-0007 ACTIVE. Updated the durable gate/state path and prepared HO-0023 for a fresh R0 reviewer. No implementation or review performed. |
+| Report / evidence | `GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md`; `spec/decisions/D-0009.yaml`; `spec/architecture/ARCH-0003.yaml`; `release/root-of-trust/signed-release-root-v1/`; `CHECKPOINTS/CP-0020.yaml`; `HANDOFFS/HO-0023-signed-release-root-r0-review.md` |
+| Verdict | — (owner direction and architecture preparation, not an R0 verdict) |
+| Output commit | the single governance/architecture rebase commit containing this entry |
+| Findings | none; historical RoT-1 findings remain evidence and are not automatically R0 blockers |
+| Next action | `FRESH_R0_ARCHITECTURE_REVIEW_OF_ARCH_0003_AT_COMMITTED_REBASE_CANDIDATE` |

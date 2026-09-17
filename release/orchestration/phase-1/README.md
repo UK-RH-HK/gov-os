@@ -1,8 +1,9 @@
 # Governance OS — Phase 1 orchestration control record
 
-This directory is the durable, repository-held memory of the Phase 1 convergence loop. The loop runs from the rejected
-RoT-1 revision 2 to one independently accepted release candidate (`OS_RELEASE_CANDIDATE_ACCEPTED`). It holds no product
-source, no evidence of its own, and no hidden reasoning. It holds only:
+This directory is the durable, repository-held memory of Phase 1. The historical CP-1/RoT-1 revision loop is frozen at
+revision 7. OWNER-DIRECTIVE-0004 rebased the active path to the separate Signed Release Root lineage (D-0009/ARCH-0003),
+whose next action is fresh R0 architecture review. This directory holds no product source, no evidence of its own, and no
+hidden reasoning. It holds only:
 - facts and decisions;
 - references to independent evidence and commits;
 - verdicts;
@@ -47,3 +48,8 @@ Never restart Phase 1 from memory. If `verify` fails, reconcile Git and the reco
 - Owner gates are presented to the product owner and never answered on their behalf.
 - The Capability Acceptance Contract is supplied by the owner and never reconstructed.
 - Nothing here certifies a release, starts Phase 2 or pushes a stable release.
+- CP-1/RoT-1 receives no Revision 8; its evidence remains immutable and it is not the active Phase-1 target.
+- R0 architecture acceptance, R1 candidate acceptance, R2 standard release certification and optional R3
+  high-assurance qualification are separate gates.
+- A review finding blocks only the gate whose normative source and lifecycle it matches; stronger proposals require
+  owner adoption.

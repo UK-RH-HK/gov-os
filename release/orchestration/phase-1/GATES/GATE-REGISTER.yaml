@@ -1,45 +1,61 @@
-# Phase 1 hard gates. A gate advances only when every precondition holds and the satisfaction evidence is committed.
-# status: NOT_OPEN (preconditions unmet) | OPEN (awaiting its satisfier) | SATISFIED | REFUSED
+# Phase 1 hard gates. A gate advances only when every precondition holds and satisfaction evidence is committed.
+# status: NOT_OPEN | OPEN | SATISFIED | REFUSED; owner records use RECORDED.
 schema: governance-os.phase-1.gate-register
 schema_version: 1
 gates:
   - id: GATE-ARCH-ACCEPT
-    title: Independent acceptance of the root-of-trust architecture
-    status: OPEN
-    frozen_by: OWNER-DIRECTIVE-0003
-    last_verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED on revision 7 (review 4c7735b); loop frozen pending meta-architecture review
-    satisfier: fresh independent architecture synthesis reviewer (role rot-review-synthesis)
-    preconditions:
-      - architecture revision committed on release/4.1.6-rc1 with a typed architect report
-      - reviewer B (trust/security) and reviewer C (compatibility/transaction) reports committed, authored independently
-      - synthesis reviewer authored additional held-out architecture attacks
-    satisfied_when: synthesis verdict ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED on an exact architecture commit
-    on_refusal: commit evidence; hand completed findings to a fresh architect for the next revision
+    title: Historical CP-1 / RoT-1 architecture acceptance gate
+    status: REFUSED
+    last_verdict: ROOT_OF_TRUST_ARCHITECTURE_REJECTED on revision 7 (review 4c7735b)
+    disposition: >-
+      CP-1 retired as the Phase-1 target by OWNER-DIRECTIVE-0004. Evidence retained; no Revision 8 and no routing into
+      the former repair loop.
     satisfaction_evidence: null
 
   - id: GATE-OWNER-D0008
-    title: Human Decision Gate — D-0008 root of trust and owner options
-    status: NOT_OPEN
-    satisfier: product owner (never an agent, never the orchestrator)
-    preconditions: [GATE-ARCH-ACCEPT]
-    decision_package_scope:
-      - proposed D-0008 and ARCH-0002
-      - OP-1..OP-6 and OP-7 (stateless verifier currency) and any later options
-      - key custody and key ceremony
-      - first-machine trust behaviour
-      - uncertified and candidate behaviour
-      - production update and install gating
-      - material usability consequences
-    satisfied_when: owner answers recorded verbatim in GATES/ and the approved decision recorded in a separate commit
+    title: Historical Human Decision Gate — D-0008 / CP-1
+    status: REFUSED
+    satisfier: product owner
+    disposition: >-
+      The owner did not activate D-0008. OWNER-DIRECTIVE-0004 selected D-0009/ARCH-0003 as a separate lineage and
+      retained D-0008/ARCH-0002 as non-active research evidence.
+    satisfaction_evidence: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md
+
+  - id: GATE-R0-ARCH-ACCEPT
+    title: R0 — independent acceptance of Signed Release Root architecture ARCH-0003
+    status: OPEN
+    satisfier: fresh independent R0 architecture reviewer
+    preconditions:
+      - D-0009 is ACTIVE and human-approved
+      - ARCH-0003 and release/root-of-trust/signed-release-root-v1 are committed as one exact review candidate
+      - frozen acceptance boundary is committed and hashable
+      - D-0007 remains ACTIVE; D-0008 and ARCH-0002 remain non-active and unchanged
+      - runtime/kernel/CLI/capability implementation is unchanged
+    reviewed_inputs:
+      - spec/decisions/D-0009.yaml
+      - spec/architecture/ARCH-0003.yaml
+      - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+      - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+      - release/root-of-trust/signed-release-root-v1/02-OP-1-OP-16-DISPOSITION.md
+      - release/root-of-trust/signed-release-root-v1/03-TRANSITION-MAP.md
+    frozen_contract_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+    satisfied_when: >-
+      fresh reviewer returns ROT_ARCHITECTURE_ACCEPTED_R0 for the exact committed candidate under the frozen R0
+      contract, with no unresolved R0 CRITICAL/HIGH and no R0 MEDIUM requiring architecture change
+    on_refusal: >-
+      record findings with source, provenance and lifecycle; do not implement, do not create RoT-1 Revision 8 and do
+      not promote R1/R2/R3 hardening into R0 without owner approval
     satisfaction_evidence: null
-    owner_design_requirements: OWNER-DESIGN-REQUIREMENTS-0001 (binding design inputs pre-selecting OP-1..OP-16 and scope; formal ratification still required here)
 
   - id: GATE-OWNER-KEY-CEREMONY
-    title: Trust-anchor and key-ceremony actions that cannot be delegated
+    title: R2 production trust-anchor and key-custody ceremony
     status: NOT_OPEN
-    satisfier: product owner / key custodians
-    preconditions: [GATE-OWNER-D0008]
-    constraint: private key material never enters the repository, an agent context or a log; only public anchors, fingerprints and ceremony transcripts
+    satisfier: product owner / authorised key custodians
+    preconditions: [GATE-R1-CANDIDATE-ACCEPT]
+    constraint: >-
+      private key material never enters the repository, an agent context or a log; repository evidence contains only
+      public anchors, fingerprints and appropriately redacted ceremony records
+    lifecycle: R2
     satisfaction_evidence: null
 
   - id: GATE-OWNER-CAC-UPLOAD
@@ -53,67 +69,99 @@ gates:
     satisfaction_evidence: null
 
   - id: GATE-BUILDER-READY
-    title: READY_FOR_INDEPENDENT_OS_VERIFICATION
+    title: R1 builder readiness — READY_FOR_INDEPENDENT_OS_VERIFICATION
     status: NOT_OPEN
     satisfier: builder (declares readiness only; never acceptance)
-    preconditions: [GATE-OWNER-D0008, GATE-OWNER-CAC-UPLOAD]
-    satisfied_when: exact candidate commit and tag recorded; full builder regression (unit, certification, plugin, migration, trust, capability, Gate W, G0-G6) evidence committed
+    preconditions: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD]
+    satisfied_when: >-
+      exact candidate commit and tag recorded; full builder regression evidence committed for product capabilities,
+      Signed Release Root, plugin/migration/trust controls, Gate W and G0-G6
     satisfaction_evidence: null
 
-  - id: GATE-P2-ACCEPT
-    title: Independent Prompt 2 verification
+  - id: GATE-R1-CANDIDATE-ACCEPT
+    legacy_alias: GATE-P2-ACCEPT
+    title: R1 — fresh independent acceptance of the Phase-1 implementation candidate
     status: NOT_OPEN
-    satisfier: fresh Prompt 2 synthesis verifier (role prompt2-synthesis) only
+    satisfier: fresh independent candidate-verification process only
     preconditions:
       - GATE-BUILDER-READY
-      - verifier A (architecture/security) and verifier B (capability/memory/workflow) reports committed with fresh held-out tests
-      - prior verifier harnesses rerun unchanged
-    satisfied_when: synthesis verdict OS_RELEASE_CANDIDATE_ACCEPTED for one exact immutable candidate
-    on_refusal: commit evidence; classify; fresh repair builder; next patch candidate; fresh verifiers; architectural HIGH/CRITICAL class routes back to GATE-ARCH-ACCEPT loop
+      - architecture/security and capability/memory/workflow evidence with fresh held-out tests
+      - prior relevant verifier harnesses rerun unchanged
+    satisfied_when: >-
+      verdict ROT_PHASE1_CANDIDATE_ACCEPTED_R1 for one exact immutable candidate under the frozen R1 contract
+    on_refusal: >-
+      record and classify every finding by provenance/lifecycle; implementation defects return to a bounded R1 repair;
+      a genuine R0 defect reopens GATE-R0-ARCH-ACCEPT; owner approval is required for expanded requirements
+    satisfaction_evidence: null
+
+  - id: GATE-R2-STANDARD-RELEASE
+    title: R2 — Standard Release Certification
+    status: NOT_OPEN
+    satisfier: fresh independent release-certification process plus owner release authority
+    preconditions: [GATE-R1-CANDIDATE-ACCEPT, GATE-OWNER-KEY-CEREMONY]
+    satisfied_when: >-
+      ROT_STANDARD_RELEASE_CERTIFIED_R2 for one exact release, target and profile with production signatures/custody,
+      two independent verification records, platform lifecycle tests, private publication smoke, rotation/revocation
+      drill, SBOM/licences/provenance, current capability evidence and applicable Gate W/G6 qualification
+    satisfaction_evidence: null
+
+  - id: GATE-R3-HIGH-ASSURANCE
+    title: R3 — Optional High-Assurance Platform Qualification
+    status: NOT_OPEN
+    optional: true
+    satisfier: independently governed high-assurance qualification process
+    preconditions: [GATE-R2-STANDARD-RELEASE]
+    satisfied_when: >-
+      the named target/profile meets the owner-adopted R3 criteria for reproduction, toolchain/bootstrap, first-contact,
+      supplier independence, compromise testing, organizational audit and extended ceremonies
+    when_unsatisfied: STANDARD RELEASE — HIGH-ASSURANCE TOOLCHAIN PROFILE NOT CERTIFIED
+    note: non-satisfaction does not invalidate R0, R1, R2 or the normal Governance OS product
     satisfaction_evidence: null
 
   - id: GATE-PHASE1-COMPLETE
     title: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
     status: NOT_OPEN
-    satisfier: orchestrator, after GATE-P2-ACCEPT, by writing the final checkpoint
-    preconditions: [GATE-P2-ACCEPT]
-    note: does not certify, push, or start Phase 2; the owner runs an external acceptance audit
+    satisfier: orchestrator, after GATE-R1-CANDIDATE-ACCEPT, by writing the final checkpoint
+    preconditions: [GATE-R1-CANDIDATE-ACCEPT]
+    note: does not itself certify R2, qualify R3, publish a stable release or start product adoption
     satisfaction_evidence: null
 
   - id: OWNER-DESIGN-REQUIREMENTS-0001
-    title: Product-owner design requirements for RoT-1 revision 7 (owner-initiated)
+    title: Historical product-owner design requirements for CP-1 revision 7
     status: RECORDED
     satisfier: product owner
-    classification: binding design inputs; NOT approval, activation or ratification of D-0008
+    classification: binding for the historical CP-1/revision-7 target; superseded as current Phase-1 direction by OWNER-DIRECTIVE-0004
     record_paths: [release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml]
-    effects:
-      - revision 7 (single concrete certified profile) follows the revision-6 synthesis whatever its verdict, unless the orchestrator proves accepted revision 6 already implements these exact requirements without architectural change
-      - D-0008 keeps status PROVISIONAL, proposal_state PROPOSED, human_approved false; D-0007 stays ACTIVE until GATE-OWNER-D0008 ratification
-      - selected parameters are not reopened unless an independent reviewer identifies a genuinely new owner trade-off
-    satisfaction_evidence: this record's commit
+    satisfaction_evidence: historical record commit
 
   - id: OWNER-DESIGN-REQUIREMENTS-0002
-    title: Product-owner resolutions of OT-1 (offline media vs 24-hour freshness) and OT-2 (toolchain assurance) for CP-1 / revision 7
+    title: Historical product-owner resolutions of OT-1 and OT-2 for CP-1 revision 7
     status: RECORDED
     satisfier: product owner
-    classification: binding owner resolutions clarifying OP-7, OP-10, OP-13 of OWNER-DESIGN-REQUIREMENTS-0001; NOT approval, activation or ratification of D-0008
+    classification: binding for the historical CP-1/revision-7 target; superseded as current Phase-1 direction by OWNER-DIRECTIVE-0004
     record_paths: [release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml]
-    effects:
-      - OT-1 and OT-2 are resolved owner requirements; reviewers B, C and synthesis attack the resulting concrete design
-      - immutable first-contact identity (both channels, media allowed) is distinct from mutable trust-state freshness, which stays OP-7(a) 24h and fail-closed to the bounded diagnostic level
-      - all targets stay NOT CERTIFIED until an explicit, executable, non-circular trusting-trust evidence criterion is met; no interim exception, no upstream-archive fallback
-      - architecture acceptance does not require a certified target, provided that criterion is explicit, executable/testable and non-circular
-    satisfaction_evidence: this record's commit
+    satisfaction_evidence: historical record commit
 
   - id: OWNER-DIRECTIVE-0003
     title: Freeze the Root-of-Trust revision loop after Revision 7
     status: RECORDED
     satisfier: product owner
-    classification: binding orchestration directive; not an architecture verdict, not D-0008 approval, not an owner option
+    classification: binding historical freeze; its prohibition on Revision 8 and CP-1 repair remains in force
     record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md
     record_sha256: b1b3aa1feace9d796373d2b795954fac79e745a86aab725b4b5ad669254df308
+    satisfaction_evidence: historical record commit
+
+  - id: OWNER-DIRECTIVE-0004
+    title: Adopt the Signed Release Root rebase and R0/R1/R2/R3 assurance separation
+    status: RECORDED
+    satisfier: product owner
+    classification: binding current owner architecture and assurance-boundary decision
+    record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md
+    record_sha256: 26243019d09e07617a63cf575c3e5e59cad307a7ac38100116dbbb3300f2a1ba
     effects:
-      - complete only in-flight revision-7 work (reviewer B evidence preserved, reviewer C finishes, planned synthesis reviewer runs, final verdict recorded)
-      - no revision 8, no further architecture author; rejected findings recorded but not routed; acceptance recorded but no implementation or D-0008 activation
-      - final durable checkpoint, then next action PHASE_1_ROOT_OF_TRUST_LOOP_FROZEN_PENDING_META_ARCHITECTURE_REVIEW
+      - D-0009 ACTIVE; ARCH-0003 is the separate provisional R0 candidate
+      - D-0007 remains ACTIVE during transition
+      - D-0008/ARCH-0002 and RoT-1 revisions 1-7 retained as non-active historical/high-assurance research
+      - CP-1 retired as Phase-1 target; no Revision 8 or resumed repair loop
+      - next deterministic action is fresh R0 review, not implementation
     satisfaction_evidence: this record's commit
