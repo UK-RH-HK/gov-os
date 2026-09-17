@@ -171,7 +171,12 @@ gates:
 
   - id: GATE-BUILDER-READY
     title: R1 builder readiness — READY_FOR_INDEPENDENT_OS_VERIFICATION
-    status: OPEN
+    status: SATISFIED
+    satisfied_by: AR-0026 (builder declares readiness only, never acceptance)
+    candidate_commit: 229d1543be0357b52f7c7e6405918171bc8e6631
+    candidate_tag: srr1-r1-candidate-1
+    builder_work_commit: 949c4d343a6d5f203534afa6e3363992fee12488
+    regression_reproduced_by_orchestrator: cargo test --lib 26 passed 0 failed; cargo test --test certification 64 passed 0 failed
     satisfier: builder (declares readiness only; never acceptance)
     preconditions: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD]
     satisfied_when: >-
@@ -182,7 +187,7 @@ gates:
   - id: GATE-R1-CANDIDATE-ACCEPT
     legacy_alias: GATE-P2-ACCEPT
     title: R1 — fresh independent acceptance of the Phase-1 implementation candidate
-    status: NOT_OPEN
+    status: OPEN
     satisfier: fresh independent candidate-verification process only
     preconditions:
       - GATE-BUILDER-READY

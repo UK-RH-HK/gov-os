@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T21:39:42Z'
-state_hash: 4272ae6f1f411c56aeffb9bbb5bb16b9fb38dca4cf4ceed6d3b4b8a1d95d0b0f
-lifecycle_state: R1_IMPLEMENTATION
-loop_status: R0_ACCEPTED__R1_BUILD_RUNNING   # CP-1 remains frozen; R0 correction cycle spent and closed
+updated_at: '2026-09-17T22:38:28Z'
+state_hash: 63febe0880e0cb9b0e7af722a999cb5ef45e91f254def13721d08e3f2574b155
+lifecycle_state: R1_CANDIDATE_VERIFICATION
+loop_status: R1_VERIFICATION_RUNNING_ON_CANDIDATE_1
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 7858b6d7ce750ebcd2e2e3acbb48101eebd917d5
+  last_recorded_commit: 229d1543be0357b52f7c7e6405918171bc8e6631
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -408,8 +408,17 @@ root_of_trust_key_ceremony:
 
 release_candidate:
   next_version: 4.1.6
-  latest: null
-  candidates: []
+  latest: srr1-r1-candidate-1
+  candidates:
+    - id: srr1-r1-candidate-1
+      commit: 229d1543be0357b52f7c7e6405918171bc8e6631
+      tag: srr1-r1-candidate-1
+      builder_run: AR-0026
+      builder_work_commit: 949c4d343a6d5f203534afa6e3363992fee12488
+      status: AWAITING_INDEPENDENT_R1_VERIFICATION
+      accepted: false
+      certified: false
+      released: false
 
 prompt2:
   status: NOT_STARTED
@@ -489,15 +498,15 @@ completed_stages:
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
 running_work:
-  - run_id: AR-0026
-    role: builder
+  - run_id: AR-0027
+    role: verifier-a
     status: RUNNING
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0026.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0026-r1-signed-release-root-builder.md
-    base_commit: 7858b6d7ce750ebcd2e2e3acbb48101eebd917d5
-    branch: phase1/srr1-r1-build
-    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0026.report.yaml
-    gate: GATE-BUILDER-READY
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0027.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0027-r1-candidate-verification.md
+    base_commit: 229d1543be0357b52f7c7e6405918171bc8e6631
+    branch: phase1/srr1-r1-verify
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0027.report.yaml
+    gate: GATE-R1-CANDIDATE-ACCEPT
 
 
 
@@ -607,7 +616,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: COMPLETE_AR_0026_R1_BUILD__THEN_MINT_THE_IMMUTABLE_R1_CANDIDATE_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R1_VERIFIER__THEN_RUN_THE_AUTOMATIC_R1_REPAIR_REVERIFICATION_LOOP_UNTIL_ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+next_deterministic_action: ADJUDICATE_AR_0027_R1_VERDICT__ON_ACCEPT_PERSIST_ROT_PHASE1_CANDIDATE_ACCEPTED_R1_AND_COMPLETE_PHASE_1__ON_BLOCKING_FINDINGS_ROUTE_ACTIVE_R1_DEFECTS_TO_A_FRESH_REPAIR_ROLE_AND_A_NEW_FRESH_VERIFIER__STOP_FOR_OWNER_IF_ANY_FINDING_REQUIRES_R0_OR_OWNER_ADJUDICATION
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0
