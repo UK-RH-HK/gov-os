@@ -258,7 +258,14 @@ r0_acceptance:
   integration_merge_commit: 7858b6d7ce750ebcd2e2e3acbb48101eebd917d5
   evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/
   accepted_digests:
-    arch_0003_body_sha256: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+    arch_0003_file_sha256_at_acceptance: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+    arch_0003_body_sha256: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+    digest_label_correction: >-
+      An earlier record labelled 42681978 as the ARCH-0003 body digest. It is the digest of the WHOLE FILE at the
+      acceptance commit 2b36b44, not of the body scalar. Disclosed by AR-0026. The body scalar digest is 093cb78e and
+      is byte-identical at the acceptance commit and at HEAD, so the accepted architecture text is unchanged by the
+      post-verdict annotation. CP-0025 retains the original label as a point-in-time snapshot; this is the corrected
+      record. Same correction applies to GATE-REGISTER accepted_arch_0003_sha256, which is likewise a file digest.
     architecture_md_sha256: 695aa185ab32a813cd596b12f80d235afb92d56f147f395b15f16e37d0bcd983
     frozen_contract_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
     contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3

@@ -1,0 +1,52 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0027
+role: verifier-a
+objective: >-
+  Fresh independent R1 candidate verification of the Signed Release Root implementation at 949c4d3, graded under the
+  frozen R1 section with independently authored held-out tests, plus independent judgement of the five residuals the
+  builder disclosed and of every Contract v3 capability whose evidence this change invalidates.
+agent_model: claude-opus-5
+fresh_context: true
+independent_of: [AR-0026 build, AR-0024 correction, AR-0023 and AR-0025 reviews, architecture authoring]
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0027-r1-candidate-verification.md
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+candidate:
+  commit: 949c4d343a6d5f203534afa6e3363992fee12488
+  branch: phase1/srr1-r1-build
+  builder_run: AR-0026
+  builder_verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+  builder_report_commit: cedb3e6f6a76f1f9a2534a8a96d0555e9520c3a8
+accepted_architecture:
+  record: spec/architecture/ARCH-0003.yaml
+  accepted_body_scalar_sha256: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+  file_sha256_at_acceptance_commit: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+  acceptance_token: ROT_ARCHITECTURE_ACCEPTED_R0
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  graded_section: R1
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+owner_inputs: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, D-0009, D-0007]
+disclosed_residuals_to_judge:
+  - unprovisioned posture - floors advance only from Authenticity::Authentic
+  - protected-state relocation via HOME/XDG_STATE_HOME by an owner-privileged process
+  - expiry as lexicographic RFC-3339 UTC comparison at second precision
+  - delegated targets verified and enforced but no issuing tooling, so privileged remote capabilities have no admission path
+  - certification harness now gives each scenario its own XDG_STATE_HOME
+non_blocking_open_owner_question:
+  id: SRR2-R1-C1
+  gate: GATE-OWNER-R1-BREAK-GLASS-EXIT
+  note: implemented at the stricter both-floors interim; the interim choice is not a defect and must not be graded as one
+branch: phase1/srr1-r1-verify
+started_at: '2026-09-18T00:05Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0027.report.yaml
+expected_evidence_path: release/verification/4.1.6-r1/
+required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
+routing_rule: >-
+  Findings marked REQUIRES_R0_OR_OWNER_ADJUDICATION stop for the owner instead of automatic repair. Ordinary R1
+  implementation defects within the accepted boundary route to a fresh bounded repair role and a new fresh verifier.
+outcome: null
