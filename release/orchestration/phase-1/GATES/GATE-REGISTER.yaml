@@ -68,7 +68,13 @@ gates:
 
   - id: GATE-OWNER-R0-BELOW-FLOOR-RECOVERY
     title: Owner trade-off inside SRR-R0-H1 — below-floor recovery behaviour
-    status: OPEN
+    status: SATISFIED
+    answer: >-
+      (b) BREAK-GLASS — permitted only as an explicit owner-authorised emergency recovery mode, on an authentic
+      Governance OS release, under an owner-controlled local/out-of-band authority that repository content, environment
+      variables, caller fields, plugins and model output cannot manufacture; durably recorded; machine marked
+      DEGRADED — RECOVERY ONLY; the signed floor is never lowered; network access is not the sole authority.
+    answer_record: OWNER-DECISION-0006
     satisfier: product owner
     raised_by: AR-0023 (independent R0 reviewer), finding SRR-R0-H1, correction item CD-R0-1
     lifecycle: R0
@@ -81,9 +87,26 @@ gates:
     why_owner: >-
       A security-versus-availability product trade-off. Both behaviours are currently consistent with the architecture
       text and they fail in opposite directions. An architecture role must not choose it on the owner's behalf.
-    blocks: authoring of CD-R0-1, and therefore the bounded R0 correction cycle
+    blocks: nothing further; the bounded R0 correction cycle is unblocked
     satisfied_when: the owner selects (a) or (b); the selection is recorded as an owner record and cited by the correction
-    satisfaction_evidence: null
+    satisfaction_evidence: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+
+  - id: OWNER-DECISION-0006
+    title: Below-floor recovery — option (b) BREAK-GLASS, authorised and recorded
+    status: RECORDED
+    satisfier: product owner
+    classification: binding owner product/security decision at R0; not an R0 acceptance and not an implementation authorisation
+    record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+    record_sha256: 903407729327d67c198c9bf97885a936c5601993e16ad76137a3106c5728d1db
+    effects:
+      - answers GATE-OWNER-R0-BELOW-FLOOR-RECOVERY and unblocks CD-R0-1
+      - break-glass requires an authentic Governance OS release; never arbitrary or unsigned code
+      - authority must be owner-controlled local/out-of-band; not manufacturable by repo content, env vars, caller fields, plugins or model output
+      - entry durably recorded; machine marked DEGRADED - RECOVERY ONLY; signed floor never lowered
+      - below-floor forbids normal privileged operation, Human Gate creation/approval, certification, trust-policy mutation, privileged plugin/profile acquisition and floor reset
+      - floor rule must govern recovery, rollback and every backward-capable privileged ingress consistently
+      - network/GitHub access is not the sole break-glass authority; recovery must work offline
+    satisfaction_evidence: this record's commit
 
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony

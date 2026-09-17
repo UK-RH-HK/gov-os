@@ -1,0 +1,37 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0024
+role: r0-architecture-correction
+objective: >-
+  Single bounded R0 architecture correction of the Signed Release Root candidate: close SRR-R0-H1 (CD-R0-1, floor rule
+  across all backward-capable privileged ingresses plus the owner-selected break-glass below-floor recovery) and
+  SRR-R0-M1 (CD-R0-2, declared time/clock assumption and non-guarantee). No implementation; does not grade itself.
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0024-srr1-r0-bounded-correction.md
+active_gate: GATE-R0-ARCH-ACCEPT
+correction_cycle: 1
+correction_cycles_permitted: 1
+rejection_corrected:
+  run: AR-0023
+  verdict: ROT_ARCHITECTURE_REJECTED_R0
+  work_commit: 2dc08c20bacdc3dd4c28592c58a21d27b6e96d12
+  delta_path: release/root-of-trust/signed-release-root-v1-review-r0/11-CORRECTION-DELTA.md
+active_repair_queue: [SRR-R0-H1, SRR-R0-M1]
+owner_inputs:
+  - {id: OWNER-DECISION-0006, path: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md, sha256: 903407729327d67c198c9bf97885a936c5601993e16ad76137a3106c5728d1db, effect: selects break-glass (b) and fixes its ten binding requirements}
+  - {id: OWNER-DECISION-0005, path: release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md, sha256: 3831cbf51d6f663299a3a338d85bd07bed662fd33e5392502d4f270ce87e36fa, effect: SRR-R0-L6 deferred to R1, SRR-R0-L7 closed; do not convert later assurance into an architecture blocker}
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  mutable: false
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+branch: phase1/srr1-r0-correction-1
+started_at: '2026-09-17T21:40Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0024.report.yaml
+expected_evidence_path: release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md
+required_verdict_vocabulary: [ARCHITECTURE_CORRECTION_READY_FOR_REVIEW, INCOMPLETE]
+outcome: null

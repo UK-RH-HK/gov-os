@@ -925,3 +925,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Adjudication | Active R0 repair queue is exactly `SRR-R0-H1` and `SRR-R0-M1`. Correction delta CD-R0-1/CD-R0-2 is text-level across `ARCH-0003.yaml` and `00-ARCHITECTURE.md`; it changes no trust chain, metadata model, ingress set or transaction invariant. The single permitted bounded R0 correction cycle is unused. CD-R0-1 carries a genuine owner security-versus-availability trade-off, so no architecture role is dispatched until the owner answers. |
 | Output commit | aa72e5062a72bd74fcd3dc36fca06605a33d00a7 (merge); review work `2dc08c2`, report `024057f` |
 | Next action | `AWAIT_OWNER_ANSWER_ON_GATE_OWNER_R0_BELOW_FLOOR_RECOVERY` then the single permitted bounded R0 correction cycle in a fresh isolated architecture role, then a new fresh R0 reviewer |
+
+## L-0065 — 2026-09-17 — owner selects break-glass; the single bounded R0 correction cycle opens
+
+| Field | Value |
+|---|---|
+| Iteration | SRR-1 bounded R0 correction cycle 1 of 1 |
+| Role | product owner (decision); orchestrator (routing only) |
+| Input commit | `6a2fcb3bf61362826345a905c9afa12a6691a1e3` |
+| Work performed | Recorded `OWNER-DECISION-0006`: below-floor recovery is **(b) break-glass**, authorised and recorded — an authentic Governance OS release only, under an owner-controlled local/out-of-band authority that repository content, environment variables, caller fields, plugins and model output cannot manufacture; durably recorded on entry; the machine marked `DEGRADED — RECOVERY ONLY`; normal privileged operation, Human Gate creation/approval, certification, trust-policy mutation, privileged plugin/profile acquisition and floor reset all forbidden below floor; the signed floor never lowered; the floor rule governing every backward-capable privileged ingress; and network access explicitly not the sole authority. `GATE-OWNER-R0-BELOW-FLOOR-RECOVERY` moved to SATISFIED, unblocking CD-R0-1. Prepared HO-0024 and dispatched one fresh isolated architecture-correction role (AR-0024) scoped to exactly `SRR-R0-H1` and `SRR-R0-M1`, forbidden from touching the frozen boundary, D-0009/D-0007/D-0008/ARCH-0002, review evidence or product source, and forbidden from grading its own work. |
+| Report / evidence | `GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md`; `HANDOFFS/HO-0024-srr1-r0-bounded-correction.md`; `AGENT_RUNS/AR-0024.run.yaml` |
+| Verdict | — (owner decision and routing; no architecture verdict) |
+| Output commit | the commit containing this entry |
+| Findings | — |
+| Next action | complete AR-0024, then dispatch a NEW fresh independent R0 reviewer scoped to the corrected text and `OWNER-DECISION-0006` |

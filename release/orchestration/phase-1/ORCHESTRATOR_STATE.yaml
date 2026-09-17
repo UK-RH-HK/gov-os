@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T20:46:09Z'
-state_hash: 0092e80d1c563e3d6cc940f62e4663a04d9d662f84457cfeb2e2d3bd1a0e7ceb
-lifecycle_state: AWAITING_OWNER_R0_TRADE_OFF
-loop_status: R0_REJECTED_CYCLE_0__AWAITING_OWNER_ANSWER_BEFORE_BOUNDED_CORRECTION   # CP-1 remains frozen
+updated_at: '2026-09-17T21:02:01Z'
+state_hash: fedc6645da92749deb4fad3fe3cbd60b06e93c96b9dba98788d19df375e33bd0
+lifecycle_state: R0_ARCHITECTURE_CORRECTION
+loop_status: R0_BOUNDED_CORRECTION_CYCLE_1_OF_1   # owner trade-off answered; CP-1 remains frozen
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -267,7 +267,7 @@ r0_findings_arch_0003:
     owner_answered:
       SRR-R0-L6: {answer: DEFER_TO_R1, record: OWNER-DECISION-0005, effect: stays non-blocking R1/R2; at R1 distinguish remotely acquired privileged plugins/tools from built-in/local tools; must not be raised as an R0 blocker}
       SRR-R0-L7: {answer: NOT_NEEDED, record: OWNER-DECISION-0005, effect: offline/air-gapped install out of scope for the private/local profile; closed without architecture edit}
-      SRR-R0-H1: {answer: PENDING, gate: GATE-OWNER-R0-BELOW-FLOOR-RECOVERY}
+      SRR-R0-H1: {answer: BREAK_GLASS_AUTHORISED_AND_RECORDED, record: OWNER-DECISION-0006, gate: GATE-OWNER-R0-BELOW-FLOOR-RECOVERY SATISFIED, effect: CD-R0-1 unblocked; architecture states the break-glass mode, its non-manufacturable authority, the durable entry record, the DEGRADED - RECOVERY ONLY marking, the forbidden operations, the exit condition and offline availability}
     owner_standing_direction: do not convert optional later-lifecycle assurance into an architecture blocker (OWNER-DECISION-0005)
     removed_from_active_queue_as_later_lifecycle:
       R1: [SRR-R0-L1, SRR-R0-L2, SRR-R0-L3, SRR-R0-L4, SRR-R0-L5, SRR-R0-L7]
@@ -309,13 +309,14 @@ known_non_blocking_residuals:
   accepted: all other residuals named in the revision-7 pack
 
 owner_gates:
-  pending: [GATE-OWNER-R0-BELOW-FLOOR-RECOVERY]
+  pending: []
   planned: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD, GATE-OWNER-KEY-CEREMONY, GATE-R1-CANDIDATE-ACCEPT, GATE-R2-STANDARD-RELEASE, GATE-R3-HIGH-ASSURANCE]
   historical_refused: [GATE-ARCH-ACCEPT, GATE-OWNER-D0008]
   owner_inputs_recorded:
     - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
     - {id: OWNER-DESIGN-REQUIREMENTS-0002, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml, classification: binding resolutions of OT-1 and OT-2 clarifying OP-7/OP-10/OP-13, not D-0008 approval}
     - {id: OWNER-DIRECTIVE-0003, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, classification: binding orchestration directive — freeze the RoT loop after the revision-7 verdict}
+    - {id: OWNER-DECISION-0006, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md, classification: binding owner R0 decision — below-floor recovery is break-glass (b), authorised and recorded}
     - {id: OWNER-DECISION-0005, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md, classification: binding answers to SRR-R0-L6 (defer to R1) and SRR-R0-L7 (not needed); SRR-R0-H1 trade-off still PENDING; not an R0 acceptance}
     - {id: OWNER-DIRECTIVE-0004, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md, classification: binding current owner decision — separate Signed Release Root lineage and R0/R1/R2/R3 boundary}
   architect_surfaced_owner_conflicts_r7:   # RESOLVED by the owner: OWNER-DESIGN-REQUIREMENTS-0002 (2026-09-14)
@@ -354,7 +355,7 @@ iteration:
   active_gate: R0
   architecture_review_cycle_under_phase_1: 6
   signed_release_root_r0_review_cycle: 1
-  signed_release_root_r0_correction_cycles_used: 0
+  signed_release_root_r0_correction_cycles_used: 1
   signed_release_root_r0_correction_cycles_permitted: 1   # ARCHITECTURE LOOP LIMIT; a second genuinely new architectural blocker or owner trade-off after the corrected re-review means R0_OWNER_READJUDICATION_REQUIRED
   implementation_repair_cycle: 0
 
@@ -420,7 +421,17 @@ completed_stages:
     commit: this_governance_rebase_commit
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
-running_work: []
+running_work:
+  - run_id: AR-0024
+    role: r0-architecture-correction
+    status: RUNNING
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0024.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0024-srr1-r0-bounded-correction.md
+    branch: phase1/srr1-r0-correction-1
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0024.report.yaml
+    gate: GATE-R0-ARCH-ACCEPT
+    scope: [SRR-R0-H1 via CD-R0-1, SRR-R0-M1 via CD-R0-2]
+
 
 
 latest_role_verdicts:
@@ -529,7 +540,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: AWAIT_OWNER_ANSWER_ON_GATE_OWNER_R0_BELOW_FLOOR_RECOVERY__THEN_RUN_THE_SINGLE_PERMITTED_BOUNDED_R0_CORRECTION_CYCLE_ON_CD_R0_1_AND_CD_R0_2_IN_A_FRESH_ISOLATED_ARCHITECTURE_ROLE__THEN_A_NEW_FRESH_R0_REVIEWER
+next_deterministic_action: COMPLETE_AR_0024_BOUNDED_R0_CORRECTION__THEN_MINT_THE_CORRECTED_CANDIDATE_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R0_REVIEWER_SCOPED_TO_THE_CORRECTED_TEXT_AND_OWNER_DECISION_0006
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0
