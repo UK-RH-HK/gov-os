@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T23:11:22Z'
-state_hash: 32eb1dfd46cd0a39924b73519d55e678f4cabdc04b380d40b472df2fb9e8c65c
+updated_at: '2026-09-17T23:11:52Z'
+state_hash: 650ab6d5817fb807a39af6023fb291ea2a7573699e2f430c52495b6469f41770
 lifecycle_state: R1_REPAIR
 loop_status: R1_REPAIR_1_RUNNING_AFTER_CANDIDATE_1_REJECTED
 
@@ -536,8 +536,19 @@ immutable_evidence:
     commit: 1c6027c18822543d6927d9906b9efa4f7a54ed4e
   - path: release/root-of-trust/4.1.6-review-r2
     commit: e5a6b8aa39d2a36311489418506d911df2587722
-  - path: release/verification
+  # Narrowed 2026-09-18: the broad release/verification pin predates this phase adding new evidence under that
+  # directory. The four historical packs are pinned individually and verified unchanged; the new R1 pack is pinned at
+  # its own merge commit. No historical evidence was rewritten - only a new sibling directory was added.
+  - path: release/verification/4.1.2
     commit: e5a6b8aa39d2a36311489418506d911df2587722
+  - path: release/verification/4.1.3
+    commit: e5a6b8aa39d2a36311489418506d911df2587722
+  - path: release/verification/4.1.4
+    commit: e5a6b8aa39d2a36311489418506d911df2587722
+  - path: release/verification/4.1.5
+    commit: e5a6b8aa39d2a36311489418506d911df2587722
+  - path: release/verification/4.1.6-r1
+    commit: d10c2a552f71462209f53977d272eaf38a35f93f
   - path: release/releases
     commit: e5a6b8aa39d2a36311489418506d911df2587722
   - path: release/root-of-trust/4.1.6-review-r3/B-trust-security
