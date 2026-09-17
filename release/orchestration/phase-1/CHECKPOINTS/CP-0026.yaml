@@ -1,0 +1,68 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0026
+trigger: R1 candidate 1 minted from AR-0026; fresh independent R1 verification AR-0027 dispatched
+date: 2026-09-18
+lifecycle_state: R1_CANDIDATE_VERIFICATION
+loop_status: R1_VERIFICATION_RUNNING_ON_CANDIDATE_1
+repository:
+  integration_branch: release/4.1.6-rc1
+  head: 0ce7f9f0a7028d54bc5beef57f0ef35a935e244d
+candidate:
+  id: srr1-r1-candidate-1
+  commit: 0ce7f9f0a7028d54bc5beef57f0ef35a935e244d
+  tag: srr1-r1-candidate-1
+  builder_run: AR-0026
+  builder_work_commit: 949c4d343a6d5f203534afa6e3363992fee12488
+  accepted: false
+  certified: false
+  released: false
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+owner_gates_open_non_blocking: [GATE-OWNER-R1-BREAK-GLASS-EXIT]
+digests:
+  contract_v3: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_contract: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  arch_0003_body_scalar: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+  arch_0003_file_at_acceptance_commit: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+  digest_label_note: >-
+    CP-0025 labelled 42681978 as the body digest; it is the whole-file digest at acceptance commit 2b36b44. The body
+    scalar is 093cb78e and is unchanged by the post-verdict annotation. CP-0025 is left as its point-in-time snapshot.
+orchestrator_verification_of_ar_0026:
+  - no prohibited path touched; no private-key material
+  - Contract v3 canonical import byte-identical to the owner root source
+  - ARCH-0003 body scalar unchanged; record still PROVISIONAL / in_effect false / human_approved false
+  - regression independently reproduced - cargo test --lib 26 passed 0 failed; cargo test --test certification 64 passed 0 failed; exit 0
+running_work:
+  - run_id: AR-0027
+    role: verifier-a
+    handoff: release/orchestration/phase-1/HANDOFFS/HO-0027-r1-candidate-verification.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify
+    branch: phase1/srr1-r1-verify
+    worktree_base_commit: 0ce7f9f0a7028d54bc5beef57f0ef35a935e244d
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0027.report.yaml
+    expected_evidence_path: release/verification/4.1.6-r1/
+residuals_routed_for_independent_judgement: [RES-1 unprovisioned posture, RES-2 protected-state relocation, RES-3 expiry comparison, RES-4 delegated-target issuing tooling and SRR-R0-L6 closure, RES-5 certification harness isolation]
+resume_rule: >-
+  If AR-0027 has a committed AR-0027.report.yaml on branch phase1/srr1-r1-verify, adjudicate that verdict. If not, the
+  run is INCOMPLETE and advances no gate: dispatch a NEW fresh independent verifier at the same candidate. Never infer a
+  verdict from conversation.
+on_accept: >-
+  Persist ROT_PHASE1_CANDIDATE_ACCEPTED_R1 with the exact accepted candidate commit and tag, mark
+  GATE-R1-CANDIDATE-ACCEPT and GATE-PHASE1-COMPLETE satisfied, record the Contract v3 hash, the R0 and R1 independent
+  evidence and the residual later-lifecycle risks separately, verify durable state, write the final checkpoint, append
+  the ledger, and STOP without starting Phase 2. Return PHASE_ORCHESTRATION_COMPLETE__ROT_PHASE1_CANDIDATE_ACCEPTED_R1.
+on_blocking_findings: >-
+  Persist and commit the evidence separately, adjudicate every finding by provenance and lifecycle, route only active R1
+  blockers to a FRESH bounded repair role, mint a new immutable candidate, invalidate dependent evidence, rerun prior
+  probes plus fresh held-out tests, and spawn a NEW fresh verifier. Continue automatically.
+stop_conditions:
+  - any finding marked REQUIRES_R0_OR_OWNER_ADJUDICATION stops for owner adjudication instead of silent architecture change
+  - three consecutive R1 iterations introducing materially new blocker classes stops with PHASE_CONVERGENCE_ESCALATION_REQUIRED plus a root-cause/meta-review package
+next_deterministic_action: ADJUDICATE_AR_0027_R1_VERDICT__ON_ACCEPT_COMPLETE_PHASE_1__ON_BLOCKING_FINDINGS_RUN_THE_AUTOMATIC_REPAIR_REVERIFICATION_LOOP
+prohibitions:
+  - no second R0 correction cycle; the R0 loop is closed
+  - no RoT-1 Revision 8 or CP-1 resumption; no D-0008/ARCH-0002 activation
+  - no amendment of D-0007, D-0009, the accepted ARCH-0003 body, the frozen boundary or any owner record
+  - verifier never modifies product source; builder never sees held-out tests before the verdict is committed
+  - no Phase 2, no certification, no stable release push, no merge to main
+  - orchestrator issues no verdict of its own and answers no owner gate
