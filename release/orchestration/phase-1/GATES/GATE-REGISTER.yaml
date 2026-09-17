@@ -23,10 +23,21 @@ gates:
 
   - id: GATE-R0-ARCH-ACCEPT
     title: R0 — independent acceptance of Signed Release Root architecture ARCH-0003
-    status: OPEN
+    status: SATISFIED
     last_verdict: >-
-      ROT_ARCHITECTURE_REJECTED_R0 on the candidate at 5fd8358 (review AR-0023, work commit 2dc08c2, merged aa72e5062a72bd74fcd3dc36fca06605a33d00a7);
-      R0 blockers SRR-R0-H1 (HIGH) and SRR-R0-M1 (MEDIUM). One bounded correction cycle is permitted and unused.
+      ROT_ARCHITECTURE_ACCEPTED_R0 for the corrected candidate (review AR-0025, work commit 5635955, merged 7858b6d7ce750ebcd2e2e3acbb48101eebd917d5).
+      The prior verdict on 5fd8358 was ROT_ARCHITECTURE_REJECTED_R0 (AR-0023, 2dc08c2); the single permitted bounded
+      correction cycle (AR-0024, 29516f8) closed SRR-R0-H1 and SRR-R0-M1 and is now spent.
+    acceptance:
+      token: ROT_ARCHITECTURE_ACCEPTED_R0
+      accepted_candidate_commit: 2b36b440915f0052d92153748cea914846955418
+      accepted_arch_0003_sha256: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+      accepted_architecture_md_sha256: 695aa185ab32a813cd596b12f80d235afb92d56f147f395b15f16e37d0bcd983
+      frozen_contract_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+      r0_items: 14 of 14 SATISFIED (6 strengthened by the correction, none weakened)
+      blocking_findings: none; 10-BLOCKING-FINDINGS.md present and explicitly empty
+      probes_and_attacks: 21 total, including 16 fresh held-out attacks authored by AR-0025
+      scope: architecture verdict only; authorises no implementation by itself
     satisfier: fresh independent R0 architecture reviewer
     preconditions:
       - D-0009 is ACTIVE and human-approved
@@ -45,10 +56,8 @@ gates:
     satisfied_when: >-
       fresh reviewer returns ROT_ARCHITECTURE_ACCEPTED_R0 for the exact committed candidate under the frozen R0
       contract, with no unresolved R0 CRITICAL/HIGH and no R0 MEDIUM requiring architecture change
-    on_refusal: >-
-      record findings with source, provenance and lifecycle; do not implement, do not create RoT-1 Revision 8 and do
-      not promote R1/R2/R3 hardening into R0 without owner approval
-    satisfaction_evidence: null
+    satisfaction_evidence: release/root-of-trust/signed-release-root-v1-review-r0-2/
+    satisfaction_report: release/orchestration/phase-1/AGENT_RUNS/AR-0025.report.yaml
 
   - id: OWNER-DECISION-0005
     title: Owner answers to the AR-0023 R0 review questions (SRR-R0-L6 deferred, SRR-R0-L7 not needed)
@@ -108,6 +117,30 @@ gates:
       - network/GitHub access is not the sole break-glass authority; recovery must work offline
     satisfaction_evidence: this record's commit
 
+  - id: GATE-OWNER-R1-BREAK-GLASS-EXIT
+    title: Owner question (non-blocking, R1) — what does break-glass exit require?
+    status: OPEN
+    satisfier: product owner
+    raised_by: AR-0025 (independent R0 re-reviewer), finding SRR2-R1-C1
+    lifecycle: R1
+    blocking: false
+    question: >-
+      Exit from DEGRADED - RECOVERY ONLY currently clears on the signed minimum secure release alone, while "below
+      floor" is defined over two floors. Counterexample inside the declared envelope: high-water v6, minimum secure v4,
+      only complete local state v5 - break-glass admits v5, exit fires because v5 >= v4, and the marking clears while
+      the machine is still below its protected high-water. Does exit require (a) the signed minimum secure release only,
+      as OWNER-DECISION-0006 requirement 7 states today, or (b) BOTH that floor and the protected local high-water?
+    why_non_blocking: >-
+      The ingress itself is authorised, recorded and marked when it occurs, so the R0 guarantee holds; only the
+      marking's lifetime is underspecified. The compliant reading is already supported by the architecture text, the
+      state is unreachable without owner-controlled break-glass authority, and the clause faithfully transcribes owner
+      requirement 7.
+    interim_decision_by_orchestrator: >-
+      R1 implements the stricter fail-safe reading (b) as ONE isolated policy point, explicitly labelled SRR2-R1-C1 and
+      documented so the owner can flip it to (a) with a single change. Recorded as an assumption, not an owner answer.
+    satisfied_when: the owner selects (a) or (b); the selection is recorded and the R1 policy point set accordingly
+    satisfaction_evidence: null
+
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony
     status: NOT_OPEN
@@ -121,17 +154,24 @@ gates:
 
   - id: GATE-OWNER-CAC-UPLOAD
     title: AWAITING_PRODUCT_OWNER_CAPABILITY_CONTRACT_UPLOAD
-    status: NOT_OPEN
+    status: SATISFIED
+    logged_precedence_conflict: >-
+      This gate was written expecting the owner to copy the contract to framework/contracts/source/ after builder
+      scaffolding existed. The owner instead supplied the normative source at the repository root and directed, in the
+      current resume directive, that the builder use that exact root file and hash-bind it. An active owner directive
+      outranks a frozen gate convention, so the root file is the authoritative source and the destination copy becomes a
+      builder-produced canonical import that must be hash-bound to it. Conflict logged rather than silently resolved.
+    owner_source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
     satisfier: product owner copies the approved file
     preconditions: [builder scaffolding for contract source, executable YAML, source lock, schema, evidence map and generated view committed]
     destination: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
     owner_source_file: Governance_OS_Capability_Acceptance_Contract_v3.md
-    satisfied_when: owner confirms upload in chat and the file exists at the destination; digest recorded
-    satisfaction_evidence: null
+    satisfied_when: the owner-supplied normative source exists and its digest is recorded for the run
+    satisfaction_evidence: repo-root Governance_OS_Capability_Acceptance_Contract_v3.md, digest recorded in ORCHESTRATOR_STATE.yaml and in each run record that binds it
 
   - id: GATE-BUILDER-READY
     title: R1 builder readiness — READY_FOR_INDEPENDENT_OS_VERIFICATION
-    status: NOT_OPEN
+    status: OPEN
     satisfier: builder (declares readiness only; never acceptance)
     preconditions: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD]
     satisfied_when: >-

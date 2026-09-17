@@ -1,0 +1,45 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0026
+role: builder
+objective: >-
+  R1 implementation of the R0-accepted Signed Release Root architecture: signed metadata and one verification policy
+  across every privileged ingress, verified-byte binding with atomic staging/commit, durable monotonic high-water and
+  signed minimum secure release enforced at every backward-capable ingress, break-glass below-floor recovery per
+  OWNER-DECISION-0006, Contract v3 hash-bound scaffolding, the built-in versus remotely-acquired plugin distinction, and
+  the carried R1 conditions - while preserving D-0007 semantics and all valid pre-RoT Governance OS capabilities.
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0026-r1-signed-release-root-builder.md
+active_gate: GATE-BUILDER-READY
+accepted_architecture:
+  record: spec/architecture/ARCH-0003.yaml
+  accepted_body_sha256: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+  accepted_by_run: AR-0025
+  acceptance_token: ROT_ARCHITECTURE_ACCEPTED_R0
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  graded_section: R1
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  destination: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+owner_inputs: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, D-0009, D-0007]
+r1_conditions_in_scope: [SRR2-R1-C1, SRR2-R1-C2, SRR2-R1-C3, SRR-R0-L1, SRR-R0-L2, SRR-R0-L3, SRR-R0-L4, SRR-R0-L5, SRR-R0-L6]
+out_of_scope: [SRR-R0-L7 offline first install (owner-closed), R2 ceremonies and custody, R3 high-assurance qualification]
+interim_assumption:
+  id: SRR2-R1-C1
+  gate: GATE-OWNER-R1-BREAK-GLASS-EXIT
+  assumption: >-
+    Break-glass exit requires a verified release at or above BOTH the signed minimum secure release and the protected
+    local high-water (the stricter, fail-safe reading), implemented as one isolated policy point the owner can flip.
+  status: orchestrator interim pending the owner's answer; not an owner decision
+branch: phase1/srr1-r1-build
+started_at: '2026-09-17T22:30Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0026.report.yaml
+expected_evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/
+required_verdict_vocabulary: [READY_FOR_INDEPENDENT_OS_VERIFICATION, INCOMPLETE]
+independence_note: builder declares readiness only; never acceptance; must not see or author held-out verifier tests
+outcome: null
