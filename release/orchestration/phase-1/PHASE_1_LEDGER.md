@@ -1002,3 +1002,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Owner adjudication routed | `AR27-OD1` → `GATE-OWNER-R1-MACHINE-STATE-ANCHOR`, flagged `REQUIRES_R0_OR_OWNER_ADJUDICATION` and explicitly **not** routed to repair: anchoring protected machine state to a fixed machine-domain path would change the accepted R0 bootstrap assumption and collides with the certification harness's own isolation mechanism. Non-blocking for repair 1. |
 | Output commit | d10c2a552f71462209f53977d272eaf38a35f93f (merge); verification work `26c2dc5`, report `6bb62cb` |
 | Next action | AR-0028 bounded repair under HO-0028, then candidate 2 and a NEW fresh independent verifier rerunning AR-0027's held-out tests plus fresh ones |
+
+## L-0070 — 2026-09-18 — owner answers both open R1 questions; no R0 readjudication
+
+| Field | Value |
+|---|---|
+| Iteration | SRR-1 R1 repair cycle 1 (running) |
+| Role | product owner (decisions); orchestrator (records only) |
+| Input commit | `a271eedc2bfd545fdfc2042f355631b81fd46ecd` |
+| Work performed | Recorded `OWNER-DECISION-0007`. **`AR27-OD1`:** keep the current derivation of protected machine state from `XDG_STATE_HOME`/`HOME`; it is not anchored to a fixed machine-domain path. The accepted R0 bootstrap/trusted-boundary assumption is therefore unchanged, **`R0_OWNER_READJUDICATION_REQUIRED` is not triggered**, `GATE-R0-ARCH-ACCEPT` stands, and the certification harness keeps its per-scenario isolation. The residual asymmetry — `GOV_MACHINE_STATE_DIR` refused on a provisioned machine while `HOME`/`XDG_STATE_HOME` relocation by an owner-privileged process remains possible and in-boundary under ARCH-0003 §1 — is now an owner-adjudicated position rather than a defect, and may not be raised as an R1 blocker. **`SRR2-R1-C1`:** keep the stricter reading — exit from `DEGRADED — RECOVERY ONLY` requires a verified authenticated release at or above **both** the signed minimum secure release and the protected local high-water. This confirms the orchestrator's fail-safe interim rather than changing it, so **no code change is required**; `EXIT_POLICY = "b_stricter_both_floors"` is now owner-decided policy. It supplements `OWNER-DECISION-0006` requirement 7, whose floor is necessary but not sufficient for clearing the marking. Both owner gates moved to SATISFIED; no owner gate is now pending. The running repair AR-0028 needed no redirection, because HO-0028 already forbade touching machine-state path resolution and required the interim to stand. |
+| Report / evidence | `GATES/OWNER-DECISION-0007-R1-QUESTIONS.md` (SHA-256 `4a0f61c0…`) |
+| Verdict | — (owner decisions; no gate verdict) |
+| Output commit | the commit containing this entry |
+| Findings | `AR27-OD1` and `SRR2-R1-C1` both CLOSED by owner decision |
+| Next action | unchanged — complete AR-0028, mint candidate 2, dispatch a NEW fresh independent verifier |

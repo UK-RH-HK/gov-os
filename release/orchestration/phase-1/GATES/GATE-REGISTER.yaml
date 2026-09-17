@@ -119,7 +119,12 @@ gates:
 
   - id: GATE-OWNER-R1-BREAK-GLASS-EXIT
     title: Owner question (non-blocking, R1) — what does break-glass exit require?
-    status: OPEN
+    status: SATISFIED
+    answer: >-
+      (b) STRICTER — exit requires a verified authenticated release at or above BOTH the signed minimum secure release
+      AND the protected local high-water. Confirms the orchestrator's fail-safe interim; no code change required. It
+      supplements OWNER-DECISION-0006 requirement 7, whose floor is necessary but not sufficient.
+    answer_record: OWNER-DECISION-0007
     satisfier: product owner
     raised_by: AR-0025 (independent R0 re-reviewer), finding SRR2-R1-C1
     lifecycle: R1
@@ -139,11 +144,17 @@ gates:
       R1 implements the stricter fail-safe reading (b) as ONE isolated policy point, explicitly labelled SRR2-R1-C1 and
       documented so the owner can flip it to (a) with a single change. Recorded as an assumption, not an owner answer.
     satisfied_when: the owner selects (a) or (b); the selection is recorded and the R1 policy point set accordingly
-    satisfaction_evidence: null
+    satisfaction_evidence: release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
 
   - id: GATE-OWNER-R1-MACHINE-STATE-ANCHOR
     title: Owner adjudication (R0 boundary) — should protected machine state be anchored to a fixed machine-domain path?
-    status: OPEN
+    status: SATISFIED
+    answer: >-
+      NO — keep the current derivation from XDG_STATE_HOME/HOME. The accepted R0 bootstrap/trusted-boundary assumption
+      is unchanged, so R0_OWNER_READJUDICATION_REQUIRED is NOT triggered and GATE-R0-ARCH-ACCEPT stands. The residual
+      asymmetry is an owner-adjudicated position, not a defect; AR27-OD1 is closed and must not be raised as an R1
+      blocker.
+    answer_record: OWNER-DECISION-0007
     satisfier: product owner
     raised_by: AR-0027 (independent R1 verifier), finding AR27-OD1
     classification: NEW_OWNER_DECISION_REQUIRED, flagged REQUIRES_R0_OR_OWNER_ADJUDICATION
@@ -164,7 +175,21 @@ gates:
       than treating it as a defect, and did not make it a blocking finding.
     must_not: be routed to a bounded R1 repair; a repair role must not change machine-state path resolution
     satisfied_when: the owner decides whether to keep the current derivation or adopt a fixed machine-domain anchor
-    satisfaction_evidence: null
+    satisfaction_evidence: release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+
+  - id: OWNER-DECISION-0007
+    title: Owner answers to the two open R1 questions (machine-state anchor; break-glass exit floor)
+    status: RECORDED
+    satisfier: product owner
+    classification: binding owner answers at R1; not an R1 acceptance and not an implementation authorisation
+    record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+    record_sha256: 4a0f61c0b3de4c4c657f5b208cd184a8b4add5cde74b4ae152cba964a6bdba7d
+    effects:
+      - AR27-OD1 closed - keep the current XDG_STATE_HOME/HOME derivation; no R0 readjudication; no repair may change machine-state path resolution
+      - SRR2-R1-C1 closed - the stricter both-floors exit is now owner-decided policy, not an orchestrator interim; no code change required
+      - supplements OWNER-DECISION-0006 requirement 7 - its floor is necessary but not sufficient for clearing the marking
+      - neither answer changes D-0007, D-0009, the accepted ARCH-0003 body or the frozen boundary
+    satisfaction_evidence: this record's commit
 
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony

@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T23:11:52Z'
-state_hash: 650ab6d5817fb807a39af6023fb291ea2a7573699e2f430c52495b6469f41770
+updated_at: '2026-09-17T23:18:44Z'
+state_hash: 7fa259bd597c64a5bf6a7a564786ba0cff8341d164157942e7a7b3e567145b12
 lifecycle_state: R1_REPAIR
 loop_status: R1_REPAIR_1_RUNNING_AFTER_CANDIDATE_1_REJECTED
 
@@ -362,7 +362,7 @@ r1_carried_conditions:
     release/root-of-trust/signed-release-root-v1-review-r0-2/20-LATER-LIFECYCLE-CONDITIONS.md and
     release/root-of-trust/signed-release-root-v1-review-r0/20-LATER-LIFECYCLE-CONDITIONS.md
   from_ar_0025:
-    SRR2-R1-C1: {severity: MEDIUM, lifecycle: R1, owner_question: true, gate: GATE-OWNER-R1-BREAK-GLASS-EXIT, status: ROUTED_NON_BLOCKING, interim: implement the stricter fail-safe reading (exit requires at or above BOTH the signed minimum secure release and the protected local high-water) as one isolated policy point the owner can flip}
+    SRR2-R1-C1: {severity: MEDIUM, lifecycle: R1, owner_question: ANSWERED, gate: GATE-OWNER-R1-BREAK-GLASS-EXIT SATISFIED, answer: stricter both-floors exit confirmed as owner policy by OWNER-DECISION-0007, status: CLOSED, code_change_required: false}
     SRR2-R1-C2: {severity: MEDIUM, lifecycle: R1, requirement: bind the protected offline-recovery record to the payload/kernel digests or kernel_manifest_hash actually verified, not to the release version alone}
     SRR2-R1-C3: {severity: LOW, lifecycle: R1, requirement: state and test that the protected high-water and signed minimum secure release survive uninstall and project removal}
   from_ar_0023:
@@ -384,13 +384,14 @@ known_non_blocking_residuals:
   accepted: all other residuals named in the revision-7 pack
 
 owner_gates:
-  pending: [GATE-OWNER-R1-BREAK-GLASS-EXIT, GATE-OWNER-R1-MACHINE-STATE-ANCHOR]   # both non-blocking for the repair cycle
+  pending: []
   planned: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD, GATE-OWNER-KEY-CEREMONY, GATE-R1-CANDIDATE-ACCEPT, GATE-R2-STANDARD-RELEASE, GATE-R3-HIGH-ASSURANCE]
   historical_refused: [GATE-ARCH-ACCEPT, GATE-OWNER-D0008]
   owner_inputs_recorded:
     - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
     - {id: OWNER-DESIGN-REQUIREMENTS-0002, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml, classification: binding resolutions of OT-1 and OT-2 clarifying OP-7/OP-10/OP-13, not D-0008 approval}
     - {id: OWNER-DIRECTIVE-0003, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, classification: binding orchestration directive — freeze the RoT loop after the revision-7 verdict}
+    - {id: OWNER-DECISION-0007, date: 2026-09-18, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md, classification: binding owner answers — keep the XDG/HOME derivation (AR27-OD1 closed, no R0 readjudication) and keep the stricter both-floors break-glass exit (SRR2-R1-C1 closed, confirms the interim)}
     - {id: OWNER-DECISION-0006, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md, classification: binding owner R0 decision — below-floor recovery is break-glass (b), authorised and recorded}
     - {id: OWNER-DECISION-0005, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md, classification: binding answers to SRR-R0-L6 (defer to R1) and SRR-R0-L7 (not needed); SRR-R0-H1 trade-off still PENDING; not an R0 acceptance}
     - {id: OWNER-DIRECTIVE-0004, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md, classification: binding current owner decision — separate Signed Release Root lineage and R0/R1/R2/R3 boundary}
