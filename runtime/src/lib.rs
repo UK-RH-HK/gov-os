@@ -11,6 +11,8 @@ pub mod checkpoints;
 pub mod cit;
 pub mod code_intelligence;
 pub mod context;
+/// Governance Capability Acceptance Contract v3: hash-bound source, compiled form and evidence map.
+pub mod contracts;
 pub mod doctor;
 pub mod error;
 pub mod exceptions;
@@ -37,6 +39,9 @@ pub mod routing;
 pub mod schemas;
 pub mod security;
 pub mod skills;
+/// Signed Release Root v1 (`ARCH-0003`): signed metadata, the one verification policy, verified-byte binding,
+/// protected floors and break-glass recovery.
+pub mod srr;
 pub mod status;
 pub mod tools;
 pub mod update;

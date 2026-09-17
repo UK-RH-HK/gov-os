@@ -10,7 +10,7 @@ rust-version = "1.80"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1", features = ["preserve_order"] }
+serde_json = { version = "1", features = ["preserve_order", "raw_value"] }
 serde_yaml = "0.9"
 rusqlite = { version = "0.31", features = ["bundled"] }
 sha2 = "0.10"
@@ -22,6 +22,9 @@ jsonschema = { version = "0.18", default-features = false, features = ["draft202
 thiserror = "1"
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
+# Signed Release Root v1 (ARCH-0003): mature, reviewed cryptographic implementation. Verification only in `gov`.
+ed25519-dalek = { version = "2", default-features = false, features = ["std", "zeroize"] }
+hex = "0.4"
 
 [profile.release]
 opt-level = 2

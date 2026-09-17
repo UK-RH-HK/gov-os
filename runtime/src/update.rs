@@ -121,6 +121,18 @@ pub fn apply_update(
     approve: bool,
     by: &str,
 ) -> Result<Value> {
+    apply_update_opts(p, source, approve, by, None, false)
+}
+
+/// `update` ingress with the Signed Release Root request fields.
+pub fn apply_update_opts(
+    p: &mut Project,
+    source: Option<&str>,
+    approve: bool,
+    by: &str,
+    channel: Option<String>,
+    break_glass: bool,
+) -> Result<Value> {
     control::guard_write(p, "update --apply")?;
     crate::authority::require(p, "update_apply")?;
     let chk = check(p, source)?;
@@ -196,8 +208,16 @@ pub fn apply_update(
         &json!({"from": chk["current"], "to": target, "at": now_iso(), "checkpoint": ck.as_ref().map(|c| c["id"].clone()), "migrations": chk["migration_path"], "by": by, "session": p.session_id, "role": p.role, "source": source_label(src), "release_commit": release_commit_for_source(src)}),
     )?;
     let (overlay_before, _) = hash_tree(&p.overlay_dir(), &[])?;
+    // Privileged lifecycle ingress `update`: the one verification policy. Admission happens BEFORE any protected
+    // write, and the floor check inside it binds this ingress exactly as it binds `rollback`.
+    let auth = crate::srr::admit(
+        crate::srr::AdmissionRequest::new(crate::srr::Ingress::Update, src)
+            .with_channel(channel)
+            .with_break_glass(break_glass)
+            .with_reason(Some(format!("gov update --apply to {target}"))),
+    )?;
     let result: Result<Value> = (|| {
-        let manifest = install_kernel(Some(src), &p.governance_dir())?;
+        let manifest = install_kernel(&auth, &p.governance_dir())?;
         let migs = load_migrations(&p.kernel_dir());
         let chain = migration_path(&migs, chk["current"].as_str().unwrap_or(""), &target);
         let mut out = MigrationOutcome::default();
@@ -306,8 +326,11 @@ pub fn apply_update(
             )
             .with_details(audit));
         }
+        // Transaction step (9), SRR-R0-L5: the floors advance only after the atomic commit and its verification,
+        // and only after the post-install governance suite has accepted the result.
+        let protected = crate::srr::record_installed(&auth)?;
         Ok(
-            json!({"migrations": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "operations": out.applied, "overlay_keys_changed": out.overlay_keys_changed, "overlay_reconciled": reconciled, "index_manifest": rebuilt, "doctor": doc.verdict, "audit": audit["verdict"], "lock": {"release_commit": release_commit_for_source(src), "source": source_label(src)}}),
+            json!({"migrations": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "operations": out.applied, "overlay_keys_changed": out.overlay_keys_changed, "overlay_reconciled": reconciled, "index_manifest": rebuilt, "doctor": doc.verdict, "audit": audit["verdict"], "lock": {"release_commit": release_commit_for_source(src), "source": source_label(src)}, "release_authenticity": auth.to_value(), "protected_state": protected}),
         )
     })();
     match result {
@@ -328,10 +351,20 @@ pub fn apply_update(
             )
         }
         Err(e) => {
-            let rb = rollback(
+            // Transaction abort, not a backward ingress: the floors were never advanced (step (9) is unreached),
+            // so restoring the pre-update installation puts the machine back exactly at its current floor and
+            // crosses no ingress boundary. `SRR-R0-L5` is what makes this safe and is why the ordering is fixed.
+            crate::srr::staging::abandon(
+                &auth.machine,
+                &auth.staged,
+                "update aborted; transaction rolled back",
+            );
+            let rb = rollback_internal(
                 p,
                 Some(&target),
                 Some(&format!("automatic: {} ({})", e.code, e.message)),
+                true,
+                false,
             )?;
             Err(
                 GovError::new(&e.code, format!("{} — update rolled back", e.message))
@@ -346,7 +379,40 @@ pub fn apply_update(
 /// initiating identity and authority, the reason, the migrations reverted, the resulting lock and the verification
 /// result; the consumed snapshot is marked so it cannot be silently re-applied.
 pub fn rollback(p: &mut Project, target: Option<&str>, reason: Option<&str>) -> Result<Value> {
+    rollback_opts(p, target, reason, false)
+}
+
+/// Operator-initiated `rollback` ingress.
+///
+/// `OWNER-DECISION-0006` §9 — "the floor rule must govern `recovery`, `rollback` and every other backward-capable
+/// privileged lifecycle ingress consistently". A rollback to a release below the machine's protected floors is
+/// therefore refused by default and is admissible only under owner-authorised break-glass. The *transaction abort*
+/// path inside [`apply_update_opts`] is different and does not cross this boundary: it restores the installation
+/// the floors already describe, because step (9) never ran.
+pub fn rollback_opts(
+    p: &mut Project,
+    target: Option<&str>,
+    reason: Option<&str>,
+    break_glass: bool,
+) -> Result<Value> {
+    rollback_internal(p, target, reason, false, break_glass)
+}
+
+fn rollback_internal(
+    p: &mut Project,
+    target: Option<&str>,
+    reason: Option<&str>,
+    transaction_abort: bool,
+    break_glass: bool,
+) -> Result<Value> {
     crate::authority::require(p, "update_apply")?;
+    if !transaction_abort {
+        crate::srr::breakglass::guard(
+            &crate::srr::state::MachineState::open()?,
+            crate::FRAMEWORK_NAME,
+            "update --rollback",
+        )?;
+    }
     let base = p.runtime_dir().join("update");
     let dir = match target {
         Some(t) => base.join(t),
@@ -375,12 +441,39 @@ pub fn rollback(p: &mut Project, target: Option<&str>, reason: Option<&str>) -> 
     let meta = read_json(&dir.join("snapshot.json"))?;
     let version_before = p.framework_version();
     let level = crate::authority::level_of(p, &p.role).unwrap_or(0);
-    for sub in ["kernel", "project", "generated"] {
+    // Privileged lifecycle ingress `rollback`: the one verification policy. The snapshot's kernel payload is the
+    // candidate; it is staged privately, measured, and checked against the machine's floors like any other
+    // candidate. A snapshot on disk is *content*, and content never establishes its own admissibility.
+    let auth = if transaction_abort {
+        None
+    } else {
+        Some(crate::srr::admit(
+            crate::srr::AdmissionRequest::new(crate::srr::Ingress::Rollback, &dir.join("kernel"))
+                .with_break_glass(break_glass)
+                .with_reason(reason.map(|r| r.to_string())),
+        )?)
+    };
+    for sub in ["project", "generated"] {
         let s = dir.join(sub);
         let d = p.governance_dir().join(sub);
         if s.exists() {
             remove_dir_if_exists(&d)?;
             copy_dir(&s, &d)?;
+        }
+    }
+    match auth.as_ref() {
+        // Verified bytes in, verified bytes installed, atomically.
+        Some(a) => {
+            crate::kernel::install_kernel(a, &p.governance_dir())?;
+        }
+        // Transaction abort: restore the tree the floors already describe.
+        None => {
+            let s = dir.join("kernel");
+            let d = p.governance_dir().join("kernel");
+            if s.exists() {
+                remove_dir_if_exists(&d)?;
+                copy_dir(&s, &d)?;
+            }
         }
     }
     std::fs::copy(dir.join("framework.lock"), p.lock_path())?;
@@ -414,7 +507,11 @@ pub fn rollback(p: &mut Project, target: Option<&str>, reason: Option<&str>) -> 
         &dir.join("consumed.json"),
         &json!({"consumed_at": now_iso(), "by": p.session_id, "role": p.role, "reason": reason, "ledger": "spec/reports/framework-updates.jsonl"}),
     )?;
+    let protected = match auth.as_ref() {
+        Some(a) => crate::srr::record_installed(a)?,
+        None => Value::Null,
+    };
     Ok(
-        json!({"rolled_back_to": meta["from"], "from": version_before, "kernel_ok": ok, "doctor": entry["verification"]["doctor"], "index_manifest": r.manifest_hash, "ledger_entry": entry, "snapshot_consumed": true}),
+        json!({"rolled_back_to": meta["from"], "from": version_before, "kernel_ok": ok, "doctor": entry["verification"]["doctor"], "index_manifest": r.manifest_hash, "ledger_entry": entry, "snapshot_consumed": true, "release_authenticity": auth.as_ref().map(|a| a.to_value()), "protected_state": protected}),
     )
 }

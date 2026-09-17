@@ -1,0 +1,12 @@
+schema: governance-os.contract-source-lock
+schema_version: 1
+contract_version: v3
+owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md
+owner_source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+canonical_import: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+canonical_import_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+compiled: framework/contracts/governance-capability-acceptance.yaml
+compiled_sha256: 30cec97cb03ad481680c5a721a99d442d0acac942e857f3a8f331e1cca8f64f3
+binding: The compiled representation is valid only while canonical_import_sha256 equals owner_source_sha256 AND the compiled file matches a fresh compilation of that source. Any difference is a hard failure (Contract v3, 'Contract authority model').
+gate: GATE-OWNER-CAC-UPLOAD
+logged_precedence_conflict: The owner supplied the normative source at the repository root rather than at the destination path; an active owner directive outranks the frozen gate convention, so the root file is authoritative and the destination copy is a hash-bound canonical import.

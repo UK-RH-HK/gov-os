@@ -1,8 +1,5 @@
 //! Kernel payload: build from the canonical repo, install into a consumer, verify immutability.
-use crate::util::{
-    copy_dir, hash_tree, hash_value, now_iso, read_json, read_yaml, remove_dir_if_exists,
-    write_json,
-};
+use crate::util::{copy_dir, hash_tree, hash_value, read_json, read_yaml, remove_dir_if_exists};
 use crate::{GovError, Result, FRAMEWORK_NAME, VERSION};
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
@@ -238,20 +235,38 @@ pub fn stage_payload(source_dir: &Path, dest: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Install a kernel payload into `governance/`; any installation invalidates the cached trust verdict.
-pub fn install_kernel(source: Option<&Path>, governance_dir: &Path) -> Result<Value> {
-    let r = install_kernel_inner(source, governance_dir);
+/// Install a kernel payload into `governance/` from a **typed authenticated-release value**.
+///
+/// ARCH-0003 §6: "Every privileged lifecycle adapter must call one verification policy and receive a typed
+/// authenticated-release value, **never a raw source directory**." That rule is enforced here by the signature:
+/// the only way to obtain an [`crate::srr::AuthenticatedRelease`] is [`crate::srr::admit`], so no ingress can
+/// install bytes that the single verifier has not staged, measured and admitted. There is no path-taking variant.
+///
+/// The bytes installed are `auth.verified_payload()` — the private staging copy that was measured — and the commit
+/// is the atomic, crash-safe transaction in [`crate::srr::staging`].
+pub fn install_kernel(
+    auth: &crate::srr::AuthenticatedRelease,
+    governance_dir: &Path,
+) -> Result<Value> {
+    let r = install_kernel_inner(auth, governance_dir);
     crate::kernel_trust::clear();
     r
 }
 
-fn install_kernel_inner(source: Option<&Path>, governance_dir: &Path) -> Result<Value> {
-    let src = resolve_kernel_source(source)?;
+fn install_kernel_inner(
+    auth: &crate::srr::AuthenticatedRelease,
+    governance_dir: &Path,
+) -> Result<Value> {
     let dest = governance_dir.join("kernel");
-    stage_payload(&src, &dest)?;
-    let mut manifest = build_manifest(&dest)?;
-    manifest["built_at"] = Value::String(now_iso());
-    write_json(&dest.join(KERNEL_MANIFEST), &manifest)?;
+    crate::srr::staging::commit_tree(&auth.machine, &auth.staged, &dest)?;
+    let manifest = read_manifest(&dest)?;
+    // The installed payload must be the verified payload, byte for byte.
+    if manifest["payload_hash"].as_str() != Some(auth.payload_hash.as_str()) {
+        return Err(GovError::new(
+            "SRR_COMMITTED_BYTES_MISMATCH",
+            "the installed kernel payload digest differs from the verified release payload digest",
+        ));
+    }
     Ok(manifest)
 }
 

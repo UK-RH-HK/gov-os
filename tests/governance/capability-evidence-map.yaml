@@ -1,0 +1,606 @@
+schema: governance-os.capability-evidence-map
+schema_version: 1
+contract_version: v3
+source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+note: capability → test/check/evidence mapping. Rows are DECLARED, never asserted as satisfied; populating them is governed work, not a builder claim.
+capabilities:
+- capability: A1
+  title: Canonical authority and policy precedence
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: A2
+  title: Authentic root of trust
+  requirement_class: POST_VERIFICATION_HARDENING
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: A3
+  title: Security, sensitivity and permissions
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: A4
+  title: Budget/resource governance
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: A5
+  title: Emergency controls
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: B1
+  title: Standard repository contract
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: B2
+  title: Path map
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: B3
+  title: Authoritative vs derived state
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C1
+  title: Deterministic structured memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C2
+  title: Relationship/graph memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C3
+  title: Semantic memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C4
+  title: Lexical memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C5
+  title: Code-structural memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C6
+  title: Temporal memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C7
+  title: Episodic execution memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C8
+  title: Failure memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C9
+  title: Working memory/context packet
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: C10
+  title: Capability memory
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: D1
+  title: Incremental indexing/freshness
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: D2
+  title: Retrieval router
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: D3
+  title: Hierarchical retrieval
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: D4
+  title: Component separation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: D5
+  title: Evidence-driven retrieval model selection
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: D6
+  title: Rebuild guarantee
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: E1
+  title: Authority levels
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: E2
+  title: Representative roles
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: E3
+  title: Typed A2A handoffs
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: E4
+  title: Concurrency/task claims
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: F1
+  title: Skill lifecycle
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: F2
+  title: Tool Capability Registry
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: F3
+  title: Missing-tool acquisition
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: F4
+  title: Plugin trust boundary
+  requirement_class: POST_VERIFICATION_HARDENING
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: F5
+  title: MCP/A2A/tool separation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: G1
+  title: Natural-language intent
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: G2
+  title: Small explicit human control set
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: H1
+  title: SPEC lineage
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: H2
+  title: 26-dimension Feature/Capability Readiness Contract
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: H3
+  title: Readiness generates work
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: H4
+  title: Scenarios drive data/tests
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: I1
+  title: Unified task DAG
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: I2
+  title: Task contract
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: I3
+  title: Dynamic generation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: I4
+  title: Parallel execution
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: J1
+  title: Research becomes evidence
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: J2
+  title: Experiment lifecycle
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: K1
+  title: CIT-P
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: K2
+  title: CIT-E
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: K3
+  title: Automatic impact simulation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: K4
+  title: Impact radius
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: L1
+  title: Contradiction resolution
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: L2
+  title: Human Decision Gate package
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: L3
+  title: Gate presentation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: L4
+  title: Non-global blocking
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: M1
+  title: T0-T3 or equivalent capability tiers
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: M2
+  title: Reasoning requirement
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: M3
+  title: Role defaults
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: M4
+  title: Empirical routing
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: N1
+  title: Structured checkpoint
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: N2
+  title: Mandatory triggers
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: N3
+  title: Provider-independent checkpoint watchdog
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: N4
+  title: Worker return contract
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: O1
+  title: Product test families
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: O2
+  title: Governance test families
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: O3
+  title: Independent test authorship
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: O4
+  title: Governance suite currency
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: O5
+  title: Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: P1
+  title: Execution telemetry
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: P2
+  title: Organisational questions
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: Q1
+  title: Lesson lifecycle
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: Q2
+  title: Decision vs lesson
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: Q3
+  title: PROJECT/PRODUCT/FRAMEWORK scope
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: Q4
+  title: Upstream Export Gate
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: R1
+  title: Legacy Governance Retirement
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: R2
+  title: Chat-memory retirement
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: R3
+  title: Archive policy
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: S1
+  title: Canonical OS repo
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: S2
+  title: Immutable releases
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: S3
+  title: '`gov init`'
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: S4
+  title: '`gov adopt`'
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: S5
+  title: '`gov update`'
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: S6
+  title: Cross-machine mechanics
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: T1
+  title: Role separation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: T2
+  title: Fresh-session independence
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: T3
+  title: Adoption evidence tree
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: V1
+  title: Fault manifest
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: V2
+  title: Hidden path-map oracle
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: V3
+  title: Hidden memory oracle
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: V4
+  title: Quantitative qualification scoring
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W1
+  title: Stable artefact identity
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W2
+  title: Typed output → input contracts
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W3
+  title: Mandatory task-input manifest
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W4
+  title: Context compiler delivery proof
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W5
+  title: Consumption receipt and implementation traceability
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W6
+  title: Upstream-change staleness propagation
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W7
+  title: Orphan/dead-output and unexplained-output detection
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W8
+  title: Forward and reverse lineage
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W9
+  title: Session/handoff continuity of mandatory inputs
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W10
+  title: Deterministic mandatory inputs outrank retrieval
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W11
+  title: Artifact-flow quantitative health
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary
+- capability: W12
+  title: Health-scheduler integration
+  requirement_class: ORIGINAL
+  automated_checks: []
+  evidence_class: NOT_YET_MAPPED
+  independent_verification_obligation: R1/R2 per the frozen acceptance boundary

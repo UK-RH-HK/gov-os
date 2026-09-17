@@ -33,6 +33,22 @@ fn uuid_like() -> String {
     )
 }
 
+/// Per-scenario simulated machine: same repository root ⇒ same machine; different roots ⇒ different machines.
+/// This is the value of `XDG_STATE_HOME`, from which the runtime derives its default protected state path.
+pub fn machine_state_home(root: &Path) -> PathBuf {
+    let key = gov_runtime::util::sha256_text(&root.display().to_string());
+    std::env::temp_dir()
+        .join("gov-cert-machine")
+        .join(&key[..16])
+}
+
+/// The protected state root the runtime will resolve for that simulated machine.
+pub fn machine_state_dir(root: &Path) -> PathBuf {
+    machine_state_home(root)
+        .join("governance-os")
+        .join("machine")
+}
+
 pub fn copy_dir(src: &Path, dst: &Path) {
     gov_runtime::util::copy_dir(src, dst).unwrap();
 }
@@ -149,6 +165,14 @@ impl Gov {
             .arg(&self.role)
             .args(args);
         c.env("GOV_CANONICAL_ROOT", canonical_root());
+        // Signed Release Root v1: the protected machine state is a property of the MACHINE, not of a project, so
+        // each certification scenario gets its own simulated machine keyed by its repository root. Without this the
+        // suite would share one machine's floors across unrelated scenarios (and pollute the developer's own).
+        //
+        // This relocates the OS state home, so the runtime resolves its DEFAULT protected path — the same code path
+        // a real installation takes. `GOV_MACHINE_STATE_DIR` is deliberately left unset, so the tests that probe the
+        // override are probing a genuine override rather than the mechanism the whole suite depends on.
+        c.env("XDG_STATE_HOME", machine_state_home(&self.root));
         c.env_remove("GOV_SESSION");
         c.env_remove("GOV_ROLE");
         for (k, v) in &self.env {

@@ -102,6 +102,12 @@ pub fn command_files(desc: &PluginDescriptor, root: &Path) -> Vec<(String, PathB
 }
 
 /// Content hash over the resolvable command files (sorted), or None when nothing local is hashable.
+/// The first resolvable implementation file of a plugin, i.e. where its bytes actually live. `None` means no local
+/// implementation resolved, which `SRR-R0-L6` treats as remotely acquired.
+pub fn resolve_implementation(desc: &PluginDescriptor, root: &Path) -> Option<PathBuf> {
+    command_files(desc, root).into_iter().next().map(|(_, p)| p)
+}
+
 pub fn pin_hash(desc: &PluginDescriptor, root: &Path) -> Option<String> {
     let mut files = command_files(desc, root);
     if files.is_empty() {
@@ -446,6 +452,24 @@ pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
     let dest = p.overlay_dir().join("plugins").join(format!("{id}.yaml"));
     let tmp = PluginDescriptor::from_value(&descriptor, &dest.to_string_lossy())
         .ok_or_else(|| GovError::new("USAGE", "descriptor is not a plugin descriptor"))?;
+    // `SRR-R0-L6` — built-in/local capabilities versus remotely acquired privileged plugins, tools and profiles.
+    // The class is derived from where the implementation bytes actually are, never from what the descriptor says
+    // about itself. A privileged capability whose bytes came from outside the verified release payload and outside
+    // the governed project must be authorised by a delegated signed target in the verified release metadata.
+    let acquisition = crate::srr::plugins::classify(
+        &p.root,
+        &crate::kernel_trust::trusted_root(p),
+        resolve_implementation(&tmp, &p.root).as_deref(),
+    );
+    let channel = crate::srr::state::MachineState::open()
+        .ok()
+        .and_then(|ms| crate::srr::state::InstalledRecord::load(&ms, crate::FRAMEWORK_NAME))
+        .map(|r| r.channel)
+        .unwrap_or_default();
+    // Delegated targets are carried by the verified release metadata of the installed release. Until a signed
+    // delegation exists for a capability, a privileged remotely-acquired one is refused rather than admitted.
+    let acquisition_verdict =
+        crate::srr::plugins::guard_acquisition(&id, &descriptor, acquisition, &[], &channel)?;
     let (healthy, hmsg) = health_static(&tmp, &p.root);
     if !healthy {
         return Err(GovError::new(
@@ -542,7 +566,7 @@ pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
     let _ = write_json(&path, &doc);
     let _ = crate::tools::generate_registry(p);
     Ok(
-        json!({"registered": true, "plugin_id": id, "path": format!("governance/project/plugins/{id}.yaml"), "pin": descriptor["pin"], "provenance": descriptor["provenance"], "approved_roles": descriptor["approved_roles"], "registry": registry::REGISTRY_PATH, "registry_entry": entry}),
+        json!({"registered": true, "plugin_id": id, "path": format!("governance/project/plugins/{id}.yaml"), "pin": descriptor["pin"], "provenance": descriptor["provenance"], "approved_roles": descriptor["approved_roles"], "registry": registry::REGISTRY_PATH, "registry_entry": entry, "acquisition": acquisition_verdict}),
     )
 }
 

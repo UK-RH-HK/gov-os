@@ -58,6 +58,11 @@ pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
 pub fn guard_write(p: &Project, operation: &str) -> Result<()> {
     // constitutional floors must come from a verified kernel before any governed mutation (verifier V-H2)
     crate::kernel_trust::guard(p, operation)?;
+    // OWNER-DECISION-0006 §6: while this machine is marked `DEGRADED — RECOVERY ONLY`, normal privileged
+    // Governance OS operation, Human Gate creation/approval, release certification, trust-policy mutation and
+    // privileged plugin/profile acquisition are refused. Inspection, backup/export, diagnosis, repair,
+    // uninstall/reinstall and restoration of an authenticated release stay available (§5).
+    crate::srr::breakglass::guard_light(crate::FRAMEWORK_NAME, operation)?;
     let s = state(p);
     if s["writes_frozen"].as_bool().unwrap_or(false) {
         return Err(GovError::new("FROZEN", format!("writes are frozen (FREEZE_WRITES active); '{operation}' refused. Run `gov resume` (L4) to lift.")));
