@@ -30,8 +30,26 @@ contract_v3:
   sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
 branch: phase1/srr1-r0-correction-1
 started_at: '2026-09-17T21:40Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0024.report.yaml
 expected_evidence_path: release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md
 required_verdict_vocabulary: [ARCHITECTURE_CORRECTION_READY_FOR_REVIEW, INCOMPLETE]
-outcome: null
+outcome:
+  verdict: ARCHITECTURE_CORRECTION_READY_FOR_REVIEW
+  worktree_base_commit: 73227a1594265743b18eb7115394d639e6c659a2
+  correction_commit: 29516f89c2030bfb4dcf12be86af7430665c7d66
+  report_commit: 032ffbbe4ef7ad754f388ca0452fec3fd3d479f4
+  integration_merge_commit: d34478aa945617a93b1c962fcc363b1c3f835ab3
+  files_changed: [spec/architecture/ARCH-0003.yaml, release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md, release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md]
+  new_owner_decision_required: none
+  orchestrator_verification:
+    - exactly the three permitted files changed between base and correction commit
+    - report commit adds only AR-0024.report.yaml
+    - frozen R0 boundary re-hashed byte-identical at 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+    - D-0007, D-0008, D-0009, ARCH-0002, packs 02 and 03, review evidence and Contract v3 unchanged
+    - ARCH-0003 remains status PROVISIONAL, in_effect false, human_approved false, proposal_state R0_REVIEW_CANDIDATE
+    - correction_state R0_CORRECTION_1_APPLIED_PENDING_FRESH_R0_RE_REVIEW with self_graded false
+  disclosed_judgement_call: >-
+    SRR-R0-L8 not fixed (no traceability rows added); two existing rows re-pointed because the sections they cite moved
+    under this correction. Disclosed by the correction role for the re-reviewer's attention.
+  completed_at: '2026-09-17T21:55Z'

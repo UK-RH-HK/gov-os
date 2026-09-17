@@ -1,0 +1,38 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0025
+role: r0-architecture-reviewer
+objective: >-
+  NEW fresh independent R0 re-review of the corrected Signed Release Root candidate: rerun SRR-R0-H1 and SRR-R0-M1 plus
+  the AR-0023 probe set, author fresh held-out R0 attacks, verify the ten OWNER-DECISION-0006 requirements are in
+  architecture text, and issue the R0 verdict under the frozen boundary.
+agent_model: claude-opus-5
+fresh_context: true
+independent_of: [AR-0023 review, AR-0024 correction, architecture authoring]
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0025-srr1-r0-re-review.md
+active_gate: GATE-R0-ARCH-ACCEPT
+review_cycle: 2
+base_commit: d34478aa945617a93b1c962fcc363b1c3f835ab3
+corrected_candidate:
+  correction_commit: 29516f89c2030bfb4dcf12be86af7430665c7d66
+  arch_0003_sha256: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+  architecture_md_sha256: 695aa185ab32a813cd596b12f80d235afb92d56f147f395b15f16e37d0bcd983
+  correction_record_sha256: 6922fd352219b36acb75395bc03b2a15888d3f801824acf0f878f6a7931a9044
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+owner_inputs: [OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DIRECTIVE-0004]
+reruns_required: [SRR-R0-H1, SRR-R0-M1, AR-0023 probe set]
+branch: phase1/srr1-r0-review-2
+started_at: '2026-09-17T22:00Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0025.report.yaml
+expected_evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/
+required_verdict_vocabulary: [ROT_ARCHITECTURE_ACCEPTED_R0, ROT_ARCHITECTURE_REJECTED_R0]
+loop_limit_note: >-
+  The single permitted bounded correction cycle is used. A rejection does not open another correction cycle; the
+  orchestrator escalates to owner readjudication, distinguishing residual blockers from genuinely new requirements.
+outcome: null

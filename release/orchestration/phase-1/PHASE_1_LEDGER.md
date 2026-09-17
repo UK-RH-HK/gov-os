@@ -939,3 +939,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit containing this entry |
 | Findings | — |
 | Next action | complete AR-0024, then dispatch a NEW fresh independent R0 reviewer scoped to the corrected text and `OWNER-DECISION-0006` |
+
+## L-0066 — 2026-09-17 — bounded R0 correction applied (AR-0024); fresh R0 re-review dispatched
+
+| Field | Value |
+|---|---|
+| Iteration | SRR-1 bounded R0 correction cycle 1 of 1, then R0 review cycle 2 |
+| Role | fresh isolated architecture-correction role (AR-0024); orchestrator routing only |
+| Input commit | `73227a1594265743b18eb7115394d639e6c659a2` |
+| Work performed | AR-0024 applied CD-R0-1 and CD-R0-2 only. **CD-R0-1:** the floor rule is now stated over the ingress set — no `init`, `adopt`, `update`, `reinstall`, `rollback` or `recovery` may place the machine below its protected high-water or the signed minimum secure release; `recovery`'s installed-integrity object is qualified as establishing *intact*, never *admissible*; offline authenticity derives from the machine's own protected record of the release it previously verified, never from the manifest, lock or repository; below-floor recovery is stated as owner-authorised break-glass with all ten OWNER-DECISION-0006 requirements in architecture text; and the revoked-binary allowance is reconciled so a revoked binary can neither re-establish itself nor issue its own break-glass entry. **CD-R0-2:** the local time source is declared inside the trusted local boundary on the OS/admin side, with a two-directional non-guarantee bounded to freshness (no floor lowered, no unauthorised release admitted, verified-byte binding intact), no claim of unseen future revocations, a conditional currency-honesty claim, and excluded time mechanisms named as excluded. Orchestrator verified before merging: exactly the three permitted files changed; frozen boundary re-hashed byte-identical; D-0007/D-0008/D-0009/ARCH-0002, packs 02/03, review evidence and Contract v3 unchanged; candidate still PROVISIONAL / not in effect / not human-approved. No new owner trade-off surfaced. |
+| Report / evidence | `AGENT_RUNS/AR-0024.report.yaml`; `release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md` |
+| Verdict | `ARCHITECTURE_CORRECTION_READY_FOR_REVIEW` — the correction did not grade itself |
+| Output commit | d34478aa945617a93b1c962fcc363b1c3f835ab3 (merge); correction `29516f8`, report `032ffbb` |
+| Findings | AR-0024 disclosed one judgement call: `SRR-R0-L8` not fixed, two traceability rows re-pointed because their target sections moved. Routed to AR-0025 to verify. |
+| Next action | AR-0025 fresh independent R0 re-review; on acceptance continue automatically into R1, on rejection stop with `R0_OWNER_READJUDICATION_REQUIRED` |

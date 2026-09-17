@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T21:02:01Z'
-state_hash: fedc6645da92749deb4fad3fe3cbd60b06e93c96b9dba98788d19df375e33bd0
-lifecycle_state: R0_ARCHITECTURE_CORRECTION
-loop_status: R0_BOUNDED_CORRECTION_CYCLE_1_OF_1   # owner trade-off answered; CP-1 remains frozen
+updated_at: '2026-09-17T21:16:14Z'
+state_hash: 51e36c0a25b38d2dbdc9b11a4767155b317455a18e020e7e302e0705325849a2
+lifecycle_state: R0_ARCHITECTURE_REVIEW
+loop_status: R0_RE_REVIEW_RUNNING_AFTER_CORRECTION_1   # correction cycle used; no further cycle authorised
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: aa72e5062a72bd74fcd3dc36fca06605a33d00a7
+  last_recorded_commit: d34478aa945617a93b1c962fcc363b1c3f835ab3
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -258,6 +258,16 @@ r0_findings_arch_0003:
   integration_merge_commit: aa72e5062a72bd74fcd3dc36fca06605a33d00a7
   evidence_path: release/root-of-trust/signed-release-root-v1-review-r0/
   correction_delta_path: release/root-of-trust/signed-release-root-v1-review-r0/11-CORRECTION-DELTA.md
+  correction_applied:
+    run: AR-0024
+    verdict: ARCHITECTURE_CORRECTION_READY_FOR_REVIEW
+    correction_commit: 29516f89c2030bfb4dcf12be86af7430665c7d66
+    integration_merge_commit: d34478aa945617a93b1c962fcc363b1c3f835ab3
+    record_path: release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md
+    closes_claimed: [SRR-R0-H1 via CD-R0-1, SRR-R0-M1 via CD-R0-2]
+    graded_by: AR-0025 (pending); the correction role did not grade itself
+    new_owner_decision_required: none surfaced by the correction
+
   orchestrator_adjudication:
     method: >-
       Every finding adjudicated against the ACTIVE gate only. A finding enters the active repair queue solely when its
@@ -354,7 +364,7 @@ iteration:
   active_architecture_lineage: ARCH-0003
   active_gate: R0
   architecture_review_cycle_under_phase_1: 6
-  signed_release_root_r0_review_cycle: 1
+  signed_release_root_r0_review_cycle: 2
   signed_release_root_r0_correction_cycles_used: 1
   signed_release_root_r0_correction_cycles_permitted: 1   # ARCHITECTURE LOOP LIMIT; a second genuinely new architectural blocker or owner trade-off after the corrected re-review means R0_OWNER_READJUDICATION_REQUIRED
   implementation_repair_cycle: 0
@@ -422,15 +432,15 @@ completed_stages:
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
 running_work:
-  - run_id: AR-0024
-    role: r0-architecture-correction
+  - run_id: AR-0025
+    role: r0-architecture-reviewer
     status: RUNNING
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0024.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0024-srr1-r0-bounded-correction.md
-    branch: phase1/srr1-r0-correction-1
-    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0024.report.yaml
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0025.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0025-srr1-r0-re-review.md
+    base_commit: d34478aa945617a93b1c962fcc363b1c3f835ab3
+    branch: phase1/srr1-r0-review-2
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0025.report.yaml
     gate: GATE-R0-ARCH-ACCEPT
-    scope: [SRR-R0-H1 via CD-R0-1, SRR-R0-M1 via CD-R0-2]
 
 
 
@@ -540,7 +550,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: COMPLETE_AR_0024_BOUNDED_R0_CORRECTION__THEN_MINT_THE_CORRECTED_CANDIDATE_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R0_REVIEWER_SCOPED_TO_THE_CORRECTED_TEXT_AND_OWNER_DECISION_0006
+next_deterministic_action: ADJUDICATE_AR_0025_R0_RE_REVIEW_VERDICT__ON_ACCEPT_PERSIST_ROT_ARCHITECTURE_ACCEPTED_R0_AND_CONTINUE_AUTOMATICALLY_INTO_R1_BUILDER__ON_REJECT_STOP_WITH_R0_OWNER_READJUDICATION_REQUIRED__IF_NO_COMMITTED_AR_0025_REPORT_RERUN_A_FRESH_RE_REVIEW
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0
