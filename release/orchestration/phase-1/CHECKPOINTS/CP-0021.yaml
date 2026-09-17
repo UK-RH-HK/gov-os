@@ -1,0 +1,52 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0021
+trigger: fresh orchestrator session self-located to Phase 1 / R0 and dispatched the R0 reviewer AR-0023
+date: 2026-09-17
+lifecycle_state: R0_ARCHITECTURE_REVIEW
+loop_status: R0_REVIEW_RUNNING
+repository:
+  integration_branch: release/4.1.6-rc1
+  orchestration_commit: 166ac4cff484160c7176e0ce15b23e59820074f2
+  reviewed_candidate_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+  rebase_record_commit: 2d78f6bf38f99ce1ff936eaf8b8b617e014441e7
+self_location_evidence:
+  state_verify: STATE_CONSISTENT
+  landing_rule: >-
+    D-0009, OWNER-DIRECTIVE-0004 and ARCH-0003 are committed; next_deterministic_action was
+    FRESH_R0_ARCHITECTURE_REVIEW_OF_ARCH_0003_AT_COMMITTED_REBASE_CANDIDATE; ROT_ARCHITECTURE_ACCEPTED_R0 absent.
+  verified_digests:
+    contract_v3_owner_source: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+    frozen_r0_boundary: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+    owner_directive_0004: 26243019d09e07617a63cf575c3e5e59cad307a7ac38100116dbbb3300f2a1ba
+    operator_ui_v8_1: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+  candidate_inputs_identical_between_2d78f6b_and_head: true
+  contract_canonical_import_or_lock: none exists yet; GATE-OWNER-CAC-UPLOAD is NOT_OPEN; nothing to cross-verify
+  operator_ui_duplicates: none
+active_gate: GATE-R0-ARCH-ACCEPT
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+running_work:
+  - run_id: AR-0023
+    role: r0-architecture-reviewer
+    handoff: release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r0-review
+    branch: phase1/srr1-r0-review
+    worktree_base_commit: 166ac4cff484160c7176e0ce15b23e59820074f2
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.report.yaml
+    expected_evidence_path: release/root-of-trust/signed-release-root-v1-review-r0/
+    agent_handle: orchestrator-session-local; not resumable from a fresh session
+resume_rule: >-
+  If AR-0023 has a committed AR-0023.report.yaml on branch phase1/srr1-r0-review, adjudicate that verdict. If it has no
+  committed report, the run is INCOMPLETE and advances no gate: discard it and dispatch a NEW fresh independent R0
+  reviewer at the same reviewed candidate under the same frozen boundary. Never infer a verdict from conversation.
+next_deterministic_action: ADJUDICATE_AR_0023_R0_VERDICT__IF_NO_COMMITTED_AR_0023_REPORT_RERUN_A_FRESH_R0_REVIEW_AT_THE_SAME_CANDIDATE
+prohibitions:
+  - no implementation before separately authorised post-R0 work
+  - no RoT-1 Revision 8 or CP-1 repair loop
+  - no D-0008/ARCH-0002 activation or mutation
+  - no D-0007 supersession/amendment during R0
+  - no historical evidence rewrite
+  - orchestrator issues no R0 verdict of its own
+  - R0 bounded-correction limit: one architecture correction cycle after an initial R0 rejection, then R0_OWNER_READJUDICATION_REQUIRED
