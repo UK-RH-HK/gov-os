@@ -5,6 +5,33 @@ as real software: an immutable kernel payload, a Rust deterministic core and `go
 plugin protocol, declarative framework migrations, synthetic certification fixtures and an implementer test harness.
 Product repositories in any language consume released kernels through `gov init` / `gov adopt` / `gov update`.
 
+## Governance OS — Start Here / Authority Map
+
+Use these sources in authority order:
+
+1. **Original product-intent sources** (historical intent):
+   [Operating Framework v4.1.2](./DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md),
+   [Release, Distribution, Adoption and Upstream Learning Protocol v1.2](./GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md), and
+   [Adoption, Migration and Independent Audit Protocol v3.0](./GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md).
+2. **Current product-owner capability contract:**
+   [Governance OS Capability Acceptance Contract v3](./Governance_OS_Capability_Acceptance_Contract_v3.md).
+   This root file is the product-owner-supplied normative capability source. Generated or machine-readable
+   representations may be executable views, but they do not replace the owner source unless an explicit
+   owner-approved decision changes that rule.
+3. **Active owner decisions and directives:** [`./spec/decisions/`](./spec/decisions/).
+4. **Accepted architecture records:** [`./spec/architecture/`](./spec/architecture/).
+5. **Frozen lifecycle-gate contracts**, as referenced by the active decisions and architecture.
+6. **Exact candidate/evidence state and durable orchestration state:** [`./release/orchestration/`](./release/orchestration/).
+7. **Current operator control panel:**
+   [Governance OS Interactive Stage Control Panel V8.1](./release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html)
+   — `NON_NORMATIVE_OPERATOR_UI`. It is a runbook/orchestration interface and never overrides the sources above.
+
+A new persistent Opus phase-orchestrator session should open that exact HTML and use its
+**V8.1 — Self-locating durable autonomous Phase Orchestrator** launcher. The launcher determines the active phase
+from committed Git/orchestration evidence, then uses the matching phase prompts internally. The product owner should
+not need to relay routine reviewer/builder prompts between agents. Each completed phase stops at its acceptance token;
+the next outer session uses the same universal launcher again.
+
 | Governing documents | |
 |---|---|
 | Operating framework v4.1.2 | [DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md](DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md) |

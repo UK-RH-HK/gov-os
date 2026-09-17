@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T17:09:10Z'
-state_hash: 02ad50b7d875c9e204a8e6be1f6bc83b89c83cebdde7c426d03c9dd2fdbca8f6
+updated_at: '2026-09-17T19:39:42Z'
+state_hash: cd26717057d3646f0add797f111c6c1c45b08d33ac418ea6021db5e6000dd9df
 lifecycle_state: R0_ARCHITECTURE_READY_FOR_FRESH_REVIEW
 loop_status: REBASED_R0_REVIEW_PENDING   # CP-1 remains frozen; separate ARCH-0003 lineage awaits fresh R0 review
 
@@ -52,6 +52,11 @@ repository:
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
+
+operator_ui:
+  canonical_path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html
+  sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+  classification: NON_NORMATIVE_OPERATOR_UI
 
 baseline_rejected_release:
   version: 4.1.5

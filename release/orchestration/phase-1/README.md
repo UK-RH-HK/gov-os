@@ -20,6 +20,15 @@ hidden reasoning. It holds only:
 | `CHECKPOINTS/CP-*.yaml` | point-in-time copies of the state at checkpoint triggers |
 | `tools/check_state.py` | `verify`, `seal` and `show` (non-product tooling) |
 
+## Current operator UI
+
+The sole current canonical operator interface is
+[`release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html`](../control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html),
+SHA-256 `54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d`.
+Its classification is `NON_NORMATIVE_OPERATOR_UI`: it is an orchestration/runbook interface and does not establish or
+change Governance OS authority. Earlier root control-panel copies remain recoverable from Git history but are not
+current operator interfaces.
+
 ## Resume (compaction or a fresh orchestrator session)
 
 Governance OS has no `gov orchestration resume phase-1` command yet. Until it does, the equivalent is:
