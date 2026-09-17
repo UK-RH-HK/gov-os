@@ -910,3 +910,18 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit containing this entry |
 | Findings | — |
 | Next action | `ADJUDICATE_AR_0023_R0_VERDICT__IF_NO_COMMITTED_AR_0023_REPORT_RERUN_A_FRESH_R0_REVIEW_AT_THE_SAME_CANDIDATE` |
+
+## L-0064 — 2026-09-17 — R0 REJECTED for ARCH-0003 (AR-0023); one bounded correction cycle opens, blocked on an owner trade-off
+
+| Field | Value |
+|---|---|
+| Iteration | Signed Release Root (SRR-1) R0 review cycle 1 |
+| Role | fresh independent R0 architecture reviewer (AR-0023); orchestrator routing only |
+| Input commit | `166ac4cff484160c7176e0ce15b23e59820074f2` (candidate `5fd8358`) |
+| Work performed | Fresh isolated reviewer applied the frozen R0 boundary `70977d11…` to D-0009/ARCH-0003 and the `signed-release-root-v1` pack. It verified the owner directive, frozen boundary and Contract v3 digests, ran 16 mandatory attacks (13 refuted) and dispositioned the fourteen frozen R0 items (9 satisfied, 1 thin, 4 not satisfied). Orchestrator verified the evidence independently before merging: both commits exist, the report names the work commit, only review paths changed, and D-0007/D-0008/ARCH-0002/D-0009/ARCH-0003 and the candidate pack are byte-identical at the branch tip. Evidence merged unmodified with `--no-ff`. |
+| Report / evidence | `AGENT_RUNS/AR-0023.report.yaml`; `release/root-of-trust/signed-release-root-v1-review-r0/` (00 report, 10 blocking findings, 11 correction delta, 20 later-lifecycle conditions, evidence/) |
+| Verdict | **`ROT_ARCHITECTURE_REJECTED_R0`** — the reviewer's alone; the orchestrator issued none |
+| Findings | **R0 blockers (2):** `SRR-R0-H1` HIGH, NECESSARY-DERIVED, frozen items 5 and 8 — signed floors are lexically scoped to the `rollback` ingress while `recovery` admits a floor-free, non-metadata-authenticated restore; falsifies the candidate's own one-policy-across-ingresses and floor-refusal claims. `SRR-R0-M1` MEDIUM, OWNER-ADDED-NORMATIVE, frozen items 10 and 12 — no time/clock assumption or non-guarantee is declared although the whole expiry/freshness/stale-honesty model is evaluated against it. **Non-blocking later-lifecycle (9):** L1–L5, L7 (R1), L6 (R1/R2), L9 (R2), L8 (INFO) — recorded and removed from the active repair queue. Three stronger-assurance proposals recorded as non-binding, none routed into the delta. |
+| Adjudication | Active R0 repair queue is exactly `SRR-R0-H1` and `SRR-R0-M1`. Correction delta CD-R0-1/CD-R0-2 is text-level across `ARCH-0003.yaml` and `00-ARCHITECTURE.md`; it changes no trust chain, metadata model, ingress set or transaction invariant. The single permitted bounded R0 correction cycle is unused. CD-R0-1 carries a genuine owner security-versus-availability trade-off, so no architecture role is dispatched until the owner answers. |
+| Output commit | aa72e5062a72bd74fcd3dc36fca06605a33d00a7 (merge); review work `2dc08c2`, report `024057f` |
+| Next action | `AWAIT_OWNER_ANSWER_ON_GATE_OWNER_R0_BELOW_FLOOR_RECOVERY` then the single permitted bounded R0 correction cycle in a fresh isolated architecture role, then a new fresh R0 reviewer |

@@ -30,8 +30,28 @@ role_prompt_source:
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r0-review
 branch: phase1/srr1-r0-review
 started_at: '2026-09-17T21:00Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.report.yaml
 expected_evidence_path: release/root-of-trust/signed-release-root-v1-review-r0/
 required_verdict_vocabulary: [ROT_ARCHITECTURE_ACCEPTED_R0, ROT_ARCHITECTURE_REJECTED_R0]
-outcome: null
+outcome:
+  verdict: ROT_ARCHITECTURE_REJECTED_R0
+  worktree_base_commit: 166ac4cff484160c7176e0ce15b23e59820074f2
+  work_commit: 2dc08c20bacdc3dd4c28592c58a21d27b6e96d12
+  report_commit: 024057fe4015a31421d3bf48b0baaca6f742cc11
+  integration_merge_commit: aa72e5062a72bd74fcd3dc36fca06605a33d00a7
+  evidence_path: release/root-of-trust/signed-release-root-v1-review-r0/
+  r0_blockers: [SRR-R0-H1, SRR-R0-M1]
+  later_lifecycle_non_blocking: [SRR-R0-L1, SRR-R0-L2, SRR-R0-L3, SRR-R0-L4, SRR-R0-L5, SRR-R0-L6, SRR-R0-L7, SRR-R0-L8, SRR-R0-L9]
+  new_owner_decision_required: [SRR-R0-H1 below-floor recovery (blocking), SRR-R0-L6 plugin acquisition authenticity (non-blocking), SRR-R0-L7 offline install path (non-blocking)]
+  routing: >-
+    SRR-R0-H1 and SRR-R0-M1 enter the single permitted bounded R0 correction cycle. CD-R0-1 cannot be authored until the
+    owner answers the below-floor-recovery trade-off, so the correction role is not dispatched yet. All later-lifecycle
+    conditions are recorded and removed from the active repair queue.
+  scope_deviation: none declared by the reviewer; none found by orchestrator verification
+  provenance_checks:
+    - work and report commits exist; report output.commit names the work commit
+    - only review evidence paths and AR-0023.report.yaml changed between base and tip
+    - D-0007, D-0008, ARCH-0002, D-0009, ARCH-0003 and the candidate pack byte-identical at tip
+    - canonical checkout clean; evidence merged unmodified (--no-ff)
+  completed_at: '2026-09-17T21:20Z'

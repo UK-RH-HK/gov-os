@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T19:45:09Z'
-state_hash: 58271b0ba63b617d24eebcea3915e642421ace8cd97185f3db90cf4a532f76f9
-lifecycle_state: R0_ARCHITECTURE_REVIEW
-loop_status: R0_REVIEW_RUNNING   # AR-0023 fresh independent R0 review of ARCH-0003; CP-1 remains frozen
+updated_at: '2026-09-17T20:08:22Z'
+state_hash: 5eacea23eb0f697c0c29a6a6af91cbafa80e56540cb2edcc92bd39f70b1707af
+lifecycle_state: AWAITING_OWNER_R0_TRADE_OFF
+loop_status: R0_REJECTED_CYCLE_0__AWAITING_OWNER_ANSWER_BEFORE_BOUNDED_CORRECTION   # CP-1 remains frozen
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+  last_recorded_commit: aa72e5062a72bd74fcd3dc36fca06605a33d00a7
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -248,6 +248,54 @@ unresolved_findings:
   owner_record_conformance: {OWNER-DESIGN-REQUIREMENTS-0001: deviates (OP-4, OP-7a, OP-10b, OP-11b, OP-13b consequence, OP-16b), OWNER-DESIGN-REQUIREMENTS-0002: deviates (OT-1 part B running-machine C3; OT-2 criterion not executable)}
   closed_as_class: [R2-H4 (matrix7 reproduced in review r7), R2-M4, R2-M6, BC5-3]
 
+r0_findings_arch_0003:
+  review_run: AR-0023
+  verdict: ROT_ARCHITECTURE_REJECTED_R0
+  reviewed_candidate_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+  review_base_commit: 166ac4cff484160c7176e0ce15b23e59820074f2
+  work_commit: 2dc08c20bacdc3dd4c28592c58a21d27b6e96d12
+  report_commit: 024057fe4015a31421d3bf48b0baaca6f742cc11
+  integration_merge_commit: aa72e5062a72bd74fcd3dc36fca06605a33d00a7
+  evidence_path: release/root-of-trust/signed-release-root-v1-review-r0/
+  correction_delta_path: release/root-of-trust/signed-release-root-v1-review-r0/11-CORRECTION-DELTA.md
+  orchestrator_adjudication:
+    method: >-
+      Every finding adjudicated against the ACTIVE gate only. A finding enters the active repair queue solely when its
+      normative source and lifecycle are R0 under the frozen boundary 70977d11. The orchestrator issued no verdict and
+      reclassified no finding; it verified the reviewer's own lifecycle labels against the frozen boundary.
+    active_r0_repair_queue: [SRR-R0-H1, SRR-R0-M1]
+    removed_from_active_queue_as_later_lifecycle:
+      R1: [SRR-R0-L1, SRR-R0-L2, SRR-R0-L3, SRR-R0-L4, SRR-R0-L5, SRR-R0-L7]
+      R1_R2: [SRR-R0-L6]
+      R2: [SRR-R0-L9]
+      INFO: [SRR-R0-L8]
+    stronger_assurance_proposals: recorded non-binding in 20-LATER-LIFECYCLE-CONDITIONS.md; none routed into the delta
+  blocking_findings:
+    SRR-R0-H1:
+      severity: HIGH
+      lifecycle: R0
+      provenance: NECESSARY-DERIVED
+      frozen_boundary_items: [5, 8]
+      title: signed floors scoped only to the rollback ingress; recovery admits a floor-free non-metadata-authenticated restore
+      claims_falsified: ['00-ARCHITECTURE.md:32 rollback below known signed floors is refused', 'ARCH-0003.yaml:47 one verifier evaluates the same policy across all six ingresses']
+      correction: CD-R0-1
+      owner_decision_required: true
+    SRR-R0-M1:
+      severity: MEDIUM
+      lifecycle: R0
+      provenance: OWNER-ADDED-NORMATIVE
+      frozen_boundary_items: [10, 12]
+      title: no time/clock assumption or non-guarantee declared although expiry/freshness/stale-honesty is evaluated against it
+      correction: CD-R0-2
+      owner_decision_required: false
+  r0_item_disposition: {satisfied: 9, satisfied_thinly: 1, not_satisfied: 4}
+  mandatory_attacks: {total: 16, refuted: 13}
+  independently_verified_by_orchestrator:
+    - work and report commits exist and the report names the work commit
+    - only review evidence paths and AR-0023.report.yaml changed between the review base and the branch tip
+    - D-0007, D-0008, ARCH-0002, D-0009, ARCH-0003 and the candidate pack are byte-identical at the branch tip
+    - canonical checkout clean; review evidence merged unmodified
+
 known_non_blocking_residuals:
   determination_path: release/root-of-trust/4.1.6-review-r7/00-REVIEW-REPORT.md   # revision-7 determinations (final)
   not_accepted: [FC-R1'/AD-1'' and FC-R3' as stated (M1), CUR-R1 and FC-R5 for revoked binaries (H1), RS-1b and RS-1c for C3 (H2), TB-S2'' and TA-12'' as stated (M2, M3)]
@@ -256,7 +304,7 @@ known_non_blocking_residuals:
   accepted: all other residuals named in the revision-7 pack
 
 owner_gates:
-  pending: []
+  pending: [GATE-OWNER-R0-BELOW-FLOOR-RECOVERY]
   planned: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD, GATE-OWNER-KEY-CEREMONY, GATE-R1-CANDIDATE-ACCEPT, GATE-R2-STANDARD-RELEASE, GATE-R3-HIGH-ASSURANCE]
   historical_refused: [GATE-ARCH-ACCEPT, GATE-OWNER-D0008]
   owner_inputs_recorded:
@@ -298,8 +346,10 @@ iteration:
   architecture_revision_under_work: null
   active_architecture_lineage: ARCH-0003
   active_gate: R0
-  architecture_review_cycle_under_phase_1: 5
+  architecture_review_cycle_under_phase_1: 6
   signed_release_root_r0_review_cycle: 1
+  signed_release_root_r0_correction_cycles_used: 0
+  signed_release_root_r0_correction_cycles_permitted: 1   # ARCHITECTURE LOOP LIMIT; a second genuinely new architectural blocker or owner trade-off after the corrected re-review means R0_OWNER_READJUDICATION_REQUIRED
   implementation_repair_cycle: 0
 
 completed_stages:
@@ -364,16 +414,7 @@ completed_stages:
     commit: this_governance_rebase_commit
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
-running_work:
-  - run_id: AR-0023
-    role: r0-architecture-reviewer
-    status: RUNNING
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
-    base_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
-    branch: phase1/srr1-r0-review
-    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.report.yaml
-    gate: GATE-R0-ARCH-ACCEPT
+running_work: []
 
 
 latest_role_verdicts:
@@ -388,6 +429,8 @@ latest_role_verdicts:
   prompt2-synthesis: null
 
 immutable_evidence:
+  - path: release/root-of-trust/signed-release-root-v1-review-r0
+    commit: aa72e5062a72bd74fcd3dc36fca06605a33d00a7
   - path: release/root-of-trust/4.1.6-review
     commit: 1c6027c18822543d6927d9906b9efa4f7a54ed4e
   - path: release/root-of-trust/4.1.6-review-r2
@@ -480,7 +523,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: ADJUDICATE_AR_0023_R0_VERDICT__IF_NO_COMMITTED_AR_0023_REPORT_RERUN_A_FRESH_R0_REVIEW_AT_THE_SAME_CANDIDATE
+next_deterministic_action: AWAIT_OWNER_ANSWER_ON_GATE_OWNER_R0_BELOW_FLOOR_RECOVERY__THEN_RUN_THE_SINGLE_PERMITTED_BOUNDED_R0_CORRECTION_CYCLE_ON_CD_R0_1_AND_CD_R0_2_IN_A_FRESH_ISOLATED_ARCHITECTURE_ROLE__THEN_A_NEW_FRESH_R0_REVIEWER
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0

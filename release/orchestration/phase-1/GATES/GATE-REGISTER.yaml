@@ -24,6 +24,9 @@ gates:
   - id: GATE-R0-ARCH-ACCEPT
     title: R0 — independent acceptance of Signed Release Root architecture ARCH-0003
     status: OPEN
+    last_verdict: >-
+      ROT_ARCHITECTURE_REJECTED_R0 on the candidate at 5fd8358 (review AR-0023, work commit 2dc08c2, merged aa72e5062a72bd74fcd3dc36fca06605a33d00a7);
+      R0 blockers SRR-R0-H1 (HIGH) and SRR-R0-M1 (MEDIUM). One bounded correction cycle is permitted and unused.
     satisfier: fresh independent R0 architecture reviewer
     preconditions:
       - D-0009 is ACTIVE and human-approved
@@ -45,6 +48,25 @@ gates:
     on_refusal: >-
       record findings with source, provenance and lifecycle; do not implement, do not create RoT-1 Revision 8 and do
       not promote R1/R2/R3 hardening into R0 without owner approval
+    satisfaction_evidence: null
+
+  - id: GATE-OWNER-R0-BELOW-FLOOR-RECOVERY
+    title: Owner trade-off inside SRR-R0-H1 — below-floor recovery behaviour
+    status: OPEN
+    satisfier: product owner
+    raised_by: AR-0023 (independent R0 reviewer), finding SRR-R0-H1, correction item CD-R0-1
+    lifecycle: R0
+    question: >-
+      For a machine whose only complete local state is below its own protected high-water or signed minimum secure
+      release: (a) STRICT — below-floor recovery is always refused and the machine must be re-initialised from an
+      authenticated release; or (b) BREAK-GLASS — permitted only under an explicit separately authorised local
+      authority that no repository record, environment variable or caller field can manufacture, recorded, and marked
+      in the machine's reported state until it returns to an at-or-above-floor release.
+    why_owner: >-
+      A security-versus-availability product trade-off. Both behaviours are currently consistent with the architecture
+      text and they fail in opposite directions. An architecture role must not choose it on the owner's behalf.
+    blocks: authoring of CD-R0-1, and therefore the bounded R0 correction cycle
+    satisfied_when: the owner selects (a) or (b); the selection is recorded as an owner record and cited by the correction
     satisfaction_evidence: null
 
   - id: GATE-OWNER-KEY-CEREMONY
