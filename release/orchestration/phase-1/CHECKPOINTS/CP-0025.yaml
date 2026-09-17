@@ -1,0 +1,67 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0025
+trigger: ROT_ARCHITECTURE_ACCEPTED_R0 persisted; R1 build AR-0026 dispatched
+date: 2026-09-17
+lifecycle_state: R1_IMPLEMENTATION
+loop_status: R0_ACCEPTED__R1_BUILD_RUNNING
+repository:
+  integration_branch: release/4.1.6-rc1
+  head: 1e31f6b5cb4e112d4ec86b45839e093c7b50d687
+  accepted_architecture_candidate_commit: 2b36b440915f0052d92153748cea914846955418
+r0_acceptance:
+  token: ROT_ARCHITECTURE_ACCEPTED_R0
+  gate: GATE-R0-ARCH-ACCEPT
+  status: SATISFIED
+  accepted_by_run: AR-0025
+  review_work_commit: 5635955f0b7c1fafa964afc8e94f2c8bab80a0a9
+  evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/
+  accepted_digests:
+    arch_0003_body: 42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda
+    architecture_md: 695aa185ab32a813cd596b12f80d235afb92d56f147f395b15f16e37d0bcd983
+    frozen_contract: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+    contract_v3: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  scope: architecture verdict only; ARCH-0003 stays PROVISIONAL / in_effect false / human_approved false
+active_gate: GATE-BUILDER-READY
+owner_gates_open_non_blocking: [GATE-OWNER-R1-BREAK-GLASS-EXIT]
+running_work:
+  - run_id: AR-0026
+    role: builder
+    handoff: release/orchestration/phase-1/HANDOFFS/HO-0026-r1-signed-release-root-builder.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-build
+    branch: phase1/srr1-r1-build
+    worktree_base_commit: 1e31f6b5cb4e112d4ec86b45839e093c7b50d687
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0026.report.yaml
+    expected_evidence_path: release/root-of-trust/signed-release-root-v1-r1-build/
+r1_interim_assumptions:
+  - id: SRR2-R1-C1
+    gate: GATE-OWNER-R1-BREAK-GLASS-EXIT
+    assumption: exit from DEGRADED - RECOVERY ONLY requires a verified release at or above BOTH the signed minimum secure release and the protected local high-water
+    rationale: fail-safe; the looser reading is a single-point change if the owner chooses it
+    status: orchestrator interim, not an owner answer
+resume_rule: >-
+  If AR-0026 has a committed AR-0026.report.yaml on branch phase1/srr1-r1-build, verify its scope and regression claims,
+  merge, mint the immutable R1 candidate, and dispatch a NEW fresh independent R1 verifier. If the report is absent the
+  run is INCOMPLETE and advances no gate: re-dispatch a fresh builder with the same HO-0026 scope, carrying forward any
+  usable committed work. If the verdict is INCOMPLETE, route the stated remainder to a follow-on build role before any
+  verifier is spawned. Never infer readiness or acceptance from conversation.
+r1_loop_rule: >-
+  On R1 rejection: persist verifier evidence, adjudicate every finding by provenance and lifecycle, route only active R1
+  blockers to a FRESH repair role, mint a new immutable candidate, invalidate dependent evidence, rerun prior probes plus
+  fresh held-out tests, and spawn a NEW fresh verifier. A finding requiring a change to the accepted R0
+  product/security/availability/cost/usability boundary STOPS for owner adjudication instead of silent architecture
+  change. If THREE consecutive R1 iterations introduce materially new blocker classes rather than closing existing ones,
+  STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED and produce the root-cause/meta-review package.
+completion_condition: >-
+  Phase 1 completes only when one exact candidate independently earns ROT_PHASE1_CANDIDATE_ACCEPTED_R1. Then persist the
+  final checkpoint, update state, append the ledger, record the accepted commit, the Contract v3 hash, the R0 and R1
+  independent evidence and the residual later-lifecycle risks, verify durable state, and STOP without starting Phase 2.
+next_deterministic_action: COMPLETE_AR_0026_R1_BUILD__THEN_MINT_THE_IMMUTABLE_R1_CANDIDATE_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R1_VERIFIER__THEN_RUN_THE_AUTOMATIC_R1_REPAIR_REVERIFICATION_LOOP_UNTIL_ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+prohibitions:
+  - no second R0 correction cycle; the R0 loop is closed
+  - no RoT-1 Revision 8 or CP-1 resumption; no D-0008/ARCH-0002 activation
+  - no amendment of D-0007, D-0009, the accepted ARCH-0003 body, the frozen boundary or any owner record
+  - no private keys in the repository, logs or agent context; no R2 ceremony; no R3 criteria imported into R1
+  - no offline/air-gapped first install (owner-closed SRR-R0-L7); break-glass recovery must still work without network
+  - builder never issues an acceptance token and never sees held-out verifier tests
+  - orchestrator issues no verdict of its own and answers no owner gate
