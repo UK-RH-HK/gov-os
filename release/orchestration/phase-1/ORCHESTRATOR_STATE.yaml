@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T19:39:42Z'
-state_hash: cd26717057d3646f0add797f111c6c1c45b08d33ac418ea6021db5e6000dd9df
-lifecycle_state: R0_ARCHITECTURE_READY_FOR_FRESH_REVIEW
-loop_status: REBASED_R0_REVIEW_PENDING   # CP-1 remains frozen; separate ARCH-0003 lineage awaits fresh R0 review
+updated_at: '2026-09-17T19:45:09Z'
+state_hash: 58271b0ba63b617d24eebcea3915e642421ace8cd97185f3db90cf4a532f76f9
+lifecycle_state: R0_ARCHITECTURE_REVIEW
+loop_status: R0_REVIEW_RUNNING   # AR-0023 fresh independent R0 review of ARCH-0003; CP-1 remains frozen
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 09f8b4f13b76e19acef4612a0b985a14cfed350b
+  last_recorded_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -57,6 +57,8 @@ operator_ui:
   canonical_path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html
   sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
   classification: NON_NORMATIVE_OPERATOR_UI
+  hash_verified_at: '2026-09-17T21:00Z'
+  duplicate_canonical_copies: none
 
 baseline_rejected_release:
   version: 4.1.5
@@ -270,6 +272,10 @@ owner_gates:
 
 capability_contract:
   upload_state: NOT_REQUESTED
+  owner_source_present: true
+  owner_source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  owner_source_verified_at: '2026-09-17T21:00Z'
+  canonical_import_or_lock: none yet (GATE-OWNER-CAC-UPLOAD NOT_OPEN); nothing to cross-verify
   owner_source_file: Governance_OS_Capability_Acceptance_Contract_v3.md
   destination: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
   reconstruction_by_any_agent: forbidden
@@ -293,7 +299,7 @@ iteration:
   active_architecture_lineage: ARCH-0003
   active_gate: R0
   architecture_review_cycle_under_phase_1: 5
-  signed_release_root_r0_review_cycle: 0
+  signed_release_root_r0_review_cycle: 1
   implementation_repair_cycle: 0
 
 completed_stages:
@@ -358,7 +364,17 @@ completed_stages:
     commit: this_governance_rebase_commit
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
-running_work: []
+running_work:
+  - run_id: AR-0023
+    role: r0-architecture-reviewer
+    status: RUNNING
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
+    base_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+    branch: phase1/srr1-r0-review
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.report.yaml
+    gate: GATE-R0-ARCH-ACCEPT
+
 
 latest_role_verdicts:
   signed-release-root-r0-reviewer: null
@@ -464,7 +480,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: FRESH_R0_ARCHITECTURE_REVIEW_OF_ARCH_0003_AT_COMMITTED_REBASE_CANDIDATE
+next_deterministic_action: ADJUDICATE_AR_0023_R0_VERDICT__IF_NO_COMMITTED_AR_0023_REPORT_RERUN_A_FRESH_R0_REVIEW_AT_THE_SAME_CANDIDATE
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0

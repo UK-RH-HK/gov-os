@@ -1,0 +1,37 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0023
+role: r0-architecture-reviewer
+objective: >-
+  Fresh independent R0 architecture review of the Signed Release Root lineage (D-0009 / ARCH-0003 /
+  release/root-of-trust/signed-release-root-v1) at the committed rebase candidate, against the frozen
+  R0/R1/R2/R3 acceptance boundary. Sole issuer of the R0 verdict for this candidate.
+agent_model: claude-opus-5
+fresh_context: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
+active_gate: GATE-R0-ARCH-ACCEPT
+base_commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+rebase_record_commit: 2d78f6bf38f99ce1ff936eaf8b8b617e014441e7
+candidate_inputs_identical_to_rebase_record: true
+reviewed_candidate:
+  decision: spec/decisions/D-0009.yaml
+  architecture: spec/architecture/ARCH-0003.yaml
+  pack: release/root-of-trust/signed-release-root-v1/
+  frozen_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  owner_directive_sha256: 26243019d09e07617a63cf575c3e5e59cad307a7ac38100116dbbb3300f2a1ba
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+role_prompt_source:
+  path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html
+  sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+  card: 'Phase 1 > R0 - fresh independent signed-release architecture review'
+  classification: NON_NORMATIVE_OPERATOR_UI template, parameterized with exact commits and hashes
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r0-review
+branch: phase1/srr1-r0-review
+started_at: '2026-09-17T21:00Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0023.report.yaml
+expected_evidence_path: release/root-of-trust/signed-release-root-v1-review-r0/
+required_verdict_vocabulary: [ROT_ARCHITECTURE_ACCEPTED_R0, ROT_ARCHITECTURE_REJECTED_R0]
+outcome: null

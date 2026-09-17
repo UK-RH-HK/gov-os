@@ -55,6 +55,7 @@ Store facts, evidence and verdicts only. No private reasoning.
 | `rot-reviewer-trust-security` | `BLOCKING_FINDINGS_PRESENT`, `NO_BLOCKING_FINDINGS` |
 | `rot-reviewer-compat-transaction` | `BLOCKING_FINDINGS_PRESENT`, `NO_BLOCKING_FINDINGS` |
 | `rot-review-synthesis` | `ROOT_OF_TRUST_ARCHITECTURE_ACCEPTED`, `ROOT_OF_TRUST_ARCHITECTURE_REJECTED` |
+| `r0-architecture-reviewer` | `ROT_ARCHITECTURE_ACCEPTED_R0`, `ROT_ARCHITECTURE_REJECTED_R0` |
 | `rot-specialist-architect` / `rot-synthesis-architect` (escalation) | `ALTERNATIVE_PROPOSED`, `ARCHITECTURE_REVISION_READY_FOR_REVIEW` |
 | `builder` / `repair-builder` | `AWAITING_PRODUCT_OWNER_CAPABILITY_CONTRACT_UPLOAD`, `READY_FOR_INDEPENDENT_OS_VERIFICATION`, `INCOMPLETE` |
 | `verifier-a` / `verifier-b` | `BLOCKING_FINDINGS_PRESENT`, `NO_BLOCKING_FINDINGS` |
