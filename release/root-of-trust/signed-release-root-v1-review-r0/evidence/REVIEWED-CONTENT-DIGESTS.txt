@@ -1,0 +1,35 @@
+# REVIEWED-CONTENT-DIGESTS — AR-0023 (R0 review of Signed Release Root SRR-1)
+# Worktree HEAD: 166ac4cff484160c7176e0ce15b23e59820074f2   branch: phase1/srr1-r0-review
+# Reviewed-candidate commit: 5fd83583f36a32b045d3943dd5ee6f2c7a491822
+# Owner rebase record commit: 2d78f6bf38f99ce1ff936eaf8b8b617e014441e7
+# Generated: 2026-09-17T19:56:29Z
+
+## Authoritative candidate inputs (1-8)
+26243019d09e07617a63cf575c3e5e59cad307a7ac38100116dbbb3300f2a1ba  release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md
+b096bb1f139de310326492b0230924d26e7b11856dc36cc11bbdcb9ff2a279e8  spec/decisions/D-0009.yaml
+038dbb0608d6338b62f7f0963fe3c29a931b3b047c1244dcf46593f0bbd08e20  spec/architecture/ARCH-0003.yaml
+f891a6f72d3b3b0617b2c313397131ebded637388173acd1d307183b391532d5  release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1  release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+4d34c3680f1704b6306b89a98762c28a02ff143a5191b101d3f87fe7459d6558  release/root-of-trust/signed-release-root-v1/02-OP-1-OP-16-DISPOSITION.md
+8f63def569b88cd25c2da7711f991a3216951ed84e105b89e1833a50418b9c6d  release/root-of-trust/signed-release-root-v1/03-TRANSITION-MAP.md
+218ba0c4e7ac6ca6e00968b84536cf1946fe7343d05abdcea360a040cbb36bcb  release/orchestration/phase-1/HANDOFFS/HO-0023-signed-release-root-r0-review.md
+
+## Owner-supplied normative source
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+
+## Higher-context normative sources
+66bfd86fca1f587000ce2e5c559653cd3d837121e62db5c60dea3b90946af8ca  DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+de908bc282c78e8c60ea697355a44ef7c3de808c7f3fe2b194ffae35d09c62c5  GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md
+4fee2e00359cd2e1cee5e506d9e982fb020e2bb32c2b4c71091b417b20530efc  GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md
+7ff5e9904bd735b503276d229d4c2573d7f732f9571399c08c9cf02ba01b1db3  spec/decisions/D-0007.yaml
+
+## Evidence-only (non-active; mined for attacks, creates no R0 requirement)
+f6173f4a846ae5588845454c2f1f3cc7f1c4c93f40ebd1bffa933f5f8f7bcb15  spec/decisions/D-0008.yaml
+95756e98a5610bba36b75c745502729efe9e8ff44739c4dd241495cf5048c160  spec/architecture/ARCH-0002.yaml
+48958bf73546dac0b78b744363bacbe6ef0185e4e53fab714973b32577add7d4  release/root-of-trust/meta-review/06-BOOTSTRAP-IMPOSSIBILITY-BOUNDARY.md
+72bfcfae5e2172e17a58b159bdc836a149f590d5d099dea6a45c2449ed35b362  release/root-of-trust/meta-review/11-RECOMMENDED-TARGET-ARCHITECTURE.md
+f50d4351ab2729f5d462735c3daf94913ce34e77a293eeca9f3acebf2208a7fe  release/root-of-trust/4.1.6-review-r7/10-BLOCKING-FINDINGS.md
+
+## Process inputs
+70791e67f91712b296085792d75803807627462cda3663565d99543852d87496  release/orchestration/phase-1/AGENT_RUNS/README.md
+6a96ebf89609e6b7be18121b3292edd9ee1bb4d2f1ab7438a81c66da20212377  release/orchestration/phase-1/AGENT_RUNS/AR-0023.run.yaml
