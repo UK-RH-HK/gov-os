@@ -1,0 +1,75 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0028
+trigger: bounded R1 repair 1 merged and verified in scope; candidate 2 minted; re-verification AR-0029 dispatched
+date: 2026-09-18
+lifecycle_state: R1_CANDIDATE_VERIFICATION
+loop_status: R1_REVERIFICATION_RUNNING_ON_CANDIDATE_2
+repository:
+  integration_branch: release/4.1.6-rc1
+  head: 2baff074095532d0e7ff42dad2f6fa316f771207
+candidate:
+  id: srr1-r1-candidate-2
+  commit: 2baff074095532d0e7ff42dad2f6fa316f771207
+  tag: srr1-r1-candidate-2
+  repair_run: AR-0028
+  repair_work_commit: 4c7c40c94119f4ec5c4e640884e1edee0bbcefc4
+  supersedes: srr1-r1-candidate-1
+  accepted: false
+  certified: false
+  released: false
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+owner_gates_pending: []
+owner_decisions_in_force: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007]
+orchestrator_verification_of_ar_0028:
+  - exactly the declared files changed
+  - runtime/src/srr/state.rs absent from the diff - AR27-OD1 untouched, machine-state path resolution unchanged
+  - exit_satisfied function body byte-identical; EXIT_POLICY unchanged - the owner's stricter exit preserved
+  - AR-0027 held-out test sources byte-identical - prior verification evidence not tampered with
+  - no release/verification, *-review*, release/releases, spec or owner-record path touched
+  - regression independently reproduced - 31 lib passed 0 failed; 65 certification passed 0 failed; exit 0
+judgement_calls_routed_to_ar_0029:
+  - narrower-than-suggested allow-list (task status and cit simulate refused as mutating)
+  - ROOT_EXPIRY_PROFILE - claim removed rather than control implemented, on root-rotation-impossibility evidence
+  - Marking::Unreadable refusing - deadlock risk if the exit path were gated behind a state read
+blocker_class_history:
+  iterations:
+    - {iteration: 1, verifier: AR-0027, classes: [BC-R1-1], materially_new: [BC-R1-1], closed: []}
+  consecutive_new_class_count: 1
+  escalation_threshold: 3
+  escalation_token: PHASE_CONVERGENCE_ESCALATION_REQUIRED
+  note: AR-0029 must label each blocking finding residual-or-materially-new so this counter can be updated correctly
+running_work:
+  - run_id: AR-0029
+    role: verifier-b
+    handoff: release/orchestration/phase-1/HANDOFFS/HO-0029-r1-reverification.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2
+    branch: phase1/srr1-r1-verify-2
+    worktree_base_commit: 2baff074095532d0e7ff42dad2f6fa316f771207
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0029.report.yaml
+    expected_evidence_path: release/verification/4.1.6-r1-2/
+resume_rule: >-
+  If AR-0029 has a committed AR-0029.report.yaml on branch phase1/srr1-r1-verify-2, adjudicate that verdict. If not, the
+  run is INCOMPLETE and advances no gate: dispatch a NEW fresh independent verifier at candidate 2. Never infer a verdict
+  from conversation.
+on_accept: >-
+  Persist ROT_PHASE1_CANDIDATE_ACCEPTED_R1 for srr1-r1-candidate-2, mark GATE-R1-CANDIDATE-ACCEPT and
+  GATE-PHASE1-COMPLETE satisfied, record the accepted commit and tag, the Contract v3 hash, the R0 and both R1
+  independent evidence trees and the residual later-lifecycle risks separately, verify durable state, write the final
+  checkpoint, append the ledger, and STOP without starting Phase 2. Return
+  PHASE_ORCHESTRATION_COMPLETE__ROT_PHASE1_CANDIDATE_ACCEPTED_R1.
+on_blocking_findings: >-
+  Persist evidence, adjudicate by provenance and lifecycle, update the blocker-class history with AR-0029's
+  residual-or-new labels, route active R1 blockers to a FRESH repair role, mint candidate 3, and spawn a NEW fresh
+  verifier. Continue automatically.
+stop_conditions:
+  - any finding marked REQUIRES_R0_OR_OWNER_ADJUDICATION stops for owner adjudication
+  - a third consecutive iteration of materially new blocker classes stops with PHASE_CONVERGENCE_ESCALATION_REQUIRED plus a root-cause/meta-review package
+next_deterministic_action: ADJUDICATE_AR_0029_R1_REVERIFICATION_VERDICT__ON_ACCEPT_COMPLETE_PHASE_1__ON_BLOCKING_FINDINGS_CONTINUE_THE_AUTOMATIC_REPAIR_LOOP
+prohibitions:
+  - no second R0 correction cycle; the R0 loop is closed
+  - AR27-OD1 and SRR2-R1-C1 are owner-closed and must not be reopened as R1 blockers
+  - no RoT-1 Revision 8, no CP-1 resumption, no D-0008/ARCH-0002 activation
+  - no amendment of D-0007, D-0009, the accepted ARCH-0003 body, the frozen boundary or any owner record
+  - verifier never modifies product source; repair roles never grade their own repairs
+  - no Phase 2, no certification, no stable release push, no merge to main
