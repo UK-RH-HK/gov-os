@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-17T23:18:44Z'
-state_hash: 7fa259bd597c64a5bf6a7a564786ba0cff8341d164157942e7a7b3e567145b12
-lifecycle_state: R1_REPAIR
-loop_status: R1_REPAIR_1_RUNNING_AFTER_CANDIDATE_1_REJECTED
+updated_at: '2026-09-17T23:50:42Z'
+state_hash: 9ca38b5e774816277ec9a636cd22751e8b1e42ab590cd7f1000222d87c0bf613
+lifecycle_state: R1_CANDIDATE_VERIFICATION
+loop_status: R1_REVERIFICATION_RUNNING_ON_CANDIDATE_2
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: d10c2a552f71462209f53977d272eaf38a35f93f
+  last_recorded_commit: 678402feacdf47235dba794e5b6c663cc5655dcd
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -349,6 +349,15 @@ r0_findings_arch_0003:
     - D-0007, D-0008, ARCH-0002, D-0009, ARCH-0003 and the candidate pack are byte-identical at the branch tip
     - canonical checkout clean; review evidence merged unmodified
 
+downstream_evidence_invalidated_by_repair_1:
+  invalidated:
+    - {evidence: AR-0027 verification of srr1-r1-candidate-1, reason: source changed in runtime/src/srr (breakglass, metadata, verifier, crypto), scope: verdict applies only to candidate 1}
+    - {evidence: AR-0026 builder regression figures, reason: superseded by the repaired suite at 31 lib and 65 certification}
+  not_invalidated:
+    - {evidence: R0 acceptance AR-0025, reason: no architecture document changed; ARCH-0003 body untouched}
+    - {evidence: AR-0027 held-out test sources, reason: byte-identical and rerunnable; three OBSERVED assertions are expected to flip}
+    - {evidence: historical verification packs 4.1.2-4.1.5, reason: untouched}
+
 r1_blocker_class_history:
   convergence_rule: >-
     If THREE consecutive R1 iterations introduce materially NEW blocker classes instead of closing the existing class,
@@ -417,7 +426,7 @@ root_of_trust_key_ceremony:
 
 release_candidate:
   next_version: 4.1.6
-  latest: srr1-r1-candidate-1
+  latest: srr1-r1-candidate-2
   candidates:
     - id: srr1-r1-candidate-1
       commit: 229d1543be0357b52f7c7e6405918171bc8e6631
@@ -425,6 +434,16 @@ release_candidate:
       builder_run: AR-0026
       builder_work_commit: 949c4d343a6d5f203534afa6e3363992fee12488
       status: REJECTED_BY_AR_0027
+      accepted: false
+      certified: false
+      released: false
+    - id: srr1-r1-candidate-2
+      commit: 678402feacdf47235dba794e5b6c663cc5655dcd
+      tag: srr1-r1-candidate-2
+      repair_run: AR-0028
+      repair_work_commit: 4c7c40c94119f4ec5c4e640884e1edee0bbcefc4
+      supersedes: srr1-r1-candidate-1
+      status: AWAITING_INDEPENDENT_R1_REVERIFICATION
       accepted: false
       certified: false
       released: false
@@ -507,14 +526,14 @@ completed_stages:
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
 running_work:
-  - run_id: AR-0028
-    role: repair-builder
+  - run_id: AR-0029
+    role: verifier-b
     status: RUNNING
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0028.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0028-r1-repair-1.md
-    base_commit: d10c2a552f71462209f53977d272eaf38a35f93f
-    branch: phase1/srr1-r1-repair-1
-    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0028.report.yaml
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0029.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0029-r1-reverification.md
+    base_commit: 678402feacdf47235dba794e5b6c663cc5655dcd
+    branch: phase1/srr1-r1-verify-2
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0029.report.yaml
     gate: GATE-R1-CANDIDATE-ACCEPT
 
 
@@ -636,7 +655,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: COMPLETE_AR_0028_BOUNDED_R1_REPAIR__THEN_MINT_CANDIDATE_2_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R1_VERIFIER_RERUNNING_AR_0027_HELD_OUT_TESTS_PLUS_FRESH_ONES
+next_deterministic_action: ADJUDICATE_AR_0029_R1_REVERIFICATION_VERDICT__ON_ACCEPT_PERSIST_ROT_PHASE1_CANDIDATE_ACCEPTED_R1_AND_COMPLETE_PHASE_1__ON_BLOCKING_FINDINGS_CONTINUE_THE_AUTOMATIC_REPAIR_LOOP_AND_UPDATE_THE_BLOCKER_CLASS_HISTORY
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0
