@@ -1,0 +1,47 @@
+# Reviewed-content digests — AR-0027 (fresh independent R1 candidate verification)
+#
+# Every normative source named in HO-0027 was digest-verified before being relied on.
+# All matched. No STOP condition was raised.
+
+## Pinned by HO-0027 — verified
+
+70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1  release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+695aa185ab32a813cd596b12f80d235afb92d56f147f395b15f16e37d0bcd983  release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+903407729327d67c198c9bf97885a936c5601993e16ad76137a3106c5728d1db  release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+
+093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a  spec/architecture/ARCH-0003.yaml :: accepted `body` scalar
+42681978d3a7603da857029e68bd120453bd9ff373b8dea2c4247343a857cfda  spec/architecture/ARCH-0003.yaml @ 2b36b44 (whole file, at the acceptance commit)
+f24ed672ef8aee401cf8d94f296bfea7a6bdc0af490bf37eb11ce209e6dac210  spec/architecture/ARCH-0003.yaml @ 0ce7f9f (whole file, current)
+
+# The two whole-file digests differ by design. `git diff 2b36b44 HEAD -- spec/architecture/ARCH-0003.yaml`
+# is 16 insertions / 1 deletion, entirely the `r0_acceptance:` governance annotation and the `review_state`
+# transition. The accepted BODY is byte-identical, which the body-scalar digest proves independently.
+
+## Other normative sources read
+
+198a136863344bdb0ff75a3d82f0b8ce3a46b789e17232c4209b9865c92d1931  release/orchestration/phase-1/HANDOFFS/HO-0026-r1-signed-release-root-builder.md
+6922fd352219b36acb75395bc03b2a15888d3f801824acf0f878f6a7931a9044  release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+
+# The canonical import is byte-identical to the owner source at the repository root, as contracts.rs requires.
+
+## Builder's own digest manifest — independently re-verified, all 8 matched
+
+# release/root-of-trust/signed-release-root-v1-r1-build/REVIEWED-CONTENT-DIGESTS.txt
+
+## Commits
+
+0ce7f9f0a7028d54bc5beef57f0ef35a935e244d  worktree HEAD verified (branch phase1/srr1-r1-verify)
+229d1543be0357b52f7c7e6405918171bc8e6631  tag srr1-r1-candidate-1
+949c4d343a6d5f203534afa6e3363992fee12488  builder work commit (AR-0026)
+1e31f6b                                    base used for the certification-harness history check
+
+## My own held-out test sources (authored by AR-0027; not product source)
+
+eb6bf282879fc9ed69f740aa4ea47a4abc32524bba4221270d234cab1a44340d  evidence/heldout-tests/Cargo.toml.txt
+1cfba8b3185d5ecc0746d5e50a2b9b9f4bd201e0d2a0fbb8b28e506121767ac2  evidence/heldout-tests/forge.rs
+4902d73551b86cd9612155e168c888f1b4cf1a67e7585d34294d90c41459c924  evidence/heldout-tests/heldout_srr.rs
+5dcbaddb2d88055fee8e4817f436073cb91bba6f9206c061e99a279a7a630155  evidence/heldout-tests/heldout_srr2.rs
+5ceb7bb5002694c7d6fdd92eb636358e5d572d83db4a7e98605d9acc45ac2a26  evidence/heldout-tests/heldout_srr3.rs
+09ead1b92a71d7e4ce4c2270062f4bcb9681b6ab669a851ad6f9eece195405f5  evidence/heldout-tests/heldout_srr4.rs

@@ -1,0 +1,21 @@
+# HELD-OUT INDEPENDENT VERIFICATION TESTS — AR-0027 (verifier-a).
+# Authored by the fresh independent R1 verifier. NOT product source. Lives outside the product tree and outside
+# the cargo workspace, so verifying the candidate requires no modification to any product file.
+[package]
+name = "srr-heldout-ar0027"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+gov-runtime = { path = "../wt/srr1-r1-verify/runtime" }
+serde_json = { version = "1", features = ["preserve_order", "raw_value"] }
+
+[dev-dependencies]
+# TEST MATERIAL ONLY: the held-out harness must be able to SIGN to forge attack material.
+# The product binary never signs; this capability exists only in this verification crate.
+ed25519-dalek = { version = "2", default-features = false, features = ["std", "rand_core"] }
+hex = "0.4"
+sha2 = "0.10"
+
+[workspace]
