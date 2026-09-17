@@ -141,6 +141,31 @@ gates:
     satisfied_when: the owner selects (a) or (b); the selection is recorded and the R1 policy point set accordingly
     satisfaction_evidence: null
 
+  - id: GATE-OWNER-R1-MACHINE-STATE-ANCHOR
+    title: Owner adjudication (R0 boundary) — should protected machine state be anchored to a fixed machine-domain path?
+    status: OPEN
+    satisfier: product owner
+    raised_by: AR-0027 (independent R1 verifier), finding AR27-OD1
+    classification: NEW_OWNER_DECISION_REQUIRED, flagged REQUIRES_R0_OR_OWNER_ADJUDICATION
+    blocking_r1_repair: false
+    question: >-
+      Protected machine state lives under a path derived from XDG_STATE_HOME/HOME. The implementation refuses the
+      GOV_MACHINE_STATE_DIR override on a provisioned machine, but an owner-privileged process can achieve the same
+      relocation by moving HOME or XDG_STATE_HOME. Should protected machine state instead be anchored to a fixed
+      machine-domain path independent of those variables?
+    why_owner: >-
+      Closing it changes the accepted R0 bootstrap/trusted-boundary assumption, which ARCH-0003 section 1 states and
+      which was accepted at R0. It also collides with the certification harness's own isolation mechanism, which relies
+      on XDG_STATE_HOME relocation to give each scenario its own machine state. A security-versus-testability trade-off
+      reserved to the owner.
+    verifier_position: >-
+      The current reliance is SOUND and NOT circular - ARCH-0003 section 1 independently disclaims protection from a
+      hostile local admin, so the implementation is not vouching for itself. The verifier records the asymmetry rather
+      than treating it as a defect, and did not make it a blocking finding.
+    must_not: be routed to a bounded R1 repair; a repair role must not change machine-state path resolution
+    satisfied_when: the owner decides whether to keep the current derivation or adopt a fixed machine-domain anchor
+    satisfaction_evidence: null
+
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony
     status: NOT_OPEN

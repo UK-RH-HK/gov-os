@@ -42,11 +42,40 @@ non_blocking_open_owner_question:
   note: implemented at the stricter both-floors interim; the interim choice is not a defect and must not be graded as one
 branch: phase1/srr1-r1-verify
 started_at: '2026-09-18T00:05Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0027.report.yaml
 expected_evidence_path: release/verification/4.1.6-r1/
 required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
 routing_rule: >-
   Findings marked REQUIRES_R0_OR_OWNER_ADJUDICATION stop for the owner instead of automatic repair. Ordinary R1
   implementation defects within the accepted boundary route to a fresh bounded repair role and a new fresh verifier.
-outcome: null
+outcome:
+  verdict: BLOCKING_FINDINGS_PRESENT
+  work_commit: 26c2dc53968cf218fe9a0c4c45b973e16ff5832c
+  report_commit: 6bb62cb688d232240a9b8b85b8c5143754f67aee
+  integration_merge_commit: d10c2a552f71462209f53977d272eaf38a35f93f
+  evidence_path: release/verification/4.1.6-r1/
+  frozen_r1_items: 11 of 12 SATISFIED
+  held_out_tests: 29 authored in a standalone crate outside the product tree and its workspace; 33 recorded probes (21 PASS, 12 CONFIRMED)
+  regression_reproduced: cargo test --lib 26 passed 0 failed; cargo test --test certification 64 passed 0 failed
+  blocking: [AR27-B1]
+  requires_r0_or_owner_adjudication: [AR27-OD1]
+  residual_judgements:
+    RES-1_unprovisioned_posture: ACCEPTED - the latch is never cleared, so an adversary cannot return a machine to it inside the declared boundary
+    RES-2_protected_state_relocation: SOUND_NOT_CIRCULAR - GOV_MACHINE_STATE_DIR genuinely refused on a provisioned machine; residual asymmetry raised separately as AR27-OD1
+    RES-3_expiry: REAL_DEFECT_NON_BLOCKING - recorded as AR27-N1 and routed to the same repair cycle
+    RES-4_delegated_targets: SRR-R0-L6 GENUINELY CLOSED - OWNER-DECISION-0005 asks R1 to distinguish the classes and decide how delegated targets apply; both limbs met; issuing tooling is R2 by the frozen boundary
+    RES-5_certification_harness: CLEAN - git diff over tests/ is 2026 insertions and 0 deletions, so no assertion could have been weakened; 49 pre-existing scenarios pass unmodified
+  orchestrator_verification:
+    - work and report commits exist; report output.commit names the work commit
+    - verifier modified no product source - diff over runtime, cli, tests, framework, spec and Cargo files is empty
+    - only its own evidence tree and run report were added
+  adjudication:
+    method: >-
+      Findings routed by normative source and lifecycle against the ACTIVE gate. The orchestrator issued no verdict and
+      reclassified nothing; it verified the verifier's own lifecycle labels.
+    active_r1_repair_queue: [AR27-B1, AR27-N1, AR27-N2, AR27-N4]
+    routed_to_owner_not_repair: [AR27-OD1]
+    removed_from_active_queue_as_later_lifecycle: {R2: [AR27-N3, AR27-N5, AR27-N6, AR27-N7]}
+    blocker_class: {id: BC-R1-1, description: break-glass section 6 refusal enforced by enumeration rather than structurally, materially_new: true, iteration: 1}
+  completed_at: '2026-09-18T01:20Z'
