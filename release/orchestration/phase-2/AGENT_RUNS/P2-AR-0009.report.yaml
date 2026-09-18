@@ -1,0 +1,437 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0009
+role: capability-family-auditor
+objective: Fresh independent iteration-0 re-audit of family beta (Contract v3 Gates C1-C10, D1-D6, R1-R3; scope P2-HO-0002, re-audit rules P2-HO-0009) on cap2-candidate-0, including the AC-7 determination,
+  D6 delete-and-rebuild and the K2<->D1 / D1<->W6 interactions.
+agent_model: claude-opus-5[1m]
+independence_statement: 'This run authored none of the Governance OS implementation, tests, fixtures, Phase-1 reviews/repairs/verifications or the earlier iteration-0 beta audit. It read the handoffs P2-HO-0009,
+  P2-HO-0000, P2-HO-0002, the frozen gate contract, AGENT_RUNS/README.md, Contract v3, the governing framework sections, D-0005/D-0006/RES-0001/API-0001 and the product source, and did NOT read release/capability-baseline/audit-0/beta/,
+  AGENT_RUNS/P2-AR-0002.*, any other family''s evidence, session/agent transcripts or user auto-memory. Disclosed deviation: once, early in the run, it read the output file of its own background `cargo
+  build` under the task-output store (/tmp/claude-*/.../tasks/), which contained only that build''s final lines; all later commands ran in the foreground. No product source was modified; only release/capability-baseline/audit-0/beta-r/
+  and this report were written. No sub-agents were spawned.'
+input:
+  base_commit: 3b8a4ab4aa28ed828512ef2037373921f0eb97f0
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+inspected:
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0002-audit-0-beta.md
+- release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+- release/orchestration/phase-2/AGENT_RUNS/README.md
+- Governance_OS_Capability_Acceptance_Contract_v3.md
+- DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (Part IV §§10-19, §§69-71, §§81-83)
+- spec/decisions/D-0005.yaml
+- spec/decisions/D-0006.yaml
+- spec/research/RES-0001.yaml
+- spec/interfaces/API-0001.yaml
+- runtime/src/{memory,retrieval,graph,context,code_intelligence,capabilities,cit,verification,orchestration,migrations}/
+- runtime/src/{adopt,records,paths,doctor,status,tools,routing,observability,checkpoints,project}.rs
+- capabilities/python/govos_capabilities/
+- framework/policies/{MEMORY,CONTEXT,AUTHORITY,ARCHIVE,CHANGE,TOOL,TEST}_POLICY.yaml
+- framework/schemas/
+- framework/contracts/
+- tests/governance/capability-evidence-map.yaml
+- docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+- docs/ARCHITECTURE.md
+- tests/certification/
+- fixtures/brownfield/project
+- commit 57177a37ea296ece16b185874831462b6a76db18
+produced:
+- release/capability-baseline/audit-0/beta-r/00-AUDIT-REPORT.md
+- release/capability-baseline/audit-0/beta-r/capability-audit.yaml
+- release/capability-baseline/audit-0/beta-r/findings.yaml
+- release/capability-baseline/audit-0/beta-r/evidence/
+- release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.report.yaml
+tests_or_attacks:
+- id: P2-AR-0009-C1-deterministic-structured-memory
+  description: 'C1: 17 record kinds as current truth (18 checks pass, 0 fail)'
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C1-deterministic-structured-memory.out
+- id: P2-AR-0009-C2-relationship-graph
+  description: 'C2: 20 relation types; orphan/stale/reversed/invalid integrity; impact traversal (7 checks pass, 3 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C2-relationship-graph.out
+- id: P2-AR-0009-C3-semantic-memory
+  description: 'C3: semantic route per content class; list fields; filter order (starvation, plugin leak) (11 checks pass, 3 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C3-semantic-memory.out
+- id: P2-AR-0009-C4-lexical-memory
+  description: 'C4: exact terms/identifiers/filenames/errors/APIs/phrases; line coverage of code (21 checks pass, 13 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C4-lexical-memory.out
+- id: P2-AR-0009-C5-code-structural-memory
+  description: 'C5: AST fidelity, symbols/refs, inheritance, calls/imports, routes, DB models, test edges, adapters (7 checks pass, 4 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C5-code-structural-memory.out
+- id: P2-AR-0009-C6-temporal-memory
+  description: 'C6: what/when/why/causal decision/lineage for governed and ungoverned changes (5 checks pass, 1 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C6-temporal-memory.out
+- id: P2-AR-0009-C7-episodic-memory
+  description: 'C7: episode facets across handoff, worker return, task close, telemetry (6 checks pass, 1 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C7-episodic-memory.out
+- id: P2-AR-0009-C8-failure-memory
+  description: 'C8: durable failure records for seven failure kinds (incl. brownfield migration failure) (6 checks pass, 2 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C8-failure-memory.out
+- id: P2-AR-0009-C9-context-packet
+  description: 'C9: reproducibility, authority block, retrieved block, bounding, citations, dedup, historical separation (8 checks pass, 2 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C9-context-packet.out
+- id: P2-AR-0009-C10-capability-memory
+  description: 'C10: tools, MCP, A2A, dependencies, providers, permissions/credentials, versions (6 checks pass, 4 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/C10-capability-memory.out
+- id: P2-AR-0009-D1-incremental-freshness
+  description: 'D1: incremental vs full comparisons; pins; path-map and sensitivity inputs; task-close blocking (8 checks pass, 3 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/D1-incremental-freshness.out
+- id: P2-AR-0009-D2-retrieval-router
+  description: 'D2: route classification and rank per query class; graph burial (5 checks pass, 4 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/D2-retrieval-router.out
+- id: P2-AR-0009-D3-hierarchical-retrieval
+  description: 'D3: chunk tree, code units, child-first, selective expansion (4 checks pass, 1 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/D3-hierarchical-retrieval.out
+- id: P2-AR-0009-D4-component-separation
+  description: 'D4: identity/replacement/independence of 10 components; weights drift (9 checks pass, 2 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/D4-component-separation.out
+- id: P2-AR-0009-D5-model-selection
+  description: 'D5 (AC-7): benchmark/compare/held-out/metrics/select/pin/change governance (7 checks pass, 4 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/D5-model-selection.out
+- id: P2-AR-0009-D6-rebuild-guarantee
+  description: 'D6: actual delete-and-rebuild (two deletion scopes), fresh agent, different absolute path (6 checks pass, 2 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/D6-rebuild-guarantee.out
+- id: P2-AR-0009-R1-R2-legacy-and-chat-retirement
+  description: 'R1/R2: brownfield A0-A11 with live legacy dependency and extra legacy knowledge (8 checks pass, 5 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/R1-R2-legacy-and-chat-retirement.out
+- id: P2-AR-0009-R3-archive-policy
+  description: 'R3: default exclusion, explicit request, dead code vs Git history, reference retention (3 checks pass, 1 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/R3-archive-policy.out
+- id: P2-AR-0009-X-K2-D1-W6-interactions
+  description: AC-16 K2<->D1 and D1<->W6 interactions (3 checks pass, 2 fail)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/X-K2-D1-W6-interactions.out
+- id: P2-AR-0009-FRESH-evidence-invalidation
+  description: 'AC-10: which invalidation inputs stale green memory/index evidence (2 checks pass, 3 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/FRESH-evidence-invalidation.out
+- id: P2-AR-0009-DERIVED-views-reconciliation
+  description: 'Frozen §1: compiled YAML / evidence map / generated view vs owner source for C/D/R (0 checks pass, 2 fail)'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/DERIVED-views-reconciliation.out
+- id: P2-AR-0009-SCALE-retrieval-latency
+  description: 'Scale datapoint: index time and per-route latency at 200/1000/3000 docs (planning, not a gate)'
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/SCALE-retrieval-latency.out
+- id: P2-AR-0009-REG-lib
+  description: 'cargo test --release --lib: 42 passed, 0 failed (builder regression evidence)'
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/REG-cargo-test-lib.out
+- id: P2-AR-0009-REG-certification
+  description: 'cargo test --release --test certification: 79 passed, 0 failed (builder regression evidence)'
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/beta-r/evidence/REG-cargo-test-certification.out
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 2
+  PARTIAL: 17
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+findings:
+- id: A0-C1-01
+  severity: MEDIUM
+  capability: C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,D1,D2,D3,D4,D5,D6,R1,R2,R3
+  blocking: true
+  blocker_class: BC-CONTRACT-DERIVED-VIEW-OMITS-BULLETS
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Derived contract views carry none of the 123 beta checklist bullets and map no evidence owner
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C2-01
+  severity: MEDIUM
+  capability: C2
+  blocking: true
+  blocker_class: BC-C2-INTEGRITY-STALE-REVERSED-ORPHAN
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Graph integrity only counts orphans and cannot see stale or reversed relationships
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C3-01
+  severity: HIGH
+  capability: C3
+  blocking: true
+  blocker_class: BC-C3-FILTER-AFTER-TRUNCATION
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Authority/namespace filters run after candidate truncation and after the reranker plugin sees the candidates
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C3-02
+  severity: HIGH
+  capability: C3,C4,C7
+  blocking: true
+  blocker_class: BC-C3-LIST-FIELDS-NOT-INDEXED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: List-valued and nested record content never enters lexical or semantic memory
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C4-01
+  severity: HIGH
+  capability: C4,D3
+  blocking: true
+  blocker_class: BC-C4-UNCHUNKED-MODULE-CODE
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Code outside recognised units (after the 15-line head) is never indexed
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C4-02
+  severity: LOW
+  capability: C4,D2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Identifier-shaped literals (error codes) are matched by OR-of-subtokens, returning near-miss documents
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C5-01
+  severity: HIGH
+  capability: C5
+  blocking: true
+  blocker_class: BC-C5-ROUTES-MODELS-INHERITANCE-ABSENT
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Route registrations, DB models and inheritance/implementation relations are not represented
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C5-02
+  severity: MEDIUM
+  capability: C5
+  blocking: true
+  blocker_class: BC-C5-FIDELITY-AND-TEST-EDGES
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: AST-equivalent fidelity only for Python; test-coverage edges only when imports happen to resolve
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C6-01
+  severity: INFO
+  capability: C6
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Ungoverned commit history is not ingested into temporal memory (recommendation)
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C8-01
+  severity: MEDIUM
+  capability: C8
+  blocking: true
+  blocker_class: BC-C8-MISSES-TOOLFAIL-NOT-DURABLE
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No durable record of ad-hoc retrieval misses or tool failures
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C9-01
+  severity: MEDIUM
+  capability: C9
+  blocking: true
+  blocker_class: BC-C9-NO-CONTENT-DEDUP
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Duplicate suppression is per-artefact only; verbatim copies are returned twice
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C9-02
+  severity: INFO
+  capability: C9
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Packet omits the CONTEXT_POLICY field 'semantic_candidates' (product self-reports LOW)
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-C10-01
+  severity: MEDIUM
+  capability: C10
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Capability memory holds no A2A agents, dependencies, credential status or observed tool versions
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D1-01
+  severity: MEDIUM
+  capability: D1,C2
+  blocking: true
+  blocker_class: BC-D1-REVERSE-EDGES-NOT-INVALIDATED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Incremental builds leave stale edges owned by unchanged files
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D1-02
+  severity: HIGH
+  capability: D1,R3
+  blocking: true
+  blocker_class: BC-D1-PATHMAP-NOT-REAPPLIED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Path-map reclassification is not applied incrementally and freshness then reports fresh (archive indexed as current)
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D1-03
+  severity: HIGH
+  capability: D1,R3,K2
+  blocking: true
+  blocker_class: BC-D1K2-CITE-STALE-POLICY-CACHE
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: CIT-E refreshes and verifies the index with the pre-mutation cached policy/path map
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D1-04
+  severity: MEDIUM
+  capability: D1
+  blocking: true
+  blocker_class: BC-D1-EVIDENCE-CURRENCY-INPUTS
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Green memory/index evidence is not invalidated by source, spec or index-manifest changes
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D2-01
+  severity: LOW
+  capability: D2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Exact-ID lookups do not rank the known record first
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D2-02
+  severity: MEDIUM
+  capability: D2,C4
+  blocking: true
+  blocker_class: BC-D2-FILENAME-MISROUTE
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Bare filename queries are routed to the symbol route only and return nothing
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D2-03
+  severity: MEDIUM
+  capability: D2
+  blocking: true
+  blocker_class: BC-D2-GRAPH-BURIED-BY-FUSION
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Graph-route answers are buried by fusion; code-impact questions never reach the graph
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D3-01
+  severity: MEDIUM
+  capability: D3
+  blocking: true
+  blocker_class: BC-D3-METHOD-UNITS
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Methods inside classes are not chunk units; symbol lookups return the file header
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D4-01
+  severity: HIGH
+  capability: D4,D1,D5
+  blocking: true
+  blocker_class: BC-D4-RUNTIME-IDENTITY-UNBOUND
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: The embedding runtime/model artefact is neither separately identified nor bound; weight changes go undetected
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D5-01
+  severity: HIGH
+  capability: D5,D1
+  blocking: true
+  blocker_class: BC-D5-REVISION-PIN-UNBOUND
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Pinned embedder/reranker revisions are strings not bound to what executes
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D5-02
+  severity: HIGH
+  capability: D5
+  blocking: true
+  blocker_class: BC-D5-PROFILE-CHANGE-UNGOVERNED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Profile changes are not bound to evidence, regression or the radius-appropriate gate
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D6-01
+  severity: MEDIUM
+  capability: D6
+  blocking: true
+  blocker_class: BC-D6-OPERATIONAL-STATE-IN-DERIVED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Claims and emergency-control state live in the directory the product classifies as derived
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-D6-02
+  severity: LOW
+  capability: D6
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: The plugin registry lives under governance/generated/ and is lost when generated views are deleted
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-R1-01
+  severity: MEDIUM
+  capability: R1,R2
+  blocking: true
+  blocker_class: BC-R1-CUE-GATED-EXTRACTION
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Legacy extraction is cue-word gated: skills, research, evidence and cue-less facts are lost on retirement'
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-R1-02
+  severity: HIGH
+  capability: R1,R2
+  blocking: true
+  blocker_class: BC-R1-NO-DEPENDENCY-PROOF
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No dependency proof before retirement; A6 rewrites live code to depend on archived legacy rules
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-R2-01
+  severity: LOW
+  capability: R2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Chat-store retirement is not executed as a CIT-E transaction
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+- id: A0-R3-01
+  severity: LOW
+  capability: R3
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Archived material cannot be explicitly requested through the CLI
+  path: release/capability-baseline/audit-0/beta-r/findings.yaml
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-beta-r
+  commit: a3d6b660ec88f248426493654e5d0cd8a0882b21
+  evidence_path: release/capability-baseline/audit-0/beta-r/
+unresolved:
+- 'AC-7 determination: NOT MET (mechanism present; A0-D4-01, A0-D5-01, A0-D5-02 plus pipeline defects A0-C3-01, A0-C3-02, A0-C4-01, A0-D2-03) — for the synthesis auditor.'
+- D4 bullet 'generative/query-planning model' recorded N/A_WITH_REASON (optional per framework §14.2, absent from the design); synthesis may reclassify under frozen §4.
+- 'Cross-family observations for owning families: OBS-1 (F4: `python3 -m` registered plugins carry no implementation pin), OBS-2 (S4/B2: adoption archives the OS''s own IDE adapter; ledger/catalogue artefact-id
+  mismatch), OBS-3 (N4/E3: worker-return status collides with report lifecycle status), OBS-4 (W6/K2: DONE tasks never flagged by upstream changes), OBS-5 (O5: no G0-G6 scheduler implementation).'
+- 'Disclosed protocol deviation: one read of this run''s own background build output in the task-output store.'
+recommended_next_action: 'Synthesis auditor: fold the beta blocker-class inventory (22 blocking findings; AC-7 NOT MET; AC-3/AC-7/AC-10/AC-13/AC-16 impacts) into the Phase-2 verdict; route repairs to a
+  capability-repair run with R1 preservation per AC-14.'
+completed_at: '2026-09-18T21:27:07Z'
