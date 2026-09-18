@@ -1,0 +1,212 @@
+===== hv_a_derivation =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/heldout)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.02s
+     Running tests/hv_a_derivation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/target-heldout/debug/deps/hv_a_derivation-8e81700d2d959fc2)
+
+running 10 tests
+test a10_the_single_exemption_writes_only_into_the_snapshot_directory ... `take_snapshot` write sites:
+            std::fs::copy(&src, &dst)?;
+            copy_dir(&src, &snap.join(&rel))?;
+    write_json(&dir.join("snapshot.json"), &manifest)?;
+EXEMPTION ACCEPTED: the record path is read for existence only; every write targets the snapshot tree.
+ok
+test a1_the_derived_census_reproduces_independently_at_the_claimed_scale ... independent walk: 84 files, 740 functions
+AR-0033 independent §6 census:
+  human_gate_create: derived 35 / writers 32 / exempt 1 / violations 0
+  human_gate_approve: derived 1 / writers 1 / exempt 0 / violations 0
+  release_certification: derived 2 / writers 1 / exempt 0 / violations 0
+  trust_policy_mutation: derived 7 / writers 1 / exempt 0 / violations 0
+  privileged_plugin_acquisition: derived 9 / writers 2 / exempt 0 / violations 0
+  floor_lower_or_reset: derived 3 / writers 1 / exempt 0 / violations 0
+  present_below_floor_release_as_current: derived 1 / writers 1 / exempt 0 / violations 0
+ok
+test a2_the_same_signatures_flag_the_pre_repair_source ... the candidate's signatures, applied to the PRE-REPAIR product: [
+    (
+        "floor_lower_or_reset",
+        "runtime/src/srr/state.rs::save",
+    ),
+    (
+        "present_below_floor_release_as_current",
+        "cli/src/main.rs::main",
+    ),
+    (
+        "privileged_plugin_acquisition",
+        "runtime/src/tools.rs::install",
+    ),
+]
+ok
+test a3_plausible_future_primitives_against_the_signatures ... bullet                                      sig    write   acc    probe
+human_gate_approve                          false  true    false  **MISSED** approve using Value::String instead of the json! macro
+human_gate_approve                          false  true    false  **MISSED** approve through a named constant
+human_gate_create                           false  true    false  **MISSED** write the gate file at a hand-built path (the repair's own uncertainty 4)
+release_certification                       false  true    false  **MISSED** certify with a differently spelled status field
+trust_policy_mutation                       false  true    false  **MISSED** write a trust role file with a computed filename
+privileged_plugin_acquisition               false  true    false  **MISSED** write a capability registry with a computed directory name
+floor_lower_or_reset                        false  true    false  **MISSED** lower a floor by public-field assignment then save — THE REPAIR'S OWN EXAMPLE of the latent primitive
+present_below_floor_release_as_current      false  true    false  **MISSED** a new reporting surface that prints the installed release
+present_below_floor_release_as_current      false  true    false  **MISSED** a new serve mode that prints and exits before the CLI envelope
+
+MISSED: 9 of 9
+  - [human_gate_approve] approve using Value::String instead of the json! macro
+  - [human_gate_approve] approve through a named constant
+  - [human_gate_create] write the gate file at a hand-built path (the repair's own uncertainty 4)
+  - [release_certification] certify with a differently spelled status field
+  - [trust_policy_mutation] write a trust role file with a computed filename
+  - [privileged_plugin_acquisition] write a capability registry with a computed directory name
+  - [floor_lower_or_reset] lower a floor by public-field assignment then save — THE REPAIR'S OWN EXAMPLE of the latent primitive
+  - [present_below_floor_release_as_current] a new reporting surface that prints the installed release
+  - [present_below_floor_release_as_current] a new serve mode that prints and exits before the CLI envelope
+ok
+test a4_the_bullet_6_primitive_the_census_cannot_see_is_refused_by_the_sink ... ok
+test a5_an_acceptance_marker_accepts_an_unenforced_implementation ... CONSTRUCTED: a function whose `human-gate` branch writes the record path by hand is ACCEPTED, because its `task` branch calls `save_record`. Acceptance is by marker, not by reachability.
+MEASURED IN THE PRODUCT: at the base commit `cit::apply_op` was accepted for bullet 2 purely by the `save_record(` marker while its `write_file` branch wrote a record path with `write_text`. The census passed it. The repair closed it by reading, not by the mechanism firing.
+ok
+test a6_the_positive_controls_are_classified_by_what_they_actually_prove ... positive controls judged COSMETIC (detector recognises its own spelling):
+  human_gate_approve: matches on "json!(\"ANSWERED\")" — a status string has many spellings; a3 evades it twice
+  release_certification: matches on "certification_status" — a manifest field name; a3 evades it
+  present_below_floor_release_as_current: matches on "\"ok\": true, \"command\"" — the control is a verbatim copy of the ONE existing envelope, so it proves only that the detector recognises the implementation it was derived from
+positive controls judged BEHAVIOURAL (a real product primitive):
+  human_gate_create: matches on "record_path_for(" — the product's own record-path builder
+  trust_policy_mutation: matches on "join(\"root.json\")" — the anchor's real filename, but a3 evades it when computed
+  privileged_plugin_acquisition: matches on "join(\"plugins\")" — the registry directory, evadable when computed
+  floor_lower_or_reset: matches on "floors_path(" — the product's own path builder — but NOT the primitive the repair itself identified
+ok
+test a7_no_sink_entry_claims_an_absence_and_bullet_7_has_real_call_sites ... §6 bullet 7 enforcement sites outside breakglass.rs: [
+    "runtime/src/context/mod.rs::compile",
+    "runtime/src/doctor.rs::run",
+    "runtime/src/srr/present.rs::presentation",
+    "runtime/src/update.rs::check",
+    "cli/src/main.rs::main",
+]
+ok
+test a8_the_rustfmt_assumption_behind_the_splitter_is_untrue_but_costs_nothing_here ... functions where the two splitters disagree on the body: 1
+  [
+    "runtime/src/util.rs::glob_to_regex",
+]
+§6 verdicts that differ between the splitters: []
+ok
+test a9_the_cfg_test_cut_hides_no_section_6_primitive ... §6-signature-matching writers hidden by the #[cfg(test)] cut: []
+ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+EXIT=0
+===== hv_b_bullet7 =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/heldout)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.97s
+     Running tests/hv_b_bullet7.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/target-heldout/debug/deps/hv_b_bullet7-32ea9cd40a7b2d58)
+
+running 7 tests
+test b1_a_below_floor_machine_does_not_read_as_current ... {
+  "surface": "held-out",
+  "below_floor": true,
+  "marking": "DEGRADED — RECOVERY ONLY",
+  "presented_as": "BELOW_FLOOR_RECOVERY_ONLY",
+  "section_6_bullet": 7,
+  "refused_class": "present_below_floor_release_as_current",
+  "refusal_code": "SRR_BELOW_FLOOR_REFUSED",
+  "entered_at": "2026-09-18T00:00:00Z",
+  "exit_condition": "install and verify an authenticated release at or above BOTH the signed minimum secure release AND the protected local high-water (SRR2-R1-C1 policy `b_stricter_both_floors`, GATE-OWNER-R1-BREAK-GLASS-EXIT); the marking is then cleared automatically",
+  "operator_note": "This machine is marked `DEGRADED — RECOVERY ONLY` (OWNER-DECISION-0006 §4). The installed release is below its signed security floor: it is NOT current and NOT fully trusted, whatever version number appears beside it. Only the §5 recovery activities are available until an authenticated release at or above both floors is installed.",
+  "permitted_while_below_floor": [
+    "inspection",
+    "backup_export",
+    "diagnosis",
+    "repair",
+    "uninstall_reinstall",
+    "restore_authenticated_release"
+  ],
+  "gate_free_restoration_routes": [
+    "kernel reinstall",
+    "update --rollback"
+  ]
+}
+ok
+test b2_an_unmarked_machine_is_not_marked_and_a_cleared_marking_lifts ... ok
+test b3_a_machine_with_no_home_is_not_spuriously_marked ... no HOME / no XDG_STATE_HOME: {"surface":"no-home","below_floor":false,"marking":null,"presented_as":"CURRENT","section_6_bullet":7,"basis":"OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}
+ok
+test b4_every_command_result_carries_the_marking_through_the_envelope ... ok
+test b5_a_stdout_path_bypasses_the_command_result_envelope ... serve-embed stdout on a MARKED machine: {"protocol":"gov-capability/1","ok":true,"provider":{"id":"probe","version":"1"},"outputs":{"vectors":[[0.0,0.0,0.0,0.0,0.0,-1.0,0.0,0.0]],"dim":8}}
+
+FOUND: `gov capabilities serve-embed` writes to stdout and calls std::process::exit(0) from inside run(), so the command-result envelope is never reached. The claim that run()'s value reaches stdout ONLY through one envelope is false as written.
+bullet 7 derived writers: ["cli/src/main.rs::main"]
+does the bullet-7 signature derive `cli/src/main.rs::run`, which holds both non-envelope print sites? false
+MEASURED: `cli/src/main.rs::run` holds both non-envelope stdout writes and is NOT in the bullet-7 derived set. DERIVATION.md §4 limit 10's statement that 'the derivation finds them' is inaccurate: they are accounted for in prose only.
+ok
+test b6_the_non_json_surface_carries_the_marking ... stdout:
+DEGRADED — RECOVERY ONLY: This machine is marked `DEGRADED — RECOVERY ONLY` (OWNER-DECISION-0006 §4). The installed release is below its signed security floor: it is NOT current and NOT fully trusted, whatever version number appears beside it. Only the §5 recovery activities are available until an authenticated release at or above both floors is installed.
+framework: agentic-engineering-os
+version: 4.1.5
+cli_version: 4.1.5
+runtime_version: 4.1.5
+index_version: 4.1.5-idx3
+
+stderr:
+
+ok
+test b7_in_process_reporting_surfaces_are_covered_only_where_they_carry_it_themselves ... the raw installed-release accessor: Some("runtime/src/project.rs::framework_version") (carries no marking, by design)
+CONFIRMED (disclosed limit 9): bullet 7 is universal at the `gov` boundary and enumerated in-process. An in-process reporting function written tomorrow gets the marking only if its author adds it.
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+EXIT=0
+===== hv_c_failclosed =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/heldout)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.95s
+     Running tests/hv_c_failclosed.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/target-heldout/debug/deps/hv_c_failclosed-ecb8b3c403e740cf)
+
+running 6 tests
+test c1_both_enforcement_points_fail_closed_on_an_undetermined_subject ... ok
+test c2_the_section_5_allow_list_is_consulted_before_the_state_read ... ok
+test c3_break_glass_can_still_be_exited_and_the_exit_policy_is_unchanged ... ok
+test c4_an_unreadable_marking_is_treated_as_marked_and_can_still_be_cleared ... ok
+test c5_the_state_carrying_guard_resolves_nothing_and_holds_under_the_same_input ... ok
+test c6_the_fail_open_is_gone_and_resolution_is_byte_identical ... resolve_state_root / default_state_root / exit_satisfied: BYTE-IDENTICAL across the repair
+ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+EXIT=0
+===== hv_d_sinks_and_preservation =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/heldout)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.05s
+     Running tests/hv_d_sinks_and_preservation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/ar0033/target-heldout/debug/deps/hv_d_sinks_and_preservation-c82dc782655becc1)
+
+running 8 tests
+test d1_a_human_gate_record_cannot_be_persisted_below_floor_however_it_was_minted ... ok
+test d2_the_cit_mutation_ops_reach_the_bullet_2_control ... ok
+test d3_gate_present_reaches_no_operation_guard_and_is_now_refused_at_the_sink ... gov gate present on a marked machine: NOT_INSTALLED
+ok
+test d4_both_acquisition_primitives_ask_section_6_unconditionally ... ok
+test d5_the_malleability_and_relaxation_properties_hold_in_held_out_material ... ok
+test d6_the_product_cannot_sign ... security/ hit for "PRIVATE KEY" in runtime/src/security/secrets.rs — inspected: detector regex only
+ok
+test d7_frozen_r1_preservation_still_holds ... `AuthenticatedRelease` construction sites: [
+    "runtime/src/srr/verifier.rs:732: Ok(AuthenticatedRelease {",
+]
+admit sites: [
+    "runtime/src/adopt.rs::a6_migrate",
+    "runtime/src/init.rs::init",
+    "runtime/src/update.rs::apply_update_opts",
+    "runtime/src/update.rs::rollback_internal",
+    "cli/src/main.rs::run",
+]
+install_kernel sites: [
+    "runtime/src/adopt.rs::a6_migrate",
+    "runtime/src/init.rs::init",
+    "runtime/src/update.rs::apply_update_opts",
+    "runtime/src/update.rs::rollback_internal",
+    "cli/src/main.rs::run",
+]
+Contract v3 canonical import SHA-256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+ok
+test d8_break_glass_consults_no_network ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+EXIT=0
