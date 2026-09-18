@@ -1,0 +1,13 @@
+=== W6: Upstream-change staleness propagation ===
+CIT-E execution (cit/mod.rs lines 812-1118):
+1. Affected tasks marked retest_required=true (line 937, propagation.mark_affected_tasks_retest)
+2. Affected tests marked stale (line 958, propagation.mark_affected_tests_stale, staleness={stale:true, reason:"CIT {id}"})
+3. Context packets invalidated: index refreshed (propagation.refresh_index), derived views regenerated
+4. Graph computes impacted downstream: impact_set() in graph/mod.rs uses IMPACT_IN/IMPACT_OUT typed edges for BFS
+5. Revalidation tasks generated: affected_tasks marked retest_required
+6. COMPLETE does not imply permanently valid: task close checks governance currency (tasks.rs line 496+), verification inputs_hash changes make prior green stale
+7. Stale evidence cannot remain green: verification/mod.rs index_freshness family checks and reports stale artifacts; memory_retrieval_regression tracks stale_hit_rate and superseded_hit_rate
+
+Demonstrated: CIT-0001 proposed with behaviour_change trigger -> auto-simulated, radius R2, human gate HDG-0001 raised.
+
+PASS: All W6 bullets evidenced.

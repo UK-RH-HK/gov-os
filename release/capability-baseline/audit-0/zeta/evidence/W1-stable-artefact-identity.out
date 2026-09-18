@@ -1,0 +1,11 @@
+=== W1: Stable artefact identity ===
+Records have: id (REQ-0001), type (requirement), status (ACTIVE), state_class (AUTHORITATIVE), canonical path (spec/requirements/REQ-0001.yaml).
+Record schema (record.schema.json) requires: id, type, status.
+Task schema adds: class, task_status, objective.
+All governed record types inherit stable ID (TYPE_PREFIX mapping), type, canonical path (TYPE_DIR mapping), status, and state_class.
+Supersession lineage: supersedes/superseded_by fields extracted by records.rs relations().
+Expected consumers: via RELATION_FIELDS mapping (consumers, producers).
+Version/content hash: context packet carries deterministic_hash and packet_hash over exact inputs supplied.
+The context compiler includes every active decision, requirement, scenario, interface, architecture record as deterministic authority - each with id, type, title, status, path.
+Producer/provenance: records store created date, session, role on creation.
+PASS: All W1 bullet fields are structurally present via schema enforcement and the record model.

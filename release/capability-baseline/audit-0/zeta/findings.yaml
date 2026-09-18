@@ -1,0 +1,147 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0006
+findings:
+  - id: A0-W7-01
+    capability: [W7]
+    bullet_source_lines: [1139, 1140, 1141, 1142, 1143]
+    severity: MEDIUM
+    title: "Orphan detection covers only zero-edge nodes; partial-orphan heuristics absent"
+    statement: >
+      graph/mod.rs orphan_nodes() detects records with no edges at all. However, a requirement
+      with an IMPLEMENTS edge but no downstream implementation/test path (W7 bullet 2), or
+      research expected to feed a decision but never consumed (W7 bullet 3), or acceptance test
+      without requirement/scenario (W7 bullet 4), are not detected by the zero-edge heuristic
+      alone. These require typed-edge-presence queries (e.g., "requirement with no IMPLEMENTS
+      inbound edge" or "test with no TESTS/VALIDATES outbound edge"). The product_traceability
+      verification family checks some of these, but not all W7 bullets have dedicated checks.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:1139-1144"
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P3
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/W7-orphan-detection.out]
+    reproduction: >
+      Review graph/mod.rs orphan_nodes() — it returns nodes with zero edges. Then check
+      verification/mod.rs product_traceability family — it checks feature->scenario and
+      feature->test coverage but does not check all five W7 orphan categories independently.
+    repair_direction: >
+      Add typed-orphan queries per W7 bullet: requirement without implementation edge,
+      research without consumed-by-decision edge, test without requirement/scenario edge,
+      implementation without requirement/decision edge. Each query should produce a governed
+      investigation task per W7 bullet 6.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-W8-01
+    capability: [W8]
+    bullet_source_lines: [1152]
+    severity: LOW
+    title: "Cross-repository lineage not exercisable in single-repo product"
+    statement: >
+      W8 bullet 5 asks for "cross-language/cross-repository relationships where in scope".
+      Governance OS is a single-repository, single-language (Rust) product. The graph module
+      supports typed edges that could encode cross-repo relations, but there is no multi-repo
+      scenario to exercise. This is a legitimate N/A-at-this-lifecycle-stage rather than a gap.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:1152"
+    provenance_class: OUT-OF-SCOPE / UNSATISFIABLE-AS-STATED
+    lifecycle: adoption
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/W8-forward-reverse-lineage.out]
+    reproduction: "Single-crate Cargo.toml; no multi-repo integration."
+    repair_direction: >
+      When Governance OS is adopted in a multi-repo environment, the adopter's A4 stage must
+      verify cross-repo lineage edges are populated and traversable.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-W11-01
+    capability: [W11]
+    bullet_source_lines: [1173, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183]
+    severity: LOW
+    title: "Quantitative health metrics require held-out data and operational history"
+    statement: >
+      W11 asks to "track where applicable" nine quantitative metrics. The infrastructure for
+      tracking is present (retrieval benchmarks with recall/mrr/precision; verification suite
+      with pass/fail counts; graph integrity checks). However, meaningful numeric values for
+      metrics like superseded-input leakage rate, staleness propagation accuracy, and fresh-agent
+      reconstruction correctness require operational history or held-out evaluation data that
+      does not yet exist for this product at this lifecycle stage. The "where applicable" qualifier
+      means absence of operational data is not a gap, but the metric-collection infrastructure
+      must be present, and it is.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:1173-1183"
+    provenance_class: LATER-QUALIFICATION/CERTIFICATION
+    lifecycle: P3
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/W11-quantitative-health.out]
+    reproduction: >
+      Run 'gov memory benchmark' in a project with held-out data — it produces recall_at_k,
+      mrr, precision_at_k. Without held-out data, the infrastructure exists but values are not
+      yet populated.
+    repair_direction: >
+      Phase 3 qualification should produce held-out evaluation data and populate all nine W11
+      metrics. Phase 4 synthetic repositories will exercise superseded-input leakage and
+      staleness propagation accuracy.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-W12-01
+    capability: [W12]
+    bullet_source_lines: [1192]
+    severity: INFO
+    title: "G6 hidden artifact-flow fault injection is Phase 4 scope"
+    statement: >
+      W12 bullet 7 requires G6 to inject hidden artifact-flow failures in sophisticated
+      qualification. This is explicitly a Phase 4 (qualification) activity, not Phase 2
+      (capability baseline). The G6 tier is defined in the health scheduler framework and
+      the Qualification Oracle format (AC-6) addresses it. The infrastructure for fault
+      injection exists (the verification suite supports fault-class families). No Phase 2
+      gap; recorded for traceability.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:1192"
+    provenance_class: LATER-QUALIFICATION/CERTIFICATION
+    lifecycle: P4
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/W12-health-scheduler-integration.out]
+    reproduction: "Contract v3 Gate V defines G6 as qualification scope; Phase 2 AC-5 says 'implemented enough to observe qualification work'."
+    repair_direction: >
+      Phase 4 qualification must exercise G6 with hidden artifact-flow fault injection via
+      the Qualification Oracle.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-W9-01
+    capability: [W9]
+    bullet_source_lines: [1159]
+    severity: MEDIUM
+    title: "Compaction-safe mandatory state relies on RecordStore persistence, not explicit compaction guard"
+    statement: >
+      W9 bullet 5 asks that "compaction cannot silently remove mandatory project state."
+      The architecture ensures mandatory inputs come from RecordStore (filesystem YAML records),
+      not from chat context, so LLM context compaction does not affect them. The context
+      compiler re-loads from RecordStore on every compile. However, there is no explicit
+      compaction-event guard or assertion that proves compaction was tested and mandatory
+      state survived. The safety is architectural (correct by construction) but not
+      independently asserted.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:1159"
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P3
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/W9-session-handoff-continuity.out]
+    reproduction: >
+      The context compiler loads from RecordStore (not chat). Checkpoint records
+      context_packet_hash. Fresh agent reconstruction test (fresh_agent_reconstruction
+      verification family) re-compiles and compares. No explicit compaction-event test.
+    repair_direction: >
+      Add an independent held-out test that simulates compaction (empty chat history) and
+      verifies the context compiler produces identical deterministic_authority from RecordStore.
+    owner_decision_required: false
+    owner_decision_reason: null

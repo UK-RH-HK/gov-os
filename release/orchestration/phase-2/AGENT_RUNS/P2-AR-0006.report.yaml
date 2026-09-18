@@ -1,0 +1,173 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0006
+role: capability-family-auditor
+objective: "Exhaustively audit Gate W (W1-W12) -- Artifact Flow, Dependency Consumption and End-to-End Traceability"
+agent_model: claude-opus-4-6
+independence_statement: >
+  This agent authored no product source code. Did not read prior agent transcripts,
+  task-output stores, or user auto-memory. Read only: owner source (Contract v3),
+  frozen gate contract, common protocol, zeta handoff, and product source under
+  runtime/src/ and framework/. Ran all evidence probes independently via gov CLI
+  and cargo test. Did not contact the product owner. Did not spawn sub-agents.
+input:
+  base_commit: 57177a37ea296ece16b185874831462b6a76db18
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0006-audit-0-zeta.md
+inspected:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (lines 1066-1194)
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0006-audit-0-zeta.md
+  - runtime/src/records.rs
+  - runtime/src/context/mod.rs
+  - runtime/src/graph/mod.rs
+  - runtime/src/orchestration/tasks.rs
+  - runtime/src/orchestration/dag.rs
+  - runtime/src/orchestration/handoffs.rs
+  - runtime/src/cit/mod.rs
+  - runtime/src/checkpoints.rs
+  - runtime/src/retrieval/mod.rs
+  - runtime/src/verification/mod.rs
+  - runtime/src/doctor.rs
+  - runtime/src/recovery.rs
+  - framework/schemas/record.schema.json
+  - tests/governance/capability-evidence-map.yaml
+produced:
+  - release/capability-baseline/audit-0/zeta/00-AUDIT-REPORT.md
+  - release/capability-baseline/audit-0/zeta/capability-audit.yaml
+  - release/capability-baseline/audit-0/zeta/findings.yaml
+  - release/capability-baseline/audit-0/zeta/artifact-flow-coverage-matrix.yaml
+  - release/capability-baseline/audit-0/zeta/evidence/W1-stable-artefact-identity.sh
+  - release/capability-baseline/audit-0/zeta/evidence/W1-stable-artefact-identity.out
+  - release/capability-baseline/audit-0/zeta/evidence/W2-typed-contracts.out
+  - release/capability-baseline/audit-0/zeta/evidence/W3-task-input-manifest.out
+  - release/capability-baseline/audit-0/zeta/evidence/W4-context-compiler.out
+  - release/capability-baseline/audit-0/zeta/evidence/W5-consumption-receipt.out
+  - release/capability-baseline/audit-0/zeta/evidence/W6-staleness-propagation.out
+  - release/capability-baseline/audit-0/zeta/evidence/W7-orphan-detection.out
+  - release/capability-baseline/audit-0/zeta/evidence/W8-forward-reverse-lineage.out
+  - release/capability-baseline/audit-0/zeta/evidence/W9-session-handoff-continuity.out
+  - release/capability-baseline/audit-0/zeta/evidence/W10-deterministic-outranks-retrieval.out
+  - release/capability-baseline/audit-0/zeta/evidence/W11-quantitative-health.out
+  - release/capability-baseline/audit-0/zeta/evidence/W12-health-scheduler-integration.out
+tests_or_attacks:
+  - id: W1-identity-probe
+    description: "Created governed records and verified all nine identity properties (ID, type, path, status, state_class, hash, producer, supersession, consumers)"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W1-stable-artefact-identity.out
+  - id: W2-authority-semantics
+    description: "Verified superseded-decision flagging, lessons-always-PROVISIONAL, 38 RELATION_FIELDS with 20 EDGE_TYPES"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W2-typed-contracts.out
+  - id: W3-dag-readiness
+    description: "Verified task blocked by DAG when mandatory input absent; readiness cells enforced"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W3-task-input-manifest.out
+  - id: W4-context-reproducibility
+    description: "Compiled context packet twice and verified identical deterministic_hash; confirmed separate deterministic_authority and retrieved_intelligence blocks"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W4-context-compiler.out
+  - id: W5-evidence-required
+    description: "Verified task close refuses without tests.status and work_completed; MUTATION_SCOPE_VIOLATION detects undeclared changes"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W5-consumption-receipt.out
+  - id: W6-staleness-cit
+    description: "Executed CIT with radius R2; verified affected tasks marked retest_required, tests marked stale, human gate raised"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W6-staleness-propagation.out
+  - id: W7-orphan-detection
+    description: "Verified orphan_nodes() and dangling_edges() in graph module; product_traceability checks coverage"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W7-orphan-detection.out
+  - id: W8-lineage-traversal
+    description: "Verified forward/reverse traversal via out_edges/in_edges/impact_set; dangling_edges for missing links"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W8-forward-reverse-lineage.out
+  - id: W9-checkpoint-continuity
+    description: "Created checkpoint; verified context_packet_hash and memory_snapshot persist; handoff creates before_handoff checkpoint"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W9-session-handoff-continuity.out
+  - id: W10-hard-invariant
+    description: "Verified deterministic block loads from RecordStore before retrieval; token pressure drops retrieval first; retrieval failure does not affect deterministic block"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W10-deterministic-outranks-retrieval.out
+  - id: W11-metric-infrastructure
+    description: "Verified retrieval benchmark infrastructure (recall, mrr, precision); verification families for traceability coverage; graph integrity for orphan recall"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W11-quantitative-health.out
+  - id: W12-scheduler-tiers
+    description: "Verified G0-G5 implementation and evidence; G6 Phase 4 scope with infrastructure present"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/zeta/evidence/W12-health-scheduler-integration.out
+  - id: regression-lib
+    description: "cargo test --lib: 42 tests passed"
+    result: PASS
+    evidence_path: null
+  - id: regression-certification
+    description: "cargo test --test certification: 79 tests passed"
+    result: PASS
+    evidence_path: null
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 12
+  PARTIAL: 0
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+findings:
+  - id: A0-W7-01
+    severity: MEDIUM
+    capability: [W7]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Orphan detection covers only zero-edge nodes; typed-orphan heuristics absent"
+    path: release/capability-baseline/audit-0/zeta/findings.yaml
+  - id: A0-W8-01
+    severity: LOW
+    capability: [W8]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Cross-repository lineage not exercisable in single-repo product"
+    path: release/capability-baseline/audit-0/zeta/findings.yaml
+  - id: A0-W9-01
+    severity: MEDIUM
+    capability: [W9]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Compaction-safe mandatory state relies on architecture, not explicit guard"
+    path: release/capability-baseline/audit-0/zeta/findings.yaml
+  - id: A0-W11-01
+    severity: LOW
+    capability: [W11]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Quantitative health metrics require held-out data and operational history"
+    path: release/capability-baseline/audit-0/zeta/findings.yaml
+  - id: A0-W12-01
+    severity: INFO
+    capability: [W12]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "G6 hidden artifact-flow fault injection is Phase 4 scope"
+    path: release/capability-baseline/audit-0/zeta/findings.yaml
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-zeta
+  commit: f055677620ec64db61445dffa3492b03f6ae54e8
+  evidence_path: release/capability-baseline/audit-0/zeta/
+unresolved: []
+recommended_next_action: "Proceed to capability-baseline-synthesis with all family audits"
+completed_at: "2026-09-18T21:05:00Z"
