@@ -1,0 +1,90 @@
+=== K1/K2: CIT propose, simulate, approve, execute lifecycle ===
+--- K1b1-b4: CIT-P propose (deterministic graph traversal) ---
+{
+  "ok": true,
+  "command": "cit",
+  "result": {
+    "id": "CIT-0001",
+    "type": "cit",
+    "title": "Rename config key MAX_RETRIES to MAX_RETRY_COUNT",
+    "status": "ACTIVE",
+    "created": "2026-09-18",
+    "proposal": "Rename config key MAX_RETRIES to MAX_RETRY_COUNT",
+    "trigger": "behaviour_change",
+    "cit_status": "SIMULATED",
+    "proposed_by": "orchestrator",
+    "targets": [],
+    "mutation_manifest": [],
+    "journal": [
+      {
+        "at": "2026-09-18T19:52:02Z",
+        "event": "proposed",
+        "session": "S-a5d8266bf510"
+
+CIT_ID: CIT-0001
+
+--- K1b2-b4: CIT-P simulate (graph traversal + semantic candidates + impact radius + consequences) ---
+radius: R2
+seeds: 0
+affected count: 0
+semantic_candidates count: 8
+consequences:
+  - 0 artefacts affected within radius R2 (graph depth 2)
+  - 0 open task(s) will be marked retest-required
+  - 0 test/scenario artefact(s) become stale and must be re-validated
+  - 0 feature(s) readiness potentially impacted
+  - human approval required before execution
+  - rollback: snapshot of every touched file is taken before execution; `gov cit rollback` restores it
+human_gate_required: True
+human_gate: HDG-0001
+
+Gate: 'HDG-0001'
+--- Present gate ---
+{
+  "ok": true,
+  "command": "gate",
+  "result": {
+    "gate": {
+
+--- Answer gate (human approval) ---
+{
+  "ok": true,
+  "command": "decide",
+  "result": {
+    "gate": "HDG-0001",
+    "decision": "D-0001",
+    "option": "A",
+    "answered_by_kind": "human",
+    "unblocked_tasks": [],
+    "cit": "CIT-0001"
+
+--- Approve CIT ---
+{
+  "ok": true,
+  "command": "cit",
+  "result": {
+    "cit": "CIT-0001",
+    "cit_status": "APPROVED",
+    "decision": "D-0001",
+    "human_gate": "HDG-0001",
+    "method": "human",
+    "human_approved": true
+
+--- Execute CIT-E ---
+cit_status: COMMITTED
+propagation keys: ['retest_required', 'stale_tests', 'touched']
+checkpoint: CKPT-00001
+
+--- Rollback CIT ---
+{
+  "ok": true,
+  "command": "cit",
+  "result": {
+    "cit": "CIT-0001",
+    "cit_status": "ROLLED_BACK",
+    "rollback": {
+      "cit": "CIT-0001",
+      "restored": [],
+      "removed": []
+
+RESULT: CIT lifecycle exercised end-to-end

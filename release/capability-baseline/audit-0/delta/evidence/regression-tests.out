@@ -1,0 +1,12 @@
+=== Regression tests ===
+test capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock ... ok
+test capabilities::host::tests::timeout_kills_child_promptly ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+===
+test repair::benchmark_records_evidence_and_selection_pins_through_decision has been running for over 60 seconds
+test repair::benchmark_records_evidence_and_selection_pins_through_decision ... ok
+
+test result: ok. 79 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 113.99s
+

@@ -1,0 +1,17 @@
+=== J2: Experiment lifecycle ===
+--- J2 bullet mapping ---
+b1 hypothesis/question: 1
+b2 method/data: method=1, data_provenance=1
+b3 reproducibility: schema does not have a dedicated reproducibility field
+b4 results: 1
+b5 interpretation: no dedicated interpretation field (conclusion/result serve this)
+b6 decision influence: via relations (derived_from, influences, affects)
+b7 production merge prohibited: production_merge_allowed=production_merge_allowed: false
+
+--- Checking production_merge_allowed enforcement ---
+runtime/src/orchestration/readiness.rs:136:            json!({"class": class, "task_status": "READY", "feature": feature_id, "objective": format!("Fill readiness dimension '{dim}' for {feature_id} (currently {})", c["state"]), "readiness_cell": dim, "generated_by": "readiness-planner", "dependencies": [], "minimum_model_tier": crate::routing::tier_for_class(p, &class), "minimum_reasoning": "medium", "allowed_paths": ["spec/**"], "forbidden_paths": ["governance/kernel/**", "product/**"], "production_merge_allowed": false, "state_class": "AUTHORITATIVE"}),
+runtime/src/orchestration/tasks.rs:56:    obj.entry("production_merge_allowed")
+runtime/src/orchestration/tasks.rs:59:        obj.insert("production_merge_allowed".into(), json!(false));
+tests/certification/brownfield.rs:284:        {"op": "append_record", "record": {"id": "TASK-0100", "type": "task", "title": "Align MAX_RETRIES with D-0002", "status": "ACTIVE", "class": "repair", "task_status": "READY", "objective": "Code says 3, decision D-0002 says 5: align implementation and fix stale test", "decisions": ["D-0002"], "allowed_paths": ["src/**", "tests/**"], "forbidden_paths": ["governance/kernel/**"], "production_merge_allowed": true, "minimum_model_tier": "T2", "minimum_reasoning": "medium"}}
+
+RESULT: J2 fields present in schema; reproducibility and interpretation lack dedicated schema fields; production_merge_allowed is a schema field

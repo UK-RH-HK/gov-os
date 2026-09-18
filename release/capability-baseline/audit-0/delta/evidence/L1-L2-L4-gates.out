@@ -1,0 +1,58 @@
+=== L1: Contradiction resolution ===
+--- L1b1: deterministic precedence first ---
+1://! Constitutional policy precedence (framework §21; verifier H-N1). A lower-precedence layer (PROJECT_POLICY overrides,
+4://! (`policies/POLICY_PRECEDENCE.yaml`); an override that violates them is refused, recorded, and leaves the effective
+70:/// Load the precedence rules from the installed kernel; fall back to the payload embedded in this binary so a
+73:    let p = kernel_dir.join("policies").join("POLICY_PRECEDENCE.yaml");
+81:        .find(|(rel, _)| *rel == "policies/POLICY_PRECEDENCE.yaml")
+87:        "embedded kernel (installed kernel has no POLICY_PRECEDENCE.yaml)",
+196:            "{full}: {why} (POLICY_PRECEDENCE mode '{mode}', rule {})",
+204:            "key is not declared overridable by the kernel precedence rules (deny by default)"
+207:            "constitutional/security key cannot be overridden by a lower-precedence layer".into()
+266:        other => refuse(format!("unknown precedence mode '{other}'")),
+--- L1b2: low-impact/reversible/high-confidence agent resolution ---
+  HUMAN_GATE_POLICY.agent_resolvable_when:
+agent_resolvable_when: {max_radius: R1, min_confidence: 0.8, reversible: true}
+--- L1b3: human escalation for consequential uncertainty ---
+325:    let human_gate_required =
+332:        if human_gate_required { "human approval required before execution".into() } else { "eligible for automatic approval under CHANGE_POLICY".into() },
+337:        "semantic_candidates": candidates, "consequences": consequences, "human_gate_required": human_gate_required, "minimum_model_tier": routing["minimum_tier"], "simulated_at": now_iso(), "index_snapshot": db.get_meta("index_manifest_hash")});
+349:    if human_gate_required && gate_id.is_empty() {
+484:    let hg_required = r.data["impact"]["human_gate_required"]
+--- L1b4: rationale/evidence recorded ---
+275:    rationale: Option<&str>,
+353:    g.set("answer", json!({"option": option, "by": by, "by_kind": kind, "acting_role": p.role, "at": now_iso(), "rationale": rationale}));
+361:        json!({"question": gdata["question"], "options": gdata["options"], "chosen_option": option, "rationale": rationale.unwrap_or(""), "approved_by": by, "approved_at": now_iso(), "human_approved": kind == "human", "impact_radius": gdata.get("impact_radius").cloned().unwrap_or(json!("R1")), "reversibility": gdata.get("reversibility").cloned().unwrap_or(json!("unknown")), "confidence": if kind == "human" { 1.0 } else { gdata.get("confidence").and_then(|v| v.as_f64()).unwrap_or(0.8) }, "derived_from": [id], "cit": gdata.get("cit").cloned().unwrap_or(Value::Null), "state_class": "AUTHORITATIVE"}),
+
+=== L2: Human Decision Gate package ===
+--- HUMAN_GATE_POLICY.decision_package_fields ---
+decision_package_fields: [question, why_now, current_state, options, impact, reversibility, cost_rework, recommendation, confidence, permitted_next_actions]
+
+--- All 10 fields in gate create: ---
+  question, why_now, current_state, options, impact, reversibility, cost_rework, recommendation, confidence, permitted_next_actions
+  Enforcement: gates.rs build() populates all of these from policy list
+2
+
+=== L4: Non-global blocking ===
+--- L4b1: Independent runnable branches continue ---
+continue_independent_work: true
+--- L4b2: Global stop only when policy or critical-path state requires ---
+1://! Emergency controls (framework §74): PAUSE, FREEZE_WRITES, CANCEL_AGENTS, RESUME. Authority-checked; state lives in
+22:            "emergency_control"
+27:        "PAUSE" => {
+28:            s["mode"] = json!("PAUSED");
+35:            s["mode"] = json!("PAUSED");
+68:        return Err(GovError::new("FROZEN", format!("writes are frozen (FREEZE_WRITES active); '{operation}' refused. Run `gov resume` (L4) to lift.")));
+70:    if s["mode"].as_str() == Some("PAUSED") {
+72:            "PAUSED",
+
+--- L4 in action: gate blocks specific tasks, not the whole system ---
+56:    o.entry("blocks_tasks").or_insert(json!([]));
+77:        .get("blocks_tasks")
+130:    for t in rec.data["blocks_tasks"]
+138:                tr.set("task_status", json!("WAITING_HUMAN"));
+228:        .map(|g| { let score = g.data.get("priority_score").and_then(|v| v.as_f64()).unwrap_or(0.0); json!({"id": g.id(), "question": g.get("question"), "gate_status": g.get("gate_status"), "presented_in_chat": g.data.get("presented_in_chat").and_then(|v| v.as_bool()).unwrap_or(false), "priority_score": score, "batchable": batch_low && score < 3.0, "blocks_tasks": g.list("blocks_tasks"), "cit": g.get("cit"), "trigger": g.get("trigger")}) }).collect();
+402:    for t in gdata["blocks_tasks"]
+408:            if tr.get("task_status") == "WAITING_HUMAN" {
+
+RESULT: L1 contradiction resolution via precedence/policy/escalation; L2 gate package enforced by policy; L4 non-global blocking with task-level gates
