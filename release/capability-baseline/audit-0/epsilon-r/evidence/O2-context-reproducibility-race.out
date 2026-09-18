@@ -1,0 +1,7 @@
+
+=== control-mode toggler running concurrently with the context_reproducibility family (up to 40 attempts)
+attempt 1: exit=3 {"findings": [["high", "deterministic authority block not reproducible for TASK-0950"], ["low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]], "ok": false}
+# irreproducible deterministic block detected by the family
+
+=== control: without the toggler the same project is reproducible
+exit=0 {"findings": [["low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]], "ok": true}

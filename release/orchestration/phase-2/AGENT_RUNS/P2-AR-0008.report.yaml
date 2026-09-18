@@ -1,0 +1,507 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0008
+role: capability-family-auditor
+objective: Fresh independent iteration-0 re-audit of capability family epsilon (O1-O5, P1-P2, Q1-Q4, U, V1-V4) on cap2-candidate-0, including the AC-5 health-scheduler audit and the AC-6 oracle-format determination
+  (P2-HO-0008).
+agent_model: claude-opus-5 (model id claude-opus-5[1m], 1M context)
+independence_statement: This run authored none of the Governance OS implementation, its tests, fixtures, or any Phase-1 review, repair or verification, and no earlier Phase-2 audit. It did not read release/capability-baseline/audit-0/epsilon/,
+  AGENT_RUNS/P2-AR-0005.*, any other family's evidence, session or agent transcripts, task-output stores, or user auto-memory. It read the handoffs P2-HO-0008, P2-HO-0000 and P2-HO-0005, the frozen gate
+  contract, AGENT_RUNS/README.md, Contract v3, the governing-document sections traced to this family, D-0004/ARCH-0003, and the product source, tests, fixtures, schemas and policies. It modified no product
+  source and wrote only its evidence directory and this report. No sub-agents were spawned.
+input:
+  base_commit: 85e2ddfce4f0b1122bc8595dd869b98b316f5ea3
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0008-audit-0-epsilon-reaudit.md
+inspected:
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0008-audit-0-epsilon-reaudit.md
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0005-audit-0-epsilon.md
+- release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+- release/orchestration/phase-2/GATES/GATE-REGISTER.yaml
+- release/orchestration/phase-2/AGENT_RUNS/README.md
+- release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml (frozen_gate_contract)
+- Governance_OS_Capability_Acceptance_Contract_v3.md (lines 1-130, 160-182, 740-866, 960-1255)
+- DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §§62-68, 74, 75-76, 75A-75H
+- GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §§7, 13-15, 17-18
+- spec/decisions/D-0004.yaml
+- spec/architecture/ARCH-0003.yaml (header)
+- runtime/src/verification/mod.rs
+- runtime/src/doctor.rs
+- runtime/src/observability.rs
+- runtime/src/lessons.rs
+- runtime/src/upstream.rs
+- runtime/src/memory/heldout.rs
+- runtime/src/status.rs
+- runtime/src/routing.rs
+- runtime/src/checkpoints.rs
+- runtime/src/orchestration/{tasks,handoffs,dag,control,gates,readiness}.rs
+- runtime/src/authority.rs
+- runtime/src/cit/mod.rs (execute, apply_op)
+- runtime/src/context/mod.rs
+- runtime/src/init.rs
+- runtime/src/update.rs
+- runtime/src/release.rs
+- runtime/src/adopt.rs (A5, A7, A10, A11)
+- runtime/src/skills.rs
+- runtime/src/contracts.rs
+- runtime/src/retrieval/mod.rs (run_heldout_with)
+- cli/src/main.rs
+- framework/policies/{TEST,LEARNING,MEMORY,CONTEXT,AUTHORITY,CHANGE,MODEL_ROUTING}_POLICY.yaml
+- framework/policies/POLICY_PRECEDENCE.yaml
+- framework/policies/ENFORCEMENT_MAP.yaml
+- framework/schemas/{lesson,framework-change-proposal,report,worker-return,test-obligation,feature,audit,decision,human-gate,release-manifest}.schema.json
+- framework/contracts/governance-capability-acceptance.yaml
+- tests/governance/capability-evidence-map.yaml
+- tests/certification/*.rs (common, greenfield, repair, repair2, update, migration, upstream)
+- fixtures/{greenfield,migration,upstream-learning,failure-injection,update}
+produced:
+- release/capability-baseline/audit-0/epsilon-r/00-AUDIT-REPORT.md
+- release/capability-baseline/audit-0/epsilon-r/capability-audit.yaml
+- release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- release/capability-baseline/audit-0/epsilon-r/evidence/ (lib.sh, RUN-ALL.sh, 15 probes with captured .out, AC15-cargo-test-{lib,certification}.out)
+- release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.report.yaml
+tests_or_attacks:
+- id: AC15-LIB
+  description: cargo test --lib on the candidate
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/AC15-cargo-test-lib.out
+- id: AC15-CERT
+  description: cargo test --test certification on the candidate (79 tests)
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/AC15-cargo-test-certification.out
+- id: BASELINE
+  description: gov init greenfield project reaches doctor HEALTHY and audit HEALTHY (probe baseline)
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/00-baseline-healthy-project.out
+- id: O1-FAMILIES
+  description: product families representable; failing product suite changes no health surface and close accepts self-attested pass
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O1-product-families.out
+- id: O2-INJECT-17
+  description: one injected violation per governance family, each detected by its family
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O2-governance-families.out
+- id: O2-SKILL-EXEC
+  description: skill with a false validation scenario detected by skill_regression
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O2-governance-families.out
+- id: O2-CTX-RACE
+  description: context reproducibility detects a deterministic block that changes between two compiles
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O2-context-reproducibility-race.out
+- id: O2-AUDIT-REPRO
+  description: audit reproducibility flags differing consecutive runs (non-deep PASS; deep forced reproducible)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O2-governance-families.out
+- id: O3-INDEPENDENCE
+  description: independence gate resists self-attested independence and planner-scaffolded 'held-out' tests
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O3-independent-authorship.out
+- id: O4-INVALIDATION-MATRIX
+  description: prior green invalidated for each Contract v3 input class (8 of 14 do)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O4-suite-currency.out
+- id: O4-CLOSE-GATE
+  description: governance-path task close refused on stale green; governance-class task on other paths
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O4-suite-currency.out
+- id: O4-W6
+  description: upstream change after DONE re-stales task evidence (AC-16 O4<->W6)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O4-suite-currency.out
+- id: O5-G0-MATRIX
+  description: 49 mutating commands under FREEZE_WRITES, PAUSED, L0, L1
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O5-G0-guard-matrix.out
+- id: O5-G0-INIT-L0
+  description: L0 role runs init --force while frozen; kernel/lock/overlay rewritten
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O5-G0-focus.out
+- id: O5-SCHED
+  description: impacted selection, parallelism, isolation, cache, RYG, hard-block, provenance, remediation (AC-5 behaviours)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O5-scheduler-requirements.out
+- id: O5-TIERS
+  description: G1-G6 tier triggers exercised
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O5-tiers-G1-G6.out
+- id: O5-G5-UPDATE
+  description: update --apply runs the full suite (applied over a DAG cycle with subset verification)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/O5-G5-update.out
+- id: P1-P2
+  description: per-field telemetry inventory without caller cooperation; §66 questions answered by summary
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/P1-P2-telemetry.out
+- id: Q-EXPORT-GATE
+  description: export gate sanitisation, scans, allowlist, synthetic preference, raw-content refusal
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/Q-learning-upstream.out
+- id: Q3-SCOPE
+  description: only FRAMEWORK lessons exportable; overlay cannot widen
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/Q-learning-upstream.out
+- id: U-SLO-HEALTHY
+  description: 15 SLOs tracked+thresholded and 13 HEALTHY conditions flip health
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/U-slos-and-healthy.out
+- id: CONTRACT-VIEWS
+  description: compiled contract/evidence map faithful to owner source for this scope (Gate U omitted; O5/V class; no bullets)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/V-oracle-format-and-contract-views.out
+- id: AC-5-DETERMINATION
+  description: 'Governance Health Scheduler G0-G6 implemented enough to observe qualification work: NOT MET'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/00-AUDIT-REPORT.md
+- id: AC-6-DETERMINATION
+  description: 'Qualification Oracle format (V1-V4): QUALIFICATION_ORACLE_FORMAT_ABSENT'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/evidence/V-oracle-format-and-contract-views.out
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 1
+  PARTIAL: 11
+  ABSENT: 4
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+findings:
+- id: A0-O1-01
+  severity: HIGH
+  capability: O1,U
+  blocking: true
+  blocker_class: O1/product-test-evidence-unconsumed
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Product-test results never reach governance: a failing product suite leaves health HEALTHY and task close accepts self-attested passes'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O1-02
+  severity: LOW
+  capability: O1
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: '''live/smoke'' family not representable as named; product families freely overridable'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O1-03
+  severity: MEDIUM
+  capability: O1,O2,O3,O4,O5,P1,P2,Q1,Q2,Q3,Q4,U,V1,V2,V3,V4
+  blocking: true
+  blocker_class: contract-views/compiled-form-semantics
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Compiled contract and evidence map carry no checklist bullets, no per-capability contract fields and no evidence owners for this family
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O2-01
+  severity: MEDIUM
+  capability: O2
+  blocking: true
+  blocker_class: O2/skill-regression-not-executed
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Skill regression family never executes skill validation scenarios
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O2-02
+  severity: LOW
+  capability: O2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Deep audits are always reported reproducible although they mutate the state they measure
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O2-03
+  severity: INFO
+  capability: O2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Every compiled context packet lacks a policy-declared retrieved field; the mismatch is a permanent low finding
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O3-01
+  severity: HIGH
+  capability: O3
+  blocking: true
+  blocker_class: O3/independence-self-attested
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Test-authorship independence is self-attested; builder tests can be certified as independent; 'held-out' tests need not come from the verifier
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O4-01
+  severity: HIGH
+  capability: O4,U,O5
+  blocking: true
+  blocker_class: O4/currency-key-incomplete
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Suite-currency key omits six Contract v3 input classes and the runtime; a broken suite stays 'current'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O4-02
+  severity: MEDIUM
+  capability: O4
+  blocking: true
+  blocker_class: O4/close-gate-path-keyed
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Governance-currency gate at task close keys on declared paths, not on the work: a governance task closes on a stale green'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O4-03
+  severity: HIGH
+  capability: O4
+  blocking: true
+  blocker_class: O4/done-evidence-never-stale
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Upstream authoritative changes never re-stale completed work (AC-16 O4↔W6)
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-01
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/no-impacted-selection
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No dependency-aware impacted-test selection; a trivial mutation's only remedy is the whole suite, run serially, twice
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-02
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/no-parallelism
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Independent checks never run in parallel
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-03
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/no-isolation
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'No isolation: checks that mutate state run in the live repository'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-04
+  severity: MEDIUM
+  capability: O5
+  blocking: true
+  blocker_class: O5/no-check-cache
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No per-check result cache; reuse only at whole-suite granularity for currency decisions
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-05
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/G0-guard-coverage
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'G0 guard incomplete: mutating commands run under FREEZE_WRITES/PAUSE and outside the caller''s authority; `init --force` by an L0 role reinstalls the kernel and wipes project policy'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-06
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/G1-G2-coverage
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'G1/G2: direct mutations are checked by nothing until a manual audit; task close ignores readiness, references, test results, secrets and schema of changed files'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-07
+  severity: MEDIUM
+  capability: O5
+  blocking: true
+  blocker_class: O5/G3-record-only
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'G3: handoff checks nothing about claims, gates or decision currency'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-08
+  severity: MEDIUM
+  capability: O5
+  blocking: true
+  blocker_class: O5/G4-absent-trigger
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'G4: no wider check after CIT-E, architecture or memory-profile changes'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-09
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/G5-incomplete
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'G5: update runs a 4-family subset (applied over a defect the full suite detects); release build runs no suite'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-10
+  severity: HIGH
+  capability: O5
+  blocking: true
+  blocker_class: O5/G6-absent
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: G6 qualification tier does not exist
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-11
+  severity: MEDIUM
+  capability: O5
+  blocking: true
+  blocker_class: O5/no-hard-block
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No health state blocks work; block-vs-warn is not declared per check
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-12
+  severity: MEDIUM
+  capability: O5
+  blocking: true
+  blocker_class: O5/provenance-incomplete
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Health-result provenance incomplete: doctor results are not persisted; audit records lack runtime identity and commit'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-13
+  severity: MEDIUM
+  capability: O5
+  blocking: true
+  blocker_class: O5/no-remediation-tasks
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No remediation-task generation from health failures
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-14
+  severity: MEDIUM
+  capability: O5,V1,V2,V3,V4
+  blocking: true
+  blocker_class: contract-views/requirement-class
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Compiled contract misclassifies O5 and V1-V4 as ORIGINAL requirements
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-O5-15
+  severity: INFO
+  capability: O5
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Release build mints a CERTIFIED manifest from a caller-supplied status without running any suite
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-P1-01
+  severity: MEDIUM
+  capability: P1,P2,U
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Tokens absent; model/provider, cost, skill versions, files read and retries depend on schema-free caller input; retrieval query text not durable
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-P2-01
+  severity: LOW
+  capability: P2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Token effect of retrieval, skill repair rate and cost by feature are not computable
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-Q1-01
+  severity: MEDIUM
+  capability: Q1
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Lesson lifecycle stages are unenforced or absent: corroboration, classification, independent validation, governed version; close-report lessons dropped'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-Q1-02
+  severity: HIGH
+  capability: Q1,Q4
+  blocking: true
+  blocker_class: Q1/export-approval-self-asserted
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Human approval for upstream export is a caller-asserted string, not an answered Human Decision Gate
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-Q1-03
+  severity: INFO
+  capability: Q1
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Canonical intake clusters inbox packets without re-checking scope
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-Q2-01
+  severity: MEDIUM
+  capability: Q2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Lessons and lesson-derived FCPs can carry state_class AUTHORITATIVE without any finding
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-Q4-01
+  severity: HIGH
+  capability: Q4
+  blocking: true
+  blocker_class: Q4/content-origin-unchecked
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Raw project source and vector-store contents leave through fixtures self-declared 'synthetic'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-U-01
+  severity: HIGH
+  capability: U
+  blocking: true
+  blocker_class: U/slo-unthresholded
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Most framework-health SLOs are not thresholded: crossing them does not change health'
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-U-02
+  severity: HIGH
+  capability: U
+  blocking: true
+  blocker_class: U/healthy-not-conjunction
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No verdict implements 'HEALTHY only when' all 13 conditions hold; recorded critical audit findings and empty readiness pass
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-U-03
+  severity: HIGH
+  capability: U
+  blocking: true
+  blocker_class: contract-views/gate-U-omitted
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Gate U is missing from the compiled contract and evidence map, yet `gov contract verify` reports CONTRACT_SOURCE_BOUND
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+- id: A0-V1-01
+  severity: HIGH
+  capability: V1,V2,V3,V4
+  blocking: true
+  blocker_class: V/oracle-format-absent
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No Qualification Oracle format exists (QUALIFICATION_ORACLE_FORMAT_ABSENT)
+  path: release/capability-baseline/audit-0/epsilon-r/findings.yaml
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-epsilon-r
+  commit: 787942b5916456dbca95378039eec9a7838cf80b
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/
+unresolved:
+- Runtime-binary invalidation of green evidence not varied (single candidate binary); non-keying shown by code and audit-record fields.
+- Adopt A11 full-suite leg relies on code and builder test brownfield::brownfield_adoption_end_to_end; not independently re-run end to end.
+- memory select / memory benchmark --record not exercised in the G0 matrix (need benchmark candidates).
+- Adopt stages A6/A8/A9 authority evaluated for $GOV_ROLE/default role per code; not exercised as L0 in this run.
+recommended_next_action: 'Synthesis auditor: carry AC-5 NOT MET, AC-6 QUALIFICATION_ORACLE_FORMAT_ABSENT, and the 27 blocking findings (AC-2/3/5/6/10/12/13/16) into the Phase-2 verdict. Repair must provide
+  a machine-checkable V1-V4 oracle format for fresh independent review and a health scheduler meeting O5/AC-5 before re-audit.'
+completed_at: '2026-09-18T21:01:32Z'

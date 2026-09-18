@@ -1,0 +1,2242 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0008
+family: epsilon
+evidence_directory: release/capability-baseline/audit-0/epsilon-r/
+candidate: cap2-candidate-0
+candidate_commit: 57177a37ea296ece16b185874831462b6a76db18
+audited_worktree_head: 85e2ddfce4f0b1122bc8595dd869b98b316f5ea3 (candidate + one orchestration-only commit; identical product_code_digest)
+product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+capabilities:
+- capability: O1
+  title: Product test families
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:751
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §62 (lines 1971-1986)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: 'Every family is representable as a test-obligation and the suite validates family names and (for acceptance/scenario/system) independence, but the product''s only execution path
+    is one family-blind command whose result is consumed by nothing: health, task close and currency are unaffected by a failing product suite.'
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — Repo A/B inject failing and stale product tests (release protocol §7.2 'stale tests', 'code/spec disagreement'); the product would report HEALTHY and close
+    tasks over a failing suite, so qualification could not distinguish a detected from an undetected product-test fault.
+  bullets:
+  - bullet: unit
+    source_line: 752
+    status: PARTIAL
+    implementation_evidence: &id001
+    - framework/policies/TEST_POLICY.yaml:3-4
+    - 'runtime/src/verification/mod.rs:769-787 (product_traceability: obligation family + independence)'
+    - 'runtime/src/verification/mod.rs:955-1006 (product_suite: one command, one exit code)'
+    - runtime/src/orchestration/tasks.rs:420-432 (close accepts report.tests.status)
+    automated_evidence: &id002
+    - certification greenfield::greenfield_end_to_end (runs gov verify product)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a unit test-obligation is accepted by product_traceability
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: contract
+    source_line: 753
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a contract test-obligation is accepted by product_traceability
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: integration
+    source_line: 754
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a integration test-obligation is accepted by product_traceability
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: system
+    source_line: 755
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a system test-obligation is accepted by product_traceability
+    - evidence/O1-product-families.out §A/§C — system obligation not independent → medium finding; independent → clean
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: acceptance
+    source_line: 756
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a acceptance test-obligation is accepted by product_traceability
+    - evidence/O1-product-families.out §A/§C — acceptance obligation independence enforced (medium finding until independent_of_implementer=true)
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: scenario
+    source_line: 757
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a scenario test-obligation is accepted by product_traceability
+    - evidence/O1-product-families.out §A/§C — scenario obligation independence enforced
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: security
+    source_line: 758
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a security test-obligation is accepted by product_traceability
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: performance
+    source_line: 759
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a performance test-obligation is accepted by product_traceability
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: recovery
+    source_line: 760
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a recovery test-obligation is accepted by product_traceability
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01).'
+  - bullet: live/smoke
+    source_line: 761
+    status: PARTIAL
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence:
+    - evidence/O1-product-families.out §A — a live/smoke test-obligation is accepted by product_traceability
+    - evidence/O1-product-families.out §B — family 'live' rejected as outside TEST_POLICY.product_families (policy only knows 'smoke')
+    - 'evidence/O1-product-families.out §F-§H — product suite result is family-blind; failing suite: doctor/audit HEALTHY, close accepted'
+    gap: 'Product-test evidence never reaches governance: `gov verify product` runs one family-blind command and exits 0 when it fails; a failing suite leaves doctor and audit HEALTHY; task close accepts
+      a self-attested tests.status=passed while the suite fails; no family''s presence or result is required (A0-O1-01). The policy vocabulary names only ''smoke''; an obligation of family ''live'' is flagged
+      (A0-O1-02).'
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G2
+  - release-clean-clone
+  evidence_owner_actually_runs: false — G2 task close checks only that report.tests.status is one of [passed, not_applicable_with_reason] (self-attested); no tier runs or consumes the product suite (evidence/O1-product-families.out
+    §G-§H).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - governing contract/policy
+    - tool/plugin
+    invalidation_demonstrated: false
+    invalidation_evidence: evidence/O4-suite-currency.out §A — source-file changes do not invalidate any recorded green; product-test evidence has no freshness state at all
+  qualification_coverage:
+    repo_a_challenge: Greenfield feature whose independent acceptance test fails after implementation; expect health non-GREEN and task close refused.
+    repo_b_challenge: Brownfield repo with stale/broken legacy tests and a misplaced test tree; expect each family's status surfaced per family and failing families blocking close.
+    hidden_oracle_fault_class: product-test-failure-not-detected; test-family-missing (security/performance/recovery/smoke absent for a feature that requires them)
+    chaos_scale_soak: 'scale: suites with thousands of tests across families (per-family result aggregation); chaos: flaky test runner/timeouts'
+    retrieval_challenge: 'not relevant: product test execution does not depend on retrieval'
+    not_challengeable: null
+  adoption_obligation: gov init/adopt must detect the project's product families and record per-family obligations; post-adoption acceptance must show the product suite result bound into health and task
+    close.
+  residual_risk: Even after repair, test authorship independence and result authenticity depend on O3 and on a trusted runner; results are reported by the project's own toolchain.
+  findings:
+  - A0-O1-01
+  - A0-O1-02
+  - A0-O1-03
+- capability: O2
+  title: Governance test families
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:763
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §63 (lines 1990-2010)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: All 17 families exist in TEST_POLICY.governance_families and each detected an injected violation in its own run; skill regression never executes skill validation scenarios and audit
+    reproducibility is suppressed for --deep audits.
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — a qualification fault class 'skill regressed' (e.g. a changed skill method that now violates its validation scenario) cannot be detected by any product
+    check, so skill-regression detection recall would be measured at zero regardless of the fault. The deep-audit reproducibility gap alone cannot undermine qualification (non-deep audits compare runs and
+    recovery_rebuild still compares two rebuilds).
+  bullets:
+  - bullet: schema/invariants
+    source_line: 764
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:125-233
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §1 decision with status outside AUTHORITY_POLICY → 2 high findings, UNHEALTHY
+    gap: null
+  - bullet: graph integrity
+    source_line: 765
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:234-278
+    - runtime/src/graph/mod.rs:177-197
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §2 task depending on a missing task → high, UNHEALTHY
+    gap: null
+  - bullet: index freshness
+    source_line: 766
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:279-302
+    - runtime/src/memory/manifest.rs (freshness)
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/O2-governance-families.out §3 indexed files edited after build → medium ''index stale: 2 changed'''
+    gap: null
+  - bullet: retrieval regression
+    source_line: 767
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:303-329
+    - runtime/src/retrieval/mod.rs:592-760
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §4 held-out expectations broken → recall 0.53 < 0.8 → high, UNHEALTHY; U-slos-and-healthy.out SLO-3 threshold boundary
+    gap: null
+  - bullet: authority/role limits
+    source_line: 768
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:330-386
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §5 task allowed_paths include governance/kernel → critical
+    gap: null
+  - bullet: mutation scope
+    source_line: 769
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:387-399
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §6 kernel payload modified in place → critical
+    gap: null
+  - bullet: repository/path-map compliance
+    source_line: 770
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:400-427
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §7 secret content in a non-secret path → critical
+    gap: null
+  - bullet: context reproducibility
+    source_line: 771
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:428-467
+    - runtime/src/context/mod.rs:170-186
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/O2-governance-families.out §8 missing policy-declared deterministic field → medium; O2-context-reproducibility-race.out: concurrent state change between the two compiles → ''deterministic
+      authority block not reproducible'' (high)'
+    gap: null
+  - bullet: concurrency/session claims
+    source_line: 772
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:468-493
+    - runtime/src/memory/claims.rs
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §9 claim on unknown task → medium; §9b expired claim → low
+    gap: null
+  - bullet: adapter/model portability
+    source_line: 773
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:494-507
+    - runtime/src/adapters.rs (verify)
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §10 hand-edited provider adapter → medium
+    gap: null
+  - bullet: skill regression
+    source_line: 774
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:508-512
+    - runtime/src/skills.rs:98-117
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/O2-governance-families.out §11 skill without method/validation scenarios → medium; §11b a skill whose declared validation scenario is false passes: scenarios are never executed'
+    gap: The family validates skill schema and that validation_scenarios is non-empty; it never executes the scenarios, so a regressed skill is not detected (A0-O2-01).
+  - bullet: command-contract consistency
+    source_line: 775
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:513-549
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §12 COMMAND_CONTRACT operation mapped to a non-existent CLI verb → medium
+    gap: null
+  - bullet: secrets/sensitivity indexing
+    source_line: 776
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:550-617
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §13 secret-bearing chunk injected into the derived index → critical
+    gap: null
+  - bullet: recovery/rebuild
+    source_line: 777
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:618-672
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §14 tracked vs live manifest hash differ → medium; §14b --deep two full rebuilds reproduce
+    gap: null
+  - bullet: fresh-agent reconstruction
+    source_line: 778
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:673-695
+    - runtime/src/status.rs:10-112
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §15 read budget below reconstruction needs → medium
+    gap: null
+  - bullet: product traceability
+    source_line: 779
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:769-849
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O2-governance-families.out §16 DONE task without closing report → medium
+    gap: null
+  - bullet: audit reproducibility
+    source_line: 780
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:850-852
+    - runtime/src/verification/mod.rs:880-907
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - certification repair::policy_enforcement_coverage_is_complete_and_honest
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/O2-governance-families.out §17b consecutive runs differ (lease expiring mid-audit) → high ''results differ between two consecutive runs''; §17c --deep: run 1 rebuilds the live index, run
+      2 differs, yet reproducible=true'
+    gap: reproducible is forced true for --deep audits (`h1 == h2 || opts.deep`, verification/mod.rs:905) although the deep run mutates the state it measures (A0-O2-02).
+  health_scheduler_tiers:
+  - G1
+  - G4
+  - G5
+  evidence_owners:
+  - G5
+  - G1
+  - release-clean-clone
+  evidence_owner_actually_runs: partial — G5 `gov audit` runs all 20 families (twice, serially); CIT-E runs a 3-check subset (schema/graph/index) on touched records (O5-tiers-G1-G6.out G1); update runs
+    a 4-family subset (O5-G5-update.out); no G1/G4 tier runs these families on mutation or milestone.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - governing contract/policy
+    - runtime/kernel implementation
+    - schema
+    - authoritative spec/decision
+    - relevant source files
+    - relevant index manifest
+    - security/sensitivity policy
+    - tool/plugin
+    invalidation_demonstrated: true
+    invalidation_evidence: evidence/O4-suite-currency.out §A (8 input classes invalidate the green suite record; 6 do not) and §B (suite broken, green still 'current')
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: introduce one violation per family during normal task work (secret in source, cycle in DAG, stale index, broken held-out query, tampered adapter, regressed skill) and
+      expect the matching family finding.'
+    repo_b_challenge: 'Brownfield: contradictory/duplicate records, stale vector index, provider rules files, secrets in legacy stores; expect schema_invariants/index_freshness/secrets families to fire
+      before adoption completes.'
+    hidden_oracle_fault_class: governance-invariant-violation per family (17 classes), incl. skill-regression and non-reproducible audit
+    chaos_scale_soak: 'chaos: concurrent writers during audit (context/audit reproducibility); scale: 10^4-10^5 records and chunks (suite latency); soak: repeated audits over evolving repo'
+    retrieval_challenge: 'retrieval regression family: held-out queries with superseded/forbidden targets and paraphrases'
+    not_challengeable: null
+  adoption_obligation: 'gov init/adopt must install TEST_POLICY families and produce a first green audit (init conformance verdict HEALTHY: 00-baseline-healthy-project.out); gov update must re-run the full
+    suite, not a subset.'
+  residual_risk: context_reproducibility samples only the first task; fresh-agent reconstruction is a proxy (counted reads vs budget) and the budget is freely overridable (U-slos-and-healthy.out SLO-15).
+  findings:
+  - A0-O2-01
+  - A0-O2-02
+  - A0-O2-03
+  - A0-O1-03
+- capability: O3
+  title: Independent test authorship
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:782
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §62 (line 1986)
+  - GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §10 Stage A5, A7, A10
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: The product has an independence vocabulary (TEST_POLICY, obligation flag, A5/A7/A10 session checks) that gates work, but every check is satisfied by caller-asserted values; builder
+    tests can be certified as independent and 'held-out' tests need not come from the verifier.
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — qualification must be able to tell builder-authored from independently authored evidence (O3; T2 'held-out tests/evidence separation is enforced'); a hidden
+    fault 'builder tests certified as independent' is invisible to the product.
+  bullets:
+  - bullet: Release-critical behavioural tests are authored independently of implementation.
+    source_line: 783
+    status: PARTIAL
+    implementation_evidence:
+    - framework/policies/TEST_POLICY.yaml:5
+    - runtime/src/orchestration/dag.rs:127-148 (independence gate)
+    - runtime/src/verification/mod.rs:778-786
+    - 'framework/schemas/test-obligation.schema.json (independent_of_implementer: boolean)'
+    automated_evidence:
+    - certification greenfield::greenfield_end_to_end (declares an independent acceptance obligation)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O3-independent-authorship.out §A — implementation task blocked while its acceptance obligation is not independent
+    - evidence/O3-independent-authorship.out §B — the implementing role sets independent_of_implementer=true on its own obligation; gate opens; same session closes the task
+    gap: Independence is a self-declared boolean; author identity (role/session) is never compared with the implementer (A0-O3-01).
+  - bullet: Builder tests remain regression evidence, not independent certification.
+    source_line: 784
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:420-432,531-547 (report stored as EVIDENCE with caller-supplied tests)
+    - runtime/src/orchestration/dag.rs:127-148
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O3-independent-authorship.out §B — a builder-written test cited by the builder's own report, with tests.independent=true, is stored as ordinary EVIDENCE and satisfies the independence gate
+    gap: Nothing classifies builder-authored tests as regression-only; the only distinction is the self-declared flag (A0-O3-01).
+  - bullet: Fresh verifier adds held-out tests.
+    source_line: 785
+    status: PARTIAL
+    implementation_evidence:
+    - 'runtime/src/adopt.rs:461-500 (A5 review: session inequality only)'
+    - runtime/src/adopt.rs:430-459 (A5 test-design scaffolds tests from the planner)
+    - runtime/src/adopt.rs:798-812 (A7)
+    - runtime/src/memory/heldout.rs:7-53
+    automated_evidence:
+    - certification migration::path_migration_with_rollback_and_memory_rebuild
+    - certification brownfield::brownfield_adoption_end_to_end
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O3-independent-authorship.out §C — planner session refused as reviewer (INDEPENDENCE)
+    - evidence/O3-independent-authorship.out §D — same caller passes another session string; plan APPROVED with '13 held-out tests', all planner-scaffolded, file unchanged
+    - evidence/O3-independent-authorship.out §E — memory held-out set is generated by `gov init` from the live index
+    - evidence/O5-G0-focus.out §2 — an L0 role under FREEZE_WRITES regenerates the held-out set, deleting a verifier-authored query
+    gap: No mechanism requires or records verifier-added held-out tests; independence is session-string inequality; held-out sets can be builder-generated and overwritten (A0-O3-01, A0-O5-05).
+  health_scheduler_tiers:
+  - G2
+  - G5
+  - G6
+  evidence_owners:
+  - G2
+  - independent-heldout
+  - release-clean-clone
+  evidence_owner_actually_runs: partial — the DAG gate (runnable computation) and product_traceability evaluate the self-declared flag; no tier verifies authorship.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - authoritative spec/decision
+    invalidation_demonstrated: false
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: implementer writes and flags its own acceptance tests as independent; expect refusal.'
+    repo_b_challenge: 'Brownfield adoption: reviewer approves the planner''s scaffolded migration tests without adding any; expect A5 refusal.'
+    hidden_oracle_fault_class: independence-violation (self-authored tests certified as independent; verifier held-out set overwritten)
+    chaos_scale_soak: 'not relevant: authorship provenance is not load- or chaos-sensitive'
+    retrieval_challenge: not relevant
+    not_challengeable: null
+  adoption_obligation: gov adopt A5/A7/A10 must bind independence to distinct authenticated identities and require verifier-authored held-out tests; post-adoption acceptance must show them.
+  residual_risk: Session and role identities are caller-asserted CLI arguments throughout; independence ultimately depends on the harness launching fresh contexts (T2, another family).
+  findings:
+  - A0-O3-01
+  - A0-O5-05
+  - A0-O1-03
+- capability: O4
+  title: Governance suite currency
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:787
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §64 (lines 2014-2020)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:95-111
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: A hash-keyed currency mechanism exists and demonstrably invalidates the green record for 8 input classes and blocks governance-path task close; 6 relevant input classes and the runtime
+    are not keyed, the close gate is path-based, and DONE work is never re-staled.
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — Gate W's challenge 'change specs after implementation' and O4 staleness faults change spec/architecture/requirements/source inputs that are not keyed; the
+    product keeps prior green evidence current, so the qualification fault would go undetected.
+  bullets:
+  - bullet: A green result becomes stale when relevant inputs change.
+    source_line: 788
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:53-71 (inputs_hash over governance/kernel, governance/project, governance/tests, spec/decisions, framework.lock)
+    - runtime/src/doctor.rs:567-585 (D021)
+    automated_evidence:
+    - certification repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger (asserts the D021 currency prompt after update)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O4-suite-currency.out §A — policy, embedding profile, path map, sensitivity, decision, held-out tests, kernel, project plugin changes → 'obsolete'
+    - evidence/O4-suite-currency.out §A — spec/architecture, spec/requirements, spec/interfaces, src/lib.rs, index manifest, tool registry changes → still 'current'
+    - evidence/O4-suite-currency.out §B — a DAG cycle makes the suite UNHEALTHY while D021 reports the old green 'current'
+    gap: The currency key omits six Contract v3 input classes (authoritative spec other than decisions, relevant source files, relevant index manifest, generated tool registry) and the runtime binary; the
+      audit record stores no runtime identity (A0-O4-01).
+  - bullet: Governance-affecting work cannot close on stale green evidence.
+    source_line: 789
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:495-525
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed) — no builder test asserts GOVERNANCE_SUITE_STALE'
+    independent_evidence:
+    - evidence/O4-suite-currency.out §C — close touching spec/decisions refused GOVERNANCE_SUITE_STALE; closes after a fresh audit
+    - evidence/O4-suite-currency.out §D — a class=governance task changing spec/architecture closes on an obsolete green
+    - evidence/O4-suite-currency.out §E — --force (L3+) closes on a stale green, recorded as degraded
+    - evidence/O4-suite-currency.out §F — an upstream requirement change after a task is DONE leaves that task's evidence green (AC-16 O4↔W6)
+    gap: The gate keys on declared paths (governance/**, spec/decisions/**), ignores task class, and inherits the incomplete currency key; completed work never becomes stale (A0-O4-02, A0-O4-03).
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G4
+  - G5
+  evidence_owners:
+  - G2
+  - G5
+  evidence_owner_actually_runs: partial — G2 task close enforces currency only for governance/** and spec/decisions/** paths; doctor D021 reports staleness as a medium warning; no tier re-runs the suite
+    when inputs change.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - governing contract/policy
+    - runtime/kernel implementation
+    - schema
+    - migration
+    - tool/plugin
+    - model/retrieval profile
+    - project path map
+    - authoritative spec/decision
+    - relevant source files
+    - relevant index manifest
+    - security/sensitivity policy
+    invalidation_demonstrated: true
+    invalidation_evidence: evidence/O4-suite-currency.out §A (per-class matrix)
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: change an architecture record and a requirement after a green audit and after task close; expect prior green and task evidence to become STALE and close/handoff to require
+      re-check.'
+    repo_b_challenge: 'Brownfield: migrate paths and rebuild the index; expect prior audit evidence invalidated by path-map and index-manifest changes.'
+    hidden_oracle_fault_class: stale-green-evidence-relied-on (unkeyed input changed; DONE evidence not re-staled)
+    chaos_scale_soak: 'soak: long-running project with many small input changes; expect no stale-green window'
+    retrieval_challenge: index manifest / embedder profile change must invalidate retrieval-dependent evidence
+    not_challengeable: null
+  adoption_obligation: Post-adoption the first audit must be recorded against a key covering every Contract v3 input class; gov update must invalidate prior green when the runtime changes.
+  residual_risk: Even with full keying, 'relevant' input selection per check needs a dependency model (see O5 impacted selection).
+  findings:
+  - A0-O4-01
+  - A0-O4-02
+  - A0-O4-03
+  - A0-O1-03
+- capability: O5
+  title: Governance Health Scheduler [NEW EXECUTION REFINEMENT]
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:791
+  governing_document_refs:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:791-808 (execution refinement; no governing-document section)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:95-111
+  requirement_class: EXECUTION_REFINEMENT
+  status: PARTIAL
+  status_justification: There is no scheduler. Health is two manually invoked, serial, in-place surfaces (doctor, audit) plus ad-hoc gates at individual commands. Tier behaviour exists partially at G0/G2/G5
+    and narrowly at G1/G4 via CIT-E; G6, impacted selection, parallelism and isolation are absent.
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — AC-5 requires the scheduler to observe qualification work; without impacted selection, parallelism, isolation, a G6 tier or health that blocks work, qualification
+    runs cannot be observed as the contract requires.
+  bullets:
+  - bullet: G0 Guard — every privileged/mutating command
+    source_line: 793
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/control.rs:57-77 (guard_write)
+    - runtime/src/authority.rs:48-56
+    - runtime/src/init.rs:222-232,259-261 (authority evaluated on a Project opened without the caller's role)
+    automated_evidence:
+    - certification repair::authority_levels_are_enforced_on_executable_paths
+    - certification repair::freeze_writes_is_honoured_by_adopt_and_upstream
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/O5-G0-guard-matrix.out — 49 commands × {RUNNING, FREEZE_WRITES, PAUSED, L0, L1}: excluding the control commands themselves, 15 commands change state under FREEZE_WRITES and 14 under PAUSED
+      (governed writes among them: audit/verify governance, heldout-starter, adapters generate, tools registry, adopt baseline, init --force, route --record, gate present, task release, upstream prepare);
+      10 change state as L0, 5 of them outside L0 authority (init --force, adopt baseline, memory heldout-starter --force, adapters generate, tools registry)'
+    - 'evidence/O5-G0-focus.out §1 — L0 (install_kernel needs L4) runs `init --force` while frozen: framework.lock, kernel manifest and PROJECT_POLICY rewritten, project override wiped'
+    - evidence/O5-G0-focus.out §2-§5 — L0 regenerates held-out tests; adopt baseline, audit, adapters/tool registry write while frozen; a budget gate is minted while frozen
+    gap: 'Guard coverage is partial: init ignores --role and FREEZE/PAUSE; adopt baseline has no guard; audit, heldout-starter, adapters generate, tools registry, route --record, upstream prepare, task
+      release mutate while frozen (A0-O5-05).'
+  - bullet: G1 Mutation — changed paths/schema/secrets/index invalidation
+    source_line: 794
+    status: PARTIAL
+    implementation_evidence:
+    - 'runtime/src/cit/mod.rs:813-1060 (CIT-E verification: schema_validation, graph_integrity, index_freshness)'
+    - runtime/src/cit/mod.rs:51-246 (secret flagging at propose)
+    - runtime/src/memory/manifest.rs (lazy freshness)
+    automated_evidence:
+    - certification repair::cit_auto_simulation_and_secret_redaction
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O5-tiers-G1-G6.out G1 — CIT-E writing an invalid record → VERIFICATION_FAILED and rolled back; secret in a CIT manifest → secret_flagged
+    - evidence/O5-tiers-G1-G6.out G1 direct edits — a secret and an invalid record written inside a task's allowed paths trigger nothing; `gov status` only shows index_fresh=false
+    gap: Mutation checks exist only on the CIT path; direct file mutations (how workers change the repository) trigger no schema/secret/path check until a later manual audit (A0-O5-06).
+  - bullet: G2 Task Close — mutation scope/readiness/tests/references/memory freshness
+    source_line: 795
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:386-563
+    automated_evidence:
+    - certification repair::task_close_enforces_mutation_scope
+    - certification repair2::task_close_uses_observed_mutations_not_self_attestation
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O5-tiers-G1-G6.out G2 (a) missing tests → EVIDENCE_REQUIRED; (b) stale index → INDEX_STALE; (c) out-of-scope change → MUTATION_SCOPE_VIOLATION
+    - evidence/O5-tiers-G1-G6.out G2 (d)+(e) readiness regressed after claim and report citing non-existent evidence/requirements → closes DONE
+    - evidence/O5-tiers-G1-G6.out G1 direct edits — close accepted with a secret and a schema-invalid record in the changed files; doctor UNHEALTHY afterwards
+    - evidence/O1-product-families.out §H — close accepts tests.status=passed while the product suite fails
+    gap: Readiness, references, test results, secrets and schema of changed files are not checked at close (A0-O5-06).
+  - bullet: G3 Checkpoint/Handoff — claims/decisions/gates/checkpoint freshness
+    source_line: 796
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/handoffs.rs:8-110 (mandatory before_handoff checkpoint)
+    - runtime/src/checkpoints.rs:16-128
+    automated_evidence:
+    - certification greenfield::greenfield_end_to_end (handoff/checkpoint)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O5-tiers-G1-G6.out G3 — handoff of a task claimed by another session and waiting on an unanswered gate is created; the checkpoint records the foreign claim and pending gate but nothing is
+      refused
+    - evidence/O5-tiers-G1-G6.out G3 — a later decision leaves the latest checkpoint unmarked
+    gap: Checkpoint freshness at handoff holds by construction (mandatory before_handoff checkpoint); claims, pending gates and decision currency are recorded, never checked (A0-O5-07).
+  - bullet: G4 Milestone — CIT-E/migration/memory/architecture changes
+    source_line: 797
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/cit/mod.rs:921-1041 (propagation + 3-check verification)
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/O5-tiers-G1-G6.out G4 — architecture change via CIT-E: only the 3-check CIT verification runs; no governance-suite audit record is produced; D021 flips only because gate/decision records
+      live under spec/decisions/'
+    - 'evidence/O5-tiers-G1-G6.out G4 — memory-profile override: no run triggered (audit records unchanged)'
+    gap: No milestone tier widens checks or propagates staleness after CIT-E, architecture or memory-profile changes (A0-O5-08).
+  - bullet: G5 Full Suite — adopt/update/release/full audit
+    source_line: 798
+    status: PARTIAL
+    implementation_evidence:
+    - 'runtime/src/verification/mod.rs:880-953 (gov audit: all families)'
+    - 'runtime/src/adopt.rs:1285-1313 (a11: full audit + doctor)'
+    - runtime/src/update.rs:309-351 (doctor + 4-family subset)
+    - runtime/src/release.rs:69-80 (no suite; caller-supplied certification status)
+    automated_evidence:
+    - certification brownfield::brownfield_adoption_end_to_end (a11)
+    - certification update::update_from_previous_release_preserves_project_and_rolls_back
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S1 — gov audit runs all 20 families
+    - evidence/O5-G5-update.out — update 4.1.1→4.1.5 applied over a DAG cycle; post-install verification DEGRADED/HEALTHY; the full suite afterwards is UNHEALTHY
+    - evidence/O5-tiers-G1-G6.out G5 — `release build --certification CERTIFIED` mints a CERTIFIED manifest in under 20 ms without running any suite
+    gap: update runs a 4-family subset and release build runs no suite (A0-O5-09).
+  - bullet: G6 Qualification — synthetic repos/chaos/soak/hidden tests
+    source_line: 799
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-tiers-G1-G6.out G6 — no qualify/qualification/scheduler/health entry point; no G6/chaos/soak hook in runtime, cli or policies
+    gap: No qualification tier exists (A0-O5-10).
+  - bullet: dependency-aware impacted-test selection
+    source_line: 802
+    status: ABSENT
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:103-117 (families come from TEST_POLICY, optionally filtered by --family)
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S1 — a whitespace-only change to one decision obsoletes the green record; the only remedy is `gov audit`, which runs all 20 families (each invocation runs the
+      suite twice)
+    gap: No selection of checks from the changed inputs exists (A0-O5-01).
+  - bullet: independent checks run in parallel when safe
+    source_line: 803
+    status: ABSENT
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:114-869 (single sequential loop)
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S1/S2 — max 1 thread during full, deep and doctor runs; the only child process is a git invocation (status reconstruction); wall time of the full audit ≈ the
+      sum of its families
+    gap: Checks run strictly serially (A0-O5-02).
+  - bullet: isolated worktrees/processes where required
+    source_line: 804
+    status: ABSENT
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:618-653 (deep rebuild of the live index)
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S3 — `gov audit --deep` replaces the live state.db (new inode, new hash) and writes the audit record into the live tree; evidence/O2-governance-families.out
+      §17c — the deep run changes the state it measures
+    gap: No isolation mechanism; checks that mutate state run in place (A0-O5-03).
+  - bullet: cache keyed by relevant content/policy/framework hashes
+    source_line: 805
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:53-84
+    - runtime/src/orchestration/tasks.rs:495-525
+    - runtime/src/doctor.rs:567-585
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S4 — two identical audits recompute every family (equal wall time, all 20 families); no cache store in .governance-runtime; a changed input recomputes everything
+    - evidence/O4-suite-currency.out §C — a current green record is reused by task close instead of re-auditing (suite-granularity reuse)
+    - evidence/O4-suite-currency.out §A — key covers 8 of 14 input classes
+    gap: Reuse exists only at whole-suite granularity for currency decisions; no per-check cache; the key is incomplete (A0-O5-04, A0-O4-01).
+  - bullet: RED/YELLOW/GREEN or equivalent machine state
+    source_line: 806
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:653-680
+    - runtime/src/verification/mod.rs:909-917
+    automated_evidence:
+    - certification failure_injection::injected_failures_are_detected_and_recovered
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S5 — HEALTHY/DEGRADED/UNHEALTHY on both doctor and audit, worst-severity aggregation, exit 0/0/3
+    gap: null
+  - bullet: hard-block vs warning semantics are explicit
+    source_line: 807
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:41-50 (per-check severity)
+    - cli/src/main.rs:797,1001-1011 (UNHEALTHY → exit 3)
+    - runtime/src/verification/mod.rs:1001-1005 (failed product suite returns Ok)
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S6 — with doctor UNHEALTHY (critical secret) task create, continue --claim, task close and cit propose all succeed
+    - evidence/O1-product-families.out §G — failed product suite exits 0
+    - evidence/O5-scheduler-requirements.out S9 — a stale green is a medium warning only
+    gap: Severity and verdict are explicit, but no check declares block-or-warn and no health state blocks any work (A0-O5-11).
+  - bullet: health result provenance is recorded
+    source_line: 808
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:929-938 (audit record fields)
+    - runtime/src/doctor.rs:681-690 (report returned, not persisted)
+    automated_evidence: []
+    independent_evidence:
+    - evidence/O5-scheduler-requirements.out S7 — audit record carries session, role, inputs_hash, result_hash, run_at; no runtime/binary identity or commit
+    - evidence/O5-scheduler-requirements.out S7 — doctor persists nothing (governed tree hash unchanged); only a cli.doctor telemetry event with ok/duration
+    gap: Doctor results have no provenance record; audit records lack runtime identity and commit (A0-O5-12).
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G0
+  - G2
+  - G5
+  evidence_owner_actually_runs: 'partial — see bullets: G0 partial, G2 partial, G5 at audit/adopt/init only; G1/G3/G4 narrow or record-only; G6 absent.'
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - runtime/kernel implementation
+    - governing contract/policy
+    - schema
+    - tool/plugin
+    invalidation_demonstrated: true
+    invalidation_evidence: evidence/O5-scheduler-requirements.out S1 (trivial mutation obsoletes the green), S9
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: stream of small mutations during feature work; expect G1 impacted checks per mutation, G2 at close, G3 at handoff, G4 after an architecture CIT, results aggregated RED/YELLOW/GREEN
+      with provenance.'
+    repo_b_challenge: 'Brownfield: adoption A0-A11 with migrations and memory rebuild; expect G4 after migration batches and memory rebuild, G5 at adopt audit and update, isolation for destructive checks.'
+    hidden_oracle_fault_class: health-not-observed (fault injected between tiers is never checked; stale result reused; health RED does not block)
+    chaos_scale_soak: 'scale: large repo where serial full-suite reruns become prohibitive; chaos: concurrent agents during deep checks (isolation); soak: cache invalidation correctness over time'
+    retrieval_challenge: index-affecting mutations must trigger retrieval regression at the right tier
+    not_challengeable: null
+  adoption_obligation: gov init/adopt/update must install and run the scheduler tiers; post-adoption acceptance must show G0-G5 firing on their triggers.
+  residual_risk: Even a complete scheduler depends on trustworthy identities and freshness keys (O3, O4).
+  findings:
+  - A0-O5-01
+  - A0-O5-02
+  - A0-O5-03
+  - A0-O5-04
+  - A0-O5-05
+  - A0-O5-06
+  - A0-O5-07
+  - A0-O5-08
+  - A0-O5-09
+  - A0-O5-10
+  - A0-O5-11
+  - A0-O5-12
+  - A0-O5-13
+  - A0-O5-14
+  - A0-O5-15
+  - A0-O1-03
+  - A0-O4-01
+- capability: P1
+  title: Execution telemetry
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:814
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §65 (lines 2026-2050)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: OpenTelemetry-shaped events record session, role, command, duration and outcome for every command, and governed records hold task, files written, tests, handoffs, decisions and human
+    answers; tokens are absent and model/provider, cost, skill versions, files read and retries depend on schema-free caller input.
+  na_reason_normative_text: null
+  partial_qualification_impact: CANNOT_UNDERMINE — V4 qualification scoring (detection recall, false positives, severity/impact/path-map accuracy, indexing, retrieval, recovery, human-gate and readiness
+    correctness) uses none of the missing fields; the gaps limit organisational analysis (P2, U SLO-11), not fault detection.
+  bullets:
+  - bullet: agent/session/model/provider
+    source_line: 815
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:13-26
+    - runtime/src/routing.rs:161-246
+    automated_evidence:
+    - certification greenfield::greenfield_end_to_end (telemetry summary)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out field-by-field — session on every event and report; model/provider in no event and not in the report unless the caller supplies them (route --record / report.model)
+    gap: Model/provider are only recorded when a caller supplies them, in schema-free form (A0-P1-01).
+  - bullet: role/task
+    source_line: 816
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:13-15
+    - runtime/src/orchestration/tasks.rs:531-535
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out field-by-field — role on every event; report record carries product-inserted task/session/role
+    gap: null
+  - bullet: skill/tool versions
+    source_line: 817
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/skills.rs:39-96 (resolve returns versions)
+    - framework/schemas/report.schema.json (skills_used/tools_used optional)
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — continue --claim resolved SKL-BACKEND-IMPL 1.0.0 but no event or report records it; only gov's own version appears (resource.service.version)
+    gap: Resolved skill and tool versions are not recorded (A0-P1-01).
+  - bullet: context packet
+    source_line: 818
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/checkpoints.rs:88-96
+    - runtime/src/context/mod.rs:248-270
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — the close-time checkpoint records context_packet_hash of the packet compiled for the task; packet persisted under .governance-runtime/context/
+    gap: null
+  - bullet: retrieval queries/hits
+    source_line: 819
+    status: PARTIAL
+    implementation_evidence:
+    - cli/src/main.rs:909
+    - runtime/src/retrieval/mod.rs:564-566
+    - runtime/src/memory/db.rs:27
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — durable telemetry has hit counts and routes but no query text; query text and hit ids live in retrieval_log in the derived DB, which a full rebuild empties (2 → 0 rows)
+    gap: Query text and hit identities are not durable (A0-P1-01).
+  - bullet: token input/output
+    source_line: 820
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — no token attribute in any event or report; telemetry emit accepts an arbitrary non-numeric 'tokens_in'
+    gap: Tokens are not recorded anywhere (A0-P1-01).
+  - bullet: latency/cost
+    source_line: 821
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:28-52
+    - cli/src/main.rs:1069-1077
+    - runtime/src/routing.rs:181-215
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — duration_ms on every cli.* event; cost only via caller-supplied routing evidence or report.cost
+    gap: Cost is not recorded by the product (A0-P1-01).
+  - bullet: files read/written
+    source_line: 822
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:274-324,536-540
+    automated_evidence:
+    - certification repair2::task_close_uses_observed_mutations_not_self_attestation
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — report records files_changed and product-observed observed_files_changed; files_read absent
+    gap: Files read are not recorded (A0-P1-01).
+  - bullet: tests
+    source_line: 823
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:995-1006
+    - runtime/src/orchestration/tasks.rs:420-432
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — product.suite event (status, exit, command, source); report.tests stored
+    gap: null
+  - bullet: retries/failures
+    source_line: 824
+    status: PARTIAL
+    implementation_evidence:
+    - cli/src/main.rs:1069-1077
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — failed commands recorded with error code; no retry attribute anywhere; repair_count only caller-supplied
+    gap: Retries are not recorded (A0-P1-01).
+  - bullet: handoffs
+    source_line: 825
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/handoffs.rs:8-193
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — handoff record HND-0001 with status RETURNED and returned_at; cli.handoff events
+    gap: null
+  - bullet: decisions
+    source_line: 826
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/gates.rs:270-400
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — decision D-0001 with chosen_option and approved_by; evidence/Q-learning-upstream.out Q2.2
+    gap: null
+  - bullet: human interventions
+    source_line: 827
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/gates.rs:270-400
+    - runtime/src/orchestration/control.rs:16-55
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out — gate answers record who answered; cli.decide events
+    gap: null
+  health_scheduler_tiers:
+  - G0
+  - G2
+  evidence_owners:
+  - release-clean-clone
+  evidence_owner_actually_runs: partial — every command emits a cli.* span (G0-time); no tier checks telemetry completeness; the builder certification test only reads the summary.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - runtime/kernel implementation
+    - tool/plugin
+    invalidation_demonstrated: not_attempted
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: Greenfield multi-agent run; verify every P1 field is present per task execution without caller cooperation.
+    repo_b_challenge: Brownfield adoption run; verify telemetry survives rebuild-memory and clone to a clean machine.
+    hidden_oracle_fault_class: telemetry-gap (execution with no model/token/cost record)
+    chaos_scale_soak: 'soak: telemetry volume and rotation; chaos: rebuild during active retrieval logging'
+    retrieval_challenge: retrieval queries/hits must be durable across index rebuild
+    not_challengeable: null
+  adoption_obligation: Adapters installed by gov init/adopt must report model/provider/tokens/cost through a typed telemetry contract.
+  residual_risk: Harness-reported values (tokens, cost) remain self-reported by the agent runtime.
+  findings:
+  - A0-P1-01
+  - A0-O1-03
+- capability: P2
+  title: Organisational questions
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:829
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §66 (lines 2054-2063)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: '`gov telemetry summary` and `gov memory verify` answer five of the eight §66 questions from recorded evidence; token effect and skill repair rate are not computable and cost is
+    by task class only.'
+  na_reason_normative_text: null
+  partial_qualification_impact: CANNOT_UNDERMINE — the organisational questions are management analytics; none is a qualification oracle input (V4) or a HEALTHY condition.
+  bullets:
+  - bullet: rework by role
+    source_line: 831
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:88-106,156
+    automated_evidence:
+    - certification greenfield::greenfield_end_to_end
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — rework_by_role from report repair_count
+    gap: null
+  - bullet: retrieval effect on token use
+    source_line: 832
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — no token metric although seeded reports carried tokens
+    gap: Not computable (A0-P2-01).
+  - bullet: model over/under-power
+    source_line: 833
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/routing.rs:248-276
+    - runtime/src/observability.rs:159
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — model_routing rows give pass rate, cost, latency and repairs per model and task class (frontier-x 8.0 vs light-y 0.2 at equal pass rate)
+    gap: null
+  - bullet: skill repair rate
+    source_line: 834
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — no skill metric although seeded reports carried skills_used and repair_count
+    gap: Not computable (A0-P2-01).
+  - bullet: human-gate concentration
+    source_line: 835
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:118-128
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/P1-P2-telemetry.out P2 — human_gates_by_feature {F-0001: 2, F-0002: 1}'
+    gap: null
+  - bullet: retrieval misses
+    source_line: 836
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:592-760 (per-query routes and by_category)
+    automated_evidence:
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — gov memory verify names the failing held-out query, its route (symbol) and per-category recall
+    gap: null
+  - bullet: cost by task/feature
+    source_line: 837
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:107-117
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — cost_by_task_class only; no per-feature or per-task cost
+    gap: Cost by feature/task is not computed (A0-P2-01).
+  - bullet: first-pass completion
+    source_line: 838
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:103-106,157
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/P1-P2-telemetry.out P2 — first_pass_completion_rate 0.667
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  evidence_owners:
+  - release-clean-clone
+  evidence_owner_actually_runs: partial — summary is on demand; no tier evaluates it; builder test greenfield reads it.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - runtime/kernel implementation
+    invalidation_demonstrated: not_attempted
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: Seed a run with known rework, gate and cost distribution; compare summary to the known answers.
+    repo_b_challenge: Brownfield with legacy telemetry absent; verify questions answerable after adoption.
+    hidden_oracle_fault_class: not a fault-detection capability; oracle compares computed answers to seeded ground truth
+    chaos_scale_soak: 'scale: 10^5 events'
+    retrieval_challenge: retrieval-miss analysis by route on paraphrase held-out queries
+    not_challengeable: null
+  adoption_obligation: None beyond P1 telemetry installation.
+  residual_risk: Answers depend on caller-supplied repair_count, cost and skills_used.
+  findings:
+  - A0-P2-01
+  - A0-O1-03
+  - A0-P1-01
+- capability: Q1
+  title: Lesson lifecycle
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:844
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §67 (lines 2069-2100)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §75H
+  - GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §13, §15
+  - spec/decisions/D-0004.yaml
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: Candidate capture (from worker returns) and FCP clustering work; corroboration and scope are export-time checks on self-maintained fields; independent validation and governed version
+    do not exist; approval is a caller string.
+  na_reason_normative_text: null
+  partial_qualification_impact: 'COULD_UNDERMINE — through the approval gap (A0-Q1-02): V4 scores human-gate correctness, and an export that policy says requires human approval completes on an agent''s
+    own assertion. The other lifecycle gaps (validation, governed version) cannot undermine qualification because they concern canonical-repository learning after qualification.'
+  bullets:
+  - bullet: execution/report
+    source_line: 845
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/handoffs.rs:163-189
+    automated_evidence:
+    - certification repair::smaller_findings_regressions (worker-return lesson)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q1.1-2 — a handoff return's lesson becomes L-0001; a task-close report's 'lessons' field creates no candidate
+    gap: Lessons in task-close reports never enter the lifecycle (A0-Q1-01).
+  - bullet: lesson candidate
+    source_line: 846
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/handoffs.rs:179-185
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/Q-learning-upstream.out Q1.1-2 — candidate: status PROVISIONAL, state_class EVIDENCE, scope PROJECT, lifecycle candidate, provenance handoff+task'
+    gap: null
+  - bullet: corroboration
+    source_line: 847
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:96-105
+    automated_evidence:
+    - certification upstream::upstream_export_gate_fails_closed_and_sanitises
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/Q-learning-upstream.out Q1.3-4 — zero-source FRAMEWORK lesson blocked at prepare; a worker lesson''s own provenance (handoff + task) counts as two sources; setting corroboration: [''self'']
+      is accepted'
+    gap: Corroboration is a source count checked only at export; no corroboration step or independence of sources (A0-Q1-01).
+  - bullet: scope classification
+    source_line: 848
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:91-95
+    - framework/schemas/lesson.schema.json (scope enum)
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q1.3-4 — a PROJECT candidate re-scoped to FRAMEWORK by a raw edit is exported (lifecycle still 'candidate')
+    gap: No classification step or record of who classified (A0-Q1-01).
+  - bullet: rule/skill/retrieval/tool proposal
+    source_line: 849
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/lessons.rs:25-133
+    - spec/decisions/D-0004.yaml
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/Q-learning-upstream.out Q1.5 — lessons cluster: 3 cross-project packets → FCP-0001 (strong_change_candidate); critical packet → FCP-0002 (immediate_patch_candidate)'
+    gap: null
+  - bullet: independent validation
+    source_line: 850
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q1.6-8 — FCP schema has no validation/approval fields; no command transitions an FCP or lesson; lifecycle 'validated' is a free edit
+    gap: No independent validation step exists (A0-Q1-01).
+  - bullet: human approval where required
+    source_line: 851
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:356-362
+    automated_evidence:
+    - certification upstream::upstream_export_gate_fails_closed_and_sanitises
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q1.6-8 — submit without --approved-by refused; an orchestrator agent passing --approved-by i-approve-myself is accepted and ledgered; no human gate exists
+    gap: Approval is a caller-asserted string, not an answered Human Decision Gate; FCPs have no approval (A0-Q1-02).
+  - bullet: governed version
+    source_line: 852
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q1.6-8 — no link from lesson/FCP to a release; release build takes no FCP input
+    - evidence/O5-tiers-G1-G6.out G5 — release build inputs
+    gap: No governed-version step (A0-Q1-01).
+  health_scheduler_tiers:
+  - G0
+  - G5
+  evidence_owners:
+  - G0
+  - release-clean-clone
+  evidence_owner_actually_runs: partial — the export gate runs at upstream prepare/submit; no tier checks lifecycle state.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - governing contract/policy
+    - security/sensitivity policy
+    invalidation_demonstrated: not_attempted
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: worker returns lessons; one must be promoted through validation and approval before export.'
+    repo_b_challenge: 'Brownfield: legacy lesson documents extracted as PROVISIONAL; ensure none reaches FRAMEWORK export without classification, validation and human approval.'
+    hidden_oracle_fault_class: lifecycle-step-skipped (unvalidated or self-approved lesson exported)
+    chaos_scale_soak: 'not relevant: lifecycle correctness is not load-sensitive'
+    retrieval_challenge: not relevant
+    not_challengeable: null
+  adoption_obligation: Adoption (A8) extracts legacy lessons as PROVISIONAL; post-adoption must not export them without the lifecycle.
+  residual_risk: 'Canonical-side intake trusts inbox contents (PROJECT-scoped packet clustered: A0-Q1-03).'
+  findings:
+  - A0-Q1-01
+  - A0-Q1-02
+  - A0-Q1-03
+  - A0-O1-03
+- capability: Q2
+  title: Decision vs lesson
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:854
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §67 line 2100
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §68 (lines 2104-2110)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: Decisions record the chosen action and lessons never enter the deterministic authority block; lesson state_class is unconstrained and mislabelled lessons are presented as AUTHORITATIVE
+    without a finding.
+  na_reason_normative_text: null
+  partial_qualification_impact: CANNOT_UNDERMINE — the context compiler's deterministic authority block is built by record type, so a mislabelled lesson cannot displace a decision; the gap is a missing
+    detection, and W2/A1 challenges would still see the correct authority.
+  bullets:
+  - bullet: Lessons are evidence, not authority.
+    source_line: 855
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:170-186,200-225
+    - 'framework/policies/AUTHORITY_POLICY.yaml (lesson: EVIDENCE)'
+    - runtime/src/lessons.rs:124
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q2.1 — D-0001 is in the deterministic block; contradicting lessons only in retrieved lessons_failures
+    - evidence/Q-learning-upstream.out Q2.1 — a lesson with state_class AUTHORITATIVE is accepted without finding and shown as AUTHORITATIVE in ranked evidence
+    - evidence/Q-learning-upstream.out Q1.5 — FCPs generated from lesson packets are written with state_class AUTHORITATIVE
+    gap: Nothing prevents or flags a lesson (or a lesson-derived FCP) labelled AUTHORITATIVE (A0-Q2-01).
+  - bullet: Decisions record chosen action.
+    source_line: 856
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/gates.rs:270-400
+    - framework/schemas/decision.schema.json
+    automated_evidence:
+    - certification repair2::cit_approval_derives_only_from_an_answered_gate
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q2.2 — gate answer B → D-0002 with question, chosen_option B, rationale, approved_by owner, human_approved true
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G5
+  evidence_owner_actually_runs: partial — schema_invariants accepts AUTHORITATIVE lessons.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - authoritative spec/decision
+    - governing contract/policy
+    invalidation_demonstrated: not_attempted
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: Inject a lesson contradicting an ACTIVE decision and labelled AUTHORITATIVE; expect a finding and correct authority.
+    repo_b_challenge: Legacy 'lessons learned' documents asserting rules; expect extraction as EVIDENCE only.
+    hidden_oracle_fault_class: lesson-as-authority
+    chaos_scale_soak: not relevant
+    retrieval_challenge: lesson semantically closer to the task than the governing decision
+    not_challengeable: null
+  adoption_obligation: Extraction (A8) must create lessons as EVIDENCE.
+  residual_risk: Agents consuming retrieved slices may still weigh a mislabelled lesson.
+  findings:
+  - A0-Q2-01
+  - A0-O1-03
+- capability: Q3
+  title: PROJECT/PRODUCT/FRAMEWORK scope
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:858
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §75E (lines 2401-2437)
+  - GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §13
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: Export eligibility is enforced by scope at prepare and cannot be widened by project policy (demonstrated).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Only FRAMEWORK candidates are eligible for upstream export.
+    source_line: 859
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:91-95
+    - framework/policies/LEARNING_POLICY.yaml:6
+    - framework/policies/POLICY_PRECEDENCE.yaml (LEARNING_POLICY.* immutable)
+    automated_evidence:
+    - certification upstream::upstream_export_gate_fails_closed_and_sanitises
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q3 — PROJECT and PRODUCT → UPSTREAM_SCOPE; FRAMEWORK prepared; overlay attempt to widen eligible scopes refused; PROJECT still refused
+    gap: null
+  health_scheduler_tiers:
+  - G0
+  evidence_owners:
+  - G0
+  - release-clean-clone
+  evidence_owner_actually_runs: true — enforced at every upstream prepare.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - governing contract/policy
+    invalidation_demonstrated: not_attempted
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: Attempt export of a PROJECT lesson; expect refusal.
+    repo_b_challenge: Legacy lessons default PROJECT; attempt export after adoption; expect refusal.
+    hidden_oracle_fault_class: non-framework-lesson-exported
+    chaos_scale_soak: not relevant
+    retrieval_challenge: not relevant
+    not_challengeable: null
+  adoption_obligation: None beyond policy installation.
+  residual_risk: Scope itself is a free field (Q1 scope classification).
+  findings:
+  - A0-O1-03
+- capability: Q4
+  title: Upstream Export Gate
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:861
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §75F, §75G (lines 2441-2483)
+  - GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §14, §17
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: Sanitisation, secret/sensitivity scans, allowlist and default deny work as demonstrated; raw project source and vector data leave the project inside fixtures self-declared synthetic,
+    contrary to protocol §17 fail-closed.
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — Repo B deliberately contains secrets and project material that must not be exported (release protocol §7.2); a hidden fault that exports raw product code
+    or index contents through a reproducer would pass the gate undetected.
+  bullets:
+  - bullet: sanitisation
+    source_line: 862
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:9-55,143-191
+    automated_evidence:
+    - certification upstream::upstream_export_gate_fails_closed_and_sanitises
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/Q-learning-upstream.out Q4.1 — L-0004: customer and project identifiers redacted; 0 identifier occurrences in the packet'
+    gap: null
+  - bullet: secret/sensitivity scan
+    source_line: 863
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:165-172,211-219,317-343
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q4.2 — L-0003 blocked (secret pattern, raw code, missing sources); fixture under a restricted DATA_SENSITIVITY class blocked
+    gap: null
+  - bullet: outbound allowlist/default deny
+    source_line: 864
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:363-407
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q4.3 — remote URL refused; non-inbox destination refused; product/** fixture blocked; allowlist widening refused (shrink_only); inbox receives only packet.yaml
+    gap: null
+  - bullet: synthetic reproducer preference
+    source_line: 865
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:192-230
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q4.4 — raw code in lesson text blocked without reproducer; allowed with a reproducer
+    - evidence/Q-learning-upstream.out Q4.5(a) — a verbatim copy of the project's src/lib.rs is accepted as a 'synthetic' reproducer
+    gap: 'Synthetic-ness is the self-declared flag `synthetic: true`; real project files pass as reproducers (A0-Q4-01).'
+  - bullet: no raw project/customer/vector-store export
+    source_line: 866
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/upstream.rs:206-221
+    - framework/policies/LEARNING_POLICY.yaml:11
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/Q-learning-upstream.out Q4.5(a) — byte-identical src/lib.rs delivered to the canonical inbox
+    - evidence/Q-learning-upstream.out Q4.5(b) — vector rows from state.db exported as embeddings.json
+    - evidence/Q-learning-upstream.out Q4.5(c) — filename controls block index.sqlite and state.db
+    gap: Controls are filename/path based; raw project source outside product/** and vector-store contents under another name leave through a 'synthetic' fixture (A0-Q4-01).
+  health_scheduler_tiers:
+  - G0
+  evidence_owners:
+  - G0
+  - release-clean-clone
+  evidence_owner_actually_runs: true — enforced at prepare and re-scanned at submit; content-origin checks absent.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - security/sensitivity policy
+    - governing contract/policy
+    invalidation_demonstrated: not_attempted
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: export a framework lesson whose reproducer embeds real source; expect refusal.'
+    repo_b_challenge: 'Brownfield: legacy chat DB and vector index present; attempt export of derived content under innocuous names; expect refusal.'
+    hidden_oracle_fault_class: raw-project-content-exported (disguised reproducer; renamed vector dump)
+    chaos_scale_soak: 'not relevant: gate is deterministic per packet'
+    retrieval_challenge: not relevant
+    not_challengeable: null
+  adoption_obligation: DATA_SENSITIVITY identifiers and product roots must be set at init/adopt so path controls cover the actual product tree (the greenfield layout keeps code in src/, not product/).
+  residual_risk: Content-origin detection has false-negative limits; human review of fixtures remains the backstop.
+  findings:
+  - A0-Q4-01
+  - A0-Q1-02
+  - A0-O1-03
+- capability: U
+  title: Framework Health SLOs (Gate U; no numbered heading)
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:976
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §75 (lines 2234-2252)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §76 (lines 2256-2272)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: Of fifteen SLOs, five are tracked and thresholded with a demonstrated state flip; governance-suite freshness flips but is computed over an incomplete key; seven are tracked without
+    an effective threshold; product-test health and tokens/task are absent. Twelve of thirteen HEALTHY conditions have a check that flips a verdict (H7, H9 and H10 only partially); H11 (unresolved critical
+    audit findings) has none; no single verdict is the conjunction of the thirteen.
+  na_reason_normative_text: null
+  partial_qualification_impact: COULD_UNDERMINE — U SLOs are what G0-G6 observe during qualification (AC-16 U↔O5); orphan outputs (W7), unresolved gates, failing product tests and unresolved critical findings
+    do not change health, so qualification faults of those classes would be reported HEALTHY.
+  bullets:
+  - bullet: governance-suite freshness
+    source_line: 979
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:567-585
+    - runtime/src/verification/mod.rs:53-71
+    automated_evidence:
+    - certification repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger (D021)
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-1 — decision added → D021 medium → doctor DEGRADED
+    - evidence/O4-suite-currency.out §B — broken suite, D021 still 'current'
+    gap: Tracked and thresholded, but the key misses six input classes, so the SLO reports fresh when it is not (A0-O4-01).
+  - bullet: product-test health
+    source_line: 980
+    status: ABSENT
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:955-1006
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-2 — failing product suite (exit 101): doctor and audit HEALTHY'
+    gap: Not a health signal; no threshold (A0-U-01, A0-O1-01).
+  - bullet: retrieval Recall@K
+    source_line: 981
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:592-760
+    - framework/policies/MEMORY_POLICY.yaml:34-39
+    automated_evidence:
+    - certification repair::unmeasured_memory_recall_is_not_green
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-3 — recall 0.94: HEALTHY at 0.80, UNHEALTHY at 0.99; lowering to 0.5 refused'
+    gap: null
+  - bullet: stale-index count
+    source_line: 982
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/manifest.rs (freshness)
+    - runtime/src/doctor.rs:261-288
+    - framework/policies/MEMORY_POLICY.yaml:29-32
+    automated_evidence:
+    - certification failure_injection
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-4 — one stale artefact → D010 / index_freshness medium → DEGRADED on both
+    gap: null
+  - bullet: orphan-graph count
+    source_line: 983
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/graph/mod.rs:182-197
+    - runtime/src/doctor.rs:460-474
+    automated_evidence: []
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-5 — 4 orphans reported in detail; doctor and audit HEALTHY
+    gap: Tracked, not thresholded (A0-U-01).
+  - bullet: unresolved contradictions
+    source_line: 984
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:441-459
+    - runtime/src/verification/mod.rs:215-231
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-6 — superseded decision still ACTIVE → D014 high / schema_invariants high → UNHEALTHY
+    gap: null
+  - bullet: unresolved human gates
+    source_line: 985
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:521-543
+    - runtime/src/orchestration/gates.rs (pending)
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-7 — 5 presented, unanswered gates: HEALTHY; one unpresented gate → D019 medium'
+    gap: Only unpresented gates cross a threshold; the count of unresolved gates is not thresholded (A0-U-01).
+  - bullet: task traceability %
+    source_line: 986
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:839-848
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-8 — task_traceability 0.0 with 3 tasks: HEALTHY'
+    gap: Tracked, not thresholded (A0-U-01).
+  - bullet: feature readiness coverage
+    source_line: 987
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/readiness.rs:30-89
+    - runtime/src/status.rs:32
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-9 — coverage 0.038 (25 gaps): HEALTHY'
+    gap: Tracked, not thresholded in health (A0-U-01).
+  - bullet: context packet size
+    source_line: 988
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:230-266
+    - runtime/src/verification/mod.rs:684-693
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-10 — packet 6093 > 1500: warning field only; low finding; HEALTHY on both after re-green'
+    gap: Crossing the threshold does not change health (A0-U-01).
+  - bullet: tokens/completed task
+    source_line: 989
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-11 — no token metric in observability, doctor or verification
+    gap: Not tracked (A0-U-01, A0-P1-01).
+  - bullet: first-pass completion
+    source_line: 990
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/observability.rs:103-106
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-12 — first_pass_completion_rate 0.0: HEALTHY'
+    gap: Tracked, not thresholded (A0-U-01).
+  - bullet: handoff failure
+    source_line: 991
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:387-399
+    - runtime/src/orchestration/handoffs.rs:129-162
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out SLO-13 — two failed/blocked returns: HEALTHY; an authority-violating return → mutation_scope high → audit UNHEALTHY (doctor HEALTHY)'
+    gap: No failure rate; failed/blocked returns are not tracked (A0-U-01).
+  - bullet: memory rebuild success
+    source_line: 992
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:618-672
+    - runtime/src/doctor.rs:232-260
+    automated_evidence:
+    - certification multi_machine::clone_rebuilds_identical_derived_state
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-14 — derived runtime absent → D009 medium → DEGRADED
+    - evidence/O2-governance-families.out §14/§14b
+    gap: null
+  - bullet: fresh-agent reconstruction success
+    source_line: 993
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:673-695
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-15 — budget 2 < 4 reads → medium → DEGRADED
+    gap: null
+  - bullet: authority unambiguous
+    source_line: 996
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:441-459
+    - runtime/src/verification/mod.rs:207-231
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out H1 — duplicate decision id → D014 high, schema_invariants high → UNHEALTHY
+    gap: null
+  - bullet: no accidental legacy authority
+    source_line: 997
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:406-440
+    automated_evidence:
+    - certification brownfield::brownfield_adoption_end_to_end
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out H2 — .cursorrules + AGENT_RULES.md → D013 high → doctor UNHEALTHY (audit HEALTHY: A0-U-02)'
+    gap: null
+  - bullet: deterministic state consistent
+    source_line: 998
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:620-633,475-496
+    automated_evidence:
+    - certification failure_injection
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out H3 — unparsable record → D023 high / schema_invariants high → UNHEALTHY
+    gap: null
+  - bullet: graph/index freshness passes
+    source_line: 999
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:261-288,460-474
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out H4 — dangling edge → DEGRADED on both; SLO-4 stale index → DEGRADED
+    gap: null
+  - bullet: retrieval meets thresholds
+    source_line: 1000
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:303-329
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out H5 — renamed symbols (content only) → audit UNHEALTHY recall 0.71 (doctor HEALTHY: A0-U-02)'
+    gap: null
+  - bullet: sensitive material isolated
+    source_line: 1001
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:289-337
+    automated_evidence:
+    - certification failure_injection
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out H6 — secret in src → D011 critical / path_map_compliance critical → UNHEALTHY
+    gap: null
+  - bullet: feature readiness explicit
+    source_line: 1002
+    status: PARTIAL
+    implementation_evidence:
+    - framework/schemas/feature.schema.json (readiness required)
+    - runtime/src/verification/mod.rs:163-181
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out H7a — feature without readiness → audit UNHEALTHY
+    - 'evidence/U-slos-and-healthy.out H7b — readiness: {} (no cell stated, coverage 0.0, 26 gaps) → HEALTHY on both'
+    gap: An empty readiness map satisfies the check (A0-U-02).
+  - bullet: task runnable/blocked state correct
+    source_line: 1003
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/dag.rs:23-200
+    - runtime/src/verification/mod.rs:261-277
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out H8 — dependency cycle → graph_integrity high → audit UNHEALTHY (doctor HEALTHY: A0-U-02)'
+    gap: null
+  - bullet: tests/traceability satisfy policy
+    source_line: 1004
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:769-849
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out H9 — DONE without report → DEGRADED
+    - evidence/U-slos-and-healthy.out SLO-2 — failing product suite → HEALTHY
+    gap: Product-test results are not part of the condition (A0-U-01, A0-O1-01).
+  - bullet: governance suite current/green
+    source_line: 1005
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/doctor.rs:567-585
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-1 — D021 → DEGRADED
+    - evidence/O4-suite-currency.out §B
+    gap: Incomplete currency key (A0-O4-01); audit cannot see it (A0-U-02).
+  - bullet: no unresolved critical audit finding
+    source_line: 1006
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - 'evidence/U-slos-and-healthy.out H11a — latest audit record holds an unresolved CRITICAL finding; doctor immediately after: HEALTHY'
+    - 'evidence/U-slos-and-healthy.out H11b — independent audit record with a critical finding: doctor and audit HEALTHY'
+    gap: No check reads recorded audit findings (A0-U-02).
+  - bullet: fresh strong agent reconstructs state within budget
+    source_line: 1007
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:673-695
+    - runtime/src/status.rs:34-60
+    automated_evidence:
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-15 — budget crossing → DEGRADED
+    gap: null
+  - bullet: derived memory is rebuildable
+    source_line: 1008
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:618-672
+    - runtime/src/doctor.rs:232-260
+    automated_evidence:
+    - certification multi_machine::clone_rebuilds_identical_derived_state
+    - 'cargo test --test certification (AC15-cargo-test-certification.out: 79 passed, 0 failed)'
+    independent_evidence:
+    - evidence/U-slos-and-healthy.out SLO-14 — runtime absent → DEGRADED
+    - evidence/O2-governance-families.out §14b — two full rebuilds identical
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  evidence_owners:
+  - G5
+  evidence_owner_actually_runs: partial — doctor and audit compute them on demand; no tier schedules them; neither surface covers all conditions.
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - governing contract/policy
+    - authoritative spec/decision
+    - relevant index manifest
+    - relevant source files
+    invalidation_demonstrated: true
+    invalidation_evidence: evidence/U-slos-and-healthy.out SLO-1
+  qualification_coverage:
+    repo_a_challenge: 'Greenfield: drive each SLO across its threshold during feature work; expect state changes and remediation.'
+    repo_b_challenge: 'Brownfield: each of the 13 HEALTHY conditions violated by seeded dirt; expect NOT HEALTHY until repaired.'
+    hidden_oracle_fault_class: health-misreported (condition violated, verdict HEALTHY)
+    chaos_scale_soak: 'soak: SLO drift over long operation; scale: thresholds on large repos'
+    retrieval_challenge: Recall@K threshold on paraphrase and superseded-vs-current held-out queries
+    not_challengeable: null
+  adoption_obligation: Post-adoption acceptance (protocol §18 item 12) must rest on a HEALTHY verdict that is the conjunction of all 13 conditions.
+  residual_risk: Several SLO thresholds are project-overridable in both directions (CONTEXT_POLICY.*), so a project can neutralise them.
+  findings:
+  - A0-U-01
+  - A0-U-02
+  - A0-U-03
+  - A0-O4-01
+  - A0-O1-01
+  - A0-O1-03
+  - A0-P1-01
+- capability: V1
+  title: Fault manifest
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1016
+  governing_document_refs:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:1012-1026 (Gate V, NEW TESTING REFINEMENT)
+  - PHASE-2-FROZEN-GATE-CONTRACT.md AC-6, §9.2
+  requirement_class: EXECUTION_REFINEMENT
+  status: ABSENT
+  status_justification: No machine-checkable fault-manifest definition exists anywhere in the candidate; the product accepts a fault-manifest record lacking every V1 field.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: fault ID
+    source_line: 1018
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: class
+    source_line: 1019
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: hidden authoritative truth
+    source_line: 1020
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: injected repository state
+    source_line: 1021
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected detection
+    source_line: 1022
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected severity
+    source_line: 1023
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected impacted artefacts/nodes
+    source_line: 1024
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected governed action
+    source_line: 1025
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: forbidden outcomes
+    source_line: 1026
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  health_scheduler_tiers: &id003
+  - G6
+  evidence_owners: &id004 []
+  evidence_owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  freshness: &id005
+    state: NO_EVIDENCE
+    invalidation_inputs:
+    - governing contract/policy
+    invalidation_demonstrated: false
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: Each Repo A fault recorded with all V1 fields.
+    repo_b_challenge: Each Repo B fault recorded with all V1 fields.
+    hidden_oracle_fault_class: all injected fault classes
+    chaos_scale_soak: 'not relevant: the oracle format is a data definition; chaos/soak results are scored through V4'
+    retrieval_challenge: V3 expected retrieval results define the retrieval challenges
+    not_challengeable: 'Not challengeable in synthetic repositories: V1-V4 define the oracle itself. Alternative independent evidence route: fresh independent oracle-format review against V1-V4 (frozen
+      contract §9.2, AC-6) plus schema validation of sample manifests.'
+  adoption_obligation: 'None for consumer projects (Contract v3 line 51: consumer projects do not receive qualification repositories); the format is a verifier-owned Phase-2 artefact.'
+  residual_risk: Until a format exists and is accepted, no hidden fault may be generated (AC-6) and qualification scoring is undefined.
+  findings:
+  - A0-V1-01
+  - A0-O5-14
+  - A0-O1-03
+- capability: V2
+  title: Hidden path-map oracle
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1028
+  governing_document_refs:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:1028-1036
+  - GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §10 A3
+  requirement_class: EXECUTION_REFINEMENT
+  status: ABSENT
+  status_justification: No path-map oracle definition exists.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: current artefact
+    source_line: 1030
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: correct classification
+    source_line: 1031
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: authority
+    source_line: 1032
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected target path
+    source_line: 1033
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE
+    source_line: 1034
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected references/consumers
+    source_line: 1035
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: sensitivity/indexing expectation
+    source_line: 1036
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  health_scheduler_tiers: *id003
+  evidence_owners: *id004
+  evidence_owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  freshness: *id005
+  qualification_coverage:
+    repo_a_challenge: not applicable to greenfield Repo A (V2 is for brownfield Repo B)
+    repo_b_challenge: Every Repo B artefact carries V2 fields.
+    hidden_oracle_fault_class: path-map misclassification / wrong target / lost consumer
+    chaos_scale_soak: 'not relevant: the oracle format is a data definition; chaos/soak results are scored through V4'
+    retrieval_challenge: V3 expected retrieval results define the retrieval challenges
+    not_challengeable: 'Not challengeable in synthetic repositories: V1-V4 define the oracle itself. Alternative independent evidence route: fresh independent oracle-format review against V1-V4 (frozen
+      contract §9.2, AC-6) plus schema validation of sample manifests.'
+  adoption_obligation: 'None for consumer projects (Contract v3 line 51: consumer projects do not receive qualification repositories); the format is a verifier-owned Phase-2 artefact.'
+  residual_risk: Until a format exists and is accepted, no hidden fault may be generated (AC-6) and qualification scoring is undefined.
+  findings:
+  - A0-V1-01
+  - A0-O5-14
+  - A0-O1-03
+- capability: V3
+  title: Hidden memory oracle
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1038
+  governing_document_refs:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:1038-1045
+  requirement_class: EXECUTION_REFINEMENT
+  status: ABSENT
+  status_justification: No memory-oracle definition exists.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: which material must be indexed
+    source_line: 1039
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: which must never be indexed
+    source_line: 1040
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected authority namespace
+    source_line: 1041
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected current/superseded status
+    source_line: 1042
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected graph relationships
+    source_line: 1043
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected code symbols
+    source_line: 1044
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: expected retrieval results
+    source_line: 1045
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  health_scheduler_tiers: *id003
+  evidence_owners: *id004
+  evidence_owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  freshness: *id005
+  qualification_coverage:
+    repo_a_challenge: Index/namespace/graph/symbol/retrieval expectations for Repo A.
+    repo_b_challenge: Same for Repo B after migration and rebuild.
+    hidden_oracle_fault_class: wrong-indexing / missed authoritative artefact / superseded result
+    chaos_scale_soak: 'not relevant: the oracle format is a data definition; chaos/soak results are scored through V4'
+    retrieval_challenge: V3 expected retrieval results define the retrieval challenges
+    not_challengeable: 'Not challengeable in synthetic repositories: V1-V4 define the oracle itself. Alternative independent evidence route: fresh independent oracle-format review against V1-V4 (frozen
+      contract §9.2, AC-6) plus schema validation of sample manifests.'
+  adoption_obligation: 'None for consumer projects (Contract v3 line 51: consumer projects do not receive qualification repositories); the format is a verifier-owned Phase-2 artefact.'
+  residual_risk: Until a format exists and is accepted, no hidden fault may be generated (AC-6) and qualification scoring is undefined.
+  findings:
+  - A0-V1-01
+  - A0-O5-14
+  - A0-O1-03
+- capability: V4
+  title: Quantitative qualification scoring
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1047
+  governing_document_refs:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:1047-1062
+  requirement_class: EXECUTION_REFINEMENT
+  status: ABSENT
+  status_justification: No scoring definition or report exists; only retrieval metrics and stale counts are computed for other purposes.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: injected defect detection recall
+    source_line: 1049
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: false positives
+    source_line: 1050
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: severity accuracy
+    source_line: 1051
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: impact-map accuracy
+    source_line: 1052
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: path-map accuracy
+    source_line: 1053
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: missed authoritative artefacts
+    source_line: 1054
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: wrong-indexing count
+    source_line: 1055
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: stale-index count
+    source_line: 1056
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    - evidence/V-oracle-format-and-contract-views.out §C — the product computes retrieval metrics / stale counts for held-out sets and the live index, but no qualification scoring report exists
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: retrieval metrics
+    source_line: 1057
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    - evidence/V-oracle-format-and-contract-views.out §C — the product computes retrieval metrics / stale counts for held-out sets and the live index, but no qualification scoring report exists
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: recovery/chaos pass rate
+    source_line: 1058
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: human-gate correctness
+    source_line: 1059
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  - bullet: task/readiness correctness
+    source_line: 1060
+    status: ABSENT
+    implementation_evidence: []
+    automated_evidence: []
+    independent_evidence:
+    - evidence/V-oracle-format-and-contract-views.out §A — no definition of this field in any tracked file; §B — a fault-manifest record missing it is accepted; no oracle command
+    gap: No machine-checkable Qualification Oracle format exists on the candidate (A0-V1-01).
+  health_scheduler_tiers: *id003
+  evidence_owners: *id004
+  evidence_owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  freshness: *id005
+  qualification_coverage:
+    repo_a_challenge: Score Repo A run.
+    repo_b_challenge: Score Repo B run.
+    hidden_oracle_fault_class: scoring error (metric computed against the wrong oracle)
+    chaos_scale_soak: 'not relevant: the oracle format is a data definition; chaos/soak results are scored through V4'
+    retrieval_challenge: V3 expected retrieval results define the retrieval challenges
+    not_challengeable: 'Not challengeable in synthetic repositories: V1-V4 define the oracle itself. Alternative independent evidence route: fresh independent oracle-format review against V1-V4 (frozen
+      contract §9.2, AC-6) plus schema validation of sample manifests.'
+  adoption_obligation: 'None for consumer projects (Contract v3 line 51: consumer projects do not receive qualification repositories); the format is a verifier-owned Phase-2 artefact.'
+  residual_risk: Until a format exists and is accepted, no hidden fault may be generated (AC-6) and qualification scoring is undefined.
+  findings:
+  - A0-V1-01
+  - A0-O5-14
+  - A0-O1-03
