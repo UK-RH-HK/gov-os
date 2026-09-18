@@ -1,0 +1,183 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0004
+role: capability-family-auditor
+objective: "Exhaustively audit delta family capabilities J1-J2, K1-K4, L1-L4, M1-M4, N1-N4 against Contract v3 lines 594-747"
+agent_model: claude-opus-4-6
+independence_statement: >-
+  This agent had no prior exposure to the Governance OS product code before this run.
+  Read: contract v3, frozen gate contract, handoff documents, common audit protocol,
+  runtime source (cit/mod.rs, gates.rs, routing.rs, checkpoints.rs, handoffs.rs,
+  records.rs, control.rs, observability.rs, policy_precedence.rs, tasks.rs, readiness.rs),
+  framework schemas (research, experiment, worker-return), framework policies (CHANGE_POLICY,
+  HUMAN_GATE_POLICY, MODEL_ROUTING_POLICY, CHECKPOINT_POLICY), CLI source (main.rs).
+  Did not read: session transcripts, task-output stores, user auto-memory, other agent reports.
+  Did not modify: any product source file.
+input:
+  base_commit: 57177a37ea296ece16b185874831462b6a76db18
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0004-audit-0-delta.md
+inspected:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (lines 594-747)
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0004-audit-0-delta.md
+  - runtime/src/cit/mod.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/routing.rs
+  - runtime/src/checkpoints.rs
+  - runtime/src/orchestration/handoffs.rs
+  - runtime/src/records.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/observability.rs
+  - runtime/src/policy_precedence.rs
+  - runtime/src/orchestration/tasks.rs
+  - runtime/src/orchestration/readiness.rs
+  - framework/schemas/research.schema.json
+  - framework/schemas/experiment.schema.json
+  - framework/schemas/worker-return.schema.json
+  - framework/policies/CHANGE_POLICY.yaml
+  - framework/policies/HUMAN_GATE_POLICY.yaml
+  - framework/policies/MODEL_ROUTING_POLICY.yaml
+  - framework/policies/CHECKPOINT_POLICY.yaml
+  - cli/src/main.rs
+produced:
+  - release/capability-baseline/audit-0/delta/00-AUDIT-REPORT.md
+  - release/capability-baseline/audit-0/delta/capability-audit.yaml
+  - release/capability-baseline/audit-0/delta/findings.yaml
+  - release/capability-baseline/audit-0/delta/evidence/J1-research-record.sh
+  - release/capability-baseline/audit-0/delta/evidence/J1-research-record.out
+  - release/capability-baseline/audit-0/delta/evidence/J2-experiment-lifecycle.sh
+  - release/capability-baseline/audit-0/delta/evidence/J2-experiment-lifecycle.out
+  - release/capability-baseline/audit-0/delta/evidence/K1-K2-cit-lifecycle.sh
+  - release/capability-baseline/audit-0/delta/evidence/K1-K2-cit-lifecycle.out
+  - release/capability-baseline/audit-0/delta/evidence/K3-auto-simulate.sh
+  - release/capability-baseline/audit-0/delta/evidence/K3-auto-simulate.out
+  - release/capability-baseline/audit-0/delta/evidence/K4-impact-radius.sh
+  - release/capability-baseline/audit-0/delta/evidence/K4-impact-radius.out
+  - release/capability-baseline/audit-0/delta/evidence/L1-L2-L4-gates.sh
+  - release/capability-baseline/audit-0/delta/evidence/L1-L2-L4-gates.out
+  - release/capability-baseline/audit-0/delta/evidence/L3-gate-attacks.sh
+  - release/capability-baseline/audit-0/delta/evidence/L3-gate-attacks.out
+  - release/capability-baseline/audit-0/delta/evidence/M1-M4-routing.sh
+  - release/capability-baseline/audit-0/delta/evidence/M1-M4-routing.out
+  - release/capability-baseline/audit-0/delta/evidence/M4-routing-evidence.out
+  - release/capability-baseline/audit-0/delta/evidence/N1-N4-checkpoints.sh
+  - release/capability-baseline/audit-0/delta/evidence/N1-N4-checkpoints.out
+  - release/capability-baseline/audit-0/delta/evidence/N3-watchdog.out
+  - release/capability-baseline/audit-0/delta/evidence/N3-watchdog.sh
+  - release/capability-baseline/audit-0/delta/evidence/cross-capability-interactions.sh
+  - release/capability-baseline/audit-0/delta/evidence/cross-capability-interactions.out
+  - release/capability-baseline/audit-0/delta/evidence/regression-tests.out
+  - release/capability-baseline/audit-0/delta/evidence/doctor-checks.out
+tests_or_attacks:
+  - id: J1-research-record
+    description: "Verify all 8 J1 research record fields are present in schema and functional"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/J1-research-record.out
+  - id: J2-experiment-lifecycle
+    description: "Verify J2 experiment lifecycle fields; identify reproducibility/interpretation gaps"
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/J2-experiment-lifecycle.out
+  - id: K1-K2-cit-lifecycle
+    description: "Full CIT-P/CIT-E lifecycle: propose, simulate, gate, approve, execute, rollback"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/K1-K2-cit-lifecycle.out
+  - id: K3-auto-simulate
+    description: "All 8 auto_simulate_triggers independently exercised"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/K3-auto-simulate.out
+  - id: K4-impact-radius
+    description: "R0-R5 radii affect traversal depth, semantic candidates, model tier, human approval"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/K4-impact-radius.out
+  - id: L1-L2-L4-gates
+    description: "Contradiction resolution, gate package enforcement, non-global blocking"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/L1-L2-L4-gates.out
+  - id: L3-gate-attacks
+    description: "Attack probes: unpresented gate, declined gate, revoked gate, agent fabrication"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/L3-gate-attacks.out
+  - id: M1-M4-routing
+    description: "T0-T3 tiers, reasoning levels, role defaults, provider overlay isolation"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/M1-M4-routing.out
+  - id: M4-routing-evidence
+    description: "All 8+1 routing evidence dimensions recorded and persisted"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/M4-routing-evidence.out
+  - id: N1-N4-checkpoints
+    description: "Structured checkpoint with 14 fields, 8 mandatory triggers, worker return contract"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/N1-N4-checkpoints.out
+  - id: N3-watchdog
+    description: "Provider-independent watchdog fires on utilisation and ops thresholds"
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/N3-watchdog.out
+  - id: cross-capability-interactions
+    description: "K2-W6 staleness, N-W9 continuity, L3-E1 authority cross-capability probes"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/cross-capability-interactions.out
+  - id: regression-tests
+    description: "42 lib + 79 certification = 121 tests, 0 failures"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/regression-tests.out
+  - id: doctor-checks
+    description: "29 health checks, all passing"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/delta/evidence/doctor-checks.out
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 16
+  PARTIAL: 2
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+findings:
+  - id: A0-J2-01
+    severity: LOW
+    capability: J2
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Experiment schema lacks dedicated reproducibility and interpretation fields"
+    path: release/capability-baseline/audit-0/delta/findings.yaml
+  - id: A0-M4-01
+    severity: LOW
+    capability: M4
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "M4 empirical routing does not aggregate reviewer_findings in report"
+    path: release/capability-baseline/audit-0/delta/findings.yaml
+  - id: A0-N3-01
+    severity: MEDIUM
+    capability: N3
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Checkpoint watchdog lacks explicit staleness marking and handoff/session-close blocking"
+    path: release/capability-baseline/audit-0/delta/findings.yaml
+  - id: A0-K2-01
+    severity: INFO
+    capability: K2
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "CIT-E derived-view regeneration and memory/index refresh always enabled by default"
+    path: release/capability-baseline/audit-0/delta/findings.yaml
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-delta
+  commit: 51ea6aa4b20812ce2fa71e9f0b02f8a8abae5cb7
+  evidence_path: release/capability-baseline/audit-0/delta/
+unresolved: []
+recommended_next_action: "Proceed to synthesis across all families; no blocking findings in delta"
+completed_at: "2026-09-18T23:59:00Z"
