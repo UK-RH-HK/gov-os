@@ -1,0 +1,134 @@
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4-1789764405-55002a/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## recording: every MODEL_ROUTING_POLICY.record_evidence field is required
+$ gov --json --session probe-2061e49b route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4-1789764405-55002a/ev-full.json
+  -> ok
+CHECK M4.rec.1 PASS a run carrying all nine policy fields is recorded
+$ gov --json --session probe-2061e49b route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4-1789764405-55002a/ev-missing.json
+  -> ERROR [USAGE] routing evidence must carry MODEL_ROUTING_POLICY.record_evidence fields; missing: ["reasoning_effort", "latency", "pass_fail", "repair_count", "reviewer_findings"]
+CHECK M4.rec.2 PASS a run missing reasoning_effort/latency/pass/repair_count/reviewer_findings is refused
+      detail: {"code": "USAGE", "details": null, "message": "routing evidence must carry MODEL_ROUTING_POLICY.record_evidence fields; missing: [\"reasoning_effort\", \"latency\", \"pass_fail\", \"repair_count\", \"reviewer_findings\"]"}
+$ gov --json --session probe-2061e49b route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4-1789764405-55002a/ev-typed.json
+  -> ok
+CHECK M4.rec.3 FAIL a run with non-numeric cost/latency/repair_count is refused
+      detail: {"cost": "expensive", "latency_ms": "slow", "model": "m1", "pass": true, "provider": "p1", "reasoning_effort": "medium", "repair_count": "many", "reviewer_findings": 0, "session": "probe-2061e49b", "task_class": "implementation", "ts": "2026-09-18T20:46:46Z"}
+
+## designed data set: pairs that differ in exactly one dimension
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-prov0.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-prov1.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-model2.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-model3.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-class4.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-class5.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-reason6.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-reason7.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-cost8.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-cost9.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-lat10.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-lat11.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-pf12.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-pf13.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-rep14.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-rep15.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-rev16.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-rev17.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-revsame18.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4b-1789764406-a520bb/ev-revsame19.json
+  -> ok
+$ gov --json --session probe-443d6c3c route --report
+  -> ok
+---- gov route --report rows ----
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m-large", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m-small", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p1", "runs": 2, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "security"}
+  {"avg_cost": 9.5, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mC2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 0.5, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mC", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 9000.0, "avg_repairs": 0.0, "model": "mL2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 100.0, "avg_repairs": 0.0, "model": "mL", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mP2", "pass_rate": 0.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mP", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mR", "pass_rate": 0.5, "provider": "p1", "runs": 2, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mV2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mV", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mW", "pass_rate": 1.0, "provider": "p1", "runs": 2, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 4.0, "model": "mX2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mX", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}
+  {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p2", "runs": 1, "task_class": "implementation"}
+OBSERVE M4.report.columns columns of the comparison report: ["avg_cost", "avg_latency_ms", "avg_repairs", "model", "pass_rate", "provider", "runs", "task_class"]
+CHECK M4.b1 PASS b1 model/provider: runs are separated and comparable per provider and per model
+      detail: {"p1": [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p1", "runs": 2, "task_class": "implementation"}, {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "security"}], "p2": [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p2", "runs": 1, "task_class": "implementation"}]}
+CHECK M4.b2 PASS b2 task class: the same model is compared per task class
+      detail: [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p1", "runs": 2, "task_class": "implementation"}, {"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "m1", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "security"}]
+CHECK M4.b3 FAIL b3 reasoning effort: two runs of one model at low vs extra_high reasoning are reported separately (reasoning effort is a comparison dimension)
+      detail: {"report_columns": ["avg_cost", "avg_latency_ms", "avg_repairs", "model", "pass_rate", "provider", "runs", "task_class"], "rows_for_model_mR": [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mR", "pass_rate": 0.5, "provider": "p1", "runs": 2, "task_class": "implementation"}]}
+CHECK M4.b4 PASS b4 cost: average cost per model/provider/class
+      detail: [[{"avg_cost": 0.5, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mC", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}], [{"avg_cost": 9.5, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mC2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}]]
+CHECK M4.b5 PASS b5 latency: average latency
+      detail: [[{"avg_cost": 1.0, "avg_latency_ms": 100.0, "avg_repairs": 0.0, "model": "mL", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}], [{"avg_cost": 1.0, "avg_latency_ms": 9000.0, "avg_repairs": 0.0, "model": "mL2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}]]
+CHECK M4.b6 PASS b6 pass/fail: pass rate
+      detail: [[{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mP", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}], [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mP2", "pass_rate": 0.0, "provider": "p1", "runs": 1, "task_class": "implementation"}]]
+CHECK M4.b7 PASS b7 repair count: average repairs
+      detail: [[{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mX", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}], [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 4.0, "model": "mX2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}]]
+CHECK M4.b8 FAIL b8 reviewer findings: a reviewer-findings aggregate is reported
+      detail: {"report_columns": ["avg_cost", "avg_latency_ms", "avg_repairs", "model", "pass_rate", "provider", "runs", "task_class"], "rows_mV": [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mV", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}], "rows_mV2": [{"avg_cost": 1.0, "avg_latency_ms": 1000.0, "avg_repairs": 0.0, "model": "mV2", "pass_rate": 1.0, "provider": "p1", "runs": 1, "task_class": "implementation"}]}
+$ gov --json --session probe-443d6c3c telemetry summary
+  -> ok
+OBSERVE M4.telemetry gov telemetry summary exposes the same model_routing rows: {"keys": ["budget", "commands", "cost_by_task_class", "events", "first_pass_completion_rate", "human_gates_by_feature", "model_routing", "retrieval", "rework_by_role"], "model_routing_rows": 17}
+CHECK M4.b8.telemetry FAIL b8 via telemetry summary: reviewer findings visible
+
+## integrity: the policy's own field name for pass/fail
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4c-1789764410-d5dd2e/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+$ gov --json --session probe-99f2bee4 route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4c-1789764410-d5dd2e/ev-pf-policy-name.json
+  -> ok
+OBSERVE M4.alias.a record with key 'pass': null: {"cost": 1.0, "latency_ms": 1000, "model": "mZ", "pass": null, "provider": "p1", "reasoning_effort": "medium", "repair_count": 0, "reviewer_findings": 0, "session": "probe-99f2bee4", "task_class": "implementation", "ts": "2026-09-18T20:46:50Z"}
+$ gov --json --session probe-99f2bee4 route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4c-1789764410-d5dd2e/ev-policynames.json
+  -> ok
+CHECK M4.alias.1 PASS a run recorded with the policy's own field names (latency, pass_fail) is accepted
+$ gov --json --session probe-99f2bee4 route --report
+  -> ok
+CHECK M4.alias.2 FAIL ...and is reported with pass_rate 1.0 and latency 1000 ms (not silently counted as a failure with 0 latency)
+      detail: [{"avg_cost": 1.0, "avg_latency_ms": 0.0, "avg_repairs": 0.0, "model": "mY", "pass_rate": 0.0, "provider": "p1", "runs": 1, "task_class": "implementation"}]
+
+## are empirical records produced by normal work, or only by explicit `gov route --record` calls?
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4d-1789764410-79c939/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+$ gov --json --session probe-c0e3c193 task create --objective tiny --class documentation --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-c0e3c193 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-c0e3c193 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-c0e3c193 task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/m4d-1789764410-79c939/rep.json
+  -> ok
+$ gov --json --session probe-c0e3c193 route --report
+  -> ok
+CHECK M4.flow FAIL a closed task's report (model, cost, repair_count) feeds the empirical routing comparison
+      detail: {"route_report_rows": []}
+$ gov --json --session probe-c0e3c193 --role routine-documentation route --class documentation
+  -> ok
+OBSERVE M4.use does routing consult recorded evidence? route output keys: ["candidates", "chosen", "minimum_tier", "note", "reasoning", "role", "task", "task_class"]
+SUMMARY checks=15 pass=9 fail=6 failed=['M4.rec.3', 'M4.b3', 'M4.b8', 'M4.b8.telemetry', 'M4.alias.2', 'M4.flow']

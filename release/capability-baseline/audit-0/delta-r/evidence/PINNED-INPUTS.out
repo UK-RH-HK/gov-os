@@ -1,0 +1,39 @@
+# P2-AR-0011 pinned-input verification (2026-09-18T20:53:30Z)
+$ git rev-parse HEAD; git rev-parse cap2-candidate-0^{commit}; git diff --stat 57177a3 HEAD
+7eddf9103311a8e2ad144bcf61788f16b460782c
+57177a37ea296ece16b185874831462b6a76db18
+ .../HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md  | 45 ++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+$ python3 release/orchestration/phase-2/tools/product_identity.py HEAD
+commit: 7eddf9103311a8e2ad144bcf61788f16b460782c
+product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+governed_state_digest: 3dabf06a25e694f30182fd52549747826edcec29e9574f5a9c2c79705223ad91
+$ python3 release/orchestration/phase-2/tools/product_identity.py cap2-candidate-0
+commit: 9ee8dff13e7a8f06b28a3063ae7ad11eae27bf73
+product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+governed_state_digest: 3dabf06a25e694f30182fd52549747826edcec29e9574f5a9c2c79705223ad91
+$ sha256sum Governance_OS_Capability_Acceptance_Contract_v3.md framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e  release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+$ grep -A3 frozen_gate_contract release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+frozen_gate_contract:
+  path: release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  revision: 1
+$ ~/.cargo/bin/cargo --version; ~/.cargo/bin/rustc --version
+cargo 1.98.1 (797e8a9bc 2026-08-05)
+rustc 1.98.1 (48a229cea 2026-09-01)
+$ ~/.cargo/bin/cargo build --release  (completed exit 0 in this worktree before probing)
+$ sha256sum target/release/gov; target/release/gov version
+3271ce0e4e095561911e0d03d8641aa92fbeda39ef3c8a2ecb2a9f21cacbe81d  target/release/gov
+framework: agentic-engineering-os
+version: 4.1.5
+cli_version: 4.1.5
+runtime_version: 4.1.5
+index_version: 4.1.5-idx3
+$ python3 --version; python3 -c "import yaml; print(yaml.__version__)"
+Python 3.12.3
+6.0.1
+$ gov --json --root . contract verify  (read-only; isolated XDG_STATE_HOME)
+{"verdict": "CONTRACT_SOURCE_BOUND", "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3", "canonical_import_byte_identical": true, "capability_count": 100}
