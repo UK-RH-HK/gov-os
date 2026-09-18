@@ -50,8 +50,43 @@ prior_held_out_suites_to_rerun:
 base_commit: 30aa98a10fd7f5ed85439b0d676761080519ceed
 branch: phase1/srr1-r1-repair-3
 started_at: '2026-09-18T10:30Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0032.report.yaml
 expected_evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_OS_VERIFICATION, INCOMPLETE]
-outcome: null
+outcome:
+  verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+  work_commit: cf527412233ab2ee435a01d1aa3c358050b1cf49
+  report_commit: 60dfa7821907dab7c010eaae1571a038b0f0b9bc
+  integration_merge_commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+  candidate_minted: srr1-r1-candidate-4
+  evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/
+  mandate_parts_claimed_met: [AR31-B1 fixed, AR31-B2 fixed, coverage derived from the product, no-primitive claims falsifiable]
+  derivation:
+    mechanism: SECTION_6_SIGNATURES plus a walk of every function in runtime/src and cli/src, deriving per bullet every function that performs a durable write and matches the signature; each must carry the enforcement or call the sink
+    scale_claimed: 84 files, 740 functions, with floors that make a broken walk fail loudly
+    result_claimed: 0 violations, 1 recorded exemption (cit::take_snapshot), exemptions re-checked every run and failing if stale or unnecessary
+    falsifiability: each detector must first flag a synthetic positive control; a signature deriving nothing panics; a dedicated test fails outright on any no-primitive entry
+    limits_disclosed: nine, in evidence/DERIVATION.md section 4
+    defeat_conditions_disclosed: five, in section 5 - sharpest is a widened acceptance marker, which the repair says nothing in the suite would notice and for which it found no cheap fix
+  bullet_7: new runtime/src/srr/present.rs is the sink; the guard's answer IS the presentation, infallible by design because section 5 requires inspection to stay available; effect went from 0 call sites to 5
+  found_by_the_derivation_itself:
+    - {item: Floors pub fields and pub save were a floor-lowering primitive, class: BC-R1-2, disposition: Floors::save is now bullet 6's sink, monotonic against the persisted value}
+    - {item: CIT write_file/move_file reached a governed record path without save_record, class: BC-R1-2, disposition: both now ask the record-write sink}
+    - {item: gov gate present reached no guard_write and previously mutated a Human Gate record below floor, class: BC-R1-2, disposition: refused at the record-write sink}
+  orchestrator_verification:
+    - work and report commits exist; report output.commit names the work commit
+    - no forbidden path touched; tests/certification/srr.rs not in the diff
+    - resolve_state_root, default_state_root and exit_satisfied all byte-identical by function-body digest; EXIT_POLICY unchanged
+    - all three prior held-out suites byte-identical - none edited
+    - bullet 7 effect confirmed to have call sites outside breakglass.rs where it previously had none
+    - regression independently reproduced - cargo test --lib 42 passed 0 failed; cargo test --test certification 79 passed 0 failed; exit 0
+  suspected_not_proven:
+    - the derivation is syntactic and will miss a primitive spelling none of the product's APIs
+    - bullet 7's universality is a CLI-boundary property; a fifth in-process reporting function would not be covered
+    - acceptance markers are as load-bearing as signatures and less defended
+    - save_record not proven the only writer of a governed record file, though no other exists today
+    - the single cit::take_snapshot exemption is the one place a wrong judgement passes quietly
+  new_material_class_suspected: none
+  new_owner_decision_required: none
+  completed_at: '2026-09-18T12:20Z'
