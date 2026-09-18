@@ -1,0 +1,176 @@
+schema: governance-os.phase-2.artifact-flow-coverage-matrix
+schema_version: 1
+run_id: P2-AR-0006
+family: zeta
+candidate: cap2-candidate-0
+
+# AC-8: Artifact Flow Coverage Matrix
+# One row per governed artefact type named in W1
+# Columns: producer -> stable_id_version -> relationship_type -> downstream_consumer_task -> mandatory_optional -> task_input_manifest -> context_packet_evidence -> consumption_receipt -> output_traceability -> invalidation_trigger -> qualification_challenge
+
+artifacts:
+  - artefact_type: specification (requirement)
+    producer: "human or task (new_record 'requirement')"
+    stable_id_version: "REQ-NNNN, status, state_class, created date, content hash via deterministic_hash"
+    relationship_type: "GOVERNED_BY (task->requirement), IMPLEMENTS (code->requirement)"
+    downstream_consumer_task: "tasks declaring requirements:[REQ-NNNN]; context compiler loads via RecordStore"
+    mandatory_optional: "mandatory (deterministic_authority block)"
+    task_input_manifest: "task.requirements field; dag enforces readiness"
+    context_packet_evidence: "deterministic_authority.governing_requirements includes req with id/type/title/status/summary"
+    consumption_receipt: "task close report records work_completed, files_changed, evidence"
+    output_traceability: "report links task->requirement; product_traceability family checks coverage"
+    invalidation_trigger: "CIT with targets:[REQ-NNNN] propagates staleness to affected tasks/tests"
+    qualification_challenge: "omit requirement from index, verify still delivered; change requirement, verify propagation"
+    evidence: evidence/W1-stable-artefact-identity.out
+
+  - artefact_type: scenario
+    producer: "human or task (new_record 'scenario')"
+    stable_id_version: "SCN-NNNN, status, state_class, given/when/then/success_criteria"
+    relationship_type: "VALIDATED_BY (feature->scenario), TESTS (scenario->requirement)"
+    downstream_consumer_task: "tasks with scenarios:[SCN-NNNN]; context compiler loads acceptance_criteria from scenarios"
+    mandatory_optional: "mandatory (deterministic_authority block)"
+    task_input_manifest: "task.scenarios and feature.scenarios; dag enforces scenarios_present"
+    context_packet_evidence: "deterministic_authority.scenarios and acceptance_criteria arrays"
+    consumption_receipt: "task close report must include tests.status"
+    output_traceability: "report links task->scenario; product_traceability checks features have scenarios"
+    invalidation_trigger: "CIT propagation marks affected tests stale"
+    qualification_challenge: "remove scenario, verify task blocked; change scenario criteria"
+    evidence: evidence/W3-task-input-manifest.out
+
+  - artefact_type: decision
+    producer: "human via gov decide, or agent auto-approval within policy"
+    stable_id_version: "D-NNNN, status, state_class, chosen_option, rationale, supersedes/superseded_by"
+    relationship_type: "GOVERNED_BY (task->decision), AFFECTS (decision->feature)"
+    downstream_consumer_task: "tasks with decisions:[D-NNNN]; context compiler collects affecting decisions"
+    mandatory_optional: "mandatory (deterministic_authority block)"
+    task_input_manifest: "task.decisions + auto-collected via affects/governed_by"
+    context_packet_evidence: "deterministic_authority.active_decisions and conflicting_decisions with authority_flag"
+    consumption_receipt: "task close report records decisions applied"
+    output_traceability: "decision->task->report chain; authority_role_limits family checks supersession conflicts"
+    invalidation_trigger: "supersession flags UNKNOWN_OR_CONFLICTING; CIT propagation"
+    qualification_challenge: "supersede a decision, verify old is flagged; create contradictory decisions"
+    evidence: evidence/W2-typed-contracts.out
+
+  - artefact_type: dataset (experiment data)
+    producer: "task or experiment"
+    stable_id_version: "EXP-NNNN, status, state_class"
+    relationship_type: "DERIVED_FROM, GENERATED_FROM"
+    downstream_consumer_task: "downstream tasks via dependencies"
+    mandatory_optional: "optional (depends on task declaration)"
+    task_input_manifest: "via dependencies field"
+    context_packet_evidence: "dependency_state in deterministic_authority"
+    consumption_receipt: "task close report"
+    output_traceability: "report chain"
+    invalidation_trigger: "CIT propagation"
+    qualification_challenge: "stale experiment feeding decision"
+    evidence: evidence/W1-stable-artefact-identity.out
+
+  - artefact_type: architecture record
+    producer: "human or task (ARCH-NNNN)"
+    stable_id_version: "ARCH-NNNN, status, state_class"
+    relationship_type: "CONSTRAINS (architecture->feature), GOVERNED_BY"
+    downstream_consumer_task: "context compiler loads all active architecture records"
+    mandatory_optional: "mandatory (deterministic_authority block)"
+    task_input_manifest: "auto-loaded from RecordStore.active('architecture')"
+    context_packet_evidence: "deterministic_authority.architecture array"
+    consumption_receipt: "task close report records architecture constraints applied"
+    output_traceability: "decision->architecture->task->code chain"
+    invalidation_trigger: "CIT with architecture_change trigger escalates radius to R3+"
+    qualification_challenge: "change architecture, verify propagation to implementation tasks"
+    evidence: evidence/W4-context-compiler.out
+
+  - artefact_type: interface
+    producer: "human or task (API-NNNN)"
+    stable_id_version: "API-NNNN, status, state_class, contract field"
+    relationship_type: "USES (feature->interface)"
+    downstream_consumer_task: "tasks via feature.interfaces"
+    mandatory_optional: "mandatory when declared on feature"
+    task_input_manifest: "feature.interfaces auto-loaded"
+    context_packet_evidence: "deterministic_authority.interfaces array"
+    consumption_receipt: "task close report"
+    output_traceability: "interface->implementation chain"
+    invalidation_trigger: "CIT with interface_change trigger"
+    qualification_challenge: "change interface contract, verify downstream impact"
+    evidence: evidence/W4-context-compiler.out
+
+  - artefact_type: test design (test-obligation)
+    producer: "human or independent test author"
+    stable_id_version: "TST-NNNN, status, family, independent_of_implementer"
+    relationship_type: "VALIDATED_BY (feature->test)"
+    downstream_consumer_task: "dag checks acceptance_tests_declared"
+    mandatory_optional: "mandatory for implementation tasks (TEST_POLICY)"
+    task_input_manifest: "task.acceptance_tests and feature acceptance_tests; dag enforces"
+    context_packet_evidence: "acceptance_criteria in deterministic_authority"
+    consumption_receipt: "task close requires tests.status"
+    output_traceability: "product_traceability family checks feature->test coverage"
+    invalidation_trigger: "CIT marks affected tests stale"
+    qualification_challenge: "remove test obligations, verify task blocked"
+    evidence: evidence/W3-task-input-manifest.out
+
+  - artefact_type: migration plan
+    producer: "gov adopt/migrate stages"
+    stable_id_version: "batch ID in migration-ledger.jsonl"
+    relationship_type: "DERIVED_FROM"
+    downstream_consumer_task: "adoption stages A0-A11"
+    mandatory_optional: "mandatory during adoption"
+    task_input_manifest: "migration inventory and ledger"
+    context_packet_evidence: "adoption baseline record"
+    consumption_receipt: "ledger entry with batch_complete"
+    output_traceability: "migration ledger and baseline record"
+    invalidation_trigger: "interrupted batch in recovery"
+    qualification_challenge: "brownfield adoption with legacy mechanisms"
+    evidence: evidence/W9-session-handoff-continuity.out
+
+  - artefact_type: audit finding
+    producer: "gov audit (verification suite)"
+    stable_id_version: "AUD-NNNN, scope, verdict, inputs_hash, result_hash"
+    relationship_type: "EVIDENCE (audit provides evidence)"
+    downstream_consumer_task: "task close checks governance currency (latest_green)"
+    mandatory_optional: "mandatory for governance-touching tasks"
+    task_input_manifest: "task close checks inputs_hash match"
+    context_packet_evidence: "project_state carries status counts, pending gates"
+    consumption_receipt: "task close refuses if governance suite stale/missing"
+    output_traceability: "audit -> findings -> remediation tasks"
+    invalidation_trigger: "inputs_hash changes make prior green stale"
+    qualification_challenge: "change governance inputs, verify suite stale"
+    evidence: evidence/W6-staleness-propagation.out
+
+  - artefact_type: benchmark result
+    producer: "gov memory benchmark (retrieval benchmark)"
+    stable_id_version: "benchmark record with recall, mrr, precision metrics"
+    relationship_type: "EVIDENCE"
+    downstream_consumer_task: "profile selection (Phase 3)"
+    mandatory_optional: "optional in Phase 2 (Phase 3 token)"
+    task_input_manifest: "via benchmark records"
+    context_packet_evidence: "index_snapshot in retrieved_intelligence"
+    consumption_receipt: "benchmark record persisted"
+    output_traceability: "benchmark -> profile selection decision chain"
+    invalidation_trigger: "embedder/reranker pin change"
+    qualification_challenge: "change embedder, verify benchmark re-run required"
+    evidence: evidence/W11-quantitative-health.out
+
+  - artefact_type: lesson / report
+    producer: "worker return, task close, handoff return"
+    stable_id_version: "L-NNNN / RPT-NNNN, status=PROVISIONAL (lessons), state_class=EVIDENCE"
+    relationship_type: "LEARNED_FROM, DERIVED_FROM"
+    downstream_consumer_task: "retrieval includes lessons/reports in retrieved_intelligence"
+    mandatory_optional: "optional (supplementary retrieval)"
+    task_input_manifest: "not mandatory; retrieved via semantic/lexical routes"
+    context_packet_evidence: "retrieved_intelligence.lessons_failures array"
+    consumption_receipt: "lesson created as PROVISIONAL (never AUTHORITATIVE)"
+    output_traceability: "lesson -> provenance.from_handoff, .task"
+    invalidation_trigger: "lessons do not invalidate mandatory inputs"
+    qualification_challenge: "ensure PROVISIONAL lesson cannot become authority"
+    evidence: evidence/W2-typed-contracts.out
+
+ac_8_determination:
+  semantic_retrieval_relied_on_for_mandatory_inputs: false
+  evidence: "Context compiler loads all mandatory inputs (requirements, decisions, scenarios, architecture, feature, task contract) from RecordStore (filesystem YAML records). Retrieval (semantic/lexical/graph) is invoked only after the deterministic_authority block is compiled (context/mod.rs line 188+). The deterministic block has its own hash and is never modified by retrieval results."
+
+  stale_versions_silently_satisfying_downstream: false
+  evidence: "Superseded-but-ACTIVE decisions are flagged UNKNOWN_OR_CONFLICTING in the deterministic block. Retrieval excludes superseded records by default (retrieval/mod.rs lines 499-505). CIT propagation marks affected tasks retest_required and tests stale. verification/mod.rs checks staleness propagation."
+
+  completion_not_traceable_to_upstream_evidence: false
+  evidence: "Task close requires work_completed, tests.status, files_changed. The close creates a report record linking task->evidence, a checkpoint recording context_packet_hash. Observed mutations are compared against the claim baseline. product_traceability family checks done tasks have closing reports."
+
+  ac_8_met: true

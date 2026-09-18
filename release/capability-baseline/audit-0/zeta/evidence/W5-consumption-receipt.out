@@ -1,0 +1,17 @@
+=== W5: Consumption receipt and implementation traceability ===
+Task close (tasks.rs lines 386-563) enforces:
+- EVIDENCE_REQUIRED: report.tests.status must be one of ["passed", "not_applicable_with_reason"]
+- EVIDENCE_REQUIRED: report.work_completed is required
+- MUTATION_SCOPE_VIOLATION: files_changed must declare all observed mutations
+- MUTATION_SCOPE_VIOLATION: observed mutations outside allowed_paths fail closed
+- CIT-governed paths bypass: scope_violations() checks cit_governed_paths()
+
+Worker return schema (worker-return.schema.json) validated at handoffs.rs line 116 requires:
+- files_changed, tests, discoveries, unresolved
+
+Task close creates:
+- Report record with: task, session, role, outcome, evidence, observed_files_changed, mutation_evidence
+- Checkpoint with files_changed and tests_status
+- Links code/test/output back via task -> report -> checkpoint chain
+
+PASS: All W5 bullets evidenced executably.

@@ -1,0 +1,18 @@
+=== W11: Artifact-flow quantitative health ===
+The verification suite and retrieval regression track:
+
+1. Required-input delivery accuracy: context_reproducibility family verifies deterministic authority block reproducibility.
+2. Current-version selection accuracy: retrieval/mod.rs run_heldout() tracks recall_at_k, mrr, precision_at_k.
+3. Superseded-input leakage rate: run_heldout() computes superseded_hit_rate and enforces max_superseded_hit_rate threshold.
+4. Missing-required-input detection: task close EVIDENCE_REQUIRED errors; dag BLOCKED when inputs missing.
+5. Staleness propagation accuracy: run_heldout() computes stale_hit_rate; freshness() tracks stale/added/removed counts.
+6. Requirement->code traceability coverage: product_traceability family computes task_traceability (tasks with feature links).
+7. Requirement->test traceability coverage: product_traceability checks features have scenarios and test obligations.
+8. Orphan-output detection recall/false positives: graph_integrity reports orphan_nodes count.
+9. Fresh-agent reconstruction correctness: fresh_agent_reconstruction family checks reads needed vs budget and status packet size.
+
+All nine metrics are tracked, though some (like explicit accuracy %) are measured only when held-out test data exists.
+
+PARTIAL NOTE: The quantitative metrics are computed as part of the verification suite but are not aggregated into a single artifact-flow health dashboard. The retrieval regression requires held-out queries to be present (MEMORY_POLICY.regression.min_queries). Without held-out data, the recall is UNMEASURED, which the suite flags as a medium finding but does not block task close.
+
+PRESENT_AND_SUBSTANTIAL: All bullets addressed by the implementation; the "where applicable" qualifier means they track when data exists.
