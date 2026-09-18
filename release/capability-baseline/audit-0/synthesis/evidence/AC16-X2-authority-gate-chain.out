@@ -1,0 +1,79 @@
+# project x2: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/synth-tmp/probes/x2-39c702/proj
+$ gov init --name x2   [role=orchestrator session=S-synth exit=0]
+   init ok version=4.1.5
+   [probe wrote] spec/features/F-0001.yaml
+   [probe wrote] spec/requirements/REQ-0001.yaml
+   [probe wrote] spec/scenarios/SCN-0001.yaml
+   [probe wrote] spec/tasks/TST-0001.yaml
+$ gov rebuild-memory   [role=orchestrator session=S-synth exit=0]
+$ gov cit propose --proposal "Add a refusal criterion to REQ-0001" --trigger acceptance_criteria_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/synth-tmp/probes/x2-39c702/proj/.governance-runtime/x2-mf.json   [role=orchestrator session=S-synth exit=0]
+$ gov cit simulate CIT-0001   [role=orchestrator session=S-synth exit=0]
+NOTE CIT CIT-0001 radius=R1 human_gate=HDG-0001
+$ gov cit approve CIT-0001 --by owner --method human   [role=change-controller session=S-cc exit=1]
+   ERR {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0001 was never presented in chat (INV-008); run `gov gate present HDG-0001`"}
+X X2-L3-approve-refused-before-answer PASS before any answer, approval is refused -- GATE_NOT_PRESENTED
+$ gov task create --id TASK-W --class implementation --objective "worker task" --status READY --allowed src/**   [role=orchestrator session=S-synth exit=0]
+$ gov rebuild-memory   [role=orchestrator session=S-synth exit=0]
+$ gov task claim TASK-W   [role=backend-engineer session=S-worker exit=0]
+   [probe wrote] src/lib.rs (1096 chars)
+NOTE worker wrote spec/decisions/HDG-0001.yaml (ANSWERED, presented, by_kind human) and spec/decisions/D-0990.yaml (human_approved true)
+$ gov memory rebuild --incremental   [role=backend-engineer session=S-worker exit=0]
+$ gov task close TASK-W --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/synth-tmp/probes/x2-39c702/proj/.governance-runtime/synth-reports/w.json   [role=backend-engineer session=S-worker exit=0]
+   ok {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-W", "task_status": "DONE"}
+X X2-E1xG2-worker-forgery-invisible-at-close FAIL E1/G2: the L1 worker's writes to OS-written gate/decision records are observed and refused at task close -- {"close_ok": true, "observed_files_changed": null}
+$ gov cit approve CIT-0001 --by owner --method human   [role=change-controller session=S-cc exit=0]
+   ok {"cit": "CIT-0001", "cit_status": "APPROVED", "decision": "D-0990", "human_approved": true, "human_gate": "HDG-0001", "method": "human"}
+X X2-L3xE1-forged-human-approval-refused FAIL L3<->E1: approval cannot derive from a gate answer written into a file by a lower role -- {"err": null, "human_approved": true, "ok": true}
+$ gov cit execute CIT-0001   [role=change-controller session=S-cc exit=0]
+   ok {"checkpoint": "CKPT-00002", "cit": "CIT-0001", "cit_status": "COMMITTED", "propagation": {"retest_required": [], "stale_tests": [], "touched": ["spec/requirements/REQ-0001.yaml"]}}
+X X2-L3xK2-forged-approval-cannot-execute FAIL L3->K2: a CIT approved on a forged answer does not commit -- {"cit_status": "COMMITTED", "ok": true}
+$ gov memory rebuild --incremental   [role=orchestrator session=S-synth exit=0]
+$ gov audit --no-persist   [role=orchestrator session=S-synth exit=0]
+X X2-L3xU-suite-detects-forged-approval FAIL L3<->U/O5: the governance suite reports approval records that no gate operation produced -- {"findings_naming_forged_records": [], "verdict": "HEALTHY"}
+$ gov gate create --question "Proceed with default?" --fields "{\"options\": [{\"id\": \"A\", \"description\": \"yes\"}, {\"id\": \"B\", \"description\": \"no\"}], \"impact_radius\": \"R3\", \"reversibility\": \"irreversible\", \"confidence\": 0.4}"   [role=orchestrator session=S-synth exit=0]
+$ gov gate present HDG-0002   [role=orchestrator session=S-synth exit=0]
+$ gov decide HDG-0002 --option A   [role=(none: --role not passed) session=S-synth exit=0]
+   ok {"answered_by_kind": "human", "cit": null, "decision": "D-0991", "gate": "HDG-0002", "option": "A", "unblocked_tasks": []}
+X X2-L3-fabrication-default FAIL L3:679 human approval cannot be fabricated by CLI metadata (default: 'gov decide HDG-0002 --option A' with no --role and no --by) -- {"answer.acting_role": "orchestrator", "answer.by": "human", "answer.by_kind": "human", "decide_ok": true}
+$ gov gate create --question "Proceed with role-human?" --fields "{\"options\": [{\"id\": \"A\", \"description\": \"yes\"}, {\"id\": \"B\", \"description\": \"no\"}], \"impact_radius\": \"R3\", \"reversibility\": \"irreversible\", \"confidence\": 0.4}"   [role=orchestrator session=S-synth exit=0]
+$ gov gate present HDG-0003   [role=orchestrator session=S-synth exit=0]
+$ gov decide HDG-0003 --option A   [role=human session=S-synth exit=0]
+   ok {"answered_by_kind": "human", "cit": null, "decision": "D-0992", "gate": "HDG-0003", "option": "A", "unblocked_tasks": []}
+X X2-L3-fabrication-role-human FAIL L3:679 human approval cannot be fabricated by CLI metadata (role-human: 'gov decide HDG-0003 --option A' ) -- {"answer.acting_role": "human", "answer.by": "human", "answer.by_kind": "human", "decide_ok": true}
+$ gov gate create --question "Proceed with env-GOV_ROLE?" --fields "{\"options\": [{\"id\": \"A\", \"description\": \"yes\"}, {\"id\": \"B\", \"description\": \"no\"}], \"impact_radius\": \"R3\", \"reversibility\": \"irreversible\", \"confidence\": 0.4}"   [role=orchestrator session=S-synth exit=0]
+$ gov gate present HDG-0004   [role=orchestrator session=S-synth exit=0]
+$ GOV_ROLE=human gov decide HDG-0004 --option A   [role=(none: --role not passed) session=S-synth exit=0]
+   ok {"answered_by_kind": "human", "cit": null, "decision": "D-0993", "gate": "HDG-0004", "option": "A", "unblocked_tasks": []}
+X X2-L3-fabrication-env-GOV_ROLE FAIL L3:679 human approval cannot be fabricated by CLI metadata (env-GOV_ROLE: 'gov decide HDG-0004 --option A' ) -- {"answer.acting_role": "human", "answer.by": "human", "answer.by_kind": "human", "decide_ok": true}
+$ gov gate create --question "revocation target"   [role=orchestrator session=S-synth exit=0]
+$ gov gate revoke HDG-0005   [role=(none: --role not passed) session=S-synth exit=0]
+   ok {"gate": "HDG-0005", "gate_status": "WITHDRAWN", "touched": {"cit": null, "decisions": []}}
+X X2-E1-undeclared-role-is-not-orchestrator FAIL framework s23 'No spawned worker behaves as an orchestrator unless explicitly assigned': an invocation with no role declared cannot perform an L4-only operation (gate revoke) -- {"err": null, "ok": true}
+$ gov init --force --name x2   [role=independent-auditor session=S-aud exit=0]
+   ok {"adapters": 5, "conformance": {"audit": "AUD-0002", "verdict": "HEALTHY"}, "doctor": "HEALTHY", "heldout_generated": 0, "index": {"artifacts": 178, "ecosystems": 1, "embedder": {"dimensions": 512, "id": "hashed-ngram", "source": "builtin", "version": "1"}, "excluded": 0, "manifest_hash": "8599308c7832ee07ed8e6e994a5ddac06b9693c5c38f5115b597a78054c15a6b"}, "kernel_files": 122, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIONS.yaml"], "protected_state": {"break_glass_exit": null, "floors": {"metadata_high_water": {}, "minimum_secure": {"release": "", "sequence": 0, "source_metadata_sha256": ""}, "note": "Protected Governance OS floors (Signed Release Root v1). Monotonic: values here are never lowered, reset or forgotten, including by break-glass recovery (OWNER-DECISION-0006 \u00a78).", "product": "agentic-engineering-os", "release_high_water": {"sequence": 0, "version": ""}, "updated_at": "2026-09-18T22:05:59Z"}, "marked_degraded": false}, "release_authenticity": {"authenticity": "UNKNOWN", "below_floor": false, "break_glass": null, "channel": "unspecified", "currency": "UNKNOWN", "floors": {"metadata_high_water": {}, "minimum_secure": {"release": "", "sequence": 0, "source_metadata_sha256": ""}, "note": "Protected Governance OS floors (Signed Release Root v1). Monotonic: values here are never lowered, reset or forgotten, includ
+$ GOV_ROLE=independent-auditor gov init --force --name x2   [role=(none: --role not passed) session=S-aud exit=1]
+   ERR {"code": "AUTHORITY_DENIED", "details": {"level": "L0", "operation": "install_kernel", "required": "L4", "role": "independent-auditor"}, "message": "role 'independent-auditor' (L0) may not perform 'install_kernel' (requires L4); AUTHORITY_POLICY.authority_levels_required"}
+X X2-E1-init-honours-declared-role FAIL E1:364 init --force (install_kernel, L4) evaluates the role the caller declared with --role -- {"--role independent-auditor": "ok", "GOV_ROLE=independent-auditor": "AUTHORITY_DENIED"}
+$ gov task create --id TASK-H --class implementation --objective "handoff task" --status READY --allowed src/**   [role=orchestrator session=S-synth exit=0]
+$ gov rebuild-memory   [role=orchestrator session=S-synth exit=0]
+$ gov handoff create --to-role backend-engineer --task TASK-H --fields "{\"objective\": \"do TASK-H\"}"   [role=orchestrator session=S-synth exit=0]
+$ gov handoff return HND-0001 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/synth-tmp/probes/x2-39c702/proj/.governance-runtime/x2-worker-return.json   [role=frontend-engineer session=S-fe exit=0]
+   ok {"files_changed": [], "handoff": "HND-0001", "lessons_created": [], "status": "RETURNED", "unresolved": ["follow-up Y"]}
+X X2-E3-return-bound-to-recipient FAIL E3 (delta-r lead N4.b1.9): a handoff addressed to backend-engineer cannot be returned by frontend-engineer -- {"err": null, "ok": true}
+$ gov task claim TASK-H   [role=backend-engineer session=S-be exit=0]
+$ gov memory rebuild --incremental   [role=orchestrator session=S-synth exit=0]
+$ gov task close TASK-H --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/synth-tmp/probes/x2-39c702/proj/.governance-runtime/x2-worker-return.json   [role=backend-engineer session=S-be exit=3]
+   ERR {"code": "SCHEMA_INVALID", "details": {"errors": ["/status: \"success\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTORICAL\",\"REJECTED\",\"DEPRECATED\",\"RETIRED\"]"]}, "message": "schema validation failed for report (RPT-0002): /status: \"success\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTORICAL\",\"REJECTED\",\"DEPRECATED\",\"RETIRED\"]"}
+X X2-N4xW5-worker-return-usable-at-close FAIL N4/W5 (beta-r OBS-3): a return that satisfies the worker-return schema can be consumed by task close as the worker's receipt -- {"err": "SCHEMA_INVALID", "msg": "schema validation failed for report (RPT-0002): /status: \"success\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTORICAL\",\"REJECTED\",\"DEPRECATED\",\"RETIRED\"]", "ok": false}
+$ gov task create --id TASK-B --class documentation --objective "blocked task" --status READY   [role=orchestrator session=S-synth exit=0]
+$ gov task status TASK-B BLOCKED --note "waiting on vendor"   [role=orchestrator session=S-synth exit=0]
+   ok {"allowed_paths": [], "class": "documentation", "created": "2026-09-18", "forbidden_paths": ["governance/kernel/**"], "id": "TASK-B", "minimum_model_tier": "T1", "minimum_reasoning": "medium", "objective": "blocked task", "production_merge_allowed": true, "status": "ACTIVE", "status_note": "waiting on vendor", "task_status": "BLOCKED", "title": "blocked task", "type": "task", "updated": "2026-09-18"}
+$ gov task dag   [role=orchestrator session=S-synth exit=0]
+X X2-I4-blocked-not-runnable FAIL I4:587 a task whose status is BLOCKED is not in the runnable set -- {"blocked": ["TASK-H"], "runnable": ["TASK-B"], "status_ok": true}
+$ gov continue   [role=backend-engineer session=S-c exit=0]
+X X2-I4-continue-does-not-offer-blocked FAIL I4: gov continue does not offer a BLOCKED task -- {"status": "NEXT_WORK", "task": "TASK-B", "task_contract": {"id": "TASK-B", "type": "task", "title": "blocked task", "status": "ACTIVE", "created": "2026-09-18", "objective": "blocked task", "class": "documentation", "task_status": "BLOCKED", "forbidden_paths": ["governance/kernel/**"], "production_merge_allowed": true, "minimum_model_tier": "T1", "minimum_reasoning": "medium", "allowed_paths": []
+NOTE store locations present: {".governance-runtime/claims.db": true, ".governance-runtime/control.json": false, "governance/generated/plugin-registry.json": false}
+NOTE REPOSITORY_CONTRACT rules matching those paths: {".governance-runtime/claims.db": [[".governance-runtime/**", "derived", null]], ".governance-runtime/control.json": [[".governance-runtime/**", "derived", null]], "governance/generated/plugin-registry.json": [["governance/generated/**", "generated", null]]}
+NOTE docs/ARCHITECTURE.md says: └── .governance-runtime/           # derived, gitignored: state.db (SQLite+FTS5), context/, cit/<id>/snapshot,
+X X2-B1B3-nonrebuildable-state-not-classified-derived FAIL B1:188 / B3:202: claims (C1 current truth), emergency-control state and the OS plugin registry (D-0007 T2) are not stored under paths the product classifies derived/generated -- {".governance-runtime/claims.db": [[".governance-runtime/**", "derived", null]], ".governance-runtime/control.json": [[".governance-runtime/**", "derived", null]], "governance/generated/plugin-registry.json": [["governance/generated/**", "generated", null]]}
+SUMMARY total=15 pass=1 fail=14 failed=['X2-E1xG2-worker-forgery-invisible-at-close', 'X2-L3xE1-forged-human-approval-refused', 'X2-L3xK2-forged-approval-cannot-execute', 'X2-L3xU-suite-detects-forged-approval', 'X2-L3-fabrication-default', 'X2-L3-fabrication-role-human', 'X2-L3-fabrication-env-GOV_ROLE', 'X2-E1-undeclared-role-is-not-orchestrator', 'X2-E1-init-honours-declared-role', 'X2-E3-return-bound-to-recipient', 'X2-N4xW5-worker-return-usable-at-close', 'X2-I4-blocked-not-runnable', 'X2-I4-continue-does-not-offer-blocked', 'X2-B1B3-nonrebuildable-state-not-classified-derived']

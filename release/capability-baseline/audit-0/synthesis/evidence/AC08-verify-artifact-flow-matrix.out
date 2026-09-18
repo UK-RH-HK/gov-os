@@ -1,0 +1,4 @@
+[AC-8] matrix rows=14 columns=11 cells=154 status_counts={'EVIDENCED': 24, 'PARTIAL': 55, 'GAP': 61}
+[AC-8] cited observations=226; matching committed AND rerun status=226
+[AC-8] problems (0):
+[AC-8] determination recorded by zeta-r: NOT_MET; rejection conditions triggered: [True, True, True]

@@ -1,0 +1,2097 @@
+schema: governance-os.phase-2.suite-to-contract-matrix
+schema_version: 1
+run_id: P2-AR-0007
+determination:
+  product_declared_owners: 0 of 101 capabilities have any automated check in tests/governance/capability-evidence-map.yaml (100 rows, all NOT_YET_MAPPED; U has no row).
+  audit_identified_owner_that_actually_runs: '15 capabilities have no evidence owner that runs: [''J1'', ''J2'', ''K3'', ''K4'', ''M1'', ''M2'', ''M3'', ''M4'', ''N3'', ''O1'', ''V1'',
+    ''V2'', ''V3'', ''V4'', ''W11'']. For every other capability the owners are G-tier-EQUIVALENT host-command checks (no G0-G6 scheduler exists: scheduled_tier_owner_runs false for
+    all 101).'
+  invalidation: 'Invalidation of prior green evidence was demonstrated to WORK for policy, kernel, schema, migration, repository contract, sensitivity, plugin descriptor, retrieval profile,
+    held-out set and decision inputs, and demonstrated to FAIL (evidence stays green) for requirements, architecture, interfaces, source files, index manifest, tool/plugin registry,
+    research/experiment/task/checkpoint/handoff records, adoption evidence, trust state and the runtime implementation (BC-P2-03). 43 capabilities do not have product-side invalidation
+    of their evidence shown working: [''A2'', ''A5'', ''B1'', ''B2'', ''B3'', ''S1'', ''S4'', ''S6'', ''T1'', ''T2'', ''T3'', ''E4'', ''I3'', ''J1'', ''J2'', ''M4'', ''N1'', ''N3'',
+    ''N4'', ''O1'', ''O3'', ''P1'', ''P2'', ''Q1'', ''Q2'', ''Q3'', ''Q4'', ''V1'', ''V2'', ''V3'', ''V4'', ''W1'', ''W2'', ''W3'', ''W4'', ''W5'', ''W6'', ''W7'', ''W8'', ''W9'', ''W10'',
+    ''W11'', ''W12''].'
+  AC-10: FAILS
+capabilities:
+- capability: A1
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — no G-tier scheduler; precedence is evaluated at every policy load (every command: G0-equivalent); doctor D027 and audit family policy_precedence run
+    on demand and inside init/update (G5-equivalent).'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - authoritative spec/decision
+  - runtime/kernel implementation
+  - schema
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] overlay policy override / kernel policy file / authoritative decision -> D021 obsolete
+- capability: A2
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — the single verifier runs on every privileged ingress and kernel integrity is checked at every guarded mutation (G0-equivalent); doctor/audit on demand
+    and after init/update (G5-equivalent); no G-tier scheduler and no check ever compares the installed kernel with the machine's protected installed record.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G4
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - security/sensitivity policy
+  - tool/plugin
+  - migration
+  - governing contract/policy
+  - schema
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out — kernel policy/schema/migration changes invalidate D021 ([F]); trust-anchor provisioning and release-key rotation do not ([F-A2]);
+    the gov binary is not a suite input (runtime/src/verification/mod.rs:54-72). A0-B3-01.
+- capability: A3
+  evidence_owners_identified_by_audit:
+  - G0
+  - G1
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — exclusion runs on every index build (G1-equivalent), gates and authority at every command (G0), doctor D011/D012 and audit families on demand (G5); no
+    G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - security/sensitivity policy
+  - project path map
+  - tool/plugin
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] data-sensitivity policy / plugin descriptor / repository contract -> D021 obsolete. A product source change leaves D021 current,
+    but the A3 evidence that depends on source content (what is indexed/excluded) is re-derived at every index build and marked stale by index freshness D010 (evidence/A3-security-sensitivity.out
+    [C4] D010 'stale'; evidence/S6-cross-machine.out [X2] fresh=False)
+- capability: A4
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — thresholds evaluated when an agent records routing evidence, claims a task or installs a tool (G0-equivalent, self-reported spend); telemetry summary
+    on demand; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] overlay policy override -> D021 obsolete (BUDGET_POLICY lives in kernel/overlay inputs)
+- capability: A5
+  evidence_owners_identified_by_audit:
+  - G0
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — guard_write enforces the state on most mutating commands (G0-equivalent); doctor D018 reports control state; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - governing contract/policy
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: B1
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — kernel trust guard at every mutation (G0), doctor D020/D024 and audit authority_role_limits/path_map_compliance on demand (G5); no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - project path map
+  - relevant source files
+  - governing contract/policy
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] repository contract -> D021 obsolete, but a relevant product source change leaves the green record current (A0-B3-01)
+- capability: B2
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — batch tests after each migration batch (G4-equivalent) and verify-migration/path_map_compliance on demand (G5); no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - project path map
+  - relevant source files
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out — adoption evidence (catalogue/tests) changes do not invalidate; A7 verdict stays accepted after post-approval edits (S4-T2-B2-negative.out
+    [N2]); A0-B3-01
+- capability: B3
+  evidence_owners_identified_by_audit:
+  - G1
+  - G5
+  - independent-heldout
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — rebuild/freshness on demand (doctor D009/D010, gov memory freshness); no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant index manifest
+  - authoritative spec/decision
+  - relevant source files
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] — index-manifest and spec/requirements changes leave the green suite record current (A0-B3-01); index freshness itself is
+    tracked separately (S6-cross-machine.out [X2] fresh=False after a pull)
+- capability: S1
+  evidence_owners_identified_by_audit:
+  - G5
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — release build/verify on demand; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - migration
+  - tool/plugin
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: S2
+  evidence_owners_identified_by_audit:
+  - G5
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — release build/verify on demand; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema
+  - migration
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] kernel schema / kernel migration -> D021 obsolete
+- capability: S3
+  evidence_owners_identified_by_audit:
+  - G5
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — init runs doctor and a conformance audit itself (G5-equivalent); no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - model/retrieval profile
+  - governing contract/policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] retrieval profile pin via MEMORY_POLICY override -> D021 obsolete
+- capability: S4
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  - independent-heldout
+  - human-gate
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — batch tests after every migration batch (G4-equivalent), deep audit + doctor at A11 (G5-equivalent); no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - project path map
+  - relevant source files
+  - authoritative spec/decision
+  - migration
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/S4-T2-B2-negative.out [N2] — adoption verdicts are not re-evaluated when the catalogue/tests they rest on change; evidence/FRESH-invalidation.out adoption
+    evidence change leaves D021 current (A0-B3-01)
+- capability: S5
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  - human-gate
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — post-install doctor + audit families inside update (G5-equivalent); no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - migration
+  - runtime/kernel implementation
+  - schema
+  - governing contract/policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] kernel migration / schema -> D021 obsolete
+- capability: S6
+  evidence_owners_identified_by_audit:
+  - G5
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — doctor D009/D010 on demand; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant index manifest
+  - runtime/kernel implementation
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out [F] index manifest change leaves D021 current (A0-B3-01); index freshness itself flips (S6-cross-machine.out [X2])
+- capability: T1
+  evidence_owners_identified_by_audit:
+  - G0
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — authority checks per command (with --role ignored on adopt); session inequality at A5/A7/A10; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G3
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - authoritative spec/decision
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: T2
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  - G4
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — session checks at three stages; no binding of reviewed artefacts; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G3
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - project path map
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/S4-T2-B2-negative.out [N2]; evidence/FRESH-invalidation.out adoption evidence (A0-B3-01)
+- capability: T3
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — A11 checks file existence and verdicts; no digest binding; no G-tier scheduler.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - project path map
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out adoption evidence change leaves D021 current (A0-B3-01)
+- capability: C1
+  evidence_owners_identified_by_audit:
+  - G2
+  - G3
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: schema_invariants/concurrency_claims families under gov audit; task close status checks; checkpoint
+    claim/transaction capture.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - schema
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections); C1 derived rows re-derive on edit (evidence/C1-deterministic-structured-memory.out
+    §C1-b17)
+- capability: C2
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: graph_integrity family (gov audit), D015 (gov doctor), CIT-E graph_integrity verification.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - project path map
+  - relevant index manifest
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C3
+  evidence_owners_identified_by_audit:
+  - G2
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: memory_retrieval_regression (gov audit / gov memory verify); index freshness at task close.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - model/retrieval profile
+  - project path map
+  - relevant source files
+  - relevant index manifest
+  - security/sensitivity policy
+  - authoritative spec/decision
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C4
+  evidence_owners_identified_by_audit:
+  - G2
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: memory_retrieval_regression lexical_literal starter queries; index_freshness.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - project path map
+  - relevant source files
+  - relevant index manifest
+  - model/retrieval profile (tokenizer pin)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C5
+  evidence_owners_identified_by_audit:
+  - G1
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: code analysis on every (incremental) index build; degradations recorded per build.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant source files
+  - tool/plugin
+  - project path map
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C6
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: CIT journal/propagation on execute; supersession edges on every index build.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C7
+  evidence_owners_identified_by_audit:
+  - G2
+  - G3
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: task close report creation; handoff return validation; checkpoint on task transition.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema
+  - authoritative spec/decision
+  - relevant index manifest
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C8
+  evidence_owners_identified_by_audit:
+  - G5
+  - G2
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: audit records (gov audit); worker-return lesson creation; adoption A7 verdicts.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - tool/plugin
+  - relevant index manifest
+  - schema
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C9
+  evidence_owners_identified_by_audit:
+  - G3
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: context_reproducibility family; checkpoint context_packet_hash; gov continue compiles packets.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - authoritative spec/decision
+  - relevant index manifest
+  - model/retrieval profile
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: C10
+  evidence_owners_identified_by_audit:
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: plugin_governance/adapter_portability families; D028; tool registry generation on init/CIT.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - tool/plugin
+  - governing contract/policy
+  - project path map
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: D1
+  evidence_owners_identified_by_audit:
+  - G1
+  - G2
+  - G4
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: incremental rebuild after task close/checkpoint/CIT; INDEX_STALE/INDEX_PIN_MISMATCH at task close;
+    index_freshness family; D010/D025.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - runtime/kernel implementation
+  - schema
+  - tool/plugin
+  - model/retrieval profile
+  - project path map
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  - security/sensitivity policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections); evidence/X-K2-D1-W6-interactions.out
+- capability: D2
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: memory_retrieval_regression (route per held-out query).'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - model/retrieval profile
+  - relevant index manifest
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: D3
+  evidence_owners_identified_by_audit:
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: chunking on every index build; parent expansion per query.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant source files
+  - model/retrieval profile (chunking pin)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: D4
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: D025/D028 (doctor); pin checks on every build/query.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - tool/plugin
+  - model/retrieval profile
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: D5
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: gov memory benchmark/select; memory_retrieval_regression; select performs a full rebuild.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - model/retrieval profile
+  - tool/plugin
+  - relevant index manifest
+  - governing contract/policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: D6
+  evidence_owners_identified_by_audit:
+  - G5
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: recovery_rebuild (--deep) and fresh_agent_reconstruction families; multi-machine certification test.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant source files
+  - relevant index manifest
+  - model/retrieval profile
+  - project path map
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: R1
+  evidence_owners_identified_by_audit:
+  - G5
+  - human-gate
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: adoption stages A0–A11 with independent roles; D013.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - project path map
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: R2
+  evidence_owners_identified_by_audit:
+  - G5
+  - human-gate
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: A8 extraction, A9 build, A10 independent memory verification.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: R3
+  evidence_owners_identified_by_audit:
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — the product has no G0–G6 scheduler (no tier implementation exists in runtime/src; checks run only when their host command runs: task close, checkpoint,
+    CIT-E, gov audit, gov doctor, adoption stages). Observed running in these probes: retrieval default filters; adoption planner ARCHIVE_POLICY.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - project path map
+  - governing contract/policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-evidence-invalidation.out; evidence/D1-incremental-freshness.out (FRESHNESS INPUT sections)
+- capability: E1
+  evidence_owners_identified_by_audit:
+  - G0
+  - G2
+  - G5
+  - independent-heldout
+  - human-gate
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — G0: authority::require + control::guard_write run inside each mutating command (not for init/adopt under --role, not for replan/heldout-starter); G2:
+    task close observed-mutation scope (exempts OS-managed prefixes); G5: suite family authority_role_limits checks TOOL_PERMISSIONS roles, INV-014 handoffs and INV-007 allowed_paths
+    only. No explicit G0-G6 scheduler exists in the product; the '
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (AUTHORITY_POLICY)
+  - runtime/kernel implementation (authority.rs
+  - ROLES.yaml)
+  - authoritative spec/decision (spec/decisions)
+  - security/sensitivity policy (TOOL_PERMISSIONS overlay)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:7-10 (overlay TOOL_PERMISSIONS change after a green record -> GOVERNANCE_SUITE_STALE), :17-20 (decision record added -> stale),
+    :33-39 (kernel ROLES.yaml / AUTHORITY_POLICY.yaml edits -> KERNEL_TAMPERED on every mutation; floors read from the embedded baseline)
+- capability: E2
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true for kernel roles — G0 level_of/require on every authority-checked command; G5 authority_role_limits flags non-kernel roles in the overlay. No tier observes
+    project-role extension (it does not exist).
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation (ROLES.yaml)
+  - governing contract/policy (TOOL_PERMISSIONS overlay
+  - MODEL_ROUTING_POLICY)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-39 (ROLES.yaml edit -> KERNEL_TAMPERED; roles read from the embedded baseline); :7-10 (overlay change -> suite stale)
+- capability: E3
+  evidence_owners_identified_by_audit:
+  - G3
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true for G3 (schema validation and authority check at return; before_handoff checkpoint at create) and G5 (mutation_scope reports handoff authority violations);
+    no tier checks recipient binding or overwrite.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema (worker-return
+  - handoff)
+  - runtime/kernel implementation (handoffs.rs)
+  - governing contract/policy (CHECKPOINT_POLICY)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-39 (kernel schema/policy edits fail closed); handoff records themselves are authoritative state read live, no cached verdict
+    to invalidate
+- capability: E4
+  evidence_owners_identified_by_audit:
+  - G0
+  - G2
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G0 claim checks holder and budget but not atomically and not the DAG; G2 close checks the holder; G5 concurrency_claims reports expired/unknown claims;
+    recovery sweeps. No tier detects concurrent double-claims.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation (claims.rs
+  - tasks.rs)
+  - governing contract/policy (BUDGET_POLICY.max_parallel_agents)
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: F1
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G5 skill_regression runs schema and presence checks only; no tier executes skill validation scenarios.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (LEARNING_POLICY)
+  - schema (skill)
+  - tool/plugin (skill files in kernel and overlay)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:12-15 (project skill added after a green record -> GOVERNANCE_SUITE_STALE); evidence/F1-skills.out:59-61 (no skill-level staleness)
+- capability: F2
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G0 tools resolve/install consult the registry inputs; G5 has no registry-accuracy family (plugin_governance covers plugins only); health checks run on
+    demand, not at a tier.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - tool/plugin (TOOLS.yaml
+  - overlay tools
+  - plugin descriptors)
+  - governing contract/policy (TOOL_POLICY
+  - TOOL_PERMISSIONS)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:7-10 (TOOL_PERMISSIONS change -> green record stale); :33-38 (TOOL_POLICY kernel edit -> KERNEL_TAMPERED)
+- capability: F3
+  evidence_owners_identified_by_audit:
+  - G0
+  - human-gate
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G0 install evaluates the conditions and raises gates; the human-gate route is not consumed; no G5 family audits tool acquisitions.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (TOOL_POLICY.auto_install_conditions
+  - BUDGET_POLICY)
+  - tool/plugin (descriptor)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-38 (TOOL_POLICY kernel edit -> KERNEL_TAMPERED); :7-10 (TOOL_PERMISSIONS install_authority_roles change -> green record stale)
+- capability: F4
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - human-gate
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G0 authorize runs on every plugin execution and registration; G5 plugin_governance and doctor D028 report invalid, self-claiming and mismatched descriptors
+    but not forged registrations or unbound gates; the human-gate route is honoured for any answered gate.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - tool/plugin (descriptor
+  - implementation
+  - registry)
+  - governing contract/policy (TOOL_POLICY.plugins
+  - TOOL_PERMISSIONS)
+  - security/sensitivity policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/F4-plugins.out:31-39 (implementation/descriptor change -> refused); evidence/FRESH-invalidation.out:22-25 (registry change does NOT stale the green
+    suite record); :33-38 (TOOL_POLICY edit -> KERNEL_TAMPERED)
+- capability: F5
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — fail-closed embedder at G0/G1 (index use); G5 has no layer-separation family and no MCP capability-gap check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - model/retrieval profile (embedding pin)
+  - tool/plugin
+  - authoritative spec/decision (D-0004)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/F5-layers.out:31-34 (embedding pin change -> index refused until rebuilt)
+- capability: G1
+  evidence_owners_identified_by_audit:
+  - G0
+  - G4
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G4 CIT-P/CIT-E run when invoked; G2 task close does not classify consequential changes; no tier checks intent routing.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation (COMMAND_CONTRACT intent_patterns)
+  - governing contract/policy (CHANGE_POLICY)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-37 (COMMAND_CONTRACT kernel edit -> KERNEL_TAMPERED)
+- capability: G2
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — control state is checked by guard_write at G0 on every mutating command; command_contract_consistency (G5) verifies the human surface commands exist.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation (COMMAND_CONTRACT human_surface
+  - control.rs)
+  - governing contract/policy (AUTHORITY_POLICY emergency_control/resume_control)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-37 (COMMAND_CONTRACT / AUTHORITY_POLICY kernel edit -> KERNEL_TAMPERED)
+- capability: H1
+  evidence_owners_identified_by_audit:
+  - G1
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — G1 incremental rebuild re-derives edges after record changes; G5 graph_integrity reports dangling/orphan edges (shown).
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision (all lineage records)
+  - relevant index manifest (derived graph)
+  invalidation_demonstrated: true
+  invalidation_evidence: 'evidence/H1-lineage.out:35-36 (a changed link invalidates the graph state: graph_integrity reports the dangling edge after incremental rebuild)'
+- capability: H2
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — readiness is evaluated live whenever the DAG is computed (task dag/replan/continue/status); schema_invariants (G5) validates feature records.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation (READINESS_DIMENSIONS.yaml)
+  - schema (feature)
+  - authoritative spec/decision (feature records)
+  invalidation_demonstrated: true
+  invalidation_evidence: 'evidence/FRESH-invalidation.out:27-31 (feature record change: readiness recomputed live, no cached green); :33-36 (READINESS_DIMENSIONS kernel edit -> KERNEL_TAMPERED)'
+- capability: H3
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — readiness gating is computed at DAG time (continue/replan) but not at G0 claim; G5 has no family that flags stored-READY tasks the DAG blocks.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation (READINESS_DIMENSIONS.yaml)
+  - governing contract/policy (PROJECT_POLICY.readiness
+  - TEST_POLICY)
+  - authoritative spec/decision (feature records)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:27-31 (feature change evaluated live); evidence/H2H3-readiness.out:112-117 (cell change flips runnable; taxonomy removal -> KERNEL_TAMPERED
+    on mutation)
+- capability: H4
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — DAG gating (TEST_POLICY) runs when tasks are scheduled; product_traceability (G5) reports features with no scenarios/tests; nothing observes data/test-data
+    lineage, author independence or provenance.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (TEST_POLICY)
+  - authoritative spec/decision (scenario
+  - test-obligation
+  - data records)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/H4-scenarios-data-tests.out:19-23 (removing scenarios/tests or independence flips implementation to blocked immediately; no cached verdict)
+- capability: I1
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — schema validation at task create (G0); schema_invariants and graph_integrity (G5) validate task records and dependency edges.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema (task)
+  - governing contract/policy (MODEL_ROUTING_POLICY.task_class_minimum_tier)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-38 (kernel policy/schema edits -> KERNEL_TAMPERED)
+- capability: I2
+  evidence_owners_identified_by_audit:
+  - G0
+  - G2
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G0 validates the contract at create; G2 enforces paths and tests at close; no tier enforces blocks, required_data, required_tools or production merge.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema (task)
+  - governing contract/policy (TEST_POLICY
+  - MODEL_ROUTING_POLICY)
+  - project path map (REPOSITORY_CONTRACT prohibited mutations)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out:33-38 (kernel policy edits -> KERNEL_TAMPERED); task contracts are read live at each close
+- capability: I3
+  evidence_owners_identified_by_audit:
+  - G4
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — readiness planning is operator-invoked; G4 CIT-E flags retest; no tier converts G2/G5 results (failed tests, findings) into tasks (AC-5 'remediation/task
+    generation').
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHANGE_POLICY.propagation)
+  - runtime/kernel implementation
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: I4
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — the DAG is recomputed on each continue/dag/replan/status; graph_integrity (G5) reports cycles and missing dependencies.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (HUMAN_GATE_POLICY.continue_independent_work)
+  - authoritative spec/decision (task and gate records)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/I4-parallel.out:31-33 (policy override changes continue behaviour immediately; no cached verdict)
+- capability: J1
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no G1 mutation check or G2 task-close check inspects research records; G4 (CIT-E schema_validation) and G5 (gov audit schema_invariants) validate only
+    the four required fields and field types; the capability-evidence map assigns no automated check. Only this audit's probes exercise J1.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - schema (research.schema.json)
+  - runtime/kernel implementation (benchmark producer)
+  - authoritative spec/decision (decisions that cite research)
+  - relevant source files (spec/research/**)
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out F.RES-0500.inv FAIL (a research-record change leaves the green governance record current) and F.impl.1 FAIL (a changed implementation
+    leaves it current)
+- capability: J2
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no tier checks experiment completeness or merge prohibition; only G5 schema_invariants type-checks experiment records when they exist.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema (experiment.schema.json)
+  - runtime/kernel implementation
+  - relevant source files (spec/experiments/**, product/**)
+  - governing contract/policy
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out F.EXP-0500.inv FAIL
+- capability: K1
+  evidence_owners_identified_by_audit:
+  - G4
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — CIT-P itself runs on every proposal/simulate (the mechanism is always exercised); no product check verifies its output (the evidence map has no K1 check);
+    builder tests and this audit's probes are the only verification.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHANGE_POLICY)
+  - runtime/kernel implementation
+  - schema (cit.schema.json)
+  - relevant index manifest (graph edges)
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.PROJECT_POLICY PASS (overlay policy change invalidates green); F.impl.1 FAIL (implementation change does not) — see A0-J1-03
+- capability: K2
+  evidence_owners_identified_by_audit:
+  - G0
+  - G4
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — CIT-E's own G0-style gate revalidation and G4-style verification (schema, dangling edges, index freshness) run on every execution; nothing checks propagation
+    completeness (DONE work, context packets, checkpoints) or derived-view consistency after rollback.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHANGE_POLICY)
+  - runtime/kernel implementation
+  - schema
+  - relevant index manifest
+  - relevant source files (spec/**)
+  - authoritative spec/decision
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.PROJECT_POLICY PASS, F.HDG-0500 PASS; F.TASK-0500.inv FAIL (task records carrying retest flags are outside inputs_hash); F.impl.1
+    FAIL
+- capability: K3
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — G1/G2 mutation observation (task close) checks paths against allowed_paths only; no check classifies a mutation as material; the evidence map assigns no
+    K3 check.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G2
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHANGE_POLICY triggers, radius rules)
+  - runtime/kernel implementation
+  - project path map / repository contract
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: 'evidence/K3-auto-impact-simulation.out OBSERVE K3.outside.2a (the governance-policy edit made the green audit stale: GOVERNANCE_SUITE_STALE) and evidence/FRESH-invalidation.out
+    F.PROJECT_POLICY PASS'
+- capability: K4
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no product check verifies radius effects; evidence map has no K4 check.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHANGE_POLICY radius rules, MODEL_ROUTING_POLICY.radius_minimum_tier)
+  - runtime/kernel implementation
+  - relevant index manifest
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.PROJECT_POLICY PASS; F.impl.1 FAIL
+- capability: L1
+  evidence_owners_identified_by_audit:
+  - G5
+  - human-gate
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G5 (gov audit schema_invariants) and doctor D014 detect supersession contradictions; nothing detects non-precedence contradictions or checks resolution
+    rationale; the evidence map assigns no L1 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (HUMAN_GATE_POLICY, POLICY_PRECEDENCE, AUTHORITY_POLICY)
+  - authoritative spec/decision (spec/decisions/**)
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.PROJECT_POLICY PASS, F.HDG-0500 PASS (decision/gate records are in inputs_hash); F.impl.1 FAIL
+- capability: L2
+  evidence_owners_identified_by_audit:
+  - human-gate
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — gates::build and the human-gate schema run on every gate (G0-style) but check only presence/types; no G3/G5 check inspects package completeness or answer
+    validity; evidence map has no L2 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (HUMAN_GATE_POLICY)
+  - schema (human-gate.schema.json)
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.PROJECT_POLICY PASS, F.HDG-0500 PASS; F.impl.1 FAIL
+- capability: L3
+  evidence_owners_identified_by_audit:
+  - G0
+  - G5
+  - human-gate
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G0-style checks run on every gate/CIT command (presentation flag, answer state, authoritative_gate, role level); doctor D019 flags unpresented gates;
+    no check verifies who answered, detects forged gate/decision records, binds approvals to content, or re-blocks tasks; the evidence map assigns no L3 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G3
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (HUMAN_GATE_POLICY, AUTHORITY_POLICY)
+  - roles (ROLES.yaml)
+  - runtime/kernel implementation
+  - authoritative spec/decision (gate and decision records)
+  - adapter/tool configuration that relays human answers
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.HDG-0500 PASS (a gate record change makes the green audit stale); F.impl.1 FAIL
+- capability: L4
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — the DAG/continue logic runs on every gov continue/task dag (the mechanism is exercised in normal use) but no product check verifies it; evidence map
+    has no L4 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (HUMAN_GATE_POLICY.continue_independent_work)
+  - runtime/kernel implementation
+  - relevant source files (spec/tasks/**, gate records)
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.PROJECT_POLICY PASS; F.TASK-0500.inv FAIL; F.impl.1 FAIL
+- capability: M1
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — routing is advisory output; no check verifies tier floors against the overlay (policy_precedence family inspects PROJECT_POLICY overrides only); evidence
+    map has no M check.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (MODEL_ROUTING_POLICY, ROLES)
+  - model/retrieval profile (MODEL_ROUTING_OVERRIDES providers)
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.MODEL_ROUTING_OVERRIDES PASS (overlay provider map change invalidates green); F.impl.1 FAIL
+- capability: M2
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — as M1.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (MODEL_ROUTING_POLICY.reasoning_levels)
+  - model/retrieval profile (overlay role_overrides)
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.MODEL_ROUTING_OVERRIDES PASS; F.impl.1 FAIL
+- capability: M3
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — as M1.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - roles (ROLES.yaml)
+  - model/retrieval profile (overlay)
+  - runtime/kernel implementation
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/FRESH-invalidation.out F.MODEL_ROUTING_OVERRIDES PASS; F.impl.1 FAIL
+- capability: M4
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no check validates routing evidence or report; evidence map has no M4 check.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (MODEL_ROUTING_POLICY.record_evidence)
+  - runtime/kernel implementation
+  - model/retrieval profile
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out F.impl.1 FAIL (routing evidence in .governance-runtime is outside inputs_hash; nothing tracks its currency)
+- capability: N1
+  evidence_owners_identified_by_audit:
+  - G3
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — checkpoints are written by close/CIT-E/handoff (G3-style) and schema-validated; no check verifies their content; evidence map has no N1 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHECKPOINT_POLICY)
+  - schema (checkpoint.schema.json)
+  - runtime/kernel implementation
+  - relevant source files (spec/reports/checkpoints/**)
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out F.CKPT-09999.inv FAIL; F.impl.1 FAIL
+- capability: N2
+  evidence_owners_identified_by_audit:
+  - G3
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — the three wired triggers run in normal operation; nothing detects a missed mandatory trigger; evidence map has no N2 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHECKPOINT_POLICY.mandatory_triggers)
+  - runtime/kernel implementation
+  - adapter templates
+  invalidation_demonstrated: true
+  invalidation_evidence: 'evidence/FRESH-invalidation.out (policy overlay change invalidates green: F.PROJECT_POLICY PASS); F.impl.1 FAIL'
+- capability: N3
+  evidence_owners_identified_by_audit:
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — G3 (checkpoint/handoff) has no freshness check; evidence map has no N3 check.
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy (CHECKPOINT_POLICY.watchdog)
+  - runtime/kernel implementation
+  - adapter templates
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out F.CKPT-09999.inv FAIL; F.impl.1 FAIL
+- capability: N4
+  evidence_owners_identified_by_audit:
+  - G2
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — the worker-return schema and the mutation_scope suite family (authority_violations on handoffs) run; evidence map has no N4 check.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - schema (worker-return.schema.json)
+  - runtime/kernel implementation
+  - relevant source files (spec/planning/**)
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FRESH-invalidation.out F.HND-0500.inv FAIL; F.impl.1 FAIL
+- capability: O1
+  evidence_owners_identified_by_audit:
+  - G2
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — G2 task close checks only that report.tests.status is one of [passed, not_applicable_with_reason] (self-attested); no tier runs or consumes the product
+    suite (evidence/O1-product-families.out §G-§H).
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant source files
+  - governing contract/policy
+  - tool/plugin
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/O4-suite-currency.out §A — source-file changes do not invalidate any recorded green; product-test evidence has no freshness state at all
+- capability: O2
+  evidence_owners_identified_by_audit:
+  - G5
+  - G1
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G5 `gov audit` runs all 20 families (twice, serially); CIT-E runs a 3-check subset (schema/graph/index) on touched records (O5-tiers-G1-G6.out G1); update
+    runs a 4-family subset (O5-G5-update.out); no G1/G4 tier runs these families on mutation or milestone.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - runtime/kernel implementation
+  - schema
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  - security/sensitivity policy
+  - tool/plugin
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/O4-suite-currency.out §A (8 input classes invalidate the green suite record; 6 do not) and §B (suite broken, green still 'current')
+- capability: O3
+  evidence_owners_identified_by_audit:
+  - G2
+  - independent-heldout
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — the DAG gate (runnable computation) and product_traceability evaluate the self-declared flag; no tier verifies authorship.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - relevant source files
+  - authoritative spec/decision
+  invalidation_demonstrated: false
+  invalidation_evidence: null
+- capability: O4
+  evidence_owners_identified_by_audit:
+  - G2
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — G2 task close enforces currency only for governance/** and spec/decisions/** paths; doctor D021 reports staleness as a medium warning; no tier re-runs
+    the suite when inputs change.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - runtime/kernel implementation
+  - schema
+  - migration
+  - tool/plugin
+  - model/retrieval profile
+  - project path map
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  - security/sensitivity policy
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/O4-suite-currency.out §A (per-class matrix)
+- capability: O5
+  evidence_owners_identified_by_audit:
+  - G0
+  - G2
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial — see bullets: G0 partial, G2 partial, G5 at audit/adopt/init only; G1/G3/G4 narrow or record-only; G6 absent.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - governing contract/policy
+  - schema
+  - tool/plugin
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/O5-scheduler-requirements.out S1 (trivial mutation obsoletes the green), S9
+- capability: P1
+  evidence_owners_identified_by_audit:
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — every command emits a cli.* span (G0-time); no tier checks telemetry completeness; the builder certification test only reads the summary.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - tool/plugin
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: P2
+  evidence_owners_identified_by_audit:
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — summary is on demand; no tier evaluates it; builder test greenfield reads it.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: Q1
+  evidence_owners_identified_by_audit:
+  - G0
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — the export gate runs at upstream prepare/submit; no tier checks lifecycle state.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - security/sensitivity policy
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: Q2
+  evidence_owners_identified_by_audit:
+  - G5
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: partial — schema_invariants accepts AUTHORITATIVE lessons.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - governing contract/policy
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: Q3
+  evidence_owners_identified_by_audit:
+  - G0
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — enforced at every upstream prepare.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: Q4
+  evidence_owners_identified_by_audit:
+  - G0
+  - release-clean-clone
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: true — enforced at prepare and re-scanned at submit; content-origin checks absent.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - security/sensitivity policy
+  - governing contract/policy
+  invalidation_demonstrated: not_attempted
+  invalidation_evidence: null
+- capability: U
+  evidence_owners_identified_by_audit:
+  - G5
+  product_declared_owners_in_evidence_map: ROW ABSENT
+  product_declared_evidence_class: ROW ABSENT
+  owner_actually_runs: partial — doctor and audit compute them on demand; no tier schedules them; neither surface covers all conditions.
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - governing contract/policy
+  - authoritative spec/decision
+  - relevant index manifest
+  - relevant source files
+  invalidation_demonstrated: true
+  invalidation_evidence: evidence/U-slos-and-healthy.out SLO-1
+- capability: V1
+  evidence_owners_identified_by_audit: []
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers: &id001
+  - G6
+  freshness_state: NO_EVIDENCE
+  invalidation_inputs: &id002
+  - governing contract/policy
+  invalidation_demonstrated: false
+  invalidation_evidence: null
+- capability: V2
+  evidence_owners_identified_by_audit: []
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers: *id001
+  freshness_state: NO_EVIDENCE
+  invalidation_inputs: *id002
+  invalidation_demonstrated: false
+  invalidation_evidence: null
+- capability: V3
+  evidence_owners_identified_by_audit: []
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers: *id001
+  freshness_state: NO_EVIDENCE
+  invalidation_inputs: *id002
+  invalidation_demonstrated: false
+  invalidation_evidence: null
+- capability: V4
+  evidence_owners_identified_by_audit: []
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: false — no G6 tier and no oracle definition exist; zero evidence owners (AC-10).
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers: *id001
+  freshness_state: NO_EVIDENCE
+  invalidation_inputs: *id002
+  invalidation_demonstrated: false
+  invalidation_evidence: null
+- capability: W1
+  evidence_owners_identified_by_audit:
+  - G1
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: incremental index rebuild (G1-equivalent) records id/type/status/hash per artefact; gov audit schema_invariants (G5-equivalent) reports duplicate ids
+    and supersession conflicts; nothing checks provenance, canonical location, migration-plan identity or audit-finding id stability.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  - project path map
+  - schema
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W2
+  evidence_owners_identified_by_audit:
+  - G5
+  - G0
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: gov audit schema_invariants flags superseded-but-ACTIVE records and graph_integrity flags dangling edges (G5-equivalent); CIT gate re-validation guards
+    authority on execute (G0-equivalent); no check covers required/optional, authority class of delivered inputs, or edge direction.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - schema
+  - governing contract/policy
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W3
+  evidence_owners_identified_by_audit:
+  - G4
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: task dag/replan (G4-equivalent) blocks missing task->task dependencies and readiness gaps; gov audit graph_integrity reports dangling edges to absent
+    inputs (G5-equivalent); no G0/G2 check of manifest presence, state, version or conflicts at claim/close.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - governing contract/policy
+  - schema
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W4
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: gov audit context_reproducibility (G5-equivalent) compiles the FIRST task twice and compares hashes and field presence (runtime/src/verification/mod.rs:428-467);
+    it never checks delivered inputs against declared inputs, content coverage or missing inputs.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - governing contract/policy
+  - schema
+  - model/retrieval profile
+  - relevant index manifest
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W5
+  evidence_owners_identified_by_audit:
+  - G2
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: task close (G2-equivalent) enforces tests status, work_completed, mutation scope, index freshness and governance currency; it verifies no input consumption
+    or traceability.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - schema
+  - governing contract/policy
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W6
+  evidence_owners_identified_by_audit:
+  - G4
+  - G1
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: CIT-E (G4-equivalent) propagates retest/staleness to open tasks and in-depth test records; index freshness (G1-equivalent, D1) detects changed artefacts
+    and blocks close until rebuild but invalidates no dependent evidence.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G1
+  - G4
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  - governing contract/policy
+  - project path map
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W7
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: gov audit graph_integrity / product_traceability and doctor D015 run on every audit/doctor call but detect only dangling edges, feature-level gaps and
+    an anonymous orphan count.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W8
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: gov audit graph_integrity/product_traceability (G5-equivalent) run; no end-to-end lineage audit; gov memory graph/impact are on-demand queries only.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G4
+  - G5
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W9
+  evidence_owners_identified_by_audit:
+  - G3
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: checkpoint/handoff creation (G3-equivalent) records state but verifies nothing about mandatory inputs; gov audit fresh_agent_reconstruction (G5-equivalent)
+    measures read count vs budget only.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G3
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - model/retrieval profile
+  - relevant index manifest
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W10
+  evidence_owners_identified_by_audit:
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: gov audit context_reproducibility (G5-equivalent) checks deterministic-hash stability of one task; none of the five W10 attacks is part of the product''s
+    own suite; the attacks here are independent probes.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - model/retrieval profile
+  - relevant index manifest
+  - authoritative spec/decision
+  - governing contract/policy
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
+- capability: W11
+  evidence_owners_identified_by_audit: []
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'false: no evidence owner computes any W11 metric.'
+  zero_evidence_owners: true
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  invalidation_demonstrated: false
+  invalidation_evidence: null
+- capability: W12
+  evidence_owners_identified_by_audit:
+  - G0
+  - G4
+  - G5
+  - independent-heldout
+  product_declared_owners_in_evidence_map: []
+  product_declared_evidence_class: NOT_YET_MAPPED
+  owner_actually_runs: 'partial: the G0/G4/G5-equivalent hooks run on every privileged command / CIT / audit, but no tier is identified or scheduled as such and G1-G3 perform no Gate-W
+    duty.'
+  zero_evidence_owners: false
+  scheduled_tier_owner_runs: false
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - G6
+  freshness_state: FRESH_FOR_CANDIDATE
+  invalidation_inputs:
+  - runtime/kernel implementation
+  - governing contract/policy
+  - authoritative spec/decision
+  - relevant source files
+  - relevant index manifest
+  invalidation_demonstrated: false
+  invalidation_evidence: evidence/FR-freshness-invalidation.out
