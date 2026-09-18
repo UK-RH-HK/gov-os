@@ -94,3 +94,14 @@ actions only.
 | Headline blockers | E1 init/adopt ignore `--role`, L0 reinstalled the kernel and ran a migration; E1 L1 worker forges gate answers/decisions, unblocking gated work and executing a human-method CIT (L3↔E1 fails); E4 claims non-atomic (15/15 races) and ignore the DAG; F3 approved tool install can never proceed; G1 spec edits inside tasks bypass impact/gates; I3 9 of 11 generation sources generate nothing. |
 | Owner-decision flags | A0-E1-04 (acting role = caller's declaration; conflicts with ARCH-0003 §8) — same question as delta's A0-L3-01/05, the human-presence/role-authentication channel. A0-F4-03 (plugin self-declaration decides whether a gate is needed). **Both held for synthesis adjudication** against ARCH-0003 §8–9, D-0007 and F4 bullet 1 ("Descriptor cannot authorise itself"). |
 | Next action | Await P2-AR-0009 (beta-r) and P2-AR-0013 (alpha-r). |
+
+## P2-L-0009 — 2026-09-18 — P2-AR-0009 beta re-audit merged (audit of record)
+
+| Field | Value |
+|---|---|
+| Run | P2-AR-0009, self-reported `claude-opus-5[1m]`; work `a3d6b66`, report `73b2381`, merge `158a128` |
+| Result | FAMILY_AUDIT_COMPLETE. 19 capabilities / 123 bullets: 2 P&S (C1, C6) / 17 PARTIAL. Bullets 86/31/5 + 1 N/A (D4 generative/query-planning model — optional per framework §14.2; synthesis to confirm). 30 findings, **22 blocking**, 0 owner decisions. |
+| AC-7 | **NOT MET** by the auditor's determination: the benchmark/select/pin/reindex path works end to end, but runtime/model artefacts are not identified (A0-D4-01), pins are not bound to the executing implementation (A0-D5-01), and profile changes need no evidence/regression/gate (A0-D5-02); retrieval-pipeline defects (A0-C3-01/02, A0-C4-01, A0-D2-03) limit quality under any profile. |
+| Other headline blockers | D1 path-map reclassification not applied incrementally so archived material is served as current; D1/K2 CIT-E refresh uses stale cached policy (K2↔D1 fails); R1 retirement without dependency proof — adoption A6 rewrote live code to read archived legacy rules; D6 deleting the "derived" runtime directory loses claims and lifts FREEZE_WRITES. |
+| Protocol deviation | Disclosed by the run: one read of its **own** background build output in the task-output store. Ruled immaterial to independence (no other role's transcript or context); recorded. |
+| Next action | Await P2-AR-0013 (alpha-r); then synthesis. |

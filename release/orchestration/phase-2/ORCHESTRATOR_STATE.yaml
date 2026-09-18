@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-18T21:24:03Z'
-state_hash: e8f3c75a29898629f178babca84244e78fd659910c9bd6bb12ae315c48ac9aca
+updated_at: '2026-09-18T21:28:11Z'
+state_hash: dfae344f96cc8ed4e99c88f38bbf5ed540060be43b79fb12370b65e694a917b8
 lifecycle_state: P2_BASELINE_AUDIT_0
 loop_status: P2_AUDIT_0_REAUDIT_RUNNING__SIX_FAMILY_REAUDITS_ON_PINNED_MODEL
 
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   phase_2_base_commit: 3374db452008628074824faacb030ad841ce4ed9
-  last_recorded_commit: aeabdc56cb734cfbe64d5a1e14caa87be2b58f56
+  last_recorded_commit: 158a128a9f38e804fe79755ee5eb147f215aa404
   main_branch: main
   main_branch_modified_by_phase_2: false
 
@@ -150,14 +150,13 @@ agent_runs:
   - {run_id: P2-AR-0005, role: capability-family-auditor, family: epsilon, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0008, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml}
   - {run_id: P2-AR-0006, role: capability-family-auditor, family: zeta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0012, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml}
   - {run_id: P2-AR-0008, role: capability-family-auditor, family: epsilon-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-epsilon-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.run.yaml}
-  - {run_id: P2-AR-0009, role: capability-family-auditor, family: beta-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-beta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml}
+  - {run_id: P2-AR-0009, role: capability-family-auditor, family: beta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-beta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml}
   - {run_id: P2-AR-0010, role: capability-family-auditor, family: gamma-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-gamma-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.run.yaml}
   - {run_id: P2-AR-0011, role: capability-family-auditor, family: delta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-delta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml}
   - {run_id: P2-AR-0012, role: capability-family-auditor, family: zeta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-zeta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml}
   - {run_id: P2-AR-0013, role: capability-family-auditor, family: alpha-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-alpha-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0009, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml}
   - {run_id: P2-AR-0013, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml}
 
 unresolved_findings:

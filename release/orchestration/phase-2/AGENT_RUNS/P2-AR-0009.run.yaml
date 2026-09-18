@@ -20,4 +20,17 @@ branch: phase2/cap-audit-0-beta-r
 expected_evidence_path: release/capability-baseline/audit-0/beta-r/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_AUDIT_COMPLETE
+  work_commit: a3d6b660ec88f248426493654e5d0cd8a0882b21
+  report_commit: 73b2381ed316e3f0095bf2af42f225950df447e4
+  integration_merge_commit: 158a128a9f38e804fe79755ee5eb147f215aa404
+  evidence_path: release/capability-baseline/audit-0/beta-r/
+  agent_model_self_reported: claude-opus-5[1m]
+  scope_check: touched only its own evidence directory and report (plus the orchestrator's handoff-carry commit)
+  conformance_check: no status/finding contradiction (C1/C6 referenced only by family-wide contract-view finding A0-C1-01 and INFO A0-C6-01); 22 probes with RUN-ALL.sh. Disclosed deviation: one read of this run's OWN background cargo-build output in the task-output store; orchestrator ruling: immaterial to independence (own output only, no other role's transcript or context), recorded not excused
+  capability_counts: {'PRESENT_AND_SUBSTANTIAL': 2, 'PARTIAL': 17}
+  bullet_counts: {'PRESENT_AND_SUBSTANTIAL': 86, 'PARTIAL': 31, 'ABSENT': 5, 'N/A_WITH_REASON': 1}
+  findings: {total: 30, blocking: 22, owner_decision_required: []}
+  role: beta audit of record for the synthesis
