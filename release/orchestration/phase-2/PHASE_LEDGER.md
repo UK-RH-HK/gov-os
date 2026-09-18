@@ -53,3 +53,13 @@ actions only.
 | Rulings | P2-AR-0001/0002/0004/0005/0006 `COMPLETED_NONCONFORMING`; P2-AR-0003 `COMPLETED_MODEL_DEVIATION`. **No capability status was adopted, overruled or issued by the orchestrator**; the rulings concern protocol conformance only. All first-pass evidence merged unchanged as historical record (`bdc1375`, `5907e7d`, `ad5af95`, `9c232a3`, `96f1031`, alpha merge). |
 | Re-dispatch | Model pinned explicitly (`opus`). P2-AR-0008 epsilon-r (P2-HO-0008), P2-AR-0009 beta-r, P2-AR-0010 gamma-r, P2-AR-0011 delta-r, P2-AR-0012 zeta-r, P2-AR-0013 alpha-r (P2-HO-0009, which restates the common protocol's standard and adds nothing new). Re-auditors are barred from reading their family's first-pass evidence. |
 | Next action | Await the six re-audits; verify, merge; dispatch synthesis P2-AR-0007 on the audits of record. |
+
+## P2-L-0005 — 2026-09-18 — P2-AR-0008 epsilon re-audit merged (audit of record)
+
+| Field | Value |
+|---|---|
+| Run | P2-AR-0008, self-reported `claude-opus-5`; work `787942b`, report `24c5f7c`, merge `ebe77fa` |
+| Result | FAMILY_AUDIT_COMPLETE. 16 capabilities / 146 bullets from the owner source, one run per bullet, `evidence/RUN-ALL.sh` reproduces all 15 probes. Capabilities: 1 P&S (Q3), 11 PARTIAL, 4 ABSENT (V1–V4). Bullets: 48 present / 51 partial / 47 absent. 36 findings, **27 blocking**, 0 owner decisions. |
+| Determinations | AC-5 **NOT MET** (no scheduler: no impacted selection, parallelism or isolation; partial cache/staleness/hard-block/provenance; no remediation tasks; G6 absent). AC-6 **QUALIFICATION_ORACLE_FORMAT_ABSENT**. Also reports AC-13/AC-10 contract-view defects (Gate U absent from the compiled contract while `contract verify` passes; V1–V4 mislabelled ORIGINAL; no bullets/fields in the compiled form) and AC-16 interaction failures (U↔O5, O4↔W6). |
+| Orchestrator checks | Scope confined to own evidence and report; no status/finding contradiction; regression reproduced by the auditor 42/79. Contrast with the first-pass epsilon audit (1 blocking finding, printed assertions) is recorded as calibration for the re-dispatch decision. |
+| Next action | Await P2-AR-0009…0013. |

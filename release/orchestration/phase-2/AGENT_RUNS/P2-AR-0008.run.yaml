@@ -13,11 +13,25 @@ active_gate: GATE-P2-BASELINE-AUDIT-0
 iteration: 0
 candidate: cap2-candidate-0
 base_commit: 57177a37ea296ece16b185874831462b6a76db18
-dispatch_commit: null
+dispatch_commit: 2b5ac5ba1373d696a4fdca290d89ad319507ead5
 product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
 frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
 branch: phase2/cap-audit-0-epsilon-r
 expected_evidence_path: release/capability-baseline/audit-0/epsilon-r/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_AUDIT_COMPLETE
+  work_commit: 787942b5916456dbca95378039eec9a7838cf80b
+  report_commit: 24c5f7c0dd13b4c1f13ae65ed1fd7547d059df21
+  integration_merge_commit: ebe77faf80b6f6b16c9d6e235af9e9e6d2c5fe20
+  evidence_path: release/capability-baseline/audit-0/epsilon-r/
+  agent_model_self_reported: claude-opus-5 (claude-opus-5[1m])
+  scope_check: touched only its own evidence directory and report (plus the orchestrator's handoff-carry commit 85e2ddf)
+  conformance_check: no status/finding contradiction (Q3's only finding reference is the family-wide A0-O1-03 on the compiled contract view); per-bullet runs; RUN-ALL.sh reproduces all 15 probes
+  capability_counts: {PRESENT_AND_SUBSTANTIAL: 1, PARTIAL: 11, ABSENT: 4, UNCLEAR: 0, N/A_WITH_REASON: 0}
+  bullet_counts: {present: 48, partial: 51, absent: 47}
+  determinations: {AC-5: NOT_MET, AC-6: QUALIFICATION_ORACLE_FORMAT_ABSENT}
+  findings: {total: 36, blocking: 27, owner_decision_required: 0}
+  role: epsilon audit of record for the synthesis
