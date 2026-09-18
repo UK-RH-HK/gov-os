@@ -59,6 +59,13 @@ fn checkout_kernel_source(canonical_root: &Path, commit: &str, dest: &Path) -> R
     Ok(())
 }
 
+/// Build a release, recording its certification status.
+///
+/// **The `OWNER-DECISION-0006` §6 bullet 3 sink.** This is the only function that mints a release with a
+/// certification status, and it takes no `Project`, so it structurally cannot reach
+/// `control::guard_write` — exactly the shape that made `AR29-B1` and `AR29-B2` possible one bullet over. The §6
+/// check is therefore taken inside the effect: while this machine is marked `DEGRADED — RECOVERY ONLY`, it
+/// certifies nothing.
 pub fn build(
     canonical_root: &Path,
     version: &str,
@@ -66,6 +73,10 @@ pub fn build(
     certification_status: &str,
     evidence: Option<&str>,
 ) -> Result<Value> {
+    crate::srr::breakglass::guard_effect(
+        crate::srr::breakglass::Effect::ReleaseCertification,
+        "release build",
+    )?;
     let dir = out_root.join("releases").join(version);
     if dir.join("manifest.yaml").exists() {
         return Err(GovError::new(

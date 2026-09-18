@@ -234,9 +234,7 @@ impl MachineState {
             .join(format!("{}.json", safe(product)))
     }
     pub fn degraded_path(&self, product: &str) -> PathBuf {
-        self.root
-            .join("degraded")
-            .join(format!("{}.json", safe(product)))
+        degraded_path_at(&self.root, product)
     }
     pub fn journal_dir(&self) -> PathBuf {
         self.root.join("journal")
@@ -262,7 +260,29 @@ impl MachineState {
     }
 
     /// Record the trust anchor. `root_bytes` are the exact provisioned bytes.
+    ///
+    /// **This is the `OWNER-DECISION-0006` §6 bullet 4 sink.** It is the only function in the product that writes
+    /// `trust/root.json` and the provisioning latch, so re-anchoring the machine, revoking a key by omission from
+    /// a successor, and moving the protected `root` metadata high-water all pass through here and nowhere else.
+    /// The §6 check therefore lives *inside* it rather than beside its callers: `provision::root_update` reached
+    /// no enforcement point at all (`AR29-B1`), and a guard bolted onto that one function would have left the
+    /// class open for whatever trust-changing path is written next.
+    ///
+    /// The check is taken at the instant of the effect, against this machine's own protected state, and it is not
+    /// parameterised on a [`crate::srr::breakglass::Clearance`] the caller supplies: a token minted earlier is a
+    /// decision taken earlier, and the question §6 asks is whether the machine is marked *now*.
     pub fn set_root_metadata(&self, root_bytes: &[u8], version: u64, product: &str) -> Result<()> {
+        // Checked under this machine's own marking key (`FRAMEWORK_NAME`, which is what `enter` writes and every
+        // other consumer reads) and, when the anchor being written names a different product, under that too — so
+        // a successor root declaring a different product cannot step around the marking.
+        for key in [crate::FRAMEWORK_NAME, product] {
+            crate::srr::breakglass::guard_effect_on(
+                self,
+                key,
+                crate::srr::breakglass::Effect::TrustPolicyMutation,
+                "trust anchor write",
+            )?;
+        }
         let p = self.root_metadata_path();
         std::fs::create_dir_all(self.trust_dir()).map_err(|e| GovError::io("mkdir trust", e))?;
         let tmp = self.trust_dir().join(".root.json.tmp");
@@ -289,6 +309,21 @@ impl MachineState {
         rec["updated_at"] = json!(now_iso());
         write_durable(&self.provisioned_path(), &rec)
     }
+}
+
+/// Where the `DEGRADED — RECOVERY ONLY` marking record for `product` lives under a protected state root.
+///
+/// `AR29-N3`: the hot-path guard used to build this path with its own, weaker sanitiser while
+/// [`MachineState::degraded_path`] used [`safe`]. The two agreed for the current `FRAMEWORK_NAME` and would have
+/// disagreed for any product string containing a character only one of them rewrote — the guard would then have
+/// read a different file from the one `enter` wrote, which is a silent, total bypass of `OWNER-DECISION-0006` §6
+/// at the main chokepoint. There is now one function and one spelling.
+///
+/// This resolves a path *within* an already-resolved state root. It is not, and must not become, machine-state
+/// root resolution: [`resolve_state_root`] and `default_state_root` are owner-closed by `OWNER-DECISION-0007` §1
+/// and are untouched.
+pub fn degraded_path_at(root: &Path, product: &str) -> PathBuf {
+    root.join("degraded").join(format!("{}.json", safe(product)))
 }
 
 fn safe(s: &str) -> String {

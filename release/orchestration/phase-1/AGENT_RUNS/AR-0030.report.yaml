@@ -1,0 +1,237 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0030
+role: repair-builder
+objective: >-
+  Close the OWNER-DECISION-0006 §6 enforcement-point class that AR-0029 found open (AR29-B1, AR29-B2) as a class
+  rather than as two instances, plus AR29-C1, N1, N3, N4 and N5, without disturbing repair 1's closures.
+agent_model: claude-opus-5
+independence_statement: >-
+  Fresh isolated R1 repair role, repair cycle 2. I am not AR-0028 and authored nothing in candidate 1, candidate 2
+  or either verification. I do not grade this repair; a NEW fresh independent verifier re-verifies it with its own
+  held-out tests, and this run declares readiness only, never acceptance. I read HO-0030, AR-0029's verification
+  report and findings, AR-0028's repair report, OWNER-DECISION-0006 and -0007, and both prior held-out suites
+  (both verdicts are issued, and the handoff permits reading and running them). I copied both suites
+  byte-identically and re-ran them without editing a line. I read no session or agent transcript, no task-output
+  store and no user auto-memory, and did not contact the product owner.
+input:
+  base_commit: f5717a9d92419f7588889e0ce5aa96bf641e3fb2
+  release: 4.1.6-rc1 (candidate tag srr1-r1-candidate-2, rejected by AR-0029)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0030-r1-repair-2.md
+inspected:
+  - release/orchestration/phase-1/HANDOFFS/HO-0030-r1-repair-2.md
+  - release/verification/4.1.6-r1-2/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - release/verification/4.1.6-r1-2/evidence/REPRODUCTION.md
+  - release/verification/4.1.6-r1-2/evidence/HELD-OUT-TEST-OUTPUT.txt
+  - release/verification/4.1.6-r1-2/evidence/heldout-tests/
+  - release/verification/4.1.6-r1/evidence/heldout-tests/
+  - release/root-of-trust/signed-release-root-v1-r1-repair-1/00-REPAIR-REPORT.md
+  - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+  - runtime/src/srr/breakglass.rs
+  - runtime/src/srr/state.rs
+  - runtime/src/srr/provision.rs
+  - runtime/src/srr/verifier.rs
+  - runtime/src/srr/plugins.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/update.rs
+  - runtime/src/release.rs
+  - runtime/src/kernel_trust.rs
+  - cli/src/main.rs
+  - tests/certification/srr.rs
+produced:
+  - runtime/src/srr/breakglass.rs
+  - runtime/src/srr/state.rs
+  - runtime/src/srr/provision.rs
+  - runtime/src/srr/verifier.rs
+  - runtime/src/srr/plugins.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/update.rs
+  - runtime/src/release.rs
+  - tests/certification/srr.rs
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/REVIEWED-CONTENT-DIGESTS.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REPRODUCTION.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-LIB.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0029-HELD-OUT-RERUN.txt
+tests_or_attacks:
+  - id: REG-LIB
+    description: cargo test --lib — 31 pre-existing plus 5 new, none edited
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-LIB.txt
+  - id: REG-CERT
+    description: cargo test --test certification — 65 pre-existing plus 5 new, none edited
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: COV-A
+    description: >-
+      section_6_effects_are_enforced_inside_their_sinks part A — every §6 bullet has a declared sink, each sink
+      carries its own enforcement call, Clearance and AuthenticatedRelease stay sealed, and no second
+      implementation of a §6 primitive exists in the tree
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: COV-B
+    description: >-
+      section_6_effects_are_enforced_inside_their_sinks part B — on a machine in genuine owner-authorised
+      break-glass: trust root-update refused with the anchor and metadata high-water unmoved; set_root_metadata
+      refused at the sink; gate create refused; kernel override on a tampered kernel refused; release build
+      refused with nothing written; §5 restoration still clears the marking; everything works again above floor
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: COV-UPDATE
+    description: >-
+      an_allow_listed_operation_cannot_create_a_human_gate_below_floor — AR29-B2's second limb end to end: an
+      allow-listed update --apply is refused at the Human Gate it would create, no gate record is written, the
+      lock is unchanged, and the gate-free route named in the refusal then clears the marking
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: COV-C1
+    description: >-
+      an_unreadable_marking_is_read_the_same_way_by_every_consumer_and_still_exits — across all seven of
+      AR-0029's corruption shapes the guard, is_degraded and Degraded::load agree, restoration stays open, and a
+      satisfied §7 exit clears the record; the exit policy itself still refuses below the stricter floor
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: COV-N5
+    description: >-
+      section_6_refusal_class_tables_are_partitioned_by_what_the_product_actually_enforces — every live
+      REFUSAL_CLASSES label is passed to a real enforcement point and every RESERVED_REFUSAL_CLASSES name is not,
+      derived from the product's own call sites
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: COV-PRESERVE
+    description: >-
+      the_no_bypass_and_no_signing_preservation_census_still_holds — restores the six checks lost when sealing
+      AuthenticatedRelease stopped AR-0029's ho_f_preservation binary compiling (no permissive verifier, no
+      signing capability, 5 admit / 5 install_kernel, D-0007 separation, monotonic floors, single exit point)
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REGRESSION-CERTIFICATION.txt
+  - id: HELDOUT-AR0027
+    description: >-
+      AR-0027's held-out suite copied byte-identically and re-run unmodified — 26 passed, 3 failed, identical to
+      repair 1; the three failures are its own OBSERVED assertions for AR27-N1 and AR27-B1, and d3's census is
+      unchanged at 32 refused / 3 permitted
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0029-B1
+    description: >-
+      ho_b_coverage::b1 and ::b2 — AR29-B1's OBSERVED assertions; gov trust root-update now returns
+      SRR_BELOW_FLOOR_REFUSED, the anchor stays at version 1, no key is revoked and the root metadata high-water
+      stays at 0
+    result: FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0029-C1
+    description: >-
+      ho_c_deadlock::c3 and ::c4 — AR29-C1's OBSERVED assertions; the §7 exit condition now clears an unreadable
+      marking and the machine no longer reports the opposite of what it enforces
+    result: FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0029-CENSUS
+    description: >-
+      ho_b_coverage::b3 and ::b6 flipped from passing to FAILING. Both assert the ABSENCE of a guard and carry
+      re-derive-this-census messages; root_update now guards and an enforcement point now sits between the
+      allow-list entry and the gate creation. Both new statements are true and are the repair; b3's printed
+      census is stale and must be re-derived
+    result: FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0029-PRESERVED
+    description: >-
+      ho_a_allowlist 6/6, ho_b_coverage::b4 and ::b5, ho_d_expiry 5/5, ho_e_rootexpiry 6/6 all pass unchanged —
+      repair 1's allow-list closure (63 near misses, 0 permitted; exactly four permitted), the expiry gate, the
+      root-expiry profile, §5 availability below floor and offline break-glass are intact
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0029-HO-F
+    description: >-
+      ho_f_preservation no longer compiles — "cannot construct AuthenticatedRelease with struct literal syntax
+      due to private fields". Its f4 IS the literal AR29-N1 asked to be made impossible, so the compile error is
+      the finding closing; its other six checks are reproduced by COV-PRESERVE
+    result: NOT_RUN
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: CLIPPY
+    description: cargo clippy --all-targets — zero warnings, zero errors
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+findings:
+  - id: AR29-B1
+    severity: MEDIUM
+    title: >-
+      Trust-policy mutation completed below floor — closed at the sink (MachineState::set_root_metadata) and at
+      the operation (provision::root_update)
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - id: AR29-B2
+    severity: MEDIUM
+    title: >-
+      New Human Gates created below floor — closed by making gates::build require a sealed breakglass::Clearance,
+      so a new gate-raising path does not compile without asking §6
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - id: AR29-C1
+    severity: LOW
+    title: >-
+      Two readers of one marking record — read_marking is now the only reader, so an unreadable marking is marked
+      for every consumer and a satisfied §7 exit clears it; the exit policy is untouched
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - id: AR29-N1
+    severity: INFO
+    title: >-
+      AuthenticatedRelease sealed with a private zero-sized admitted token and one by_admit call site;
+      "constructible only by admit" is now a type property rather than an enumeration
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - id: AR29-N3
+    severity: INFO
+    title: >-
+      One marking-path builder (state::degraded_path_at) shared by guard_light and MachineState::degraded_path;
+      the latent silent §6 bypass for a non-default product string is gone
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - id: AR29-N4
+    severity: LOW
+    title: >-
+      The allow-list and the reachable behaviour agree — BELOW_FLOOR_LIMITS and GATE_FREE_RESTORATION_ROUTES
+      state where §6 still bites inside a permitted operation, and are surfaced in every refusal
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - id: AR29-N5
+    severity: INFO
+    title: >-
+      REFUSAL_CLASSES pruned to labels the product actually enforces; the ten phantoms moved to
+      RESERVED_REFUSAL_CLASSES and the partition is machine-checked against the product's own call sites
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+output:
+  branch: phase1/srr1-r1-repair-2
+  commit: 748c5d3c19c5401e7449f4f21523c33cc7877aec
+  evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/
+unresolved:
+  - >-
+    guard_effect fails open when resolve_state_root() errors, exactly as guard_light has since repair 1. That is
+    the "no protected state on this machine" case; changing it would mean changing machine-state root resolution,
+    which OWNER-DECISION-0007 §1 puts out of scope. Inherited, not introduced.
+  - >-
+    §6 bullet 7 (presenting a below-floor release as current) has no sink because it has no primitive. I verified
+    gov trust status, gov trust break-glass and gov recover, and AR29-C1 closed the case where they disagreed with
+    the guard, but I did not exhaustively audit every other JSON surface for a field readable as "current and
+    fully trusted" without the marking beside it.
+  - >-
+    §6 bullet 5's sink is the acquisition decision (plugins::guard_acquisition), not a byte-installing primitive.
+    It has one caller today; tools::install reaches the same effect through the operation-level guard only. A
+    future path that installs a privileged capability without consulting guard_acquisition would miss the
+    effect-level point. Weaker than the bullet 2 and 4 sinks, and stated as such.
+  - >-
+    ho_b_coverage::b3's printed §6 census is stale after this repair and needs re-deriving by the next verifier.
+  - >-
+    R2-lifecycle AR29-N2, AR27-N3, AR27-N5, AR27-N6, AR27-N7 remain carried and untouched.
+  - >-
+    NEW_OWNER_DECISION_REQUIRED — none. Both blocking findings implement a policy the owner already decided in
+    OWNER-DECISION-0006 §6; no owner decision was required and none was invented.
+recommended_next_action: >-
+  Dispatch a NEW fresh independent verifier (not AR-0027, AR-0029 or this run) with its own held-out tests against
+  phase1/srr1-r1-repair-2 @ 748c5d3c19c5401e7449f4f21523c33cc7877aec, asking it to attack the effect-sink census
+  directly: whether SECTION_6_SINKS really enumerates every primitive that can realise each §6 bullet, and whether
+  bullets 5 and 7 hold as claimed.
+completed_at: 2026-09-18T02:20:00Z

@@ -14,7 +14,22 @@ fn radius_rank(r: &str) -> u8 {
         .unwrap_or(5)
 }
 
-fn build(p: &Project, mut fields: Value) -> Result<crate::records::Record> {
+/// **The `OWNER-DECISION-0006` §6 bullet 2 (creation) sink.**
+///
+/// This is the only constructor of a `human-gate` record in the product, so every path that can raise a new Human
+/// Gate — `gov gate create`, the system triggers in `update`, `kernel_trust`, `tasks`, `tools`, `adopt`,
+/// `routing` and `capabilities`, and any path written after this code — passes through it.
+///
+/// The `&Clearance` parameter is not decoration: [`crate::srr::breakglass::Clearance`] has private fields and no
+/// public constructor, so this function **cannot be called** without [`crate::srr::breakglass::guard_effect`]
+/// having run and returned `Ok`. `AR29-B2` was `create_system` quietly saving a gate record with no guard; a guard
+/// call added to `create_system` would have closed that one caller. A parameter the compiler demands closes the
+/// class: a new gate-raising function inside this module does not compile until it has asked §6.
+fn build(
+    p: &Project,
+    _clearance: &crate::srr::breakglass::Clearance,
+    mut fields: Value,
+) -> Result<crate::records::Record> {
     let pol = p.policies();
     let store = RecordStore::load(&p.root);
     let id = fields
@@ -132,7 +147,11 @@ fn block_tasks(p: &Project, rec: &crate::records::Record) -> Result<()> {
 pub fn create(p: &Project, fields: Value) -> Result<Value> {
     control::guard_write(p, "gate create")?;
     authority::require(p, "create_gate")?;
-    let rec = build(p, fields)?;
+    let clearance = crate::srr::breakglass::guard_effect(
+        crate::srr::breakglass::Effect::HumanGateCreate,
+        "gate create",
+    )?;
+    let rec = build(p, &clearance, fields)?;
     save_record(&p.root, &rec)?;
     block_tasks(p, &rec)?;
     Ok(rec.data)
@@ -140,8 +159,16 @@ pub fn create(p: &Project, fields: Value) -> Result<Value> {
 
 /// Create a gate raised by the system itself (budget/threshold/update/migration triggers) — not subject to the
 /// acting role's authority, because the gate is the mechanism that stops the acting role.
+///
+/// It is **not** exempt from `OWNER-DECISION-0006` §6 bullet 2. Not being subject to the acting role's authority
+/// is a statement about *who* may raise the gate; §6 is a statement about *whether a Human Gate may be created at
+/// all* while the machine is marked `DEGRADED — RECOVERY ONLY`, and the answer is no, whoever is asking.
 pub fn create_system(p: &Project, fields: Value) -> Result<Value> {
-    let rec = build(p, fields)?;
+    let clearance = crate::srr::breakglass::guard_effect(
+        crate::srr::breakglass::Effect::HumanGateCreate,
+        "gate create (system)",
+    )?;
+    let rec = build(p, &clearance, fields)?;
     save_record(&p.root, &rec)?;
     block_tasks(p, &rec)?;
     Ok(rec.data)
@@ -248,6 +275,14 @@ pub fn answer(
     rationale: Option<&str>,
 ) -> Result<Value> {
     control::guard_write(p, "gate answer")?;
+    // **The OWNER-DECISION-0006 §6 bullet 2 (approval) sink.** `gov decide` and `gov gate answer` both land here,
+    // and this is the only function that moves a gate to ANSWERED. The operation-level guard above already
+    // refuses the label below floor; this refuses the *effect*, so the property survives a future caller that
+    // reaches approval by some other label.
+    let _clearance = crate::srr::breakglass::guard_effect(
+        crate::srr::breakglass::Effect::HumanGateApprove,
+        "gate answer",
+    )?;
     let pol = p.policies();
     let mut store = RecordStore::load(&p.root);
     let g = store

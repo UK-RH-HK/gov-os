@@ -125,6 +125,10 @@ pub fn delegation_for<'a>(
 ///
 /// Built-in capabilities are covered by the release payload digests; local-project capabilities keep the existing
 /// kernel-owned controls. Only the third class needs a delegation, and it is refused without one.
+///
+/// **The `OWNER-DECISION-0006` §6 bullet 5 sink.** Every capability acquisition decision in the product resolves
+/// here, so the below-floor refusal sits here too rather than beside the two operations (`plugins register`,
+/// `tools install`) that happen to reach it today.
 pub fn guard_acquisition(
     capability_id: &str,
     descriptor: &Value,
@@ -133,6 +137,12 @@ pub fn guard_acquisition(
     release_channel: &str,
 ) -> Result<Value> {
     let privileged = is_privileged(descriptor);
+    if privileged {
+        crate::srr::breakglass::guard_effect(
+            crate::srr::breakglass::Effect::PrivilegedPluginAcquisition,
+            "plugin acquisition",
+        )?;
+    }
     let verdict = json!({
         "capability": capability_id,
         "acquisition_class": acquisition.as_str(),
