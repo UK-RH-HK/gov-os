@@ -1,611 +1,6774 @@
 schema: governance-os.capability-acceptance-contract
-schema_version: 1
+schema_version: 2
 contract_version: v3
 compiled_from:
   owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md
   canonical_import: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
   source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
 compiler:
-  note: Mechanically derived from the approved source headings. No contract semantics are authored here; the normative text is the source, and this file is valid only while contract-source.lock proves it was compiled from that exact source hash.
-capability_count: 100
+  note: 'Mechanically derived from the approved source by a line-accounting compiler. No contract semantics are authored here: every carried line is the owner''s text, verbatim; ids are minted from position; a per-capability field the owner source states no value for is null. This file is valid only while contract-source.lock proves it was compiled from that exact source hash, and `gov contract verify` fails on any semantic difference.'
+document:
+  title:
+    line: 1
+    text: '# Governance OS Capability Acceptance Contract — v3'
+coverage:
+  rule: every line of the owner source except blank lines and '---' thematic breaks is carried verbatim, with its line number, exactly once (checklist items as '- [ ] <text>' or '<number>. [ ] <text>')
+  source_lines: 1255
+  carried_lines: 1026
+  excluded_lines: 229
+field_definitions:
+- line: 57
+  field: stable capability ID
+  key: id
+  value_stated_in: owner_source
+- line: 58
+  field: title/description
+  key: title
+  value_stated_in: owner_source
+- line: 59
+  field: source governing-document reference
+  key: source_reference
+  value_stated_in: owner_source
+- line: 60
+  field: 'requirement class: `ORIGINAL`, `POST_VERIFICATION_HARDENING`, or `EXECUTION_REFINEMENT`'
+  key: requirement_class
+  value_stated_in: owner_source
+- line: 61
+  field: severity if violated
+  key: severity
+  value_stated_in: evidence_map
+- line: 62
+  field: applicability rule
+  key: applicability
+  value_stated_in: evidence_map
+- line: 63
+  field: evidence class(es)
+  key: evidence_class
+  value_stated_in: evidence_map
+- line: 64
+  field: automated check/test IDs
+  key: automated_checks
+  value_stated_in: evidence_map
+- line: 65
+  field: independent-verification obligation
+  key: independent_verification
+  value_stated_in: evidence_map
+- line: 66
+  field: evidence-freshness triggers
+  key: freshness_triggers
+  value_stated_in: evidence_map
+- line: 67
+  field: health-scheduler tier(s) G0–G6
+  key: health_scheduler_tiers
+  value_stated_in: evidence_map
+- line: 68
+  field: advanced-qualification challenge IDs
+  key: qualification_challenge_ids
+  value_stated_in: owner_source
+- line: 69
+  field: adoption verification obligation
+  key: adoption_obligation
+  value_stated_in: evidence_map
+- line: 70
+  field: periodic operational-audit obligation
+  key: operational_audit_obligation
+  value_stated_in: evidence_map
+- line: 71
+  field: allowed status values
+  key: allowed_status
+  value_stated_in: evidence_map
+- line: 72
+  field: N/A requirements
+  key: na_requirements
+  value_stated_in: evidence_map
+- line: 73
+  field: remediation/task-generation rule
+  key: remediation_rule
+  value_stated_in: evidence_map
+vocabularies:
+  requirement_classes:
+  - ORIGINAL
+  - POST_VERIFICATION_HARDENING
+  - EXECUTION_REFINEMENT
+  evidence_classes:
+  - line: 83
+    value: automated invariant/guard
+  - line: 84
+    value: unit/integration/system test
+  - line: 85
+    value: governance health check
+  - line: 86
+    value: independent held-out test
+  - line: 87
+    value: migration/rollback evidence
+  - line: 88
+    value: synthetic-repository evidence
+  - line: 89
+    value: human-gate evidence
+  - line: 90
+    value: clean-clone/release evidence
+  - line: 91
+    value: independent audit evidence
+  freshness_inputs:
+  - line: 99
+    value: governing contract/policy
+  - line: 100
+    value: runtime/kernel implementation
+  - line: 101
+    value: schema
+  - line: 102
+    value: migration
+  - line: 103
+    value: tool/plugin
+  - line: 104
+    value: model/retrieval profile
+  - line: 105
+    value: project path map
+  - line: 106
+    value: authoritative spec/decision
+  - line: 107
+    value: relevant source files
+  - line: 108
+    value: relevant index manifest
+  - line: 109
+    value: security/sensitivity policy
+  lifecycle_points:
+  - line: 117
+    value: Governance OS build/Prompt 2 verification
+  - line: 118
+    value: pre-qualification capability-baseline acceptance
+  - line: 119
+    value: sophisticated synthetic qualification
+  - line: 120
+    value: final release certification
+  - line: 121
+    value: '`gov init`'
+  - line: 122
+    value: '`gov adopt`'
+  - line: 123
+    value: post-adoption acceptance
+  - line: 124
+    value: '`gov update`'
+  - line: 125
+    value: major architecture/security/memory/tool/retrieval changes
+  - line: 126
+    value: periodic operational governance-health audits
+  - line: 127
+    value: framework-upgrade regression
+  health_scheduler_tiers:
+  - tier: G0
+    line: 793
+    value: G0 Guard — every privileged/mutating command
+  - tier: G1
+    line: 794
+    value: G1 Mutation — changed paths/schema/secrets/index invalidation
+  - tier: G2
+    line: 795
+    value: G2 Task Close — mutation scope/readiness/tests/references/memory freshness
+  - tier: G3
+    line: 796
+    value: G3 Checkpoint/Handoff — claims/decisions/gates/checkpoint freshness
+  - tier: G4
+    line: 797
+    value: G4 Milestone — CIT-E/migration/memory/architecture changes
+  - tier: G5
+    line: 798
+    value: G5 Full Suite — adopt/update/release/full audit
+  - tier: G6
+    line: 799
+    value: G6 Qualification — synthetic repos/chaos/soak/hidden tests
+preamble:
+- id: FRONT-MATTER
+  heading: null
+  lines:
+  - line: 3
+    text: '**Role:** First-class, versioned Governance OS capability contract and second-layer health/audit baseline.'
+  - line: 5
+    text: This contract is derived from the original three Governance OS governing documents. Later independent-verification hardening requirements remain explicitly labelled as such rather than silently rewriting the original requirements.
+  checklist: []
+- id: CANONICAL-IMPLEMENTATION-IN-THE-GOVERNANCE-OS-REPOSITORY
+  heading:
+    line: 7
+    text: '## Canonical implementation in the Governance OS repository'
+  lines:
+  - line: 9
+    text: The human/product owner controls the normative checklist source. The IDE agent must **not invent or rewrite its semantics from memory**.
+  - line: 11
+    text: 'Use this structure:'
+  - line: 13
+    text: '```text'
+  - line: 14
+    text: framework/
+  - line: 15
+    text: '  contracts/'
+  - line: 16
+    text: '    source/'
+  - line: 17
+    text: '      GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md'
+  - line: 18
+    text: '        # HUMAN-APPROVED NORMATIVE SOURCE; uploaded by the product owner'
+  - line: 19
+    text: '    governance-capability-acceptance.yaml'
+  - line: 20
+    text: '        # executable compiled representation consumed by Governance OS'
+  - line: 21
+    text: '    contract-source.lock'
+  - line: 22
+    text: '        # binds the compiled representation to the exact uploaded source hash'
+  - line: 23
+    text: '  schemas/'
+  - line: 24
+    text: '    governance-capability-acceptance.schema.json'
+  - line: 26
+    text: tests/
+  - line: 27
+    text: '  governance/'
+  - line: 28
+    text: '    capability-evidence-map.yaml'
+  - line: 29
+    text: '        # capability → test/check/evidence mapping'
+  - line: 31
+    text: docs/
+  - line: 32
+    text: '  generated/'
+  - line: 33
+    text: '    GOVERNANCE_CAPABILITY_ACCEPTANCE.md'
+  - line: 34
+    text: '        # generated readable runtime view'
+  - line: 35
+    text: '```'
+  checklist: []
+- id: CONTRACT-AUTHORITY-MODEL
+  heading:
+    line: 37
+    text: '### Contract authority model'
+  lines:
+  - line: 39
+    text: '`framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md` is the **human-approved normative source**.'
+  - line: 41
+    text: '`framework/contracts/governance-capability-acceptance.yaml` is the **machine-executable compiled form**.'
+  - line: 43
+    text: The runtime consumes the YAML, but it is valid only when `contract-source.lock` proves that it was compiled/validated from the exact approved source hash.
+  - line: 45
+    text: The builder may create the destination path and compiler/schema machinery, but MUST stop and ask the product owner to upload the approved contract file. It must not fabricate the contract from remembered conversation context or silently change its semantics.
+  - line: 47
+    text: Any semantic difference between source and compiled representation is a hard failure.
+  - line: 49
+    text: The generated docs view is derived and non-authoritative.
+  - line: 51
+    text: Consumer projects do **not** receive giant synthetic qualification repositories. They receive the contract, the governance health scheduler, and the executable evidence/check families needed to evaluate the real project.
+  checklist: []
+- id: REQUIRED-CONTRACT-FIELDS-PER-CAPABILITY
+  heading:
+    line: 53
+    text: '## Required contract fields per capability'
+  lines:
+  - line: 55
+    text: 'Every capability item should carry, where applicable:'
+  - line: 57
+    text: '- stable capability ID;'
+  - line: 58
+    text: '- title/description;'
+  - line: 59
+    text: '- source governing-document reference;'
+  - line: 60
+    text: '- requirement class: `ORIGINAL`, `POST_VERIFICATION_HARDENING`, or `EXECUTION_REFINEMENT`;'
+  - line: 61
+    text: '- severity if violated;'
+  - line: 62
+    text: '- applicability rule;'
+  - line: 63
+    text: '- evidence class(es);'
+  - line: 64
+    text: '- automated check/test IDs;'
+  - line: 65
+    text: '- independent-verification obligation;'
+  - line: 66
+    text: '- evidence-freshness triggers;'
+  - line: 67
+    text: '- health-scheduler tier(s) G0–G6;'
+  - line: 68
+    text: '- advanced-qualification challenge IDs;'
+  - line: 69
+    text: '- adoption verification obligation;'
+  - line: 70
+    text: '- periodic operational-audit obligation;'
+  - line: 71
+    text: '- allowed status values;'
+  - line: 72
+    text: '- N/A requirements;'
+  - line: 73
+    text: '- remediation/task-generation rule.'
+  checklist: []
+- id: RELATIONSHIP-BETWEEN-THE-CONTRACT-AND-THE-GOVERNANCE-SUITE
+  heading:
+    line: 75
+    text: '## Relationship between the contract and the governance suite'
+  lines:
+  - line: 77
+    text: The contract is the umbrella acceptance definition.
+  - line: 79
+    text: The governance suite is the continuous executable evidence layer beneath it.
+  - line: 81
+    text: 'Not every capability can be proven by a unit test. Each item must therefore map to one or more evidence classes:'
+  - line: 83
+    text: '- automated invariant/guard;'
+  - line: 84
+    text: '- unit/integration/system test;'
+  - line: 85
+    text: '- governance health check;'
+  - line: 86
+    text: '- independent held-out test;'
+  - line: 87
+    text: '- migration/rollback evidence;'
+  - line: 88
+    text: '- synthetic-repository evidence;'
+  - line: 89
+    text: '- human-gate evidence;'
+  - line: 90
+    text: '- clean-clone/release evidence;'
+  - line: 91
+    text: '- independent audit evidence.'
+  - line: 93
+    text: A capability may not be reported `PRESENT_AND_SUBSTANTIAL` solely because a file/schema/policy exists.
+  checklist: []
+- id: EVIDENCE-FRESHNESS
+  heading:
+    line: 95
+    text: '## Evidence freshness'
+  lines:
+  - line: 97
+    text: 'A previously green capability becomes `STALE` when any relevant evidence input changes, including where applicable:'
+  - line: 99
+    text: '- governing contract/policy;'
+  - line: 100
+    text: '- runtime/kernel implementation;'
+  - line: 101
+    text: '- schema;'
+  - line: 102
+    text: '- migration;'
+  - line: 103
+    text: '- tool/plugin;'
+  - line: 104
+    text: '- model/retrieval profile;'
+  - line: 105
+    text: '- project path map;'
+  - line: 106
+    text: '- authoritative spec/decision;'
+  - line: 107
+    text: '- relevant source files;'
+  - line: 108
+    text: '- relevant index manifest;'
+  - line: 109
+    text: '- security/sensitivity policy.'
+  - line: 111
+    text: Stale evidence must trigger the appropriate G0–G5 re-check before work is allowed to rely on it.
+  checklist: []
+- id: LIFECYCLE
+  heading:
+    line: 113
+    text: '## Lifecycle'
+  lines:
+  - line: 115
+    text: 'The same contract is used at:'
+  - line: 117
+    text: 1. Governance OS build/Prompt 2 verification;
+  - line: 118
+    text: 2. pre-qualification capability-baseline acceptance;
+  - line: 119
+    text: 3. sophisticated synthetic qualification;
+  - line: 120
+    text: 4. final release certification;
+  - line: 121
+    text: 5. `gov init`;
+  - line: 122
+    text: 6. `gov adopt`;
+  - line: 123
+    text: 7. post-adoption acceptance;
+  - line: 124
+    text: 8. `gov update`;
+  - line: 125
+    text: 9. major architecture/security/memory/tool/retrieval changes;
+  - line: 126
+    text: 10. periodic operational governance-health audits;
+  - line: 127
+    text: 11. framework-upgrade regression.
+  checklist: []
+gate_count: 23
+gates:
+- id: A
+  title: Constitutional and Trust Foundations
+  heading:
+    line: 130
+    text: '# GATE A — Constitutional and Trust Foundations'
+  requirement_class_label: null
+  source_lines:
+    start: 130
+    end: 178
+  gate_capability: false
+  capabilities:
+  - A1
+  - A2
+  - A3
+  - A4
+  - A5
+  statements: []
+  qualification_challenge_ids:
+  - AQC-A1
+  - AQC-A2
+  - AQC-A3
+- id: B
+  title: Repository Contract, Paths and State
+  heading:
+    line: 182
+    text: '# GATE B — Repository Contract, Paths and State'
+  requirement_class_label: null
+  source_lines:
+    start: 182
+    end: 203
+  gate_capability: false
+  capabilities:
+  - B1
+  - B2
+  - B3
+  statements: []
+  qualification_challenge_ids:
+  - AQC-B2
+- id: C
+  title: Development Knowledge Fabric
+  heading:
+    line: 207
+    text: '# GATE C — Development Knowledge Fabric'
+  requirement_class_label: null
+  source_lines:
+    start: 207
+    end: 301
+  gate_capability: false
+  capabilities:
+  - C1
+  - C2
+  - C3
+  - C4
+  - C5
+  - C6
+  - C7
+  - C8
+  - C9
+  - C10
+  statements: []
+  qualification_challenge_ids: []
+- id: D
+  title: Indexing, Retrieval and Context
+  heading:
+    line: 305
+    text: '# GATE D — Indexing, Retrieval and Context'
+  requirement_class_label: null
+  source_lines:
+    start: 305
+    end: 356
+  gate_capability: false
+  capabilities:
+  - D1
+  - D2
+  - D3
+  - D4
+  - D5
+  - D6
+  statements: []
+  qualification_challenge_ids:
+  - AQC-D6
+- id: E
+  title: Agent Organisation and Independent Work
+  heading:
+    line: 360
+    text: '# GATE E — Agent Organisation and Independent Work'
+  requirement_class_label: null
+  source_lines:
+    start: 360
+    end: 392
+  gate_capability: false
+  capabilities:
+  - E1
+  - E2
+  - E3
+  - E4
+  statements: []
+  qualification_challenge_ids: []
+- id: F
+  title: Skills, Tools, MCP and Capabilities
+  heading:
+    line: 396
+    text: '# GATE F — Skills, Tools, MCP and Capabilities'
+  requirement_class_label: null
+  source_lines:
+    start: 396
+    end: 437
+  gate_capability: false
+  capabilities:
+  - F1
+  - F2
+  - F3
+  - F4
+  - F5
+  statements: []
+  qualification_challenge_ids: []
+- id: G
+  title: Human Command Surface
+  heading:
+    line: 441
+    text: '# GATE G — Human Command Surface'
+  requirement_class_label: null
+  source_lines:
+    start: 441
+    end: 454
+  gate_capability: false
+  capabilities:
+  - G1
+  - G2
+  statements: []
+  qualification_challenge_ids: []
+- id: H
+  title: Specification and Readiness
+  heading:
+    line: 458
+    text: '# GATE H — Specification and Readiness'
+  requirement_class_label: null
+  source_lines:
+    start: 458
+    end: 529
+  gate_capability: false
+  capabilities:
+  - H1
+  - H2
+  - H3
+  - H4
+  statements: []
+  qualification_challenge_ids:
+  - AQC-H4
+- id: I
+  title: Dynamic Work System
+  heading:
+    line: 533
+    text: '# GATE I — Dynamic Work System'
+  requirement_class_label: null
+  source_lines:
+    start: 533
+    end: 590
+  gate_capability: false
+  capabilities:
+  - I1
+  - I2
+  - I3
+  - I4
+  statements: []
+  qualification_challenge_ids: []
+- id: J
+  title: Research and Experimentation
+  heading:
+    line: 594
+    text: '# GATE J — Research and Experimentation'
+  requirement_class_label: null
+  source_lines:
+    start: 594
+    end: 616
+  gate_capability: false
+  capabilities:
+  - J1
+  - J2
+  statements: []
+  qualification_challenge_ids:
+  - AQC-J2
+- id: K
+  title: Change Control and Impact
+  heading:
+    line: 620
+    text: '# GATE K — Change Control and Impact'
+  requirement_class_label: null
+  source_lines:
+    start: 620
+    end: 650
+  gate_capability: false
+  capabilities:
+  - K1
+  - K2
+  - K3
+  - K4
+  statements: []
+  qualification_challenge_ids: []
+- id: L
+  title: Human Decision Gates and Contradictions
+  heading:
+    line: 654
+    text: '# GATE L — Human Decision Gates and Contradictions'
+  requirement_class_label: null
+  source_lines:
+    start: 654
+    end: 683
+  gate_capability: false
+  capabilities:
+  - L1
+  - L2
+  - L3
+  - L4
+  statements: []
+  qualification_challenge_ids: []
+- id: M
+  title: Model Routing
+  heading:
+    line: 687
+    text: '# GATE M — Model Routing'
+  requirement_class_label: null
+  source_lines:
+    start: 687
+    end: 711
+  gate_capability: false
+  capabilities:
+  - M1
+  - M2
+  - M3
+  - M4
+  statements: []
+  qualification_challenge_ids: []
+- id: N
+  title: Checkpoints, Compaction and Handoffs
+  heading:
+    line: 715
+    text: '# GATE N — Checkpoints, Compaction and Handoffs'
+  requirement_class_label: null
+  source_lines:
+    start: 715
+    end: 745
+  gate_capability: false
+  capabilities:
+  - N1
+  - N2
+  - N3
+  - N4
+  statements: []
+  qualification_challenge_ids: []
+- id: O
+  title: Verification and Continuous Governance Health
+  heading:
+    line: 749
+    text: '# GATE O — Verification and Continuous Governance Health'
+  requirement_class_label: null
+  source_lines:
+    start: 749
+    end: 808
+  gate_capability: false
+  capabilities:
+  - O1
+  - O2
+  - O3
+  - O4
+  - O5
+  statements: []
+  qualification_challenge_ids: []
+- id: P
+  title: Observability and Telemetry
+  heading:
+    line: 812
+    text: '# GATE P — Observability and Telemetry'
+  requirement_class_label: null
+  source_lines:
+    start: 812
+    end: 838
+  gate_capability: false
+  capabilities:
+  - P1
+  - P2
+  statements: []
+  qualification_challenge_ids: []
+- id: Q
+  title: Learning, Lessons and Upstream Improvement
+  heading:
+    line: 842
+    text: '# GATE Q — Learning, Lessons and Upstream Improvement'
+  requirement_class_label: null
+  source_lines:
+    start: 842
+    end: 866
+  gate_capability: false
+  capabilities:
+  - Q1
+  - Q2
+  - Q3
+  - Q4
+  statements: []
+  qualification_challenge_ids: []
+- id: R
+  title: Legacy, Archive and Historical State
+  heading:
+    line: 870
+    text: '# GATE R — Legacy, Archive and Historical State'
+  requirement_class_label: null
+  source_lines:
+    start: 870
+    end: 890
+  gate_capability: false
+  capabilities:
+  - R1
+  - R2
+  - R3
+  statements: []
+  qualification_challenge_ids: []
+- id: S
+  title: Release, Distribution, Init, Adopt and Update
+  heading:
+    line: 894
+    text: '# GATE S — Release, Distribution, Init, Adopt and Update'
+  requirement_class_label: null
+  source_lines:
+    start: 894
+    end: 950
+  gate_capability: false
+  capabilities:
+  - S1
+  - S2
+  - S3
+  - S4
+  - S5
+  - S6
+  statements: []
+  qualification_challenge_ids: []
+- id: T
+  title: Independent Adoption and Audit Roles
+  heading:
+    line: 954
+    text: '# GATE T — Independent Adoption and Audit Roles'
+  requirement_class_label: null
+  source_lines:
+    start: 954
+    end: 972
+  gate_capability: false
+  capabilities:
+  - T1
+  - T2
+  - T3
+  statements: []
+  qualification_challenge_ids: []
+- id: U
+  title: Framework Health SLOs
+  heading:
+    line: 976
+    text: '# GATE U — Framework Health SLOs'
+  requirement_class_label: null
+  source_lines:
+    start: 976
+    end: 1008
+  gate_capability: true
+  capabilities:
+  - U
+  statements: []
+  qualification_challenge_ids: []
+- id: V
+  title: Qualification Oracle
+  heading:
+    line: 1012
+    text: '# GATE V — Qualification Oracle **[NEW TESTING REFINEMENT]**'
+  requirement_class_label: NEW TESTING REFINEMENT
+  source_lines:
+    start: 1012
+    end: 1062
+  gate_capability: false
+  capabilities:
+  - V1
+  - V2
+  - V3
+  - V4
+  statements:
+  - line: 1014
+    kind: prose
+    text: The sophisticated qualification repositories must have a verifier-owned hidden oracle.
+  qualification_challenge_ids: []
+- id: W
+  title: Artifact Flow, Dependency Consumption and End-to-End Traceability
+  heading:
+    line: 1066
+    text: '# GATE W — Artifact Flow, Dependency Consumption and End-to-End Traceability'
+  requirement_class_label: null
+  source_lines:
+    start: 1066
+    end: 1194
+  gate_capability: false
+  capabilities:
+  - W1
+  - W2
+  - W3
+  - W4
+  - W5
+  - W6
+  - W7
+  - W8
+  - W9
+  - W10
+  - W11
+  - W12
+  statements: []
+  qualification_challenge_ids:
+  - AQC-W12
+capability_count: 101
+checklist_item_count: 713
 capabilities:
 - id: A1
   title: Canonical authority and policy precedence
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:132
+  heading:
+    line: 132
+    text: '## A1. Canonical authority and policy precedence'
+  gate: A
+  gate_capability: false
   family: A
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:132
+  source_lines:
+    start: 132
+    end: 140
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: A1.1
+    line: 133
+    text: Constitution/hard invariants are identifiable and machine-readable.
+  - id: A1.2
+    line: 134
+    text: Security and authority floors cannot be weakened by lower-precedence policy.
+  - id: A1.3
+    line: 135
+    text: Project policy may specialise/strengthen only within allowed override modes.
+  - id: A1.4
+    line: 136
+    text: Active decision/spec/task context follows deterministic precedence.
+  - id: A1.5
+    line: 137
+    text: Retrieved context/model inference cannot override higher authority.
+  - id: A1.6
+    line: 138
+    text: Invalid weakening attempts fail closed and are observable.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-A1
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: A2
   title: Authentic root of trust
-  requirement_class: POST_VERIFICATION_HARDENING
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:142
+  heading:
+    line: 142
+    text: '## A2. Authentic root of trust **[POST-VERIFICATION HARDENING]**'
+  gate: A
+  gate_capability: false
   family: A
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:142
+  source_lines:
+    start: 142
+    end: 154
+  requirement_class: POST_VERIFICATION_HARDENING
+  requirement_class_label: POST-VERIFICATION HARDENING
+  requirement_class_label_line: 142
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: A2.1
+    line: 143
+    text: Release/source authenticity is established before any privileged kernel material is staged or installed.
+  - id: A2.2
+    line: 144
+    text: Integrity and authenticity are treated as separate properties.
+  - id: A2.3
+    line: 145
+    text: Init/adopt/update/reinstall/recovery/rollback ingress paths share a non-circular trust root.
+  - id: A2.4
+    line: 146
+    text: Installed-kernel verification detects post-install tampering.
+  - id: A2.5
+    line: 147
+    text: Source-release authentication detects pre-install tampering.
+  - id: A2.6
+    line: 148
+    text: A source directory cannot regenerate its own trusted identity.
+  - id: A2.7
+    line: 149
+    text: Trusted release identity is recorded, not invented, by `framework.lock`.
+  - id: A2.8
+    line: 150
+    text: Bootstrap/dev/test trust modes cannot masquerade as certified production.
+  - id: A2.9
+    line: 151
+    text: Signing keys/trust anchors support rotation/revocation/recovery.
+  - id: A2.10
+    line: 152
+    text: Release verification works offline after obtaining an authentic release envelope where designed.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-A2
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: A3
   title: Security, sensitivity and permissions
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:156
+  heading:
+    line: 156
+    text: '## A3. Security, sensitivity and permissions'
+  gate: A
+  gate_capability: false
   family: A
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:156
+  source_lines:
+    start: 156
+    end: 164
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: A3.1
+    line: 157
+    text: Paths/datasets/tools/namespaces carry sensitivity/access classification.
+  - id: A3.2
+    line: 158
+    text: Secret/credential/restricted content is excluded according to policy.
+  - id: A3.3
+    line: 159
+    text: Restricted/confidential namespaces cannot be weakened by project overrides.
+  - id: A3.4
+    line: 160
+    text: Tool execution respects role/authority/permission boundaries.
+  - id: A3.5
+    line: 161
+    text: Destructive/elevated operations require correct gates.
+  - id: A3.6
+    line: 162
+    text: Outbound/export controls are default-deny where required.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-A3
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: A4
   title: Budget/resource governance
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:166
+  heading:
+    line: 166
+    text: '## A4. Budget/resource governance'
+  gate: A
+  gate_capability: false
   family: A
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:166
+  source_lines:
+    start: 166
+    end: 170
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: A4.1
+    line: 167
+    text: Model/API/cloud/network/tool-install/parallel-agent/experiment budgets are governed.
+  - id: A4.2
+    line: 168
+    text: Delegated thresholds are executable, not merely declared.
+  - id: A4.3
+    line: 169
+    text: Exceeding delegated limits creates the required Human Decision Gate.
+  - id: A4.4
+    line: 170
+    text: Budget state and interventions are observable.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: A5
   title: Emergency controls
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:172
+  heading:
+    line: 172
+    text: '## A5. Emergency controls'
+  gate: A
+  gate_capability: false
   family: A
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:172
+  source_lines:
+    start: 172
+    end: 178
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: A5.1
+    line: 173
+    text: '`PAUSE`'
+  - id: A5.2
+    line: 174
+    text: '`FREEZE_WRITES`'
+  - id: A5.3
+    line: 175
+    text: '`CANCEL_AGENTS`'
+  - id: A5.4
+    line: 176
+    text: '`ROLLBACK_TRANSACTION`'
+  - id: A5.5
+    line: 177
+    text: Emergency commands are deterministic and authority-gated.
+  - id: A5.6
+    line: 178
+    text: Recovery from emergency controls is auditable.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: B1
   title: Standard repository contract
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:184
+  heading:
+    line: 184
+    text: '## B1. Standard repository contract'
+  gate: B
+  gate_capability: false
   family: B
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:184
+  source_lines:
+    start: 184
+    end: 188
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: B1.1
+    line: 185
+    text: Governance/framework/project/generated/runtime boundaries are explicit.
+  - id: B1.2
+    line: 186
+    text: Good native product architecture is preserved when healthy.
+  - id: B1.3
+    line: 187
+    text: Repository contract maps project-specific layout without cosmetic refactoring.
+  - id: B1.4
+    line: 188
+    text: Generated/runtime state is distinguished from authoritative tracked state.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: B2
   title: Path map
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:190
+  heading:
+    line: 190
+    text: '## B2. Path map'
+  gate: B
+  gate_capability: false
   family: B
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:190
+  source_lines:
+    start: 190
+    end: 197
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: B2.1
+    line: 191
+    text: Every material artefact can be classified by current path, class, authority and intended target.
+  - id: B2.2
+    line: 192
+    text: Target action supports KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE.
+  - id: B2.3
+    line: 193
+    text: Unknown material artefacts block destructive migration.
+  - id: B2.4
+    line: 194
+    text: Imports/references/citations/consumers are represented.
+  - id: B2.5
+    line: 195
+    text: Path-map compliance is machine-checkable.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-B2
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: B3
   title: Authoritative vs derived state
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:199
+  heading:
+    line: 199
+    text: '## B3. Authoritative vs derived state'
+  gate: B
+  gate_capability: false
   family: B
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:199
+  source_lines:
+    start: 199
+    end: 203
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: B3.1
+    line: 200
+    text: Git/project records remain authoritative.
+  - id: B3.2
+    line: 201
+    text: SQLite/vector/graph/lexical/code indexes are derived.
+  - id: B3.3
+    line: 202
+    text: Deleting derived state cannot delete project truth.
+  - id: B3.4
+    line: 203
+    text: Derived records carry provenance sufficient to reconstruct source hits.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C1
   title: Deterministic structured memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:209
+  heading:
+    line: 209
+    text: '## C1. Deterministic structured memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:209
+  source_lines:
+    start: 209
+    end: 227
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C1.1
+    line: 211
+    text: projects
+    group: 210
+  - id: C1.2
+    line: 212
+    text: features/capabilities
+    group: 210
+  - id: C1.3
+    line: 213
+    text: requirements
+    group: 210
+  - id: C1.4
+    line: 214
+    text: decisions
+    group: 210
+  - id: C1.5
+    line: 215
+    text: tasks
+    group: 210
+  - id: C1.6
+    line: 216
+    text: scenarios
+    group: 210
+  - id: C1.7
+    line: 217
+    text: tests
+    group: 210
+  - id: C1.8
+    line: 218
+    text: interfaces
+    group: 210
+  - id: C1.9
+    line: 219
+    text: experiments
+    group: 210
+  - id: C1.10
+    line: 220
+    text: releases
+    group: 210
+  - id: C1.11
+    line: 221
+    text: claims
+    group: 210
+  - id: C1.12
+    line: 222
+    text: transactions
+    group: 210
+  - id: C1.13
+    line: 223
+    text: statuses
+    group: 210
+  - id: C1.14
+    line: 224
+    text: skill versions
+    group: 210
+  - id: C1.15
+    line: 225
+    text: tool versions
+    group: 210
+  - id: C1.16
+    line: 226
+    text: model-routing records
+    group: 210
+  - id: C1.17
+    line: 227
+    text: index manifests
+    group: 210
+  statements:
+  - line: 210
+    kind: lead_in
+    text: 'Must represent current truth for:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C2
   title: Relationship/graph memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:229
+  heading:
+    line: 229
+    text: '## C2. Relationship/graph memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:229
+  source_lines:
+    start: 229
+    end: 232
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C2.1
+    line: 230
+    text: Typed relationships support DEPENDS_ON/BLOCKS/IMPLEMENTS/REALISES/GOVERNED_BY/CONSTRAINS/DERIVED_FROM/SUPERSEDES/VALIDATED_BY/TESTS/USES/PRODUCES/CONSUMES/AFFECTS/GENERATED_FROM/CALLS/IMPORTS/OWNS/FAILED_BECAUSE/LEARNED_FROM or equivalent.
+  - id: C2.2
+    line: 231
+    text: Graph integrity checks detect orphan/stale/reversed/invalid relationships.
+  - id: C2.3
+    line: 232
+    text: Impact traversal is executable.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C3
   title: Semantic memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:234
+  heading:
+    line: 234
+    text: '## C3. Semantic memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:234
+  source_lines:
+    start: 234
+    end: 241
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C3.1
+    line: 235
+    text: Decisions/rationale
+  - id: C3.2
+    line: 236
+    text: lessons/failures
+  - id: C3.3
+    line: 237
+    text: reports/research
+  - id: C3.4
+    line: 238
+    text: experiments
+  - id: C3.5
+    line: 239
+    text: requirements/specifications
+  - id: C3.6
+    line: 240
+    text: selected code units
+  - id: C3.7
+    line: 241
+    text: Semantic namespace/authority filters apply before or during retrieval.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C4
   title: Lexical memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:243
+  heading:
+    line: 243
+    text: '## C4. Lexical memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:243
+  source_lines:
+    start: 243
+    end: 249
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C4.1
+    line: 244
+    text: Exact terms
+  - id: C4.2
+    line: 245
+    text: identifiers
+  - id: C4.3
+    line: 246
+    text: filenames
+  - id: C4.4
+    line: 247
+    text: error strings
+  - id: C4.5
+    line: 248
+    text: APIs/config keys
+  - id: C4.6
+    line: 249
+    text: literal phrases
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C5
   title: Code-structural memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:251
+  heading:
+    line: 251
+    text: '## C5. Code-structural memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:251
+  source_lines:
+    start: 251
+    end: 259
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C5.1
+    line: 252
+    text: AST/LSP/SCIP or equivalent
+  - id: C5.2
+    line: 253
+    text: symbols/definitions/references
+  - id: C5.3
+    line: 254
+    text: inheritance/interfaces
+  - id: C5.4
+    line: 255
+    text: calls/imports
+  - id: C5.5
+    line: 256
+    text: route registrations
+  - id: C5.6
+    line: 257
+    text: DB models
+  - id: C5.7
+    line: 258
+    text: test-coverage relationships
+  - id: C5.8
+    line: 259
+    text: language-appropriate adapters are resolved via capability registry
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C6
   title: Temporal memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:261
+  heading:
+    line: 261
+    text: '## C6. Temporal memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:261
+  source_lines:
+    start: 261
+    end: 266
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C6.1
+    line: 262
+    text: what changed
+  - id: C6.2
+    line: 263
+    text: when
+  - id: C6.3
+    line: 264
+    text: why
+  - id: C6.4
+    line: 265
+    text: causal decision
+  - id: C6.5
+    line: 266
+    text: supersession/version lineage
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C7
   title: Episodic execution memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:268
+  heading:
+    line: 268
+    text: '## C7. Episodic execution memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:268
+  source_lines:
+    start: 268
+    end: 274
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C7.1
+    line: 269
+    text: agent/session
+  - id: C7.2
+    line: 270
+    text: task/context
+  - id: C7.3
+    line: 271
+    text: tools
+  - id: C7.4
+    line: 272
+    text: files read/changed
+  - id: C7.5
+    line: 273
+    text: tests/outcomes
+  - id: C7.6
+    line: 274
+    text: failures/discoveries
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C8
   title: Failure memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:276
+  heading:
+    line: 276
+    text: '## C8. Failure memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:276
+  source_lines:
+    start: 276
+    end: 283
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C8.1
+    line: 277
+    text: bugs
+  - id: C8.2
+    line: 278
+    text: failed approaches
+  - id: C8.3
+    line: 279
+    text: wrong assumptions
+  - id: C8.4
+    line: 280
+    text: retrieval misses
+  - id: C8.5
+    line: 281
+    text: regressions
+  - id: C8.6
+    line: 282
+    text: migration failures
+  - id: C8.7
+    line: 283
+    text: tool failures
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C9
   title: Working memory/context packet
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:285
+  heading:
+    line: 285
+    text: '## C9. Working memory/context packet'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:285
+  source_lines:
+    start: 285
+    end: 292
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C9.1
+    line: 286
+    text: small reproducible current-task context
+  - id: C9.2
+    line: 287
+    text: deterministic authority block
+  - id: C9.3
+    line: 288
+    text: retrieved supplementary intelligence
+  - id: C9.4
+    line: 289
+    text: bounded size
+  - id: C9.5
+    line: 290
+    text: provenance/citations
+  - id: C9.6
+    line: 291
+    text: duplicate suppression
+  - id: C9.7
+    line: 292
+    text: active-vs-historical separation
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: C10
   title: Capability memory
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:294
+  heading:
+    line: 294
+    text: '## C10. Capability memory'
+  gate: C
+  gate_capability: false
   family: C
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:294
+  source_lines:
+    start: 294
+    end: 301
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: C10.1
+    line: 295
+    text: tools
+  - id: C10.2
+    line: 296
+    text: MCP servers
+  - id: C10.3
+    line: 297
+    text: A2A agents
+  - id: C10.4
+    line: 298
+    text: packages/dependencies
+  - id: C10.5
+    line: 299
+    text: model providers
+  - id: C10.6
+    line: 300
+    text: permission/credential status
+  - id: C10.7
+    line: 301
+    text: environment/tool versions
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: D1
   title: Incremental indexing/freshness
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:307
+  heading:
+    line: 307
+    text: '## D1. Incremental indexing/freshness'
+  gate: D
+  gate_capability: false
   family: D
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:307
+  source_lines:
+    start: 307
+    end: 313
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: D1.1
+    line: 308
+    text: Content-hash/repo-commit based invalidation.
+  - id: D1.2
+    line: 309
+    text: Changed artefacts invalidate affected chunks/nodes/symbols.
+  - id: D1.3
+    line: 310
+    text: Rename/move/delete+add are handled.
+  - id: D1.4
+    line: 311
+    text: Model/embedder/dimension change invalidates incompatible semantic state.
+  - id: D1.5
+    line: 312
+    text: Index manifest records compatible component identity.
+  - id: D1.6
+    line: 313
+    text: Required stale indexes degrade/block task close according to policy.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: D2
   title: Retrieval router
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:315
+  heading:
+    line: 315
+    text: '## D2. Retrieval router'
+  gate: D
+  gate_capability: false
   family: D
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:315
+  source_lines:
+    start: 315
+    end: 321
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: D2.1
+    line: 316
+    text: structured lookup for known IDs/paths
+  - id: D2.2
+    line: 317
+    text: code/symbol route
+  - id: D2.3
+    line: 318
+    text: lexical route
+  - id: D2.4
+    line: 319
+    text: graph/impact route
+  - id: D2.5
+    line: 320
+    text: semantic route
+  - id: D2.6
+    line: 321
+    text: multi-route fusion for complex questions
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: D3
   title: Hierarchical retrieval
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:323
+  heading:
+    line: 323
+    text: '## D3. Hierarchical retrieval'
+  gate: D
+  gate_capability: false
   family: D
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:323
+  source_lines:
+    start: 323
+    end: 327
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: D3.1
+    line: 324
+    text: document → section/record → child chunk
+  - id: D3.2
+    line: 325
+    text: code file → module/class → function/symbol
+  - id: D3.3
+    line: 326
+    text: child-first retrieval
+  - id: D3.4
+    line: 327
+    text: selective parent/graph-neighbour expansion
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: D4
   title: Component separation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:329
+  heading:
+    line: 329
+    text: '## D4. Component separation'
+  gate: D
+  gate_capability: false
   family: D
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:329
+  source_lines:
+    start: 329
+    end: 340
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: D4.1
+    line: 330
+    text: embedding model
+  - id: D4.2
+    line: 331
+    text: embedding runtime
+  - id: D4.3
+    line: 332
+    text: vector/index store
+  - id: D4.4
+    line: 333
+    text: lexical engine
+  - id: D4.5
+    line: 334
+    text: graph engine
+  - id: D4.6
+    line: 335
+    text: code intelligence
+  - id: D4.7
+    line: 336
+    text: reranker
+  - id: D4.8
+    line: 337
+    text: retrieval router
+  - id: D4.9
+    line: 338
+    text: generative/query-planning model
+  - id: D4.10
+    line: 339
+    text: context compiler
+  statements:
+  - line: 340
+    kind: qualifier
+    text: are independently identifiable and replaceable where designed.
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: D5
   title: Evidence-driven retrieval model selection
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:342
+  heading:
+    line: 342
+    text: '## D5. Evidence-driven retrieval model selection'
+  gate: D
+  gate_capability: false
   family: D
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:342
+  source_lines:
+    start: 342
+    end: 348
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: D5.1
+    line: 343
+    text: benchmark mechanism exists
+  - id: D5.2
+    line: 344
+    text: multiple candidate models/runtimes can be compared
+  - id: D5.3
+    line: 345
+    text: golden/held-out retrieval queries exist
+  - id: D5.4
+    line: 346
+    text: Recall@K/MRR/precision/stale-hit/latency/resource metrics exist
+  - id: D5.5
+    line: 347
+    text: selected embedder/reranker revisions are pinned
+  - id: D5.6
+    line: 348
+    text: changing them requires governed migration/reindex/regression
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: D6
   title: Rebuild guarantee
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:350
+  heading:
+    line: 350
+    text: '## D6. Rebuild guarantee'
+  gate: D
+  gate_capability: false
   family: D
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:350
+  source_lines:
+    start: 350
+    end: 356
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: D6.1
+    line: 351
+    text: All derived memory/index state can be deleted and rebuilt.
+  - id: D6.2
+    line: 352
+    text: Fresh rebuild preserves authoritative structured state and claims where required.
+  - id: D6.3
+    line: 353
+    text: Fresh-agent reconstruction succeeds after rebuild.
+  - id: D6.4
+    line: 354
+    text: Multi-machine/path-independent rebuild is deterministic where required.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-D6
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: E1
   title: Authority levels
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:362
+  heading:
+    line: 362
+    text: '## E1. Authority levels'
+  gate: E
+  gate_capability: false
   family: E
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:362
+  source_lines:
+    start: 362
+    end: 366
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: E1.1
+    line: 363
+    text: L0-L5 or equivalent are executable.
+  - id: E1.2
+    line: 364
+    text: Role authority is checked on every privileged/mutating path.
+  - id: E1.3
+    line: 365
+    text: Lower roles cannot manufacture higher-trust facts.
+  - id: E1.4
+    line: 366
+    text: Independent auditors/testers are appropriately constrained.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: E2
   title: Representative roles
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:368
+  heading:
+    line: 368
+    text: '## E2. Representative roles'
+  gate: E
+  gate_capability: false
   family: E
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:368
+  source_lines:
+    start: 368
+    end: 375
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: E2.1
+    line: 369
+    text: Orchestrator/CTO
+  - id: E2.2
+    line: 370
+    text: architecture/research/data/implementation roles as needed
+  - id: E2.3
+    line: 371
+    text: memory engineer
+  - id: E2.4
+    line: 372
+    text: independent test author
+  - id: E2.5
+    line: 373
+    text: independent verifier/auditor
+  - id: E2.6
+    line: 374
+    text: security/release roles
+  - id: E2.7
+    line: 375
+    text: project-specific roles through governed extension
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: E3
   title: Typed A2A handoffs
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:377
+  heading:
+    line: 377
+    text: '## E3. Typed A2A handoffs'
+  gate: E
+  gate_capability: false
   family: E
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:377
+  source_lines:
+    start: 377
+    end: 385
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: E3.1
+    line: 378
+    text: Work completed
+  - id: E3.2
+    line: 379
+    text: files changed
+  - id: E3.3
+    line: 380
+    text: evidence/tests
+  - id: E3.4
+    line: 381
+    text: discoveries/risks
+  - id: E3.5
+    line: 382
+    text: lessons/proposed decisions
+  - id: E3.6
+    line: 383
+    text: unresolved items
+  - id: E3.7
+    line: 384
+    text: next action
+  statements:
+  - line: 385
+    kind: qualifier
+    text: persist beyond conversation lifetime.
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: E4
   title: Concurrency/task claims
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:387
+  heading:
+    line: 387
+    text: '## E4. Concurrency/task claims'
+  gate: E
+  gate_capability: false
   family: E
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:387
+  source_lines:
+    start: 387
+    end: 392
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: E4.1
+    line: 388
+    text: Sessions/worktrees/tasks can be claimed.
+  - id: E4.2
+    line: 389
+    text: Claim collision is detected.
+  - id: E4.3
+    line: 390
+    text: Claims survive derived-memory rebuild.
+  - id: E4.4
+    line: 391
+    text: Stale claims have governed recovery.
+  - id: E4.5
+    line: 392
+    text: Parallel work is allowed only where dependency/mutation constraints permit.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: F1
   title: Skill lifecycle
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:398
+  heading:
+    line: 398
+    text: '## F1. Skill lifecycle'
+  gate: F
+  gate_capability: false
   family: F
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:398
+  source_lines:
+    start: 398
+    end: 402
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: F1.1
+    line: 399
+    text: Skills are versioned methods, not authority.
+  - id: F1.2
+    line: 400
+    text: Skill applicability/inputs/outputs/evidence are defined.
+  - id: F1.3
+    line: 401
+    text: Skill regression is testable.
+  - id: F1.4
+    line: 402
+    text: Lessons can propose skill updates through governed promotion.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: F2
   title: Tool Capability Registry
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:404
+  heading:
+    line: 404
+    text: '## F2. Tool Capability Registry'
+  gate: F
+  gate_capability: false
   family: F
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:404
+  source_lines:
+    start: 404
+    end: 412
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: F2.1
+    line: 405
+    text: identity/version
+  - id: F2.2
+    line: 406
+    text: executable/transport
+  - id: F2.3
+    line: 407
+    text: permissions
+  - id: F2.4
+    line: 408
+    text: allowed roles/task classes
+  - id: F2.5
+    line: 409
+    text: sensitivity/network/filesystem scope
+  - id: F2.6
+    line: 410
+    text: health status
+  - id: F2.7
+    line: 411
+    text: provenance/hash pin
+  - id: F2.8
+    line: 412
+    text: installation/approval status
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: F3
   title: Missing-tool acquisition
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:414
+  heading:
+    line: 414
+    text: '## F3. Missing-tool acquisition'
+  gate: F
+  gate_capability: false
   family: F
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:414
+  source_lines:
+    start: 414
+    end: 423
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: F3.1
+    line: 415
+    text: capability gap → candidate discovery
+  - id: F3.2
+    line: 416
+    text: security/licence/maintenance/cost review
+  - id: F3.3
+    line: 417
+    text: reversible selection
+  - id: F3.4
+    line: 418
+    text: approval when required
+  - id: F3.5
+    line: 419
+    text: install/configure
+  - id: F3.6
+    line: 420
+    text: version pin
+  - id: F3.7
+    line: 421
+    text: register
+  - id: F3.8
+    line: 422
+    text: health test
+  - id: F3.9
+    line: 423
+    text: continue task
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: F4
   title: Plugin trust boundary
-  requirement_class: POST_VERIFICATION_HARDENING
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:425
+  heading:
+    line: 425
+    text: '## F4. Plugin trust boundary **[POST-VERIFICATION HARDENING]**'
+  gate: F
+  gate_capability: false
   family: F
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:425
+  source_lines:
+    start: 425
+    end: 431
+  requirement_class: POST_VERIFICATION_HARDENING
+  requirement_class_label: POST-VERIFICATION HARDENING
+  requirement_class_label_line: 425
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: F4.1
+    line: 426
+    text: Descriptor cannot authorise itself.
+  - id: F4.2
+    line: 427
+    text: Registration/provenance live in trusted OS state.
+  - id: F4.3
+    line: 428
+    text: Descriptor/implementation bytes are hash-bound.
+  - id: F4.4
+    line: 429
+    text: Drift/tampering fails closed.
+  - id: F4.5
+    line: 430
+    text: Elevated permissions reference authoritative gate/decision.
+  - id: F4.6
+    line: 431
+    text: Security review cannot be self-attested.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: F5
   title: MCP/A2A/tool separation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:433
+  heading:
+    line: 433
+    text: '## F5. MCP/A2A/tool separation'
+  gate: F
+  gate_capability: false
   family: F
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:433
+  source_lines:
+    start: 433
+    end: 437
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: F5.1
+    line: 434
+    text: MCP/tools = action/capability
+  - id: F5.2
+    line: 435
+    text: A2A = communication
+  - id: F5.3
+    line: 436
+    text: Knowledge Fabric = knowing
+  - id: F5.4
+    line: 437
+    text: No layer silently substitutes for another.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: G1
   title: Natural-language intent
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:443
+  heading:
+    line: 443
+    text: '## G1. Natural-language intent'
+  gate: G
+  gate_capability: false
   family: G
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:443
+  source_lines:
+    start: 443
+    end: 446
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: G1.1
+    line: 444
+    text: Human can express intent without knowing internal command syntax.
+  - id: G1.2
+    line: 445
+    text: Intent maps deterministically to governed operations.
+  - id: G1.3
+    line: 446
+    text: Consequential changes automatically invoke required impact/gate logic.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: G2
   title: Small explicit human control set
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:448
+  heading:
+    line: 448
+    text: '## G2. Small explicit human control set'
+  gate: G
+  gate_capability: false
   family: G
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:448
+  source_lines:
+    start: 448
+    end: 454
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: G2.1
+    line: 450
+    text: status
+    group: 449
+  - id: G2.2
+    line: 451
+    text: continue
+    group: 449
+  - id: G2.3
+    line: 452
+    text: decide
+    group: 449
+  - id: G2.4
+    line: 453
+    text: audit
+    group: 449
+  - id: G2.5
+    line: 454
+    text: pause/freeze/rollback as applicable
+    group: 449
+  statements:
+  - line: 449
+    kind: lead_in
+    text: 'At minimum equivalent controls for:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: H1
   title: SPEC lineage
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:460
+  heading:
+    line: 460
+    text: '## H1. SPEC lineage'
+  gate: H
+  gate_capability: false
   family: H
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:460
+  source_lines:
+    start: 460
+    end: 478
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: H1.1
+    line: 462
+    text: idea
+    group: 461
+  - id: H1.2
+    line: 463
+    text: mission/outcomes
+    group: 461
+  - id: H1.3
+    line: 464
+    text: users/actors
+    group: 461
+  - id: H1.4
+    line: 465
+    text: journeys
+    group: 461
+  - id: H1.5
+    line: 466
+    text: scenarios
+    group: 461
+  - id: H1.6
+    line: 467
+    text: features/capabilities
+    group: 461
+  - id: H1.7
+    line: 468
+    text: data
+    group: 461
+  - id: H1.8
+    line: 469
+    text: requirements/NFRs
+    group: 461
+  - id: H1.9
+    line: 470
+    text: research/experiments
+    group: 461
+  - id: H1.10
+    line: 471
+    text: decisions
+    group: 461
+  - id: H1.11
+    line: 472
+    text: algorithms/processing
+    group: 461
+  - id: H1.12
+    line: 473
+    text: architecture
+    group: 461
+  - id: H1.13
+    line: 474
+    text: interfaces
+    group: 461
+  - id: H1.14
+    line: 475
+    text: security/performance/operations
+    group: 461
+  - id: H1.15
+    line: 476
+    text: WBS/task DAG
+    group: 461
+  - id: H1.16
+    line: 477
+    text: acceptance/test obligations
+    group: 461
+  - id: H1.17
+    line: 478
+    text: live evidence
+    group: 461
+  statements:
+  - line: 461
+    kind: lead_in
+    text: 'The system can trace:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: H2
   title: 26-dimension Feature/Capability Readiness Contract
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:480
+  heading:
+    line: 480
+    text: '## H2. 26-dimension Feature/Capability Readiness Contract'
+  gate: H
+  gate_capability: false
   family: H
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:480
+  source_lines:
+    start: 480
+    end: 515
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: H2.1
+    line: 482
+    number: 1
+    text: intent/outcome
+    group: 481
+  - id: H2.2
+    line: 483
+    number: 2
+    text: user/actor
+    group: 481
+  - id: H2.3
+    line: 484
+    number: 3
+    text: journey/workflow
+    group: 481
+  - id: H2.4
+    line: 485
+    number: 4
+    text: scenarios
+    group: 481
+  - id: H2.5
+    line: 486
+    number: 5
+    text: inputs
+    group: 481
+  - id: H2.6
+    line: 487
+    number: 6
+    text: data model/schema
+    group: 481
+  - id: H2.7
+    line: 488
+    number: 7
+    text: representative test data
+    group: 481
+  - id: H2.8
+    line: 489
+    number: 8
+    text: processing/algorithm
+    group: 481
+  - id: H2.9
+    line: 490
+    number: 9
+    text: expected outputs
+    group: 481
+  - id: H2.10
+    line: 491
+    number: 10
+    text: functional requirements
+    group: 481
+  - id: H2.11
+    line: 492
+    number: 11
+    text: non-functional requirements
+    group: 481
+  - id: H2.12
+    line: 493
+    number: 12
+    text: UX/interactions where applicable
+    group: 481
+  - id: H2.13
+    line: 494
+    number: 13
+    text: backend/service behaviour
+    group: 481
+  - id: H2.14
+    line: 495
+    number: 14
+    text: database/state requirements
+    group: 481
+  - id: H2.15
+    line: 496
+    number: 15
+    text: interface/API/event contracts
+    group: 481
+  - id: H2.16
+    line: 497
+    number: 16
+    text: security/privacy
+    group: 481
+  - id: H2.17
+    line: 498
+    number: 17
+    text: integrations
+    group: 481
+  - id: H2.18
+    line: 499
+    number: 18
+    text: DevOps/runtime
+    group: 481
+  - id: H2.19
+    line: 500
+    number: 19
+    text: observability
+    group: 481
+  - id: H2.20
+    line: 501
+    number: 20
+    text: performance/capacity
+    group: 481
+  - id: H2.21
+    line: 502
+    number: 21
+    text: cost constraints
+    group: 481
+  - id: H2.22
+    line: 503
+    number: 22
+    text: recovery/fallback
+    group: 481
+  - id: H2.23
+    line: 504
+    number: 23
+    text: measurable success criteria
+    group: 481
+  - id: H2.24
+    line: 505
+    number: 24
+    text: measurable failure criteria
+    group: 481
+  - id: H2.25
+    line: 506
+    number: 25
+    text: independent acceptance/system tests
+    group: 481
+  - id: H2.26
+    line: 507
+    number: 26
+    text: documentation/operations
+    group: 481
+  - id: H2.27
+    line: 510
+    text: PRESENT
+    group: 509
+  - id: H2.28
+    line: 511
+    text: MISSING
+    group: 509
+  - id: H2.29
+    line: 512
+    text: PROVISIONAL
+    group: 509
+  - id: H2.30
+    line: 513
+    text: BLOCKED
+    group: 509
+  - id: H2.31
+    line: 514
+    text: N/A_WITH_REASON
+    group: 509
+  statements:
+  - line: 481
+    kind: lead_in
+    text: 'Each feature/capability explicitly tracks:'
+  - line: 509
+    kind: lead_in
+    text: 'Statuses:'
+  - line: 515
+    kind: qualifier
+    text: and silent N/A is invalid.
+    group: 509
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: H3
   title: Readiness generates work
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:517
+  heading:
+    line: 517
+    text: '## H3. Readiness generates work'
+  gate: H
+  gate_capability: false
   family: H
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:517
+  source_lines:
+    start: 517
+    end: 522
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: H3.1
+    line: 518
+    text: Missing data → data task.
+  - id: H3.2
+    line: 519
+    text: Missing performance target → benchmark/research task.
+  - id: H3.3
+    line: 520
+    text: Missing security analysis → security task.
+  - id: H3.4
+    line: 521
+    text: Missing independent test → independent test-design task.
+  - id: H3.5
+    line: 522
+    text: Production implementation does not become READY before required prerequisite cells satisfy policy.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: H4
   title: Scenarios drive data/tests
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:524
+  heading:
+    line: 524
+    text: '## H4. Scenarios drive data/tests'
+  gate: H
+  gate_capability: false
   family: H
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:524
+  source_lines:
+    start: 524
+    end: 529
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: H4.1
+    line: 525
+    text: FEATURE → SCENARIOS → DATA → TEST DATA → SUCCESS/FAILURE → INDEPENDENT TESTS.
+  - id: H4.2
+    line: 526
+    text: Test-data author independence is supported.
+  - id: H4.3
+    line: 527
+    text: Data provenance is recorded.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-H4
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: I1
   title: Unified task DAG
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:535
+  heading:
+    line: 535
+    text: '## I1. Unified task DAG'
+  gate: I
+  gate_capability: false
   family: I
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:535
+  source_lines:
+    start: 535
+    end: 558
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: I1.1
+    line: 537
+    text: discovery
+    group: 536
+  - id: I1.2
+    line: 538
+    text: research
+    group: 536
+  - id: I1.3
+    line: 539
+    text: experiment
+    group: 536
+  - id: I1.4
+    line: 540
+    text: specification
+    group: 536
+  - id: I1.5
+    line: 541
+    text: decision-preparation
+    group: 536
+  - id: I1.6
+    line: 542
+    text: data
+    group: 536
+  - id: I1.7
+    line: 543
+    text: architecture
+    group: 536
+  - id: I1.8
+    line: 544
+    text: implementation
+    group: 536
+  - id: I1.9
+    line: 545
+    text: integration
+    group: 536
+  - id: I1.10
+    line: 546
+    text: test design
+    group: 536
+  - id: I1.11
+    line: 547
+    text: test execution
+    group: 536
+  - id: I1.12
+    line: 548
+    text: security
+    group: 536
+  - id: I1.13
+    line: 549
+    text: DevOps
+    group: 536
+  - id: I1.14
+    line: 550
+    text: performance
+    group: 536
+  - id: I1.15
+    line: 551
+    text: validation
+    group: 536
+  - id: I1.16
+    line: 552
+    text: refactor
+    group: 536
+  - id: I1.17
+    line: 553
+    text: repair
+    group: 536
+  - id: I1.18
+    line: 554
+    text: documentation
+    group: 536
+  - id: I1.19
+    line: 555
+    text: release
+    group: 536
+  - id: I1.20
+    line: 556
+    text: tooling
+    group: 536
+  - id: I1.21
+    line: 557
+    text: memory
+    group: 536
+  - id: I1.22
+    line: 558
+    text: governance
+    group: 536
+  statements:
+  - line: 536
+    kind: lead_in
+    text: 'Supports:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: I2
   title: Task contract
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:560
+  heading:
+    line: 560
+    text: '## I2. Task contract'
+  gate: I
+  gate_capability: false
   family: I
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:560
+  source_lines:
+    start: 560
+    end: 569
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: I2.1
+    line: 561
+    text: objective
+  - id: I2.2
+    line: 562
+    text: requirements/decisions
+  - id: I2.3
+    line: 563
+    text: dependencies/blocks
+  - id: I2.4
+    line: 564
+    text: scenarios/data
+  - id: I2.5
+    line: 565
+    text: acceptance tests
+  - id: I2.6
+    line: 566
+    text: required skills/tools
+  - id: I2.7
+    line: 567
+    text: minimum model tier/reasoning
+  - id: I2.8
+    line: 568
+    text: allowed/forbidden paths
+  - id: I2.9
+    line: 569
+    text: production-merge permission
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: I3
   title: Dynamic generation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:571
+  heading:
+    line: 571
+    text: '## I3. Dynamic generation'
+  gate: I
+  gate_capability: false
   family: I
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:571
+  source_lines:
+    start: 571
+    end: 583
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: I3.1
+    line: 573
+    text: readiness gaps
+    group: 572
+  - id: I3.2
+    line: 574
+    text: failed tests
+    group: 572
+  - id: I3.3
+    line: 575
+    text: audit findings
+    group: 572
+  - id: I3.4
+    line: 576
+    text: research discoveries
+    group: 572
+  - id: I3.5
+    line: 577
+    text: human decisions
+    group: 572
+  - id: I3.6
+    line: 578
+    text: CIT effects
+    group: 572
+  - id: I3.7
+    line: 579
+    text: lessons
+    group: 572
+  - id: I3.8
+    line: 580
+    text: missing tools/skills
+    group: 572
+  - id: I3.9
+    line: 581
+    text: retrieval failures
+    group: 572
+  - id: I3.10
+    line: 582
+    text: security findings
+    group: 572
+  - id: I3.11
+    line: 583
+    text: performance regressions
+    group: 572
+  statements:
+  - line: 572
+    kind: lead_in
+    text: 'Tasks can be generated from:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: I4
   title: Parallel execution
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:585
+  heading:
+    line: 585
+    text: '## I4. Parallel execution'
+  gate: I
+  gate_capability: false
   family: I
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:585
+  source_lines:
+    start: 585
+    end: 590
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: I4.1
+    line: 586
+    text: runnable/blocked sets
+  - id: I4.2
+    line: 587
+    text: critical path
+  - id: I4.3
+    line: 588
+    text: per-feature end-to-end path
+  - id: I4.4
+    line: 589
+    text: human-gate dependencies
+  - id: I4.5
+    line: 590
+    text: independent branches continue while one branch waits for human input
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: J1
   title: Research becomes evidence
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:596
+  heading:
+    line: 596
+    text: '## J1. Research becomes evidence'
+  gate: J
+  gate_capability: false
   family: J
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:596
+  source_lines:
+    start: 596
+    end: 605
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: J1.1
+    line: 598
+    text: question/reason
+    group: 597
+  - id: J1.2
+    line: 599
+    text: method
+    group: 597
+  - id: J1.3
+    line: 600
+    text: sources/data
+    group: 597
+  - id: J1.4
+    line: 601
+    text: measurements
+    group: 597
+  - id: J1.5
+    line: 602
+    text: uncertainty
+    group: 597
+  - id: J1.6
+    line: 603
+    text: conclusion
+    group: 597
+  - id: J1.7
+    line: 604
+    text: confidence
+    group: 597
+  - id: J1.8
+    line: 605
+    text: influenced decisions/tasks
+    group: 597
+  statements:
+  - line: 597
+    kind: lead_in
+    text: 'Each governed research output records:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: J2
   title: Experiment lifecycle
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:607
+  heading:
+    line: 607
+    text: '## J2. Experiment lifecycle'
+  gate: J
+  gate_capability: false
   family: J
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:607
+  source_lines:
+    start: 607
+    end: 616
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: J2.1
+    line: 608
+    text: hypothesis/question
+  - id: J2.2
+    line: 609
+    text: method/data
+  - id: J2.3
+    line: 610
+    text: reproducibility
+  - id: J2.4
+    line: 611
+    text: results
+  - id: J2.5
+    line: 612
+    text: interpretation
+  - id: J2.6
+    line: 613
+    text: decision influence
+  - id: J2.7
+    line: 614
+    text: production merge prohibited where experimental
+  statements: []
+  qualification_challenge_ids:
+  - AQC-J2
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: K1
   title: CIT-P
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:622
+  heading:
+    line: 622
+    text: '## K1. CIT-P'
+  gate: K
+  gate_capability: false
   family: K
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:622
+  source_lines:
+    start: 622
+    end: 626
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: K1.1
+    line: 623
+    text: Proposed material change triggers deterministic graph traversal.
+  - id: K1.2
+    line: 624
+    text: Semantic/lexical/code candidates can supplement impact.
+  - id: K1.3
+    line: 625
+    text: Impact radius is produced.
+  - id: K1.4
+    line: 626
+    text: Human-readable consequences are surfaced.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: K2
   title: CIT-E
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:628
+  heading:
+    line: 628
+    text: '## K2. CIT-E'
+  gate: K
+  gate_capability: false
   family: K
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:628
+  source_lines:
+    start: 628
+    end: 636
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: K2.1
+    line: 629
+    text: Final decision
+  - id: K2.2
+    line: 630
+    text: mutation manifest
+  - id: K2.3
+    line: 631
+    text: authoritative updates
+  - id: K2.4
+    line: 632
+    text: staleness/retest/rework propagation
+  - id: K2.5
+    line: 633
+    text: derived-view regeneration
+  - id: K2.6
+    line: 634
+    text: memory/index refresh
+  - id: K2.7
+    line: 635
+    text: verification
+  - id: K2.8
+    line: 636
+    text: commit or rollback/block atomically
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: K3
   title: Automatic impact simulation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:638
+  heading:
+    line: 638
+    text: '## K3. Automatic impact simulation'
+  gate: K
+  gate_capability: false
   family: K
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:638
+  source_lines:
+    start: 638
+    end: 647
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: K3.1
+    line: 640
+    text: architecture
+    group: 639
+  - id: K3.2
+    line: 641
+    text: behaviour
+    group: 639
+  - id: K3.3
+    line: 642
+    text: interfaces
+    group: 639
+  - id: K3.4
+    line: 643
+    text: security
+    group: 639
+  - id: K3.5
+    line: 644
+    text: governance/policy
+    group: 639
+  - id: K3.6
+    line: 645
+    text: infrastructure cost
+    group: 639
+  - id: K3.7
+    line: 646
+    text: acceptance criteria
+    group: 639
+  - id: K3.8
+    line: 647
+    text: data migration
+    group: 639
+  statements:
+  - line: 639
+    kind: lead_in
+    text: 'Auto-trigger for material:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: K4
   title: Impact radius
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:649
+  heading:
+    line: 649
+    text: '## K4. Impact radius'
+  gate: K
+  gate_capability: false
   family: K
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:649
+  source_lines:
+    start: 649
+    end: 650
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: K4.1
+    line: 650
+    text: R0-R5 or equivalent affects traversal/test scope/model tier/agents/human approval/rollback.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: L1
   title: Contradiction resolution
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:656
+  heading:
+    line: 656
+    text: '## L1. Contradiction resolution'
+  gate: L
+  gate_capability: false
   family: L
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:656
+  source_lines:
+    start: 656
+    end: 660
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: L1.1
+    line: 657
+    text: deterministic precedence first
+  - id: L1.2
+    line: 658
+    text: low-impact/reversible/high-confidence agent resolution where allowed
+  - id: L1.3
+    line: 659
+    text: human escalation for consequential uncertainty
+  - id: L1.4
+    line: 660
+    text: rationale/evidence recorded
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: L2
   title: Human Decision Gate package
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:662
+  heading:
+    line: 662
+    text: '## L2. Human Decision Gate package'
+  gate: L
+  gate_capability: false
   family: L
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:662
+  source_lines:
+    start: 662
+    end: 672
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: L2.1
+    line: 663
+    text: plain-language question
+  - id: L2.2
+    line: 664
+    text: why now
+  - id: L2.3
+    line: 665
+    text: current state
+  - id: L2.4
+    line: 666
+    text: options
+  - id: L2.5
+    line: 667
+    text: impact
+  - id: L2.6
+    line: 668
+    text: reversibility
+  - id: L2.7
+    line: 669
+    text: cost/rework
+  - id: L2.8
+    line: 670
+    text: recommendation
+  - id: L2.9
+    line: 671
+    text: confidence
+  - id: L2.10
+    line: 672
+    text: exact permitted next actions
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: L3
   title: Gate presentation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:674
+  heading:
+    line: 674
+    text: '## L3. Gate presentation'
+  gate: L
+  gate_capability: false
   family: L
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:674
+  source_lines:
+    start: 674
+    end: 679
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: L3.1
+    line: 675
+    text: Gate in a file only is NOT presented.
+  - id: L3.2
+    line: 676
+    text: It must surface in active human interface.
+  - id: L3.3
+    line: 677
+    text: Presented ≠ answered.
+  - id: L3.4
+    line: 678
+    text: Declined/revoked/stale/other-CIT gates cannot authorise execution.
+  - id: L3.5
+    line: 679
+    text: Human approval cannot be fabricated by agent/CLI metadata.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: L4
   title: Non-global blocking
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:681
+  heading:
+    line: 681
+    text: '## L4. Non-global blocking'
+  gate: L
+  gate_capability: false
   family: L
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:681
+  source_lines:
+    start: 681
+    end: 683
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: L4.1
+    line: 682
+    text: Independent runnable branches continue.
+  - id: L4.2
+    line: 683
+    text: Global stop only when policy or critical-path state requires.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: M1
   title: T0-T3 or equivalent capability tiers
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:689
+  heading:
+    line: 689
+    text: '## M1. T0-T3 or equivalent capability tiers'
+  gate: M
+  gate_capability: false
   family: M
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:689
+  source_lines:
+    start: 689
+    end: 693
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: M1.1
+    line: 690
+    text: deterministic/no-LLM route
+  - id: M1.2
+    line: 691
+    text: lightweight route
+  - id: M1.3
+    line: 692
+    text: strong engineering route
+  - id: M1.4
+    line: 693
+    text: frontier/high-reasoning route
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: M2
   title: Reasoning requirement
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:695
+  heading:
+    line: 695
+    text: '## M2. Reasoning requirement'
+  gate: M
+  gate_capability: false
   family: M
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:695
+  source_lines:
+    start: 695
+    end: 696
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: M2.1
+    line: 696
+    text: low/medium/high/extra-high or equivalent minimum can be declared/enforced.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: M3
   title: Role defaults
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:698
+  heading:
+    line: 698
+    text: '## M3. Role defaults'
+  gate: M
+  gate_capability: false
   family: M
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:698
+  source_lines:
+    start: 698
+    end: 700
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: M3.1
+    line: 699
+    text: orchestration/memory/audit default to strong enough tier.
+  - id: M3.2
+    line: 700
+    text: provider names are mapped externally without rewriting project state.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: M4
   title: Empirical routing
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:702
+  heading:
+    line: 702
+    text: '## M4. Empirical routing'
+  gate: M
+  gate_capability: false
   family: M
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:702
+  source_lines:
+    start: 702
+    end: 711
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: M4.1
+    line: 704
+    text: model/provider
+    group: 703
+  - id: M4.2
+    line: 705
+    text: task class
+    group: 703
+  - id: M4.3
+    line: 706
+    text: reasoning effort
+    group: 703
+  - id: M4.4
+    line: 707
+    text: cost
+    group: 703
+  - id: M4.5
+    line: 708
+    text: latency
+    group: 703
+  - id: M4.6
+    line: 709
+    text: pass/fail
+    group: 703
+  - id: M4.7
+    line: 710
+    text: repair count
+    group: 703
+  - id: M4.8
+    line: 711
+    text: reviewer findings
+    group: 703
+  statements:
+  - line: 703
+    kind: lead_in
+    text: 'Telemetry can compare:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: N1
   title: Structured checkpoint
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:717
+  heading:
+    line: 717
+    text: '## N1. Structured checkpoint'
+  gate: N
+  gate_capability: false
   family: N
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:717
+  source_lines:
+    start: 717
+    end: 727
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: N1.1
+    line: 719
+    text: session/role/task/mode/claim
+    group: 718
+  - id: N1.2
+    line: 720
+    text: last completed step
+    group: 718
+  - id: N1.3
+    line: 721
+    text: next action
+    group: 718
+  - id: N1.4
+    line: 722
+    text: pending decisions/questions
+    group: 718
+  - id: N1.5
+    line: 723
+    text: open transactions
+    group: 718
+  - id: N1.6
+    line: 724
+    text: files changed
+    group: 718
+  - id: N1.7
+    line: 725
+    text: test status
+    group: 718
+  - id: N1.8
+    line: 726
+    text: context packet hash
+    group: 718
+  - id: N1.9
+    line: 727
+    text: memory snapshot/state reference
+    group: 718
+  statements:
+  - line: 718
+    kind: lead_in
+    text: 'Records:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: N2
   title: Mandatory triggers
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:729
+  heading:
+    line: 729
+    text: '## N2. Mandatory triggers'
+  gate: N
+  gate_capability: false
   family: N
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:729
+  source_lines:
+    start: 729
+    end: 737
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: N2.1
+    line: 730
+    text: task transition
+  - id: N2.2
+    line: 731
+    text: material decision
+  - id: N2.3
+    line: 732
+    text: accepted CIT
+  - id: N2.4
+    line: 733
+    text: significant mutation
+  - id: N2.5
+    line: 734
+    text: before handoff
+  - id: N2.6
+    line: 735
+    text: before model/provider switch
+  - id: N2.7
+    line: 736
+    text: before session close
+  - id: N2.8
+    line: 737
+    text: before known compaction
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: N3
   title: Provider-independent checkpoint watchdog
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:739
+  heading:
+    line: 739
+    text: '## N3. Provider-independent checkpoint watchdog'
+  gate: N
+  gate_capability: false
   family: N
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:739
+  source_lines:
+    start: 739
+    end: 742
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: N3.1
+    line: 740
+    text: Does not depend solely on proprietary hooks.
+  - id: N3.2
+    line: 741
+    text: Can mark checkpoint stale when material state changed.
+  - id: N3.3
+    line: 742
+    text: Handoff/session close can be blocked or degraded when checkpoint freshness violates policy.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: N4
   title: Worker return contract
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:744
+  heading:
+    line: 744
+    text: '## N4. Worker return contract'
+  gate: N
+  gate_capability: false
   family: N
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:744
+  source_lines:
+    start: 744
+    end: 745
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: N4.1
+    line: 745
+    text: structured result survives subagent conversation death.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: O1
   title: Product test families
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:751
+  heading:
+    line: 751
+    text: '## O1. Product test families'
+  gate: O
+  gate_capability: false
   family: O
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:751
+  source_lines:
+    start: 751
+    end: 761
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: O1.1
+    line: 752
+    text: unit
+  - id: O1.2
+    line: 753
+    text: contract
+  - id: O1.3
+    line: 754
+    text: integration
+  - id: O1.4
+    line: 755
+    text: system
+  - id: O1.5
+    line: 756
+    text: acceptance
+  - id: O1.6
+    line: 757
+    text: scenario
+  - id: O1.7
+    line: 758
+    text: security
+  - id: O1.8
+    line: 759
+    text: performance
+  - id: O1.9
+    line: 760
+    text: recovery
+  - id: O1.10
+    line: 761
+    text: live/smoke
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: O2
   title: Governance test families
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:763
+  heading:
+    line: 763
+    text: '## O2. Governance test families'
+  gate: O
+  gate_capability: false
   family: O
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:763
+  source_lines:
+    start: 763
+    end: 780
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: O2.1
+    line: 764
+    text: schema/invariants
+  - id: O2.2
+    line: 765
+    text: graph integrity
+  - id: O2.3
+    line: 766
+    text: index freshness
+  - id: O2.4
+    line: 767
+    text: retrieval regression
+  - id: O2.5
+    line: 768
+    text: authority/role limits
+  - id: O2.6
+    line: 769
+    text: mutation scope
+  - id: O2.7
+    line: 770
+    text: repository/path-map compliance
+  - id: O2.8
+    line: 771
+    text: context reproducibility
+  - id: O2.9
+    line: 772
+    text: concurrency/session claims
+  - id: O2.10
+    line: 773
+    text: adapter/model portability
+  - id: O2.11
+    line: 774
+    text: skill regression
+  - id: O2.12
+    line: 775
+    text: command-contract consistency
+  - id: O2.13
+    line: 776
+    text: secrets/sensitivity indexing
+  - id: O2.14
+    line: 777
+    text: recovery/rebuild
+  - id: O2.15
+    line: 778
+    text: fresh-agent reconstruction
+  - id: O2.16
+    line: 779
+    text: product traceability
+  - id: O2.17
+    line: 780
+    text: audit reproducibility
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: O3
   title: Independent test authorship
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:782
+  heading:
+    line: 782
+    text: '## O3. Independent test authorship'
+  gate: O
+  gate_capability: false
   family: O
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:782
+  source_lines:
+    start: 782
+    end: 785
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: O3.1
+    line: 783
+    text: Release-critical behavioural tests are authored independently of implementation.
+  - id: O3.2
+    line: 784
+    text: Builder tests remain regression evidence, not independent certification.
+  - id: O3.3
+    line: 785
+    text: Fresh verifier adds held-out tests.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: O4
   title: Governance suite currency
-  requirement_class: ORIGINAL
+  heading:
+    line: 787
+    text: '## O4. Governance suite currency'
+  gate: O
+  gate_capability: false
+  family: O
   source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:787
-  family: O
-  status: DECLARED
-- id: O5
-  title: Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**
+  source_lines:
+    start: 787
+    end: 789
   requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:791
-  family: O
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: O4.1
+    line: 788
+    text: A green result becomes stale when relevant inputs change.
+  - id: O4.2
+    line: 789
+    text: Governance-affecting work cannot close on stale green evidence.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
+- id: O5
+  title: Governance Health Scheduler
+  heading:
+    line: 791
+    text: '## O5. Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**'
+  gate: O
+  gate_capability: false
+  family: O
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:791
+  source_lines:
+    start: 791
+    end: 808
+  requirement_class: EXECUTION_REFINEMENT
+  requirement_class_label: NEW EXECUTION REFINEMENT
+  requirement_class_label_line: 791
+  requirement_class_enumerated: true
+  status: DECLARED
+  checklist:
+  - id: O5.1
+    line: 793
+    text: G0 Guard — every privileged/mutating command
+    group: 792
+  - id: O5.2
+    line: 794
+    text: G1 Mutation — changed paths/schema/secrets/index invalidation
+    group: 792
+  - id: O5.3
+    line: 795
+    text: G2 Task Close — mutation scope/readiness/tests/references/memory freshness
+    group: 792
+  - id: O5.4
+    line: 796
+    text: G3 Checkpoint/Handoff — claims/decisions/gates/checkpoint freshness
+    group: 792
+  - id: O5.5
+    line: 797
+    text: G4 Milestone — CIT-E/migration/memory/architecture changes
+    group: 792
+  - id: O5.6
+    line: 798
+    text: G5 Full Suite — adopt/update/release/full audit
+    group: 792
+  - id: O5.7
+    line: 799
+    text: G6 Qualification — synthetic repos/chaos/soak/hidden tests
+    group: 792
+  - id: O5.8
+    line: 802
+    text: dependency-aware impacted-test selection
+    group: 801
+  - id: O5.9
+    line: 803
+    text: independent checks run in parallel when safe
+    group: 801
+  - id: O5.10
+    line: 804
+    text: isolated worktrees/processes where required
+    group: 801
+  - id: O5.11
+    line: 805
+    text: cache keyed by relevant content/policy/framework hashes
+    group: 801
+  - id: O5.12
+    line: 806
+    text: RED/YELLOW/GREEN or equivalent machine state
+    group: 801
+  - id: O5.13
+    line: 807
+    text: hard-block vs warning semantics are explicit
+    group: 801
+  - id: O5.14
+    line: 808
+    text: health result provenance is recorded
+    group: 801
+  statements:
+  - line: 792
+    kind: lead_in
+    text: 'Tiered checks:'
+  - line: 801
+    kind: lead_in
+    text: 'Scheduler requirements:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: P1
   title: Execution telemetry
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:814
+  heading:
+    line: 814
+    text: '## P1. Execution telemetry'
+  gate: P
+  gate_capability: false
   family: P
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:814
+  source_lines:
+    start: 814
+    end: 827
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: P1.1
+    line: 815
+    text: agent/session/model/provider
+  - id: P1.2
+    line: 816
+    text: role/task
+  - id: P1.3
+    line: 817
+    text: skill/tool versions
+  - id: P1.4
+    line: 818
+    text: context packet
+  - id: P1.5
+    line: 819
+    text: retrieval queries/hits
+  - id: P1.6
+    line: 820
+    text: token input/output
+  - id: P1.7
+    line: 821
+    text: latency/cost
+  - id: P1.8
+    line: 822
+    text: files read/written
+  - id: P1.9
+    line: 823
+    text: tests
+  - id: P1.10
+    line: 824
+    text: retries/failures
+  - id: P1.11
+    line: 825
+    text: handoffs
+  - id: P1.12
+    line: 826
+    text: decisions
+  - id: P1.13
+    line: 827
+    text: human interventions
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: P2
   title: Organisational questions
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:829
+  heading:
+    line: 829
+    text: '## P2. Organisational questions'
+  gate: P
+  gate_capability: false
   family: P
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:829
+  source_lines:
+    start: 829
+    end: 838
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: P2.1
+    line: 831
+    text: rework by role
+    group: 830
+  - id: P2.2
+    line: 832
+    text: retrieval effect on token use
+    group: 830
+  - id: P2.3
+    line: 833
+    text: model over/under-power
+    group: 830
+  - id: P2.4
+    line: 834
+    text: skill repair rate
+    group: 830
+  - id: P2.5
+    line: 835
+    text: human-gate concentration
+    group: 830
+  - id: P2.6
+    line: 836
+    text: retrieval misses
+    group: 830
+  - id: P2.7
+    line: 837
+    text: cost by task/feature
+    group: 830
+  - id: P2.8
+    line: 838
+    text: first-pass completion
+    group: 830
+  statements:
+  - line: 830
+    kind: lead_in
+    text: 'Telemetry supports analysis of:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: Q1
   title: Lesson lifecycle
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:844
+  heading:
+    line: 844
+    text: '## Q1. Lesson lifecycle'
+  gate: Q
+  gate_capability: false
   family: Q
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:844
+  source_lines:
+    start: 844
+    end: 852
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: Q1.1
+    line: 845
+    text: execution/report
+  - id: Q1.2
+    line: 846
+    text: lesson candidate
+  - id: Q1.3
+    line: 847
+    text: corroboration
+  - id: Q1.4
+    line: 848
+    text: scope classification
+  - id: Q1.5
+    line: 849
+    text: rule/skill/retrieval/tool proposal
+  - id: Q1.6
+    line: 850
+    text: independent validation
+  - id: Q1.7
+    line: 851
+    text: human approval where required
+  - id: Q1.8
+    line: 852
+    text: governed version
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: Q2
   title: Decision vs lesson
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:854
+  heading:
+    line: 854
+    text: '## Q2. Decision vs lesson'
+  gate: Q
+  gate_capability: false
   family: Q
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:854
+  source_lines:
+    start: 854
+    end: 856
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: Q2.1
+    line: 855
+    text: Lessons are evidence, not authority.
+  - id: Q2.2
+    line: 856
+    text: Decisions record chosen action.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: Q3
   title: PROJECT/PRODUCT/FRAMEWORK scope
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:858
+  heading:
+    line: 858
+    text: '## Q3. PROJECT/PRODUCT/FRAMEWORK scope'
+  gate: Q
+  gate_capability: false
   family: Q
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:858
+  source_lines:
+    start: 858
+    end: 859
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: Q3.1
+    line: 859
+    text: Only FRAMEWORK candidates are eligible for upstream export.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: Q4
   title: Upstream Export Gate
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:861
+  heading:
+    line: 861
+    text: '## Q4. Upstream Export Gate'
+  gate: Q
+  gate_capability: false
   family: Q
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:861
+  source_lines:
+    start: 861
+    end: 866
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: Q4.1
+    line: 862
+    text: sanitisation
+  - id: Q4.2
+    line: 863
+    text: secret/sensitivity scan
+  - id: Q4.3
+    line: 864
+    text: outbound allowlist/default deny
+  - id: Q4.4
+    line: 865
+    text: synthetic reproducer preference
+  - id: Q4.5
+    line: 866
+    text: no raw project/customer/vector-store export
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: R1
   title: Legacy Governance Retirement
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:872
+  heading:
+    line: 872
+    text: '## R1. Legacy Governance Retirement'
+  gate: R
+  gate_capability: false
   family: R
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:872
+  source_lines:
+    start: 872
+    end: 879
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: R1.1
+    line: 873
+    text: activate current authority
+  - id: R1.2
+    line: 874
+    text: mark old governance LEGACY
+  - id: R1.3
+    line: 875
+    text: inventory
+  - id: R1.4
+    line: 876
+    text: extract useful decisions/lessons/skills/evidence/research
+  - id: R1.5
+    line: 877
+    text: reconcile contradictions
+  - id: R1.6
+    line: 878
+    text: retire/remove duplicate mechanisms
+  - id: R1.7
+    line: 879
+    text: verify no active dependency remains
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: R2
   title: Chat-memory retirement
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:881
+  heading:
+    line: 881
+    text: '## R2. Chat-memory retirement'
+  gate: R
+  gate_capability: false
   family: R
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:881
+  source_lines:
+    start: 881
+    end: 885
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: R2.1
+    line: 882
+    text: raw chat DB is not active/default truth
+  - id: R2.2
+    line: 883
+    text: unique durable knowledge extracted
+  - id: R2.3
+    line: 884
+    text: dependency proof before retirement
+  - id: R2.4
+    line: 885
+    text: CIT-E/index refresh/regression on retirement
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: R3
   title: Archive policy
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:887
+  heading:
+    line: 887
+    text: '## R3. Archive policy'
+  gate: R
+  gate_capability: false
   family: R
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:887
+  source_lines:
+    start: 887
+    end: 890
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: R3.1
+    line: 888
+    text: historical/superseded material excluded from default current retrieval
+  - id: R3.2
+    line: 889
+    text: Git history preferred over unnecessary dead-code archive
+  - id: R3.3
+    line: 890
+    text: deliberate reference implementations may be retained explicitly
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: S1
   title: Canonical OS repo
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:896
+  heading:
+    line: 896
+    text: '## S1. Canonical OS repo'
+  gate: S
+  gate_capability: false
   family: S
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:896
+  source_lines:
+    start: 896
+    end: 898
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: S1.1
+    line: 897
+    text: framework/runtime/CLI/tools/migrations/tests/fixtures/lessons/change-proposals/release/docs separation exists.
+  - id: S1.2
+    line: 898
+    text: canonical OS developed once, consumer repos do not rebuild it independently.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: S2
   title: Immutable releases
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:900
+  heading:
+    line: 900
+    text: '## S2. Immutable releases'
+  gate: S
+  gate_capability: false
   family: S
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:900
+  source_lines:
+    start: 900
+    end: 911
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: S2.1
+    line: 901
+    text: semantic versioning
+  - id: S2.2
+    line: 902
+    text: release manifest
+  - id: S2.3
+    line: 903
+    text: file hashes
+  - id: S2.4
+    line: 904
+    text: supported migrations
+  - id: S2.5
+    line: 905
+    text: schema versions
+  - id: S2.6
+    line: 906
+    text: CLI/runtime versions
+  - id: S2.7
+    line: 907
+    text: adapter/capability versions
+  - id: S2.8
+    line: 908
+    text: release notes
+  - id: S2.9
+    line: 909
+    text: affected indexes
+  - id: S2.10
+    line: 910
+    text: human decisions
+  - id: S2.11
+    line: 911
+    text: rollback
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: S3
   title: '`gov init`'
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:913
+  heading:
+    line: 913
+    text: '## S3. `gov init`'
+  gate: S
+  gate_capability: false
   family: S
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:913
+  source_lines:
+    start: 913
+    end: 919
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: S3.1
+    line: 914
+    text: certified kernel installation
+  - id: S3.2
+    line: 915
+    text: project overlay creation
+  - id: S3.3
+    line: 916
+    text: repository contract
+  - id: S3.4
+    line: 917
+    text: initial memory/state
+  - id: S3.5
+    line: 918
+    text: health checks
+  - id: S3.6
+    line: 919
+    text: reference retrieval profile bootstrap when certified
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: S4
   title: '`gov adopt`'
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:921
+  heading:
+    line: 921
+    text: '## S4. `gov adopt`'
+  gate: S
+  gate_capability: false
   family: S
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:921
+  source_lines:
+    start: 921
+    end: 934
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: S4.1
+    line: 923
+    text: A0 safety baseline
+    group: 922
+  - id: S4.2
+    line: 924
+    text: A1 cold inventory
+    group: 922
+  - id: S4.3
+    line: 925
+    text: A2 classification
+    group: 922
+  - id: S4.4
+    line: 926
+    text: A3 target path map
+    group: 922
+  - id: S4.5
+    line: 927
+    text: A4 migration plan
+    group: 922
+  - id: S4.6
+    line: 928
+    text: A5 independent migration review/test authoring
+    group: 922
+  - id: S4.7
+    line: 929
+    text: A6 controlled migration
+    group: 922
+  - id: S4.8
+    line: 930
+    text: A7 independent migration verification
+    group: 922
+  - id: S4.9
+    line: 931
+    text: A8 legacy memory extraction/retirement
+    group: 922
+  - id: S4.10
+    line: 932
+    text: A9 new Knowledge Fabric
+    group: 922
+  - id: S4.11
+    line: 933
+    text: A10 independent memory verification
+    group: 922
+  - id: S4.12
+    line: 934
+    text: A11 full project audit
+    group: 922
+  statements:
+  - line: 922
+    kind: lead_in
+    text: 'Stages are executable/evidenced:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: S5
   title: '`gov update`'
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:936
+  heading:
+    line: 936
+    text: '## S5. `gov update`'
+  gate: S
+  gate_capability: false
   family: S
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:936
+  source_lines:
+    start: 936
+    end: 945
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: S5.1
+    line: 937
+    text: check/impact simulation
+  - id: S5.2
+    line: 938
+    text: authenticated source
+  - id: S5.3
+    line: 939
+    text: compatibility/migration
+  - id: S5.4
+    line: 940
+    text: preserve project overlay
+  - id: S5.5
+    line: 941
+    text: regenerate adapters/views
+  - id: S5.6
+    line: 942
+    text: rebuild affected indexes
+  - id: S5.7
+    line: 943
+    text: verify
+  - id: S5.8
+    line: 944
+    text: rollback
+  - id: S5.9
+    line: 945
+    text: ledger/provenance
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: S6
   title: Cross-machine mechanics
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:947
+  heading:
+    line: 947
+    text: '## S6. Cross-machine mechanics'
+  gate: S
+  gate_capability: false
   family: S
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:947
+  source_lines:
+    start: 947
+    end: 950
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: S6.1
+    line: 948
+    text: tracked truth syncs through Git/private remote
+  - id: S6.2
+    line: 949
+    text: derived runtime rebuilds locally
+  - id: S6.3
+    line: 950
+    text: machine-specific absolute paths do not define release identity
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: T1
   title: Role separation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:956
+  heading:
+    line: 956
+    text: '## T1. Role separation'
+  gate: T
+  gate_capability: false
   family: T
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:956
+  source_lines:
+    start: 956
+    end: 965
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: T1.1
+    line: 957
+    text: recovery agent
+  - id: T1.2
+    line: 958
+    text: adoption auditor/planner
+  - id: T1.3
+    line: 959
+    text: independent migration reviewer/test author
+  - id: T1.4
+    line: 960
+    text: migration executor
+  - id: T1.5
+    line: 961
+    text: independent migration verifier
+  - id: T1.6
+    line: 962
+    text: memory engineer
+  - id: T1.7
+    line: 963
+    text: independent memory verifier/test author
+  - id: T1.8
+    line: 964
+    text: comprehensive independent auditor
+  - id: T1.9
+    line: 965
+    text: operator/CTO
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: T2
   title: Fresh-session independence
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:967
+  heading:
+    line: 967
+    text: '## T2. Fresh-session independence'
+  gate: T
+  gate_capability: false
   family: T
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:967
+  source_lines:
+    start: 967
+    end: 969
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: T2.1
+    line: 968
+    text: independent roles do not simply continue builder/executor context.
+  - id: T2.2
+    line: 969
+    text: held-out tests/evidence separation is enforced.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: T3
   title: Adoption evidence tree
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:971
+  heading:
+    line: 971
+    text: '## T3. Adoption evidence tree'
+  gate: T
+  gate_capability: false
   family: T
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:971
+  source_lines:
+    start: 971
+    end: 972
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: T3.1
+    line: 972
+    text: inventory → classification → path map → migration plan → independent tests → migration → independent verification → memory → memory verification → full audit is traceable.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
+- id: U
+  title: Framework Health SLOs
+  heading: null
+  gate: U
+  gate_capability: true
+  family: U
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:976
+  source_lines:
+    start: 976
+    end: 1008
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
+  status: DECLARED
+  checklist:
+  - id: U.1
+    line: 979
+    text: governance-suite freshness
+    group: 978
+  - id: U.2
+    line: 980
+    text: product-test health
+    group: 978
+  - id: U.3
+    line: 981
+    text: retrieval Recall@K
+    group: 978
+  - id: U.4
+    line: 982
+    text: stale-index count
+    group: 978
+  - id: U.5
+    line: 983
+    text: orphan-graph count
+    group: 978
+  - id: U.6
+    line: 984
+    text: unresolved contradictions
+    group: 978
+  - id: U.7
+    line: 985
+    text: unresolved human gates
+    group: 978
+  - id: U.8
+    line: 986
+    text: task traceability %
+    group: 978
+  - id: U.9
+    line: 987
+    text: feature readiness coverage
+    group: 978
+  - id: U.10
+    line: 988
+    text: context packet size
+    group: 978
+  - id: U.11
+    line: 989
+    text: tokens/completed task
+    group: 978
+  - id: U.12
+    line: 990
+    text: first-pass completion
+    group: 978
+  - id: U.13
+    line: 991
+    text: handoff failure
+    group: 978
+  - id: U.14
+    line: 992
+    text: memory rebuild success
+    group: 978
+  - id: U.15
+    line: 993
+    text: fresh-agent reconstruction success
+    group: 978
+  - id: U.16
+    line: 996
+    text: authority unambiguous
+    group: 995
+  - id: U.17
+    line: 997
+    text: no accidental legacy authority
+    group: 995
+  - id: U.18
+    line: 998
+    text: deterministic state consistent
+    group: 995
+  - id: U.19
+    line: 999
+    text: graph/index freshness passes
+    group: 995
+  - id: U.20
+    line: 1000
+    text: retrieval meets thresholds
+    group: 995
+  - id: U.21
+    line: 1001
+    text: sensitive material isolated
+    group: 995
+  - id: U.22
+    line: 1002
+    text: feature readiness explicit
+    group: 995
+  - id: U.23
+    line: 1003
+    text: task runnable/blocked state correct
+    group: 995
+  - id: U.24
+    line: 1004
+    text: tests/traceability satisfy policy
+    group: 995
+  - id: U.25
+    line: 1005
+    text: governance suite current/green
+    group: 995
+  - id: U.26
+    line: 1006
+    text: no unresolved critical audit finding
+    group: 995
+  - id: U.27
+    line: 1007
+    text: fresh strong agent reconstructs state within budget
+    group: 995
+  - id: U.28
+    line: 1008
+    text: derived memory is rebuildable
+    group: 995
+  statements:
+  - line: 978
+    kind: lead_in
+    text: 'Track and threshold:'
+  - line: 995
+    kind: lead_in
+    text: 'A repository is HEALTHY only when:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: V1
   title: Fault manifest
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1016
+  heading:
+    line: 1016
+    text: '## V1. Fault manifest'
+  gate: V
+  gate_capability: false
   family: V
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1016
+  source_lines:
+    start: 1016
+    end: 1026
+  requirement_class: NEW TESTING REFINEMENT
+  requirement_class_label: NEW TESTING REFINEMENT
+  requirement_class_label_line: 1012
+  requirement_class_enumerated: false
   status: DECLARED
+  checklist:
+  - id: V1.1
+    line: 1018
+    text: fault ID
+    group: 1017
+  - id: V1.2
+    line: 1019
+    text: class
+    group: 1017
+  - id: V1.3
+    line: 1020
+    text: hidden authoritative truth
+    group: 1017
+  - id: V1.4
+    line: 1021
+    text: injected repository state
+    group: 1017
+  - id: V1.5
+    line: 1022
+    text: expected detection
+    group: 1017
+  - id: V1.6
+    line: 1023
+    text: expected severity
+    group: 1017
+  - id: V1.7
+    line: 1024
+    text: expected impacted artefacts/nodes
+    group: 1017
+  - id: V1.8
+    line: 1025
+    text: expected governed action
+    group: 1017
+  - id: V1.9
+    line: 1026
+    text: forbidden outcomes
+    group: 1017
+  statements:
+  - line: 1017
+    kind: lead_in
+    text: 'Each injected defect records:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: V2
   title: Hidden path-map oracle
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1028
+  heading:
+    line: 1028
+    text: '## V2. Hidden path-map oracle'
+  gate: V
+  gate_capability: false
   family: V
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1028
+  source_lines:
+    start: 1028
+    end: 1036
+  requirement_class: NEW TESTING REFINEMENT
+  requirement_class_label: NEW TESTING REFINEMENT
+  requirement_class_label_line: 1012
+  requirement_class_enumerated: false
   status: DECLARED
+  checklist:
+  - id: V2.1
+    line: 1030
+    text: current artefact
+    group: 1029
+  - id: V2.2
+    line: 1031
+    text: correct classification
+    group: 1029
+  - id: V2.3
+    line: 1032
+    text: authority
+    group: 1029
+  - id: V2.4
+    line: 1033
+    text: expected target path
+    group: 1029
+  - id: V2.5
+    line: 1034
+    text: KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE
+    group: 1029
+  - id: V2.6
+    line: 1035
+    text: expected references/consumers
+    group: 1029
+  - id: V2.7
+    line: 1036
+    text: sensitivity/indexing expectation
+    group: 1029
+  statements:
+  - line: 1029
+    kind: lead_in
+    text: 'For brownfield Repo B:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: V3
   title: Hidden memory oracle
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1038
+  heading:
+    line: 1038
+    text: '## V3. Hidden memory oracle'
+  gate: V
+  gate_capability: false
   family: V
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1038
+  source_lines:
+    start: 1038
+    end: 1045
+  requirement_class: NEW TESTING REFINEMENT
+  requirement_class_label: NEW TESTING REFINEMENT
+  requirement_class_label_line: 1012
+  requirement_class_enumerated: false
   status: DECLARED
+  checklist:
+  - id: V3.1
+    line: 1039
+    text: which material must be indexed
+  - id: V3.2
+    line: 1040
+    text: which must never be indexed
+  - id: V3.3
+    line: 1041
+    text: expected authority namespace
+  - id: V3.4
+    line: 1042
+    text: expected current/superseded status
+  - id: V3.5
+    line: 1043
+    text: expected graph relationships
+  - id: V3.6
+    line: 1044
+    text: expected code symbols
+  - id: V3.7
+    line: 1045
+    text: expected retrieval results
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: V4
   title: Quantitative qualification scoring
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1047
+  heading:
+    line: 1047
+    text: '## V4. Quantitative qualification scoring'
+  gate: V
+  gate_capability: false
   family: V
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1047
+  source_lines:
+    start: 1047
+    end: 1062
+  requirement_class: NEW TESTING REFINEMENT
+  requirement_class_label: NEW TESTING REFINEMENT
+  requirement_class_label_line: 1012
+  requirement_class_enumerated: false
   status: DECLARED
+  checklist:
+  - id: V4.1
+    line: 1049
+    text: injected defect detection recall
+    group: 1048
+  - id: V4.2
+    line: 1050
+    text: false positives
+    group: 1048
+  - id: V4.3
+    line: 1051
+    text: severity accuracy
+    group: 1048
+  - id: V4.4
+    line: 1052
+    text: impact-map accuracy
+    group: 1048
+  - id: V4.5
+    line: 1053
+    text: path-map accuracy
+    group: 1048
+  - id: V4.6
+    line: 1054
+    text: missed authoritative artefacts
+    group: 1048
+  - id: V4.7
+    line: 1055
+    text: wrong-indexing count
+    group: 1048
+  - id: V4.8
+    line: 1056
+    text: stale-index count
+    group: 1048
+  - id: V4.9
+    line: 1057
+    text: retrieval metrics
+    group: 1048
+  - id: V4.10
+    line: 1058
+    text: recovery/chaos pass rate
+    group: 1048
+  - id: V4.11
+    line: 1059
+    text: human-gate correctness
+    group: 1048
+  - id: V4.12
+    line: 1060
+    text: task/readiness correctness
+    group: 1048
+  statements:
+  - line: 1048
+    kind: lead_in
+    text: 'Report:'
+  - line: 1062
+    kind: qualifier
+    text: The permanent public qualification suite and fresh verifier hidden oracle must remain separate.
+    group: 1048
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W1
   title: Stable artefact identity
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1068
+  heading:
+    line: 1068
+    text: '## W1. Stable artefact identity'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1068
+  source_lines:
+    start: 1068
+    end: 1080
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W1.1
+    line: 1070
+    text: stable artefact ID
+    group: 1069
+  - id: W1.2
+    line: 1071
+    text: artefact type
+    group: 1069
+  - id: W1.3
+    line: 1072
+    text: canonical path
+    group: 1069
+  - id: W1.4
+    line: 1073
+    text: authoritative status
+    group: 1069
+  - id: W1.5
+    line: 1074
+    text: lifecycle state
+    group: 1069
+  - id: W1.6
+    line: 1075
+    text: version/content hash
+    group: 1069
+  - id: W1.7
+    line: 1076
+    text: producer/provenance
+    group: 1069
+  - id: W1.8
+    line: 1077
+    text: supersedes/superseded-by lineage
+    group: 1069
+  - id: W1.9
+    line: 1078
+    text: expected downstream consumers where known
+    group: 1069
+  statements:
+  - line: 1069
+    kind: lead_in
+    text: 'Every material output that may feed downstream work has:'
+  - line: 1080
+    kind: qualifier
+    text: Applies to specifications, scenarios, decisions, datasets, experiments, architecture records, interfaces, test designs, migration plans, audit findings, benchmark results and equivalent governed outputs.
+    group: 1069
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W2
   title: Typed output → input contracts
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1082
+  heading:
+    line: 1082
+    text: '## W2. Typed output → input contracts'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1082
+  source_lines:
+    start: 1082
+    end: 1090
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W2.1
+    line: 1083
+    text: Upstream/downstream relationship type is explicit.
+  - id: W2.2
+    line: 1084
+    text: Required vs optional dependency is explicit.
+  - id: W2.3
+    line: 1085
+    text: Authority semantics are preserved across stages.
+  - id: W2.4
+    line: 1086
+    text: Research evidence cannot silently become a decision.
+  - id: W2.5
+    line: 1087
+    text: Lessons cannot silently become authoritative policy.
+  - id: W2.6
+    line: 1088
+    text: Historical/retrieved material cannot replace current authoritative input.
+  - id: W2.7
+    line: 1089
+    text: Output schemas define what downstream stages may consume.
+  - id: W2.8
+    line: 1090
+    text: Relationships such as `EVIDENCE_FOR`, `CONSTRAINS`, `IMPLEMENTS`, `TESTS`, `GENERATES`, `VALIDATES`, `SUPERSEDES` or equivalent are machine-usable.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W3
   title: Mandatory task-input manifest
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1092
+  heading:
+    line: 1092
+    text: '## W3. Mandatory task-input manifest'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1092
+  source_lines:
+    start: 1092
+    end: 1104
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W3.1
+    line: 1094
+    text: required input IDs
+    group: 1093
+  - id: W3.2
+    line: 1095
+    text: required authority/lifecycle state
+    group: 1093
+  - id: W3.3
+    line: 1096
+    text: required version/hash constraints where applicable
+    group: 1093
+  - id: W3.4
+    line: 1097
+    text: reason for each dependency
+    group: 1093
+  - id: W3.5
+    line: 1098
+    text: supplementary/retrieved context separately from mandatory inputs
+    group: 1093
+  - id: W3.6
+    line: 1101
+    text: Task cannot become READY if a mandatory input is absent.
+    group: 1100
+  - id: W3.7
+    line: 1102
+    text: Superseded input cannot silently satisfy a current requirement.
+    group: 1100
+  - id: W3.8
+    line: 1103
+    text: Conflicting mandatory inputs trigger contradiction handling.
+    group: 1100
+  - id: W3.9
+    line: 1104
+    text: Required inputs are resolved deterministically, not by semantic retrieval ranking.
+    group: 1100
+  statements:
+  - line: 1093
+    kind: lead_in
+    text: 'Every governed task that depends on upstream artefacts declares:'
+  - line: 1100
+    kind: lead_in
+    text: 'Rules:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W4
   title: Context compiler delivery proof
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1106
+  heading:
+    line: 1106
+    text: '## W4. Context compiler delivery proof'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1106
+  source_lines:
+    start: 1106
+    end: 1112
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W4.1
+    line: 1107
+    text: Mandatory authoritative inputs are loaded deterministically into the task context packet.
+  - id: W4.2
+    line: 1108
+    text: Required inputs are separated from supplementary semantic/lexical/graph/code retrieval.
+  - id: W4.3
+    line: 1109
+    text: Required inputs cannot be displaced by context-ranking/token pressure without an explicit governed failure/degradation.
+  - id: W4.4
+    line: 1110
+    text: Exact input IDs/versions/hashes are recorded in the context packet.
+  - id: W4.5
+    line: 1111
+    text: Context packet hash/provenance proves what the worker was supplied.
+  - id: W4.6
+    line: 1112
+    text: Missing required input causes refusal or explicit blocked state.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W5
   title: Consumption receipt and implementation traceability
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1114
+  heading:
+    line: 1114
+    text: '## W5. Consumption receipt and implementation traceability'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1114
+  source_lines:
+    start: 1114
+    end: 1126
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W5.1
+    line: 1116
+    text: exact required inputs supplied/consumed
+    group: 1115
+  - id: W5.2
+    line: 1117
+    text: outputs produced
+    group: 1115
+  - id: W5.3
+    line: 1118
+    text: requirements/features/scenarios implemented
+    group: 1115
+  - id: W5.4
+    line: 1119
+    text: decisions/architecture constraints applied
+    group: 1115
+  - id: W5.5
+    line: 1120
+    text: tests/acceptance evidence produced
+    group: 1115
+  - id: W5.6
+    line: 1121
+    text: deviations/unknowns
+    group: 1115
+  - id: W5.7
+    line: 1124
+    text: refuses missing mandatory traceability where required
+    group: 1123
+  - id: W5.8
+    line: 1125
+    text: detects undocumented/untraceable implementation
+    group: 1123
+  - id: W5.9
+    line: 1126
+    text: links code/test/output evidence back to authoritative upstream inputs
+    group: 1123
+  statements:
+  - line: 1115
+    kind: lead_in
+    text: 'Worker/task return records:'
+  - line: 1123
+    kind: lead_in
+    text: 'Task close:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W6
   title: Upstream-change staleness propagation
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1128
+  heading:
+    line: 1128
+    text: '## W6. Upstream-change staleness propagation'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1128
+  source_lines:
+    start: 1128
+    end: 1136
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W6.1
+    line: 1130
+    text: dependent task evidence becomes stale as appropriate
+    group: 1129
+  - id: W6.2
+    line: 1131
+    text: implementation/release/test evidence is invalidated according to impact
+    group: 1129
+  - id: W6.3
+    line: 1132
+    text: affected context packets are invalidated
+    group: 1129
+  - id: W6.4
+    line: 1133
+    text: graph/CIT computes impacted downstream nodes
+    group: 1129
+  - id: W6.5
+    line: 1134
+    text: revalidation/rework tasks are generated
+    group: 1129
+  - id: W6.6
+    line: 1135
+    text: '`COMPLETE` does not imply permanently valid'
+    group: 1129
+  - id: W6.7
+    line: 1136
+    text: stale evidence cannot remain green merely because the original task closed successfully
+    group: 1129
+  statements:
+  - line: 1129
+    kind: lead_in
+    text: 'When an authoritative upstream artefact changes:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W7
   title: Orphan/dead-output and unexplained-output detection
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1138
+  heading:
+    line: 1138
+    text: '## W7. Orphan/dead-output and unexplained-output detection'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1138
+  source_lines:
+    start: 1138
+    end: 1144
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W7.1
+    line: 1139
+    text: Completed authoritative outputs with expected consumers but no actual consumer are detectable.
+  - id: W7.2
+    line: 1140
+    text: Requirement/spec without downstream implementation/test path is detectable.
+  - id: W7.3
+    line: 1141
+    text: Research expected to feed a decision but never consumed is visible.
+  - id: W7.4
+    line: 1142
+    text: Acceptance test without requirement/scenario is visible.
+  - id: W7.5
+    line: 1143
+    text: Implementation/code with no active requirement/decision/spec justification is detectable.
+  - id: W7.6
+    line: 1144
+    text: Orphans produce governed investigation/remediation rather than silent deletion.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W8
   title: Forward and reverse lineage
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1146
+  heading:
+    line: 1146
+    text: '## W8. Forward and reverse lineage'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1146
+  source_lines:
+    start: 1146
+    end: 1152
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W8.1
+    line: 1148
+    text: outcome/feature → scenario → requirement → decision → architecture → task → code → test → evidence → release
+    group: 1147
+  - id: W8.2
+    line: 1149
+    text: reverse impact from changed requirement/decision/spec to affected implementation/tests/release evidence
+    group: 1147
+  - id: W8.3
+    line: 1150
+    text: missing lineage link detection
+    group: 1147
+  - id: W8.4
+    line: 1151
+    text: stale lineage link detection
+    group: 1147
+  - id: W8.5
+    line: 1152
+    text: cross-language/cross-repository relationships where in scope
+    group: 1147
+  statements:
+  - line: 1147
+    kind: lead_in
+    text: 'Governance can answer:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W9
   title: Session/handoff continuity of mandatory inputs
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1154
+  heading:
+    line: 1154
+    text: '## W9. Session/handoff continuity of mandatory inputs'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1154
+  source_lines:
+    start: 1154
+    end: 1160
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W9.1
+    line: 1155
+    text: Required-input manifest persists across session end.
+  - id: W9.2
+    line: 1156
+    text: Checkpoint records input IDs/versions/hashes or equivalent state reference.
+  - id: W9.3
+    line: 1157
+    text: Model/provider switch reconstructs the same authoritative task inputs.
+  - id: W9.4
+    line: 1158
+    text: Fresh agent reconstructs mandatory inputs without prior chat.
+  - id: W9.5
+    line: 1159
+    text: Compaction cannot silently remove mandatory project state.
+  - id: W9.6
+    line: 1160
+    text: Handoff with stale/missing required-input state is blocked or explicitly degraded.
+  statements: []
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W10
   title: Deterministic mandatory inputs outrank retrieval
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1162
+  heading:
+    line: 1162
+    text: '## W10. Deterministic mandatory inputs outrank retrieval'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1162
+  source_lines:
+    start: 1162
+    end: 1171
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W10.1
+    line: 1167
+    text: current spec is delivered even if absent from semantic index
+    group: 1166
+  - id: W10.2
+    line: 1168
+    text: superseded but semantically similar spec cannot replace current required spec
+    group: 1166
+  - id: W10.3
+    line: 1169
+    text: token pressure drops supplementary context before mandatory authoritative inputs
+    group: 1166
+  - id: W10.4
+    line: 1170
+    text: retrieval/index outage does not erase deterministic required dependencies
+    group: 1166
+  - id: W10.5
+    line: 1171
+    text: required-input delivery is independently testable
+    group: 1166
+  statements:
+  - line: 1163
+    kind: lead_in
+    text: 'Hard invariant:'
+  - line: 1164
+    kind: hard_invariant
+    text: '> Mandatory task inputs are resolved through authoritative structured dependency/state mechanisms before supplementary retrieval. Semantic/lexical/graph/code retrieval may enrich the task but may not substitute for a required authoritative input.'
+    group: 1163
+  - line: 1166
+    kind: lead_in
+    text: 'Verify:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W11
   title: Artifact-flow quantitative health
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1173
+  heading:
+    line: 1173
+    text: '## W11. Artifact-flow quantitative health'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1173
+  source_lines:
+    start: 1173
+    end: 1183
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W11.1
+    line: 1175
+    text: required-input delivery accuracy
+    group: 1174
+  - id: W11.2
+    line: 1176
+    text: current-version selection accuracy
+    group: 1174
+  - id: W11.3
+    line: 1177
+    text: superseded-input leakage rate
+    group: 1174
+  - id: W11.4
+    line: 1178
+    text: missing-required-input detection
+    group: 1174
+  - id: W11.5
+    line: 1179
+    text: staleness propagation accuracy
+    group: 1174
+  - id: W11.6
+    line: 1180
+    text: requirement→code traceability coverage
+    group: 1174
+  - id: W11.7
+    line: 1181
+    text: requirement→test traceability coverage
+    group: 1174
+  - id: W11.8
+    line: 1182
+    text: orphan-output detection recall/false positives
+    group: 1174
+  - id: W11.9
+    line: 1183
+    text: fresh-agent reconstruction correctness
+    group: 1174
+  statements:
+  - line: 1174
+    kind: lead_in
+    text: 'Track where applicable:'
+  qualification_challenge_ids: []
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
 - id: W12
   title: Health-scheduler integration
-  requirement_class: ORIGINAL
-  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1185
+  heading:
+    line: 1185
+    text: '## W12. Health-scheduler integration'
+  gate: W
+  gate_capability: false
   family: W
+  source_reference: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1185
+  source_lines:
+    start: 1185
+    end: 1194
+  requirement_class: ORIGINAL
+  requirement_class_label: null
+  requirement_class_label_line: null
+  requirement_class_enumerated: true
   status: DECLARED
+  checklist:
+  - id: W12.1
+    line: 1186
+    text: G0 blocks invalid authority/current-version substitution on privileged operations.
+  - id: W12.2
+    line: 1187
+    text: G1 invalidates affected dependency/lineage evidence after material mutations.
+  - id: W12.3
+    line: 1188
+    text: G2 verifies task input/consumption/traceability before task close.
+  - id: W12.4
+    line: 1189
+    text: G3 verifies mandatory-input continuity across checkpoint/handoff.
+  - id: W12.5
+    line: 1190
+    text: G4 runs wider staleness/impact propagation after CIT/spec/decision/architecture changes.
+  - id: W12.6
+    line: 1191
+    text: G5 audits end-to-end lineage and orphan states.
+  - id: W12.7
+    line: 1192
+    text: G6 injects hidden artifact-flow failures in sophisticated qualification.
+  statements: []
+  qualification_challenge_ids:
+  - AQC-W12
+  severity: null
+  applicability: null
+  evidence_class: null
+  automated_checks: null
+  independent_verification: null
+  freshness_triggers: null
+  health_scheduler_tiers: null
+  adoption_obligation: null
+  operational_audit_obligation: null
+  allowed_status: null
+  na_requirements: null
+  remediation_rule: null
+advanced_qualification_challenges:
+- id: AQC-A1
+  gate: A
+  section: A1
+  line: 140
+  text: '**Advanced qualification challenge:** inject contradictory project policies, obsolete provider rules, active/superseded decisions, malicious exceptions, and attempted authority/sensitivity weakening.'
+- id: AQC-A2
+  gate: A
+  section: A2
+  line: 154
+  text: '**Advanced qualification challenge:** tampered source payload, stale/forged manifest, wrong key, altered security policy, modified migration, downgrade/replay attempt, interrupted install.'
+- id: AQC-A3
+  gate: A
+  section: A3
+  line: 164
+  text: '**Advanced qualification challenge:** seeded secrets, restricted research, confidential project files, malicious plugin descriptors, weakened project policy.'
+- id: AQC-B2
+  gate: B
+  section: B2
+  line: 197
+  text: '**Advanced qualification challenge:** Repo B starts without a path map; includes misplaced specs, duplicate authority, provider rules, dead code, generated files in wrong locations and hidden cross-references.'
+- id: AQC-D6
+  gate: D
+  section: D6
+  line: 356
+  text: '**Advanced qualification challenge:** deliberately missing index coverage, stale chunks, wrong authority namespace, archive indexed as current, renamed files duplicated, graph edges stale, deleted indexes, wrong embedder pins.'
+- id: AQC-H4
+  gate: H
+  section: H4
+  line: 529
+  text: '**Advanced qualification challenge:** deliberately omit scenarios, test datasets, failure criteria, NFRs, security analysis, performance targets, recovery and operations documentation.'
+- id: AQC-J2
+  gate: J
+  section: J2
+  line: 616
+  text: '**Advanced qualification challenge:** unsupported research conclusion, irreproducible experiment, decision taken before required evidence, conflicting scientific reference data.'
+- id: AQC-W12
+  gate: W
+  section: W12
+  line: 1194
+  text: '**Advanced qualification challenge:** intentionally omit current specs from semantic index, index superseded specs with higher semantic similarity, change specs after implementation, move files while retaining stable IDs, omit task dependency declarations, return code without consumption receipts, create contradictory mandatory inputs, induce context pressure, switch model/session, and create orphan authoritative outputs. The hidden oracle defines the correct required input/version and expected downstream propagation.'
+closing:
+- id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE
+  heading:
+    line: 1197
+    text: '# PRE-ADVANCED-QUALIFICATION ACCEPTANCE GATE'
+  lines:
+  - line: 1199
+    text: 'Before sophisticated synthetic repositories are executed, require:'
+  - line: 1211
+    text: 'Gate result:'
+  - line: 1213
+    text: '`GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED`'
+  - line: 1215
+    text: Only then may the advanced qualification repositories be executed.
+  checklist:
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.1
+    line: 1201
+    number: 1
+    text: Every original constitutional capability above has a status and evidence location.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.2
+    line: 1202
+    number: 2
+    text: No `ABSENT` or `UNCLEAR` item remains for a required capability.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.3
+    line: 1203
+    number: 3
+    text: Any `PARTIAL` item has an explicit justification and cannot undermine the qualification scenario.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.4
+    line: 1204
+    number: 4
+    text: All post-verification trust hardening relevant to the release is incorporated.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.5
+    line: 1205
+    number: 5
+    text: Governance Health Scheduler G0-G6 is implemented enough to observe the qualification work.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.6
+    line: 1206
+    number: 6
+    text: Qualification Oracle format is accepted before generating hidden faults.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.7
+    line: 1207
+    number: 7
+    text: A provisional retrieval profile is available so sophisticated qualification is not run on intentionally inadequate semantic retrieval.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.8
+    line: 1208
+    number: 8
+    text: Artifact Flow & Consumption Integrity (Gate W) has executable evidence and dedicated advanced-qualification challenges.
+  - id: PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.9
+    line: 1209
+    number: 9
+    text: The exact candidate commit/hash is frozen for qualification.
+- id: PROPOSED-ORDER-AFTER-THIS-CHECKLIST-IS-ACCEPTED
+  heading:
+    line: 1219
+    text: '# PROPOSED ORDER AFTER THIS CHECKLIST IS ACCEPTED'
+  lines:
+  - line: 1221
+    text: '```text'
+  - line: 1222
+    text: Prompt 2 core verification/repair
+  - line: 1223
+    text: '  ↓'
+  - line: 1224
+    text: OS_RELEASE_CANDIDATE_ACCEPTED
+  - line: 1225
+    text: '  ↓'
+  - line: 1226
+    text: Capability Acceptance Checklist audit
+  - line: 1227
+    text: '  ↓'
+  - line: 1228
+    text: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+  - line: 1229
+    text: '  ↓'
+  - line: 1230
+    text: Provisional retrieval bootstrap
+  - line: 1231
+    text: '  ↓'
+  - line: 1232
+    text: PROVISIONAL_RETRIEVAL_PROFILE_READY
+  - line: 1233
+    text: '  ↓'
+  - line: 1234
+    text: Generate two sophisticated qualification repos + hidden oracle
+  - line: 1235
+    text: '  ↓'
+  - line: 1236
+    text: Advanced qualification
+  - line: 1237
+    text: '  ↓'
+  - line: 1238
+    text: ADVANCED_QUALIFICATION_ACCEPTED
+  - line: 1239
+    text: '  ↓'
+  - line: 1240
+    text: Final Qwen/BGE/other retrieval bake-off using those repos
+  - line: 1241
+    text: '  ↓'
+  - line: 1242
+    text: REFERENCE_RETRIEVAL_PROFILE_SELECTED
+  - line: 1243
+    text: '  ↓'
+  - line: 1244
+    text: Package + fresh clean-install integration verification
+  - line: 1245
+    text: '  ↓'
+  - line: 1246
+    text: REFERENCE_RETRIEVAL_PROFILE_ACCEPTED
+  - line: 1247
+    text: '  ↓'
+  - line: 1248
+    text: Prompt 3 final certification
+  - line: 1249
+    text: '  ↓'
+  - line: 1250
+    text: Private remote publication + remote-clone smoke
+  - line: 1251
+    text: '  ↓'
+  - line: 1252
+    text: PRIVATE_REMOTE_RELEASE_READY
+  - line: 1253
+    text: '  ↓'
+  - line: 1254
+    text: Product A / Product B adoption
+  - line: 1255
+    text: '```'
+  checklist: []

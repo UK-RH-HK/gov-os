@@ -31,6 +31,7 @@ pub mod policy;
 pub mod policy_coverage;
 pub mod policy_precedence;
 pub mod project;
+pub mod qualification_oracle;
 pub mod records;
 pub mod recovery;
 pub mod release;

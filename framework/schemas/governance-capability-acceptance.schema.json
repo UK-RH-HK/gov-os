@@ -1,40 +1,1004 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "governance-os.capability-acceptance-contract",
-  "title": "Governance Capability Acceptance Contract — compiled representation",
-  "description": "Machine-executable compiled form of the human-approved Governance Capability Acceptance Contract v3. It is valid only while framework/contracts/contract-source.lock proves it was compiled from the exact approved source hash; any semantic difference between source and compiled representation is a hard failure.",
+  "$id": "https://schemas.agentic-engineering-os/contracts/governance-capability-acceptance.schema.json",
+  "title": "Governance Capability Acceptance Contract — compiled representation (and, under $defs/evidence_map, the capability evidence map)",
+  "description": "Machine-executable compiled form of the human-approved Governance Capability Acceptance Contract v3. It is valid only while framework/contracts/contract-source.lock proves it was compiled from the exact approved source hash; any semantic difference between source and compiled representation is a hard failure (Contract v3:37-49). Every line of the owner source other than a blank line or a '---' thematic break is carried verbatim, with its line number, exactly once; `gov contract verify` checks that against the source text. A per-capability field of Contract v3:53-73 for which the owner source states no capability-specific value is carried as null here (the compiler may not invent one) and its governed value lives in the evidence map.",
   "type": "object",
-  "required": ["schema", "schema_version", "contract_version", "compiled_from", "capability_count", "capabilities"],
-  "additionalProperties": true,
+  "required": [
+    "schema",
+    "schema_version",
+    "contract_version",
+    "compiled_from",
+    "compiler",
+    "document",
+    "coverage",
+    "field_definitions",
+    "vocabularies",
+    "preamble",
+    "gate_count",
+    "gates",
+    "capability_count",
+    "checklist_item_count",
+    "capabilities",
+    "advanced_qualification_challenges",
+    "closing"
+  ],
+  "additionalProperties": false,
   "properties": {
-    "schema": { "const": "governance-os.capability-acceptance-contract" },
-    "schema_version": { "type": "integer", "minimum": 1 },
-    "contract_version": { "type": "string", "minLength": 1 },
+    "schema": {
+      "const": "governance-os.capability-acceptance-contract"
+    },
+    "schema_version": {
+      "const": 2
+    },
+    "contract_version": {
+      "type": "string",
+      "minLength": 1
+    },
     "compiled_from": {
       "type": "object",
-      "required": ["owner_source", "canonical_import", "source_sha256"],
+      "required": [
+        "owner_source",
+        "canonical_import",
+        "source_sha256"
+      ],
+      "additionalProperties": false,
       "properties": {
-        "owner_source": { "type": "string", "minLength": 1 },
-        "canonical_import": { "type": "string", "minLength": 1 },
-        "source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        "owner_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_import": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
       }
     },
-    "compiler": { "type": "object" },
-    "capability_count": { "type": "integer", "minimum": 1 },
+    "compiler": {
+      "type": "object"
+    },
+    "document": {
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/source_line"
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "rule",
+        "source_lines",
+        "carried_lines",
+        "excluded_lines"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_lines": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "carried_lines": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "excluded_lines": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "field_definitions": {
+      "description": "Contract v3:57-73, one entry per required per-capability field, in source order.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/field_definition"
+      }
+    },
+    "vocabularies": {
+      "$ref": "#/$defs/vocabularies"
+    },
+    "preamble": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/section"
+      }
+    },
+    "gate_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/gate"
+      }
+    },
+    "capability_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "checklist_item_count": {
+      "type": "integer",
+      "minimum": 0
+    },
     "capabilities": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "title", "requirement_class", "source_reference", "family", "status"],
-        "additionalProperties": true,
+        "required": [
+          "id",
+          "title",
+          "heading",
+          "gate",
+          "gate_capability",
+          "family",
+          "source_reference",
+          "source_lines",
+          "requirement_class",
+          "requirement_class_label",
+          "requirement_class_label_line",
+          "requirement_class_enumerated",
+          "status",
+          "checklist",
+          "statements",
+          "qualification_challenge_ids",
+          "severity",
+          "applicability",
+          "evidence_class",
+          "automated_checks",
+          "independent_verification",
+          "freshness_triggers",
+          "health_scheduler_tiers",
+          "adoption_obligation",
+          "operational_audit_obligation",
+          "allowed_status",
+          "na_requirements",
+          "remediation_rule"
+        ],
+        "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^[A-Z]+[0-9]+$" },
-          "title": { "type": "string", "minLength": 1 },
-          "requirement_class": { "enum": ["ORIGINAL", "POST_VERIFICATION_HARDENING", "EXECUTION_REFINEMENT"] },
-          "source_reference": { "type": "string", "minLength": 1 },
-          "family": { "type": "string", "pattern": "^[A-Z]+$" },
-          "status": { "enum": ["DECLARED", "EVIDENCED", "N/A_WITH_REASON"] }
+          "id": {
+            "description": "A capability id exactly as the owner source gives it: a numbered capability heading ('A1', 'W12') or the letter of a gate that states its checklist without numbered capability headings ('U').",
+            "type": "string",
+            "pattern": "^[A-Z]+[0-9]*$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "heading": {
+            "$ref": "#/$defs/nullable_source_line"
+          },
+          "gate": {
+            "$ref": "#/$defs/gate_id"
+          },
+          "gate_capability": {
+            "type": "boolean"
+          },
+          "family": {
+            "type": "string",
+            "pattern": "^[A-Z]+$"
+          },
+          "source_reference": {
+            "type": "string",
+            "pattern": "^framework/contracts/source/.+\\.md:[0-9]+$"
+          },
+          "source_lines": {
+            "$ref": "#/$defs/source_range"
+          },
+          "requirement_class": {
+            "description": "The Contract v3:60 class the source label denotes (ORIGINAL when unlabelled), or — when the label denotes none of the enumerated classes — the label itself, verbatim (requirement_class_enumerated false).",
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_class_label": {
+            "description": "The label exactly as the owner source states it, on the capability heading or its gate heading.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requirement_class_label_line": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "requirement_class_enumerated": {
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "DECLARED",
+              "EVIDENCED",
+              "N/A_WITH_REASON"
+            ]
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/item"
+            }
+          },
+          "statements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/statement"
+            }
+          },
+          "qualification_challenge_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/challenge_id"
+            }
+          },
+          "severity": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "applicability": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "evidence_class": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "automated_checks": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "independent_verification": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "freshness_triggers": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "health_scheduler_tiers": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "adoption_obligation": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "operational_audit_obligation": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "allowed_status": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "na_requirements": {
+            "$ref": "#/$defs/not_stated"
+          },
+          "remediation_rule": {
+            "$ref": "#/$defs/not_stated"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "requirement_class_enumerated": {
+                  "const": true
+                }
+              },
+              "required": [
+                "requirement_class_enumerated"
+              ]
+            },
+            "then": {
+              "properties": {
+                "requirement_class": {
+                  "enum": [
+                    "ORIGINAL",
+                    "POST_VERIFICATION_HARDENING",
+                    "EXECUTION_REFINEMENT"
+                  ]
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "requirement_class_label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "advanced_qualification_challenges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/challenge"
+      }
+    },
+    "closing": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/section"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "line_number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "capability_id": {
+      "description": "A capability id exactly as the owner source gives it: a numbered capability heading ('A1', 'W12') or the letter of a gate that states its checklist without numbered capability headings ('U').",
+      "type": "string",
+      "pattern": "^[A-Z]+[0-9]*$"
+    },
+    "gate_id": {
+      "type": "string",
+      "pattern": "^[A-Z]+$"
+    },
+    "item_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9-]*\\.[0-9]+$"
+    },
+    "challenge_id": {
+      "type": "string",
+      "pattern": "^AQC-[A-Z]+[0-9]*(-[0-9]+)?$"
+    },
+    "source_line": {
+      "type": "object",
+      "required": [
+        "line",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "nullable_source_line": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/source_line"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "item": {
+      "description": "A checklist item. The source line is '- [ ] <text>', or '<number>. [ ] <text>' when number is present. group is the line of the lead-in the item belongs to.",
+      "type": "object",
+      "required": [
+        "id",
+        "line",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/item_id"
+        },
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        },
+        "group": {
+          "$ref": "#/$defs/line_number"
+        }
+      }
+    },
+    "statement": {
+      "description": "A non-checklist line of a gate or capability section, verbatim. kind is mechanical: lead_in (ends with ':'), qualifier (follows checklist items), hard_invariant (a quotation under a 'Hard invariant:' lead-in), quote, prose.",
+      "type": "object",
+      "required": [
+        "line",
+        "kind",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "kind": {
+          "enum": [
+            "lead_in",
+            "qualifier",
+            "hard_invariant",
+            "quote",
+            "prose"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "group": {
+          "$ref": "#/$defs/line_number"
+        }
+      }
+    },
+    "challenge": {
+      "description": "An advanced-qualification challenge paragraph, verbatim. section is the capability (or gate) section it appears in; the id is minted from that position.",
+      "type": "object",
+      "required": [
+        "id",
+        "gate",
+        "section",
+        "line",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/challenge_id"
+        },
+        "gate": {
+          "$ref": "#/$defs/gate_id"
+        },
+        "section": {
+          "$ref": "#/$defs/capability_id"
+        },
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "^\\*\\*Advanced qualification challenge:\\*\\*"
+        }
+      }
+    },
+    "section": {
+      "description": "A preamble or closing section of the owner source, verbatim.",
+      "type": "object",
+      "required": [
+        "id",
+        "heading",
+        "lines",
+        "checklist"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9][A-Z0-9-]*$"
+        },
+        "heading": {
+          "$ref": "#/$defs/nullable_source_line"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_line"
+          }
+        },
+        "checklist": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        }
+      }
+    },
+    "field_definition": {
+      "type": "object",
+      "required": [
+        "line",
+        "field",
+        "key",
+        "value_stated_in"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z_]+$"
+        },
+        "value_stated_in": {
+          "enum": [
+            "owner_source",
+            "evidence_map"
+          ]
+        }
+      }
+    },
+    "vocabulary_entry": {
+      "type": "object",
+      "required": [
+        "line",
+        "value"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "vocabularies": {
+      "type": "object",
+      "required": [
+        "requirement_classes",
+        "evidence_classes",
+        "freshness_inputs",
+        "lifecycle_points",
+        "health_scheduler_tiers"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requirement_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z_]+$"
+          }
+        },
+        "evidence_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/vocabulary_entry"
+          }
+        },
+        "freshness_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/vocabulary_entry"
+          }
+        },
+        "lifecycle_points": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/vocabulary_entry"
+          }
+        },
+        "health_scheduler_tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "tier",
+              "line",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "tier": {
+                "type": "string",
+                "pattern": "^G[0-9]+$"
+              },
+              "line": {
+                "$ref": "#/$defs/line_number"
+              },
+              "value": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "heading",
+        "requirement_class_label",
+        "source_lines",
+        "gate_capability",
+        "capabilities",
+        "statements",
+        "qualification_challenge_ids"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/gate_id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "heading": {
+          "$ref": "#/$defs/source_line"
+        },
+        "requirement_class_label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_lines": {
+          "$ref": "#/$defs/source_range"
+        },
+        "gate_capability": {
+          "type": "boolean"
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/capability_id"
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statement"
+          }
+        },
+        "qualification_challenge_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/challenge_id"
+          }
+        }
+      }
+    },
+    "source_range": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/line_number"
+        },
+        "end": {
+          "$ref": "#/$defs/line_number"
+        }
+      }
+    },
+    "not_stated": {
+      "description": "The owner source states no capability-specific value for this Contract v3:53-73 field. The compiled form carries the field and may not invent a value; the governed value lives in the evidence map.",
+      "type": "null"
+    },
+    "evidence_map": {
+      "description": "tests/governance/capability-evidence-map.yaml: capability → test/check/evidence mapping. Source-derived fields are checked against the owner source by `gov contract verify`; governed fields are populated by governed evidence mapping and preserved by `gov contract compile`.",
+      "type": "object",
+      "required": [
+        "schema",
+        "schema_version",
+        "contract_version",
+        "source_sha256",
+        "note",
+        "governed_fields",
+        "gates",
+        "advanced_qualification_challenges",
+        "capabilities"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "governance-os.capability-evidence-map"
+        },
+        "schema_version": {
+          "const": 2
+        },
+        "contract_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "note": {
+          "type": "string"
+        },
+        "governed_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "line",
+              "requirement_class_label",
+              "statements"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/gate_id"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "line": {
+                "$ref": "#/$defs/line_number"
+              },
+              "requirement_class_label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "statements": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/statement"
+                }
+              }
+            }
+          }
+        },
+        "advanced_qualification_challenges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/challenge"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence_row"
+          }
+        }
+      }
+    },
+    "evidence_item": {
+      "type": "object",
+      "required": [
+        "id",
+        "line",
+        "text",
+        "automated_checks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/item_id"
+        },
+        "line": {
+          "$ref": "#/$defs/line_number"
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        },
+        "group": {
+          "$ref": "#/$defs/line_number"
+        },
+        "automated_checks": {
+          "$ref": "#/$defs/automated_checks"
+        }
+      }
+    },
+    "automated_checks": {
+      "description": "Governed: the automated check/test IDs that evidence this capability or checklist item (Contract v3:64). Empty until mapped.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "evidence_row": {
+      "type": "object",
+      "required": [
+        "capability",
+        "title",
+        "gate",
+        "source_reference",
+        "requirement_class",
+        "requirement_class_label",
+        "checklist",
+        "statements",
+        "qualification_challenge_ids",
+        "evidence_class",
+        "automated_checks",
+        "independent_verification",
+        "freshness_triggers",
+        "health_scheduler_tiers",
+        "severity",
+        "applicability",
+        "adoption_obligation",
+        "operational_audit_obligation",
+        "allowed_status",
+        "na_requirements",
+        "remediation_rule"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/capability_id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gate": {
+          "$ref": "#/$defs/gate_id"
+        },
+        "source_reference": {
+          "type": "string",
+          "pattern": "^framework/contracts/source/.+\\.md:[0-9]+$"
+        },
+        "requirement_class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement_class_label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "checklist": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_item"
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/statement"
+          }
+        },
+        "qualification_challenge_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/challenge_id"
+          }
+        },
+        "evidence_class": {
+          "description": "Governed: NOT_YET_MAPPED, or one or more evidence classes of Contract v3:81-91.",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          ]
+        },
+        "automated_checks": {
+          "$ref": "#/$defs/automated_checks"
+        },
+        "independent_verification": {
+          "description": "Governed: independent-verification obligation (Contract v3:65)."
+        },
+        "freshness_triggers": {
+          "description": "Governed: evidence-freshness triggers, drawn from Contract v3:97-109.",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          ]
+        },
+        "health_scheduler_tiers": {
+          "description": "Governed: health-scheduler tiers, drawn from O5 (G0-G6).",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^G[0-9]+$"
+              }
+            }
+          ]
+        },
+        "severity": {
+          "description": "Governed: severity if violated (Contract v3:61).",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "applicability": {
+          "description": "Governed: applicability rule (Contract v3:62)."
+        },
+        "adoption_obligation": {
+          "description": "Governed: adoption verification obligation (Contract v3:69)."
+        },
+        "operational_audit_obligation": {
+          "description": "Governed: periodic operational-audit obligation (Contract v3:70)."
+        },
+        "allowed_status": {
+          "description": "Governed: allowed status values (Contract v3:71).",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          ]
+        },
+        "na_requirements": {
+          "description": "Governed: N/A requirements (Contract v3:72)."
+        },
+        "remediation_rule": {
+          "description": "Governed: remediation/task-generation rule (Contract v3:73)."
         }
       }
     }
