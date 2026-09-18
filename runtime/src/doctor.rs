@@ -25,6 +25,17 @@ pub struct Report {
     pub framework_version: String,
     pub cli_version: String,
     pub root: String,
+    /// `OWNER-DECISION-0006` §6 bullet 7: this machine's break-glass posture, carried beside `framework_version`
+    /// and `verdict` (`AR31-B1`).
+    ///
+    /// **`verdict` and `release_trust.below_floor` are different predicates and must not be read as one.**
+    /// `doctor`'s own `DEGRADED` verdict means "medium or low severity checks failed" — the word an operator
+    /// scans for was already taken by an unrelated meaning, which is why this is a separate field rather than a
+    /// verdict value. `release_trust.below_floor` is `true` when the machine carries the
+    /// `DEGRADED — RECOVERY ONLY` marking, read through `crate::srr::breakglass` at the one §6 bullet 7 sink.
+    /// A machine can be HEALTHY on every check and still be below floor; before this field it reported exactly
+    /// that, with nothing to say so.
+    pub release_trust: Value,
 }
 
 fn chk(
@@ -72,6 +83,7 @@ pub fn run(p: &Project) -> Result<Report> {
             framework_version: String::new(),
             cli_version: CLI_VERSION.into(),
             root: p.root.display().to_string(),
+            release_trust: crate::srr::present::presentation("doctor"),
         });
     }
     let lock = p.lock()?.clone();
@@ -674,6 +686,7 @@ pub fn run(p: &Project) -> Result<Report> {
         framework_version: p.framework_version(),
         cli_version: CLI_VERSION.into(),
         root: p.root.display().to_string(),
+        release_trust: crate::srr::present::presentation("doctor"),
     })
 }
 

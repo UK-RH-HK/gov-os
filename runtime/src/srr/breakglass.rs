@@ -32,6 +32,19 @@
 //! reaches the effect only through its sink, and the sink refuses. The enforcement is a property of the effect,
 //! not of the caller.
 //!
+//! ## Why the census is derived and not declared
+//!
+//! That argument is only as good as the census behind it, and three R1 iterations failed the same way: a
+//! *declared enumeration* standing in for a universal negative, complete when written and silently short as soon
+//! as the product grew an unenumerated path — and, each time, a test derived from the same enumeration as the
+//! code, so it could not see that the enumeration was short. [`SECTION_6_SINKS`] was the third such enumeration.
+//!
+//! [`SECTION_6_SIGNATURES`] replaces the claim. It names, per bullet, the product's own primitives an
+//! implementation of that effect must use, and `section_6_coverage_is_derived_from_the_product` walks **every
+//! function in `runtime/src` and `cli/src`** to find them. A new primitive appears in the derived set without
+//! anyone remembering to add it. A bullet that claims no primitive exists must first prove its detector can see
+//! one, against a positive control. What the derivation cannot see is written down beside it.
+//!
 //! Both points call one private decision (`decide`) over one reading of one record ([`read_marking`]), so the
 //! operation-level guard, the effect-level guard, [`Degraded::load`] and [`is_degraded`] can never disagree about
 //! whether this machine is marked (`AR29-C1`).
@@ -272,6 +285,48 @@ fn refuse(class: &'static str, operation: &str, entered_at: &str, record: &Value
     }))
 }
 
+/// **Refuse when the subject of the §6 decision cannot be determined** (`AR31-B2`).
+///
+/// [`guard_light`] and [`guard_effect`] are reached from sinks that hold no [`MachineState`], so they resolve the
+/// protected state root themselves. Both used to convert a resolution error into a clearance. The comment that
+/// justified it named "the ungoverned/unprovisioned case" — and AR-0031 enumerated every input to
+/// [`crate::srr::state::resolve_state_root`] and showed that case returns `Ok` and never reaches the branch. The
+/// only input that reaches it is `GOV_MACHINE_STATE_DIR` pointing elsewhere on an already-provisioned machine,
+/// which is the one input the product has already classified as hostile and refuses. Both enforcement points
+/// therefore failed open on precisely that input, together, for all of bullets 1-7.
+///
+/// `OWNER-DECISION-0006` §6 is a MUST NOT. A check that cannot identify its subject has not established that the
+/// subject is unmarked, so it refuses. No legitimate input reaches this path, so failing closed costs nothing.
+///
+/// The fix is here and nowhere else: machine-state root resolution is owner-closed by `OWNER-DECISION-0007` §1
+/// (`AR27-OD1` is out of scope) and [`crate::srr::state::resolve_state_root`] and `default_state_root` are
+/// byte-identical across this repair. Only the handling of their error changed.
+///
+/// [`guard_effect_on`] and [`guard`] cannot reach this: they are handed the [`MachineState`] and resolve nothing,
+/// which is why §6 bullet 4 held under the input that opened the others.
+fn undetermined_subject(class: &'static str, operation: &str, cause: &GovError) -> GovError {
+    GovError::new(
+        "SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED",
+        format!(
+            "'{operation}' is refused: this machine's protected state root could not be resolved, so whether it is marked `{DEGRADED_TOKEN}` cannot be determined ({}: {}). OWNER-DECISION-0006 §6 is a MUST NOT, and a check that cannot identify its subject has not established that the machine is unmarked, so it refuses rather than clears. Unset {} and retry.",
+            cause.code,
+            cause.message,
+            crate::srr::state::ENV_STATE_DIR
+        ),
+    )
+    .with_details(json!({
+        "marking": DEGRADED_TOKEN,
+        "operation": operation,
+        "refused_class": class,
+        "section_6_bullet": refusal_bullet(class),
+        "subject": "UNDETERMINED",
+        "fail": "closed",
+        "cause": {"code": cause.code, "message": cause.message},
+        "state_root_env": crate::srr::state::ENV_STATE_DIR,
+        "exit_condition": exit_condition_description(),
+    }))
+}
+
 /// A three-valued read of the marking record, so that "present but unreadable" is never silently "not marked".
 ///
 /// **This is the only reader of the marking record in the implementation** (`AR29-C1`). The guards, the effect
@@ -352,11 +407,10 @@ pub fn guard_light(product: &str, operation: &str) -> Result<()> {
     if permitted_activity(operation).is_some() {
         return Ok(());
     }
-    let Ok(root) = crate::srr::state::resolve_state_root() else {
-        // No protected machine state resolves here, so there is no marking on this machine to enforce: the
-        // ungoverned/unprovisioned case, not a degraded one. `resolve_state_root` is used exactly as it stands;
-        // this repair does not change how machine-state paths are resolved (AR27-OD1 is out of scope).
-        return Ok(());
+    let root = match crate::srr::state::resolve_state_root() {
+        Ok(r) => r,
+        // `AR31-B2` — **fail closed on an undetermined subject.** See [`undetermined_subject`].
+        Err(e) => return Err(undetermined_subject(refusal_class(operation), operation, &e)),
     };
     decide(
         &degraded_path_at(&root, product),
@@ -487,23 +541,31 @@ impl Effect {
     }
 }
 
-/// **The §6 sink census.** For each §6 bullet, the single primitive in this product that can realise the effect,
-/// and therefore the single place the enforcement point has to sit.
+/// **The §6 sink census.** For each §6 bullet, the primitive in this product that realises the effect, and
+/// therefore the place the enforcement point has to sit.
 ///
-/// This is the claim the repair makes, written where it can be checked. The certification test
-/// `section_6_effects_are_enforced_inside_their_sinks` reads the product's own source against it and fails when a
-/// sink loses its enforcement call, when the token stops being sealed, or when a second implementation of a §6
-/// primitive appears somewhere else in the tree.
+/// **This table is a summary, not the coverage claim.** Three R1 iterations failed because a *declared*
+/// enumeration stood in for a universal negative and went silently short as soon as the product grew a path its
+/// author had not enumerated: first the list of forbidden operations, then the set of guarded call sites, then
+/// this census. The coverage claim now lives in [`SECTION_6_SIGNATURES`], which is **derived from the product's
+/// own source** by `section_6_coverage_is_derived_from_the_product`: every function in `runtime/src` and
+/// `cli/src` is examined, and any function that performs a durable write and matches an effect's signature must
+/// carry that effect's enforcement. This table exists so a reader can see the answer; the derivation is what
+/// checks it.
 ///
-/// Bullets 6 and 7 have no sink because they have no primitive: [`Floors`] exposes only `raise_*`, which are
-/// monotonic and ignore a lower value rather than writing it, and every surface that reports the installed release
-/// carries the marking alongside it.
+/// No entry claims "no primitive exists" any more. Bullets 6 and 7 used to, and both claims were unfalsifiable by
+/// the product's own suite (`AR31-N5`) — which is exactly how `AR31-B1` survived repair 2. Both now have real
+/// sinks. The mechanism that makes an absence claim refutable is kept anyway, for the next bullet that needs one:
+/// see [`SECTION_6_SIGNATURES`].
 pub const SECTION_6_SINKS: &[(&str, &str)] = &[
     (
         "normal_privileged_operation",
         "crate::orchestration::control::guard_write",
     ),
-    ("human_gate_create", "crate::orchestration::gates::build"),
+    (
+        "human_gate_create",
+        "crate::records::save_record (every write of a `human-gate` record, however the Record was minted) + crate::orchestration::gates::build (compiler-enforced &Clearance, inside gates.rs)",
+    ),
     ("human_gate_approve", "crate::orchestration::gates::answer"),
     ("release_certification", "crate::release::build"),
     (
@@ -512,17 +574,197 @@ pub const SECTION_6_SINKS: &[(&str, &str)] = &[
     ),
     (
         "privileged_plugin_acquisition",
-        "crate::srr::plugins::guard_acquisition",
+        "crate::srr::plugins::guard_acquisition + crate::tools::install — both capability-registry writers ask, unconditionally",
     ),
     (
         "floor_lower_or_reset",
-        "no primitive: Floors::raise_* are monotonic and never write a lower value",
+        "crate::srr::state::Floors::save — the only writer of floors/<product>.json, monotonic against the persisted value",
     ),
     (
         "present_below_floor_release_as_current",
-        "no primitive: every reporting surface carries the marking",
+        "crate::srr::present::presentation — reached by every command result the CLI emits, and by doctor, update --check and the agent context packet directly",
     ),
 ];
+
+/// **The §6 effect signatures — the coverage claim, in a form the product can be measured against.**
+///
+/// Each entry is `(activity, signature markers, acceptance markers)`.
+///
+/// * **signature markers** name the product's own primitives that an implementation of the effect must use: the
+///   record-type table, the protected path builders, the capability registries, the command-result envelope. A
+///   function that performs a durable write and mentions one of these is *derived* to be a place the effect can
+///   happen — whether or not anyone remembered to put it in [`SECTION_6_SINKS`].
+/// * **acceptance markers** are what makes such a function acceptable: it carries the effect's enforcement call,
+///   or it reaches the sink that does.
+///
+/// `section_6_coverage_is_derived_from_the_product` walks **every** function in `runtime/src` and `cli/src`,
+/// computes the derived set, and fails naming any function in it that carries no acceptance marker. Nothing is on
+/// a list of "places to look": the function set comes from the tree.
+///
+/// **How a "no primitive exists" claim can now fail.** An entry may legitimately derive to the empty set — that
+/// is what "no primitive realises this effect" means. Such a claim is only worth anything if the detector behind
+/// it can detect a primitive, so the test first runs each signature against a **positive control**: a synthetic
+/// implementation of that effect, written the way a future author plausibly would. A signature that fails to
+/// match its positive control fails the test, whatever it then finds (or does not find) in the product. An
+/// absence claim is therefore the *most* tested case rather than a loop the test silently skips (`AR31-N5`).
+///
+/// **What this cannot see**, stated plainly because three roles in this lineage overstated a universal property
+/// and every overstatement was later falsified:
+///
+/// * an implementation that reaches the effect without using any of the product's own primitives — writing
+///   `trust/root.json` with a hand-built path and `std::fs::write`, say. The path-literal markers below catch the
+///   obvious spellings and nothing catches a computed one.
+/// * anything outside `runtime/src` and `cli/src`.
+/// * a caller that is *given* a value rather than deriving it: a `&Clearance` handed across a function boundary
+///   is accepted at the boundary, not re-derived.
+/// * dynamic dispatch, macro-generated code, and any string assembled at run time.
+///
+/// **A cost of this mechanism, stated so it is not mistaken for a defect.** The markers below are string literals,
+/// and they name the product's own primitives. A *file-level* grep census — "which files mention
+/// `root_metadata_path`, `guard_acquisition`, `floors_path`?" — will therefore now also count this file. Such a
+/// census must exclude [`SECTION_6_SIGNATURES`]; the derived census in the certification suite is unaffected,
+/// because it examines function bodies and these are module-level constants inside none.
+/// * the marking on a non-CLI consumer: the command-result envelope covers every `gov` command including ones not
+///   yet written, but an in-process embedder of `gov_runtime` that calls a reporting function directly gets the
+///   marking only from the surfaces that carry it themselves.
+pub const SECTION_6_SIGNATURES: &[(&str, &[&str], &[&str])] = &[
+    (
+        "normal_privileged_operation",
+        &["control::guard_write(", "guard_write(p,", "guard_write(&p"],
+        &["guard_write(", "breakglass::guard_light"],
+    ),
+    (
+        "human_gate_create",
+        &["save_record(", "record_path_for(", "record_dir_for("],
+        &[
+            "Effect::HumanGateCreate",
+            "guarded_record_effect(",
+            "save_record(",
+            "_clearance: &crate::srr::breakglass::Clearance",
+        ],
+    ),
+    (
+        "human_gate_approve",
+        &["json!(\"ANSWERED\")", "\"gate_status\", json!(\"ANSWERED\")"],
+        &["Effect::HumanGateApprove"],
+    ),
+    (
+        "release_certification",
+        &["certification_status", "\"certification\": {\"status\""],
+        &["Effect::ReleaseCertification"],
+    ),
+    (
+        "trust_policy_mutation",
+        &[
+            "root_metadata_path(",
+            "provisioned_path(",
+            "join(\"root.json\")",
+            "join(\"provisioned.json\")",
+        ],
+        &["Effect::TrustPolicyMutation", "set_root_metadata("],
+    ),
+    (
+        "privileged_plugin_acquisition",
+        &["join(\"plugins\")", "join(\"tools\")", "guard_acquisition"],
+        &["Effect::PrivilegedPluginAcquisition", "guard_acquisition"],
+    ),
+    (
+        "floor_lower_or_reset",
+        &["floors_path(", "join(\"floors\")"],
+        &["floor_lower_or_reset", "raise_metadata(", "raise_release(", "raise_minimum_secure("],
+    ),
+    (
+        "present_below_floor_release_as_current",
+        &["\"command\": name", "\"ok\": true, \"command\""],
+        &[
+            "Effect::PresentBelowFloorReleaseAsCurrent",
+            "present::attach(",
+            "present::presentation(",
+        ],
+    ),
+];
+
+/// **What counts as performing a durable write**, derived rather than assumed.
+///
+/// The derived census asks two questions of every function: does it match an effect's signature, and does it
+/// write anything durable. This is the second question. A function that matches a signature but writes nothing
+/// cannot realise the effect — it is a reader, a path builder or a report — so it is not a violation.
+///
+/// These are the product's own persistence primitives. The certification suite proves the list non-vacuous by
+/// running it against a positive control, the same way it proves each signature.
+pub const SECTION_6_WRITE_PRIMITIVES: &[&str] = &[
+    "write_durable(",
+    "std::fs::write(",
+    "fs::write(",
+    "std::fs::rename(",
+    "File::create(",
+    "write_yaml(",
+    "write_text(",
+    "write_json(",
+    "save_record(",
+    ".save(",
+    "write_all(",
+    "println!",
+    "print!",
+];
+
+/// **Functions the derivation finds and that are not violations, each with the reason.**
+///
+/// This is not a list of places to look — the derivation is complete over `runtime/src` and `cli/src` and this
+/// list is what it *found*. The signatures deliberately over-approximate, because a universal negative is better
+/// served by a detector that is too eager than by one that is too narrow, and an over-eager detector needs
+/// somewhere for the justified cases to be written down.
+///
+/// The difference from the enumerations that failed three times is the direction of the obligation. Those listed
+/// where the effect could happen, and went short when the product grew a path nobody listed. This lists
+/// exceptions *after* derivation: a new match cannot appear silently, because the census fails until someone
+/// writes the reason here. `section_6_coverage_is_derived_from_the_product` additionally fails when an entry here
+/// no longer matches its signature, so an exemption cannot rot into a blanket after the code it excused has
+/// moved.
+pub const SECTION_6_DERIVATION_EXEMPTIONS: &[(&str, &str, &str)] = &[(
+    "human_gate_create",
+    "runtime/src/cit/mod.rs::take_snapshot",
+    "computes a record's own canonical path (`record_path_for`) in order to COPY that record into a CIT rollback snapshot. It mints no record, and every byte it writes goes to the snapshot directory, never to a record path. The two CIT ops that do reach a record path — `append_record` and `write_file` — pass `save_record` and the §6 record-type check respectively.",
+)];
+
+/// The reason `path::function` is exempt from `activity`'s derived census, or `None` if it is not exempt.
+pub fn derivation_exemption(activity: &str, site: &str) -> Option<&'static str> {
+    SECTION_6_DERIVATION_EXEMPTIONS
+        .iter()
+        .find(|(a, s, _)| *a == activity && *s == site)
+        .map(|(_, _, why)| *why)
+}
+
+/// The signature and acceptance markers declared for `activity`, or `None` when the census does not name it.
+pub fn section_6_signature(activity: &str) -> Option<(&'static [&'static str], &'static [&'static str])> {
+    SECTION_6_SIGNATURES
+        .iter()
+        .find(|(a, _, _)| *a == activity)
+        .map(|(_, sig, acc)| (*sig, *acc))
+}
+
+/// **Record types whose persistence is itself an `OWNER-DECISION-0006` §6 effect.**
+///
+/// `AR31-N3`: the bullet-2 creation guarantee was a property of `gates.rs`, not of the product.
+/// [`crate::orchestration::gates::build`] is private and takes a sealed [`Clearance`], so no new gate-raising
+/// function *inside that module* compiles without asking §6 — but `records::new_record`, `records::save_record`
+/// and every field of `Record` are `pub`, and AR-0031 minted a `human-gate` record three ways with no
+/// `Clearance` in existence. One of those three (a non-literal type argument) is invisible to **any** source
+/// scan, so a source-literal census cannot close it.
+///
+/// The effect is therefore enforced where the effect happens. However a `Record` is minted, it becomes durable
+/// only through [`crate::records::save_record`], and that function asks §6 for every type named here. The
+/// compiler-enforced `&Clearance` on `gates::build` is kept as well: the two are complementary, one binding new
+/// code inside `gates.rs` at compile time and one binding every writer in the product at the instant of the write.
+pub const GUARDED_RECORD_TYPES: &[(&str, Effect)] = &[("human-gate", Effect::HumanGateCreate)];
+
+/// The §6 effect that persisting a record of type `rtype` realises, or `None` when persistence is not a §6 effect.
+pub fn guarded_record_effect(rtype: &str) -> Option<Effect> {
+    GUARDED_RECORD_TYPES
+        .iter()
+        .find(|(t, _)| *t == rtype)
+        .map(|(_, e)| *e)
+}
 
 /// **A sealed witness that [`guard_effect`] was consulted for one effect and did not refuse it.**
 ///
@@ -585,7 +827,8 @@ pub fn guard_effect_on(
 }
 
 /// [`guard_effect_on`] for a sink that holds no [`MachineState`], resolving the protected state root the same way
-/// [`guard_light`] does and failing open on the same ungoverned/unprovisioned case for the same reason.
+/// [`guard_light`] does and, since `AR31-B2`, failing **closed** on the same undetermined subject for the same
+/// reason ([`undetermined_subject`]).
 ///
 /// The marking is always written and read under [`crate::FRAMEWORK_NAME`] — `enter` writes
 /// `degraded/<product>.json` for the product the break-glass token binds, and `authorise` refuses a token whose
@@ -594,8 +837,10 @@ pub fn guard_effect(effect: Effect, operation: &str) -> Result<Clearance> {
     if effect == Effect::NormalPrivilegedOperation && permitted_activity(operation).is_some() {
         return Ok(Clearance::issue(effect, operation));
     }
-    let Ok(root) = crate::srr::state::resolve_state_root() else {
-        return Ok(Clearance::issue(effect, operation));
+    let root = match crate::srr::state::resolve_state_root() {
+        Ok(r) => r,
+        // `AR31-B2` — **fail closed on an undetermined subject.** See [`undetermined_subject`].
+        Err(e) => return Err(undetermined_subject(effect.activity(), operation, &e)),
     };
     decide(
         &degraded_path_at(&root, crate::FRAMEWORK_NAME),
@@ -1135,6 +1380,93 @@ mod tests {
         assert!(!is_degraded(&ms, product));
         assert!(guard(&ms, product, "cit approve").is_ok());
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// `AR31-B2` — the guards fail **closed** when they cannot determine their subject, and the refusal says so
+    /// rather than borrowing the vocabulary of a machine known to be marked.
+    #[test]
+    fn an_undetermined_subject_refuses_and_says_which_it_is() {
+        let cause = GovError::new("SRR_PROTECTED_STATE_OVERRIDE_REFUSED", "relocated");
+        let e = undetermined_subject("human_gate_create", "gate create", &cause);
+        assert_eq!(e.code, "SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED");
+        assert_eq!(e.details["subject"], "UNDETERMINED");
+        assert_eq!(e.details["fail"], "closed");
+        assert_eq!(e.details["refused_class"], "human_gate_create");
+        assert_eq!(e.details["section_6_bullet"], 2);
+        assert_eq!(e.details["cause"]["code"], "SRR_PROTECTED_STATE_OVERRIDE_REFUSED");
+        // the operator is told what to do about it, not merely that it happened
+        assert!(e.message.contains(crate::srr::state::ENV_STATE_DIR));
+        assert!(!e.details["exit_condition"].as_str().unwrap_or("").is_empty());
+    }
+
+    /// The allow-list is consulted before any state is resolved, so a §5 recovery operation can never be blocked
+    /// by the fail-closed path: restoration stays available on a machine whose state root will not resolve.
+    #[test]
+    fn failing_closed_never_blocks_a_section_5_restoration_route() {
+        for route in ["kernel reinstall", "update --apply", "update --rollback", "checkpoint"] {
+            assert!(
+                permitted_activity(route).is_some(),
+                "'{route}' must be decided by the allow-list before any state read"
+            );
+        }
+    }
+
+    /// `AR31-N3` — the record-write sink dispatches on the record TYPE, which is what all three of AR-0031's
+    /// constructions produce, rather than on a source literal that two of them do not spell.
+    #[test]
+    fn a_guarded_record_type_is_recognised_however_the_record_was_minted() {
+        assert_eq!(guarded_record_effect("human-gate"), Some(Effect::HumanGateCreate));
+        assert_eq!(guarded_record_effect("task"), None);
+        assert_eq!(guarded_record_effect(""), None);
+        for (rtype, effect) in GUARDED_RECORD_TYPES {
+            assert!(REFUSED_ACTIVITIES.contains(&effect.activity()));
+            assert!(
+                crate::records::record_dir_for(rtype).is_ok(),
+                "'{rtype}' is guarded but is not a record type this product has"
+            );
+        }
+        let computed: &str = "human-gate";
+        let r = crate::records::new_record(computed, "HDG-0001", "t", json!({}));
+        assert_eq!(guarded_record_effect(&r.rtype()), Some(Effect::HumanGateCreate));
+        let mut retyped = crate::records::new_record("task", "TASK-0001", "t", json!({}));
+        retyped.set("type", json!("human-gate"));
+        assert_eq!(
+            guarded_record_effect(&retyped.rtype()),
+            Some(Effect::HumanGateCreate)
+        );
+    }
+
+    /// `AR31-N5` / `OWNER-DECISION-0008` mandate parts 3 and 4 — the census is derived and no bullet is excused.
+    ///
+    /// The behaviour is measured by `section_6_coverage_is_derived_from_the_product` in the certification suite,
+    /// which needs the source tree. This asserts the shape the derivation depends on, where it is cheapest to
+    /// notice that it has gone.
+    #[test]
+    fn every_section_6_bullet_has_a_derivation_signature_and_none_claims_an_absence() {
+        assert_eq!(SECTION_6_SIGNATURES.len(), REFUSED_ACTIVITIES.len());
+        for a in REFUSED_ACTIVITIES {
+            let (sig, acc) = section_6_signature(a)
+                .unwrap_or_else(|| panic!("§6 activity '{a}' has no derivation signature"));
+            assert!(!sig.is_empty(), "'{a}' has an empty signature: it would derive nothing");
+            assert!(!acc.is_empty(), "'{a}' has no acceptance marker: everything would be a violation");
+            for m in sig.iter().chain(acc.iter()) {
+                assert!(!m.trim().is_empty(), "'{a}' has a blank marker, which matches everything");
+            }
+        }
+        for (activity, sink) in SECTION_6_SINKS {
+            assert!(
+                !sink.starts_with("no primitive"),
+                "§6 '{activity}' claims no primitive exists; that claim must be carried by a signature that                  derives nothing while still flagging its positive control, not by a sink string"
+            );
+        }
+        assert!(!SECTION_6_WRITE_PRIMITIVES.is_empty());
+        for (activity, site, why) in SECTION_6_DERIVATION_EXEMPTIONS {
+            assert!(REFUSED_ACTIVITIES.contains(activity));
+            assert!(site.contains("::"), "an exemption names a path::function");
+            assert!(why.len() > 60, "'{site}' needs a usable reason");
+            assert_eq!(derivation_exemption(activity, site), Some(*why));
+        }
+        assert_eq!(derivation_exemption("human_gate_create", "nowhere::nothing"), None);
     }
 
     #[test]

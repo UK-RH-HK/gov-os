@@ -419,7 +419,45 @@ impl Floors {
         })
     }
 
+    /// Persist the floors.
+    ///
+    /// **The `OWNER-DECISION-0006` §6 bullet 6 (and §8) sink.** This is the only function in the product that
+    /// writes `floors/<product>.json`, so every path that could lower or reset a floor passes through it — and it
+    /// refuses to lower one. The persisted value is re-applied through the same monotonic `raise_*` functions
+    /// before the write, so a floor can only ever move up, whatever the in-memory value says and whoever set it.
+    ///
+    /// Repair 2's census recorded bullet 6 as `no primitive exists: Floors::raise_* are monotonic and never write
+    /// a lower value`. The derived census (`SECTION_6_SIGNATURES`) contradicts that by construction: every field
+    /// of [`Floors`] is `pub` and `save` is `pub`, so `f.release_high_water_sequence = 0; f.save(&ms)` is a
+    /// floor-lowering primitive that the mutator census could not see, exactly the shape of `AR31-N1` one bullet
+    /// over. No code in the product does it today and the certification suite measures that; the property is now
+    /// a property of the sink rather than of the callers, so it also holds for code that has not been written.
+    ///
+    /// Monotonicity is enforced here **at all times**, not only below floor: §8 says break-glass does not lower,
+    /// reset or forget the floors, and ARCH-0003 §7 says the floors are the highest values the machine has
+    /// observed. Neither is conditional on the marking, and a check that binds always cannot be skipped by a
+    /// caller that reaches it at the wrong moment. Every current caller loads, raises and saves, so the merge is
+    /// a no-op for all of them.
     pub fn save(&mut self, ms: &MachineState) -> Result<()> {
+        let persisted = Floors::load(ms, &self.product);
+        let roles: Vec<(String, u64)> = persisted
+            .metadata_high_water
+            .iter()
+            .map(|(k, v)| (k.clone(), *v))
+            .collect();
+        for (role, version) in roles {
+            self.raise_metadata(&role, version);
+        }
+        self.raise_release(
+            &persisted.release_high_water_version,
+            persisted.release_high_water_sequence,
+            true,
+        );
+        self.raise_minimum_secure(
+            &persisted.minimum_secure_release,
+            persisted.minimum_secure_sequence,
+            &persisted.minimum_secure_source_sha256,
+        );
         self.updated_at = now_iso();
         write_durable(&ms.floors_path(&self.product), &self.to_value())
     }

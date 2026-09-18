@@ -169,7 +169,14 @@ pub fn compile(p: &Project, db: &RuntimeDb, task_id: &str) -> Result<Value> {
         .collect();
     let det = json!({
         "task": brief(task), "objective": task.get("objective"),
-        "project_state": {"framework_version": p.framework_version(), "task_status_counts": status_counts, "pending_human_gates": pending_gates, "control": ctl.get("mode"), "projects": store.of_type("project").iter().map(|r| brief(r)).collect::<Vec<_>>()},
+        // `OWNER-DECISION-0006` §6 bullet 7 (`AR31-B1`): `framework_version` is what the LOCK says is installed;
+        // `release_trust.below_floor` is whether this machine is marked `DEGRADED — RECOVERY ONLY` and is
+        // therefore running beneath its signed security floor. This packet is the deterministic authority block
+        // every kernel role reads, and it used to carry the version with no marking, so every agent consuming it
+        // treated the below-floor release as the current one. The two are different predicates and are never
+        // merged (frozen R0 item 11). The block is read at the one §6 bullet 7 sink, `crate::srr::present`, which
+        // asks `breakglass::guard_effect` and reports the refusal rather than swallowing it.
+        "project_state": {"framework_version": p.framework_version(), "release_trust": crate::srr::present::presentation("context packet"), "task_status_counts": status_counts, "pending_human_gates": pending_gates, "control": ctl.get("mode"), "projects": store.of_type("project").iter().map(|r| brief(r)).collect::<Vec<_>>()},
         "authority_layers": authority_layers, "hard_invariants": invariants.iter().map(|i| i["id"].clone()).collect::<Vec<_>>(),
         "feature": feature.map(brief), "governing_requirements": collect(&req_ids, "requirement"), "active_decisions": active_decisions, "conflicting_decisions": conflicting,
         "architecture": store.active("architecture").iter().map(|r| brief(r)).collect::<Vec<_>>(), "interfaces": collect(&iface_ids, "interface"), "scenarios": collect(&scn_ids, "scenario"),

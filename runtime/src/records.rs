@@ -317,7 +317,24 @@ pub fn load_record(root: &Path, relpath: &str) -> Result<Option<Record>> {
     Ok(parse_record_text(&text, relpath))
 }
 
+/// Persist a governed record.
+///
+/// **The `OWNER-DECISION-0006` §6 bullet 2 (creation) effect sink** (`AR31-N3`). Whatever minted a `Record` —
+/// [`new_record`] with a literal type, `new_record` with a computed one, [`Record::set`] retyping an existing
+/// record, or a struct literal, all of which are `pub` — it becomes durable only here. The §6 question is
+/// therefore asked here, keyed by the record type, for every type in
+/// [`crate::srr::breakglass::GUARDED_RECORD_TYPES`].
+///
+/// This does not replace the compiler-enforced `&Clearance` on [`crate::orchestration::gates::build`]; the two
+/// bind different things. The clearance binds new code written inside `gates.rs` at compile time. This binds
+/// every writer in the product, including one that never goes near `gates.rs`, at the instant of the write. The
+/// gap AR-0031 demonstrated — three constructions with no `Clearance` in existence, one of them invisible to any
+/// source scan — is closed by this one, not by that one.
 pub fn save_record(root: &Path, rec: &Record) -> Result<()> {
+    let rtype = rec.rtype();
+    if let Some(effect) = crate::srr::breakglass::guarded_record_effect(&rtype) {
+        crate::srr::breakglass::guard_effect(effect, &format!("{rtype} record write"))?;
+    }
     let p = root.join(&rec.path);
     match rec.format {
         RecordFormat::Md => {

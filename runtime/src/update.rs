@@ -95,10 +95,20 @@ pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
     let impact = json!({"radius": radius, "overlay_changes": dry.overlay_keys_changed, "index_rebuild": dry.index_rebuild, "regenerate_adapters": dry.regenerate_adapters, "notes": dry.notes, "breaking_changes": breaking, "human_gates": human_gates, "consequences": [
         format!("kernel {current} → {target} ({} migration step(s))", chain.len()), "spec/ and product/ are not touched (INV-013)", if dry.index_rebuild { "all derived indexes are rebuilt after install" } else { "no index rebuild required" },
         if cert == "CERTIFIED" { "target release is certified" } else { "target release is NOT certified: human approval required" }]});
-    Ok(
-        json!({"current": current, "available": target, "source": src.display().to_string(), "up_to_date": ord != std::cmp::Ordering::Less, "downgrade": ord == std::cmp::Ordering::Greater, "compatible": compatible, "migration_path": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "migration_path_complete": !chain.is_empty() || current == target,
-        "certification": cert, "impact": impact, "human_gate_required": human_gate_required, "recommendation": if ord != std::cmp::Ordering::Less { "nothing to do" } else if !compatible { "unsupported upgrade path: adopt an intermediate release" } else if human_gate_required { "review impact; approve with `gov update --apply --approve --by <human>`" } else { "safe: `gov update --apply`" }}),
-    )
+    let mut out = json!({"current": current, "available": target, "source": src.display().to_string(), "up_to_date": ord != std::cmp::Ordering::Less, "downgrade": ord == std::cmp::Ordering::Greater, "compatible": compatible, "migration_path": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "migration_path_complete": !chain.is_empty() || current == target,
+        "certification": cert, "impact": impact, "human_gate_required": human_gate_required, "recommendation": if ord != std::cmp::Ordering::Less { "nothing to do" } else if !compatible { "unsupported upgrade path: adopt an intermediate release" } else if human_gate_required { "review impact; approve with `gov update --apply --approve --by <human>`" } else { "safe: `gov update --apply`" }});
+    // **`OWNER-DECISION-0006` §6 bullet 7** (`AR31-B1`). `gov update --check` used to emit
+    // `{"current": <below-floor version>, "up_to_date": true, "recommendation": "nothing to do"}` on a machine
+    // marked `DEGRADED — RECOVERY ONLY` — the bullet in the decision's own words, and the opposite of what is
+    // true, since restoring an authenticated at-floor release is the only way out of break-glass. It is
+    // read-only, so it never reaches `control::guard_write` and nothing refused it.
+    //
+    // `crate::srr::present::attach` is the §6 bullet 7 sink: it asks `crate::srr::breakglass::guard_effect` for
+    // `Effect::PresentBelowFloorReleaseAsCurrent` and, when that refuses, rewrites the currency claim and carries
+    // the marking rather than swallowing the refusal. Attaching the marking beside an affirmative `up_to_date`
+    // would not have been enough — the claim itself is the forbidden presentation.
+    crate::srr::present::attach("update --check", &mut out);
+    Ok(out)
 }
 
 fn snapshot_dir(p: &Project, target: &str) -> std::path::PathBuf {
