@@ -1,0 +1,174 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0001
+role: capability-family-auditor
+objective: "Audit every checklist bullet of capabilities A1-A5, B1-B3, S1-S6, T1-T3 with executable evidence"
+agent_model: claude-opus-4-6
+independence_statement: >
+  This is the first run in this worktree. No prior agent output was read. I did not read session/agent
+  transcripts, task-output stores, or user auto-memory. I did not spawn sub-agents. I did not modify
+  product source. All evidence was produced independently by building the binary and driving the gov CLI.
+input:
+  base_commit: 57177a37ea296ece16b185874831462b6a76db18
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0001-audit-0-alpha.md
+inspected:
+  - runtime/src/policy.rs
+  - runtime/src/policy_precedence.rs
+  - runtime/src/authority.rs
+  - runtime/src/exceptions.rs
+  - runtime/src/kernel.rs
+  - runtime/src/kernel_trust.rs
+  - runtime/src/init.rs
+  - runtime/src/adopt.rs
+  - runtime/src/update.rs
+  - runtime/src/release.rs
+  - runtime/src/recovery.rs
+  - runtime/src/lock.rs
+  - runtime/src/paths.rs
+  - runtime/src/srr/mod.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/migrations/planner.rs
+  - framework/roles/ROLES.yaml
+  - framework/constitution/HARD_INVARIANTS.yaml
+  - framework/policies/POLICY_PRECEDENCE.yaml
+  - framework/policies/SECURITY_POLICY.yaml
+  - framework/policies/AUTHORITY_POLICY.yaml
+  - framework/policies/BUDGET_POLICY.yaml
+  - governance/project/REPOSITORY_CONTRACT.yaml
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0001-audit-0-alpha.md
+produced:
+  - release/capability-baseline/audit-0/alpha/00-AUDIT-REPORT.md
+  - release/capability-baseline/audit-0/alpha/capability-audit.yaml
+  - release/capability-baseline/audit-0/alpha/findings.yaml
+  - release/capability-baseline/audit-0/alpha/evidence/A1-canonical-authority.out
+  - release/capability-baseline/audit-0/alpha/evidence/A1-canonical-authority.sh
+  - release/capability-baseline/audit-0/alpha/evidence/A2-root-of-trust.out
+  - release/capability-baseline/audit-0/alpha/evidence/A3-security-sensitivity.out
+  - release/capability-baseline/audit-0/alpha/evidence/A4-budget-governance.out
+  - release/capability-baseline/audit-0/alpha/evidence/A5-emergency-controls.out
+  - release/capability-baseline/audit-0/alpha/evidence/B-repository-contract.out
+  - release/capability-baseline/audit-0/alpha/evidence/S1-canonical-repo.out
+  - release/capability-baseline/audit-0/alpha/evidence/S2-immutable-releases.out
+  - release/capability-baseline/audit-0/alpha/evidence/S3-gov-init.out
+  - release/capability-baseline/audit-0/alpha/evidence/S4-gov-adopt.out
+  - release/capability-baseline/audit-0/alpha/evidence/S5-gov-update.out
+  - release/capability-baseline/audit-0/alpha/evidence/S6-cross-machine.out
+  - release/capability-baseline/audit-0/alpha/evidence/T-roles.out
+  - release/capability-baseline/audit-0/alpha/evidence/cross-capability-S-A2.out
+  - release/capability-baseline/audit-0/alpha/evidence/regression-suite.out
+tests_or_attacks:
+  - id: probe-A1-precedence
+    description: "Inject weakening overrides to security floors, authority floors, and additive sets"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/A1-canonical-authority.out
+  - id: probe-A2-tamper
+    description: "Modify installed CONSTITUTION.md and verify kernel trust detects tampering"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/A2-root-of-trust.out
+  - id: probe-A2-srr-separation
+    description: "Verify SRR separates intact/authentic/admissible predicates"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/A2-root-of-trust.out
+  - id: probe-A3-never-index
+    description: "Verify never_index_classes includes secret and restricted"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/A3-security-sensitivity.out
+  - id: probe-A5-authority-gate
+    description: "Attempt emergency control as L1 role (research-agent), verify AUTHORITY_DENIED"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/A5-emergency-controls.out
+  - id: probe-A5-pause-freeze-cancel-resume
+    description: "Exercise PAUSE, FREEZE_WRITES, CANCEL_AGENTS, RESUME cycle"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/A5-emergency-controls.out
+  - id: probe-B-path-classification
+    description: "Verify REPOSITORY_CONTRACT maps native layout with path classification"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/B-repository-contract.out
+  - id: probe-B2-target-actions
+    description: "Verify migration planner implements all required target actions"
+    result: FAIL
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/B-repository-contract.out
+  - id: probe-S2-immutability
+    description: "Build release, verify manifest, attempt re-build of same version"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/S2-immutable-releases.out
+  - id: probe-S4-adopt-brownfield
+    description: "Drive A0-A6 on brownfield fixture with session independence test"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/S4-gov-adopt.out
+  - id: probe-S4-a6-rollback
+    description: "Verify A6 migration batch rolls back on test failure"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/S4-gov-adopt.out
+  - id: probe-cross-srr-routing
+    description: "Verify init/adopt/update all route through crate::srr::admit"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/cross-capability-S-A2.out
+  - id: regression-lib
+    description: "cargo test --lib (42 tests)"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/regression-suite.out
+  - id: regression-certification
+    description: "cargo test --test certification (79 tests)"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/alpha/evidence/regression-suite.out
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 16
+  PARTIAL: 1
+  ABSENT: 0
+  UNCLEAR: 0
+  N_A_WITH_REASON: 0
+findings:
+  - id: A0-B2-01
+    severity: MEDIUM
+    capability: B2
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: true
+    title: "Target action RENAME, SPLIT, MERGE not implemented in migration planner"
+    path: release/capability-baseline/audit-0/alpha/findings.yaml
+  - id: A0-T1-01
+    severity: LOW
+    capability: T1
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "No dedicated 'recovery agent' role in ROLES.yaml"
+    path: release/capability-baseline/audit-0/alpha/findings.yaml
+  - id: A0-T1-02
+    severity: LOW
+    capability: T1
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "No dedicated 'adoption auditor/planner' role in ROLES.yaml"
+    path: release/capability-baseline/audit-0/alpha/findings.yaml
+  - id: A0-A5-01
+    severity: INFO
+    capability: A5
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "ROLLBACK_TRANSACTION is not a first-class emergency command"
+    path: release/capability-baseline/audit-0/alpha/findings.yaml
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-alpha
+  commit: 7e1e0062ec62dc71f4509cb3e4d36b97295045a1
+  evidence_path: release/capability-baseline/audit-0/alpha/
+unresolved:
+  - "A0-B2-01: owner decision required on RENAME/SPLIT/MERGE target actions"
+recommended_next_action: "Owner decision on A0-B2-01; proceed with remaining family audits and synthesis"
+completed_at: "2026-09-18T20:15:00Z"
