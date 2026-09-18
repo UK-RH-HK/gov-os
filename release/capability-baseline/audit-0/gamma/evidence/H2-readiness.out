@@ -1,0 +1,34 @@
+=== H2: 26-dimension readiness ===
+--- Create a feature ---
+created: True
+Feature readiness
+
+Usage: gov readiness [OPTIONS] <COMMAND>
+
+Commands:
+  check  
+  plan   
+  help   Print this message or the help of the given subcommand(s)
+
+Options:
+      --root <ROOT>        Repository root (default: discovered from the current directory)
+      --json               Structured JSON output envelope
+      --session <SESSION>  Session id (default: $GOV_SESSION or a new id)
+      --role <ROLE>        Acting role (default: $GOV_ROLE or orchestrator)
+  -h, --help               Print help
+--- Readiness check (26 dimensions) ---
+ok: False
+error: FEATURE_NOT_FOUND FEAT-0001 not found
+=== H2: Readiness check with 26 dimensions ===
+ok: True
+dimension_count: 26
+states: {'PRESENT': 10, 'MISSING': 14, 'PROVISIONAL': 1, 'N/A_WITH_REASON': 1}
+gaps_count: 15
+invalid_count: 0
+coverage: 0.4230769230769231
+pre_implementation_ok: False
+=== H2: N/A_WITH_REASON correctly handled (silent N/A rejected) ===
+invalid (silent N/A detected): ['user_actor: silent N/A or invalid cell value is not allowed']
+=== H2: Status vocabulary present ===
+READINESS_DIMENSIONS.yaml cell_states:
+cell_states: [PRESENT, MISSING, PROVISIONAL, BLOCKED, N/A_WITH_REASON]

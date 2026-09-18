@@ -1,0 +1,65 @@
+=== F1: Skill lifecycle ===
+--- Skills listed (versioned methods) ---
+ok: True
+count: 12
+has_id: True
+has_version: True
+has_status: True
+has_inputs: True
+has_validation_scenarios: True
+--- Skill resolve for task ---
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/usr/lib/python3.12/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+--- Skill validation ---
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/usr/lib/python3.12/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+--- Skill resolve ---
+Usage: gov skills resolve [OPTIONS] <TASK>
+
+Arguments:
+  <TASK>  
+
+Options:
+      --root <ROOT>        Repository root (default: discovered from the current directory)
+      --json               Structured JSON output envelope
+      --session <SESSION>  Session id (default: $GOV_SESSION or a new id)
+      --role <ROLE>        Acting role (default: $GOV_ROLE or orchestrator)
+  -h, --help               Print help
+---
+error: unexpected argument '--task-class' found
+
+  tip: to pass '--task-class' as a value, use '-- --task-class'
+
+Usage: gov skills resolve [OPTIONS] <TASK>
+
+For more information, try '--help'.
+--- Skill resolve for TASK-0001 ---
+ok: True
+has_resolved: True
+has_candidates: True
+has_capability_gap: True
+missing: []

@@ -1,0 +1,10 @@
+=== AC-16: L3 gate respects E1 (final) ===
+created: True
+gate_id: HDG-0002
+--- Present gate ---
+present ok: True
+--- Low-authority (L1) cannot decide ---
+ok: False
+code: AUTHORITY_DENIED
+--- Orchestrator (L4 relaying) can decide ---
+ok: True

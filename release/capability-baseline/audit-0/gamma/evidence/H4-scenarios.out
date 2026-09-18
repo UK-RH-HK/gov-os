@@ -1,0 +1,20 @@
+=== H4: Scenarios drive data/tests ===
+--- Feature->scenarios->data->tests chain structure ---
+scenarios: present=True
+test_data: present=False
+acceptance_tests: present=True
+success_criteria: present=False
+failure_criteria: present=False
+--- Test-obligation schema exists ---
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/gamma-probes/proj1/governance/kernel/schemas/test-obligation.schema.json
+PRESENT
+--- Scenario schema exists ---
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/gamma-probes/proj1/governance/kernel/schemas/scenario.schema.json
+PRESENT
+--- Data provenance: record has provenance field ---
+state_class: True
+provenance: True
+--- Test-data independence (TEST_POLICY.independent_test_author_required_for) ---
+            // TEST_POLICY.independent_test_author_required_for: declared obligations of those families must be independent
+                .get_list("TEST_POLICY", "independent_test_author_required_for");
+                        reasons.push(format!("{tid} ({}) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for)", o.get("family")));

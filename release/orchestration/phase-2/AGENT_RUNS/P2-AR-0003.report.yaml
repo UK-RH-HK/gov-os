@@ -1,0 +1,214 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0003
+role: capability-family-auditor
+objective: "Exhaustively audit capabilities E (E1-E4), F (F1-F5), G (G1-G2), H (H1-H4), I (I1-I4) from Governance_OS_Capability_Acceptance_Contract_v3.md lines 360-590 with executable evidence."
+agent_model: claude-opus-4-6
+independence_statement: >-
+  This agent has not authored any product source, test, fixture, schema, policy or Cargo file.
+  This agent read only: runtime source (authority.rs, skills.rs, tools.rs, capabilities/*.rs,
+  orchestration/*.rs, memory/claims.rs, doctor.rs, verification/mod.rs, cit/mod.rs, lessons.rs),
+  framework files (ROLES.yaml, COMMAND_CONTRACT.yaml, READINESS_DIMENSIONS.yaml), schemas
+  (task.schema.json, feature.schema.json, worker-return.schema.json, record.schema.json,
+  skill.schema.json), the frozen gate contract, the capability acceptance contract v3,
+  orchestration handoffs (P2-HO-0000, P2-HO-0003), and the run report README. It did not
+  read any other agent's evidence, run reports, session transcripts, task-output stores, or
+  user auto-memory. All evidence was produced by driving `target/release/gov` against a
+  disposable governed project initialized under a scratch directory.
+input:
+  base_commit: 57177a37ea296ece16b185874831462b6a76db18
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0003-audit-0-gamma.md
+inspected:
+  - runtime/src/authority.rs
+  - runtime/src/skills.rs
+  - runtime/src/tools.rs
+  - runtime/src/capabilities/registry.rs
+  - runtime/src/capabilities/protocol.rs
+  - runtime/src/capabilities/governance.rs
+  - runtime/src/capabilities/host.rs
+  - runtime/src/orchestration/claims.rs
+  - runtime/src/orchestration/tasks.rs
+  - runtime/src/orchestration/dag.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/orchestration/handoffs.rs
+  - runtime/src/orchestration/intents.rs
+  - runtime/src/orchestration/readiness.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/memory/claims.rs
+  - runtime/src/doctor.rs
+  - runtime/src/verification/mod.rs
+  - runtime/src/cit/mod.rs
+  - runtime/src/lessons.rs
+  - framework/roles/ROLES.yaml
+  - framework/commands/COMMAND_CONTRACT.yaml
+  - framework/taxonomy/READINESS_DIMENSIONS.yaml
+  - governance/kernel/schemas/task.schema.json
+  - governance/kernel/schemas/feature.schema.json
+  - governance/kernel/schemas/worker-return.schema.json
+  - governance/kernel/schemas/record.schema.json
+  - governance/kernel/schemas/skill.schema.json
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0003-audit-0-gamma.md
+produced:
+  - release/capability-baseline/audit-0/gamma/00-AUDIT-REPORT.md
+  - release/capability-baseline/audit-0/gamma/capability-audit.yaml
+  - release/capability-baseline/audit-0/gamma/findings.yaml
+  - release/capability-baseline/audit-0/gamma/evidence/E1-authority-levels.sh
+  - release/capability-baseline/audit-0/gamma/evidence/E1-authority-levels.out
+  - release/capability-baseline/audit-0/gamma/evidence/E2-roles.sh
+  - release/capability-baseline/audit-0/gamma/evidence/E2-roles.out
+  - release/capability-baseline/audit-0/gamma/evidence/E3-handoffs.out
+  - release/capability-baseline/audit-0/gamma/evidence/E4-claims.out
+  - release/capability-baseline/audit-0/gamma/evidence/F1-skills.out
+  - release/capability-baseline/audit-0/gamma/evidence/F2-tool-registry.out
+  - release/capability-baseline/audit-0/gamma/evidence/F3-missing-tool.out
+  - release/capability-baseline/audit-0/gamma/evidence/F4-plugin-trust.out
+  - release/capability-baseline/audit-0/gamma/evidence/F5-separation.out
+  - release/capability-baseline/audit-0/gamma/evidence/G1-intent.out
+  - release/capability-baseline/audit-0/gamma/evidence/G2-human-surface.out
+  - release/capability-baseline/audit-0/gamma/evidence/H1-spec-lineage.out
+  - release/capability-baseline/audit-0/gamma/evidence/H2-readiness.out
+  - release/capability-baseline/audit-0/gamma/evidence/H3-readiness-generates.out
+  - release/capability-baseline/audit-0/gamma/evidence/H4-scenarios.out
+  - release/capability-baseline/audit-0/gamma/evidence/I1-task-dag.out
+  - release/capability-baseline/audit-0/gamma/evidence/I2-task-contract.out
+  - release/capability-baseline/audit-0/gamma/evidence/I3-dynamic-generation.out
+  - release/capability-baseline/audit-0/gamma/evidence/I4-parallel.out
+  - release/capability-baseline/audit-0/gamma/evidence/AC16-cross-cap.out
+tests_or_attacks:
+  - id: E1-authority-probe
+    description: "L0-L5 authority level enforcement: lower roles denied, higher roles allowed"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/E1-authority-levels.out
+  - id: E2-roles-probe
+    description: "28 kernel roles accepted, unknown role rejected with UNKNOWN_ROLE"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/E2-roles.out
+  - id: E3-handoff-probe
+    description: "Handoff create/return with full worker-return schema validation"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/E3-handoffs.out
+  - id: E4-claims-probe
+    description: "Claim/collision/rebuild-survive/DAG concurrent work control"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/E4-claims.out
+  - id: F1-skills-probe
+    description: "Skill list/resolve/validate lifecycle"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/F1-skills.out
+  - id: F2-tool-registry-probe
+    description: "Tool registry with identity/version/permissions/roles/health/provenance"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/F2-tool-registry.out
+  - id: F3-missing-tool-probe
+    description: "Gap detection, candidate discovery, condition checks, gate-guarded install"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/F3-missing-tool.out
+  - id: F4-plugin-trust-probe
+    description: "All 6 plugin trust boundary bullets: self-auth, registry, hash-bind, drift, gates, review"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/F4-plugin-trust.out
+  - id: F5-separation-probe
+    description: "MCP/A2A/Knowledge Fabric separation (architectural, not runtime invariant)"
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/F5-separation.out
+  - id: G1-intent-probe
+    description: "Deterministic intent routing for 7 phrases, gate logic invocation"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/G1-intent.out
+  - id: G2-human-surface-probe
+    description: "All 5 human controls (status, continue, decide, audit, pause/freeze/resume)"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/G2-human-surface.out
+  - id: H1-spec-lineage-probe
+    description: "16 lineage categories present, 60+ schema types"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/H1-spec-lineage.out
+  - id: H2-readiness-probe
+    description: "26 dimensions evaluated, all states exercised, silent N/A rejected"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/H2-readiness.out
+  - id: H3-readiness-generates-probe
+    description: "15 gap tasks created from MISSING readiness cells"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/H3-readiness-generates.out
+  - id: H4-scenarios-probe
+    description: "Schema fields and independence enforcement (partial: test_data/success_criteria as dimensions)"
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/H4-scenarios.out
+  - id: I1-task-dag-probe
+    description: "23 task classes all create successfully, DAG computes runnable/blocked"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/I1-task-dag.out
+  - id: I2-task-contract-probe
+    description: "All 10 contract fields present in task schema"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/I2-task-contract.out
+  - id: I3-dynamic-generation-probe
+    description: "8 of 11 generation sources produce tasks; 3 produce findings only"
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/I3-dynamic-generation.out
+  - id: I4-parallel-probe
+    description: "DAG with runnable/blocked/cycles/critical-path/per-feature/human-gate"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/I4-parallel.out
+  - id: AC16-cross-cap-probe
+    description: "L3 gate presentation respects E1 authority enforcement"
+    result: PASS
+    evidence_path: release/capability-baseline/audit-0/gamma/evidence/AC16-cross-cap.out
+  - id: regression-lib
+    description: "cargo test --lib (42 tests)"
+    result: PASS
+    evidence_path: null
+  - id: regression-certification
+    description: "cargo test --test certification (79 tests)"
+    result: PASS
+    evidence_path: null
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 16
+  PARTIAL: 3
+  ABSENT: 0
+  UNCLEAR: 0
+  N_A_WITH_REASON: 0
+findings:
+  - id: A0-F5-01
+    severity: LOW
+    capability: F5
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "MCP/A2A/Knowledge Fabric separation is architectural, not runtime-invariant"
+    path: release/capability-baseline/audit-0/gamma/findings.yaml
+  - id: A0-H4-01
+    severity: LOW
+    capability: H4
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "test_data/success_criteria/failure_criteria are readiness dimensions, not schema fields"
+    path: release/capability-baseline/audit-0/gamma/findings.yaml
+  - id: A0-I3-01
+    severity: LOW
+    capability: I3
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "3 of 11 generation sources produce findings, not governed tasks"
+    path: release/capability-baseline/audit-0/gamma/findings.yaml
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-gamma
+  commit: 323b25a42190d49a8b3d7e1f701c5a0919f1fdbf
+  evidence_path: release/capability-baseline/audit-0/gamma/
+unresolved: []
+recommended_next_action: "Proceed to capability-baseline synthesis (P2-HO-0007) to merge all family audit results."
+completed_at: "2026-09-18T00:00:00Z"

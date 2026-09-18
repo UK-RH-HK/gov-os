@@ -1,0 +1,18 @@
+=== G2: Human control surface ===
+--- status ---
+status ok: True
+--- continue ---
+continue ok: True
+--- decide (gate present) ---
+present ok: True
+decide ok: True
+--- audit ---
+audit ok: True
+--- pause ---
+pause ok: True
+--- resume ---
+resume ok: True
+--- freeze-writes ---
+freeze ok: True
+--- resume after freeze ---
+resume ok: True
