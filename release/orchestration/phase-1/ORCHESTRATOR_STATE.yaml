@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-18T01:26:43Z'
-state_hash: d9fe0d99ad6c05a080f3899188a45295ce56baa49d9f79cdb6de3c3aeaa4d4a8
-lifecycle_state: R1_CANDIDATE_VERIFICATION
-loop_status: R1_VERIFICATION_3_RUNNING_ON_CANDIDATE_3   # convergence decision point
+updated_at: '2026-09-18T02:03:04Z'
+state_hash: 1468c89a06cbcc16c02133a61315faf008fff067cf5a735f3b3758ba7fce9ada
+lifecycle_state: PHASE_CONVERGENCE_ESCALATION_REQUIRED
+loop_status: STOPPED_PENDING_OWNER_CONVERGENCE_DECISION   # automatic repair loop halted by the orchestrator per its pre-committed rule
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   integration_branch_base_commit: e5a6b8aa39d2a36311489418506d911df2587722
-  last_recorded_commit: 2c463d3740a43ce94ee328ead9d7911d5dbab568
+  last_recorded_commit: f48dd9db2c510a3516aa55ac5f70743ca019383c
   active_tag: null
   main_branch: main
   main_branch_modified_by_phase_1: false
@@ -367,8 +367,19 @@ r1_blocker_class_history:
     STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED and produce a root-cause/meta-review package.
   iterations:
     - {iteration: 1, verifier: AR-0027, candidate: srr1-r1-candidate-1, classes: [BC-R1-1], materially_new: [BC-R1-1], closed: [], note: guard DECISION shape - deny-list instead of class control}
-    - {iteration: 2, verifier: AR-0029, candidate: srr1-r1-candidate-2, classes: [BC-R1-2], materially_new: [BC-R1-2], closed: [BC-R1-1], note: guard COVERAGE - privileged paths reaching no enforcement point; assigned class fully closed}
-  consecutive_new_class_count: 2
+    - {iteration: 2, verifier: AR-0029, candidate: srr1-r1-candidate-2, classes: [BC-R1-2], materially_new: [BC-R1-2], closed: [BC-R1-1], note: guard COVERAGE; assigned class fully closed}
+    - {iteration: 3, verifier: AR-0031, candidate: srr1-r1-candidate-3, classes: [BC-R1-3, residual of BC-R1-2], materially_new: [BC-R1-3], closed: [BC-R1-2 for bullets 2/3/4/6 only], note: BC-R1-3 is undetermined-subject fail-open; AR31-B1 is a residual of BC-R1-2 at bullet 7}
+  consecutive_new_class_count: 3
+  escalation_fired: true
+  escalation_token: PHASE_CONVERGENCE_ESCALATION_REQUIRED
+  escalation_package: release/orchestration/phase-1/ESCALATION/PHASE-CONVERGENCE-ESCALATION-R1.md
+  escalation_package_sha256: 82d87c963c1bf423e181e006c157d4ded9171ade9683f24223c22d602b46d829
+  escalation_honesty_note: >-
+    The orchestrator pre-committed, before iteration 3 ran, to stopping if a third materially new class appeared, and
+    to not rationalising one away. AR-0031 labelled AR31-B2 materially new. The nuance that argues for continuing -
+    AR31-B2 was self-disclosed by repair 2, inherited from repair 1, present in candidates 1 and 2, and is two lines to
+    fix - is recorded IN the escalation package for the owner to weigh, not used by the orchestrator to cancel its own
+    commitment. The convergence decision is the owner's.
   iterations_that_failed_to_close_their_assigned_queue: 0
   escalation_reading: >-
     The protocol escalates when three consecutive iterations introduce materially new blocker classes INSTEAD OF closing
@@ -407,7 +418,7 @@ known_non_blocking_residuals:
   accepted: all other residuals named in the revision-7 pack
 
 owner_gates:
-  pending: []
+  pending: [GATE-OWNER-R1-CONVERGENCE-DECISION]
   planned: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD, GATE-OWNER-KEY-CEREMONY, GATE-R1-CANDIDATE-ACCEPT, GATE-R2-STANDARD-RELEASE, GATE-R3-HIGH-ASSURANCE]
   historical_refused: [GATE-ARCH-ACCEPT, GATE-OWNER-D0008]
   owner_inputs_recorded:
@@ -464,7 +475,7 @@ release_candidate:
       repair_run: AR-0030
       repair_work_commit: 748c5d3c19c5401e7449f4f21523c33cc7877aec
       supersedes: srr1-r1-candidate-2
-      status: AWAITING_INDEPENDENT_R1_VERIFICATION_ITERATION_3
+      status: REJECTED_BY_AR_0031
       accepted: false
       certified: false
       released: false
@@ -549,16 +560,7 @@ completed_stages:
     commit: this_governance_rebase_commit
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
-running_work:
-  - run_id: AR-0031
-    role: verifier-c
-    status: RUNNING
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0031.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0031-r1-reverification-2.md
-    base_commit: 2c463d3740a43ce94ee328ead9d7911d5dbab568
-    branch: phase1/srr1-r1-verify-3
-    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0031.report.yaml
-    gate: GATE-R1-CANDIDATE-ACCEPT
+running_work: []
 
 
 
@@ -679,7 +681,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: ADJUDICATE_AR_0031_R1_VERDICT__ON_ACCEPT_PERSIST_ROT_PHASE1_CANDIDATE_ACCEPTED_R1_AND_COMPLETE_PHASE_1__ON_A_THIRD_MATERIALLY_NEW_BLOCKER_CLASS_STOP_WITH_PHASE_CONVERGENCE_ESCALATION_REQUIRED_AND_PRODUCE_THE_ROOT_CAUSE_PACKAGE__ON_RESIDUALS_ONLY_CONTINUE_THE_BOUNDED_REPAIR_LOOP
+next_deterministic_action: AWAIT_OWNER_CONVERGENCE_DECISION_ON_THE_ESCALATION_PACKAGE_OPTIONS_A_B_C_OR_D__NO_FURTHER_REPAIR_OR_VERIFICATION_ROLE_MAY_BE_DISPATCHED_UNTIL_THE_OWNER_CHOOSES
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0

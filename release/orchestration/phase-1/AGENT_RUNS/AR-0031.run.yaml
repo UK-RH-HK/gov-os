@@ -46,7 +46,7 @@ contract_v3:
   sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
 branch: phase1/srr1-r1-verify-3
 started_at: '2026-09-18T07:30Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0031.report.yaml
 expected_evidence_path: release/verification/4.1.6-r1-3/
 required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
@@ -55,4 +55,48 @@ convergence_tracking: >-
   iteration produces a third materially new class, the orchestrator STOPS with PHASE_CONVERGENCE_ESCALATION_REQUIRED and
   produces a root-cause/meta-review package. Each blocking finding must therefore be labelled residual-or-materially-new
   with reasons.
-outcome: null
+outcome:
+  verdict: BLOCKING_FINDINGS_PRESENT
+  work_commit: 807a04605e61e8cc6bbc36d685bc73a00bae9958
+  report_commit: 3304a1b99bf184e9e574b39f595137545da4c147
+  integration_merge_commit: f48dd9db2c510a3516aa55ac5f70743ca019383c
+  evidence_path: release/verification/4.1.6-r1-3/
+  census_attack: SECTION_6_SINKS sound for bullets 2 create, 2 approve, 3, 4 and 6; FALSE for bullets 5 and 7; bullet 4 is the strongest sink in the set
+  blocking:
+    AR31-B1: {severity: HIGH, classification: RESIDUAL of AR29-B1/B2, finding: section 6 bullet 7 enforced nowhere; its effect has no call site outside breakglass.rs and the excusing claim that every reporting surface carries the marking is false}
+    AR31-B2: {severity: MEDIUM, classification: MATERIALLY_NEW class BC-R1-3, finding: both enforcement points convert a state-root resolution error into a clearance, so one environment variable makes all eight section 6 effects return Ok on a genuinely marked machine}
+  verifier_disagreement_with_repair_routing: >-
+    AR-0030 characterised the fail-open as requiring the owner-closed machine-state change. AR-0031 falsified both
+    limbs - the unprovisioned case never reaches the branch, and the branches are in breakglass.rs alone. It therefore
+    did NOT mark it REQUIRES_R0_OR_OWNER_ADJUDICATION. The orchestrator confirmed both branches in breakglass.rs at
+    lines 355-360 and 597-599, with resolve_state_root byte-identical.
+  disclosed_weaknesses_judged:
+    U-1_fail_open: repair characterisation WRONG on both limbs; blocking as AR31-B2; repairable within R1
+    U-2_bullet_7: FALSIFIED - not merely unaudited but unenforced, with the excusing claim false; blocking as AR31-B1
+    U-3_bullet_5: census entry FALSE (tools::install is a second primitive) but NON-BLOCKING - the allow-list default-refuse still refuses it below floor; recorded AR31-N1
+    U-4_clearance_witness: trade AGREED; the compiler claim is true only inside gates.rs because build is private; recorded AR31-N3
+  prior_evidence_changes_verified:
+    ho_f_migration: >-
+      Compile error is genuine closure. Assertion-by-assertion comparison found f3, f5, f7 reproduced in full, f1's
+      static half STRENGTHENED, f6 covered elsewhere - but TWO sub-checks were DROPPED: f1's behavioural malleated-S
+      check and f2's second half. Both re-verified as still holding; loss of coverage, not a live defect (AR31-N4).
+      The malleability check cannot live in the product suite by design (SRR-R0-L4), which is why it belongs in
+      held-out evidence.
+    b3_b6_flips: both confirmed as the repair working, not regressions; the stale b3 census was re-derived
+    b4: both halves verified - the latch precedes the guard so SRR_ALREADY_PROVISIONED survives, and the door is independently closed at the sink
+  frozen_r1_items: 12 of 12 HOLD except item 9 QUALIFIED by AR31-B2
+  regression_reproduced: cargo test --lib 36 passed 0 failed; cargo test --test certification 70 passed 0 failed
+  prior_suites: AR-0027 26 passed / 3 failed as predicted; AR-0029 26 passed / 2 failed with ho_f not compiling, all four OBSERVED failures flipped to passing
+  delegation_disclosed: >-
+    One read-only sub-agent did a single breadth sweep of reporting surfaces for the bullet-7 question. The verifier
+    states it relied on none of its judgements and re-derived every claim from source before pinning it in a test.
+    All classification, severity and verdict work was the verifier's own.
+  new_owner_decision_required: none
+  requires_r0_or_owner_adjudication: none
+  orchestrator_verification:
+    - work and report commits exist; report output.commit names the work commit
+    - no product source touched - diff over runtime, cli, tests, framework, spec and Cargo files is empty
+    - AR31-B1 confirmed - doctor.rs contains zero references to breakglass, is_degraded, Degraded or below_floor
+    - AR31-B1 confirmed - PresentBelowFloorReleaseAsCurrent has no call site outside breakglass.rs
+    - AR31-B2 confirmed - the two fail-open branches are at breakglass.rs lines 355-360 and 597-599, both returning Ok on a resolve_state_root error
+  completed_at: '2026-09-18T09:40Z'

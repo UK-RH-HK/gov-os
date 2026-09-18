@@ -191,6 +191,28 @@ gates:
       - neither answer changes D-0007, D-0009, the accepted ARCH-0003 body or the frozen boundary
     satisfaction_evidence: this record's commit
 
+  - id: GATE-OWNER-R1-CONVERGENCE-DECISION
+    title: Owner convergence decision after PHASE_CONVERGENCE_ESCALATION_REQUIRED
+    status: OPEN
+    satisfier: product owner
+    raised_by: orchestrator, after R1 verification iteration 3 (AR-0031)
+    lifecycle: R1
+    blocking: true
+    blocks: any further R1 repair or verification role
+    package: release/orchestration/phase-1/ESCALATION/PHASE-CONVERGENCE-ESCALATION-R1.md
+    package_sha256: 82d87c963c1bf423e181e006c157d4ded9171ade9683f24223c22d602b46d829
+    question: >-
+      Three R1 iterations have each closed their assigned class and each surfaced a class the previous iteration did not
+      see. Both remaining blockers are local and need no owner decision, but the shared root cause - a universal
+      negative implemented three times as a positive enumeration, with tests derived from the same enumeration as the
+      code - is not addressed by fixing them. Which option: A instances only; B instances plus a structural mandate
+      (orchestrator recommendation); C re-scope R1 so bullets 5 and 7 become R2 obligations (needs an owner decision
+      because it changes what OWNER-DECISION-0006 section 6 requires at R1); or D pause R1 and re-examine the
+      architecture (not indicated - every finding has been an implementation defect inside the accepted boundary)?
+    orchestrator_recommendation: B
+    satisfied_when: the owner selects an option; the selection is recorded as an owner record and the loop resumes or stops accordingly
+    satisfaction_evidence: null
+
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony
     status: NOT_OPEN
