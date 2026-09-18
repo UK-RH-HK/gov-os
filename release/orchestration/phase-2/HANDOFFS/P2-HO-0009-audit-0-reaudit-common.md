@@ -4,7 +4,7 @@
 |---|---|
 | Handoff | P2-HO-0009 |
 | From | Phase-2 orchestrator (routing only) |
-| Applies to | re-audit runs P2-AR-0009 (beta), P2-AR-0010 (gamma), P2-AR-0011 (delta), P2-AR-0012 (zeta), and any later family re-audit that cites it |
+| Applies to | re-audit runs P2-AR-0009 (beta), P2-AR-0010 (gamma), P2-AR-0011 (delta), P2-AR-0012 (zeta), P2-AR-0013 (alpha), and any later family re-audit that cites it |
 | Candidate | `cap2-candidate-0`, `product_code_digest` `bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547` |
 | Evidence directory | `release/capability-baseline/audit-0/<family>-r/` |
 | Scope | exactly the original family handoff `P2-HO-000N-audit-0-<family>.md` — same capabilities, same family-specific duties |
@@ -14,7 +14,7 @@ all apply unchanged); your family's original handoff; the frozen gate contract; 
 
 ## Why the families are being re-audited
 
-The iteration-0 family audits P2-AR-0002…0006 were recorded against `agent_model: claude-opus-5` but each run
+The iteration-0 family audits P2-AR-0001…0006 were recorded against `agent_model: claude-opus-5` but each run
 self-reported `claude-opus-4-6`, a deviation from the phase's recorded protocol. Several also fell short of the common
 protocol's evidence standard: capability statuses of `PRESENT_AND_SUBSTANTIAL` alongside the same run's own findings of
 unmet bullets, and many bullets resting on a single aggregate output. For a uniform exhaustive baseline, every family is
