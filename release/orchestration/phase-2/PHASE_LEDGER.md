@@ -32,3 +32,13 @@ actions only.
 | Handoffs | `P2-HO-0000` (common protocol, SHA-256 `333764e7…`), `P2-HO-0001`…`P2-HO-0006` (families). |
 | Inherited | `PHASE-1-RESIDUAL-RISKS.md` (`b08678b0…`) as input; its items are R1-LOW/R2 and none is a Phase-2 obligation. |
 | Next action | Tag this commit `cap2-candidate-0`; create six worktrees/branches; dispatch P2-AR-0001…0006. |
+
+## P2-L-0003 — 2026-09-18 — Iteration-0 audit dispatched on `cap2-candidate-0`
+
+| Field | Value |
+|---|---|
+| Candidate | `cap2-candidate-0` = `57177a37ea296ece16b185874831462b6a76db18` (annotated tag). `product_code_digest` `bd4d65d9…0547` = `srr1-r1-accepted`; AC-14 R1-preservation therefore not required for this candidate. |
+| Runs | P2-AR-0001 alpha (A/B/S/T) · P2-AR-0002 beta (C/D/R, AC-7) · P2-AR-0003 gamma (E/F/G/H/I) · P2-AR-0004 delta (J/K/L/M/N) · P2-AR-0005 epsilon (O/P/Q/U/V, AC-5, AC-6) · P2-AR-0006 zeta (W, AC-8) |
+| Isolation | One git worktree and branch per run (`phase2/cap-audit-0-<family>`), all at the tag; evidence confined to `release/capability-baseline/audit-0/<family>/`. |
+| Independence | Each auditor is a fresh context; none authored the implementation or any Phase-1 role; the families cannot read each other's unmerged evidence. |
+| Next action | Await the six reports; verify and merge each; then dispatch the fresh synthesis auditor P2-AR-0007. |
