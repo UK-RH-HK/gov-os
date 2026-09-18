@@ -1,0 +1,86 @@
+=== O1: Product test families ===
+--- TEST_POLICY.product_families ---
+product_families: [unit, contract, integration, system, acceptance, scenario, security, performance, recovery, smoke]
+
+--- gov verify --help ---
+Verify governance (audit) or product suite
+
+Usage: gov verify [OPTIONS] [WHAT]
+
+Arguments:
+  [WHAT]  [default: governance]
+
+Options:
+      --root <ROOT>        Repository root (default: discovered from the current directory)
+      --json               Structured JSON output envelope
+      --session <SESSION>  Session id (default: $GOV_SESSION or a new id)
+      --role <ROLE>        Acting role (default: $GOV_ROLE or orchestrator)
+  -h, --help               Print help
+
+--- gov audit --family schema_invariants ---
+{
+  "ok": true,
+  "command": "audit",
+  "result": {
+    "audit": "",
+    "verdict": "HEALTHY",
+    "green": true,
+    "families": {
+      "schema_invariants": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "records_checked": 1
+        }
+      }
+    },
+    "findings": [],
+    "inputs_hash": "0472750441e2bc52a02a1ba785f334d3ab9e110abf2b9ccbfd1bb52f75cbc51e",
+    "result_hash": "03cf967b44b60a2ea1f611d427efc6dae141ba4ffd6a405d87801735dfec3750",
+    "reproducible": true,
+    "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    }
+  },
+  "session": "",
+  "release_trust": {
+    "surface": "audit",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
+    "section_6_bullet": 7,
+    "basis": "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."
+  }
+}
+
+--- Checking Rust test infrastructure ---
+total 16
+drwxr-xr-x  4 usain usain 4096 Sep 18 20:44 .
+drwxr-xr-x 18 usain usain 4096 Sep 18 20:46 ..
+drwxr-xr-x  2 usain usain 4096 Sep 18 20:44 certification
+drwxr-xr-x  2 usain usain 4096 Sep 18 20:44 governance
+
+--- cargo test --lib count (run from product tree, not the scratch project) ---
+srr::breakglass::tests::every_permitted_operation_names_a_real_section_5_activity: test
+srr::breakglass::tests::every_section_6_activity_has_exactly_one_declared_sink: test
+srr::breakglass::tests::every_section_6_bullet_has_a_derivation_signature_and_none_claims_an_absence: test
+srr::breakglass::tests::exit_requires_both_floors_under_the_stricter_policy: test
+srr::breakglass::tests::failing_closed_never_blocks_a_section_5_restoration_route: test
+srr::breakglass::tests::refusal_classes_report_a_section_6_bullet_but_decide_nothing: test
+srr::breakglass::tests::reserved_refusal_classes_are_inert_and_disjoint: test
+srr::breakglass::tests::the_marking_record_has_exactly_one_reader: test
+srr::metadata::tests::canonical_utc_timestamp_accepts_exactly_what_now_iso_emits: test
+srr::metadata::tests::expiry_fails_closed_on_absent_and_non_canonical_forms: test
+srr::plugins::tests::a_matching_delegation_admits_a_privileged_remote_capability_on_its_own_channel: test
+srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused: test
+srr::plugins::tests::built_in_and_local_capabilities_need_no_delegation: test
+srr::present::tests::a_presentation_always_states_which_way_it_went: test
+srr::present::tests::attach_demotes_a_currency_claim_exactly_when_the_guard_refused: test
+util::tests::deep_helpers: test
+util::tests::glob_semantics: test
+util::tests::hashing_is_canonical: test
+
+42 tests, 0 benchmarks

@@ -1,0 +1,1613 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0005
+family: epsilon
+candidate: cap2-candidate-0
+candidate_commit: 57177a37ea296ece16b185874831462b6a76db18
+product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+capabilities:
+
+  #############################################################################
+  # O1 — Product test families
+  #############################################################################
+  - capability: O1
+    title: Product test families
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:751
+    governing_document_refs: [framework Part XVII §62]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      TEST_POLICY.product_families declares all ten families (unit, contract, integration,
+      system, acceptance, scenario, security, performance, recovery, smoke). cargo test --lib
+      passes 42 tests. cargo test --test certification passes 79 tests. gov verify governance
+      and gov verify product are separate entry points. The product_suite function detects
+      ecosystem test commands and runs them.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "unit"
+        source_line: 752
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3, runtime/src/verification/mod.rs:956-1006]
+        automated_evidence: [cargo test --lib (42 tests)]
+        independent_evidence: [evidence/O1-cargo-test-lib.out]
+        gap: null
+      - bullet: "contract"
+        source_line: 753
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification (79 tests)]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "integration"
+        source_line: 754
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "system"
+        source_line: 755
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "acceptance"
+        source_line: 756
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3, framework/policies/TEST_POLICY.yaml:5]
+        automated_evidence: [cargo test --test certification]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "scenario"
+        source_line: 757
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "security"
+        source_line: 758
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification (srr tests)]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "performance"
+        source_line: 759
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification (benchmark test)]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "recovery"
+        source_line: 760
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [cargo test --test certification (failure_injection, recovery tests)]
+        independent_evidence: [evidence/O1-cargo-test-certification.out]
+        gap: null
+      - bullet: "live/smoke"
+        source_line: 761
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:3]
+        automated_evidence: [gov doctor, gov audit]
+        independent_evidence: [evidence/O1-product-test-families.out]
+        gap: null
+    health_scheduler_tiers: [G5, G6]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [product source, test source, Cargo.toml]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Run all declared product test families against the greenfield fixture and verify each family produces test evidence"
+      repo_b_challenge: "Run product tests against the brownfield fixture after adoption to verify regression coverage"
+      hidden_oracle_fault_class: "Inject a regression into a product family and verify the test framework detects it"
+      chaos_scale_soak: "not relevant: product test families are a capability declaration, not a runtime mechanism"
+      retrieval_challenge: "not relevant: product test families do not depend on retrieval"
+      not_challengeable: null
+    adoption_obligation: "gov init installs TEST_POLICY with all ten families; gov adopt A11 runs the full suite"
+    residual_risk: "Product test families are declared in policy but actual test coverage depends on the consumer project"
+    findings: []
+
+  #############################################################################
+  # O2 — Governance test families
+  #############################################################################
+  - capability: O2
+    title: Governance test families
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:763
+    governing_document_refs: [framework Part XVII §63-64]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      TEST_POLICY.governance_families declares 20 families (the 16 from Contract v3 plus
+      4 additional: policy_enforcement_coverage, policy_precedence, plugin_governance,
+      audit_reproducibility). gov audit runs all 20. All 20 pass HEALTHY on the scratch
+      project. Each family has an implementation in verification/mod.rs with specific checks.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "schema/invariants"
+        source_line: 764
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:125-232]
+        automated_evidence: [gov audit --family schema_invariants]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "graph integrity"
+        source_line: 765
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:234-278]
+        automated_evidence: [gov audit --family graph_integrity]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "index freshness"
+        source_line: 766
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:279-301]
+        automated_evidence: [gov audit --family index_freshness]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "retrieval regression"
+        source_line: 767
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:303-329]
+        automated_evidence: [gov audit --family memory_retrieval_regression]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "authority/role limits"
+        source_line: 768
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:330-386]
+        automated_evidence: [gov audit --family authority_role_limits]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "mutation scope"
+        source_line: 769
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:387-399]
+        automated_evidence: [gov audit --family mutation_scope]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "repository/path-map compliance"
+        source_line: 770
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:400-427]
+        automated_evidence: [gov audit --family path_map_compliance]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "context reproducibility"
+        source_line: 771
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:428-466]
+        automated_evidence: [gov audit --family context_reproducibility]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "concurrency/session claims"
+        source_line: 772
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:468-492]
+        automated_evidence: [gov audit --family concurrency_claims]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "adapter/model portability"
+        source_line: 773
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:494-507]
+        automated_evidence: [gov audit --family adapter_portability]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "skill regression"
+        source_line: 774
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:508-512]
+        automated_evidence: [gov audit --family skill_regression]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "command-contract consistency"
+        source_line: 775
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:513-549]
+        automated_evidence: [gov audit --family command_contract_consistency]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "secrets/sensitivity indexing"
+        source_line: 776
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:550-617]
+        automated_evidence: [gov audit --family secrets_sensitivity_indexing]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "recovery/rebuild"
+        source_line: 777
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:618-672]
+        automated_evidence: [gov audit --family recovery_rebuild]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "fresh-agent reconstruction"
+        source_line: 778
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:673-695]
+        automated_evidence: [gov audit --family fresh_agent_reconstruction]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "product traceability"
+        source_line: 779
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:769-849]
+        automated_evidence: [gov audit --family product_traceability]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+    health_scheduler_tiers: [G5, G6]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [governance families implementation, policy, kernel, project overlay]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/O3-O4-independent-currency.out
+    qualification_coverage:
+      repo_a_challenge: "Run gov audit on a greenfield project and verify all 16+ families execute and produce findings"
+      repo_b_challenge: "Run gov audit on a brownfield project after adoption and verify governance families detect real issues"
+      hidden_oracle_fault_class: "Inject a governance violation (e.g., secret in index, broken graph) and verify the relevant family detects it"
+      chaos_scale_soak: "not relevant: governance families run deterministically"
+      retrieval_challenge: "memory_retrieval_regression family directly tests retrieval"
+      not_challengeable: null
+    adoption_obligation: "gov init installs TEST_POLICY with all governance families; gov audit runs them"
+    residual_risk: "Additional governance families beyond the 16 required are implementation choices, not contract requirements"
+    findings: []
+
+  #############################################################################
+  # O3 — Independent test authorship
+  #############################################################################
+  - capability: O3
+    title: Independent test authorship
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:782
+    governing_document_refs: [framework Part XVII §63]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      TEST_POLICY.independent_test_author_required_for declares [acceptance, scenario, system].
+      The product_traceability governance family checks independent_of_implementer on
+      test obligations for those families. Builder tests (cargo test) are regression evidence;
+      the fresh verifier adds held-out tests per the Phase-2 protocol. The
+      governance-capability-evidence-map.yaml distinguishes independent verification obligations.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Release-critical behavioural tests are authored independently of implementation."
+        source_line: 783
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:5, runtime/src/verification/mod.rs:778-786]
+        automated_evidence: [gov audit --family product_traceability]
+        independent_evidence: [evidence/O3-O4-independent-currency.out]
+        gap: null
+      - bullet: "Builder tests remain regression evidence, not independent certification."
+        source_line: 784
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/TEST_POLICY.yaml:5]
+        automated_evidence: []
+        independent_evidence: [evidence/O3-O4-independent-currency.out]
+        gap: null
+      - bullet: "Fresh verifier adds held-out tests."
+        source_line: 785
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/memory/heldout.rs:1-53, tests/governance/capability-evidence-map.yaml]
+        automated_evidence: []
+        independent_evidence: [evidence/O3-O4-independent-currency.out]
+        gap: null
+    health_scheduler_tiers: [G5, G6]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [TEST_POLICY, product_traceability family]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Author independent tests for a greenfield project and verify they are distinguishable from builder tests"
+      repo_b_challenge: "Verify brownfield adoption test authoring preserves independence"
+      hidden_oracle_fault_class: "A builder test marked as independent should be detected by the traceability check"
+      chaos_scale_soak: "not relevant: test authorship is a process property"
+      retrieval_challenge: "not relevant: independence is a role separation concern"
+      not_challengeable: null
+    adoption_obligation: "gov adopt A5 requires independent migration review and test authoring"
+    residual_risk: "Independence is a convention enforced by record metadata, not by code isolation at this lifecycle"
+    findings: []
+
+  #############################################################################
+  # O4 — Governance suite currency
+  #############################################################################
+  - capability: O4
+    title: Governance suite currency
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:787
+    governing_document_refs: [framework Part XVII §64]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      inputs_hash tracks governance/kernel, governance/project, governance/tests, spec/decisions,
+      governance/framework.lock. A green audit record carries an inputs_hash. Doctor D021
+      checks currency by comparing the current inputs_hash to the latest green record.
+      Demonstrated: mutating PROJECT_POLICY.yaml causes D021 to report stale.
+      Task close requires tests_status in [passed, not_applicable_with_reason].
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "A green result becomes stale when relevant inputs change."
+        source_line: 788
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:54-71, runtime/src/doctor.rs:568-585]
+        automated_evidence: [gov doctor D021]
+        independent_evidence: [evidence/O3-O4-independent-currency.out]
+        gap: null
+      - bullet: "Governance-affecting work cannot close on stale green evidence."
+        source_line: 789
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/tasks.rs:481, framework/policies/TEST_POLICY.yaml:8]
+        automated_evidence: [task_close_requires_tests_status]
+        independent_evidence: [evidence/O3-O4-independent-currency.out]
+        gap: null
+    health_scheduler_tiers: [G2, G5]
+    evidence_owners: [G2, G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [governance inputs, TEST_POLICY]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/O3-O4-independent-currency.out
+    qualification_coverage:
+      repo_a_challenge: "After a green audit, mutate a governance input and verify D021 reports stale"
+      repo_b_challenge: "Verify brownfield adoption produces a green audit that becomes stale on subsequent changes"
+      hidden_oracle_fault_class: "Inject a mutation that should invalidate evidence but does not"
+      chaos_scale_soak: "not relevant: staleness is deterministic"
+      retrieval_challenge: "not relevant: currency is hash-based"
+      not_challengeable: null
+    adoption_obligation: "gov init runs the initial audit; staleness is automatic from that point"
+    residual_risk: "inputs_hash covers five directory trees; a new governance-affecting input type would need to be added"
+    findings: []
+
+  #############################################################################
+  # O5 — Governance Health Scheduler
+  #############################################################################
+  - capability: O5
+    title: Governance Health Scheduler
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:791
+    governing_document_refs: [framework Part XVII §64]
+    requirement_class: EXECUTION_REFINEMENT
+    status: PARTIAL
+    status_justification: >
+      The G0-G6 tiered checks are present as emergent behaviour rather than an explicit
+      scheduler. G0 guard_write runs on every mutating command. The governance suite (G5)
+      runs all 20 families. The --family flag enables impacted-test selection. RED/YELLOW/GREEN
+      equivalent exists as UNHEALTHY/DEGRADED/HEALTHY. Hard-block vs warning semantics are
+      explicit (critical/high vs medium). Health result provenance is recorded (audit record
+      with session, role, inputs_hash, run_at). Remediation is provided by doctor checks.
+      However: independent checks run sequentially (not in parallel), no isolated
+      worktrees/processes exist for check isolation, cache reuse across runs is not
+      explicit, and the G0-G6 tier model is not an explicit scheduler dispatch.
+    na_reason_normative_text: null
+    partial_qualification_impact: CANNOT_UNDERMINE
+    bullets:
+      - bullet: "G0 Guard - every privileged/mutating command"
+        source_line: 793
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/control.rs:58-75]
+        automated_evidence: [guard_write called in 10+ mutating paths]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "G1 Mutation - changed paths/schema/secrets/index invalidation"
+        source_line: 794
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:54-71, runtime/src/memory/manifest.rs]
+        automated_evidence: [inputs_hash, index freshness]
+        independent_evidence: [evidence/O3-O4-independent-currency.out]
+        gap: null
+      - bullet: "G2 Task Close - mutation scope/readiness/tests/references/memory freshness"
+        source_line: 795
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/tasks.rs:386-551]
+        automated_evidence: [task close checks tests_status, stale artifacts, mutation scope]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "G3 Checkpoint/Handoff - claims/decisions/gates/checkpoint freshness"
+        source_line: 796
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/checkpoints.rs, runtime/src/orchestration/handoffs.rs]
+        automated_evidence: [checkpoint creation with guard_write, pending decisions]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "G4 Milestone - CIT-E/migration/memory/architecture changes"
+        source_line: 797
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/cit/mod.rs, runtime/src/orchestration/gates.rs]
+        automated_evidence: [CIT lifecycle, milestone gates]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "G5 Full Suite - adopt/update/release/full audit"
+        source_line: 798
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:881-953, cli/src/main.rs:791]
+        automated_evidence: [gov audit runs all 20 families]
+        independent_evidence: [evidence/O2-governance-test-families.out]
+        gap: null
+      - bullet: "G6 Qualification - synthetic repos/chaos/soak/hidden tests"
+        source_line: 799
+        status: PARTIAL
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: "G6 qualification tier is declared but not implemented. This is expected as qualification is Phase 4."
+      - bullet: "dependency-aware impacted-test selection"
+        source_line: 802
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:114-117, cli/src/main.rs:791]
+        automated_evidence: [gov audit --family <name> selects specific families]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "independent checks run in parallel when safe"
+        source_line: 803
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: "Families run sequentially in a for-loop. No parallel execution."
+      - bullet: "isolated worktrees/processes where required"
+        source_line: 804
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: "All checks run in-process. No worktree or process isolation."
+      - bullet: "cache keyed by relevant content/policy/framework hashes"
+        source_line: 805
+        status: PARTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:54-71]
+        automated_evidence: [inputs_hash recorded with each audit]
+        independent_evidence: [evidence/O5-health-scheduler.out, evidence/O3-O4-independent-currency.out]
+        gap: "inputs_hash exists and marks staleness, but no cache skip mechanism exists. All families re-run every time."
+      - bullet: "RED/YELLOW/GREEN or equivalent machine state"
+        source_line: 806
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:910-916]
+        automated_evidence: [UNHEALTHY/DEGRADED/HEALTHY verdict]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "hard-block vs warning semantics are explicit"
+        source_line: 807
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:862-867, runtime/src/doctor.rs:656-679]
+        automated_evidence: [critical/high=UNHEALTHY=hard-block; medium=DEGRADED=warning]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+      - bullet: "health result provenance is recorded"
+        source_line: 808
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:936]
+        automated_evidence: [audit record has auditor_role, session, run_at, inputs_hash]
+        independent_evidence: [evidence/O5-health-scheduler.out]
+        gap: null
+    health_scheduler_tiers: [G0, G1, G2, G3, G4, G5, G6]
+    evidence_owners: [G0, G1, G2, G3, G4, G5]
+    evidence_owner_actually_runs: partial - G0-G5 run; G6 declared but not implemented
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [verification implementation, policy, kernel, runtime]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/O3-O4-independent-currency.out
+    qualification_coverage:
+      repo_a_challenge: "Exercise each G0-G6 tier in a greenfield project; verify impacted-test selection reduces runtime"
+      repo_b_challenge: "Verify the scheduler handles brownfield adoption checks correctly"
+      hidden_oracle_fault_class: "A mutation that should trigger G1 but is missed; a check that should run at G2 but doesn't"
+      chaos_scale_soak: "Large project with many governance families; measure whether serial execution is a bottleneck"
+      retrieval_challenge: "not relevant: scheduler does not depend on retrieval"
+      not_challengeable: null
+    adoption_obligation: "gov init sets up all governance families; scheduler tiers are embedded in the command lifecycle"
+    residual_risk: "Sequential execution is a performance concern, not a correctness concern. G6 is Phase 4."
+    findings: [A0-O5-01, A0-O5-02, A0-O5-03, A0-O5-04]
+
+  #############################################################################
+  # P1 — Execution telemetry
+  #############################################################################
+  - capability: P1
+    title: Execution telemetry
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:814
+    governing_document_refs: [framework Part XVIII §65-66]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      OpenTelemetry-compatible JSONL telemetry records resource (service.name, version, project),
+      name, timestamp, trace_id, span_id, attributes, session, role. Events are emitted for
+      CLI commands, audit verdicts, product suite runs, retrieval, network calls, and other
+      operations. The Span type provides start/end timing with duration_ms. Telemetry is
+      stored as append-only JSONL in .governance-runtime/telemetry/events.jsonl. Token I/O
+      and model/provider are not recorded by the OS (it does not invoke LLMs); these are
+      the orchestration layer's responsibility.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "agent/session/model/provider"
+        source_line: 815
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:14-15]
+        automated_evidence: [events.jsonl session and role fields]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "role/task"
+        source_line: 816
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:14-15]
+        automated_evidence: [events.jsonl role field; task in attributes]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "skill/tool versions"
+        source_line: 817
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:14]
+        automated_evidence: [service.version in resource]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "context packet"
+        source_line: 818
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/status.rs:152-161]
+        automated_evidence: [context_packet in continue_work response]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "retrieval queries/hits"
+        source_line: 819
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:83-85]
+        automated_evidence: [retrieval events in summary]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "token input/output"
+        source_line: 820
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:14]
+        automated_evidence: []
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "latency/cost"
+        source_line: 821
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:48, runtime/src/observability.rs:111-116]
+        automated_evidence: [duration_ms in Span, cost_by_task_class in summary]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "files read/written"
+        source_line: 822
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/tasks.rs]
+        automated_evidence: [files_changed in task close]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "tests"
+        source_line: 823
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:936]
+        automated_evidence: [audit verdict in telemetry]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "retries/failures"
+        source_line: 824
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:49]
+        automated_evidence: [ok field and error in Span]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "handoffs"
+        source_line: 825
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/handoffs.rs]
+        automated_evidence: [handoff events in telemetry]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "decisions"
+        source_line: 826
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/gates.rs]
+        automated_evidence: [gate decision events]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "human interventions"
+        source_line: 827
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/gates.rs]
+        automated_evidence: [human gate events]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [observability implementation]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Run a sequence of operations and verify every P1 bullet appears in telemetry events"
+      repo_b_challenge: "Verify telemetry captures brownfield adoption operations"
+      hidden_oracle_fault_class: "An operation that fails to emit telemetry"
+      chaos_scale_soak: "Large-scale operation log; verify telemetry doesn't grow unboundedly or lose events"
+      retrieval_challenge: "Verify retrieval queries/hits are recorded"
+      not_challengeable: null
+    adoption_obligation: "gov init creates the telemetry directory; events accumulate automatically"
+    residual_risk: "Token I/O and model routing are the orchestration layer's responsibility, not the OS"
+    findings: [A0-P1-01]
+
+  #############################################################################
+  # P2 — Organisational questions
+  #############################################################################
+  - capability: P2
+    title: Organisational questions
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:829
+    governing_document_refs: [framework Part XVIII §66]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      gov telemetry summary produces a structured answer to all P2 organisational questions:
+      rework_by_role, retrieval (queries, avg_latency, avg_hits), model_routing,
+      first_pass_completion_rate, cost_by_task_class, human_gates_by_feature, budget
+      (network calls by task, over-budget), commands (count, ok rate, avg_ms).
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "rework by role"
+        source_line: 831
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:90-100]
+        automated_evidence: [gov telemetry summary → rework_by_role]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "retrieval effect on token use"
+        source_line: 832
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:83-86, 155]
+        automated_evidence: [gov telemetry summary → retrieval]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "model over/under-power"
+        source_line: 833
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:159]
+        automated_evidence: [gov telemetry summary → model_routing]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "skill repair rate"
+        source_line: 834
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:90-100]
+        automated_evidence: [gov telemetry summary → rework_by_role (repairs_per_report)]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "human-gate concentration"
+        source_line: 835
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:118-128]
+        automated_evidence: [gov telemetry summary → human_gates_by_feature]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "retrieval misses"
+        source_line: 836
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:155]
+        automated_evidence: [gov telemetry summary → retrieval.avg_hits]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "cost by task/feature"
+        source_line: 837
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:106-117]
+        automated_evidence: [gov telemetry summary → cost_by_task_class]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+      - bullet: "first-pass completion"
+        source_line: 838
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:157]
+        automated_evidence: [gov telemetry summary → first_pass_completion_rate]
+        independent_evidence: [evidence/P1-P2-telemetry.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [telemetry summary implementation]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Generate telemetry with varied operations and verify all P2 questions are answerable"
+      repo_b_challenge: "Verify organisational questions work on brownfield telemetry"
+      hidden_oracle_fault_class: "A P2 question that returns null/zero when data exists"
+      chaos_scale_soak: "Large telemetry log; verify summary computes correctly"
+      retrieval_challenge: "not relevant: P2 questions are computed from telemetry, not retrieval"
+      not_challengeable: null
+    adoption_obligation: "Telemetry accumulates from gov init; summary is available immediately"
+    residual_risk: "Organisational questions depend on telemetry completeness, which is P1's responsibility"
+    findings: []
+
+  #############################################################################
+  # Q1 — Lesson lifecycle
+  #############################################################################
+  - capability: Q1
+    title: Lesson lifecycle
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:843
+    governing_document_refs: [framework Part XIX §67-68, Release/Distribution protocol §13-15]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      LEARNING_POLICY defines lesson_lifecycle: [candidate, corroborated, classified, proposed,
+      validated, approved, promoted, rejected]. Lessons are records of type 'lesson' with
+      state_class EVIDENCE. The upstream pipeline (prepare → submit) transitions the lifecycle
+      to 'promoted'. gov lessons cluster processes inbox packets into Framework Change
+      Proposals. The Q1 bullets map to the lifecycle stages plus the lesson record fields
+      and the upstream pipeline.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "execution/report"
+        source_line: 845
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/tasks.rs:386-551]
+        automated_evidence: [task close with report]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "lesson candidate"
+        source_line: 846
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/LEARNING_POLICY.yaml:4]
+        automated_evidence: [lesson_lifecycle includes candidate]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "corroboration"
+        source_line: 847
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:97-104]
+        automated_evidence: [corroboration_min_sources enforcement]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "scope classification"
+        source_line: 848
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/LEARNING_POLICY.yaml:3, runtime/src/upstream.rs:92-94]
+        automated_evidence: [upstream_eligible_scopes: FRAMEWORK only]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "rule/skill/retrieval/tool proposal"
+        source_line: 849
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/lessons.rs:120-124]
+        automated_evidence: [FCP records with suggested_framework_change]
+        independent_evidence: [evidence/Q1-lesson-cluster.out]
+        gap: null
+      - bullet: "independent validation"
+        source_line: 850
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [framework/policies/LEARNING_POLICY.yaml:4]
+        automated_evidence: [lesson_lifecycle includes validated]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "human approval where required"
+        source_line: 851
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:356-362]
+        automated_evidence: [upstream.approval: human enforcement]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "governed version"
+        source_line: 852
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:246]
+        automated_evidence: [framework_version in prepared packet]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [LEARNING_POLICY, upstream implementation, lessons implementation]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Create a lesson, prepare it, submit it, and verify lifecycle transitions"
+      repo_b_challenge: "Verify brownfield-adopted lessons follow the same lifecycle"
+      hidden_oracle_fault_class: "A lesson that bypasses a lifecycle stage"
+      chaos_scale_soak: "not relevant: lesson lifecycle is a record-state machine"
+      retrieval_challenge: "not relevant: lessons are records, not retrieval targets"
+      not_challengeable: null
+    adoption_obligation: "gov init installs LEARNING_POLICY; lesson records are project-created"
+    residual_risk: "Lesson lifecycle enforcement is by convention (record status) not by runtime guard"
+    findings: []
+
+  #############################################################################
+  # Q2 — Decision vs lesson
+  #############################################################################
+  - capability: Q2
+    title: Decision vs lesson
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:854
+    governing_document_refs: [framework Part XIX §67]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      Decisions are records of type 'decision' with state_class AUTHORITATIVE. Lessons are
+      records of type 'lesson' with state_class EVIDENCE. The schema_invariants governance
+      family validates state_class against AUTHORITY_POLICY.state_classes. Decisions record
+      chosen actions; lessons record evidence and are never AUTHORITATIVE.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Lessons are evidence, not authority."
+        source_line: 855
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:182-205]
+        automated_evidence: [schema_invariants checks state_class]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "Decisions record chosen action."
+        source_line: 856
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/gates.rs]
+        automated_evidence: [gate answers produce AUTHORITATIVE decisions]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [schema_invariants, AUTHORITY_POLICY]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Create a lesson and a decision and verify their state_class differs"
+      repo_b_challenge: "Verify brownfield adoption correctly classifies legacy decisions vs lessons"
+      hidden_oracle_fault_class: "A lesson with state_class AUTHORITATIVE that is not caught"
+      chaos_scale_soak: "not relevant: classification is a schema property"
+      retrieval_challenge: "not relevant: state_class is metadata"
+      not_challengeable: null
+    adoption_obligation: "gov init installs AUTHORITY_POLICY with state_classes"
+    residual_risk: "state_class is enforced by schema validation, not by a runtime guard on record creation"
+    findings: []
+
+  #############################################################################
+  # Q3 — PROJECT/PRODUCT/FRAMEWORK scope
+  #############################################################################
+  - capability: Q3
+    title: PROJECT/PRODUCT/FRAMEWORK scope
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:858
+    governing_document_refs: [framework Part XIX §68, Release/Distribution protocol §13]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      LEARNING_POLICY.upstream_eligible_scopes: [FRAMEWORK]. The upstream prepare function
+      checks lesson scope against this list and refuses non-FRAMEWORK lessons with error
+      code UPSTREAM_SCOPE. Demonstrated: creating a FRAMEWORK-scoped lesson succeeds at
+      prepare; the certification test brownfield.rs shows a PROJECT-scoped lesson is refused.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Only FRAMEWORK candidates are eligible for upstream export."
+        source_line: 859
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:91-94, framework/policies/LEARNING_POLICY.yaml:6]
+        automated_evidence: [upstream_export_gate_fails_closed_and_sanitises certification test]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [LEARNING_POLICY.upstream_eligible_scopes]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Attempt to export a PROJECT-scoped lesson and verify it is refused"
+      repo_b_challenge: "Verify brownfield project lessons are correctly scoped"
+      hidden_oracle_fault_class: "A PROJECT lesson that passes scope check"
+      chaos_scale_soak: "not relevant: scope check is a string comparison"
+      retrieval_challenge: "not relevant: scope is metadata"
+      not_challengeable: null
+    adoption_obligation: "gov init installs LEARNING_POLICY with scope restrictions"
+    residual_risk: "Scope is set by the lesson author; the OS enforces at export gate only"
+    findings: []
+
+  #############################################################################
+  # Q4 — Upstream Export Gate
+  #############################################################################
+  - capability: Q4
+    title: Upstream Export Gate
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:861
+    governing_document_refs: [framework Part XIX §68, Release/Distribution protocol §13-14]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      gov upstream prepare performs sanitisation (redact_identifiers, strip_paths), secret/
+      sensitivity scan (scan_text, scan_file), outbound allowlist/default-deny (allowed_payload),
+      synthetic reproducer preference (max_code_lines_unless_synthetic), and blocks raw
+      project/customer/vector-store export (raw_product_code_included, raw_customer_data_included,
+      raw_spec_included must be false). The submit function re-scans at submission time.
+      Failure is closed: any blocked reason prevents export. Demonstrated: FRAMEWORK-scoped
+      lesson prepared successfully with sanitisation scans.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "sanitisation"
+        source_line: 862
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:9-55, 155-191]
+        automated_evidence: [upstream_export_gate_fails_closed_and_sanitises]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "secret/sensitivity scan"
+        source_line: 863
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:165-172, 318-343]
+        automated_evidence: [secret_scanner.scan_text at prepare and submit]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "outbound allowlist/default deny"
+        source_line: 864
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:377-383, framework/policies/LEARNING_POLICY.yaml:9]
+        automated_evidence: [allowed_payload: packet, synthetic_fixture]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "synthetic reproducer preference"
+        source_line: 865
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:133-138, 228-229]
+        automated_evidence: [max_code_lines_unless_synthetic: 0]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+      - bullet: "no raw project/customer/vector-store export"
+        source_line: 866
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/upstream.rs:344-355]
+        automated_evidence: [raw_product_code_included/raw_customer_data_included/raw_spec_included must be false]
+        independent_evidence: [evidence/Q1-Q4-lessons-upstream.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [upstream implementation, LEARNING_POLICY, SECURITY_POLICY]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Prepare and submit a lesson with various content types; verify all scans run"
+      repo_b_challenge: "Verify brownfield project upstream export applies the same gate"
+      hidden_oracle_fault_class: "A secret or project identifier that passes sanitisation"
+      chaos_scale_soak: "not relevant: export gate is a single-record operation"
+      retrieval_challenge: "not relevant: export gate does not depend on retrieval"
+      not_challengeable: null
+    adoption_obligation: "gov init installs LEARNING_POLICY and SECURITY_POLICY; upstream is available"
+    residual_risk: "Pattern-based secret scanning depends on scanner quality; novel patterns may be missed"
+    findings: []
+
+  #############################################################################
+  # U — Framework Health SLOs
+  #############################################################################
+  - capability: U
+    title: Framework Health SLOs
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:976
+    governing_document_refs: [framework Part XXIII §75-76]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >
+      Doctor (gov doctor) runs 29 checks mapping to the 15 SLO bullets and 13 HEALTHY
+      conditions. The verdict is HEALTHY/DEGRADED/UNHEALTHY. Each check has an id, severity,
+      message, and remediation. The HEALTHY conditions are enforced: a repository is HEALTHY
+      only when all checks pass. Demonstrated: doctor runs on scratch project, reports
+      DEGRADED when D010 (index freshness) fails, HEALTHY when all pass. Release trust
+      posture is reported separately (not merged with doctor verdict).
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "governance-suite freshness"
+        source_line: 979
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:568-585]
+        automated_evidence: [D021 governance suite green and current]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "product-test health"
+        source_line: 980
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:956-1006]
+        automated_evidence: [gov verify product]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "retrieval Recall@K"
+        source_line: 981
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:303-329]
+        automated_evidence: [memory_retrieval_regression family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "stale-index count"
+        source_line: 982
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:262-288]
+        automated_evidence: [D010 index freshness]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "orphan-graph count"
+        source_line: 983
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:461-473]
+        automated_evidence: [D015 graph integrity]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "unresolved contradictions"
+        source_line: 984
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:443-459]
+        automated_evidence: [D014 authority unambiguous]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "unresolved human gates"
+        source_line: 985
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:522-543]
+        automated_evidence: [D019 human gates presented in chat]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "task traceability %"
+        source_line: 986
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:769-849]
+        automated_evidence: [product_traceability family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "feature readiness coverage"
+        source_line: 987
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/readiness.rs]
+        automated_evidence: [gov readiness check]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "context packet size"
+        source_line: 988
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:684-693]
+        automated_evidence: [fresh_agent_reconstruction checks max_packet_chars]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "tokens/completed task"
+        source_line: 989
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:151-158]
+        automated_evidence: [telemetry summary cost_by_task_class]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "first-pass completion"
+        source_line: 990
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/observability.rs:157]
+        automated_evidence: [telemetry summary first_pass_completion_rate]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "handoff failure"
+        source_line: 991
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/handoffs.rs]
+        automated_evidence: [telemetry rework_by_role repairs_per_report]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "memory rebuild success"
+        source_line: 992
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:618-672]
+        automated_evidence: [recovery_rebuild family, D009]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "fresh-agent reconstruction success"
+        source_line: 993
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:673-695]
+        automated_evidence: [fresh_agent_reconstruction family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "authority unambiguous"
+        source_line: 996
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:443-459]
+        automated_evidence: [D014]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "no accidental legacy authority"
+        source_line: 997
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:407-440]
+        automated_evidence: [D013]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "deterministic state consistent"
+        source_line: 998
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:164-176]
+        automated_evidence: [D006 project overlay]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "graph/index freshness passes"
+        source_line: 999
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:262-288, 461-473]
+        automated_evidence: [D010, D015]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "retrieval meets thresholds"
+        source_line: 1000
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:303-329]
+        automated_evidence: [memory_retrieval_regression family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "sensitive material isolated"
+        source_line: 1001
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:290-337]
+        automated_evidence: [D011, D012]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "feature readiness explicit"
+        source_line: 1002
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/readiness.rs]
+        automated_evidence: [gov readiness check]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "task runnable/blocked state correct"
+        source_line: 1003
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/orchestration/dag.rs]
+        automated_evidence: [DAG computation, graph_integrity family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "tests/traceability satisfy policy"
+        source_line: 1004
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:769-849]
+        automated_evidence: [product_traceability family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "governance suite current/green"
+        source_line: 1005
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/doctor.rs:568-585]
+        automated_evidence: [D021]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "no unresolved critical audit finding"
+        source_line: 1006
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:862-867, 910-916]
+        automated_evidence: [UNHEALTHY on critical/high findings]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "fresh strong agent reconstructs state within budget"
+        source_line: 1007
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:673-695]
+        automated_evidence: [fresh_agent_reconstruction family]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+      - bullet: "derived memory is rebuildable"
+        source_line: 1008
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/verification/mod.rs:618-672]
+        automated_evidence: [recovery_rebuild family, D009]
+        independent_evidence: [evidence/U-framework-health-slos.out]
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5]
+    evidence_owner_actually_runs: true
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: [doctor implementation, verification implementation]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/U-framework-health-slos.out
+    qualification_coverage:
+      repo_a_challenge: "Run doctor on a healthy greenfield project and verify HEALTHY; inject faults and verify DEGRADED/UNHEALTHY"
+      repo_b_challenge: "Run doctor on a brownfield project after adoption and verify all SLOs are checked"
+      hidden_oracle_fault_class: "A health condition that should be UNHEALTHY but reports HEALTHY"
+      chaos_scale_soak: "not relevant: doctor checks are deterministic"
+      retrieval_challenge: "Recall@K threshold challenge via memory_retrieval_regression"
+      not_challengeable: null
+    adoption_obligation: "gov init installs doctor checks and governance families; doctor is available immediately"
+    residual_risk: "Some SLO bullets (tokens/task, first-pass completion) are telemetry-level metrics without hard thresholds in doctor"
+    findings: [A0-U-01]
+
+  #############################################################################
+  # V1 — Fault manifest
+  #############################################################################
+  - capability: V1
+    title: Fault manifest
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1016
+    governing_document_refs: [framework Part XXIV]
+    requirement_class: ORIGINAL
+    status: ABSENT
+    status_justification: >
+      No machine-checkable fault manifest format exists on this candidate. V1 status is
+      DECLARED in the compiled contract with evidence_class NOT_YET_MAPPED. No schema
+      or format definition for fault manifest records exists. AC-6 requires a format
+      to be accepted before hidden faults are generated (Phase 4).
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "fault ID"
+        source_line: 1018
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "class"
+        source_line: 1019
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "hidden authoritative truth"
+        source_line: 1020
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "injected repository state"
+        source_line: 1021
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "expected detection"
+        source_line: 1022
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "expected severity"
+        source_line: 1023
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "expected impacted artefacts/nodes"
+        source_line: 1024
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "expected governed action"
+        source_line: 1025
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+      - bullet: "forbidden outcomes"
+        source_line: 1026
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No fault manifest schema exists"
+    health_scheduler_tiers: [G6]
+    evidence_owners: []
+    evidence_owner_actually_runs: false
+    freshness:
+      state: NO_EVIDENCE
+      invalidation_inputs: [oracle format definition]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Generate a fault manifest for a greenfield qualification repository"
+      repo_b_challenge: "Generate a fault manifest for a brownfield qualification repository"
+      hidden_oracle_fault_class: "The fault manifest itself is the oracle"
+      chaos_scale_soak: "not relevant: format definition"
+      retrieval_challenge: "not relevant: format definition"
+      not_challengeable: null
+    adoption_obligation: "None at Phase 2; format must be defined before Phase 4"
+    residual_risk: "AC-6 blocker: format must be produced and accepted by a fresh reviewer"
+    findings: [A0-V1-01]
+
+  #############################################################################
+  # V2 — Hidden path-map oracle
+  #############################################################################
+  - capability: V2
+    title: Hidden path-map oracle
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1028
+    governing_document_refs: [framework Part XXIV]
+    requirement_class: ORIGINAL
+    status: ABSENT
+    status_justification: >
+      No machine-checkable hidden path-map oracle format exists. Status DECLARED in the
+      compiled contract, evidence_class NOT_YET_MAPPED.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "current artefact"
+        source_line: 1030
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+      - bullet: "correct classification"
+        source_line: 1031
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+      - bullet: "authority"
+        source_line: 1032
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+      - bullet: "expected target path"
+        source_line: 1033
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+      - bullet: "KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE"
+        source_line: 1034
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+      - bullet: "expected references/consumers"
+        source_line: 1035
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+      - bullet: "sensitivity/indexing expectation"
+        source_line: 1036
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No path-map oracle schema exists"
+    health_scheduler_tiers: [G6]
+    evidence_owners: []
+    evidence_owner_actually_runs: false
+    freshness:
+      state: NO_EVIDENCE
+      invalidation_inputs: [oracle format definition]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "not applicable at format-definition stage"
+      repo_b_challenge: "Generate hidden path-map oracle for a brownfield qualification repository"
+      hidden_oracle_fault_class: "The path-map oracle itself is the oracle"
+      chaos_scale_soak: "not relevant: format definition"
+      retrieval_challenge: "not relevant: format definition"
+      not_challengeable: null
+    adoption_obligation: "None at Phase 2"
+    residual_risk: "AC-6 blocker: format must be produced and accepted"
+    findings: [A0-V1-01]
+
+  #############################################################################
+  # V3 — Hidden memory oracle
+  #############################################################################
+  - capability: V3
+    title: Hidden memory oracle
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1038
+    governing_document_refs: [framework Part XXIV]
+    requirement_class: ORIGINAL
+    status: ABSENT
+    status_justification: >
+      No machine-checkable hidden memory oracle format exists. Status DECLARED in the
+      compiled contract, evidence_class NOT_YET_MAPPED.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "which material must be indexed"
+        source_line: 1039
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+      - bullet: "which must never be indexed"
+        source_line: 1040
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+      - bullet: "expected authority namespace"
+        source_line: 1041
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+      - bullet: "expected current/superseded status"
+        source_line: 1042
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+      - bullet: "expected graph relationships"
+        source_line: 1043
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+      - bullet: "expected code symbols"
+        source_line: 1044
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+      - bullet: "expected retrieval results"
+        source_line: 1045
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No memory oracle schema exists"
+    health_scheduler_tiers: [G6]
+    evidence_owners: []
+    evidence_owner_actually_runs: false
+    freshness:
+      state: NO_EVIDENCE
+      invalidation_inputs: [oracle format definition]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Generate hidden memory oracle for a greenfield qualification repository"
+      repo_b_challenge: "Generate hidden memory oracle for a brownfield qualification repository"
+      hidden_oracle_fault_class: "The memory oracle itself is the oracle"
+      chaos_scale_soak: "not relevant: format definition"
+      retrieval_challenge: "Retrieval accuracy is scored against the memory oracle"
+      not_challengeable: null
+    adoption_obligation: "None at Phase 2"
+    residual_risk: "AC-6 blocker: format must be produced and accepted"
+    findings: [A0-V1-01]
+
+  #############################################################################
+  # V4 — Quantitative qualification scoring
+  #############################################################################
+  - capability: V4
+    title: Quantitative qualification scoring
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1047
+    governing_document_refs: [framework Part XXIV]
+    requirement_class: ORIGINAL
+    status: ABSENT
+    status_justification: >
+      No machine-checkable quantitative scoring format exists. Status DECLARED in the
+      compiled contract, evidence_class NOT_YET_MAPPED. The scoring metrics listed in V4
+      would be computed by comparing qualification execution results against the V1-V3
+      oracle data.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "injected defect detection recall"
+        source_line: 1049
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "false positives"
+        source_line: 1050
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "severity accuracy"
+        source_line: 1051
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "impact-map accuracy"
+        source_line: 1052
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "path-map accuracy"
+        source_line: 1053
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "missed authoritative artefacts"
+        source_line: 1054
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "wrong-indexing count"
+        source_line: 1055
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "stale-index count"
+        source_line: 1056
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "retrieval metrics"
+        source_line: 1057
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "recovery/chaos pass rate"
+        source_line: 1058
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "human-gate correctness"
+        source_line: 1059
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+      - bullet: "task/readiness correctness"
+        source_line: 1060
+        status: ABSENT
+        implementation_evidence: []
+        automated_evidence: []
+        independent_evidence: [evidence/V1-V4-qualification-oracle.out]
+        gap: "No scoring format exists"
+    health_scheduler_tiers: [G6]
+    evidence_owners: []
+    evidence_owner_actually_runs: false
+    freshness:
+      state: NO_EVIDENCE
+      invalidation_inputs: [oracle format definition, scoring implementation]
+      invalidation_demonstrated: false
+      invalidation_evidence: null
+    qualification_coverage:
+      repo_a_challenge: "Score qualification execution against greenfield oracle"
+      repo_b_challenge: "Score qualification execution against brownfield oracle"
+      hidden_oracle_fault_class: "The scoring format defines how faults are scored"
+      chaos_scale_soak: "Recovery/chaos pass rate is a V4 metric"
+      retrieval_challenge: "Retrieval metrics are a V4 metric"
+      not_challengeable: null
+    adoption_obligation: "None at Phase 2"
+    residual_risk: "AC-6 blocker: scoring format must be produced with the oracle format"
+    findings: [A0-V1-01]

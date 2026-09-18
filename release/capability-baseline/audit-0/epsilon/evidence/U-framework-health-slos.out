@@ -1,0 +1,79 @@
+=== U: Framework Health SLOs ===
+--- U: Doctor checks map to HEALTHY conditions ---
+verdict: DEGRADED
+checks:
+  D001 framework.lock present: ok=True severity=info
+  D002 framework.lock schema: ok=True severity=info
+  D003 kernel payload integrity: ok=True severity=info
+  D004 lock matches kernel manifest: ok=True severity=info
+  D005 CLI/kernel compatibility: ok=True severity=info
+  D006 project overlay: ok=True severity=info
+  D007 policies: ok=True severity=info
+  D029 constitutional policy read from a verified kernel: ok=True severity=info
+  D027 policy precedence respected (no override weakens security/authority/gate floors): ok=True severity=info
+  D028 capability plugins governed (schema-valid, registered, pinned, authorised): ok=True severity=info
+  D008 framework.json in sync with repository contract: ok=True severity=info
+  D009 derived runtime: ok=True severity=info
+  D010 index freshness: ok=False severity=medium
+  D011 secrets outside secret class: ok=True severity=info
+  D012 no secrets in index: ok=True severity=info
+  D025 semantic index consistent with pinned embedder/reranker: ok=True severity=info
+  D026 claims store present and intact: ok=True severity=info
+  D013 legacy governance mechanisms retired: ok=True severity=info
+  D014 authority unambiguous (no supersession conflicts / duplicate ids): ok=True severity=info
+  D015 graph integrity: ok=True severity=info
+  D016 no interrupted transactions: ok=True severity=info
+  D017 session claims: ok=True severity=info
+  D018 control state: ok=True severity=info
+  D019 human gates presented in chat: ok=True severity=info
+  D020 adapters current and conformant: ok=True severity=info
+  D021 governance suite green and current: ok=True severity=info
+  D022 native toolchains for detected ecosystems: ok=True severity=info
+  D023 records parse: ok=True severity=info
+  D024 .governance-runtime ignored by git: ok=True severity=info
+failed: 1
+remediation: ['gov rebuild-memory (full when pins changed; --incremental otherwise)']
+framework_version: 4.1.5
+release_trust: {
+    "surface": "doctor",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
+    "section_6_bullet": 7,
+    "basis": "OWNER-DECISION-0006 \u00a76 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED \u2014 RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."
+}
+
+--- U: SLO thresholds tracked in doctor checks ---
+D001 framework.lock present
+D002 framework.lock schema
+D003 kernel payload integrity (authority unambiguous, no accidental legacy)
+D004 lock matches kernel manifest
+D005 CLI/kernel compatibility
+D006 project overlay (deterministic state consistent)
+D007 policies
+D008 framework.json in sync (graph/index freshness passes)
+D009 derived runtime (memory rebuild success)
+D010 index freshness (retrieval meets thresholds)
+D011 secrets outside secret class (sensitive material isolated)
+D012 no secrets in index
+D013 legacy governance mechanisms retired (no accidental legacy authority)
+D014 authority unambiguous
+D015 graph integrity
+D016 no interrupted transactions
+D017 session claims
+D018 control state
+D019 human gates presented (unresolved human gates)
+D020 adapters current
+D021 governance suite green and current (governance suite current/green)
+D022 native toolchains for detected ecosystems
+D023 records parse
+D024 .governance-runtime ignored by git
+D025 semantic index consistent
+D026 claims store present
+D027 policy precedence (no weakening overrides)
+D028 capability plugins governed
+D029 constitutional policy from verified kernel
+
+--- U: HEALTHY only when all conditions hold ---
+Doctor verdict HEALTHY when all checks pass; DEGRADED/UNHEALTHY otherwise.
+The 13 HEALTHY conditions map onto the 29 doctor checks.

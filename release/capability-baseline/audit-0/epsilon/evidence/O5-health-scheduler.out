@@ -1,0 +1,44 @@
+=== O5: Governance Health Scheduler ===
+--- O5 Tier checks: which tiers exist? ---
+The audit command with --family selects individual governance families.
+Doctor runs a fixed set of checks.
+Tiered checks would map to G0-G6 levels.
+
+--- O5 Impacted-test selection: --family flag ---
+Probing: run a single family (schema_invariants)
+families_run: ['schema_invariants']
+
+real	0m0.047s
+user	0m0.077s
+sys	0m0.010s
+
+--- O5 Full suite ---
+families_run: 20 verdict: HEALTHY
+
+real	0m0.300s
+user	0m0.281s
+sys	0m0.072s
+
+--- O5 Deep mode ---
+(skipping deep mode in this probe for time, but it exists: --deep flag)
+      --deep               
+
+--- O5 Reproducibility: audit runs twice and compares result_hash ---
+reproducible: True result_hash: f2eda58a0fca800d45d200430465b65ca900bb9cc6c4086484d22c5ce4838942
+
+--- O5 machine state: RED/YELLOW/GREEN equivalent ---
+The audit produces: HEALTHY (green), DEGRADED (yellow), UNHEALTHY (red)
+
+--- O5 hard-block vs warning semantics ---
+critical+high → UNHEALTHY (hard-block); medium → DEGRADED (warning); low → ok
+Doctor D021 marks stale suite as 'medium' severity (DEGRADED/warning)
+
+--- O5 health result provenance: audit record has run_at, session, role ---
+audit_id: AUD-0002 verdict: HEALTHY inputs_hash: 0472750441e2bc52a02a1ba785f334d3ab9e110abf2b9ccbfd1bb52f75cbc51e
+
+--- O5 remediation/task generation: doctor provides remediation ---
+remediation: []
+
+--- O5 cache keyed by content/policy/framework hashes: inputs_hash ---
+inputs_hash covers governance/kernel, governance/project, governance/tests, spec/decisions, governance/framework.lock
+This was demonstrated in O4 probe: mutating an input changes inputs_hash
