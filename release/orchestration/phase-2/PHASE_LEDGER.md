@@ -83,3 +83,14 @@ actions only.
 | Result | FAMILY_AUDIT_COMPLETE. W1–W12: 0 P&S / 11 PARTIAL / 1 ABSENT (W11). Bullets 19/34/32 + 1 N/A (W12 G6 — Phase 4 per frozen contract §7). 27 findings, **24 blocking**, 0 owner decisions. |
 | AC-8 | **NOT MET** — matrix 14 rows × 140 cells: 24 proven / 55 partial / 61 GAP; all three rejection conditions hold (some declared inputs reach workers only via retrieval or not at all; superseded inputs satisfy READY/DONE while audit stays HEALTHY; close records no consumption and accepts fabricated traceability). W10 attack 4 fails: index outage/corruption or a re-pinned embedder makes `context compile`/`continue` fail outright, withholding mandatory inputs. |
 | Next action | Await P2-AR-0009, 0010, 0013. |
+
+## P2-L-0008 — 2026-09-18 — P2-AR-0010 gamma re-audit merged (audit of record)
+
+| Field | Value |
+|---|---|
+| Run | P2-AR-0010, self-reported `claude-opus-5[1m]`; work `9523978`, report `851f2a9`, merge `aeabdc5` |
+| Result | FAMILY_AUDIT_COMPLETE. 19 capabilities / 167 items: 4 P&S (G2, H1, H2, I1) / 15 PARTIAL. Items 115/42/10. 36 findings, **19 blocking**. |
+| AC-4 (F4) | **NOT MET.** R1 acceptance still holds for this candidate (digest identical; R1-4 held-out 31/31 re-run unedited), but above-floor plugin-trust defects outside R1's scope: any answered-yes gate authorises elevated plugin registration (A0-F4-01); forged registry undetected and does not stale the suite (A0-F4-02); security review satisfied by naming any record (A0-F4-05). |
+| Headline blockers | E1 init/adopt ignore `--role`, L0 reinstalled the kernel and ran a migration; E1 L1 worker forges gate answers/decisions, unblocking gated work and executing a human-method CIT (L3↔E1 fails); E4 claims non-atomic (15/15 races) and ignore the DAG; F3 approved tool install can never proceed; G1 spec edits inside tasks bypass impact/gates; I3 9 of 11 generation sources generate nothing. |
+| Owner-decision flags | A0-E1-04 (acting role = caller's declaration; conflicts with ARCH-0003 §8) — same question as delta's A0-L3-01/05, the human-presence/role-authentication channel. A0-F4-03 (plugin self-declaration decides whether a gate is needed). **Both held for synthesis adjudication** against ARCH-0003 §8–9, D-0007 and F4 bullet 1 ("Descriptor cannot authorise itself"). |
+| Next action | Await P2-AR-0009 (beta-r) and P2-AR-0013 (alpha-r). |

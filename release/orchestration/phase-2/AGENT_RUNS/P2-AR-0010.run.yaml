@@ -20,4 +20,17 @@ branch: phase2/cap-audit-0-gamma-r
 expected_evidence_path: release/capability-baseline/audit-0/gamma-r/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_AUDIT_COMPLETE
+  work_commit: 95239786dd96424328b248e752bf6ae42ee52217
+  report_commit: 851f2a9ff5e31032d79a756dda0c02a4563390f3
+  integration_merge_commit: aeabdc56cb734cfbe64d5a1e14caa87be2b58f56
+  evidence_path: release/capability-baseline/audit-0/gamma-r/
+  agent_model_self_reported: claude-opus-5[1m]
+  scope_check: touched only its own evidence directory and report (plus the orchestrator's handoff-carry commit)
+  conformance_check: no status/finding contradiction (G2, H1, H2, I1 referenced only by the family-wide non-blocking contract-view finding A0-E1-06); 167 items each citing exact probe-output lines; R1-4 held-out suite re-run unedited 31/31
+  capability_counts: {'PARTIAL': 15, 'PRESENT_AND_SUBSTANTIAL': 4}
+  bullet_counts: {'PRESENT_AND_SUBSTANTIAL': 116, 'PARTIAL': 42, 'ABSENT': 10}
+  findings: {total: 36, blocking: 19, owner_decision_required: ['A0-E1-04', 'A0-F4-03']}
+  role: gamma audit of record for the synthesis
