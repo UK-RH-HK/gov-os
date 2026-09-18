@@ -1,0 +1,64 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0033
+role: verifier-d
+objective: >-
+  NEW fresh independent R1 verification of candidate 4 after the authorised structural repair - attack the derivation
+  mechanism itself (can SECTION_6_SIGNATURES be made to miss a plausible future primitive; does any acceptance marker
+  accept something unenforced; does the bullet-7 marking survive a reporting path outside the CLI envelope), judge the
+  single exemption and the falsifiability positive controls, independently verify the seven AR-0031 held-out failures,
+  and issue the R1 verdict.
+agent_model: claude-opus-5
+fresh_context: true
+independent_of: [AR-0026 build, AR-0028 repair, AR-0030 repair, AR-0032 repair, AR-0027/AR-0029/AR-0031 verifications]
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0033-r1-verification-4.md
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+r1_verification_iteration: 4
+repair_under_verification:
+  run: AR-0032
+  verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+  work_commit: cf527412233ab2ee435a01d1aa3c358050b1cf49
+  report_commit: 60dfa7821907dab7c010eaae1571a038b0f0b9bc
+  authorisation: OWNER-DECISION-0008 Option B
+  closed_claimed: [AR31-B1, AR31-B2, AR31-N1, AR31-N2, AR31-N3, AR31-N4, AR31-N5]
+  structural_claim: >-
+    SECTION_6_SIGNATURES plus a walk of every function in runtime/src and cli/src derives, per section 6 bullet, every
+    function performing a durable write that matches the signature; each must carry the enforcement or call the sink.
+    Claimed 0 violations and 1 recorded exemption (cit::take_snapshot). Falsifiability by positive controls per effect,
+    a panic when a signature derives nothing, and a test that fails outright on any no-primitive claim.
+primary_targets:
+  - can SECTION_6_SIGNATURES be made to miss a primitive a plausible future author would write
+  - does any acceptance marker accept something unenforced (the repair calls markers as load-bearing as signatures and less defended)
+  - does the bullet-7 marking survive a reporting path that does not go through the CLI envelope
+  - are the falsifiability positive controls genuine, or is each detector tuned to its own control
+  - is the single cit::take_snapshot exemption sound
+repair_disclosed_limits: nine limits in evidence/DERIVATION.md section 4 and five defeat conditions in section 5 - to be tested, not accepted
+found_by_the_derivation_itself:
+  - Floors pub fields and pub save were a floor-lowering primitive; Floors::save is now bullet 6's sink, monotonic against the persisted value
+  - CIT write_file/move_file reached a governed record path without save_record
+  - gov gate present reached no guard_write and previously mutated a Human Gate record below floor; now refused at the record-write sink
+prior_suites_to_rerun_unedited:
+  - {path: release/verification/4.1.6-r1/evidence/heldout-tests/, reported: 26 passed / 3 failed}
+  - {path: release/verification/4.1.6-r1-2/evidence/heldout-tests/, reported: 26 passed / 2 failed of 28 compiled, ho_f not compiling}
+  - {path: release/verification/4.1.6-r1-3/evidence/heldout-tests/, reported: 27 passed / 7 failed, from a 26/8 baseline - four flipped to passing, three flipped to failing as structural tripwires asserting the old shape, four still failing of which three fail at a location assertion; the account must be independently verified rather than accepted}
+owner_closed_verify_but_do_not_grade: [AR27-OD1, SRR2-R1-C1, SRR-R0-L7]
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  graded_section: R1
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+carried_not_this_cycle: [AR31-N6, AR29-N2, AR27-N3, AR27-N5, AR27-N6, AR27-N7]
+branch: phase1/srr1-r1-verify-4
+started_at: '2026-09-18T12:30Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0033.report.yaml
+expected_evidence_path: release/verification/4.1.6-r1-4/
+required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
+convergence_policy: >-
+  Under OWNER-DECISION-0008, residuals within BC-R1-1, BC-R1-2 and BC-R1-3 repair and re-verify automatically. A
+  genuinely NEW material blocker class, or anything needing an architecture or owner decision, stops the loop and
+  escalates to the owner IMMEDIATELY. The verifier's residual-versus-new label therefore determines directly whether the
+  owner is interrupted, and must be precise and reasoned.
+outcome: null
