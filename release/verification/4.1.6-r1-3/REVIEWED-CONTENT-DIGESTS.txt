@@ -1,0 +1,54 @@
+AR-0031 — content digests verified at worktree HEAD 26bfe9bbf9141a4d27126da0d09bbeceb4a395d7
+branch phase1/srr1-r1-verify-3, candidate srr1-r1-candidate-3 (repair work commit 748c5d3)
+Verified 2026-09-18. All six match the values AR-0029 and AR-0030 pinned. No mismatch; no STOP condition.
+
+--- pinned normative inputs (sha256) ---
+70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1  release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+695aa185ab32a813cd596b12f80d235afb92d56f147f395b15f16e37d0bcd983  release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+903407729327d67c198c9bf97885a936c5601993e16ad76137a3106c5728d1db  release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+4a0f61c0b3de4c4c657f5b208cd184a8b4add5cde74b4ae152cba964a6bdba7d  release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a  spec/architecture/ARCH-0003.yaml :: accepted `body` scalar
+
+Reproduce the first five with sha256sum; the sixth with:
+  python3 -c "import yaml,hashlib;print(hashlib.sha256(yaml.safe_load(open('spec/architecture/ARCH-0003.yaml'))['body'].encode()).hexdigest())"
+
+--- Contract v3 canonical import, byte-identical (frozen R1 preservation) ---
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+Digest pinned in runtime/src/contracts.rs; CONTRACT_SOURCE_DIVERGED present (fails closed). Verified hx_d::d9.
+
+--- owner-closed items, verified byte-identical ACROSS the repair work commit, not graded ---
+Method: extract each function body from `git show 748c5d3~1:<file>` and compare to the candidate.
+  resolve_state_root            IDENTICAL   (844 bytes -> 844 bytes)
+  default_state_root            IDENTICAL   (494 bytes -> 494 bytes)
+  exit_satisfied                IDENTICAL
+  exit_condition_description    IDENTICAL
+  EXIT_POLICY                   IDENTICAL   ("b_stricter_both_floors")
+  REFUSED_AUTHORITY_ENV         IDENTICAL   (9 variables)
+Both containing files WERE edited by the repair: runtime/src/srr/state.rs +38/-3,
+runtime/src/srr/breakglass.rs +527/-59. Neither owner-closed item moved.
+
+--- candidate diff shape (git diff --numstat 748c5d3~1 748c5d3) ---
+  runtime/src/orchestration/gates.rs     +38  -3
+  runtime/src/release.rs                 +11  -0
+  runtime/src/srr/breakglass.rs         +527 -59
+  runtime/src/srr/plugins.rs             +10  -0
+  runtime/src/srr/provision.rs           +16  -0
+  runtime/src/srr/state.rs               +38  -3
+  runtime/src/srr/verifier.rs            +45  -4
+  runtime/src/update.rs                  +11  -0
+  tests/certification/srr.rs            +866  -0      <- purely additive, no existing test edited
+
+--- prior held-out suites: unchanged at this commit, and not edited by me ---
+`git log 26bfe9b -- release/verification/4.1.6-r1/evidence release/verification/4.1.6-r1-2/evidence`
+returns only the two original verification commits:
+  26c2dc5  Phase 1: AR-0027 fresh independent R1 candidate verification — BLOCKING_FINDINGS_PRESENT
+  d3f52c6  Phase 1: AR-0029 independent R1 re-verification — BLOCKING_FINDINGS_PRESENT on candidate 2
+
+--- test results pinned by this run ---
+  cargo test --lib                 36 passed;  0 failed   (exit 0)
+  cargo test --test certification  70 passed;  0 failed   (exit 0)
+  AR-0027 held-out suite, unmodified   26 passed;  3 failed  (its 3 OBSERVED flips)
+  AR-0029 held-out suite, unmodified   26 passed;  2 failed  (ho_b::b3, ::b6) + ho_f does not compile
+  AR-0031 held-out suite (this run)    26 passed;  8 failed  (all OBSERVED findings)
