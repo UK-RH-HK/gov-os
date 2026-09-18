@@ -1,0 +1,194 @@
+# Governance OS — Phase 2 orchestrator state (machine-readable, resumable).
+# Durable facts, decisions, evidence references, verdicts and next actions only.
+# Verify / seal / show: python3 release/orchestration/phase-2/tools/check_state.py {verify|seal|show}
+schema: governance-os.phase-2.orchestrator-state
+schema_version: 1
+phase: 2
+phase_name: GOVERNANCE CAPABILITY BASELINE
+target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+updated_at: '2026-09-18T19:43:57Z'
+state_hash: 82913799555316ef26f1416ee9232c7f9c77ac5b721f74941eb4ea91bfdc9999
+lifecycle_state: P2_BASELINE_AUDIT_0
+loop_status: P2_INITIALISED__AUDIT_0_DISPATCH_PENDING
+
+protocol:
+  source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
+  launcher: V8.2 — Self-locating durable autonomous Phase Orchestrator (NON_NORMATIVE_OPERATOR_UI)
+  completion_signal: PHASE_ORCHESTRATION_COMPLETE__GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+  out_of_scope: [phase-3, provisional-retrieval-profile-selection, advanced-qualification-execution, r2-certification, r3, publication, merge-to-main]
+  agent_model: claude-opus-5
+  role_templates: V8.2 Phase 2 card, CAP-1 Independent Governance Capability Baseline Auditor (non-normative template)
+
+self_location:
+  performed_at: '2026-09-18'
+  method: committed Git state and evidence only; no conversational memory
+  phase_1:
+    r0: {token: ROT_ARCHITECTURE_ACCEPTED_R0, run: AR-0025, work_commit: 5635955f0b7c1fafa964afc8e94f2c8bab80a0a9, report_commit: 57294b93f1f5de25b4c4d31a6507b3b7cb37de1a, evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/, independently_earned: true}
+    r1: {token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1, run: AR-0033, work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100, report_commit: 6dc1b0a8fdfc2031c3413f669646fc618f18516d, evidence_path: release/verification/4.1.6-r1-4/, blocking_findings: 0, independently_earned: true}
+    final_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-FINAL-PHASE-1-COMPLETE.yaml
+    transition_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-0034-PHASE-2-TRANSITION.yaml
+    phase_1_state_check: STATE_CONSISTENT
+    verified_note: >-
+      R1 was verified at worktree HEAD 84b9ee8, which differs from the candidate c7d3fef only in three Phase-1
+      orchestration files. HEAD 3374db4 differs from c7d3fef only in README.md, docs/DECISIONS.md, ARCH-0003 adoption
+      metadata and orchestration records; product_code_digest is identical at c7d3fef and 3374db4.
+  arch_0003_adoption:
+    record: OWNER-DECISION-0009
+    record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md
+    record_sha256: a0d3325fa8618f1af5089b47370e362cee37ba76516c1bd1ad77acf53ca1fd39
+    state_at_head: {status: ACTIVE, in_effect: true, human_approved: true, approval_state: OWNER_ADOPTED}
+    body_sha256_at_r0_candidate_r1_candidate_and_head: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+    adoption_commit: 3374db452008628074824faacb030ad841ce4ed9
+  earliest_unearned_target: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+  result: PHASE 2 — GOVERNANCE CAPABILITY BASELINE
+  phase_state_conflict: false
+
+repository:
+  path: /home/usain/Dynamic-Agentic-Engineering-OS
+  integration_branch: release/4.1.6-rc1
+  phase_2_base_commit: 3374db452008628074824faacb030ad841ce4ed9
+  last_recorded_commit: 3374db452008628074824faacb030ad841ce4ed9
+  main_branch: main
+  main_branch_modified_by_phase_2: false
+
+contract_v3:
+  path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  canonical_import_path: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+  canonical_import_byte_identical: true
+  compiled_path: framework/contracts/governance-capability-acceptance.yaml
+  compiled_file_sha256: 3bc27e106dd8bab08b9772696efe449bd8f6eabd36bc18579f4a635a00250f9c
+  lock_path: framework/contracts/contract-source.lock
+  lock_compiled_sha256: 30cec97cb03ad481680c5a721a99d442d0acac942e857f3a8f331e1cca8f64f3
+  lock_hash_note: the lock's compiled_sha256 is runtime::util::hash_value (canonical JSON of the parsed YAML), not a file-byte digest; the two values above are therefore expected to differ
+  gov_contract_verify_at_phase_2_entry: CONTRACT_SOURCE_BOUND
+  compiled_capability_count: 100
+  evidence_map_path: tests/governance/capability-evidence-map.yaml
+  evidence_map_state_at_entry: every row evidence_class NOT_YET_MAPPED (carried as AR27-N7 from Phase 1)
+
+operator_ui:
+  path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html
+  sha256: 6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c
+  version: V8.2
+  classification: NON_NORMATIVE_OPERATOR_UI
+  hash_matches_owner_expected_value: true
+  duplicate_canonical_copies: none (V8.1 is labelled historical Phase-1 evidence)
+  phase_2_card: 'section id="capability-baseline" — CAP-1 role prompt; acceptance rule; Gate W baseline audit'
+  logged_conflicts:
+    - id: P2-CONFLICT-1
+      v8_text: CAP-1 "Any source/kernel/runtime repair after rejection creates a new candidate and requires R1 verification again before this audit is rerun."
+      higher_source: Contract v3 evidence freshness (lines 95-111) governs what evidence a change invalidates
+      resolution: frozen contract AC-14 and section 9.3 — independent R1-preservation verification of every candidate whose product code differs from srr1-r1-accepted
+    - id: P2-CONFLICT-2
+      v8_text: Phase 3 card places provisional retrieval after GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+      higher_source: Contract v3 pre-advanced-qualification item 7 and its own PROPOSED ORDER
+      resolution: frozen contract AC-7 and section 9.1 (orchestrator interpretation, owner may override)
+
+frozen_gate_contract:
+  path: release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  revision: 1
+  frozen_before_first_dispatch: true
+  acceptance_criteria: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16]
+
+active_decisions:
+  active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001, ARCH-0003]
+  superseded: [D-0001]
+  proposed_not_active: [D-0008, ARCH-0002]
+  owner_records_in_force: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009]
+  owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses the owner Phase-2 directive's three-iteration convergence rule
+  d0007: ACTIVE and unchanged; the explicit D-0007 transition record remains open and was not requested
+  frozen_srr_boundary_path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  frozen_srr_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+
+inherited_inputs:
+  residual_risk_register_path: release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
+  residual_risk_register_sha256: b08678b0cbb9afe1a1ea23b0da89bac8ba4a935d27891d4cb10f835481d66b9e
+  residual_risk_disposition: >-
+    Inherited as input, not as Phase-2 obligations: the register's items are R1-LOW or R2 lifecycle and none is a Phase-2
+    requirement (register section 6). AR27-N7 (evidence-map rows NOT_YET_MAPPED) is independently a Phase-2 matter under
+    frozen contract AC-10 and is expected to surface through the audit, not by inheritance.
+
+baseline_regression:
+  commit: 3374db452008628074824faacb030ad841ce4ed9
+  lib: 42 passed, 0 failed
+  certification: 79 passed, 0 failed
+  reproduced_by: phase-2 orchestrator (regression reproduction only; not a verdict)
+  toolchain: {cargo: 1.98.1, rustc: 1.98.1, python: 3.12.3}
+
+candidates:
+  - id: cap2-candidate-0
+    tag: cap2-candidate-0
+    commit: null            # recorded in the dispatch commit (a commit cannot name its own hash)
+    product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+    product_code_equal_to: srr1-r1-accepted (c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112)
+    r1_preservation_required: false
+    status: UNDER_BASELINE_AUDIT_0
+    accepted: false
+
+current_candidate:
+  id: cap2-candidate-0
+  tag: cap2-candidate-0
+  commit: null
+
+iteration:
+  current: 0
+  kind: exhaustive baseline audit
+  convergence_rule: >-
+    If three consecutive verification iterations each introduce materially new blocker classes (frozen contract section 8)
+    instead of closing known ones, STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED and produce a root-cause/meta-review package.
+  consecutive_new_class_iterations: 0
+  blocker_class_inventory: []     # established by the iteration-0 synthesis
+  history: []
+
+agent_runs: []
+
+running_work: []
+
+unresolved_findings:
+  CRITICAL: []
+  HIGH: []
+  MEDIUM: []
+  LOW: []
+  INFO: []
+
+downstream_evidence_invalidated: []
+
+owner_gates:
+  pending: []
+  answered: []
+
+immutable_evidence:
+  - path: release/orchestration/phase-1
+    commit: 3374db452008628074824faacb030ad841ce4ed9
+  - path: release/verification
+    commit: 3374db452008628074824faacb030ad841ce4ed9
+  - path: release/root-of-trust
+    commit: 3374db452008628074824faacb030ad841ce4ed9
+
+completed_stages:
+  - stage: P2_SELF_LOCATED
+    commit: 3374db452008628074824faacb030ad841ce4ed9
+    note: Phase-1 tokens verified from committed evidence; ARCH-0003 adoption verified; Contract v3 and V8.2 identities verified; located to Phase 2
+  - stage: P2_INITIALISED
+    commit: null
+    note: durable state, frozen gate contract, gate register, audit-0 handoffs created
+
+next_deterministic_action: >-
+  DISPATCH_AUDIT_0 — tag the initialisation commit cap2-candidate-0; create worktrees and branches
+  phase2/cap-audit-0-{alpha,beta,gamma,delta,epsilon,zeta} at that tag; record run claims P2-AR-0001..P2-AR-0006; launch
+  six fresh independent family auditors with handoffs P2-HO-0000 + P2-HO-0001..0006.
+
+current_prohibitions:
+  - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
+  - {action: builder or repair role grading its own work, until: never}
+  - {action: exposing held-out verifier/test-author tests to a builder or repair role, until: that verifier's verdict is committed}
+  - {action: modifying release/verification/**, release/root-of-trust/**, release/releases/**, release/orchestration/phase-1/**, until: never}
+  - {action: moving or recreating tags srr1-r1-accepted or srr1-r1-candidate-*, until: never}
+  - {action: amending or superseding D-0007, until: an explicit owner-authorised transition record}
+  - {action: reconstructing or paraphrasing Contract v3 content, until: never}
+  - {action: starting Phase 3 or selecting a provisional retrieval profile, until: never in this session}
+  - {action: merging to main, publishing, or certifying a release, until: never in Phase 2}
+  - {action: any role reading/listing/searching session or agent transcripts, task-output stores or user auto-memory, until: never}
+  - {action: writing held-out test content, in-progress verdicts or unreviewed findings into user auto-memory, until: never}

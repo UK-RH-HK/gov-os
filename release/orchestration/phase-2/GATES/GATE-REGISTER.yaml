@@ -1,0 +1,66 @@
+# Phase 2 gate register. Every hard gate, its preconditions and its satisfaction evidence.
+# A gate is SATISFIED only by the satisfier named; the orchestrator records, it never satisfies a verdict gate itself.
+schema: governance-os.phase-2.gate-register
+schema_version: 1
+phase: 2
+gates:
+  - id: GATE-P2-ENTRY
+    title: Phase 2 may begin — Phase 1 independently complete and ARCH-0003 owner-adopted
+    status: SATISFIED
+    satisfier: committed Phase-1 evidence, verified by the Phase-2 orchestrator at bootstrap
+    satisfied_when: >-
+      ROT_ARCHITECTURE_ACCEPTED_R0 and ROT_PHASE1_CANDIDATE_ACCEPTED_R1 earned by independent runs with committed evidence;
+      the accepted candidate's product code reconciles with HEAD; ARCH-0003 ACTIVE / in_effect / human_approved under an
+      owner record; Contract v3 and V8.2 identities established.
+    satisfaction_evidence:
+      r0: {token: ROT_ARCHITECTURE_ACCEPTED_R0, run: AR-0025, work_commit: 5635955f0b7c1fafa964afc8e94f2c8bab80a0a9, evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/}
+      r1: {token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1, run: AR-0033, work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100, evidence_path: release/verification/4.1.6-r1-4/, blocking_findings: 0}
+      accepted_candidate: {id: srr1-r1-candidate-4, commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112, tag: srr1-r1-accepted}
+      head_reconciliation: product_code_digest of c7d3fef and of 3374db4 both bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+      arch_0003: {status: ACTIVE, in_effect: true, human_approved: true, approval_state: OWNER_ADOPTED, record: OWNER-DECISION-0009, body_sha256: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a, body_unchanged_since_r0: true}
+      contract_v3: {sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3, gov_contract_verify: CONTRACT_SOURCE_BOUND}
+      operator_ui: {version: V8.2, sha256: 6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c}
+      regression_reproduced: cargo test --lib 42 passed 0 failed; cargo test --test certification 79 passed 0 failed (at 3374db4)
+      phase_1_state_check: STATE_CONSISTENT
+
+  - id: GATE-P2-FROZEN-CONTRACT
+    title: Phase-2 gate contract frozen and hashed before any audit
+    status: SATISFIED
+    satisfier: Phase-2 orchestrator (procedure only; no verdict)
+    path: release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+    sha256_recorded_in: ORCHESTRATOR_STATE.yaml frozen_gate_contract.sha256
+    satisfied_when: the frozen contract is committed before the first audit dispatch
+
+  - id: GATE-P2-BASELINE-AUDIT-0
+    title: Iteration-0 exhaustive capability baseline audit of cap2-candidate-0
+    status: OPEN
+    satisfier: six fresh independent family auditors plus one fresh independent synthesis auditor
+    preconditions: [GATE-P2-ENTRY, GATE-P2-FROZEN-CONTRACT]
+    satisfied_when: every family audit and the synthesis have committed durable typed reports; the synthesis issues a Phase-2 verdict
+
+  - id: GATE-P2-ORACLE-FORMAT
+    title: Qualification Oracle format (V1-V4) accepted by a fresh independent reviewer before any hidden fault exists
+    status: NOT_SATISFIED
+    satisfier: fresh independent reviewer (frozen contract AC-6, section 9.2)
+    preconditions: [GATE-P2-FROZEN-CONTRACT]
+
+  - id: GATE-P2-R1-PRESERVATION
+    title: R1 acceptance remains valid for the candidate under verification
+    status: NOT_REQUIRED_FOR_CANDIDATE_0
+    satisfier: fresh independent verifier (frozen contract AC-14, section 9.3)
+    note: >-
+      cap2-candidate-0 carries product code byte-identical to srr1-r1-accepted (product_code_digest bd4d65d9...), so AC-14
+      is satisfied by the existing AR-0033 evidence. Any later candidate with a different product_code_digest reopens this gate.
+
+  - id: GATE-P2-CAPABILITY-BASELINE-ACCEPT
+    title: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED on one exact frozen candidate
+    status: NOT_SATISFIED
+    satisfier: fresh independent acceptance verifier/synthesis role only
+    preconditions: [GATE-P2-ENTRY, GATE-P2-FROZEN-CONTRACT, GATE-P2-ORACLE-FORMAT, GATE-P2-R1-PRESERVATION]
+    token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+    satisfied_when: every acceptance criterion AC-1..AC-16 of the frozen contract holds for one exact frozen candidate
+
+  - id: GATE-P3-PROVISIONAL-RETRIEVAL
+    title: Phase 3 — PROVISIONAL_RETRIEVAL_PROFILE_READY
+    status: NOT_OPEN
+    note: not started in this session under any outcome
