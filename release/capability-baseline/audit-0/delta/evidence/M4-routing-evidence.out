@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "command": "route",
+  "result": {
+    "model": "claude-opus-5",
+    "provider": "anthropic",
+    "task_class": "governance",
+    "reasoning_effort": "high",
+    "cost": 0.05,
+    "latency_ms": 1200,
+    "pass": true,
+    "repair_count": 0,
+    "reviewer_findings": 0,
+    "ts": "2026-09-18T19:55:43Z",
+    "session": "S-7acaeddca9c9"
+  },
+  "session": "",
+  "release_trust": {
+    "surface": "route",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
+    "section_6_bullet": 7,
+    "basis": "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."
+  }
+}

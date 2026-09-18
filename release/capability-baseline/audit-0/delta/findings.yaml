@@ -1,0 +1,114 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0004
+findings:
+  - id: A0-J2-01
+    capability: [J2]
+    bullet_source_lines: [610, 612]
+    severity: LOW
+    title: "Experiment schema lacks dedicated reproducibility and interpretation fields"
+    statement: >-
+      The experiment schema (experiment.schema.json) has fields for hypothesis, method, data_provenance, result,
+      confidence and production_merge_allowed, but has no dedicated fields for "reproducibility" (J2 bullet 3)
+      or "interpretation" (J2 bullet 5). These concepts can be expressed through freeform fields (body, summary)
+      or relations, but are not structurally enforced by the schema. The method and result fields partially cover
+      these needs but do not explicitly name them.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:610,612 — J2 bullets 'reproducibility' and 'interpretation'"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - evidence/J2-experiment-lifecycle.out
+    reproduction: >-
+      python3 -c "import json; d=json.load(open('framework/schemas/experiment.schema.json')); props=list(d['properties'].keys()); print('reproducibility' in props, 'interpretation' in props)"
+    repair_direction: >-
+      Add optional reproducibility (string or structured) and interpretation (string) fields to the experiment schema.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-M4-01
+    capability: [M4]
+    bullet_source_lines: [711]
+    severity: LOW
+    title: "M4 empirical routing does not record reviewer_findings from telemetry report aggregation"
+    statement: >-
+      The routing::report() function aggregates model, provider, task_class, runs, pass_rate, avg_cost,
+      avg_latency_ms, avg_repairs — 8 of the 8 M4 dimensions. However, reviewer_findings is accepted in
+      record() but not aggregated in report(). The field is recorded in the JSONL evidence file and can be
+      queried directly, but the structured report lacks a reviewer_findings_avg column.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:711 — M4 bullet 'reviewer findings'"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - evidence/M1-M4-routing.out
+      - evidence/M4-routing-evidence.out
+    reproduction: >-
+      grep "reviewer_findings" runtime/src/routing.rs  # present in record() but not in report()
+    repair_direction: >-
+      Add reviewer_findings aggregation to routing::report() alongside the existing avg_repairs column.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-N3-01
+    capability: [N3]
+    bullet_source_lines: [741, 742]
+    severity: MEDIUM
+    title: "Checkpoint watchdog lacks explicit staleness marking and handoff/session-close blocking on stale checkpoints"
+    statement: >-
+      N3b2 requires the watchdog to "mark checkpoint stale when material state changed" and N3b3 requires
+      "handoff/session close can be blocked or degraded when checkpoint freshness violates policy". The watchdog
+      fires based on context_utilisation and operations count (provider-independent, good), and checkpoints
+      record index_manifest_hash for comparison. However: (1) there is no code path that marks an existing
+      checkpoint record as "stale" when material state changes after its creation — staleness is implicitly
+      handled by creating a new checkpoint, not marking old ones; (2) the before_handoff trigger creates a
+      new checkpoint but does not check whether the previous checkpoint is stale or whether the new one's
+      freshness satisfies policy — it just creates unconditionally. Session close blocking on stale
+      checkpoints is not implemented in the runtime (it would depend on the harness/provider to call
+      checkpoint watchdog before closing).
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:741-742 — N3 bullets 2 and 3"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-3]
+    blocking: false
+    evidence:
+      - evidence/N3-watchdog.out
+      - evidence/N1-N4-checkpoints.out
+    reproduction: >-
+      grep -n "stale" runtime/src/checkpoints.rs  # no staleness marking code
+      # Handoff creates checkpoint unconditionally, no freshness check
+      grep -B2 -A8 "before_handoff" runtime/src/orchestration/handoffs.rs
+    repair_direction: >-
+      (1) Add a staleness check that compares the latest checkpoint's index_manifest_hash against the current
+      index state, marking it stale if they differ. (2) In handoff create and session-close paths, check
+      whether the latest checkpoint is stale or too old relative to policy and block/degrade if so.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-K2-01
+    capability: [K2]
+    bullet_source_lines: [633]
+    severity: INFO
+    title: "CIT-E derived-view regeneration and memory/index refresh are policy-gated but always enabled"
+    statement: >-
+      K2 bullets for derived-view regeneration and memory/index refresh are implemented and executed
+      during CIT-E (lines 968-984 of cit/mod.rs), gated by CHANGE_POLICY.propagation flags (all true
+      by default). The implementation is complete; this is recorded for completeness that the default
+      policy always enables these steps.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:633-634"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - evidence/K1-K2-cit-lifecycle.out
+    reproduction: "grep 'propagation' framework/policies/CHANGE_POLICY.yaml"
+    repair_direction: "No repair needed; information only."
+    owner_decision_required: false
+    owner_decision_reason: null

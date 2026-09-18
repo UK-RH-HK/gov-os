@@ -1,0 +1,78 @@
+=== N1: Structured checkpoint ===
+--- CHECKPOINT_POLICY.fields ---
+fields: [session, role, task, mode, claim, last_completed_step, next_action, pending_decisions, open_questions, open_transactions, files_changed, tests_status, context_packet_hash, memory_snapshot]
+
+--- Create checkpoint and verify all 9 fields ---
+
+--- Prose summary prohibition ---
+  CHECKPOINT_POLICY.prose_summary_as_checkpoint: prose_summary_as_checkpoint: prohibited
+
+=== N2: Mandatory triggers ===
+--- CHECKPOINT_POLICY.mandatory_triggers ---
+mandatory_triggers: [task_transition, material_decision, accepted_cit, significant_mutation, before_handoff, before_model_switch, before_session_close, before_compaction]
+
+--- Enforcement in code ---
+20:    let triggers = pol.get_list("CHECKPOINT_POLICY", "mandatory_triggers");
+
+--- Trigger: accepted_cit (auto-created in CIT execute) ---
+runtime/src/orchestration/handoffs.rs:94:    // CHECKPOINT_POLICY mandatory trigger `before_handoff`
+runtime/src/orchestration/handoffs.rs:98:        .any(|t| t == "before_handoff")
+runtime/src/orchestration/handoffs.rs:105:            json!({"trigger": "before_handoff", "task": task, "next_action": format!("worker {} executes {task} via {id}", to_role), "last_completed_step": format!("handoff {id} prepared")}),
+runtime/src/cit/mod.rs:1071:                json!({"trigger": "accepted_cit", "next_action": "gov continue", "last_completed_step": format!("executed {id}"), "open_transactions": []}),
+runtime/src/orchestration/tasks.rs:551:        json!({"task": id, "trigger": "task_transition", "last_completed_step": format!("closed {id}"), "next_action": "gov continue", "tests_status": tests_status, "files_changed": files_changed, "observed_files_changed": observed}),
+
+=== N3: Provider-independent checkpoint watchdog ===
+--- N3b1: Does not depend solely on proprietary hooks ---
+  CHECKPOINT_POLICY.watchdog:
+watchdog:
+  context_utilisation_threshold: 0.75
+  max_operations_between_checkpoints: 25
+location: spec/reports/checkpoints
+
+--- N3 watchdog in code (context_utilisation + operations count) ---
+pub fn watchdog(
+    p: &Project,
+    db: &RuntimeDb,
+    context_utilisation: f64,
+    ops_since: i64,
+    task: Option<&str>,
+    next_action: &str,
+) -> Result<Value> {
+    let pol = p.policies();
+    let th = pol.get_f64(
+        "CHECKPOINT_POLICY",
+
+--- N3b2: Can mark checkpoint stale ---
+  Freshness tracked in memory_snapshot.index_manifest_hash
+
+--- N3b3: Handoff/session close blocked when checkpoint freshness violates policy ---
+94:    // CHECKPOINT_POLICY mandatory trigger `before_handoff`
+98:        .any(|t| t == "before_handoff")
+102:        crate::checkpoints::create(
+105:            json!({"trigger": "before_handoff", "task": task, "next_action": format!("worker {} executes {task} via {id}", to_role), "last_completed_step": format!("handoff {id} prepared")}),
+
+=== N4: Worker return contract ===
+--- N4b1: Structured result survives subagent conversation death ---
+  Worker-return schema required fields:
+  Required: ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'tests', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+
+--- Handoff return validation ---
+112:pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
+116:        .validate("worker-return", &ret, "(worker return contract)")?;
+184:            json!({"status": "PROVISIONAL", "state_class": "EVIDENCE", "scope": "PROJECT", "lifecycle": "candidate", "category": "worker-return", "problem_statement": text, "evidence_strength": "low", "sources": [id, task_id], "provenance": {"from_handoff": id, "task": task_id, "at": now_iso()}}),
+
+RESULT: N1 9-field structured checkpoint; N2 8 mandatory triggers; N3 provider-independent watchdog (context+ops thresholds); N4 worker return schema with 12 required fields
+ok: True
+Checkpoint fields present:
+  session: YES = S-1af15f976d6a
+  role: YES = orchestrator
+  trigger: YES = task_transition
+  mode: YES = RUNNING
+  last_completed_step: YES = finished widget X
+  next_action: YES = continue implementation
+  pending_decisions: YES = ['HDG-0006', 'HDG-0002', 'HDG-0003', 'HDG-0004', 'HDG-0005', 'HDG-0007', 'HDG-00
+  open_transactions: YES = ['CIT-0002', 'CIT-0003', 'CIT-0004', 'CIT-0005', 'CIT-0006', 'CIT-0007', 'CIT-00
+  files_changed: YES = []
+  tests_status: YES = unknown
+  context_packet_hash: YES = 
+  memory_snapshot: YES = {'index_manifest_hash': 'd638f25cfde8e655e1b371aa22e2ffcc0d7dbcabdc686c470c970c0
