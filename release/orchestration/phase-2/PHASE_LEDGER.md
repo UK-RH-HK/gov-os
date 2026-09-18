@@ -42,3 +42,14 @@ actions only.
 | Isolation | One git worktree and branch per run (`phase2/cap-audit-0-<family>`), all at the tag; evidence confined to `release/capability-baseline/audit-0/<family>/`. |
 | Independence | Each auditor is a fresh context; none authored the implementation or any Phase-1 role; the families cannot read each other's unmerged evidence. |
 | Next action | Await the six reports; verify and merge each; then dispatch the fresh synthesis auditor P2-AR-0007. |
+
+## P2-L-0004 — 2026-09-18 — First-pass family audits ruled nonconforming; all six families re-audited on the pinned model
+
+| Field | Value |
+|---|---|
+| Returned | P2-AR-0001 alpha (16 P&S / 1 PARTIAL, 0 blocking) · P2-AR-0002 beta (17/2, 0 blocking) · P2-AR-0003 gamma (16/3, 0 blocking) · P2-AR-0004 delta (16/2, 0 blocking) · P2-AR-0005 epsilon (10 P&S + U / 1 PARTIAL / 4 ABSENT, 1 blocking) · P2-AR-0006 zeta (12/0, 0 blocking). Each touched only its own evidence directory and report. |
+| Model deviation | Every run self-reported `agent_model: claude-opus-4-6`; the run claims recorded `claude-opus-5`, the model Phase 1 used for every role. |
+| Conformance (orchestrator, procedure only) | Mechanical scan of each `capability-audit.yaml` against its own `findings.yaml`: capabilities recorded `PRESENT_AND_SUBSTANTIAL` while the same run records unmet bullets — alpha T1, A5 (and S4 claimed for A0–A11 while adopt was driven A0–A6); beta C9, R3; delta M4; epsilon P1, U (all 28 U bullets on one doctor output); zeta W7, W9, W11 (with artifact-flow gaps mislabelled lifecycle `P3`). Evidence concentration: beta 123 bullets on 8 distinct references; delta 93 on 12; epsilon's O5 probe records tier semantics as printed `echo` assertions and a U↔O5 output reading `UNHEALTHY` was recorded PASS. Gamma: no contradiction found; retained as corroboration. |
+| Rulings | P2-AR-0001/0002/0004/0005/0006 `COMPLETED_NONCONFORMING`; P2-AR-0003 `COMPLETED_MODEL_DEVIATION`. **No capability status was adopted, overruled or issued by the orchestrator**; the rulings concern protocol conformance only. All first-pass evidence merged unchanged as historical record (`bdc1375`, `5907e7d`, `ad5af95`, `9c232a3`, `96f1031`, alpha merge). |
+| Re-dispatch | Model pinned explicitly (`opus`). P2-AR-0008 epsilon-r (P2-HO-0008), P2-AR-0009 beta-r, P2-AR-0010 gamma-r, P2-AR-0011 delta-r, P2-AR-0012 zeta-r, P2-AR-0013 alpha-r (P2-HO-0009, which restates the common protocol's standard and adds nothing new). Re-auditors are barred from reading their family's first-pass evidence. |
+| Next action | Await the six re-audits; verify, merge; dispatch synthesis P2-AR-0007 on the audits of record. |

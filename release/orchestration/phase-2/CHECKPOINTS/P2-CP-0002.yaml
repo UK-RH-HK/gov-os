@@ -1,0 +1,27 @@
+schema: governance-os.phase-2.checkpoint
+schema_version: 1
+checkpoint: P2-CP-0002
+trigger: significant task transition — first-pass family audits ruled nonconforming; six re-audits dispatched on the pinned model
+date: '2026-09-18'
+lifecycle_state: P2_BASELINE_AUDIT_0
+loop_status: P2_AUDIT_0_REAUDIT_RUNNING__SIX_FAMILY_REAUDITS_ON_PINNED_MODEL
+candidate: {id: cap2-candidate-0, commit: 57177a37ea296ece16b185874831462b6a76db18, product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547}
+frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+first_pass_audits:
+  P2-AR-0001: COMPLETED_NONCONFORMING
+  P2-AR-0002: COMPLETED_NONCONFORMING
+  P2-AR-0003: COMPLETED_MODEL_DEVIATION
+  P2-AR-0004: COMPLETED_NONCONFORMING
+  P2-AR-0005: COMPLETED_NONCONFORMING
+  P2-AR-0006: COMPLETED_NONCONFORMING
+running_work:
+  - {run_id: P2-AR-0008, family: epsilon-r, branch: phase2/cap-audit-0-epsilon-r}
+  - {run_id: P2-AR-0009, family: beta-r, branch: phase2/cap-audit-0-beta-r}
+  - {run_id: P2-AR-0010, family: gamma-r, branch: phase2/cap-audit-0-gamma-r}
+  - {run_id: P2-AR-0011, family: delta-r, branch: phase2/cap-audit-0-delta-r}
+  - {run_id: P2-AR-0012, family: zeta-r, branch: phase2/cap-audit-0-zeta-r}
+  - {run_id: P2-AR-0013, family: alpha-r, branch: phase2/cap-audit-0-alpha-r}
+pending_decisions: []
+open_owner_gates: []
+next_deterministic_action: AWAIT_AUDIT_0_REAUDITS (see ORCHESTRATOR_STATE.yaml)

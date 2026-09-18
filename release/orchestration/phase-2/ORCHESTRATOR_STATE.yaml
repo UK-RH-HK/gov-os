@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-18T19:44:35Z'
-state_hash: 877314e18cd298e8604f68b03cd1b45bd61f23c552f7416f16da33e7a04d7618
+updated_at: '2026-09-18T20:16:51Z'
+state_hash: a5c345fe1015121609958fd7a17304615fd0a643483ffcd788d6b0a2bdf67b8d
 lifecycle_state: P2_BASELINE_AUDIT_0
-loop_status: P2_AUDIT_0_RUNNING__SIX_FAMILY_AUDITORS
+loop_status: P2_AUDIT_0_REAUDIT_RUNNING__SIX_FAMILY_REAUDITS_ON_PINNED_MODEL
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   phase_2_base_commit: 3374db452008628074824faacb030ad841ce4ed9
-  last_recorded_commit: 57177a37ea296ece16b185874831462b6a76db18
+  last_recorded_commit: ab964d70e9b598b38e07fd1ffcdd63735af1c355
   main_branch: main
   main_branch_modified_by_phase_2: false
 
@@ -143,20 +143,26 @@ iteration:
   history: []
 
 agent_runs:
-  - {run_id: P2-AR-0001, role: capability-family-auditor, family: alpha, iteration: 0, candidate: cap2-candidate-0, branch: phase2/cap-audit-0-alpha, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml}
-  - {run_id: P2-AR-0002, role: capability-family-auditor, family: beta, iteration: 0, candidate: cap2-candidate-0, branch: phase2/cap-audit-0-beta, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.run.yaml}
-  - {run_id: P2-AR-0003, role: capability-family-auditor, family: gamma, iteration: 0, candidate: cap2-candidate-0, branch: phase2/cap-audit-0-gamma, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.run.yaml}
-  - {run_id: P2-AR-0004, role: capability-family-auditor, family: delta, iteration: 0, candidate: cap2-candidate-0, branch: phase2/cap-audit-0-delta, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.run.yaml}
-  - {run_id: P2-AR-0005, role: capability-family-auditor, family: epsilon, iteration: 0, candidate: cap2-candidate-0, branch: phase2/cap-audit-0-epsilon, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml}
-  - {run_id: P2-AR-0006, role: capability-family-auditor, family: zeta, iteration: 0, candidate: cap2-candidate-0, branch: phase2/cap-audit-0-zeta, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml}
+  - {run_id: P2-AR-0001, role: capability-family-auditor, family: alpha, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0013, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml}
+  - {run_id: P2-AR-0002, role: capability-family-auditor, family: beta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0009, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.run.yaml}
+  - {run_id: P2-AR-0003, role: capability-family-auditor, family: gamma, iteration: 0, status: COMPLETED_MODEL_DEVIATION, superseded_by: P2-AR-0010, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.run.yaml}
+  - {run_id: P2-AR-0004, role: capability-family-auditor, family: delta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0011, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.run.yaml}
+  - {run_id: P2-AR-0005, role: capability-family-auditor, family: epsilon, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0008, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml}
+  - {run_id: P2-AR-0006, role: capability-family-auditor, family: zeta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0012, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml}
+  - {run_id: P2-AR-0008, role: capability-family-auditor, family: epsilon-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-epsilon-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.run.yaml}
+  - {run_id: P2-AR-0009, role: capability-family-auditor, family: beta-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-beta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml}
+  - {run_id: P2-AR-0010, role: capability-family-auditor, family: gamma-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-gamma-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.run.yaml}
+  - {run_id: P2-AR-0011, role: capability-family-auditor, family: delta-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-delta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml}
+  - {run_id: P2-AR-0012, role: capability-family-auditor, family: zeta-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-zeta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml}
+  - {run_id: P2-AR-0013, role: capability-family-auditor, family: alpha-r, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-alpha-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0001, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml}
-  - {run_id: P2-AR-0002, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.run.yaml}
-  - {run_id: P2-AR-0003, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.run.yaml}
-  - {run_id: P2-AR-0004, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.run.yaml}
-  - {run_id: P2-AR-0005, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml}
-  - {run_id: P2-AR-0006, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml}
+  - {run_id: P2-AR-0008, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.run.yaml}
+  - {run_id: P2-AR-0009, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml}
+  - {run_id: P2-AR-0010, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.run.yaml}
+  - {run_id: P2-AR-0011, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml}
+  - {run_id: P2-AR-0012, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml}
+  - {run_id: P2-AR-0013, role: capability-family-auditor, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml}
 
 unresolved_findings:
   CRITICAL: []
@@ -187,15 +193,23 @@ completed_stages:
     commit: 57177a37ea296ece16b185874831462b6a76db18
     note: durable state, frozen gate contract, gate register, audit-0 handoffs created; tagged cap2-candidate-0
   - stage: P2_AUDIT_0_DISPATCHED
-    commit: null
+    commit: 990f85832ccc1cb14e9182ff1bb9a81b11fd8bbd
     note: six family auditors dispatched in isolated worktrees
+  - stage: P2_AUDIT_0_FIRST_PASS_RULED_NONCONFORMING
+    commit: ab964d70e9b598b38e07fd1ffcdd63735af1c355
+    note: >-
+      All six first-pass family audits returned; all self-reported claude-opus-4-6 against the recorded claude-opus-5;
+      five were ruled COMPLETED_NONCONFORMING (status/finding contradictions, aggregate-output evidence) and gamma
+      COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on the
+      pinned model under P2-HO-0008 / P2-HO-0009.
 
 next_deterministic_action: >-
-  AWAIT_AUDIT_0 — six family auditors P2-AR-0001..P2-AR-0006 are running on branches phase2/cap-audit-0-*. On each
-  completion: verify its report and work commit exist, that it touched only its own evidence directory and report, then
-  merge its branch into release/4.1.6-rc1 (--no-ff). A run with no report is INCOMPLETE: re-dispatch a fresh auditor for
-  that family from the same handoff. When all six are merged, write P2-HO-0007 and dispatch the fresh synthesis auditor
-  P2-AR-0007 on the merge commit.
+  AWAIT_AUDIT_0_REAUDITS — six re-audits on the pinned model are running: P2-AR-0008 epsilon-r, P2-AR-0009 beta-r,
+  P2-AR-0010 gamma-r, P2-AR-0011 delta-r, P2-AR-0012 zeta-r, P2-AR-0013 alpha-r (branches phase2/cap-audit-0-<family>-r).
+  On each completion: verify report and work commit exist, scope confined to its own evidence directory and report,
+  self-reported model, and mechanical status/finding consistency; merge --no-ff. A run with no report is INCOMPLETE:
+  re-dispatch from the same handoff. When all six are merged, fill {{MERGE_COMMIT}} in P2-HO-0007, point it at the -r
+  audits of record, and dispatch the fresh synthesis auditor P2-AR-0007 (model pinned).
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
