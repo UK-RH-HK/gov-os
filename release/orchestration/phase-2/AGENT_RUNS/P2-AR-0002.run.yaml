@@ -22,4 +22,16 @@ expected_evidence_path: release/capability-baseline/audit-0/beta/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
 started_at: '2026-09-18T19:50Z'
-status: RUNNING
+status: COMPLETED_NONCONFORMING
+outcome:
+  verdict_reported: FAMILY_AUDIT_COMPLETE
+  work_commit: 3569f6d60b1e8e1738bd73ddb6de26b3af6b7766
+  report_commit: 15db6a269030160131d9189b09a79aefc51bbc3e
+  integration_merge_commit: 5907e7d1f5f28f968b5930bcbb9d4071232391c6
+  evidence_path: release/capability-baseline/audit-0/beta/
+  agent_model_self_reported: claude-opus-4-6
+  scope_check: touched only its own evidence directory and report
+  orchestrator_conformance_ruling: >-
+    C9 and R3 recorded PRESENT_AND_SUBSTANTIAL while the run's own findings A0-C9-01 and A0-R3-01 record unmet aspects of those capabilities; 123 bullets rest on 8 distinct evidence references (43 on one aggregate output), which is not bullet-level demonstration; model deviation (self-reported claude-opus-4-6 against the recorded claude-opus-5). This is a ruling on protocol conformance only, not a capability status; no status of this run is adopted or
+    overruled by the orchestrator.
+  disposition: evidence retained unchanged as historical record; family re-audited from scratch by P2-AR-0009 (P2-HO-0009); the synthesis uses P2-AR-0009 as the beta audit of record

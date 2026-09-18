@@ -22,4 +22,16 @@ expected_evidence_path: release/capability-baseline/audit-0/gamma/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
 started_at: '2026-09-18T19:50Z'
-status: RUNNING
+status: COMPLETED_MODEL_DEVIATION
+outcome:
+  verdict_reported: FAMILY_AUDIT_COMPLETE
+  work_commit: 323b25a42190d49a8b3d7e1f701c5a0919f1fdbf
+  report_commit: c980207a3f7c66ad58aa853bb9b58548ada14e2a
+  integration_merge_commit: ad5af95f8cf33829afe7b9c6103d8b6157a0ab79
+  evidence_path: release/capability-baseline/audit-0/gamma/
+  agent_model_self_reported: claude-opus-4-6
+  scope_check: touched only its own evidence directory and report
+  orchestrator_conformance_ruling: >-
+    no status/finding contradiction found by the orchestrator's mechanical check; 116 bullets on 20 distinct evidence references; model deviation (self-reported claude-opus-4-6). Retained as corroborating evidence; re-audited for a uniform standard. This is a ruling on protocol conformance only, not a capability status; no status of this run is adopted or
+    overruled by the orchestrator.
+  disposition: evidence retained unchanged as historical record; family re-audited from scratch by P2-AR-0010 (P2-HO-0009); the synthesis uses P2-AR-0010 as the gamma audit of record

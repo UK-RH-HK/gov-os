@@ -22,4 +22,16 @@ expected_evidence_path: release/capability-baseline/audit-0/zeta/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
 started_at: '2026-09-18T19:50Z'
-status: RUNNING
+status: COMPLETED_NONCONFORMING
+outcome:
+  verdict_reported: FAMILY_AUDIT_COMPLETE
+  work_commit: f055677620ec64db61445dffa3492b03f6ae54e8
+  report_commit: e82cf513b9e2162c1c6b4eade086ad94c639e741
+  integration_merge_commit: 96f10313d8514b81db76c6d39a3ab47a74eb77d9
+  evidence_path: release/capability-baseline/audit-0/zeta/
+  agent_model_self_reported: claude-opus-4-6
+  scope_check: touched only its own evidence directory and report
+  orchestrator_conformance_ruling: >-
+    W7, W9 and W11 recorded PRESENT_AND_SUBSTANTIAL while the run's own findings A0-W7-01, A0-W9-01 and A0-W11-01 record gaps in those capabilities; artifact-flow findings labelled lifecycle P3 (Phase 3 is the provisional retrieval profile); model deviation (self-reported claude-opus-4-6). This is a ruling on protocol conformance only, not a capability status; no status of this run is adopted or
+    overruled by the orchestrator.
+  disposition: evidence retained unchanged as historical record; family re-audited from scratch by P2-AR-0012 (P2-HO-0009); the synthesis uses P2-AR-0012 as the zeta audit of record

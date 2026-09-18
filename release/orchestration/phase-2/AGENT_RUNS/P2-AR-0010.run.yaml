@@ -1,0 +1,23 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0010
+role: capability-family-auditor
+family: gamma (re-audit)
+objective: Fresh independent iteration-0 RE-AUDIT of family gamma on cap2-candidate-0 on the pinned model, under P2-HO-0009.
+agent_model: claude-opus-5 (pinned explicitly at dispatch)
+fresh_context: true
+independent_of: [Governance OS implementation authors, all Phase-1 roles, P2-AR-0001..P2-AR-0008 and the other re-audits]
+must_not_read: [release/capability-baseline/audit-0/gamma/, release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.report.yaml, other families' evidence]
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+scope_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0003-audit-0-gamma.md
+active_gate: GATE-P2-BASELINE-AUDIT-0
+iteration: 0
+candidate: cap2-candidate-0
+base_commit: 57177a37ea296ece16b185874831462b6a76db18
+product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+branch: phase2/cap-audit-0-gamma-r
+expected_evidence_path: release/capability-baseline/audit-0/gamma-r/
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.report.yaml
+required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
+status: RUNNING

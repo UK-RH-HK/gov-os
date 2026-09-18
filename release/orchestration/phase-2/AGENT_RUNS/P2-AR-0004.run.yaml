@@ -22,4 +22,16 @@ expected_evidence_path: release/capability-baseline/audit-0/delta/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
 started_at: '2026-09-18T19:50Z'
-status: RUNNING
+status: COMPLETED_NONCONFORMING
+outcome:
+  verdict_reported: FAMILY_AUDIT_COMPLETE
+  work_commit: 51ea6aa4b20812ce2fa71e9f0b02f8a8abae5cb7
+  report_commit: e42d23b61397cd9811d9e255b79d144c7d20b7ff
+  integration_merge_commit: 9c232a3cf6f701d1b9703e0752895375b1e12c24
+  evidence_path: release/capability-baseline/audit-0/delta/
+  agent_model_self_reported: claude-opus-4-6
+  scope_check: touched only its own evidence directory and report
+  orchestrator_conformance_ruling: >-
+    M4 recorded PRESENT_AND_SUBSTANTIAL while the run's own finding A0-M4-01 records that reviewer findings are absent from the routing report aggregation (an M4 bullet); 93 bullets on 12 distinct evidence references; model deviation (self-reported claude-opus-4-6). This is a ruling on protocol conformance only, not a capability status; no status of this run is adopted or
+    overruled by the orchestrator.
+  disposition: evidence retained unchanged as historical record; family re-audited from scratch by P2-AR-0011 (P2-HO-0009); the synthesis uses P2-AR-0011 as the delta audit of record
