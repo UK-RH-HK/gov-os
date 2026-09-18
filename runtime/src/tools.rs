@@ -296,6 +296,15 @@ pub fn resolve(p: &Project, role: &str, capability: &str) -> Result<Value> {
 /// Install/register a tool only when every TOOL_POLICY auto-install condition holds; otherwise raise a Human Decision Gate.
 pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Result<Value> {
     crate::orchestration::control::guard_write(p, "tools install")?;
+    // **`OWNER-DECISION-0006` §6 bullet 5, at the second acquisition primitive** (`AR31-N1`).
+    //
+    // This function installs a capability — writing a descriptor into `governance/project/tools/` and optionally
+    // running its install command — and never reached `plugins::guard_acquisition`, which the census named as the
+    // sole sink for bullet 5. Below floor the operation-level guard above already refuses it, so there was no
+    // live bypass; what was missing was the effect-level control, which is the one that survives a future
+    // acquisition path taking no `Project`. The derived census (`breakglass::SECTION_6_SIGNATURES`) now finds
+    // every writer of a capability registry and requires this call in each.
+    crate::srr::plugins::guard_acquisition_below_floor("tools install")?;
     crate::authority::require(p, "install_tool")?;
     let pol = p.policies();
     if pol.get_bool("TOOL_POLICY", "health_check_required", true)

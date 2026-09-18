@@ -12,6 +12,7 @@ mod multi_machine;
 mod repair;
 mod repair2;
 mod repair3;
+mod section6;
 mod srr;
 mod srr_material;
 mod update;

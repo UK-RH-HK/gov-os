@@ -1,0 +1,54 @@
+# AR-0032 — preservation census, measured after the repair
+# base commit: 30aa98a10fd7f5ed85439b0d676761080519ceed
+
+== files changed (git diff --numstat against the base commit) ==
+42	4	cli/src/main.rs
+24	1	runtime/src/cit/mod.rs
+8	1	runtime/src/context/mod.rs
+13	0	runtime/src/doctor.rs
+17	0	runtime/src/records.rs
+353	21	runtime/src/srr/breakglass.rs
+1	0	runtime/src/srr/mod.rs
+39	6	runtime/src/srr/plugins.rs
+38	0	runtime/src/srr/state.rs
+9	0	runtime/src/tools.rs
+14	4	runtime/src/update.rs
+1	0	tests/certification/main.rs
+
+== untracked new files ==
+?? release/root-of-trust/signed-release-root-v1-r1-repair-3/
+?? runtime/src/srr/present.rs
+?? tests/certification/section6.rs
+
+== OUT OF SCOPE: resolve_state_root / default_state_root must be byte-identical ==
+  (no line touching machine-state root resolution appears in the diff)
+  default_state_root: BYTE-IDENTICAL  sha256 df6efff19aa29df4
+  resolve_state_root: BYTE-IDENTICAL  sha256 20a774bd659defd6
+
+== OUT OF SCOPE: exit_satisfied / EXIT_POLICY (SRR2-R1-C1) must be unchanged ==
+  exit_satisfied: BYTE-IDENTICAL
+870:pub const EXIT_POLICY: &str = "b_stricter_both_floors";
+  exit-floor comparisons in the tree: runtime/src/srr/verifier.rs:1 runtime/src/srr/breakglass.rs:3 
+
+== no historical / owner record touched ==
+  release/verification: 0 modified/untracked entries
+  release/releases: 0 modified/untracked entries
+  release/orchestration/phase-1/GATES: 0 modified/untracked entries
+  release/orchestration/phase-1/ESCALATION: 0 modified/untracked entries
+  release/orchestration/phase-1/HANDOFFS: 0 modified/untracked entries
+  release/root-of-trust/*-review*: 0 entries
+
+== preservation greps ==
+  srr::admit( call sites: 5
+  install_kernel( call sites (raw grep of the identifier is 17 incl. decl/doc): see the certification census, 5
+  Admitted::by_admit():   1
+  AuthenticatedRelease literals: 1
+  Clearance constructed outside breakglass: 0
+  new_record("human-gate" files: runtime/src/orchestration/gates.rs 
+  root_metadata_path() files: runtime/src/srr/state.rs runtime/src/srr/verifier.rs 
+  SigningKey / PRIVATE KEY in product source: 1 — the secret DETECTOR pattern in runtime/src/security/secrets.rs, not a signing capability
+  PERMITTED_OPERATIONS entries: 4
+
+== Contract v3 canonical import byte-identity ==
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md

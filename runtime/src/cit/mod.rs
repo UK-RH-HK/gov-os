@@ -707,7 +707,20 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
                     "CIT may not write into governance/kernel/",
                 ));
             }
-            write_text(&p.root.join(path), op["content"].as_str().unwrap_or(""))?;
+            // **`OWNER-DECISION-0006` §6 bullet 2, at the one mutation op that does not pass `save_record`.**
+            //
+            // `append_record` below persists through `save_record`, which is the §6 record-write sink. A
+            // `write_file` op reaches the same durable artefact by writing the bytes directly, so the effect is
+            // asked here by the record type the bytes themselves declare. Below floor `cit execute` is refused at
+            // the operation level too; this is the effect-level control, which is the one that survives a caller
+            // that reaches this op by some other route. Nothing changes above floor.
+            let content = op["content"].as_str().unwrap_or("");
+            if let Some(r) = parse_record_text(content, path) {
+                if let Some(effect) = crate::srr::breakglass::guarded_record_effect(&r.rtype()) {
+                    crate::srr::breakglass::guard_effect(effect, "cit write_file")?;
+                }
+            }
+            write_text(&p.root.join(path), content)?;
             touched.push(path.to_string());
         }
         "move_file" => {
@@ -717,6 +730,16 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
             );
             if from.is_empty() || to.is_empty() {
                 return Err(GovError::new("USAGE", "move_file requires path and to"));
+            }
+            // §6 bullet 2, as for `write_file`: relocating a file that parses as a guarded record type reaches
+            // the same durable artefact without passing `save_record`.
+            if let Some(r) = std::fs::read_to_string(p.root.join(from))
+                .ok()
+                .and_then(|t| parse_record_text(&t, to))
+            {
+                if let Some(effect) = crate::srr::breakglass::guarded_record_effect(&r.rtype()) {
+                    crate::srr::breakglass::guard_effect(effect, "cit move_file")?;
+                }
             }
             if let Some(d) = p.root.join(to).parent() {
                 std::fs::create_dir_all(d)?;

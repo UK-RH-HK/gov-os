@@ -34,6 +34,7 @@ pub mod breakglass;
 pub mod crypto;
 pub mod metadata;
 pub mod plugins;
+pub mod present;
 pub mod provision;
 pub mod staging;
 pub mod state;

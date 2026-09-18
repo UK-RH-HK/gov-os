@@ -1076,17 +1076,47 @@ fn main() {
             json!({"ok": result.is_ok(), "duration_ms": started.elapsed().as_millis() as u64, "error": result.as_ref().err().map(|e| e.code.clone())}),
         );
     }
+    // **`OWNER-DECISION-0006` §6 bullet 7 — the one place a command result leaves this product** (`AR31-B1`).
+    //
+    // Repair 2 recorded bullet 7 as "no primitive: every reporting surface carries the marking". That was a list,
+    // and AR-0031 showed the list was short: `gov doctor`, `gov update --check`, `gov version` and the agent
+    // context packet all reported the installed release with no marking beside it, and nothing was ever refused
+    // under bullet 7 because the effect had no call site.
+    //
+    // A longer list would fail the same way. `run()` is called exactly once and its value reaches stdout only
+    // through the match below, so attaching the presentation to the envelope here covers **every command,
+    // including ones that do not exist yet and ones that have never heard of break-glass**. That is measured by
+    // the certification suite, which drives a command with no relationship to release identity on a marked
+    // machine and asserts the marking is present.
+    //
+    // `srr::present::attach` is the sink: it asks `breakglass::guard_effect` for
+    // `Effect::PresentBelowFloorReleaseAsCurrent` and reports the refusal instead of swallowing it. §5 keeps
+    // inspection and diagnosis available below floor, so the enforcement is in what is said, not in refusing to
+    // speak.
+    let mark = |v: Value| {
+        let mut v = v;
+        gov_runtime::srr::present::attach(name, &mut v);
+        v
+    };
     match result {
         Ok(v) => {
             if cli.json {
                 println!(
                     "{}",
-                    serde_json::to_string_pretty(
-                        &json!({"ok": true, "command": name, "result": v, "session": session})
-                    )
+                    serde_json::to_string_pretty(&mark(
+                        json!({"ok": true, "command": name, "result": v, "session": session})
+                    ))
                     .unwrap()
                 );
             } else {
+                let banner = mark(json!({}));
+                if banner["release_trust"]["below_floor"].as_bool().unwrap_or(true) {
+                    println!(
+                        "{}: {}",
+                        banner["release_trust"]["marking"].as_str().unwrap_or(""),
+                        banner["release_trust"]["operator_note"].as_str().unwrap_or("")
+                    );
+                }
                 print!(
                     "{}",
                     serde_yaml::to_string(&v).unwrap_or_else(|_| v.to_string())
@@ -1095,8 +1125,16 @@ fn main() {
         }
         Err(e) => {
             if cli.json {
-                println!("{}", serde_json::to_string_pretty(&json!({"ok": false, "command": name, "error": {"code": e.code, "message": e.message, "details": e.details}, "session": session})).unwrap());
+                println!("{}", serde_json::to_string_pretty(&mark(json!({"ok": false, "command": name, "error": {"code": e.code, "message": e.message, "details": e.details}, "session": session}))).unwrap());
             } else {
+                let banner = mark(json!({}));
+                if banner["release_trust"]["below_floor"].as_bool().unwrap_or(true) {
+                    eprintln!(
+                        "{}: {}",
+                        banner["release_trust"]["marking"].as_str().unwrap_or(""),
+                        banner["release_trust"]["operator_note"].as_str().unwrap_or("")
+                    );
+                }
                 eprintln!("error [{}]: {}", e.code, e.message);
                 if !e.details.is_null() {
                     eprintln!("{}", serde_yaml::to_string(&e.details).unwrap_or_default());

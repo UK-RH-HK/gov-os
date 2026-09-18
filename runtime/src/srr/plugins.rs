@@ -121,6 +121,29 @@ pub fn delegation_for<'a>(
     })
 }
 
+/// **The `OWNER-DECISION-0006` §6 bullet 5 question, as a named door in this module.**
+///
+/// `AR31-N1`: the census named [`guard_acquisition`] as the *sole* sink for bullet 5, and `tools::install` — which
+/// installs a capability, writes its descriptor into the governed overlay and may run its install command — never
+/// reached it. The census entry was therefore false: the product realises bullet 5's effect in two places.
+///
+/// Both now ask, and both ask the same question: [`guard_acquisition`] asks at the instant of the acquisition
+/// *decision*, and this function is the door for a capability-installing path that is not that decision, so such a
+/// path reaches §6 through this module rather than reaching into `breakglass` on its own terms. There is no second
+/// policy here and there cannot be: every §6 question in the implementation, from either enforcement point, ends
+/// in the one private `decide` over the one reading of the marking record.
+///
+/// The refusal is reported as `privileged_plugin_acquisition` whatever the descriptor declares about itself, for
+/// the reason given in [`guard_acquisition`]: below floor the product has no basis for believing a descriptor's
+/// claim that the capability it describes is unprivileged.
+pub fn guard_acquisition_below_floor(operation: &str) -> Result<()> {
+    crate::srr::breakglass::guard_effect(
+        crate::srr::breakglass::Effect::PrivilegedPluginAcquisition,
+        operation,
+    )?;
+    Ok(())
+}
+
 /// Fail closed when a **privileged, remotely acquired** capability has no delegated signed target.
 ///
 /// Built-in capabilities are covered by the release payload digests; local-project capabilities keep the existing
@@ -136,13 +159,23 @@ pub fn guard_acquisition(
     delegations: &[Delegation],
     release_channel: &str,
 ) -> Result<Value> {
+    // **The `OWNER-DECISION-0006` §6 bullet 5 question, asked unconditionally** (`AR31-N2`).
+    //
+    // It used to be asked only `if is_privileged(descriptor)`, and `is_privileged` reads
+    // `required_permission_classes` straight out of the descriptor — making this the only §6 sink whose decision
+    // to ask at all rested on self-asserted data. A descriptor declaring `READ_ONLY`, or declaring nothing,
+    // never reached the check, even below floor and even when remotely acquired. Bullets 2, 3 and 4 ask
+    // unconditionally; so does this one now.
+    //
+    // The refusal is reported as `privileged_plugin_acquisition` even for a capability that declares itself
+    // unprivileged, because below floor the product has no basis for believing that declaration. ARCH-0003 §9:
+    // descriptors cannot self-authorise — and deciding whether to ask the question is a form of authorising.
+    // Nothing above floor changes: an unmarked machine clears every effect.
+    crate::srr::breakglass::guard_effect(
+        crate::srr::breakglass::Effect::PrivilegedPluginAcquisition,
+        "plugin acquisition",
+    )?;
     let privileged = is_privileged(descriptor);
-    if privileged {
-        crate::srr::breakglass::guard_effect(
-            crate::srr::breakglass::Effect::PrivilegedPluginAcquisition,
-            "plugin acquisition",
-        )?;
-    }
     let verdict = json!({
         "capability": capability_id,
         "acquisition_class": acquisition.as_str(),

@@ -1,0 +1,5 @@
+# AR-0032 — cargo clippy --all-targets
+
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-repair-3/runtime)
+    Checking gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-repair-3/cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.21s
