@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-18T10:56:31Z'
-state_hash: 07735250a21089ede5ac40302e9e039f12db33ac1189f2c94e01c3698a0aada2
-lifecycle_state: R1_CANDIDATE_VERIFICATION
-loop_status: R1_VERIFICATION_4_RUNNING_ON_CANDIDATE_4
+updated_at: '2026-09-18T11:40:08Z'
+state_hash: 2125a7bb87fbe3e82dd2b9fe8df0541346a93e291697f0a41899f8f4cab2afd9
+lifecycle_state: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
+loop_status: COMPLETE__STOPPED_BEFORE_PHASE_2
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -248,6 +248,27 @@ unresolved_findings:
   owner_record_conformance: {OWNER-DESIGN-REQUIREMENTS-0001: deviates (OP-4, OP-7a, OP-10b, OP-11b, OP-13b consequence, OP-16b), OWNER-DESIGN-REQUIREMENTS-0002: deviates (OT-1 part B running-machine C3; OT-2 criterion not executable)}
   closed_as_class: [R2-H4 (matrix7 reproduced in review r7), R2-M4, R2-M6, BC5-3]
 
+r1_acceptance:
+  token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+  gate: GATE-R1-CANDIDATE-ACCEPT
+  accepted_candidate: srr1-r1-candidate-4
+  accepted_commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+  acceptance_tag: srr1-r1-accepted
+  accepted_by_run: AR-0033
+  review_work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100
+  review_report_commit: 6dc1b0a8fdfc2031c3413f669646fc618f18516d
+  evidence_path: release/verification/4.1.6-r1-4/
+  blocking_findings: 0
+  frozen_r1_items: 12 of 12 HOLD
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_contract_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  regression_reproduced_by_orchestrator: cargo test --lib 42 passed 0 failed; cargo test --test certification 79 passed 0 failed
+  scope: >-
+    Implementation candidate acceptance only. It certifies no release (R2), qualifies no platform (R3), publishes
+    nothing, and does not merge to main. ARCH-0003 remains PROVISIONAL, in_effect false and human_approved false
+    pending owner adoption.
+  residual_risk_register: release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
+
 r0_acceptance:
   token: ROT_ARCHITECTURE_ACCEPTED_R0
   gate: GATE-R0-ARCH-ACCEPT
@@ -459,6 +480,7 @@ root_of_trust_key_ceremony:
 release_candidate:
   next_version: 4.1.6
   latest: srr1-r1-candidate-4
+  accepted: srr1-r1-candidate-4
   candidates:
     - id: srr1-r1-candidate-1
       commit: 229d1543be0357b52f7c7e6405918171bc8e6631
@@ -476,6 +498,9 @@ release_candidate:
       repair_work_commit: 4c7c40c94119f4ec5c4e640884e1edee0bbcefc4
       supersedes: srr1-r1-candidate-1
       status: REJECTED_BY_AR_0029
+      accepted: false
+      certified: false
+      released: false
     - id: srr1-r1-candidate-3
       commit: 2c463d3740a43ce94ee328ead9d7911d5dbab568
       tag: srr1-r1-candidate-3
@@ -483,6 +508,9 @@ release_candidate:
       repair_work_commit: 748c5d3c19c5401e7449f4f21523c33cc7877aec
       supersedes: srr1-r1-candidate-2
       status: REJECTED_BY_AR_0031
+      accepted: false
+      certified: false
+      released: false
     - id: srr1-r1-candidate-4
       commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
       tag: srr1-r1-candidate-4
@@ -490,16 +518,16 @@ release_candidate:
       repair_work_commit: cf527412233ab2ee435a01d1aa3c358050b1cf49
       supersedes: srr1-r1-candidate-3
       structural: true
-      status: AWAITING_INDEPENDENT_R1_VERIFICATION_ITERATION_4
-      accepted: false
+      status: ACCEPTED_BY_AR_0033
+      acceptance_tag: srr1-r1-accepted
+      accepted: true
       certified: false
       released: false
-      accepted: false
-      certified: false
-      released: false
-      accepted: false
-      certified: false
-      released: false
+  record_repair_note: >-
+    This block was rewritten on 2026-09-18 after the orchestrator found duplicate accepted/certified/released keys
+    stacked under candidate 4, left by successive in-place insertions: candidates 2 and 3 had lost their flags and
+    candidate 4 carried three sets. YAML's last-key-wins hid it from the schema check. Commits, tags, runs and statuses
+    are unchanged and were re-derived from the ledger and the candidate tags; only the malformed flags were repaired.
 
 prompt2:
   status: NOT_STARTED
@@ -578,16 +606,7 @@ completed_stages:
     commit: this_governance_rebase_commit
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
-running_work:
-  - run_id: AR-0033
-    role: verifier-d
-    status: RUNNING
-    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0033.run.yaml
-    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0033-r1-verification-4.md
-    base_commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
-    branch: phase1/srr1-r1-verify-4
-    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0033.report.yaml
-    gate: GATE-R1-CANDIDATE-ACCEPT
+running_work: []
 
 
 
@@ -709,7 +728,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: ADJUDICATE_AR_0033_R1_VERDICT__ON_ACCEPT_PERSIST_ROT_PHASE1_CANDIDATE_ACCEPTED_R1_AND_COMPLETE_PHASE_1_STOPPING_BEFORE_PHASE_2__ON_RESIDUALS_IN_KNOWN_CLASSES_CONTINUE_THE_LOOP_AUTOMATICALLY__ON_A_GENUINELY_NEW_MATERIAL_CLASS_OR_OWNER_DECISION_STOP_AND_ESCALATE_IMMEDIATELY
+next_deterministic_action: NONE__PHASE_1_COMPLETE__PHASE_2_NOT_STARTED__AWAIT_EXPLICIT_OWNER_INSTRUCTION_BEFORE_ANY_FURTHER_PHASE
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0

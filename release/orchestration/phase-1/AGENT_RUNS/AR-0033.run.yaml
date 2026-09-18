@@ -52,7 +52,7 @@ contract_v3:
 carried_not_this_cycle: [AR31-N6, AR29-N2, AR27-N3, AR27-N5, AR27-N6, AR27-N7]
 branch: phase1/srr1-r1-verify-4
 started_at: '2026-09-18T12:30Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0033.report.yaml
 expected_evidence_path: release/verification/4.1.6-r1-4/
 required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
@@ -61,4 +61,32 @@ convergence_policy: >-
   genuinely NEW material blocker class, or anything needing an architecture or owner decision, stops the loop and
   escalates to the owner IMMEDIATELY. The verifier's residual-versus-new label therefore determines directly whether the
   owner is interrupted, and must be precise and reasoned.
-outcome: null
+outcome:
+  verdict: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+  work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100
+  report_commit: 6dc1b0a8fdfc2031c3413f669646fc618f18516d
+  integration_merge_commit: 70a67f1
+  evidence_path: release/verification/4.1.6-r1-4/
+  blocking_findings: 0
+  materially_new_blocker_classes: 0
+  owner_escalation_triggered: false
+  frozen_r1_items: 12 of 12 HOLD; item 7 strengthened; item 9's AR31-B2 qualification discharged
+  held_out_tests: 31 authored, 31 passing, no delegation
+  decisive_evidence: >-
+    The verifier graded the PRE-repair source with the candidate's own signatures. It flags exactly three violations -
+    the latent bullet-6 primitive, AR31-B1 and AR31-N1 - so the derivation would have failed the suite on candidate 3,
+    independently rediscovering a HIGH finding that cost a human verifier a full iteration.
+  limits_confirmed_honestly:
+    - nine of nine plausible future primitives evade the detector
+    - three of seven positive controls are cosmetic, establishing non-vacuity rather than coverage
+    - acceptance markers accept unenforced code, and the product held that exact shape one commit ago
+    - one reporting path bypasses the CLI envelope, breaching no section 6 bullet
+    - two mechanism-reach claims false as written, with no section 6 consequence
+    - DERIVATION.md limit 5's rustfmt mitigation absent - cargo fmt --check fails, consequence measured at one function body and no section 6 verdict change
+  orchestrator_verification:
+    - work and report commits exist; report output.commit names the work commit
+    - no product source touched; only its own evidence tree and run report added
+    - all three prior held-out suites still byte-identical
+    - regression independently reproduced - cargo test --lib 42 passed 0 failed; cargo test --test certification 79 passed 0 failed
+    - AR33-N5 independently confirmed - cargo fmt --check fails on the accepted candidate
+  completed_at: '2026-09-18T14:10Z'

@@ -281,7 +281,20 @@ gates:
   - id: GATE-R1-CANDIDATE-ACCEPT
     legacy_alias: GATE-P2-ACCEPT
     title: R1 — fresh independent acceptance of the Phase-1 implementation candidate
-    status: OPEN
+    status: SATISFIED
+    acceptance:
+      token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+      accepted_candidate: srr1-r1-candidate-4
+      accepted_commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+      acceptance_tag: srr1-r1-accepted
+      accepted_by_run: AR-0033 (verifier-d, fresh and independent of the build and all three repairs)
+      review_work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100
+      evidence_path: release/verification/4.1.6-r1-4/
+      blocking_findings: none; 10-BLOCKING-FINDINGS.md present and explicitly empty
+      frozen_r1_items: 12 of 12 HOLD; item 7 strengthened; item 9's AR31-B2 qualification discharged
+      owner_decision_0006: all ten requirements satisfied; section 6 enforced for every bullet
+      iterations: 4 verifications and 3 repairs; the accepted candidate is the fourth
+      scope: implementation candidate acceptance only; certifies no release and qualifies no platform
     satisfier: fresh independent candidate-verification process only
     preconditions:
       - GATE-BUILDER-READY
@@ -289,10 +302,8 @@ gates:
       - prior relevant verifier harnesses rerun unchanged
     satisfied_when: >-
       verdict ROT_PHASE1_CANDIDATE_ACCEPTED_R1 for one exact immutable candidate under the frozen R1 contract
-    on_refusal: >-
-      record and classify every finding by provenance/lifecycle; implementation defects return to a bounded R1 repair;
-      a genuine R0 defect reopens GATE-R0-ARCH-ACCEPT; owner approval is required for expanded requirements
-    satisfaction_evidence: null
+    satisfaction_evidence: release/verification/4.1.6-r1-4/
+    satisfaction_report: release/orchestration/phase-1/AGENT_RUNS/AR-0033.report.yaml
 
   - id: GATE-R2-STANDARD-RELEASE
     title: R2 — Standard Release Certification
@@ -320,11 +331,12 @@ gates:
 
   - id: GATE-PHASE1-COMPLETE
     title: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
-    status: NOT_OPEN
+    status: SATISFIED
     satisfier: orchestrator, after GATE-R1-CANDIDATE-ACCEPT, by writing the final checkpoint
     preconditions: [GATE-R1-CANDIDATE-ACCEPT]
     note: does not itself certify R2, qualify R3, publish a stable release or start product adoption
-    satisfaction_evidence: null
+    satisfaction_evidence: release/orchestration/phase-1/CHECKPOINTS/CP-FINAL-PHASE-1-COMPLETE.yaml
+    residual_risk_register: release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
 
   - id: OWNER-DESIGN-REQUIREMENTS-0001
     title: Historical product-owner design requirements for CP-1 revision 7

@@ -1,0 +1,110 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-FINAL-PHASE-1-COMPLETE
+trigger: ROT_PHASE1_CANDIDATE_ACCEPTED_R1 independently earned; Phase 1 complete; orchestration stopped before Phase 2
+date: 2026-09-18
+lifecycle_state: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
+loop_status: COMPLETE__STOPPED_BEFORE_PHASE_2
+final: true
+
+accepted_candidate:
+  id: srr1-r1-candidate-4
+  commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+  candidate_tag: srr1-r1-candidate-4
+  acceptance_tag: srr1-r1-accepted
+  branch: release/4.1.6-rc1
+  accepted: true
+  certified: false
+  released: false
+  merged_to_main: false
+
+acceptance_tokens:
+  R0:
+    token: ROT_ARCHITECTURE_ACCEPTED_R0
+    gate: GATE-R0-ARCH-ACCEPT
+    accepted_by_run: AR-0025
+    accepted_candidate_commit: 2b36b440915f0052d92153748cea914846955418
+    evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/
+  R1:
+    token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+    gate: GATE-R1-CANDIDATE-ACCEPT
+    accepted_by_run: AR-0033
+    review_work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100
+    review_report_commit: 6dc1b0a8fdfc2031c3413f669646fc618f18516d
+    evidence_path: release/verification/4.1.6-r1-4/
+    blocking_findings: 0
+
+normative_anchors:
+  contract_v3_owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_r0_r1_r2_r3_boundary: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  frozen_contract_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  accepted_architecture_body_sha256: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+  operator_ui_sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+
+independent_evidence:
+  r0:
+    - {run: AR-0023, verdict: ROT_ARCHITECTURE_REJECTED_R0, path: release/root-of-trust/signed-release-root-v1-review-r0/}
+    - {run: AR-0024, verdict: ARCHITECTURE_CORRECTION_READY_FOR_REVIEW, path: release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md}
+    - {run: AR-0025, verdict: ROT_ARCHITECTURE_ACCEPTED_R0, path: release/root-of-trust/signed-release-root-v1-review-r0-2/}
+  r1:
+    - {run: AR-0026, verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION, path: release/root-of-trust/signed-release-root-v1-r1-build/}
+    - {run: AR-0027, verdict: BLOCKING_FINDINGS_PRESENT, path: release/verification/4.1.6-r1/}
+    - {run: AR-0028, verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION, path: release/root-of-trust/signed-release-root-v1-r1-repair-1/}
+    - {run: AR-0029, verdict: BLOCKING_FINDINGS_PRESENT, path: release/verification/4.1.6-r1-2/}
+    - {run: AR-0030, verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION, path: release/root-of-trust/signed-release-root-v1-r1-repair-2/}
+    - {run: AR-0031, verdict: BLOCKING_FINDINGS_PRESENT, path: release/verification/4.1.6-r1-3/}
+    - {run: AR-0032, verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION, path: release/root-of-trust/signed-release-root-v1-r1-repair-3/}
+    - {run: AR-0033, verdict: ROT_PHASE1_CANDIDATE_ACCEPTED_R1, path: release/verification/4.1.6-r1-4/}
+  independence: >-
+    Four distinct verifiers (AR-0027, AR-0029, AR-0031, AR-0033) and three distinct repair roles (AR-0028, AR-0030,
+    AR-0032), each in a fresh isolated worktree. No role graded its own work. No verifier modified product source. All
+    held-out test suites remain byte-identical and re-runnable.
+
+regression_at_acceptance:
+  lib: 42 passed, 0 failed
+  certification: 79 passed, 0 failed
+  reproduced_independently_by_orchestrator: true
+  note: cargo fmt --check fails on the accepted candidate; recorded as AR33-N5, LOW, non-blocking, consequence measured
+
+owner_records_in_force:
+  - {id: OWNER-DIRECTIVE-0004, effect: Signed Release Root lineage and the R0/R1/R2/R3 assurance separation}
+  - {id: OWNER-DECISION-0005, effect: SRR-R0-L6 deferred to R1 and closed there; SRR-R0-L7 offline first install out of scope}
+  - {id: OWNER-DECISION-0006, effect: below-floor recovery is break-glass, authorised and recorded, with ten binding requirements}
+  - {id: OWNER-DECISION-0007, effect: machine-state derivation kept; break-glass exit requires BOTH floors}
+  - {id: OWNER-DECISION-0008, effect: Option B structural repair authorised; immediate escalation on a new material class}
+
+gates:
+  GATE-R0-ARCH-ACCEPT: SATISFIED
+  GATE-OWNER-CAC-UPLOAD: SATISFIED (precedence conflict logged)
+  GATE-BUILDER-READY: SATISFIED
+  GATE-R1-CANDIDATE-ACCEPT: SATISFIED
+  GATE-PHASE1-COMPLETE: SATISFIED
+  GATE-OWNER-KEY-CEREMONY: NOT_OPEN (R2)
+  GATE-R2-STANDARD-RELEASE: NOT_OPEN
+  GATE-R3-HIGH-ASSURANCE: NOT_OPEN
+
+residual_risks:
+  register: release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
+  sha256: b08678b0cbb9afe1a1ea23b0da89bac8ba4a935d27891d4cb10f835481d66b9e
+  highest_value_r2_item: AR33-N2 - acceptance markers accept unenforced implementations; the recommended fix is a negative control per acceptance set
+
+what_this_does_not_do:
+  - does not certify any release (R2) or qualify any platform (R3)
+  - does not publish, push a stable release, or merge to main
+  - does not make ARCH-0003 active - it remains PROVISIONAL, in_effect false, human_approved false pending owner adoption
+  - does not start Phase 2, and does not authorise any later phase
+  - does not resolve the residual risk register; R2 inherits it as input
+
+state_integrity:
+  check_state_verify: STATE_CONSISTENT
+  duplicate_key_scan: clean
+  candidates_block_repair: >-
+    On 2026-09-18 the orchestrator found duplicate accepted/certified/released keys stacked under candidate 4, left by
+    successive in-place insertions - candidates 2 and 3 had lost their flags and candidate 4 carried three sets. YAML's
+    last-key-wins hid it from the schema check. The block was rewritten from the ledger and the candidate tags; commits,
+    tags, runs and statuses are unchanged and only the malformed flags were repaired.
+
+running_work: []
+next_deterministic_action: NONE__PHASE_1_COMPLETE__PHASE_2_NOT_STARTED__AWAIT_EXPLICIT_OWNER_INSTRUCTION_BEFORE_ANY_FURTHER_PHASE
+return_token: PHASE_ORCHESTRATION_COMPLETE__ROT_PHASE1_CANDIDATE_ACCEPTED_R1
