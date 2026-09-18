@@ -1,0 +1,141 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0013
+role: capability-family-auditor
+objective: Fresh independent iteration-0 re-audit of family alpha (Gates A, B, S, T; 17 capabilities, 100 bullets) on cap2-candidate-0, bullet-level with executable evidence, including A2/AC-4 against the Phase-1 R1 evidence, all twelve gov adopt stages end-to-end, and S3/S4/S5 <-> A2.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]). This run authored none of the Governance OS
+  implementation, tests, fixtures or policies, none of the Phase-1 reviews, repairs or verifications, and no other
+  Phase-2 run. It did not read release/capability-baseline/audit-0/alpha/, AGENT_RUNS/P2-AR-0001.*, any other family's
+  evidence, any session or agent transcript, any task-output store, or user auto-memory. It did not spawn sub-agents
+  or contact the product owner. It read the handoffs, Contract v3, the frozen gate contract, the three governing
+  documents, the owner records under release/orchestration/phase-1/GATES/, ARCH-0003, D-0007, the SRR boundary, the
+  Phase-1 R1 verification reports and residual-risk list, and the product source, tests and fixtures. Every behavioural
+  claim rests on probes this run wrote and ran itself against target/release/gov in isolated sandboxes. Builder tests
+  were run as regression evidence only. No product source was modified.
+input:
+  base_commit: 3b8a4ab4aa28ed828512ef2037373921f0eb97f0
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0001-audit-0-alpha.md
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+  - framework/contracts/ (compiled form, lock, evidence map, generated view)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+  - GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md
+  - GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md
+  - spec/architecture/ARCH-0003.yaml
+  - spec/decisions/D-0007.yaml
+  - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/orchestration/phase-1/GATES/ (OWNER-DIRECTIVE-0004, OWNER-DECISION-0005/0006/0007/0009)
+  - release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
+  - release/verification/4.1.6-r1/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-3/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-4/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-4/20-LATER-LIFECYCLE-CONDITIONS.md
+  - docs/ARCHITECTURE.md
+  - runtime/src/ (policy, policy_precedence, exceptions, authority, context, kernel, kernel_trust, lock, srr/*, init, adopt, migrations/*, update, release, recovery, orchestration/*, paths, project, memory/indexer, tools, upstream, routing, observability, verification, doctor, contracts, capabilities)
+  - cli/src/main.rs
+  - framework/constitution/, framework/policies/, framework/roles/, framework/overlay-templates/
+  - fixtures/brownfield/
+  - tests/certification/
+produced:
+  - release/capability-baseline/audit-0/alpha-r/00-AUDIT-REPORT.md
+  - release/capability-baseline/audit-0/alpha-r/capability-audit.yaml
+  - release/capability-baseline/audit-0/alpha-r/findings.yaml
+  - release/capability-baseline/audit-0/alpha-r/evidence/ (24 probes + pinned-input/regression scripts, their outputs, lib/env.sh, lib/srr_mint.py)
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.report.yaml
+tests_or_attacks:
+  - {id: REG-1, description: "cargo build --release; cargo test --release --lib (42) and --test certification (79), default environment", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/00-build-and-regression.out}
+  - {id: REG-2, description: "same regression with XDG_CACHE_HOME lacking a '.cache' segment", result: FAIL, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/00-regression-variant-xdg-cache.out}
+  - {id: PIN-1, description: "product_code_digest, Contract v3 and frozen gate contract hashes match the pinned values", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/00-pinned-inputs.out}
+  - {id: A1-ATK-1, description: "13 policy-override and 3 exception weakening attempts against security/authority floors take effect", result: REFUTED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A1-policy-precedence.out}
+  - {id: A1-ATK-2, description: "tampered installed HARD_INVARIANTS.yaml reaches the agent context packet", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A1-policy-precedence.out}
+  - {id: A2-ATK-1, description: "tampered/self-identified/embedded release installs on the default unprovisioned machine", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-01-unprovisioned-posture.out}
+  - {id: A2-ATK-2, description: "unsigned, tampered, wrong-key, forged-digest, unauthorised-migration, expired, replayed, downgraded, wrong-product/channel/platform releases admitted at init/adopt/update/reinstall/rollback on a provisioned machine", result: REFUTED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-02-provisioned-ingress.out}
+  - {id: A2-ATK-3, description: "consistent payload+KERNEL_MANIFEST.json+framework.lock rewrite evades installed-kernel verification", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-03-post-install-tamper.out}
+  - {id: A2-ATK-4, description: "forged release_commit in unsigned manifest.json recorded in framework.lock on an AUTHENTIC install; lock identity varies with XDG_CACHE_HOME", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-04-lock-identity-and-masquerade.out}
+  - {id: A2-ATK-5, description: "unsigned CERTIFIED claim on a signed release removes the update Human Decision Gate", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-04-lock-identity-and-masquerade.out}
+  - {id: A2-ATK-6, description: "root succession skip/unauthorised/not-self-signed/expired, rotated-out key, old-root replay, lost-key forgery accepted", result: REFUTED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-05-rotation-revocation-recovery.out}
+  - {id: A2-T-7, description: "owner-signed break-glass restores an older authentic release (init --force) with DEGRADED marking and floors kept", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-05-rotation-revocation-recovery.out}
+  - {id: A2-ATK-8, description: "update --rollback on a provisioned machine cannot restore the previous release; break-glass reinstall leaves a half-installed kernel", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-05-rotation-revocation-recovery.out}
+  - {id: A2-T-9, description: "verification, tamper refusal, stale-currency and protected-record recovery with no network (unshare -rn)", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-06-offline-verification.out}
+  - {id: A2-T-10, description: "crash windows prepare/swap/swap-lost/committed recover to exactly one installation, floors unchanged", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-07-interrupted-install.out}
+  - {id: A2-ATK-11, description: "refused reinstall of an authentic different-version release leaves the new kernel committed under the old lock", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-08-reinstall-version-change.out}
+  - {id: A2-T-12, description: "privileged-ingress census: 5 admit sites paired with the only 5 install_kernel calls", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A2-00-ingress-census.out}
+  - {id: A3-ATK-1, description: "seeded secrets/credentials/restricted data retrievable, or exclusion weakened by project levers", result: REFUTED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.out}
+  - {id: A3-ATK-2, description: "low-authority role or self-authorising elevated plugin executes; export without approval", result: REFUTED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.out}
+  - {id: A4-ATK-1, description: "network-call and high-cost-experiment budgets exceeded without a Human Decision Gate", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A4-budget-governance.out}
+  - {id: A5-ATK-1, description: "governed writes succeed while FREEZE_WRITES is active; cancelled agents keep claims", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/A5-emergency-controls.out}
+  - {id: B-T-1, description: "native layout preserved; kernel boundary enforced; derived state deleted and rebuilt to identical manifest hash; provenance reconstructs hits", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/B-repository-contract.out}
+  - {id: C0-ATK-1, description: "compiled contract / evidence map omit owner-source bullets and evidence owners", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/C0-contract-derived-views.out}
+  - {id: FRESH-1, description: "green governance evidence stays current after a relevant input change (4 of 13 file input classes stay current, plus trust-anchor provisioning/rotation; 9 correctly invalidate)", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/FRESH-invalidation.out}
+  - {id: S12-T-1, description: "canonical separation, consumer cannot rebuild OS, manifest fields, immutability, reproducible rebuild", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S1-S2-release.out}
+  - {id: S3-ATK-1, description: "a release whose manifest records REJECTED installs silently via gov init", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S3-init.out}
+  - {id: S34-ATK-1, description: "--role is ignored by gov init --force and gov adopt stages (L0 performs L4/L3 operations)", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S3-S4-role-flag-authority.out}
+  - {id: S4-T-1, description: "gov adopt A0-A11 end-to-end on the prepared brownfield fixture with per-role sessions", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S4-adopt-end-to-end.out}
+  - {id: S4-ATK-2, description: "fixture as shipped (raw .sql chat dump): plan and scaffolded test contradict, adoption blocked at A6", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S4-adopt-raw-sql-chat-store.out}
+  - {id: T2-ATK-1, description: "executor edits approved tests/catalogue after A5; ungated deletion executes; A7 accepts with 0 tests", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S4-T2-B2-negative.out}
+  - {id: T2-ATK-2, description: "single agent without session flags completes A0-A11", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S4-T2-B2-negative.out}
+  - {id: B2-ATK-1, description: "false A7 acceptance over diverged reality; destructive batch with an UNKNOWN artefact", result: REFUTED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S4-T2-B2-negative.out}
+  - {id: S5-T-1, description: "update check/apply with gate, overlay preserved, adapters/indexes regenerated, auto-rollback on failed verification, operator rollback (unprovisioned)", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S5-update.out}
+  - {id: S5-ATK-2, description: "refused update followed by rollback writes a ledger entry for an update that never happened", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S5-update.out}
+  - {id: S6-T-1, description: "git sync both ways, local rebuild with identical manifest hash on a second machine path", result: PASS, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/S6-cross-machine.out}
+  - {id: T1-ATK-1, description: "one session acts as planner, executor, memory builder and A11 auditor; verdict roles unvalidated", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/alpha-r/evidence/T1-roles.out}
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 3
+  PARTIAL: 14
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+findings:
+  - {id: A0-A2-01, severity: HIGH, capability: "A2", blocking: true, blocker_class: "AC-4; AC-3", new_vs_residual: BASELINE, owner_decision_required: true, title: "Consistent post-install kernel rewrite accepted as intact; protected installed record never consulted", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A2-02, severity: HIGH, capability: "A2, S3, S5", blocking: true, blocker_class: "AC-4; AC-3", new_vs_residual: BASELINE, owner_decision_required: true, title: "Default unprovisioned posture installs unauthenticated kernel material at every ingress, presented as current", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A2-03, severity: MEDIUM, capability: "A2, S6", blocking: true, blocker_class: "AC-4", new_vs_residual: BASELINE, owner_decision_required: false, title: "framework.lock records unverified, path-dependent release identity with no authenticity basis", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A2-04, severity: HIGH, capability: "A2, A3, S2, S5", blocking: true, blocker_class: "AC-4; AC-3", new_vs_residual: BASELINE, owner_decision_required: false, title: "Unsigned editable certification claim removes the update Human Decision Gate; any role can mint CERTIFIED", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-T2-01, severity: HIGH, capability: "T2, T1, T3, S4, A3", blocking: true, blocker_class: "AC-3", new_vs_residual: BASELINE, owner_decision_required: false, title: "Adoption independence not bound to reviewed artefacts; post-approval edits executed and accepted", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A1-02, severity: MEDIUM, capability: "A1-A5, B1-B3, S1-S6, T1-T3", blocking: true, blocker_class: "AC-10; AC-13", new_vs_residual: BASELINE, owner_decision_required: false, title: "Compiled contract drops all 100 alpha bullets; evidence map gives zero evidence owners", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-B3-01, severity: MEDIUM, capability: "A2, B1, B2, B3, S4, S6, T2, T3", blocking: true, blocker_class: "AC-10", new_vs_residual: BASELINE, owner_decision_required: false, title: "Green governance evidence not invalidated by relevant spec/source/index/adoption/trust/binary changes", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A1-01, severity: MEDIUM, capability: "A1", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Context packet constitution layer read from the unverified installed kernel", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A4-01, severity: MEDIUM, capability: "A4", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Network and high-cost-experiment budgets not enforced; spend to date not observable", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A5-01, severity: MEDIUM, capability: "A5", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "FREEZE_WRITES leaves governed-write commands open", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A5-02, severity: MEDIUM, capability: "A5", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "CANCEL_AGENTS revokes no claims or handoffs", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A5-03, severity: LOW, capability: "A5", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Recovery from emergency controls leaves no durable reasoned record", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-B2-01, severity: LOW, capability: "B2", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "SPLIT and MERGE path-map actions not executable", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-B2-02, severity: LOW, capability: "B2", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Documentation citations not represented in the path map", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S2-01, severity: LOW, capability: "S2", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Release manifest carries no capability/plugin versions", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S3-01, severity: MEDIUM, capability: "S3", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "gov init neither checks nor records certification; REJECTED release installs silently", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S4-01, severity: MEDIUM, capability: "S4", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "A0 safety baseline: no adoption branch/worktree, no snapshot, interrupted work only advised", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S4-02, severity: MEDIUM, capability: "S4", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Plan and scaffolded tests contradict for a secret-bearing legacy chat store; adoption cannot proceed", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S4-03, severity: MEDIUM, capability: "S3, S4, T1", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "--role ignored by gov init and gov adopt", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S5-01, severity: MEDIUM, capability: "S5", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Refused update leaves a snapshot; rollback records an update that never happened", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-S5-02, severity: MEDIUM, capability: "S5, A2", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Refused kernel reinstall leaves a half-installed kernel; provisioned update rollback cannot run", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A2-05, severity: INFO, capability: "A2", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Completed interrupted swap leaves kernel.srr-old behind", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A3-01, severity: INFO, capability: "A3", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Customer/personal data excluded only when the project classifies it", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-A3-02, severity: INFO, capability: "A3", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Overlay can grant roles elevated permission classes without gate or finding", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+  - {id: A0-B1-01, severity: INFO, capability: "B1", blocking: false, blocker_class: null, new_vs_residual: BASELINE, owner_decision_required: false, title: "Root-level project files match no rule of the init repository contract", path: release/capability-baseline/audit-0/alpha-r/findings.yaml}
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-alpha-r
+  commit: 04d819799339f841a5703fd097145701d78e2868
+  evidence_path: release/capability-baseline/audit-0/alpha-r/
+unresolved:
+  - "AC-4 (A2) NOT MET: A0-A2-01, A0-A2-02, A0-A2-03, A0-A2-04"
+  - "Owner decision required: A0-A2-01 (D-0007 T1 post-install integrity anchor; anchor for machines without a protected record)"
+  - "Owner decision required: A0-A2-02 (unprovisioned default posture vs Contract v3 A2 bullet 1; R1 AR-0027 accepted it as an implementation choice)"
+  - "AC-3: COULD_UNDERMINE PARTIALs A2, A3, S4, S5, T1, T2, T3 (A0-A2-01/02/04, A0-T2-01)"
+  - "AC-10/AC-13: A0-A1-02, A0-B3-01 (cross-cutting; for the synthesis auditor)"
+  - "Not established: G-tier behaviour (no G0-G6 scheduler exists); R2 key custody/rotation drill; overlay loss via phantom rollback (inferred only); update --apply across an incomplete major-version chain"
+recommended_next_action: "Synthesis auditor: carry the 7 blocking findings into the baseline decision; route A0-A2-01 and A0-A2-02 to the product owner; route A0-A2-03, A0-A2-04, A0-T2-01, A0-A1-02 and A0-B3-01 to bounded capability repair."
+completed_at: "2026-09-18T21:33:10Z"
