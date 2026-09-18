@@ -1,0 +1,89 @@
+
+=== workflow (no explicit telemetry emit): create, continue --claim, skills resolve, memory query, checkpoint, handoff create/return, gate create/present/decide, close, verify product
+task TASK-0001
+exit=0 {"packet_hash": "26084d89cb32a91c", "skills": [{"id": "SKL-BACKEND-IMPL", "source": "kernel", "version": "1.0.0"}], "status": "NEXT_WORK"}
+exit=0 {"hits": 8}
+exit=0 CKPT-00001
+handoff HND-0001
+exit=0 ["L-0001"]
+exit=0 true
+exit=0 [true, "DONE"]
+exit=0 passed
+
+=== inventory of the telemetry log produced by that workflow
+events: 15
+  cli.task               attrs=['duration_ms', 'error', 'ok']
+  cli.rebuild-memory     attrs=['duration_ms', 'error', 'ok']
+  cli.continue           attrs=['duration_ms', 'error', 'ok']
+  retrieval              attrs=['hits', 'latency_ms', 'routes']
+  cli.memory             attrs=['duration_ms', 'error', 'ok']
+  cli.checkpoint         attrs=['duration_ms', 'error', 'ok']
+  cli.handoff            attrs=['duration_ms', 'error', 'ok']
+  cli.gate               attrs=['duration_ms', 'error', 'ok']
+  cli.decide             attrs=['duration_ms', 'error', 'ok']
+  product.suite          attrs=['at', 'command', 'cwd', 'exit', 'ran', 'source', 'status', 'stderr_tail', 'stdout_tail']
+  cli.verify             attrs=['duration_ms', 'error', 'ok']
+envelope keys: ['attributes', 'name', 'resource', 'role', 'session', 'span_id', 'timestamp', 'trace_id'] | resource: {'service.name': 'gov', 'service.version': '4.1.5', 'project': 'fx-base'}
+  attribute 'model' present in any event: False
+  attribute 'provider' present in any event: False
+  attribute 'task' present in any event: False
+  attribute 'skill' present in any event: False
+  attribute 'skills' present in any event: False
+  attribute 'tool_versions' present in any event: False
+  attribute 'context_packet' present in any event: False
+  attribute 'packet_hash' present in any event: False
+  attribute 'query' present in any event: False
+  attribute 'hits' present in any event: True
+  attribute 'tokens_in' present in any event: False
+  attribute 'tokens_out' present in any event: False
+  attribute 'input_tokens' present in any event: False
+  attribute 'output_tokens' present in any event: False
+  attribute 'duration_ms' present in any event: True
+  attribute 'latency_ms' present in any event: True
+  attribute 'cost' present in any event: False
+  attribute 'files_read' present in any event: False
+  attribute 'files_written' present in any event: False
+  attribute 'files_changed' present in any event: False
+  attribute 'tests' present in any event: False
+  attribute 'status' present in any event: True
+  attribute 'retries' present in any event: False
+  attribute 'retry' present in any event: False
+  attribute 'error' present in any event: True
+  attribute 'handoff' present in any event: False
+  attribute 'decision' present in any event: False
+  attribute 'human' present in any event: False
+
+=== field-by-field: where (if anywhere) each P1 item is recorded by the product for this run
+agent/session       : event.session = ['S-agent-1', 'S-probe'] | report.session = S-agent-1
+model/provider      : in events: False | report.model: None
+role                : event.role = ['backend-engineer', 'human', 'orchestrator']
+task                : events carrying a task id: 0 of 15 | report.task = TASK-0001
+skill/tool versions : events carrying skills/tools: 0 | report.skills_used: None | report.tools_used: None | resource service.version: 4.1.5
+context packet      : events carrying packet hash: 0 | checkpoint.context_packet_hash: 26084d89cb32a91c | report has packet: False
+retrieval q/hits    : retrieval events: [(8, ['lexical', 'semantic'])] | retrieval_log rows: 2 sample query: probe implementation task probe implementation task
+token input/output  : any token attribute: False | report token fields: []
+latency/cost        : duration_ms on cli events: True | any cost attribute: False | report.cost: None
+files read/written  : report.files_changed: ['src/lib.rs'] observed: ['src/lib.rs'] | report.files_read: None
+tests               : product.suite events: [('passed', 0)] | report.tests: {'status': 'passed'}
+retries/failures    : failed cli events: [] | retry attribute anywhere: False | report.repair_count: None
+handoffs            : handoff record HND-0001 RETURNED True | cli.handoff events: 2
+decisions           : decision records: [('D-0001', 'A', 'owner')]
+human interventions : gate answers: [('HDG-0001', 'owner')] | cli.decide events: 1
+# retrieval_log lives in the derived index: does it survive a full rebuild?
+retrieval_log rows after gov rebuild-memory: 0
+# the only way to record tokens/model/cost/skills is caller-supplied, schema-free: telemetry emit accepts anything
+exit=0 {"anything": {"nested": true}, "tokens_in": "not-a-number"}
+
+=== P2 — seed caller-supplied evidence, then ask telemetry summary each §66 question
+exit=0 {"budget": {"active_sessions": [], "max_network_calls_per_task": 200, "max_parallel_agents": 4, "network_calls_by_task": {}, "over_budget": []}, "commands": [{"avg_ms": 0.0, "count": 3, "name": "audit", "ok": 3}, {"avg_ms": 127.33333333333333, "count": 3, "name": "cli.audit", "ok": 3}, {"avg_ms": 56.5, "count": 2, "name": "cli.doctor", "ok": 2}, {"avg_ms": 421.0, "count": 1, "name": "cli.init", "ok": 1}, {"avg_ms": 15.0, "count": 1, "name": "cli.memory", "ok": 1}, {"avg_ms": 6.5, "count": 2, "name": "cli.route", "ok": 2}, {"avg_ms": 0.0, "count": 1, "name": "retrieval", "ok": 1}, {"avg_ms": 0.0, "count": 2, "name": "routing.evidence", "ok": 2}], "cost_by_task_class": {"implementation": 4.5}, "events": 15, "first_pass_completion_rate": 0.6666666666666666, "human_gates_by_feature": {"F-0001": 2, "F-0002": 1}, "model_routing": [{"avg_cost": 8.0, "avg_latency_ms": 100.0, "avg_repairs": 0.0, "model": "frontier-x", "pass_rate": 1.0, "provider": "p", "runs": 1, "task_class": "documentation"}, {"avg_cost": 0.2, "avg_latency_ms": 100.0, "avg_repairs": 0.0, "model": "light-y", "pass_rate": 1.0, "provider": "p", "runs": 1, "task_class": "documentation"}], "retrieval": {"avg_hits": 8.0, "avg_latency_ms": 10.0, "queries": 1}, "rework_by_role": [{"repairs": 2, "repairs_per_report": 1.0, "reports": 2, "role": "backend-engineer"}, {"repairs": 0, "repairs_per_report": 0.0, "reports": 1, "role": "frontend-engineer"}]}
+
+Q rework by role          : [{'repairs': 2, 'repairs_per_report': 1.0, 'reports': 2, 'role': 'backend-engineer'}, {'repairs': 0, 'repairs_per_report': 0.0, 'reports': 1, 'role': 'frontend-engineer'}]
+Q retrieval effect on tokens: no token metric in summary | retrieval block: {'avg_hits': 8.0, 'avg_latency_ms': 10.0, 'queries': 1}
+Q model over/under-power  : [{'avg_cost': 8.0, 'avg_latency_ms': 100.0, 'avg_repairs': 0.0, 'model': 'frontier-x', 'pass_rate': 1.0, 'provider': 'p', 'runs': 1, 'task_class': 'documentation'}, {'avg_cost': 0.2, 'avg_latency_ms': 100.0, 'avg_repairs': 0.0, 'model': 'light-y', 'pass_rate': 1.0, 'provider': 'p', 'runs': 1, 'task_class': 'documentation'}]
+Q skill repair rate       : no skill metric in summary
+Q human-gate concentration: {'F-0001': 2, 'F-0002': 1}
+Q retrieval misses        : no miss metric in summary
+Q cost by task/feature    : {'implementation': 4.5} | by feature: none
+Q first-pass completion   : 0.6666666666666666
+# retrieval misses of KNOWN knowledge by route: held-out evaluation (gov memory verify) with one injected miss
+exit=0 {"by_category": [{"category": "symbol", "queries": 5, "recall": 0.8}, {"category": "lexical_literal", "queries": 6, "recall": 1.0}, {"category": "exact_path", "queries": 6, "recall": 1.0}], "failed": [["HQ-007", "symbol", ["symbol"], ["file:tests/ledger_test.rs"], ["file:src/lib.rs"]]]}

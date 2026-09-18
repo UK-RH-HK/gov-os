@@ -1,0 +1,57 @@
+# GOV=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-audit0-epsilon-r/target/release/gov
+# SCRATCH=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/epsr-final/g0
+command                            | RUNNING/orchestrator       | FREEZE_WRITES              | PAUSED                     | role L0 independent-auditor    | role L1 research-agent    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+task create                        | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+task status                        | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+task claim                         | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | ok [MUTATED]              
+task release                       | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | AUTHORITY_DENIED               | ok [MUTATED]              
+task close                         | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | ok [MUTATED]              
+task replan                        | ok                         | FROZEN                     | PAUSED                     | ok                             | ok                        
+continue --claim                   | ok [MUTATED]               | FROZEN [MUTATED]           | ok [MUTATED]               | AUTHORITY_DENIED               | ok [MUTATED]              
+cit propose                        | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+cit simulate                       | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+cit approve                        | GATE_NOT_PRESENTED         | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+cit reject                         | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+cit execute                        | USAGE                      | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+cit rollback                       | USAGE                      | USAGE                      | USAGE                      | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+checkpoint create                  | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | ok [MUTATED]              
+checkpoint watchdog                | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | ok [MUTATED]              
+context compile                    | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+handoff create                     | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+handoff return                     | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | ok [MUTATED]              
+gate create                        | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+gate present                       | ok                         | ok [MUTATED]               | ok                         | AUTHORITY_DENIED               | ok [MUTATED]              
+decide                             | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+gate revoke                        | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+readiness plan                     | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+route --record                     | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | AUTHORITY_DENIED               | ok [MUTATED]              
+telemetry emit                     | ok                         | ok                         | ok                         | ok                             | ok                        
+audit (persist)                    | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | UNHEALTHY [MUTATED]       
+verify governance                  | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | UNHEALTHY [MUTATED]       
+verify product                     | ok                         | ok                         | ok                         | ok                             | ok                        
+rebuild-memory                     | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+memory rebuild                     | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+memory heldout-starter --force     | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+memory benchmark --record          | USAGE                      | USAGE                      | USAGE                      | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+adapters generate                  | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+tools registry                     | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+tools install                      | USAGE                      | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+plugins register                   | SCHEMA_INVALID             | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+upstream prepare                   | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | AUTHORITY_DENIED               | ok [MUTATED]              
+upstream submit                    | PACKET_NOT_FOUND           | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+kernel override                    | ok                         | ok                         | ok                         | ok                             | ok                        
+kernel reinstall                   | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+update --apply                     | ok                         | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+update --rollback                  | SNAPSHOT_MISSING           | SNAPSHOT_MISSING           | SNAPSHOT_MISSING           | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+recover                            | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+claims sweep                       | ok                         | ok                         | ok                         | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+adopt baseline                     | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+init --force                       | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]                   | ok [MUTATED]              
+pause                              | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+freeze-writes                      | ok [MUTATED]               | ok [MUTATED]               | ok [MUTATED]               | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+upstream submit (prepared first)   | ok [MUTATED]               | FROZEN                     | PAUSED                     | AUTHORITY_DENIED               | AUTHORITY_DENIED          
+
+state mutated while FREEZE_WRITES active: ['task release', 'continue --claim', 'context compile', 'gate present', 'route --record', 'audit (persist)', 'verify governance', 'rebuild-memory', 'memory rebuild', 'memory heldout-starter --force', 'adapters generate', 'tools registry', 'upstream prepare', 'adopt baseline', 'init --force', 'pause', 'freeze-writes']
+state mutated while PAUSED: ['task release', 'continue --claim', 'context compile', 'route --record', 'audit (persist)', 'verify governance', 'rebuild-memory', 'memory rebuild', 'memory heldout-starter --force', 'adapters generate', 'tools registry', 'upstream prepare', 'adopt baseline', 'init --force', 'pause', 'freeze-writes']
+state mutated by role L0 independent-auditor: ['context compile', 'audit (persist)', 'verify governance', 'rebuild-memory', 'memory rebuild', 'memory heldout-starter --force', 'adapters generate', 'tools registry', 'adopt baseline', 'init --force']

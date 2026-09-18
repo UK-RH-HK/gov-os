@@ -1,0 +1,87 @@
+
+=== G1 (mutation) — via a Change-Impact Transaction: schema/graph/index checks run on the touched set
+propose: CIT-0001
+radius/gate: R2 HDG-0001
+present: exit=0 true
+decide : exit=0 true
+approve: exit=0 true
+execute: exit=3 {"err": "VERIFICATION_FAILED", "msg": "CIT-E verification failed: spec/requirements/REQ-0101.yaml: /status: \"NOT_A_LIFECYCLE_STATUS\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTORICAL\",\"REJECTED\",\"DEPRECATED\",\"RETIRED\"", "ok": false, "prop": null}
+file left behind after failed CIT-E? no
+# G1 secrets at mutation: a CIT manifest carrying a secret is flagged at proposal
+exit=0 {"err": null, "ok": true, "secret_flagged": true}
+
+=== G1 (mutation) — via direct file edits inside a task's allowed paths (how workers mutate): what runs?
+exit=0 true
+# status / continue immediately after the edits (no command was asked to check anything):
+exit=0 {"memory": {"added": 1, "index_fresh": false, "index_manifest_present": true, "removed": 0, "runtime_present": true, "stale": 2}, "next_action": "no runnable tasks: run readiness planning or discovery"}
+# the edits are only examined at task close (G2):
+task close: exit=0 {"degraded": [], "err": null, "ok": true, "status": "DONE"}
+after close — doctor: exit=3 {"failed": [["D011", "critical", "1 file(s) contain secret patterns but are not secret-class: src/lib.rs"], ["D015", "medium", "1 dangling edge(s), 2 orphan record(s)"]], "ok": false, "verdict": "UNHEALTHY"}
+
+=== G2 (task close) — what the close gate checks
+exit=0 true
+# (a) tests evidence missing
+    exit=1 [false, "EVIDENCE_REQUIRED", "report.tests.status must be one of [\"passed\", \"not_applicable_with_reason\"] (got '')"]
+# (b) memory freshness: index stale after the edit
+    exit=1 [false, "INDEX_STALE"]
+# (c) mutation scope: an undeclared change outside allowed_paths
+    exit=1 [false, "MUTATION_SCOPE_VIOLATION"]
+# (d) readiness regressed after the claim (feature readiness cell now MISSING) — re-checked at close?
+# (e) references: report cites evidence and records that do not exist
+    close with (d)+(e): exit=0 [true, "DONE"]
+exit=0 {"blocked": []}
+
+=== G3 (checkpoint/handoff) — claims / decisions / gates / checkpoint freshness at handoff
+exit=0 true
+# task TASK-0001 is claimed by S-other and waits on unanswered gate HDG-0001; orchestrator hands it off anyway:
+exit=0 {"blocked_by_dag": [{"gate": "HDG-0001", "task": "TASK-0001"}]}
+handoff create: exit=0 {"err": null, "id": "HND-0001", "ok": true}
+# checkpoint written by the handoff and its content:
+{'trigger': 'before_handoff', 'claim': {'task_id': 'TASK-0001', 'session_id': 'S-other', 'role': 'backend-engineer', 'claimed_at': '2026-09-18T20:50:05Z', 'expires_at': '2026-09-19T00:50:05Z'}, 'pending_decisions': ['HDG-0001'], 'context_packet_hash': ''}
+# an old checkpoint vs changed state: nothing marks it stale or blocks the next handoff
+exit=0 {"id": "CKPT-00001", "pending_decisions": ["HDG-0001"], "trigger": "before_handoff"}
+
+=== G4 (milestone) — after CIT-E / architecture / memory-profile changes: is a wider check run?
+propose: CIT-0001
+radius/gate: R2 HDG-0001
+present: exit=0 true
+decide : exit=0 true
+approve: exit=0 true
+execute: exit=0 {"err": null, "msg": "", "ok": true, "prop": null}
+governance-suite audit records before/after the architecture CIT-E: 1 / 1
+D021: exit=0 green record "AUD-0001" is obsolete (inputs changed)
+# D021 flips here only because gate and decision records are stored under spec/decisions/ (an inputs_hash input):
+CIT-0001.yaml
+D-0001.yaml
+HDG-0001.yaml
+# memory profile change (memory select requires a benchmark candidate; the overlay path is exercised instead):
+status right after: exit=0 {"added": 0, "index_fresh": false, "index_manifest_present": true, "removed": 0, "runtime_present": true, "stale": 1}
+audit records: 1 (no run triggered)
+
+=== G5 (full suite) — at adopt / update / release / full audit
+# full audit: gov audit runs all TEST_POLICY.governance_families (see O5-scheduler-requirements.out S1: 20 families)
+# update --apply post-install verification families (runtime/src/update.rs:330-341):
+        let audit = crate::verification::audit(
+            p,
+            &crate::verification::SuiteOptions {
+                deep: false,
+                families: vec![
+                    "schema_invariants".into(),
+                    "mutation_scope".into(),
+                    "adapter_portability".into(),
+                    "secrets_sensitivity_indexing".into(),
+                ],
+            },
+            false,
+# release build: certification status is a caller-supplied string; no suite is run
+{'ok': True, 'err': None, 'msg': '', 'certification': {'status': 'CERTIFIED', 'implementer_evidence': '', 'independent_verifier': '', 'certified_at': ''}}
+release build wall: 18 ms
+180:certification:
+# adopt: a11 runs the full suite + doctor (runtime/src/adopt.rs:1285-1313); exercised by the builder test brownfield::brownfield_adoption_end_to_end (AC15-cargo-test-certification.out)
+
+=== G6 (qualification) — is there any qualification tier entry point?
+gov qualify: error: unrecognized subcommand 'qualify'  
+gov qualification: error: unrecognized subcommand 'qualification'  
+gov scheduler: error: unrecognized subcommand 'scheduler'  
+gov health: error: unrecognized subcommand 'health'  
+(no matches above = none in runtime/cli/policies)
