@@ -1,0 +1,16 @@
+=== S1: Canonical OS repo ===
+--- S1-b1: framework/runtime/CLI/tools/migrations/tests/fixtures/lessons/change-proposals/release/docs separation ---
+cli/
+docs/
+fixtures/
+framework/
+migrations/
+release/
+runtime/
+tests/
+tools/
+
+--- S1-b2: canonical OS developed once, consumer repos do not rebuild independently ---
+Kernel embedded in binary (kernel::embedded), installed via gov init/update
+Consumer repos get the kernel via install, not by rebuilding
+=== S1 Complete ===
