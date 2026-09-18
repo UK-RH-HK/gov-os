@@ -1,0 +1,86 @@
+=== P1: Execution telemetry ===
+--- P1: Telemetry emit test ---
+Usage: gov telemetry emit [OPTIONS] --name <NAME>
+
+Options:
+      --name <NAME>        
+      --root <ROOT>        Repository root (default: discovered from the current directory)
+      --attrs <ATTRS>      
+      --json               Structured JSON output envelope
+      --session <SESSION>  Session id (default: $GOV_SESSION or a new id)
+      --role <ROLE>        Acting role (default: $GOV_ROLE or orchestrator)
+  -h, --help               Print help
+
+--- P1: Telemetry events after a few commands ---
+
+--- P1: Telemetry events JSONL ---
+{"resource":{"service.name":"gov","service.version":"4.1.5","project":"project-244210"},"name":"cli.init","timestamp":"2026-09-18T19:49:03Z","trace_id":"S-5177e2a6fedc","span_id":"8fd50af3","attributes":{"ok":true,"duration_ms":370,"error":null},"session":"S-5177e2a6fedc","role":"orchestrator"}
+{"resource":{"service.name":"gov","service.version":"4.1.5","project":"project-244210"},"name":"audit","timestamp":"2026-09-18T19:49:20Z","trace_id":"S-4e38d00c3419","span_id":"823f647d","attributes":{"verdict":"HEALTHY","audit":""},"session":"S-4e38d00c3419","role":"orchestrator"}
+{"resource":{"service.name":"gov","service.version":"4.1.5","project":"project-244210"},"name":"cli.audit","timestamp":"2026-09-18T19:49:20Z","trace_id":"S-ee4fe9b37a2a","span_id":"17d049c6","attributes":{"ok":true,"duration_ms":10,"error":null},"session":"S-ee4fe9b37a2a","role":"orchestrator"}
+
+--- P1: Telemetry event fields ---
+event fields: ['attributes', 'name', 'resource', 'role', 'session', 'span_id', 'timestamp', 'trace_id']
+attributes: ['duration_ms', 'error', 'ok']
+
+--- P2: Telemetry summary for organisational questions ---
+summary keys: ['budget', 'commands', 'cost_by_task_class', 'events', 'first_pass_completion_rate', 'human_gates_by_feature', 'model_routing', 'retrieval', 'rework_by_role']
+
+--- P2: Full summary output ---
+{
+  "budget": {
+    "max_network_calls_per_task": 200,
+    "network_calls_by_task": {},
+    "over_budget": [],
+    "max_parallel_agents": 4,
+    "active_sessions": []
+  },
+  "events": 21,
+  "commands": [
+    {
+      "name": "audit",
+      "count": 7,
+      "ok": 7,
+      "avg_ms": 0.0
+    },
+    {
+      "name": "cli.audit",
+      "count": 7,
+      "ok": 7,
+      "avg_ms": 213.0
+    },
+    {
+      "name": "cli.doctor",
+      "count": 4,
+      "ok": 4,
+      "avg_ms": 67.5
+    },
+    {
+      "name": "cli.init",
+      "count": 1,
+      "ok": 1,
+      "avg_ms": 370.0
+    },
+    {
+      "name": "cli.status",
+      "count": 1,
+      "ok": 1,
+      "avg_ms": 27.0
+    },
+    {
+      "name": "cli.telemetry",
+      "count": 1,
+      "ok": 1,
+      "avg_ms": 7.0
+    }
+  ],
+  "retrieval": {
+    "queries": 0,
+    "avg_latency_ms": 0.0,
+    "avg_hits": 0.0
+  },
+  "rework_by_role": [],
+  "first_pass_completion_rate": 1.0,
+  "cost_by_task_class": {},
+  "human_gates_by_feature": {},
+  "model_routing": []
+}

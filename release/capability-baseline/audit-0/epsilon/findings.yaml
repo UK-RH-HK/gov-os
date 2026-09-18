@@ -1,0 +1,193 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0005
+findings:
+  - id: A0-O5-01
+    capability: [O5]
+    bullet_source_lines: [803]
+    severity: MEDIUM
+    title: Independent checks run sequentially, not in parallel
+    statement: >
+      O5 bullet "independent checks run in parallel when safe" is not met.
+      The governance suite (verification/mod.rs) iterates families in a sequential
+      for-loop. No parallel/concurrent execution of independent checks exists.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:803 'independent checks run in parallel when safe'"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-5]
+    blocking: false
+    evidence: [evidence/O5-health-scheduler.out]
+    reproduction: "grep 'for fam in' runtime/src/verification/mod.rs — sequential iteration; no thread/async/spawn"
+    repair_direction: >
+      Families that are mutually independent (e.g. schema_invariants, adapter_portability,
+      concurrency_claims) must be able to run concurrently when safe. The mechanism
+      could be thread-pool, async tasks, or process isolation, as long as safety is preserved.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-O5-02
+    capability: [O5]
+    bullet_source_lines: [804]
+    severity: MEDIUM
+    title: No explicit isolated worktrees/processes for check isolation
+    statement: >
+      O5 bullet "isolated worktrees/processes where required" is not met.
+      All governance suite families run in-process within the same Project context.
+      No worktree or process isolation is applied to checks that modify derived state.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:804 'isolated worktrees/processes where required'"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-5]
+    blocking: false
+    evidence: [evidence/O5-health-scheduler.out]
+    reproduction: "grep -rn 'worktree\\|spawn\\|isolat' runtime/src/verification/mod.rs — no hits"
+    repair_direction: >
+      Checks that mutate derived state (recovery_rebuild in deep mode) or that could
+      interfere (e.g. claims sweep) should run in a separate process or worktree.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-O5-03
+    capability: [O5]
+    bullet_source_lines: [805]
+    severity: MEDIUM
+    title: Cache is content-hash-keyed but no explicit cache reuse across runs
+    statement: >
+      O5 bullet "cache keyed by relevant content/policy/framework hashes" is partially met.
+      The inputs_hash mechanism tracks content changes and marks stale, but there is no
+      explicit cache that allows skipping a check whose inputs have not changed. The audit
+      always re-runs all requested families; it only compares results afterward.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:805 'cache keyed by relevant content/policy/framework hashes'"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-5]
+    blocking: false
+    evidence: [evidence/O5-health-scheduler.out, evidence/O3-O4-independent-currency.out]
+    reproduction: "inputs_hash exists and is recorded; but audit always re-runs all families regardless of cache state"
+    repair_direction: >
+      When a check's inputs have not changed since the last green run, the scheduler
+      should be able to reuse the prior result. The cache key must include all relevant
+      content/policy/framework hashes per family.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-O5-04
+    capability: [O5]
+    bullet_source_lines: [793, 794, 795, 796, 797, 798, 799]
+    severity: MEDIUM
+    title: G0-G6 tiers are not explicitly modelled as a tiered scheduler
+    statement: >
+      The G0-G6 tiers are conceptually present but not explicitly modelled as a scheduler
+      that selects and dispatches checks by tier. G0 guard is guard_write (per-mutation).
+      G5 is the full audit. G6 qualification is declared but not implemented. However,
+      there is no explicit scheduler dispatch that says "this is a G1 mutation check" vs
+      "this is a G2 task-close check" vs "this is a G3 checkpoint check" etc. The mapping
+      exists as an emergent property of when commands are run, not as an explicit scheduler.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:793-799 G0-G6 tier checks"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-5]
+    blocking: false
+    evidence: [evidence/O5-health-scheduler.out]
+    reproduction: "grep -rn 'G0\\|G1\\|G2\\|G3\\|G4\\|G5\\|G6\\|tier\\|scheduler' runtime/src/ — no explicit tier scheduler model"
+    repair_direction: >
+      Either the existing mechanisms should be labelled with their tier assignment so
+      that "which checks run at G2 vs G3" is machine-readable and schedulable, or a
+      tier-dispatch layer should select checks by tier and run them at the appropriate
+      lifecycle moment.
+    owner_decision_required: true
+    owner_decision_reason: >
+      Whether the tier model is explicit-dispatch or emergent-labelled is an architecture
+      decision. The contract says the scheduler exists; the current implementation has the
+      individual pieces but not the orchestrating tier-selection mechanism.
+
+  - id: A0-V1-01
+    capability: [V1, V2, V3, V4]
+    bullet_source_lines: [1017, 1029, 1038, 1048]
+    severity: INFO
+    title: Qualification oracle format absent on this candidate
+    statement: >
+      No machine-checkable oracle format covering V1 (fault manifest), V2 (hidden path-map
+      oracle), V3 (hidden memory oracle) or V4 (quantitative scoring) exists on this candidate.
+      All four capabilities have status DECLARED in the compiled contract and evidence_class
+      NOT_YET_MAPPED in the evidence map. This is expected: AC-6 requires the format to be
+      accepted by Phase 2, but the format itself has not yet been produced.
+    normative_source: "PHASE-2-FROZEN-GATE-CONTRACT.md:AC-6 'Qualification Oracle format covering V1-V4 exists as a machine-checkable definition'"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-6]
+    blocking: true
+    evidence: [evidence/V1-V4-qualification-oracle.out]
+    reproduction: "grep 'status: DECLARED' framework/contracts/governance-capability-acceptance.yaml for V1-V4; no schema or format definition exists"
+    repair_direction: >
+      A machine-checkable schema/format must be defined for V1 (fault manifest fields),
+      V2 (hidden path-map oracle fields), V3 (hidden memory oracle fields), and V4
+      (quantitative scoring metrics). This is a format definition, not actual hidden faults.
+    owner_decision_required: true
+    owner_decision_reason: >
+      The oracle format design involves choices about schema representation, field types,
+      extensibility, and compatibility with the qualification execution infrastructure.
+      These are product-architecture decisions.
+
+  - id: A0-P1-01
+    capability: [P1]
+    bullet_source_lines: [815, 816, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 827]
+    severity: LOW
+    title: Telemetry event schema covers basic fields but not all P1 bullets explicitly
+    statement: >
+      The telemetry JSONL events record resource (service.name, service.version, project),
+      name, timestamp, trace_id, span_id, attributes, session, role. The P1 bullets require
+      agent/session/model/provider, role/task, skill/tool versions, context packet,
+      retrieval queries/hits, token input/output, latency/cost, files read/written, tests,
+      retries/failures, handoffs, decisions, human interventions. Many of these are recorded
+      as event attributes when the relevant operation runs (e.g., retrieval events record
+      queries/hits, audit events record verdicts), but there is no central enforcement that
+      every CLI operation emits all applicable P1 fields. Token input/output is not recorded
+      by the Governance OS itself (it does not invoke LLMs directly). This is a structural
+      property: the OS provides the telemetry infrastructure and records what it controls;
+      agent-level metrics are the caller's responsibility.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:815-827 execution telemetry fields"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/P1-P2-telemetry.out]
+    reproduction: "cat .governance-runtime/telemetry/events.jsonl | head -1 — check attribute fields"
+    repair_direction: >
+      Verify that every P1 bullet has at least one event type that records it. Token
+      I/O and model/provider are caller-level concerns; document which bullets are the
+      OS responsibility vs the orchestration layer.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-U-01
+    capability: [U]
+    bullet_source_lines: [981, 988, 989]
+    severity: LOW
+    title: Retrieval Recall@K and tokens/completed-task SLOs are not thresholded by doctor
+    statement: >
+      Gate U lists "retrieval Recall@K" and "tokens/completed task" as SLO bullets. The
+      governance suite's memory_retrieval_regression family checks recall regression, but
+      doctor does not have an explicit check for Recall@K being above a threshold. Similarly,
+      tokens/completed-task is available in the telemetry summary but not thresholded by
+      doctor. These are more naturally telemetry-summary items than doctor checks.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:981,988,989"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/U-framework-health-slos.out]
+    reproduction: "gov doctor --json does not have explicit Recall@K or tokens/task threshold checks"
+    repair_direction: >
+      The memory_retrieval_regression family checks recall in the governance suite. This
+      could be exposed as a doctor check with a configurable threshold, or documented as
+      a telemetry-level SLO rather than a doctor check.
+    owner_decision_required: false
+    owner_decision_reason: null
