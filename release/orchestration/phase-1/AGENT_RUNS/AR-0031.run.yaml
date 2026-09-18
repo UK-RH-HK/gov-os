@@ -1,0 +1,58 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0031
+role: verifier-c
+objective: >-
+  NEW fresh independent R1 verification of candidate 3 after bounded repair 2 - attack the SECTION_6_SINKS census
+  itself (does exactly one primitive realise each section 6 effect, and is the check inside it), judge the four
+  weaknesses the repair disclosed, verify the three prior-evidence changes are consequences rather than regressions,
+  and issue the R1 verdict with precise residual-versus-materially-new classification.
+agent_model: claude-opus-5
+fresh_context: true
+independent_of: [AR-0026 build, AR-0027 verification, AR-0028 repair, AR-0029 verification, AR-0030 repair]
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0031-r1-reverification-2.md
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+r1_verification_iteration: 3
+repair_under_verification:
+  run: AR-0030
+  verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+  work_commit: 748c5d3c19c5401e7449f4f21523c33cc7877aec
+  report_commit: e38ee46d3dfc62439bf5267b172c186ea92e6641
+  closed_claimed: [AR29-B1, AR29-B2, AR29-C1, AR29-N1, AR29-N3, AR29-N4, AR29-N5]
+  design: >-
+    Section 6 bullet 1 names a class of operations; bullets 2-7 name effects. A second enforcement point was added
+    inside the single primitive that realises each effect, with SECTION_6_SINKS as a machine-readable census and
+    Clearance sealed so a new gate-raising function does not compile until it has asked section 6.
+prior_verifications:
+  - {run: AR-0027, candidate: 1, verdict: BLOCKING_FINDINGS_PRESENT, class: BC-R1-1 guard decision shape}
+  - {run: AR-0029, candidate: 2, verdict: BLOCKING_FINDINGS_PRESENT, class: BC-R1-2 guard coverage}
+disclosed_weaknesses_to_judge:
+  - guard_effect fails open when resolve_state_root errors - inherited from repair 1; the repair says closing it would require the owner-closed machine-state root resolution change
+  - section 6 bullet 7 has no sink because no primitive is claimed to exist; gov status, gov doctor and telemetry were not exhaustively audited
+  - section 6 bullet 5's sink is the acquisition decision, not a byte-installing primitive; tools::install reaches the effect through the operation guard only
+  - Clearance is a witness rather than a lifetime-scoped capability and is deliberately not used at three of the five sinks
+prior_evidence_changes_to_verify:
+  - AR-0029 ho_f_preservation no longer compiles - the struct literal AR29-N1 asked to be made impossible; its six unrelated checks were moved into the product suite and must be confirmed not weakened in the move
+  - AR-0029 ho_b b3 and b6 flipped passing to failing - both assert the absence of a guard; b3's printed census is stale and must be re-derived
+  - ho_b b4 was briefly broken by guard ordering in provision and the cause was reverted; verify b4 passes and the door is closed at the sink
+owner_closed_verify_but_do_not_grade: [AR27-OD1, SRR2-R1-C1, SRR-R0-L7]
+carried_not_this_cycle: [AR29-N2, AR27-N3, AR27-N5, AR27-N6, AR27-N7]
+frozen_contract:
+  path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  graded_section: R1
+contract_v3:
+  owner_source_path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+branch: phase1/srr1-r1-verify-3
+started_at: '2026-09-18T07:30Z'
+status: PENDING_DISPATCH
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0031.report.yaml
+expected_evidence_path: release/verification/4.1.6-r1-3/
+required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
+convergence_tracking: >-
+  Two consecutive iterations have produced materially new blocker classes while closing their assigned queues. If this
+  iteration produces a third materially new class, the orchestrator STOPS with PHASE_CONVERGENCE_ESCALATION_REQUIRED and
+  produces a root-cause/meta-review package. Each blocking finding must therefore be labelled residual-or-materially-new
+  with reasons.
+outcome: null
