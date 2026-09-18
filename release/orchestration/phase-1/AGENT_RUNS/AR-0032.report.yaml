@@ -1,0 +1,340 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0032
+role: repair-builder
+objective: >-
+  Execute the OWNER-DECISION-0008 Option B structural repair of srr1-r1-candidate-3: enforce OWNER-DECISION-0006 §6
+  bullet 7 and make the reporting-surface claim true (AR31-B1), make both enforcement points fail closed on an
+  undetermined subject (AR31-B2), derive §6 coverage from the product instead of a declared enumeration, make a
+  "no primitive exists" claim refutable by the product's own suite, and close AR31-N1, N2, N3, N4 and N5.
+agent_model: claude-opus-5
+independence_statement: >-
+  Fresh isolated R1 repair role, repair cycle 3 (structural). I am not AR-0028 and not AR-0030, and I authored
+  nothing in candidate 1, 2 or 3 or in any of the three verifications. I do not grade this repair; a NEW fresh
+  independent verifier re-verifies it with its own held-out tests, and this run declares readiness only, never
+  acceptance. I read HO-0032, OWNER-DECISION-0008, OWNER-DECISION-0006 and -0007, the
+  PHASE_CONVERGENCE_ESCALATION_REQUIRED package, AR-0031's verification report, blocking findings and later
+  lifecycle conditions, AR-0030's repair report, and all three prior held-out suites — every one of those verdicts
+  is issued and the handoff permits reading and running them. I copied all three suites byte-identically (verified
+  with cmp) and re-ran them without editing a line; only each Cargo.toml's dependency path target changed, by
+  symlink. I did not edit any pre-existing test, weaken any assertion, or modify any owner record, frozen-boundary
+  content, release/verification/**, release/root-of-trust/*-review*/** or release/releases/**. I read no session or
+  agent transcript, no task-output store and no user auto-memory, and did not contact the product owner.
+input:
+  base_commit: 30aa98a10fd7f5ed85439b0d676761080519ceed
+  release: 4.1.6-rc1 (candidate tag srr1-r1-candidate-3, rejected by AR-0031)
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0032-r1-structural-repair.md
+inspected:
+  - release/orchestration/phase-1/HANDOFFS/HO-0032-r1-structural-repair.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0008-CONVERGENCE-OPTION-B.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+  - release/orchestration/phase-1/ESCALATION/PHASE-CONVERGENCE-ESCALATION-R1.md
+  - release/verification/4.1.6-r1-3/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-3/10-BLOCKING-FINDINGS.md
+  - release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/
+  - release/verification/4.1.6-r1-2/evidence/heldout-tests/
+  - release/verification/4.1.6-r1/evidence/heldout-tests/
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/evidence/REPRODUCTION.md
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - runtime/src/srr/breakglass.rs
+  - runtime/src/srr/state.rs
+  - runtime/src/srr/plugins.rs
+  - runtime/src/srr/verifier.rs
+  - runtime/src/srr/provision.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/records.rs
+  - runtime/src/cit/mod.rs
+  - runtime/src/doctor.rs
+  - runtime/src/update.rs
+  - runtime/src/context/mod.rs
+  - runtime/src/status.rs
+  - runtime/src/recovery.rs
+  - runtime/src/release.rs
+  - runtime/src/tools.rs
+  - runtime/src/capabilities/governance.rs
+  - cli/src/main.rs
+  - tests/certification/srr.rs
+  - tests/certification/common.rs
+  - tests/certification/srr_material.rs
+produced:
+  - runtime/src/srr/present.rs
+  - runtime/src/srr/breakglass.rs
+  - runtime/src/srr/state.rs
+  - runtime/src/srr/plugins.rs
+  - runtime/src/srr/mod.rs
+  - runtime/src/records.rs
+  - runtime/src/cit/mod.rs
+  - runtime/src/doctor.rs
+  - runtime/src/update.rs
+  - runtime/src/context/mod.rs
+  - runtime/src/tools.rs
+  - cli/src/main.rs
+  - tests/certification/section6.rs
+  - tests/certification/main.rs
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/REVIEWED-CONTENT-DIGESTS.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVATION.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/HELD-OUT-FLIPS.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REPRODUCTION.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/PRESERVATION.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVED-CENSUS.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-LIB.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/CLIPPY.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0031-HELD-OUT-RERUN.txt
+tests_or_attacks:
+  - id: REG-LIB
+    description: cargo test --lib — 36 pre-existing plus 6 new, none edited, none weakened
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-LIB.txt
+  - id: REG-CERT
+    description: cargo test --test certification — 70 pre-existing plus 9 new; tests/certification/srr.rs not in the diff
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: CLIPPY
+    description: cargo clippy --all-targets — zero warnings, zero errors
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/CLIPPY.txt
+  - id: DERIVED-CENSUS
+    description: >-
+      section_6_coverage_is_derived_from_the_product — walks all 84 files and 740 functions of runtime/src and
+      cli/src; for each §6 effect derives every function that performs a durable write and matches the effect's
+      signature, and fails by name on any that carries no enforcement. Zero violations, one recorded exemption
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVED-CENSUS.txt
+  - id: POSITIVE-CONTROLS
+    description: >-
+      a_no_primitive_claim_is_refutable_by_this_suite — every §6 effect detector is run against a synthetic
+      unguarded implementation of that effect and must flag it as a violation, and against arithmetic and must not.
+      A "no primitive" sink entry fails the suite outright. This is OWNER-DECISION-0008 mandate part 4 and AR31-N5
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVED-CENSUS.txt
+  - id: BULLET7-UNIVERSAL
+    description: >-
+      the_below_floor_marking_reaches_every_surface_including_ones_that_know_nothing_about_it — on a machine in
+      genuine owner-authorised break-glass: gov doctor carries it in the report and the envelope, gov update --check
+      reports up_to_date false with the exit condition, gov version and gov context carry it, and gate list / policy
+      overrides / claims list — commands with no relationship to release identity — carry it too
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: BULLET7-LIFTS
+    description: >-
+      the_marking_is_absent_from_every_surface_on_a_healthy_machine — an unmarked machine reports below_floor false,
+      presented_as CURRENT and marking null; the control lifts
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: FAIL-CLOSED
+    description: >-
+      an_undetermined_subject_fails_closed_at_both_enforcement_points — driven through the real binary on a
+      provisioned, genuinely marked machine with GOV_MACHINE_STATE_DIR pointing elsewhere: gate create and release
+      build --certification CERTIFIED both return SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED with nothing written, bullet
+      7 reports UNDETERMINED, guard_effect_on is unaffected, and resolve_state_root is unchanged
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: BULLET6-SINK
+    description: >-
+      the_floors_sink_never_lowers_a_floor_however_the_value_was_set — assigning Floors' public fields to lower
+      values and saving leaves every persisted floor unchanged, the in-memory value is corrected to match, and
+      raising still works
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: BULLET2-RECORD-SINK
+    description: >-
+      a_human_gate_record_cannot_be_written_below_floor_however_it_was_minted — all three of AR-0031's constructions
+      dispatch on the record type at records::save_record; gate create is refused with the class named and no gate
+      exists below floor
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: BULLET5-BOTH-PRIMITIVES
+    description: >-
+      both_capability_acquisition_primitives_ask_section_6_without_consulting_the_descriptor — the derived census
+      finds both capability-registry writers and both carry the enforcement; guard_acquisition no longer gates the
+      §6 question on is_privileged(descriptor)
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: N4-RESTORED
+    description: >-
+      the_dropped_held_out_sub_checks_run_here — ho_f::f1's behavioural malleated S+L signature check and ho_f::f2's
+      relaxation-switch census both run again, with the no-signing census beside them
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/REGRESSION-CERTIFICATION.txt
+  - id: HELDOUT-AR0027
+    description: >-
+      AR-0027's held-out suite copied byte-identically and re-run unmodified — 26 passed, 3 failed, identical to
+      repair 2; the three failures remain its own OBSERVED assertions for AR27-N1 and AR27-B1
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0029
+    description: >-
+      AR-0029's held-out suite copied byte-identically and re-run unmodified — 26 passed, 2 failed of 28 compiled,
+      ho_f_preservation still not compiling (AR29-N1's seal), identical to repair 2
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0031-B2
+    description: >-
+      hx_b::b2, ::b3 and ::b4 — AR31-B2's three OBSERVED assertions; one environment variable no longer clears any
+      §6 effect or any operation label, and gates::create_system no longer receives a Clearance under the override
+    result: FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0031-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0031-N1
+    description: >-
+      hx_d::d3 — AR31-N1's OBSERVED assertion; tools::install now reaches the acquisition module's named §6 door
+      (plugins::guard_acquisition_below_floor)
+    result: FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/AR-0031-HELD-OUT-RERUN.txt
+  - id: HELDOUT-AR0031-TRIPWIRES
+    description: >-
+      hx_a::a1, hx_b::b6 and hx_d::d2 flipped from passing to FAILING. All three assert the OLD shape — the set of
+      bullets claiming no primitive, the two fail-open let-else blocks, and the descriptor-gated §6 question. All
+      three statements are now false, and that is the repair. Explained one by one in HELD-OUT-FLIPS.md
+    result: FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/HELD-OUT-FLIPS.md
+  - id: HELDOUT-AR0031-NOT-FLIPPED
+    description: >-
+      hx_a::a5, ::a8, hx_c::c2 and ::c3 still fail. Each fails at a LOCATION assertion, not at its property: a5 and
+      c2/c3 grep tests/certification/srr.rs, which was deliberately not edited, and the properties are closed in the
+      product and tested in tests/certification/section6.rs; a8 fails at its first assertion, which pins the old
+      bullet-7 census string, and all four of its OBSERVED conditions were verified individually and now hold
+    result: NOT_FLIPPED
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/HELD-OUT-FLIPS.md
+  - id: PRESERVATION
+    description: >-
+      resolve_state_root, default_state_root and exit_satisfied compared byte-for-byte against the base commit (all
+      three identical); 5 admit / 5 install_kernel; one by_admit site and one AuthenticatedRelease literal; no
+      Clearance constructed outside breakglass; four-entry allow-list; Contract v3 4c2df291… on both copies; zero
+      modified entries under release/verification, release/releases, release/root-of-trust/*-review*, GATES,
+      ESCALATION and HANDOFFS
+    result: PASS
+    evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/PRESERVATION.txt
+findings:
+  - id: AR31-B1
+    severity: HIGH
+    title: >-
+      §6 bullet 7 enforced nowhere and the reporting-surface claim false — closed by srr::present, the bullet 7
+      sink, reached from the single CLI command-result envelope plus doctor, update --check and the context packet
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: AR31-B2
+    severity: MEDIUM
+    title: >-
+      Both enforcement points converted a state-root resolution error into a clearance — both now refuse with
+      SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED; resolve_state_root and default_state_root byte-identical
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: OD-0008-MANDATE-3
+    severity: HIGH
+    title: >-
+      §6 coverage is derived from the product — SECTION_6_SIGNATURES plus a census over every function in
+      runtime/src and cli/src, replacing the declared SECTION_6_SINKS enumeration as the coverage claim
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVATION.md
+  - id: OD-0008-MANDATE-4
+    severity: HIGH
+    title: >-
+      A "no primitive exists" claim is refutable — every detector must flag a synthetic unguarded implementation of
+      its effect before any absence claim is believed, and an empty derivation panics rather than passing
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVATION.md
+  - id: AR31-N1
+    severity: LOW
+    title: >-
+      Bullet 5 realised in two places with one declared sink — tools::install now reaches
+      plugins::guard_acquisition_below_floor, and the derived census finds both capability-registry writers
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: AR31-N2
+    severity: INFO
+    title: >-
+      The only §6 sink whose decision to ask rested on self-asserted data — guard_acquisition now asks
+      unconditionally; the descriptor can no longer decide whether the question is put
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: AR31-N3
+    severity: LOW
+    title: >-
+      The bullet 2 guarantee was a source-literal property scoped to gates.rs — records::save_record is now the
+      record-write sink keyed by record type, and the CIT write_file and move_file ops ask the same question
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: AR31-N4
+    severity: LOW
+    title: >-
+      The malleated-signature check and the relaxation-switch census ran nowhere — both restored in
+      tests/certification/section6.rs, where the harness can sign and SRR-R0-L4 is measured rather than held
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: AR31-N5
+    severity: LOW
+    title: >-
+      The census test could not fail on a bullet claiming no primitive — replaced by positive controls, a
+      non-vacuity panic, and an outright failure on any "no primitive" sink entry
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/evidence/DERIVATION.md
+  - id: AR32-D1
+    severity: LOW
+    title: >-
+      Found by the new derivation, not handed to this run — Floors' public fields plus a public save were a
+      floor-lowering primitive the mutator census could not see. Floors::save is now bullet 6's sink and is
+      monotonic against the persisted value. BC-R1-2 residual, closed and reported
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+  - id: AR32-D2
+    severity: LOW
+    title: >-
+      Found by the new derivation, not handed to this run — the CIT write_file and move_file mutation ops reach a
+      governed record path without passing save_record. No live bypass (cit execute is refused below floor at the
+      operation level); the effect-level control was missing and is now present. BC-R1-2 residual, closed and reported
+    path: release/root-of-trust/signed-release-root-v1-r1-repair-3/00-REPAIR-REPORT.md
+verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+output:
+  branch: phase1/srr1-r1-repair-3
+  commit: cf527412233ab2ee435a01d1aa3c358050b1cf49
+  evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-3/
+unresolved:
+  - >-
+    The derivation is syntactic. It will not see an implementation that reaches a §6 effect without using any of
+    the product's own primitives — a hand-built path plus std::fs::write, for instance. evidence/DERIVATION.md §4
+    lists nine limits and §5 lists what would defeat it. This is much less likely than the three enumerations that
+    preceded it and is NOT impossible; no universal claim is made here and the suite makes none.
+  - >-
+    Bullet 7's universality is a property of the CLI boundary. Every gov command carries the marking because run()
+    is called once and its value reaches stdout through one envelope. An in-process embedder of gov_runtime gets it
+    only from the four surfaces that carry it in their own payload; a fifth in-process reporting function written
+    tomorrow would not, and nothing in the suite would catch that.
+  - >-
+    Acceptance markers are as load-bearing as signatures and are less well defended. A marker widened to something
+    common would accept everything and nothing in the suite would notice: the positive control proves acceptance
+    matches an enforced implementation, not that it fails to match an unenforced one.
+  - >-
+    records::save_record is the record-write sink, and I did not prove it is the only writer of a governed record
+    file. A function that hard-codes spec/decisions/HDG-0001.yaml and calls write_text matches no marker. None
+    exists today; nothing structural prevents one.
+  - >-
+    cit::take_snapshot is the single derivation exemption, with its reason in SECTION_6_DERIVATION_EXEMPTIONS. I
+    read it and believe it; an exemption is the one place a wrong judgement passes quietly, so a verifier should
+    read it too.
+  - >-
+    A file-level grep census over product source will now also count breakglass.rs for any primitive named in
+    SECTION_6_SIGNATURES, because the signatures are string literals naming the product's own primitives. Such a
+    census must exclude the table.
+  - >-
+    AR-0031's hx_a::a5, hx_a::a8, hx_c::c2 and hx_c::c3 still fail. Each fails at a location assertion rather than
+    at its property; every property is closed and measured, and a8's four OBSERVED conditions were each verified
+    individually. Full explanation in evidence/HELD-OUT-FLIPS.md.
+  - >-
+    Behaviour change worth a verifier's attention: gov gate present calls authority::require and save_record and
+    NOT control::guard_write, so on candidate 3 it mutated a governed Human Gate record below floor. It is now
+    refused at the record-write sink.
+  - >-
+    R2-lifecycle AR31-N6, AR29-N2, AR27-N3, N5, N6 and N7 remain carried and untouched.
+  - >-
+    NEW_MATERIAL_CLASS_SUSPECTED — none. Both items the derivation surfaced rather than handed to this run
+    (AR32-D1, AR32-D2) sit inside BC-R1-2, which OWNER-DECISION-0008 authorises to repair automatically. Both are
+    closed and both are reported above rather than absorbed silently.
+  - >-
+    NEW_OWNER_DECISION_REQUIRED — none. Everything implements a policy the owner already decided in
+    OWNER-DECISION-0006 §6. No owner record, frozen-boundary content or normative source was amended.
+recommended_next_action: >-
+  Dispatch a NEW fresh independent verifier (not AR-0027, AR-0029, AR-0031 or this run) with its own held-out tests
+  against phase1/srr1-r1-repair-3 @ cf527412233ab2ee435a01d1aa3c358050b1cf49, asking it to attack the derivation
+  itself: whether SECTION_6_SIGNATURES can be made to miss a primitive a plausible future author would write,
+  whether an acceptance marker accepts something unenforced, and whether the §6 bullet 7 marking survives a
+  reporting path that does not go through the CLI envelope.
+completed_at: 2026-09-18T12:05:00Z
