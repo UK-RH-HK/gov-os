@@ -1,0 +1,898 @@
+# P2-AR-0011 — iteration-0 family RE-AUDIT, family delta: findings (iteration-0 baseline inventory; new_vs_residual BASELINE)
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0011
+findings:
+- id: A0-J1-01
+  capability:
+  - J1
+  bullet_source_lines:
+  - 598
+  - 599
+  - 600
+  - 601
+  - 602
+  - 603
+  - 604
+  - 605
+  severity: MEDIUM
+  title: Research outputs are not required to record the J1 fields; influences are never recorded
+  statement: 'Only `gov memory benchmark --record` writes a research record with question, reason, method, sources, measurements, uncertainty,
+    conclusion and confidence, and it writes influences: [] which `gov memory select --research` never back-fills. For every other governed research
+    output the product requires only `question`: a research record with only question+conclusion is committed through CIT-E (RES-0100), written
+    directly (RES-0101, RES-0102 question only), indexed and retrieved as EVIDENCE, used as the basis of a decision, and `gov audit` is HEALTHY
+    with no finding on any of them.'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:597-605 ''Each governed research output records: question/reason, method,
+    sources/data, measurements, uncertainty, conclusion, confidence, influenced decisions/tasks''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §45 ''Unstructured research notes remain reference only until transformed into a governed finding or decision.'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-J1-RESEARCH-COMPLETENESS-UNENFORCED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.py
+  - release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.out (J1.a.influences, J1.a.influence_backlink, J1.b.accepted,
+    J1.b.audit FAIL; OBSERVE J1.b.retrieval, J1.b.decision)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 J1-J2-research-experiments.py  #
+    essential: gov memory benchmark --candidate current --candidate builtin:128 --record; gov memory select builtin:128 --research RES-0001; gov
+    cit propose --manifest <append_record research {question, conclusion}> ...; gov audit --no-persist'
+  repair_direction: A research record must not be treated as governed evidence (state_class EVIDENCE, retrievable as current, citable by a decision)
+    unless it records question/reason, method, sources/data, measurements, uncertainty, conclusion and confidence; incomplete ones must be refused
+    or held reference-only and reported by the governance suite; the research output must record the decisions/tasks it influenced when a decision
+    derives from it (Contract v3 lines 597-605, framework §45).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-J1-02
+  capability:
+  - J1
+  - J2
+  - K1
+  - K2
+  - K3
+  - K4
+  - L1
+  - L2
+  - L3
+  - L4
+  - M1
+  - M2
+  - M3
+  - M4
+  - N1
+  - N2
+  - N3
+  - N4
+  bullet_source_lines: []
+  severity: MEDIUM
+  title: Derived contract views omit every family-delta checklist bullet and map no evidence owner
+  statement: 'Scope: the contract-binding chain for all 18 family-delta capabilities; this finding asserts no checklist-bullet gap and does not
+    change bullet-derived statuses. Reconciliation against the owner source (lines 594-747: 18 capabilities, 93 bullets) shows the compiled ''machine-executable''
+    form (framework/contracts/governance-capability-acceptance.yaml) carries only id/title/requirement_class/source_reference/family/status for
+    each capability — none of the 93 bullets and none of the Contract v3 ''required contract fields per capability'' (lines 53-73) — and tests/governance/capability-evidence-map.yaml
+    maps all 18 family-delta capabilities to automated_checks: [] / evidence_class NOT_YET_MAPPED. `gov contract verify` still reports CONTRACT_SOURCE_BOUND
+    because it checks hashes and headings only. The headings, titles and source lines are faithful.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:41-47 'framework/contracts/governance-capability-acceptance.yaml is the
+    machine-executable compiled form ... Any semantic difference between source and compiled representation is a hard failure'; Governance_OS_Capability_Acceptance_Contract_v3.md:53-73
+    required contract fields; frozen gate contract AC-10 (every required capability has at least one evidence owner) and AC-13; P2-HO-0004 'If
+    you find that a derived view omits or distorts anything in your scope, that is itself a finding.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-10
+  - AC-13
+  blocking: true
+  blocker_class: BC-CONTRACT-DERIVED-VIEW-OMISSION
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/DERIVED-VIEWS-JKLMN.py
+  - release/capability-baseline/audit-0/delta-r/evidence/DERIVED-VIEWS-JKLMN.out (DV.compiled.bullets FAIL, DV.compiled.fields FAIL, DV.map.1
+    FAIL; 18 heading checks PASS)
+  - 'release/capability-baseline/audit-0/delta-r/evidence/PINNED-INPUTS.out (gov contract verify: CONTRACT_SOURCE_BOUND)'
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 DERIVED-VIEWS-JKLMN.py
+  repair_direction: The compiled contract form must carry the checklist semantics of each capability (at least its bullets and the lines 53-73
+    fields where applicable) so that no semantic difference from the owner source exists, and the evidence map must name at least one executing
+    evidence owner per family-delta capability (frozen contract AC-10, AC-13). The synthesis auditor adjudicates the cross-family extent.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-J1-03
+  capability:
+  - J1
+  - J2
+  - K1
+  - K2
+  - K3
+  - K4
+  - L1
+  - L2
+  - L3
+  - L4
+  - M1
+  - M2
+  - M3
+  - M4
+  - N1
+  - N2
+  - N3
+  - N4
+  bullet_source_lines: []
+  severity: MEDIUM
+  title: Green governance evidence is not invalidated by implementation changes or by the record classes family delta depends on, and no suite
+    family re-checks J-N behaviour
+  statement: 'Scope: evidence currency for all 18 family-delta capabilities (Contract v3 lines 95-111); this finding asserts no checklist-bullet
+    gap and does not change bullet-derived statuses. The only currency mechanism (verification::inputs_hash over governance/kernel, governance/project,
+    governance/tests, spec/decisions, framework.lock) correctly invalidates green evidence for overlay policy, provider-map and gate/decision
+    record changes and blocks governance-touching task close until a fresh audit (demonstrated). It does not change when research (J1), experiment
+    (J2), task (K2 retest flags), checkpoint (N1/N3) or handoff (N4) records change, nor when the runtime/CLI implementation changes (a different
+    gov binary reproduces the same inputs_hash; the audit record carries no implementation identity). The re-check run on stale evidence (TEST_POLICY.governance_families)
+    contains no family that exercises gate, CIT, checkpoint, handoff, routing, research or experiment behaviour.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:95-111 'A previously green capability becomes STALE when any relevant evidence
+    input changes, including ... runtime/kernel implementation; schema; ... relevant source files ... Stale evidence must trigger the appropriate
+    G0-G5 re-check before work is allowed to rely on it.'; frozen gate contract AC-10 'Changing a relevant implementation/policy/spec/tool/model/index/path-map
+    input is shown to invalidate prior green evidence rather than leave it green.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-10
+  - AC-12
+  blocking: true
+  blocker_class: BC-EVIDENCE-CURRENCY-SCOPE
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/FRESH-invalidation.py
+  - release/capability-baseline/audit-0/delta-r/evidence/FRESH-invalidation.out (F.PROJECT_POLICY/F.MODEL_ROUTING_OVERRIDES/F.HDG-0500/F.close.1/F.close.2
+    PASS; F.RES-0500.inv, F.EXP-0500.inv, F.CKPT-09999.inv, F.HND-0500.inv, F.TASK-0500.inv, F.impl.1, F.families.1 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 FRESH-invalidation.py
+  repair_direction: For each family-delta capability the evidence the product relies on must become stale when any Contract v3 lines 97-109 input
+    relevant to it changes — including the runtime/CLI implementation and the record classes it depends on — and the re-check triggered by staleness
+    must actually exercise that capability (lines 95-111; AC-10).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-J2-01
+  capability:
+  - J2
+  bullet_source_lines:
+  - 608
+  - 609
+  - 610
+  - 611
+  - 612
+  - 613
+  - 614
+  severity: HIGH
+  title: Experiment lifecycle is absent; the production-merge prohibition is a flag nothing enforces
+  statement: 'There is no experiment command, no lifecycle state and no required field: an experiment record with none of hypothesis, method/data,
+    results is committed through CIT-E and the governance suite has no finding; reproducibility, interpretation and decision influence have no
+    representation at all. Experiment-class tasks carry production_merge_allowed: false, but no code reads the flag: an experiment task writes
+    product/gateway_async.py, closes DONE, the code is committed into the production tree and the suite reports nothing about it.'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:607-614 ''J2. Experiment lifecycle: hypothesis/question, method/data,
+    reproducibility, results, interpretation, decision influence, production merge prohibited where experimental''; Governance_OS_Capability_Acceptance_Contract_v3.md:616
+    advanced challenge ''irreproducible experiment''.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-2
+  blocking: true
+  blocker_class: BC-J2-EXPERIMENT-LIFECYCLE-ABSENT
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.py
+  - release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.out (OBSERVE J2.schema, J2.cli; J2.empty, J2.incomplete.audit,
+    J2.merge.enforced, J2.merge.detected FAIL; J2.merge.flag, J2.merge.flag2, J2.merge.schema PASS)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 J1-J2-research-experiments.py  #
+    essential: gov task create --class experiment --allowed ''product/**''; gov task claim; write product/gateway_async.py; gov task close --report
+    ...; git commit; gov audit --no-persist'
+  repair_direction: Experiments must be governed through a lifecycle that records hypothesis/question, method/data, reproducibility, results,
+    interpretation and decision influence, and output of experimental work must be prevented from entering (or detected in) the production tree
+    without a governed promotion (Contract v3 lines 607-614).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-K2-01
+  capability:
+  - K2
+  bullet_source_lines:
+  - 632
+  severity: HIGH
+  title: 'CIT-E propagation stops at open work: completed tasks, their evidence, context packets and checkpoints stay valid (K2 <-> W6)'
+  statement: After a committed CIT changes REQ-0001, the open dependent task is marked retest_required and the test obligation/scenario stale,
+    but the DONE task that implemented REQ-0001 and its closing report RPT-0001 are left untouched (cit::execute skips DONE/CANCELLED tasks),
+    no revalidation or rework task is generated, the stored context packet keeps its pre-change hash with no invalidation marker and the checkpoint
+    that recorded that hash is not marked stale.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:632 'staleness/retest/rework propagation'; Governance_OS_Capability_Acceptance_Contract_v3.md:1130-1136
+    (W6) 'dependent task evidence becomes stale ... affected context packets are invalidated ... revalidation/rework tasks are generated ... COMPLETE
+    does not imply permanently valid ... stale evidence cannot remain green merely because the original task closed successfully'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §47.2; frozen gate contract AC-16 'K2 <-> D1 <-> W6'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  - AC-16
+  blocking: true
+  blocker_class: BC-K2-PROPAGATION-SKIPS-COMPLETED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.py
+  - release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.out (K2.b4.4, K2.b4.5, K2.b4.6, K2.w6.1, K2.w6.2 FAIL; K2.b4.1-3 PASS)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 K2-cit-e.py  # essential: close
+    a task implementing REQ-0001; gov context compile <open task>; gov checkpoint create --task <open task>; CIT set_field REQ-0001 -> present/decide/approve/execute;
+    gov cit show <DONE task> / <report> / <checkpoint>'
+  repair_direction: An executed CIT must propagate staleness to every dependent artefact within its impact set — including completed tasks, their
+    reports/test evidence, compiled context packets and checkpoints — and generate revalidation/rework work so that completed status never implies
+    permanent validity (Contract v3 lines 632, 1130-1136).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-K2-02
+  capability:
+  - K2
+  bullet_source_lines:
+  - 636
+  severity: LOW
+  title: A failed CIT-E rolls back authoritative state but leaves derived views regenerated from the rolled-back state
+  statement: A CIT that writes governance/project/tools/probe-tool.yaml and then fails verification is ROLLED_BACK and the descriptor removed,
+    but the tool registry regenerated during the failed execution still lists probe-tool (the error path restores the snapshot and re-indexes
+    but does not regenerate derived views).
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:636 'commit or rollback/block atomically'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §47.2.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-K2-DERIVED-VIEW-ROLLBACK
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.py
+  - release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.out (K2.b8.2 FAIL; K2.b8.1 PASS)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 K2-cit-e.py  # CIT-B: write_file
+    governance/project/tools/probe-tool.yaml + set_field task_status BOGUS; execute; inspect governance/generated/tool-registry.json'
+  repair_direction: Rollback of a CIT-E must leave derived views consistent with the restored authoritative state (Contract v3 line 636).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-K2-03
+  capability:
+  - K2
+  bullet_source_lines:
+  - 635
+  severity: LOW
+  title: CIT-E verification attributes pre-existing, not-yet-indexed graph damage to the transaction
+  statement: The dangling-edge baseline is read from the index as it was before execution; when a record edited earlier (not yet re-indexed) contains
+    a dangling reference, the incremental refresh inside execution makes it 'new' and a harmless editorial CIT is rolled back with VERIFICATION_FAILED
+    naming an edge it did not create.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:635 'verification'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-K2-VERIFICATION-BASELINE
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.out (K2.b7.2 FAIL)
+  - 'release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.py (comment before section b5: the probe rebuilds the index
+    so that its own earlier record edit is not blamed on later CITs)'
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 K2-cit-e.py  # edit SCN-0001 depends_on
+    REQ-9999 without rebuild; editorial CIT write_file docs/e.md; execute'
+  repair_direction: CIT-E verification must distinguish damage introduced by the transaction from damage present before it (fresh pre-execution
+    baseline) (Contract v3 line 635). It fails closed today, so it does not undermine qualification.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-K3-01
+  capability:
+  - K3
+  bullet_source_lines:
+  - 640
+  - 641
+  - 642
+  - 643
+  - 644
+  - 645
+  - 646
+  - 647
+  severity: HIGH
+  title: 'Materiality is the proposer''s label: material changes labelled ''editorial'' auto-approve at R0, and material changes made in ordinary
+    tasks never reach CIT-P'
+  statement: Auto-simulation and human gating are keyed on the trigger the proposer declares. Declared 'editorial', a change to an architecture
+    record, a product behaviour bound, an interface contract, a security check (signature verification removed), infrastructure sizing, an acceptance
+    criterion and a DROP COLUMN migration each simulate to R0, auto-approve with human_approved false and commit. The same seven classes edited
+    inside an ordinary task (allowed_paths spec/**, product/**, infra/**) and a governance-policy change (after a fresh green audit) close DONE
+    with no CIT at all. Only governance/** paths inside a CIT are forced to R5 regardless of label.
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:638-647 ''Auto-trigger for material: architecture, behaviour, interfaces,
+    security, governance/policy, infrastructure cost, acceptance criteria, data migration''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §48 ''The human should not need to type /impact. When a proposed change meets an impact threshold, CIT-P is automatic.''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §47 ''Every accepted material state change is handled atomically.'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-K3-MATERIALITY-SELF-DECLARED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/K3-auto-impact-simulation.py
+  - release/capability-baseline/audit-0/delta-r/evidence/K3-auto-impact-simulation.out (K3.b1..b8.mislabel, K3.outside.1, K3.outside.2, K3.outside.3
+    FAIL; K3.b*.label, K3.b5.path PASS)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 K3-auto-impact-simulation.py  #
+    essential: gov cit propose --trigger editorial --targets ARCH-0001 --manifest <set_field ARCH-0001 summary>; gov cit simulate; gov cit approve
+    --method auto; gov cit execute'
+  repair_direction: Whether a proposed or performed change is material for each of the eight classes must be determined from what it changes (records,
+    paths, contracts), not only from a label its proposer chooses, and material changes must not be able to complete outside change control (Contract
+    v3 lines 638-647; framework §47-48).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-K4-01
+  capability:
+  - K4
+  bullet_source_lines:
+  - 650
+  severity: MEDIUM
+  title: Impact radius does not affect model tier, number of specialist agents or the rollback plan
+  statement: Radius drives traversal depth, semantic breadth, test scope and human approval (demonstrated), but every CIT reports minimum_model_tier
+    T3 at R0..R5 (CIT-P routes class 'governance'), no output determines specialist agents/reviewers, and the rollback consequence is identical
+    at every radius.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:650 'R0-R5 or equivalent affects traversal/test scope/model tier/agents/human
+    approval/rollback'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §49.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-K4-RADIUS-EFFECTS-INCOMPLETE
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/K4-impact-radius.py
+  - release/capability-baseline/audit-0/delta-r/evidence/K4-impact-radius.out (K4.d.model_tier, K4.e.agents, K4.g.rollback FAIL; K4.a/b/c/f PASS)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 K4-impact-radius.py
+  repair_direction: 'Radius must drive the model tier, the specialist-agent/review scope and the rollback plan attached to a transaction, as it
+    already drives traversal, test scope and approval (Contract v3 line 650). Non-blocking: argued CANNOT_UNDERMINE in capability-audit.yaml K4.'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L1-01
+  capability:
+  - L1
+  - L2
+  bullet_source_lines:
+  - 658
+  - 668
+  severity: MEDIUM
+  title: Agent resolution fails open on unassessed reversibility and is judged on creator-declared values
+  statement: A gate raised without a reversibility value is stored as 'not assessed', which gates::answer treats as reversible, so an L3+ agent
+    resolves it itself. The radius/confidence/reversibility thresholds are applied to values the gate's creator declares; the same acting agent
+    can raise a gate declaring R0/0.99/reversible and resolve it.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:658 'low-impact/reversible/high-confidence agent resolution where allowed';
+    DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §50 'low impact + high confidence + reversible? yes -> agent resolves +
+    records rationale; no -> Human Decision Gate'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-L1-AGENT-RESOLUTION-FAIL-OPEN
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L1-contradiction-resolution.py
+  - release/capability-baseline/audit-0/delta-r/evidence/L1-contradiction-resolution.out (L1.b2.neg.no-reversibility FAIL; OBSERVE L1.b2.self)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L1-contradiction-resolution.py  #
+    gov gate create --question q --fields ''{"impact_radius":"R0","confidence":0.95}''; gov gate present; gov decide <g> --option A --by orchestrator'
+  repair_direction: Agent resolution must be allowed only when impact, reversibility and confidence have been assessed and meet policy — an unassessed
+    value must count against agent resolution — and the assessment must not rest solely on the resolving agent's own declaration (Contract v3
+    line 658; framework §50).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L1-02
+  capability:
+  - L1
+  bullet_source_lines:
+  - 660
+  severity: LOW
+  title: Contradiction resolutions need no rationale and have nowhere to record evidence
+  statement: An agent resolution and a relayed human answer without --rationale are accepted and the decision record stores rationale ''; the
+    decision record has no evidence/evidence_refs field.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:660 'rationale/evidence recorded'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §50 'agent resolves + records rationale'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-L1-RATIONALE-OPTIONAL
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L1-contradiction-resolution.out (L1.b4.1, L1.b4.4 FAIL; OBSERVE L1.b4.2)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L1-contradiction-resolution.py
+  repair_direction: Every contradiction resolution must record its rationale and the evidence it relied on (Contract v3 line 660). Non-blocking
+    on its own (the qualification scores the outcome, not the rationale field).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L1-03
+  capability:
+  - L1
+  bullet_source_lines:
+  - 659
+  severity: MEDIUM
+  title: Contradictions that precedence cannot resolve are neither detected nor escalated; both sides reach workers as authority
+  statement: Two ACTIVE decisions with contradictory choices for the same feature (postgres vs mysql) and no supersession link are both delivered
+    in the task context packet's active_decisions, with no conflict flag, no suite/doctor finding and no Human Decision Gate.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:659 'human escalation for consequential uncertainty'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §50 'For each contradiction evaluate impact, reversibility, confidence, authority, cost of being wrong, downstream blast radius ... no ->
+    Human Decision Gate'; Governance_OS_Capability_Acceptance_Contract_v3.md:1103 (W3) 'Conflicting mandatory inputs trigger contradiction handling'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-L1-UNRESOLVED-CONTRADICTION-DELIVERED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L1-contradiction-resolution.out (L1.b1.6 FAIL; OBSERVE L1.b1.5)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L1-contradiction-resolution.py
+  repair_direction: Contradictory authoritative inputs that deterministic precedence cannot resolve must be detected and routed to agent resolution
+    (within policy) or a Human Decision Gate rather than delivered together as authority (Contract v3 lines 657-659, 1103).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L2-01
+  capability:
+  - L2
+  bullet_source_lines:
+  - 664
+  - 665
+  - 666
+  - 667
+  - 668
+  - 669
+  - 670
+  - 671
+  - 672
+  severity: MEDIUM
+  title: 'The decision package is not enforced: fields default, options may be empty, answers are not validated, next actions are placeholders'
+  statement: 'An agent can raise a gate with only a question: why_now, current_state, impact, reversibility, cost_rework and recommendation become
+    ''not assessed'', options [], confidence the number 0.5 (presented as if assessed). An answer naming an option the package does not offer
+    (''Z'' on an option-less gate, ''C'' on an A/B gate) is recorded as a decision. permitted_next_actions is the placeholder template ''gov decide
+    <gate> --option <id>'' on every system-raised gate (CIT-P, budget); the budget gate also omits cost_rework.'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:662-672 ''Human Decision Gate package: plain-language question, why now,
+    current state, options, impact, reversibility, cost/rework, recommendation, confidence, exact permitted next actions''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §52.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-L2-PACKAGE-UNENFORCED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L2-decision-package.py
+  - release/capability-baseline/audit-0/delta-r/evidence/L2-decision-package.out (L2.min.1, L2.b4.min, L2.b10.min, L2.b4.answer, L2.b4.answer2,
+    L2.cit.b10, L2.budget.complete FAIL; all ten L2.b*.render PASS)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L2-decision-package.py  # gov
+    gate create --question ''Should we proceed?''; gov gate present; gov decide <g> --option Z'
+  repair_direction: A gate must not be presented without substantive content for every package field and at least one option, its answer must
+    be one of the offered options, and it must state the exact permitted next actions for this gate (Contract v3 lines 662-672).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L3-01
+  capability:
+  - L3
+  bullet_source_lines:
+  - 679
+  severity: HIGH
+  title: 'Human approval is recorded from caller-declared metadata: the default CLI invocation, --role human, GOV_ROLE=human'
+  statement: 'gates::answer records answered_by_kind ''human'' (decision human_approved: true) whenever --by is not a kernel agent id and the
+    acting role is L3+. Both come from the caller: with no --role and no --by an agent is the L4 orchestrator answering ''by human'' (the CLI
+    defaults), and the decision carried a CIT to COMMITTED; `--role human` and `GOV_ROLE=human` do the same. `gov memory select` derives human_approved
+    from the caller''s role level; `gov intent ''approve it''` proposes ''gov cit approve ... --by human''. The product documents this as an adapter
+    boundary (docs/ARCHITECTURE.md §4.8 ''the OS ... does not authenticate who holds the session'') — a documented boundary, but the contract
+    requirement is unmet. L3 <-> E1 (AC-16): the E1 role checks hold (an L1 role cannot answer, L1 cannot revoke, L0 cannot present), but the
+    role being checked is the caller''s own claim.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:679 'Human approval cannot be fabricated by agent/CLI metadata.'; spec/decisions/D-0007.yaml
+    rule (2) '"approved", "human_approved", "authority" ... are facts of T1/T2 only; a T4/T5/T6 field carrying such a name is a request, recorded
+    and ignored' (T5 = CLI --role, --by); spec/architecture/ARCH-0003.yaml §8 'Environment variables, repository files and caller/model/plugin
+    claims cannot manufacture trust or approval.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-16
+  blocking: true
+  blocker_class: BC-L3-HUMAN-APPROVAL-FROM-CALLER-METADATA
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.py
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out (L3.b5.1, L3.b5.2, L3.b5.3, L3.b5.11 FAIL; OBSERVE L3.b5.1x
+    COMMITTED; L3.b5.4-7 PASS)
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-supplement.out (L3s.2 FAIL)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L3-gate-presentation-attacks.py  #
+    essential: gov cit propose --trigger governance_change ...; gov gate present HDG-x; gov decide HDG-x --option A   (no --role, no --by) ; gov
+    cit approve CIT-x; gov cit execute CIT-x'
+  repair_direction: A human answer to a Human Decision Gate (and any record asserting human approval) must derive from a source the acting agent
+    cannot supply through CLI arguments, environment, role claims or defaults (Contract v3 line 679; D-0007 rule 2; ARCH-0003 §8).
+  owner_decision_required: true
+  owner_decision_reason: Closing this requires choosing how a human is authenticated to the product — e.g. owner-signed answers reusing the ARCH-0003
+    owner-controlled key mechanism, an OS-account/administrator-domain boundary, or an interactive local confirmation channel. That is a trust-boundary
+    and security/usability choice (and D-0007, not human-approved, currently accepts the caller-declared role as a documented adapter boundary);
+    the accepted sources require the property but do not choose the channel. The requirement itself is not an owner decision.
+- id: A0-L3-02
+  capability:
+  - L3
+  bullet_source_lines:
+  - 675
+  - 679
+  severity: HIGH
+  title: Forged gate/decision records approve and execute a CIT; workers' edits to them are invisible to mutation scope and to the suite
+  statement: 'Writing a gate file as ANSWERED/A/presented with by_kind human plus a matching decision file (never through gov decide) makes `gov
+    cit approve` return human_approved true and `gov cit execute` commit. Flipping presented_in_chat in a file makes a never-surfaced gate answerable.
+    A backend-engineer (L1) worker that hand-writes those records inside its claimed task closes the task DONE: task close excludes spec/decisions/HDG-,
+    CIT- and D- from observed mutations (OS_MANAGED_PREFIXES), so observed_files_changed lists only the product file. `gov audit` reports no finding
+    on the forged approvals.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:675 'Gate in a file only is NOT presented.'; Governance_OS_Capability_Acceptance_Contract_v3.md:679;
+    D-0007 T2 'authoritative project state written by the OS'; ARCH-0003 §8 'Repository gate records remain requests ... repository files ...
+    cannot manufacture trust or approval.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-16
+  blocking: true
+  blocker_class: BC-L3-APPROVAL-RECORD-FORGERY
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out (L3.b1.6, L3.b5.8, L3.b5.9, L3.b5.10 FAIL)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L3-gate-presentation-attacks.py  #
+    sections b1 (record-edit presentation) and b5.8-b5.10'
+  repair_direction: Gate presentation/answer state and approval decisions must be verifiable as written by the product's own gate operations (not
+    by any process with repository write access), worker edits to those records must be observed and refused by mutation-scope enforcement, and
+    the governance suite must detect approval records that no gate operation produced (Contract v3 lines 675, 679; D-0007; ARCH-0003 §8). The
+    mechanism depends on the channel chosen for A0-L3-01 only for the human-answer part; the mutation-scope and detection parts do not.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L3-03
+  capability:
+  - L3
+  bullet_source_lines:
+  - 678
+  severity: HIGH
+  title: 'An approval is not bound to what was approved: changed manifests and larger radii execute under the old answer; answers can be re-bound
+    to another CIT'
+  statement: After the human answered and the CIT was approved, appending an op to its mutation manifest (write into governance/project/) still
+    executes and commits. Answered at R2, a manifest edit plus `gov cit simulate` re-simulates to R5 without a new gate and the old answer approves
+    and executes. Editing an answered gate's cit field (and nothing else) lets CIT-1's answer approve and execute CIT-2 (the decision's own cit
+    field is not checked). Gates never expire.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:678 'Declined/revoked/stale/other-CIT gates cannot authorise execution.';
+    DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §47.2 'decision finalised -> mutation manifest -> ...'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-L3-APPROVAL-NOT-CONTENT-BOUND
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out (L3.b4.s2, L3.b4.s3, L3.b4.o2 FAIL; L3.b4.s1, L3.b4.o1
+    PASS)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L3-gate-presentation-attacks.py  #
+    section b4 stale/other-CIT'
+  repair_direction: An approval must bind the exact transaction content and impact the human answered (proposal, manifest, simulated impact) and
+    the specific CIT, and any later change must make the approval stale at approve and at execute (Contract v3 line 678).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L3-04
+  capability:
+  - L3
+  bullet_source_lines:
+  - 678
+  severity: HIGH
+  title: Task-blocking gates authorise work when declined, withdrawn, revoked, missing or still pending
+  statement: 'gates::answer moves every WAITING_HUMAN blocked task to READY whatever option was chosen, so a task whose gate was declined (option
+    B, decision marked declined) becomes runnable. The DAG blocks only on PENDING/PRESENTED gates: after an approving gate is revoked the task
+    stays runnable; a gate withdrawn unanswered lets `gov task replan` make the task READY and it is claimed; a task referencing a non-existent
+    gate is runnable. A task already IN_PROGRESS when a blocking gate is raised is closed DONE while the gate is still PENDING.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:678 'Declined/revoked/stale/other-CIT gates cannot authorise execution.';
+    DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §53 'applies the answer when received; recomputes the DAG'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-L3-TASK-GATE-UNBLOCK
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out (L3.b4.t2, L3.b4.t3, L3.b4.t4, L3.b4.t5 FAIL; L3.b4.t1
+    PASS)
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-supplement.out (L3s.1 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L3-gate-presentation-attacks.py
+    && python3 L3-supplement.py
+  repair_direction: Work blocked by a Human Decision Gate must become runnable only on an answer that authorises it, must return to blocked when
+    that authorisation is revoked or withdrawn, must not be completed while the gate is unanswered, and a reference to a missing gate must block
+    (Contract v3 line 678).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-L3-05
+  capability:
+  - L3
+  bullet_source_lines:
+  - 676
+  severity: MEDIUM
+  title: 'Presentation is self-attested: any L1 caller, --json rendering and gov continue mark a gate ''presented in chat'''
+  statement: gates::present sets presented_in_chat true for any L1+ role whenever it renders the package to the caller's stdout, including `gov
+    --json gate present` (package only inside a machine envelope) and as a side effect of `gov --json continue`. The record carries only the caller's
+    session/role; there is no human-side receipt. Generated adapters merely instruct the agent to present gates in chat.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:676 'It must surface in active human interface.'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §52 'A Human Decision Gate that exists only in a file is not considered presented. The orchestrator must surface it in the active human interface.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-L3-PRESENTATION-SELF-ATTESTED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out (L3.b2.2, L3.b2.3, L3.b2.5 FAIL; OBSERVE L3.b2.4b)
+  - release/capability-baseline/audit-0/delta-r/evidence/L3-supplement.out (OBSERVE L3s.3)
+  reproduction: 'cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 L3-gate-presentation-attacks.py  #
+    section b2'
+  repair_direction: A gate must be recorded as presented only when it has demonstrably reached the active human interface, not merely because
+    an agent process rendered it (Contract v3 line 676; framework §52).
+  owner_decision_required: true
+  owner_decision_reason: Evidence that a package reached a human depends on the same human channel chosen for A0-L3-01 (e.g. an acknowledgement
+    over that channel); the accepted sources do not choose it.
+- id: A0-M1-01
+  capability:
+  - M1
+  bullet_source_lines:
+  - 690
+  severity: MEDIUM
+  title: There is no deterministic/no-LLM route
+  statement: No kernel role/task-class combination resolves to T0 (every agent role's minimum_tier is >= T1; no task class maps to T0); when T0
+    is forced through the overlay for the human role, the router still selects an LLM (a-strong).
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:690 ''deterministic/no-LLM route''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §55 ''T0 — deterministic/no LLM: SQL, graph, AST, parsing, validation, tests, generation.'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-M1-NO-T0-ROUTE
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/M1-M3-routing.py
+  - release/capability-baseline/audit-0/delta-r/evidence/M1-M3-routing.out (M1.b1.1, M1.b1.2 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 M1-M3-routing.py
+  repair_direction: 'Routing must be able to resolve deterministic work to a no-LLM route and, when it does, must not select a model (Contract
+    v3 line 690). Non-blocking: cost/efficiency only (argued in capability-audit.yaml M1).'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-M1-02
+  capability:
+  - M1
+  - M2
+  - M3
+  bullet_source_lines:
+  - 693
+  - 696
+  - 699
+  severity: MEDIUM
+  title: The project routing overlay silently lowers kernel tier floors and reasoning minimums, bypassing POLICY_PRECEDENCE
+  statement: 'MODEL_ROUTING_OVERRIDES.task_class_overrides is returned verbatim by routing::tier_for_class: security: T1 routes security work
+    to T1 and security tasks are created with minimum_model_tier T1, although the same weakening through PROJECT_POLICY.policy_overrides is refused
+    as a floor violation. role_overrides.default_reasoning replaces the reasoning level outright: a task declaring extra_high is routed at low,
+    and the orchestrator''s default becomes low. Nothing is refused or reported (gov policy overrides, audit).'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:693, 696, 699; Governance_OS_Capability_Acceptance_Contract_v3.md:134
+    (A1) ''Security and authority floors cannot be weakened by lower-precedence policy''; framework/policies/POLICY_PRECEDENCE.yaml ''MODEL_ROUTING_POLICY.task_class_minimum_tier.*:
+    floor''; D-0007 rule (3) ''A T4 layer may specialise or strengthen a higher layer, never weaken it''.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: BC-M-ROUTING-OVERLAY-BYPASSES-PRECEDENCE
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/M1-M3-routing.out (M1.floor.1, M2.b1.4, M3.b1.floor FAIL; M1.floor.2 PASS; OBSERVE M1.floor.3)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 M1-M3-routing.py
+  repair_direction: 'Every project-level routing input (including MODEL_ROUTING_OVERRIDES) must be subject to the same precedence rules as policy
+    overrides: kernel tier floors and declared reasoning minimums may be raised, never lowered, and a refused weakening must be reported (Contract
+    v3 lines 693-699, 134).'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-M2-01
+  capability:
+  - M2
+  bullet_source_lines:
+  - 696
+  severity: LOW
+  title: Recorded routing evidence is not checked against the task's declared minimum
+  statement: '`gov route --record` accepts a run of an extra_high task on a low-reasoning T1 model with no refusal or flag.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:696 'minimum can be declared/enforced'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-M2-NO-EXECUTION-CHECK
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/M1-M3-routing.out (M2.b1.5 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 M1-M3-routing.py
+  repair_direction: 'A run below the declared tier/reasoning minimum must be detectable from recorded evidence (Contract v3 line 696). Non-blocking:
+    selection-time enforcement exists.'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-M4-01
+  capability:
+  - M4
+  bullet_source_lines:
+  - 706
+  - 710
+  - 711
+  severity: MEDIUM
+  title: Telemetry cannot compare reasoning effort or reviewer findings, and normal work does not feed the comparison
+  statement: 'Family-duty result: gov route --report (and the model_routing block of gov telemetry summary) groups by provider|model|task_class
+    and aggregates pass, cost, latency and repairs only; two runs of one model at low vs extra_high reasoning are merged (pass_rate 0.5) and reviewer_findings
+    (0 vs 7) is invisible, though both are required at record time. A closed task''s report (model, cost, repair_count) never reaches routing
+    evidence.'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:702-711 ''Telemetry can compare: model/provider, task class, reasoning
+    effort, cost, latency, pass/fail, repair count, reviewer findings''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §58.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-M4-DIMENSIONS-NOT-COMPARABLE
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/M4-empirical-routing.py
+  - release/capability-baseline/audit-0/delta-r/evidence/M4-empirical-routing.out (M4.b3, M4.b8, M4.b8.telemetry, M4.flow FAIL; M4.b1, b2, b4-b7
+    PASS)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 M4-empirical-routing.py
+  repair_direction: 'The product''s telemetry must support comparison across all eight dimensions from recorded data, including reasoning effort
+    and reviewer findings (Contract v3 lines 702-711). Non-blocking: argued CANNOT_UNDERMINE in capability-audit.yaml M4.'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-M4-02
+  capability:
+  - M4
+  bullet_source_lines:
+  - 707
+  - 708
+  - 709
+  - 710
+  severity: LOW
+  title: Routing evidence is untyped and the policy's own field names are silently mis-aggregated
+  statement: Non-numeric cost/latency/repair_count ('expensive', 'slow', 'many') are accepted; a run recorded with the MODEL_ROUTING_POLICY names
+    latency and pass_fail is accepted (alias check) but reported as 0 ms latency and pass_rate 0.0.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:707-710; framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence [..,
+    latency, pass_fail, ..].
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-M4-EVIDENCE-INTEGRITY
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/M4-empirical-routing.out (M4.rec.3, M4.alias.2 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 M4-empirical-routing.py
+  repair_direction: Recorded routing evidence must be validated for type and aggregated under the same field names the policy requires (Contract
+    v3 lines 707-710).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-N1-01
+  capability:
+  - N1
+  bullet_source_lines:
+  - 722
+  - 724
+  severity: LOW
+  title: Checkpoints cannot record open questions and record changed files coarsely
+  statement: '`gov checkpoint create` has no way to supply open_questions (always []); files_changed comes from `git status --porcelain`, so a
+    new file in an untracked directory is recorded as ''product/'' and OS-written gate/CIT/task records are mixed in.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:722 'pending decisions/questions'; Governance_OS_Capability_Acceptance_Contract_v3.md:724
+    'files changed'; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §59.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: BC-N1-FIELD-FIDELITY
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/N1-N2-checkpoints.out (N1.b4b, N1.b6 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 N1-N2-checkpoints.py
+  repair_direction: 'A checkpoint must be able to record open questions and the exact files changed (Contract v3 lines 722, 724). Non-blocking:
+    argued CANNOT_UNDERMINE in capability-audit.yaml N1.'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-N2-01
+  capability:
+  - N2
+  bullet_source_lines:
+  - 730
+  - 731
+  - 733
+  - 735
+  - 736
+  - 737
+  severity: HIGH
+  title: Half the mandatory checkpoint triggers never fire
+  statement: 'Automatic: accepted CIT, before handoff, task close, migration batches. Never: other task transitions (status change, claim), material
+    decision (answered R3 gate), significant mutation in normal work (30 new indexed files), model/provider switch (the provider map changes and
+    routing selects the new model with no checkpoint; the before_model_switch label is used by framework update instead), session close (no operation
+    exists), known compaction (no hook; generated adapters only list the trigger).'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:729-737 ''Mandatory triggers: task transition, material decision, accepted
+    CIT, significant mutation, before handoff, before model/provider switch, before session close, before known compaction''; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md
+    §60 ''A provider adapter should use native pre-compaction hooks where available.'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-16
+  blocking: true
+  blocker_class: BC-N2-TRIGGERS-NOT-WIRED
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/N1-N2-checkpoints.py
+  - release/capability-baseline/audit-0/delta-r/evidence/N1-N2-checkpoints.out (N2.b1.other, N2.b2, N2.b4, N2.b6, N2.b7, N2.b8 FAIL; N2.b1.close,
+    N2.b3, N2.b5, N2.b8.manual PASS)
+  - release/capability-baseline/audit-0/delta-r/evidence/N2-significant-mutation-adopt.out (N2.b4.adopt PASS)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 N1-N2-checkpoints.py && python3
+    N2-significant-mutation-adopt.py
+  repair_direction: 'Each mandatory trigger must produce a checkpoint without relying on the agent remembering to: product operations for decisions,
+    transitions and significant mutations, and generated provider hooks or an equivalent product-observed boundary for model/provider switch,
+    session close and known compaction (Contract v3 lines 729-737; framework §60).'
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-N3-01
+  capability:
+  - N3
+  bullet_source_lines:
+  - 740
+  - 741
+  - 742
+  severity: HIGH
+  title: No checkpoint staleness, no freshness policy for handoff/session close, and a watchdog that counts nothing (N <-> W9)
+  statement: 'Family-duty result: nothing marks a checkpoint stale — after the requirement a task checkpoint relied on is changed by a committed
+    CIT and a new gate is raised, the checkpoint, gov status and gov doctor show no staleness. There is no checkpoint-freshness policy: a handoff
+    after that change succeeds and its before_handoff checkpoint records the stored, pre-change context-packet hash (the current hash differs);
+    no session-close operation exists. `gov checkpoint watchdog` compares caller-supplied counters (default 0) with policy thresholds — after
+    40 mutating commands it does not fire.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:739-742 'Does not depend solely on proprietary hooks. Can mark checkpoint
+    stale when material state changed. Handoff/session close can be blocked or degraded when checkpoint freshness violates policy.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1156,
+    1160 (W9) 'Checkpoint records input IDs/versions/hashes ... Handoff with stale/missing required-input state is blocked or explicitly degraded.';
+    frozen gate contract AC-16 'N <-> W9'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-16
+  blocking: true
+  blocker_class: BC-N3-CHECKPOINT-STALENESS-ABSENT
+  new_vs_residual: BASELINE
+  evidence:
+  - release/capability-baseline/audit-0/delta-r/evidence/N3-N4-W9-watchdog-handoff.py
+  - release/capability-baseline/audit-0/delta-r/evidence/N3-N4-W9-watchdog-handoff.out (N3.b1.5, N3.b2.1, N3.b2.2, N3.b3.1, N3.b3.2, N3.b3.3 FAIL;
+    N3.b1.1-4, N3.b1.6 PASS)
+  - release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.out (K2.w6.2 FAIL)
+  reproduction: cd release/capability-baseline/audit-0/delta-r/evidence && PROBE_SCRATCH=<scratch dir> python3 N3-N4-W9-watchdog-handoff.py
+  repair_direction: Checkpoints must become stale when the material state they captured changes; handoff and session close must be blocked or
+    explicitly degraded when checkpoint freshness violates a stated policy (including a stale required-input/context hash); the watchdog must
+    observe execution boundaries itself rather than trust caller-supplied counters (Contract v3 lines 739-742, 1156-1160).
+  owner_decision_required: false
+  owner_decision_reason: null

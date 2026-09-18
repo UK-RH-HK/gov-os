@@ -1,0 +1,490 @@
+# Run report written by the agent itself (P2-AR-0011). Facts, evidence and verdict only.
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0011
+role: capability-family-auditor
+objective: Iteration-0 exhaustive re-audit of family delta (J1-J2, K1-K4, L1-L4, M1-M4, N1-N4) on cap2-candidate-0 under P2-HO-0009 / P2-HO-0004
+agent_model: claude-opus-5
+independence_statement: Fresh run on model claude-opus-5 (model id claude-opus-5[1m], 1M context). Authored nothing in the Governance OS implementation,
+  tests, Phase-1 reviews/repairs/verifications or earlier Phase-2 work. Did not read release/capability-baseline/audit-0/delta/, AGENT_RUNS/P2-AR-0004.*,
+  any other family's evidence, session/agent transcripts, task-output stores (the one background build's output was never read; test output was
+  redirected into this evidence directory) or user auto-memory. No sub-agents. No product-source modification; wrote only release/capability-baseline/audit-0/delta-r/
+  and this report. Builder tests were run as regression evidence only; every bullet status rests on probes this run wrote and executed.
+input:
+  base_commit: 7eddf9103311a8e2ad144bcf61788f16b460782c
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: 'release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md (scope: release/orchestration/phase-2/HANDOFFS/P2-HO-0004-audit-0-delta.md;
+    protocol: P2-HO-0000-audit-0-common-protocol.md)'
+inspected:
+- Governance_OS_Capability_Acceptance_Contract_v3.md (full)
+- release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+- release/orchestration/phase-2/AGENT_RUNS/README.md
+- release/orchestration/phase-2/HANDOFFS/P2-HO-0000, P2-HO-0004, P2-HO-0009
+- DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Parts XII-XVI (§45-61)
+- spec/decisions/CIT-0001.yaml, D-0007.yaml; spec/architecture/ARCH-0003.yaml §7-11; spec/research/RES-0001.yaml; docs/ARCHITECTURE.md §4.8, §5
+- cli/src/main.rs
+- runtime/src/cit/mod.rs
+- runtime/src/orchestration/{gates,tasks,dag,handoffs,control,intents,claims}.rs
+- runtime/src/{routing,checkpoints,observability,records,status,authority,project,context/mod}.rs
+- runtime/src/graph/mod.rs
+- runtime/src/memory/benchmark.rs
+- runtime/src/verification/mod.rs
+- runtime/src/doctor.rs (D014, D019, D021)
+- runtime/src/retrieval/mod.rs (route classification)
+- runtime/src/adopt.rs (batch checkpoints)
+- runtime/src/recovery.rs
+- runtime/src/tools.rs (registry)
+- framework/policies/{HUMAN_GATE,CHANGE,MODEL_ROUTING,CHECKPOINT,AUTHORITY,TEST,POLICY_PRECEDENCE,ENFORCEMENT_MAP}.yaml
+- framework/roles/ROLES.yaml
+- framework/schemas/{research,experiment,checkpoint,handoff,worker-return,human-gate,cit,decision,report,task}.schema.json
+- framework/adapters/*
+- framework/contracts/governance-capability-acceptance.yaml, contract-source.lock; tests/governance/capability-evidence-map.yaml; docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+- tests/certification/*.rs (test names and the brownfield fixture preparation)
+- fixtures/brownfield/project
+produced:
+- release/capability-baseline/audit-0/delta-r/00-AUDIT-REPORT.md
+- release/capability-baseline/audit-0/delta-r/capability-audit.yaml
+- release/capability-baseline/audit-0/delta-r/findings.yaml
+- release/capability-baseline/audit-0/delta-r/evidence/ (17 probe sources + outputs, harness.py, RUN-ALL.sh, PINNED-INPUTS.out, REG-*.out)
+- release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.report.yaml
+tests_or_attacks:
+- id: REG-LIB
+  description: cargo test --lib on the candidate (regression evidence only)
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/REG-cargo-test-lib.out
+- id: REG-CERT
+  description: cargo test --test certification on the candidate (79 tests; regression evidence only)
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/REG-cargo-test-certification.out
+- id: PIN-1
+  description: 'pinned inputs: product_code_digest, Contract v3 sha256, frozen gate contract sha256, contract verify'
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/PINNED-INPUTS.out
+- id: DV-1
+  description: derived views reconcile headings/titles/lines for 18 capabilities against the owner source
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/DERIVED-VIEWS-JKLMN.out
+- id: DV-2
+  description: compiled contract form carries the 93 family-delta bullets / required fields; evidence map names an owner
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/DERIVED-VIEWS-JKLMN.out
+- id: ATK-L3-FILE-ONLY
+  description: decide/approve a gate that exists only in a file
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FILE-FLAG
+  description: flip presented_in_chat by record edit, then answer
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-JSON-PRESENT
+  description: mark a gate presented via --json present / --json continue with no human-facing output
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-PRESENTED-NOT-ANSWERED
+  description: approve/execute a CIT whose gate is presented but unanswered
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-DECLINED-CIT
+  description: execute a CIT whose gate was declined (incl. hand-reset CIT status)
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-REVOKED-CIT
+  description: approve/execute a CIT whose gate or decision was revoked (incl. hand-restored APPROVED)
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-STALE-REANSWER
+  description: execute after the gate was re-answered
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-STALE-CONTENT
+  description: edit the CIT manifest after the answer/approval, or re-simulate to a larger radius, then execute
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-OTHER-CIT-POINTER
+  description: point CIT-2 at CIT-1's answered gate
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-OTHER-CIT-REBIND
+  description: re-bind CIT-1's answered gate to CIT-2 by editing gate.cit, then execute CIT-2
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-TASK-GATES
+  description: run a task whose gate was declined / revoked / withdrawn / missing / still pending
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-DEFAULTS
+  description: record a human approval with no --role and no --by (CLI defaults) and execute
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-ROLE
+  description: record a human approval with --role human
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-ENV-ROLE
+  description: record a human approval with GOV_ROLE=human
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-ENV-APPROVED
+  description: create approval with GOV_HUMAN_GATE_APPROVED=1
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-LOW-ROLE
+  description: record a human answer as an L1 role / as an agent on an R5 gate / upgrade an agent answer with --method human
+  result: REFUTED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-RECORDS
+  description: forge gate + decision files, approve and execute; hide the forgery inside a worker task; audit
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: ATK-L3-FAB-MEMORY-SELECT
+  description: record human_approved via gov memory select --role human
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out
+- id: L2-PACKAGE
+  description: decision package fields rendered / enforced; answers validated against options
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L2-decision-package.out
+- id: L1-RESOLUTION
+  description: precedence first; agent resolution bounds; escalation; rationale
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L1-contradiction-resolution.out
+- id: L4-NONGLOBAL
+  description: independent branches continue; global stop only on policy/all-blocked/PAUSE
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/L4-non-global-blocking.out
+- id: K1-CITP
+  description: deterministic traversal, candidates, radius, consequences
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/K1-cit-p.out
+- id: K2-CITE
+  description: CIT-E decision, manifest, updates, propagation, views, index, verification, atomicity incl. SIGKILL recovery
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.out
+- id: K2-W6
+  description: 'K2 <-> W6: completed work, reports, context packets and checkpoints invalidated by an upstream CIT'
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/K2-cit-e.out
+- id: ATK-K3-MISLABEL
+  description: execute material changes of all eight classes under trigger 'editorial' without a human gate
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/K3-auto-impact-simulation.out
+- id: ATK-K3-OUTSIDE-CIT
+  description: complete material changes inside ordinary tasks without CIT-P
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/K3-auto-impact-simulation.out
+- id: K4-RADIUS
+  description: radius effects on traversal/semantic breadth/tests/tier/agents/approval/rollback
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/K4-impact-radius.out
+- id: J1-RESEARCH
+  description: research outputs record the J1 fields; incomplete research refused/flagged; influences recorded
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.out
+- id: J2-EXPERIMENT
+  description: experiment lifecycle fields and production-merge prohibition
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.out
+- id: M1-M3-ROUTING
+  description: T0-T3 routes, reasoning minimum, role defaults, provider mapping
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/M1-M3-routing.out
+- id: ATK-M-OVERLAY-WEAKEN
+  description: lower tier floors / reasoning minimums through MODEL_ROUTING_OVERRIDES
+  result: CONFIRMED
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/M1-M3-routing.out
+- id: M4-EIGHT-DIMS
+  description: compare the eight M4 dimensions from recorded data
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/M4-empirical-routing.out
+- id: N1-CHECKPOINT
+  description: structured checkpoint fields and fresh-agent reconstruction
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/N1-N2-checkpoints.out
+- id: N2-TRIGGERS
+  description: each mandatory trigger produces a checkpoint
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/N1-N2-checkpoints.out
+- id: N2-ADOPT
+  description: significant_mutation checkpoints before migration batches (brownfield fixture)
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/N2-significant-mutation-adopt.out
+- id: N3-WATCHDOG
+  description: watchdog independence, checkpoint staleness, handoff/session-close blocking (N <-> W9)
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/N3-N4-W9-watchdog-handoff.out
+- id: N4-RETURN
+  description: structured worker return survives the worker process, rebuild and a different session
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/N3-N4-W9-watchdog-handoff.out
+- id: FRESH-1
+  description: input changes invalidate prior green evidence (policy, provider map, gate records; task-close blocking)
+  result: PASS
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/FRESH-invalidation.out
+- id: FRESH-2
+  description: research/experiment/task/checkpoint/handoff record changes and an implementation change invalidate green evidence
+  result: FAIL
+  evidence_path: release/capability-baseline/audit-0/delta-r/evidence/FRESH-invalidation.out
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 3
+  PARTIAL: 14
+  ABSENT: 1
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+findings:
+- id: A0-J1-01
+  severity: MEDIUM
+  capability: J1
+  blocking: true
+  blocker_class: BC-J1-RESEARCH-COMPLETENESS-UNENFORCED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Research outputs are not required to record the J1 fields; influences are never recorded
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-J1-01
+- id: A0-J1-02
+  severity: MEDIUM
+  capability: J1-N4 (all 18, family-wide)
+  blocking: true
+  blocker_class: BC-CONTRACT-DERIVED-VIEW-OMISSION
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Derived contract views omit every family-delta checklist bullet and map no evidence owner
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-J1-02
+- id: A0-J1-03
+  severity: MEDIUM
+  capability: J1-N4 (all 18, family-wide)
+  blocking: true
+  blocker_class: BC-EVIDENCE-CURRENCY-SCOPE
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Green governance evidence is not invalidated by implementation changes or by the record classes family delta depends on, and no suite
+    family re-checks J-N behaviour
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-J1-03
+- id: A0-J2-01
+  severity: HIGH
+  capability: J2
+  blocking: true
+  blocker_class: BC-J2-EXPERIMENT-LIFECYCLE-ABSENT
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Experiment lifecycle is absent; the production-merge prohibition is a flag nothing enforces
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-J2-01
+- id: A0-K2-01
+  severity: HIGH
+  capability: K2
+  blocking: true
+  blocker_class: BC-K2-PROPAGATION-SKIPS-COMPLETED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'CIT-E propagation stops at open work: completed tasks, their evidence, context packets and checkpoints stay valid (K2 <-> W6)'
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-K2-01
+- id: A0-K2-02
+  severity: LOW
+  capability: K2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: A failed CIT-E rolls back authoritative state but leaves derived views regenerated from the rolled-back state
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-K2-02
+- id: A0-K2-03
+  severity: LOW
+  capability: K2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: CIT-E verification attributes pre-existing, not-yet-indexed graph damage to the transaction
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-K2-03
+- id: A0-K3-01
+  severity: HIGH
+  capability: K3
+  blocking: true
+  blocker_class: BC-K3-MATERIALITY-SELF-DECLARED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'Materiality is the proposer''s label: material changes labelled ''editorial'' auto-approve at R0, and material changes made in ordinary
+    tasks never reach CIT-P'
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-K3-01
+- id: A0-K4-01
+  severity: MEDIUM
+  capability: K4
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Impact radius does not affect model tier, number of specialist agents or the rollback plan
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-K4-01
+- id: A0-L1-01
+  severity: MEDIUM
+  capability: L1, L2
+  blocking: true
+  blocker_class: BC-L1-AGENT-RESOLUTION-FAIL-OPEN
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Agent resolution fails open on unassessed reversibility and is judged on creator-declared values
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L1-01
+- id: A0-L1-02
+  severity: LOW
+  capability: L1
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Contradiction resolutions need no rationale and have nowhere to record evidence
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L1-02
+- id: A0-L1-03
+  severity: MEDIUM
+  capability: L1
+  blocking: true
+  blocker_class: BC-L1-UNRESOLVED-CONTRADICTION-DELIVERED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Contradictions that precedence cannot resolve are neither detected nor escalated; both sides reach workers as authority
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L1-03
+- id: A0-L2-01
+  severity: MEDIUM
+  capability: L2
+  blocking: true
+  blocker_class: BC-L2-PACKAGE-UNENFORCED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'The decision package is not enforced: fields default, options may be empty, answers are not validated, next actions are placeholders'
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L2-01
+- id: A0-L3-01
+  severity: HIGH
+  capability: L3
+  blocking: true
+  blocker_class: BC-L3-HUMAN-APPROVAL-FROM-CALLER-METADATA
+  new_vs_residual: BASELINE
+  owner_decision_required: true
+  title: 'Human approval is recorded from caller-declared metadata: the default CLI invocation, --role human, GOV_ROLE=human'
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L3-01
+- id: A0-L3-02
+  severity: HIGH
+  capability: L3
+  blocking: true
+  blocker_class: BC-L3-APPROVAL-RECORD-FORGERY
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Forged gate/decision records approve and execute a CIT; workers' edits to them are invisible to mutation scope and to the suite
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L3-02
+- id: A0-L3-03
+  severity: HIGH
+  capability: L3
+  blocking: true
+  blocker_class: BC-L3-APPROVAL-NOT-CONTENT-BOUND
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: 'An approval is not bound to what was approved: changed manifests and larger radii execute under the old answer; answers can be re-bound
+    to another CIT'
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L3-03
+- id: A0-L3-04
+  severity: HIGH
+  capability: L3
+  blocking: true
+  blocker_class: BC-L3-TASK-GATE-UNBLOCK
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Task-blocking gates authorise work when declined, withdrawn, revoked, missing or still pending
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L3-04
+- id: A0-L3-05
+  severity: MEDIUM
+  capability: L3
+  blocking: true
+  blocker_class: BC-L3-PRESENTATION-SELF-ATTESTED
+  new_vs_residual: BASELINE
+  owner_decision_required: true
+  title: 'Presentation is self-attested: any L1 caller, --json rendering and gov continue mark a gate ''presented in chat'''
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-L3-05
+- id: A0-M1-01
+  severity: MEDIUM
+  capability: M1
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: There is no deterministic/no-LLM route
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-M1-01
+- id: A0-M1-02
+  severity: MEDIUM
+  capability: M1, M2, M3
+  blocking: true
+  blocker_class: BC-M-ROUTING-OVERLAY-BYPASSES-PRECEDENCE
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: The project routing overlay silently lowers kernel tier floors and reasoning minimums, bypassing POLICY_PRECEDENCE
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-M1-02
+- id: A0-M2-01
+  severity: LOW
+  capability: M2
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Recorded routing evidence is not checked against the task's declared minimum
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-M2-01
+- id: A0-M4-01
+  severity: MEDIUM
+  capability: M4
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Telemetry cannot compare reasoning effort or reviewer findings, and normal work does not feed the comparison
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-M4-01
+- id: A0-M4-02
+  severity: LOW
+  capability: M4
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Routing evidence is untyped and the policy's own field names are silently mis-aggregated
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-M4-02
+- id: A0-N1-01
+  severity: LOW
+  capability: N1
+  blocking: false
+  blocker_class: null
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Checkpoints cannot record open questions and record changed files coarsely
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-N1-01
+- id: A0-N2-01
+  severity: HIGH
+  capability: N2
+  blocking: true
+  blocker_class: BC-N2-TRIGGERS-NOT-WIRED
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: Half the mandatory checkpoint triggers never fire
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-N2-01
+- id: A0-N3-01
+  severity: HIGH
+  capability: N3
+  blocking: true
+  blocker_class: BC-N3-CHECKPOINT-STALENESS-ABSENT
+  new_vs_residual: BASELINE
+  owner_decision_required: false
+  title: No checkpoint staleness, no freshness policy for handoff/session close, and a watchdog that counts nothing (N <-> W9)
+  path: release/capability-baseline/audit-0/delta-r/findings.yaml#A0-N3-01
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-delta-r
+  commit: aacc9a01750b0cd0ec9730e8dfcd2372c4058a77
+  evidence_path: release/capability-baseline/audit-0/delta-r
+unresolved:
+- 'OWNER DECISION (A0-L3-01, A0-L3-05): choose the channel through which a human''s Human Decision Gate answer (and acknowledgement of presentation)
+  is authenticated to the product; the contract requires that CLI/agent metadata cannot fabricate it, the accepted sources do not choose the mechanism.'
+- Surfacing of a gate in the active human interface cannot be demonstrated in a synthetic repository without a human and a real adapter (alternative
+  route recorded under L3 qualification_coverage.not_challengeable).
+- Session close / provider compaction / live model switch are outside the product; tested only through the product's trigger surfaces and generated
+  adapters.
+- 'Cross-family observations passed to synthesis (not delta findings): I4 BLOCKED tasks handed out as runnable; E3/E1 any role may return any
+  handoff; C7/D2 nested worker return not indexed; C9 duplicate CIT-P candidates.'
+recommended_next_action: 'Synthesis auditor: carry the 17 blocking delta findings (J2 ABSENT; L3, K2, K3, N2, N3 HIGH) into the Phase-2 verdict
+  and route A0-L3-01/-05 to the product owner for the human-channel decision.'
+completed_at: '2026-09-18T21:10:18Z'

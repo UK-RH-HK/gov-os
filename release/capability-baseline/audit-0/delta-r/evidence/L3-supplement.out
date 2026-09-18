@@ -1,0 +1,30 @@
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l3s-1789764864-7201a8/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## a gate raised against a task that is already IN_PROGRESS: can the task still be completed unanswered?
+$ gov --json --session probe-cf165e98 task create --objective 'migrate customer table' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-cf165e98 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-cf165e98 gate create --question 'Is it safe to continue TASK-0001?' --fields '{"blocks_tasks": ["TASK-0001"], "options": [{"id": "A", "description": "continue"}, {"id": "B", "description": "stop"}], "impact_radius": "R4"}'
+  -> ok
+OBSERVE L3s.1a task status after the blocking gate is raised: {"gate_status": "PENDING", "human_gate": "HDG-0001", "task_status": "WAITING_HUMAN"}
+$ gov --json --session probe-cf165e98 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-cf165e98 task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l3s-1789764864-7201a8/rep.json
+  -> ok
+CHECK L3s.1 FAIL a task whose blocking Human Decision Gate is still PENDING (unpresented, unanswered) cannot be closed as DONE
+      detail: {"close": {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}, "gate_status": "PENDING"}
+
+## the natural-language surface
+$ gov --json --session probe-cf165e98 cit propose --proposal 'probe change nl' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l3s-1789764864-7201a8/m-nl.json --trigger governance_change
+  -> ok
+$ gov --json --session probe-cf165e98 intent 'approve it'
+  -> ok
+OBSERVE L3s.2 gov intent 'approve it' — commands the product proposes to the agent: ["gov decide HDG-0001 --option <id>", "gov cit approve CIT-0001 --by human", "gov cit execute CIT-0001", "gov continue"]
+CHECK L3s.2 FAIL the intent router does not propose commands that assert a human identity on the agent's behalf
+      detail: ["gov decide HDG-0001 --option <id>", "gov cit approve CIT-0001 --by human", "gov cit execute CIT-0001", "gov continue"]
+
+## generated adapters: instruction vs mechanism for surfacing gates
+OBSERVE L3s.3 gate-related lines in each generated adapter: {"governance/generated/adapters/api/system-instruction.txt": ["- INV-008: A Human Decision Gate that exists only in a file is not considered presented.", "Human Decision Gates must be presented in chat; continue independent work while they are pending."], "governance/generated/adapters/cli/bootstrap-packet.json": ["\"invariants\": [{\"id\":\"INV-001\",\"name\":\"session-not-source-of-truth\",\"statement\":\"The agent session is not the source of truth. The governed project system is the source of truth.\",\"enforced_by\":[\"context_compiler\",\"checkpoint_policy\"]},{\"id\":\"INV-002\",\"name\":\"no-knowledge-only-in-conversation\",\"statement\":\"No essential project knowledge may exist only inside a conversation.\",\"enforced_by\":[\"task_close\",\"worker_return_contract\"]},{\"id\":\"INV-003\",\"name\":\"authority-precedence\",\"statement\":\"When project information conflicts, deterministic authority precedence applies; semantic retrieval cannot silently make something authoritative.\",\"enforced_by\":[\"retrieval_router\",\"doctor\"]},{\"id\":\"INV-004\",\"name\":\"legacy-has-no-default-authority\",\"statement\":\"Legacy governance material has no default authority over the installed framework.\",\"enforced_by\":[\"adopt\",\"doctor\",\"retrieval_router\"]},{\"id\":\"INV-005\",\"name\":\"model-agnostic\",\"statement\":\"No canonical policy, skill, task or decision may depend permanently on a current model or vendor name.\",\"enforced_by\":[\"schema_validation\",\"adapter_conformance\"]},{\"id\":\"INV-006\",\"name\":\"no-self-modification\",\"statement\":\"An executing agent must not rewrite the rules governing its own execution.\",\"enforced_by\":[\"mutation_scope\",\"kernel_immutability\"]},{\"id\":\"INV-007\",\"name\":\"kernel-immutable\",\"statement\":\"Agents do not customise governance/kernel/ inside a product repository; framework improvements are proposed upstream and released centrally.\",\"enforced_by\":[\"doctor\",\"mutation_scope\"]},{\"id\":\"INV-008
+SUMMARY checks=2 pass=0 fail=2 failed=['L3s.1', 'L3s.2']

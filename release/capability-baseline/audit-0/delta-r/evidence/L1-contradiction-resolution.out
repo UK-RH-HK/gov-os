@@ -1,0 +1,143 @@
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l1-1789763708-3ef6f4/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## setup: a feature governed by an older decision and a newer superseding one that left the older ACTIVE
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0101.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0102.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0103.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0104.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TASK-0101.yaml
+$ gov --json --session probe-402377a0 rebuild-memory
+  -> ok
+
+## b1 deterministic precedence first
+$ gov --json --session probe-402377a0 context compile TASK-0101
+  -> ok
+CHECK L1.b1.1 PASS supersession precedence: only the superseding decision is active authority in the task context packet
+      detail: {"active": ["D-0102", "D-0103", "D-0104"]}
+CHECK L1.b1.2 PASS the superseded-but-ACTIVE decision is flagged UNKNOWN_OR_CONFLICTING, never authority
+      detail: [{"authority_flag": "UNKNOWN_OR_CONFLICTING", "chosen_option": "3", "id": "D-0101", "path": "spec/decisions/D-0101.yaml", "rationale": "initial", "reason": "superseded by a later decision but still marked ACTIVE; resolve via CIT before relying on it", "status": "ACTIVE", "superseded_by": "D-0102", "title": "Retry limit is 3", "type": "decision"}]
+$ gov --json --session probe-402377a0 audit --no-persist
+  -> ERROR [UNHEALTHY] governance suite UNHEALTHY: 0 critical, 2 high
+CHECK L1.b1.3 PASS the governance suite reports the supersession contradiction (schema_invariants, high)
+      detail: [{"family": "schema_invariants", "id": "GF-0002", "message": "D-0101 is superseded by D-0102 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)", "path": "spec/decisions/D-0101.yaml", "severity": "high"}]
+$ gov --json --session probe-402377a0 doctor
+  -> ERROR [UNHEALTHY] doctor: UNHEALTHY (2 failed checks)
+CHECK L1.b1.4 PASS gov doctor D014 reports the authority ambiguity
+      detail: [{"id": "D014", "message": "1 supersession conflict(s), 0 duplicate id(s)", "name": "authority unambiguous (no supersession conflicts / duplicate ids)", "ok": false, "remediation": "resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids", "severity": "high"}]
+OBSERVE L1.b1.5 two ACTIVE decisions with contradictory choices and no supersession link (D-0103 postgres vs D-0104 mysql) as seen by the task context and the suite: {"audit_mentions": [], "context_active": ["D-0102", "D-0103", "D-0104"]}
+$ gov --json --session probe-402377a0 context compile TASK-0101
+  -> ok
+CHECK L1.b1.6 FAIL a contradiction that deterministic precedence cannot resolve (two ACTIVE decisions, no supersession) is detected rather than both being delivered as active authority
+      detail: {"active": ["D-0102", "D-0103", "D-0104"]}
+$ gov --json --session probe-402377a0 policy overrides
+  -> ok
+CHECK L1.b1.7 PASS project overrides that would widen agent resolution / auto-approval are refused by deterministic policy precedence
+      detail: [{"kernel_value": "R1", "key": "agent_resolvable_when.max_radius", "policy": "HUMAN_GATE_POLICY", "reason": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius: \"R4\" would weaken the kernel maximum \"R1\" (POLICY_PRECEDENCE mode 'ceiling', rule HUMAN_GATE_POLICY.agent_resolvable_when.max_radius)", "source": "PROJECT_POLICY.policy_overrides", "value": "R4"}, {"kernel_value": 0.8, "key": "agent_resolvable_when.min_confidence", "policy": "HUMAN_GATE_POLICY", "reason": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence: 0.1 would weaken the kernel minimum 0.8 (POLICY_PRECEDENCE mode 'floor', rule HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence)", "source": "PROJECT_POLICY.policy_overrides", "value": 0.1}, {"kernel_value": "R1", "key": "auto_approve_max_radius", "policy": "CHANGE_POLICY", "reason": "CHANGE_POLICY.auto_approve_max_radius: \"R5\" would weaken the kernel maximum \"R1\" (POLICY_PRECEDENCE mode 'ceiling', rule CHANGE_POLICY.auto_approve_max_radius)", "source": "PROJECT_POLICY.policy_overrides", "value": "R5"}]
+$ gov --json --session probe-402377a0 policy effective HUMAN_GATE_POLICY
+  -> ok
+CHECK L1.b1.8 PASS effective agent_resolvable_when is unchanged (R1 / 0.8)
+      detail: {"max_radius": "R1", "min_confidence": 0.8, "reversible": true}
+$ gov --json --session probe-402377a0 policy overrides
+  -> ok
+OBSERVE L1.b1.9 PROJECT_POLICY restored: []
+
+## b2 agent resolution only when low impact + high confidence + reversible, by an L3+ acting role
+$ gov --json --session probe-402377a0 gate create --question 'Resolve retry-limit contradiction' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R1", "confidence": 0.9, "reversibility": "reversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0001
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0001 --option A --by orchestrator --rationale 'D-0102 supersedes D-0101; load-test evidence RPT-x'
+  -> ok
+CHECK L1.b2.1 PASS an L4 acting role may resolve an R1 / 0.9 / reversible contradiction as an agent
+      detail: {"answered_by_kind": "agent", "cit": null, "decision": "D-0105", "gate": "HDG-0001", "option": "A", "unblocked_tasks": []}
+CHECK L1.b2.2 PASS the agent resolution is recorded as agent (human_approved false)
+      detail: {"approved_by": "orchestrator", "approved_by_kind": "agent", "confidence": 0.9, "human_approved": false}
+$ gov --json --session probe-402377a0 gate create --question 'Contradiction R2' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R2", "confidence": 0.95, "reversibility": "reversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0002
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0002 --option A --by orchestrator --rationale agent
+  -> ERROR [AUTHORITY_DENIED] agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0002: agent_resolvable_when requires radius <= R1 (gate R2), confidence >= 0.8 (gate 0.95), reversible (true) and an L3+ acting role
+CHECK L1.b2.neg.R2 PASS agent resolution refused for R2
+      detail: {"code": "AUTHORITY_DENIED", "details": {"level": "L4", "operation": "answer_gate_as_agent", "role": "orchestrator"}, "message": "agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0002: agent_resolvable_when requires radius <= R1 (gate R2), confidence >= 0.8 (gate 0.95), reversible (true) and an L3+ acting role"}
+$ gov --json --session probe-402377a0 gate create --question 'Contradiction conf0.7' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R0", "confidence": 0.7, "reversibility": "reversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0003
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0003 --option A --by orchestrator --rationale agent
+  -> ERROR [AUTHORITY_DENIED] agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0003: agent_resolvable_when requires radius <= R1 (gate R0), confidence >= 0.8 (gate 0.7), reversible (true) and an L3+ acting role
+CHECK L1.b2.neg.conf0.7 PASS agent resolution refused for conf0.7
+      detail: {"code": "AUTHORITY_DENIED", "details": {"level": "L4", "operation": "answer_gate_as_agent", "role": "orchestrator"}, "message": "agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0003: agent_resolvable_when requires radius <= R1 (gate R0), confidence >= 0.8 (gate 0.7), reversible (true) and an L3+ acting role"}
+$ gov --json --session probe-402377a0 gate create --question 'Contradiction irreversible' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R0", "confidence": 0.95, "reversibility": "irreversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0004
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0004 --option A --by orchestrator --rationale agent
+  -> ERROR [AUTHORITY_DENIED] agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0004: agent_resolvable_when requires radius <= R1 (gate R0), confidence >= 0.8 (gate 0.95), reversible (false) and an L3+ acting role
+CHECK L1.b2.neg.irreversible PASS agent resolution refused for irreversible
+      detail: {"code": "AUTHORITY_DENIED", "details": {"level": "L4", "operation": "answer_gate_as_agent", "role": "orchestrator"}, "message": "agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0004: agent_resolvable_when requires radius <= R1 (gate R0), confidence >= 0.8 (gate 0.95), reversible (false) and an L3+ acting role"}
+$ gov --json --session probe-402377a0 gate create --question 'Contradiction no-reversibility' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R0", "confidence": 0.95}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0005
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0005 --option A --by orchestrator --rationale agent
+  -> ok
+CHECK L1.b2.neg.no-reversibility FAIL agent resolution refused for no-reversibility
+$ gov --json --session probe-402377a0 gate create --question 'Contradiction low acting role' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R0", "confidence": 0.95, "reversibility": "reversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0006
+  -> ok
+$ gov --json --session probe-402377a0 --role architecture-agent decide HDG-0006 --option A --by orchestrator
+  -> ERROR [AUTHORITY_DENIED] agent 'orchestrator' (acting role architecture-agent L2) may not answer HDG-0006: agent_resolvable_when requires radius <= R1 (gate R0), confidence >= 0.8 (gate 0.95), reversible (true) and an L3+ acting role
+CHECK L1.b2.neg.L2role PASS agent resolution by an L2 acting role is refused (requires L3+)
+      detail: {"code": "AUTHORITY_DENIED", "details": {"level": "L2", "operation": "answer_gate_as_agent", "role": "architecture-agent"}, "message": "agent 'orchestrator' (acting role architecture-agent L2) may not answer HDG-0006: agent_resolvable_when requires radius <= R1 (gate R0), confidence >= 0.8 (gate 0.95), reversible (true) and an L3+ acting role"}
+$ gov --json --session probe-402377a0 gate create --question 'Self-assessed contradiction' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R0", "confidence": 0.99, "reversibility": "reversible", "why_now": "agent-created"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0007
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0007 --option A --by orchestrator
+  -> ok
+OBSERVE L1.b2.self the same acting agent can raise a gate declaring R0 / 0.99 / reversible and then resolve it itself (thresholds are applied to creator-declared values): {"answered_by_kind": "agent", "cit": null, "decision": "D-0107", "gate": "HDG-0007", "option": "A", "unblocked_tasks": []}
+
+## b3 human escalation for consequential uncertainty
+$ gov --json --session probe-402377a0 cit propose --proposal 'probe change l1b3' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l1-1789763708-3ef6f4/m-l1b3.json --trigger architecture_change --targets D-0101
+  -> ok
+CHECK L1.b3.1 PASS resolving an architecture-level contradiction through change control raises a Human Decision Gate
+      detail: {"gate": "HDG-0008", "radius": "R3"}
+$ gov --json --session probe-402377a0 gate present HDG-0008
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0008 --option A --by orchestrator
+  -> ERROR [AUTHORITY_DENIED] agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0008: agent_resolvable_when requires radius <= R1 (gate R3), confidence >= 0.8 (gate 0.7), reversible (true) and an L3+ acting role
+CHECK L1.b3.2 PASS an agent cannot answer that consequential gate itself
+      detail: {"code": "AUTHORITY_DENIED", "details": {"level": "L4", "operation": "answer_gate_as_agent", "role": "orchestrator"}, "message": "agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0008: agent_resolvable_when requires radius <= R1 (gate R3), confidence >= 0.8 (gate 0.7), reversible (true) and an L3+ acting role"}
+$ gov --json --session probe-402377a0 gate create --question 'Low-confidence critical-path contradiction' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R1", "confidence": 0.3, "reversibility": "reversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0009
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0009 --option A --by orchestrator
+  -> ERROR [AUTHORITY_DENIED] agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0009: agent_resolvable_when requires radius <= R1 (gate R1), confidence >= 0.8 (gate 0.3), reversible (true) and an L3+ acting role
+CHECK L1.b3.3 PASS low confidence forces human resolution
+      detail: {"code": "AUTHORITY_DENIED", "details": {"level": "L4", "operation": "answer_gate_as_agent", "role": "orchestrator"}, "message": "agent 'orchestrator' (acting role orchestrator L4) may not answer HDG-0009: agent_resolvable_when requires radius <= R1 (gate R1), confidence >= 0.8 (gate 0.3), reversible (true) and an L3+ acting role"}
+
+## b4 rationale/evidence recorded
+$ gov --json --session probe-402377a0 gate create --question 'Contradiction resolved without rationale' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R1", "confidence": 0.9, "reversibility": "reversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0010
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0010 --option A --by orchestrator
+  -> ok
+CHECK L1.b4.1 FAIL an agent resolution without a rationale is refused (framework §50: 'agent resolves + records rationale')
+      detail: {"decide_ok": true, "decision.rationale": ""}
+$ gov --json --session probe-402377a0 gate create --question 'Human answer without rationale' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R3", "confidence": 0.5, "reversibility": "irreversible"}'
+  -> ok
+$ gov --json --session probe-402377a0 gate present HDG-0011
+  -> ok
+$ gov --json --session probe-402377a0 decide HDG-0011 --option B
+  -> ok
+OBSERVE L1.b4.2 a relayed human answer without rationale: {"decide_ok": true, "decision.rationale": ""}
+OBSERVE L1.b4.3 decision record written by the agent resolution in b2.1 (rationale + provenance fields): {"approved_by": "orchestrator", "approved_by_kind": "agent", "chosen_option": "A", "derived_from": ["HDG-0001"], "options": [{"description": "keep 5", "id": "A"}, {"description": "revert to 3", "id": "B"}], "question": "Resolve retry-limit contradiction", "rationale": "D-0102 supersedes D-0101; load-test evidence RPT-x"}
+CHECK L1.b4.4 FAIL the resolution record has a place for the evidence it relied on (not only free-text rationale)
+      detail: {"keys": ["approved_at", "approved_by", "approved_by_kind", "chosen_option", "confidence", "created", "derived_from", "human_approved", "id", "impact_radius", "options", "question", "rationale", "reversibility", "state_class", "status", "title", "type"]}
+SUMMARY checks=19 pass=15 fail=4 failed=['L1.b1.6', 'L1.b2.neg.no-reversibility', 'L1.b4.1', 'L1.b4.4']

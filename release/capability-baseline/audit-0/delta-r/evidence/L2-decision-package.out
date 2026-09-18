@@ -1,0 +1,172 @@
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l2-1789763624-3fbfa9/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## a complete package supplied by the creator is carried into the rendered chat text
+$ gov --json --session probe-4b1cde5d gate create --question 'Which payment vendor should we integrate?' --fields '{"why_now": "vendor contract renews Friday", "current_state": "two vendors shortlisted, none selected", "options": [{"id": "A", "description": "choose vendor X", "impact": "lock-in 1y"}, {"id": "B", "description": "choose vendor Y"}], "impact": "all integration tasks re-planned", "reversibility": "reversible within 30 days", "cost_rework": "2 tasks rework", "recommendation": "A", "confidence": 0.65, "permitted_next_actions": ["gov decide HDG-0001 --option A", "gov decide HDG-0001 --option B"], "impact_radius": "R3"}'
+  -> ok
+$ gov --session probe-4b1cde5d gate present HDG-0001
+---- rendered package (text mode) ----
+HUMAN DECISION GATE HDG-0001
+Question: Which payment vendor should we integrate?
+Why now: vendor contract renews Friday
+Current state: two vendors shortlisted, none selected
+Options:
+  [A] choose vendor X (impact: lock-in 1y)
+  [B] choose vendor Y 
+Impact: all integration tasks re-planned
+Reversibility: reversible within 30 days
+Cost/rework: 2 tasks rework
+Recommendation: A
+Confidence: 0.65
+Permitted next actions: ["gov decide HDG-0001 --option A","gov decide HDG-0001 --option B"]
+
+gate:
+  id: HDG-0001
+  type: human-gate
+  title: Which payment vendor should we integrate?
+  status: ACTIVE
+  created: 2026-09-18
+  why_now: vendor contract renews Friday
+  current_state: two vendors shortlisted, none selected
+  options:
+  - id: A
+    description: choose vendor X
+    impact: lock-in 1y
+  - id: B
+    description: choose vendor Y
+  impact: all integration tasks re-planned
+  reversibility: reversible within 30 days
+  cost_rework: 2 tasks rework
+  recommendation: A
+  confidence: 0.65
+  permitted_next_actions:
+  - gov decide HDG-0001 --option A
+  - gov decide HDG-0001 --option B
+  impact_radius: R3
+  question: Which payment vendor should we integrate?
+  gate_status: PRESENTED
+  presented_in_chat: true
+  blocks_tasks: []
+  priority_score: 9.0
+  presented_at: 2026-09-18T20:33:44Z
+  presented_by:
+    session: probe-4b1cde5d
+    role: orchestrator
+chat_text: "HUMAN DECISION GATE HDG-0001\nQuestion: Which payment vendor should we integrate?\nWhy now: vendor contract renews Friday\nCurrent state: two vendors shortlisted, none selected\nOptions:\n  [A] choose vendor X (impact: lock-in 1y)\n  [B] choose vendor Y \nImpact: all integration tasks re-planned\nReversibility: reversible within 30 days\nCost/rework: 2 tasks rework\nRecommendation: A\nConfidence: 0.65\nPermitted next actions: [\"gov decide HDG-0001 --option A\",\"gov decide HDG-0001 --option B\"]\n"
+---- end ----
+CHECK L2.b1.render PASS rendered package carries 'question' with the creator's value
+CHECK L2.b2.render PASS rendered package carries 'why_now' with the creator's value
+CHECK L2.b3.render PASS rendered package carries 'current_state' with the creator's value
+CHECK L2.b4.render PASS rendered package carries 'options' with the creator's value
+CHECK L2.b5.render PASS rendered package carries 'impact' with the creator's value
+CHECK L2.b6.render PASS rendered package carries 'reversibility' with the creator's value
+CHECK L2.b7.render PASS rendered package carries 'cost_rework' with the creator's value
+CHECK L2.b8.render PASS rendered package carries 'recommendation' with the creator's value
+CHECK L2.b9.render PASS rendered package carries 'confidence' with the creator's value
+CHECK L2.b10.render PASS rendered package carries 'permitted_next_actions' with the creator's value
+
+## a gate raised with only a question: what the package contains
+$ gov --json --session probe-4b1cde5d gate create --question 'Should we proceed?'
+  -> ok
+OBSERVE L2.min.record fields of a question-only gate as persisted: {"confidence": 0.5, "cost_rework": "not assessed", "current_state": "not assessed", "impact": "not assessed", "options": [], "permitted_next_actions": ["gov decide <gate> --option <id>", "continue independent runnable work"], "question": "Should we proceed?", "recommendation": "not assessed", "reversibility": "not assessed", "why_now": "not assessed"}
+$ gov --session probe-4b1cde5d gate present HDG-0002
+---- rendered question-only package ----
+HUMAN DECISION GATE HDG-0002
+Question: Should we proceed?
+Why now: not assessed
+Current state: not assessed
+Options:
+Impact: not assessed
+Reversibility: not assessed
+Cost/rework: not assessed
+Recommendation: not assessed
+Confidence: 0.5
+Permitted next actions: ["gov decide <gate> --option <id>","continue independent runnable work"]
+
+gate:
+  id: HDG-0002
+  type: human-gate
+  title: Should we proceed?
+  status: ACTIVE
+  created: 2026-09-18
+  question: Should we proceed?
+  gate_status: PRESENTED
+  presented_in_chat: true
+  options: []
+  permitted_next_actions:
+  - gov decide <gate> --option <id>
+  - continue independent runnable work
+  blocks_tasks: []
+  why_now: not assessed
+  current_state: not assessed
+  impact: not assessed
+  reversibility: not assessed
+  cost_rework: not assessed
+  recommendation: not assessed
+  confidence: 0.5
+  priority_score: 3.0
+  presented_at: 2026-09-18T20:33:44Z
+  presented_by:
+    session: probe-4b1cde5d
+    role: orchestrator
+chat_text: |
+  HUMAN DECISION GATE HDG-0002
+  Question: Should we proceed?
+  Why now: not assessed
+  Current state: not assessed
+  Options:
+  Impact: not assessed
+  Reversibility: not assessed
+  Cost/rework: not assessed
+  Recommendation: not assessed
+  Confidence: 0.5
+  Permitted next actions: ["gov decide <gate> --option <id>","continue independent runnable work"]
+---- end ----
+CHECK L2.min.1 FAIL a gate cannot be raised with the package fields merely defaulted ('not assessed' / [] / 0.5)
+      detail: {"defaulted_fields": ["why_now", "current_state", "options", "impact", "reversibility", "cost_rework", "recommendation", "confidence"]}
+CHECK L2.b4.min FAIL a gate always carries at least one option for the human
+      detail: {"options": []}
+CHECK L2.b10.min FAIL permitted next actions are exact commands (no '<gate>'/'<id>' placeholders)
+      detail: {"permitted_next_actions": ["gov decide <gate> --option <id>", "continue independent runnable work"]}
+
+## the answer must be one of the package's options
+$ gov --json --session probe-4b1cde5d decide HDG-0002 --option Z --rationale 'not an offered option'
+  -> ok
+CHECK L2.b4.answer FAIL an answer naming an option that the package does not offer is refused
+      detail: {"answered_by_kind": "human", "cit": null, "decision": "D-0001", "gate": "HDG-0002", "option": "Z", "unblocked_tasks": []}
+$ gov --json --session probe-4b1cde5d gate present HDG-0001
+  -> ok
+$ gov --json --session probe-4b1cde5d decide HDG-0001 --option C
+  -> ok
+CHECK L2.b4.answer2 FAIL an answer 'C' to a gate offering only A/B is refused
+      detail: {"answered_by_kind": "human", "cit": null, "decision": "D-0002", "gate": "HDG-0001", "option": "C", "unblocked_tasks": []}
+
+## b1 plain-language question is required; malformed confidence
+$ gov --json --session probe-4b1cde5d gate create --question 
+  -> ERROR [USAGE] a human gate needs a question
+CHECK L2.b1.required PASS a gate without a question is refused
+      detail: {"code": "USAGE", "details": null, "message": "a human gate needs a question"}
+$ gov --json --session probe-4b1cde5d gate create --question q? --fields '{"confidence": "very high"}'
+  -> ERROR [SCHEMA_INVALID] schema validation failed for human-gate (HDG-0003): /confidence: "very high" is not of type "number"
+CHECK L2.b9.type PASS a non-numeric confidence is refused by the human-gate schema
+      detail: {"code": "SCHEMA_INVALID", "details": {"errors": ["/confidence: \"very high\" is not of type \"number\""]}, "message": "schema validation failed for human-gate (HDG-0003): /confidence: \"very high\" is not of type \"number\""}
+
+## system-raised gates: CIT-P gate and budget gate package completeness
+$ gov --json --session probe-4b1cde5d cit propose --proposal 'probe change l2cit' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l2-1789763624-3fbfa9/m-l2cit.json --trigger architecture_change
+  -> ok
+OBSERVE L2.cit.record CIT-P gate package fields: {"confidence": 0.7, "cost_rework": "0 tasks retest", "current_state": "proposal simulated, not executed", "impact": "0 artefacts affected within radius R3 (graph depth 3); 0 open task(s) will be marked retest-required; 0 test/scenario artefact(s) become stale and must be re-validated; 0 feature(s) readiness potentially impacted; human approval required before execution; rollback: snapshot of every touched file is taken before execution; `gov cit rollback` restores it", "options": [{"description": "approve and execute (CIT-E)", "id": "A"}, {"description": "reject", "id": "B"}], "permitted_next_actions": ["gov decide <gate> --option <id>", "continue independent runnable work"], "question": "Approve change CIT-0001: probe change l2cit", "recommendation": "A if the proposal matches product direction", "reversibility": "snapshot rollback available", "why_now": "impact radius \"R3\" / trigger architecture_change"}
+CHECK L2.cit.complete PASS the CIT-P-raised gate carries every package field with substantive content
+      detail: {"missing_or_defaulted": []}
+CHECK L2.cit.b10 FAIL the CIT-P gate's permitted next actions are exact (reference this gate/CIT)
+      detail: {"permitted_next_actions": ["gov decide <gate> --option <id>", "continue independent runnable work"]}
+$ gov --json --session probe-4b1cde5d route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/l2-1789763624-3fbfa9/ev-budget.json
+  -> ok
+OBSERVE L2.budget.record budget-threshold gate package fields: {"confidence": 0.7, "cost_rework": "not assessed", "current_state": "spent today 99.00", "impact": "cost", "options": [{"description": "raise the budget", "id": "A"}, {"description": "stop this workstream", "id": "B"}], "permitted_next_actions": ["gov decide <gate> --option <id>", "continue independent runnable work"], "question": "Budget threshold exceeded: task cost 99 > BUDGET_POLICY.defaults.max_task_cost_usd 25. Continue spending on TASK-X?", "recommendation": "B", "reversibility": "reversible", "why_now": "delegated budget exhausted"}
+CHECK L2.budget.complete FAIL the budget-threshold gate carries every package field with substantive content
+      detail: {"missing_or_defaulted": ["cost_rework"]}
+
+## prioritisation / batching (framework §54, context only)
+$ gov --json --session probe-4b1cde5d gate list
+  -> ok
+OBSERVE L2.list gov gate list (sorted by priority_score, batchable flag): [{"batchable": false, "blocks_tasks": [], "cit": "CIT-0001", "gate_status": "PENDING", "id": "HDG-0003", "presented_in_chat": false, "priority_score": 9.0, "question": "Approve change CIT-0001: probe change l2cit", "trigger": "architecture_change"}, {"batchable": false, "blocks_tasks": [], "cit": "", "gate_status": "PENDING", "id": "HDG-0004", "presented_in_chat": false, "priority_score": 3.0, "question": "Budget threshold exceeded: task cost 99 > BUDGET_POLICY.defaults.max_task_cost_usd 25. Continue spending on TASK-X?", "trigger": "budget_threshold"}]
+SUMMARY checks=20 pass=13 fail=7 failed=['L2.min.1', 'L2.b4.min', 'L2.b10.min', 'L2.b4.answer', 'L2.b4.answer2', 'L2.cit.b10', 'L2.budget.complete']
