@@ -1,0 +1,669 @@
+schema: governance-os.phase-2.artifact-flow-coverage-matrix
+schema_version: 1
+run_id: P2-AR-0012
+family: zeta
+candidate: cap2-candidate-0
+product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+columns:
+- producer_artefact
+- stable_id_version
+- relationship_type
+- downstream_consumer
+- mandatory_optional
+- task_input_manifest
+- context_packet_evidence
+- consumption_receipt
+- output_traceability
+- invalidation_trigger
+- qualification_challenge
+cell_status_legend:
+  EVIDENCED: an executed probe observation on the exact candidate proves the cell
+  PARTIAL: executed evidence proves the stated part; the rest is a gap (note)
+  GAP: no behaviour, or executed evidence shows the behaviour is absent
+rows_cover: 'one row per W1-named governed output type (Contract v3 line 1080): specifications (requirement, feature), scenarios, decisions, datasets, experiments,
+  architecture records, interfaces, test designs, migration plans, audit findings, benchmark results, and equivalents (research records, execution reports)'
+ac8_determination:
+  criterion: 'AC-8 (frozen gate contract §3): Gate W has executable evidence and dedicated advanced-qualification challenges, shown by this matrix. Fails if semantic
+    retrieval is relied on to rediscover mandatory inputs, if stale versions can silently satisfy downstream work, or if completion cannot be traced to upstream evidence.'
+  determination: NOT_MET
+  rejection_conditions:
+  - condition: semantic retrieval is relied on to rediscover mandatory inputs
+    triggered: true
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:experiment(derived_from) FAIL, :research(derived_from) FAIL, :interface(task.interfaces)
+      FAIL (each 'reachable only via retrieved block=True'); :dataset(required_data) FAIL (not delivered at all)
+    - evidence/W10-hard-invariant-attacks.out W10-a4-* FAIL (deterministic delivery depends on retrieval availability)
+    scope: Not triggered for requirements, decisions, scenarios, feature-level interfaces and architecture, which are resolved from governed records independently
+      of the index (W10-a1-*, W10-a2-*, W3-r4 PASS).
+  - condition: stale versions can silently satisfy downstream work
+    triggered: true
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-r2-superseded-input-not-silent FAIL
+    - evidence/W12-scheduler-integration.out AC16-W12xO5-health-state-reflects-superseded-consumption FAIL (DONE on SUPERSEDED input, audit HEALTHY)
+    - evidence/W06-staleness-propagation.out AC16-W6xD1-rebuild-does-not-license-stale-consumption FAIL, W6-s6-* FAIL, W6-s7-retest-flag-not-cleared-by-close FAIL
+    - evidence/W09-session-handoff-continuity.out W9-c6-handoff-stale-inputs-blocked-or-degraded FAIL
+  - condition: completion cannot be traced to upstream evidence
+    triggered: true
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-c1-refuses-missing-traceability FAIL, W5-r3r4-fabricated-trace-refused FAIL, W5-c3-* FAIL
+    - evidence/W08-lineage.out W8-l1-forward-reaches:file:src/lib.rs FAIL, W8-l2-reverse-impact(*)->implementation FAIL, ->evidence FAIL
+  dedicated_challenges: 'Every row carries a dedicated advanced-qualification challenge id (W-QC-*) proposed here; the Gate W challenge of Contract v3 line 1194 is
+    covered as: omit current specs from index (W-QC-REQ, W10), superseded specs with higher similarity (W-QC-REQ, W10), change specs after implementation (W-QC-REQ/SCN/ARCH/API),
+    move files keeping ids (W1 challenge), omit task dependency declarations (W3 challenge), code without consumption receipts (W5 challenge, W-QC-RPT), contradictory
+    mandatory inputs (W-QC-DEC), context pressure (W4/W10), model/session switch (W9), orphan authoritative outputs (W-QC-RES, W7). Hidden-fault generation remains
+    Phase 4 (frozen contract §7).'
+  cell_counts:
+    EVIDENCED: 24
+    PARTIAL: 55
+    GAP: 61
+rows:
+- artefact_type: 'specification: requirement'
+  record_type: requirement (spec/requirements, REQ-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-specification(requirement) PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-move-keeps-id PASS, W1-b6-specification(requirement) PASS
+    - evidence/W04-context-delivery.out W4-b4-input-versions-hashes-recorded FAIL
+    note: id stable across moves, content hash in index manifest; no version/hash travels with the input
+  relationship_type:
+    status: EVIDENCED
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b1-typed-edges PASS
+    - evidence/W06-staleness-propagation.out W6-s4-graph-impact(REQ) PASS
+    note: task.requirements / feature.requirements -> GOVERNED_BY
+  downstream_consumer:
+    status: EVIDENCED
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s4-cit-computes-impacted-nodes PASS
+    note: tasks and features
+  mandatory_optional: &id001
+    status: GAP
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b2-required-optional-marker FAIL, W2-b2-declared-input-drop-is-explicit FAIL
+    note: no required/optional marker exists for any declared input; absent or wrongly-typed declared inputs are dropped silently
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-m1-input-ids-declared-and-consumed PASS, W3-m2-required-state-enforced FAIL, W3-m3-hash-pin-enforced FAIL, W3-m4-reason-delivered
+      FAIL
+    note: ids only
+  context_packet_evidence:
+    status: PARTIAL
+    evidence:
+    - evidence/W04-context-delivery.out W4-b1-deterministic-load PASS, W4-b1-normative-content-loaded(statement field) FAIL, W4-b1-normative-content-loaded(markdown
+      body) FAIL, W4-b6-missing-required-input-refused-or-blocked FAIL
+    - evidence/W03-task-input-manifest.out W3-r2-superseded-input-not-silent FAIL
+    note: id/title/status/acceptance_criteria delivered; statement/body not; superseded delivered unflagged; absent ids vanish
+  consumption_receipt: &id002
+    status: GAP
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-r1-inputs-supplied-in-receipt FAIL, W5-r3-requirements-implemented-recorded FAIL, W5-r4-decisions-applied-recorded FAIL,
+      W5-r3r4-fabricated-trace-refused FAIL
+    note: the task report records no consumed inputs; only the close checkpoint carries the last packet hash (W5-r1-packet-hash-on-close-checkpoint PASS)
+  output_traceability: &id003
+    status: GAP
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-c3-code-linked-to-requirement FAIL, W5-c3-report-linked-to-requirement FAIL, W5-c3-task-to-code-edge FAIL
+    - evidence/W08-lineage.out W8-l2-reverse-impact(REQ-0001)->implementation FAIL, ->evidence FAIL
+    note: no task->code edge; report->task edge inverted; outputs not reachable from the input
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s1-open-dependent-task-stale(CIT) PASS, W6-s6-completed-task-revalidated(CIT) FAIL, W6-s1-open-dependent-task-stale(direct)
+      FAIL, W6-s3-context-packets-invalidated(CIT) FAIL
+    - evidence/FR-freshness-invalidation.out FR-invalidates[authoritative requirement (spec/requirements)] FAIL
+    note: only open dependents, only via CIT
+  qualification_challenge: 'W-QC-REQ: change a requirement''s acceptance criteria after (a) a dependent task is DONE and (b) its packet was handed off, once via CIT
+    at R1 and once by direct edit; omit it from the semantic index; index a superseded near-duplicate with higher similarity. Oracle: current id/version delivered,
+    DONE task + report + packets stale, rework task generated.'
+- artefact_type: 'specification: feature'
+  record_type: feature (spec/features, F-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-specification(feature) PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-specification(feature) PASS
+    - evidence/W04-context-delivery.out W4-b4-input-versions-hashes-recorded FAIL
+  relationship_type:
+    status: EVIDENCED
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b1-typed-edges PASS
+    - evidence/W08-lineage.out W8-l1-forward-reaches:SCN-0001 PASS, W8-l1-forward-reaches:REQ-0001 PASS
+    note: task.feature -> REALISES; feature.requirements/scenarios -> GOVERNED_BY/VALIDATED_BY
+  downstream_consumer:
+    status: EVIDENCED
+    evidence:
+    - evidence/W08-lineage.out W8-l1-forward-reaches:TASK-0001 PASS
+    note: 'tasks; readiness gates implementation tasks (builder regression: cargo test --test certification greenfield::greenfield_end_to_end ok)'
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-m1-input-ids-declared-and-consumed PASS
+    note: single feature id; no state/version constraint
+  context_packet_evidence:
+    status: PARTIAL
+    evidence:
+    - evidence/W04-context-delivery.out W4-b1-deterministic-load PASS, W4-b1-no-duplicate-delivery FAIL
+    note: feature brief delivered and its requirements/scenarios/interfaces merged (duplicates not suppressed)
+  consumption_receipt: *id002
+  output_traceability:
+    status: PARTIAL
+    evidence:
+    - evidence/W08-lineage.out W8-l3-missing-feature-scenario-link-detected PASS
+    note: features without scenarios/tests are reported; implementation not linked
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s4-cit-computes-impacted-nodes PASS
+    note: CIT lists affected features; no feature-level staleness marker
+  qualification_challenge: 'W-QC-FEAT: add a scenario and a readiness gap to a feature whose implementation task is DONE; oracle: readiness regression + rework task.'
+- artefact_type: scenario
+  record_type: scenario (spec/scenarios, SCN-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-scenario PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-scenario PASS
+    note: hash in manifest only
+  relationship_type:
+    status: EVIDENCED
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b1-typed-edges PASS
+    note: VALIDATED_BY
+  downstream_consumer:
+    status: EVIDENCED
+    evidence:
+    - evidence/W08-lineage.out W8-l1-forward-reaches:SCN-0001 PASS
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-m1-input-ids-declared-and-consumed PASS
+    note: ids only
+  context_packet_evidence:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-stale-input-marked-in-packet FAIL
+    note: given/when/then/success/failure and derived acceptance criteria delivered; CIT-recorded staleness not surfaced
+  consumption_receipt: *id002
+  output_traceability: *id003
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s2-test-evidence-invalidated(CIT,R2) PASS, W6-s2-test-evidence-invalidated(CIT) FAIL, W6-s2-test-evidence-invalidated(direct)
+      FAIL
+    note: marked stale only via CIT at radius >= R2
+  qualification_challenge: 'W-QC-SCN: change a scenario''s expected outcome after tests were written; oracle: tests and dependent tasks stale, packet marked.'
+- artefact_type: decision
+  record_type: decision (spec/decisions, D-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-decision PASS, W1-b7-gate-decision-provenance PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-decision PASS
+    note: hash in manifest only
+  relationship_type:
+    status: EVIDENCED
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b1-typed-edges PASS
+    - evidence/W08-lineage.out W8-l2-reverse-impact(D-0001)->task PASS
+    note: GOVERNED_BY / AFFECTS
+  downstream_consumer:
+    status: EVIDENCED
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-m1-input-ids-declared-and-consumed PASS
+    note: tasks (declared or via affects/governed_by)
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-m1-input-ids-declared-and-consumed PASS
+  context_packet_evidence:
+    status: PARTIAL
+    evidence:
+    - evidence/W03-task-input-manifest.out W3-r3-conflict-flagged-in-packet PASS, W3-r3-conflict-triggers-handling FAIL
+    - evidence/W02-typed-contracts.out W2-b6-stale-decision-flagged PASS
+    - evidence/W04-context-delivery.out W4-b6-missing-required-input-refused-or-blocked FAIL
+    note: active/conflicting decisions with supersession flag; flag does not block; absent ids vanish
+  consumption_receipt: *id002
+  output_traceability: *id003
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W12-scheduler-integration.out W12-G4-cit-wider-propagation PASS
+    - evidence/FR-freshness-invalidation.out FR-invalidates[authoritative decision (spec/decisions)] PASS
+    - evidence/W06-staleness-propagation.out W6-s6-completed-task-revalidated(CIT,R2) FAIL
+    note: via CIT; green record goes stale; DONE tasks never
+  qualification_challenge: 'W-QC-DEC: supersede a decision while a dependent task is in progress and another is DONE; contradictory ACTIVE decision pair; oracle:
+    contradiction handling, current decision only, DONE work revalidated.'
+- artefact_type: dataset
+  record_type: data (spec/data; no schema, no id prefix)
+  producer_artefact:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-dataset PASS, W1-b4-dataset PASS
+    note: record exists (state_class NARRATIVE by default; no schema)
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-dataset PASS
+  relationship_type:
+    status: GAP
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s4-graph-impact(dataset consumed via task.required_data) FAIL
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:DATA-0001 FAIL
+    note: task.required_data creates no edge
+  downstream_consumer:
+    status: GAP
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:DATA-0001 FAIL
+    note: declaring tasks unreachable
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out (task created with required_data [DATA-0001])
+    note: id declarable in required_data
+  context_packet_evidence:
+    status: GAP
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:dataset(required_data) FAIL
+    note: never delivered, not even via retrieval
+  consumption_receipt: *id002
+  output_traceability: *id003
+  invalidation_trigger:
+    status: GAP
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:DATA-0001 FAIL
+  qualification_challenge: 'W-QC-DATA: replace a representative dataset a test-design and an implementation task depend on; oracle: both receive the new dataset version
+    and become stale.'
+- artefact_type: experiment
+  record_type: experiment (spec/experiments, EXP-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-experiment PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-experiment PASS
+  relationship_type:
+    status: EVIDENCED
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:EXP-0001 PASS
+    note: task.derived_from -> DERIVED_FROM
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:EXP-0001 PASS
+    note: declaring task reachable in the graph but not delivered
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:EXP-0001 PASS (declaration recorded as DERIVED_FROM)
+    note: declarable only through derived_from/relations; not a manifest field
+  context_packet_evidence:
+    status: GAP
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:experiment(derived_from) FAIL (reachable only via retrieved block)
+    note: 'AC-8 rejection condition 1: reaches the worker only through semantic/lexical retrieval'
+  consumption_receipt: *id002
+  output_traceability: *id003
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:EXP-0001 PASS
+    note: impact reaches the task; propagation only via CIT
+  qualification_challenge: 'W-QC-EXP: experiment result reversed after a decision and implementation relied on it; oracle: decision flagged for review, dependent
+    tasks stale; experiment must be delivered deterministically to the task that declares it.'
+- artefact_type: architecture record
+  record_type: architecture (spec/architecture, ARCH-; no schema)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-architecture record PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-architecture record PASS
+  relationship_type:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:ARCH-0001 FAIL
+    note: no task->architecture edge; delivered to every task implicitly
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:architecture(implicit, all ACTIVE) PASS
+    note: all tasks receive all ACTIVE architecture; not task-specific
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: GAP
+    note: a task cannot declare an architecture dependency
+  context_packet_evidence:
+    status: EVIDENCED
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:architecture(implicit, all ACTIVE) PASS
+  consumption_receipt: *id002
+  output_traceability: *id003
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W12-scheduler-integration.out W12-G4-cit-wider-propagation PASS, W12-G4-propagation-after-noncit-architecture-change FAIL
+    - evidence/FR-freshness-invalidation.out FR-invalidates[authoritative architecture (spec/architecture)] FAIL
+    note: only via an architecture_change CIT
+  qualification_challenge: 'W-QC-ARCH: move a responsibility between components after implementation; oracle: affected tasks/tests stale and rework generated.'
+- artefact_type: interface
+  record_type: interface (spec/interfaces, API-; has version, consumers, producers)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-interface PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W04-context-delivery.out W4-b4-input-versions-hashes-recorded FAIL
+    note: record version (e.g. 2.3.1) exists but is not delivered
+  relationship_type:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:API-0009 PASS
+    - evidence/W02-typed-contracts.out W2-b8-consumes-direction-not-inverted FAIL
+    note: 'task.interfaces -> USES is correct; consumers:/producers: inverted'
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b8-consumer-reached-from-producer-change PASS (via USES)
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:API-0009 PASS (task-level declaration recorded)
+    - evidence/W04-context-delivery.out W4-b1-deterministic-load PASS (feature-level interface delivered)
+    note: declarable on task or feature; only feature-level declarations are delivered
+  context_packet_evidence:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:interface(task.interfaces) FAIL
+    - evidence/W04-context-delivery.out W4-b4-input-versions-hashes-recorded FAIL
+    note: feature-level interfaces delivered without version; task-level interfaces reach the worker only via retrieval
+  consumption_receipt: *id002
+  output_traceability:
+    status: GAP
+    evidence:
+    - evidence/W08-lineage.out W8-l5-cross-language-through-interface FAIL
+    note: producer/consumer code in different languages not connected through the interface
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:API-0009 PASS
+    note: impact reaches USES-declaring tasks; propagation only via CIT
+  qualification_challenge: 'W-QC-API: bump an interface version (breaking) with TS consumer and Python producer tasks; oracle: both tasks receive the new version
+    and become stale.'
+- artefact_type: test design
+  record_type: test-obligation (spec/tasks, TST-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-test design PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-test design PASS
+  relationship_type:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:TST-0002 FAIL
+    note: task.acceptance_tests -> '<task> VALIDATED_BY <test>' not followed from test to task
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-r5-acceptance-evidence-bound-to-declared-tests FAIL
+    note: declared on tasks; close does not require them
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - 'evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:test-design(acceptance_tests) FAIL (id delivered: True; content: False)'
+    - evidence/builder-tests/cargo-test-certification.out greenfield::greenfield_end_to_end ok (implementation tasks require declared tests)
+    note: acceptance_tests ids only
+  context_packet_evidence:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:test-design(acceptance_tests) FAIL (id only)
+    note: id delivered, content not
+  consumption_receipt:
+    status: GAP
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-r5-acceptance-evidence-bound-to-declared-tests FAIL
+  output_traceability:
+    status: GAP
+    evidence:
+    - evidence/W07-orphan-detection.out W7-o4-acceptance-test-without-requirement FAIL
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s2-test-evidence-invalidated(CIT,R2) PASS, W6-s2-test-evidence-invalidated(CIT) FAIL
+    note: marked stale via CIT at >= R2
+  qualification_challenge: 'W-QC-TST: acceptance test designed independently, then its scenario changes; oracle: test stale, implementation task cannot close on it.'
+- artefact_type: migration plan
+  record_type: adoption evidence file spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml (+ .md)
+  producer_artefact:
+    status: PARTIAL
+    evidence:
+    - evidence/W01b-migration-plan-identity.out W1-migplan-persisted PASS
+    note: persisted by gov adopt plan (A4) as an evidence file, not a governed record
+  stable_id_version:
+    status: GAP
+    evidence:
+    - evidence/W01b-migration-plan-identity.out W1-b1-migplan-stable-id FAIL, W1-b6-migplan-version-hash FAIL, W1-b8-migplan-replan-keeps-history FAIL
+  relationship_type:
+    status: GAP
+    evidence:
+    - evidence/W01b-migration-plan-identity.out W1-b9-migplan-consumers FAIL
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - evidence/builder-tests/cargo-test-certification.out brownfield::brownfield_adoption_end_to_end ok (builder regression evidence only)
+    note: consumed by A5 review / A6 migrate through adoption stage gating; not independently probed beyond A4
+  mandatory_optional:
+    status: GAP
+    note: not a task input
+  task_input_manifest:
+    status: GAP
+    note: not declarable by a task
+  context_packet_evidence:
+    status: GAP
+    note: never in a context packet
+  consumption_receipt:
+    status: GAP
+  output_traceability:
+    status: GAP
+  invalidation_trigger:
+    status: GAP
+    evidence:
+    - evidence/W01b-migration-plan-identity.out W1-b8-migplan-replan-keeps-history FAIL
+    note: re-plan overwrites; nothing downstream invalidated
+  qualification_challenge: 'W-QC-MIG (Repo B): revise the migration plan after review; oracle: prior approval invalidated, plan versions preserved, migrate refuses
+    the stale approval.'
+- artefact_type: audit finding
+  record_type: finding entry inside an audit record (spec/audits/AUD-*, ids GF-nnnn)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b7-audit-provenance PASS
+  stable_id_version:
+    status: GAP
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b1-audit-finding-id-stable FAIL
+    note: positional ids renumbered between runs
+  relationship_type:
+    status: GAP
+    note: findings carry no relation to remediation tasks or affected artefacts beyond a path
+  downstream_consumer:
+    status: GAP
+    evidence:
+    - evidence/W07-orphan-detection.out W7-o6-orphans-produce-governed-remediation FAIL
+    note: no task generated from findings (framework §43)
+  mandatory_optional:
+    status: GAP
+    note: not a task input
+  task_input_manifest:
+    status: GAP
+  context_packet_evidence:
+    status: GAP
+    note: only via retrieval (report/audit records are retrievable)
+  consumption_receipt:
+    status: GAP
+  output_traceability:
+    status: GAP
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/FR-freshness-invalidation.out FR-invalidates[governing policy (PROJECT_POLICY override)] PASS, FR-invalidates[authoritative requirement (spec/requirements)]
+      FAIL
+    note: the audit record's green currency tracks governance inputs only
+  qualification_challenge: 'W-QC-AUD: a finding recurs across audits and is remediated; oracle: stable finding id linked to its remediation task and closed by evidence.'
+- artefact_type: benchmark result
+  record_type: research record from gov memory benchmark --record (RES-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W01-artefact-identity.out W1-benchmark-result-has-id PASS, W1-b7-benchmark-provenance PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-benchmark-hash-in-manifest PASS, W1-b6-benchmark-hash-in-record FAIL
+  relationship_type:
+    status: EVIDENCED
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-benchmark-result-consumed-by-decision PASS
+    note: decision derived_from research
+  downstream_consumer:
+    status: EVIDENCED
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-benchmark-result-consumed-by-decision PASS
+    note: gov memory select decision
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:RES-0001 PASS (declaration recorded)
+    note: declarable only via derived_from
+  context_packet_evidence:
+    status: GAP
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:research(derived_from) FAIL
+    note: reaches a declaring task only through retrieval
+  consumption_receipt: *id002
+  output_traceability:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-benchmark-result-consumed-by-decision PASS
+    note: decision -> research link exists
+  invalidation_trigger:
+    status: GAP
+    note: 'no path invalidates the selection decision when a later benchmark contradicts it (only CIT-E writes staleness: runtime/src/cit/mod.rs:922-967); not separately
+      probed'
+  qualification_challenge: 'W-QC-BENCH (Phase 3/5): re-run the benchmark with a different winner; oracle: pinned-profile decision flagged for review; retrieval-dependent
+    evidence stale.'
+- artefact_type: 'equivalent: research record'
+  record_type: research (spec/research, RES-)
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b4-research-stays-evidence PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W01-artefact-identity.out W1-b6-benchmark-hash-in-manifest PASS
+  relationship_type:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:RES-0001 PASS
+    - evidence/W07-orphan-detection.out W7-o3-research-never-consumed FAIL
+    note: derived_from -> edge; influences -> no edge
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - evidence/W02-typed-contracts.out W2-b4-research-not-decision PASS
+    note: decisions via derived_from; never promoted to decision
+  mandatory_optional: *id001
+  task_input_manifest:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:RES-0001 PASS (declaration recorded)
+    note: derived_from only
+  context_packet_evidence:
+    status: GAP
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-delivered-deterministically:research(derived_from) FAIL
+    note: retrieval only
+  consumption_receipt: *id002
+  output_traceability:
+    status: GAP
+    evidence:
+    - evidence/W07-orphan-detection.out W7-o3-research-never-consumed FAIL, W7-o3b-linked-research-never-consumed FAIL
+  invalidation_trigger:
+    status: PARTIAL
+    evidence:
+    - evidence/W04b-input-class-delivery.out W4b-impact-reaches-declaring-task:RES-0001 PASS
+  qualification_challenge: 'W-QC-RES: research expected to feed a decision is never consumed; oracle: visible as orphan, investigation task created.'
+- artefact_type: 'equivalent: execution report'
+  record_type: report (spec/reports, RPT-) minted by task close
+  producer_artefact:
+    status: EVIDENCED
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-r2-outputs-produced PASS
+  stable_id_version:
+    status: PARTIAL
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-r2-outputs-produced PASS (persisted report RPT-0001 with id, session, role)
+    note: stable RPT id; no version travels with it
+  relationship_type:
+    status: PARTIAL
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-c3-report-task-edge-direction FAIL
+    note: report.task mapped to an inverted PRODUCES edge
+  downstream_consumer:
+    status: PARTIAL
+    evidence:
+    - 'evidence/W11-quantitative-health.out (gov status full output: recent_reports lists the closing reports)'
+    - evidence/W04-context-delivery.out W4-b6-missing-task-dependency-explicit PASS (dependency_state carries task status only)
+    note: surfaced by gov status; not an input of dependent tasks
+  mandatory_optional:
+    status: GAP
+    note: dependent tasks cannot require a predecessor's report
+  task_input_manifest:
+    status: GAP
+  context_packet_evidence:
+    status: GAP
+    note: retrieval only
+  consumption_receipt:
+    status: PARTIAL
+    evidence:
+    - evidence/W05-consumption-receipt.out W5-c1-refuses-missing-traceability FAIL
+    note: the report is the receipt, lacking consumed inputs
+  output_traceability: *id003
+  invalidation_trigger:
+    status: GAP
+    evidence:
+    - evidence/W06-staleness-propagation.out W6-s7-closed-task-evidence-not-green(CIT) FAIL
+    note: stays ACTIVE after its inputs change
+  qualification_challenge: 'W-QC-RPT: downstream task depends on an upstream task''s result; upstream spec changes after close; oracle: upstream report stale, downstream
+    blocked.'

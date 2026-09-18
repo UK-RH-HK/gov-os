@@ -1,0 +1,902 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0012
+note: blocker_class and new_vs_residual per frozen gate contract §6/§8; iteration-0 findings are BASELINE (they establish the blocker-class inventory).
+findings:
+- id: A0-W1-01
+  capability:
+  - W1
+  bullet_source_lines:
+  - 1070
+  - 1071
+  - 1072
+  - 1076
+  - 1077
+  severity: MEDIUM
+  title: Stable identity missing for migration plans and audit findings; no provenance on authored records; misplaced records undetected
+  statement: The adoption migration plan (spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml) has no id, type, status, version, producer or supersession lineage and is
+    rewritten in place when A4 is re-run; audit findings receive positional ids (GF-nnnn) that change when another finding precedes them on the next run; requirement/feature/scenario/decision/data/experiment/architecture/interface/test-obligation
+    records and tasks created by `gov task create` carry no producer/provenance; a requirement stored under spec/scenarios/ is loaded and delivered with no finding.
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:1069-1080 ''Every material output that may feed downstream work has: stable artefact ID ...
+    artefact type ... canonical path ... producer/provenance ... supersedes/superseded-by lineage'' and ''Applies to ... migration plans, audit findings ...'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W1/identity-incomplete-for-listed-types
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W01-artefact-identity.out (W1-b7-* FAIL, W1-b1-audit-finding-id-stable FAIL, W1-b3-noncanonical-location-flagged FAIL)
+  - evidence/W01b-migration-plan-identity.out (W1-b1/b2/b4/b6/b7/b8/b9-migplan-* FAIL, W1-b8-migplan-replan-keeps-history FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W01-artefact-identity.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Every W1-named governed output type, including migration plans and audit findings, must carry a stable id, type, version/hash, producer and supersession
+    lineage that survive re-generation, and records outside their type's canonical location must be reported (Contract v3 lines 1069-1080).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W2-01
+  capability:
+  - W2
+  - W1
+  - W6
+  bullet_source_lines:
+  - 1078
+  - 1090
+  - 1133
+  severity: MEDIUM
+  title: Relation fields consumers/producers/task produce inverted edges; required_data/influences produce none
+  statement: 'RELATION_FIELDS maps `X.consumers: [T]` to the edge `X CONSUMES T`, `X.producers: [P]` to `X PRODUCES P` and `report.task: T` to `report PRODUCES T`,
+    i.e. the reverse of their meaning; impact from a producer therefore never reaches its declared consumers while a change to the consumer propagates to the producer.
+    `required_data` and `influences` create no edge, so a dataset change reaches none of the tasks that declare it; `acceptance_tests` yields ''<task> VALIDATED_BY
+    <test>'', which impact does not follow from the test back to the task, and tasks have no edge to the architecture records delivered to them, so changes to an
+    acceptance-test obligation or an architecture record reach no task through impact traversal.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1090 'Relationships such as EVIDENCE_FOR, CONSTRAINS, IMPLEMENTS, TESTS, GENERATES, VALIDATES,
+    SUPERSEDES or equivalent are machine-usable'; Governance_OS_Capability_Acceptance_Contract_v3.md:1133 'graph/CIT computes impacted downstream nodes'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W2/relation-edge-semantics
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W02-typed-contracts.out (W2-b8-consumes-direction-not-inverted FAIL)
+  - evidence/W06-staleness-propagation.out (W6-s4-graph-impact(dataset consumed via task.required_data) FAIL)
+  - evidence/W05-consumption-receipt.out (W5-c3-report-task-edge-direction FAIL)
+  - evidence/W04b-input-class-delivery.out (W4b-impact-reaches-declaring-task:DATA-0001 FAIL, :TST-0002 FAIL, :ARCH-0001 FAIL; :EXP-0001/:RES-0001/:API-0009 PASS)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W02-typed-contracts.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Every relation field must yield an edge whose direction matches its meaning, and every declared upstream-input field of a task (including required_data)
+    must yield an edge that impact traversal follows from the producer to the consumer (Contract v3 lines 1090, 1133).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W2-02
+  capability:
+  - W2
+  bullet_source_lines:
+  - 1084
+  - 1085
+  - 1089
+  severity: MEDIUM
+  title: No required/optional distinction; authority class dropped on entry to the authority block; no schema-defined consumption rules
+  statement: A task cannot mark an upstream input required or optional, and the compiler silently discards declared inputs that are absent or of an unexpected type
+    (a research record or scenario listed under requirements vanishes). The deterministic authority block omits state_class, so a NARRATIVE-class record listed as
+    a requirement is presented as governing authority. No output schema states what downstream stages may consume; consumption is decided by hard-coded type filters.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1084 'Required vs optional dependency is explicit.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1085
+    'Authority semantics are preserved across stages.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1089 'Output schemas define what downstream stages may
+    consume.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W2/contract-typing
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W02-typed-contracts.out (W2-b2-* FAIL, W2-b3-non-authoritative-not-promoted FAIL, W2-b7-output-schema-consumption-rules FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W02-typed-contracts.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Declared dependencies must state required/optional; a declared-but-undeliverable required input must fail visibly; authority class must survive
+    into the context packet; output contracts must declare what downstream stages may consume (Contract v3 lines 1084-1089).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W3-01
+  capability:
+  - W3
+  bullet_source_lines:
+  - 1101
+  severity: HIGH
+  title: Tasks become READY and are claimed with absent mandatory inputs
+  statement: A task whose declared requirements/decisions/scenarios do not exist becomes READY through `task create --status READY`, `task status <id> READY` and
+    `task replan`, and `task claim` succeeds (claim checks task_status only). Only an absent task->task dependency blocks, and only in replan; `task status READY`
+    + `claim` bypasses even that.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1101 'Task cannot become READY if a mandatory input is absent.'; framework §38 'Only when required
+    pre-implementation cells satisfy policy can production code tasks become READY.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W3/absent-input-readiness
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W03-task-input-manifest.out (W3-r1-create-READY-with-missing-input FAIL, W3-r1-replan-READY-with-missing-input FAIL, W3-r1-status-READY-with-missing-input
+    FAIL, W3-r1-claim-with-missing-input FAIL, W3-r1-missing-task-dependency-bypass-via-status FAIL)
+  - evidence/W12-scheduler-integration.out (W12-G2-input-consumption-traceability-verified-at-close FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W03-task-input-manifest.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Every route that sets or relies on READY (create, status change, replan, claim, continue) must refuse while any declared mandatory input of any
+    type is absent (Contract v3 line 1101).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W3-02
+  capability:
+  - W3
+  - W2
+  - W10
+  bullet_source_lines:
+  - 1088
+  - 1102
+  severity: HIGH
+  title: Superseded and historical mandatory inputs silently satisfy current work
+  statement: A task (or its feature) that lists a SUPERSEDED or HISTORICAL requirement receives it in deterministic_authority.governing_requirements with no flag;
+    the task becomes READY, is claimed and closes DONE; gov audit reports the project HEALTHY. Only decisions get an UNKNOWN_OR_CONFLICTING flag, and it does not
+    block.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1102 'Superseded input cannot silently satisfy a current requirement.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1088
+    'Historical/retrieved material cannot replace current authoritative input.'; frozen gate contract AC-8 'Fails ... if stale versions can silently satisfy downstream
+    work'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W3/stale-input-satisfies
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W03-task-input-manifest.out (W3-r2-superseded-input-not-silent FAIL)
+  - evidence/W02-typed-contracts.out (W2-b6-stale-requirement-cannot-replace-current FAIL)
+  - evidence/W10-hard-invariant-attacks.out (W10-a2-variant-stale-structured-reference FAIL)
+  - evidence/W12-scheduler-integration.out (AC16-W12xO5-health-state-reflects-superseded-consumption FAIL; audit HEALTHY)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W03-task-input-manifest.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: A mandatory input that is SUPERSEDED/HISTORICAL/DEPRECATED must never be delivered or accepted as satisfying a current requirement without an
+    explicit governed failure, block or contradiction record (Contract v3 lines 1088, 1102).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W3-03
+  capability:
+  - W3
+  bullet_source_lines:
+  - 1095
+  - 1096
+  - 1097
+  - 1098
+  severity: HIGH
+  title: Task input manifest cannot declare required state, version/hash constraints, reasons or supplementary context
+  statement: 'The task schema and compiler provide no way to declare the required authority/lifecycle state of an input, a version/hash constraint, the reason for
+    a dependency, or supplementary context; such fields are accepted (open schema) and ignored: a task pinned to an ACTIVE requirement at a hash that never matches
+    stays runnable after the requirement is DEPRECATED. A dependency declared through the schema''s own relations[{type,target,note}] is not delivered at all.'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:1093-1098 ''Every governed task that depends on upstream artefacts declares: required input
+    IDs; required authority/lifecycle state; required version/hash constraints where applicable; reason for each dependency; supplementary/retrieved context separately
+    from mandatory inputs'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W3/manifest-fields
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W03-task-input-manifest.out (W3-m2-required-state-enforced FAIL, W3-m3-hash-pin-enforced FAIL, W3-m4-reason-delivered FAIL, W3-m4-relations-note-dependency-delivered
+    FAIL, W3-m5-supplementary-declared-separately FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W03-task-input-manifest.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: The task input manifest must carry, per dependency, id, required state, version/hash constraint where applicable and reason, plus separately declared
+    supplementary context, and readiness/delivery must enforce them (Contract v3 lines 1093-1098).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W3-04
+  capability:
+  - W3
+  bullet_source_lines:
+  - 1103
+  severity: MEDIUM
+  title: Conflicting mandatory inputs trigger no contradiction handling
+  statement: When a task's mandatory decisions conflict (superseded-but-ACTIVE D-0001 alongside its successor) the packet flags D-0001 and gov audit/doctor D014 report
+    the conflict, but the task becomes READY and claimable and no gate, block or contradiction task is raised. Two different records with the same id are resolved
+    silently to the first path in the packet.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1103 'Conflicting mandatory inputs trigger contradiction handling.'; framework §50 (agent-resolvable
+    vs human-resolvable contradictions)
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: W3/conflict-handling
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W03-task-input-manifest.out (W3-r3-conflict-triggers-handling FAIL, W3-r3-duplicate-id-conflict-handled FAIL; W3-r3-conflicts-detected-by-audit PASS,
+    W3-r3-conflicts-detected-by-doctor PASS)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W03-task-input-manifest.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: A task whose mandatory inputs conflict must not become READY until the contradiction is resolved through the governed contradiction path (Contract
+    v3 line 1103; framework §50).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W4-01
+  capability:
+  - W4
+  bullet_source_lines:
+  - 1107
+  - 1110
+  - 1111
+  severity: HIGH
+  title: Context packet omits normative content and version identity; its hash cannot prove what was supplied
+  statement: 'The deterministic block carries only a whitelist of fields (runtime/src/context/mod.rs:10-34): a requirement''s statement, a Markdown record''s body
+    and an interface''s version are not delivered, and changing them leaves deterministic_hash unchanged. No input carries a version or content hash; the packet is
+    not bound to a repository commit or input hashes and is overwritten on the next compile, so a recorded packet hash cannot be tied back to input versions.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1107 'Mandatory authoritative inputs are loaded deterministically into the task context packet.';
+    Governance_OS_Capability_Acceptance_Contract_v3.md:1110 'Exact input IDs/versions/hashes are recorded in the context packet.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1111
+    'Context packet hash/provenance proves what the worker was supplied.'; framework §15.1 'Reproducible and content-hashed'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W4/packet-content-and-version
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W04-context-delivery.out (W4-b1-normative-content-loaded(statement field) FAIL, W4-b1-normative-content-loaded(markdown body) FAIL, W4-b4-input-versions-hashes-recorded
+    FAIL, W4-b5-hash-changes-when-supplied-content-changes FAIL, W4-b5-packet-bound-to-repo-state FAIL)
+  - evidence/W09-session-handoff-continuity.out (W9-c2-packet-hash-tracks-input-content FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W04-context-delivery.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: The packet must deliver each mandatory input's normative content with its exact id and version/content hash, and its hash/provenance must change
+    whenever any supplied input content changes and be traceable to the input versions (Contract v3 lines 1107-1111).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W4-02
+  capability:
+  - W4
+  - W3
+  bullet_source_lines:
+  - 1107
+  - 1104
+  severity: HIGH
+  title: Several declared input types reach the worker only through semantic retrieval, or not at all
+  statement: A task's declared datasets (required_data) are never delivered; experiments and research declared via derived_from and interfaces declared on the task
+    (rather than on its feature) are absent from the deterministic block and reach the worker only if retrieval happens to surface them; test obligations are delivered
+    as bare ids without content.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1164 'Mandatory task inputs are resolved through authoritative structured dependency/state
+    mechanisms before supplementary retrieval.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1107; frozen gate contract AC-8 'Fails if semantic retrieval is
+    relied on to rediscover mandatory inputs'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W4/input-types-not-delivered
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W04b-input-class-delivery.out (W4b-delivered-deterministically:dataset(required_data) FAIL, :experiment(derived_from) FAIL, :research(derived_from) FAIL,
+    :interface(task.interfaces) FAIL, :test-design(acceptance_tests) FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W04b-input-class-delivery.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Every input type a task can declare as a dependency must be delivered deterministically in the authority block (id, version, content), never left
+    to retrieval (Contract v3 lines 1107, 1164).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W4-03
+  capability:
+  - W4
+  - W9
+  bullet_source_lines:
+  - 1112
+  - 1160
+  severity: HIGH
+  title: Missing required inputs are silently omitted instead of refused or blocked
+  statement: Compiling a task whose declared requirements/decisions/scenarios do not exist succeeds and the absent ids appear nowhere in the packet; handoff creation
+    and checkpoint creation for such a task succeed likewise. Only absent task dependencies are marked (task_status MISSING), without blocking.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1112 'Missing required input causes refusal or explicit blocked state.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W4/missing-input-silent
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W04-context-delivery.out (W4-b6-missing-required-input-refused-or-blocked FAIL)
+  - evidence/W09-session-handoff-continuity.out (W9-c6-handoff-missing-inputs-blocked-or-degraded FAIL)
+  - evidence/W12-scheduler-integration.out (W12-G3-continuity-verified(checkpoint) FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W04-context-delivery.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Compiling, dispatching or handing off a task with an absent mandatory input must refuse or produce an explicit blocked state naming the missing
+    ids (Contract v3 line 1112).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W4-04
+  capability:
+  - W4
+  bullet_source_lines:
+  - 1107
+  severity: LOW
+  title: Same mandatory input delivered twice
+  statement: When both the task and its feature list a requirement, governing_requirements contains it twice (no de-duplication of req_ids, runtime/src/context/mod.rs:47-50).
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1107; Governance_OS_Capability_Acceptance_Contract_v3.md:291 (C9 'duplicate suppression')
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: W4/duplicate-delivery
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W04-context-delivery.out (W4-b1-no-duplicate-delivery FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W04-context-delivery.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Each mandatory input must appear once in the authority block.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W4-05
+  capability:
+  - W4
+  bullet_source_lines:
+  - 1109
+  severity: INFO
+  title: Over-budget authority block is dispatched with a warning only
+  statement: When the deterministic block alone exceeds CONTEXT_POLICY.max_packet_chars the packet carries a warning ('split the task'), but `gov continue` still
+    dispatches it as NEXT_WORK. Mandatory inputs are never displaced, so W4 bullet 1109 is met; recorded for later hardening.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1109
+  provenance_class: VERIFIER-HARDENING
+  lifecycle: P2
+  falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: W4/over-budget-dispatch
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W04-context-delivery.out (W4-b3-over-budget-governed-at-dispatch FAIL; W4-b3-over-budget-is-explicit PASS)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W04-context-delivery.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Dispatch of an over-budget packet should itself be a governed degradation (explicit state), not only a packet field.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W5-01
+  capability:
+  - W5
+  bullet_source_lines:
+  - 1116
+  - 1118
+  - 1119
+  - 1120
+  - 1121
+  - 1124
+  - 1125
+  severity: HIGH
+  title: Task close accepts completion with no consumption receipt or implementation traceability
+  statement: Task close requires only tests.status in {passed, not_applicable_with_reason}, work_completed and in-scope declared mutations. The persisted report records
+    no consumed inputs, implemented requirements/scenarios or applied decisions; fabricated claims (a nonexistent REQ-9999, D-4242, 'REQ-0001@deadbeef') are accepted
+    unvalidated; the task's declared acceptance tests need not be referenced; deviations/unknowns are optional; an implementation task with no feature/requirement/decision/scenario
+    closes cleanly and gov audit computes task_traceability=0.0 without a finding.
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:1115-1126 ''Worker/task return records: exact required inputs supplied/consumed ... requirements/features/scenarios
+    implemented ... decisions/architecture constraints applied ... Task close: refuses missing mandatory traceability where required; detects undocumented/untraceable
+    implementation''; frozen gate contract AC-8 ''Fails ... if completion cannot be traced to upstream evidence'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W5/receipt-and-traceability
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W05-consumption-receipt.out (W5-c1-refuses-missing-traceability FAIL, W5-r1-inputs-supplied-in-receipt FAIL, W5-r3-requirements-implemented-recorded
+    FAIL, W5-r4-decisions-applied-recorded FAIL, W5-r3r4-fabricated-trace-refused FAIL, W5-r5-acceptance-evidence-bound-to-declared-tests FAIL, W5-r6-task-close-requires-unknowns
+    FAIL, W5-c2-untraceable-implementation-detected FAIL, W5-c2-untraceable-implementation-reported-by-audit FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W05-consumption-receipt.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: The worker/task return must record consumed input ids/versions, implemented requirements/scenarios, applied decisions/constraints, acceptance
+    evidence against the declared tests and deviations/unknowns, validated against the task manifest; close must refuse missing mandatory traceability and report
+    untraceable implementation (Contract v3 lines 1115-1126).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W5-02
+  capability:
+  - W5
+  - W8
+  bullet_source_lines:
+  - 1126
+  - 1148
+  - 1149
+  severity: MEDIUM
+  title: Outputs are not linked back to upstream inputs in the lineage graph
+  statement: files_changed is not a relation (no task->code edge) and report.task becomes '<report> PRODUCES <task>'; impact from the requirement or decision a task
+    implemented reaches the task and test obligations but never the code it changed or its closing report.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1126 'links code/test/output evidence back to authoritative upstream inputs'; Governance_OS_Capability_Acceptance_Contract_v3.md:1148-1149
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W5/output-backlinks
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W05-consumption-receipt.out (W5-c3-code-linked-to-requirement FAIL, W5-c3-report-linked-to-requirement FAIL, W5-c3-task-to-code-edge FAIL)
+  - evidence/W08-lineage.out (W8-l2-reverse-impact(REQ-0001)->implementation FAIL, ->evidence FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W05-consumption-receipt.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Closing a task must create machine-usable links from its code/test/output evidence to the task and to the authoritative inputs it implemented,
+    followable in both directions (Contract v3 lines 1126, 1148-1149).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W5-03
+  capability:
+  - W5
+  - W9
+  bullet_source_lines:
+  - 1125
+  - 1156
+  severity: LOW
+  title: 'First dirty path truncated: wrong paths attributed to workers and recorded in checkpoints'
+  statement: Project::git() trims the whole stdout, so the first `git status --porcelain` line (' M path') loses its leading space and `l[3..]` drops the path's first
+    character (runtime/src/project.rs:247-289). Closing a task without a claim baseline then attributes a nonexistent path ('overnance/generated/index-manifest.json')
+    to the worker and refuses an honest report with MUTATION_SCOPE_VIOLATION; checkpoints record the same wrong path in files_changed.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1125 'detects undocumented/untraceable implementation'; Governance_OS_Capability_Acceptance_Contract_v3.md:724
+    (N1 'files changed')
+  provenance_class: IMPLEMENTATION-CHOICE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  blocker_class: W5/porcelain-path-parse
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W05-consumption-receipt.out (W5-c2-no-claim-observed-paths-correct FAIL)
+  - evidence/W09-session-handoff-continuity.out (W9-c2-checkpoint-files-changed-paths-exist FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W05-consumption-receipt.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Observed-mutation and checkpoint file lists must contain exactly the repository paths that changed.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W6-01
+  capability:
+  - W6
+  bullet_source_lines:
+  - 1130
+  - 1131
+  - 1134
+  - 1135
+  - 1136
+  severity: HIGH
+  title: Completed work and its evidence are never invalidated by upstream change; no rework is generated; close clears retest
+  statement: CIT-E marks only non-DONE affected tasks retest_required (runtime/src/cit/mod.rs:936); DONE tasks and their closing reports stay DONE/ACTIVE after their
+    governing requirement changes (at R1, R2 and R3 and on direct edits); no revalidation/rework task is generated; closing a task that CIT marked retest_required
+    clears the flag without any retest evidence (runtime/src/orchestration/tasks.rs:543-545).
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1134-1136 'revalidation/rework tasks are generated; COMPLETE does not imply permanently valid;
+    stale evidence cannot remain green merely because the original task closed successfully'; frozen gate contract AC-8 'Fails ... if stale versions can silently
+    satisfy downstream work'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  - AC-10
+  blocking: true
+  blocker_class: W6/completed-work-never-invalidated
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W06-staleness-propagation.out (W6-s6-completed-task-revalidated(CIT|CIT,R2|direct) FAIL, W6-s7-closed-task-evidence-not-green(CIT) FAIL, W6-s5-rework-tasks-generated(CIT)
+    FAIL, W6-s7-retest-flag-not-cleared-by-close FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W06-staleness-propagation.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: When an authoritative upstream artefact changes, dependent completed tasks and their implementation/test evidence must become stale, revalidation/rework
+    tasks must be generated, and closing must not clear staleness without retest evidence (Contract v3 lines 1130-1136).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W6-02
+  capability:
+  - W6
+  - W12
+  bullet_source_lines:
+  - 1130
+  - 1131
+  - 1132
+  - 1187
+  severity: HIGH
+  title: Ungoverned (non-CIT) upstream changes propagate nothing; an index rebuild then licenses stale consumption
+  statement: Editing an authoritative requirement or architecture record directly (outside CIT) marks no dependent task, test or packet stale. Index freshness detects
+    the change and blocks close with INDEX_STALE, but after `gov memory rebuild --incremental` the dependent task closes on work done against the pre-change packet,
+    and the close checkpoint records the pre-change packet hash. A change made during an open claim is reported only as the worker's own out-of-scope mutation.
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:1129-1136 ''When an authoritative upstream artefact changes: dependent task evidence becomes
+    stale ... affected context packets are invalidated''; Governance_OS_Capability_Acceptance_Contract_v3.md:1187 ''G1 invalidates affected dependency/lineage evidence
+    after material mutations''; Constitution INV-011'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  - AC-16
+  blocking: true
+  blocker_class: W6/non-cit-change-unpropagated
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W06-staleness-propagation.out (W6-s1-open-dependent-task-stale(direct) FAIL, W6-s1-direct-change-forces-cit FAIL, AC16-W6xD1-rebuild-does-not-license-stale-consumption
+    FAIL, W6-B2-concurrent-upstream-change-detected-at-close PASS (misattributed))
+  - evidence/W12-scheduler-integration.out (W12-G1-dependency-evidence-invalidated FAIL, W12-G4-propagation-after-noncit-architecture-change FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W06-staleness-propagation.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Any material change to an authoritative artefact, however made, must either be forced through CIT-E or trigger the same staleness propagation
+    before dependent work can close; index freshness must not substitute for dependency staleness (Contract v3 lines 1129-1136, 1187).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W6-03
+  capability:
+  - W6
+  - W4
+  bullet_source_lines:
+  - 1132
+  severity: MEDIUM
+  title: Context packets are never invalidated and staleness is not surfaced in recompiled packets
+  statement: Neither CIT-E nor a direct change marks an affected packet stale; handoffs keep pointing at stale packets. A scenario marked stale by CIT-E is delivered
+    in the next compiled packet with no staleness marker (the brief whitelist omits `staleness`).
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1132 'affected context packets are invalidated'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W6/packet-invalidation
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W06-staleness-propagation.out (W6-s3-context-packets-invalidated(CIT) FAIL, W6-s3-context-packets-invalidated(direct) FAIL)
+  - evidence/W04b-input-class-delivery.out (W4b-stale-input-marked-in-packet FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W06-staleness-propagation.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Packets built from an input that later changes must become invalid (and be refused/recompiled before use), and stale inputs must be marked as
+    stale in any packet that still delivers them (Contract v3 line 1132).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W6-04
+  capability:
+  - W6
+  bullet_source_lines:
+  - 1131
+  severity: MEDIUM
+  title: Test evidence invalidation is radius-limited; implementation and release evidence are never invalidated
+  statement: An acceptance_criteria_change to a requirement is estimated R1 (traversal depth 1), so the feature's scenario and acceptance test obligation two hops
+    away are not marked stale; at R2+ they are. Implementation evidence (closing reports, changed code) and release evidence are never invalidated by any path.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1131 'implementation/release/test evidence is invalidated according to impact'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  blocker_class: W6/evidence-invalidation-scope
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W06-staleness-propagation.out (W6-s2-test-evidence-invalidated(CIT) FAIL at R1; W6-s2-test-evidence-invalidated(CIT,R2) PASS; W6-s2-test-evidence-invalidated(direct)
+    FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W06-staleness-propagation.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Invalidation must reach the test, implementation and release evidence that the impact analysis says depends on the change, including evidence
+    validating changed acceptance criteria (Contract v3 line 1131).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W6-05
+  capability:
+  - W6
+  - W12
+  bullet_source_lines:
+  - 1136
+  severity: HIGH
+  title: Green governance evidence ignores Gate-W-relevant inputs
+  statement: The only persisted green evidence (governance-suite audit record; currency via doctor D021) is keyed by inputs_hash over governance/kernel, governance/project,
+    governance/tests, spec/decisions and framework.lock (runtime/src/verification/mod.rs:54-71). It goes stale on policy, schema, retrieval-profile, path-map, sensitivity
+    and decision changes, but stays green after changes to requirements, interfaces, architecture, task manifests, source files and the index manifest - the inputs
+    Gate W evidence depends on.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:95-111 'A previously green capability becomes STALE when any relevant evidence input changes,
+    including ... authoritative spec/decision; relevant source files; relevant index manifest'; frozen gate contract AC-10 'Changing a relevant implementation/policy/spec/tool/model/index/path-map
+    input is shown to invalidate prior green evidence rather than leave it green.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-10
+  - AC-12
+  blocking: true
+  blocker_class: W6/green-currency-inputs
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/FR-freshness-invalidation.out (FR-invalidates[authoritative requirement|interface|architecture|task input manifest|relevant source file|relevant index
+    manifest] FAIL; policy/schema/profile/path-map/sensitivity/decision PASS)
+  - evidence/W06-staleness-propagation.out (AC16-W6xO4-green-goes-stale-on-requirement-change FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 FR-freshness-invalidation.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Green evidence relied on for Gate W must be keyed by, and invalidated on change of, every relevant input class of Contract v3 lines 97-109, including
+    specs, task manifests, relevant source and the index manifest.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W7-01
+  capability:
+  - W7
+  bullet_source_lines:
+  - 1139
+  - 1140
+  - 1141
+  - 1142
+  - 1143
+  - 1144
+  severity: HIGH
+  title: Orphan, dead and unexplained outputs are not detected and produce no remediation
+  statement: 'No product surface (gov audit, gov doctor, gov status, gov task dag) names: an output whose existing declared consumer never consumes it; a requirement
+    with no implementation/test path; research expected to feed a decision but never consumed; an acceptance test without requirement/scenario; code with no justification.
+    Only a declared consumer that does not exist is reported (dangling edge), features without scenarios/tests are reported (low), and an anonymous count of records
+    with no edge at all (which also counts audit records) appears in audit detail and doctor D015. No investigation or remediation task is created.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1139-1144 (W7 bullets, esp. 'Orphans produce governed investigation/remediation rather than
+    silent deletion')
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  blocking: true
+  blocker_class: W7/orphan-detection
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W07-orphan-detection.out (W7-o1-expected-consumer-not-consuming, W7-o2*, W7-o3*, W7-o4*, W7-o5-unjustified-code, W7-o6-orphans-produce-governed-remediation
+    FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W07-orphan-detection.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Each W7 orphan class must be detected by name and turned into governed investigation/remediation work (Contract v3 lines 1139-1144).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W8-01
+  capability:
+  - W8
+  bullet_source_lines:
+  - 1148
+  - 1149
+  - 1151
+  - 1152
+  severity: MEDIUM
+  title: Lineage stops before implementation, evidence and release; stale links and cross-language links not captured
+  statement: Forward lineage from a feature reaches scenario, requirement, decision, architecture, task and report but not code, tests or any release artefact; reverse
+    impact from a requirement or decision never reaches implementation code, evidence reports or release evidence; a task linked to a SUPERSEDED requirement produces
+    no finding; a TypeScript consumer and a Python producer of the same interface are not connected.
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:1147-1152 ''Governance can answer: outcome/feature -> ... -> code -> test -> evidence -> release;
+    reverse impact ...; missing lineage link detection; stale lineage link detection; cross-language/cross-repository relationships where in scope'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W8/lineage-coverage
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W08-lineage.out (W8-l1-forward-reaches:file:src/lib.rs FAIL, :file:tests/ledger_test.rs FAIL, :release FAIL; W8-l2-reverse-impact(*)->implementation/evidence
+    FAIL; W8-l4-stale-link-to-superseded-detected FAIL; W8-l5-cross-language-through-interface FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W08-lineage.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Lineage queries must connect the full chain through code, tests, evidence and release in both directions, detect links to superseded artefacts,
+    and connect artefacts across languages through shared specs/interfaces (Contract v3 lines 1147-1152).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W9-01
+  capability:
+  - W9
+  bullet_source_lines:
+  - 1156
+  - 1160
+  severity: HIGH
+  title: Checkpoints and handoffs do not preserve or verify mandatory-input continuity
+  statement: Checkpoints record no input ids/versions; their packet hash is insensitive to normative content (W4) and their index state reference is recorded before
+    the index reflects a just-made change (runtime/src/checkpoints.rs:97 vs 118-126), with no staleness marker. Handoffs are created for tasks with absent inputs
+    and never-compiled packets, and for tasks whose packet predates an upstream change; the before_handoff checkpoint records the stale packet hash unflagged; doctor
+    has no checkpoint-freshness check.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1156 'Checkpoint records input IDs/versions/hashes or equivalent state reference.'; Governance_OS_Capability_Acceptance_Contract_v3.md:1160
+    'Handoff with stale/missing required-input state is blocked or explicitly degraded.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  - AC-16
+  blocking: true
+  blocker_class: W9/continuity-verification
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W09-session-handoff-continuity.out (W9-c2-checkpoint-input-ids FAIL, W9-c2-state-reference-current-at-checkpoint FAIL, W9-c6-handoff-missing-inputs-blocked-or-degraded
+    FAIL, W9-c6-handoff-stale-inputs-blocked-or-degraded FAIL, AC16-NxW9-before-handoff-checkpoint-flags-stale-packet FAIL, AC16-NxW9-doctor-checkpoint-freshness
+    FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W09-session-handoff-continuity.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Checkpoints must record the mandatory inputs' ids and versions (or a state reference current at checkpoint time), and handoff must block or explicitly
+    degrade when required-input state is missing or has changed since the packet/checkpoint (Contract v3 lines 1156, 1160).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W10-01
+  capability:
+  - W10
+  bullet_source_lines:
+  - 1170
+  severity: HIGH
+  title: Retrieval/index outage withholds the deterministic mandatory inputs (hard invariant)
+  statement: '`context::compile` resolves the deterministic block first but then calls `retrieve(...)?` (runtime/src/context/mod.rs:190-209); any retrieval error
+    aborts the whole compile. Deleting the derived index (the INV-010 case), corrupting it, re-pinning the embedder before re-indexing (the retrieval-profile change
+    path) or an unavailable pinned reranker make `gov context compile` and `gov continue` fail (INDEX_MISSING / DB_ERROR / EMBEDDER_MISMATCH / RERANKER_UNAVAILABLE);
+    no mandatory input is delivered until the index is rebuilt.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1164 'Mandatory task inputs are resolved through authoritative structured dependency/state
+    mechanisms before supplementary retrieval. Semantic/lexical/graph/code retrieval may enrich the task but may not substitute for a required authoritative input.';
+    Governance_OS_Capability_Acceptance_Contract_v3.md:1170 'retrieval/index outage does not erase deterministic required dependencies'; Constitution INV-010
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-8
+  - AC-3
+  blocking: true
+  blocker_class: W10/outage-blocks-authority
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W10-hard-invariant-attacks.out (W10-a4-derived-index-deleted(INV-010) FAIL, W10-a4-derived-index-corrupted FAIL, W10-a4-embedder-repinned-before-reindex(profile-change)
+    FAIL, W10-a4-reranker-unavailable FAIL, each -continue FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W10-hard-invariant-attacks.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: A retrieval or index failure must degrade only the supplementary block, explicitly marked, while the deterministic mandatory inputs are still
+    delivered (Contract v3 lines 1164, 1170).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W11-01
+  capability:
+  - W11
+  bullet_source_lines:
+  - 1175
+  - 1176
+  - 1177
+  - 1178
+  - 1179
+  - 1180
+  - 1181
+  - 1182
+  - 1183
+  severity: HIGH
+  title: Artifact-flow quantitative health is not tracked
+  statement: 'None of the nine W11 metrics is computed or reported by any product surface (telemetry summary, audit, doctor, status, memory verify, task dag captured
+    in full). The nearest numbers measure other quantities: memory verify superseded_hit_rate (retrieval leakage; 0.0 while a DONE task consumed a SUPERSEDED requirement),
+    task_traceability (tasks naming a feature), an anonymous orphan count, and fresh-agent read count.'
+  normative_source: 'Governance_OS_Capability_Acceptance_Contract_v3.md:1174-1183 ''Track where applicable: required-input delivery accuracy ... fresh-agent reconstruction
+    correctness'''
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-2
+  blocking: true
+  blocker_class: W11/metrics-absent
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W11-quantitative-health.out (W11-m1..m9 FAIL; proxies W11-m3/m6/m8/m9-proxy-* PASS as different quantities)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W11-quantitative-health.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: The product must track and report the nine artefact-flow metrics of Contract v3 lines 1175-1183 for the governed repository.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W12-01
+  capability:
+  - W12
+  bullet_source_lines:
+  - 1186
+  - 1187
+  - 1188
+  - 1189
+  - 1190
+  - 1191
+  severity: HIGH
+  title: Gate W duties are not integrated into G0-G6 health-scheduler tiers
+  statement: 'There is no tiered scheduler in the candidate (no tier identifiers, RED/YELLOW/GREEN states or impacted-check selection in runtime/ or cli/). At the
+    equivalent hook points: G0 blocks authority substitution at CIT execute but not current-version substitution (claim of a task on a SUPERSEDED input; CIT editing
+    a SUPERSEDED record); G1 detects index staleness only; G2 and G3 perform no input/consumption/traceability/continuity check; G4 propagates only through CIT; G5
+    reports a dangling missing input but returns HEALTHY for a DONE task built on a SUPERSEDED requirement and has no end-to-end lineage audit.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1186-1191 (W12 G0-G5 bullets); Governance_OS_Capability_Acceptance_Contract_v3.md:791-808 (O5
+    tiers and scheduler requirements)
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-8
+  - AC-16
+  blocking: true
+  blocker_class: W12/tier-integration
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/W12-scheduler-integration.out (W12-G0-current-version-substitution-blocked(claim) FAIL, W12-G0-superseded-target-substitution-blocked(cit) FAIL, W12-G1-dependency-evidence-invalidated
+    FAIL, W12-G2-* FAIL, W12-G3-* FAIL, W12-G4-propagation-after-noncit-architecture-change FAIL, W12-G5-audits-superseded-consumption FAIL, W12-G5-audits-end-to-end-lineage
+    FAIL, AC16-W12xO5-* FAIL)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 W12-scheduler-integration.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: Each of G0-G5 must perform its Gate-W duty on the events that define the tier (privileged ops, material mutations, task close, checkpoint/handoff,
+    CIT/spec/decision/architecture changes, full audit), with the result reflected in the health state (Contract v3 lines 1186-1191, 791-808).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-W-01
+  capability:
+  - W1
+  - W2
+  - W3
+  - W4
+  - W5
+  - W6
+  - W7
+  - W8
+  - W9
+  - W10
+  - W11
+  - W12
+  bullet_source_lines:
+  - 1068
+  - 1164
+  - 1194
+  severity: MEDIUM
+  title: Derived contract views carry none of Gate W's checklist semantics and map no evidence to it
+  statement: '`gov contract verify` binds the source (CONTRACT_SOURCE_BOUND) and the compiled form lists W1-W12 with correct titles and source lines, but it carries
+    0 of the 86 Gate W checklist bullets, not the W10 hard-invariant text (line 1164) or the Gate W advanced-qualification challenge (line 1194), and none of the
+    per-capability fields of lines 53-73 (severity, evidence class, check ids, freshness triggers, scheduler tiers, challenge ids, adoption obligation). The evidence
+    map lists all 12 W capabilities as evidence_class NOT_YET_MAPPED with automated_checks []. The runtime therefore has no machine-readable Gate W obligation to
+    evaluate.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:41-47 'framework/contracts/governance-capability-acceptance.yaml is the machine-executable
+    compiled form ... Any semantic difference between source and compiled representation is a hard failure.'; Governance_OS_Capability_Acceptance_Contract_v3.md:53-73
+    (required contract fields per capability); frozen gate contract §1 ('a derived view that omits or distorts ... is itself a finding' per handoff P2-HO-0006) and
+    AC-13
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-13
+  - AC-10
+  blocking: true
+  blocker_class: W/derived-view-fidelity
+  new_vs_residual: BASELINE
+  evidence:
+  - evidence/DV-derived-view-reconciliation.out (DV-compiled-carries-W-bullets FAIL 0/86, DV-compiled-carries-W10-hard-invariant FAIL, DV-compiled-carries-W-advanced-challenge
+    FAIL, DV-compiled-carries-required-contract-fields(lines 53-73) FAIL, DV-evidence-map-W-has-evidence-owner FAIL; DV-contract-verify-binds PASS)
+  reproduction: 'from the worktree root: ~/.cargo/bin/cargo build --release; then cd release/capability-baseline/audit-0/zeta-r/evidence && python3 DV-derived-view-reconciliation.py  (or
+    ./run-all.sh for every probe)'
+  repair_direction: The compiled representation must carry the Gate W checklist semantics (bullets, hard invariant, qualification challenge, per-capability fields)
+    and the evidence map must name at least one evidence owner per W capability (Contract v3 lines 41-73; AC-10, AC-13). Adjudication of AC-13 across all gates rests
+    with the synthesis auditor.
+  owner_decision_required: false
+  owner_decision_reason: null

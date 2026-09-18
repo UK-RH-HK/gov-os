@@ -1,0 +1,19 @@
+scratch root: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zeta-r-final3
+gov: framework: agentic-engineering-os version: 4.1.5 cli_version: 4.1.5 runtime_version: 4.1.5 index_version: 4.1.5-idx3 
+2026-09-18T20:58:20Z W00-harness-smoke exit=0 total=1 pass=1 fail=0
+2026-09-18T20:58:21Z W01-artefact-identity exit=0 total=84 pass=71 fail=13
+2026-09-18T20:58:23Z W01b-migration-plan-identity exit=0 total=9 pass=1 fail=8
+2026-09-18T20:58:25Z W02-typed-contracts exit=0 total=16 pass=10 fail=6
+2026-09-18T20:58:26Z W03-task-input-manifest exit=0 total=20 pass=7 fail=13
+2026-09-18T20:58:28Z W04-context-delivery exit=0 total=15 pass=7 fail=8
+2026-09-18T20:58:29Z W04b-input-class-delivery exit=0 total=14 pass=5 fail=9  (re-run individually after adding impact checks, 2026-09-18T21:08:52Z)
+2026-09-18T20:58:30Z W05-consumption-receipt exit=0 total=20 pass=6 fail=14
+2026-09-18T20:58:38Z W06-staleness-propagation exit=0 total=27 pass=10 fail=17
+2026-09-18T20:58:47Z W07-orphan-detection exit=0 total=12 pass=3 fail=9
+2026-09-18T20:58:48Z W08-lineage exit=0 total=24 pass=14 fail=10
+2026-09-18T20:58:51Z W09-session-handoff-continuity exit=0 total=16 pass=8 fail=8
+2026-09-18T20:58:53Z W10-hard-invariant-attacks exit=0 total=23 pass=13 fail=10
+2026-09-18T20:59:01Z W11-quantitative-health exit=0 total=13 pass=4 fail=9
+2026-09-18T20:59:03Z W12-scheduler-integration exit=0 total=17 pass=5 fail=12
+2026-09-18T20:59:12Z FR-freshness-invalidation exit=0 total=13 pass=7 fail=6
+2026-09-18T20:59:14Z DV-derived-view-reconciliation exit=0 total=9 pass=4 fail=5

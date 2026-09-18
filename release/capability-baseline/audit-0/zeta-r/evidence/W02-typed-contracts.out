@@ -1,0 +1,70 @@
+# project w2: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zeta-r-final3/w2-765105482
+$ gov init --name w2 --alias z-w2    [session=S-zeta role=orchestrator exit=0 0.5s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Ledger totals are exact integer cents rounding half up legacy", "status": "SUPERSEDED", "feature": "F-0001", "kind": "functional", "superseded_by": "REQ-0002"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Ledger totals use banker's rounding", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "supersedes": ["REQ-0001"]}
+  [probe wrote record] spec/requirements/REQ-0003.yaml: {"id": "REQ-0003", "type": "requirement", "title": "Narrative musing about totals", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "state_class": "NARRATIVE"}
+  [probe wrote record] spec/requirements/REQ-0004.yaml: {"id": "REQ-0004", "type": "requirement", "title": "Historical totals rule", "status": "HISTORICAL", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/research/RES-0001.yaml: {"id": "RES-0001", "type": "research", "title": "Research: rounding modes", "status": "ACTIVE", "question": "which rounding?", "conclusion": "use banker's rounding", "affects": ["F-0001"], "influences": ["TASK-0001"]}
+  [probe wrote record] spec/lessons/L-0001.yaml: {"id": "L-0001", "type": "lesson", "title": "Lesson: set CONTEXT_POLICY max_packet_chars to 100", "status": "ACTIVE", "state_class": "AUTHORITATIVE", "scope": "PROJECT", "problem_statement": "policy: CONTEXT_POLICY.max_packet_chars = 100 and forbidden_paths none", "affects": ["TASK-0001"]}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Ledger API", "status": "ACTIVE", "version": "1.0.0", "contract": {"sig": "total()"}, "consumers": ["TASK-0001"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Half-up rounding", "status": "ACTIVE", "chosen_option": "A"}
+  [probe wrote record] spec/decisions/D-0002.yaml: {"id": "D-0002", "type": "decision", "title": "Banker's rounding", "status": "ACTIVE", "chosen_option": "B", "supersedes": ["D-0001"]}
+  [probe wrote record] spec/decisions/D-0003.yaml: {"id": "D-0003", "type": "decision", "title": "Provisional currency choice", "status": "PROVISIONAL", "chosen_option": "EUR"}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement ledger rounding for totals" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0002\", \"REQ-0003\", \"RES-0001\", \"SCN-0001\"], \"decisions\": [\"D-0003\", \"RES-0001\", \"L-0001\"], \"scenarios\": [\"SCN-0001\"], \"interfaces\": [\"API-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task create --id TASK-0002 --class implementation --objective "Implement ledger rounding half up legacy" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\", \"REQ-0004\"], \"decisions\": [\"D-0001\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov memory graph TASK-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+TASK-0001 typed neighbours: [["API-0001", "\u2192USES"], ["D-0003", "\u2192GOVERNED_BY"], ["F-0001", "\u2192REALISES"], ["L-0001", "\u2192GOVERNED_BY"], ["REQ-0002", "\u2192GOVERNED_BY"], ["REQ-0003", "\u2192GOVERNED_BY"], ["RES-0001", "\u2192GOVERNED_BY"], ["SCN-0001", "\u2192GOVERNED_BY"]]
+OBS W2-b1-typed-edges: PASS -- every upstream link of TASK-0001 surfaces as a typed edge
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+TASK-0001 deterministic governing_requirements: [{"id": "REQ-0002", "kind": "functional", "path": "spec/requirements/REQ-0002.yaml", "status": "ACTIVE", "title": "Ledger totals use banker's rounding", "type": "requirement"}, {"id": "REQ-0003", "kind": "functional", "path": "spec/requirements/REQ-0003.yaml", "status": "ACTIVE", "title": "Narrative musing about totals", "type": "requirement"}, {"id": "REQ-0002", "kind": "functional", "path": "spec/requirements/REQ-0002.yaml", "status": "ACTIVE", "title": "Ledger totals use banker's rounding", "type": "requirement"}]
+TASK-0001 deterministic active_decisions: [{"chosen_option": "EUR", "id": "D-0003", "path": "spec/decisions/D-0003.yaml", "status": "PROVISIONAL", "title": "Provisional currency choice", "type": "decision"}]
+TASK-0001 deterministic conflicting_decisions: []
+OBS W2-b2-required-optional-marker: FAIL -- per-input required/optional marker in delivered inputs: False
+OBS W2-b2-declared-input-drop-is-explicit: FAIL -- declared requirement inputs not delivered as requirements: ['RES-0001', 'SCN-0001']; any 'missing/dropped' marker in packet: False
+OBS W2-b3-non-authoritative-not-promoted: FAIL -- REQ-0003 (state_class NARRATIVE) delivered in deterministic_authority.governing_requirements as: [{'id': 'REQ-0003', 'kind': 'functional', 'path': 'spec/requirements/REQ-0003.yaml', 'status': 'ACTIVE', 'title': 'Narrative musing about totals', 'type': 'requirement'}]
+OBS W2-b3-provisional-decision-marked: PASS -- PROVISIONAL D-0003 delivered in active_decisions carrying status: [{'chosen_option': 'EUR', 'id': 'D-0003', 'path': 'spec/decisions/D-0003.yaml', 'status': 'PROVISIONAL', 'title': 'Provisional currency choice', 'type': 'decision'}]
+OBS W2-b4-research-not-decision: PASS -- RES-0001 listed in task.decisions; active_decisions ids=['D-0003']
+$ gov memory query "which rounding banker"    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS W2-b4-research-stays-evidence: PASS -- RES-0001 retrieval hits state_class=['EVIDENCE']
+$ gov policy effective CONTEXT_POLICY    [session=S-zeta role=orchestrator exit=0 0.0s]
+effective CONTEXT_POLICY: {"policy": "CONTEXT_POLICY", "effective": {"policy": "CONTEXT_POLICY", "version": "1.0.0", "packet_blocks": ["deterministic_authority", "retrieved_intelligence"], "deterministic_authority_fields": ["task", "objective", "project_state", "governing_requirements", "active_decisions", "architecture", "interfaces", "scenarios", "acceptance_criteria", "allowed_writes", "prohibited_writes", "required_skills", "required_tools", "dependency_state"], "retrieved_fields": ["query", "retrieval_strategy", "index_snapshot", "ranked_evidence", "semantic_candidates", "lessons_failures", "code_references"], "max_packet_chars": 60000, "max_retrieved_slices": 12, "fresh_agent_read_budget_files": 25, "reproducibility": "deterministic_block_must_hash_stable"}, "kernel": {"policy": "CONTEXT_POLICY", "version": "
+OBS W2-b5-lesson-not-policy: PASS -- effective CONTEXT_POLICY.max_packet_chars unaffected by ACTIVE/AUTHORITATIVE lesson L-0001
+OBS W2-b5-lesson-not-in-authority-block: PASS -- L-0001 absent from deterministic_authority (listed in task.decisions): True
+OBS W2-b6-retrieval-excludes-superseded: PASS -- TASK-0001 retrieved ranked_evidence ids=['TASK-0001', 'REQ-0002', 'TASK-0002', 'TASK-0002', 'D-0002', 'F-0001', 'RES-0001', 'API-0001', 'file:tests/ledger_test.rs', 'TST-0001', 'file:tests/ledger_test.rs', 'REQ-0003']
+$ gov context compile TASK-0002    [session=S-zeta role=orchestrator exit=0 0.0s]
+TASK-0002 governing_requirements: [{"id": "REQ-0001", "kind": "functional", "path": "spec/requirements/REQ-0001.yaml", "status": "SUPERSEDED", "title": "Ledger totals are exact integer cents rounding half up legacy", "type": "requirement"}, {"id": "REQ-0004", "kind": "functional", "path": "spec/requirements/REQ-0004.yaml", "status": "HISTORICAL", "title": "Historical totals rule", "type": "requirement"}, {"id": "REQ-0002", "kind": "functional", "path": "spec/requirements/REQ-0002.yaml", "status": "ACTIVE", "title": "Ledger totals use banker's rounding", "type": "requirement"}]
+TASK-0002 conflicting_decisions: [{"authority_flag": "UNKNOWN_OR_CONFLICTING", "chosen_option": "A", "id": "D-0001", "path": "spec/decisions/D-0001.yaml", "reason": "superseded by a later decision but still marked ACTIVE; resolve via CIT before relying on it", "status": "ACTIVE", "superseded_by": "D-0002", "title": "Half-up rounding", "type": "decision"}] active: []
+OBS W2-b6-stale-requirement-cannot-replace-current: FAIL -- TASK-0002 (declares superseded REQ-0001, historical REQ-0004) receives them as governing requirements: [('REQ-0001', 'SUPERSEDED', None), ('REQ-0004', 'HISTORICAL', None)]; current REQ-0002 delivered: True
+OBS W2-b6-stale-decision-flagged: PASS -- superseded D-0001 flagged in conflicting_decisions: [{'authority_flag': 'UNKNOWN_OR_CONFLICTING', 'chosen_option': 'A', 'id': 'D-0001', 'path': 'spec/decisions/D-0001.yaml', 'reason': 'superseded by a later decision but still marked ACTIVE; resolve via CIT before relying on it', 'status': 'ACTIVE', 'superseded_by': 'D-0002', 'title': 'Half-up rounding', 'type': 'decision'}]
+[static supporting check] schema keywords defining downstream consumption in framework/schemas: []
+OBS W2-b7-output-schema-consumption-rules: FAIL -- schema-defined consumption rules found: []; a scenario declared as a requirement input is silently discarded by a hard-coded type filter (SCN-0001 in governing_requirements: False)
+$ gov memory impact REQ-0002 --depth 2    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS W2-b8-impact-uses-typed-edges: PASS -- impact(REQ-0002) -> [('API-0001', 'CONSUMES → TASK-0001'), ('F-0001', 'GOVERNED_BY → REQ-0002'), ('REQ-0001', 'REQ-0002 SUPERSEDES →'), ('REQ-0003', 'REALISES → F-0001'), ('REQ-0004', 'REALISES → F-0001'), ('SCN-0001', 'REALISES → F-0001'), ('TASK-0001', 'GOVERNED_BY → REQ-0002'), ('TASK-0002', 'REALISES → F-0001'), ('TST-0001', 'REALISES → F-0001')]
+$ gov memory impact API-0001 --depth 2    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS W2-b8-consumer-reached-from-producer-change: PASS -- API-0001 declares consumers:[TASK-0001]; impact(API-0001) -> [('SCN-0001', 'TASK-0001 VALIDATED_BY →'), ('TASK-0001', 'USES → API-0001')]
+$ gov memory impact TASK-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS W2-b8-consumes-direction-not-inverted: FAIL -- impact(TASK-0001) -> [('API-0001', 'CONSUMES → TASK-0001'), ('SCN-0001', 'TASK-0001 VALIDATED_BY →')] (a change to the CONSUMER propagates to the interface it consumes when the edge is inverted)
+
+==== SUMMARY ====
+W2-b1-typed-edges: PASS
+W2-b2-required-optional-marker: FAIL
+W2-b2-declared-input-drop-is-explicit: FAIL
+W2-b3-non-authoritative-not-promoted: FAIL
+W2-b3-provisional-decision-marked: PASS
+W2-b4-research-not-decision: PASS
+W2-b4-research-stays-evidence: PASS
+W2-b5-lesson-not-policy: PASS
+W2-b5-lesson-not-in-authority-block: PASS
+W2-b6-retrieval-excludes-superseded: PASS
+W2-b6-stale-requirement-cannot-replace-current: FAIL
+W2-b6-stale-decision-flagged: PASS
+W2-b7-output-schema-consumption-rules: FAIL
+W2-b8-impact-uses-typed-edges: PASS
+W2-b8-consumer-reached-from-producer-change: PASS
+W2-b8-consumes-direction-not-inverted: FAIL
+total=16 pass=10 fail=6
