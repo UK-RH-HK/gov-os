@@ -20,4 +20,17 @@ branch: phase2/cap-audit-0-alpha-r
 expected_evidence_path: release/capability-baseline/audit-0/alpha-r/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_AUDIT_COMPLETE
+  work_commit: 04d819799339f841a5703fd097145701d78e2868
+  report_commit: 3cfe8818342caaffdf56c4a6ee39f8533d51ba1b
+  integration_merge_commit: fdc4f3263d5833c6c071707f3857503441225bb9
+  evidence_path: release/capability-baseline/audit-0/alpha-r/
+  agent_model_self_reported: claude-opus-5[1m]
+  scope_check: touched only its own evidence directory and report (plus the orchestrator's handoff-carry commit)
+  conformance_check: no status/finding contradiction (B1, B3, S1 referenced only by cross-cutting contract-view A0-A1-02 and green-record freshness A0-B3-01, plus non-blocking A0-B1-01); all twelve adopt stages driven end-to-end; independent signing harness for A2
+  capability_counts: {'PARTIAL': 14, 'PRESENT_AND_SUBSTANTIAL': 3}
+  bullet_counts: {'PARTIAL': 39, 'PRESENT_AND_SUBSTANTIAL': 61}
+  findings: {total: 25, blocking: 7, owner_decision_required: ['A0-A2-01', 'A0-A2-02']}
+  role: alpha audit of record for the synthesis

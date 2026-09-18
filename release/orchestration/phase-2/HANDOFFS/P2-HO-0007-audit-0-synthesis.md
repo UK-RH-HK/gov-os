@@ -6,7 +6,7 @@
 | From | Phase-2 orchestrator (routing only) |
 | To | fresh independent `capability-baseline-synthesis`, run **P2-AR-0007** — not any of P2-AR-0001…0006, 0008…0013 |
 | Candidate | `cap2-candidate-0` = `57177a37ea296ece16b185874831462b6a76db18`, `product_code_digest` `bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547` |
-| Base commit (family audits merged) | `{{MERGE_COMMIT}}` |
+| Base commit (family audits merged) | `fdc4f3263d5833c6c071707f3857503441225bb9` |
 | Active gate | `GATE-P2-BASELINE-AUDIT-0` → verdict for `GATE-P2-CAPABILITY-BASELINE-ACCEPT` |
 | Frozen gate contract | `release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md`, SHA-256 `d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e` |
 | Contract v3 | `Governance_OS_Capability_Acceptance_Contract_v3.md`, SHA-256 `4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3` |

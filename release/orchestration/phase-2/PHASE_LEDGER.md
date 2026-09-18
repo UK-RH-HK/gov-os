@@ -105,3 +105,15 @@ actions only.
 | Other headline blockers | D1 path-map reclassification not applied incrementally so archived material is served as current; D1/K2 CIT-E refresh uses stale cached policy (K2↔D1 fails); R1 retirement without dependency proof — adoption A6 rewrote live code to read archived legacy rules; D6 deleting the "derived" runtime directory loses claims and lifts FREEZE_WRITES. |
 | Protocol deviation | Disclosed by the run: one read of its **own** background build output in the task-output store. Ruled immaterial to independence (no other role's transcript or context); recorded. |
 | Next action | Await P2-AR-0013 (alpha-r); then synthesis. |
+
+## P2-L-0010 — 2026-09-18 — P2-AR-0013 alpha re-audit merged; all six audits of record in
+
+| Field | Value |
+|---|---|
+| Run | P2-AR-0013, self-reported `claude-opus-5[1m]`; work `04d8197`, report `3cfe881`, merge `fdc4f32` |
+| Result | FAMILY_AUDIT_COMPLETE. 17 capabilities / 100 bullets: 3 P&S (B1, B3, S1) / 14 PARTIAL. Bullets 61/39. 25 findings, **7 blocking**. |
+| AC-4 (A2) | **NOT MET.** R1 acceptance still valid for the candidate (digest identical; R1 behaviours re-established with an independent signing harness). But bullets 146, 149, 150 fail on every machine and 143/147 hold only on a provisioned machine while the product default is unprovisioned. Areas R1 did not examine: consistent post-install rewrite; identity recorded in framework.lock; unsigned certification claim used as an update-gate input; offline verification beyond break-glass. |
+| Other blockers | A0-A2-04 editing the unsigned manifest to CERTIFIED removes the update Human Gate, any role can build a CERTIFIED release; A0-T2-01 adoption verdicts not bound to what the reviewer approved (executor emptied tests and turned a keep into an ungated delete; A7 accepted with 0 tests); A0-A1-02 compiled contract headings only; A0-B3-01 green record not staled by spec/source/index/binary/trust-anchor changes. |
+| Owner-decision flags | A0-A2-01 (post-install integrity anchor — the auditor says it needs a D-0007 trust-class amendment) and A0-A2-02 (unprovisioned-machine posture: embed/pre-install production root keys vs refuse vs accept; R1's AR-0027 accepted the posture as an implementation choice). **Held for synthesis adjudication** against ARCH-0003 §§3, 5, 7, 8, 11, D-0007, OWNER-DIRECTIVE-0004, the frozen SRR boundary and the R1 evidence. |
+| Audit-of-record totals | alpha-r 7 · beta-r 22 · gamma-r 19 · delta-r 17 · epsilon-r 27 · zeta-r 24 = **116 blocking findings** across 102 capability records (family counts; synthesis will dedupe and classify). Every family reports its derived-contract-view defect independently. |
+| Next action | Dispatch the fresh synthesis auditor P2-AR-0007 at this merge commit. |
