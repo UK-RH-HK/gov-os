@@ -74,3 +74,12 @@ actions only.
 | Owner-decision flags | A0-L3-01 and A0-L3-05 — "how a human is authenticated to the product" (the human-presence channel). **Held for synthesis adjudication**: whether ARCH-0003 §8 ("Interactive trust changes use local administrator/Human Gate authority. Repository gate records remain requests"), D-0007 trust direction and the break-glass owner-authority precedent (OWNER-DECISION-0006) already determine the channel, or whether a genuine owner choice remains. Not presented to the owner yet. |
 | Out-of-family observations | Passed to the synthesis as leads, not findings: I4 BLOCKED task handed out as runnable; E3/E1 any role can return any handoff; C7/D2 nested worker return not indexed; C9 duplicate impact candidates. |
 | Next action | Await P2-AR-0009, 0010, 0012, 0013. |
+
+## P2-L-0007 — 2026-09-18 — P2-AR-0012 zeta re-audit merged (audit of record)
+
+| Field | Value |
+|---|---|
+| Run | P2-AR-0012, self-reported `claude-opus-5[1m]`; work `f705341`, report `459987b`, merge `3b8eb2d` |
+| Result | FAMILY_AUDIT_COMPLETE. W1–W12: 0 P&S / 11 PARTIAL / 1 ABSENT (W11). Bullets 19/34/32 + 1 N/A (W12 G6 — Phase 4 per frozen contract §7). 27 findings, **24 blocking**, 0 owner decisions. |
+| AC-8 | **NOT MET** — matrix 14 rows × 140 cells: 24 proven / 55 partial / 61 GAP; all three rejection conditions hold (some declared inputs reach workers only via retrieval or not at all; superseded inputs satisfy READY/DONE while audit stays HEALTHY; close records no consumption and accepts fabricated traceability). W10 attack 4 fails: index outage/corruption or a re-pinned embedder makes `context compile`/`continue` fail outright, withholding mandatory inputs. |
+| Next action | Await P2-AR-0009, 0010, 0013. |

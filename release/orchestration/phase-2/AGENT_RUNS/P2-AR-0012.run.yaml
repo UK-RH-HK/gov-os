@@ -20,4 +20,17 @@ branch: phase2/cap-audit-0-zeta-r
 expected_evidence_path: release/capability-baseline/audit-0/zeta-r/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_AUDIT_COMPLETE
+  work_commit: f705341146c4641d197c03cb345fd78eb3adcf6f
+  report_commit: 459987b533000dd98ad9804fa09b3028a0c1cc96
+  integration_merge_commit: 3b8eb2d9314182e9024015bf6f3489f3e2ef4826
+  evidence_path: release/capability-baseline/audit-0/zeta-r/
+  agent_model_self_reported: claude-opus-5[1m]
+  scope_check: touched only its own evidence directory and report (plus the orchestrator's handoff-carry commit)
+  conformance_check: no status/finding contradiction; 86 bullets, 17 probes, 333 observations; artifact-flow-coverage-matrix.yaml 14 rows x 140 cells; evidence/run-all.sh
+  capability_counts: {'PARTIAL': 11, 'ABSENT': 1}
+  bullet_counts: {'PARTIAL': 34, 'PRESENT_AND_SUBSTANTIAL': 19, 'ABSENT': 32, 'N/A_WITH_REASON': 1}
+  findings: {total: 27, blocking: 24, owner_decision_required: []}
+  role: zeta audit of record for the synthesis
