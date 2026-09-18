@@ -13,10 +13,11 @@ common_protocol_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1
 active_gate: GATE-P2-REPAIR-1
 iteration: 1
 round: 1
-base_commit: null
+base_commit: c6b60bc760a0bb42907f74210fd9e644a420851a
 branch: phase2/repair-1-ws09-11
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-ws09-11
 expected_output_path: release/capability-baseline/repair-1/ws09-11/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0021.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
 status: RUNNING
+started_at: '2026-09-19'
