@@ -1,0 +1,309 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0031
+role: verifier-c
+objective: >-
+  Fresh independent R1 re-verification (iteration 3) of the Signed Release Root v1 candidate
+  srr1-r1-candidate-3 against the R1 section of the frozen acceptance boundary, with independently authored
+  held-out tests, after bounded repair 2 (AR-0030) claimed to close the AR29-B1/AR29-B2 enforcement-point class
+  by putting a check inside the single primitive that realises each OWNER-DECISION-0006 section 6 effect.
+agent_model: claude-opus-5
+independence_statement: >-
+  This run is not AR-0027, not AR-0029, and not AR-0028 or AR-0030. It authored none of the implementation,
+  either repair, either prior verification, or the architecture. It authored all 34 held-out scenarios itself,
+  in a standalone crate (srr-heldout-ar0031) outside the product tree and outside its cargo workspace, depending
+  on gov-runtime by path, so verification required no edit to any product file; the harness in bench.rs was
+  written from an independent reading of runtime/src/srr/breakglass.rs and runtime/src/srr/state.rs and shares no
+  source line with AR-0027's forge.rs or AR-0029's mint.rs. No product source, frozen boundary, owner record,
+  prior review or verification evidence, release/releases/** content or historical record was modified; the only
+  files created are under release/verification/4.1.6-r1-3/ and this report. Both prior held-out suites were
+  re-run byte-unmodified and were verified unchanged at this commit by git history before being run. AR-0027's
+  and AR-0029's evidence was read for orientation and then verified rather than adopted. DELEGATION DISCLOSED -
+  one read-only sub-agent performed a single breadth sweep enumerating the product's release/trust reporting
+  surfaces for the section 6 bullet 7 question; it made no judgement that was relied upon, every claim of its
+  that appears in this report was independently re-derived from source by this run and then pinned in a held-out
+  test, and all classification, severity and verdict work is this run's own. Read - the HO-0031 handoff, the
+  frozen R0/R1/R2/R3 acceptance boundary, OWNER-DECISION-0006, OWNER-DECISION-0007, the Capability Acceptance
+  Contract v3, ARCH-0003.yaml, the AR-0030 repair report and its digest manifest, AR-0027's and AR-0029's full
+  verification evidence including their held-out test sources, the product source under runtime/ and cli/, the
+  certification suite, and git history at 748c5d3 and 26bfe9b. Not read - any session or agent transcript, any
+  task-output store, any user auto-memory. The product owner was not contacted. No fix was implemented.
+input:
+  base_commit: 26bfe9bbf9141a4d27126da0d09bbeceb4a395d7
+  release: srr1-r1-candidate-3
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0031-r1-reverification-2.md
+inspected:
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+  - release/root-of-trust/signed-release-root-v1-r1-repair-2/00-REPAIR-REPORT.md
+  - release/verification/4.1.6-r1/
+  - release/verification/4.1.6-r1-2/
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - spec/architecture/ARCH-0003.yaml
+  - runtime/src/srr/breakglass.rs
+  - runtime/src/srr/state.rs
+  - runtime/src/srr/plugins.rs
+  - runtime/src/srr/provision.rs
+  - runtime/src/srr/verifier.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/release.rs
+  - runtime/src/tools.rs
+  - runtime/src/update.rs
+  - runtime/src/doctor.rs
+  - runtime/src/context/mod.rs
+  - runtime/src/records.rs
+  - runtime/src/kernel_trust.rs
+  - runtime/src/capabilities/governance.rs
+  - cli/src/main.rs
+  - tests/certification/srr.rs
+  - commit 748c5d3 and its parent
+  - commit 26bfe9b
+produced:
+  - release/verification/4.1.6-r1-3/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-3/10-BLOCKING-FINDINGS.md
+  - release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - release/verification/4.1.6-r1-3/REVIEWED-CONTENT-DIGESTS.txt
+  - release/verification/4.1.6-r1-3/evidence/REPRODUCTION.md
+  - release/verification/4.1.6-r1-3/evidence/REGRESSION.txt
+  - release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - release/verification/4.1.6-r1-3/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - release/verification/4.1.6-r1-3/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/Cargo.toml.txt
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/bench.rs
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/hx_a_census.rs
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/hx_b_failopen.rs
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/hx_c_prior_evidence.rs
+  - release/verification/4.1.6-r1-3/evidence/heldout-tests/hx_d_acquisition_and_preservation.rs
+tests_or_attacks:
+  - id: DIGESTS
+    description: All six pinned normative digests verified at HEAD against AR-0029's and AR-0030's values.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/REVIEWED-CONTENT-DIGESTS.txt
+  - id: REGRESSION-LIB
+    description: cargo test --lib reproduced independently.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/REGRESSION.txt
+  - id: REGRESSION-CERT
+    description: cargo test --test certification reproduced independently.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/REGRESSION.txt
+  - id: ADDITIVE-DIFF
+    description: tests/certification/srr.rs is +866/-0 across 748c5d3; no existing test edited or deleted.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/REVIEWED-CONTENT-DIGESTS.txt
+  - id: OWNER-CLOSED
+    description: >-
+      resolve_state_root, default_state_root, exit_satisfied, exit_condition_description, EXIT_POLICY and
+      REFUSED_AUTHORITY_ENV verified byte-identical across the repair commit by per-function body comparison,
+      despite both containing files being edited. Verified, not graded.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/REVIEWED-CONTENT-DIGESTS.txt
+  - id: AR0027-RERUN
+    description: AR-0027 held-out suite re-run byte-unmodified - 26 passed, 3 failed (its three OBSERVED flips).
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - id: AR0029-RERUN
+    description: >-
+      AR-0029 held-out suite re-run byte-unmodified - 26 passed, 2 failed (ho_b::b3, ::b6), ho_f does not compile.
+      All four of its OBSERVED failures flipped to passing.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0029-HELD-OUT-RERUN.txt
+  - id: hx_a::a1-a4,a6,a7
+    description: >-
+      SECTION_6_SINKS census attacked per bullet. Bullets 2 (create), 2 (approve), 3, 4 and 6 are complete - no
+      second primitive reaches any of those effects, and each sink refuses at the instant of the effect.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_a::a5
+    description: >-
+      The section 6 bullet 2 census clause is a source-literal property, not the effect property it is described
+      as - a human-gate record was minted three ways with no Clearance in existence. No such path exists today.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_a::a8
+    description: >-
+      Section 6 bullet 7's "no primitive - every reporting surface carries the marking" falsified against
+      gov doctor, gov update --check, gov version and the agent context packet.
+    result: REFUTED
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_b::b1
+    description: >-
+      Every input to resolve_state_root() enumerated. It returns Err only for the provisioned-plus-override case,
+      never for the unprovisioned case the fail-open comment names.
+    result: REFUTED
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_b::b2
+    description: >-
+      On a provisioned, marked machine, GOV_MACHINE_STATE_DIR makes guard_effect return Ok for all eight section 6
+      effects.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_b::b3
+    description: guard_light fails open on the same input, so both enforcement points fail open together.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_b::b4
+    description: >-
+      gates::create_system has no operation-level guard by design, so under the override a Human Gate is created
+      below floor and gates::answer loses its check on the same input.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_b::b5
+    description: >-
+      guard_effect_on does not share the defect - bullet 4's sink holds under the identical input, which is the
+      proof that the defect is in the resolution and not in the decision.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_b::b6
+    description: >-
+      The fail-open is two blocks in breakglass.rs and nowhere else; closing it does not touch the owner-closed
+      machine-state path resolution.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_c::c1
+    description: >-
+      The migrated ho_f preservation census compared assertion by assertion. f3, f5 and f7 reproduced in full;
+      f1's static half strengthened.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_c::c2,c2b
+    description: >-
+      ho_f::f1's behavioural half (malleated S+L signature refused identically by verify and verify_strict) was
+      NOT reproduced in the move and now runs nowhere; reproduced here and the property still holds.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_c::c3,c3b
+    description: >-
+      ho_f::f2's relaxation-switch census was NOT reproduced in the move; reproduced here and the property still
+      holds.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_c::c4
+    description: ho_b::b3's stale candidate-2 section 6 census re-derived for candidate 3.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_c::c5
+    description: >-
+      ho_b::b6's new statement verified - a guard now sits between the section 5 allow-list entry and the gate
+      creation, and the allow-listed entry still passes bullet 1.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_c::c6
+    description: >-
+      ho_b::b4 both halves - SRR_ALREADY_PROVISIONED survives because the guard sits after the latch, and the
+      door is independently closed at the sink with section_6_bullet 4.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_d::d1,d2
+    description: >-
+      The bullet 5 sink refuses a privileged capability below floor in every acquisition class, but whether it
+      asks section 6 at all is decided by the descriptor's own required_permission_classes.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_d::d3
+    description: >-
+      tools::install reaches the bullet 5 effect without the census's claimed sole sink; refused below floor by
+      the operation guard only, so no live bypass follows.
+    result: FAIL
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_d::d4
+    description: >-
+      Clearance is a witness, not a capability - exactly one sink is compiler-protected, and that guarantee is
+      scoped to the gates module because build is private.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_d::d5
+    description: >-
+      The four-operation section 5 allow-list and its exact-match semantics preserved; twelve near-miss forms per
+      entry plus the empty label all refused.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+  - id: hx_d::d6-d12
+    description: >-
+      Preservation set - five admit sites paired with five install_kernel sites and no path-taking installer;
+      gov never signs; D-0007 independent in both directions; Contract v3 byte-identical at 4c2df291 and failing
+      closed; EXIT_POLICY single and unchanged; floors monotonic and advancing only from verified facts;
+      break-glass purely local (SRR-R0-L7).
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-3/evidence/AR-0031-HELD-OUT-OUTPUT.txt
+findings:
+  - id: AR31-B1
+    severity: HIGH
+    title: >-
+      OWNER-DECISION-0006 section 6 bullet 7 is enforced nowhere and its "no primitive exists" census entry is
+      false - gov doctor, gov update --check, gov version and the agent context packet all report the below-floor
+      release as current or healthy with no marking. RESIDUAL of AR29-B1/AR29-B2.
+    path: release/verification/4.1.6-r1-3/10-BLOCKING-FINDINGS.md
+  - id: AR31-B2
+    severity: MEDIUM
+    title: >-
+      guard_effect and guard_light convert resolve_state_root()'s SRR_PROTECTED_STATE_OVERRIDE_REFUSED into a
+      clearance, so both section 6 enforcement points fail open together on the one input the product classifies
+      as hostile. MATERIALLY NEW class, disclosed by the repair and inherited from repair 1; repairable within R1
+      without touching the owner-closed path resolution.
+    path: release/verification/4.1.6-r1-3/10-BLOCKING-FINDINGS.md
+  - id: AR31-N1
+    severity: LOW
+    title: >-
+      The section 6 bullet 5 census entry names one sink for a bullet the product realises in two places -
+      tools::install never reaches plugins::guard_acquisition. Non-blocking - the operation guard refuses it below
+      floor. RESIDUAL of AR29-B1/B2.
+    path: release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR31-N2
+    severity: INFO
+    title: >-
+      Whether section 6 bullet 5 is consulted at all is decided by the descriptor's own
+      required_permission_classes, unlike bullets 2, 3 and 4 whose sinks ask unconditionally.
+    path: release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR31-N3
+    severity: LOW
+    title: >-
+      The bullet 2 census clause is policed by one grep for the source literal new_record("human-gate"; three
+      demonstrated constructions reach the same durable artefact without spelling it and without a Clearance. No
+      second path exists today. RESIDUAL of AR29-B2.
+    path: release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR31-N4
+    severity: LOW
+    title: >-
+      Two ho_f sub-checks were dropped when the preservation census moved into the product suite - f1's malleated
+      S+L behavioural half and f2's relaxation-switch census. Both properties re-measured here and both still
+      hold; this is a loss of assurance coverage, not a live defect.
+    path: release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR31-N5
+    severity: INFO
+    title: >-
+      section_6_effects_are_enforced_inside_their_sinks cannot fail on the two bullets that claim no primitive
+      exists - its A2 loop skips every sink string beginning "no primitive:".
+    path: release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR31-N6
+    severity: INFO
+    title: >-
+      R2 - status::continue_work drops the release_trust block, including the marking, that status::status
+      computed one function above.
+    path: release/verification/4.1.6-r1-3/20-LATER-LIFECYCLE-CONDITIONS.md
+verdict: BLOCKING_FINDINGS_PRESENT
+output:
+  branch: phase1/srr1-r1-verify-3
+  commit: 807a04605e61e8cc6bbc36d685bc73a00bae9958
+  evidence_path: release/verification/4.1.6-r1-3/
+unresolved:
+  - AR31-B1 — blocking, HIGH, RESIDUAL of AR29-B1/B2; bounded R1 repair; no owner decision required
+  - AR31-B2 — blocking, MEDIUM, MATERIALLY NEW class but disclosed by the repair and inherited from repair 1; bounded R1 repair local to breakglass.rs; NOT REQUIRES_R0_OR_OWNER_ADJUDICATION
+  - AR31-N1, AR31-N3 — non-blocking, R1-lifecycle, RESIDUALs of AR29-B1/B2; recommended for the same repair cycle
+  - AR31-N4 — non-blocking, R1-lifecycle; the lost malleability check cannot live in the product suite by design (SRR-R0-L4) and belongs in held-out evidence
+  - AR31-N2, AR31-N5 — INFO; a descriptor-supplied predicate and a census test that cannot fail on two of its eight bullets
+  - AR31-N6 — R2
+  - AR29-N2, AR27-N3, AR27-N5, AR27-N6, AR27-N7 — R2 conditions carried unchanged, not re-examined this cycle
+  - AR29-B1, AR29-B2, AR29-C1, AR29-N1, AR29-N3, AR29-N4 — all verified CLOSED on this candidate
+  - AR27-B1, AR27-N1, AR27-N2, AR27-N4 — verified still closed; the section 5 allow-list could not be broken
+  - CONVERGENCE — one materially new class this iteration (AR31-B2), but disclosed by the repair rather than surfaced one level deeper; the one undisclosed blocking finding new to this iteration (AR31-B1) is a RESIDUAL. The PHASE_CONVERGENCE_ESCALATION_REQUIRED decision is the orchestrator's, on these facts.
+recommended_next_action: >-
+  Orchestrator to decide convergence first on the classification facts above, then either escalate or dispatch a
+  third bounded R1 repair for AR31-B1 and AR31-B2 together with AR31-N1, N3 and N4. Both blockers are local and
+  need no owner decision - AR31-B2 is two lines in breakglass.rs failing closed instead of open, and AR31-B1
+  requires either a primitive for bullet 7 or making the "every reporting surface carries the marking" claim true
+  and testable by driving those surfaces on a marked machine.
+completed_at: 2026-09-18T03:05:00Z
