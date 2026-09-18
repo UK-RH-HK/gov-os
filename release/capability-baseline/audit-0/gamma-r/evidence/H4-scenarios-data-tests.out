@@ -1,0 +1,44 @@
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/gamma-r-probes/h4
+records written
+
+==== H4.b1 FEATURE -> SCENARIOS -> DATA -> TEST DATA -> SUCCESS/FAILURE -> INDEPENDENT TESTS, traced with the product's own fields ====
+  F-0001    -> SCN-0001 TRACED via →VALIDATED_BY
+  SCN-0001  -> DATA-0001 NOT an edge (neighbours: ['F-0001', 'TST-0001'])
+  DATA-0001 -> TD-0001  NOT an edge (neighbours: [])
+  TD-0001   -> TST-0001 NOT an edge (neighbours: [])
+  SCN-0001  -> TST-0001 TRACED via ←TESTS
+  TST-0001  -> F-0001   TRACED via →REALISES
+$ the relation fields the graph derives edges from (records.rs RELATION_FIELDS) — is data_requirements / data_provenance among them?
+  21:    ("scenarios", "VALIDATED_BY"),
+  34:    ("scenario", "TESTS"),
+  46:    ("scenario", "spec/scenarios"),
+  71:    ("scenario", "SCN"),
+$ success/failure criteria reach the implementer's context packet (via the scenario)
+  scenario: SCN-0001 success: ['exact integer total'] failure: ['duplicate order ids accepted']
+  acceptance_criteria block: [{'criterion': 'exact integer total', 'scenario': 'SCN-0001'}, {'scenario': 'SCN-0001', 'then': 'total_cents is 399'}]
+$ the chain gates implementation: TEST_POLICY.implementation_task_requires + independent_test_author_required_for
+  complete chain -> TASK-0001 runnable: True
+  no scenarios   -> [['TEST_POLICY.implementation_task_requires: no scenarios declared on the task or its feature']]
+  no tests       -> [['TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature']]
+  non-independent acceptance obligation -> [['TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for)']]
+$ missing success or failure criteria on the scenario: is the chain refused anywhere?
+  scenario without success/failure criteria -> TASK-0001 runnable: True
+  suite findings mentioning SCN-0001: []
+$ (readiness still says success_criteria / failure_criteria PRESENT for F-0001: the cell is author-asserted)
+   [('representative_test_data', 'PRESENT'), ('success_criteria', 'PRESENT'), ('failure_criteria', 'PRESENT'), ('independent_acceptance_tests', 'PRESENT')]
+
+==== H4.b2 test-data author independence ====
+$ the kernel has a data-author role
+  data-author: data-author T1
+$ the test dataset TD-0001 was authored by the implementer role (author_role: backend-engineer, same as TASK-0001.role): anything refused or flagged?
+  TASK-0001 blocked reasons: [] runnable: True
+  suite findings mentioning TD-0001/DATA-0001/author: []
+$ source: where is a data author's independence recorded or compared? (search for data author / data_author / author_role consumers)
+
+==== H4.b3 data provenance is recorded ====
+$ TST-0001 carries data_provenance; a second obligation without it, and a readiness cell 'representative_test_data: PRESENT' with no dataset record at all
+  findings mentioning TST-0002 or provenance: []
+  TST-0001.data_provenance = TD-0001 (synthetic, generated)
+$ is data_provenance consumed anywhere (DAG, close, suite, context)?
+  (no lines above = the field is stored when an author writes it, never required or read)
+END
