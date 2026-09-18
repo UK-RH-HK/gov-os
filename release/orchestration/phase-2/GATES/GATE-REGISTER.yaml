@@ -33,7 +33,10 @@ gates:
 
   - id: GATE-P2-BASELINE-AUDIT-0
     title: Iteration-0 exhaustive capability baseline audit of cap2-candidate-0
-    status: OPEN
+    status: SATISFIED
+    outcome: GOVERNANCE_CAPABILITY_BASELINE_REJECTED by P2-AR-0007 (work ea6abea, merge 395df8d); 134 blocking findings in 52 classes
+    audits_of_record: [P2-AR-0013 alpha-r, P2-AR-0009 beta-r, P2-AR-0010 gamma-r, P2-AR-0011 delta-r, P2-AR-0008 epsilon-r, P2-AR-0012 zeta-r]
+    first_pass_nonconforming: [P2-AR-0001, P2-AR-0002, P2-AR-0003 (model deviation), P2-AR-0004, P2-AR-0005, P2-AR-0006]
     satisfier: six fresh independent family auditors plus one fresh independent synthesis auditor
     preconditions: [GATE-P2-ENTRY, GATE-P2-FROZEN-CONTRACT]
     satisfied_when: every family audit and the synthesis have committed durable typed reports; the synthesis issues a Phase-2 verdict
@@ -59,6 +62,21 @@ gates:
     preconditions: [GATE-P2-ENTRY, GATE-P2-FROZEN-CONTRACT, GATE-P2-ORACLE-FORMAT, GATE-P2-R1-PRESERVATION]
     token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
     satisfied_when: every acceptance criterion AC-1..AC-16 of the frozen contract holds for one exact frozen candidate
+
+  - id: HG-P2-0001
+    title: Owner decisions OD-P2-01 (agent-role identity binding) and OD-P2-02 (unprovisioned-machine posture)
+    status: PRESENTED_AWAITING_OWNER
+    satisfier: product owner only
+    record_path: release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md
+    raised_by: P2-AR-0007 owner-decisions-required.md; classification confirmed by the orchestrator
+    blocks: [BC-P2-36 admission part, agent-identity extension of BC-P2-34]
+    does_not_block: all determined repair requirements (non-global blocking)
+
+  - id: GATE-P2-REPAIR-1
+    title: Repair iteration 1 — all rounds integrated into a new immutable candidate cap2-candidate-1
+    status: OPEN
+    satisfier: capability-repair builders (claims only) + orchestrator integration; never an acceptance
+    rounds: {round_1: RUNNING, round_2: NOT_STARTED, round_3: NOT_STARTED}
 
   - id: GATE-P3-PROVISIONAL-RETRIEVAL
     title: Phase 3 — PROVISIONAL_RETRIEVAL_PROFILE_READY

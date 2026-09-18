@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-18T21:35:50Z'
-state_hash: a81363da0cd97ce2bed9acabe8b4f0501c68fabd68b055ca25cf4736378cf1e4
-lifecycle_state: P2_BASELINE_AUDIT_0
-loop_status: P2_AUDIT_0_SYNTHESIS_RUNNING
+updated_at: '2026-09-18T23:01:57Z'
+state_hash: 495be5fe5285313dd64d59a4d004ed47f930027e23d4e28f4fd3aa4049d9b0c8
+lifecycle_state: P2_REPAIR_ITERATION_1
+loop_status: P2_REPAIR_1_ROUND_1_RUNNING__HUMAN_GATE_HG-P2-0001_PRESENTED
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -124,7 +124,9 @@ candidates:
     product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
     product_code_equal_to: srr1-r1-accepted (c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112)
     r1_preservation_required: false
-    status: UNDER_BASELINE_AUDIT_0
+    status: REJECTED_BY_P2_AR_0007
+    verdict_run: P2-AR-0007
+    verdict_commit: ea6abea28f7605c7799477bda2434e8b970a088b
     accepted: false
 
 current_candidate:
@@ -133,14 +135,74 @@ current_candidate:
   commit: 57177a37ea296ece16b185874831462b6a76db18
 
 iteration:
-  current: 0
-  kind: exhaustive baseline audit
+  current: 1
+  kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
   convergence_rule: >-
     If three consecutive verification iterations each introduce materially new blocker classes (frozen contract section 8)
     instead of closing known ones, STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED and produce a root-cause/meta-review package.
   consecutive_new_class_iterations: 0
-  blocker_class_inventory: []     # established by the iteration-0 synthesis
-  history: []
+  blocker_class_inventory_path: release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  blocker_class_inventory_established_by: P2-AR-0007 (iteration 0)
+  blocker_class_inventory:
+    - {id: BC-P2-01, title: "Compiled contract views lose owner-source semantics and verification is self-referential", findings: 9, max_severity: HIGH}
+    - {id: BC-P2-02, title: "Evidence map declares no evidence owner for any capability", findings: 7, max_severity: HIGH}
+    - {id: BC-P2-03, title: "Green governance evidence currency: key omits relevant input classes and enforcement\
+  \ is path-keyed", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-04, title: "Upstream change does not invalidate completed work, its evidence or compiled packets", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-05, title: "Checkpoint and handoff continuity: triggers, staleness and handoff blocking", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-06, title: "Health scheduler mechanics absent", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-07, title: "Health tiers G1-G6 do not perform their duties at their trigger events (incl. Gate-W\
+  \ duties)", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-08, title: "Acting-role resolution and G0 guard coverage on privileged/mutating paths", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-09, title: "OS-written (T2) records honoured without binding to an OS operation; lower-role writes\
+  \ exempt at task close", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-10, title: "Human approval and presentation derived from caller-declared metadata", findings: 4, max_severity: HIGH}
+    - {id: BC-P2-11, title: "Gate approval not bound to the subject and content it authorises", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-12, title: "Task-blocking gate semantics", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-13, title: "Material changes escape change control (materiality self-declared, in-task edits\
+  \ bypass CIT)", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-14, title: "Task-contract fields and path scope not enforced", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-15, title: "Claim atomicity and claim scope", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-16, title: "Runnable / claimable / READY state not derived from the DAG", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-17, title: "Mandatory task-input manifest semantics", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-18, title: "Contradiction detection and resolution", findings: 3, max_severity: MEDIUM}
+    - {id: BC-P2-19, title: "Context-packet delivery, provenance and outage behaviour", findings: 4, max_severity: HIGH}
+    - {id: BC-P2-20, title: "Consumption receipt and implementation traceability", findings: 4, max_severity: HIGH}
+    - {id: BC-P2-21, title: "Artefact identity and relation-edge semantics", findings: 3, max_severity: MEDIUM}
+    - {id: BC-P2-22, title: "Orphan / unexplained output detection", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-23, title: "Artifact-flow quantitative health absent", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-24, title: "Governed work not generated from events", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-25, title: "Index content coverage and chunk granularity", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-26, title: "Retrieval pipeline ordering, routing and de-duplication", findings: 4, max_severity: HIGH}
+    - {id: BC-P2-27, title: "Code-structural extraction", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-28, title: "Graph integrity detection", findings: 1, max_severity: MEDIUM}
+    - {id: BC-P2-29, title: "Incremental index invalidation", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-30, title: "Retrieval-profile component identity and change governance", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-31, title: "Non-rebuildable authoritative state stored in, or classified as, derived/generated\
+  \ state", findings: 2, max_severity: MEDIUM}
+    - {id: BC-P2-32, title: "Failure memory not durable", findings: 1, max_severity: MEDIUM}
+    - {id: BC-P2-33, title: "Legacy identification, extraction and retirement", findings: 4, max_severity: HIGH}
+    - {id: BC-P2-34, title: "Independence of test, review and verification authorship is self-attested", findings: 4, max_severity: HIGH}
+    - {id: BC-P2-35, title: "Post-install kernel integrity anchored only in repository-controlled records", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-36, title: "Unauthenticated installation presented as current/verified (default posture)", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-37, title: "Trust decisions and identity records taken from unauthenticated release fields", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-38, title: "Provisioned-machine rollback/reinstall", findings: 1, max_severity: MEDIUM}
+    - {id: BC-P2-39, title: "Plugin elevation decided by descriptor self-declaration", findings: 1, max_severity: MEDIUM}
+    - {id: BC-P2-40, title: "Plugin implementation bytes not bound", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-41, title: "Tool acquisition: review evidence and approval not bound to the tool installation", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-42, title: "Skill regression never executed", findings: 2, max_severity: MEDIUM}
+    - {id: BC-P2-43, title: "Product-test results not governed", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-44, title: "Health SLO thresholds and the HEALTHY conjunction", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-45, title: "Project overlay files bypass POLICY_PRECEDENCE", findings: 2, max_severity: MEDIUM}
+    - {id: BC-P2-46, title: "Scenario -> data -> test-data lineage and provenance", findings: 2, max_severity: MEDIUM}
+    - {id: BC-P2-47, title: "Research output completeness", findings: 1, max_severity: MEDIUM}
+    - {id: BC-P2-48, title: "Experiment lifecycle absent", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-49, title: "Human Decision Gate package not enforced", findings: 1, max_severity: MEDIUM}
+    - {id: BC-P2-50, title: "Upstream export gate fails open on content", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-51, title: "Qualification Oracle format absent", findings: 1, max_severity: HIGH}
+    - {id: BC-P2-52, title: "Path map does not represent documentation citations", findings: 1, max_severity: MEDIUM}
+  history:
+    - {iteration: 0, candidate: cap2-candidate-0, verdict_run: P2-AR-0007, verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED, classes: 52, blocking_findings: 134, materially_new: baseline-inventory, closed: []}
 
 agent_runs:
   - {run_id: P2-AR-0001, role: capability-family-auditor, family: alpha, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0013, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml}
@@ -155,22 +217,37 @@ agent_runs:
   - {run_id: P2-AR-0011, role: capability-family-auditor, family: delta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-delta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml}
   - {run_id: P2-AR-0012, role: capability-family-auditor, family: zeta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-zeta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml}
   - {run_id: P2-AR-0013, role: capability-family-auditor, family: alpha-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-alpha-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml}
-  - {run_id: P2-AR-0007, role: capability-baseline-synthesis, iteration: 0, status: RUNNING, branch: phase2/cap-audit-0-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.run.yaml}
+  - {run_id: P2-AR-0007, role: capability-baseline-synthesis, iteration: 0, status: COMPLETED, verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED, branch: phase2/cap-audit-0-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.run.yaml}
+  - {run_id: P2-AR-0014, role: capability-repair, workstream: WS-1(part)+WS-12, iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws01-12, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0014.run.yaml}
+  - {run_id: P2-AR-0015, role: capability-repair, workstream: WS-2(part), iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0015.run.yaml}
+  - {run_id: P2-AR-0016, role: capability-repair, workstream: WS-3, iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws03, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0016.run.yaml}
+  - {run_id: P2-AR-0017, role: capability-repair, workstream: WS-4(part), iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws04, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0017.run.yaml}
+  - {run_id: P2-AR-0018, role: capability-repair, workstream: WS-5(part), iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0018.run.yaml}
+  - {run_id: P2-AR-0019, role: capability-repair, workstream: WS-6(part), iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws06, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0019.run.yaml}
+  - {run_id: P2-AR-0020, role: capability-repair, workstream: WS-8(part), iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.run.yaml}
+  - {run_id: P2-AR-0021, role: capability-repair, workstream: WS-9(part)+WS-11, iteration: 1, round: 1, status: RUNNING, branch: phase2/repair-1-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0021.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0007, role: capability-baseline-synthesis, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.run.yaml}
+  - {run_id: P2-AR-0014, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0014.run.yaml}
+  - {run_id: P2-AR-0015, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0015.run.yaml}
+  - {run_id: P2-AR-0016, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0016.run.yaml}
+  - {run_id: P2-AR-0017, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0017.run.yaml}
+  - {run_id: P2-AR-0018, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0018.run.yaml}
+  - {run_id: P2-AR-0019, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0019.run.yaml}
+  - {run_id: P2-AR-0020, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.run.yaml}
+  - {run_id: P2-AR-0021, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0021.run.yaml}
 
 unresolved_findings:
-  CRITICAL: []
-  HIGH: []
-  MEDIUM: []
-  LOW: []
-  INFO: []
+  source: release/capability-baseline/audit-0/synthesis/findings.yaml
+  blocking_total: 134
+  classes: 52
+  note: per-finding severity, provenance, lifecycle and class are in the synthesis findings file; not duplicated here
 
 downstream_evidence_invalidated: []
 
 owner_gates:
-  pending: []
+  pending:
+    - {id: HG-P2-0001, record_path: release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md, decisions: [OD-P2-01, OD-P2-02], presented: true, presented_via: active chat (AskUserQuestion), blocks: [BC-P2-36 admission part, any agent-identity extension of BC-P2-34], does_not_block: all determined repair requirements (L4 non-global blocking)}
   answered: []
 
 immutable_evidence:
@@ -191,6 +268,9 @@ completed_stages:
   - stage: P2_AUDIT_0_DISPATCHED
     commit: 990f85832ccc1cb14e9182ff1bb9a81b11fd8bbd
     note: six family auditors dispatched in isolated worktrees
+  - stage: P2_AUDIT_0_SYNTHESIS_REJECTED
+    commit: 395df8d27ca3312948f727de1ff0111ed101c2c2
+    note: P2-AR-0007 GOVERNANCE_CAPABILITY_BASELINE_REJECTED on cap2-candidate-0; 134 blocking findings in 52 classes; OD-P2-01/02 confirmed
   - stage: P2_AUDIT_0_FIRST_PASS_RULED_NONCONFORMING
     commit: ab964d70e9b598b38e07fd1ffcdd63735af1c355
     note: >-
@@ -200,11 +280,13 @@ completed_stages:
       pinned model under P2-HO-0008 / P2-HO-0009.
 
 next_deterministic_action: >-
-  AWAIT_SYNTHESIS_0 — P2-AR-0007 is running on branch phase2/cap-audit-0-synthesis from fdc4f32. On completion: verify
-  report and work commit, scope confined to release/capability-baseline/audit-0/synthesis/ and its report; merge --no-ff;
-  record the verdict and blocker-class inventory in state. If REJECTED: adjudicate each owner-decision item it lists
-  (present genuine ones as ONE Human Gate; route the rest as ordinary repair requirements), then partition the repair
-  delta into isolated repair workstreams and dispatch them. If ACCEPTED: record the token and finalise Phase 2.
+  AWAIT_REPAIR_1_ROUND_1_AND_HG-P2-0001 — eight round-1 builders P2-AR-0014..0021 run on branches phase2/repair-1-*. On
+  each completion: verify report and work commit, file scope (owned files + declared additive hot-spot edits), regression
+  counts; merge --no-ff into release/4.1.6-rc1 in the order WS-3, WS-4, WS-5, WS-6, WS-8, WS-9/11, WS-2, WS-1/12 (clean
+  merges only; any textual or semantic conflict goes to a fresh integration builder); after all eight: build, cargo test
+  --lib, --test certification, R1 held-out suites; then prepare round 2 (repair-delta section 2 waves 2-3 plus collected
+  integration points). When the owner answers HG-P2-0001: record OWNER-DECISION-P2-0001/0002 and route the admission
+  part of BC-P2-36 (and any OD-P2-01 extension) into the next round.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}

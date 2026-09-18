@@ -117,3 +117,17 @@ actions only.
 | Owner-decision flags | A0-A2-01 (post-install integrity anchor — the auditor says it needs a D-0007 trust-class amendment) and A0-A2-02 (unprovisioned-machine posture: embed/pre-install production root keys vs refuse vs accept; R1's AR-0027 accepted the posture as an implementation choice). **Held for synthesis adjudication** against ARCH-0003 §§3, 5, 7, 8, 11, D-0007, OWNER-DIRECTIVE-0004, the frozen SRR boundary and the R1 evidence. |
 | Audit-of-record totals | alpha-r 7 · beta-r 22 · gamma-r 19 · delta-r 17 · epsilon-r 27 · zeta-r 24 = **116 blocking findings** across 102 capability records (family counts; synthesis will dedupe and classify). Every family reports its derived-contract-view defect independently. |
 | Next action | Dispatch the fresh synthesis auditor P2-AR-0007 at this merge commit. |
+
+## P2-L-0011 — 2026-09-19 — Iteration-0 synthesis: REJECTED; repair iteration 1 round 1 dispatched; HG-P2-0001 presented
+
+| Field | Value |
+|---|---|
+| Synthesis | P2-AR-0007 (fresh, pinned model, self-reported `claude-opus-5[1m]`), work `ea6abea`, report `8ad351c`, merge `395df8d`. **`GOVERNANCE_CAPABILITY_BASELINE_REJECTED`** on `cap2-candidate-0`. Re-ran all six families' probes in a throwaway clone — 1,680 PASS/FAIL outcomes identical to the committed evidence; regression 42/79 green. |
+| Statuses | 11 PRESENT_AND_SUBSTANTIAL / 84 PARTIAL / 6 ABSENT (J2, V1–V4, W11) of 101 capabilities (100 numbered + Gate U). |
+| Acceptance criteria | HOLD AC-1, AC-9, AC-11, AC-12, AC-14, AC-15. FAIL AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-10, AC-13, AC-16. |
+| Findings | 180 family findings: 165 confirmed, 15 corrected, 0 refuted; 10 added. **134 blocking in 52 blocker classes BC-P2-01…52** — the iteration-0 inventory against which convergence is measured. |
+| Owner flags adjudicated | Determined by accepted sources, so routed as repairs: human-approval channel (BC-P2-10), default role (BC-P2-08), plugin self-declaration (BC-P2-39), A2 post-install anchor (BC-P2-35), unauthenticated-install presentation (BC-P2-36). Genuine owner decisions: **OD-P2-01** (agent-role identity binding) and **OD-P2-02** (unprovisioned-machine admission posture). The orchestrator re-checked both classifications against the owner's Phase-2 directive: OD-P2-01 is a security/cost trade-off against D-0007 consequence 5; OD-P2-02 is a security-versus-availability posture the owner already reserved (OWNER-DECISION-0005 §1). |
+| Human Gate | **HG-P2-0001** (`GATES/HG-P2-0001-OWNER-DECISIONS.md`) presented in the active chat after the builders were dispatched. It blocks only BC-P2-36's admission part and any agent-identity extension of BC-P2-34 (non-global blocking, Contract v3 L4). |
+| Repair plan | repair-delta §2 dependency waves grouped into rounds. **Round 1** (eight builders, pinned model, disjoint owned files, CARGO_BUILD_JOBS=2): P2-AR-0014 WS-1/12 (BC-01, 51) · P2-AR-0015 WS-2 (03, 06, 42, 43) · P2-AR-0016 WS-3 (08, 09, 10, 12a, 18r, 45, 49) · P2-AR-0017 WS-4 (21r, 17, 19, 20c) · P2-AR-0018 WS-5 (14, 15) · P2-AR-0019 WS-6 (25, 26, 27, 29, 32) · P2-AR-0020 WS-8 (35, 36-presentation, 37, 38) · P2-AR-0021 WS-9/11 (33, 52, 21c, 50). Handoffs P2-HO-0010 (common) and P2-HO-0011…0018. |
+| Housekeeping | 13 audit worktrees removed after confirming each branch merged and clean (branches retained). |
+| Next action | Await round 1 and the owner's answer; integrate; round 2. |
