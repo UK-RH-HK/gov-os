@@ -235,6 +235,24 @@ gates:
       - accepts no candidate, certifies no release, changes no normative source; R0 acceptance unaffected
     satisfaction_evidence: this record's commit
 
+  - id: OWNER-DECISION-0009
+    title: Owner adoption of ARCH-0003 (Signed Release Root v1)
+    status: RECORDED
+    satisfier: product owner
+    classification: >-
+      binding owner approval/adoption of an architecture already independently accepted at R0 (AR-0025) and implemented
+      by an independently accepted R1 candidate (AR-0033); not a technical verdict
+    record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md
+    record_sha256: a0d3325fa8618f1af5089b47370e362cee37ba76516c1bd1ad77acf53ca1fd39
+    effects:
+      - ARCH-0003 status ACTIVE, in_effect true, human_approved true, approval_state OWNER_ADOPTED
+      - ARCH-0003 body and summary byte-identical; body sha256 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+      - in effect as the adopted release-authentication architecture; not R2-certified, not R3-qualified, not released, not merged to main
+      - D-0007 remains ACTIVE and unchanged; its explicit transition record remains open and was not requested
+      - ARCH-0001 remains ACTIVE as the overall implementation architecture
+      - accepted candidate, acceptance tag and all R0/R1 evidence untouched
+    satisfaction_evidence: this record's commit
+
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony
     status: NOT_OPEN

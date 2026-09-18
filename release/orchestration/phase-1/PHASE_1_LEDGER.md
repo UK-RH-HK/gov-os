@@ -1137,3 +1137,19 @@ Entries are never edited after they are written. Corrections are made by a later
 | Output commit | the commit containing this entry; acceptance evidence merge `70a67f1` |
 | Next action | **NONE.** Phase 1 is complete and orchestration has stopped. Phase 2 is **not** started and requires an explicit owner instruction. |
 | Return token | `PHASE_ORCHESTRATION_COMPLETE__ROT_PHASE1_CANDIDATE_ACCEPTED_R1` |
+
+## L-0078 — 2026-09-18 — Phase-1 → Phase-2 operator transition: ARCH-0003 owner-adopted, V8.2 installed
+
+| Field | Value |
+|---|---|
+| Iteration | post-completion transition housekeeping — **Phase 2 not started** |
+| Role | product owner (adoption decision, V8.2 supply); orchestrator (records only) |
+| Input commit | `e3e8a7fbb9474aa8f770da04c431016f4e33b1c6` |
+| Work performed | **Owner adoption.** Recorded `OWNER-DECISION-0009`: the product owner adopts ARCH-0003. ARCH-0003 moved from `PROVISIONAL` / `in_effect: false` / `human_approved: false` to `ACTIVE` / `in_effect: true` / `human_approved: true`, `approval_state: OWNER_ADOPTED`, following the conventions of the existing active records `ARCH-0001` and `D-0009`. The architecture `body` and `summary` are **byte-identical** (body SHA-256 `093cb78e…` before and after, verified by digest); `r0_acceptance`, `corrections`, `governed_by`, `depends_on` and `affects` unchanged. The independent technical acceptance remains `ROT_ARCHITECTURE_ACCEPTED_R0` (AR-0025) and `ROT_PHASE1_CANDIDATE_ACCEPTED_R1` (AR-0033); adoption adds owner approval only. **D-0007 is deliberately unchanged**: ARCH-0003 §11 says it "remains ACTIVE through R0 and transition", and the accepted transition map says it "cannot be superseded or amended merely because R0 is accepted" and needs "a later explicit transition record" — which was not requested and remains open. ARCH-0001 stays ACTIVE; ARCH-0003 affects it and does not replace it. **V8.2 installed.** SHA-256 verified at `6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c`, exactly the owner-supplied expected value. Before committing a file the orchestrator did not write, its identity was checked: its title reads V8.2, it carries the Phase 2 card, it self-classifies `NON_NORMATIVE_OPERATOR_UI`, and it loads no external scripts or stylesheets. It is now the sole current operator UI; V8.1 is retained **unchanged** as historical Phase-1 operator evidence and is labelled as such everywhere it is still referenced, so the two are never presented as simultaneously current. The root README and the phase-1 README now direct a fresh session to V8.2 and its launcher. |
+| Preserved unchanged | Accepted candidate `srr1-r1-candidate-4` at `c7d3fef`; tag `srr1-r1-accepted` (not moved or recreated); all R0 and R1 verifier evidence; Contract v3 and its canonical import; the runtime, kernel, CLI and product implementation; and `CP-FINAL-PHASE-1-COMPLETE.yaml`, which was **not edited** — its schema does not require a transition reference, so the transition is recorded in the additive `CP-0034-PHASE-2-TRANSITION.yaml` instead. Historical references to V8.1 in AR-0023, CP-0021 and earlier ledger entries are immutable history and were left as they are. |
+| Report / evidence | `GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md` (SHA-256 `a0d3325f…`); `CHECKPOINTS/CP-0034-PHASE-2-TRANSITION.yaml`; `spec/architecture/ARCH-0003.yaml`; `docs/DECISIONS.md`; `README.md`; `release/orchestration/phase-1/README.md` |
+| Verdict | — (owner adoption and operator housekeeping; no gate verdict) |
+| Findings | — |
+| Phase 2 | **Not started.** `release/orchestration/phase-2/` was deliberately not created; the fresh Phase-2 outer orchestrator establishes it. |
+| Output commit | the single transition commit `orchestration: adopt ARCH-0003 and install V8.2 control panel` |
+| Next action | `START_FRESH_PHASE_2_OUTER_ORCHESTRATOR_USING_V8_2` |

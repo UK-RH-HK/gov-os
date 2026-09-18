@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-18T11:40:08Z'
-state_hash: 2125a7bb87fbe3e82dd2b9fe8df0541346a93e291697f0a41899f8f4cab2afd9
+updated_at: '2026-09-18T19:30:43Z'
+state_hash: 62129c59063764d1ea45078d72e8321dca04aa20eb8d5a845ba8c89d350496c1
 lifecycle_state: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
-loop_status: COMPLETE__STOPPED_BEFORE_PHASE_2
+loop_status: PHASE_1_COMPLETE__TRANSITION_HOUSEKEEPING_DONE__PHASE_2_NOT_STARTED
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -54,11 +54,21 @@ repository:
   main_branch_modified_by_phase_1: false
 
 operator_ui:
-  canonical_path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html
-  sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+  canonical_path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html
+  sha256: 6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c
+  version: V8.2
   classification: NON_NORMATIVE_OPERATOR_UI
-  hash_verified_at: '2026-09-17T21:00Z'
+  hash_verified_at: '2026-09-18'
+  installed_at: Phase-1 to Phase-2 transition
+  self_identification_checked: title reads V8.2; carries the Phase 2 card; self-classifies NON_NORMATIVE_OPERATOR_UI; loads no external scripts or stylesheets
   duplicate_canonical_copies: none
+  historical:
+    - version: V8.1
+      path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html
+      sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+      classification: NON_NORMATIVE_OPERATOR_UI
+      status: HISTORICAL_PHASE_1_OPERATOR_EVIDENCE - retained unchanged; NOT a current operator interface
+      served: all of Phase 1
 
 baseline_rejected_release:
   version: 4.1.5
@@ -70,26 +80,34 @@ baseline_rejected_release:
   evidence_path: release/verification/4.1.5
 
 governing_decisions:
-  active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001]
+  active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001, ARCH-0003]
   superseded: [D-0001]
-  proposed_not_active: [D-0008, ARCH-0002, ARCH-0003]
+  proposed_not_active: [D-0008, ARCH-0002]
   d0008_disposition: non-active CP-1 research evidence; unchanged; never owner-activated; no Revision 8
   d0007_active_until: ARCH-0003 passes R0 and a later explicit transition record authorises amendment or supersession
+  d0007_status_after_arch_0003_adoption: >-
+    ACTIVE and UNCHANGED. ARCH-0003 has passed R0 and R1 and is owner-adopted, but per ARCH-0003 section 11 and the
+    accepted transition map, D-0007 cannot be amended or superseded merely by acceptance or adoption. The explicit
+    transition record identifying which D-0007 wording, if any, changes remains OPEN and was not requested at the
+    Phase-1 to Phase-2 transition. All D-0007 rules survive.
   owner_design_direction:
     selected_design_target: compact TUF-style Signed Release Root with trusted platform/admin bootstrap
     record: OWNER-DIRECTIVE-0004
     token: ADOPT_A_TUF_STYLE_SIGNED_RELEASE_ROOT_WITH_PLATFORM_TRUSTED_BOOTSTRAP__KEEP_D0007_TRUST_DIRECTION__SEPARATE_PHASE1_RELEASE_CERTIFICATION_AND_OPTIONAL_HIGH_ASSURANCE_QUALIFICATION__RETIRE_CP1_AS_THE_PHASE1_TARGET
   assurance_boundary: [R0 architecture, R1 implementation candidate, R2 standard release certification, R3 optional high-assurance qualification]
-  owner_approved_in_phase_1: [D-0009, OWNER-DIRECTIVE-0004]
+  owner_approved_in_phase_1: [D-0009, OWNER-DIRECTIVE-0004, OWNER-DECISION-0009 (ARCH-0003 adoption)]
 
 active_architecture_lineage:
   name: Signed Release Root
   short_name: SRR-1
   decision: D-0009
   architecture: ARCH-0003
-  status: R0_ACCEPTED__NOT_IMPLEMENTED__NOT_IN_EFFECT
-  in_effect: false
-  implemented: false
+  status: OWNER_ADOPTED__R0_AND_R1_ACCEPTED__IN_EFFECT
+  in_effect: true
+  implemented: true
+  implemented_by: srr1-r1-candidate-4 (c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112, tag srr1-r1-accepted)
+  owner_adoption: OWNER-DECISION-0009
+  in_effect_scope: adopted release-authentication architecture of the repository; NOT R2-certified, NOT R3-qualified, NOT released, NOT merged to main
   pack_path: release/root-of-trust/signed-release-root-v1
   acceptance_boundary_path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
   acceptance_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
@@ -247,6 +265,27 @@ unresolved_findings:
   owner_requirements_HO_0001: {s3_1: SATISFIED, s3_2: NOT_SATISFIED, s3_3: SATISFIED_AS_CLASS, s3_4: SATISFIED, s4: SATISFIED}
   owner_record_conformance: {OWNER-DESIGN-REQUIREMENTS-0001: deviates (OP-4, OP-7a, OP-10b, OP-11b, OP-13b consequence, OP-16b), OWNER-DESIGN-REQUIREMENTS-0002: deviates (OT-1 part B running-machine C3; OT-2 criterion not executable)}
   closed_as_class: [R2-H4 (matrix7 reproduced in review r7), R2-M4, R2-M6, BC5-3]
+
+phase_transition:
+  from: Phase 1 (PHASE_1_INTERNAL_CONVERGENCE_COMPLETE)
+  to: Phase 2 - GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+  phase_2_started: false
+  housekeeping_performed:
+    - ARCH-0003 owner-adopted (OWNER-DECISION-0009); technical content byte-identical
+    - V8.2 installed as the sole current operator UI; V8.1 retained as historical Phase-1 operator evidence
+    - README and orchestration navigation redirected to V8.2
+  preserved_unchanged:
+    - accepted candidate srr1-r1-candidate-4 at c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+    - tag srr1-r1-accepted (not moved or recreated)
+    - all R0 and R1 verifier evidence
+    - Contract v3 owner source and its canonical import
+    - runtime, kernel, CLI and product implementation
+    - CHECKPOINTS/CP-FINAL-PHASE-1-COMPLETE.yaml (not edited; the transition is recorded in CP-0034 instead)
+  transition_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-0034-PHASE-2-TRANSITION.yaml
+  phase_2_durable_state: not created - release/orchestration/phase-2/ is established by the fresh Phase-2 outer orchestrator, not by this transition
+  open_items_carried_to_phase_2:
+    - PHASE-1-RESIDUAL-RISKS.md (AR33-N2 first)
+    - D-0007 explicit transition record (open; not requested)
 
 r1_acceptance:
   token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
@@ -452,6 +491,7 @@ owner_gates:
     - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
     - {id: OWNER-DESIGN-REQUIREMENTS-0002, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml, classification: binding resolutions of OT-1 and OT-2 clarifying OP-7/OP-10/OP-13, not D-0008 approval}
     - {id: OWNER-DIRECTIVE-0003, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, classification: binding orchestration directive — freeze the RoT loop after the revision-7 verdict}
+    - {id: OWNER-DECISION-0009, date: 2026-09-18, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md, classification: binding owner adoption of the independently accepted ARCH-0003; approval only, no technical content changed; D-0007 and ARCH-0001 unchanged}
     - {id: OWNER-DECISION-0008, date: 2026-09-18, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0008-CONVERGENCE-OPTION-B.md, classification: binding owner convergence decision — Option B structural repair authorised; new-class escalation is now immediate}
     - {id: OWNER-DECISION-0007, date: 2026-09-18, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md, classification: binding owner answers — keep the XDG/HOME derivation (AR27-OD1 closed, no R0 readjudication) and keep the stricter both-floors break-glass exit (SRR2-R1-C1 closed, confirms the interim)}
     - {id: OWNER-DECISION-0006, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md, classification: binding owner R0 decision — below-floor recovery is break-glass (b), authorised and recorded}
@@ -728,7 +768,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: NONE__PHASE_1_COMPLETE__PHASE_2_NOT_STARTED__AWAIT_EXPLICIT_OWNER_INSTRUCTION_BEFORE_ANY_FURTHER_PHASE
+next_deterministic_action: START_FRESH_PHASE_2_OUTER_ORCHESTRATOR_USING_V8_2
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0

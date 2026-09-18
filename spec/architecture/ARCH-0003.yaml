@@ -1,9 +1,9 @@
 id: ARCH-0003
 type: architecture
-title: "PROVISIONAL R0 CANDIDATE — Signed Release Root v1 (TUF-style metadata, platform/admin bootstrap, uniform lifecycle verification)"
-status: PROVISIONAL
-proposal_state: R0_REVIEW_CANDIDATE
-approval_state: OWNER_DIRECTION_APPROVED
+title: "Signed Release Root v1 (TUF-style metadata, platform/admin bootstrap, uniform lifecycle verification)"
+status: ACTIVE
+proposal_state: OWNER_ADOPTED
+approval_state: OWNER_ADOPTED
 review_state: R0_ACCEPTED
 r0_acceptance:
   token: ROT_ARCHITECTURE_ACCEPTED_R0
@@ -20,15 +20,45 @@ r0_acceptance:
   annotation_note: >-
     These acceptance fields are governance metadata added after the verdict. The accepted architecture body is
     unchanged; accepted_content_sha256 identifies the exact bytes AR-0025 reviewed.
-correction_state: R0_CORRECTION_1_APPLIED_PENDING_FRESH_R0_RE_REVIEW
-in_effect: false
+owner_adoption:
+  record: OWNER-DECISION-0009
+  record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md
+  adopted_at: "2026-09-18"
+  adopted_by: human (product owner)
+  basis: >-
+    Owner approval/adoption of an architecture that had already been independently accepted. The independent technical
+    acceptance is ROT_ARCHITECTURE_ACCEPTED_R0 (AR-0025, r0_acceptance above) and the implementation acceptance is
+    ROT_PHASE1_CANDIDATE_ACCEPTED_R1 (AR-0033, srr1-r1-candidate-4, tag srr1-r1-accepted). Adoption records owner
+    approval only; it is not a further technical verdict and changes no technical content.
+  architecture_body_unchanged: true
+  accepted_body_sha256: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+  r1_acceptance:
+    token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+    accepted_candidate: srr1-r1-candidate-4
+    accepted_commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+    acceptance_tag: srr1-r1-accepted
+    accepted_by_run: AR-0033
+  in_effect_scope: >-
+    In effect as the adopted release-authentication architecture of the Governance OS repository, implemented by the
+    R1-accepted candidate. It does NOT certify any release (R2), qualify any platform (R3), publish anything, or merge
+    to main; those remain separate gates.
+  does_not_supersede: [ARCH-0001, D-0007]
+  d0007_note: >-
+    Per this record's own section 11 and the accepted transition map, D-0007 remains ACTIVE and is neither amended nor
+    superseded by this adoption. Any change to D-0007 wording requires a separate explicit transition record, which
+    remains open and was not requested.
+  arch_0001_note: ARCH-0001 remains the active overall implementation architecture; ARCH-0003 affects it and does not replace it.
+correction_state: R0_CORRECTION_1_APPLIED_AND_INDEPENDENTLY_ACCEPTED
+in_effect: true
 state_class: NARRATIVE
 created: "2026-09-17"
-updated: "2026-09-17"
+updated: "2026-09-18"
 owner_role: human
-human_approved: false
+human_approved: true
+approved_by: "human (product owner, OWNER-DECISION-0009)"
+approved_at: "2026-09-18"
 direction_human_approved: true
-tags: [root-of-trust, signed-release-root, tuf-style, r0-candidate, private-local-profile, not-implemented]
+tags: [root-of-trust, signed-release-root, tuf-style, private-local-profile, r0-accepted, r1-accepted, owner-adopted]
 governed_by: [D-0002, D-0007, D-0009, OWNER-DIRECTIVE-0004]
 depends_on: [ARCH-0001]
 affects: [ARCH-0001, API-0001, API-0002]

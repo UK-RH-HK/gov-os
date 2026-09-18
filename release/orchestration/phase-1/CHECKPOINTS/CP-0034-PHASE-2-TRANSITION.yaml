@@ -1,0 +1,70 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0034
+trigger: Phase-1 to Phase-2 operator transition housekeeping - ARCH-0003 owner-adopted and V8.2 installed; Phase 2 NOT started
+date: 2026-09-18
+lifecycle_state: PHASE_1_INTERNAL_CONVERGENCE_COMPLETE
+loop_status: PHASE_1_COMPLETE__TRANSITION_HOUSEKEEPING_DONE__PHASE_2_NOT_STARTED
+supplements: CP-FINAL-PHASE-1-COMPLETE.yaml
+supplement_note: >-
+  CP-FINAL-PHASE-1-COMPLETE.yaml is deliberately NOT edited. Its schema does not require a transition reference, so the
+  transition is recorded here as an additive checkpoint instead, leaving the Phase-1 final checkpoint exactly as it was
+  when Phase 1 completed.
+
+phase_1_acceptance_preserved:
+  accepted_candidate: srr1-r1-candidate-4
+  accepted_commit: c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112
+  acceptance_tag: srr1-r1-accepted
+  tag_moved_or_recreated: false
+  r0_token: ROT_ARCHITECTURE_ACCEPTED_R0
+  r1_token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+  r0_r1_evidence_modified: false
+  contract_v3_modified: false
+  product_implementation_modified: false
+
+owner_adoption:
+  record: OWNER-DECISION-0009
+  record_sha256: a0d3325fa8618f1af5089b47370e362cee37ba76516c1bd1ad77acf53ca1fd39
+  architecture: ARCH-0003
+  resulting_state: {status: ACTIVE, in_effect: true, human_approved: true, approval_state: OWNER_ADOPTED}
+  body_sha256_before: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+  body_sha256_after: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
+  technical_content_changed: false
+  in_effect_scope: adopted release-authentication architecture; NOT R2-certified, NOT R3-qualified, NOT released, NOT merged to main
+  unchanged_by_adoption: [D-0007 (ACTIVE; its explicit transition record remains open), ARCH-0001 (ACTIVE), D-0008, ARCH-0002, frozen R0/R1/R2/R3 boundary]
+
+operator_ui:
+  current:
+    version: V8.2
+    path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html
+    sha256: 6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c
+    sha256_verified_against_owner_expected_value: true
+    classification: NON_NORMATIVE_OPERATOR_UI
+  historical:
+    version: V8.1
+    path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html
+    sha256: 54730e8e0b8b14bfac7280b52fc6593c8e72dc4e35782fd051aed4af36bc585d
+    status: HISTORICAL_PHASE_1_OPERATOR_EVIDENCE - unchanged; not a current operator interface
+  simultaneously_current: false
+
+phase_2:
+  started: false
+  target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+  durable_state_created: false
+  durable_state_path_for_the_fresh_orchestrator: release/orchestration/phase-2/
+  launcher: V8.2 - Self-locating durable autonomous Phase Orchestrator
+  inputs_to_inherit:
+    - release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md (AR33-N2 first)
+    - repo-root Governance_OS_Capability_Acceptance_Contract_v3.md, SHA-256 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+    - the D-0007 explicit transition record, which remains open
+  scope_note: >-
+    Per the launcher's applicability matrix, Phase 2 is the exhaustive full-capability baseline: read and audit the
+    entire Contract v3 capability-by-capability. That is Phase 2's work and was not begun here.
+
+running_work: []
+next_deterministic_action: START_FRESH_PHASE_2_OUTER_ORCHESTRATOR_USING_V8_2
+prohibitions:
+  - do not start Phase 2 from this session; a fresh outer orchestrator session does that using V8.2
+  - do not move, recreate or retag srr1-r1-candidate-4 or srr1-r1-accepted
+  - do not rewrite R0/R1 evidence or the Phase-1 final checkpoint
+  - do not amend or supersede D-0007 without an explicit owner-authorised transition record

@@ -23,11 +23,14 @@ Use these sources in authority order:
 5. **Frozen lifecycle-gate contracts**, as referenced by the active decisions and architecture.
 6. **Exact candidate/evidence state and durable orchestration state:** [`./release/orchestration/`](./release/orchestration/).
 7. **Current operator control panel:**
-   [Governance OS Interactive Stage Control Panel V8.1](./release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html)
-   — `NON_NORMATIVE_OPERATOR_UI`. It is a runbook/orchestration interface and never overrides the sources above.
+   [Governance OS Interactive Stage Control Panel V8.2](./release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html)
+   — `NON_NORMATIVE_OPERATOR_UI`, SHA-256 `6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c`.
+   It is a runbook/orchestration interface and never overrides the sources above. V8.1
+   ([`…_v8_1.html`](./release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html))
+   is retained unchanged as **historical Phase-1 operator evidence only** and is **not** a current operator interface.
 
-A new persistent Opus phase-orchestrator session should open that exact HTML and use its
-**V8.1 — Self-locating durable autonomous Phase Orchestrator** launcher. The launcher determines the active phase
+A new persistent Opus phase-orchestrator session should open that exact V8.2 HTML and use its
+**V8.2 — Self-locating durable autonomous Phase Orchestrator** launcher. The launcher determines the active phase
 from committed Git/orchestration evidence, then uses the matching phase prompts internally. The product owner should
 not need to relay routine reviewer/builder prompts between agents. Each completed phase stops at its acceptance token;
 the next outer session uses the same universal launcher again.
