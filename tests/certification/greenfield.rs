@@ -159,7 +159,14 @@ fn greenfield_end_to_end() {
         "impl task must become READY after readiness satisfied: {rp}"
     );
     // --- continue: context packet is deterministic ---
-    let c1 = g.ok(&["continue", "--claim"]);
+    // the task contract designates backend-engineer, and the designated role binds who may claim and close it
+    // (BC-P2-14): the orchestrator is refused, the designated role continues the work
+    assert_eq!(
+        g.err(&["task", "claim", &impl_id]).error_code(),
+        "ROLE_NOT_DESIGNATED"
+    );
+    let be = g.with_role("backend-engineer");
+    let c1 = be.ok(&["continue", "--claim"]);
     assert_eq!(c1["status"], "NEXT_WORK");
     assert_eq!(c1["task"], impl_id);
     assert_eq!(c1["routing"]["minimum_tier"], "T2");
@@ -263,7 +270,7 @@ fn greenfield_end_to_end() {
         "passed",
     );
     g.ok(&["rebuild-memory", "--incremental"]);
-    let cl = g.ok(&["task", "close", &impl_id, "--report", &rep]);
+    let cl = be.ok(&["task", "close", &impl_id, "--report", &rep]);
     assert!(cl["checkpoint"].as_str().unwrap().starts_with("CKPT-"));
     let wd = g.ok(&[
         "checkpoint",
