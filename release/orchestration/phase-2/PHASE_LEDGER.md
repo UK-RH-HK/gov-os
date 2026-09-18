@@ -131,3 +131,13 @@ actions only.
 | Repair plan | repair-delta §2 dependency waves grouped into rounds. **Round 1** (eight builders, pinned model, disjoint owned files, CARGO_BUILD_JOBS=2): P2-AR-0014 WS-1/12 (BC-01, 51) · P2-AR-0015 WS-2 (03, 06, 42, 43) · P2-AR-0016 WS-3 (08, 09, 10, 12a, 18r, 45, 49) · P2-AR-0017 WS-4 (21r, 17, 19, 20c) · P2-AR-0018 WS-5 (14, 15) · P2-AR-0019 WS-6 (25, 26, 27, 29, 32) · P2-AR-0020 WS-8 (35, 36-presentation, 37, 38) · P2-AR-0021 WS-9/11 (33, 52, 21c, 50). Handoffs P2-HO-0010 (common) and P2-HO-0011…0018. |
 | Housekeeping | 13 audit worktrees removed after confirming each branch merged and clean (branches retained). |
 | Next action | Await round 1 and the owner's answer; integrate; round 2. |
+
+## P2-L-0012 — 2026-09-19 — HG-P2-0001 answered by the product owner
+
+| Field | Value |
+|---|---|
+| Channel | Active chat (AskUserQuestion), presented after the round-1 builders were dispatched so that no independent work waited on it |
+| OD-P2-01 | **Option A** — agent roles (L0–L4) stay declared by the launching harness/adapter (D-0007 consequence 5). Recorded as `OWNER-DECISION-P2-0001` (SHA-256 `612849ba…`). No new class; residual risk recorded (an agent could claim a higher *agent* role, never a human one). BC-P2-08/09/10 unaffected and still required. |
+| OD-P2-02 | **Option A** — refuse external-source kernel ingress on unprovisioned machines; the binary's embedded payload only as a marked bootstrap mode; dev/test provision a throw-away root; Phase-4 qualification and release evidence on provisioned machines. Recorded as `OWNER-DECISION-P2-0002` (SHA-256 `5d73bbe3…`). BC-P2-36's admission part becomes a determined, owner-added requirement for round 2 (WS-8, with harness/fixture/docs provisioning). |
+| Unchanged | D-0007 text (its explicit transition record stays open, not requested); ARCH-0001; ARCH-0003; the frozen gate contract. |
+| Next action | Continue awaiting round 1. |

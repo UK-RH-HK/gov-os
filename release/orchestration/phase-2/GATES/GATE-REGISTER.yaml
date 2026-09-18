@@ -65,7 +65,8 @@ gates:
 
   - id: HG-P2-0001
     title: Owner decisions OD-P2-01 (agent-role identity binding) and OD-P2-02 (unprovisioned-machine posture)
-    status: PRESENTED_AWAITING_OWNER
+    status: ANSWERED
+    answered: {OD-P2-01: A (OWNER-DECISION-P2-0001), OD-P2-02: A (OWNER-DECISION-P2-0002), at: '2026-09-19', channel: active chat}
     satisfier: product owner only
     record_path: release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md
     raised_by: P2-AR-0007 owner-decisions-required.md; classification confirmed by the orchestrator
