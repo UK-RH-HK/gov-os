@@ -1,0 +1,69 @@
+schema: governance-os.phase-1.checkpoint
+schema_version: 1
+checkpoint: CP-0033
+trigger: structural repair merged and verified in scope; candidate 4 minted; verification iteration 4 dispatched
+date: 2026-09-18
+lifecycle_state: R1_CANDIDATE_VERIFICATION
+loop_status: R1_VERIFICATION_4_RUNNING_ON_CANDIDATE_4
+repository:
+  integration_branch: release/4.1.6-rc1
+  head: 84b9ee8b8a34c4308f25ed12af89b90344a3bcab
+candidate:
+  id: srr1-r1-candidate-4
+  commit: 84b9ee8b8a34c4308f25ed12af89b90344a3bcab
+  tag: srr1-r1-candidate-4
+  repair_run: AR-0032
+  repair_work_commit: cf527412233ab2ee435a01d1aa3c358050b1cf49
+  supersedes: srr1-r1-candidate-3
+  structural: true
+  accepted: false
+  certified: false
+  released: false
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+owner_gates_pending: []
+owner_decisions_in_force: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008]
+orchestrator_verification_of_ar_0032:
+  - resolve_state_root, default_state_root and exit_satisfied all byte-identical by function-body digest; EXIT_POLICY unchanged
+  - all three prior held-out suites byte-identical; tests/certification/srr.rs not in the diff
+  - no forbidden path touched
+  - bullet 7 effect confirmed to have call sites outside breakglass.rs where it previously had none
+  - regression independently reproduced - 42 lib passed 0 failed; 79 certification passed 0 failed; exit 0
+verification_primary_targets:
+  - can SECTION_6_SIGNATURES be made to miss a primitive a plausible future author would write
+  - does any acceptance marker accept something unenforced
+  - does any reporting path bypass the CLI envelope that carries the bullet-7 marking
+  - are the falsifiability positive controls genuine or is each detector tuned to its own control
+  - is the single cit::take_snapshot exemption sound
+  - independently verify the repair's account of the seven AR-0031 held-out failures rather than accept it
+blocker_class_history:
+  known_classes: [BC-R1-1 guard decision, BC-R1-2 guard coverage, BC-R1-3 undetermined-subject fail-open]
+  policy: OWNER-DECISION-0008 - residuals in known classes loop automatically; a genuinely new material class or owner decision escalates IMMEDIATELY on one occurrence
+running_work:
+  - run_id: AR-0033
+    role: verifier-d
+    handoff: release/orchestration/phase-1/HANDOFFS/HO-0033-r1-verification-4.md
+    worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-4
+    branch: phase1/srr1-r1-verify-4
+    worktree_base_commit: 84b9ee8b8a34c4308f25ed12af89b90344a3bcab
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0033.report.yaml
+    expected_evidence_path: release/verification/4.1.6-r1-4/
+resume_rule: >-
+  If AR-0033 has a committed AR-0033.report.yaml on branch phase1/srr1-r1-verify-4, adjudicate that verdict. If not, the
+  run is INCOMPLETE and advances no gate: dispatch a NEW fresh independent verifier at candidate 4. Never infer a verdict
+  from conversation.
+on_accept: >-
+  Persist ROT_PHASE1_CANDIDATE_ACCEPTED_R1 for srr1-r1-candidate-4, mark GATE-R1-CANDIDATE-ACCEPT and
+  GATE-PHASE1-COMPLETE satisfied, record the accepted commit and tag, the Contract v3 hash, the R0 and all four R1
+  independent evidence trees and the residual later-lifecycle risks separately, verify durable state, write the final
+  checkpoint, append the ledger, and STOP before Phase 2. Return
+  PHASE_ORCHESTRATION_COMPLETE__ROT_PHASE1_CANDIDATE_ACCEPTED_R1.
+on_residual_blockers: continue the bounded repair/reverify loop automatically, no owner interruption
+on_new_material_class_or_owner_decision: STOP immediately and escalate with the evidence
+next_deterministic_action: ADJUDICATE_AR_0033_R1_VERDICT__ACCEPT_COMPLETES_PHASE_1__RESIDUALS_LOOP_AUTOMATICALLY__A_NEW_MATERIAL_CLASS_ESCALATES_IMMEDIATELY
+prohibitions:
+  - no R0 reopening; ROT_ARCHITECTURE_ACCEPTED_R0 stands
+  - AR27-OD1, machine-state path resolution and the SRR2-R1-C1 exit policy are owner-closed
+  - no RoT-1 Revision 8, no CP-1 resumption, no D-0008/ARCH-0002 activation
+  - no amendment of D-0007, D-0009, the accepted ARCH-0003 body, the frozen boundary or any owner record
+  - verifiers never modify product source; repair roles never grade their own repairs
+  - no Phase 2, no certification, no stable release push, no merge to main
