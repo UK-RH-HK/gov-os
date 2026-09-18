@@ -63,3 +63,14 @@ actions only.
 | Determinations | AC-5 **NOT MET** (no scheduler: no impacted selection, parallelism or isolation; partial cache/staleness/hard-block/provenance; no remediation tasks; G6 absent). AC-6 **QUALIFICATION_ORACLE_FORMAT_ABSENT**. Also reports AC-13/AC-10 contract-view defects (Gate U absent from the compiled contract while `contract verify` passes; V1–V4 mislabelled ORIGINAL; no bullets/fields in the compiled form) and AC-16 interaction failures (U↔O5, O4↔W6). |
 | Orchestrator checks | Scope confined to own evidence and report; no status/finding contradiction; regression reproduced by the auditor 42/79. Contrast with the first-pass epsilon audit (1 blocking finding, printed assertions) is recorded as calibration for the re-dispatch decision. |
 | Next action | Await P2-AR-0009…0013. |
+
+## P2-L-0006 — 2026-09-18 — P2-AR-0011 delta re-audit merged (audit of record)
+
+| Field | Value |
+|---|---|
+| Run | P2-AR-0011, self-reported `claude-opus-5`; work `aacc9a0`, report `2e12353`, merge `79ae966` |
+| Result | FAMILY_AUDIT_COMPLETE. 18 capabilities / 93 bullets, each with an executable check (17 probes incl. SIGKILL mid-transaction, forged records, modified binary). Capabilities 3 P&S (K1, L4, N4) / 14 PARTIAL / 1 ABSENT (J2). Bullets 29/50/14. 26 findings, **17 blocking**. |
+| Headline blockers | L3 human approval derivable from caller claims (CLI defaults, `--role human`, `GOV_ROLE`), forged gate/decision files, approval not bound to content, tasks runnable past declined/missing gates; J2 no experiment lifecycle; K2 CIT-E staleness stops at open work (K2↔W6 fails); K3 materiality self-labelled; N2 four of eight checkpoint triggers never fire; N3 nothing marks a checkpoint stale (N↔W9 fails); M1 routing overrides lower kernel tier floors. |
+| Owner-decision flags | A0-L3-01 and A0-L3-05 — "how a human is authenticated to the product" (the human-presence channel). **Held for synthesis adjudication**: whether ARCH-0003 §8 ("Interactive trust changes use local administrator/Human Gate authority. Repository gate records remain requests"), D-0007 trust direction and the break-glass owner-authority precedent (OWNER-DECISION-0006) already determine the channel, or whether a genuine owner choice remains. Not presented to the owner yet. |
+| Out-of-family observations | Passed to the synthesis as leads, not findings: I4 BLOCKED task handed out as runnable; E3/E1 any role can return any handoff; C7/D2 nested worker return not indexed; C9 duplicate impact candidates. |
+| Next action | Await P2-AR-0009, 0010, 0012, 0013. |

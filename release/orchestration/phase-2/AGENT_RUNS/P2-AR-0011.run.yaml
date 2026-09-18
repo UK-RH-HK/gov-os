@@ -20,4 +20,17 @@ branch: phase2/cap-audit-0-delta-r
 expected_evidence_path: release/capability-baseline/audit-0/delta-r/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.report.yaml
 required_verdict_vocabulary: [FAMILY_AUDIT_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_AUDIT_COMPLETE
+  work_commit: aacc9a01750b0cd0ec9730e8dfcd2372c4058a77
+  report_commit: 2e12353f89f2b5251f9e3d58926f2b0c8cad67a5
+  integration_merge_commit: 79ae9667946d3e20e2e9a88f65000f3e704ce8a3
+  evidence_path: release/capability-baseline/audit-0/delta-r/
+  agent_model_self_reported: claude-opus-5
+  scope_check: touched only its own evidence directory and report (plus the orchestrator's handoff-carry commit)
+  conformance_check: no status/finding contradiction (K1, L4, N4 are referenced only by the family-wide contract-view/freshness findings A0-J1-02/A0-J1-03); 93 bullets each with an executable check; 17 probe scripts and RUN-ALL.sh
+  capability_counts: {'PARTIAL': 14, 'ABSENT': 1, 'PRESENT_AND_SUBSTANTIAL': 3}
+  bullet_counts: {'PARTIAL': 50, 'ABSENT': 14, 'PRESENT_AND_SUBSTANTIAL': 29}
+  findings: {total: 26, blocking: 17, owner_decision_required: ['A0-L3-01', 'A0-L3-05']}
+  role: delta audit of record for the synthesis
