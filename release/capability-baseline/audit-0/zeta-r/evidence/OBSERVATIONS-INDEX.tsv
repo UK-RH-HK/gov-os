@@ -1,0 +1,334 @@
+# Index of every observation line in *.out (generated from the *.out files; see 00-AUDIT-REPORT.md). Columns: file:line<TAB>observation id<TAB>result
+DV-derived-view-reconciliation.out:18	DV-contract-verify-binds	PASS
+DV-derived-view-reconciliation.out:119	DV-compiled-has-all-W-ids	PASS
+DV-derived-view-reconciliation.out:120	DV-compiled-source-lines-match	PASS
+DV-derived-view-reconciliation.out:121	DV-compiled-carries-W-bullets	FAIL
+DV-derived-view-reconciliation.out:122	DV-compiled-carries-W10-hard-invariant	FAIL
+DV-derived-view-reconciliation.out:123	DV-compiled-carries-W-advanced-challenge	FAIL
+DV-derived-view-reconciliation.out:124	DV-compiled-carries-required-contract-fields(lines 53-73)	FAIL
+DV-derived-view-reconciliation.out:223	DV-evidence-map-W-has-evidence-owner	FAIL
+DV-derived-view-reconciliation.out:238	DV-generated-view-lists-all-W	PASS
+FR-freshness-invalidation.out:17	FR-baseline-green-current	PASS
+FR-freshness-invalidation.out:19	FR-invalidates[governing policy (PROJECT_POLICY override)]	PASS
+FR-freshness-invalidation.out:22	FR-invalidates[schema (installed kernel schema)]	PASS
+FR-freshness-invalidation.out:24	FR-invalidates[model/retrieval profile (MEMORY_POLICY pin)]	PASS
+FR-freshness-invalidation.out:26	FR-invalidates[project path map (REPOSITORY_CONTRACT)]	PASS
+FR-freshness-invalidation.out:29	FR-invalidates[security/sensitivity policy (DATA_SENSITIVITY)]	PASS
+FR-freshness-invalidation.out:31	FR-invalidates[authoritative decision (spec/decisions)]	PASS
+FR-freshness-invalidation.out:33	FR-invalidates[authoritative requirement (spec/requirements)]	FAIL
+FR-freshness-invalidation.out:35	FR-invalidates[authoritative interface (spec/interfaces)]	FAIL
+FR-freshness-invalidation.out:37	FR-invalidates[authoritative architecture (spec/architecture)]	FAIL
+FR-freshness-invalidation.out:39	FR-invalidates[task input manifest (spec/tasks)]	FAIL
+FR-freshness-invalidation.out:42	FR-invalidates[relevant source file (src/)]	FAIL
+FR-freshness-invalidation.out:45	FR-invalidates[relevant index manifest (governance/generated)]	FAIL
+W00-harness-smoke.out:209	W00-1	PASS
+W01-artefact-identity.out:172	W1-b1-specification(requirement)	PASS
+W01-artefact-identity.out:173	W1-b2-specification(requirement)	PASS
+W01-artefact-identity.out:174	W1-b3-specification(requirement)	PASS
+W01-artefact-identity.out:175	W1-b4-specification(requirement)	PASS
+W01-artefact-identity.out:176	W1-b5-specification(requirement)	PASS
+W01-artefact-identity.out:177	W1-b6-specification(requirement)	PASS
+W01-artefact-identity.out:178	W1-b7-specification(requirement)	FAIL
+W01-artefact-identity.out:181	W1-b1-specification(feature)	PASS
+W01-artefact-identity.out:182	W1-b2-specification(feature)	PASS
+W01-artefact-identity.out:183	W1-b3-specification(feature)	PASS
+W01-artefact-identity.out:184	W1-b4-specification(feature)	PASS
+W01-artefact-identity.out:185	W1-b5-specification(feature)	PASS
+W01-artefact-identity.out:186	W1-b6-specification(feature)	PASS
+W01-artefact-identity.out:187	W1-b7-specification(feature)	FAIL
+W01-artefact-identity.out:190	W1-b1-scenario	PASS
+W01-artefact-identity.out:191	W1-b2-scenario	PASS
+W01-artefact-identity.out:192	W1-b3-scenario	PASS
+W01-artefact-identity.out:193	W1-b4-scenario	PASS
+W01-artefact-identity.out:194	W1-b5-scenario	PASS
+W01-artefact-identity.out:195	W1-b6-scenario	PASS
+W01-artefact-identity.out:196	W1-b7-scenario	FAIL
+W01-artefact-identity.out:199	W1-b1-decision	PASS
+W01-artefact-identity.out:200	W1-b2-decision	PASS
+W01-artefact-identity.out:201	W1-b3-decision	PASS
+W01-artefact-identity.out:202	W1-b4-decision	PASS
+W01-artefact-identity.out:203	W1-b5-decision	PASS
+W01-artefact-identity.out:204	W1-b6-decision	PASS
+W01-artefact-identity.out:205	W1-b7-decision	FAIL
+W01-artefact-identity.out:208	W1-b1-dataset	PASS
+W01-artefact-identity.out:209	W1-b2-dataset	PASS
+W01-artefact-identity.out:210	W1-b3-dataset	PASS
+W01-artefact-identity.out:211	W1-b4-dataset	PASS
+W01-artefact-identity.out:212	W1-b5-dataset	PASS
+W01-artefact-identity.out:213	W1-b6-dataset	PASS
+W01-artefact-identity.out:214	W1-b7-dataset	FAIL
+W01-artefact-identity.out:217	W1-b1-experiment	PASS
+W01-artefact-identity.out:218	W1-b2-experiment	PASS
+W01-artefact-identity.out:219	W1-b3-experiment	PASS
+W01-artefact-identity.out:220	W1-b4-experiment	PASS
+W01-artefact-identity.out:221	W1-b5-experiment	PASS
+W01-artefact-identity.out:222	W1-b6-experiment	PASS
+W01-artefact-identity.out:223	W1-b7-experiment	FAIL
+W01-artefact-identity.out:226	W1-b1-architecture record	PASS
+W01-artefact-identity.out:227	W1-b2-architecture record	PASS
+W01-artefact-identity.out:228	W1-b3-architecture record	PASS
+W01-artefact-identity.out:229	W1-b4-architecture record	PASS
+W01-artefact-identity.out:230	W1-b5-architecture record	PASS
+W01-artefact-identity.out:231	W1-b6-architecture record	PASS
+W01-artefact-identity.out:232	W1-b7-architecture record	FAIL
+W01-artefact-identity.out:235	W1-b1-interface	PASS
+W01-artefact-identity.out:236	W1-b2-interface	PASS
+W01-artefact-identity.out:237	W1-b3-interface	PASS
+W01-artefact-identity.out:238	W1-b4-interface	PASS
+W01-artefact-identity.out:239	W1-b5-interface	PASS
+W01-artefact-identity.out:240	W1-b6-interface	PASS
+W01-artefact-identity.out:241	W1-b7-interface	FAIL
+W01-artefact-identity.out:244	W1-b1-test design	PASS
+W01-artefact-identity.out:245	W1-b2-test design	PASS
+W01-artefact-identity.out:246	W1-b3-test design	PASS
+W01-artefact-identity.out:247	W1-b4-test design	PASS
+W01-artefact-identity.out:248	W1-b5-test design	PASS
+W01-artefact-identity.out:249	W1-b6-test design	PASS
+W01-artefact-identity.out:250	W1-b7-test design	FAIL
+W01-artefact-identity.out:253	W1-b1-task	PASS
+W01-artefact-identity.out:254	W1-b2-task	PASS
+W01-artefact-identity.out:255	W1-b3-task	PASS
+W01-artefact-identity.out:256	W1-b4-task	PASS
+W01-artefact-identity.out:257	W1-b5-task	PASS
+W01-artefact-identity.out:258	W1-b6-task	PASS
+W01-artefact-identity.out:259	W1-b7-task	FAIL
+W01-artefact-identity.out:260	W1-b8-superseded_by-computed	PASS
+W01-artefact-identity.out:282	W1-b8-SUPERSEDES-edge	PASS
+W01-artefact-identity.out:298	W1-b9-consumers-recorded	PASS
+W01-artefact-identity.out:308	W1-b9-dataset-consumers-recorded	PASS
+W01-artefact-identity.out:394	W1-move-keeps-id	PASS
+W01-artefact-identity.out:396	W1-move-still-delivered	PASS
+W01-artefact-identity.out:402	W1-b3-noncanonical-location-flagged	FAIL
+W01-artefact-identity.out:439	W1-b7-gate-decision-provenance	PASS
+W01-artefact-identity.out:442	W1-b7-audit-provenance	PASS
+W01-artefact-identity.out:445	W1-b1-audit-finding-id-stable	FAIL
+W01-artefact-identity.out:580	W1-benchmark-result-has-id	PASS
+W01-artefact-identity.out:581	W1-b7-benchmark-provenance	PASS
+W01-artefact-identity.out:582	W1-b6-benchmark-hash-in-record	FAIL
+W01-artefact-identity.out:584	W1-b6-benchmark-hash-in-manifest	PASS
+W01b-migration-plan-identity.out:140	W1-migplan-persisted	PASS
+W01b-migration-plan-identity.out:160	W1-b1-migplan-stable-id	FAIL
+W01b-migration-plan-identity.out:161	W1-b2-migplan-type	FAIL
+W01b-migration-plan-identity.out:162	W1-b4-migplan-authority	FAIL
+W01b-migration-plan-identity.out:163	W1-b6-migplan-version-hash	FAIL
+W01b-migration-plan-identity.out:164	W1-b7-migplan-provenance	FAIL
+W01b-migration-plan-identity.out:165	W1-b8-migplan-lineage	FAIL
+W01b-migration-plan-identity.out:166	W1-b9-migplan-consumers	FAIL
+W01b-migration-plan-identity.out:169	W1-b8-migplan-replan-keeps-history	FAIL
+W02-typed-contracts.out:22	W2-b1-typed-edges	PASS
+W02-typed-contracts.out:27	W2-b2-required-optional-marker	FAIL
+W02-typed-contracts.out:28	W2-b2-declared-input-drop-is-explicit	FAIL
+W02-typed-contracts.out:29	W2-b3-non-authoritative-not-promoted	FAIL
+W02-typed-contracts.out:30	W2-b3-provisional-decision-marked	PASS
+W02-typed-contracts.out:31	W2-b4-research-not-decision	PASS
+W02-typed-contracts.out:33	W2-b4-research-stays-evidence	PASS
+W02-typed-contracts.out:36	W2-b5-lesson-not-policy	PASS
+W02-typed-contracts.out:37	W2-b5-lesson-not-in-authority-block	PASS
+W02-typed-contracts.out:38	W2-b6-retrieval-excludes-superseded	PASS
+W02-typed-contracts.out:42	W2-b6-stale-requirement-cannot-replace-current	FAIL
+W02-typed-contracts.out:43	W2-b6-stale-decision-flagged	PASS
+W02-typed-contracts.out:45	W2-b7-output-schema-consumption-rules	FAIL
+W02-typed-contracts.out:47	W2-b8-impact-uses-typed-edges	PASS
+W02-typed-contracts.out:49	W2-b8-consumer-reached-from-producer-change	PASS
+W02-typed-contracts.out:51	W2-b8-consumes-direction-not-inverted	FAIL
+W03-task-input-manifest.out:45	W3-m1-input-ids-declared-and-consumed	PASS
+W03-task-input-manifest.out:81	W3-m2m3m4-manifest-fields-schema	PASS
+W03-task-input-manifest.out:84	W3-m2-required-state-enforced	FAIL
+W03-task-input-manifest.out:85	W3-m3-hash-pin-enforced	FAIL
+W03-task-input-manifest.out:87	W3-m4-reason-delivered	FAIL
+W03-task-input-manifest.out:91	W3-m4-relations-note-dependency-delivered	FAIL
+W03-task-input-manifest.out:94	W3-m5-supplementary-declared-separately	FAIL
+W03-task-input-manifest.out:125	W3-r1-create-READY-with-missing-input	FAIL
+W03-task-input-manifest.out:129	W3-r1-replan-READY-with-missing-input	FAIL
+W03-task-input-manifest.out:159	W3-r1-status-READY-with-missing-input	FAIL
+W03-task-input-manifest.out:174	W3-r1-claim-with-missing-input	FAIL
+W03-task-input-manifest.out:177	W3-r1-contrast-missing-task-dependency-blocks	PASS
+W03-task-input-manifest.out:181	W3-r1-missing-task-dependency-bypass-via-status	FAIL
+W03-task-input-manifest.out:185	W3-r2-superseded-input-not-silent	FAIL
+W03-task-input-manifest.out:192	W3-r3-conflict-flagged-in-packet	PASS
+W03-task-input-manifest.out:193	W3-r3-conflict-triggers-handling	FAIL
+W03-task-input-manifest.out:198	W3-r3-duplicate-id-conflict-handled	FAIL
+W03-task-input-manifest.out:200	W3-r3-conflicts-detected-by-audit	PASS
+W03-task-input-manifest.out:202	W3-r3-conflicts-detected-by-doctor	PASS
+W03-task-input-manifest.out:207	W3-r4-deterministic-resolution	PASS
+W04-context-delivery.out:18	W4-b1-deterministic-load	PASS
+W04-context-delivery.out:19	W4-b1-normative-content-loaded(statement field)	FAIL
+W04-context-delivery.out:20	W4-b1-normative-content-loaded(markdown body)	FAIL
+W04-context-delivery.out:21	W4-b1-no-duplicate-delivery	FAIL
+W04-context-delivery.out:22	W4-b2-separated-blocks	PASS
+W04-context-delivery.out:23	W4-b4-input-ids-recorded	PASS
+W04-context-delivery.out:24	W4-b4-input-versions-hashes-recorded	FAIL
+W04-context-delivery.out:30	W4-b5-hash-changes-when-supplied-content-changes	FAIL
+W04-context-delivery.out:31	W4-b5-packet-bound-to-repo-state	FAIL
+W04-context-delivery.out:37	W4-b3-supplementary-dropped-first	PASS
+W04-context-delivery.out:40	W4-b3-mandatory-never-displaced	PASS
+W04-context-delivery.out:41	W4-b3-over-budget-is-explicit	PASS
+W04-context-delivery.out:44	W4-b3-over-budget-governed-at-dispatch	FAIL
+W04-context-delivery.out:48	W4-b6-missing-required-input-refused-or-blocked	FAIL
+W04-context-delivery.out:49	W4-b6-missing-task-dependency-explicit	PASS
+W04b-input-class-delivery.out:19	W4b-delivered-deterministically:dataset(required_data)	FAIL
+W04b-input-class-delivery.out:20	W4b-delivered-deterministically:experiment(derived_from)	FAIL
+W04b-input-class-delivery.out:21	W4b-delivered-deterministically:research(derived_from)	FAIL
+W04b-input-class-delivery.out:22	W4b-delivered-deterministically:interface(task.interfaces)	FAIL
+W04b-input-class-delivery.out:23	W4b-delivered-deterministically:test-design(acceptance_tests)	FAIL
+W04b-input-class-delivery.out:24	W4b-delivered-deterministically:architecture(implicit, all ACTIVE)	PASS
+W04b-input-class-delivery.out:26	W4b-impact-reaches-declaring-task:DATA-0001	FAIL
+W04b-input-class-delivery.out:28	W4b-impact-reaches-declaring-task:EXP-0001	PASS
+W04b-input-class-delivery.out:30	W4b-impact-reaches-declaring-task:RES-0001	PASS
+W04b-input-class-delivery.out:32	W4b-impact-reaches-declaring-task:API-0009	PASS
+W04b-input-class-delivery.out:34	W4b-impact-reaches-declaring-task:TST-0002	FAIL
+W04b-input-class-delivery.out:36	W4b-impact-reaches-declaring-task:ARCH-0001	FAIL
+W04b-input-class-delivery.out:44	W4b-stale-input-marked-in-packet	FAIL
+W04b-input-class-delivery.out:76	W4b-benchmark-result-consumed-by-decision	PASS
+W05-consumption-receipt.out:24	W5-c1-refuses-missing-traceability	FAIL
+W05-consumption-receipt.out:27	W5-r1-inputs-supplied-in-receipt	FAIL
+W05-consumption-receipt.out:28	W5-r1-packet-hash-on-close-checkpoint	PASS
+W05-consumption-receipt.out:29	W5-r2-outputs-produced	PASS
+W05-consumption-receipt.out:30	W5-r3-requirements-implemented-recorded	FAIL
+W05-consumption-receipt.out:31	W5-r4-decisions-applied-recorded	FAIL
+W05-consumption-receipt.out:32	W5-r5-acceptance-evidence-bound-to-declared-tests	FAIL
+W05-consumption-receipt.out:33	W5-r6-task-close-requires-unknowns	FAIL
+W05-consumption-receipt.out:37	W5-c3-code-linked-to-requirement	FAIL
+W05-consumption-receipt.out:38	W5-c3-report-linked-to-requirement	FAIL
+W05-consumption-receipt.out:40	W5-c3-report-task-edge-direction	FAIL
+W05-consumption-receipt.out:42	W5-c3-task-to-code-edge	FAIL
+W05-consumption-receipt.out:66	W5-r3r4-fabricated-trace-refused	FAIL
+W05-consumption-receipt.out:88	W5-r5-tests-status-enforced	PASS
+W05-consumption-receipt.out:112	W5-r6-deviations-persisted-when-given	PASS
+W05-consumption-receipt.out:139	W5-r6-handoff-return-requires-unknowns	PASS
+W05-consumption-receipt.out:180	W5-c2-undocumented-change-detected	PASS
+W05-consumption-receipt.out:204	W5-c2-untraceable-implementation-detected	FAIL
+W05-consumption-receipt.out:207	W5-c2-untraceable-implementation-reported-by-audit	FAIL
+W05-consumption-receipt.out:248	W5-c2-no-claim-observed-paths-correct	FAIL
+W06-staleness-propagation.out:167	W6-s4-cit-computes-impacted-nodes	PASS
+W06-staleness-propagation.out:187	W6-A-cit-executed	PASS
+W06-staleness-propagation.out:190	W6-s1-open-dependent-task-stale(CIT)	PASS
+W06-staleness-propagation.out:191	W6-s6-completed-task-revalidated(CIT)	FAIL
+W06-staleness-propagation.out:192	W6-s7-closed-task-evidence-not-green(CIT)	FAIL
+W06-staleness-propagation.out:193	W6-s2-test-evidence-invalidated(CIT)	FAIL
+W06-staleness-propagation.out:194	W6-s3-context-packets-invalidated(CIT)	FAIL
+W06-staleness-propagation.out:196	W6-s3-checkpoint-packet-ref-flagged(CIT)	FAIL
+W06-staleness-propagation.out:198	W6-s5-rework-tasks-generated(CIT)	FAIL
+W06-staleness-propagation.out:200	W6-s1-stale-open-task-blocked(CIT)	PASS
+W06-staleness-propagation.out:249	W6-s2-test-evidence-invalidated(CIT,R2)	PASS
+W06-staleness-propagation.out:250	W6-s6-completed-task-revalidated(CIT,R2)	FAIL
+W06-staleness-propagation.out:252	W6-s2-stale-test-evidence-blocks-consumers(CIT,R2)	PASS
+W06-staleness-propagation.out:278	AC16-W6xD1-content-hash-detects-upstream-change	PASS
+W06-staleness-propagation.out:280	W6-s1-open-dependent-task-stale(direct)	FAIL
+W06-staleness-propagation.out:281	W6-s6-completed-task-revalidated(direct)	FAIL
+W06-staleness-propagation.out:282	W6-s2-test-evidence-invalidated(direct)	FAIL
+W06-staleness-propagation.out:300	AC16-W6xD1-stale-index-blocks-close	PASS
+W06-staleness-propagation.out:302	W6-s3-context-packets-invalidated(direct)	FAIL
+W06-staleness-propagation.out:313	AC16-W6xD1-rebuild-does-not-license-stale-consumption	FAIL
+W06-staleness-propagation.out:314	W6-s1-direct-change-forces-cit	FAIL
+W06-staleness-propagation.out:317	AC16-W6xO4-green-goes-stale-on-requirement-change	FAIL
+W06-staleness-propagation.out:320	W6-s7-stale-evidence-surfaced(direct)	FAIL
+W06-staleness-propagation.out:374	W6-B2-concurrent-upstream-change-detected-at-close	PASS
+W06-staleness-propagation.out:416	W6-s7-retest-flag-not-cleared-by-close	FAIL
+W06-staleness-propagation.out:418	W6-s4-graph-impact(REQ)	PASS
+W06-staleness-propagation.out:420	W6-s4-graph-impact(dataset consumed via task.required_data)	FAIL
+W07-orphan-detection.out:63	W7-o1-expected-consumer-not-consuming	FAIL
+W07-orphan-detection.out:64	W7-o1-expected-consumer-missing	PASS
+W07-orphan-detection.out:65	W7-o2-requirement-without-impl-or-test	FAIL
+W07-orphan-detection.out:66	W7-o3-research-never-consumed	FAIL
+W07-orphan-detection.out:67	W7-o4-acceptance-test-without-requirement	FAIL
+W07-orphan-detection.out:68	W7-o2b-linked-requirement-without-impl-or-test	FAIL
+W07-orphan-detection.out:69	W7-o3b-linked-research-never-consumed	FAIL
+W07-orphan-detection.out:70	W7-o4b-feature-only-acceptance-test	FAIL
+W07-orphan-detection.out:71	W7-orphan-count-surfaced	PASS
+W07-orphan-detection.out:72	W7-o5-unjustified-code	FAIL
+W07-orphan-detection.out:75	W7-o6-orphans-produce-governed-remediation	FAIL
+W07-orphan-detection.out:76	W7-o6-no-silent-deletion	PASS
+W08-lineage.out:26	W8-l1-forward-reaches:SCN-0001	PASS
+W08-lineage.out:27	W8-l1-forward-reaches:REQ-0001	PASS
+W08-lineage.out:28	W8-l1-forward-reaches:D-0001	PASS
+W08-lineage.out:29	W8-l1-forward-reaches:ARCH-0001	PASS
+W08-lineage.out:30	W8-l1-forward-reaches:TASK-0001	PASS
+W08-lineage.out:31	W8-l1-forward-reaches:file:src/lib.rs	FAIL
+W08-lineage.out:32	W8-l1-forward-reaches:file:tests/ledger_test.rs	FAIL
+W08-lineage.out:33	W8-l1-forward-reaches:RPT-0001	PASS
+W08-lineage.out:34	W8-l1-forward-reaches:release	FAIL
+W08-lineage.out:37	W8-l2-reverse-impact(REQ-0001)->task	PASS
+W08-lineage.out:38	W8-l2-reverse-impact(REQ-0001)->implementation	FAIL
+W08-lineage.out:39	W8-l2-reverse-impact(REQ-0001)->tests	PASS
+W08-lineage.out:40	W8-l2-reverse-impact(REQ-0001)->evidence	FAIL
+W08-lineage.out:43	W8-l2-reverse-impact(D-0001)->task	PASS
+W08-lineage.out:44	W8-l2-reverse-impact(D-0001)->implementation	FAIL
+W08-lineage.out:45	W8-l2-reverse-impact(D-0001)->tests	PASS
+W08-lineage.out:46	W8-l2-reverse-impact(D-0001)->evidence	FAIL
+W08-lineage.out:57	W8-l3-missing-target-link-detected	PASS
+W08-lineage.out:58	W8-l3-missing-feature-scenario-link-detected	PASS
+W08-lineage.out:59	W8-l3-missing-task-to-code-link-detected	FAIL
+W08-lineage.out:65	W8-l4-stale-link-to-superseded-detected	FAIL
+W08-lineage.out:70	W8-l5-intra-language-edges(ts)	PASS
+W08-lineage.out:71	W8-l5-intra-language-edges(py)	PASS
+W08-lineage.out:73	W8-l5-cross-language-through-interface	FAIL
+W09-session-handoff-continuity.out:15	W9-c1-manifest-persists	PASS
+W09-session-handoff-continuity.out:16	W9-c2-checkpoint-input-ids	FAIL
+W09-session-handoff-continuity.out:17	W9-c2-checkpoint-state-reference	PASS
+W09-session-handoff-continuity.out:22	W9-c2-packet-hash-tracks-input-content	FAIL
+W09-session-handoff-continuity.out:23	W9-c2-index-hash-tracks-input-content	PASS
+W09-session-handoff-continuity.out:27	W9-c2-state-reference-current-at-checkpoint	FAIL
+W09-session-handoff-continuity.out:30	W9-c2-checkpoint-files-changed-paths-exist	FAIL
+W09-session-handoff-continuity.out:32	W9-c3-before-model-switch-checkpoint	PASS
+W09-session-handoff-continuity.out:36	W9-c3-provider-switch-same-inputs	PASS
+W09-session-handoff-continuity.out:38	W9-c3-role-switch-same-inputs	PASS
+W09-session-handoff-continuity.out:41	W9-c4-fresh-agent-reconstructs	PASS
+W09-session-handoff-continuity.out:44	W9-c5-compaction-cannot-remove-state	PASS
+W09-session-handoff-continuity.out:81	W9-c6-handoff-missing-inputs-blocked-or-degraded	FAIL
+W09-session-handoff-continuity.out:119	W9-c6-handoff-stale-inputs-blocked-or-degraded	FAIL
+W09-session-handoff-continuity.out:121	AC16-NxW9-before-handoff-checkpoint-flags-stale-packet	FAIL
+W09-session-handoff-continuity.out:123	AC16-NxW9-doctor-checkpoint-freshness	FAIL
+W10-hard-invariant-attacks.out:16	W10-a1-precondition-REQ-0002-absent-from-semantic-index	PASS
+W10-hard-invariant-attacks.out:18	W10-a1-current-spec-delivered-when-not-indexed	PASS
+W10-hard-invariant-attacks.out:30	W10-a1-current-spec-delivered-when-chunks-deleted	PASS
+W10-hard-invariant-attacks.out:43	W10-a2-precondition-superseded-ranks-higher	PASS
+W10-hard-invariant-attacks.out:45	W10-a2-superseded-not-in-authority-block	PASS
+W10-hard-invariant-attacks.out:46	W10-a2-superseded-not-in-retrieved-block	PASS
+W10-hard-invariant-attacks.out:50	W10-a2-variant-successor-only-supersession	PASS
+W10-hard-invariant-attacks.out:53	W10-a2-variant-stale-structured-reference	FAIL
+W10-hard-invariant-attacks.out:66	W10-a3-budget-8811	PASS
+W10-hard-invariant-attacks.out:68	W10-a3-budget-7711	PASS
+W10-hard-invariant-attacks.out:70	W10-a3-budget-300	PASS
+W10-hard-invariant-attacks.out:88	W10-a4-derived-index-deleted(INV-010)	FAIL
+W10-hard-invariant-attacks.out:90	W10-a4-derived-index-deleted(INV-010)-continue	FAIL
+W10-hard-invariant-attacks.out:108	W10-a4-derived-index-corrupted	FAIL
+W10-hard-invariant-attacks.out:110	W10-a4-derived-index-corrupted-continue	FAIL
+W10-hard-invariant-attacks.out:160	W10-a4-vector-table-lost	PASS
+W10-hard-invariant-attacks.out:162	W10-a4-vector-table-lost-continue	PASS
+W10-hard-invariant-attacks.out:194	W10-a4-embedder-repinned-before-reindex(profile-change)	FAIL
+W10-hard-invariant-attacks.out:196	W10-a4-embedder-repinned-before-reindex(profile-change)-continue	FAIL
+W10-hard-invariant-attacks.out:214	W10-a4-reranker-unavailable	FAIL
+W10-hard-invariant-attacks.out:216	W10-a4-reranker-unavailable-continue	FAIL
+W10-hard-invariant-attacks.out:228	W10-a5-deterministic-block-separately-observable	PASS
+W10-hard-invariant-attacks.out:231	W10-a5-product-tests-delivery-against-declaration	FAIL
+W11-quantitative-health.out:1120	W11-m1-required-input-delivery-accuracy	FAIL
+W11-quantitative-health.out:1122	W11-m2-current-version-selection-accuracy	FAIL
+W11-quantitative-health.out:1124	W11-m3-superseded-input-leakage-rate	FAIL
+W11-quantitative-health.out:1126	W11-m4-missing-required-input-detection	FAIL
+W11-quantitative-health.out:1128	W11-m5-staleness-propagation-accuracy	FAIL
+W11-quantitative-health.out:1130	W11-m6-requirement-to-code-traceability-coverage	FAIL
+W11-quantitative-health.out:1132	W11-m7-requirement-to-test-traceability-coverage	FAIL
+W11-quantitative-health.out:1134	W11-m8-orphan-detection-recall-fp	FAIL
+W11-quantitative-health.out:1136	W11-m9-fresh-agent-reconstruction-correctness	FAIL
+W11-quantitative-health.out:1137	W11-m3-proxy-retrieval-superseded-hit-rate	PASS
+W11-quantitative-health.out:1138	W11-m6-proxy-task-traceability	PASS
+W11-quantitative-health.out:1139	W11-m8-proxy-orphan-count	PASS
+W11-quantitative-health.out:1140	W11-m9-proxy-fresh-agent-read-budget	PASS
+W12-scheduler-integration.out:26	W12-G0-current-version-substitution-blocked(claim)	FAIL
+W12-scheduler-integration.out:31	W12-G0-superseded-target-substitution-blocked(cit)	FAIL
+W12-scheduler-integration.out:37	W12-G0-authority-substitution-blocked(cit execute)	PASS
+W12-scheduler-integration.out:55	W12-G1-mutation-detected(index)	PASS
+W12-scheduler-integration.out:56	W12-G1-dependency-evidence-invalidated	FAIL
+W12-scheduler-integration.out:74	W12-G2-input-consumption-traceability-verified-at-close	FAIL
+W12-scheduler-integration.out:94	W12-G3-continuity-verified(stale packet handoff)	FAIL
+W12-scheduler-integration.out:95	W12-G3-continuity-verified(missing input handoff)	FAIL
+W12-scheduler-integration.out:96	W12-G3-continuity-verified(checkpoint)	FAIL
+W12-scheduler-integration.out:115	W12-G4-cit-wider-propagation	PASS
+W12-scheduler-integration.out:131	W12-G4-propagation-after-noncit-architecture-change	FAIL
+W12-scheduler-integration.out:156	W12-G5-audits-superseded-consumption	FAIL
+W12-scheduler-integration.out:157	AC16-W12xO5-health-state-reflects-superseded-consumption	FAIL
+W12-scheduler-integration.out:184	W12-G5-audits-missing-input	PASS
+W12-scheduler-integration.out:185	AC16-W12xO5-health-state-reflects-missing-input	PASS
+W12-scheduler-integration.out:186	W12-G5-audits-end-to-end-lineage	FAIL
+W12-scheduler-integration.out:187	AC16-W12xO5-tier-scheduler-present	FAIL

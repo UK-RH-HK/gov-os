@@ -1,0 +1,250 @@
+owner source sha256=4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+$ gov contract verify    [session=S-dv role=orchestrator exit=0 0.0s]
+  ok=true result={
+ "canonical_import": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md",
+ "canonical_import_byte_identical": true,
+ "capability_count": 100,
+ "compiled": "framework/contracts/governance-capability-acceptance.yaml",
+ "contract_version": "v3",
+ "evidence_map": "tests/governance/capability-evidence-map.yaml",
+ "generated_view": "docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md",
+ "owner_source": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+ "owner_source_present_in_tree": true,
+ "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3",
+ "schema": "framework/schemas/governance-capability-acceptance.schema.json",
+ "source_lock": "framework/contracts/contract-source.lock",
+ "verdict": "CONTRACT_SOURCE_BOUND"
+}
+OBS DV-contract-verify-binds: PASS -- gov contract verify -> ok=True
+owner source Gate W: {"W1": {"line": 1068, "bullets": 9}, "W2": {"line": 1082, "bullets": 8}, "W3": {"line": 1092, "bullets": 9}, "W4": {"line": 1106, "bullets": 6}, "W5": {"line": 1114, "bullets": 9}, "W6": {"line": 1128, "bullets": 7}, "W7": {"line": 1138, "bullets": 6}, "W8": {"line": 1146, "bullets": 5}, "W9": {"line": 1154, "bullets": 6}, "W10": {"line": 1162, "bullets": 5}, "W11": {"line": 1173, "bullets": 9}, "W12": {"line": 1185, "bullets": 7}}
+W10 hard invariant at line 1164; Gate W advanced-qualification challenge at line 1194
+compiled W entries: {
+ "W1": {
+  "id": "W1",
+  "title": "Stable artefact identity",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1068",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W2": {
+  "id": "W2",
+  "title": "Typed output \u2192 input contracts",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1082",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W3": {
+  "id": "W3",
+  "title": "Mandatory task-input manifest",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1092",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W4": {
+  "id": "W4",
+  "title": "Context compiler delivery proof",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1106",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W5": {
+  "id": "W5",
+  "title": "Consumption receipt and implementation traceability",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1114",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W6": {
+  "id": "W6",
+  "title": "Upstream-change staleness propagation",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1128",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W7": {
+  "id": "W7",
+  "title": "Orphan/dead-output and unexplained-output detection",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1138",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W8": {
+  "id": "W8",
+  "title": "Forward and reverse lineage",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1146",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W9": {
+  "id": "W9",
+  "title": "Session/handoff continuity of mandatory inputs",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1154",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W10": {
+  "id": "W10",
+  "title": "Deterministic mandatory inputs outrank retrieval",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1162",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W11": {
+  "id": "W11",
+  "title": "Artifact-flow quantitative health",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1173",
+  "family": "W",
+  "status": "DECLARED"
+ },
+ "W12": {
+  "id": "W12",
+  "title": "Health-scheduler integration",
+  "requirement_class": "ORIGINAL",
+  "source_reference": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md:1185",
+  "family": "W",
+  "status": "DECLARED"
+ }
+}
+OBS DV-compiled-has-all-W-ids: PASS -- compiled ids ['W1', 'W10', 'W11', 'W12', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9'] vs source ['W1', 'W10', 'W11', 'W12', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9']
+OBS DV-compiled-source-lines-match: PASS -- compiled source_reference lines equal owner-source heading lines
+OBS DV-compiled-carries-W-bullets: FAIL -- owner-source W checklist bullets carried by the compiled form: 0/86
+OBS DV-compiled-carries-W10-hard-invariant: FAIL -- W10 hard-invariant text present in the compiled form
+OBS DV-compiled-carries-W-advanced-challenge: FAIL -- Gate W advanced-qualification challenge present in the compiled form
+OBS DV-compiled-carries-required-contract-fields(lines 53-73): FAIL -- required per-capability fields present in compiled W entries: {'severity': False, 'applicability': False, 'evidence_class': False, 'automated_checks': False, 'freshness_triggers': False, 'health_scheduler_tiers': False, 'qualification_challenge_ids': False, 'adoption_obligation': False}
+evidence-map W rows: {
+ "W1": {
+  "capability": "W1",
+  "title": "Stable artefact identity",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W2": {
+  "capability": "W2",
+  "title": "Typed output \u2192 input contracts",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W3": {
+  "capability": "W3",
+  "title": "Mandatory task-input manifest",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W4": {
+  "capability": "W4",
+  "title": "Context compiler delivery proof",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W5": {
+  "capability": "W5",
+  "title": "Consumption receipt and implementation traceability",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W6": {
+  "capability": "W6",
+  "title": "Upstream-change staleness propagation",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W7": {
+  "capability": "W7",
+  "title": "Orphan/dead-output and unexplained-output detection",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W8": {
+  "capability": "W8",
+  "title": "Forward and reverse lineage",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W9": {
+  "capability": "W9",
+  "title": "Session/handoff continuity of mandatory inputs",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W10": {
+  "capability": "W10",
+  "title": "Deterministic mandatory inputs outrank retrieval",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W11": {
+  "capability": "W11",
+  "title": "Artifact-flow quantitative health",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ },
+ "W12": {
+  "capability": "W12",
+  "title": "Health-scheduler integration",
+  "requirement_class": "ORIGINAL",
+  "automated_checks": [],
+  "evidence_class": "NOT_YET_MAPPED",
+  "independent_verification_obligation": "R1/R2 per the frozen acceptance boundary"
+ }
+}
+OBS DV-evidence-map-W-has-evidence-owner: FAIL -- W rows with >=1 automated check: []; evidence_class values: ['NOT_YET_MAPPED']
+generated view W rows: [
+ "| `W1` | Stable artefact identity | `ORIGINAL` |",
+ "| `W2` | Typed output \u2192 input contracts | `ORIGINAL` |",
+ "| `W3` | Mandatory task-input manifest | `ORIGINAL` |",
+ "| `W4` | Context compiler delivery proof | `ORIGINAL` |",
+ "| `W5` | Consumption receipt and implementation traceability | `ORIGINAL` |",
+ "| `W6` | Upstream-change staleness propagation | `ORIGINAL` |",
+ "| `W7` | Orphan/dead-output and unexplained-output detection | `ORIGINAL` |",
+ "| `W8` | Forward and reverse lineage | `ORIGINAL` |",
+ "| `W9` | Session/handoff continuity of mandatory inputs | `ORIGINAL` |",
+ "| `W10` | Deterministic mandatory inputs outrank retrieval | `ORIGINAL` |",
+ "| `W11` | Artifact-flow quantitative health | `ORIGINAL` |",
+ "| `W12` | Health-scheduler integration | `ORIGINAL` |"
+]
+OBS DV-generated-view-lists-all-W: PASS -- 12 W rows in the generated view
+
+==== SUMMARY ====
+DV-contract-verify-binds: PASS
+DV-compiled-has-all-W-ids: PASS
+DV-compiled-source-lines-match: PASS
+DV-compiled-carries-W-bullets: FAIL
+DV-compiled-carries-W10-hard-invariant: FAIL
+DV-compiled-carries-W-advanced-challenge: FAIL
+DV-compiled-carries-required-contract-fields(lines 53-73): FAIL
+DV-evidence-map-W-has-evidence-owner: FAIL
+DV-generated-view-lists-all-W: PASS
+total=9 pass=4 fail=5
