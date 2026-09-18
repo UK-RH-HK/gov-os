@@ -1,0 +1,14 @@
+=== C1: Deterministic Structured Memory ===
+--- gov status --json to verify record tracking ---
+Records tracked: 12
+Memory fresh: True
+Tasks: {'counts': {'total': 1, 'runnable': 1, 'blocked': 0, 'waiting_human': 0, 'done': 0, 'open': 1}, 'runnable': ['TASK-001'], 'waiting_human': [], 'blocked': [], 'longest_chain': ['TASK-001'], 'cycles': []}
+
+--- Query record types indexed ---
+error: unexpected argument '--sql' found
+
+  tip: to pass '--sql' as a value, use '-- --sql'
+
+Usage: gov memory query [OPTIONS] <QUERY>
+
+For more information, try '--help'.

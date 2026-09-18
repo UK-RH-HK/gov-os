@@ -1,0 +1,241 @@
+========================================
+=== D1: Incremental Indexing / Freshness ===
+========================================
+--- Freshness before modification ---
+{
+  "ok": true,
+  "command": "memory",
+  "result": {
+    "fresh": true,
+    "stale": [],
+    "added": [],
+    "removed": [],
+    "manifest_present": true,
+    "checked": 168,
+    "pin_mismatch": [],
+    "age_hours": 0.04861111111111111,
+    "age_exceeded": false
+  },
+  "session": "",
+  "release_trust": {
+    "surface": "memory",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
+    "section_6_bullet": 7,
+    "basis": "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."
+  }
+}
+
+--- Modify a file to trigger staleness ---
+Fresh: True
+Stale: []
+Added: []
+Removed: []
+Pin mismatch: []
+
+--- Incremental rebuild after modification ---
+Mode: full
+Indexed: 168
+Unchanged: 0
+Removed: 0
+
+--- Add a new file, check added detection ---
+ create mode 100644 src/auth/utils.py
+Fresh after add: True
+Added: []
+
+--- Rename/move detection ---
+ rename src/auth/{utils.py => helpers.py} (100%)
+Fresh after rename: True
+Added (new path): []
+Removed (old path): []
+
+--- Rebuild picks up rename ---
+Mode: full
+Moved: []
+Indexed: 168
+Removed: 0
+
+--- Delete file + rebuild ---
+rm 'src/auth/helpers.py'
+ delete mode 100644 src/auth/helpers.py
+Fresh after delete: True
+Removed: []
+Removed after rebuild: 0
+
+--- Verify manifest records embedder identity ---
+Embedder: {'dimensions': 512, 'id': 'hashed-ngram', 'source': 'builtin', 'version': '1'}
+Chunking: {'levels': ['document', 'section', 'child'], 'max_chars': 1200, 'overlap_chars': 120}
+Lexical: {'engine': 'sqlite-fts5', 'tokenizer': 'porter unicode61'}
+
+========================================
+=== D2: Retrieval Router ===
+========================================
+--- Structured lookup (known ID) ---
+Structured route D-001: 2 hits
+  D-001 routes=['structured']
+  D-001 routes=['structured']
+
+--- Code/symbol route ---
+Symbol route: 0 hits
+
+--- Lexical route ---
+Lexical route: 3 hits
+  D-001 routes=['lexical']
+  RES-001 routes=['lexical']
+
+--- Graph/impact route ---
+Graph route: 5 hits
+  D-001 routes=['graph']
+  F-001 routes=['graph']
+  SCN-001 routes=['graph']
+
+--- Semantic route ---
+Semantic route: 5 hits
+  F-001 routes=['semantic']
+  file:governance/kernel/migrations/M-4.1.1-4.1.2.yaml routes=['semantic']
+
+--- Multi-route fusion ---
+Fusion strategy: fusion
+Routes used: ['lexical', 'semantic']
+Total hits: 8
+  F-001 score=0.033 routes=['lexical', 'semantic']
+  TASK-001 score=0.031 routes=['lexical', 'semantic']
+  TST-001 score=0.030 routes=['lexical', 'semantic']
+
+========================================
+=== D3: Hierarchical Retrieval ===
+========================================
+--- Verify document > section > child chunks ---
+Chunks: 325
+Artifacts: 168
+
+--- Retrieval hit has parent_excerpt and neighbours ---
+artifact: RES-001
+  level: document
+  section: Password hashing benchmark
+  has parent_excerpt: False
+  neighbours: []
+artifact: D-001
+  level: document
+  section: Use bcrypt for password hashing
+  has parent_excerpt: False
+  neighbours: ['←GOVERNED_BY TASK-001']
+
+========================================
+=== D4: Component Separation ===
+========================================
+--- Verify independently identifiable components ---
+Embedder:
+  Embedder: {'dimensions': 512, 'id': 'hashed-ngram', 'source': 'builtin', 'version': '1'}
+  Reranker: {'provider': 'none'}
+  Chunking: {'levels': ['document', 'section', 'child'], 'max_chars': 1200, 'overlap_chars': 120}
+  Lexical: {'engine': 'sqlite-fts5', 'tokenizer': 'porter unicode61'}
+  Index version: 4.1.5-idx3
+
+--- Verify plugin system for replaceable components ---
+Plugin ecosystem: {'role': 'orchestrator', 'usable': [], 'denied': [], 'rejected': []}
+--- Capabilities subcommands (ecosystems, registrations) ---
+Capability ecosystem: ecosystems, plugins, invoke
+
+Usage: gov capabilities [OPTIONS] <COMMAND>
+
+Commands:
+  ecosystems   
+  plugins      
+  invoke       
+  serve-embed  Act as a gov-capability/1 `embed` plugin over stdin/stdout using the built-in embedder (reference plugin; --reverse yields a distinct vector space for tests)
+  help         Print this message or the help of the given subcommand(s)
+
+Options:
+      --root <ROOT>        Repository root (default: discovered from the current directory)
+      --json               Structured JSON output envelope
+      --session <SESSION>  Session id (default: $GOV_SESSION or a new id)
+
+========================================
+=== D5: Evidence-Driven Retrieval Model Selection ===
+========================================
+--- Benchmark mechanism exists ---
+Benchmark embedder/reranker candidates on the held-out set (evidence-based selection, framework 14.3)
+
+Usage: gov memory benchmark [OPTIONS]
+
+Options:
+      --candidate <CANDIDATES>  
+      --root <ROOT>             Repository root (default: discovered from the current directory)
+      --heldout <HELDOUT>       
+      --json                    Structured JSON output envelope
+      --record                  
+      --session <SESSION>       Session id (default: $GOV_SESSION or a new id)
+      --role <ROLE>             Acting role (default: $GOV_ROLE or orchestrator)
+  -h, --help                    Print help
+
+--- Held-out starter generation ---
+Generated: 
+Queries: 0
+Status: 
+
+--- Run held-out verification ---
+Recall@K: 1.0
+MRR: 1.0
+Precision@K: 1.0
+Stale hit rate: 0.0
+Pass: True
+Categories: [{'category': 'lexical_literal', 'queries': 6, 'recall': 1.0}, {'category': 'exact_path', 'queries': 6, 'recall': 1.0}]
+
+--- Selection mechanism exists ---
+Pin a benchmarked candidate through a decision record and a full rebuild
+
+Usage: gov memory select [OPTIONS] <CANDIDATE>
+
+Arguments:
+  <CANDIDATE>  
+
+Options:
+      --research <RESEARCH>  
+      --root <ROOT>          Repository root (default: discovered from the current directory)
+      --by <BY>              [default: human]
+      --json                 Structured JSON output envelope
+      --session <SESSION>    Session id (default: $GOV_SESSION or a new id)
+      --role <ROLE>          Acting role (default: $GOV_ROLE or orchestrator)
+  -h, --help                 Print help
+
+========================================
+=== D6: Rebuild Guarantee ===
+========================================
+--- Save state before rebuild ---
+
+--- Delete derived state ---
+ls: cannot access '.gov-os/': No such file or directory
+
+--- Full rebuild ---
+Mode: full
+Indexed: 168
+Manifest hash: bfd4f7331dc7613f7d8a618565ec62b1cd2cc7862d02ec168b2bfb4a654bc941
+Problems: []
+
+--- Status after rebuild ---
+Records: 12
+Memory fresh: True
+Tasks: {'total': 1, 'runnable': 1, 'blocked': 0, 'waiting_human': 0, 'done': 0, 'open': 1}
+
+--- Verify authoritative records preserved ---
+spec/decisions/D-001.yaml
+spec/features/F-001.yaml
+spec/tasks/TASK-001.yaml
+
+--- Fresh-agent reconstruction (gov status) succeeds after rebuild ---
+(gov status ran successfully above)
+
+--- Claims survive rebuild ---
+{
+  "ok": true,
+  "command": "claims",
+  "result": [],
+  "session": "",
+  "release_trust": {
+    "surface": "claims",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
