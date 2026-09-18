@@ -1,0 +1,75 @@
+# AR-0033 — the derivation attacked, as a standalone probe
+
+An independent Python re-implementation of `section_6_coverage_is_derived_from_the_product`, used to
+explore the mechanism before the Rust held-out suite pinned the results. Both agree.
+
+## 1. The census, three ways
+```
+--- indentation splitter, cfg(test) cut (the product's own): 84 files, 740 functions
+  human_gate_create                          derived  35 / writers  32 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   2 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   7 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived   9 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
+--- brace-depth splitter, cfg(test) cut (independent): 84 files, 740 functions
+  human_gate_create                          derived  35 / writers  32 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   2 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   7 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived   9 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
+--- indentation splitter, NO cfg(test) cut: 84 files, 793 functions
+  human_gate_create                          derived  37 / writers  32 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   2 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   7 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived  12 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
+```
+
+## 2. The candidate signatures applied to the PRE-REPAIR source (base 30aa98a)
+```
+--- BASE 30aa98a graded with the CANDIDATE's signatures: 83 files, 732 functions
+  human_gate_create                          derived  35 / writers  32 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   2 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   7 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived   8 / writers   2 / exempt 0 / violations 1  ==> ['runtime/src/tools.rs::install']
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 1  ==> ['runtime/src/srr/state.rs::save']
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 1  ==> ['cli/src/main.rs::main']
+```
+
+## 3. Plausible future primitives against the signatures
+```
+bullet                                   sig?  write?  acc?  DETECTED  probe
+----------------------------------------------------------------------------------------------------------------------------------
+human_gate_approve                       False True    False **NO**    approve via Value::String instead of json!()
+human_gate_approve                       False True    False **NO**    approve via a named constant
+human_gate_approve                       False True    False **NO**    approve by direct data assignment
+release_certification                    True  True    False YES       certify with a differently-spelled field
+release_certification                    False True    False **NO**    certify writing only a status field
+trust_policy_mutation                    False True    False **NO**    anchor write with a computed role filename
+trust_policy_mutation                    False True    False **NO**    anchor write via a path constant
+privileged_plugin_acquisition            False True    False **NO**    capability registry write via a computed dir name
+floor_lower_or_reset                     False True    False **NO**    floor reset by public-field assignment + save (the repair's own example)
+present_below_floor_release_as_current   False False   False **NO**    a new in-process reporting surface
+present_below_floor_release_as_current   False True    False **NO**    a new CLI print that exits before the envelope
+human_gate_create                        False True    False **NO**    gate file written by a hand-built literal path
+
+MISSED BY THE DERIVATION: 11 of 12
+  - [human_gate_approve] approve via Value::String instead of json!()  (signature does not match)
+  - [human_gate_approve] approve via a named constant  (signature does not match)
+  - [human_gate_approve] approve by direct data assignment  (signature does not match)
+  - [release_certification] certify writing only a status field  (signature does not match)
+  - [trust_policy_mutation] anchor write with a computed role filename  (signature does not match)
+  - [trust_policy_mutation] anchor write via a path constant  (signature does not match)
+  - [privileged_plugin_acquisition] capability registry write via a computed dir name  (signature does not match)
+  - [floor_lower_or_reset] floor reset by public-field assignment + save (the repair's own example)  (signature does not match)
+  - [present_below_floor_release_as_current] a new in-process reporting surface  (signature does not match)
+  - [present_below_floor_release_as_current] a new CLI print that exits before the envelope  (signature does not match)
+  - [human_gate_create] gate file written by a hand-built literal path  (signature does not match)
+```

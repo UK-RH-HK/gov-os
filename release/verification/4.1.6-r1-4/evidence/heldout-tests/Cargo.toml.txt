@@ -1,0 +1,24 @@
+# HELD-OUT INDEPENDENT VERIFICATION TESTS — AR-0033 (verifier-d), R1 verification iteration 4.
+# Authored by the NEW fresh independent R1 verifier for candidate 4 (`srr1-r1-candidate-4`).
+# NOT product source. Lives outside the product tree and outside the cargo workspace, so verifying the candidate
+# requires no modification to any product file.
+# Independently authored: it shares no source line with AR-0027's, AR-0029's or AR-0031's harnesses, and none
+# with `tests/certification/section6.rs`, which is the material under test.
+[package]
+name = "srr-heldout-ar0033"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+gov-runtime = { path = "../wt/srr1-r1-verify-4/runtime" }
+serde_json = { version = "1", features = ["preserve_order", "raw_value"] }
+
+[dev-dependencies]
+# TEST MATERIAL ONLY. Reproducing `ho_f::f1`'s malleability property requires the ability to SIGN. The product
+# binary cannot and must not (`SRR-R0-L4`); this capability exists only in this verification crate.
+ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
+hex = "0.4"
+sha2 = "0.10"
+
+[workspace]
