@@ -1,0 +1,414 @@
+schema: governance-os.phase-1.agent-report
+schema_version: 1
+run_id: AR-0029
+role: verifier-b
+objective: >-
+  Fresh independent R1 re-verification (iteration 2) of the Signed Release Root v1 candidate
+  srr1-r1-candidate-2 against the R1 section of the frozen acceptance boundary, with independently authored
+  held-out tests, after bounded repair 1 (AR-0028) claimed to close AR27-B1, N1, N2 and N4.
+agent_model: claude-opus-5
+independence_statement: >-
+  This run is not AR-0027. It authored none of the implementation, the repair, the ARCH-0003 architecture, the R0
+  correction or any prior review or verification. It authored all 35 held-out tests itself; neither the builder nor
+  the repair role has seen them. The metadata forge in mint.rs was written from an independent reading of
+  runtime/src/srr/metadata.rs and shares no source line with AR-0027's forge.rs, nor does it reuse the builder's
+  tests/certification/srr_material.rs. No product source, frozen boundary, owner record, prior review or
+  verification evidence, release/releases/** content or historical record was modified; the only files created are
+  under release/verification/4.1.6-r1-2/ and this report. The held-out crate is standalone, outside the product
+  tree and outside its cargo workspace, and depends on gov-runtime by path, so verification required no edit to
+  any product file. AR-0027's evidence was read for orientation and then verified rather than adopted; two of its
+  dispositions are corrected in this report on measured evidence. Read: the HO-0029 handoff, the frozen
+  R0/R1/R2/R3 acceptance boundary, 00-ARCHITECTURE.md, ARCH-0003.yaml, OWNER-DECISION-0005, OWNER-DECISION-0006,
+  OWNER-DECISION-0007, OWNER-DIRECTIVE-0004, Capability Acceptance Contract v3, the AR-0026 build report, the
+  AR-0028 repair report and its digest manifest, AR-0027's full verification evidence including its held-out test
+  sources, the product source under runtime/ and cli/, the certification suite, and git history at 4c7c40c. Not
+  read: any session or agent transcript, any task-output store, any user auto-memory. No subagent was used and
+  nothing was delegated. The product owner was not contacted.
+input:
+  base_commit: 2baff074095532d0e7ff42dad2f6fa316f771207
+  release: srr1-r1-candidate-2
+  handoff: release/orchestration/phase-1/HANDOFFS/HO-0029-r1-reverification.md
+inspected:
+  - 2baff074095532d0e7ff42dad2f6fa316f771207
+  - 4c7c40c
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md
+  - release/root-of-trust/signed-release-root-v1-r1-build/
+  - release/root-of-trust/signed-release-root-v1-r1-repair-1/
+  - release/verification/4.1.6-r1/
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md
+  - release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md
+  - spec/architecture/ARCH-0003.yaml
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - runtime/src/srr/
+  - runtime/src/kernel.rs
+  - runtime/src/kernel_trust.rs
+  - runtime/src/update.rs
+  - runtime/src/init.rs
+  - runtime/src/adopt.rs
+  - runtime/src/recovery.rs
+  - runtime/src/release.rs
+  - runtime/src/contracts.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/orchestration/tasks.rs
+  - runtime/src/cit/mod.rs
+  - cli/src/main.rs
+  - tests/certification/
+produced:
+  - release/verification/4.1.6-r1-2/00-VERIFICATION-REPORT.md
+  - release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - release/verification/4.1.6-r1-2/REVIEWED-CONTENT-DIGESTS.txt
+  - release/verification/4.1.6-r1-2/evidence/REPRODUCTION.md
+  - release/verification/4.1.6-r1-2/evidence/HELD-OUT-TEST-OUTPUT.txt
+  - release/verification/4.1.6-r1-2/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - release/verification/4.1.6-r1-2/evidence/REGRESSION.txt
+  - release/verification/4.1.6-r1-2/evidence/heldout-tests/
+tests_or_attacks:
+  - id: DIGESTS
+    description: >-
+      Verify all six digests pinned by HO-0029 plus OWNER-DECISION-0005 and OWNER-DIRECTIVE-0004 before relying on
+      them. All matched; no STOP condition.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/REVIEWED-CONTENT-DIGESTS.txt
+  - id: REGRESSION
+    description: >-
+      cargo test --lib and cargo test --test certification with every GOV_* authority variable stripped;
+      31 passed and 65 passed, 0 failed. tests/certification/srr.rs is +177/-0.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/evidence/REGRESSION.txt
+  - id: AR0027_RERUN
+    description: >-
+      AR-0027's five held-out sources re-run byte-identical. 26 passed, 3 failed, exactly as HO-0029 predicts. The
+      three failures are its own OBSERVED weakness assertions flipping — heldout_srr2::b1 and ::b2 for AR27-N1 and
+      heldout_srr3::d3 for AR27-B1 — and are confirmed as intended flips, not regressions. Every test pinning a
+      satisfied property still passes.
+    result: FLIPPED
+    evidence_path: release/verification/4.1.6-r1-2/evidence/AR-0027-HELD-OUT-RERUN.txt
+  - id: A1
+    description: >-
+      The allow-list decision function is exact-match under 63 near-miss forms — case, leading and trailing
+      whitespace, tab, newline, NUL, gov prefix, doubled space, NBSP, em dash for the double hyphen, a Cyrillic
+      homoglyph, one-character truncation at each end, and the argument-bearing forms kernel reinstall --force and
+      update --apply-unverified. 0 permitted.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_a_allowlist.rs
+  - id: A2
+    description: >-
+      Refusal is the structural default for labels in neither table, including the empty string, whitespace, a bare
+      em dash, a NUL, an emoji, proper prefixes and substrings of permitted labels, a superstring, and invented
+      labels; each is reported under section 6 bullet 1.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_a_allowlist.rs
+  - id: A3
+    description: >-
+      Sweeping all 28 labels that reach a break-glass guard anywhere in the product through the real guard on a
+      marked machine yields a permitted set of exactly four — checkpoint, update --apply, kernel reinstall,
+      update --rollback. All seven AR27-B1 operations are refused. AR27-B1 is closed at the guard.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_a_allowlist.rs
+  - id: A4
+    description: >-
+      REFUSAL_CLASSES is reporting-only. A named and an invented label are refused identically, differing only in
+      refused_class; every class it can report is a section 6 activity; no entry is simultaneously permitted.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_a_allowlist.rs
+  - id: A5
+    description: No false positives — an unmarked machine and a machine after a cleared exit refuse none of the 28 labels.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_a_allowlist.rs
+  - id: A6
+    description: >-
+      SRR2-R1-C1 is still the single exit point, breakglass::exit_satisfied with EXIT_POLICY
+      b_stricter_both_floors; a release between the floors, below the high-water sequence, or below the high-water
+      version does not exit. Verified, not graded (OWNER-DECISION-0007 section 2).
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_a_allowlist.rs
+  - id: B1
+    description: >-
+      On a machine marked DEGRADED — RECOVERY ONLY, gov trust root-update completed a trust-policy mutation:
+      trusted root re-anchored from version 1 to version 2 and one key revoked by omission. The guard would refuse
+      the operation, but provision::root_update calls neither control::guard_write nor breakglass::guard.
+      OWNER-DECISION-0006 section 6 bullet 4. BLOCKING finding AR29-B1.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - id: B2
+    description: >-
+      The same violation measured by effect rather than return value — after the below-floor rotation the anchor is
+      version 2, the protected root metadata high-water is 2, and the anchor is held by a different quorum.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - id: B3
+    description: >-
+      Enforcement-point census for every OWNER-DECISION-0006 section 6 bullet, derived from the candidate's source.
+      Bullet 2 gates::create_system UNGUARDED; bullet 3 release::build UNGUARDED (takes no Project); bullet 4
+      provision::root_update UNGUARDED; bullets 2 (approval), 5 and 6 enforced.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - id: B4
+    description: >-
+      provision refuses to re-anchor a provisioned machine with SRR_ALREADY_PROVISIONED, closing that door to
+      section 6 bullet 4 and supplying limb (c) of the AR27-N2 root-rotation argument.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_b_coverage.rs
+  - id: B5
+    description: >-
+      Section 5 inspection, diagnosis, repair, backup/export and restoration all remain reachable below floor. None
+      of the 27 labels that reach control::guard_write is a read surface; gov recover guards nothing itself and its
+      only guarded downstream call is checkpoint, which is allow-listed; gov trust status and gov trust break-glass
+      answer on a marked machine with requirements.network_required false.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_b_coverage.rs
+  - id: B6
+    description: >-
+      The allow-listed update --apply passes the guard and then reaches gates::create_system at update.rs:157 with
+      no guard in between, creating a Human Gate below floor (section 6 bullet 2); the gate cannot then be answered,
+      so the operation cannot complete. BLOCKING finding AR29-B2, plus non-blocking AR29-N4.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - id: C1
+    description: >-
+      Seven shapes of unreadable marking record — truncated JSON, empty file, binary, non-object, no active member,
+      string active, null active — all refuse, and each refusal names the offending file.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_c_deadlock.rs
+  - id: C2
+    description: >-
+      The repair's claim that the allow-list is consulted before any state read holds — all four permitted
+      operations still pass the guard under an unreadable marking, so the restoration path stays open.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_c_deadlock.rs
+  - id: C3
+    description: >-
+      The exit half of that claim does not hold. After the OWNER-DECISION-0006 section 7 exit condition is met with
+      an authenticated release above both floors, try_exit returns None, rewrites nothing, and the guard keeps
+      refusing, because Degraded::load treats an unreadable record as absent while read_marking treats it as
+      present. Condition AR29-C1.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: C4
+    description: >-
+      The same divergence at the reporting surface — gov trust status reports degraded null and gov trust
+      break-glass reports currently_degraded false while every governed mutation is refused as
+      DEGRADED — RECOVERY ONLY.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: C5
+    description: >-
+      Control case — with a readable marking the machine holds below the high-water, holds on an unauthenticated
+      release, clears on an authenticated at-floor release, and governed operation then resumes.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_c_deadlock.rs
+  - id: D1
+    description: >-
+      AR27-N1 canonical-form gate attacked with 20 RFC-3339 and near-RFC-3339 forms — offsets, lowercase t and z in
+      all combinations, fractional seconds, space separator, missing seconds, no zone, date only, two-digit year,
+      leading plus, surrounding whitespace, trailing newline and NUL, slashes, empty. All rejected, all expired.
+      What util::now_iso emits passes the gate.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_d_expiry.rs
+  - id: D2
+    description: >-
+      Expiry is fail-closed in all four directions — absent expires, non-canonical expires, non-canonical clock
+      reading, and canonical expires at or before now including the exact boundary.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_d_expiry.rs
+  - id: D3
+    description: >-
+      Fail-closed does not brick legitimate operation — a real signed root with an ordinary canonical future expiry
+      verifies, while three near-forms fail closed with a message naming the fault rather than printing a non-date
+      as a date.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_d_expiry.rs
+  - id: D4
+    description: >-
+      The canonical gate validates shape, not calendar range, so 9999-99-99T99:99:99Z reads as a future expiry.
+      Not adversary-reachable and ordering stays sound. Non-blocking R2 observation AR29-N2.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: D5
+    description: >-
+      Every expiry consumer inherits the gate through Envelope::is_expired — root succession refuses a
+      non-canonical candidate and still accepts a well-formed successor.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_d_expiry.rs
+  - id: E1
+    description: >-
+      AR27-N2 profile honesty — an expired installed anchor loads, and gov trust status reports
+      trust_anchor.expired_against_local_clock true with the anchor's expires. Nothing claims it is refused.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_e_rootexpiry.rs
+  - id: E2
+    description: >-
+      Limb 1 of the repair's reasoning measured — root rotation from an expired anchor succeeds (v1 to v2, one key
+      revoked), while an expired successor root is still refused with SRR_METADATA_EXPIRED.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_e_rootexpiry.rs
+  - id: E3
+    description: >-
+      Limb 2 measured — re-provisioning a provisioned machine is refused, so barring an expired anchor would leave
+      no path to rotate it. The repair's reasoning for ROOT_EXPIRY_PROFILE holds and AR27-N2 is closed.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/00-VERIFICATION-REPORT.md
+  - id: E4
+    description: >-
+      The enforced half of the profile is real — first provisioning and parse_self_signed_root both refuse an
+      expired root with SRR_METADATA_EXPIRED.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_e_rootexpiry.rs
+  - id: E5
+    description: >-
+      trusted_root carries no vestigial expiry branch, names the profile it implements, and the profile constant
+      states both the enforced and the not-enforced half explicitly.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_e_rootexpiry.rs
+  - id: E6
+    description: >-
+      An expired anchor still authorises its delegated roles, which is exactly what the profile declares. Reported,
+      not admission-blocking.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_e_rootexpiry.rs
+  - id: F1
+    description: >-
+      AR27-N4 closed crate-wide — across all 83 product source files with comments stripped there are zero
+      ed25519_dalek::Verifier imports and zero bare .verify( calls; verify and verify_strict are one behaviour
+      including on a signature malleated by S + L.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_f_preservation.rs
+  - id: F2
+    description: >-
+      gov verifies and never signs — zero hits for SigningKey, ed25519_dalek::Signer, from_keypair_bytes or a PEM
+      private-key header once the secret-detector regex in security/secrets.rs is excluded by name, and no
+      verification-relaxing flag, env var or cargo feature. SRR-R0-L4 remains vacuous.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_f_preservation.rs
+  - id: F3
+    description: >-
+      Exactly 5 srr::admit sites and exactly 5 install_kernel call sites, each paired; install_kernel takes a typed
+      authenticated-release value and has no path-taking variant.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_f_preservation.rs
+  - id: F4
+    description: >-
+      The no-bypass property is an enumeration property, not a type property — every field of AuthenticatedRelease,
+      Staged, MachineState and Floors is pub, so an external crate constructed one claiming Authenticity::Authentic
+      at sequence 9999. Non-blocking observation AR29-N1; AR-0027's "no public constructor" wording is corrected.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: F5
+    description: >-
+      D-0007 remains a separate control — kernel_trust references none of admit, AuthenticatedRelease, Authenticity,
+      breakglass, below_floor or Floors, and admit_inner references no kernel_trust. The three predicates stay
+      separate.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_f_preservation.rs
+  - id: F6
+    description: >-
+      The Contract v3 canonical import is byte-identical to the owner source at 4c2df291..., the digest is pinned
+      in contracts.rs, and CONTRACT_SOURCE_DIVERGED is present.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_f_preservation.rs
+  - id: F7
+    description: >-
+      Floors are monotonic upward-only across release, minimum-secure and per-role metadata high-water, and an
+      unauthenticated observation raises nothing.
+    result: PASS
+    evidence_path: release/verification/4.1.6-r1-2/evidence/heldout-tests/ho_f_preservation.rs
+  - id: DURABILITY
+    description: >-
+      Durability ordering re-read at staging.rs is journal intent, build .srr-new, journal swap, rename aside,
+      rename into place, fsync parent, journal committed, verify committed bytes, drop .srr-old, then advance the
+      floors at step 9, journal done. Floors advance last.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/00-VERIFICATION-REPORT.md
+  - id: TXN_ABORT
+    description: >-
+      rollback_internal is private with exactly two callers — rollback_opts with transaction_abort false, the only
+      public entry, and one call inside apply_update_opts's error arm. On the abort path admit has already
+      succeeded, record_installed is not called and no floor advances. Not a usable bypass.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/00-VERIFICATION-REPORT.md
+  - id: REPAIR_DIFF
+    description: >-
+      git diff --numstat 4c7c40c~1 4c7c40c confirms the repair touched exactly the five files claimed and that
+      tests/certification/srr.rs is purely additive at +177/-0, so no pre-existing assertion was weakened.
+    result: CONFIRMED
+    evidence_path: release/verification/4.1.6-r1-2/00-VERIFICATION-REPORT.md
+findings:
+  - id: AR29-B1
+    severity: MEDIUM
+    title: >-
+      A machine marked DEGRADED — RECOVERY ONLY completes a trust-policy mutation — gov trust root-update
+      re-anchors the trusted root and revokes keys by omission, because provision::root_update reaches no
+      break-glass guard (OWNER-DECISION-0006 section 6 bullet 4). MATERIALLY NEW BLOCKER CLASS, not a residual of
+      AR27-B1.
+    path: release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - id: AR29-B2
+    severity: MEDIUM
+    title: >-
+      New Human Gates are created below floor — gates::create_system is unguarded and is reachable from gov kernel
+      override and from inside the allow-listed update --apply (OWNER-DECISION-0006 section 6 bullet 2).
+      MATERIALLY NEW BLOCKER CLASS, same class as AR29-B1.
+    path: release/verification/4.1.6-r1-2/10-BLOCKING-FINDINGS.md
+  - id: AR29-C1
+    severity: LOW
+    title: >-
+      An unreadable marking record refuses as degraded but cannot be cleared — read_marking and Degraded::load
+      disagree, so meeting the section 7 exit condition does not resume governed operation and the machine reports
+      not-degraded while enforcing degraded. RESIDUAL of AR27-B1. Non-blocking.
+    path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR29-N1
+    severity: INFO
+    title: >-
+      "Constructible only by admit" is an enumeration property, not a type property — every field of
+      AuthenticatedRelease and its components is pub, so an external crate can construct one. The five/five census
+      is the property that holds.
+    path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR29-N2
+    severity: INFO
+    title: >-
+      The canonical-timestamp gate is syntactic, not calendrical, so 9999-99-99T99:99:99Z reads as a future expiry.
+      Not adversary-reachable. R2.
+    path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR29-N3
+    severity: INFO
+    title: >-
+      guard_light and MachineState::degraded_path spell the marking path with two different sanitisers. Identical
+      for the current FRAMEWORK_NAME, but a latent silent bypass of section 6 for any other product string.
+    path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR29-N4
+    severity: LOW
+    title: >-
+      update --apply is allow-listed but cannot complete below floor when a Human Gate is required, because
+      answering that gate is correctly refused. Not a deadlock — kernel reinstall and update --rollback are
+      gate-free.
+    path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+  - id: AR29-N5
+    severity: INFO
+    title: >-
+      REFUSAL_CLASSES names eight operations that exist nowhere in the product, creating an impression of coverage
+      that a label sweep reads as enforcement — the mechanism behind AR-0027's false negative on trust root-update.
+    path: release/verification/4.1.6-r1-2/20-LATER-LIFECYCLE-CONDITIONS.md
+verdict: BLOCKING_FINDINGS_PRESENT
+output:
+  branch: phase1/srr1-r1-verify-2
+  commit: d3f52c65b419dc722408993a572eb4e978d2cddb
+  evidence_path: release/verification/4.1.6-r1-2/
+unresolved:
+  - AR29-B1 — blocking, MATERIALLY NEW blocker class; bounded R1 repair; no architecture change and no owner decision required
+  - AR29-B2 — blocking, MATERIALLY NEW blocker class, same class as AR29-B1; bounded R1 repair
+  - AR29-C1 — non-blocking but R1-lifecycle and a RESIDUAL of AR27-B1; recommended for the same repair cycle
+  - AR29-N3, AR29-N4 — non-blocking, R1-lifecycle, cheap and in the same files; recommended for the same cycle
+  - AR29-N1, AR29-N5 — INFO; claim wording and an inert table that misleads a label sweep
+  - AR29-N2 — R2, with AR27-N3
+  - AR27-N3, AR27-N5, AR27-N6, AR27-N7 — R2 conditions carried unchanged from AR-0027, not re-examined this cycle
+  - AR27-B1, AR27-N1, AR27-N2, AR27-N4 — all four CLOSED and verified closed; no residual of any of them at the guard
+recommended_next_action: >-
+  Dispatch a second bounded R1 repair for AR29-B1 and AR29-B2, and with them AR29-C1, AR29-N3 and AR29-N4, then
+  re-verify. Prefer a single enforcement point every trust-changing and gate-creating path must pass over
+  per-operation guard calls, so a newly added operation inherits section 6 by construction. No owner decision is
+  required; OWNER-DECISION-0006 section 6 already decides the policy.
+completed_at: 2026-09-18T00:25:00Z

@@ -1,0 +1,163 @@
+AR-0029 (verifier-b) — held-out suite output, R1 verification iteration 2
+worktree HEAD: 2baff074095532d0e7ff42dad2f6fa316f771207
+toolchain:     cargo 1.98.1 (797e8a9bc 2026-08-05)
+captured:      2026-09-18T00:11:18Z
+
+Reading results: a PASSING test means the asserted behaviour is what candidate 2 does.
+Assertions that pin an observed WEAKNESS carry 'OBSERVED:' in the message and therefore FAIL.
+Expected: 32 passed / 4 failed; the four failures are b1, b2 (AR29-B1) and c3, c4 (AR29-C1).
+
+################ ho_a_allowlist ################
+
+running 6 tests
+test a1_the_decision_function_is_exact_match_under_every_near_miss_i_could_construct ... AR-0029 A1 — 63 near-miss forms probed, 0 permitted
+ok
+test a2_refusal_is_the_default_for_labels_that_exist_in_neither_table ... ok
+test a3_the_real_guard_on_a_marked_machine_permits_exactly_the_four ... AR-0029 A3 — of 28 real guarded labels: PERMITTED ["checkpoint", "update --apply", "kernel reinstall", "update --rollback"]; REFUSED 24 others
+ok
+test a4_refusal_classes_are_reporting_only_and_never_load_bearing ... ok
+test a5_an_unmarked_machine_is_not_refused_anything ... ok
+test a6_the_exit_policy_point_is_single_and_still_the_stricter_reading ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+################ ho_b_coverage ################
+
+running 6 tests
+test b1_trust_root_update_mutates_trust_policy_while_the_machine_is_marked_degraded ... AR-0029 B1 — marked `DEGRADED — RECOVERY ONLY`; `gov trust root-update` returned Ok(Bool(true))
+  trust anchor version before = 1, after = 2; revoked keyids = ["10ba682c8ad13513971e8b56881aab8bd702bb807796eca81932c735a94d6e6d"]
+  machine still marked degraded after the trust-policy mutation = true
+
+thread 'b1_trust_root_update_mutates_trust_policy_while_the_machine_is_marked_degraded' (1436705) panicked at tests/ho_b_coverage.rs:83:5:
+OBSERVED (AR29-B1): `gov trust root-update` completed a trust-policy mutation while the machine was marked `DEGRADED — RECOVERY ONLY`. OWNER-DECISION-0006 §6 bullet 4 forbids trust-policy mutation below floor, and REFUSAL_CLASSES names this exact operation, but `provision::root_update` reaches no break-glass guard. Anchor moved from version 1 to 2; keys revoked by omission: ["10ba682c8ad13513971e8b56881aab8bd702bb807796eca81932c735a94d6e6d"].
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test b2_the_trust_anchor_actually_moves_while_marked ... AR-0029 B2 — after the below-floor rotation: anchor version = 2, root metadata high-water = 2, anchor key held by = eeec86207f875ff654d070a8179f86becb1fda1395b3312be417542c99c6ba53
+
+thread 'b2_the_trust_anchor_actually_moves_while_marked' (1436706) panicked at tests/ho_b_coverage.rs:126:5:
+assertion `left == right` failed: OBSERVED (AR29-B1): the trusted root was re-anchored from version 1 to version 2 while the machine was marked `DEGRADED — RECOVERY ONLY`; the protected root metadata high-water advanced to 2. This is `trust_policy_mutation`, an OWNER-DECISION-0006 §6 bullet 4 MUST NOT.
+  left: 2
+ right: 1
+FAILED
+test b3_census_of_section_6_operations_against_their_enforcement_points ... AR-0029 B3 — §6 enforcement-point census on candidate 2:
+  §6 bullet 2 (Human Gate creation): `gates::create` GUARDED; `gates::create_system` UNGUARDED (reachable below floor via `gov kernel override` -> kernel_trust::request_override)
+  §6 bullet 2 (Human Gate approval): `gates::answer` GUARDED (`gov decide` lands here)
+  §6 bullet 3 (release certification): `release::build` UNGUARDED (takes no Project)
+  §6 bullet 4 (trust-policy mutation): `provision::root_update` UNGUARDED; `provision::provision` UNGUARDED but inert on a provisioned machine (SRR_ALREADY_PROVISIONED)
+  §6 bullet 5 (privileged plugin acquisition): `tools install`, `plugins register` GUARDED
+  §6 bullet 6 (floor lowering): no lowering path exists; Floors::raise_* are monotonic
+ok
+test b4_provision_cannot_re_anchor_a_provisioned_machine ... AR-0029 B4 — provision on a provisioned machine -> SRR_ALREADY_PROVISIONED
+ok
+test b5_section_5_inspection_diagnosis_and_restoration_remain_available_below_floor ... AR-0029 B5 — 27 distinct labels reach control::guard_write: ["adopt build-memory", "adopt extract-legacy", "adopt migrate", "checkpoint", "cit approve", "cit execute", "cit propose", "cit reject", "cit simulate", "gate answer", "gate create", "gate revoke", "handoff create", "handoff return", "kernel reinstall", "memory select", "plugins register", "plugins unregister", "readiness plan", "replan", "task claim", "task close", "task create", "task status", "tools install", "update --apply", "upstream submit"]
+AR-0029 B5 — §5 inspection, diagnosis, repair, backup/export and restoration all remain reachable below floor
+ok
+test b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls ... AR-0029 B6 — OBSERVED (AR29-B2): `update --apply` is allow-listed and passes the guard, then calls `gates::create_system` at update.rs:157 with no guard in between — creating a new Human Gate below floor (§6 bullet 2). It then returns HUMAN_GATE_REQUIRED, and answering that gate (`gov decide` -> `gates::answer` -> guard_write("gate answer")) is refused, so the operation cannot complete. `kernel reinstall` and `update --rollback` remain gate-free exits.
+ok
+
+failures:
+
+failures:
+    b1_trust_root_update_mutates_trust_policy_while_the_machine_is_marked_degraded
+    b2_the_trust_anchor_actually_moves_while_marked
+
+test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `--test ho_b_coverage`
+
+################ ho_c_deadlock ################
+
+running 5 tests
+test c1_an_unreadable_marking_refuses_everything_outside_the_allow_list ... AR-0029 C1 — all 7 corruption shapes refuse
+ok
+test c2_the_restore_half_of_the_claim_holds ... AR-0029 C2 — restoration and backup remain available under an unreadable marking
+ok
+test c3_an_unreadable_marking_cannot_be_cleared_by_meeting_the_exit_condition ... AR-0029 C3 — after installing an authenticated release above BOTH floors:
+  try_exit returned None
+  marking record rewritten = false
+  `cit approve` still refused = true
+  is_degraded() reports = false   (the guard disagrees)
+
+thread 'c3_an_unreadable_marking_cannot_be_cleared_by_meeting_the_exit_condition' (1437137) panicked at tests/ho_c_deadlock.rs:104:5:
+OBSERVED (AR29-C1): the exit condition of OWNER-DECISION-0006 §7 was met — an authenticated release at or above both floors was installed — yet the machine still refuses governed operation as `DEGRADED — RECOVERY ONLY`. `try_exit` returned None and did not rewrite the record, because `Degraded::load` treats an unreadable marking as absent while `read_marking` treats it as present. The repair's claim that "the exit path stays open" holds for restoration but not for clearing the marking.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test c4_the_machine_reports_not_degraded_while_refusing_as_degraded ... AR-0029 C4 — `gov trust status`.degraded = null; `gov trust break-glass`.currently_degraded = false; guard_light("cit approve") = SRR_BELOW_FLOOR_REFUSED
+
+thread 'c4_the_machine_reports_not_degraded_while_refusing_as_degraded' (1437140) panicked at tests/ho_c_deadlock.rs:137:5:
+OBSERVED (AR29-C1): `gov trust break-glass` reports currently_degraded=false and `gov trust status` reports degraded=null while every governed mutation is refused with `DEGRADED — RECOVERY ONLY`. Two readers of the same record disagree about whether the machine is marked.
+FAILED
+test c5_a_readable_marking_clears_when_the_exit_condition_is_met ... AR-0029 C5 — readable marking: held below floor, held when unauthenticated, cleared at floor
+ok
+
+failures:
+
+failures:
+    c3_an_unreadable_marking_cannot_be_cleared_by_meeting_the_exit_condition
+    c4_the_machine_reports_not_degraded_while_refusing_as_degraded
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `--test ho_c_deadlock`
+
+################ ho_d_expiry ################
+
+running 5 tests
+test d1_the_canonical_form_gate_accepts_exactly_the_form_the_profile_emits ... AR-0029 D1 — canonical gate rejects every non-emitted RFC-3339 form probed
+ok
+test d2_expiry_is_fail_closed_in_all_four_directions ... AR-0029 D2 — fail-closed on absent, non-canonical expires, non-canonical clock and expires <= now
+ok
+test d3_fail_closed_does_not_brick_an_ordinary_document ... AR-0029 D3 — an ordinary canonical future expiry verifies; three near-forms fail closed with a reason
+ok
+test d4_the_canonical_gate_is_syntactic_only ... AR-0029 D4 — OBSERVATION (non-blocking, R2): the canonical gate validates shape, not calendar range; '9999-99-99T99:99:99Z' is accepted as a future expiry. Unreachable by an adversary (the value is inside the signed bytes) and orders correctly; a publisher-side lint would close it.
+ok
+test d5_every_expiry_consumer_inherits_the_gate ... AR-0029 D5 — succession inherits the gate and still accepts a well-formed successor
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+
+################ ho_e_rootexpiry ################
+
+running 6 tests
+test e1_the_profile_is_honest_about_what_an_expired_anchor_does_not_bar ... AR-0029 E1 — expired anchor: trusted_root() loads it, `gov trust status` reports expired_against_local_clock = true and expires = "2020-01-01T00:00:00Z"
+ok
+test e2_root_rotation_is_possible_under_the_implemented_profile ... AR-0029 E2 — rotation from an EXPIRED anchor succeeded: v1 -> v2, revoked 1 key(s)
+AR-0029 E2 — an expired SUCCESSOR root is refused: SRR_METADATA_EXPIRED
+ok
+test e3_the_alternative_would_make_rotation_permanently_impossible ... AR-0029 E3 — re-provisioning a provisioned machine is refused (SRR_ALREADY_PROVISIONED), so if `trusted_root` barred an expired anchor there would be no remaining path to rotate it. The repair's reasoning holds.
+ok
+test e4_the_enforced_half_of_the_profile_is_real ... AR-0029 E4 — first provisioning and self-signed parse both refuse an expired root
+ok
+test e5_trusted_root_carries_no_vestigial_expiry_branch ... AR-0029 E5 — no vestigial branch; the profile names itself at the site and states both halves
+ok
+test e6_an_expired_anchor_does_not_bar_verifying_release_metadata_against_it ... AR-0029 E6 — an expired anchor still authorises its delegated roles (1 signature accepted), which is exactly what ROOT_EXPIRY_PROFILE = "reported_not_admission_blocking_r1" declares. Reported, not admission-blocking.
+ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+
+################ ho_f_preservation ################
+
+running 7 tests
+test f1_the_permissive_ed25519_verifier_is_out_of_scope_crate_wide ... AR-0029 F1 — across 83 product source files: `Verifier` trait imports = []; bare `.verify(` calls = []
+AR-0029 F1 — `verify` and `verify_strict` are one behaviour, including on a malleated S+L signature
+ok
+test f2_no_signing_capability_exists_in_product_source ... AR-0029 F2 — signing-capability hits in product source: []
+ok
+test f3_the_ingress_invariant_still_counts_five_and_five ... AR-0029 F3 — admit sites 5: ["/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/cli/src/main.rs:939", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/adopt.rs:638", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/init.rs:237", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/update.rs:213", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/update.rs:450"]
+AR-0029 F3 — install_kernel call sites 5: ["/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/cli/src/main.rs:944", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/adopt.rs:642", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/init.rs:244", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/update.rs:220", "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-2/runtime/src/update.rs:467"]
+ok
+test f4_authenticated_release_is_not_type_constructor_enforced ... AR-0029 F4 — OBSERVATION: an `AuthenticatedRelease` claiming authenticity=Authentic at sequence 9999 was constructed outside `admit`, from a crate that only depends on gov-runtime. All fields are `pub`, so "constructible only by admit" is an enumeration property (5 admit / 5 install_kernel sites), not a type-system property. Non-blocking: reaching it requires new product or caller source.
+ok
+test f5_d0007_remains_independent_of_the_srr_verdicts ... AR-0029 F5 — the three predicates stay separate: no reference in either direction at decision time
+ok
+test f6_contract_v3_canonical_import_is_byte_identical ... AR-0029 F6 — owner source 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3, canonical import 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+ok
+test f7_floors_are_monotonic_and_only_rise_from_verified_facts ... AR-0029 F7 — floors monotonic; an unauthenticated observation raises nothing
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+
