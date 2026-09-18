@@ -1,0 +1,743 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0013
+notes: >-
+  Evidence paths are relative to release/capability-baseline/audit-0/alpha-r/. "[TAG]" names the output lines of a
+  probe that carry that marker. Every reproduction assumes the product was built first at the worktree root with
+  `~/.cargo/bin/cargo build --release`, then runs from the evidence directory as
+  `PROBE_TMP=$(mktemp -d) python3 <probe>.py`; every probe isolates HOME and XDG_* in a scratch sandbox and strips
+  GOV_* variables, so no real machine state is read or written. Severity labels describe impact; blocking follows the
+  frozen acceptance criteria only (frozen contract §6).
+findings:
+  # ------------------------------------------------------------------------------------------------ blocking
+  - id: A0-A2-01
+    capability: [A2]
+    bullet_source_lines: [146]
+    severity: HIGH
+    title: A consistent post-install rewrite of the installed kernel is accepted as intact; the protected installed record is never consulted after install
+    statement: >-
+      Installed-kernel verification (runtime/src/kernel_trust.rs:125-285, the D-0007 T1 test) decides "intact" from
+      three files that all live in the project repository: the payload, governance/kernel/KERNEL_MANIFEST.json and
+      governance/framework.lock.kernel_manifest_hash. An actor with repository write access who edits one kernel
+      policy file and then rewrites KERNEL_MANIFEST.json and framework.lock to agree passes every check: in
+      A2-03 [T2] `gov kernel verify` returns ok with trust.verified=true and no embedded-baseline substitution,
+      mutating commands run, doctor D003 reports "intact (4.1.5)", audit family mutation_scope is HEALTHY, and the
+      effective SECURITY_POLICY.never_index_classes becomes [] (secrets and restricted content indexable). The
+      machine's own protected record written at install (srr::verifier::record_installed, payload_hash e2e7b0cf…)
+      no longer matches the installed payload (bb26a3af…), but nothing compares them after installation: kernel_trust
+      has no reference to the installed record, and doctor/audit/status/guards never read it. A naive single-file edit
+      is detected (A2-03 [T1]); the consistent rewrite is the case that matters because D-0007's own rationale names
+      the defect class ("reading an assertion from the artefact whose privileges the assertion controls").
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:146 "Installed-kernel verification detects post-install
+      tampering."; :154 challenge "altered security policy"; spec/decisions/D-0007.yaml rationale ("reading an
+      assertion from the artefact whose privileges the assertion controls") and trust class T1 definition;
+      OWNER-DIRECTIVE-0004 "D-0007's manifest and framework.lock remain post-install integrity and release-pin records"
+      and "D-0007 is not superseded or amended unless ARCH-0003 passes R0 and a later transition record explicitly
+      authorises that change".
+    provenance_class: OWNER-ADDED-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-4, AC-3]
+    blocking: true
+    evidence: [evidence/A2-03-post-install-tamper.py, evidence/A2-03-post-install-tamper.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A2-03-post-install-tamper.py  # lines [T2]"
+    repair_direction: >-
+      Installed-kernel integrity must be established against a reference the repository cannot rewrite, so that a
+      mutually consistent payload/KERNEL_MANIFEST.json/framework.lock rewrite is detected and fails closed like the
+      naive edit (Contract v3:146). Where the machine holds a protected record of what it verified and installed, the
+      installed payload must be checked against it at the points where kernel trust is decided.
+    owner_decision_required: true
+    owner_decision_reason: >-
+      Architecture-boundary change. D-0007 defines T1 as a kernel matching its manifest and lock, and
+      OWNER-DIRECTIVE-0004 keeps D-0007's manifest/lock as the post-install integrity records and forbids amending
+      D-0007 without an explicit transition record. Anchoring post-install integrity elsewhere changes that definition.
+      The owner must also choose what anchors integrity on a machine that holds no protected record for the project
+      (a fresh clone on a second machine, S6; an unprovisioned machine, A0-A2-02): refuse, re-verify from a signed
+      release, or accept the repository's manifest/lock as today.
+
+  - id: A0-A2-02
+    capability: [A2, S3, S5]
+    bullet_source_lines: [143, 147, 150, 914, 938]
+    severity: HIGH
+    title: On the default unprovisioned posture every ingress installs unauthenticated kernel material, and the result is presented as current
+    statement: >-
+      A machine without a provisioned trust anchor is the default state (posture UNPROVISIONED, A2-01 [U0]); the
+      binary ships no embedded root keys. On such a machine srr::admit (runtime/src/srr/verifier.rs:437-507) records
+      authenticity UNKNOWN and still admits the candidate: a release payload tampered after build (SECURITY_POLICY
+      never_index_classes emptied) installs through `gov init --source` and the tampered policy becomes effective
+      (A2-01 [U2]); the embedded payload and a self-identified source claiming CERTIFIED install the same way
+      ([U3][U4]); `gov update` installs with release_authenticity UNKNOWN (S5-update.out [U2]); adopt, reinstall and
+      rollback share the verifier. The honesty notes are present, but the operator-facing surfaces do not treat the
+      state as a problem: the CLI envelope reports release_trust.presented_as CURRENT, gov status reports
+      verified_release "4.1.5" with verified_payload_hash for the unauthenticated bytes, and doctor raises no check about
+      authenticity or posture (A2-01 [U2]). On a provisioned machine the same inputs are refused at every ingress
+      (A2-02-provisioned-ingress.out [P2]-[P9]). R1 (AR-0027 report §1) accepted the unprovisioned posture as an
+      implementation choice after examining its honesty and floor behaviour, not against Contract v3 A2 bullet 1.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:143 "Release/source authenticity is established before any
+      privileged kernel material is staged or installed."; :147 "Source-release authentication detects pre-install
+      tampering."; :150 "Bootstrap/dev/test trust modes cannot masquerade as certified production."; :938 "authenticated
+      source"; OWNER-DIRECTIVE-0004 target chain "trusted platform/admin bootstrap -> embedded or pre-installed offline
+      root public keys -> ..."; release/verification/4.1.6-r1/00-VERIFICATION-REPORT.md:254 "Unprovisioned posture —
+      ACCEPTED as an IMPLEMENTATION-CHOICE".
+    provenance_class: NEW-OWNER-DECISION-REQUIRED
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-4, AC-3]
+    blocking: true
+    evidence: [evidence/A2-01-unprovisioned-posture.py, evidence/A2-01-unprovisioned-posture.out, evidence/A2-02-provisioned-ingress.out, evidence/S5-update.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A2-01-unprovisioned-posture.py  # lines [U0]-[U4]"
+    repair_direction: >-
+      Either privileged kernel material is installed only after authenticity is established on every supported
+      machine (Contract v3:143, :147, :938), or the owner explicitly places the unprovisioned posture outside A2's
+      obligation. In the second case an unauthenticated installation must still never be presented as current or
+      verified, and must be visible to doctor/audit (:150).
+    owner_decision_required: true
+    owner_decision_reason: >-
+      Normative conflict plus owner-controlled material and a usability trade-off: the Phase-1 R1 acceptance recorded
+      this posture as an acceptable implementation choice, while Contract v3 A2 bullet 1 requires authenticity before
+      installation. Closing it means either shipping or pre-installing the production root public keys (owner-controlled
+      material, OWNER-DIRECTIVE-0004 chain) or refusing first installs on unprovisioned machines (breaks the documented
+      embedded-payload install path; offline first install is out of scope per SRR-R0-L7). Only the owner can choose
+      between those, or declare the posture acceptable for Phase 2.
+
+  - id: A0-A2-03
+    capability: [A2, S6]
+    bullet_source_lines: [149, 950]
+    severity: MEDIUM
+    title: framework.lock records release identity that verification never established, with no authenticity basis, and it depends on a machine path
+    statement: >-
+      framework.lock (runtime/src/lock.rs:12-34, fields from runtime/src/kernel.rs:112-172) takes release_commit and
+      the source label from outside the verified material. (1) After a signed release's unsigned manifest.json is edited
+      to release_commit f00dface…, an AUTHENTIC install records that forged commit (A2-04 [L1]). (2) The lock records
+      no authenticity, sequence, channel or metadata digest: the locks from an AUTHENTIC and an UNKNOWN install of the
+      same payload cannot be told apart ([L3]). (3) For the embedded payload, the recorded identity depends on where
+      XDG_CACHE_HOME points: "embedded:…" with release_commit 25dac6ef… under the default ~/.cache, "source:…" with
+      release_commit "unknown" when the cache path has no ".cache" segment, and the consumer repository's own HEAD when
+      the cache sits inside the consumer repository ([L4], S6-cross-machine.out [X3]). The builder's own regression
+      test repair2::framework_lock_is_release_identifying_and_portable fails when XDG_CACHE_HOME has no ".cache"
+      segment (00-regression-variant-xdg-cache.out); it passes under the default environment
+      (00-build-and-regression.out, 79/79).
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:149 "Trusted release identity is recorded, not invented, by
+      `framework.lock`."; :950 "machine-specific absolute paths do not define release identity"; OWNER-DIRECTIVE-0004
+      "A project repository may pin an authenticated release identity but cannot establish its trust root."
+    provenance_class: OWNER-ADDED-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-4]
+    blocking: true
+    evidence: [evidence/A2-04-lock-identity-and-masquerade.out, evidence/S6-cross-machine.out, evidence/00-regression-variant-xdg-cache.sh, evidence/00-regression-variant-xdg-cache.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A2-04-lock-identity-and-masquerade.py  # lines [L1] [L3] [L4]; PROBE_TMP=$(mktemp -d) python3 S6-cross-machine.py  # [X3]; bash 00-regression-variant-xdg-cache.sh"
+    repair_direction: >-
+      Every identity field framework.lock records must come from what verification established (the authenticated
+      release, or constants of the running binary for the embedded payload) or be marked as unverified. The lock must
+      record the basis on which the identity was accepted. The recorded identity must not vary with machine paths
+      (Contract v3:149, :950).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A2-04
+    capability: [A2, A3, S2, S5]
+    bullet_source_lines: [150, 161, 937]
+    severity: HIGH
+    title: An unsigned, freely editable certification claim removes the update Human Decision Gate; any role can mint a CERTIFIED release
+    statement: >-
+      `gov update --check/--apply` derives human_gate_required from the certification.status field of the candidate's
+      manifest.json (runtime/src/update.rs:82-99: `|| cert != "CERTIFIED"`). manifest.json is not bound by the signed
+      metadata and can be edited after signing without affecting verification. In A2-04 [L2], a signed 4.1.6 whose
+      manifest.json was edited to CERTIFIED flips human_gate_required from true to false and the recommendation to
+      "safe: `gov update --apply`". `gov update --apply` then installs it with no gate and no human record. The
+      signature is genuine, so the edit is invisible to verification. The honest manifest (control) requires the gate.
+      `gov release build --certification CERTIFIED` takes no project and checks no role; research-agent (L1) mints a
+      CERTIFIED release ([L2]). `gov release verify` still reports a post-release certification edit as the manifest's
+      status (S1-S2-release.out [M2]). Nothing in init, status or doctor surfaces certification at all (A0-S3-01).
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:150 "Bootstrap/dev/test trust modes cannot masquerade as
+      certified production."; :161 "Destructive/elevated operations require correct gates."; :937 "check/impact
+      simulation"; GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md:483 "human gate
+      if material"; spec/decisions/D-0007.yaml rule (2) "'registered', 'approved', 'verified', 'human_approved',
+      'authority', 'provenance' are facts of T1/T2 only; a T4/T5/T6 field carrying such a name is a request, recorded
+      and ignored."
+    provenance_class: OWNER-ADDED-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-4, AC-3]
+    blocking: true
+    evidence: [evidence/A2-04-lock-identity-and-masquerade.py, evidence/A2-04-lock-identity-and-masquerade.out, evidence/S1-S2-release.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A2-04-lock-identity-and-masquerade.py  # lines [L2-control] [L2]"
+    repair_direction: >-
+      No gate-relaxing or trust-relaxing decision may rest on a certification claim that the trust root has not
+      authenticated. A release whose certification is not authenticated must be treated as uncertified everywhere
+      (update gating, init, status). Minting a certification claim must itself be an authority-gated act (Contract
+      v3:150, :161; D-0007 rule 2).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-T2-01
+    capability: [T2, T1, T3, S4, A3]
+    bullet_source_lines: [968, 969, 958, 959, 960, 961, 963, 964, 928, 929, 930, 933, 934, 972, 161]
+    severity: HIGH
+    title: Adoption independence is not bound to the reviewed artefacts; the executor can change the approved plan and tests and every independent stage still accepts
+    statement: >-
+      (a) The A5 verdict (runtime/src/adopt.rs:461-505) records a session string, a free-text role and a test count.
+      It stores no digest of the path map, plan or 06-migration-tests.yaml it approved. In S4-T2-B2-negative.out [N2]
+      the reviewer approves 10 tests. The executor then empties 06-migration-tests.yaml and changes src/pkg/util.py
+      (imported by core.py) from KEEP_IN_PLACE to DELETE_FROM_ACTIVE_TREE in batch 2 with no gate. A6 executes it (the
+      imported module is deleted) and A7 accepts MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD with 0 tests, no catalogue
+      problems and no broken links. (b) Verdict roles are never validated: A5 accepts reviewer-role migration-executor
+      and an arbitrary non-kernel string (S4-adopt-end-to-end.out [A5]); A7 accepts verifier-role migration-executor
+      with acting role backend-engineer ([N7]). (c) Independence is session-string inequality only
+      (adopt.rs:479-481, 806-811, 1205-1210), and without --session every invocation gets a fresh random id. One agent
+      with no session flags completes A0→A11 with verdict ADOPTED_WITH_ACCEPTED_EXCEPTIONS ([N1]). (d) A11, the
+      comprehensive independent auditor, has no session or role check; the executor's own session runs it
+      (T1-roles.out [T1c]). The planner session is also the executor and the memory builder, all accepted. Planner
+      stages accept an L0 role. (e) A10 evaluates the held-out set that the memory builder generated at A9
+      (S4-adopt-end-to-end.out [A9] heldout_generated 31, [A10]). What the product does enforce, it enforces correctly:
+      explicit same-session attempts are refused at A5/A7/A10, a false A7 acceptance is refused VERDICT_CONFLICT, and
+      stage order is enforced ([A5][A7][A10], [N3]).
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:968 "independent roles do not simply continue
+      builder/executor context."; :969 "held-out tests/evidence separation is enforced."; :958-964 (roles); :928, :930,
+      :933, :934 (A5/A7/A10/A11); :972 (traceable chain); GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md
+      §3 Role B "Fresh session. Reviews the plan and creates independent acceptance tests before migration execution.",
+      Role C "Executes only the approved migration/adoption plan", Role G "Fresh session after memory acceptance.";
+      §11 "Do not weaken tests to complete migration."; §15 "Fresh test author creates held-out tests independently."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-3]
+    blocking: true
+    evidence: [evidence/S4-T2-B2-negative.py, evidence/S4-T2-B2-negative.out, evidence/S4-adopt-end-to-end.out, evidence/T1-roles.py, evidence/T1-roles.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S4-T2-B2-negative.py  # [N1] [N2] [N7]; PROBE_TMP=$(mktemp -d) python3 T1-roles.py  # [T1c]; PROBE_TMP=$(mktemp -d) python3 S4-adopt-end-to-end.py  # [A5] [A9] [A10]"
+    repair_direction: >-
+      Execution and every independent verdict must be bound to the exact artefacts the independent reviewer approved.
+      Changing the plan, map or tests after approval must invalidate the approval, or be refused (protocol §3 Role C,
+      §11). Each independent stage (A5, A7, A10, A11) must be performed by a kernel role designated for it and be
+      distinguishable from the planner/executor/builder by more than a caller-chosen string, within the documented
+      D-0007 caller-declared-identity boundary. A10's held-out tests must come from the independent verifier, not
+      the builder (protocol §15; Contract v3:968-969).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A1-02
+    capability: [A1, A2, A3, A4, A5, B1, B2, B3, S1, S2, S3, S4, S5, S6, T1, T2, T3]
+    bullet_source_lines: []
+    severity: MEDIUM
+    title: The compiled contract drops all 100 alpha checklist bullets, and the evidence map gives every alpha capability zero evidence owners
+    statement: >-
+      `gov contract verify` passes and the canonical import is byte-identical to the owner source (C0-contract-derived-views.out
+      [C0]). But the compiled form carries, for each of the 17 alpha capabilities, only family/id/requirement_class/
+      source_reference/status/title. None of the 100 checklist bullets and none of the per-capability fields in Contract
+      v3:55-73 (evidence classes, automated check IDs, freshness triggers, G0-G6 tiers, challenge IDs, adoption
+      obligation, …) are represented ([C1]). The compiler reads headings only (runtime/src/contracts.rs:110-165).
+      The finding concerns how all 100 alpha bullets (Contract v3 lines 133-138, 143-152, 157-162, 167-170, 173-178,
+      185-188, 191-195, 200-203, 897-898, 901-911, 914-919, 923-934, 937-945, 948-950, 957-965, 968-969, 972) are
+      represented in the derived views. It is not a gap in any bullet's behaviour, so bullet_source_lines is empty. The
+      evidence map classifies every alpha capability NOT_YET_MAPPED with no automated check. Everything a
+      consumer or scheduler would evaluate against the contract therefore differs in substance from the owner source.
+      Phase 1 recorded the evidence-map gap as an R2 obligation (PHASE-1-RESIDUAL-RISKS.md AR27-N7). The frozen Phase-2
+      gate contract makes suite-to-contract mapping (AC-10) and a semantically faithful compiled form and evidence map
+      (AC-13) Phase-2 acceptance criteria.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:47 "Any semantic difference between source and compiled
+      representation is a hard failure."; :53-73 required contract fields per capability; :81 "Each item must therefore
+      map to one or more evidence classes"; release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md AC-10
+      "No required capability has zero evidence owners." and AC-13 "compiled form, lock, evidence map and generated view
+      carry no semantic difference from the owner source".
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-10, AC-13]
+    blocking: true
+    evidence: [evidence/C0-contract-derived-views.py, evidence/C0-contract-derived-views.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && python3 C0-contract-derived-views.py"
+    repair_direction: >-
+      The compiled contract must represent every owner-source checklist bullet and the per-capability fields of Contract
+      v3:55-73 without semantic difference (:47). Every alpha capability must name at least one evidence owner in the
+      evidence map (AC-10).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-B3-01
+    capability: [A2, B1, B2, B3, S4, S6, T2, T3]
+    bullet_source_lines: []
+    severity: MEDIUM
+    title: Green governance evidence stays current when authoritative spec, product source, index manifest, adoption evidence, trust anchor or the gov binary changes
+    statement: >-
+      The only currency mechanism for green governance evidence is doctor D021 (and the task-close check at
+      runtime/src/orchestration/tasks.rs:501). Both compare the green record's inputs_hash
+      (runtime/src/verification/mod.rs:54-72) with the current tree. That hash covers governance/kernel,
+      governance/project, governance/tests, spec/decisions and framework.lock only. FRESH-invalidation.out shows D021
+      correctly going obsolete for nine input classes ([F] overlay policy, kernel policy, schema, migration, repository
+      contract, data sensitivity, plugin descriptor, retrieval-profile pin, decisions). It stays "current" after a change
+      to another authoritative spec record (spec/requirements), relevant product source, the index manifest and the
+      adoption evidence tree ([F]), and after trust-anchor provisioning and release-key rotation on the machine
+      ([F-A2]). The runtime implementation (the gov binary) is not an input at all. Adoption verdicts are not
+      re-evaluated when the catalogue/tests they rest on change (S4-T2-B2-negative.out [N2]).
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:97-109 "A previously green capability becomes `STALE` when any
+      relevant evidence input changes, including where applicable: … runtime/kernel implementation; … project path map;
+      authoritative spec/decision; relevant source files; relevant index manifest; security/sensitivity policy."; :111
+      "Stale evidence must trigger the appropriate G0–G5 re-check before work is allowed to rely on it."; frozen
+      contract AC-10 "Changing a relevant implementation/policy/spec/tool/model/index/path-map input is shown to
+      invalidate prior green evidence rather than leave it green."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-10]
+    blocking: true
+    evidence: [evidence/FRESH-invalidation.py, evidence/FRESH-invalidation.out, evidence/S4-T2-B2-negative.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 FRESH-invalidation.py"
+    repair_direction: >-
+      A change to any evidence input class of Contract v3:99-109 that is relevant to a capability's green evidence
+      (including the runtime implementation, authoritative spec beyond decisions, relevant source, index manifest, and
+      the trust state the evidence rests on) must make that evidence stale before work relies on it (:111; AC-10).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  # ------------------------------------------------------------------------------------------------ non-blocking
+  - id: A0-A1-01
+    capability: [A1]
+    bullet_source_lines: [133]
+    severity: MEDIUM
+    title: The context packet's constitution layer is read from the unverified installed kernel
+    statement: >-
+      context::compile reads HARD_INVARIANTS.yaml from p.kernel_dir() (runtime/src/context/mod.rs:94-104). It does not
+      use kernel_trust::trusted_root, which the policy layer uses (D-0007 consequence: "PolicySet, policy precedence,
+      ROLES.yaml, routing, handoffs, adapters … read kernel content only through kernel_trust::trusted_root"). With the
+      installed file tampered, the packet delivers the rewritten INV-009 ("Secrets may be indexed when convenient…")
+      while kernel verify is false and policy already uses the embedded baseline (A1-policy-precedence.out [I2]). With
+      the file emptied, compile succeeds with zero invariants in layer 1 ([I2b]). The same packet's layer 2 reports
+      kernel_trust.verified=false, and mutations are refused KERNEL_TAMPERED, so enforcement is unaffected. The
+      invariants shown to agents are not.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:133 "Constitution/hard invariants are identifiable and
+      machine-readable."; spec/decisions/D-0007.yaml rule (1) "an enforcement decision reads its floor from T1 only;
+      when T1 cannot be authenticated, the embedded baseline is substituted explicitly".
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A1-policy-precedence.py, evidence/A1-policy-precedence.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A1-policy-precedence.py  # [I2] [I2b]"
+    repair_direction: >-
+      The constitutional layer delivered to agents must come from the same verified (or explicitly substituted
+      embedded) kernel root as the enforced policy (D-0007 rule 1).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A4-01
+    capability: [A4]
+    bullet_source_lines: [167, 168, 169, 170]
+    severity: MEDIUM
+    title: Network-call and high-cost-experiment budgets are declared governed but not enforced; spend to date is not observable
+    statement: >-
+      BUDGET_POLICY.governed lists network_calls and high_cost_experiments (A4-budget-governance.out [B0]).
+      max_network_calls_per_task appears only in a telemetry summary. A task with 205 calls over a budget of 200 is
+      listed as over_budget and no gate is raised ([B4]). No threshold or gate exists for experiments: a 50k experiment
+      task is created and claimed with no gate ([B6]). Cloud changes are gated only by the CIT trigger label, whatever
+      the amount ([B5]). Daily spend to date against max_daily_spend_usd is reported nowhere ([B7]). Model/API spend
+      (per-task, daily), parallel agents and tool-install cost are enforced with gates ([B1]-[B3]). Spend counts only
+      when an agent records it with `gov route --record`.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:167-170; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md:2201-2213
+      §73 "Govern: … network calls; … high-cost experiments. A task exceeding delegated thresholds creates a Human
+      Decision Gate."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A4-budget-governance.py, evidence/A4-budget-governance.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A4-budget-governance.py"
+    repair_direction: >-
+      Every budget class framework §73 names must have an executable threshold that creates a Human Decision Gate when
+      exceeded. Budget state (spend to date against each limit) must be observable (Contract v3:167-170).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A5-01
+    capability: [A5]
+    bullet_source_lines: [174]
+    severity: MEDIUM
+    title: FREEZE_WRITES (and PAUSE) leave several commands that change governed files open
+    statement: >-
+      With writes_frozen set, eleven mutating commands are refused FROZEN, but `task release`, `gate present`,
+      `continue`, `route --record` (which creates a new HDG record), `adopt baseline` (writes the adoption evidence tree)
+      and `audit` (writes spec/audits/AUD-*) still change governed files under spec/ (A5-emergency-controls.out [E2]).
+      `gate present` has no guard_write call (runtime/src/orchestration/gates.rs:178). (Under PAUSE, `gov continue`
+      also presents a pending gate and rewrites spec/decisions/HDG-0001.yaml ([E1]); presenting a pending question to
+      the human is not agent work, so it is not counted against PAUSE, bullet 173.)
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:174 "`FREEZE_WRITES`"; DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md:2217-2228
+      §74 "These map to deterministic governance operations."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A5-emergency-controls.py, evidence/A5-emergency-controls.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A5-emergency-controls.py  # [E1] [E2]"
+    repair_direction: >-
+      While FREEZE_WRITES is in force, no command may change authoritative governed state except the emergency-recovery
+      operations the policy explicitly allows (e.g. ROLLBACK_TRANSACTION), and the allow-list must be explicit
+      (framework §74).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A5-02
+    capability: [A5]
+    bullet_source_lines: [175]
+    severity: MEDIUM
+    title: CANCEL_AGENTS sets a flag and pauses but revokes no agent's claims or handoffs
+    statement: >-
+      `gov cancel-agents` (runtime/src/orchestration/control.rs:35-39) sets agents_cancelled and mode PAUSED. The
+      cancelled agent's task claim and the open handoff survive, and after RESUME the cancelled session still holds its
+      claim (A5-emergency-controls.out [E3]). Cancellation differs from PAUSE only in a flag; nothing records which
+      agents were cancelled.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:175 \"`CANCEL_AGENTS`\"; framework §74 (lines 2217-2228)."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A5-emergency-controls.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A5-emergency-controls.py  # [E3]"
+    repair_direction: >-
+      CANCEL_AGENTS must deterministically end the cancelled agents' authority to continue (claims, handoffs, sessions),
+      and that must survive RESUME (framework §74).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A5-03
+    capability: [A5]
+    bullet_source_lines: [178]
+    severity: LOW
+    title: Recovery from an emergency control leaves no durable, reasoned record
+    statement: >-
+      control.json is overwritten on RESUME (reason null). Telemetry, which is gitignored derived runtime, records
+      command/role/session but not the reason. No governed record under spec/ or governance/ retains that an incident
+      control was entered or left, or why (A5-emergency-controls.out [E6]).
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:178 \"Recovery from emergency controls is auditable.\""
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A5-emergency-controls.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A5-emergency-controls.py  # [E6]"
+    repair_direction: "Entering and leaving each emergency control, with actor and reason, must be recorded in authoritative tracked state (Contract v3:178)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-B2-01
+    capability: [B2]
+    bullet_source_lines: [192]
+    severity: LOW
+    title: SPLIT and MERGE path-map actions are not executable
+    statement: >-
+      A catalogue entry with action SPLIT or MERGE is refused by the executor: "PLAN_UNSUPPORTED … requires a manual
+      CIT" (runtime/src/migrations/executor.rs ~250; S4-T2-B2-negative.out [N4]). RENAME is executed as MOVE. The planner
+      never proposes SPLIT/MERGE.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:192 \"Target action supports KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE.\""
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S4-T2-B2-negative.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S4-T2-B2-negative.py  # [N4]"
+    repair_direction: "Every target action B2 bullet 2 lists must be supported by the migration transaction (planned, executed, verified and rolled back), or routed there explicitly (Contract v3:192)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-B2-02
+    capability: [B2]
+    bullet_source_lines: [194]
+    severity: LOW
+    title: Documentation citations are not represented in the path map
+    statement: >-
+      Code imports and consumers are recorded (src/pkg/core.py imports util.py; tests consume core.py). The markdown link
+      README.md -> docs/spec-login.md is not: both entries have references=[]. The link is still rewritten when the spec
+      moves and reverted on rollback (S4-T2-B2-negative.out [N5]). Impact analysis from the map alone misses citations.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:194 \"Imports/references/citations/consumers are represented.\""
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S4-T2-B2-negative.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S4-T2-B2-negative.py  # [N5]"
+    repair_direction: "Citations (document links) must appear in the path map alongside imports and consumers (Contract v3:194)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S2-01
+    capability: [S2]
+    bullet_source_lines: [907]
+    severity: LOW
+    title: The release manifest carries adapter versions but no capability/plugin versions
+    statement: >-
+      A built manifest has adapter_versions (generic/ide/cli/api/mcp) and no capability or plugin version key. No
+      capabilities directory is part of the payload (S1-S2-release.out [M1]).
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:907 \"adapter/capability versions\""
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S1-S2-release.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S1-S2-release.py  # [M1]"
+    repair_direction: "The release manifest must identify the versions of the capabilities it ships (Contract v3:907)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S3-01
+    capability: [S3]
+    bullet_source_lines: [914]
+    severity: MEDIUM
+    title: gov init neither checks nor records release certification; a REJECTED release installs silently
+    statement: >-
+      Installing release/releases/4.1.4, whose own manifest records certification REJECTED, succeeds with no
+      warning. Neither the init result, framework.lock, gov status nor doctor mentions certification
+      (S3-init.out [I1] [I1b]).
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:914 \"certified kernel installation\"; release protocol §12 line 502 \"A project may remain on an older certified release when migration is not yet approved.\""
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S3-init.py, evidence/S3-init.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S3-init.py  # [I1] [I1b]"
+    repair_direction: >-
+      Kernel installation must establish and record the installed release's certification state from an authenticated
+      source and must not present an uncertified or rejected release as certified (Contract v3:914; see A0-A2-04 for
+      the authenticity of the claim).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S4-01
+    capability: [S4]
+    bullet_source_lines: [923]
+    severity: MEDIUM
+    title: The A0 safety baseline creates no adoption branch/worktree, does not clean or snapshot the tree, and only advises on interrupted work
+    statement: >-
+      `gov adopt baseline` pins the commit and records baseline tests. With one uncommitted edit present it creates no
+      branch or worktree and does not stash, snapshot or clean the tree. It records the dirty path truncated as
+      "rc/app/main.py" (S4-adopt-end-to-end.out [A0]). When interrupted prior governance work is detected, it
+      reports PARTIAL_SHOULD_ROLL_BACK and "freeze advice" but refuses nothing, and A1 can proceed
+      (S4-T2-B2-negative.out [N6]).
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:923 "A0 safety baseline"; release protocol §10 Stage A0 (lines
+      275-279) "clean/snapshot working tree; create adoption branch/worktree; pin current commit; record baseline tests;
+      detect interrupted prior governance work."; adoption protocol §4 "freeze broad governance/memory work".
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S4-adopt-end-to-end.out, evidence/S4-T2-B2-negative.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S4-adopt-end-to-end.py  # [A0]; PROBE_TMP=$(mktemp -d) python3 S4-T2-B2-negative.py  # [N6]"
+    repair_direction: "A0 must leave a clean/snapshotted tree on an adoption branch or worktree, record paths exactly, and freeze broad work when interrupted work is detected (release protocol §10 A0; adoption protocol §4)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S4-02
+    capability: [S4]
+    bullet_source_lines: [928, 929]
+    severity: MEDIUM
+    title: The planner and the test scaffold contradict each other for a secret-bearing legacy chat store, and adoption cannot proceed
+    statement: >-
+      With the brownfield fixture as shipped (memory/chat_history.sql text dump, not the sqlite the fixture README says
+      a harness prepares), the dump is classified SECRET (chat_store + secret patterns). The planner keeps it in place
+      ("secrets are never moved by automation"), while A5's scaffold generates MT-029 legacy_not_active for the same
+      path. Batch 1 fails that test and rolls back, downstream batches do not run, and A7-A11 are unreachable
+      (S4-adopt-raw-sql-chat-store.out [A6]). Nothing in the product resolves the conflict. The only route is a manual
+      edit of the reviewed tests, which is the pattern A0-T2-01 shows is unguarded. With the prepared fixture the full
+      A0→A11 run completes (S4-adopt-end-to-end.out).
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:928-929; release protocol §10 Stage A8 (legacy memory extraction/retirement) and adoption protocol §13."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S4-adopt-raw-sql-chat-store.out, evidence/S4-adopt-end-to-end.py]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && RAW_SQL_STORE=1 PROBE_TMP=$(mktemp -d) python3 S4-adopt-end-to-end.py  # [A6]"
+    repair_direction: "For every artefact, the plan and the independently scaffolded tests must agree on its disposition, including legacy stores that also carry secrets (Contract v3:928-929)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S4-03
+    capability: [S3, S4, T1]
+    bullet_source_lines: [914, 929, 960, 962]
+    severity: MEDIUM
+    title: The global --role flag is ignored by gov init and every gov adopt stage
+    statement: >-
+      `gov init` and `gov adopt` do not open the project through open_project (cli/src/main.rs:760-766, 782-813), so
+      the acting role comes only from GOV_ROLE or the default "orchestrator" (L4) (runtime/src/project.rs:40-49).
+      With --role independent-auditor (L0), init --force (install_kernel, L4) and adopt migrate/extract-legacy
+      (migrate_execute, L3) succeed. The same role through GOV_ROLE, or through --role on `gov kernel reinstall`, is
+      refused AUTHORITY_DENIED (S3-S4-role-flag-authority.out [R1] [R2]; S3-init.out [I7]). The role is
+      caller-declared by design (D-0007), but this flag's documented contract ("Acting role (default: $GOV_ROLE or
+      orchestrator)") is silently not honoured on the lifecycle commands.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:914, :923-934, :960, :962; framework/policies/AUTHORITY_POLICY.yaml authority_levels_required install_kernel L4, migrate_execute L3; cli/src/main.rs:20 flag contract."
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S3-S4-role-flag-authority.py, evidence/S3-S4-role-flag-authority.out, evidence/S3-init.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S3-S4-role-flag-authority.py"
+    repair_direction: "Every command must evaluate authority against the role the caller declared by whichever documented means, consistently across commands (AUTHORITY_POLICY; D-0007 T5)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S5-01
+    capability: [S5]
+    bullet_source_lines: [945, 944]
+    severity: MEDIUM
+    title: A refused update leaves its snapshot behind; gov update --rollback then records a rollback of an update that never happened
+    statement: >-
+      apply_update_opts snapshots kernel/overlay/lock/generated before srr::admit (runtime/src/update.rs:217-239). On a
+      provisioned machine an unsigned 4.1.6 is refused SRR_RELEASE_UNVERIFIED, the snapshot directory 4.1.6 remains,
+      and `gov update --rollback` succeeds "from 4.1.5 to 4.1.5". The only ledger event is that rollback, naming an
+      update to 4.1.6 (S5-update.out [U8]). The ledger's provenance is false. Because the rollback restores the
+      snapshotted overlay, overlay changes made after the refused update would also be reverted silently. That
+      consequence follows from the code path and was not separately exercised.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:945 \"ledger/provenance\", :944 \"rollback\"."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/S5-update.py, evidence/S5-update.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 S5-update.py  # [U8]"
+    repair_direction: "Rollback state and ledger entries must exist only for updates that were actually applied (Contract v3:944-945)."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-S5-02
+    capability: [S5, A2]
+    bullet_source_lines: [944]
+    severity: MEDIUM
+    title: A refused kernel reinstall leaves a half-installed kernel, and on a provisioned machine the update rollback path cannot run
+    statement: >-
+      After an authenticated update, `gov update --rollback` is refused SRR_RELEASE_UNVERIFIED with or without
+      --break-glass. The snapshot carries no signed metadata, and the protected installed record vouches only for the
+      current release, not the one it previously verified (A2-02 [P9]; A2-05 [K6b]). `gov kernel reinstall
+      --break-glass` with an authentic older release and a valid owner token installs the older payload and enters
+      DEGRADED — RECOVERY ONLY. It then fails KERNEL_MISMATCH (cli/src/main.rs:945, after install_kernel). The machine
+      is left with the older kernel, the newer framework.lock and an installed record for the newer payload, and
+      every mutation is refused KERNEL_TAMPERED until an at-floor reinstall (A2-05 [K6a]). The same ordering hurts the
+      ordinary case with no break-glass: reinstalling from an authentic, above-floor release of a different version
+      (4.1.6 onto 4.1.5) is refused KERNEL_MISMATCH only after the 4.1.6 payload has been committed. The refused
+      command leaves kernel 4.1.6 under a 4.1.5 lock, trust.verified=false, and ordinary mutations refused
+      KERNEL_TAMPERED until the locked release is reinstalled (A2-08-reinstall-version-change.out [V1]-[V3]). Both
+      cases fail closed and can be recovered. The working below-floor restoration path is `gov init --force
+      --break-glass` with the older signed release ([K6c]). The floor rule itself is owner-decided
+      (OWNER-DECISION-0006/0007) and is not questioned here.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:944 \"rollback\"; :151 \"Signing keys/trust anchors support rotation/revocation/recovery.\"; OWNER-DIRECTIVE-0004 \"The architecture must cover init, adopt, update, reinstall, rollback and recovery.\""
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A2-05-rotation-revocation-recovery.py, evidence/A2-05-rotation-revocation-recovery.out, evidence/A2-02-provisioned-ingress.out, evidence/A2-08-reinstall-version-change.py, evidence/A2-08-reinstall-version-change.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A2-05-rotation-revocation-recovery.py  # [K6a] [K6b] [K6c]; PROBE_TMP=$(mktemp -d) python3 A2-08-reinstall-version-change.py  # [V1]-[V3]"
+    repair_direction: >-
+      On a provisioned machine, the rollback ingress must be able to restore a release this machine previously
+      verified, subject to the owner's floor/break-glass rule. A refused privileged lifecycle command must leave the
+      installation as it found it (OWNER-DIRECTIVE-0004 ingress coverage; Contract v3:944).
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A2-05
+    capability: [A2]
+    bullet_source_lines: [154]
+    severity: INFO
+    title: Completing an interrupted swap leaves the superseded kernel tree beside the installation
+    statement: >-
+      In the crash window between the two renames, `gov trust recover-transactions` completes the swap correctly (one
+      complete installation, floors unchanged, journal emptied) but leaves governance/kernel.srr-old in the project
+      (A2-07-interrupted-install.out [W2-after]). The "committed" window removes it ([W4]). Crash safety holds. The
+      leftover is hygiene: an untracked copy of the previous kernel inside the governance tree.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:154 challenge \"interrupted install\"."
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A2-07-interrupted-install.py, evidence/A2-07-interrupted-install.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A2-07-interrupted-install.py  # [W2]"
+    repair_direction: "Recovery of an interrupted install should leave no superseded installation tree behind in any window."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A3-01
+    capability: [A3]
+    bullet_source_lines: [158]
+    severity: INFO
+    title: Customer/personal data is excluded only when the project itself classifies it
+    statement: >-
+      Secrets and credentials are excluded by kernel patterns whatever the project contract says (A3-security-sensitivity.out
+      [C3b]). Customer data is excluded only through the project's own DATA_SENSITIVITY classification. When the project
+      deletes that entry, the customer list is indexed ([C3c]). This matches the policy as written (never_index_classes
+      restricted/secret), so it is not a gap in bullet 158. Framework §72 also names "production personal data" and
+      "unapproved customer material", which no kernel control detects.
+    normative_source: "DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md:2189-2197 §72 \"Never index: … unapproved customer material; production personal data …\"."
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A3-security-sensitivity.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A3-security-sensitivity.py  # [C3c]"
+    repair_direction: "Consider a kernel-level floor for personal/customer data comparable to the secret patterns, so that removing a project classification cannot silently expose it."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-A3-02
+    capability: [A3]
+    bullet_source_lines: [160]
+    severity: INFO
+    title: A project overlay can grant any role elevated permission classes with no gate or finding
+    statement: >-
+      After governance/project/TOOL_PERMISSIONS.yaml grants independent-auditor SECRET_READ/DEPLOY_PRODUCTION/
+      NETWORK_WRITE, no doctor check or audit finding mentions the grant (A3-security-sensitivity.out [C4]). No
+      execution effect was observed: an unregistered elevated plugin stays PLUGIN_NOT_APPROVED even for a granted role
+      ([C4b]), and tool resolution was unchanged. The observation is therefore about visibility of a T4 widening, not a
+      bypass.
+    normative_source: "spec/decisions/D-0007.yaml rule (3) \"A T4 layer may specialise or strengthen a higher layer, never weaken it\"; Contract v3:160."
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/A3-security-sensitivity.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 A3-security-sensitivity.py  # [C4] [C4b]"
+    repair_direction: "An overlay grant that widens a role's permission classes should be refused or raised as a finding, consistent with D-0007 rule 3."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-B1-01
+    capability: [B1]
+    bullet_source_lines: [187]
+    severity: INFO
+    title: Root-level project files match no rule of the repository contract written by init
+    statement: >-
+      After `gov init` on a native layout, pyproject.toml matches no REPOSITORY_CONTRACT rule. It has no class and is not
+      indexed (B-repository-contract.out [K2]). The native layout is otherwise mapped in place without refactoring.
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:187 \"Repository contract maps project-specific layout without cosmetic refactoring.\""
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence: [evidence/B-repository-contract.out]
+    reproduction: "cd release/capability-baseline/audit-0/alpha-r/evidence && PROBE_TMP=$(mktemp -d) python3 B-repository-contract.py  # [K2]"
+    repair_direction: "The generated contract should classify root-level project manifests/configuration it finds."
+    owner_decision_required: false
+    owner_decision_reason: null

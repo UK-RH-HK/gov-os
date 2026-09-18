@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""S4 (gov adopt A0..A11, each stage a bullet) driven end-to-end on a copy of fixtures/brownfield/project, with
+B2 (path map), T1 (role separation), T2 (fresh-session independence) and T3 (evidence tree) observations.
+
+Roles/sessions used (explicit, distinct): planner S-plan (Role A), reviewer S-review (Role B), executor S-exec (Role C),
+migration verifier S-verify (Role D), memory engineer S-mem (Role E), memory verifier S-memv (Role F).
+Every stage also gets a NEGATIVE check (order, independence, verdict conflict) where the product claims one.
+Run: PROBE_TMP=<scratch> python3 S4-adopt-end-to-end.py            (fixture prepared as its README documents)
+     PROBE_TMP=<scratch> RAW_SQL_STORE=1 python3 S4-adopt-end-to-end.py   (raw fixture: memory/chat_history.sql left as text)
+"""
+import os, sys, json, shutil, subprocess
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib"))
+from srr_mint import *
+import yaml
+
+sb = Sandbox("s4")
+p = sb.path("brown")
+shutil.copytree(os.path.join(REPO, "fixtures/brownfield/project"), p)
+if not os.environ.get("RAW_SQL_STORE"):
+    # fixtures/brownfield/README.md: "memory/chat_history.sqlite (built by the harness from memory/chat_history.sql)"
+    import sqlite3
+    con = sqlite3.connect(os.path.join(p, "memory/chat_history.sqlite")); con.executescript(open(os.path.join(p, "memory/chat_history.sql")).read()); con.commit(); con.close()
+    os.remove(os.path.join(p, "memory/chat_history.sql"))
+    print("[SETUP] fixture prepared per its README: memory/chat_history.sqlite built from memory/chat_history.sql (sqlite3), .sql removed")
+else:
+    print("[SETUP] RAW_SQL_STORE=1: memory/chat_history.sql left as a text dump")
+sb.git(p, "init", "-q", "-b", "main"); sb.git(p, "add", "-A"); sb.git(p, "commit", "-q", "-m", "brownfield baseline")
+EV = os.path.join(p, "spec/audits/GOVERNANCE-ADOPTION")
+def jl(name):
+    f = os.path.join(EV, name)
+    return [json.loads(l) for l in open(f)] if os.path.exists(f) else []
+def base():
+    return yaml.safe_load(open(os.path.join(EV, "00-BASELINE.yaml")))
+def A(*args, s=None, role=None, quiet=True):
+    return sb.gov("adopt", *args, cwd=p, session=s, role=role, quiet=quiet)
+def show_(label, o, keys=None):
+    if o["ok"]:
+        r = o["result"]; print(f"[{label}] ok", json.dumps({k: r.get(k) for k in keys} if keys else r, ensure_ascii=False)[:700])
+    else:
+        print(f"[{label}] REFUSED {err(o)}: {str(o['error']['message'])[:220]}")
+
+print("## [ORDER] a later stage before A0")
+show_("ORDER", A("inventory", s="S-plan"))
+
+print("\n## [A0] safety baseline (the tree is made dirty first; one uncommitted edit)")
+open(os.path.join(p, "src/app/main.py"), "a").write("\n# uncommitted local edit\n")
+branches_before = sb.git(p, "branch", "--list")[1]
+stash_before = sb.git(p, "stash", "list")[1]
+o = A("baseline", s="S-plan"); show_("A0", o)
+b = base()
+print("[A0] 00-BASELINE: commit =", b["commit"][:12], "| branch =", b["branch"], "| dirty_files =", b["dirty_files"], "| baseline_tests =", json.dumps(b["baseline_tests"])[:200])
+print("[A0] interrupted_work =", json.dumps(b["interrupted_work"])[:200])
+print("[A0] adoption branch/worktree created?", "branches before:", branches_before.split(), "after:", sb.git(p, "branch", "--list")[1].split(), "| worktrees:", sb.git(p, "worktree", "list")[1])
+print("[A0] working tree snapshotted/cleaned? stash before:", repr(stash_before), "after:", repr(sb.git(p, "stash", "list")[1]), "| main.py still dirty:", "main.py" in sb.git(p, "status", "--porcelain")[1])
+sb.git(p, "checkout", "--", "src/app/main.py")
+
+print("\n## [A1] cold inventory")
+o = A("inventory", s="S-plan"); show_("A1", o, ["summary"])
+inv = jl("01-COLD-INVENTORY.jsonl")
+tracked = set(sb.git(p, "ls-files")[1].split())
+inv_paths = {i["path"] for i in inv}
+print("[A1] inventory entries =", len(inv), "| every git-tracked file inventoried:", tracked - {x for x in tracked if x.startswith("spec/audits/GOVERNANCE-ADOPTION/")} <= inv_paths,
+      "| missing:", sorted(tracked - inv_paths)[:8])
+for path in [".cursorrules", ".github/copilot-instructions.md", ".chat/sessions.jsonl", "memory/chat_history.sql", "memory/chat_history.sqlite", ".index/vectors.json", ".env", "config/secrets.yaml", "pyproject.toml", "web/package.json", "src/app/main.py", "tests/test_retry.py", "AGENT_RULES_v2.md"]:
+    e = next((i for i in inv if i["path"] == path), None)
+    print(f"[A1]   {path:40s} kinds={e and e.get('kinds')} tracked={e and e.get('tracked')}")
+print("[A1] inventory record fields:", sorted(inv[0].keys()))
+
+print("\n## [A2] classification")
+o = A("classify", s="S-plan"); show_("A2", o, ["classified", "by_class", "by_authority", "unknown", "conflicting"])
+cl = jl("02-CLASSIFICATION.jsonl")
+print("[A2] every inventoried artefact classified:", {c["path"] for c in cl} >= inv_paths, "| every entry has class+authority+artifact_id:", all(c.get("class") and c.get("authority") and c.get("artifact_id") for c in cl))
+for path in [".cursorrules", "AGENT_RULES_v2.md", ".chat/sessions.jsonl", ".index/vectors.json", ".env", "docs/DECISIONS.md", "docs/old/decision-2-copy.yaml", "src/app/old_export.py", "src/specs/feature-login.md", "specs/requirements.md", "src/app/main.py", "tests/test_retry.py"]:
+    c = next((x for x in cl if x["path"] == path), {})
+    print(f"[A2]   {path:34s} class={c.get('class')} authority={c.get('authority')}")
+print("[A2] 03-LEGACY-GOVERNANCE-MAP.md present:", os.path.exists(os.path.join(EV, "03-LEGACY-GOVERNANCE-MAP.md")))
+
+print("\n## [A3] target path map (B2)")
+o = A("map", s="S-plan"); show_("A3", o, ["entries", "actions", "unknown_blocking_destructive", "schema_problems"])
+cat = jl("04-TARGET-PATH-MAP.jsonl")
+print("[A3] one map entry per classified artefact:", len(cat), "vs", len(cl))
+print("[A3] map entry fields:", sorted(cat[0].keys()))
+for path in [".cursorrules", ".chat/sessions.jsonl", "memory/chat_history.sqlite", ".index/vectors.json", "src/app/old_export.py", "src/app/main.py", "src/specs/feature-login.md", "docs/decisions/ADR-001-retries.md", "docs/test_utils.py", "docs/legacy_module.py"]:
+    e = next((x for x in cat if x["current_path"] == path), {})
+    print(f"[A3]   {path:34s} -> {str(e.get('action')):24s} target={e.get('target_path')} batch={e.get('batch')} gate={e.get('requires_human_gate')} refs={str(e.get('references'))[:60]} imports={str(e.get('imports'))[:50]} consumers={str(e.get('consumers'))[:50]}")
+print("[A3] files moved during mapping (git status):", sb.git(p, "status", "--porcelain", "--", ".", ":!spec/audits")[1].splitlines()[:5])
+
+print("\n## [A4] migration plan")
+o = A("plan", s="S-plan"); show_("A4", o)
+plan = yaml.safe_load(open(os.path.join(EV, "05-plan.yaml")))
+print("[A4] batches:", [(bb["batch"], bb["entries"], bb["requires_human_gate"], bb["rollback_point"]) for bb in plan["batches"]], "| unknown_blocking =", plan["unknown_blocking"])
+
+print("\n## [A5] independent migration review / test authoring")
+show_("A6-before-review", sb.gov("adopt", "migrate", "--batch", "0", cwd=p, session="S-exec", quiet=True))
+o = A("test-design", s="S-plan"); show_("A5-design", o)
+tests = yaml.safe_load(open(os.path.join(EV, "06-migration-tests.yaml")))
+print("[A5] scaffolded tests:", len(tests["tests"]), "| kinds:", sorted({t.get("kind") or t.get("type") for t in tests["tests"]})[:12])
+show_("A5-same-session", sb.gov("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", "--reviewer-session", "S-plan", cwd=p, quiet=True))
+show_("A5-role-not-a-reviewer", sb.gov("adopt", "review", "--verdict", "MIGRATION_PLAN_REJECTED", "--reviewer-session", "S-x", "--reviewer-role", "migration-executor", cwd=p, quiet=True))
+print("[A5]   ^ a REJECTED verdict recorded by a reviewer whose declared role is migration-executor; current A5 =", base()["verdicts"].get("A5"))
+show_("A5-arbitrary-role", sb.gov("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", "--reviewer-session", "S-y", "--reviewer-role", "definitely-not-a-kernel-role", cwd=p, quiet=True))
+show_("A5", sb.gov("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", "--reviewer-session", "S-review", "--notes", "reviewed map and scaffold", cwd=p, session="S-review", quiet=True))
+print("[A5] A5 verdict record:", base()["verdicts"]["A5"])
+print("[A5] does the verdict bind the reviewed test set / catalogue by digest?", any(k in base()["verdicts"]["A5"] for k in ("tests_sha256", "catalogue_sha256", "tests_hash", "plan_hash")))
+
+print("\n## [A6] controlled migration")
+o = sb.gov("adopt", "migrate", cwd=p, session="S-exec", quiet=True); show_("A6", o, ["complete"])
+if o["ok"]:
+    for bb in o["result"]["batches"]:
+        print("[A6]   batch", bb.get("batch"), "| installed =", (bb.get("installed") or {}).get("version"), "| applied =", bb.get("applied"), "| moves =", str(bb.get("moves"))[:120], "| skipped =", [(s_.get("artifact_id"), (s_.get("reason") or "")[:50]) for s_ in (bb.get("skipped") or [])][:3], "| tests =", {k: (bb.get("tests") or {}).get(k) for k in ("ok", "pass", "fail")})
+if not o["ok"]:
+    import re as _re
+    rep = open(os.path.join(EV, "07-MIGRATION-EXECUTION-REPORT.md")).read()
+    for blk in _re.findall(r"```json\n(.*?)\n```", rep, flags=_re.S):
+        try:
+            j = json.loads(blk)
+        except Exception:
+            continue
+        for t_ in (j.get("results") or []):
+            if not t_.get("ok"):
+                print("[A6] failing independent test:", json.dumps(t_))
+    cat_ = {e["current_path"]: e for e in jl("04-TARGET-PATH-MAP.jsonl")}
+    for pth in ("memory/chat_history.sql",):
+        if pth in cat_:
+            print("[A6] map entry for", pth, "->", json.dumps({k: cat_[pth].get(k) for k in ("current_class", "action", "batch", "reason")}))
+led = [json.loads(l) for l in open(os.path.join(EV, "migration-ledger.jsonl"))] if os.path.exists(os.path.join(EV, "migration-ledger.jsonl")) else []
+print("[A6] migration ledger entries:", len(led), "| statuses:", sorted({l.get("status") for l in led}))
+gl = sb.gov("gate", "list", cwd=p, quiet=True)["result"]
+print("[A6] destructive-entry gates pending:", [(g_["id"], g_.get("artifact_id")) for g_ in gl if g_.get("trigger") == "destructive_migration"])
+for g_ in gl:
+    if g_.get("trigger") == "destructive_migration":
+        sb.gov("gate", "present", g_["id"], cwd=p, quiet=True); sb.gov("decide", g_["id"], "--option", "A", "--by", "human", role="human", cwd=p, quiet=True)
+o = sb.gov("adopt", "migrate", "--batch", "7", cwd=p, session="S-exec", quiet=True); show_("A6-batch7-after-gates", o, ["complete"])
+print("[A6] adopt status:", [(s_["stage"], s_["status"]) for s_ in sb.gov("adopt", "status", cwd=p, quiet=True)["result"]["stages"]])
+
+print("\n## [A7] independent migration verification")
+show_("A7-executor-session", sb.gov("adopt", "verify-migration", cwd=p, session="S-exec", quiet=True))
+show_("A7-claims-accept", sb.gov("adopt", "verify-migration", "--verdict", "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD", cwd=p, session="S-verify", quiet=True), ["verdict", "tests", "secrets_isolated", "kernel_intact"])
+o = sb.gov("adopt", "verify-migration", cwd=p, session="S-verify", quiet=True); show_("A7", o, ["verdict", "catalogue_problems", "broken_links", "legacy_in_active_tree", "tests", "secrets_isolated", "kernel_intact"])
+if o["ok"] and o["result"]["verdict"] != "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD":
+    print("[A7] computed REJECTED; details above. (Probe continues: the next stages must refuse.)")
+show_("A8-before-A7-accept?", A("extract-legacy", s="S-mem"))
+
+print("\n## [A8] legacy memory extraction / retirement")
+o = A("extract-legacy", s="S-mem"); show_("A8", o, ["stores", "created_records", "retired", "legacy_record"])
+if o["ok"]:
+    for rp in o["result"]["created_records"][:4]:
+        r_ = yaml.safe_load(open(os.path.join(p, rp))); print("[A8]   record", rp, "| status =", r_.get("status"), "| provenance =", json.dumps(r_.get("provenance"))[:160])
+
+print("\n## [A9] new Knowledge Fabric")
+o = A("build-memory", s="S-mem"); show_("A9", o, ["counts", "excluded", "secret_blocked", "heldout_generated"])
+held = yaml.safe_load(open(os.path.join(p, "governance/tests/memory/heldout.yaml")))
+print("[A9] held-out set now has", len(held.get("queries", [])), "queries | generated_by:", held.get("generated_by") or held.get("source") or held.get("author"))
+
+print("\n## [A10] independent memory verification")
+show_("A10-builder-session", sb.gov("adopt", "verify-memory", cwd=p, session="S-mem", quiet=True))
+o = sb.gov("adopt", "verify-memory", cwd=p, session="S-memv", quiet=True); show_("A10", o, ["verdict", "heldout", "reproducible", "secret_leak"])
+
+print("\n## [A11] full project audit")
+o = A("audit", s="S-audit"); show_("A11", o, ["verdict", "audit_verdict", "doctor", "findings"])
+if o["ok"]:
+    for c_ in o["result"]["checks"]:
+        print("[A11]   ", "OK " if c_["ok"] else "NO ", c_["criterion"])
+    print("[A11] doctor_failed:", [(d_["id"], d_["message"][:80]) for d_ in o["result"]["doctor_failed"]][:6])
+
+print("\n## [T3] adoption evidence tree")
+files = sorted(os.listdir(EV))
+print("[T3] files:", files)
+want = ["00-BASELINE.yaml", "01-COLD-INVENTORY.md", "02-CLASSIFICATION.jsonl", "03-LEGACY-GOVERNANCE-MAP.md", "04-TARGET-PATH-MAP.jsonl", "05-ADOPTION-MIGRATION-PLAN.md", "06-INDEPENDENT-MIGRATION-TEST-DESIGN.md",
+        "07-MIGRATION-EXECUTION-REPORT.md", "08-INDEPENDENT-MIGRATION-VERIFICATION.md", "09-LEGACY-MEMORY-EXTRACTION.md", "10-MEMORY-IMPLEMENTATION-REPORT.md", "11-INDEPENDENT-MEMORY-VERIFICATION.md", "12-ADOPTION-FINAL-REPORT.md"]
+print("[T3] protocol §5 files missing:", [w for w in want if w not in files])
+b = base()
+print("[T3] stage_status:", b["stage_status"]); print("[T3] verdicts:", {k: (v.get("verdict"), v.get("session"), v.get("role")) for k, v in b["verdicts"].items()})
+print("[T3] sessions recorded: planner", b.get("planner_session"), "| executor", b.get("executor_session"), "| memory builder", b.get("memory_builder_session"))
+print("\nDONE")

@@ -1,0 +1,44 @@
+## [B0] BUDGET_POLICY (effective): {"policy": "BUDGET_POLICY", "version": "1.0.0", "governed": ["model_spend", "api_spend", "cloud_changes", "parallel_agents", "network_calls", "package_install", "high_cost_experiments"], "defaults": {"max_parallel_agents": 4, "max_task_cost_usd": 25, "max_daily_spend_usd": 200, "max_install_cost_usd": 0, "max_network_calls_per_task": 200}, "on_threshold_exceeded": "human_decision_gate"}
+
+## [B1] model / API spend: per-task and daily thresholds (routing evidence)
+[B1] cost 10 (under 25): ok | threshold_exceeded = None | gate = None
+[B1] cost 30 (> max_task_cost_usd 25): ok | threshold_exceeded = task cost 30 > BUDGET_POLICY.defaults.max_task_cost_usd 25 | gate = HDG-0001
+[B1] after 8 more records of 24 (daily > 200): | threshold_exceeded = daily spend 232.00 > BUDGET_POLICY.defaults.max_daily_spend_usd 200 | gate = HDG-0003
+[B1] gates now: [('HDG-0001', 'budget_threshold', 'Budget threshold exceeded: task cost 30 > BUDGET_POLICY.defaults.max_t'), ('HDG-0002', 'budget_threshold', 'Budget threshold exceeded: daily spend 208.00 > BUDGET_POLICY.defaults'), ('HDG-0003', 'budget_threshold', 'Budget threshold exceeded: daily spend 232.00 > BUDGET_POLICY.defaults')]
+[B1] is further work blocked while the budget gate is pending? task claim -> ok (not blocked)
+[B1] spend is only counted when an agent records it: an unrecorded spend is invisible (by construction of `gov route --record`)
+
+## [B2] parallel agents: task claims beyond BUDGET_POLICY.defaults.max_parallel_agents (4)
+[B2] session S-agent-0 claims TASK-0002: ok
+[B2] session S-agent-1 claims TASK-0003: ok
+[B2] session S-agent-2 claims TASK-0004: ok
+[B2] session S-agent-3 claims TASK-0005: REFUSED BUDGET_EXCEEDED max_parallel_agents (4) reached: 4 active session(s); human decision gate "HDG-0004" raised
+[B2] session S-agent-4 claims TASK-0006: REFUSED BUDGET_EXCEEDED max_parallel_agents (4) reached: 4 active session(s); human decision gate "HDG-0005" raised
+[B2] session S-agent-5 claims TASK-0007: REFUSED BUDGET_EXCEEDED max_parallel_agents (4) reached: 4 active session(s); human decision gate "HDG-0006" raised
+[B2] gates now: [('HDG-0005', 'budget_threshold', 'Budget threshold exceeded: 4 parallel agent sessions hold claims (BUDG'), ('HDG-0006', 'budget_threshold', 'Budget threshold exceeded: 4 parallel agent sessions hold claims (BUDG')]
+
+## [B3] tool / package install cost vs max_install_cost_usd (0)
+[B3] tools install (cost 10): {"installed": false, "human_gate": "HDG-0007", "checks": [{"condition": "role_has_install_authority", "ok": true, "detail": "role orchestrator; install roles [\"tooling-engineer\", \"orchestrator\"]"}, {"condition": "installation_reversible", "ok": true, "detail": "descriptor.reversible"}, {"condition": "cost_within_budget", "ok": false, "detail": "cost 10 <= 0"}, {"condition": "no_privilege_escalation", "ok": true, "detail": "required [\"READ_REPO\"] within role permissions [\"READ_REPO\", \"WRITE_REPO_SCOPED\", \"RUN_TESTS\", \"NETWORK_READ\"]"}, {"condition": "licence_and_security_satisfied", "ok": false, "detail": "license MIT; security_review null evidenced by no governed record (descriptor.security_review_record)"}, {"condition": "version_pinned_and_recorded", "ok": false, "detail": "descriptor.version_pin"}, {"condition": "tool_registered", "ok": true, "detail": "will be registere
+[B3] gates: [('HDG-0006', 'budget_threshold', 'Budget threshold exceeded: 4 parallel agent sessions hold claims (BUDG')]
+
+## [B4] network calls per task vs max_network_calls_per_task (200)
+[B4] telemetry summary budget block: {"max_network_calls_per_task": 200, "network_calls_by_task": {"TASK-NET": 205}, "over_budget": [{"task": "TASK-NET", "network_calls": 205, "budget": 200}], "max_parallel_agents": 4, "active_sessions": ["S-agent-0", "S-agent-1", "S-agent-2", "S-spender"]}
+[B4] gates raised for the network budget: []
+
+## [B5] cloud changes: governed as a material change (CIT trigger infrastructure_cost)
+[B5] cit propose (infrastructure_cost): True {"id": "CIT-0001", "type": "cit", "title": "provision 40 GPU nodes in the cloud", "status": "ACTIVE", "created": "2026-09-18", "proposal": "provision 40 GPU nodes in the cloud", "trigger": "infrastructure_cost", "mutation_manifest": [{"op": "write_file", "path": "spec/architecture/INFRA-note.md", "content": "scale to 40 GPU nodes"}], "cit_status": "SIMULATED", "proposed_by": "orchestrator", "targets": [], "journal": [{"at": "2026-09-18T20:44:48Z", "event": "proposed", "session": "S-94230606a6af"
+[B5] cit simulate: {"human_gate": "HDG-0008", "impact": {"radius": "R1", "seeds": [], "affected": [], "affected_tasks": [], "tests_required": [], "features": [], "other": [], "semantic_candidates": [{"artifact_id": "file:governance/kernel/schemas/tool.schema.json", "path": "governance/kernel/schemas/tool.schema.json", "score": 0.027313266443701224, "routes": ["lexical", "semantic"]}, {"artifact_id": "file:governance/kernel/policies/MEMORY_POLICY.yaml", "path": "governance/kernel/policies/MEMORY_POLICY.yaml", "scor
+[B5] gates: [('HDG-0008', 'infrastructure_cost', 'Approve change CIT-0001: provision 40 GPU nodes in the cloud')]
+[B5] a cost threshold for cloud changes (BUDGET_POLICY) is not consulted anywhere: the CIT gate fires on the trigger label, independent of amount
+
+## [B6] high-cost experiments (fresh project, no other claims)
+[B6] experiment task create: ok TASK-0001
+[B6] claim the 50k experiment task: ok | gates referencing experiments: []
+
+## [B7] budget state and interventions observable
+[B7] gov status human_gates: [('HDG-0007', 'tool_install'), ('HDG-0001', 'budget_threshold'), ('HDG-0002', 'budget_threshold'), ('HDG-0003', 'budget_threshold'), ('HDG-0004', 'budget_threshold'), ('HDG-0005', 'budget_threshold'), ('HDG-0006', 'budget_threshold'), ('HDG-0008', 'infrastructure_cost')]
+[B7] gov route --report rows: [{"provider": "prov-x", "model": "m-1", "task_class": "implementation", "runs": 10, "pass_rate": 1.0, "avg_cost": 23.2, "avg_latency_ms": 1000.0, "avg_repairs": 0.0}]
+[B7] telemetry summary keys: ['budget', 'commands', 'cost_by_task_class', 'events', 'first_pass_completion_rate', 'human_gates_by_feature', 'model_routing', 'retrieval', 'rework_by_role'] | cost_by_task_class = {}
+[B7] daily spend to date vs max_daily_spend_usd reported anywhere: False
+
+DONE

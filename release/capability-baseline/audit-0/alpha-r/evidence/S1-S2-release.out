@@ -1,0 +1,62 @@
+## [C1] canonical repository layout (this candidate)
+[C1] framework          present=True tracked_files=117
+[C1] runtime            present=True tracked_files=85
+[C1] cli                present=True tracked_files=2
+[C1] tools              present=True tracked_files=3
+[C1] migrations         present=True tracked_files=5
+[C1] tests              present=True tracked_files=17
+[C1] fixtures           present=True tracked_files=173
+[C1] lessons/inbox      present=True tracked_files=1
+[C1] change-proposals   present=True tracked_files=1
+[C1] release            present=True tracked_files=1784
+[C1] docs               present=True tracked_files=7
+[C1] built release directory: ['RELEASE_NOTES.md', 'ROLLBACK.md', 'kernel', 'manifest.json', 'manifest.yaml'] | kernel payload top-level: ['KERNEL.yaml', 'KERNEL_MANIFEST.json', 'adapters', 'commands', 'constitution', 'migrations', 'overlay-templates', 'policies', 'roles', 'schemas', 'skills', 'taxonomy', 'tools']
+[C1] payload excludes runtime/cli/tests/fixtures sources: True
+
+## [C2] consumers receive the released payload only and cannot rebuild the OS
+[C2] consumer tree top-level: ['.gitignore', '.governance-runtime', 'README.md', 'archive', 'framework.json', 'governance', 'product', 'spec'] | governance/: ['framework.lock', 'generated', 'kernel', 'project', 'tests']
+[C2] consumer contains OS sources (runtime/, cli/, Cargo.toml)? False
+[C2] `gov release build --canonical <consumer>` -> REFUSED KERNEL_SOURCE_NOT_FOUND: canonical framework/ not found
+[C2] consumer edits its kernel copy -> next governed mutation: REFUSED KERNEL_TAMPERED
+[C1] canonical lessons/inbox -> change-proposals pipeline (`gov lessons cluster`): ok {"inbox": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/alpha-r-s12-szo0zxjg/canon/lessons/inbox", "clusters": [], "proposals_written": [
+
+## [M1] manifest content per S2 bullet
+[M1] semantic versioning        version                  = "4.1.5"
+[M1] release manifest           framework                = "agentic-engineering-os"
+[M1] file hashes                file_hashes              = {"KERNEL.yaml": "f65a83b9683c1cf1d41d3961cb53f46f766202856f0de7ab25226706e982c709", "adapters/api/adapter.yaml": "349dc1
+[M1] supported migrations       supported_from_versions  = ["4.1.1", "4.1.2", "4.1.3", "4.1.4"]
+[M1] supported migrations (ids) migration_ids            = ["M-4.1.4-4.1.5"]
+[M1] schema versions            schema_versions          = {"framework-lock": "1.1.0", "kernel-manifest": "1.0.0", "repository-contract": "1.0.0", "project-policy": "1.0.0", "capa
+[M1] CLI version                cli_version              = "4.1.5"
+[M1] runtime version            runtime_version          = "4.1.5"
+[M1] adapter versions           adapter_versions         = {"generic": "1.0.0", "ide": "1.0.0", "cli": "1.0.0", "api": "1.0.0", "mcp": "1.0.0"}
+[M1] release notes              release_notes            = "# 4.1.5\nAudit probe release notes.\n"
+[M1] affected indexes           required_index_rebuilds  = ["code", "graph", "lexical", "semantic"]
+[M1] human decisions            human_gates              = []
+[M1] breaking changes           breaking_changes         = []
+[M1] rollback                   rollback_procedure       = "gov update --rollback restores the previous kernel, overlay snapshot and framework.lock from .governance-runtime/update
+[M1] release commit             release_commit           = "b41c397a81949b4a65fbfc7a71f63e05a812053f"
+[M1] release hash               release_hash             = "e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6faac2d04e15c7f37"
+[M1] certification              certification            = {"status": "READY_FOR_INDEPENDENT_OS_VERIFICATION", "implementer_evidence": "", "independent_verifier": "", "certified_a
+[M1] capability/plugin versions anywhere in the manifest: [] | capabilities/ in payload: False
+[M1] RELEASE_NOTES.md / ROLLBACK.md files: True True
+[M1] file_hashes entry verified by hand: KERNEL.yaml True | count = 122
+[M1] manifest validates against the release-manifest schema (build refuses otherwise): see runtime/src/release.rs schemas.validate
+
+## [M2] immutability and verification
+[M2] rebuild the same version into the same release dir -> REFUSED RELEASE_IMMUTABLE
+[M2] release verify (pristine): {'ok': True, 'modified': [], 'missing': [], 'added': [], 'release_hash_matches_kernel': True}
+[M2] release verify (payload edited after release): {'ok': False, 'modified': ['policies/TOOL_POLICY.yaml']}
+[M2] release verify after editing manifest.json certification/notes (payload restored? no): {'ok': False, 'modified': ['policies/TOOL_POLICY.yaml'], 'certification': {'certified_at': '', 'implementer_evidence': '', 'independent_verifier': '', 'status': 'CERTIFIED'}}
+
+## [M3] reproducibility: an existing version is rebuilt from its recorded release_commit, not the working tree
+[M3] rebuild -> ok | provenance = {"release_branch": "main", "release_tag": "v4.1.5-rc1", "reproduced_from_commit": "b41c397a81949b4a65fbfc7a71f63e05a812053f", "kernel_source": "git archive of release_commit", "migration_substance_pro | release_hash equal to original: True
+
+## [M4] semantic versioning: version string handling and breaking-change semantics
+[M4] non-semver version 'banana' -> REFUSED SCHEMA_INVALID: schema validation failed for release-manifest (release manifest): /version: "banana" does not match "^\d+\.\d+\.\d+([-+]
+[M4] a PATCH bump (4.1.5 -> 4.1.6) carrying a breaking migration -> ok (built) | breaking_changes = ['removes a schema field (breaking)'] | human_gates = ['schema_break'] | required_index_rebuilds = ['semantic']
+[M4] consumer update --check against it: radius = R5 | human_gate_required = True
+[M4] CLI/kernel major-version compatibility rule: lock::compatibility (4.1.x vs 5.0.0 incompatible) — exercised via update --check below
+[M4] 4.1.5 -> 5.0.0 check: {"compatible": true, "migration_path_complete": false, "recommendation": "review impact; approve with `gov update --apply --approve --by <human>`"}
+
+DONE

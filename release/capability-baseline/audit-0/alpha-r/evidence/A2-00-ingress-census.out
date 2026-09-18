@@ -1,0 +1,39 @@
+## commit
+3b8a4ab4aa28ed828512ef2037373921f0eb97f0
+## calls of the single verifier srr::admit (excluding its definition and tests)
+runtime/src/adopt.rs:638:                let a = crate::srr::admit(
+runtime/src/init.rs:237:    let auth = crate::srr::admit(
+runtime/src/update.rs:234:    let auth = crate::srr::admit(
+runtime/src/update.rs:471:        Some(crate::srr::admit(
+cli/src/main.rs:939:                let auth = gov_runtime::srr::admit(
+## calls of install_kernel (the only function that writes governance/kernel)
+runtime/src/adopt.rs:642:                let m = install_kernel(&a, &gov)?;
+runtime/src/init.rs:244:    let manifest = install_kernel(&auth, &gov)?;
+runtime/src/update.rs:241:        let manifest = install_kernel(&auth, &p.governance_dir())?;
+runtime/src/update.rs:488:            crate::kernel::install_kernel(a, &p.governance_dir())?;
+cli/src/main.rs:944:                let m = gov_runtime::kernel::install_kernel(&auth, &p.governance_dir())?;
+## install_kernel signature (takes the sealed AuthenticatedRelease)
+247:pub fn install_kernel(
+## Ingress variants and where each is constructed
+58:pub enum Ingress {
+59-    Init,
+60-    Adopt,
+61-    Update,
+62-    Reinstall,
+63-    Rollback,
+64-    Recovery,
+65-}
+66-
+67-impl Ingress {
+68-    pub fn as_str(&self) -> &'static str {
+69-        match self {
+70-            Ingress::Init => "init",
+runtime/src/adopt.rs:639 Ingress::Adopt
+runtime/src/init.rs:238 Ingress::Init
+runtime/src/update.rs:235 Ingress::Update
+runtime/src/update.rs:472 Ingress::Rollback
+cli/src/main.rs:940 Ingress::Reinstall
+## gov recover installs no kernel bytes (no install/admit call in recovery.rs)
+(none)
+## other writers into governance/kernel outside kernel.rs/srr (should be none)
+(none)

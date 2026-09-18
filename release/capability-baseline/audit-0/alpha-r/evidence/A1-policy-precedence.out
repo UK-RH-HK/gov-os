@@ -1,0 +1,77 @@
+init ok = True
+
+## [I1] the kernel constitution is machine-readable
+[I1] HARD_INVARIANTS.yaml version 1.0.0 | invariants: ['INV-001', 'INV-002', 'INV-003', 'INV-004', 'INV-005', 'INV-006', 'INV-007', 'INV-008', 'INV-009', 'INV-010', 'INV-011', 'INV-012', 'INV-013', 'INV-014', 'INV-015']
+[I1] every invariant has id/name/statement/enforced_by: True
+[I1] CONSTITUTION.md present: True
+[I1] audit family schema_invariants: HEALTHY []
+[I1] context packet layer 1 = constitution_hard_invariants with 15 invariants; layers = ['constitution_hard_invariants', 'security_authority', 'project_policy', 'active_decisions_and_spec', 'task_contract_and_mutation_manifest', 'role_and_skill', 'retrieved_context', 'model_inference']
+[I1] adapters carry every invariant statement verbatim:
+      adapters verify ok = True {"ok": true, "adapters_checked": 5, "invariants": 15, "problems": []}
+
+## [W1] weakening attempts through PROJECT_POLICY.policy_overrides
+[W1] applied = []
+[W1] REFUSED SECURITY_POLICY.never_index_classes = ["secret"] :: SECURITY_POLICY.never_index_classes: kernel entries ["restricted"] may not be removed (additive key: a lower layer may only add) (POLICY_PRECEDENCE mo
+[W1] REFUSED SECURITY_POLICY.never_export_classes = ["secret"] :: SECURITY_POLICY.never_export_classes: kernel entries ["restricted", "confidential"] may not be removed (additive key: a lower layer may only add) (POL
+[W1] REFUSED SECURITY_POLICY.on_secret_in_export_payload = "allow" :: SECURITY_POLICY.on_secret_in_export_payload: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'imm
+[W1] REFUSED AUTHORITY_POLICY.authority_levels_required.install_kernel = "L1" :: AUTHORITY_POLICY.authority_levels_required.install_kernel: "L1" would weaken the kernel minimum "L4" (POLICY_PRECEDENCE mode 'floor', rule AUTHORITY_P
+[W1] REFUSED AUTHORITY_POLICY.authority_levels_required.answer_gate = "L0" :: AUTHORITY_POLICY.authority_levels_required.answer_gate: "L0" would weaken the kernel minimum "L3" (POLICY_PRECEDENCE mode 'floor', rule AUTHORITY_POLI
+[W1] REFUSED HUMAN_GATE_POLICY.agent_resolvable_when.max_radius = "R5" :: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius: "R5" would weaken the kernel maximum "R1" (POLICY_PRECEDENCE mode 'ceiling', rule HUMAN_GATE_POLIC
+[W1] REFUSED HUMAN_GATE_POLICY.agent_resolvable_when.reversible = false :: HUMAN_GATE_POLICY.agent_resolvable_when.reversible: only the strict value true is allowed (POLICY_PRECEDENCE mode 'strengthen_only_bool', rule HUMAN_G
+[W1] REFUSED CHANGE_POLICY.auto_approve_max_radius = "R5" :: CHANGE_POLICY.auto_approve_max_radius: "R5" would weaken the kernel maximum "R1" (POLICY_PRECEDENCE mode 'ceiling', rule CHANGE_POLICY.auto_approve_ma
+[W1] REFUSED MEMORY_POLICY.namespaces.secret.embed = true :: MEMORY_POLICY.namespaces.secret.embed: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutable
+[W1] REFUSED MEMORY_POLICY.namespaces.product.sensitivity = "public" :: MEMORY_POLICY.namespaces.product.sensitivity: "public" would weaken the kernel minimum "internal" (POLICY_PRECEDENCE mode 'floor', rule MEMORY_POLICY.
+[W1] REFUSED TOOL_POLICY.plugins.min_authority = "L0" :: TOOL_POLICY.plugins.min_authority: "L0" would weaken the kernel minimum "L2" (POLICY_PRECEDENCE mode 'floor', rule TOOL_POLICY.plugins.min_authority)
+[W1] REFUSED BUDGET_POLICY.defaults.max_daily_spend_usd = 100000 :: BUDGET_POLICY.defaults.max_daily_spend_usd: 100000 would weaken the kernel maximum 200 (POLICY_PRECEDENCE mode 'ceiling', rule BUDGET_POLICY.defaults.
+[W1] REFUSED POLICY_PRECEDENCE.default_mode = "overridable" :: POLICY_PRECEDENCE.default_mode: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutable', rule
+[W1] problems = []
+[W1] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted'] | never_export_classes = ['secret', 'restricted', 'confidential']
+[W1] effective AUTHORITY_POLICY install_kernel = L4 | answer_gate = L3
+
+## [W2] weakening through PROJECT_EXCEPTIONS (with and without a governing decision)
+[W2] applied = []
+[W2] REFUSED EXC-1 SECURITY_POLICY.never_index_classes :: SECURITY_POLICY.never_index_classes: kernel entries ["restricted"] may not be removed (additive key: a lower layer may only add) (POLICY_PRECEDENCE mode 'additive', rule 
+[W2] REFUSED EXC-2 AUTHORITY_POLICY.authority_levels_required.install_kernel :: AUTHORITY_POLICY.authority_levels_required.install_kernel: "L0" would weaken the kernel minimum "L4" (POLICY_PRECEDENCE mode 'floor', rule AUTHORITY_POLICY.authority_leve
+[W2] REFUSED EXC-3 SECURITY_POLICY.never_export_classes :: exception EXC-3 references decision D-9999, which does not exist in this repository (unresolved governance reference: fail closed)
+
+## [O1] refusals are observable and fail closed (doctor D027 critical, audit, context packet layer 3)
+[O1] doctor exit = 3 | verdict = UNHEALTHY | D027 = [(False, 'critical', '3 refused: SECURITY_POLICY.never_index_classes (SECURITY_POLICY.never_index_classes: kernel entries ["restricted"] may not be removed (additive key: a lower lay')]
+[O1] audit policy_precedence: exit = 3 | verdict = UNHEALTHY | findings = [('critical', 'override of SECURITY_POLICY.never_index_classes from EXC-1 refused by POLICY_PRECEDENCE: SECURITY_POLICY.never'), ('critical', 'override of AUTHORITY_POLICY.authority_levels_required.install_kernel from EXC-2 refused by POLICY_PRECEDENCE:'), ('critical', 'override of SECURITY_POLICY.never_export_classes from EXC-3 refused by POLICY_PRECEDENCE: exception EXC-3 refe')]
+[O1] context packet layer 3 policy_overrides_refused = [('SECURITY_POLICY', 'never_index_classes'), ('AUTHORITY_POLICY', 'authority_levels_required.install_kernel'), ('SECURITY_POLICY', 'never_export_classes')]
+
+## [S1] strengthening / specialising within the allowed modes (and the effect is real)
+[S1] APPLIED SECURITY_POLICY.never_index_classes = ["secret", "restricted", "confidential"] mode=additive
+[S1] APPLIED AUTHORITY_POLICY.authority_levels_required.create_task = "L3" mode=floor
+[S1] APPLIED CHANGE_POLICY.auto_approve_max_radius = "R0" mode=ceiling
+[S1] APPLIED HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence = 0.99 mode=floor
+[S1] APPLIED MEMORY_POLICY.retrieval.default_k = 5 mode=overridable
+[S1] APPLIED TOOL_POLICY.approved_licences = ["MIT"] mode=shrink_only
+[S1] REFUSED SECURITY_POLICY.brand_new_key :: SECURITY_POLICY.brand_new_key: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutab
+[S1] problems = ['policy override targets unknown policy/key: NOT_A_POLICY.some_key']
+[S1] effect: product-spec-agent (L2) task create -> REFUSED AUTHORITY_DENIED role 'product-spec-agent' (L2) may not perform 'create_task' (requires L3); AUTHORITY_POLICY.authority_levels_required
+[S1] effect: change-controller (L3) task create -> ok
+
+## [D1] deterministic precedence of decision/spec/task context
+[D1] active_decisions = [('D-0202', 'B')]
+[D1] conflicting_decisions = [('D-0201', 'UNKNOWN_OR_CONFLICTING', 'D-0202')]
+[D1] REJECTED D-0203 absent from authority: True
+[D1] deterministic_hash stable across compiles: True e4eb833e0d736f4f
+[D1] authority layer order = [1, 2, 3, 4, 5, 6, 7, 8] ['constitution_hard_invariants', 'security_authority', 'project_policy', 'active_decisions_and_spec', 'task_contract_and_mutation_manifest', 'role_and_skill', 'retrieved_context', 'model_inference']
+
+## [R1] retrieved context / model inference cannot override higher authority
+[R1] retrieved slices: [('spec/tasks/TASK-0003.yaml', 'AUTHORITATIVE'), ('spec/reports/R-9001-note.md', 'EVIDENCE'), ('spec/tasks/TASK-0003.yaml', 'AUTHORITATIVE'), ('spec/reports/R-9001-note.md', 'EVIDENCE'), ('spec/features/F-0901.yaml', 'AUTHORITATIVE'), ('spec/decisions/D-0202.yaml', 'AUTHORITATIVE')]
+[R1] the planted report is in the RETRIEVED block: True
+[R1] authority block unchanged: active_decisions = ['D-0202'] | never_index_classes = ['secret', 'restricted']
+[R1] deterministic_hash unchanged by retrieval (only record set matters): True
+[R1] effective never_index_classes after the planted claim = ['secret', 'restricted']
+[R1] memory query default (current authority only): [('spec/decisions/D-0202.yaml', 'ACTIVE'), ('spec/reports/R-9001-note.md', 'ACTIVE'), ('spec/reports/R-9001-note.md', 'ACTIVE'), ('spec/tasks/TASK-0003.yaml', 'ACTIVE'), ('spec/tasks/TASK-0003.yaml', 'ACTIVE')]
+[R1] REJECTED decision retrieved by default: False
+[R1] REJECTED decision retrieved with --include-historical: True
+
+## [I2] the invariants shown to agents come from which kernel? (naive tamper of installed HARD_INVARIANTS.yaml)
+[I2] kernel verify ok = False | modified = ['constitution/HARD_INVARIANTS.yaml'] | trust.substituted_embedded_baseline = True
+[I2] context compile ok on a tampered kernel; INV-009 in the packet = Secrets may be indexed when convenient; credentials, unapproved customer material, product
+[I2b] the installed HARD_INVARIANTS.yaml emptied
+[I2b] context compile ok; invariants in packet layer 1 = 0 | hard_invariants = [] | kernel_trust.verified in layer 2 = False
+
+DONE
