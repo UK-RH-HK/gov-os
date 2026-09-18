@@ -1,0 +1,52 @@
+schema: governance-os.phase-1.agent-run
+schema_version: 1
+run_id: AR-0030
+role: repair-builder
+objective: >-
+  Bounded R1 repair 2 - close the guard-COVERAGE class by building a single enforcement point every trust-changing and
+  gate-creating path must pass, plus a coverage test that fails when a new unguarded path appears; and close AR29-C1,
+  AR29-N1, AR29-N3, AR29-N4 and AR29-N5. Preserve everything repair 1 closed.
+agent_model: claude-opus-5
+fresh_context: true
+independent_of: [AR-0026 build, AR-0027 verification, AR-0028 repair, AR-0029 verification]
+does_not_grade_itself: true
+handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0030-r1-repair-2.md
+active_gate: GATE-R1-CANDIDATE-ACCEPT
+r1_repair_iteration: 2
+rejected_candidate:
+  id: srr1-r1-candidate-2
+  commit: 678402feacdf47235dba794e5b6c663cc5655dcd
+  verification_run: AR-0029
+  verdict: BLOCKING_FINDINGS_PRESENT
+  verification_work_commit: d3f52c65b419dc722408993a572eb4e978d2cddb
+active_repair_queue:
+  blocking: [AR29-B1, AR29-B2]
+  same_gate_authorised: [AR29-C1, AR29-N1, AR29-N3, AR29-N4, AR29-N5]
+blocker_class: {id: BC-R1-2, description: guard COVERAGE - privileged operations reaching no enforcement point at all, distinct from BC-R1-1 which was the guard DECISION shape}
+required_fix_shape: >-
+  A single enforcement point every trust-changing and gate-creating path must pass, plus a path-enumerating coverage
+  test. Bolting individual guard calls onto root_update and create_system closes two instances and leaves the class
+  open, which is the same mistake AR27-B1 taught one level down.
+out_of_scope:
+  owner_closed: [AR27-OD1 and machine-state path resolution, SRR2-R1-C1 exit policy, SRR-R0-L7]
+  later_lifecycle_R2: [AR29-N2, AR27-N3, AR27-N5, AR27-N6, AR27-N7]
+must_preserve:
+  - the four-operation allow-list and its exact-match semantics (AR27-B1 closure, confirmed unbreakable across 63 near-miss forms)
+  - AR27-N1 expiry canonical-form gate, AR27-N2 ROOT_EXPIRY_PROFILE, AR27-N4 strict-only crypto::verify
+  - all twelve frozen R1 items; 5 admit sites paired with 5 install_kernel sites; floors at six ingresses advancing last
+  - D-0007 separate control; SRR-R0-L4 vacuous; gov verifies and never signs; Contract v3 import byte-identical
+regression_baseline: {lib: 31, certification: 65, failures: 0}
+prior_held_out_suites_to_rerun:
+  - {path: release/verification/4.1.6-r1/evidence/heldout-tests/, expect: 26 passed / 3 failed (AR-0027 OBSERVED flips)}
+  - {path: release/verification/4.1.6-r1-2/evidence/heldout-tests/, expect: its four OBSERVED failures to flip to passing once the findings close}
+base_commit: 1bc4427d0f9ceba0da23892d5897cdfc863e2cee
+branch: phase1/srr1-r1-repair-2
+started_at: '2026-09-18T05:00Z'
+status: RUNNING
+expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0030.report.yaml
+expected_evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/
+required_verdict_vocabulary: [READY_FOR_INDEPENDENT_OS_VERIFICATION, INCOMPLETE]
+convergence_warning: >-
+  If the next verification iteration produces another materially new blocker class, the orchestrator stops with
+  PHASE_CONVERGENCE_ESCALATION_REQUIRED and produces a root-cause/meta-review package for the product owner.
+outcome: null

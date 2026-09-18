@@ -46,11 +46,56 @@ contract_v3:
 carried_not_this_cycle: [AR27-N3, AR27-N5, AR27-N6, AR27-N7]
 branch: phase1/srr1-r1-verify-2
 started_at: '2026-09-18T03:00Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0029.report.yaml
 expected_evidence_path: release/verification/4.1.6-r1-2/
 required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]
 convergence_tracking: >-
   Each blocking finding must be labelled residual-of-AR27 or materially-new. Two consecutive iterations of materially
   new classes have occurred at count 1; a third would reach PHASE_CONVERGENCE_ESCALATION_REQUIRED.
-outcome: null
+outcome:
+  verdict: BLOCKING_FINDINGS_PRESENT
+  work_commit: d3f52c65b419dc722408993a572eb4e978d2cddb
+  report_commit: fcc7bd8749bb859e9804eb00214181b7e32fa850
+  integration_merge_commit: 1bc4427d0f9ceba0da23892d5897cdfc863e2cee
+  evidence_path: release/verification/4.1.6-r1-2/
+  frozen_r1_items: 12 of 12 SATISFIED (R1-9 qualified - the two blockers are operations proceeding below floor with owner-held authority, not inputs manufacturing authority)
+  owner_decision_0006: sections 1-5 and 7-10 SATISFIED; section 6 PARTLY SATISFIED - bullet 1 closed, bullets 5/6/7 hold, bullets 2 and 4 NOT ENFORCED
+  prior_findings_closed: [AR27-B1, AR27-N1, AR27-N2, AR27-N4]
+  ar27_b1_probing: exact match held against 63 near-miss forms with 0 permitted; 28-label sweep through the real guard permits exactly the four section 5 operations; REFUSAL_CLASSES inert; no false positives on unmarked machines
+  blocking: [AR29-B1, AR29-B2]
+  blocking_classification: both MATERIALLY NEW - guard COVERAGE (operations reaching no enforcement point), distinct from BC-R1-1 guard DECISION shape
+  requires_r0_or_owner_adjudication: none
+  new_owner_decision_required: none
+  judgement_calls_resolved:
+    deadlock_risk: >-
+      Repair 1's claim is HALF right. Restoration stays open under an unreadable marking, but exit does not - try_exit
+      goes through Degraded::load, which reads the same record with the opposite disposition, so a machine above both
+      floors still refuses while status reports degraded: null. Graded LOW non-blocking (AR29-C1) and labelled a
+      RESIDUAL of AR27-B1, on the reasoning that write_durable is atomic, no product writer emits such a record, the
+      refusal names the offending file, and the remedy sits with the owner inside the trusted boundary.
+    narrower_allow_list: >-
+      Reasoning HOLDS and nothing is stranded. task status and cit simulate both advance a governed record's lifecycle,
+      so both are section 6 bullet 1 and refusing them is right. All 27 guard_write labels enumerated from source - none
+      is a read surface; doctor, status, verify, list/show, audit, query never touch the guard. Section 5 repair is gov
+      recover, whose only guarded downstream call is the allow-listed checkpoint.
+    root_expiry_profile: >-
+      Reasoning SOUND and measured, not accepted. Rotation is genuinely impossible under the alternative - root_update
+      requires the outgoing quorum and provision refuses to re-anchor with SRR_ALREADY_PROVISIONED. v1 to v2 from an
+      expired anchor was measured working, an expired successor still refused, and the profile's enforced/not-enforced
+      lists were checked item by item.
+  ar27_held_out_rerun: 26 passed / 3 failed - confirmed the three are the intended OBSERVED flips (heldout_srr2::b1, b2 for AR27-N1; heldout_srr3::d3 for AR27-B1) and not regressions; every test pinning a satisfied property still passes
+  own_held_out_tests: 35 authored in a standalone crate with an independently written forge sharing no line with AR-0027's; 31 pass, 4 OBSERVED failures pinning the new findings
+  regression_reproduced: cargo test --lib 31 passed 0 failed; cargo test --test certification 65 passed 0 failed
+  scope_deviation: >-
+    One, disclosed: AR29-B2 rests on the call graph pinned against the candidate's own source rather than an end-to-end
+    drive, because exercising gov kernel override needs a fully initialised governed project and a tampered kernel. Its
+    decision half is measured. AR29-B1 is fully dynamic.
+  orchestrator_verification:
+    - work and report commits exist; report output.commit names the work commit
+    - no product source touched - diff over runtime, cli, tests, framework, spec and Cargo files is empty
+    - AR-0027 held-out sources still byte-identical
+    - AR29-B1 confirmed in source - provision::root_update contains no guard_write or breakglass::guard call
+    - AR29-B2 confirmed in source - orchestration/gates.rs create at line 132 calls guard_write; create_system at line 143 does not
+    - AR29-N1 confirmed in source - every field of AuthenticatedRelease is pub, so the constructor claim is an enumeration property not a type property
+  completed_at: '2026-09-18T04:50Z'
