@@ -193,7 +193,13 @@ gates:
 
   - id: GATE-OWNER-R1-CONVERGENCE-DECISION
     title: Owner convergence decision after PHASE_CONVERGENCE_ESCALATION_REQUIRED
-    status: OPEN
+    status: SATISFIED
+    answer: >-
+      Option B - one additional bounded R1 STRUCTURAL repair. Fix AR31-B1 and AR31-B2, and remove the root cause by
+      deriving section 6 coverage from the product rather than a manually asserted enumeration, with tests able to
+      falsify any no-primitive-exists claim. Residuals within the identified classes repair and re-verify automatically;
+      a genuinely new material blocker class or any architecture/owner decision escalates IMMEDIATELY.
+    answer_record: OWNER-DECISION-0008
     satisfier: product owner
     raised_by: orchestrator, after R1 verification iteration 3 (AR-0031)
     lifecycle: R1
@@ -211,7 +217,23 @@ gates:
       architecture (not indicated - every finding has been an implementation defect inside the accepted boundary)?
     orchestrator_recommendation: B
     satisfied_when: the owner selects an option; the selection is recorded as an owner record and the loop resumes or stops accordingly
-    satisfaction_evidence: null
+    satisfaction_evidence: release/orchestration/phase-1/GATES/OWNER-DECISION-0008-CONVERGENCE-OPTION-B.md
+
+  - id: OWNER-DECISION-0008
+    title: Convergence decision - Option B, structural repair authorised
+    status: RECORDED
+    satisfier: product owner
+    classification: binding owner decision on orchestration scope and R1 convergence policy
+    record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0008-CONVERGENCE-OPTION-B.md
+    record_sha256: aa541eab86192c3710a76cf3119efdeb7e108891c5f0e9782a88e05a20d06518
+    effects:
+      - one additional bounded R1 structural repair authorised; the loop resumes
+      - mandate - fix AR31-B1 and AR31-B2, derive section 6 coverage from the product, and make no-primitive-exists claims falsifiable by the product's own tests
+      - convergence policy superseded for the remainder of R1 - residuals within BC-R1-1, BC-R1-2 and BC-R1-3 repair and re-verify automatically
+      - a genuinely new material blocker class or any architecture/owner decision escalates IMMEDIATELY, not after three iterations
+      - on R1 acceptance continue automatically to ROT_PHASE1_CANDIDATE_ACCEPTED_R1, checkpoint Phase 1 and stop before Phase 2
+      - accepts no candidate, certifies no release, changes no normative source; R0 acceptance unaffected
+    satisfaction_evidence: this record's commit
 
   - id: GATE-OWNER-KEY-CEREMONY
     title: R2 production trust-anchor and key-custody ceremony

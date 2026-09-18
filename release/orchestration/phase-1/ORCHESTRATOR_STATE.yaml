@@ -4,10 +4,10 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-18T02:03:04Z'
-state_hash: 1468c89a06cbcc16c02133a61315faf008fff067cf5a735f3b3758ba7fce9ada
-lifecycle_state: PHASE_CONVERGENCE_ESCALATION_REQUIRED
-loop_status: STOPPED_PENDING_OWNER_CONVERGENCE_DECISION   # automatic repair loop halted by the orchestrator per its pre-committed rule
+updated_at: '2026-09-18T09:56:43Z'
+state_hash: 05b8d0dc7ea481fe19c94962c337f399ea9615356806933b3023529539458905
+lifecycle_state: R1_REPAIR
+loop_status: R1_STRUCTURAL_REPAIR_3_RUNNING_UNDER_OWNER_DECISION_0008
 
 protocol:
   source: 'owner prompt "Governance OS — Phase 1 Autonomous Convergence Orchestrator" (received 2026-09-14)'
@@ -371,6 +371,12 @@ r1_blocker_class_history:
     - {iteration: 3, verifier: AR-0031, candidate: srr1-r1-candidate-3, classes: [BC-R1-3, residual of BC-R1-2], materially_new: [BC-R1-3], closed: [BC-R1-2 for bullets 2/3/4/6 only], note: BC-R1-3 is undetermined-subject fail-open; AR31-B1 is a residual of BC-R1-2 at bullet 7}
   consecutive_new_class_count: 3
   escalation_fired: true
+  escalation_resolved_by: OWNER-DECISION-0008 (Option B)
+  superseding_convergence_policy: >-
+    For the remainder of R1, OWNER-DECISION-0008 replaces the three-iteration rule. Residual defects within the
+    already-identified classes BC-R1-1, BC-R1-2 and BC-R1-3 repair and re-verify AUTOMATICALLY for as many cycles as
+    needed, with no owner interruption. A genuinely NEW material blocker class, or any architecture/owner decision,
+    STOPS the loop and escalates IMMEDIATELY - one occurrence is enough, not three.
   escalation_token: PHASE_CONVERGENCE_ESCALATION_REQUIRED
   escalation_package: release/orchestration/phase-1/ESCALATION/PHASE-CONVERGENCE-ESCALATION-R1.md
   escalation_package_sha256: 82d87c963c1bf423e181e006c157d4ded9171ade9683f24223c22d602b46d829
@@ -418,13 +424,14 @@ known_non_blocking_residuals:
   accepted: all other residuals named in the revision-7 pack
 
 owner_gates:
-  pending: [GATE-OWNER-R1-CONVERGENCE-DECISION]
+  pending: []
   planned: [GATE-R0-ARCH-ACCEPT, GATE-OWNER-CAC-UPLOAD, GATE-OWNER-KEY-CEREMONY, GATE-R1-CANDIDATE-ACCEPT, GATE-R2-STANDARD-RELEASE, GATE-R3-HIGH-ASSURANCE]
   historical_refused: [GATE-ARCH-ACCEPT, GATE-OWNER-D0008]
   owner_inputs_recorded:
     - {id: OWNER-DESIGN-REQUIREMENTS-0001, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0001.yaml, classification: binding design inputs for revision 7, not D-0008 approval}
     - {id: OWNER-DESIGN-REQUIREMENTS-0002, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.md, index_path: release/orchestration/phase-1/GATES/OWNER-DESIGN-REQUIREMENTS-0002.yaml, classification: binding resolutions of OT-1 and OT-2 clarifying OP-7/OP-10/OP-13, not D-0008 approval}
     - {id: OWNER-DIRECTIVE-0003, date: 2026-09-14, record_path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0003-FREEZE-ROT-LOOP.md, classification: binding orchestration directive — freeze the RoT loop after the revision-7 verdict}
+    - {id: OWNER-DECISION-0008, date: 2026-09-18, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0008-CONVERGENCE-OPTION-B.md, classification: binding owner convergence decision — Option B structural repair authorised; new-class escalation is now immediate}
     - {id: OWNER-DECISION-0007, date: 2026-09-18, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0007-R1-QUESTIONS.md, classification: binding owner answers — keep the XDG/HOME derivation (AR27-OD1 closed, no R0 readjudication) and keep the stricter both-floors break-glass exit (SRR2-R1-C1 closed, confirms the interim)}
     - {id: OWNER-DECISION-0006, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md, classification: binding owner R0 decision — below-floor recovery is break-glass (b), authorised and recorded}
     - {id: OWNER-DECISION-0005, date: 2026-09-17, record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0005-R0-REVIEW-ANSWERS.md, classification: binding answers to SRR-R0-L6 (defer to R1) and SRR-R0-L7 (not needed); SRR-R0-H1 trade-off still PENDING; not an R0 acceptance}
@@ -496,7 +503,7 @@ iteration:
   signed_release_root_r0_review_cycle: 2
   signed_release_root_r0_correction_cycles_used: 1
   signed_release_root_r0_correction_cycles_permitted: 1   # ARCHITECTURE LOOP LIMIT; a second genuinely new architectural blocker or owner trade-off after the corrected re-review means R0_OWNER_READJUDICATION_REQUIRED
-  implementation_repair_cycle: 2
+  implementation_repair_cycle: 3
 
 completed_stages:
   - stage: ORCHESTRATION_INIT
@@ -560,7 +567,16 @@ completed_stages:
     commit: this_governance_rebase_commit
     note: OWNER-DIRECTIVE-0004, D-0009 and ARCH-0003 recorded; CP-1 retired as Phase-1 target; no implementation; HO-0023 prepared
 
-running_work: []
+running_work:
+  - run_id: AR-0032
+    role: repair-builder
+    status: RUNNING
+    run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0032.run.yaml
+    handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0032-r1-structural-repair.md
+    branch: phase1/srr1-r1-repair-3
+    expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0032.report.yaml
+    gate: GATE-R1-CANDIDATE-ACCEPT
+
 
 
 
@@ -681,7 +697,7 @@ infrastructure:
   legacy_rebuild: "git worktree add --detach <dir> <commit> && (cd <dir> && ~/.cargo/bin/cargo build --release)"
   toolchain: {cargo: 1.98.1, python: 3.12.3, pyyaml: 6.0.1}
 
-next_deterministic_action: AWAIT_OWNER_CONVERGENCE_DECISION_ON_THE_ESCALATION_PACKAGE_OPTIONS_A_B_C_OR_D__NO_FURTHER_REPAIR_OR_VERIFICATION_ROLE_MAY_BE_DISPATCHED_UNTIL_THE_OWNER_CHOOSES
+next_deterministic_action: COMPLETE_AR_0032_STRUCTURAL_R1_REPAIR__THEN_MINT_CANDIDATE_4_AND_DISPATCH_A_NEW_FRESH_INDEPENDENT_R1_VERIFIER__RESIDUALS_IN_KNOWN_CLASSES_LOOP_AUTOMATICALLY__A_GENUINELY_NEW_CLASS_ESCALATES_IMMEDIATELY
 rebase_context: >-
   OWNER-DIRECTIVE-0004 adopts D-0009 and the separate ARCH-0003 Signed Release Root lineage. CP-1/RoT-1 remains frozen
   at rejected revision 7 with no Revision 8. D-0007 remains ACTIVE. The current action is a fresh independent R0

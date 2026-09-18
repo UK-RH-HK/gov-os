@@ -1085,3 +1085,17 @@ Entries are never edited after they are written. Corrections are made by a later
 | Root cause identified | `OWNER-DECISION-0006` §6 is a **universal negative** implemented three times as a **positive enumeration** at successively deeper levels — forbidden operations, then guarded call sites, then effect primitives. Each was complete when written and silently incomplete as soon as the product grew a path its author had not enumerated. And at each level the **test was derived from the same enumeration as the code**, so it could not detect that the enumeration was short: AR-0027's sweep pushed labels with no call sites, and the census test **skips the bullets whose entry says "no primitive"** (`AR31-N5`), making bullets 6 and 7 unfalsifiable by the candidate's own suite. |
 | Output commit | f48dd9db2c510a3516aa55ac5f70743ca019383c (merge); verification work `807a046`, report `3304a1b` |
 | Next action | `AWAIT_OWNER_CONVERGENCE_DECISION` — gate `GATE-OWNER-R1-CONVERGENCE-DECISION`. **No further repair or verification role may be dispatched until the owner chooses.** Orchestrator recommendation: option B. |
+
+## L-0075 — 2026-09-18 — owner selects Option B; structural repair authorised and dispatched
+
+| Field | Value |
+|---|---|
+| Iteration | SRR-1 R1 repair cycle 3 (structural) |
+| Role | product owner (decision); orchestrator (routing only) |
+| Input commit | `f067eb5626387ba9d9c73a680c3c9130c40d68f9` |
+| Work performed | Recorded `OWNER-DECISION-0008`: **Option B**, one additional bounded R1 **structural** repair. The mandate has four parts — fix `AR31-B1`, fix `AR31-B2`, **derive §6 coverage from the product** rather than a manually asserted enumeration, and make any **"no primitive exists" claim falsifiable** by the product's own suite. The owner also **superseded the three-iteration convergence rule** for the remainder of R1: residual defects within the three identified classes (`BC-R1-1` guard decision, `BC-R1-2` guard coverage, `BC-R1-3` undetermined-subject fail-open) now repair and re-verify automatically without owner interruption, while a genuinely new material blocker class — or anything needing an architecture or owner decision — escalates **immediately**, on one occurrence rather than three. `GATE-OWNER-R1-CONVERGENCE-DECISION` moved to SATISFIED and the loop resumed. HO-0032 dispatched to a fresh isolated repair role (AR-0032, neither AR-0028 nor AR-0030), carrying the mandate, the residuals authorised in the same cycle (`AR31-N1`…`N5`), the out-of-scope fence, and an explicit instruction to **report rather than absorb** any discovery outside the known classes. |
+| Report / evidence | `GATES/OWNER-DECISION-0008-CONVERGENCE-OPTION-B.md` (SHA-256 `aa541eab…`); `HANDOFFS/HO-0032-r1-structural-repair.md`; `AGENT_RUNS/AR-0032.run.yaml` |
+| Verdict | — (owner decision and routing; no gate verdict) |
+| Output commit | the commit containing this entry |
+| Findings | — |
+| Next action | complete AR-0032, mint candidate 4, dispatch a NEW fresh independent verifier; residuals in known classes loop automatically, a genuinely new class escalates immediately |
