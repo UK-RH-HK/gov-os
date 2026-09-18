@@ -1,0 +1,28 @@
+=== S3: gov init ===
+--- S3-b1: certified kernel installation ---
+Init result shows release_authenticity with ingress=init, payload hash, kernel_manifest_hash
+install_kernel() requires AuthenticatedRelease type (ARCH-0003 §6)
+
+--- S3-b2: project overlay creation ---
+CAPABILITY_PROFILE.yaml
+DATA_SENSITIVITY.yaml
+MODEL_ROUTING_OVERRIDES.yaml
+PROJECT_EXCEPTIONS.yaml
+PROJECT_POLICY.yaml
+REPOSITORY_CONTRACT.yaml
+TOOL_PERMISSIONS.yaml
+
+--- S3-b3: repository contract ---
+PRESENT
+
+--- S3-b4: initial memory/state ---
+Generated dir: PRESENT
+Spec dir: PRESENT
+
+--- S3-b5: health checks ---
+Init runs conformance audit after install (init.rs:312)
+Init runs doctor (init.rs:329)
+
+--- S3-b6: reference retrieval profile bootstrap when certified ---
+Init generates starter held-out set (init.rs:298) when not skip-index
+=== S3 Complete ===

@@ -1,0 +1,59 @@
+=== S6: Cross-machine mechanics ===
+--- S6-b1: tracked truth syncs through Git ---
+governance/ and spec/ directories are git-tracked
+framework.lock is git-tracked (the exact release identity)
+No machine-specific paths in governance/
+
+--- S6-b2: derived runtime rebuilds locally ---
+.governance-runtime/ is gitignored
+gov rebuild-memory rebuilds all derived state from git + authoritative records
+SQLite/vector/graph indexes are derived (B3)
+
+--- S6-b3: machine-specific absolute paths do not define release identity ---
+framework.lock contains:
+  - release_hash (content hash)
+  - release_commit (git commit, not path)
+  - source (logical label like 'embedded:agentic-engineering-os@4.1.5')
+  - kernel_manifest_hash (content hash)
+No absolute paths in the lock. Source label uses logical names, not machine paths.
+0
+Lock file paths (relative references only):
+framework: agentic-engineering-os
+version: 4.1.5
+release_commit: 25dac6efcc4a0d8149d12b619b1776788f34dcaf
+release_hash: e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6faac2d04e15c7f37
+source: embedded:agentic-engineering-os@4.1.5
+installed_at_commit: 65afef6061191f5ddf0959f29e659e7f824d41bd
+installed_at: '2026-09-18T19:49:48Z'
+kernel_manifest_hash: 3a93cc29327dd36612388e44b0d49e7c61be45d10bc979c674f7b705149c3c82
+cli_version: 4.1.5
+schema_versions:
+  capability-profile: 1.0.0
+  checkpoint: 1.0.0
+  cit: 1.0.0
+  context-packet: 1.0.0
+  data-sensitivity: 1.0.0
+  decision: 1.1.0
+  feature: 1.0.0
+  framework-change-proposal: 1.0.0
+  framework-lock: 1.1.0
+  handoff: 1.0.0
+  index-manifest: 1.0.0
+  kernel-manifest: 1.0.0
+  lesson: 1.0.0
+  migration: 1.1.0
+  model-routing-overrides: 1.0.0
+  plugin-descriptor: 1.2.0
+  plugin-registry: 1.0.0
+  project-exceptions: 1.0.0
+  project-policy: 1.0.0
+  record: 1.0.0
+  release-manifest: 1.2.0
+  repository-contract: 1.0.0
+  skill: 1.0.0
+  task: 1.0.0
+  tool: 1.2.0
+  tool-permissions: 1.0.0
+  upstream-packet: 1.0.0
+lock_schema_version: 1.1.0
+=== S6 Complete ===

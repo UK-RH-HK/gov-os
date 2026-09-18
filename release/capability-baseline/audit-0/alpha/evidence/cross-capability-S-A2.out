@@ -1,0 +1,19 @@
+=== Cross-capability interaction: S3/S4/S5 ↔ A2 ===
+Every lifecycle ingress (init, adopt/migrate, update) goes through the common verifier (SRR admit).
+
+--- S3 (init) → A2 ---
+init.rs:237: crate::srr::admit(AdmissionRequest::new(Ingress::Init, &src))
+The authenticated release is then passed to install_kernel, which requires the typed value.
+
+--- S4 (adopt/migrate) → A2 ---
+638:                let a = crate::srr::admit(
+
+--- S5 (update) → A2 ---
+234:    let auth = crate::srr::admit(
+471:        Some(crate::srr::admit(
+
+--- S5 rollback → A2 ---
+update.rs rollback: srr::admit for floor enforcement (non-transaction-abort path)
+Transaction abort does NOT go through admit (floors were never advanced)
+
+=== Cross-capability probe complete ===
