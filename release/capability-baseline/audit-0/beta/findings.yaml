@@ -1,0 +1,83 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0002
+findings:
+  - id: A0-C5-01
+    capability: [C5]
+    bullet_source_lines: [259]
+    severity: MEDIUM
+    title: "Ecosystem detection returns empty for greenfield with source files"
+    statement: "gov capabilities ecosystems returns an empty list for a greenfield project that contains Python source files under product/auth/login.py. The C5 bullet 'language-appropriate adapters are resolved via capability registry' depends on ecosystem detection to identify languages present and look up corresponding code-intelligence plugins. Because ecosystem detection returns empty, no language-specific adapters are resolved in practice without manual plugin registration."
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:259 'language-appropriate adapters are resolved via capability registry, with defined fallback to the built-in generic analyser.'"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - "evidence/additional-probes.out"
+      - "evidence/C1-C10-probes.out"
+    reproduction: "gov init --name test-eco --alias eco; mkdir -p product/auth; echo 'def hash_password(pw): return bcrypt.hashpw(pw)' > product/auth/login.py; gov capabilities ecosystems --json"
+    repair_direction: "Ecosystem detection must identify languages from source files present under governed paths (per REPOSITORY_CONTRACT.yaml path rules) even when no package-manager manifest (requirements.txt, Cargo.toml, etc.) is present. The detection should at minimum inspect file extensions of indexed files."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-C8-01
+    capability: [C8]
+    bullet_source_lines: [277, 278, 279, 280, 281, 282, 283]
+    severity: LOW
+    title: "Failure subtypes share generic lesson/report record type"
+    statement: "All seven failure subtypes listed in C8 (bugs, failed approaches, wrong assumptions, retrieval misses, regressions, migration failures, tool failures) are stored using the generic lesson or report record types. There are no dedicated per-subtype record kinds with typed fields for root cause, affected components, resolution status, or failure-specific metadata. Retrieval misses are logged in the retrieval_log table but not automatically promoted to structured failure records. Regressions detected by held-out verification are reported as pass/fail but not automatically recorded as failure records."
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:276-283 'Failure memory. The system specifically records: bugs; failed approaches; wrong assumptions; retrieval misses; regressions; migration failures; tool failures.'"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P3
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - "evidence/C1-C10-probes.out"
+      - "evidence/additional-probes.out"
+    reproduction: "Inspect runtime/src/records.rs for failure-specific record kinds. Observe that all failure types use the same lesson/report record structure. Run gov memory query 'regression' and observe results are content-matched, not type-filtered."
+    repair_direction: "Either introduce typed failure record subtypes with fields specific to each failure class (root cause, affected components, resolution), or add structured tags/metadata fields to lesson records that allow precise failure-class filtering without content-based search."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-C9-01
+    capability: [C9]
+    bullet_source_lines: [291]
+    severity: LOW
+    title: "Duplicate artifact IDs in context packet retrieved evidence"
+    statement: "The context packet's retrieved_intelligence section contains 2 duplicate artifact IDs out of 12 retrieved items. The retrieval code limits per-artifact duplicates to 2 (not full dedup). While within the configured limit, this means the same artifact can appear twice in the context packet, slightly reducing the diversity of retrieved evidence presented to the agent."
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:291 'duplicate suppression'"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P3
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - "evidence/additional-probes.out"
+      - "evidence/C1-C10-probes.out"
+    reproduction: "gov context compile TASK-001 --json | python3 -c \"import sys,json; d=json.load(sys.stdin); ids=[h['artifact_id'] for h in d['ranked_evidence']]; print(f'total={len(ids)}, unique={len(set(ids))}')\""
+    repair_direction: "The per-artifact duplicate limit should either be reduced to 1 (full dedup) or the duplicate suppression bullet should be documented as allowing configurable per-artifact limits."
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: A0-R3-01
+    capability: [R3]
+    bullet_source_lines: [888]
+    severity: MEDIUM
+    title: "Archive content not retrievable via CLI even when deliberately requested"
+    statement: "Content under archive/** paths has default_retrieval: false in REPOSITORY_CONTRACT.yaml, correctly excluding it from default retrieval. However, deliberately accessing archive content requires the include_archive option (runtime/src/retrieval/mod.rs:506), which is separate from include_historical. The CLI exposes --include-historical (for superseded/historical status filtering) but does NOT expose --include-archive. This means archive content is unretrievable through the CLI even when a user deliberately wants to consult it. The archive exclusion from default retrieval (the core R3 requirement) is met, but the ability to deliberately access archived content is absent from the CLI interface."
+    normative_source: "Governance_OS_Capability_Acceptance_Contract_v3.md:888 'historical/superseded material excluded from default current retrieval' — the exclusion is correct, but the inverse (deliberate access) is not supported in the CLI"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    evidence:
+      - "evidence/R3-archive-retrieval.out"
+      - "evidence/R1-R3-probes.out"
+    reproduction: "Place a file under archive/ in a governed project. Run gov memory query 'archive content' --include-historical --json. Observe 0 hits for archive content. Inspect cli/src/main.rs for --include-archive flag: absent."
+    repair_direction: "The CLI must expose an --include-archive flag (or equivalent) on gov memory query so that users can deliberately retrieve archive content when needed. The flag must remain separate from --include-historical since they control different filtering dimensions (status vs default_retrieval)."
+    owner_decision_required: false
+    owner_decision_reason: null

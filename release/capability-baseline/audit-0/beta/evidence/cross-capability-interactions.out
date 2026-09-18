@@ -1,0 +1,84 @@
+=== Cross-Capability: K2 <-> D1 (CIT-E triggers index refresh) ===
+--- CIT mechanism ---
+Change-Impact Transactions
+
+Usage: gov cit [OPTIONS] <COMMAND>
+
+Commands:
+  propose   
+  simulate  
+  approve   
+  reject    
+  execute   
+  rollback  
+  list      
+  show      
+  help      Print this message or the help of the given subcommand(s)
+
+
+--- CIT list ---
+{
+  "ok": true,
+  "command": "cit",
+  "result": [],
+  "session": "",
+  "release_trust": {
+    "surface": "cit",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
+
+=== Cross-Capability: D1 <-> W6 (Index staleness) ===
+--- Modify a governed file to make index stale ---
+Before rebuild, check doctor:
+  index freshness =  
+  no secrets in index =  
+  semantic index consistent with pinned embedder/reranker =  
+
+=== AC-7 Path to Provisional Retrieval Profile ===
+--- D4 components separately identifiable ---
+Embedder: pinned in MEMORY_POLICY, recorded in manifest
+Reranker: pinned in MEMORY_POLICY, resolved through plugin system
+Vector store: SQLite + vectors table
+Lexical engine: SQLite FTS5
+Code intelligence: builtin generic + plugin system
+Context compiler: deterministic
+Router: retrieval/mod.rs multi-route fusion
+
+--- D5 benchmark/compare/select mechanism ---
+benchmark: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-audit0-beta/target/release/gov memory benchmark --candidate ... --candidate ...
+select: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-audit0-beta/target/release/gov memory select <candidate>
+heldout: governance/tests/memory/heldout.yaml
+Held-out queries: 12
+By category: [{'category': 'exact_path', 'queries': 6, 'recall': 1.0}, {'category': 'lexical_literal', 'queries': 6, 'recall': 1.0}]
+Thresholds: {'min_recall_at_k': 0.8, 'min_mrr': 0.5, 'max_stale_hit_rate': 0.0, 'max_superseded_hit_rate': 0.0, 'min_queries': 5}
+
+--- D5 pinned embedder governs reindex ---
+Changing embedder pin triggers a full rebuild (pin_mismatch detection).
+The embedder is recorded in runtime meta and index manifest.
+for_query() checks live pin == policy pin (EMBEDDER_MISMATCH error).
+
+=== Regression Tests ===
+--- cargo test --lib ---
+test util::tests::glob_semantics ... ok
+test capabilities::host::tests::bad_json_and_protocol_mismatch_are_reported ... ok
+test srr::breakglass::tests::the_marking_record_has_exactly_one_reader ... ok
+test srr::breakglass::tests::a_named_section_6_effect_has_no_allow_list_exception ... ok
+test capabilities::host::tests::large_stdin_request_and_stderr_flood_are_drained ... ok
+test capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock ... ok
+test capabilities::host::tests::timeout_kills_child_promptly ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+
+--- cargo test --test certification ---
+test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
+test srr::the_floor_binds_every_ingress_and_only_owner_signed_break_glass_admits_a_below_floor_release ... ok
+test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
+test failure_injection::injected_failures_are_detected_and_recovered ... ok
+test brownfield::brownfield_adoption_end_to_end ... ok
+test repair::benchmark_records_evidence_and_selection_pins_through_decision has been running for over 60 seconds
+test repair::benchmark_records_evidence_and_selection_pins_through_decision ... ok
+
+test result: ok. 79 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 114.98s
+

@@ -1,0 +1,77 @@
+=== Doctor checks relevant to beta family ===
+Total checks: 29
+  [] framework.lock present: 
+  [] framework.lock schema: 
+  [] kernel payload integrity: 
+  [] lock matches kernel manifest: 
+  [] CLI/kernel compatibility: 
+  [] project overlay: 
+  [] policies: 
+  [] constitutional policy read from a verified kernel: 
+  [] policy precedence respected (no override weakens security/authority/gate floors): 
+  [] capability plugins governed (schema-valid, registered, pinned, authorised): 
+  [] framework.json in sync with repository contract: 
+  [] derived runtime: 
+  [] index freshness: 
+  [] secrets outside secret class: 
+  [] no secrets in index: 
+  [] semantic index consistent with pinned embedder/reranker: 
+  [] claims store present and intact: 
+  [] legacy governance mechanisms retired: 
+  [] authority unambiguous (no supersession conflicts / duplicate ids): 
+  [] graph integrity: 
+  [] no interrupted transactions: 
+  [] session claims: 
+  [] control state: 
+  [] human gates presented in chat: 
+  [] adapters current and conformant: 
+  [] governance suite green and current: 
+  [] native toolchains for detected ecosystems: 
+  [] records parse: 
+  [] .governance-runtime ignored by git: 
+
+=== C5 Code-structural memory - symbol extraction detail ===
+Symbol hits for "login": 1
+  file:product/auth/login.py path=product/auth/login.py section=login level=section
+
+=== C5 - verify language adapters resolved via capability registry ===
+Capability ecosystems:
+{
+  "ecosystems": [],
+  "count": 0
+}
+
+=== C6 Temporal - supersession/version lineage ===
+ create mode 100644 spec/decisions/D-002.yaml
+--- Verify supersession tracking ---
+D-001 query hits: 2
+  D-001 status=ACTIVE flags=['superseded_by:D-002']
+  D-001 status=ACTIVE flags=['superseded_by:D-002']
+
+D-002 query hits: 1
+  D-002 status=ACTIVE flags=[]
+
+=== C9 Working Memory - verify context packet with conflicting decisions ===
+Active decisions: 0
+Conflicting decisions: 1
+  D-001 title=Use bcrypt for password hashing flag=UNKNOWN_OR_CONFLICTING
+
+=== C9 - duplicate suppression, bounded size ===
+Chars: 18667
+Truncated slices: none
+Packet ID: CTX-TASK-001-79405c85
+Retrieved evidence items: 12
+Unique artifact IDs: 10
+Duplicate artifact IDs: 2
+
+=== C10 Capability Memory - environment/tool versions ===
+Registered tools: 16
+  TOOL-FS-001 filesystem type=CLI
+  TOOL-GIT-001 git type=CLI
+  TOOL-TEST-001 pytest-runner type=CLI
+  TOOL-AST-001 python-ast type=library
+  TOOL-CARGO-001 cargo-test type=CLI
+
+=== Adopter routes for R1 legacy retirement ===
+Adoption stage: 
+Status: 
