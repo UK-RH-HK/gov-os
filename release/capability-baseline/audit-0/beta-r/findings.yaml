@@ -1,0 +1,763 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0009
+findings:
+- id: A0-C1-01
+  capability:
+  - C1
+  - C2
+  - C3
+  - C4
+  - C5
+  - C6
+  - C7
+  - C8
+  - C9
+  - C10
+  - D1
+  - D2
+  - D3
+  - D4
+  - D5
+  - D6
+  - R1
+  - R2
+  - R3
+  bullet_source_lines: []
+  severity: MEDIUM
+  title: Derived contract views carry none of the 123 beta checklist bullets and map no evidence owner
+  statement: 'The compiled executable form (framework/contracts/governance-capability-acceptance.yaml, self-described as ''mechanically derived from the approved source headings'') carries only id/title/requirement_class/source_reference/family/status
+    for C1–C10, D1–D6 and R1–R3; none of the 123 owner-source checklist bullets (Contract v3 lines 211–890) is represented. The evidence map lists all 19 capabilities as evidence_class NOT_YET_MAPPED with
+    automated_checks: [], and the generated view carries no checklist items. `gov contract verify` nevertheless reports CONTRACT_SOURCE_BOUND. The runtime therefore cannot evaluate bullet-level acceptance
+    for this family, and no suite-to-contract evidence owner is declared for any beta capability even though governance families (index_freshness, graph_integrity, memory_retrieval_regression, recovery_rebuild,
+    fresh_agent_reconstruction, context_reproducibility, concurrency_claims) exercise parts of them. This is a derived-view finding; it records no gap in product behaviour for any single bullet.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:47 'Any semantic difference between source and compiled representation is a hard failure.'; :53-73 required fields per capability (evidence
+    classes, automated check/test IDs, freshness triggers, G0–G6 tiers, challenge IDs); frozen gate contract AC-10, AC-13.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-10
+  - AC-13
+  blocking: true
+  evidence:
+  - evidence/DERIVED-views-reconciliation.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 DERIVED-views-reconciliation.py
+  repair_direction: The compiled form, evidence map and generated view must carry every owner-source checklist item of C1–C10, D1–D6, R1–R3 with the Contract v3:53-73 fields (evidence classes, check IDs,
+    freshness triggers, tiers), and `gov contract verify` must fail while they do not.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C2-01
+  capability:
+  - C2
+  bullet_source_lines:
+  - 231
+  severity: MEDIUM
+  title: Graph integrity only counts orphans and cannot see stale or reversed relationships
+  statement: 'graph_integrity/D015 flag dangling targets and schema_invariants rejects unknown relation types, but: orphan records are only counted (D015 ok=true, severity info, no audit finding); an edge
+    to a SUPERSEDED record (F-0202 GOVERNED_BY D-0101) produces no finding; reversed-direction relationships (a requirement that IMPLEMENTS an architecture record, a requirement that TESTS a test obligation)
+    are accepted without any endpoint-type/direction validation. Cyclic supersession is caught only indirectly as a superseded-but-ACTIVE authority conflict.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:231 'Graph integrity checks detect orphan/stale/reversed/invalid relationships.'; :356 advanced challenge 'graph edges stale'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C2-relationship-graph.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C2-relationship-graph.py
+  repair_direction: Integrity checks must raise (not merely count) orphan relationships, detect relationships whose target is no longer current (superseded/retired/historical), and validate relationship
+    direction and endpoint types per relation type.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C3-01
+  capability:
+  - C3
+  bullet_source_lines:
+  - 241
+  severity: HIGH
+  title: Authority/namespace filters run after candidate truncation and after the reranker plugin sees the candidates
+  statement: 'retrieve() truncates each route to max(4k,20) candidates, fuses them, sends up to 24 fused candidates'' text to a pinned reranker plugin, and only then applies the authority (status/superseded_by/default_retrieval)
+    and namespace-role filters (runtime/src/retrieval/mod.rs:235-548). Demonstrated: with 40 superseded near-duplicates of an ACTIVE decision the ACTIVE decision is returned at no k (hits=[] at k=3,5,8;
+    excluded_by_authority=20/32); a product-spec-agent query sent 10 product-namespace chunks (source code outside its namespace) to the reranker plugin before they were filtered out.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:241 'Semantic namespace/authority filters apply before or during retrieval.'; framework §14 complex flow 'query ↓ authority + namespace
+    filter ↓ lexical + vector + graph/code candidates'; Contract v3:356 challenges 'wrong authority namespace', 'archive indexed as current', 'stale chunks'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C3-semantic-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C3-semantic-memory.py
+  repair_direction: Authority and namespace filters must be applied before candidate truncation and before any plugin receives candidate text, so excluded material can neither exhaust the candidate pool
+    nor cross a plugin boundary.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C3-02
+  capability:
+  - C3
+  - C4
+  - C7
+  bullet_source_lines:
+  - 239
+  - 249
+  - 274
+  severity: HIGH
+  title: List-valued and nested record content never enters lexical or semantic memory
+  statement: 'Record chunks are built from the title, top-level string fields of >=40 chars and the body (runtime/src/records.rs:214-226; indexer.rs:516-522). List-valued and nested fields are never chunked,
+    FTS-indexed or embedded: scenario given/when/then, requirement acceptance_criteria, decision options/consequences, report discoveries/risks/lessons, and everything a worker returns (nested under a handoff''s
+    `return`). Record::text() (records.rs:153-212), which would include several of these, has no caller. Demonstrated: SCN-0001 has a single chunk (its title); an acceptance-criterion phrase and a scenario
+    step are not found by the lexical store; a semantic query made of the scenario''s own steps misses SCN-0001; a failed worker''s discoveries/risks are in no chunk and an exact query for them returns
+    nothing.'
+  normative_source: framework §11.3 (semantic memory for requirements, specifications, failures), §11.4 (literal phrases); Governance_OS_Capability_Acceptance_Contract_v3.md:239, :249, :274; V3 'expected
+    retrieval results' (:1045).
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-7
+  blocking: true
+  evidence:
+  - evidence/C3-semantic-memory.out
+  - evidence/C4-lexical-memory.out
+  - evidence/C7-episodic-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C3-semantic-memory.py && python3 C4-lexical-memory.py && python3 C7-episodic-memory.py
+  repair_direction: All governed record content, including list-valued and nested fields, must be represented in lexical and semantic memory with section-level provenance.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C4-01
+  capability:
+  - C4
+  - D3
+  bullet_source_lines:
+  - 247
+  - 248
+  - 249
+  - 325
+  severity: HIGH
+  title: Code outside recognised units (after the 15-line head) is never indexed
+  statement: 'chunk_code emits a document chunk with the first 15 lines, a header chunk with the lines before the first recognised unit, and one section per top-level unit (runtime/src/memory/chunking.rs:191-266).
+    Lines between units and after the last unit are in no chunk, hence absent from FTS and vectors. Demonstrated: 7 non-empty lines of a 40-line Flask module (route decorators between functions, a module
+    constant, the __main__ block) and 5 non-empty lines of a 24-line express module (router.get route registration, export) are in no chunk; tokens that occur only there (''SENTINEL'', ''8088'', ''/api/orders/:id'')
+    are unfindable by the router and by the lexical store.'
+  normative_source: framework §11.4 lexical memory for 'exact terms; identifiers; ... error strings; API names; configuration keys; literal phrases'; Governance_OS_Capability_Acceptance_Contract_v3.md:244-249;
+    :356 'deliberately missing index coverage'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-7
+  blocking: true
+  evidence:
+  - evidence/C4-lexical-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C4-lexical-memory.py
+  repair_direction: Every non-empty line of an indexed code file must be held by at least one chunk (module-level statements, decorators and trailing blocks included).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C4-02
+  capability:
+  - C4
+  - D2
+  bullet_source_lines:
+  - 247
+  severity: LOW
+  title: Identifier-shaped literals (error codes) are matched by OR-of-subtokens, returning near-miss documents
+  statement: classify() returns ['symbol','lexical'] for any bare identifier before its own literal-like branch (runtime/src/retrieval/mod.rs:116-118), so ERR_LEDGER_DRIFT_4712 (which exists nowhere) returns
+    the ERR_LEDGER_DRIFT_4711 runbook first — contrary to the function's stated intent at lines 119-121 ('exact routes only, never an OR-of-subtokens lexical match'). Recall for existing codes is preserved.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:247 'error strings'; framework §14 'exact text/error? → lexical/FTS/BM25'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/C4-lexical-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C4-lexical-memory.py
+  repair_direction: Identifier-shaped literals (error codes, keys) must be matched exactly or ranked exact-first, with non-matches reported as such.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C5-01
+  capability:
+  - C5
+  bullet_source_lines:
+  - 254
+  - 256
+  - 257
+  severity: HIGH
+  title: Route registrations, DB models and inheritance/implementation relations are not represented
+  statement: Neither the built-in extractor (runtime/src/code_intelligence/generic.rs) nor the shipped python-ast plugin extracts HTTP route registrations (Flask @app.route/@app.post, express router.get,
+    Go http.HandleFunc demonstrated), recognises database models (SQLAlchemy model with __tablename__), or records inheritance/implementation relationships (Python bases, TS implements/extends, Rust impl
+    Trait for Type); bases survive only inside a signature string. Interfaces/traits are captured as symbols.
+  normative_source: framework §11.5 'route registrations; database models; ... inheritance; ... interfaces'; Governance_OS_Capability_Acceptance_Contract_v3.md:254, :256, :257; V3 'expected code symbols'
+    (:1044).
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C5-code-structural-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C5-code-structural-memory.py
+  repair_direction: Code-structural memory must represent route registrations, database models and inheritance/implementation relations for the languages in scope (built-in or via registered adapters).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C5-02
+  capability:
+  - C5
+  bullet_source_lines:
+  - 252
+  - 258
+  severity: MEDIUM
+  title: AST-equivalent fidelity only for Python; test-coverage edges only when imports happen to resolve
+  statement: Only Python has an AST adapter (optional plugin); all other languages use line-regex heuristics that produce false symbols (a class declared inside a docstring was extracted) and no LSP/SCIP
+    adapter ships (rust-analyzer is registered 'proposed'). TESTS edges are derived only when a test file's import resolves; resolution tries the file's ancestors, the product root and relative paths, so
+    a tests/ file importing a src/-layout package (and Rust integration tests importing the crate) gets no TESTS edge (runtime/src/memory/indexer.rs:85-212, 653-657).
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:252 'AST/LSP/SCIP or equivalent', :258 'test-coverage relationships'; framework §11.5.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C5-code-structural-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C5-code-structural-memory.py
+  repair_direction: Structural extraction for each in-scope language must be AST/LSP/SCIP-equivalent (no symbols from comments/strings), and test→code relationships must be derived for standard layouts
+    (src/ packages, crate imports).
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C6-01
+  capability:
+  - C6
+  bullet_source_lines: []
+  severity: INFO
+  title: Ungoverned commit history is not ingested into temporal memory (recommendation)
+  statement: The runtime never reads git log/diff/blame; for changes made outside CIT/task close the fabric knows only the new content hash and the repo commit at index time, so 'why did X change' is answerable
+    only from raw Git. Framework §11.6 defines temporal memory as 'Git and version lineage', so this is recorded as a stronger-assurance recommendation, not as a gap of any C6 bullet.
+  normative_source: 'framework §11.6 ''Temporal memory: Git and version lineage''.'
+  provenance_class: VERIFIER-HARDENING
+  lifecycle: P2
+  falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/C6-temporal-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C6-temporal-memory.py
+  repair_direction: Consider ingesting commit metadata so temporal questions about ungoverned changes are answerable through the fabric.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C8-01
+  capability:
+  - C8
+  bullet_source_lines:
+  - 280
+  - 283
+  severity: MEDIUM
+  title: No durable record of ad-hoc retrieval misses or tool failures
+  statement: An ad-hoc retrieval miss leaves only retrieval_log rows in the derived state.db (wiped by the next full rebuild); held-out misses survive only as failed IDs inside an audit record's family
+    detail (no memory-quality event, root cause or link to a new held-out test). A code_intel adapter crash is recorded only in the rebuild report and runtime meta (overwritten to [] by the next rebuild);
+    embedder bad output is a transient error; failing tool health checks are not persisted. No spec/ record mentions any of them.
+  normative_source: 'framework §11.8 ''Structured records of: ... retrieval misses; ... tool failures'', §18 ''A retrieval failure creates an explicit memory-quality event''; Governance_OS_Capability_Acceptance_Contract_v3.md:280,
+    :283.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C8-failure-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C8-failure-memory.py
+  repair_direction: Retrieval misses and tool failures must produce durable, structured, kind-distinguishable failure records that survive memory rebuilds.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C9-01
+  capability:
+  - C9
+  bullet_source_lines:
+  - 291
+  severity: MEDIUM
+  title: Duplicate suppression is per-artefact only; verbatim copies are returned twice
+  statement: 'Duplicate suppression is a cap of two slices per artefact (runtime/src/retrieval/mod.rs:513-517). A verbatim copy of a document under another path is returned alongside the original: 4 of
+    10 hits were two identical excerpts.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:291 'duplicate suppression'; framework §14 flow 'deduplication'; :356 'renamed files duplicated'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C9-context-packet.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C9-context-packet.py
+  repair_direction: Retrieval and context compilation must suppress content-level duplicates across artefacts.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C9-02
+  capability:
+  - C9
+  bullet_source_lines: []
+  severity: INFO
+  title: Packet omits the CONTEXT_POLICY field 'semantic_candidates' (product self-reports LOW)
+  statement: CONTEXT_POLICY.retrieved_fields lists semantic_candidates; the packet has no such key (semantic-route hits are inside ranked_evidence with route provenance), and the product's own context_reproducibility
+    family reports this at LOW on every audit. Not a gap of the Contract v3 bullet.
+  normative_source: framework §15.2 'semantic candidates'; framework/policies/CONTEXT_POLICY.yaml retrieved_fields.
+  provenance_class: IMPLEMENTATION-CHOICE
+  lifecycle: P2
+  falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/C9-context-packet.out
+  - evidence/C8-failure-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C9-context-packet.py
+  repair_direction: Align the packet and CONTEXT_POLICY.retrieved_fields.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-C10-01
+  capability:
+  - C10
+  bullet_source_lines:
+  - 297
+  - 298
+  - 300
+  - 301
+  severity: MEDIUM
+  title: Capability memory holds no A2A agents, dependencies, credential status or observed tool versions
+  statement: No A2A agent is representable (tool type A2A refused by TOOL_POLICY.tool_types; handoffs only to static kernel roles); declared dependencies (pyproject/package.json) are held nowhere and root
+    manifests are not indexed by the default path map; only a declared credential_scope string exists (no credential status); tool versions are declared ('system', 'stdlib') and health checks keep exit
+    codes only.
+  normative_source: framework §11.10 'available tools; MCP servers; A2A agents; packages/dependencies; model providers; credentials/permissions status; environment/tool versions'; Governance_OS_Capability_Acceptance_Contract_v3.md:297,
+    :298, :300, :301.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/C10-capability-memory.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C10-capability-memory.py
+  repair_direction: Capability memory must hold available A2A agents, declared packages/dependencies, credential availability status and observed environment/tool versions.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D1-01
+  capability:
+  - D1
+  - C2
+  bullet_source_lines:
+  - 309
+  severity: MEDIUM
+  title: Incremental builds leave stale edges owned by unchanged files
+  statement: Incremental indexing re-derives facts only for changed files; CALLS/TESTS edges and call references owned by unchanged files are not re-evaluated. After compute_total was renamed in models.py,
+    tests/test_models.py kept its CALLS edge to models.py under the incremental build while a full build dropped it (incremental != full). The edge still targets an existing file, so dangling-edge checks
+    do not notice.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:309 'Changed artefacts invalidate affected chunks/nodes/symbols.'; framework §13 'invalidate affected chunks/nodes/symbols'; :356 'graph
+    edges stale'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/D1-incremental-freshness.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D1-incremental-freshness.py
+  repair_direction: Incremental indexing must invalidate derived facts in other artefacts that depend on a changed artefact, so incremental and full builds agree.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D1-02
+  capability:
+  - D1
+  - R3
+  bullet_source_lines:
+  - 309
+  - 888
+  severity: HIGH
+  title: Path-map reclassification is not applied incrementally and freshness then reports fresh (archive indexed as current)
+  statement: 'The incremental path skips files whose content hash is unchanged (runtime/src/memory/indexer.rs:424-433) and freshness compares only content hashes and pins (manifest.rs:117-214), so a REPOSITORY_CONTRACT
+    reclassification never reaches unchanged files. Demonstrated: docs/** reclassified historical/default_retrieval=false; after the incremental rebuild (the remediation the product itself prescribes) freshness
+    reports fresh while docs/runbook.md stays narrative/ACTIVE/default_retrieval=1 and is returned as current; only a full rebuild corrects it. (A sensitivity-policy restriction is applied incrementally.)'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:97-111 ('project path map' is an evidence-freshness input), :309; framework §71 'Historical/superseded artefacts are excluded from
+    default current-state retrieval'; :356 'archive indexed as current'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-10
+  blocking: true
+  evidence:
+  - evidence/D1-incremental-freshness.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D1-incremental-freshness.py
+  repair_direction: A path-map change must invalidate and re-derive the classification of every affected artefact, and freshness must not report fresh until it has.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D1-03
+  capability:
+  - D1
+  - R3
+  - K2
+  bullet_source_lines:
+  - 309
+  - 888
+  severity: HIGH
+  title: CIT-E refreshes and verifies the index with the pre-mutation cached policy/path map
+  statement: 'cit::execute applies the mutation manifest and then runs the index refresh and the index_freshness/graph_integrity verification with the same Project value whose policies/contract were cached
+    (OnceCell) before the mutation; it never calls invalidate() (runtime/src/cit/mod.rs:813-1040; project.rs:30-36, 237-243). `gov memory select` does invalidate (benchmark.rs:183-185). Demonstrated: (a)
+    a CIT pinning an unavailable embedder is COMMITTED with verification ok, after which freshness reports a pin mismatch, semantic retrieval fails EMBEDDER_MISMATCH and the next CIT cannot be proposed;
+    (b) a CIT reclassifying docs/** as historical is COMMITTED while the index keeps the old classification and returns the archived runbook as current. K2 is owned by another family; the D1 side (index
+    refresh/invalidation inside a governed change) is graded here.'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:309, and K2 bullets :634-636 'memory/index refresh; verification; commit or rollback/block atomically'; framework §47.2; frozen gate
+    contract AC-16 'K2 ↔ D1 ↔ W6'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  - AC-16
+  blocking: true
+  evidence:
+  - evidence/X-K2-D1-W6-interactions.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 X-K2-D1-W6-interactions.py
+  repair_direction: CIT-E must refresh and verify the index under the post-mutation policy and path map, and roll back when the refreshed index is incompatible or cannot be verified.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D1-04
+  capability:
+  - D1
+  bullet_source_lines: []
+  severity: MEDIUM
+  title: Green memory/index evidence is not invalidated by source, spec or index-manifest changes
+  statement: 'Evidence currency for the governance-suite families that own beta evidence is keyed by verification::inputs_hash over governance/kernel, governance/project, governance/tests, spec/decisions
+    and governance/framework.lock only (runtime/src/verification/mod.rs:54-73). Demonstrated: deleting a source file that two held-out queries expect (recall 1.0 -> 0.905, HQ-008/HQ-011 fail on re-run),
+    rewriting a requirement, or changing the index manifest leaves the green audit record current. Retrieval-profile, path-map and held-out-set changes do invalidate it. (O4 is owned by another family;
+    the currency of beta capability evidence is recorded here.)'
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:97-111 ('relevant source files', 'authoritative spec/decision', 'relevant index manifest'); frozen gate contract AC-10 'Changing a
+    relevant implementation/policy/spec/tool/model/index/path-map input is shown to invalidate prior green evidence rather than leave it green.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-10
+  blocking: true
+  evidence:
+  - evidence/FRESH-evidence-invalidation.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 FRESH-evidence-invalidation.py
+  repair_direction: Green evidence for the memory/index families must go stale when relevant sources, authoritative specs or the index manifest change.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D2-01
+  capability:
+  - D2
+  bullet_source_lines:
+  - 316
+  severity: LOW
+  title: Exact-ID lookups do not rank the known record first
+  statement: Exact-ID queries run structured + lexical routes fused by RRF; the known record's first chunk ties with the top lexical chunk (1/61) and the tie is broken by chunk_id order, so AUD-0001 (which
+    lists many IDs) outranks REQ-0001, PRJ-0001, SCN-0001 and EXP-0001. The record is still returned (rank 2).
+  normative_source: framework §14 'known ID/path? → structured lookup'; Governance_OS_Capability_Acceptance_Contract_v3.md:316.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/D2-retrieval-router.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D2-retrieval-router.py
+  repair_direction: An exact structured match for a known ID/path must rank first.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D2-02
+  capability:
+  - D2
+  - C4
+  bullet_source_lines:
+  - 246
+  - 318
+  severity: MEDIUM
+  title: Bare filename queries are routed to the symbol route only and return nothing
+  statement: A bare filename such as 'runbook.md' or 'ledger.rs' matches symbol_rx as a dotted qualified name and is classified ['symbol'] only (no path/lexical route; runtime/src/retrieval/mod.rs:112-162),
+    returning zero hits although the lexical store holds the file.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:246 'filenames'; framework §11.4 'filenames', §14 'known ID/path? → structured lookup'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/C4-lexical-memory.out
+  - evidence/D2-retrieval-router.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 C4-lexical-memory.py && python3 D2-retrieval-router.py
+  repair_direction: Filename-shaped queries must reach a route that resolves file names.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D2-03
+  capability:
+  - D2
+  bullet_source_lines:
+  - 319
+  severity: MEDIUM
+  title: Graph-route answers are buried by fusion; code-impact questions never reach the graph
+  statement: Impact questions reach the graph route only when they contain a record-ID token and a fixed trigger word; the router always adds lexical+semantic for questions of 4+ words and fuses with equal-weight
+    RRF. For 'what depends on REQ-0001' the first graph hit is rank 28 of 30 (27 kernel-schema lexical/semantic hits first) and the dependant F-0001 is absent from the top 30, while --route graph alone
+    returns it. 'What breaks if compute_total changes' never reaches the graph route.
+  normative_source: framework §14 'dependency/impact? → graph traversal'; Governance_OS_Capability_Acceptance_Contract_v3.md:319.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/D2-retrieval-router.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D2-retrieval-router.py
+  repair_direction: The router must deliver graph-route answers for dependency/impact questions (including code entities) instead of letting fused lexical/semantic noise displace them.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D3-01
+  capability:
+  - D3
+  bullet_source_lines:
+  - 325
+  severity: MEDIUM
+  title: Methods inside classes are not chunk units; symbol lookups return the file header
+  statement: Code chunks are one section per top-level unit (generic.rs:284-286 keeps units only for parent-less symbols; chunking.rs:238-264) with size-based children; methods are never their own chunk.
+    chunk_for falls back to the first chunk when no chunk carries the qualname (retrieval/mod.rs:192-207), so a symbol lookup for SettlementPipeline.reconcile_quarantine returns the file's 15-line header.
+  normative_source: framework §14.1 'For code, prefer structural units such as module/class/function/symbol/reference over arbitrary token windows'; Governance_OS_Capability_Acceptance_Contract_v3.md:325
+    'code file → module/class → function/symbol'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/D3-hierarchical-retrieval.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D3-hierarchical-retrieval.py
+  repair_direction: Code must be chunked hierarchically down to function/method units, and symbol lookups must return the unit's own slice.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D4-01
+  capability:
+  - D4
+  - D1
+  - D5
+  bullet_source_lines:
+  - 331
+  - 312
+  severity: HIGH
+  title: The embedding runtime/model artefact is neither separately identified nor bound; weight changes go undetected
+  statement: 'The index manifest records EmbedSpec {id, version, dimensions, source} taken from policy, and plugin registration binds only the resolvable command files. Demonstrated: changing the weights
+    file behind a registered embed plugin (same id, version and adapter bytes) is invisible — freshness fresh, D025/D028 ok, semantic queries run against vectors produced with the old weights, and an incremental
+    rebuild does not re-embed.'
+  normative_source: 'framework §14.2 ''The framework must distinguish: embedding model; inference runtime; ...''; §14.3 ''The chosen embedding and reranker versions are pinned in the memory/index manifest'';
+    Governance_OS_Capability_Acceptance_Contract_v3.md:331, :312; frozen gate contract §9.1 ''pluggable, separately identifiable embedder/reranker/runtime components (D4)''.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-7
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/D4-component-separation.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D4-component-separation.py
+  repair_direction: The model artefact and inference runtime used for embedding must be separately identified and content-bound in the index manifest, and any change must invalidate the semantic index.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D5-01
+  capability:
+  - D5
+  - D1
+  bullet_source_lines:
+  - 347
+  - 312
+  severity: HIGH
+  title: Pinned embedder/reranker revisions are strings not bound to what executes
+  statement: The embedder resolves its plugin by id only (runtime/src/memory/embedder.rs:125), so a descriptor at version 2 silently serves a pin of version 1; the reranker's recorded revision is MEMORY_POLICY.reranker.version
+    ('0'), not the plugin's (1); select hard-codes version '1' for plugin candidates (benchmark.rs:30); a registered plugin invoked as `python3 -m module` (the form the shipped templates document) records
+    implementation_files [] and implementation_sha256 null.
+  normative_source: framework §14.3 pinned versions; Governance_OS_Capability_Acceptance_Contract_v3.md:347 'selected embedder/reranker revisions are pinned'; frozen gate contract §9.1.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-7
+  blocking: true
+  evidence:
+  - evidence/D5-model-selection.out
+  - evidence/D4-component-separation.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D5-model-selection.py
+  repair_direction: The pin must bind the actual implementation/model revision used at index and query time and fail closed on any mismatch.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D5-02
+  capability:
+  - D5
+  bullet_source_lines:
+  - 348
+  severity: HIGH
+  title: Profile changes are not bound to evidence, regression or the radius-appropriate gate
+  statement: '`gov memory select` pinned an unbenchmarked candidate (builtin:8, no research record) and wrote an AUTHORITATIVE decision whose rationale reads ''selected on held-out evidence'' with derived_from
+    []; the switch runs and records no held-out regression; select writes governance/project/PROJECT_POLICY.yaml directly under an R3 decision with no human gate and no CIT (a CIT touching governance paths
+    is R5 with a human gate; CHANGE_POLICY.auto_approve_max_radius is R1); a pin edited directly in the overlay (no decision) is accepted after a rebuild and gov audit raises nothing. Reindex is enforced
+    (EMBEDDER_MISMATCH until a full rebuild) and select is L3-gated.'
+  normative_source: framework §14.3 'may be changed only through a measured migration with re-indexing and regression testing'; Governance_OS_Capability_Acceptance_Contract_v3.md:348; framework/policies/CHANGE_POLICY.yaml
+    auto_approve_max_radius / radius_rules.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-7
+  blocking: true
+  evidence:
+  - evidence/D5-model-selection.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D5-model-selection.py
+  repair_direction: Changing a retrieval profile must require benchmark evidence for the chosen candidate, run and record the held-out regression after re-indexing, pass the change-control gate for its
+    radius, and detect ungoverned pin changes; decision records must not assert evidence that was not supplied.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D6-01
+  capability:
+  - D6
+  bullet_source_lines:
+  - 352
+  severity: MEDIUM
+  title: Claims and emergency-control state live in the directory the product classifies as derived
+  statement: claims.db, control.json (FREEZE_WRITES/PAUSE) and CIT rollback snapshots live in .governance-runtime/, which the product's own REPOSITORY_CONTRACT classifies `derived` and whose documentation
+    states 'Everything in `.governance-runtime/` is derived and rebuildable' (docs/ARCHITECTURE.md:76). Deleting that directory and rebuilding lost the active claim (another session then claimed the task)
+    and lifted FREEZE_WRITES. `gov rebuild-memory` itself preserves them.
+  normative_source: Governance_OS_Capability_Acceptance_Contract_v3.md:352 'Fresh rebuild preserves authoritative structured state and claims where required.'; framework §19, §81; :356 'deleted indexes'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/D6-rebuild-guarantee.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D6-rebuild-guarantee.py
+  repair_direction: Non-rebuildable operational state (claims, emergency control, rollback snapshots) must not live in or be classified as derived state, or must survive its deletion.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-D6-02
+  capability:
+  - D6
+  bullet_source_lines:
+  - 352
+  severity: LOW
+  title: The plugin registry lives under governance/generated/ and is lost when generated views are deleted
+  statement: plugin-registry.json (TOOL_POLICY.plugins.registry_path, 'the only proof of registration') sits under governance/generated/**, classified `generated`; deleting generated views per framework
+    §19 drops the registration and no rebuild recreates it (Git restore does). A tampered implementation still fails closed because registration also writes the pin into the descriptor.
+  normative_source: framework §19 'delete generated views'; Governance_OS_Capability_Acceptance_Contract_v3.md:352.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/D6-rebuild-guarantee.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 D6-rebuild-guarantee.py
+  repair_direction: Registration state must not be stored as a generated (deletable) view.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-R1-01
+  capability:
+  - R1
+  - R2
+  bullet_source_lines:
+  - 876
+  - 883
+  severity: MEDIUM
+  title: 'Legacy extraction is cue-word gated: skills, research, evidence and cue-less facts are lost on retirement'
+  statement: A8 extracts only strings containing fixed decision/lesson cue phrases (runtime/src/adopt.rs:958-975, 1057-1060) into PROVISIONAL decisions/lessons, then retires the store. Four auditor-added
+    chat entries — a research measurement, a release procedure (skill), an evidence reference and a unique cue-less fact (staging host requiring mTLS) — produced no record.
+  normative_source: 'framework §69 ''extract useful: decisions, lessons, skills, evidence, research'', §70 ''export any unique durable knowledge'', §79.1; Governance_OS_Capability_Acceptance_Contract_v3.md:876,
+    :883.'
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/R1-R2-legacy-and-chat-retirement.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 R1-R2-legacy-and-chat-retirement.py
+  repair_direction: Legacy extraction must cover skills, research, evidence and other unique durable knowledge (or surface everything not extracted for review) before a store is retired.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-R1-02
+  capability:
+  - R1
+  - R2
+  bullet_source_lines:
+  - 879
+  - 884
+  severity: HIGH
+  title: No dependency proof before retirement; A6 rewrites live code to depend on archived legacy rules
+  statement: No stage proves that active code/config no longer depends on retired mechanisms. A6 reference rewriting changed active src/app/rules_loader.py from '.cursorrules' to 'archive/governance/legacy-rules/.cursorrules'
+    (live code now reads archived legacy rules) and A7 accepted the migration; A8 retired memory/chat_history.sqlite while active code still referenced it (reference left dangling); A11 and D013 report
+    nothing. Legacy detection checks only legacy files in the active tree and markdown links.
+  normative_source: framework §69 'validate no active dependency remains', §70 'prove no active functionality depends on it'; Governance_OS_Capability_Acceptance_Contract_v3.md:879, :884; :197 Repo B 'hidden
+    cross-references'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria:
+  - AC-3
+  blocking: true
+  evidence:
+  - evidence/R1-R2-legacy-and-chat-retirement.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 R1-R2-legacy-and-chat-retirement.py
+  repair_direction: Retirement must be preceded by a dependency proof over code, configuration and docs; retirement must be refused or gated while active references exist, and migration must not rewrite
+    active references into archived legacy material.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-R2-01
+  capability:
+  - R2
+  bullet_source_lines:
+  - 885
+  severity: LOW
+  title: Chat-store retirement is not executed as a CIT-E transaction
+  statement: A8 retires chat stores by git mv without a CIT record or rollback snapshot; index refresh (A9) and independent regression (A10) follow as separate adoption stages.
+  normative_source: framework §70 'remove it through CIT-E; update memory indexes; run regression tests'; Governance_OS_Capability_Acceptance_Contract_v3.md:885.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/R1-R2-legacy-and-chat-retirement.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 R1-R2-legacy-and-chat-retirement.py
+  repair_direction: Store retirement should be a CIT-E transaction with rollback, followed by index refresh and regression.
+  owner_decision_required: false
+  owner_decision_reason: null
+- id: A0-R3-01
+  capability:
+  - R3
+  bullet_source_lines:
+  - 888
+  severity: LOW
+  title: Archived material cannot be explicitly requested through the CLI
+  statement: RetrieveOptions.include_archive exists (runtime/src/retrieval/mod.rs:14-25) but `gov memory query` exposes only --include-historical; archived (default_retrieval=false) material is unreachable
+    even on explicit request.
+  normative_source: framework §71 'excluded from default current-state retrieval unless explicitly requested'.
+  provenance_class: ORIGINAL-NORMATIVE
+  lifecycle: P2
+  falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+  blocks_acceptance_criteria: []
+  blocking: false
+  evidence:
+  - evidence/R3-archive-policy.out
+  reproduction: cd release/capability-baseline/audit-0/beta-r/evidence && PROBE_TMP=$(mktemp -d) python3 R3-archive-policy.py
+  repair_direction: An explicit request path for archived material must exist on the agent-facing surface.
+  owner_decision_required: false
+  owner_decision_reason: null

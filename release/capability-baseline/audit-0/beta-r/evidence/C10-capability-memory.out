@@ -1,0 +1,94 @@
+# command: PROBE_TMP=<scratch> python3 C10-capability-memory.py   (run 2026-09-18T21:12:06Z)
+$ gov --role orchestrator init --name orders-ledger --alias c10 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+C10-b1 tools
+====================================================================================================
+$ gov --role orchestrator tools registry  -> exit 0 ok=True
+registry tools: [('TOOL-FS-001', 'CLI', 'active', 'builtin'), ('TOOL-GIT-001', 'CLI', 'active', 'system'), ('TOOL-TEST-001', 'CLI', 'active', 'system'), ('TOOL-AST-001', 'library', 'active', 'stdlib'), ('TOOL-CARGO-001', 'CLI', 'active', 'system'), ('TOOL-CARGO-002', 'CLI', 'active', 'system'), ('TOOL-CARGO-003', 'CLI', 'active', 'system'), ('TOOL-LSP-RUST-001', 'CLI', 'proposed', 'system'), ('TOOL-NPM-001', 'CLI', 'active', 'system'), ('TOOL-GO-001', 'CLI', 'active', 'system'), ('TOOL-CMAKE-001', 'CLI', 'active', 'system'), ('TOOL-MAKE-001', 'CLI', 'active', 'system'), ('TOOL-MAVEN-001', 'CLI', 'active', 'system'), ('TOOL-SQLITE-001', 'library', 'active', 'stdlib'), ('TOOL-SECRETS-001', 'library', 'active', 'builtin'), ('TOOL-WEB-001', 'MCP', 'proposed', '0'), ('TOOL-RUFF-001', 'CLI', 'active', '0.6.9')]
+$ gov --role orchestrator tools resolve --capability lint  -> exit 0 ok=True
+tools resolve lint: {'project_languages': ['javascript', 'python', 'typescript'], 'tools': [{'tool_id': 'TOOL-NPM-001', 'name': 'npm-test', 'type': 'CLI', 'version': 'system', 'languages': ['javascript', 'typescript'], 'available': True}, {'tool_id': 'TOOL-RUFF-001', 'name': 'ruff', 'type': 'CLI', 'version': '0.6.9', 'languages': ['python'], 'available': False}], 'capability_gap': False, 'reason': ''}
+$ gov --role orchestrator tools resolve --capability deploy_k8s  -> exit 0 ok=True
+tools resolve deploy_k8s: {'tools': [], 'capability_gap': True, 'reason': 'no registered tool provides this capability'}
+[PASS] C10-b1: tools are registered (kernel + project), resolved per role/language, and gaps reported
+
+====================================================================================================
+C10-b2 MCP servers
+====================================================================================================
+$ gov --role orchestrator tools registry  -> exit 0 ok=True
+registry mcp_servers: [('MCP-REPO-001', 'planned'), ('MCP-DOCS-001', 'active')]
+role exposure (orchestrator) mcp: ['MCP-DOCS-001']
+$ gov --role orchestrator tools resolve --capability doc_search  -> exit 0 ok=True
+resolve doc_search -> mcp: [{'mcp_id': 'MCP-DOCS-001', 'name': 'docs-search'}]
+$ gov --role orchestrator mcp serve  -> exit 1 ok=False error={"code": "MCP_NOT_IMPLEMENTED", "message": "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)", "details": null}
+gov mcp serve -> MCP_NOT_IMPLEMENTED
+[PASS] C10-b2: MCP servers (kernel + project) are held in capability memory with status and per-role exposure
+
+====================================================================================================
+C10-b3 A2A agents
+====================================================================================================
+kernel role roster (id, level, tier): [('orchestrator', 'L4', 'T3'), ('product-spec-agent', 'L2', 'T2'), ('research-agent', 'L1', 'T2'), ('architecture-agent', 'L2', 'T3'), ('ux-agent', 'L1', 'T2'), ('frontend-engineer', 'L1', 'T2'), ('backend-engineer', 'L1', 'T2'), ('data-engineer', 'L1', 'T2')] ...
+$ gov --role orchestrator tools install --descriptor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/final2/c10-a2a.json  -> exit 2 ok=False error={"code": "USAGE", "message": "tool type 'A2A' is not in TOOL_POLICY.tool_types [\"MCP\", \"CLI\", \"API\", \"library\"]", "details": null}
+register an A2A agent as a capability -> False USAGE tool type 'A2A' is not in TOOL_POLICY.tool_types ["MCP", "CLI", "API", "library"]
+any A2A entries in the tool/MCP registry: []
+$ gov --role orchestrator handoff create --to-role external-risk-agent --task TASK-0001  -> exit 1 ok=False error={"code": "UNKNOWN_ROLE", "message": "to_role 'external-risk-agent' is not a kernel role", "details": null}
+handoff to a non-kernel agent -> UNKNOWN_ROLE
+[FAIL] C10-b3: available A2A agents (identity, endpoint/transport, capabilities, availability) are held in capability memory
+
+====================================================================================================
+C10-b4 packages/dependencies
+====================================================================================================
+$ gov --role orchestrator capabilities ecosystems  -> exit 0 ok=True
+gov capabilities ecosystems: [('python', 'pyproject.toml', True), ('node-npm', 'package.json', True)]
+runtime capability memory (ecosystems): [('{"ecosystems":[{"id":"python","manifest":"pyproject.toml","dir":"","languages":["python"],"required_binary":"python3","available":true,"build":null,"test":{"command":["python3","-m","pytest","-q"],"available":true},"lint":{"command":["python3","-m","pyflakes","."],"available":true},"format":null,"metadata":null,"gap":null},{"id":"node-npm","manifest":"package.json","dir":"","languages":["javasc
+dependency manifests in the index: []
+$ gov --role orchestrator memory query 'which version of sqlalchemy do we depend on' --k 5  -> exit 0 ok=True
+query sqlalchemy dependency -> ['file:governance/kernel/policies/MODEL_ROUTING_POLICY.yaml', 'file:src/app/models.py', 'RES-0101', 'file:governance/kernel/schemas/readiness-dimensions.schema.json', 'file:governance/kernel/schemas/policy-TEST_POLICY.schema.json']
+[PASS] C10-b4-ecosystems: package ecosystems (manifests + native tool availability) are detected
+[FAIL] C10-b4-dependencies: declared packages/dependencies (flask, sqlalchemy==2.0.30, express, zod) are held in capability memory or retrievable
+
+====================================================================================================
+C10-b5 model providers
+====================================================================================================
+$ gov --role routine-documentation route --class documentation  -> exit 0 ok=True
+route documentation (acting role routine-documentation, tier T1) candidates: [('prov-b', 'mid', 'T2'), ('prov-a', 'big', 'T3')] chosen: {'provider': 'prov-b', 'model': 'mid', 'tier': 'T2', 'max_reasoning': 'high', 'cost_per_1k_in': 0.0, 'cost_per_1k_out': 0.0}
+[PASS] C10-b5: model providers and their models/tiers are held and used for routing
+
+====================================================================================================
+C10-b6 permission / credential status
+====================================================================================================
+$ gov --role orchestrator tools registry  -> exit 0 ok=True
+role exposure backend-engineer permissions: ['READ_REPO', 'WRITE_REPO_SCOPED', 'RUN_TESTS', 'PACKAGE_INSTALL']
+$ gov --role orchestrator tools registry  -> exit 0 ok=True
+TOOL-GW-001 as recorded: {'credential_scope': 'env:GATEWAY_API_KEY', 'status': 'active', 'required_permission_classes': ['NETWORK_READ']}
+credential-status fields anywhere in the registry: []
+$ gov --role orchestrator tools resolve --capability gateway_call --role backend-engineer  -> exit 0 ok=True
+resolve gateway_call for backend-engineer (no NETWORK_READ): {'tools': [], 'capability_gap': True, 'reason': 'role lacks approval or permission classes for the available tool'}
+[PASS] C10-b6-permissions: permission status per role is held and enforced in resolution
+[FAIL] C10-b6-credentials: credential status (present/absent/expired for a declared credential scope) is held in capability memory
+
+====================================================================================================
+C10-b7 environment / tool versions
+====================================================================================================
+$ gov --role orchestrator version  -> exit 0 ok=True
+gov version: {'framework': 'agentic-engineering-os', 'version': '4.1.5', 'cli_version': '4.1.5', 'runtime_version': '4.1.5', 'index_version': '4.1.5-idx3'}
+$ gov --role orchestrator tools health  -> exit 0 ok=True
+tools health sample: [{'tool_id': 'TOOL-FS-001', 'ok': True, 'kind': 'builtin'}, {'tool_id': 'TOOL-GIT-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}, {'tool_id': 'TOOL-TEST-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}, {'tool_id': 'TOOL-AST-001', 'ok': True, 'kind': 'builtin'}]
+registry versions (declared): {'TOOL-FS-001': 'builtin', 'TOOL-GIT-001': 'system', 'TOOL-TEST-001': 'system', 'TOOL-AST-001': 'stdlib', 'TOOL-CARGO-001': 'system', 'TOOL-CARGO-002': 'system', 'TOOL-CARGO-003': 'system', 'TOOL-LSP-RUST-001': 'system', 'TOOL-NPM-001': 'system', 'TOOL-GO-001': 'system', 'TOOL-CMAKE-001': 'system', 'TOOL-MAKE-001': 'system', 'TOOL-MAVEN-001': 'system', 'TOOL-SQLITE-001': 'stdlib', 'TOOL-SECRETS-001': 'builtin', 'TOOL-WEB-001': '0', 'TOOL-GW-001': '2.1.0', 'TOOL-RUFF-001': '0.6.9'}
+health results carrying an observed version string: []
+[PASS] C10-b7-declared: CLI/runtime and declared tool versions are recorded
+[FAIL] C10-b7-observed: observed environment/tool versions (e.g. python3/cargo/node actually present) are captured
+
+=== SUMMARY ===
+PASS  C10-b1  tools are registered (kernel + project), resolved per role/language, and gaps reported
+PASS  C10-b2  MCP servers (kernel + project) are held in capability memory with status and per-role exposure
+FAIL  C10-b3  available A2A agents (identity, endpoint/transport, capabilities, availability) are held in capability memory
+PASS  C10-b4-ecosystems  package ecosystems (manifests + native tool availability) are detected
+FAIL  C10-b4-dependencies  declared packages/dependencies (flask, sqlalchemy==2.0.30, express, zod) are held in capability memory or retrievable
+PASS  C10-b5  model providers and their models/tiers are held and used for routing
+PASS  C10-b6-permissions  permission status per role is held and enforced in resolution
+FAIL  C10-b6-credentials  credential status (present/absent/expired for a declared credential scope) is held in capability memory
+PASS  C10-b7-declared  CLI/runtime and declared tool versions are recorded
+FAIL  C10-b7-observed  observed environment/tool versions (e.g. python3/cargo/node actually present) are captured
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes/final2
