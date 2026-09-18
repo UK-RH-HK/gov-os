@@ -1,0 +1,146 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0010
+role: capability-family-auditor
+objective: Re-audit capability family gamma (E1-E4, F1-F5, G1-G2, H1-H4, I1-I4) from scratch on cap2-candidate-0 with bullet-level executable evidence (P2-HO-0009, P2-HO-0000, P2-HO-0003)
+agent_model: claude-opus-5[1m]
+independence_statement: >-
+  Fresh run on the pinned model (Opus 5, 1M context). I authored none of the Governance OS implementation, tests, Phase-1
+  reviews, repairs, verifications or earlier Phase-2 audits. I did not read release/capability-baseline/audit-0/gamma/,
+  any P2-AR-0003.* file, any other family's evidence, session or agent transcripts, task-output stores or user
+  auto-memory. I read the handoffs, the frozen gate contract, Contract v3 in full, the governing-document sections and
+  decisions/interfaces traced to my scope, the implementation, builder tests, and the Phase-1 R1 verification reports and
+  held-out suites (for the F4/AC-4 duty). All probes are my own, live outside the product tree, and were run by me; no
+  product source was modified. No sub-agents were used.
+input:
+  base_commit: 7eddf9103311a8e2ad144bcf61788f16b460782c
+  candidate: cap2-candidate-0
+  candidate_commit: 57177a37ea296ece16b185874831462b6a76db18
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md (scope release/orchestration/phase-2/HANDOFFS/P2-HO-0003-audit-0-gamma.md; protocol P2-HO-0000)
+  binary_under_test_sha256: 3271ce0e4e095561911e0d03d8641aa92fbeda39ef3c8a2ecb2a9f21cacbe81d
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0003-audit-0-gamma.md
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml (identity fields only)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (full)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (Parts VI-XI; §§2, 11.1, 47-48, 59-61, 63, 67)
+  - spec/decisions/D-0003.yaml, D-0004.yaml, D-0005.yaml, D-0007.yaml; spec/interfaces/API-0001.yaml, API-0002.yaml
+  - spec/architecture/ARCH-0003.yaml (§§7-11); docs/ARCHITECTURE.md §4.8
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/verification/4.1.6-r1/00-VERIFICATION-REPORT.md, 4.1.6-r1-3/00-VERIFICATION-REPORT.md, 4.1.6-r1-4/00-VERIFICATION-REPORT.md and 4.1.6-r1-4/evidence/{REPRODUCTION.md,heldout-tests/}
+  - cli/src/main.rs; runtime/src/{authority,project,init,adopt,status,skills,tools,records,routing,checkpoints,recovery,upstream,lessons,policy_coverage}.rs
+  - runtime/src/orchestration/{tasks,dag,readiness,gates,handoffs,claims,control,intents}.rs; runtime/src/memory/claims.rs
+  - runtime/src/capabilities/{governance,registry,protocol,host}.rs; runtime/src/srr/plugins.rs; runtime/src/cit/mod.rs (propose, authoritative_gate, approve, execute propagation, rollback)
+  - runtime/src/context/mod.rs; runtime/src/verification/mod.rs; runtime/src/graph/mod.rs; runtime/src/kernel_trust.rs (guard, request_override)
+  - framework/{roles/ROLES.yaml, policies/*, skills/*, taxonomy/*, commands/COMMAND_CONTRACT.yaml, schemas/*, overlay-templates/*}; tools/registry/TOOLS.yaml; tools/mcp/registry.yaml
+  - framework/contracts/governance-capability-acceptance.yaml; tests/governance/capability-evidence-map.yaml; docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+  - tests/certification/*.rs (harness and test names)
+produced:
+  - release/capability-baseline/audit-0/gamma-r/00-AUDIT-REPORT.md
+  - release/capability-baseline/audit-0/gamma-r/capability-audit.yaml
+  - release/capability-baseline/audit-0/gamma-r/findings.yaml
+  - release/capability-baseline/audit-0/gamma-r/evidence/ (17 probe scripts + outputs, lib.sh, treesnap.py, DV-derived-views.py/.out, REGRESSION-builder-suites.out, F4-AC4-r1-heldout-rerun.sh/.out)
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.report.yaml
+tests_or_attacks:
+  - {id: REG-1, description: "cargo test --lib and cargo test --test certification on the worktree (regression evidence only)", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/REGRESSION-builder-suites.out}
+  - {id: AC4-R1-RERUN, description: "Phase-1 R1-4 held-out suite hv_a/hv_b/hv_c/hv_d re-run unedited against this candidate (31 tests)", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F4-AC4-r1-heldout-rerun.out}
+  - {id: E1-LEVELS, description: "L0-L5 x 7 operations authority matrix", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E1-authority.out}
+  - {id: E1-CENSUS, description: "40 mutating commands run as L0 with file snapshots (replan and heldout-starter unauthorised)", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E1-authority.out}
+  - {id: E1-ROLEFLAG, description: "--role ignored by init --force and all adopt/migrate stages; GOV_ROLE control refused", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E1-authority.out}
+  - {id: E1-FORGE, description: "L1 worker forges gate answers/decisions; close succeeds; forged answer authorises CIT approve/execute", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E1-authority.out}
+  - {id: E1-INDEP, description: "implementer claims/closes the independent test-design task; independence flag self-declared", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E1-authority.out}
+  - {id: AC16-L3E1, description: "gate present/answer/agent-resolve/revoke authority through the CLI", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E1-authority.out}
+  - {id: E2-ROLES, description: "each representative role as a capability contract; project role extension attempted", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E2-roles.out}
+  - {id: E3-RETURN, description: "field-by-field worker-return enforcement, persistence across process/rebuild/clone, recipient binding/overwrite", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E3-handoffs.out}
+  - {id: E4-RACE, description: "15 trials x 3 simultaneous claimants of one task", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E4-claims.out}
+  - {id: E4-DAGBYPASS, description: "dependency-blocked task claimed and closed; overlapping mutation scopes claimed concurrently", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E4-claims.out}
+  - {id: E4-REBUILD-RECOVER, description: "claims survive rebuild; expired lease swept by governed recover", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/E4-claims.out}
+  - {id: F1-SKILLS, description: "skills versioned/not authority; applicability; regression; lesson->FCP promotion path", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F1-skills.out}
+  - {id: F2F3-TOOLS, description: "registry fields; acquisition conditions; approved gate dead end; failed health still active; registry self-claim", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F2F3-tools.out}
+  - {id: F4-SELFAUTH, description: "descriptor claims ignored; under-declared plugin writes with no gate", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F4-plugins.out}
+  - {id: F4-GATEBIND, description: "unrelated answered gate authorises elevated registration", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F4-plugins.out}
+  - {id: F4-REGFORGE, description: "worker-forged registry entry runs an unapproved network plugin undetected", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F4-plugins.out}
+  - {id: F4-PIN, description: "registered descriptor/implementation tamper fails closed; unregistered TOFU reset accepted", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F4-plugins.out}
+  - {id: F4-SECREVIEW, description: "security_review_record satisfied by any existing record", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F4-plugins.out}
+  - {id: F5-LAYERS, description: "layer separation; missing embedder fails closed; MCP gap not reported", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/F5-layers.out}
+  - {id: G1-INTENT, description: "deterministic intent routing; negation inversion; consequential change inside a task bypasses CIT", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/G1G2-command-surface.out}
+  - {id: G2-CONTROLS, description: "status/continue/decide/audit/pause/freeze/cancel/resume/rollback exercised with effects", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/G1G2-command-surface.out}
+  - {id: H1-LINEAGE, description: "17-stage lineage traced pairwise and end to end; dangling link detected", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/H1-lineage.out}
+  - {id: H2-DIMS-STATUSES, description: "26 dimensions, 5 statuses, silent N/A rule", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/H2H3-readiness.out}
+  - {id: H3-GEN-READY, description: "gap-task generation per cell; READY gate bypass by stored status and overlay switch", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/H2H3-readiness.out}
+  - {id: H4-CHAIN, description: "scenario->data->test data->criteria->independent tests; data-author independence; provenance", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/H4-scenarios-data-tests.out}
+  - {id: I1-CLASSES, description: "22 task classes created, tiered and scheduled in one DAG", result: PASS, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/I1I2-tasks.out}
+  - {id: I2-CONTRACT, description: "each task-contract field's consumer; blocks/required_data/tools/merge unenforced; permanent CIT exemption; porcelain truncation", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/I1I2-tasks.out}
+  - {id: I3-SOURCES, description: "11 generation sources triggered; task deltas counted", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/I3-generation.out}
+  - {id: I4-PARALLEL, description: "runnable/blocked, critical path, per-feature path, gate dependencies, two-agent continue", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/I4-parallel.out}
+  - {id: FRESH-INV, description: "input changes after a green record invalidate it (overlay, skill, decision) or fail closed (kernel); registry changes do not", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/FRESH-invalidation.out}
+  - {id: DV-RECON, description: "derived views vs owner source for the 19 gamma capabilities; gov contract verify", result: CONFIRMED, evidence_path: release/capability-baseline/audit-0/gamma-r/evidence/DV-derived-views.out}
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 4
+  PARTIAL: 15
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+bullet_status_summary:   # 167 items = 165 checklist lines + qualifiers at lines 385 and 515
+  PRESENT_AND_SUBSTANTIAL: 115
+  PARTIAL: 42
+  ABSENT: 10
+ac4_f4_determination: >-
+  NOT MET. R1 acceptance remains valid for this candidate (identical product_code_digest; R1-4 held-out suite 31/31
+  unedited; certification 79/79), but F4 is not fully incorporated: A0-F4-01 (gate not bound to the plugin), A0-F4-02
+  (registry forgeable and exempt at close), A0-F4-03 (self-declared elevation; owner decision) and A0-F4-05 (security
+  review satisfied by any record) are blocking.
+findings:
+  - {id: A0-E1-01, severity: HIGH, capability: E1, blocking: true, blocker_class: BC-E1-ACTING-ROLE-NOT-APPLIED, new_vs_residual: BASELINE, owner_decision_required: false, title: "init and adopt/migrate ignore --role; authority checked against GOV_ROLE/default orchestrator", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E1-02, severity: HIGH, capability: "E1, I2", blocking: true, blocker_class: BC-E1-T2-FORGERY-OS-MANAGED-EXEMPTION, new_vs_residual: BASELINE, owner_decision_required: false, title: "lower-role worker forges gate answers/decisions; close exempts OS-managed paths; forgery authorises CIT approval", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E1-03, severity: MEDIUM, capability: E1, blocking: true, blocker_class: BC-E1-UNCLASSED-MUTATIONS, new_vs_residual: BASELINE, owner_decision_required: false, title: "task replan and memory heldout-starter mutate governed state without an authority class", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E1-04, severity: HIGH, capability: E1, blocking: false, blocker_class: BC-E1-CALLER-DECLARED-ROLE, new_vs_residual: BASELINE, owner_decision_required: true, title: "acting role is caller-declared; any process may act as human", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E1-05, severity: MEDIUM, capability: "E1, H3", blocking: true, blocker_class: BC-E1-INDEPENDENCE-SELF-ATTESTED, new_vs_residual: BASELINE, owner_decision_required: false, title: "task role not enforced; tester independence self-declared", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E1-06, severity: MEDIUM, capability: "E1-E4, F1-F5, G1-G2, H1-H4, I1-I4", blocking: false, blocker_class: BC-DV-DERIVED-VIEWS-HEADINGS-ONLY, new_vs_residual: BASELINE, owner_decision_required: false, title: "derived views carry headings only; evidence map NOT_YET_MAPPED for all 19", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E2-01, severity: MEDIUM, capability: E2, blocking: false, blocker_class: BC-E2-NO-PROJECT-ROLE-EXTENSION, new_vs_residual: BASELINE, owner_decision_required: false, title: "no governed extension point for project roles", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E3-01, severity: MEDIUM, capability: E3, blocking: false, blocker_class: BC-E3-RETURN-UNBOUND-OVERWRITE, new_vs_residual: BASELINE, owner_decision_required: false, title: "handoff return unbound to recipient; second return overwrites the first", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E4-01, severity: HIGH, capability: E4, blocking: true, blocker_class: BC-E4-CLAIM-RACE, new_vs_residual: BASELINE, owner_decision_required: false, title: "concurrent claims all succeed (15/15 trials)", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E4-02, severity: HIGH, capability: "E4, H3", blocking: true, blocker_class: BC-E4-CLAIM-IGNORES-DAG, new_vs_residual: BASELINE, owner_decision_required: false, title: "task claim ignores DAG; dependency/readiness-blocked tasks claimed", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E4-03, severity: MEDIUM, capability: E4, blocking: true, blocker_class: BC-E4-NO-WORKTREE-NO-MUTATION-CONSTRAINT, new_vs_residual: BASELINE, owner_decision_required: false, title: "no worktree identity; mutation overlap not a parallelism constraint", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-E4-04, severity: MEDIUM, capability: "I4, E4", blocking: false, blocker_class: BC-I4-CONTINUE-OFFERS-CLAIMED, new_vs_residual: BASELINE, owner_decision_required: false, title: "continue offers tasks claimed by other sessions", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F1-01, severity: MEDIUM, capability: F1, blocking: false, blocker_class: BC-F1-REGRESSION-STATIC-ONLY, new_vs_residual: BASELINE, owner_decision_required: false, title: "skill regression static only; project skill versions not content-bound", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F1-02, severity: LOW, capability: F1, blocking: false, blocker_class: BC-F1-EVIDENCE-UNDEFINED, new_vs_residual: BASELINE, owner_decision_required: false, title: "skill evidence undefined; inputs/outputs optional and unconsumed", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F1-03, severity: MEDIUM, capability: F1, blocking: false, blocker_class: BC-F1-NO-SKILL-PROMOTION, new_vs_residual: BASELINE, owner_decision_required: false, title: "no skill-specific governed promotion", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F2-01, severity: MEDIUM, capability: F2, blocking: false, blocker_class: BC-F2-REGISTRY-INCOMPLETE, new_vs_residual: BASELINE, owner_decision_required: false, title: "registry lacks task classes, sensitivity, tool hash pins, approval status", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F2-02, severity: MEDIUM, capability: "F2, F4", blocking: false, blocker_class: BC-F2-REGISTRY-SELF-CLAIM, new_vs_residual: BASELINE, owner_decision_required: false, title: "generated registry reports a descriptor's self-claimed registration as approval", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F3-01, severity: HIGH, capability: F3, blocking: true, blocker_class: BC-F3-APPROVAL-DEAD-END, new_vs_residual: BASELINE, owner_decision_required: false, title: "approved install gate never leads to installation", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F3-02, severity: MEDIUM, capability: F3, blocking: false, blocker_class: BC-F3-ACQUISITION-INCOMPLETE, new_vs_residual: BASELINE, owner_decision_required: false, title: "no maintenance review/candidates; unhealthy tools stay active; no task linkage", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F4-01, severity: HIGH, capability: F4, blocking: true, blocker_class: BC-F4-GATE-NOT-BOUND, new_vs_residual: BASELINE, owner_decision_required: false, title: "any answered-A gate authorises elevated plugin registration", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F4-02, severity: HIGH, capability: F4, blocking: true, blocker_class: BC-F4-REGISTRY-FORGEABLE, new_vs_residual: BASELINE, owner_decision_required: false, title: "plugin registry forgeable, exempt at close, undetected, non-invalidating", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F4-03, severity: MEDIUM, capability: F4, blocking: true, blocker_class: BC-F4-SELF-DECLARED-ELEVATION, new_vs_residual: BASELINE, owner_decision_required: true, title: "elevation self-declared; under-declared plugin runs with no gate", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F4-04, severity: MEDIUM, capability: F4, blocking: false, blocker_class: BC-F4-TOFU-UNREGISTERED, new_vs_residual: BASELINE, owner_decision_required: false, title: "unregistered plugins bound only by machine-local TOFU", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F4-05, severity: MEDIUM, capability: "F4, F3", blocking: true, blocker_class: BC-F4-SECURITY-RECORD-UNBOUND, new_vs_residual: BASELINE, owner_decision_required: false, title: "security review satisfied by any existing record", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-F5-01, severity: LOW, capability: F5, blocking: false, blocker_class: BC-F5-SILENT-MCP-GAP, new_vs_residual: BASELINE, owner_decision_required: false, title: "MCP gap not reported by doctor/readiness (D-0004); handoff authority may exceed task", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-G1-01, severity: MEDIUM, capability: G1, blocking: false, blocker_class: BC-G1-INTENT-COVERAGE, new_vs_residual: BASELINE, owner_decision_required: false, title: "intent routing: control phrases only, negation inversion, not wired to adapters", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-G1-02, severity: HIGH, capability: G1, blocking: true, blocker_class: BC-G1-CONSEQUENTIAL-CHANGE-BYPASS, new_vs_residual: BASELINE, owner_decision_required: false, title: "consequential spec changes inside tasks bypass impact simulation and gates", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-H3-01, severity: MEDIUM, capability: H3, blocking: false, blocker_class: BC-H3-READINESS-SWITCH, new_vs_residual: BASELINE, owner_decision_required: false, title: "overlay switch disables readiness gating outside precedence; lenient cells", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-H4-01, severity: MEDIUM, capability: H4, blocking: true, blocker_class: BC-H4-DATA-CHAIN-UNREPRESENTED, new_vs_residual: BASELINE, owner_decision_required: false, title: "data/test-data chain unrepresented; success/failure criteria not required", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-H4-02, severity: MEDIUM, capability: H4, blocking: true, blocker_class: BC-H4-DATA-AUTHOR-INDEPENDENCE, new_vs_residual: BASELINE, owner_decision_required: false, title: "test-data author independence neither recorded nor checked", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-H4-03, severity: MEDIUM, capability: H4, blocking: true, blocker_class: BC-H4-PROVENANCE-UNREAD, new_vs_residual: BASELINE, owner_decision_required: false, title: "data provenance optional and never read", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-I2-01, severity: MEDIUM, capability: I2, blocking: true, blocker_class: BC-I2-CONTRACT-FIELDS-UNENFORCED, new_vs_residual: BASELINE, owner_decision_required: false, title: "blocks/required_data/required_tools/production merge unenforced", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-I2-02, severity: HIGH, capability: "I2, G1", blocking: true, blocker_class: BC-I2-PERMANENT-CIT-EXEMPTION, new_vs_residual: BASELINE, owner_decision_required: false, title: "paths once touched by any committed CIT are permanently in scope", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-I2-03, severity: LOW, capability: I2, blocking: false, blocker_class: BC-I2-PORCELAIN-TRUNCATION, new_vs_residual: BASELINE, owner_decision_required: false, title: "no-baseline close truncates the first dirty path", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-I3-01, severity: HIGH, capability: I3, blocking: true, blocker_class: BC-I3-NO-DYNAMIC-GENERATION, new_vs_residual: BASELINE, owner_decision_required: false, title: "tasks generated only from readiness gaps; 9 of 11 sources generate none", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+  - {id: A0-I4-01, severity: LOW, capability: I4, blocking: false, blocker_class: BC-I4-PER-FEATURE-GROUPING, new_vs_residual: BASELINE, owner_decision_required: false, title: "per-feature view is a grouping, not an end-to-end path", path: release/capability-baseline/audit-0/gamma-r/findings.yaml}
+verdict: FAMILY_AUDIT_COMPLETE
+output:
+  branch: phase2/cap-audit-0-gamma-r
+  commit: 95239786dd96424328b248e752bf6ae42ee52217
+  evidence_path: release/capability-baseline/audit-0/gamma-r/
+unresolved:
+  - "19 blocking findings: A0-E1-01, A0-E1-02, A0-E1-03, A0-E1-05, A0-E4-01, A0-E4-02, A0-E4-03, A0-F3-01, A0-F4-01, A0-F4-02, A0-F4-03, A0-F4-05, A0-G1-02, A0-H4-01, A0-H4-02, A0-H4-03, A0-I2-01, A0-I2-02, A0-I3-01"
+  - "owner decisions required: A0-E1-04 (authenticated role identity vs documented adapter boundary), A0-F4-03 (self-declared plugin elevation vs D-0005 hand-declared plugins)"
+  - "not demonstrated by input change: E4 and I3 invalidation (not_attempted)"
+recommended_next_action: "Synthesis auditor folds gamma's 15 PARTIAL capabilities (9 COULD_UNDERMINE under AC-3: E1, E4, F3, F4, G1, H3, H4, I2, I3 — F4 also AC-4; 6 justified CANNOT_UNDERMINE) into the Phase-2 verdict; route A0-E1-04 and A0-F4-03 to the owner; repair the 19 blocking classes on a new candidate."
+completed_at: '2026-09-18T21:21:17Z'
