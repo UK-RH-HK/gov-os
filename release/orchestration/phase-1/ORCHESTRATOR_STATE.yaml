@@ -4,8 +4,8 @@
 schema: governance-os.phase-1.orchestrator-state
 schema_version: 1
 phase: 1
-updated_at: '2026-09-18T09:56:43Z'
-state_hash: 05b8d0dc7ea481fe19c94962c337f399ea9615356806933b3023529539458905
+updated_at: '2026-09-18T09:57:00Z'
+state_hash: d4f49f1d05ce319cead2c1351a01c29f5a9f39a17562d15909a60a63f39825cd
 lifecycle_state: R1_REPAIR
 loop_status: R1_STRUCTURAL_REPAIR_3_RUNNING_UNDER_OWNER_DECISION_0008
 
@@ -572,6 +572,7 @@ running_work:
     role: repair-builder
     status: RUNNING
     run_record_path: release/orchestration/phase-1/AGENT_RUNS/AR-0032.run.yaml
+    base_commit: 30aa98a10fd7f5ed85439b0d676761080519ceed
     handoff_path: release/orchestration/phase-1/HANDOFFS/HO-0032-r1-structural-repair.md
     branch: phase1/srr1-r1-repair-3
     expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0032.report.yaml

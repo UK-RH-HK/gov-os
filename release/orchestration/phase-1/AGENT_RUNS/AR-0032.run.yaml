@@ -47,7 +47,7 @@ prior_held_out_suites_to_rerun:
   - {path: release/verification/4.1.6-r1/evidence/heldout-tests/, expect: 26 passed / 3 failed}
   - {path: release/verification/4.1.6-r1-2/evidence/heldout-tests/, expect: 26 passed / 2 failed with ho_f not compiling - that compile failure is AR29-N1 closing, not a regression}
   - {path: release/verification/4.1.6-r1-3/evidence/heldout-tests/, expect: its eight OBSERVED failures to flip toward passing; the repair must say which flip, which do not, and why}
-base_commit: f067eb5626387ba9d9c73a680c3c9130c40d68f9
+base_commit: 30aa98a10fd7f5ed85439b0d676761080519ceed
 branch: phase1/srr1-r1-repair-3
 started_at: '2026-09-18T10:30Z'
 status: RUNNING
