@@ -46,7 +46,7 @@ contract_v3:
   sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
 branch: phase1/srr1-r1-verify-3
 started_at: '2026-09-18T07:30Z'
-status: PENDING_DISPATCH
+status: RUNNING
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0031.report.yaml
 expected_evidence_path: release/verification/4.1.6-r1-3/
 required_verdict_vocabulary: [ROT_PHASE1_CANDIDATE_ACCEPTED_R1, BLOCKING_FINDINGS_PRESENT]

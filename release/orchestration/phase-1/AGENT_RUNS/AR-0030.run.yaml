@@ -42,11 +42,45 @@ prior_held_out_suites_to_rerun:
 base_commit: 1bc4427d0f9ceba0da23892d5897cdfc863e2cee
 branch: phase1/srr1-r1-repair-2
 started_at: '2026-09-18T05:00Z'
-status: RUNNING
+status: COMPLETED
 expected_report_path: release/orchestration/phase-1/AGENT_RUNS/AR-0030.report.yaml
 expected_evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_OS_VERIFICATION, INCOMPLETE]
 convergence_warning: >-
   If the next verification iteration produces another materially new blocker class, the orchestrator stops with
   PHASE_CONVERGENCE_ESCALATION_REQUIRED and produces a root-cause/meta-review package for the product owner.
-outcome: null
+outcome:
+  verdict: READY_FOR_INDEPENDENT_OS_VERIFICATION
+  work_commit: 748c5d3c19c5401e7449f4f21523c33cc7877aec
+  report_commit: e38ee46d3dfc62439bf5267b172c186ea92e6641
+  integration_merge_commit: 2c463d3740a43ce94ee328ead9d7911d5dbab568
+  candidate_minted: srr1-r1-candidate-3
+  evidence_path: release/root-of-trust/signed-release-root-v1-r1-repair-2/
+  findings_closed_claimed: [AR29-B1, AR29-B2, AR29-C1, AR29-N1, AR29-N3, AR29-N4, AR29-N5]
+  design: >-
+    Section 6 bullet 1 names a class of OPERATIONS; bullets 2-7 name EFFECTS. gov trust root-update takes no Project so
+    it can never reach the operation chokepoint; update --apply is an allow-listed operation containing a bullet-2
+    effect. The section 6 check now sits INSIDE the single primitive realising each effect, so a caller that does not
+    exist yet still reaches the effect only through its primitive. SECTION_6_SINKS is the machine-readable census;
+    guard, guard_light and guard_effect* all end in one private decide over one read_marking through one refuse.
+  compiler_enforced: gates::build takes a sealed &Clearance, so a new gate-raising function does not compile until it has asked section 6; AuthenticatedRelease carries a private zero-sized admitted token so the no-bypass property is now a type property
+  coverage_test: section_6_effects_are_enforced_inside_their_sinks - half A asserts the mechanism from the candidate's own source including that no second implementation of a section 6 primitive exists; half B drives refusals through the real gov binary on a machine in genuine owner-authorised break-glass
+  orchestrator_verification:
+    - work and report commits exist; report output.commit names the work commit
+    - no forbidden path touched
+    - state.rs WAS touched but resolve_state_root and default_state_root are byte-identical; only an already-resolved path was unified (AR29-N3) and the bullet-4 sink added, so OWNER-DECISION-0007 section 1 is intact
+    - exit_satisfied byte-identical and EXIT_POLICY unchanged - SRR2-R1-C1 not widened
+    - both prior held-out suites byte-identical - neither edited
+    - AuthenticatedRelease confirmed sealed with a private admitted field
+    - regression independently reproduced - cargo test --lib 36 passed 0 failed; cargo test --test certification 70 passed 0 failed; exit 0
+  disclosed_unproven:
+    - {id: U-1, item: guard_effect fails open when resolve_state_root errors, note: inherited from repair 1; the repair says closing it needs the owner-closed machine-state root change}
+    - {id: U-2, item: section 6 bullet 7 has no sink because no primitive is claimed to exist; gov status, gov doctor and telemetry not exhaustively audited}
+    - {id: U-3, item: section 6 bullet 5's sink is the acquisition decision rather than a byte-installing primitive; tools::install reaches the effect through the operation guard only}
+    - {id: U-4, item: Clearance is a witness rather than a lifetime-scoped capability and is deliberately not used at three of the five sinks}
+  prior_evidence_changes:
+    - AR-0029 ho_f_preservation no longer compiles - the struct literal AR29-N1 asked to be made impossible; its six unrelated checks were reproduced in the product suite and must be confirmed not weakened in the move
+    - AR-0029 ho_b b3 and b6 flipped passing to failing - both assert the absence of a guard; b3's printed census is stale and must be re-derived
+    - ho_b b4 briefly broken by guard ordering in provision; cause reverted, guard now sits after the already-provisioned check and section 6 at that door is proved at the sink
+  new_owner_decision_required: none
+  completed_at: '2026-09-18T07:20Z'
