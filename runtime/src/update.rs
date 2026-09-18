@@ -154,6 +154,17 @@ pub fn apply_update_opts(
         let gate = match update_gate(p, &target_v) {
             Some(g) => g,
             None => {
+                // `AR29-B2` / `AR29-N4`. `update --apply` is on the OWNER-DECISION-0006 §5 allow-list as
+                // restoration of an authenticated release, and §6 bullet 2 still forbids creating a new Human
+                // Gate below floor. The refusal is taken here, at the same enforcement point the gate sink uses
+                // and before any protected write, so the allow-list's promise and the reachable behaviour agree:
+                // the operation completes below floor exactly when the target needs no gate, and the refusal
+                // names `kernel reinstall` and `update --rollback`, which need none. An already-answered gate
+                // (the `Some` arm) is neither a creation nor an approval and is unaffected.
+                crate::srr::breakglass::guard_effect(
+                    crate::srr::breakglass::Effect::HumanGateCreate,
+                    "gate create (update --apply)",
+                )?;
                 let g = gates::create_system(
                     p,
                     json!({"question": format!("Approve framework update {} → {}?", chk["current"], chk["available"]), "why_now": "gov update --apply requested", "current_state": format!("installed {}", chk["current"]), "options": [{"id": "A", "description": "approve update"}, {"id": "B", "description": "stay on current release"}], "impact": chk["impact"]["consequences"].to_string(), "reversibility": "gov update --rollback restores kernel/overlay/lock", "recommendation": "A after reviewing release notes", "confidence": 0.7, "trigger": "framework_update", "update_target": target_v, "impact_radius": chk["impact"]["radius"]}),

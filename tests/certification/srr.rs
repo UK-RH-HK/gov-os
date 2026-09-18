@@ -1237,3 +1237,869 @@ fn below_floor_refusal_is_default_refuse_across_the_whole_operation_surface() {
     assert_eq!(r["protected_state"]["break_glass_exit"]["cleared"], true);
     assert!(g.ok(&["trust", "status"])["degraded"].is_null());
 }
+
+// ------------------------------------------------ 11. OWNER-DECISION-0006 §6 coverage: is the guard on the path?
+
+/// Read a product source file, by path relative to the repository root.
+fn src(rel: &str) -> String {
+    std::fs::read_to_string(canonical_root().join(rel))
+        .unwrap_or_else(|e| panic!("read {rel}: {e}"))
+}
+
+/// Every `.rs` file the product ships (runtime + cli), as (path, text).
+fn product_sources() -> Vec<(String, String)> {
+    fn walk(dir: &Path, out: &mut Vec<(String, String)>) {
+        let Ok(rd) = std::fs::read_dir(dir) else { return };
+        for e in rd.filter_map(|e| e.ok()) {
+            let p = e.path();
+            if p.is_dir() {
+                walk(&p, out);
+            } else if p.extension().map(|x| x == "rs").unwrap_or(false) {
+                out.push((
+                    p.display().to_string(),
+                    std::fs::read_to_string(&p).unwrap_or_default(),
+                ));
+            }
+        }
+    }
+    let mut v = vec![];
+    walk(&canonical_root().join("runtime/src"), &mut v);
+    walk(&canonical_root().join("cli/src"), &mut v);
+    v.sort();
+    v
+}
+
+/// The body of `fn <name>` in `text`, from the signature to the first column-0 `}`.
+fn fn_body<'a>(text: &'a str, name: &str) -> &'a str {
+    let at = text
+        .find(&format!("fn {name}("))
+        .unwrap_or_else(|| panic!("fn {name}( not found — the §6 sink census must be re-derived"));
+    let rest = &text[at..];
+    let end = rest.find("\n}").unwrap_or(rest.len());
+    &rest[..end]
+}
+
+/// **The `OWNER-DECISION-0006` §6 coverage test.**
+///
+/// `AR29-B1` and `AR29-B2` were not defects in a decision procedure — repair 1's allow-list decides correctly, and
+/// AR-0029 confirmed it could not be broken. They were two operations that never reached a decision procedure at
+/// all. A test that swept operation *labels* through the guard could not see that, and did not: AR-0027's `d3`
+/// printed `trust root-update` in its REFUSED column while the operation succeeded.
+///
+/// So this test asks the prior question, in two halves, and would have failed on candidate 2 in both:
+///
+/// * **structurally** — for every §6 bullet, the single primitive that can realise it
+///   ([`breakglass::SECTION_6_SINKS`]) carries the enforcement point *inside* it, the witness type is sealed, and
+///   no second implementation of a §6 primitive exists anywhere in the tree. This is what fails when someone adds
+///   a new way to raise a Human Gate or write a trust anchor.
+/// * **dynamically** — every §6-named operation the product actually exposes is driven end to end, through the
+///   real `gov` binary, on a machine in genuine owner-authorised break-glass, and must refuse. This is
+///   `AR29-B1`'s and `AR29-B2`'s counterexamples, kept as regressions.
+#[test]
+fn section_6_effects_are_enforced_inside_their_sinks() {
+    use gov_runtime::srr::breakglass as bg;
+
+    // ---------------------------------------------------------------- A. the mechanism, read off the source
+
+    // A1. Every §6 activity the decision names has a declared sink, and no sink names an activity §6 does not.
+    assert_eq!(bg::SECTION_6_SINKS.len(), bg::REFUSED_ACTIVITIES.len());
+    for (activity, _sink) in bg::SECTION_6_SINKS {
+        assert!(
+            bg::REFUSED_ACTIVITIES.contains(activity),
+            "'{activity}' is not an OWNER-DECISION-0006 §6 activity"
+        );
+    }
+    for a in bg::REFUSED_ACTIVITIES {
+        assert!(
+            bg::SECTION_6_SINKS.iter().any(|(x, _)| x == a),
+            "§6 activity '{a}' has no declared enforcement sink"
+        );
+    }
+
+    // A2. Each sink that names a function contains the enforcement call for its own effect, in its own body.
+    let state_rs = src("runtime/src/srr/state.rs");
+    let gates_rs = src("runtime/src/orchestration/gates.rs");
+    let release_rs = src("runtime/src/release.rs");
+    let plugins_rs = src("runtime/src/srr/plugins.rs");
+    let control_rs = src("runtime/src/orchestration/control.rs");
+    for (sink_body, needle, what) in [
+        (
+            fn_body(&state_rs, "set_root_metadata"),
+            "Effect::TrustPolicyMutation",
+            "§6 bullet 4 sink `MachineState::set_root_metadata`",
+        ),
+        (
+            fn_body(&gates_rs, "answer"),
+            "Effect::HumanGateApprove",
+            "§6 bullet 2 (approval) sink `gates::answer`",
+        ),
+        (
+            fn_body(&release_rs, "build"),
+            "Effect::ReleaseCertification",
+            "§6 bullet 3 sink `release::build`",
+        ),
+        (
+            fn_body(&plugins_rs, "guard_acquisition"),
+            "Effect::PrivilegedPluginAcquisition",
+            "§6 bullet 5 sink `plugins::guard_acquisition`",
+        ),
+        (
+            fn_body(&control_rs, "guard_write"),
+            "breakglass::guard_light",
+            "§6 bullet 1 chokepoint `control::guard_write`",
+        ),
+    ] {
+        assert!(
+            sink_body.contains(needle),
+            "{what} no longer contains `{needle}`: the enforcement point has left the effect"
+        );
+    }
+
+    // A3. The §6 bullet 2 (creation) sink is enforced by the TYPE SYSTEM, not by a call this test can only grep
+    // for: `gates::build` takes a `&Clearance`, which has no constructor outside `breakglass`.
+    assert!(
+        gates_rs.contains("_clearance: &crate::srr::breakglass::Clearance"),
+        "`gates::build` no longer requires a §6 clearance; a new gate-raising path would compile unguarded"
+    );
+    for wrapper in ["create", "create_system"] {
+        assert!(
+            fn_body(&gates_rs, wrapper).contains("Effect::HumanGateCreate"),
+            "`gates::{wrapper}` no longer asks §6 before building a gate"
+        );
+    }
+
+    // A4. The witness is sealed: private fields, one private constructor, and no construction site outside
+    // `breakglass`. If any of this is relaxed, A3's compile-time guarantee silently becomes decorative.
+    let bg_rs = src("runtime/src/srr/breakglass.rs");
+    let clearance_struct = bg_rs
+        .split("pub struct Clearance {")
+        .nth(1)
+        .expect("Clearance struct")
+        .split("\n}")
+        .next()
+        .unwrap();
+    assert!(
+        !clearance_struct.contains("pub "),
+        "`Clearance` gained a public field: a struct literal outside `breakglass` would then compile"
+    );
+    assert!(
+        bg_rs.contains("    fn issue(effect: Effect, operation: &str) -> Clearance {"),
+        "`Clearance::issue` is no longer the private sole constructor"
+    );
+    for deriv in ["Clone, Debug", "Debug, Clone", "Default"] {
+        assert!(
+            !bg_rs.contains(&format!("#[derive({deriv})]\npub struct Clearance")),
+            "`Clearance` must not derive `{deriv}`"
+        );
+    }
+    let outside: Vec<String> = product_sources()
+        .into_iter()
+        .filter(|(p, t)| !p.ends_with("srr/breakglass.rs") && t.contains("Clearance {"))
+        .map(|(p, _)| p)
+        .collect();
+    assert!(
+        outside.is_empty(),
+        "a `Clearance` value is constructed outside `breakglass`: {outside:?}"
+    );
+
+    // A5. `AR29-N1` — the no-bypass claim is now a type property: `AuthenticatedRelease` holds a private seal, so
+    // no struct literal outside `srr::verifier` compiles, and the seal has exactly one construction site.
+    let verifier_rs = src("runtime/src/srr/verifier.rs");
+    assert!(
+        verifier_rs.contains("    admitted: sealed::Admitted,"),
+        "`AuthenticatedRelease` lost its private seal; 'constructible only by admit' would be an enumeration again"
+    );
+    assert!(
+        !verifier_rs.contains("pub admitted"),
+        "the seal field must not be public"
+    );
+    let by_admit: usize = product_sources()
+        .iter()
+        .map(|(_, t)| t.matches("Admitted::by_admit()").count())
+        .sum();
+    assert_eq!(
+        by_admit, 1,
+        "the seal constructor must have exactly one call site (the tail of `admit_inner`)"
+    );
+    let literals: Vec<String> = product_sources()
+        .into_iter()
+        .flat_map(|(path, t)| {
+            t.lines()
+                .enumerate()
+                .filter(|(_, l)| {
+                    l.contains("AuthenticatedRelease {")
+                        && !l.contains("struct ")
+                        && !l.contains("impl ")
+                })
+                .map(|(n, l)| format!("{path}:{} {}", n + 1, l.trim()))
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    assert_eq!(
+        literals.len(),
+        1,
+        "`AuthenticatedRelease` is constructed in more than one place: {literals:?}"
+    );
+
+    // A6. **No second implementation of a §6 primitive.** This is the assertion that fails when a future change
+    // adds a new way to perform a forbidden effect rather than a new caller of an existing one.
+    let human_gate_records: Vec<String> = product_sources()
+        .into_iter()
+        .filter(|(_, t)| t.contains(r#"new_record("human-gate""#))
+        .map(|(p, _)| p)
+        .collect();
+    assert_eq!(
+        human_gate_records.len(),
+        1,
+        "a `human-gate` record is minted outside `gates::build`: {human_gate_records:?}"
+    );
+    assert!(human_gate_records[0].ends_with("orchestration/gates.rs"));
+
+    let anchor_writers: Vec<String> = product_sources()
+        .into_iter()
+        .filter(|(_, t)| t.contains("root_metadata_path()"))
+        .map(|(p, _)| p)
+        .collect();
+    assert_eq!(
+        anchor_writers.len(),
+        2,
+        "the trust anchor path is reached from somewhere new: {anchor_writers:?} (expected `state.rs` to write \
+         it and `verifier.rs` to read it)"
+    );
+
+    // §6 bullet 6 has no sink because it has no primitive: the only mutators of a floor are monotonic.
+    let floors = state_rs
+        .split("impl Floors {")
+        .nth(1)
+        .unwrap()
+        .split("\n}")
+        .next()
+        .unwrap();
+    let mutators: Vec<&str> = floors
+        .match_indices("pub fn ")
+        .map(|(i, _)| floors[i + 7..].split('(').next().unwrap())
+        .filter(|n| {
+            !matches!(
+                *n,
+                "load"
+                    | "to_value"
+                    | "save"
+                    | "metadata_floor"
+                    | "observed_only"
+                    | "effective_floor_sequence"
+                    | "effective_floor_version"
+            )
+        })
+        .collect();
+    assert_eq!(
+        mutators,
+        vec!["raise_metadata", "raise_release", "raise_minimum_secure"],
+        "`Floors` gained a mutator that is not a monotonic raise: {mutators:?}"
+    );
+
+    // ---------------------------------------------------------------- B. the reachability half, measured
+
+    let (root, proj, g) = project("srr-s6-coverage");
+    let p = Publisher::new();
+    let admin = root.join("admin-domain");
+    provision(&root, &g, &p, 1, &far_future());
+
+    let hi = root.join("rel-hi");
+    make_release(&hi);
+    p.publish(&hi, 20, 100, "stable", &far_future(), "4.0.0", 50);
+    g.ok(&[
+        "init",
+        "--source",
+        hi.join("kernel").to_str().unwrap(),
+        "--name",
+        "x",
+        "--alias",
+        "fx-x",
+    ]);
+
+    let lo = root.join("rel-lo");
+    make_release(&lo);
+    p.publish(&lo, 21, 60, "stable", &far_future(), "4.0.0", 50);
+
+    // Genuine break-glass: an owner-signed authorisation, out of band, through the real `admit` path.
+    let bg_status = g.ok(&["trust", "break-glass"]);
+    let inbox = PathBuf::from(bg_status["inbox"].as_str().unwrap());
+    let (_, payload_hash, kmh, ver) = measure(&lo.join("kernel"));
+    let tok = break_glass_doc(
+        &machine_id(&g),
+        "nonce-s6-1",
+        "restore after a bad release",
+        &far_future(),
+        &ver,
+        &payload_hash,
+        &kmh,
+    );
+    std::fs::write(inbox.join("auth.json"), envelope(&tok, &[&p.recovery])).unwrap();
+    g.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        lo.join("kernel").to_str().unwrap(),
+        "--break-glass",
+    ]);
+    let ms = gov_runtime::srr::state::MachineState::at(&machine_state_dir(&proj)).unwrap();
+    assert!(bg::is_degraded(&ms, gov_runtime::FRAMEWORK_NAME));
+    let anchor_before = g.ok(&["trust", "status"])["trust_anchor"]["version"].clone();
+    let root_floor_before =
+        gov_runtime::srr::state::Floors::load(&ms, gov_runtime::FRAMEWORK_NAME).metadata_floor("root");
+
+    // B1 — §6 bullet 4. `AR29-B1`'s counterexample, verbatim: a successor root signed by BOTH quorums, i.e. a
+    // succession that would be accepted on a healthy machine, offered to a machine marked DEGRADED.
+    let n1 = key(0xB1);
+    let n2 = key(0xB2);
+    let doc = root_doc(
+        2,
+        &far_future(),
+        &[&n1, &n2],
+        2,
+        &[&p.release],
+        &p.snapshot,
+        &p.timestamp,
+        Some(&p.recovery),
+    );
+    let successor = admin.join("root-2-s6.json");
+    std::fs::write(
+        &successor,
+        envelope(&doc, &[&p.root_a, &p.root_b, &n1, &n2]),
+    )
+    .unwrap();
+    let e = g.err(&["trust", "root-update", "--anchor", successor.to_str().unwrap()]);
+    assert_eq!(
+        e.error_code(),
+        "SRR_BELOW_FLOOR_REFUSED",
+        "§6 bullet 4: a trust-policy mutation must not complete below floor"
+    );
+    assert_eq!(e.details()["refused_class"], "trust_policy_mutation");
+    assert_eq!(e.details()["section_6_bullet"], 4);
+    // and nothing moved
+    assert_eq!(
+        g.ok(&["trust", "status"])["trust_anchor"]["version"],
+        anchor_before
+    );
+    assert_eq!(
+        gov_runtime::srr::state::Floors::load(&ms, gov_runtime::FRAMEWORK_NAME).metadata_floor("root"),
+        root_floor_before
+    );
+
+    // B2 — the same bullet through the other door. A machine cannot carry the marking without already holding a
+    // trust anchor, so `gov trust provision` is shut here by the already-provisioned latch — which is the
+    // accurate diagnosis, and why the §6 guard on this path sits after that check rather than before it. What
+    // matters for §6 is that the *effect* cannot happen, which B2b measures at the sink itself.
+    let fresh = p.write_root(&admin, 1, &far_future());
+    let e = g.err(&["trust", "provision", "--anchor", fresh.to_str().unwrap()]);
+    assert_eq!(e.error_code(), "SRR_ALREADY_PROVISIONED");
+
+    // B2b — the sink. Every trust anchor write in the product goes through `set_root_metadata`, including one
+    // written by code that does not exist yet, and below floor it refuses.
+    let anchor_bytes = std::fs::read(&fresh).unwrap();
+    let e = ms
+        .set_root_metadata(&anchor_bytes, 1, gov_runtime::FRAMEWORK_NAME)
+        .unwrap_err();
+    assert_eq!(e.code, "SRR_BELOW_FLOOR_REFUSED");
+    assert_eq!(e.details["refused_class"], "trust_policy_mutation");
+    assert_eq!(e.details["section_6_bullet"], 4);
+
+    // B3 — §6 bullet 2 (creation), through the operator surface.
+    let e = g.err(&["gate", "create", "--question", "approve something?"]);
+    assert_eq!(e.error_code(), "SRR_BELOW_FLOOR_REFUSED");
+    assert_eq!(e.details()["refused_class"], "human_gate_create");
+
+    // B4 — §6 bullet 2 reached from INSIDE an allow-listed §5 operation is measured separately, in
+    // `an_allow_listed_operation_cannot_create_a_human_gate_below_floor`, because it needs a machine whose
+    // installed version is genuinely behind the candidate. Structurally, here: the enforcement point sits between
+    // the allow-list entry and the gate creation, which is precisely the span `AR29-B2` measured as empty.
+    let update_rs = src("runtime/src/update.rs");
+    let apply = update_rs.split("pub fn apply_update_opts").nth(1).unwrap();
+    let head = &apply[..apply.find("let auth = crate::srr::admit").unwrap()];
+    let marker = r#"guard_write(p, "update --apply")"#;
+    let between =
+        &head[head.find(marker).unwrap() + marker.len()..head.find("gates::create_system").unwrap()];
+    assert!(
+        between.contains("breakglass::guard_effect")
+            && between.contains("Effect::HumanGateCreate"),
+        "nothing enforces §6 between the allow-list entry and the gate creation in `update --apply`"
+    );
+    assert!(
+        bg::permitted_activity("update --apply").is_some(),
+        "the allow-list still permits the operation; what §6 forbids is the gate inside it"
+    );
+
+    // B5 — §6 bullet 2 (creation) reached from `gov kernel override`, the second caller `AR29-B2` named and the
+    // one it could not drive end to end. The kernel is tampered first so the override is actually attempted.
+    let victim = proj.join("governance/kernel/policies/AUTHORITY_POLICY.yaml");
+    let original = std::fs::read(&victim).unwrap();
+    std::fs::write(&victim, [&original[..], b"\n# tampered\n"].concat()).unwrap();
+    let e = g.err(&["kernel", "override", "--reason", "coverage probe"]);
+    assert_eq!(
+        e.error_code(),
+        "SRR_BELOW_FLOOR_REFUSED",
+        "§6 bullet 2: `gov kernel override` must not raise a kernel-integrity gate below floor"
+    );
+    assert_eq!(e.details()["refused_class"], "human_gate_create");
+    std::fs::write(&victim, &original).unwrap();
+
+    // B6 — §6 bullet 3. `release::build` takes no `Project` and structurally cannot reach `control::guard_write`;
+    // the effect-level point is the only thing standing between a degraded machine and a certified release.
+    let e = g.err(&[
+        "release",
+        "build",
+        "--version",
+        "9.9.9",
+        "--certification",
+        "CERTIFIED",
+        "--out",
+        root.join("rel-out").to_str().unwrap(),
+        "--canonical",
+        canonical_root().to_str().unwrap(),
+    ]);
+    assert_eq!(
+        e.error_code(),
+        "SRR_BELOW_FLOOR_REFUSED",
+        "§6 bullet 3: release certification must not complete below floor"
+    );
+    assert_eq!(e.details()["refused_class"], "release_certification");
+    assert!(
+        !root.join("rel-out/releases/9.9.9").exists(),
+        "the refusal must happen before anything is written"
+    );
+
+    // B7 — §5, §7 and §10 are not collateral damage: the gate-free restoration route still works, still needs no
+    // network, and still clears the marking.
+    assert!(g.run(&["trust", "status"]).ok());
+    p.publish(&hi, 30, 100, "stable", &far_future(), "4.0.0", 50);
+    let r = g.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        hi.join("kernel").to_str().unwrap(),
+    ]);
+    assert_eq!(r["protected_state"]["break_glass_exit"]["cleared"], true);
+    assert!(g.ok(&["trust", "status"])["degraded"].is_null());
+
+    // B8 — and once the machine is out of break-glass, every one of them is available again. A guard that never
+    // lifts is indistinguishable from a broken product.
+    let r = g.ok(&["trust", "root-update", "--anchor", successor.to_str().unwrap()]);
+    assert_eq!(r["to_version"], 2);
+    assert!(g.run(&["gate", "create", "--question", "approve something?"]).ok());
+}
+
+/// `AR29-B2` second limb and `AR29-N4`, measured end to end: `update --apply` is on the `OWNER-DECISION-0006` §5
+/// allow-list and is still refused below floor at the Human Gate it would have to create, before any protected
+/// write, with the gate-free restoration routes named — and one of those routes then works.
+///
+/// This is the case the allow-list and the reachable behaviour used to disagree about. They now agree, and the
+/// agreement is written down in `breakglass::BELOW_FLOOR_LIMITS` as well as enforced here.
+#[test]
+fn an_allow_listed_operation_cannot_create_a_human_gate_below_floor() {
+    use gov_runtime::srr::breakglass as bg;
+
+    let (root, proj, g) = project("srr-s6-update");
+    let p = Publisher::new();
+    provision(&root, &g, &p, 1, &far_future());
+
+    // A machine installed on a genuinely older release, so `update --check` has somewhere to go.
+    let prev = canonical_root().join("fixtures/update/previous-release/4.1.1");
+    let old = root.join("rel-old");
+    copy_dir(&prev, &old.join("kernel"));
+    p.publish(&old, 20, 100, "stable", &far_future(), "4.0.0", 50);
+    let r = g.ok(&[
+        "init",
+        "--source",
+        old.join("kernel").to_str().unwrap(),
+        "--name",
+        "u",
+        "--alias",
+        "fx-u",
+    ]);
+    assert_eq!(r["version"], "4.1.1");
+
+    // Genuine owner-authorised break-glass onto the same payload published below the floor.
+    let below = root.join("rel-below");
+    copy_dir(&prev, &below.join("kernel"));
+    p.publish(&below, 21, 60, "stable", &far_future(), "4.0.0", 50);
+    let bg_status = g.ok(&["trust", "break-glass"]);
+    let inbox = PathBuf::from(bg_status["inbox"].as_str().unwrap());
+    let (_, payload_hash, kmh, ver) = measure(&below.join("kernel"));
+    let tok = break_glass_doc(
+        &machine_id(&g),
+        "nonce-s6-update",
+        "restore after a bad release",
+        &far_future(),
+        &ver,
+        &payload_hash,
+        &kmh,
+    );
+    std::fs::write(inbox.join("auth.json"), envelope(&tok, &[&p.recovery])).unwrap();
+    let r = g.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        below.join("kernel").to_str().unwrap(),
+        "--break-glass",
+    ]);
+    assert_eq!(r["release_authenticity"]["below_floor"], true);
+    let ms = gov_runtime::srr::state::MachineState::at(&machine_state_dir(&proj)).unwrap();
+    assert!(bg::is_degraded(&ms, gov_runtime::FRAMEWORK_NAME));
+
+    // The candidate the operator would update to. Uncertified, so `human_gate_required` is true — the ordinary
+    // break-glass case, and the reason this is not a corner.
+    let hi = root.join("rel-hi");
+    make_release(&hi);
+    p.publish(&hi, 22, 200, "stable", &far_future(), "4.0.0", 50);
+    let chk = g.ok(&["update", "--check", "--source", hi.join("kernel").to_str().unwrap()]);
+    assert_eq!(chk["current"], "4.1.1");
+    assert_eq!(chk["human_gate_required"], true, "scenario precondition: {chk}");
+
+    // The allow-list permits the operation ...
+    assert!(bg::permitted_activity("update --apply").is_some());
+    // ... and §6 bullet 2 refuses the gate inside it.
+    let e = g.err(&[
+        "update",
+        "--apply",
+        "--source",
+        hi.join("kernel").to_str().unwrap(),
+    ]);
+    assert_eq!(
+        e.error_code(),
+        "SRR_BELOW_FLOOR_REFUSED",
+        "an allow-listed operation does not suspend §6 inside itself"
+    );
+    assert_eq!(e.details()["refused_class"], "human_gate_create");
+    assert_eq!(e.details()["section_6_bullet"], 2);
+    assert_eq!(e.details()["operation"], "gate create (update --apply)");
+    let routes = e.details()["gate_free_restoration_routes"].clone();
+    assert!(
+        routes
+            .as_array()
+            .unwrap()
+            .contains(&json!("kernel reinstall")),
+        "a refusal that strands the operator is not a refusal we can ship: {routes}"
+    );
+    assert!(
+        e.details()["below_floor_limits"]
+            .to_string()
+            .contains("update --apply"),
+        "the refusal must state the allow-list limit it is enforcing"
+    );
+
+    // Nothing was created, and nothing was written.
+    let gates = g.ok(&["gate", "list"]);
+    assert!(
+        gates.as_array().map(|a| a.is_empty()).unwrap_or(true),
+        "a Human Gate was created below floor: {gates}"
+    );
+    assert_eq!(
+        yaml(&proj, "governance/framework.lock")["version"],
+        "4.1.1",
+        "the refused update must not have installed anything"
+    );
+
+    // And the route the refusal names actually works: §7 exit, offline, no gate.
+    let back = root.join("rel-back");
+    copy_dir(&prev, &back.join("kernel"));
+    p.publish(&back, 23, 100, "stable", &far_future(), "4.0.0", 50);
+    let r = g.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        back.join("kernel").to_str().unwrap(),
+    ]);
+    assert_eq!(r["protected_state"]["break_glass_exit"]["cleared"], true);
+    assert!(g.ok(&["trust", "status"])["degraded"].is_null());
+    // once out, the gate the operator needs can be created again: the refusal was §6, not a permanent brake
+    let e = g.err(&[
+        "update",
+        "--apply",
+        "--source",
+        hi.join("kernel").to_str().unwrap(),
+    ]);
+    assert_eq!(
+        e.error_code(),
+        "HUMAN_GATE_REQUIRED",
+        "above floor the ordinary Human Gate flow resumes"
+    );
+    assert!(
+        e.details()["gate"].as_str().is_some(),
+        "the gate that §6 forbade below floor is created normally above it: {}",
+        e.details()
+    );
+}
+
+/// `AR29-C1` — the marking record has exactly one reader, so the machine cannot refuse as marked while reporting
+/// itself unmarked, and a satisfied `OWNER-DECISION-0006` §7 exit clears it even when it is unreadable.
+///
+/// This does not touch the exit **policy**: `exit_satisfied` and `EXIT_POLICY` are owner-decided
+/// (`OWNER-DECISION-0007` §2) and are the single exit-floor comparison, unchanged.
+#[test]
+fn an_unreadable_marking_is_read_the_same_way_by_every_consumer_and_still_exits() {
+    use gov_runtime::srr::breakglass as bg;
+    use gov_runtime::srr::state::{Floors, MachineState};
+
+    let dir = tmp("srr-c1-one-reader");
+    let ms = MachineState::at(&dir.join("machine")).unwrap();
+    let product = gov_runtime::FRAMEWORK_NAME;
+
+    let mut floors = Floors {
+        product: product.to_string(),
+        ..Default::default()
+    };
+    floors.raise_minimum_secure("4.1.2", 12, "src");
+    floors.raise_release("4.1.5", 15, true);
+
+    for shape in [
+        &b"{\"active\": tr"[..],
+        &b""[..],
+        &b"\x00\x01\x02binary"[..],
+        &b"[1,2,3]"[..],
+        &b"{\"marking\":\"x\"}"[..],
+        &b"{\"active\":\"true\"}"[..],
+        &b"{\"active\":null}"[..],
+    ] {
+        std::fs::write(ms.degraded_path(product), shape).unwrap();
+
+        // the guard refuses ...
+        let e = bg::guard(&ms, product, "cit approve").unwrap_err();
+        assert_eq!(e.code, "SRR_BELOW_FLOOR_REFUSED");
+        // ... and every other reader agrees that the machine is marked
+        assert!(
+            bg::is_degraded(&ms, product),
+            "two readers of one record disagree (AR29-C1)"
+        );
+        assert!(bg::Degraded::load(&ms, product).is_some());
+
+        // restoration stays open ...
+        for l in ["kernel reinstall", "update --apply", "update --rollback", "checkpoint"] {
+            assert!(bg::guard(&ms, product, l).is_ok(), "§5 '{l}' must stay open");
+        }
+        // ... and so does the exit: the §7 condition clears the record rather than being silently ignored
+        let exit = bg::try_exit(&ms, product, 16, "4.1.6", true, &floors)
+            .unwrap()
+            .expect("an unreadable marking is still a marking");
+        assert_eq!(exit["cleared"], true);
+        assert!(!bg::is_degraded(&ms, product));
+        assert!(
+            bg::guard(&ms, product, "cit approve").is_ok(),
+            "governed operation must resume once the §7 exit condition is met"
+        );
+    }
+
+    // The exit policy itself is untouched and still refuses below the stricter floor.
+    std::fs::write(ms.degraded_path(product), b"{\"active\": tr").unwrap();
+    assert_eq!(bg::EXIT_POLICY, "b_stricter_both_floors");
+    let held = bg::try_exit(&ms, product, 13, "4.1.3", true, &floors)
+        .unwrap()
+        .unwrap();
+    assert_eq!(held["cleared"], false);
+    let unauth = bg::try_exit(&ms, product, 16, "4.1.6", false, &floors)
+        .unwrap()
+        .unwrap();
+    assert_eq!(unauth["cleared"], false);
+    assert!(bg::is_degraded(&ms, product));
+}
+
+/// `AR29-N5` — the refusal-class tables are partitioned by what the product actually enforces, and the partition
+/// is checked against the product's own enforcement-point call sites rather than asserted.
+///
+/// This is the mechanism behind AR-0027's false negative, closed: a table naming operations that do not exist
+/// made a label sweep look like coverage. A label that is enforced belongs in `REFUSAL_CLASSES`; a label that is
+/// not belongs in `RESERVED_REFUSAL_CLASSES`, which is a statement that the operation is absent.
+#[test]
+fn section_6_refusal_class_tables_are_partitioned_by_what_the_product_actually_enforces() {
+    use gov_runtime::srr::breakglass as bg;
+
+    // Every string literal this product passes to an enforcement point, read off the call sites.
+    let mut enforced: Vec<String> = vec![];
+    for (path, text) in product_sources() {
+        if path.ends_with("srr/breakglass.rs") {
+            continue; // the tables themselves, and the guards' own definitions
+        }
+        for call in [
+            "guard_write(p, \"",
+            "guard_write(&p, \"",
+            "guard_write(&p0, \"",
+            "guard_write(&self.project, \"",
+        ] {
+            for part in text.split(call).skip(1) {
+                if let Some(q) = part.find('"') {
+                    enforced.push(part[..q].to_string());
+                }
+            }
+        }
+        // `breakglass::guard(...)` and `guard_effect(...)` take the label as the last argument.
+        for part in text.split("Effect::").skip(1) {
+            if let Some(a) = part.find(",\n") {
+                let tail = &part[a..];
+                if let Some(q0) = tail.find('"') {
+                    if let Some(q1) = tail[q0 + 1..].find('"') {
+                        enforced.push(tail[q0 + 1..q0 + 1 + q1].to_string());
+                    }
+                }
+            }
+        }
+        for part in text.split("breakglass::guard(&ms, crate::FRAMEWORK_NAME, \"").skip(1) {
+            if let Some(q) = part.find('"') {
+                enforced.push(part[..q].to_string());
+            }
+        }
+    }
+    enforced.sort();
+    enforced.dedup();
+    println!("§6 enforcement-point labels in the product ({}): {enforced:?}", enforced.len());
+
+    for (label, class) in bg::REFUSAL_CLASSES {
+        assert!(
+            bg::REFUSED_ACTIVITIES.contains(class),
+            "'{class}' is not an OWNER-DECISION-0006 §6 activity"
+        );
+        assert!(
+            enforced.iter().any(|e| e == label),
+            "REFUSAL_CLASSES names '{label}', which this product passes to no enforcement point. A table of \
+             operations that do not exist is what made AR-0027's label sweep read as coverage (AR29-N5); move \
+             it to RESERVED_REFUSAL_CLASSES or give it a call site."
+        );
+        assert!(bg::permitted_activity(label).is_none());
+    }
+    for (label, class) in bg::RESERVED_REFUSAL_CLASSES {
+        assert!(bg::REFUSED_ACTIVITIES.contains(class));
+        assert!(
+            !enforced.iter().any(|e| e == label),
+            "'{label}' is reserved as a name no operation carries, but the product now enforces it: promote it \
+             to REFUSAL_CLASSES"
+        );
+    }
+    // Neither table decides anything: an unnamed label is refused exactly as a named one is.
+    assert_eq!(bg::REFUSAL_POLICY, "allow_list_default_refuse");
+    assert_eq!(
+        bg::refusal_class("an operation invented after AR-0030"),
+        "normal_privileged_operation"
+    );
+}
+
+/// The preservation census, in the product's own suite.
+///
+/// `AR29-N1` asked for `AuthenticatedRelease` to become genuinely unconstructible outside `admit`. Sealing it has
+/// one unavoidable consequence: AR-0029's `ho_f_preservation` binary no longer compiles, because its `f4` **is** a
+/// struct literal of that type from an external crate — the compile error is the finding closing. That binary also
+/// carried six preservation checks unrelated to `f4`, so they are restored here, in the same shape, rather than
+/// quietly lost. Nothing here is new policy; it is evidence that was external and is now internal.
+#[test]
+fn the_no_bypass_and_no_signing_preservation_census_still_holds() {
+    // f1 — the permissive ed25519 verifier is out of scope crate-wide, not merely unused.
+    let mut importers: Vec<String> = vec![];
+    let mut permissive: Vec<String> = vec![];
+    for (path, text) in product_sources() {
+        for (n, line) in text.lines().enumerate() {
+            let code = line.split("//").next().unwrap_or("");
+            if code.contains("use ed25519_dalek") && code.contains("Verifier") {
+                importers.push(format!("{path}:{}", n + 1));
+            }
+            if code.contains(".verify(") && !code.contains("verify_strict") {
+                permissive.push(format!("{path}:{} {}", n + 1, code.trim()));
+            }
+        }
+    }
+    assert!(
+        importers.is_empty(),
+        "the permissive `Verifier` trait is in scope at {importers:?}"
+    );
+    assert!(permissive.is_empty(), "a bare `.verify(` call exists: {permissive:?}");
+
+    // f2 — `gov` verifies and never signs (`SRR-R0-L4` stays vacuous).
+    let mut signing: Vec<String> = vec![];
+    for (path, text) in product_sources() {
+        for (n, line) in text.lines().enumerate() {
+            let code = line.split("//").next().unwrap_or("");
+            for needle in ["SigningKey", "ed25519_dalek::Signer", "PRIVATE KEY", "from_keypair_bytes"] {
+                if !code.contains(needle) {
+                    continue;
+                }
+                // `security/secrets.rs` carries a secret *detector* regex naming the PEM header it looks for.
+                if needle == "PRIVATE KEY" && path.ends_with("security/secrets.rs") && code.contains("-----BEGIN")
+                {
+                    continue;
+                }
+                signing.push(format!("{path}:{} {}", n + 1, code.trim()));
+            }
+        }
+    }
+    assert!(signing.is_empty(), "product source can sign: {signing:?}");
+
+    // f3 — exactly five `admit` sites, exactly five `install_kernel` call sites, no path-taking variant.
+    let mut admits: Vec<String> = vec![];
+    let mut installs: Vec<String> = vec![];
+    for (path, text) in product_sources() {
+        for (n, line) in text.lines().enumerate() {
+            let code = line.split("//").next().unwrap_or("");
+            if code.contains("srr::admit(") {
+                admits.push(format!("{path}:{}", n + 1));
+            }
+            if (code.contains("install_kernel(&") || code.contains("install_kernel(a,"))
+                && !code.contains("fn install_kernel")
+            {
+                installs.push(format!("{path}:{}", n + 1));
+            }
+        }
+    }
+    assert_eq!(admits.len(), 5, "admit call sites: {admits:?}");
+    assert_eq!(installs.len(), 5, "install_kernel call sites: {installs:?}");
+    let kernel = src("runtime/src/kernel.rs");
+    assert!(kernel.contains("pub fn install_kernel(\n    auth: &crate::srr::AuthenticatedRelease,"));
+    assert!(!kernel.contains("pub fn install_kernel_from_path"));
+
+    // f5 — D-0007 stays a separate control that establishes *intact*, never *authentic* or *admissible*.
+    let kt = src("runtime/src/kernel_trust.rs");
+    for forbidden in [
+        "srr::admit",
+        "AuthenticatedRelease",
+        "Authenticity",
+        "breakglass",
+        "below_floor",
+        "Floors",
+    ] {
+        assert!(
+            !kt.contains(forbidden),
+            "D-0007 (`kernel_trust`) reads `{forbidden}` from the SRR verdicts"
+        );
+    }
+    let verifier_rs = src("runtime/src/srr/verifier.rs");
+    let admit_body = verifier_rs.split("fn admit_inner").nth(1).unwrap();
+    assert!(
+        !admit_body.contains("kernel_trust"),
+        "the verifier consults the D-0007 integrity control when deciding admissibility"
+    );
+
+    // f7 — floors are monotonic and rise only from an authenticated observation.
+    let mut f = gov_runtime::srr::state::Floors {
+        product: gov_runtime::FRAMEWORK_NAME.into(),
+        ..Default::default()
+    };
+    f.raise_release("4.1.5", 15, true);
+    f.raise_minimum_secure("4.1.2", 12, "src");
+    f.raise_metadata("release", 7);
+    f.raise_release("4.0.0", 1, true);
+    f.raise_minimum_secure("4.0.0", 1, "src");
+    f.raise_metadata("release", 1);
+    assert_eq!(f.release_high_water_sequence, 15);
+    assert_eq!(f.release_high_water_version, "4.1.5");
+    assert_eq!(f.minimum_secure_sequence, 12);
+    assert_eq!(f.metadata_floor("release"), 7);
+    let before = f.release_high_water_sequence;
+    f.raise_release("9.9.9", 999, false);
+    assert_eq!(before, f.release_high_water_sequence, "an unverified install raised a floor");
+
+    // and the SRR2-R1-C1 exit policy point is untouched and still single.
+    assert_eq!(gov_runtime::srr::breakglass::EXIT_POLICY, "b_stricter_both_floors");
+    let exit_sites: usize = product_sources()
+        .iter()
+        .map(|(_, t)| t.matches("effective_floor_sequence()").count())
+        .sum();
+    assert!(
+        exit_sites <= 4,
+        "the exit-floor comparison has spread beyond `exit_satisfied` and its reporting"
+    );
+}

@@ -4,8 +4,9 @@
 //! recovery" and "Every privileged lifecycle adapter must call one verification policy and receive a typed
 //! authenticated-release value, never a raw source directory."
 //!
-//! [`admit`] is that verifier. It is the only constructor of [`AuthenticatedRelease`], and
-//! [`crate::kernel::install_kernel`] takes an `&AuthenticatedRelease` rather than a path — so an ingress cannot
+//! [`admit`] is that verifier. It is the only constructor of [`AuthenticatedRelease`] — enforced by the private
+//! `admitted: sealed::Admitted` field, which makes a struct literal outside this module fail to compile — and
+//! [`crate::kernel::install_kernel`] takes an `&AuthenticatedRelease` rather than a path, so an ingress cannot
 //! install from a source directory even by mistake. The compiler, not a convention, enforces "no bypass".
 //!
 //! The policy, in order:
@@ -187,10 +188,48 @@ impl Currency {
     }
 }
 
-/// The typed authenticated-release value. Only [`admit`] constructs it, and only it names bytes an installer may
-/// read (`verified_payload`).
+/// The seal on [`AuthenticatedRelease`] (`AR29-N1`).
+///
+/// A zero-sized private token whose only constructor is [`Admitted::by_admit`], which is `pub(super)` and is
+/// called from exactly one place: the tail of [`admit_inner`]. Because `AuthenticatedRelease` holds a field of
+/// this type and that field is **not** `pub`, no struct literal outside this module compiles — not from another
+/// module of this crate, not from a crate that depends on `gov-runtime`, not with functional-update syntax.
+///
+/// This is the difference `AR29-N1` asked for. "Constructible only by `admit`" was previously an *enumeration*
+/// property, held up by a 5-admit/5-`install_kernel` census: every field of `AuthenticatedRelease` was `pub`, so a
+/// caller could write the literal and the census was what would have noticed. It is now a *type* property, as the
+/// architecture has been claiming. The census still runs, and now it checks something narrower and stronger: that
+/// `by_admit` has one call site.
+mod sealed {
+    /// Zero-sized proof that a value came from the one verification policy.
+    #[derive(Debug, Clone)]
+    pub struct Admitted(());
+
+    impl Admitted {
+        /// The only constructor. Visible to `srr::verifier` and to nothing else.
+        pub(super) fn by_admit() -> Admitted {
+            Admitted(())
+        }
+    }
+}
+
+/// The typed authenticated-release value.
+///
+/// **Only [`admit`] constructs it, and that is enforced by the compiler**: the private `admitted` field
+/// ([`sealed::Admitted`]) cannot be named or built outside this module, so no struct literal anywhere else
+/// compiles. [`crate::kernel::install_kernel`] takes an `&AuthenticatedRelease` rather than a path, and only this
+/// value names bytes an installer may read (`verified_payload`). The two together are the no-bypass property.
+///
+/// Every other field stays `pub` for reading: the seal is on *construction*, which is the property that carries
+/// security weight, and nothing is gained by hiding what the verifier decided.
 #[derive(Debug, Clone)]
 pub struct AuthenticatedRelease {
+    /// Private and unconstructible outside this module: see [`sealed::Admitted`].
+    ///
+    /// It is deliberately never *read*. Its whole job is to exist, because a struct with a private field cannot be
+    /// built by a literal from anywhere else — which is the no-bypass property, stated to the compiler.
+    #[allow(dead_code)]
+    admitted: sealed::Admitted,
     pub ingress: Ingress,
     pub product: String,
     pub release_version: String,
@@ -691,6 +730,8 @@ fn admit_inner(
     }
 
     Ok(AuthenticatedRelease {
+        // The one call site of the seal, at the tail of the one verification policy.
+        admitted: sealed::Admitted::by_admit(),
         ingress: req.ingress,
         product: product.to_string(),
         release_version,

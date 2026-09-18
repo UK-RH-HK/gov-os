@@ -9,17 +9,38 @@
 //! | 3 | durable entry record | [`enter`] → `degraded/<product>.json` in protected machine state |
 //! | 4 | explicit `DEGRADED — RECOVERY ONLY` marking | [`DEGRADED_TOKEN`] |
 //! | 5 | permitted activities | [`PERMITTED_ACTIVITIES`] (the §5 text) and [`PERMITTED_OPERATIONS`] (the operation labels that realise it) |
-//! | 6 | refused activities | [`guard`] / [`guard_light`] — a **default-refuse allow-list** ([`REFUSAL_POLICY`]): every operation outside [`PERMITTED_OPERATIONS`] is refused, so §6 bullet 1 is enforced as a class rather than as an enumeration. [`REFUSED_ACTIVITIES`] and [`REFUSAL_CLASSES`] only name which bullet a refusal is reported under |
+//! | 6 | refused activities | **two enforcement points, one decision.** [`guard`] / [`guard_light`] decide §6 bullet 1 at the *operation* level through a default-refuse allow-list ([`REFUSAL_POLICY`]). [`guard_effect`] / [`guard_effect_on`] decide §6 bullets 2–7 at the *effect* level, and are called **from inside the primitive that performs the effect** ([`SECTION_6_SINKS`]), so a path that reaches the effect cannot miss them. [`REFUSED_ACTIVITIES`] names the classes; [`REFUSAL_CLASSES`] only chooses which bullet a bullet-1 refusal is reported under |
 //! | 7 | exit condition | [`exit_satisfied`] — the single `SRR2-R1-C1` policy point |
 //! | 8 | the floor itself is never lowered | [`enter`] writes no floor; `Floors::raise_*` are monotonic-only |
 //! | 9 | ingress consistency | the floor check lives in the one verifier every ingress calls |
 //! | 10| works with no network | every check here reads local files only |
+//!
+//! ## Why there are two enforcement points and not one, and why that is still one decision
+//!
+//! `OWNER-DECISION-0006` §6 bullet 1 names a **class of operations** ("normal privileged Governance OS
+//! operation"), so it is decided where operations are named: at [`crate::orchestration::control::guard_write`],
+//! which every mutating governed operation already calls. Bullets 2–7 name **effects** — creating or approving a
+//! Human Gate, certifying a release, mutating trust policy, acquiring a privileged plugin, lowering a floor,
+//! presenting a below-floor release as current. An effect is not an operation: `update --apply` is an allow-listed
+//! §5 restoration operation that *contains* a §6 bullet 2 effect, and `gov trust root-update` is an operation that
+//! never passes an operation-level chokepoint at all because it takes no `Project`.
+//!
+//! `AR29-B1` and `AR29-B2` were both instances of one class: **the guard was not on the path**. Adding a guard
+//! call beside each offending operation would close those two instances and leave the class open, because the next
+//! operation someone writes would need someone to remember. So the effect-level check lives **inside the single
+//! primitive that realises each effect** ([`SECTION_6_SINKS`]). A caller that has not been written yet still
+//! reaches the effect only through its sink, and the sink refuses. The enforcement is a property of the effect,
+//! not of the caller.
+//!
+//! Both points call one private decision (`decide`) over one reading of one record ([`read_marking`]), so the
+//! operation-level guard, the effect-level guard, [`Degraded::load`] and [`is_degraded`] can never disagree about
+//! whether this machine is marked (`AR29-C1`).
 use crate::srr::metadata::BreakGlassToken;
-use crate::srr::state::{write_durable, Floors, MachineState};
+use crate::srr::state::{degraded_path_at, write_durable, Floors, MachineState};
 use crate::util::now_iso;
 use crate::{GovError, Result};
 use serde_json::{json, Value};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// The machine marking required by `OWNER-DECISION-0006` §4, byte-exact.
 ///
@@ -70,6 +91,11 @@ pub const REFUSED_ACTIVITIES: &[&str] = &[
 /// | `update --apply` | restoration of an authenticated release | same, and independently floor-checked inside `admit` |
 /// | `update --rollback` | restoration of an authenticated release | restores a previously installed release, whose target is admitted through `admit` like every other ingress (§9) |
 ///
+/// **An entry permits the operation; it does not suspend §6 inside it** (`AR29-N4`). §5 is permissive and §6 is a
+/// MUST NOT, so an allow-listed operation that internally needs a §6 bullet 2–7 effect is refused at that effect
+/// by [`guard_effect`]. [`BELOW_FLOOR_LIMITS`] states, per entry, exactly where that bites, so the allow-list and
+/// the reachable behaviour agree rather than merely coexisting.
+///
 /// The admission criterion applied to this table: an operation belongs here only when it realises a §5 activity
 /// **and** it neither advances the lifecycle of a governed record nor changes trust, authority or policy state.
 /// That criterion deliberately excludes two labels a reader might expect to find here, because both mutate
@@ -95,6 +121,26 @@ pub const PERMITTED_OPERATIONS: &[(&str, &str)] = &[
 /// The shape of the §6 control, named in one checkable place: an allow-list whose default is refusal.
 pub const REFUSAL_POLICY: &str = "allow_list_default_refuse";
 
+/// **What an allow-listed operation still cannot do below floor** (`AR29-N4`).
+///
+/// `OWNER-DECISION-0006` §5 permits an *activity*; §6 forbids a set of *effects*. The two meet inside
+/// `update --apply`, which is permitted as restoration of an authenticated release and which, for a target the
+/// installed policy says needs human approval, would have to create a new Human Gate — a §6 bullet 2 MUST NOT.
+/// The decision is not ours to soften: the operation is refused at that point, and the restoration routes that
+/// need no gate stay open.
+///
+/// This table exists so the promise and the behaviour are written down in the same place. It decides nothing:
+/// [`guard_effect`] is the decision, and it is reached from inside the effect whether or not an operation appears
+/// here. It is surfaced in every refusal's `details` and in the durable entry record so an operator reads the
+/// limit at the moment it bites.
+pub const BELOW_FLOOR_LIMITS: &[(&str, &str)] = &[(
+    "update --apply",
+    "completes below floor only when the target needs no new Human Gate: creating one is OWNER-DECISION-0006 §6 bullet 2, which binds inside an allow-listed operation exactly as it binds outside one. `kernel reinstall` and `update --rollback` need no gate and remain available.",
+)];
+
+/// The gate-free restoration routes, named in refusals so a refused operator is never left without one.
+pub const GATE_FREE_RESTORATION_ROUTES: &[&str] = &["kernel reinstall", "update --rollback"];
+
 /// The `OWNER-DECISION-0006` §5 activity that permits `operation` below floor, or `None` when nothing does.
 ///
 /// This is the whole of the §6 decision procedure. `None` means refuse.
@@ -111,34 +157,73 @@ pub fn permitted_activity(operation: &str) -> Option<&'static str> {
 /// exactly as one present in it is, and is reported under §6 bullet 1, `normal_privileged_operation` — the class
 /// the decision names for privileged governed work in general. The table exists only so that an operation the
 /// decision names specifically is refused with that specific bullet quoted back to the operator.
+///
+/// **Every label here names a real operation** (`AR29-N5`): each one is a string this product actually passes to
+/// an enforcement point — `control::guard_write`, [`guard`], [`guard_light`] or [`guard_effect`]. AR-0027's
+/// false negative on `trust root-update` came from the opposite arrangement: the table named eight operations the
+/// product did not have, a label sweep refused the *labels*, and nobody noticed that no *operation* was reached.
+/// Names that no operation carries now live in [`RESERVED_REFUSAL_CLASSES`] where they cannot be mistaken for
+/// coverage, and the certification test
+/// `section_6_refusal_class_tables_are_partitioned_by_what_the_product_actually_enforces` checks the partition
+/// against the product's own call sites.
 pub const REFUSAL_CLASSES: &[(&str, &str)] = &[
+    ("gate create (system)", "human_gate_create"),
+    ("gate create (update --apply)", "human_gate_create"),
     ("gate create", "human_gate_create"),
-    ("gate present", "human_gate_create"),
     ("gate answer", "human_gate_approve"),
-    ("decide", "human_gate_approve"),
     ("release build", "release_certification"),
-    ("release certify", "release_certification"),
-    ("certify", "release_certification"),
     ("trust provision", "trust_policy_mutation"),
     ("trust root-update", "trust_policy_mutation"),
+    ("trust anchor write", "trust_policy_mutation"),
+    ("plugin acquisition", "privileged_plugin_acquisition"),
+    ("plugins register", "privileged_plugin_acquisition"),
+    ("tools install", "privileged_plugin_acquisition"),
+];
+
+/// Names that `OWNER-DECISION-0006` §6 makes plausible but that **no operation in this product carries**.
+///
+/// They are kept, separately and explicitly, for one narrow reason: if such an operation is ever added, its
+/// refusal should quote the right bullet on day one rather than default to bullet 1. They are exactly as inert as
+/// [`REFUSAL_CLASSES`] — nothing is refused or permitted because of either table — and being listed here is a
+/// statement that the operation **does not exist**, which is the opposite of a coverage claim.
+pub const RESERVED_REFUSAL_CLASSES: &[(&str, &str)] = &[
+    ("gate present", "human_gate_create"),
+    ("decide", "human_gate_approve"),
+    ("release certify", "release_certification"),
+    ("certify", "release_certification"),
     ("trust revoke", "trust_policy_mutation"),
     ("policy set", "trust_policy_mutation"),
     ("plugin install", "privileged_plugin_acquisition"),
     ("plugin acquire", "privileged_plugin_acquisition"),
-    ("plugins register", "privileged_plugin_acquisition"),
-    ("tools install", "privileged_plugin_acquisition"),
     ("skills install", "privileged_plugin_acquisition"),
     ("floor", "floor_lower_or_reset"),
 ];
 
 /// The §6 bullet a refusal of `operation` is reported under. Bullet 1 is the default for everything else.
 pub fn refusal_class(operation: &str) -> &'static str {
-    for (needle, class) in REFUSAL_CLASSES {
+    for (needle, class) in REFUSAL_CLASSES.iter().chain(RESERVED_REFUSAL_CLASSES) {
         if operation.contains(needle) {
             return class;
         }
     }
     "normal_privileged_operation"
+}
+
+/// The `OWNER-DECISION-0006` §6 bullet number a refusal class belongs to, for the operator-facing refusal.
+///
+/// Bullet 2 covers two classes ("creation **or approval** of new Human Gates"), so this is an explicit mapping and
+/// not a position in [`REFUSED_ACTIVITIES`].
+pub fn refusal_bullet(class: &str) -> u8 {
+    match class {
+        "normal_privileged_operation" => 1,
+        "human_gate_create" | "human_gate_approve" => 2,
+        "release_certification" => 3,
+        "trust_policy_mutation" => 4,
+        "privileged_plugin_acquisition" => 5,
+        "floor_lower_or_reset" => 6,
+        "present_below_floor_release_as_current" => 7,
+        _ => 1,
+    }
 }
 
 /// The permitted set rendered for an operator-facing refusal message.
@@ -150,13 +235,17 @@ fn permitted_summary() -> String {
         .join(", ")
 }
 
-/// The single refusal, shared by [`guard`] and [`guard_light`] so the two can never drift apart.
-fn refuse(operation: &str, entered_at: &str, record: &Value) -> GovError {
-    let class = refusal_class(operation);
+/// The single refusal, shared by [`guard`], [`guard_light`] and [`guard_effect`] so they can never drift apart.
+///
+/// `class` is supplied by the caller rather than derived here, because the two enforcement points know it for
+/// different reasons: the operation-level guards read it off [`refusal_class`] (reporting only), while
+/// [`guard_effect`] already holds the [`Effect`] it was asked to clear, which *is* the class.
+fn refuse(class: &'static str, operation: &str, entered_at: &str, record: &Value) -> GovError {
+    let bullet = refusal_bullet(class);
     GovError::new(
         "SRR_BELOW_FLOOR_REFUSED",
         format!(
-            "'{operation}' is refused: this machine is marked `{DEGRADED_TOKEN}`. Below-floor recovery permits only the OWNER-DECISION-0006 §5 recovery activities and refuses everything else (§6); '{operation}' is refused as {class}. Permitted while below floor: {}. To leave break-glass, {}.",
+            "'{operation}' is refused: this machine is marked `{DEGRADED_TOKEN}`. Below-floor recovery permits only the OWNER-DECISION-0006 §5 recovery activities and refuses everything else (§6); '{operation}' is refused as {class} (§6 bullet {bullet}). Permitted while below floor: {}. To leave break-glass, {}.",
             permitted_summary(),
             exit_condition_description()
         ),
@@ -165,6 +254,7 @@ fn refuse(operation: &str, entered_at: &str, record: &Value) -> GovError {
         "marking": DEGRADED_TOKEN,
         "operation": operation,
         "refused_class": class,
+        "section_6_bullet": bullet,
         "refusal_policy": REFUSAL_POLICY,
         "entered_at": entered_at,
         "permitted": PERMITTED_ACTIVITIES,
@@ -172,24 +262,39 @@ fn refuse(operation: &str, entered_at: &str, record: &Value) -> GovError {
             .iter()
             .map(|(l, a)| json!({"operation": l, "section_5_activity": a}))
             .collect::<Vec<_>>(),
+        "below_floor_limits": BELOW_FLOOR_LIMITS
+            .iter()
+            .map(|(l, note)| json!({"operation": l, "limit": note}))
+            .collect::<Vec<_>>(),
+        "gate_free_restoration_routes": GATE_FREE_RESTORATION_ROUTES,
         "exit_condition": exit_condition_description(),
         "break_glass_record": record,
     }))
 }
 
 /// A three-valued read of the marking record, so that "present but unreadable" is never silently "not marked".
+///
+/// **This is the only reader of the marking record in the implementation** (`AR29-C1`). The guards, the effect
+/// enforcement point, [`Degraded::load`], [`is_degraded`], `gov trust status`, `gov trust break-glass`,
+/// `gov recover` and [`try_exit`] all resolve through it, so no two consumers can hold opposite opinions about
+/// whether this machine is marked.
 enum Marking {
     /// No marking record at all, or one whose `active` is explicitly `false` (a cleared exit).
     NotMarked,
     /// The machine is marked `DEGRADED — RECOVERY ONLY`.
     Marked(Value),
     /// A marking record exists but cannot be read as one. Refusal is the structural default here too: a machine
-    /// whose marking cannot be read is not thereby unmarked. Recovery is unaffected, because every
-    /// [`PERMITTED_OPERATIONS`] entry is allowed before this is ever consulted, so the exit path stays open.
+    /// whose marking cannot be read is not thereby unmarked.
+    ///
+    /// Neither half of recovery is blocked by it. **Restoration** stays open because every
+    /// [`PERMITTED_OPERATIONS`] entry is allowed before this is ever consulted. **Exit** stays open because
+    /// [`Degraded::load`] reads through this same function, so an unreadable record is a `Degraded` value that a
+    /// satisfied `OWNER-DECISION-0006` §7 exit rewrites in place — which is what `AR29-C1` found was not true of
+    /// the previous arrangement, where `Degraded::load` read the record with the opposite disposition.
     Unreadable,
 }
 
-fn read_marking(path: &std::path::Path) -> Marking {
+fn read_marking(path: &Path) -> Marking {
     if !path.exists() {
         return Marking::NotMarked;
     }
@@ -211,13 +316,36 @@ fn entered_at_of(record: &Value) -> String {
         .to_string()
 }
 
+/// **The whole §6 decision**, in one place: is this machine marked, and if so, refuse under `class`.
+///
+/// Every enforcement point in the implementation ends here — the operation-level [`guard`] and [`guard_light`],
+/// and the effect-level [`guard_effect`] / [`guard_effect_on`]. There is exactly one reading of the record
+/// ([`read_marking`]) and exactly one refusal ([`refuse`]).
+fn decide(path: &Path, class: &'static str, operation: &str) -> Result<()> {
+    match read_marking(path) {
+        Marking::NotMarked => Ok(()),
+        Marking::Marked(v) => Err(refuse(class, operation, &entered_at_of(&v), &v)),
+        Marking::Unreadable => Err(refuse(
+            class,
+            operation,
+            "",
+            &json!({"unreadable_marking_record": path.display().to_string()}),
+        )),
+    }
+}
+
 /// Cheap `DEGRADED — RECOVERY ONLY` check for the hot path: it resolves the protected state root and reads one
 /// file, without creating the state layout. Used by [`crate::orchestration::control::guard_write`], which every
-/// mutating governed operation already calls, so `OWNER-DECISION-0006` §6 is enforced at the same chokepoint as
-/// `FREEZE_WRITES` rather than at a new one that a code path could forget.
+/// mutating governed operation already calls, so `OWNER-DECISION-0006` §6 bullet 1 is enforced at the same
+/// chokepoint as `FREEZE_WRITES` rather than at a new one that a code path could forget.
 ///
 /// Identical policy to [`guard`]: both consult [`permitted_activity`] and both refuse through the same private
-/// `refuse`, so the hot-path guard and the state-carrying guard cannot diverge.
+/// `decide`, so the hot-path guard and the state-carrying guard cannot diverge.
+///
+/// `AR29-N3`: the marking path is built by [`crate::srr::state::degraded_path_at`], the same function
+/// `MachineState::degraded_path` uses. The two used to sanitise the product string differently — identical for
+/// the current `FRAMEWORK_NAME`, and a silent total bypass of §6 for any product string containing a character
+/// only one of them rewrote.
 pub fn guard_light(product: &str, operation: &str) -> Result<()> {
     // The §5 allow-list is consulted first, so a recovery operation needs no state read at all and can never be
     // blocked by a failure to read state.
@@ -230,18 +358,11 @@ pub fn guard_light(product: &str, operation: &str) -> Result<()> {
         // this repair does not change how machine-state paths are resolved (AR27-OD1 is out of scope).
         return Ok(());
     };
-    let path = root
-        .join("degraded")
-        .join(format!("{}.json", product.replace(['/', '\\'], "_")));
-    match read_marking(&path) {
-        Marking::NotMarked => Ok(()),
-        Marking::Marked(v) => Err(refuse(operation, &entered_at_of(&v), &v)),
-        Marking::Unreadable => Err(refuse(
-            operation,
-            "",
-            &json!({"unreadable_marking_record": path.display().to_string()}),
-        )),
-    }
+    decide(
+        &degraded_path_at(&root, product),
+        refusal_class(operation),
+        operation,
+    )
 }
 
 /// The durable break-glass entry record and current marking for one product.
@@ -254,25 +375,42 @@ pub struct Degraded {
 }
 
 impl Degraded {
+    /// Load the marking **through the same reader the guards use** (`AR29-C1`).
+    ///
+    /// A record that exists but cannot be read as one is `Some`, not `None`: the guards refuse on it, so every
+    /// other consumer must agree that the machine is marked, and — the part that was actually broken —
+    /// [`try_exit`] must be able to *clear* it when the `OWNER-DECISION-0006` §7 exit condition is met. Returning
+    /// `None` here meant the exit rewrote nothing and the guard went on refusing for ever, while
+    /// `gov trust status` reported `degraded: null`.
+    ///
+    /// This changes only who reads the record, never the exit **policy**: [`exit_satisfied`] and [`EXIT_POLICY`]
+    /// are untouched and remain the single owner-decided exit-floor comparison.
     pub fn load(ms: &MachineState, product: &str) -> Option<Degraded> {
-        let v = crate::util::read_json(&ms.degraded_path(product)).ok()?;
-        if !v.get("active").and_then(|x| x.as_bool()).unwrap_or(false) {
-            return None;
+        let path = ms.degraded_path(product);
+        match read_marking(&path) {
+            Marking::NotMarked => None,
+            Marking::Marked(v) => Some(Degraded {
+                product: product.to_string(),
+                marking: v
+                    .get("marking")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or(DEGRADED_TOKEN)
+                    .to_string(),
+                entered_at: entered_at_of(&v),
+                record: v,
+            }),
+            Marking::Unreadable => Some(Degraded {
+                product: product.to_string(),
+                marking: DEGRADED_TOKEN.to_string(),
+                entered_at: String::new(),
+                record: json!({
+                    "active": true,
+                    "marking": DEGRADED_TOKEN,
+                    "unreadable_marking_record": path.display().to_string(),
+                    "note": "This machine's break-glass marking record is present but cannot be read as a record. It is treated as marked by every reader, and a satisfied OWNER-DECISION-0006 §7 exit rewrites it in place.",
+                }),
+            }),
         }
-        Some(Degraded {
-            product: product.to_string(),
-            marking: v
-                .get("marking")
-                .and_then(|x| x.as_str())
-                .unwrap_or(DEGRADED_TOKEN)
-                .to_string(),
-            entered_at: v
-                .get("entered_at")
-                .and_then(|x| x.as_str())
-                .unwrap_or("")
-                .to_string(),
-            record: v,
-        })
     }
 }
 
@@ -281,27 +419,190 @@ pub fn is_degraded(ms: &MachineState, product: &str) -> bool {
     Degraded::load(ms, product).is_some()
 }
 
-/// Refuse an operation while the machine is marked `DEGRADED — RECOVERY ONLY` (OWNER-DECISION-0006 §6).
+/// Refuse an operation while the machine is marked `DEGRADED — RECOVERY ONLY` (OWNER-DECISION-0006 §6 bullet 1).
 ///
 /// **The default is refuse, structurally.** The decision procedure is [`permitted_activity`]: an operation
 /// proceeds only when its label appears verbatim in [`PERMITTED_OPERATIONS`] alongside the §5 activity that
 /// covers it. Everything else is refused, whether or not anyone anticipated it — which is what it means to refuse
 /// "normal privileged Governance OS operation" (§6 bullet 1) as a class rather than as a list of strings.
 /// [`REFUSAL_CLASSES`] chooses only which §6 bullet the refusal is *reported* under; it decides nothing.
+///
+/// This is the *operation*-level point. Bullets 2–7 name effects rather than operations and are enforced by
+/// [`guard_effect`] from inside the effect itself; see the module header.
 pub fn guard(ms: &MachineState, product: &str, operation: &str) -> Result<()> {
     if permitted_activity(operation).is_some() {
         return Ok(());
     }
-    let path = ms.degraded_path(product);
-    match read_marking(&path) {
-        Marking::NotMarked => Ok(()),
-        Marking::Marked(v) => Err(refuse(operation, &entered_at_of(&v), &v)),
-        Marking::Unreadable => Err(refuse(
-            operation,
-            "",
-            &json!({"unreadable_marking_record": path.display().to_string()}),
-        )),
+    decide(
+        &ms.degraded_path(product),
+        refusal_class(operation),
+        operation,
+    )
+}
+
+// ------------------------------------------- OWNER-DECISION-0006 §6 bullets 2-7 : the effect enforcement point
+
+/// The effects `OWNER-DECISION-0006` §6 forbids below floor, one variant per named effect.
+///
+/// An effect is not an operation. `gov trust root-update` is an operation that performs
+/// [`Effect::TrustPolicyMutation`]; `update --apply` is an *allow-listed* operation that would perform
+/// [`Effect::HumanGateCreate`] on its way to a §5 restoration. §6 binds the effect in both cases.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Effect {
+    /// Bullet 1 — normal privileged Governance OS operation. Decided by [`guard`] / [`guard_light`].
+    NormalPrivilegedOperation,
+    /// Bullet 2 — creation of a new Human Gate.
+    HumanGateCreate,
+    /// Bullet 2 — approval of a new Human Gate.
+    HumanGateApprove,
+    /// Bullet 3 — release certification.
+    ReleaseCertification,
+    /// Bullet 4 — trust-policy mutation.
+    TrustPolicyMutation,
+    /// Bullet 5 — privileged plugin/profile acquisition.
+    PrivilegedPluginAcquisition,
+    /// Bullet 6 — lowering or resetting the signed security floor / high-water.
+    FloorLowerOrReset,
+    /// Bullet 7 — treating the below-floor release as current or fully trusted.
+    PresentBelowFloorReleaseAsCurrent,
+}
+
+impl Effect {
+    /// The `OWNER-DECISION-0006` §6 activity name this effect is refused as. Always in [`REFUSED_ACTIVITIES`].
+    pub fn activity(&self) -> &'static str {
+        match self {
+            Effect::NormalPrivilegedOperation => "normal_privileged_operation",
+            Effect::HumanGateCreate => "human_gate_create",
+            Effect::HumanGateApprove => "human_gate_approve",
+            Effect::ReleaseCertification => "release_certification",
+            Effect::TrustPolicyMutation => "trust_policy_mutation",
+            Effect::PrivilegedPluginAcquisition => "privileged_plugin_acquisition",
+            Effect::FloorLowerOrReset => "floor_lower_or_reset",
+            Effect::PresentBelowFloorReleaseAsCurrent => "present_below_floor_release_as_current",
+        }
     }
+    /// The §6 bullet number.
+    pub fn bullet(&self) -> u8 {
+        refusal_bullet(self.activity())
+    }
+}
+
+/// **The §6 sink census.** For each §6 bullet, the single primitive in this product that can realise the effect,
+/// and therefore the single place the enforcement point has to sit.
+///
+/// This is the claim the repair makes, written where it can be checked. The certification test
+/// `section_6_effects_are_enforced_inside_their_sinks` reads the product's own source against it and fails when a
+/// sink loses its enforcement call, when the token stops being sealed, or when a second implementation of a §6
+/// primitive appears somewhere else in the tree.
+///
+/// Bullets 6 and 7 have no sink because they have no primitive: [`Floors`] exposes only `raise_*`, which are
+/// monotonic and ignore a lower value rather than writing it, and every surface that reports the installed release
+/// carries the marking alongside it.
+pub const SECTION_6_SINKS: &[(&str, &str)] = &[
+    (
+        "normal_privileged_operation",
+        "crate::orchestration::control::guard_write",
+    ),
+    ("human_gate_create", "crate::orchestration::gates::build"),
+    ("human_gate_approve", "crate::orchestration::gates::answer"),
+    ("release_certification", "crate::release::build"),
+    (
+        "trust_policy_mutation",
+        "crate::srr::state::MachineState::set_root_metadata",
+    ),
+    (
+        "privileged_plugin_acquisition",
+        "crate::srr::plugins::guard_acquisition",
+    ),
+    (
+        "floor_lower_or_reset",
+        "no primitive: Floors::raise_* are monotonic and never write a lower value",
+    ),
+    (
+        "present_below_floor_release_as_current",
+        "no primitive: every reporting surface carries the marking",
+    ),
+];
+
+/// **A sealed witness that [`guard_effect`] was consulted for one effect and did not refuse it.**
+///
+/// The fields are private and there is no public constructor, no `Clone`, no `Copy` and no `Default`, so a value
+/// of this type cannot come into existence anywhere except inside this module — not by a struct literal, not by
+/// functional-update syntax, not from another crate. A function that takes a `&Clearance` therefore cannot be
+/// called at all without the §6 decision having run: the *compiler* puts the enforcement point on the path, not a
+/// convention and not a reviewer's memory.
+///
+/// It is deliberately **not** how the trust-policy and release-certification sinks are gated. Those call
+/// [`guard_effect`] themselves, at the instant of the effect, because a token passed in from a caller is a
+/// decision taken at some earlier moment; the check inside the sink is the decision taken *now*. The witness is
+/// used where a sink has a small, fixed set of in-module wrappers ([`crate::orchestration::gates::build`]) and the
+/// type system can carry the proof the last few lines without opening a time-of-use gap.
+#[derive(Debug)]
+pub struct Clearance {
+    effect: Effect,
+    operation: String,
+}
+
+impl Clearance {
+    /// The only constructor, private to this module and reachable only from [`guard_effect_on`].
+    fn issue(effect: Effect, operation: &str) -> Clearance {
+        Clearance {
+            effect,
+            operation: operation.to_string(),
+        }
+    }
+    pub fn effect(&self) -> Effect {
+        self.effect
+    }
+    pub fn operation(&self) -> &str {
+        &self.operation
+    }
+}
+
+/// **THE `OWNER-DECISION-0006` §6 bullets 2–7 enforcement point**, state-carrying form.
+///
+/// Called from inside the primitive that performs `effect` (see [`SECTION_6_SINKS`]), so every path that reaches
+/// the effect passes it — including paths written after this code, which is what makes §6 a property of the
+/// effect rather than of a list of callers somebody has to maintain.
+///
+/// **There is no allow-list exception here.** [`PERMITTED_OPERATIONS`] is the §5 exception to bullet 1 and to
+/// bullet 1 only. Bullets 2–7 are MUST NOTs that bind *inside* a permitted operation exactly as they bind outside
+/// one — the live case being `update --apply`, which is permitted as restoration and still may not create a Human
+/// Gate to get there (`AR29-N4`, [`BELOW_FLOOR_LIMITS`]). [`Effect::NormalPrivilegedOperation`] is accepted for
+/// completeness and is the one variant that does consult the allow-list, so that the two enforcement points state
+/// one policy between them.
+pub fn guard_effect_on(
+    ms: &MachineState,
+    product: &str,
+    effect: Effect,
+    operation: &str,
+) -> Result<Clearance> {
+    if effect == Effect::NormalPrivilegedOperation && permitted_activity(operation).is_some() {
+        return Ok(Clearance::issue(effect, operation));
+    }
+    decide(&ms.degraded_path(product), effect.activity(), operation)?;
+    Ok(Clearance::issue(effect, operation))
+}
+
+/// [`guard_effect_on`] for a sink that holds no [`MachineState`], resolving the protected state root the same way
+/// [`guard_light`] does and failing open on the same ungoverned/unprovisioned case for the same reason.
+///
+/// The marking is always written and read under [`crate::FRAMEWORK_NAME`] — `enter` writes
+/// `degraded/<product>.json` for the product the break-glass token binds, and `authorise` refuses a token whose
+/// product is not this one — so that is the product this resolves.
+pub fn guard_effect(effect: Effect, operation: &str) -> Result<Clearance> {
+    if effect == Effect::NormalPrivilegedOperation && permitted_activity(operation).is_some() {
+        return Ok(Clearance::issue(effect, operation));
+    }
+    let Ok(root) = crate::srr::state::resolve_state_root() else {
+        return Ok(Clearance::issue(effect, operation));
+    };
+    decide(
+        &degraded_path_at(&root, crate::FRAMEWORK_NAME),
+        effect.activity(),
+        operation,
+    )?;
+    Ok(Clearance::issue(effect, operation))
 }
 
 // ------------------------------------------------------------------- SRR2-R1-C1 : the single exit policy point
@@ -519,6 +820,15 @@ pub fn enter(
             .collect::<Vec<_>>(),
         "refusal_policy": REFUSAL_POLICY,
         "refused_activities": REFUSED_ACTIVITIES,
+        "below_floor_limits": BELOW_FLOOR_LIMITS
+            .iter()
+            .map(|(l, note)| json!({"operation": l, "limit": note}))
+            .collect::<Vec<_>>(),
+        "section_6_enforcement": {
+            "bullet_1": "operation level: crate::orchestration::control::guard_write -> breakglass::guard_light, a default-refuse allow-list",
+            "bullets_2_to_7": "effect level: breakglass::guard_effect, called from inside the primitive that performs the effect",
+            "sinks": SECTION_6_SINKS.iter().map(|(a, s)| json!({"activity": a, "sink": s})).collect::<Vec<_>>(),
+        },
         "exit_condition": exit_condition_description(),
         "exit_policy": EXIT_POLICY,
         "floors_unchanged": "OWNER-DECISION-0006 §8: break-glass records that the machine is operating beneath its floors; it does not lower, reset or forget them.",
@@ -667,6 +977,164 @@ mod tests {
                 "'{class}' is not an OWNER-DECISION-0006 §6 activity"
             );
         }
+    }
+
+    /// `AR29-B1` / `AR29-B2` — the §6 bullets 2–7 effect enforcement point has **no allow-list exception**.
+    ///
+    /// The allow-list is the §5 exception to bullet 1. An operation that is permitted below floor is still
+    /// forbidden the named effects, which is the whole of the `update --apply` case: permitted as restoration,
+    /// refused at the Human Gate it would have to create.
+    #[test]
+    fn a_named_section_6_effect_has_no_allow_list_exception() {
+        let dir = std::env::temp_dir().join(format!("bg-effect-{}", crate::util::short_uuid()));
+        let ms = MachineState::at(&dir).unwrap();
+        let product = "p";
+        write_durable(
+            &ms.degraded_path(product),
+            &json!({"active": true, "marking": DEGRADED_TOKEN, "entered_at": "2026-01-01T00:00:00Z"}),
+        )
+        .unwrap();
+
+        // bullet 1 keeps its §5 exception, at both the operation guard and the effect point
+        assert!(guard(&ms, product, "update --apply").is_ok());
+        assert!(guard_effect_on(
+            &ms,
+            product,
+            Effect::NormalPrivilegedOperation,
+            "update --apply"
+        )
+        .is_ok());
+
+        // bullets 2-7 do not, whatever operation label is presented — including an allow-listed one
+        for effect in [
+            Effect::HumanGateCreate,
+            Effect::HumanGateApprove,
+            Effect::ReleaseCertification,
+            Effect::TrustPolicyMutation,
+            Effect::PrivilegedPluginAcquisition,
+            Effect::FloorLowerOrReset,
+            Effect::PresentBelowFloorReleaseAsCurrent,
+        ] {
+            for label in ["update --apply", "kernel reinstall", "checkpoint", "anything"] {
+                let e = guard_effect_on(&ms, product, effect, label).unwrap_err();
+                assert_eq!(e.code, "SRR_BELOW_FLOOR_REFUSED");
+                assert_eq!(e.details["refused_class"], effect.activity());
+                assert_eq!(e.details["section_6_bullet"], effect.bullet());
+            }
+        }
+
+        // and on an unmarked machine every effect clears
+        std::fs::remove_file(ms.degraded_path(product)).unwrap();
+        for effect in [Effect::TrustPolicyMutation, Effect::HumanGateCreate] {
+            let c = guard_effect_on(&ms, product, effect, "x").unwrap();
+            assert_eq!(c.effect(), effect);
+            assert_eq!(c.operation(), "x");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Every §6 activity has a declared sink and every sink names a §6 activity, so the census cannot silently
+    /// lose a bullet.
+    #[test]
+    fn every_section_6_activity_has_exactly_one_declared_sink() {
+        assert_eq!(SECTION_6_SINKS.len(), REFUSED_ACTIVITIES.len());
+        for a in REFUSED_ACTIVITIES {
+            assert_eq!(
+                SECTION_6_SINKS.iter().filter(|(x, _)| x == a).count(),
+                1,
+                "§6 activity '{a}' must have exactly one declared sink"
+            );
+        }
+        for (activity, sink) in SECTION_6_SINKS {
+            assert!(REFUSED_ACTIVITIES.contains(activity));
+            assert!(!sink.is_empty());
+        }
+        // the enum and the activity names are one vocabulary
+        for effect in [
+            Effect::NormalPrivilegedOperation,
+            Effect::HumanGateCreate,
+            Effect::HumanGateApprove,
+            Effect::ReleaseCertification,
+            Effect::TrustPolicyMutation,
+            Effect::PrivilegedPluginAcquisition,
+            Effect::FloorLowerOrReset,
+            Effect::PresentBelowFloorReleaseAsCurrent,
+        ] {
+            assert!(REFUSED_ACTIVITIES.contains(&effect.activity()));
+            assert!((1..=7).contains(&effect.bullet()));
+        }
+    }
+
+    /// `AR29-N5` — the reserved names are inert, report a real §6 bullet, and are disjoint from the live table.
+    #[test]
+    fn reserved_refusal_classes_are_inert_and_disjoint() {
+        for (label, class) in RESERVED_REFUSAL_CLASSES {
+            assert!(
+                REFUSED_ACTIVITIES.contains(class),
+                "'{class}' is not an OWNER-DECISION-0006 §6 activity"
+            );
+            assert!(
+                permitted_activity(label).is_none(),
+                "'{label}' is both refusal-classified and permitted"
+            );
+            assert!(
+                !REFUSAL_CLASSES.iter().any(|(l, _)| l == label),
+                "'{label}' is in both tables"
+            );
+        }
+        // reporting only: a reserved name is refused exactly as an unnamed one is
+        assert_eq!(refusal_class("release certify"), "release_certification");
+        assert_eq!(refusal_class("trust root-update"), "trust_policy_mutation");
+        assert_eq!(refusal_class("gate create"), "human_gate_create");
+        assert_eq!(refusal_class("nothing at all"), "normal_privileged_operation");
+    }
+
+    /// `AR29-N4` — every limit named applies to an operation the allow-list actually permits, so the table cannot
+    /// drift into describing something that is not on offer.
+    #[test]
+    fn below_floor_limits_describe_allow_listed_operations() {
+        for (label, note) in BELOW_FLOOR_LIMITS {
+            assert!(
+                permitted_activity(label).is_some(),
+                "'{label}' carries a below-floor limit but is not on the allow-list"
+            );
+            assert!(note.len() > 40, "'{label}' needs a usable explanation");
+        }
+        for route in GATE_FREE_RESTORATION_ROUTES {
+            assert!(
+                permitted_activity(route).is_some(),
+                "'{route}' is offered as a way out of break-glass but is not permitted below floor"
+            );
+        }
+    }
+
+    /// `AR29-C1` — one reader. An unreadable record is marked for the guard *and* for `Degraded::load`, and a
+    /// satisfied §7 exit rewrites it instead of silently doing nothing.
+    #[test]
+    fn the_marking_record_has_exactly_one_reader() {
+        let dir = std::env::temp_dir().join(format!("bg-reader-{}", crate::util::short_uuid()));
+        let ms = MachineState::at(&dir).unwrap();
+        let product = "p";
+        let mut floors = Floors {
+            product: product.into(),
+            ..Default::default()
+        };
+        floors.raise_release("4.1.5", 15, true);
+
+        std::fs::write(ms.degraded_path(product), b"{\"active\": tr").unwrap();
+        assert!(guard(&ms, product, "cit approve").is_err());
+        assert!(
+            is_degraded(&ms, product),
+            "the guard refuses as marked, so every other reader must agree"
+        );
+        // the exit is open, not merely the restore path
+        let exit = try_exit(&ms, product, 16, "4.1.6", true, &floors)
+            .unwrap()
+            .expect("an unreadable marking is a marking");
+        assert_eq!(exit["cleared"], true);
+        assert!(!is_degraded(&ms, product));
+        assert!(guard(&ms, product, "cit approve").is_ok());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

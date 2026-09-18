@@ -36,6 +36,16 @@ pub fn provision(root_file: &Path, project_root: Option<&Path>) -> Result<Value>
         )
         .with_details(json!({"current_root_version": current_version, "candidate_root_version": root.version})));
     }
+    // OWNER-DECISION-0006 §6 bullet 4. This takes no `Project`, so it can never reach `control::guard_write`; the
+    // operation-level refusal is taken here, and the effect is independently refused inside
+    // `MachineState::set_root_metadata` even if this line is ever lost.
+    //
+    // It sits **after** the already-provisioned check on purpose. A machine cannot be marked
+    // `DEGRADED — RECOVERY ONLY` without a trust anchor — the marking is written by `enter`, which needs the
+    // root's `recovery` role — so on every marked machine this door is already shut, and `SRR_ALREADY_PROVISIONED`
+    // is the accurate diagnosis. Refusing under §6 first would tell an operator the command might work once they
+    // leave break-glass, which is false. The guard is kept for the case that is not reachable today.
+    super::breakglass::guard(&ms, crate::FRAMEWORK_NAME, "trust provision")?;
     ms.set_root_metadata(&bytes, root.version, &root.product)?;
     Ok(json!({
         "provisioned": true, "machine_id": ms.machine_id, "state_root": ms.root.display().to_string(),
@@ -50,6 +60,12 @@ pub fn provision(root_file: &Path, project_root: Option<&Path>) -> Result<Value>
 /// effect; see [`metadata::accept_root_succession`] for the concrete acceptance rules.
 pub fn root_update(root_file: &Path, project_root: Option<&Path>) -> Result<Value> {
     let ms = MachineState::open()?;
+    // `AR29-B1`. OWNER-DECISION-0006 §6 bullet 4: "Below-floor recovery MUST NOT permit ... trust-policy
+    // mutation". Root succession re-anchors the machine, revokes by omission every key the successor omits and
+    // advances the protected `root` metadata high-water. This operation takes no `Project`, so it never reaches
+    // `control::guard_write`; the operation-level refusal is taken here, and the effect itself is refused inside
+    // `MachineState::set_root_metadata`, which is where a trust-changing path written tomorrow will meet it.
+    super::breakglass::guard(&ms, crate::FRAMEWORK_NAME, "trust root-update")?;
     let now = metadata::local_clock_now();
     refuse_repository_sourced_anchor(root_file, project_root)?;
     let current = super::verifier::trusted_root(&ms, &now)?.ok_or_else(|| {
