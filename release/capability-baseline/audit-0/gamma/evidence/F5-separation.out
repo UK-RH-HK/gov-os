@@ -1,0 +1,17 @@
+=== F5: MCP/A2A/tool separation ===
+--- Tool registry distinguishes tool types ---
+tool_types: ['CLI', 'MCP', 'library']
+has_mcp: True
+--- Code shows: MCP = action, A2A = communication, Knowledge = knowing ---
+--- Separate registries for tools vs MCP ---
+7:pub fn kernel_tools(p: &Project) -> Vec<Value> {
+18:pub fn project_tools(p: &Project) -> Vec<Value> {
+34:pub fn mcp_servers(p: &Project) -> Vec<Value> {
+84:pub fn plugin_tools(p: &Project) -> (Vec<Value>, Value) {
+142:    let mut tools = kernel_tools(p);
+143:    tools.extend(project_tools(p));
+144:    let (ptools, plugin_summary) = plugin_tools(p);
+146:    let servers = mcp_servers(p);
+--- A2A handoffs separate from tool invocation ---
+10:    crate::authority::require(p, "create_handoff")?;
+114:    crate::authority::require(p, "return_handoff")?;

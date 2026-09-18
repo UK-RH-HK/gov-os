@@ -1,0 +1,28 @@
+=== G1: Natural-language intent routing ===
+--- phrase: 'what is the status' ---
+intent: STATUS
+commands: ['gov status']
+--- phrase: 'continue working' ---
+intent: CONTINUE
+commands: ['gov continue']
+--- phrase: 'go ahead approve' ---
+intent: APPROVE
+commands: ['gov decide HDG-0001 --option <id>', 'gov continue']
+--- phrase: 'audit the repository' ---
+intent: AUDIT
+commands: ['gov audit']
+--- phrase: 'discover how to implement auth' ---
+intent: DISCOVER
+commands: ['gov task create --class discovery --objective "discover how to implement auth"', 'gov cit propose ... && gov cit simulate <CIT>']
+--- phrase: 'pause everything' ---
+intent: PAUSE
+commands: ['gov pause']
+--- phrase: 'roll back the last change' ---
+intent: ROLLBACK
+commands: ['gov cit rollback <CIT>']
+--- Deterministic test ---
+R1=STATUS R2=STATUS deterministic=PASS
+--- APPROVE intent references gate/cit ---
+intent: APPROVE
+commands: ['gov decide HDG-0001 --option <id>', 'gov continue']
+references_gate_logic: True

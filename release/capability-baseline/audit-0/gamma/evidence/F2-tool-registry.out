@@ -1,0 +1,22 @@
+=== F2: Tool Capability Registry ===
+--- Tools list (identity/version/permissions/roles/status/provenance/health) ---
+ok: True
+count: 16
+has_tool_id: True
+has_version: True
+has_status: True
+has_approved_roles: True
+has_permissions: True
+has_health_check: True
+has_provenance: False
+has_role_exposure: False
+has_plugins: False
+has_mcp_servers: True
+--- Tool resolve by capability and role ---
+ok: True
+has_capability_gap: True
+has_tools: True
+has_mcp_servers: True
+has_reason: True
+--- Tools health ---
+ok: True
