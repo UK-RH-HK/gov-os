@@ -2,21 +2,37 @@
 //! Never read: secret-class paths and any sensitivity class in SECURITY_POLICY.never_index_classes (fail closed).
 //! The embedding implementation is the one pinned by policy; it is recorded in runtime meta and the manifest and a
 //! pin change escalates an incremental build to a full rebuild (no mixed-embedder index, no silent fallback).
+//!
+//! **Incremental equals full (BC-P2-29, Contract v3:308-313).** Three rules make an incremental build derive the
+//! same index as a full one:
+//! 1. *Current policy.* Every build reads the policy set, overlay and path map from disk ([`current_view`]), never
+//!    from a view a caller cached before a governed mutation (CIT-E applies a manifest and then refreshes: the
+//!    refresh runs under the post-mutation path map and pins, and fails — so the transaction rolls back — when the
+//!    new pins cannot be built).
+//! 2. *Per-artefact derivation key.* Besides its content hash, each artefact carries a key over everything outside
+//!    its content that shapes its derived rows: its path-map decision (class, namespace, sensitivity, index flags,
+//!    default retrieval), the code-intelligence adapter that analyses it, and the authority state-class mapping for
+//!    records ([`DerivationContext`]). An unchanged file whose key changed (a path-map reclassification, an adapter
+//!    registered or replaced) is re-derived, and `manifest::freshness` reports it stale until it is.
+//! 3. *Cross-artefact facts are derived globally.* Import resolution, `IMPORTS`/`CALLS`/`TESTS` edges,
+//!    inheritance/implementation edges and supersession are recomputed over the whole index after every build
+//!    ([`derive_cross_artifact_facts`]), so a fact owned by an unchanged file that depends on a changed one (a
+//!    caller's `CALLS` edge to a renamed function, a superseder that was removed) never goes stale.
 use crate::capabilities::ecosystems;
 use crate::capabilities::governance::plugin_set;
 use crate::capabilities::protocol::PluginDescriptor;
 use crate::code_intelligence;
-use crate::memory::chunking::{chunk_code, chunk_plain, chunk_record, Chunk};
+use crate::memory::chunking::{chunk_code, chunk_plain, chunk_record, uncovered_lines, Chunk};
 use crate::memory::db::RuntimeDb;
 use crate::memory::embedder::{EmbedSpec, Embedder, RerankSpec, Reranker};
 use crate::memory::manifest::{build_index_manifest, read_index_manifest, write_manifests};
-use crate::paths::iter_repo_files;
-use crate::records::{parse_record_text, state_class_for};
-use crate::util::{is_text_file, now_iso, read_text, sha256_hex};
+use crate::paths::{iter_repo_files, PathDecision};
+use crate::records::{parse_record_text, state_class_for, Record};
+use crate::util::{hash_value, is_text_file, now_iso, read_text, sha256_hex};
 use crate::{GovError, Project, Result, INDEX_VERSION};
 use rusqlite::params;
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Default)]
@@ -26,6 +42,9 @@ pub struct IndexOptions {
     pub db_path: Option<PathBuf>,
     /// Override the policy-pinned embedder (benchmarks only).
     pub embed_override: Option<EmbedSpec>,
+    /// Record the tool failures this build observes in failure memory (`memory::failures`). Default: yes, except
+    /// for benchmark builds (a failing candidate is a benchmark result, recorded in its research record).
+    pub record_failures: Option<bool>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Default)]
@@ -47,6 +66,13 @@ pub struct IndexReport {
     pub supersession_conflicts: Vec<Value>,
     pub mode: String,
     pub escalated_to_full: Option<String>,
+    /// Unchanged-content artefacts re-derived because their derivation key changed (reclassification, adapter).
+    pub rederived: Vec<String>,
+    /// Coverage of the artefacts (re)indexed by this build: every non-empty code line and every record content
+    /// line must be held by a chunk (`memory::coverage`).
+    pub coverage: Value,
+    /// Failure-memory outcomes for tool failures this build observed.
+    pub failures: Vec<Value>,
 }
 
 pub fn lexical_config(p: &Project) -> Value {
@@ -54,7 +80,7 @@ pub fn lexical_config(p: &Project) -> Value {
 }
 pub fn chunking_config(p: &Project) -> Value {
     let pol = p.policies();
-    json!({"max_chars": pol.get_i64("MEMORY_POLICY", "chunking.max_chars", 1200).max(200), "overlap_chars": pol.get_i64("MEMORY_POLICY", "chunking.overlap_chars", 120), "levels": ["document", "section", "child"]})
+    json!({"max_chars": pol.get_i64("MEMORY_POLICY", "chunking.max_chars", 1200).max(200), "overlap_chars": pol.get_i64("MEMORY_POLICY", "chunking.overlap_chars", 120), "levels": ["document", "section", "child"], "chunker": crate::memory::chunking::CHUNKER_VERSION})
 }
 
 /// The pins the live index must satisfy: embedder, reranker, chunking, lexical engine, index format version.
@@ -82,133 +108,83 @@ pub fn pin_differences(expected: &Value, live: &Value) -> Vec<String> {
     out
 }
 
-fn resolve_import(
-    root: &Path,
-    from_rel: &str,
-    language: &str,
-    name: &str,
-    product_roots: &[String],
-    go_modules: &[(String, String)],
-) -> Option<String> {
-    let exists = |rel: &str| root.join(rel).is_file();
-    let dir = Path::new(from_rel)
+/// A view of the project whose policy set, overlay, path map and secret scanner are read from disk now — never a
+/// cache taken before a mutation. Same root, session and role as `p`.
+pub fn current_view(p: &Project) -> Project {
+    Project::open(&p.root).with_session(Some(p.session_id.clone()), Some(p.role.clone()))
+}
+
+/// Everything outside an artefact's content that shapes its derived index rows.
+pub struct DerivationContext {
+    plugins: Vec<PluginDescriptor>,
+    authority_sig: String,
+    provider_cache: std::cell::RefCell<HashMap<String, String>>,
+}
+
+impl DerivationContext {
+    pub fn new(p: &Project, plugins: &[PluginDescriptor]) -> Self {
+        let authority = p
+            .policies()
+            .effective
+            .get("AUTHORITY_POLICY")
+            .and_then(|a| a.get("default_state_class_by_type"))
+            .cloned()
+            .unwrap_or(Value::Null);
+        DerivationContext {
+            plugins: plugins.to_vec(),
+            authority_sig: hash_value(&authority),
+            provider_cache: std::cell::RefCell::new(HashMap::new()),
+        }
+    }
+    fn provider(&self, language: &str) -> String {
+        if let Some(v) = self.provider_cache.borrow().get(language) {
+            return v.clone();
+        }
+        let v = code_intelligence::provider_identity(language, &self.plugins);
+        self.provider_cache
+            .borrow_mut()
+            .insert(language.to_string(), v.clone());
+        v
+    }
+    /// The derivation key of the artefact at `rel` under decision `d` (path-independent; no machine paths).
+    pub fn key(&self, d: &PathDecision, rel: &str) -> String {
+        let ext = Path::new(rel)
+            .extension()
+            .map(|e| e.to_string_lossy().to_lowercase())
+            .unwrap_or_default();
+        let provider = match (d.flag("code_index"), ecosystems::language_for_ext(&ext)) {
+            (true, Some(lang)) => self.provider(lang),
+            _ => String::new(),
+        };
+        let record_like = matches!(ext.as_str(), "yaml" | "yml" | "md");
+        let v = json!({
+            "class": d.class(), "namespace": d.namespace(), "sensitivity": d.sensitivity(),
+            "default_retrieval": d.default_retrieval(), "never_index": d.is_never_index(),
+            "flags": [d.flag("lexical_index"), d.flag("semantic_index"), d.flag("graph_index"), d.flag("code_index")],
+            "provider": provider, "authority": if record_like { self.authority_sig.as_str() } else { "" },
+        });
+        sha256_hex(v.to_string().as_bytes())[..32].to_string()
+    }
+}
+
+// ---------------------------------------------------------------------------------------------- import resolution
+
+/// Resolves import names to repository files from the file set of the current tree (no filesystem probing, so the
+/// result depends only on the tree and is identical for incremental and full builds).
+pub struct ImportResolver {
+    files: HashSet<String>,
+    by_dir: HashMap<String, Vec<String>>,
+    by_basename: HashMap<String, Vec<String>>,
+    product_roots: Vec<String>,
+    go_modules: Vec<(String, String)>,
+    rust_crates: Vec<(String, String)>,
+}
+
+fn parent_dir(rel: &str) -> String {
+    Path::new(rel)
         .parent()
         .map(|p| p.to_string_lossy().to_string())
-        .unwrap_or_default();
-    match language {
-        "python" => {
-            let rel_mod = name.trim_start_matches('.').replace('.', "/");
-            let mut bases = vec![String::new(), dir.clone() + "/"];
-            for pr in product_roots {
-                bases.push(pr.clone());
-            }
-            let mut anc = Path::new(from_rel).parent();
-            while let Some(a) = anc {
-                bases.push(format!("{}/", a.to_string_lossy()));
-                anc = a.parent();
-            }
-            for b in bases {
-                let b = b.trim_start_matches('/').to_string();
-                for cand in [
-                    format!("{b}{rel_mod}.py"),
-                    format!("{b}{rel_mod}/__init__.py"),
-                ] {
-                    let c = cand.trim_start_matches('/').replace("//", "/");
-                    if exists(&c) {
-                        return Some(c);
-                    }
-                }
-            }
-            None
-        }
-        "javascript" | "typescript" => {
-            if !name.starts_with('.') {
-                return None;
-            }
-            let norm = normalize(
-                &Path::new(&dir)
-                    .join(name)
-                    .to_string_lossy()
-                    .replace('\\', "/"),
-            );
-            for ext in [
-                "",
-                ".ts",
-                ".tsx",
-                ".js",
-                ".jsx",
-                ".mjs",
-                "/index.ts",
-                "/index.js",
-            ] {
-                let c = format!("{norm}{ext}");
-                if exists(&c) {
-                    return Some(c);
-                }
-            }
-            None
-        }
-        "rust" => {
-            let path = name.trim_start_matches("crate::").replace("::", "/");
-            let first = path.split('/').next().unwrap_or("");
-            for base in [dir.clone(), "src".to_string(), format!("{dir}/..")] {
-                for cand in [
-                    format!("{base}/{first}.rs"),
-                    format!("{base}/{first}/mod.rs"),
-                    format!("{base}/{path}.rs"),
-                ] {
-                    let c = normalize(&cand);
-                    if exists(&c) {
-                        return Some(c);
-                    }
-                }
-            }
-            None
-        }
-        "go" => {
-            // module-path imports (go.mod `module X`): X/a/b -> <dir of go.mod>/a/b/<first non-test .go>
-            for (mod_path, mod_dir) in go_modules {
-                if let Some(rest) = name.strip_prefix(mod_path.as_str()) {
-                    let sub = rest.trim_start_matches('/');
-                    let d = if mod_dir.is_empty() {
-                        sub.to_string()
-                    } else if sub.is_empty() {
-                        mod_dir.clone()
-                    } else {
-                        format!("{mod_dir}/{sub}")
-                    };
-                    if let Ok(rd) = std::fs::read_dir(root.join(&d)) {
-                        let mut files: Vec<String> = rd
-                            .filter_map(|e| e.ok())
-                            .map(|e| e.file_name().to_string_lossy().to_string())
-                            .filter(|n| n.ends_with(".go") && !n.ends_with("_test.go"))
-                            .collect();
-                        files.sort();
-                        if let Some(f) = files.first() {
-                            return Some(normalize(&format!("{d}/{f}")));
-                        }
-                    }
-                }
-            }
-            for cand in [format!("{dir}/{name}"), name.to_string()] {
-                let c = normalize(&cand);
-                if exists(&c) {
-                    return Some(c);
-                }
-            }
-            None
-        }
-        "c" | "cpp" => {
-            for cand in [format!("{dir}/{name}"), name.to_string()] {
-                let c = normalize(&cand);
-                if exists(&c) {
-                    return Some(c);
-                }
-            }
-            None
-        }
-        _ => None,
-    }
+        .unwrap_or_default()
 }
 
 fn normalize(p: &str) -> String {
@@ -225,35 +201,735 @@ fn normalize(p: &str) -> String {
     out.join("/")
 }
 
-fn go_modules(root: &Path, files: &[(PathBuf, String)]) -> Vec<(String, String)> {
-    let mut out = vec![];
-    for (abs, rel) in files {
-        if rel == "go.mod" || rel.ends_with("/go.mod") {
-            if let Ok(t) = read_text(abs) {
-                if let Some(line) = t.lines().find(|l| l.trim_start().starts_with("module ")) {
-                    let m = line.trim().trim_start_matches("module ").trim().to_string();
-                    let dir = Path::new(rel)
-                        .parent()
-                        .map(|d| d.to_string_lossy().to_string())
-                        .unwrap_or_default();
-                    out.push((m, dir));
+impl ImportResolver {
+    pub fn new(root: &Path, files: &[(PathBuf, String)], product_roots: &[String]) -> Self {
+        let mut set = HashSet::new();
+        let mut by_dir: HashMap<String, Vec<String>> = HashMap::new();
+        let mut by_basename: HashMap<String, Vec<String>> = HashMap::new();
+        let mut go_modules = vec![];
+        let mut rust_crates = vec![];
+        for (abs, rel) in files {
+            set.insert(rel.clone());
+            let name = rel.rsplit('/').next().unwrap_or(rel).to_string();
+            by_dir
+                .entry(parent_dir(rel))
+                .or_default()
+                .push(name.clone());
+            by_basename
+                .entry(name.clone())
+                .or_default()
+                .push(rel.clone());
+            if name == "go.mod" {
+                if let Ok(t) = read_text(abs) {
+                    if let Some(line) = t.lines().find(|l| l.trim_start().starts_with("module ")) {
+                        let m = line.trim().trim_start_matches("module ").trim().to_string();
+                        go_modules.push((m, parent_dir(rel)));
+                    }
+                }
+            }
+            if name == "Cargo.toml" {
+                if let Ok(t) = read_text(abs) {
+                    let mut in_pkg = false;
+                    for l in t.lines() {
+                        let l = l.trim();
+                        if l.starts_with('[') {
+                            in_pkg = l == "[package]";
+                            continue;
+                        }
+                        if in_pkg && l.starts_with("name") {
+                            if let Some(v) =
+                                l.split_once('=').map(|(_, v)| v.trim().trim_matches('"'))
+                            {
+                                rust_crates.push((v.replace('-', "_"), parent_dir(rel)));
+                            }
+                        }
+                    }
                 }
             }
         }
+        for v in by_dir.values_mut() {
+            v.sort();
+        }
+        for v in by_basename.values_mut() {
+            v.sort();
+        }
+        let _ = root;
+        ImportResolver {
+            files: set,
+            by_dir,
+            by_basename,
+            product_roots: product_roots.to_vec(),
+            go_modules,
+            rust_crates,
+        }
     }
-    let _ = root;
-    out
+
+    fn exists(&self, rel: &str) -> bool {
+        self.files.contains(rel)
+    }
+
+    /// Files whose path ends with `/<key>` (or equals it), best match first: longest shared directory prefix with
+    /// the importing file, then shortest path, then lexical order.
+    fn by_suffix(&self, key: &str, from_rel: &str) -> Option<String> {
+        let base = key.rsplit('/').next().unwrap_or(key);
+        let cands: Vec<&String> = self
+            .by_basename
+            .get(base)?
+            .iter()
+            .filter(|f| f.as_str() == key || f.ends_with(&format!("/{key}")))
+            .collect();
+        let dir = parent_dir(from_rel);
+        let shared = |f: &str| {
+            dir.split('/')
+                .zip(f.split('/'))
+                .take_while(|(a, b)| a == b)
+                .count()
+        };
+        cands
+            .into_iter()
+            .max_by(|a, b| {
+                shared(a)
+                    .cmp(&shared(b))
+                    .then(b.len().cmp(&a.len()))
+                    .then(b.cmp(a))
+            })
+            .cloned()
+    }
+
+    /// Nearest ancestor directory of `rel` holding a `Cargo.toml` (the crate root), if any.
+    fn crate_root_of(&self, rel: &str) -> Option<String> {
+        let mut d = parent_dir(rel);
+        loop {
+            let c = if d.is_empty() {
+                "Cargo.toml".to_string()
+            } else {
+                format!("{d}/Cargo.toml")
+            };
+            if self.exists(&c) {
+                return Some(d);
+            }
+            if d.is_empty() {
+                return None;
+            }
+            d = parent_dir(&d);
+        }
+    }
+
+    pub fn resolve(&self, from_rel: &str, language: &str, name: &str) -> Option<String> {
+        let dir = parent_dir(from_rel);
+        match language {
+            "python" => {
+                let dots = name.chars().take_while(|c| *c == '.').count();
+                let rel_mod = name.trim_start_matches('.').replace('.', "/");
+                if dots > 0 {
+                    // relative import: the importing package, then its parents for each extra dot
+                    let mut base = dir.clone();
+                    for _ in 1..dots {
+                        base = parent_dir(&base);
+                    }
+                    for cand in [
+                        format!("{base}/{rel_mod}.py"),
+                        format!("{base}/{rel_mod}/__init__.py"),
+                    ] {
+                        let c = normalize(&cand);
+                        if !rel_mod.is_empty() && self.exists(&c) {
+                            return Some(c);
+                        }
+                    }
+                }
+                let mut bases = vec![String::new(), dir.clone() + "/"];
+                for pr in &self.product_roots {
+                    bases.push(pr.clone());
+                }
+                let mut anc = Path::new(from_rel).parent();
+                while let Some(a) = anc {
+                    bases.push(format!("{}/", a.to_string_lossy()));
+                    anc = a.parent();
+                }
+                for b in bases {
+                    let b = b.trim_start_matches('/').to_string();
+                    for cand in [
+                        format!("{b}{rel_mod}.py"),
+                        format!("{b}{rel_mod}/__init__.py"),
+                    ] {
+                        let c = cand.trim_start_matches('/').replace("//", "/");
+                        if self.exists(&c) {
+                            return Some(c);
+                        }
+                    }
+                }
+                // src-layout and other source roots: the package path anywhere in the tree
+                if rel_mod.is_empty() {
+                    return None;
+                }
+                self.by_suffix(&format!("{rel_mod}.py"), from_rel)
+                    .or_else(|| self.by_suffix(&format!("{rel_mod}/__init__.py"), from_rel))
+            }
+            "javascript" | "typescript" => {
+                if !name.starts_with('.') {
+                    return None;
+                }
+                let norm = normalize(
+                    &Path::new(&dir)
+                        .join(name)
+                        .to_string_lossy()
+                        .replace('\\', "/"),
+                );
+                for ext in [
+                    "",
+                    ".ts",
+                    ".tsx",
+                    ".js",
+                    ".jsx",
+                    ".mjs",
+                    "/index.ts",
+                    "/index.js",
+                ] {
+                    let c = format!("{norm}{ext}");
+                    if self.exists(&c) {
+                        return Some(c);
+                    }
+                }
+                None
+            }
+            "rust" => {
+                let path = name.trim_start_matches("crate::").replace("::", "/");
+                let first = path.split('/').next().unwrap_or("");
+                for base in [dir.clone(), "src".to_string(), format!("{dir}/..")] {
+                    for cand in [
+                        format!("{base}/{first}.rs"),
+                        format!("{base}/{first}/mod.rs"),
+                        format!("{base}/{path}.rs"),
+                    ] {
+                        let c = normalize(&cand);
+                        if self.exists(&c) {
+                            return Some(c);
+                        }
+                    }
+                }
+                // crate-qualified paths: `crate::`, `self::`, `super::`, or another crate of the tree by name
+                let segs: Vec<&str> = name.split("::").filter(|s| !s.is_empty()).collect();
+                let (src, rest): (Option<String>, &[&str]) = match segs.first().copied() {
+                    Some("crate") => (
+                        self.crate_root_of(from_rel)
+                            .map(|r| normalize(&format!("{r}/src"))),
+                        &segs[1..],
+                    ),
+                    Some("self") => (Some(dir.clone()), &segs[1..]),
+                    Some("super") => (Some(parent_dir(&dir)), &segs[1..]),
+                    Some(c) => (
+                        self.rust_crates
+                            .iter()
+                            .find(|(n, _)| n == c)
+                            .map(|(_, d)| normalize(&format!("{d}/src"))),
+                        &segs[1..],
+                    ),
+                    None => (None, &segs[..]),
+                };
+                let src = src?;
+                for n in (0..=rest.len()).rev() {
+                    let sub = rest[..n].join("/");
+                    let cands = if sub.is_empty() {
+                        vec![format!("{src}/lib.rs"), format!("{src}/main.rs")]
+                    } else {
+                        vec![format!("{src}/{sub}.rs"), format!("{src}/{sub}/mod.rs")]
+                    };
+                    for c in cands {
+                        let c = normalize(&c);
+                        if self.exists(&c) {
+                            return Some(c);
+                        }
+                    }
+                }
+                None
+            }
+            "go" => {
+                // module-path imports (go.mod `module X`): X/a/b -> <dir of go.mod>/a/b/<first non-test .go>
+                for (mod_path, mod_dir) in &self.go_modules {
+                    if let Some(rest) = name.strip_prefix(mod_path.as_str()) {
+                        let sub = rest.trim_start_matches('/');
+                        let d = if mod_dir.is_empty() {
+                            sub.to_string()
+                        } else if sub.is_empty() {
+                            mod_dir.clone()
+                        } else {
+                            format!("{mod_dir}/{sub}")
+                        };
+                        if let Some(names) = self.by_dir.get(&normalize(&d)) {
+                            if let Some(f) = names
+                                .iter()
+                                .find(|n| n.ends_with(".go") && !n.ends_with("_test.go"))
+                            {
+                                return Some(normalize(&format!("{d}/{f}")));
+                            }
+                        }
+                    }
+                }
+                for cand in [format!("{dir}/{name}"), name.to_string()] {
+                    let c = normalize(&cand);
+                    if self.exists(&c) {
+                        return Some(c);
+                    }
+                }
+                None
+            }
+            "c" | "cpp" => {
+                for cand in [format!("{dir}/{name}"), name.to_string()] {
+                    let c = normalize(&cand);
+                    if self.exists(&c) {
+                        return Some(c);
+                    }
+                }
+                self.by_suffix(name, from_rel)
+            }
+            _ => None,
+        }
+    }
+
+    /// The file a *relative* import names when it resolves to nothing in the tree (a broken reference: the target
+    /// was renamed or deleted). Represented as an edge to that path, so graph integrity reports it as dangling in
+    /// incremental and full builds alike. `None` for non-relative (package/module) imports.
+    pub fn intended_path(&self, from_rel: &str, language: &str, name: &str) -> Option<String> {
+        let dir = parent_dir(from_rel);
+        let ext = Path::new(from_rel)
+            .extension()
+            .map(|e| e.to_string_lossy().to_string())
+            .unwrap_or_default();
+        match language {
+            "javascript" | "typescript" if name.starts_with('.') => {
+                let norm = normalize(&format!("{dir}/{name}"));
+                if Path::new(&norm).extension().is_some() || ext.is_empty() {
+                    Some(norm)
+                } else {
+                    Some(format!("{norm}.{ext}"))
+                }
+            }
+            "python" if name.starts_with('.') => {
+                let dots = name.chars().take_while(|c| *c == '.').count();
+                let rel_mod = name.trim_start_matches('.').replace('.', "/");
+                if rel_mod.is_empty() {
+                    return None;
+                }
+                let mut base = dir;
+                for _ in 1..dots {
+                    base = parent_dir(&base);
+                }
+                Some(normalize(&format!("{base}/{rel_mod}.py")))
+            }
+            _ => None,
+        }
+    }
+
+    /// Non-test Go files of the same package directory (a `_test.go` file tests its package without importing it).
+    fn go_package_files(&self, test_rel: &str) -> Vec<String> {
+        let dir = parent_dir(test_rel);
+        self.by_dir
+            .get(&dir)
+            .map(|names| {
+                names
+                    .iter()
+                    .filter(|n| n.ends_with(".go") && !n.ends_with("_test.go"))
+                    .map(|n| {
+                        if dir.is_empty() {
+                            n.clone()
+                        } else {
+                            format!("{dir}/{n}")
+                        }
+                    })
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+}
+
+/// A test file by the conventions of the ecosystems in scope (test directories and test file names), in addition to
+/// whatever the path map classifies `test`.
+pub fn is_test_path(rel: &str) -> bool {
+    let parts: Vec<&str> = rel.split('/').collect();
+    let file = parts.last().copied().unwrap_or("");
+    if parts[..parts.len().saturating_sub(1)]
+        .iter()
+        .any(|d| matches!(*d, "tests" | "test" | "__tests__" | "testing"))
+    {
+        return true;
+    }
+    let lower = file.to_lowercase();
+    (lower.starts_with("test_") && lower.ends_with(".py"))
+        || lower.ends_with("_test.py")
+        || lower.ends_with("_test.go")
+        || lower.ends_with("_test.rs")
+        || lower.ends_with("_spec.rb")
+        || lower.ends_with("_test.rb")
+        || [".test.", ".spec."].iter().any(|m| lower.contains(m))
+        || [
+            "test.java",
+            "tests.java",
+            "test.kt",
+            "tests.kt",
+            "test.cs",
+            "tests.cs",
+            "test.scala",
+            "spec.scala",
+        ]
+        .iter()
+        .any(|s| lower.ends_with(s) && file.len() > s.len())
+}
+
+// ---------------------------------------------------------------------------------------------- cross-artefact facts
+
+const TYPE_KINDS: &[&str] = &[
+    "class",
+    "struct",
+    "interface",
+    "trait",
+    "type",
+    "enum",
+    "impl",
+    "record",
+];
+
+/// Recompute every fact that depends on more than one artefact, over the whole index: import targets and `IMPORTS`
+/// edges, `CALLS` edges, inheritance (`DEPENDS_ON`, provenance `inherits:`) and implementation (`IMPLEMENTS`)
+/// edges, `TESTS` edges (test files by path class or convention → the files they import/call, Go same-package
+/// tests → their package), and supersession (`superseded_by`, conflicts). Deterministic and independent of which
+/// artefacts this build re-indexed, so an incremental build equals a full build.
+pub fn derive_cross_artifact_facts(
+    db: &RuntimeDb,
+    p: &Project,
+    resolver: &ImportResolver,
+    report: &mut IndexReport,
+) -> Result<()> {
+    let contract = p.contract();
+    let scanner = p.secret_scanner();
+    let arts = db.query(
+        "SELECT artifact_id, path, path_class, graph FROM artifacts WHERE record_type='file' ORDER BY path",
+        &[],
+    )?;
+    let mut graph_on: HashSet<String> = HashSet::new();
+    let mut tests: BTreeSet<String> = BTreeSet::new();
+    let mut path_of: HashMap<String, String> = HashMap::new();
+    for a in &arts {
+        let aid = a["artifact_id"].as_str().unwrap_or("").to_string();
+        let path = a["path"].as_str().unwrap_or("").to_string();
+        if a["graph"].as_i64() == Some(1) {
+            graph_on.insert(aid.clone());
+        }
+        if a["path_class"].as_str() == Some("test") || is_test_path(&path) {
+            tests.insert(aid.clone());
+        }
+        path_of.insert(aid, path);
+    }
+    db.exec(
+        "DELETE FROM edges WHERE src LIKE 'file:%' AND (type IN ('IMPORTS','CALLS','TESTS') OR provenance LIKE 'inherits:%' OR provenance LIKE 'implements:%')",
+        &[],
+    )?;
+    // --- imports
+    let mut imports_of: HashMap<String, Vec<String>> = HashMap::new();
+    for r in db.query(
+        "SELECT rowid AS rid, path, name, target FROM symbol_refs WHERE kind='import' ORDER BY path, name, rowid",
+        &[],
+    )? {
+        let path = r["path"].as_str().unwrap_or("");
+        let name = r["name"].as_str().unwrap_or("");
+        let src = format!("file:{path}");
+        let ext = Path::new(path)
+            .extension()
+            .map(|e| e.to_string_lossy().to_lowercase())
+            .unwrap_or_default();
+        let lang = ecosystems::language_for_ext(&ext).unwrap_or("");
+        let target = match resolver.resolve(path, lang, name) {
+            Some(t) => {
+                let td = contract.decide(&t);
+                if td.is_never_index() || scanner.path_is_secret(&t) {
+                    format!("excluded:{t}")
+                } else {
+                    format!("file:{t}")
+                }
+            }
+            // a relative import of a file that is not in the tree is a broken reference, not an external module
+            None => match resolver.intended_path(path, lang, name) {
+                Some(t) => format!("file:{t}"),
+                None => format!("module:{name}"),
+            },
+        };
+        if r["target"].as_str() != Some(target.as_str()) {
+            db.exec(
+                "UPDATE symbol_refs SET target=?1 WHERE rowid=?2",
+                &[&target, &r["rid"].as_i64().unwrap_or(0)],
+            )?;
+        }
+        if (target.starts_with("file:") || target.starts_with("excluded:")) && graph_on.contains(&src) {
+            db.exec("INSERT OR IGNORE INTO edges(src, type, dst, source_artifact, provenance) VALUES (?1,'IMPORTS',?2,?1,?3)", &[&src, &target, &format!("import:{name}")])?;
+        }
+        if target.starts_with("file:") {
+            imports_of.entry(src).or_default().push(target);
+        }
+    }
+    // --- calls: callee name resolved to the file defining a symbol of that name (same file preferred)
+    let mut calls_of: HashMap<String, BTreeSet<String>> = HashMap::new();
+    let mut first_def: HashMap<String, Option<String>> = HashMap::new();
+    for r in db.query(
+        "SELECT DISTINCT path, name FROM symbol_refs WHERE kind='call' ORDER BY path, name",
+        &[],
+    )? {
+        let path = r["path"].as_str().unwrap_or("").to_string();
+        let callee = r["name"].as_str().unwrap_or("").to_string();
+        let src = format!("file:{path}");
+        let same = db.query_one("SELECT artifact_id FROM symbols WHERE name=?1 AND path=?2 AND kind NOT IN ('module','route','db_model') LIMIT 1", &[&callee, &path])?;
+        let target = match same {
+            Some(r) => Some(r["artifact_id"].as_str().unwrap_or("").to_string()),
+            None => first_def
+                .entry(callee.clone())
+                .or_insert_with(|| {
+                    db.query_one("SELECT artifact_id FROM symbols WHERE name=?1 AND kind NOT IN ('module','route','db_model') ORDER BY path LIMIT 1", &[&callee])
+                        .ok()
+                        .flatten()
+                        .map(|r| r["artifact_id"].as_str().unwrap_or("").to_string())
+                })
+                .clone(),
+        };
+        if let Some(t) = target {
+            if t != src && !t.is_empty() {
+                db.exec("INSERT OR IGNORE INTO edges(src, type, dst, source_artifact, provenance) VALUES (?1,'CALLS',?2,?1,?3)", &[&src, &t, &format!("call:{callee}")])?;
+                calls_of.entry(src).or_default().insert(t);
+            }
+        }
+    }
+    // --- inheritance / implementation
+    for r in db.query(
+        "SELECT DISTINCT path, name, kind FROM symbol_refs WHERE kind IN ('inherits','implements') ORDER BY path, name, kind",
+        &[],
+    )? {
+        let path = r["path"].as_str().unwrap_or("").to_string();
+        let base = r["name"].as_str().unwrap_or("").to_string();
+        let kind = r["kind"].as_str().unwrap_or("").to_string();
+        let src = format!("file:{path}");
+        let defs: Vec<String> = db
+            .query(
+                &format!(
+                    "SELECT DISTINCT artifact_id FROM symbols WHERE name=?1 AND kind IN ({}) ORDER BY path",
+                    TYPE_KINDS
+                        .iter()
+                        .map(|k| format!("'{k}'"))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ),
+                &[&base],
+            )?
+            .into_iter()
+            .filter_map(|x| x["artifact_id"].as_str().map(|s| s.to_string()))
+            .collect();
+        if defs.is_empty() || defs.contains(&src) {
+            continue; // external supertype, or defined in the same file
+        }
+        let imported = imports_of.get(&src).cloned().unwrap_or_default();
+        let dst = defs
+            .iter()
+            .find(|d| imported.contains(d))
+            .cloned()
+            .unwrap_or_else(|| defs[0].clone());
+        let etype = if kind == "implements" {
+            "IMPLEMENTS"
+        } else {
+            "DEPENDS_ON"
+        };
+        db.exec("INSERT OR IGNORE INTO edges(src, type, dst, source_artifact, provenance) VALUES (?1,?2,?3,?1,?4)", &[&src, &etype, &dst, &format!("{kind}:{base}")])?;
+    }
+    // --- test-coverage relationships
+    for t in &tests {
+        let mut targets: BTreeMap<String, &str> = BTreeMap::new();
+        for d in imports_of.get(t).cloned().unwrap_or_default() {
+            targets.entry(d).or_insert("import");
+        }
+        for d in calls_of.get(t).cloned().unwrap_or_default() {
+            targets.entry(d).or_insert("call");
+        }
+        let tpath = path_of.get(t).cloned().unwrap_or_default();
+        if tpath.ends_with("_test.go") {
+            for f in resolver.go_package_files(&tpath) {
+                targets.entry(format!("file:{f}")).or_insert("package");
+            }
+        }
+        for (dst, basis) in targets {
+            if tests.contains(&dst) || &dst == t || !path_of.contains_key(&dst) {
+                continue;
+            }
+            db.exec("INSERT OR IGNORE INTO edges(src, type, dst, source_artifact, provenance) VALUES (?1,'TESTS',?2,?1,?3)", &[t, &dst, &format!("tests:{basis}")])?;
+        }
+    }
+    // --- supersession: a record's own `superseded_by`, else the first superseder (path order) that names it
+    let recs = db.query(
+        "SELECT artifact_id, path, data_json, status, superseded_by FROM artifacts WHERE record_type != 'file' ORDER BY path",
+        &[],
+    )?;
+    let mut sb: BTreeMap<String, Option<String>> = BTreeMap::new();
+    let mut status_of: HashMap<String, (String, String)> = HashMap::new();
+    let mut pairs: Vec<(String, String)> = vec![];
+    for r in &recs {
+        let aid = r["artifact_id"].as_str().unwrap_or("").to_string();
+        let data: Value =
+            serde_json::from_str(r["data_json"].as_str().unwrap_or("{}")).unwrap_or(json!({}));
+        let own = data
+            .get("superseded_by")
+            .and_then(|v| v.as_str())
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string());
+        sb.insert(aid.clone(), own);
+        status_of.insert(
+            aid.clone(),
+            (
+                r["status"].as_str().unwrap_or("").to_string(),
+                r["path"].as_str().unwrap_or("").to_string(),
+            ),
+        );
+        let rec = Record {
+            path: r["path"].as_str().unwrap_or("").to_string(),
+            data,
+            body: String::new(),
+            format: crate::records::RecordFormat::Yaml,
+            problems: vec![],
+        };
+        for (t, target) in rec.relations() {
+            if t == "SUPERSEDES" {
+                pairs.push((aid.clone(), target));
+            }
+        }
+    }
+    for (superseder, superseded) in &pairs {
+        if let Some(slot) = sb.get_mut(superseded) {
+            if slot.is_none() {
+                *slot = Some(superseder.clone());
+            }
+        }
+    }
+    let current: HashMap<String, Option<String>> = recs
+        .iter()
+        .map(|r| {
+            (
+                r["artifact_id"].as_str().unwrap_or("").to_string(),
+                r["superseded_by"]
+                    .as_str()
+                    .filter(|s| !s.is_empty())
+                    .map(|s| s.to_string()),
+            )
+        })
+        .collect();
+    for (aid, v) in &sb {
+        if current.get(aid) != Some(v) {
+            db.exec(
+                "UPDATE artifacts SET superseded_by=?1 WHERE artifact_id=?2",
+                &[v, aid],
+            )?;
+        }
+    }
+    report.supersession_conflicts.clear();
+    for (superseder, superseded) in &pairs {
+        if let Some((status, path)) = status_of.get(superseded) {
+            if status == "ACTIVE" {
+                report.supersession_conflicts.push(json!({"superseded": superseded, "by": superseder, "status": "ACTIVE", "path": path}));
+            }
+        }
+    }
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------------------------- per-artefact indexing
+
+/// Structural units for the chunker: every symbol with a span (nested ones included) plus the adapter's own units.
+fn chunk_units(facts: &code_intelligence::CodeFacts) -> Vec<(String, usize, usize)> {
+    let mut u: Vec<(String, usize, usize)> = vec![];
+    for s in &facts.symbols {
+        if matches!(s.kind.as_str(), "module" | "route" | "db_model")
+            || s.qualname.is_empty()
+            || s.lineno == 0
+            || s.end_lineno < s.lineno
+        {
+            continue;
+        }
+        let x = (s.qualname.clone(), s.lineno, s.end_lineno);
+        if !u.contains(&x) {
+            u.push(x);
+        }
+    }
+    for x in &facts.units {
+        if x.0 != crate::memory::chunking::MODULE_SECTION && !u.contains(x) {
+            u.push(x.clone());
+        }
+    }
+    u
+}
+
+use crate::memory::coverage::without_heading_markers;
+
+#[derive(Default)]
+struct CoverageTally {
+    checked: usize,
+    uncovered: usize,
+    gaps: Vec<Value>,
+}
+
+impl CoverageTally {
+    fn check(&mut self, rel: &str, expected: &str, chunks: &[Chunk], max_chars: usize) {
+        self.checked += 1;
+        let miss = uncovered_lines(expected, chunks, max_chars);
+        if !miss.is_empty() {
+            self.uncovered += miss.len();
+            if self.gaps.len() < 20 {
+                self.gaps.push(json!({"path": rel, "lines": miss.iter().take(5).map(|(n, l)| json!({"line": n, "text": l.chars().take(120).collect::<String>()})).collect::<Vec<_>>(), "count": miss.len()}));
+            }
+        }
+    }
+    fn to_value(&self) -> Value {
+        json!({"checked_artifacts": self.checked, "uncovered_lines": self.uncovered, "complete": self.uncovered == 0, "gaps": self.gaps})
+    }
+}
+
+/// Adapter failures observed during a build, grouped by adapter identity and error code.
+#[derive(Default)]
+struct AdapterFailures {
+    by_key: BTreeMap<(String, String, String), (String, Vec<String>)>,
+}
+
+fn tool_failure_from(
+    kind: &str,
+    id: &str,
+    version: &str,
+    e: &GovError,
+    operation: &str,
+) -> crate::memory::failures::ToolFailure {
+    crate::memory::failures::ToolFailure {
+        tool_kind: kind.into(),
+        tool_id: id.into(),
+        version: version.into(),
+        code: e.code.clone(),
+        message: e.message.clone(),
+        operation: operation.into(),
+        affected: vec![],
+    }
 }
 
 /// Rebuild (full or incremental) the derived index. Full builds are staged in a temporary database and swapped in
 /// only on success, so a failing embedder never leaves a partial index behind.
-pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
+pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
     let started = std::time::Instant::now();
-    p.require_installed()?;
+    p_in.require_installed()?;
     // the never-index / secret floors applied below come from kernel policy: refuse to index against an
     // unverified kernel rather than silently indexing under a tampered floor (verifier V-H2 / VV-14)
-    crate::kernel_trust::guard(p, "rebuild-memory")?;
+    crate::kernel_trust::guard(p_in, "rebuild-memory")?;
+    // BC-P2-29: derive from the policy, overlay and path map on disk now, not from a view cached by the caller
+    let view = current_view(p_in);
+    let p = &view;
     std::fs::create_dir_all(p.runtime_dir())?;
+    let final_db = opts.db_path.clone().unwrap_or(p.db_path());
+    let benchmark_mode = opts.db_path.is_some();
+    let record_failures = opts.record_failures.unwrap_or(!benchmark_mode) && !benchmark_mode;
+    let mut report = IndexReport::default();
+    let note_tool_failure = |report: &mut IndexReport, t: crate::memory::failures::ToolFailure| {
+        if record_failures {
+            let o = crate::memory::failures::record_tool_failure(p, &t, false);
+            report.failures.push(o.to_value());
+        }
+    };
     let pol = p.policies();
     let governed = plugin_set(p); // schema-valid, registered, healthy, pinned, authorised for the acting role
     let plugins = governed.usable.clone();
@@ -261,16 +937,32 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
         .embed_override
         .clone()
         .unwrap_or_else(|| EmbedSpec::from_policy(p));
-    let embed = Embedder::resolve(&spec, &governed)?; // no silent fallback
-    let reranker = Reranker::resolve(p, &governed)?; // pinned reranker must exist too
+    let embed = match Embedder::resolve(&spec, &governed) {
+        Ok(e) => e,
+        Err(e) => {
+            note_tool_failure(
+                &mut report,
+                tool_failure_from("embed", &spec.id, &spec.version, &e, "rebuild-memory"),
+            );
+            return Err(e); // no silent fallback
+        }
+    };
+    let reranker = match Reranker::resolve(p, &governed) {
+        Ok(r) => r,
+        Err(e) => {
+            let rs = RerankSpec::from_policy(p);
+            note_tool_failure(
+                &mut report,
+                tool_failure_from("rerank", &rs.provider, &rs.version, &e, "rebuild-memory"),
+            );
+            return Err(e); // pinned reranker must exist too
+        }
+    };
     let expected = {
         let mut e = expected_pins(p);
         e["embedder"] = spec.to_value();
         e
     };
-    let final_db = opts.db_path.clone().unwrap_or(p.db_path());
-    let benchmark_mode = opts.db_path.is_some();
-    let mut report = IndexReport::default();
     // --- decide mode: incremental only when the live pins match; otherwise escalate to a full rebuild
     let mut incremental = opts.incremental && !benchmark_mode;
     if incremental {
@@ -342,19 +1034,27 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
         .filter(|(k, _)| k == "product")
         .map(|(_, v)| v.clone())
         .collect();
+    let derive = DerivationContext::new(p, &plugins);
     let repo_commit = p.git_commit();
     let now = now_iso();
     let files = iter_repo_files(&p.root, false);
-    let gomods = go_modules(&p.root, &files);
+    let resolver = ImportResolver::new(&p.root, &files, &product_roots);
     let mut seen_paths: HashSet<String> = HashSet::new();
     let mut seen_ids: HashSet<String> = HashSet::new();
-    let mut supersedes_map: Vec<(String, String)> = vec![];
+    let mut excluded_now: HashSet<String> = HashSet::new();
     let mut pending_vectors: Vec<(String, String, String)> = vec![];
-    let mut test_files: Vec<(String, Vec<String>)> = vec![];
-    let mut pending_calls: Vec<(String, String, String)> = vec![]; // (src artifact, path, callee name)
+    let mut coverage = CoverageTally::default();
+    let mut adapter_failures = AdapterFailures::default();
     let mut in_batch = 0usize;
     db.begin()?;
     for (abs, rel) in &files {
+        if crate::memory::failures::is_memory_quality_path(rel) {
+            // memory-quality events never feed back into retrieval (like the held-out set)
+            report
+                .excluded
+                .push(json!({"path": rel, "reason": "memory_quality_event"}));
+            continue;
+        }
         let d = contract.decide(rel);
         if d.is_never_index() || scanner.path_is_secret(rel) {
             let reason = if d.is_secret() || scanner.path_is_secret(rel) {
@@ -363,6 +1063,7 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
                 format!("sensitivity:{}", d.sensitivity())
             };
             report.excluded.push(json!({"path": rel, "reason": reason}));
+            excluded_now.insert(rel.clone());
             db.exec(
                 "INSERT OR REPLACE INTO excluded(path, reason, detail) VALUES (?1,?2,?3)",
                 &[rel, &reason, &d.rule_pattern.clone().unwrap_or_default()],
@@ -403,13 +1104,14 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
             let ids: Vec<String> = hits
                 .iter()
                 .map(|h| h.pattern_id.clone())
-                .collect::<HashSet<_>>()
+                .collect::<BTreeSet<_>>()
                 .into_iter()
                 .collect();
             report
                 .excluded
                 .push(json!({"path": rel, "reason": "secret_content", "patterns": ids}));
             report.secret_blocked.push(json!({"path": rel, "patterns": ids, "lines": hits.iter().map(|h| h.line).collect::<Vec<_>>()}));
+            excluded_now.insert(rel.clone());
             db.exec(
                 "INSERT OR REPLACE INTO excluded(path, reason, detail) VALUES (?1,?2,?3)",
                 &[rel, &"secret_content", &ids.join(",")],
@@ -420,15 +1122,23 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
             continue;
         }
         let hash = sha256_hex(text.as_bytes());
+        let dkey = derive.key(&d, rel);
         seen_paths.insert(rel.clone());
         if incremental {
             if let Some(prev_e) = prev_arts.get(rel) {
-                if prev_e.get("content_hash").and_then(|v| v.as_str()) == Some(hash.as_str()) {
+                let same_content =
+                    prev_e.get("content_hash").and_then(|v| v.as_str()) == Some(hash.as_str());
+                let same_derivation =
+                    prev_e.get("derivation").and_then(|v| v.as_str()) == Some(dkey.as_str());
+                if same_content && same_derivation {
                     report.unchanged += 1;
                     if let Some(id) = prev_e.get("artifact_id").and_then(|v| v.as_str()) {
                         seen_ids.insert(id.to_string());
                     }
                     continue;
+                }
+                if same_content {
+                    report.rederived.push(rel.clone());
                 }
             }
             if let Some(a) = db.artifact_by_path(rel)? {
@@ -466,7 +1176,7 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
         );
         let mut edges: Vec<(String, String, String)> = vec![];
         let mut symbols: Vec<code_intelligence::Symbol> = vec![];
-        let mut sym_refs: Vec<(String, String, String)> = vec![];
+        let mut sym_refs: Vec<(String, String, String, usize)> = vec![];
         let mut provider = String::new();
         match record {
             Some(r) if !r.id().is_empty() && !r.rtype().is_empty() => {
@@ -483,9 +1193,7 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
                         if old_path != *rel {
                             if p.root.join(&old_path).exists()
                                 && !seen_paths.contains(&old_path)
-                                && iter_repo_files(&p.root, false)
-                                    .iter()
-                                    .any(|(_, r)| r == &old_path)
+                                && files.iter().any(|(_, r)| r == &old_path)
                             {
                                 report.problems.push(format!("duplicate record id {id} at {rel} (first occurrence {old_path} kept)"));
                                 continue;
@@ -513,18 +1221,24 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
                     state_class_for(&r, &authority)
                 };
                 data_json = serde_json::to_string(&r.data)?;
-                let fields = r.text_fields();
+                // BC-P2-25: every content field — list-valued and nested ones included — is a named section
+                let sections = r.text_sections();
                 let body = if r.body.is_empty() {
                     r.get("body")
                 } else {
                     r.body.clone()
                 };
-                chunks = chunk_record(&title, &fields, &body, max_chars, overlap);
+                chunks = chunk_record(&title, &sections, &body, max_chars, overlap);
+                let body_lines = without_heading_markers(&body);
+                let expected: String = sections
+                    .iter()
+                    .map(|(_, t)| t.as_str())
+                    .chain(std::iter::once(body_lines.as_str()))
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                coverage.check(rel, &expected, &chunks, max_chars);
                 for (t, target) in r.relations() {
                     edges.push((id.clone(), t.clone(), target.clone()));
-                    if t == "SUPERSEDES" {
-                        supersedes_map.push((id.clone(), target));
-                    }
                 }
                 let sb = r.get("superseded_by");
                 superseded_by = if sb.is_empty() { None } else { Some(sb) };
@@ -553,58 +1267,83 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
                     provider = facts.provider.clone();
                     if let Some(dg) = &facts.degraded {
                         report.degradations.push(format!("{rel}: {dg}"));
-                    }
-                    chunks = chunk_code(rel, &text, &facts.units, max_chars, overlap);
-                    symbols = facts.symbols.clone();
-                    let mut resolved = vec![];
-                    for imp in &facts.imports {
-                        match resolve_import(&p.root, rel, lang, imp, &product_roots, &gomods) {
-                            Some(target) => {
-                                let td = contract.decide(&target);
-                                if td.is_never_index() || scanner.path_is_secret(&target) {
-                                    edges.push((
-                                        artifact_id.clone(),
-                                        "IMPORTS".into(),
-                                        format!("excluded:{target}"),
-                                    ));
-                                    sym_refs.push((
-                                        imp.clone(),
-                                        "import".into(),
-                                        format!("excluded:{target}"),
-                                    ));
-                                } else {
-                                    edges.push((
-                                        artifact_id.clone(),
-                                        "IMPORTS".into(),
-                                        format!("file:{target}"),
-                                    ));
-                                    sym_refs.push((
-                                        imp.clone(),
-                                        "import".into(),
-                                        format!("file:{target}"),
-                                    ));
-                                    resolved.push(format!("file:{target}"));
-                                }
-                            }
-                            None => {
-                                sym_refs.push((
-                                    imp.clone(),
-                                    "import".into(),
-                                    format!("module:{imp}"),
-                                ));
-                            }
+                        if let Some(desc) = crate::capabilities::host::find(
+                            &plugins,
+                            "code_intel",
+                            Some(lang),
+                            None,
+                        ) {
+                            let code = dg
+                                .split_once('(')
+                                .and_then(|(_, r)| r.split_once(')'))
+                                .map(|(c, _)| c.to_string())
+                                .unwrap_or_else(|| "PLUGIN_UNUSABLE_OUTPUT".into());
+                            let e = adapter_failures
+                                .by_key
+                                .entry((desc.plugin_id.clone(), desc.version.clone(), code))
+                                .or_insert((dg.clone(), vec![]));
+                            e.1.push(rel.clone());
                         }
                     }
-                    for (from, name) in &facts.calls {
-                        sym_refs.push((name.clone(), "call".into(), from.clone()));
-                        pending_calls.push((artifact_id.clone(), rel.clone(), name.clone()));
+                    chunks = chunk_code(rel, &text, &chunk_units(&facts), max_chars, overlap);
+                    coverage.check(rel, &text, &chunks, max_chars);
+                    symbols = facts.symbols.clone();
+                    for rt in &facts.routes {
+                        symbols.push(code_intelligence::Symbol {
+                            name: rt.path.clone(),
+                            qualname: format!("route:{} {}", rt.method, rt.path),
+                            kind: "route".into(),
+                            lineno: rt.lineno,
+                            end_lineno: rt.lineno,
+                            parent: rt.handler.clone(),
+                            signature: format!(
+                                "{} {} -> {}",
+                                rt.method,
+                                rt.path,
+                                rt.handler.clone().unwrap_or_else(|| "<inline>".into())
+                            ),
+                        });
+                        sym_refs.push((
+                            rt.path.clone(),
+                            "route".into(),
+                            rt.handler.clone().unwrap_or_default(),
+                            rt.lineno,
+                        ));
                     }
-                    if d.class() == "test" {
-                        test_files.push((artifact_id.clone(), resolved));
+                    for m in &facts.models {
+                        symbols.push(code_intelligence::Symbol {
+                            name: m.name.clone(),
+                            qualname: format!("db_model:{}", m.qualname),
+                            kind: "db_model".into(),
+                            lineno: m.lineno,
+                            end_lineno: m.lineno,
+                            parent: Some(m.qualname.clone()),
+                            signature: format!(
+                                "table={} evidence={}",
+                                m.table.clone().unwrap_or_default(),
+                                m.evidence
+                            ),
+                        });
+                    }
+                    for rel_ in &facts.relations {
+                        sym_refs.push((
+                            rel_.name.clone(),
+                            rel_.kind.clone(),
+                            format!("symbol:{}", rel_.from),
+                            rel_.lineno,
+                        ));
+                    }
+                    for imp in &facts.imports {
+                        // resolved over the whole tree by `derive_cross_artifact_facts`
+                        sym_refs.push((imp.clone(), "import".into(), format!("module:{imp}"), 0));
+                    }
+                    for (from, name) in &facts.calls {
+                        sym_refs.push((name.clone(), "call".into(), from.clone(), 0));
                     }
                 } else if ext == "md" || ext == "txt" || ext == "rst" {
                     chunks =
                         crate::memory::chunking::chunk_markdown(rel, &text, max_chars, overlap);
+                    coverage.check(rel, &without_heading_markers(&text), &chunks, max_chars);
                 } else {
                     chunks = chunk_plain(rel, &text, max_chars, overlap);
                 }
@@ -612,6 +1351,10 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
         }
         db.exec("INSERT OR REPLACE INTO artifacts(artifact_id, path, record_type, title, status, state_class, namespace, sensitivity, path_class, content_hash, repo_commit, index_version, size, indexed_at, data_json, semantic, lexical, graph, code, default_retrieval, superseded_by) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21)",
             &[&artifact_id, rel, &record_type, &title, &status, &state_class, &d.namespace(), &d.sensitivity(), &d.class(), &hash, &repo_commit, &INDEX_VERSION, &(size as i64), &now, &data_json, &(sem as i64), &(lex as i64), &(gr as i64), &(code as i64), &(d.default_retrieval() as i64), &superseded_by])?;
+        db.exec(
+            "INSERT OR REPLACE INTO derivation(path, artifact_id, key) VALUES (?1,?2,?3)",
+            &[rel, &artifact_id, &dkey],
+        )?;
         for c in &chunks {
             let chunk_id = format!("{artifact_id}#{}", c.ordinal);
             let parent = c.parent_ordinal.map(|po| format!("{artifact_id}#{po}"));
@@ -636,10 +1379,10 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
             let sid = format!("{rel}::{}", s.qualname);
             db.exec("INSERT OR REPLACE INTO symbols(symbol_id, artifact_id, path, name, qualname, kind, lineno, end_lineno, parent, signature, language, provider) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)", &[&sid, &artifact_id, rel, &s.name, &s.qualname, &s.kind, &(s.lineno as i64), &(s.end_lineno as i64), &s.parent, &s.signature, &language.unwrap_or(""), &provider])?;
         }
-        for (name, kind, target) in &sym_refs {
+        for (name, kind, target, lineno) in &sym_refs {
             db.exec(
-                "INSERT INTO symbol_refs(path, name, kind, lineno, target) VALUES (?1,?2,?3,0,?4)",
-                &[rel, name, kind, target],
+                "INSERT INTO symbol_refs(path, name, kind, lineno, target) VALUES (?1,?2,?3,?4,?5)",
+                &[rel, name, kind, &(*lineno as i64), target],
             )?;
         }
         report.indexed += 1;
@@ -650,49 +1393,61 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
             in_batch = 0;
         }
     }
-    for (aid, resolved) in &test_files {
-        for target in resolved {
-            db.exec("INSERT OR IGNORE INTO edges(src, type, dst, source_artifact, provenance) VALUES (?1,'TESTS',?2,?1,'code-intel')", &[aid, target])?;
-        }
-    }
-    // CALLS edges: callee name resolved to the file defining a symbol of that name (same file preferred)
-    for (src, path, callee) in &pending_calls {
-        let same = db.query_one("SELECT artifact_id FROM symbols WHERE name=?1 AND path=?2 AND kind != 'module' LIMIT 1", &[callee, path])?;
-        let target = match same { Some(r) => Some(r["artifact_id"].as_str().unwrap_or("").to_string()), None => db.query_one("SELECT artifact_id FROM symbols WHERE name=?1 AND kind != 'module' ORDER BY path LIMIT 1", &[callee])?.map(|r| r["artifact_id"].as_str().unwrap_or("").to_string()) };
-        if let Some(t) = target {
-            if t != *src {
-                db.exec("INSERT OR IGNORE INTO edges(src, type, dst, source_artifact, provenance) VALUES (?1,'CALLS',?2,?1,?3)", &[src, &t, &format!("call:{callee}")])?;
-            }
-        }
-    }
-    for (superseder, superseded) in &supersedes_map {
-        db.exec("UPDATE artifacts SET superseded_by=?1 WHERE artifact_id=?2 AND (superseded_by IS NULL OR superseded_by='')", &[superseder, superseded])?;
-        if let Some(a) = db.artifact(superseded)? {
-            if a["status"].as_str() == Some("ACTIVE") {
-                report.supersession_conflicts.push(json!({"superseded": superseded, "by": superseder, "status": "ACTIVE", "path": a["path"]}));
-            }
-        }
-    }
     if incremental {
+        // artefacts no longer part of the index (deleted, reclassified out of every index, now binary/too large)
         for a in db.query("SELECT artifact_id, path FROM artifacts", &[])? {
             let path = a["path"].as_str().unwrap_or("").to_string();
-            if !seen_paths.contains(&path) && !p.root.join(&path).exists() {
+            if !seen_paths.contains(&path) {
                 db.delete_artifact(a["artifact_id"].as_str().unwrap_or(""))?;
                 report.removed += 1;
             }
         }
+        // exclusions that no longer apply
+        for e in db.query("SELECT path FROM excluded", &[])? {
+            let path = e["path"].as_str().unwrap_or("").to_string();
+            if !excluded_now.contains(&path) {
+                db.exec("DELETE FROM excluded WHERE path=?1", &[&path])?;
+            }
+        }
+        db.exec(
+            "DELETE FROM derivation WHERE path NOT IN (SELECT path FROM artifacts)",
+            &[],
+        )?;
     }
+    derive_cross_artifact_facts(&db, p, &resolver, &mut report)?;
     db.commit()?;
+    report.coverage = coverage.to_value();
+    if coverage.uncovered > 0 {
+        report.problems.push(format!(
+            "INDEX_COVERAGE_GAP: {} non-empty line(s) of {} artefact(s) are held by no chunk",
+            coverage.uncovered,
+            coverage.gaps.len()
+        ));
+    }
     // --- vectors with the pinned embedder (errors abort the build; no fallback)
     let emb_spec = embed.spec();
     db.begin()?;
     for batch in pending_vectors.chunks(256) {
         let texts: Vec<String> = batch.iter().map(|(_, _, t)| t.clone()).collect();
-        let vecs = embed.embed_batch(&texts, &p.root).inspect_err(|_e| {
-            if !incremental {
-                let _ = std::fs::remove_file(&build_path);
+        let vecs = match embed.embed_batch(&texts, &p.root) {
+            Ok(v) => v,
+            Err(e) => {
+                if !incremental {
+                    let _ = std::fs::remove_file(&build_path);
+                }
+                note_tool_failure(
+                    &mut report,
+                    tool_failure_from(
+                        "embed",
+                        &emb_spec.id,
+                        &emb_spec.version,
+                        &e,
+                        "rebuild-memory",
+                    ),
+                );
+                return Err(e);
             }
-        })?;
+        };
         for ((chunk_id, artifact_id, _), v) in batch.iter().zip(vecs) {
             db.conn.execute("INSERT OR REPLACE INTO vectors(chunk_id, artifact_id, embedder, dim, vec) VALUES (?1,?2,?3,?4,?5)", params![chunk_id, artifact_id, emb_spec.id, v.len() as i64, serde_json::to_string(&v)?])?;
         }
@@ -719,6 +1474,7 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
         "supersession_conflicts",
         &json!(report.supersession_conflicts),
     )?;
+    db.set_meta("index_coverage", &report.coverage)?;
     let excluded_all = db.query("SELECT path, reason FROM excluded ORDER BY path", &[])?;
     let manifest = build_index_manifest(
         p,
@@ -763,7 +1519,118 @@ pub fn rebuild(p: &Project, opts: IndexOptions) -> Result<IndexReport> {
         .map(|r| r.spec.to_value())
         .unwrap_or(json!({"provider": "none"}));
     report.ecosystems = eco;
+    // --- failure memory: adapter failures observed by this build (BC-P2-32); a new record is indexed at once
+    if record_failures {
+        let mut recorded_new = false;
+        for ((plugin_id, version, code), (message, paths)) in &adapter_failures.by_key {
+            let mut t = crate::memory::failures::ToolFailure {
+                tool_kind: "code_intel".into(),
+                tool_id: plugin_id.clone(),
+                version: version.clone(),
+                code: code.clone(),
+                message: message.clone(),
+                operation: "rebuild-memory".into(),
+                affected: paths.clone(),
+            };
+            t.affected.truncate(10);
+            let o = crate::memory::failures::record_tool_failure(p, &t, false);
+            recorded_new |= o.status == "recorded";
+            report.failures.push(o.to_value());
+        }
+        if recorded_new {
+            let again = rebuild(
+                p_in,
+                IndexOptions {
+                    incremental: true,
+                    record_failures: Some(false),
+                    ..Default::default()
+                },
+            )?;
+            report.indexed += again.indexed;
+            report.manifest_hash = again.manifest_hash;
+            report.counts = again.counts;
+        }
+    }
     report.duration_ms = started.elapsed().as_millis();
     let _ = PluginDescriptor::from_value(&Value::Null, "");
     Ok(report)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_paths_by_convention() {
+        for t in [
+            "tests/test_models.py",
+            "src/app/test_colocated.py",
+            "pkg/server_test.go",
+            "web/format.test.ts",
+            "web/__tests__/x.js",
+            "src/OrderTest.java",
+            "spec/models/order_spec.rb",
+        ] {
+            assert!(is_test_path(t), "{t}");
+        }
+        for f in [
+            "src/app/models.py",
+            "src/latest.py",
+            "docs/testing-guide.md",
+            "src/contest.go",
+            "Test.java",
+        ] {
+            assert!(!is_test_path(f), "{f}");
+        }
+    }
+
+    #[test]
+    fn import_resolution_covers_src_layouts_and_crates() {
+        let files: Vec<(PathBuf, String)> = [
+            "src/app/__init__.py",
+            "src/app/models.py",
+            "tests/test_models.py",
+            "lib/other/app/models.py",
+            "crates/ledger/src/lib.rs",
+            "crates/ledger/src/entries.rs",
+            "crates/ledger/tests/it.rs",
+            "srv/a.go",
+            "srv/b.go",
+            "srv/a_test.go",
+        ]
+        .iter()
+        .map(|r| (PathBuf::from(format!("/nonexistent/{r}")), r.to_string()))
+        .collect();
+        let mut r = ImportResolver::new(Path::new("/nonexistent"), &files, &[]);
+        r.rust_crates
+            .push(("ledger".into(), "crates/ledger".into()));
+        r.files.insert("crates/ledger/Cargo.toml".into());
+        assert_eq!(
+            r.resolve("tests/test_models.py", "python", "app.models")
+                .as_deref(),
+            Some("src/app/models.py")
+        );
+        assert_eq!(
+            r.resolve("src/app/__init__.py", "python", ".models")
+                .as_deref(),
+            Some("src/app/models.py")
+        );
+        assert_eq!(
+            r.resolve("crates/ledger/tests/it.rs", "rust", "ledger::entries::sum")
+                .as_deref(),
+            Some("crates/ledger/src/entries.rs")
+        );
+        assert_eq!(
+            r.resolve("crates/ledger/src/lib.rs", "rust", "crate::entries")
+                .as_deref(),
+            Some("crates/ledger/src/entries.rs")
+        );
+        assert_eq!(
+            r.go_package_files("srv/a_test.go"),
+            vec!["srv/a.go".to_string(), "srv/b.go".to_string()]
+        );
+        assert!(r
+            .resolve("tests/test_models.py", "python", "flask")
+            .is_none());
+    }
 }

@@ -1,8 +1,21 @@
-"""Python code-structural memory via the stdlib AST: symbols, imports, calls, structural chunks."""
+"""Python code-structural memory via the stdlib AST: symbols, imports, calls, structural chunks, and (protocol
+fields `relations`, `routes`, `models`) inheritance, route registrations and database models.
+
+Everything is read from the syntax tree, so nothing inside a string, docstring or comment is ever reported.
+"""
 from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, field
+
+# HTTP-framework route registration methods (decorator form `@<obj>.<verb>("/path")`) and the method each implies.
+_ROUTE_VERBS = {"route": None, "api_route": None, "get": "GET", "post": "POST", "put": "PUT", "delete": "DELETE",
+                "patch": "PATCH", "head": "HEAD", "options": "OPTIONS", "websocket": "WEBSOCKET"}
+# Class-body statements that mark an ORM-mapped class (SQLAlchemy/Django/SQLModel/peewee style) ...
+_MODEL_BODY_NAMES = {"__tablename__", "__table__", "__table_args__"}
+_MODEL_CALLS = {"Column", "mapped_column", "relationship", "ForeignKey"}
+# ... and ORM bases that map a class by themselves (qualified forms only: a bare `Model` base is too ambiguous).
+_MODEL_BASES = {"models.Model", "db.Model", "DeclarativeBase", "ApplicationRecord"}
 
 
 @dataclass
@@ -77,6 +90,99 @@ def analyze(source: str, module_name: str = "module") -> ModuleFacts:
     return ModuleFacts(symbols=symbols, imports=sorted(set(imports)))
 
 
+def _simple(expr: ast.AST) -> str:
+    """Last identifier of a base/decorator expression: `models.Model` -> `Model`, `Generic[T]` -> `Generic`."""
+    if isinstance(expr, ast.Subscript):
+        return _simple(expr.value)
+    if isinstance(expr, ast.Call):
+        return _simple(expr.func)
+    if isinstance(expr, ast.Attribute):
+        return expr.attr
+    if isinstance(expr, ast.Name):
+        return expr.id
+    return ""
+
+
+def _str_arg(call: ast.Call) -> str | None:
+    if call.args and isinstance(call.args[0], ast.Constant) and isinstance(call.args[0].value, str):
+        return call.args[0].value
+    for kw in call.keywords:
+        if kw.arg in ("path", "rule") and isinstance(kw.value, ast.Constant) and isinstance(kw.value.value, str):
+            return kw.value.value
+    return None
+
+
+def structure(tree: ast.AST, symbols: list[Symbol]) -> tuple[list[dict], list[dict], list[dict]]:
+    """Inheritance relations, route registrations and database models, read from the AST only."""
+    by_node: dict[int, str] = {}
+
+    def qualify(node: ast.AST, parent: str | None):
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                q = f"{parent}.{child.name}" if parent else child.name
+                by_node[id(child)] = q
+                qualify(child, q)
+            else:
+                qualify(child, parent)
+
+    qualify(tree, None)
+    relations: list[dict] = []
+    routes: list[dict] = []
+    models: list[dict] = []
+    for node in ast.walk(tree):
+        q = by_node.get(id(node))
+        if isinstance(node, ast.ClassDef) and q:
+            for b in node.bases:
+                name = _simple(b)
+                if name and name != "object":
+                    relations.append({"kind": "inherits", "from": q, "name": name, "lineno": node.lineno})
+            table = None
+            evidence = None
+            for stmt in node.body:
+                targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target] if isinstance(stmt, ast.AnnAssign) else []
+                for t in targets:
+                    if isinstance(t, ast.Name) and t.id in _MODEL_BODY_NAMES:
+                        evidence = evidence or t.id
+                        v = getattr(stmt, "value", None)
+                        if t.id == "__tablename__" and isinstance(v, ast.Constant) and isinstance(v.value, str):
+                            table = v.value
+                value = getattr(stmt, "value", None)
+                if isinstance(value, ast.Call):
+                    fn = value.func
+                    name = _simple(fn)
+                    django_field = (isinstance(fn, ast.Attribute) and isinstance(fn.value, ast.Name)
+                                    and fn.value.id == "models" and name.endswith(("Field", "ForeignKey", "Key")))
+                    if name in _MODEL_CALLS or django_field:
+                        evidence = evidence or f"{name}()"
+            for b in node.bases:
+                full = ast.unparse(b)
+                if full in _MODEL_BASES or (full == "SQLModel" and any(k.arg == "table" for k in node.keywords)):
+                    evidence = evidence or f"base {full}"
+            if evidence:
+                models.append({"name": node.name, "qualname": q, "table": table, "lineno": node.lineno, "evidence": evidence})
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and q:
+            for d in node.decorator_list:
+                if not (isinstance(d, ast.Call) and isinstance(d.func, ast.Attribute)):
+                    continue
+                verb = d.func.attr
+                if verb not in _ROUTE_VERBS:
+                    continue
+                path = _str_arg(d)
+                if path is None or not (path.startswith("/") or path == ""):
+                    continue
+                method = _ROUTE_VERBS[verb]
+                if method is None:
+                    methods = [kw.value for kw in d.keywords if kw.arg == "methods"]
+                    if methods and isinstance(methods[0], (ast.List, ast.Tuple)):
+                        ms = [e.value.upper() for e in methods[0].elts if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+                        method = "|".join(ms) if ms else "GET"
+                    else:
+                        method = "GET" if verb == "route" else "ANY"
+                routes.append({"method": method, "path": path, "handler": q, "lineno": d.lineno})
+    _ = symbols
+    return relations, routes, models
+
+
 def structural_chunks(source: str, facts: ModuleFacts) -> list[tuple[str, str, int, int]]:
     """Return (qualname, text, lineno, end_lineno) for module-level docstring + each top-level class/function."""
     lines = source.splitlines()
@@ -108,7 +214,9 @@ def _handle(inputs: dict) -> dict:
                 "parent": s.parent, "signature": s.signature} for s in facts.symbols]
     calls = [{"from": s.qualname, "name": c} for s in facts.symbols for c in s.calls]
     chunks = [{"qualname": q, "lineno": a, "end_lineno": b} for (q, _t, a, b) in structural_chunks(source, facts)] if facts.ok else []
-    return {"ok_parse": facts.ok, "error": facts.error, "symbols": symbols, "imports": facts.imports, "calls": calls, "chunks": chunks}
+    relations, routes, models = structure(ast.parse(source), facts.symbols) if facts.ok else ([], [], [])
+    return {"ok_parse": facts.ok, "error": facts.error, "symbols": symbols, "imports": facts.imports, "calls": calls,
+            "chunks": chunks, "relations": relations, "routes": routes, "models": models}
 
 
 def main() -> int:
