@@ -1,0 +1,51 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/runtime)
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.10s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-15a10c09d13f7815)
+
+running 33 tests
+test repair2::interface_contract_kernel_yaml_and_migration_substance_are_consistent ... ok
+test repair2::release_build_reproduces_released_versions_from_their_commit ... ok
+test repair3::current_release_payload_identity_and_hygiene ... ok
+test repair::plugin_host_large_response_through_cli ... ok
+test repair::reranker_hook_invoked_and_never_silently_skipped ... ok
+test repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts ... ok
+test section6::a_no_primitive_claim_is_refutable_by_this_suite ... ok
+test repair::sensitivity_classes_and_namespaces_are_enforced ... ok
+test section6::both_capability_acquisition_primitives_ask_section_6_without_consulting_the_descriptor ... ok
+test section6::section_6_coverage_is_derived_from_the_product ... ok
+test repair3::policy_exceptions_require_a_real_governing_decision ... ok
+test section6::the_dropped_held_out_sub_checks_run_here ... ok
+test section6::the_floors_sink_never_lowers_a_floor_however_the_value_was_set ... ok
+test repair::unmeasured_memory_recall_is_not_green ... ok
+test repair2::plugins_are_governed_capabilities_not_arbitrary_commands ... ok
+test repair2::incremental_rebuild_follows_record_relocation ... ok
+test repair::freeze_writes_is_honoured_by_adopt_and_upstream ... ok
+test repair::policy_enforcement_coverage_is_complete_and_honest ... ok
+test section6::a_human_gate_record_cannot_be_written_below_floor_however_it_was_minted ... ok
+test repair2::project_policy_cannot_weaken_constitutional_floors ... ok
+test repair2::cit_approval_derives_only_from_an_answered_gate has been running for over 60 seconds
+test repair2::framework_lock_is_release_identifying_and_portable has been running for over 60 seconds
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger has been running for over 60 seconds
+test repair2::task_close_uses_observed_mutations_not_self_attestation has been running for over 60 seconds
+test repair3::constitutional_floors_require_a_verified_kernel has been running for over 60 seconds
+test repair3::plugin_descriptors_can_never_authorise_themselves has been running for over 60 seconds
+test repair::implementation_prerequisites_and_symbol_route has been running for over 60 seconds
+test repair::smaller_findings_regressions has been running for over 60 seconds
+test repair2::task_close_uses_observed_mutations_not_self_attestation ... ok
+test repair::task_close_enforces_mutation_scope has been running for over 60 seconds
+test repair::implementation_prerequisites_and_symbol_route ... ok
+test section6::an_undetermined_subject_fails_closed_at_both_enforcement_points ... ok
+test section6::the_below_floor_marking_reaches_every_surface_including_ones_that_know_nothing_about_it ... ok
+test repair::update_approval_requires_presented_answered_gate ... ok
+test section6::the_marking_is_absent_from_every_surface_on_a_healthy_machine ... ok
+test repair3::plugin_descriptors_can_never_authorise_themselves ... ok
+test repair2::cit_approval_derives_only_from_an_answered_gate ... ok
+test repair3::constitutional_floors_require_a_verified_kernel ... ok
+test repair2::framework_lock_is_release_identifying_and_portable ... ok
+test repair::smaller_findings_regressions ... ok
+test repair::task_close_enforces_mutation_scope ... ok
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 104 filtered out; finished in 151.04s
+

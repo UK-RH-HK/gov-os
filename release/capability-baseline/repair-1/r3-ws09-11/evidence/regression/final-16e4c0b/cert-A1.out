@@ -1,0 +1,27 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/runtime)
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.01s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-15a10c09d13f7815)
+
+running 12 tests
+test arch::core_crates_have_no_python_or_node_bindings ... ok
+test arch::kernel_data_contains_no_language_or_toolchain_assumptions ... ok
+test arch::rust_sources_never_hardcode_external_language_runtimes ... ok
+test arch::builtin_embedder_matches_python_reference_plugin ... ok
+test arch::ecosystem_resolution_follows_the_governed_project_not_the_os ... ok
+test arch::schemas_policies_and_registries_validate_against_kernel_schemas ... ok
+test arch::core_runs_without_any_governed_toolchain_on_path has been running for over 60 seconds
+test arch::plugin_protocol_is_language_neutral_bash_embedder has been running for over 60 seconds
+test brownfield::brownfield_adoption_end_to_end has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered has been running for over 60 seconds
+test greenfield::greenfield_end_to_end has been running for over 60 seconds
+test multi_machine::clone_rebuilds_identical_derived_state has been running for over 60 seconds
+test arch::plugin_protocol_is_language_neutral_bash_embedder ... ok
+test multi_machine::clone_rebuilds_identical_derived_state ... ok
+test arch::core_runs_without_any_governed_toolchain_on_path ... ok
+test failure_injection::injected_failures_are_detected_and_recovered ... ok
+test greenfield::greenfield_end_to_end ... ok
+test brownfield::brownfield_adoption_end_to_end ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 125 filtered out; finished in 420.16s
+

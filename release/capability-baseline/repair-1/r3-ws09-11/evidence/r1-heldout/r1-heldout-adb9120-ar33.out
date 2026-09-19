@@ -1,0 +1,182 @@
+# P2-AR-0040 R1 held-out re-run, label=adb9120-ar33
+# worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+# worktree HEAD: adb912009419eca1f8966fc6b6351221b41a4d66
+# product files differing from HEAD (runtime/ cli/ framework/ migrations/ tools/ Cargo.*): 0
+# private scratch root: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-2 -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-3 -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-4 -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+# tree census (.rs under runtime/src + cli/src): 118 files
+# date: 2026-09-19T09:51:57Z
+# byte-identity of copied suites (cmp):
+  identical ho27/heldout_srr.rs
+  identical ho27/heldout_srr2.rs
+  identical ho27/heldout_srr3.rs
+  identical ho27/heldout_srr4.rs
+  identical ho27/common/forge.rs
+  identical ho27/Cargo.toml
+  identical ho29/ho_a_allowlist.rs
+  identical ho29/ho_b_coverage.rs
+  identical ho29/ho_c_deadlock.rs
+  identical ho29/ho_d_expiry.rs
+  identical ho29/ho_e_rootexpiry.rs
+  identical ho29/ho_f_preservation.rs
+  identical ho29/common/mint.rs
+  identical ho29/Cargo.toml
+  identical ho31/hx_a_census.rs
+  identical ho31/hx_b_failopen.rs
+  identical ho31/hx_c_prior_evidence.rs
+  identical ho31/hx_d_acquisition_and_preservation.rs
+  identical ho31/common/bench.rs
+  identical ho31/Cargo.toml
+  identical ho33/hv_a_derivation.rs
+  identical ho33/hv_b_bullet7.rs
+  identical ho33/hv_c_failclosed.rs
+  identical ho33/hv_d_sinks_and_preservation.rs
+  identical ho33/common/mod.rs
+  identical ho33/Cargo.toml
+# (S1) derived copy vs the held-out hv_a_derivation.rs (the ONLY difference must be the two scale assertions):
+22,23c22,23
+<     assert_eq!(files.len(), 84, "the product tree is not the size the census claims");
+<     assert_eq!(funcs.len(), 740, "my splitter does not agree with the candidate's function count");
+---
+>     println!("DERIVED COPY (P2-AR-0032, round-2 integration): scale pin 84 files not asserted; measured {}", files.len());
+>     println!("DERIVED COPY (P2-AR-0032, round-2 integration): scale pin 740 functions not asserted; measured {}", funcs.len());
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.84s
+# candidate gov: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/target/debug/gov sha256 3f5772484fa265b82d30659e54b0c24b2d2dfc627b396ddfbef313f368f2b6ec
+===== AR-0033 :: hv_a_derivation =====
+    Updating crates.io index
+     Locking 164 packages to latest compatible versions
+      Adding ed25519-dalek v2.2.0 (available: v3.0.0)
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding sha2 v0.10.9 (available: v0.11.0)
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 33s
+     Running tests/hv_a_derivation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/hv_a_derivation-6df39438b0b19321)
+running 10 tests
+test a10_the_single_exemption_writes_only_into_the_snapshot_directory ... ok
+test a1_the_derived_census_reproduces_independently_at_the_claimed_scale ... FAILED
+test a2_the_same_signatures_flag_the_pre_repair_source ... ok
+test a3_plausible_future_primitives_against_the_signatures ... ok
+test a4_the_bullet_6_primitive_the_census_cannot_see_is_refused_by_the_sink ... ok
+test a5_an_acceptance_marker_accepts_an_unenforced_implementation ... ok
+test a6_the_positive_controls_are_classified_by_what_they_actually_prove ... ok
+test a7_no_sink_entry_claims_an_absence_and_bullet_7_has_real_call_sites ... ok
+test a8_the_rustfmt_assumption_behind_the_splitter_is_untrue_but_costs_nothing_here ... ok
+test a9_the_cfg_test_cut_hides_no_section_6_primitive ... ok
+failures:
+---- a1_the_derived_census_reproduces_independently_at_the_claimed_scale stdout ----
+independent walk: 118 files, 2017 functions
+thread 'a1_the_derived_census_reproduces_independently_at_the_claimed_scale' (3376755) panicked at tests/hv_a_derivation.rs:22:5:
+assertion `left == right` failed: the product tree is not the size the census claims
+  left: 118
+ right: 84
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+failures:
+    a1_the_derived_census_reproduces_independently_at_the_claimed_scale
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.49s
+error: test failed, to rerun pass `--test hv_a_derivation`
+===== AR-0033 :: hv_b_bullet7 =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.22s
+     Running tests/hv_b_bullet7.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/hv_b_bullet7-37581a2580a50efc)
+running 7 tests
+test b1_a_below_floor_machine_does_not_read_as_current ... ok
+test b2_an_unmarked_machine_is_not_marked_and_a_cleared_marking_lifts ... ok
+test b3_a_machine_with_no_home_is_not_spuriously_marked ... ok
+test b4_every_command_result_carries_the_marking_through_the_envelope ... ok
+test b5_a_stdout_path_bypasses_the_command_result_envelope ... ok
+test b6_the_non_json_surface_carries_the_marking ... ok
+test b7_in_process_reporting_surfaces_are_covered_only_where_they_carry_it_themselves ... ok
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.27s
+===== AR-0033 :: hv_c_failclosed =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.32s
+     Running tests/hv_c_failclosed.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/hv_c_failclosed-01adb6d9f067afba)
+running 6 tests
+test c1_both_enforcement_points_fail_closed_on_an_undetermined_subject ... ok
+test c2_the_section_5_allow_list_is_consulted_before_the_state_read ... ok
+test c3_break_glass_can_still_be_exited_and_the_exit_policy_is_unchanged ... ok
+test c4_an_unreadable_marking_is_treated_as_marked_and_can_still_be_cleared ... ok
+test c5_the_state_carrying_guard_resolves_nothing_and_holds_under_the_same_input ... ok
+test c6_the_fail_open_is_gone_and_resolution_is_byte_identical ... ok
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+===== AR-0033 :: hv_d_sinks_and_preservation =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.05s
+     Running tests/hv_d_sinks_and_preservation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/hv_d_sinks_and_preservation-e178c1b0b40b47f4)
+running 8 tests
+test d1_a_human_gate_record_cannot_be_persisted_below_floor_however_it_was_minted ... ok
+test d2_the_cit_mutation_ops_reach_the_bullet_2_control ... ok
+test d3_gate_present_reaches_no_operation_guard_and_is_now_refused_at_the_sink ... ok
+test d4_both_acquisition_primitives_ask_section_6_unconditionally ... ok
+test d5_the_malleability_and_relaxation_properties_hold_in_held_out_material ... ok
+test d6_the_product_cannot_sign ... ok
+test d7_frozen_r1_preservation_still_holds ... ok
+test d8_break_glass_consults_no_network ... ok
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.95s
+
+# SUMMARY (per test binary)
+AR-0033  hv_a_derivation                          passed=  9 failed=  1  ['a1_the_derived_census_reproduces_independently_at_the_claimed_scale']
+AR-0033  hv_b_bullet7                             passed=  7 failed=  0  []
+AR-0033  hv_c_failclosed                          passed=  6 failed=  0  []
+AR-0033  hv_d_sinks_and_preservation              passed=  8 failed=  0  []
+
+# SUMMARY (per suite)
+AR-0033: 30 passed / 1 failed; failing=['a1_the_derived_census_reproduces_independently_at_the_claimed_scale']; not-compiling=[]
+
+# CENSUS reported by AR-0033 hv_a::a1 (independent walk of THIS worktree): 118 files, 2017 functions
+
+===== SUPPLEMENTARY (S1) :: hv_a_derivation_a1_unpinned (derived copy P2-AR-0032; scale pins printed, not asserted) =====
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.22s
+     Running tests/hv_a_derivation_a1_unpinned.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/hv_a_derivation_a1_unpinned-634f1269313ad9aa)
+running 1 test
+test a1_the_derived_census_reproduces_independently_at_the_claimed_scale ... independent walk: 118 files, 2017 functions
+DERIVED COPY (P2-AR-0032, round-2 integration): scale pin 84 files not asserted; measured 118
+DERIVED COPY (P2-AR-0032, round-2 integration): scale pin 740 functions not asserted; measured 2017
+AR-0033 independent §6 census:
+  human_gate_create: derived 47 / writers 42 / exempt 1 / violations 0
+  human_gate_approve: derived 1 / writers 1 / exempt 0 / violations 0
+  release_certification: derived 1 / writers 1 / exempt 0 / violations 0
+  trust_policy_mutation: derived 8 / writers 1 / exempt 0 / violations 0
+  privileged_plugin_acquisition: derived 9 / writers 2 / exempt 0 / violations 0
+  floor_lower_or_reset: derived 3 / writers 1 / exempt 0 / violations 0
+  present_below_floor_release_as_current: derived 1 / writers 1 / exempt 0 / violations 0
+ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.23s
+
+===== SUPPLEMENTARY (S2) :: release/verification/4.1.6-r1-4/evidence/derive.py (ROOT line only substituted) =====
+# diff of the copy against the evidence file:
+2c2
+< ROOT = "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/5009a8bf-a263-4632-bdc3-6bf820075cc1/scratchpad/wt/srr1-r1-verify-4"
+---
+> ROOT = "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11"
+--- indentation splitter, cfg(test) cut (the product's own): 118 files, 2017 functions
+  human_gate_create                          derived  47 / writers  42 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   1 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   8 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived   9 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
+--- brace-depth splitter, cfg(test) cut (independent): 118 files, 2017 functions
+  human_gate_create                          derived  47 / writers  42 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   1 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   8 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived   9 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
+--- indentation splitter, NO cfg(test) cut: 118 files, 2304 functions
+  human_gate_create                          derived  50 / writers  43 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   1 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   8 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived  12 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
