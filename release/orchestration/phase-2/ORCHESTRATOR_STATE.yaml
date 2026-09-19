@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-19T16:40:02Z'
-state_hash: b603be976420f53009476e02effbf5b9821644c12d2ec01151925cc24f27084b
+updated_at: '2026-09-19T16:40:57Z'
+state_hash: 5f3356a60cc7d60b9109e22a7cae37f11aa0b48c5b7ad98a4abd183ccaaff50d
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_REPAIR_1_ROUND_3_RUNNING
 
@@ -302,7 +302,7 @@ completed_stages:
       pinned model under P2-HO-0008 / P2-HO-0009.
 
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0001-orchestrator-continuity.md
-latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0006.yaml
+latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0007.yaml
 next_deterministic_action: >-
   AWAIT_REPAIR_1_ROUND_4 — round 3 integrated (merge e4cb662, product_code_digest 1d3e9f59...85df7; orchestrator reproduced
   lib 262/0, certification 189/0). Two parallel round-4 builders from the merged tree: P2-AR-0042 WS-1 BC-P2-02 evidence map

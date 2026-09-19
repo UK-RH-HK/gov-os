@@ -8,6 +8,10 @@
 
 ## Where things stand
 
+> **Superseded in part (2026-09-19, P2-CP-0007):** round 3 is integrated and merged (`e4cb662`; P2-L-0022, P2-L-0023). Steps 1–3
+> are done. Round 4 (step 4) runs as **two** parallel builders — P2-AR-0042 (BC-P2-02, P2-HO-0041) and P2-AR-0043 (residual
+> integration points, P2-HO-0042). Resume from `CHECKPOINTS/P2-CP-0007.yaml`, then steps 4 (merge both) to 7 below.
+
 - Phase 2, lifecycle `P2_REPAIR_ITERATION_1`, **repair round 3 of 4**. Candidate `cap2-candidate-0` was REJECTED (P2-AR-0007:
   134 blocking findings, 52 classes BC-P2-01…52, `release/capability-baseline/audit-0/synthesis/`). No `cap2-candidate-1` yet.
 - Rounds 1 and 2 are integrated and merged (`b7e6d52`, `e8e1ff2`; last reproduced 207/0 lib, 136/0 certification).
