@@ -1,0 +1,12 @@
+# rustfmt --edition 2021 --check on every Rust file this run touched (0 = no hunk); commit 25edc5a67bd725c5fe0420540879a3ef02d0f673
+runtime/src/lifecycle/mod.rs: 0
+runtime/src/lifecycle/research.rs: 0
+runtime/src/lifecycle/experiment.rs: 0
+runtime/src/lifecycle/scenario.rs: 0
+cli/src/main.rs: 0
+runtime/src/orchestration/control.rs: 0
+runtime/src/lib.rs: only the added 'pub mod lifecycle;' line; rustfmt on lib.rs recurses into every module and reports the same 14 pre-existing hunks at base 843d79c and here
+# JSON schemas: python json.load round-trip
+framework/schemas/research.schema.json: valid JSON
+framework/schemas/experiment.schema.json: valid JSON
+framework/schemas/scenario.schema.json: valid JSON

@@ -1,0 +1,214 @@
+# P2-AR-0031 audit-of-record probe re-run (unedited): beta-r/C1-deterministic-structured-memory mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/base-tree (HEAD n/a); product files differing from HEAD: 0
+# probe sha256 97db8f8666f66213aacf4b0560eae94b02b053a94707693a6ae065057f083a80; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/mirror-shim-before/target/release/gov
+# date 2026-09-19T04:28:58Z
+$ gov --role orchestrator init --name orders-ledger --alias c1 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator status  -> exit 0 ok=True
+
+====================================================================================================
+C1-b01 projects
+====================================================================================================
+artifacts row: ('PRJ-0001', 'project', 'ACTIVE', 'AUTHORITATIVE', 'spec/product/PRJ-0001.yaml')
+gov status .project: {'name': 'orders-ledger', 'alias': 'c1', 'root': '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-before-beta-r-C1-deterministic-structured-memory-esUHGw/c1', 'commit': '496084dca32a67ec385f215432a40666bfd0d2e6', 'branch': 'main'}
+spec/product/PRJ-0001.yaml: {'id': 'PRJ-0001', 'type': 'project', 'title': 'orders-ledger', 'status': 'ACTIVE'}
+memory query PRJ-0001 routes/hits: ['structured', 'lexical'] ['PRJ-0001', 'PRJ-0001', 'TST-0001'] (rank of PRJ-0001: 1 )
+[PASS] C1-b01: project record held (spec/product/PRJ-0001.yaml), in SQLite artifacts, returned by gov status and by structured ID lookup
+
+====================================================================================================
+C1-b02 features
+====================================================================================================
+artifacts row: ('F-0001', 'feature', 'ACTIVE', 'AUTHORITATIVE', 'spec/features/F-0001.yaml')
+$ gov --role orchestrator readiness check F-0001  -> exit 0 ok=True
+gov readiness check F-0001 -> {'feature': 'F-0001', 'coverage': 1.0, 'pre_implementation_ok': True} gaps: 0
+$ gov --role orchestrator status  -> exit 0 ok=True
+gov status .features: [{'id': 'F-0001', 'title': 'Order totals', 'coverage': 1.0, 'pre_implementation_ok': True, 'gaps': 0}]
+[PASS] C1-b02: feature record in SQLite, evaluated by gov readiness check, listed by gov status
+
+====================================================================================================
+C1-b03 requirements
+====================================================================================================
+artifacts row: ('REQ-0001', 'requirement', 'ACTIVE', 'AUTHORITATIVE', 'spec/requirements/REQ-0001.yaml')
+$ gov --role orchestrator task create --class implementation --objective 'Implement exact order totals' --feature F-0001 --status READY --allowed src/**,tests/** --fields '{"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator context compile TASK-0001  -> exit 0 ok=True
+context packet governing_requirements: ['REQ-0001']
+[PASS] C1-b03: requirement record in SQLite and delivered as current governing requirement in the deterministic authority block
+
+====================================================================================================
+C1-b04 decisions (current truth under supersession)
+====================================================================================================
+D-0101 row: ('D-0101', 'decision', 'SUPERSEDED', 'AUTHORITATIVE', 'spec/decisions/D-0101.yaml')
+D-0102 row: ('D-0102', 'decision', 'ACTIVE', 'AUTHORITATIVE', 'spec/decisions/D-0102.yaml')
+context packet active_decisions: ['D-0102'] conflicting: []
+default query hits: [('D-0102', 'ACTIVE'), ('PRJ-0001', 'ACTIVE'), ('file:docs/runbook.md', 'ACTIVE'), ('L-0101', 'ACTIVE'), ('D-0102', 'ACTIVE'), ('file:src/core/ledger.rs', 'ACTIVE'), ('ARCH-0101', 'ACTIVE'), ('file:src/core/ledger.rs', 'ACTIVE')]
+--include-historical hits: [('D-0101', 'SUPERSEDED', ['superseded_by:D-0102']), ('D-0102', 'ACTIVE', []), ('D-0101', 'SUPERSEDED', ['superseded_by:D-0102']), ('PRJ-0001', 'ACTIVE', []), ('L-0101', 'ACTIVE', []), ('D-0102', 'ACTIVE', []), ('file:docs/runbook.md', 'ACTIVE', []), ('file:src/core/ledger.rs', 'ACTIVE', [])]
+[PASS] C1-b04: decision current truth = D-0102; superseded D-0101 recorded superseded_by, excluded from authority and default retrieval, visible only on explicit historical request
+
+====================================================================================================
+C1-b05 tasks (current truth follows status change)
+====================================================================================================
+$ gov --role orchestrator task show TASK-0001  -> exit 0 ok=True
+task show before: {'id': 'TASK-0001', 'class': 'implementation', 'task_status': 'READY', 'feature': 'F-0001'}
+$ gov --role orchestrator task status TASK-0001 IN_PROGRESS --note probe  -> exit 0 ok=True
+$ gov --role orchestrator task show TASK-0001  -> exit 0 ok=True
+task show after status change: {'id': 'TASK-0001', 'task_status': 'IN_PROGRESS'}
+$ gov --role orchestrator task dag  -> exit 0 ok=True
+task present in DAG: True
+[PASS] C1-b05: task record created via gov task create; status change is the new current truth (task show, task dag)
+
+====================================================================================================
+C1-b06 scenarios
+====================================================================================================
+artifacts row: ('SCN-0001', 'scenario', 'ACTIVE', 'AUTHORITATIVE', 'spec/scenarios/SCN-0001.yaml') packet scenarios: ['SCN-0001'] acceptance criteria: [{'criterion': 'exact total', 'scenario': 'SCN-0001'}, {'scenario': 'SCN-0001', 'then': 'the total is 750 cents'}]
+[PASS] C1-b06: scenario record in SQLite; delivered with its then/success criteria as acceptance criteria
+
+====================================================================================================
+C1-b07 tests (test obligations + test artefacts + TESTS relationships)
+====================================================================================================
+TST-0001 row: ('TST-0001', 'test-obligation', 'ACTIVE', 'AUTHORITATIVE', 'spec/tasks/TST-0001.yaml')
+TESTS edges: [('TST-0001', 'TESTS', 'REQ-0001'), ('TST-0001', 'TESTS', 'SCN-0001'), ('file:tests/test_models.py', 'TESTS', 'file:src/app/models.py')]
+test-class file artefacts: [('file:tests/test_models.py', 'test')]
+[PASS] C1-b07: test obligations are typed records with TESTS edges; test files are classified path_class=test in structured memory
+
+====================================================================================================
+C1-b08 interfaces
+====================================================================================================
+artifacts row: ('API-0101', 'interface', 'ACTIVE', 'AUTHORITATIVE', 'spec/interfaces/API-0101.yaml') packet interfaces: ['API-0101']
+[PASS] C1-b08: interface record in SQLite and delivered in the authority block
+
+====================================================================================================
+C1-b09 experiments
+====================================================================================================
+artifacts row: ('EXP-0001', 'experiment', 'ACTIVE', 'EVIDENCE', 'spec/experiments/EXP-0001.yaml') production_merge_allowed: False
+structured lookup: ['structured', 'lexical'] ['EXP-0001', 'EXP-0001']
+[PASS] C1-b09: experiment record (hypothesis/method/result, production_merge_allowed=false) held and retrievable by ID
+
+====================================================================================================
+C1-b10 releases
+====================================================================================================
+framework.lock: {'framework': 'agentic-engineering-os', 'version': '4.1.5', 'release_hash': '26ea7d2d48a0e9ec1b152b24a671a6190da0dc0c20e0d05b61b2122db857dd72', 'installed_at': '2026-09-19T04:28:58Z'}
+gov status .framework: {'name': 'agentic-engineering-os', 'version': '4.1.5', 'release_hash': '26ea7d2d48a0e9ec1b152b24a671a6190da0dc0c20e0d05b61b2122db857dd72', 'cli_version': '4.1.5', 'installed_at': '2026-09-19T04:28:58Z'}
+generic REL-0001 row after incremental rebuild: ('REL-0001', 'release', 'ACTIVE', 'NARRATIVE', 'spec/releases/REL-0001.yaml')
+$ gov --role orchestrator audit --family schema_invariants --no-persist  -> exit 0 ok=True
+schema_invariants verdict: HEALTHY findings mentioning REL-0001: []
+[PASS] C1-b10: installed Governance OS release is current truth in framework.lock and gov status
+[PASS] C1-b10-note: a governed product's own release can only be an untyped generic record (no release type/dir/prefix); indexed generically
+
+====================================================================================================
+C1-b11 claims
+====================================================================================================
+$ gov --role orchestrator task status TASK-0001 READY  -> exit 0 ok=True
+$ gov --role orchestrator task claim TASK-0001  -> exit 0 ok=True
+$ gov --role orchestrator claims list  -> exit 0 ok=True
+claims list: [{'task_id': 'TASK-0001', 'session_id': 'S-probe', 'role': 'orchestrator', 'claimed_at': '2026-09-19T04:29:06Z', 'expires_at': '2026-09-19T08:29:06Z', 'worktree': '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-before-beta-r-C1-deterministic-structured-memory-esUHGw/c1', 'git_dir': '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-before-beta-r-C1-deterministic-structured-memory-esUHGw/c1/.git', 'branch': 'main', 'head': 'cd2636087f1c69760c3b2640bb5859980f436939', 'scope': ['src/**', 'tests/**'], 'expired': False}]
+$ gov --role orchestrator task claim TASK-0001  -> exit 1 ok=False error={"code": "TASK_CLAIMED", "message": "TASK-0001 is claimed by session S-probe until \"2026-09-19T08:29:06Z\"", "details": {"task_id": "TASK-0001", "session_id": "S-probe", "role": "orchestrator", "claimed_at": "2026-09-19T04:29:06Z", "expires_at": "2026-09-19T08:29:06Z", "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-before-beta-r-C1-deterministic-structured-memory-esUHGw/c1", "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/a
+second session claim -> TASK_CLAIMED
+[PASS] C1-b11: claims held in the claims store (.governance-runtime/claims.db); current holder enforced against a second session
+
+====================================================================================================
+C1-b12 transactions (CIT records)
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Rename the settlement window key' --trigger behaviour_change --targets REQ-0001  -> exit 0 ok=True
+$ gov --role orchestrator cit list  -> exit 0 ok=True
+$ gov --role orchestrator status  -> exit 0 ok=True
+cit list: [('CIT-0001', 'SIMULATED')]
+gov status open_transactions: [{'id': 'CIT-0001', 'cit_status': 'SIMULATED', 'title': 'Rename the settlement window key'}]
+$ gov --role orchestrator cit reject CIT-0001 --by orchestrator --reason probe  -> exit 0 ok=True
+$ gov --role orchestrator status  -> exit 0 ok=True
+$ gov --role orchestrator cit list  -> exit 0 ok=True
+after reject: cit list: [('CIT-0001', 'REJECTED')] open_transactions: []
+[PASS] C1-b12: change transactions are CIT records whose status is current truth (open -> REJECTED removes it from open_transactions)
+
+====================================================================================================
+C1-b13 statuses (lifecycle statuses are policy-bounded current truth)
+====================================================================================================
+$ gov --role orchestrator audit --family schema_invariants --no-persist  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "governance suite UNHEALTHY: 0 critical, 2 high", "details": {"audit": "", "verdict": "UNHEALTHY", "green": false, "families": {"schema_invariants": {"ok": false, "findings": 2, "detail": {"records_checked": 18}, "status": "executed", "cached_from": null}}, "findings": [{"severity": "high", "family": "schema_invariants", "message": "REQ-0099 (requirement): /status: \"WHATEVER\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTORICAL\",\"REJECTED\",\"DEPRECATED\",\"RETIRED\"]", "path": "spec/requirements/REQ-0099.yaml", "id": "GF-0001"},
+schema_invariants on invalid status: ['REQ-0099 (requirement): /status: "WHATEVER" is not one of ["ACTIVE","PROVISIONAL","SUPERSEDED","LEGACY","HISTORICAL","REJECTED","DEPRECATED","RETIRED"]', "REQ-0099 has status 'WHATEVER' outside AUTHORITY_POLICY.lifecycle_statuses"]
+$ gov --role orchestrator status  -> exit 0 ok=True
+gov status task counts: {'total': 1, 'runnable': 1, 'blocked': 0, 'waiting_human': 0, 'done': 0, 'open': 1}
+[PASS] C1-b13: status values are validated against AUTHORITY_POLICY.lifecycle_statuses; task status counts are current truth in gov status
+
+====================================================================================================
+C1-b14 skill versions
+====================================================================================================
+$ gov --role orchestrator skills list  -> exit 0 ok=True
+skills (id, version, source): [('SKL-API-CONTRACT-REVIEW', '1.0.0', 'kernel'), ('SKL-BACKEND-IMPL', '1.0.0', 'kernel'), ('SKL-DB-MIGRATION', '1.0.0', 'kernel'), ('SKL-IMPACT-ANALYSIS', '1.0.0', 'kernel'), ('SKL-LIVE-MIGRATION', '1.0.0', 'kernel'), ('SKL-MEMORY-RECONSTRUCTION', '1.0.0', 'kernel'), ('SKL-REPO-ADOPTION', '1.0.0', 'kernel'), ('SKL-RESEARCH-BENCHMARK', '1.0.0', 'kernel'), ('SKL-TASK-CLOSE', '1.0.0', 'kernel'), ('SKL-TEST-DESIGN', '1.0.0', 'kernel'), ('SKL-THREAT-MODEL', '1.0.0', 'kernel'), ('SKL-TOOL-INSTALL', '1.0.0', 'kernel')]
+$ gov --role orchestrator task create --class test-design --objective 'Design acceptance tests' --feature F-0001 --fields '{"required_skills": ["SKL-TEST-DESIGN"]}'  -> exit 0 ok=True
+$ gov --role orchestrator context compile TASK-0002  -> exit 0 ok=True
+context packet required_skills: [{'id': 'SKL-TEST-DESIGN', 'resolved': True, 'version': '1.0.0'}]
+[PASS] C1-b14: skills carry versions; task context resolves the required skill's current version
+
+====================================================================================================
+C1-b15 tool versions
+====================================================================================================
+$ gov --role orchestrator tools registry  -> exit 0 ok=True
+tool registry (tool_id, version, version_pin): [('TOOL-FS-001', 'builtin', None), ('TOOL-GIT-001', 'system', None), ('TOOL-TEST-001', 'system', None), ('TOOL-AST-001', 'stdlib', 'python>=3.11'), ('TOOL-CARGO-001', 'system', None), ('TOOL-CARGO-002', 'system', None), ('TOOL-CARGO-003', 'system', None), ('TOOL-LSP-RUST-001', 'system', None), ('TOOL-NPM-001', 'system', None), ('TOOL-GO-001', 'system', None), ('TOOL-CMAKE-001', 'system', None), ('TOOL-MAKE-001', 'system', None), ('TOOL-MAVEN-001', 'system', None), ('TOOL-SQLITE-001', 'stdlib', 'sqlite>=3.35'), ('TOOL-SECRETS-001', 'builtin', None), ('TOOL-WEB-001', '0', None)]
+governance/generated/tool-registry.json present: True
+[PASS] C1-b15: tool registry records every tool's version (and version_pin where declared) in a generated manifest
+
+====================================================================================================
+C1-b16 model-routing records
+====================================================================================================
+$ gov --role orchestrator route --class implementation  -> exit 0 ok=True
+route implementation: {'minimum_tier': 'T3', 'reasoning': 'high', 'chosen': {'provider': 'prov-a', 'model': 'big', 'tier': 'T3', 'max_reasoning': 'extra_high', 'cost_per_1k_in': 3.0, 'cost_per_1k_out': 6.0}}
+$ gov --role orchestrator route --record /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-before-beta-r-C1-deterministic-structured-memory-esUHGw/c1-routing-ev.json  -> exit 0 ok=True
+$ gov --role orchestrator route --report  -> exit 0 ok=True
+route report rows: [{'provider': 'prov-a', 'model': 'mid', 'task_class': 'implementation', 'runs': 1, 'pass_rate': 1.0, 'avg_cost': 0.4, 'avg_latency_ms': 900.0, 'avg_repairs': 0.0}]
+[PASS] C1-b16: model routing mapping (overlay) resolves the current route; routing evidence records are kept and reported
+NOTE: routing evidence lives in .governance-runtime/routing/evidence.jsonl exists: True (untracked runtime directory)
+
+====================================================================================================
+C1-b17 index manifests
+====================================================================================================
+index-manifest keys: ['artifacts', 'built_at', 'chunking', 'counts', 'embedder', 'excluded', 'index_version', 'lexical', 'manifest_hash', 'repo_commit', 'reranker']
+index-manifest embedder/lexical/chunking/index_version: {'dimensions': 512, 'id': 'hashed-ngram', 'source': 'builtin', 'version': '1'} {'engine': 'sqlite-fts5', 'tokenizer': 'porter unicode61'} {'chunker': '2', 'levels': ['document', 'section', 'child'], 'max_chars': 1200, 'overlap_chars': 120} 4.1.5-idx3
+index-manifest artifacts: 181 manifest_hash: 03a572663797453e8dd3afae7cac87663635116398a81c29f123e04d7ba0feff
+memory-manifest keys: ['heldout_hash', 'manifest_hash', 'memory_policy_version', 'namespaces', 'runtime_dir', 'stores']
+$ gov --role orchestrator memory freshness  -> exit 0 ok=True
+gov memory freshness: {'fresh': False, 'manifest_present': True, 'checked': 184, 'stale': ['governance/project/MODEL_ROUTING_OVERRIDES.yaml'], 'added': ['spec/decisions/CIT-0001.yaml', 'spec/decisions/HDG-0001.yaml', 'spec/tasks/TASK-0002.yaml'], 'removed': [], 'pin_mismatch': []}
+$ gov --role orchestrator memory freshness  -> exit 0 ok=True
+after editing docs/runbook.md: freshness stale= ['docs/runbook.md', 'governance/project/MODEL_ROUTING_OVERRIDES.yaml'] ; after incremental rebuild manifest_hash changed: True ; entry content_hash updated: True
+[PASS] C1-b17: tracked index manifest records component identity + per-artefact content hashes; it is read as current truth and updated on change
+
+====================================================================================================
+C1 derived SQLite deterministic store: record kinds present
+====================================================================================================
+   ('architecture', 1)
+   ('audit', 1)
+   ('cit', 1)
+   ('decision', 2)
+   ('experiment', 1)
+   ('feature', 1)
+   ('file', 166)
+   ('human-gate', 1)
+   ('interface', 1)
+   ('lesson', 1)
+   ('project', 1)
+   ('release', 1)
+   ('requirement', 1)
+   ('research', 1)
+   ('scenario', 1)
+   ('task', 2)
+   ('test-obligation', 1)
+
+=== SUMMARY ===
+PASS  C1-b01  project record held (spec/product/PRJ-0001.yaml), in SQLite artifacts, returned by gov status and by structured ID lookup
+PASS  C1-b02  feature record in SQLite, evaluated by gov readiness check, listed by gov status
+PASS  C1-b03  requirement record in SQLite and delivered as current governing requirement in the deterministic authority block
+PASS  C1-b04  decision current truth = D-0102; superseded D-0101 recorded superseded_by, excluded from authority and default retrieval, visible only on explicit historical request
+PASS  C1-b05  task record created via gov task create; status change is the new current truth (task show, task dag)
+PASS  C1-b06  scenario record in SQLite; delivered with its then/success criteria as acceptance criteria
+PASS  C1-b07  test obligations are typed records with TESTS edges; test files are classified path_class=test in structured memory
+PASS  C1-b08  interface record in SQLite and delivered in the authority block
+PASS  C1-b09  experiment record (hypothesis/method/result, production_merge_allowed=false) held and retrievable by ID
+PASS  C1-b10  installed Governance OS release is current truth in framework.lock and gov status
+PASS  C1-b10-note  a governed product's own release can only be an untyped generic record (no release type/dir/prefix); indexed generically
+PASS  C1-b11  claims held in the claims store (.governance-runtime/claims.db); current holder enforced against a second session
+PASS  C1-b12  change transactions are CIT records whose status is current truth (open -> REJECTED removes it from open_transactions)
+PASS  C1-b13  status values are validated against AUTHORITY_POLICY.lifecycle_statuses; task status counts are current truth in gov status
+PASS  C1-b14  skills carry versions; task context resolves the required skill's current version
+PASS  C1-b15  tool registry records every tool's version (and version_pin where declared) in a generated manifest
+PASS  C1-b16  model routing mapping (overlay) resolves the current route; routing evidence records are kept and reported
+PASS  C1-b17  tracked index manifest records component identity + per-artefact content hashes; it is read as current truth and updated on change
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-before-beta-r-C1-deterministic-structured-memory-esUHGw
+[exit=0]

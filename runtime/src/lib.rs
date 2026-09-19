@@ -23,6 +23,8 @@ pub mod init;
 pub mod kernel;
 pub mod kernel_trust;
 pub mod lessons;
+/// Research, experiment and test-data lifecycles (WS-10; Contract v3 Gate J and H4).
+pub mod lifecycle;
 pub mod lock;
 pub mod memory;
 pub mod migrations;

@@ -1,0 +1,27 @@
+--- before
++++ after
+@@ -36,0 +37 @@
++  runtime/src/orchestration/control.rs:330:    // an L1 class for research-agent/data-author is WS-3's to declare, IP-WS10-01). A promotion records an
+@@ -37,0 +39,14 @@
++  runtime/src/lifecycle/scenario.rs:1://! # Scenarios drive data and tests (Contract v3 H4, lines 524-527; framework §39; BC-P2-46 and the data-authorship
++  runtime/src/lifecycle/scenario.rs:52:/// Task classes whose author is "the implementation author" for data-author independence.
++  runtime/src/lifecycle/scenario.rs:1020:                "{} (session {}) may not author test dataset {id}: it is {clash:?} of the scenario(s) this data serves; the data author must be independent of the implementation author and the end-to-end test author (framework §39; Contract v3:526). Register it as an independent role/session (e.g. data-author), or attach an owner-approved `independence_waiver: {{decision: D-…}}`.",
++  runtime/src/lifecycle/scenario.rs:1118:            "authorship": {"role": "data-author", "session": "S-da"}, "os_binding": {"test": "verified"}}));
++  runtime/src/lifecycle/scenario.rs:1120:            "independent_of_implementer": true, "author_role": "independent-test-designer", "test_data": ["TD-0001"]}));
++  runtime/src/lifecycle/scenario.rs:1162:        fx.put("spec/data/TD-0001.yaml", json!({"id": "TD-0001", "type": "data", "status": "ACTIVE", "author_role": "backend-engineer"}));
++  runtime/src/lifecycle/scenario.rs:1242:    fn data_author_independence_uses_recorded_authorship_and_honours_only_an_approved_waiver() {
++  runtime/src/lifecycle/scenario.rs:1259:                json!({"role": "data-author", "session": "S-impl"}),
++  runtime/src/lifecycle/mod.rs:50:/// spec records other than decisions). The L1 roles that author this material — `research-agent`, `data-author` —
++  runtime/src/lifecycle/mod.rs:517:    let role = non_empty(r.get("author_role")).or_else(|| non_empty(r.get("author")));
++  runtime/src/lifecycle/mod.rs:955:        fx.put("spec/data/TD-0001.yaml", json!({"id": "TD-0001", "type": "data", "status": "ACTIVE", "authorship": {"role": "data-author", "session": "S-da"}, "os_binding": {"test": "verified"}}));
++  runtime/src/lifecycle/mod.rs:956:        fx.put("spec/data/TD-0002.yaml", json!({"id": "TD-0002", "type": "data", "status": "ACTIVE", "authorship": {"role": "data-author", "session": "S-da"}}));
++  runtime/src/lifecycle/mod.rs:957:        fx.put("spec/data/TD-0003.yaml", json!({"id": "TD-0003", "type": "data", "status": "ACTIVE", "author_role": "backend-engineer"}));
++  runtime/src/lifecycle/mod.rs:958:        fx.put("spec/data/TD-0004.yaml", json!({"id": "TD-0004", "type": "data", "status": "ACTIVE", "author_role": "data-author"}));
+@@ -43,0 +59,7 @@
++  runtime/src/lifecycle/experiment.rs:55:    "data_provenance",
++  runtime/src/lifecycle/experiment.rs:107:        && !present(data.get("data_provenance"))
++  runtime/src/lifecycle/scenario.rs:16://! | INDEPENDENT TESTS | `test-obligation.scenario` (a family in `TEST_POLICY.independent_test_author_required_for`, `independent_of_implementer: true`), with the test data it uses in `test_data` (also accepted: `required_data`, ids named in `data_provenance`) |
++  runtime/src/lifecycle/scenario.rs:196:/// named in `data_provenance`), and its free-text provenance if any.
++  runtime/src/lifecycle/scenario.rs:204:    let prov = t.data.get("data_provenance");
++  runtime/src/lifecycle/scenario.rs:565:        tests_view.push(json!({"id": t.id(), "family": t.get("family"), "independent": independent_test(ctx, t), "test_data": ids, "data_provenance_text": text, "author": authorship_of(ctx, t).to_value()}));
++  runtime/src/lifecycle/scenario.rs:1164:            "independent_of_implementer": true, "data_provenance": "TD-0001 (synthetic, generated)"}));

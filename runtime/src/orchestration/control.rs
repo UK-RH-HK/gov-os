@@ -395,6 +395,33 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     // format compiled into this binary; it opens no project
     outside("oracle format", "qualification tooling: prints the Qualification Oracle format compiled into this binary; opens no project"),
     outside("oracle validate", "qualification tooling: read-only validation of verifier-custody oracle / score-report documents; opens no governed project"),
+    // ---- WS-10 (P2-AR-0031, BC-P2-46/47/48): research, experiment and test-data lifecycles (runtime/src/lifecycle).
+    // Every transition writes a governed spec record (spec/research, spec/experiments, spec/data) and T2-seals it:
+    // `mutate_spec_other`, the class of governed spec records other than decisions (= `lifecycle::RECORD_AUTHORITY`;
+    // an L1 class for research-agent/data-author is WS-3's to declare, IP-WS10-01). A promotion records an
+    // owner-signed human approval of experimental output entering production (and may raise the gate for it):
+    // `approve_cit_human`, the class that applies a human-answered gate to a production change
+    // (= `lifecycle::PROMOTE_AUTHORITY`). show/check/trace read records, VCS history and the working tree only.
+    g("research record", "mutate_spec_other", Write),
+    g("research update", "mutate_spec_other", Write),
+    g("research conclude", "mutate_spec_other", Write),
+    g("research withdraw", "mutate_spec_other", Write),
+    g("research sync", "mutate_spec_other", Write),
+    g("research show", "read", Read),
+    g("research check", "read", Read),
+    g("experiment design", "mutate_spec_other", Write),
+    g("experiment update", "mutate_spec_other", Write),
+    g("experiment run", "mutate_spec_other", Write),
+    g("experiment reproduce", "mutate_spec_other", Write),
+    g("experiment conclude", "mutate_spec_other", Write),
+    g("experiment abandon", "mutate_spec_other", Write),
+    g("experiment promote", "approve_cit_human", Write),
+    g("experiment show", "read", Read),
+    g("experiment check", "read", Read),
+    g("data register", "mutate_spec_other", Write),
+    g("data show", "read", Read),
+    g("scenario trace", "read", Read),
+    g("scenario check", "read", Read),
 ];
 
 /// **The FREEZE_WRITES recovery allow-list** — the only writes permitted while writes are frozen, with the reason.

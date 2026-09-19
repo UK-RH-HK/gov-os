@@ -1,0 +1,96 @@
+# P2-AR-0031 audit-of-record probe re-run (unedited): beta-r/C2-relationship-graph mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws10 (HEAD 25edc5a67bd725c5fe0420540879a3ef02d0f673); product files differing from HEAD: 0
+# probe sha256 380d158933dd323e72286e1073393bb438aa1f24cc1c17ad203fb431bb0cbe47; gov eb9e9e6e599fcc085969b649039d2c116a1cae20e0c5b4c3fbe1a7243844a211 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/mirror-shim-after/target/release/gov
+# date 2026-09-19T05:02:12Z
+$ gov --role orchestrator init --name orders-ledger --alias c2 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+
+====================================================================================================
+C2-b1 typed relationships: one explicit `relations:` entry per named type
+====================================================================================================
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+edge types present in store: ['AFFECTS', 'BLOCKS', 'CALLS', 'CONSTRAINS', 'CONSUMES', 'DEPENDS_ON', 'DERIVED_FROM', 'FAILED_BECAUSE', 'GENERATED_FROM', 'GOVERNED_BY', 'IMPLEMENTS', 'IMPORTS', 'LEARNED_FROM', 'OWNS', 'PRODUCES', 'REALISES', 'SUPERSEDES', 'TESTS', 'USES', 'VALIDATED_BY']
+missing from store: []
+$ gov --role orchestrator memory graph ARCH-0201  -> exit 0 ok=True
+gov memory graph ARCH-0201 -> [('→AFFECTS', 'REQ-0001')]
+code-derived edges (CALLS/IMPORTS): [('ARCH-0201', 'CALLS', 'REQ-0001'), ('file:src/app/api.py', 'CALLS', 'file:src/app/models.py'), ('file:tests/test_models.py', 'CALLS', 'file:src/app/models.py'), ('ARCH-0201', 'IMPORTS', 'REQ-0001'), ('file:src/app/api.py', 'IMPORTS', 'file:src/app/models.py'), ('file:src/web/api.ts', 'IMPORTS', 'file:src/web/format.ts'), ('file:tests/test_models.py', 'IMPORTS', 'file:src/app/models.py')]
+[PASS] C2-b1: all 20 named relationship types are stored as typed edges; code analysis derives CALLS/IMPORTS
+field-derived edges (feature/requirements/scenarios/interfaces/supersedes/tests): [('D-0102', 'AFFECTS', 'F-0001'), ('D-0102', 'SUPERSEDES', 'D-0101'), ('F-0001', 'GOVERNED_BY', 'REQ-0001'), ('F-0001', 'USES', 'API-0101'), ('F-0001', 'VALIDATED_BY', 'SCN-0001'), ('REQ-0001', 'REALISES', 'F-0001'), ('TST-0001', 'REALISES', 'F-0001'), ('TST-0001', 'TESTS', 'REQ-0001'), ('TST-0001', 'TESTS', 'SCN-0001')]
+
+====================================================================================================
+C2-b2 integrity: baseline
+====================================================================================================
+$ gov --role orchestrator audit --no-persist --family graph_integrity  -> exit 0 ok=True
+baseline graph_integrity family: {"ok": true, "findings": 0, "detail": {"dangling": 0, "orphans": 5, "edge_types": {"AFFECTS": 3, "BLOCKS": 1, "CALLS": 3, "CONSTRAINS": 1, "CONSUMES": 1, "DEPENDS_ON": 1, "DERIVED_FROM": 1, "FAILED_BECAUSE": 2, "GENERATED_FROM": 1, "GOVERNED_BY": 2, "IMPLEMENTS": 1, "IMPORTS": 4, "LEARNED_FROM": 1, "OWNS": 1, "PRODUCES": 1, "REALISES": 4, "SUPERSEDES": 2, "TESTS": 4, "USES": 2, "VALIDATED_BY": 2}}, "status": "executed", "cached_from": null} findings: []
+
+====================================================================================================
+C2-b2a ORPHAN: governed record with no relationships at all
+====================================================================================================
+$ gov --role orchestrator audit --no-persist --family graph_integrity  -> exit 0 ok=True
+graph_integrity detail: {"ok": true, "findings": 0, "detail": {"dangling": 0, "orphans": 6, "edge_types": {"AFFECTS": 3, "BLOCKS": 1, "CALLS": 3, "CONSTRAINS": 1, "CONSUMES": 1, "DEPENDS_ON": 1, "DERIVED_FROM": 1, "FAILED_BECAUSE": 2, "GENERATED_FROM": 1, "GOVERNED_BY": 2, "IMPLEMENTS": 1, "IMPORTS": 4, "LEARNED_FROM": 1, "OWNS": 1, "PRODUCES": 1, "REALISES": 4, "SUPERSEDES": 2, "TESTS": 4, "USES": 2, "VALIDATED_BY": 2}}, "status": "executed", "cached_from": null}
+graph_integrity findings: []
+$ gov --role orchestrator doctor  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "doctor: UNHEALTHY (2 failed checks)", "details": {"verdict": "UNHEALTHY", "checks": [{"id": "D001", "name": "framework.lock present", "ok": true, "severity": "info", "message": "present", "remediation": "gov init / gov adopt", "enforcement": {"mode": "hard-block", "refuses": [{"at_or_above": "critical", "operations": ["task.create", "task.claim", "task.close", "cit.propose", "cit.approve", "cit.execute", "handoff.create", "release.build", "update.apply", "adopt.migrate"], "scope": "global"}], "below_threshold": "warning"}}, {"id": "D002", "name": "framework.lo
+doctor D015: {'id': 'D015', 'name': 'graph integrity', 'ok': True, 'severity': 'info', 'message': '0 dangling edge(s), 6 orphan record(s)', 'remediation': 'fix references in records or add missing records', 'enforcement': {'mode': 'warning', 'refuses': []}}
+orphan nodes per the product's own orphan query (graph::orphan_nodes): [('ARCH-0101',), ('AUD-0001',), ('EXP-0001',), ('PRJ-0001',), ('RES-0101',), ('REQ-0299',)]
+[PASS] C2-b2-orphan-counted: orphan relationship state is computed (count reported)
+[FAIL] C2-b2-orphan-flagged: orphan state raises a finding / failing check
+
+====================================================================================================
+C2-b2b STALE: relationship to a record that is no longer current (SUPERSEDED target) and to a deleted file
+====================================================================================================
+edges from F-0202: [('F-0202', 'GOVERNED_BY', 'D-0101')] ; D-0101 status: [('SUPERSEDED', 'D-0102')]
+$ gov --role orchestrator audit --no-persist --family graph_integrity --family schema_invariants  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "governance suite UNHEALTHY: 0 critical, 5 high", "details": {"audit": "", "verdict": "UNHEALTHY", "green": false, "families": {"schema_invariants": {"ok": false, "findings": 5, "detail": {"records_checked": 17}, "status": "executed", "cached_from": null}, "graph_integrity": {"ok": true, "findings": 0, "detail": {"dangling": 0, "orphans": 6, "edge_types": {"AFFECTS": 3, "BLOCKS": 1, "CALLS": 3, "CONSTRAINS": 1, "CONSUMES": 1, "DEPENDS_ON": 1, "DERIVED_FROM": 1, "FAILED_BECAUSE": 2, "GENERATED_FROM": 1, "GOVERNED_BY": 3, "IMPLEMENTS": 1, "IMPORTS": 4, "LEARNED_F
+findings mentioning F-0202/D-0101: []
+[FAIL] C2-b2-stale-superseded-target: edge to a SUPERSEDED record (stale relationship) is detected
+edges still pointing at the renamed file: [('file:src/web/api.ts', 'IMPORTS', 'file:src/web/format.ts')]
+$ gov --role orchestrator audit --no-persist --family graph_integrity  -> exit 0 ok=True
+graph_integrity findings: ['1 dangling edge(s) reference unknown artefacts (e.g. "file:src/web/api.ts" "IMPORTS" "file:src/web/format.ts")']
+$ gov --role orchestrator doctor  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "doctor: UNHEALTHY (4 failed checks)", "details": {"verdict": "UNHEALTHY", "checks": [{"id": "D001", "name": "framework.lock present", "ok": true, "severity": "info", "message": "present", "remediation": "gov init / gov adopt", "enforcement": {"mode": "hard-block", "refuses": [{"at_or_above": "critical", "operations": ["task.create", "task.claim", "task.close", "cit.propose", "cit.approve", "cit.execute", "handoff.create", "release.build", "update.apply", "adopt.migrate"], "scope": "global"}], "below_threshold": "warning"}}, {"id": "D002", "name": "framework.lo
+doctor D015: {'id': 'D015', 'name': 'graph integrity', 'ok': False, 'severity': 'medium', 'message': '1 dangling edge(s), 6 orphan record(s)', 'remediation': 'fix references in records or add missing records', 'enforcement': {'mode': 'warning', 'refuses': []}}
+[PASS] C2-b2-stale-dangling: edge left pointing at a renamed/deleted artefact is detected as dangling
+
+====================================================================================================
+C2-b2c REVERSED: relationship recorded in the wrong direction
+====================================================================================================
+supersession edges: [('D-0101', 'SUPERSEDES', 'D-0102'), ('D-0102', 'SUPERSEDES', 'D-0101'), ('D-0201', 'SUPERSEDES', 'D-0102')]
+$ gov --role orchestrator audit --no-persist --family graph_integrity --family schema_invariants  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "governance suite UNHEALTHY: 0 critical, 6 high", "details": {"audit": "", "verdict": "UNHEALTHY", "green": false, "families": {"schema_invariants": {"ok": false, "findings": 6, "detail": {"records_checked": 18}, "status": "executed", "cached_from": null}, "graph_integrity": {"ok": true, "findings": 0, "detail": {"dangling": 0, "orphans": 5, "edge_types": {"AFFECTS": 3, "BLOCKS": 1, "CALLS": 3, "CONSTRAINS": 1, "CONSUMES": 1, "DEPENDS_ON": 1, "DERIVED_FROM": 1, "FAILED_BECAUSE": 2, "GENERATED_FROM": 1, "GOVERNED_BY": 3, "IMPLEMENTS": 2, "IMPORTS": 4, "LEARNED_F
+findings mentioning the reversed/cyclic relationships: ['D-0102 is superseded by D-0101 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)']
+$ gov --role orchestrator doctor  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "doctor: UNHEALTHY (3 failed checks)", "details": {"verdict": "UNHEALTHY", "checks": [{"id": "D001", "name": "framework.lock present", "ok": true, "severity": "info", "message": "present", "remediation": "gov init / gov adopt", "enforcement": {"mode": "hard-block", "refuses": [{"at_or_above": "critical", "operations": ["task.create", "task.claim", "task.close", "cit.propose", "cit.approve", "cit.execute", "handoff.create", "release.build", "update.apply", "adopt.migrate"], "scope": "global"}], "below_threshold": "warning"}}, {"id": "D002", "name": "framework.lo
+doctor D014: {'id': 'D014', 'name': 'authority unambiguous (no supersession conflicts / duplicate ids)', 'ok': False, 'severity': 'high', 'message': '2 supersession conflict(s), 0 duplicate id(s)', 'remediation': 'resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids', 'enforcement': {'mode': 'hard-block', 'refuses': [{'at_or_above': 'high', 'operations': ['task.close', 'cit.execute', 'release.build', 'update.apply'], 'scope': 'global'}], 'below_threshold': 'warning'}}
+[FAIL] C2-b2-reversed-direction: reversed-direction edges (requirement IMPLEMENTS architecture; requirement TESTS a test obligation) are detected
+[PASS] C2-b2-reversed-supersession-cycle: cyclic (mutually reversed) supersession is detected (as an authority conflict)
+
+====================================================================================================
+C2-b2d INVALID: unknown relationship type and dangling target
+====================================================================================================
+stored edges from REQ-0204: [('REQ-0204', 'DEPENDS_ON', 'REQ-9999'), ('REQ-0204', 'LOVES', 'F-0001')]
+$ gov --role orchestrator audit --no-persist --family graph_integrity --family schema_invariants  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "governance suite UNHEALTHY: 0 critical, 6 high", "details": {"audit": "", "verdict": "UNHEALTHY", "green": false, "families": {"schema_invariants": {"ok": false, "findings": 6, "detail": {"records_checked": 18}, "status": "executed", "cached_from": null}, "graph_integrity": {"ok": false, "findings": 1, "detail": {"dangling": 1, "orphans": 6, "edge_types": {"AFFECTS": 3, "BLOCKS": 1, "CALLS": 3, "CONSTRAINS": 1, "CONSUMES": 1, "DEPENDS_ON": 2, "DERIVED_FROM": 1, "FAILED_BECAUSE": 2, "GENERATED_FROM": 1, "GOVERNED_BY": 3, "IMPLEMENTS": 1, "IMPORTS": 4, "LEARNED_
+findings: ['REQ-0204 (requirement): /relations/0/type: "LOVES" is not one of ["DEPENDS_ON","BLOCKS","IMPLEMENTS","REALISES","GOVERNED_BY","CONSTRAINS","DERIVED_FROM","SUPERSEDES","VALIDATED_BY","TESTS","USES","PRODUCES","CONSUMES","AFFECTS","GENERATED_FROM","CALLS","IMPORTS","OWNS","FAILED_BECAUSE","LEARNED_FROM"]', '1 dangling edge(s) reference unknown artefacts (e.g. "REQ-0204" "DEPENDS_ON" "REQ-9999")']
+[PASS] C2-b2-invalid-type: unknown relationship type rejected by schema_invariants
+[PASS] C2-b2-invalid-dangling: relationship to a non-existent artefact detected as dangling
+
+====================================================================================================
+C2-b3 impact traversal (records and code)
+====================================================================================================
+$ gov --role orchestrator memory impact REQ-0001 --depth 2  -> exit 0 ok=True
+gov memory impact REQ-0001 --depth 2: [('ARCH-0201', 1, 'CALLS → REQ-0001'), ('F-0001', 1, 'GOVERNED_BY → REQ-0001'), ('SCN-0001', 2, 'REALISES → F-0001'), ('TST-0001', 1, 'TESTS → REQ-0001')]
+$ gov --role orchestrator memory impact file:src/app/models.py --depth 2  -> exit 0 ok=True
+gov memory impact file:src/app/models.py: [('file:src/app/api.py', 1, 'CALLS → file:src/app/models.py'), ('file:tests/test_models.py', 1, 'CALLS → file:src/app/models.py')]
+$ gov --role orchestrator cit propose --proposal 'Change REQ-0001 to allow fractional cents' --trigger behaviour_change --targets REQ-0001  -> exit 0 ok=True
+$ gov --role orchestrator cit simulate CIT-0001  -> exit 0 ok=True
+cit simulate impact: radius R2 graph nodes: ['ARCH-0201', 'F-0001', 'SCN-0001', 'TST-0001']
+cit simulate affected keys: ['affected', 'affected_tasks', 'consequences', 'features', 'human_gate_required', 'index_snapshot', 'minimum_model_tier', 'other', 'radius', 'seeds', 'semantic_candidates', 'simulated_at', 'tests_required']
+[PASS] C2-b3: deterministic impact traversal over typed edges (records and code), reproducible, consumed by CIT-P
+
+=== SUMMARY ===
+PASS  C2-b1  all 20 named relationship types are stored as typed edges; code analysis derives CALLS/IMPORTS
+PASS  C2-b2-orphan-counted  orphan relationship state is computed (count reported)
+FAIL  C2-b2-orphan-flagged  orphan state raises a finding / failing check
+FAIL  C2-b2-stale-superseded-target  edge to a SUPERSEDED record (stale relationship) is detected
+PASS  C2-b2-stale-dangling  edge left pointing at a renamed/deleted artefact is detected as dangling
+FAIL  C2-b2-reversed-direction  reversed-direction edges (requirement IMPLEMENTS architecture; requirement TESTS a test obligation) are detected
+PASS  C2-b2-reversed-supersession-cycle  cyclic (mutually reversed) supersession is detected (as an authority conflict)
+PASS  C2-b2-invalid-type  unknown relationship type rejected by schema_invariants
+PASS  C2-b2-invalid-dangling  relationship to a non-existent artefact detected as dangling
+PASS  C2-b3  deterministic impact traversal over typed edges (records and code), reproducible, consumed by CIT-P
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-beta-r-C2-relationship-graph-LlxPPR
+[exit=0]

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/scenario.schema.json",
   "title": "scenario",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -170,7 +170,8 @@
       "type": "string"
     },
     "feature": {
-      "type": "string"
+      "type": "string",
+      "description": "the feature this scenario realises"
     },
     "actor": {
       "type": "string"
@@ -197,24 +198,32 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "H4 DATA: ids of the `data` records (data_kind requirement) this scenario needs"
     },
     "success_criteria": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "H4 SUCCESS criteria (measurable)"
     },
     "failure_criteria": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "H4 FAILURE criteria (measurable)"
+    },
+    "data_requirements_not_applicable": {
+      "type": "string",
+      "description": "why this scenario needs no data (an explicit, reasoned N/A; a silent N/A is a gap)"
     }
   },
   "required": [
     "id",
     "type",
     "status"
-  ]
+  ],
+  "description": "A scenario (Contract v3 Gate H4, lines 524-527; framework §39). The chain FEATURE -> SCENARIOS -> DATA -> TEST DATA -> SUCCESS/FAILURE -> INDEPENDENT TESTS is carried by these fields: `feature` (or the feature's `scenarios`), `data_requirements` (ids of `data` records of data_kind requirement; or `data_requirements_not_applicable` with the reason - a silent N/A is a gap), `success_criteria`, `failure_criteria`; test datasets name the requirements they realise (`implements`), carry `provenance` and OS-recorded authorship (`gov data register`); test obligations name the scenario (`scenario`) and the test data they use (`test_data`). Missing links are reported by `gov scenario check` / `gov scenario trace` (runtime/src/lifecycle/scenario.rs)."
 }
