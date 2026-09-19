@@ -1,0 +1,38 @@
+## [L1] signed release; unsigned manifest.json edited AFTER signing (release_commit forged, certification CERTIFIED)
+[L1] honest release_commit was d842f930315233c2025ccb8758185fb718d3baae
+[L1] init ok = True | authenticity = AUTHENTIC
+[L1] framework.lock.release_commit = f00dfacef00dfacef00dfacef00dfacef00dface | source = source:agentic-engineering-os@4.1.5
+[L1] lock keys: ['cli_version', 'framework', 'installed_at', 'installed_at_commit', 'kernel_manifest_hash', 'lock_schema_version', 'release_commit', 'release_hash', 'schema_versions', 'source', 'version']
+
+## [L2] update to a SIGNED 4.1.6 whose UNSIGNED manifest.json claims certification CERTIFIED
+[L2-control] honest manifest: certification = READY_FOR_INDEPENDENT_OS_VERIFICATION | human_gate_required = True | review impact; approve with `gov update --apply --approve --by <human>`
+[L2] edited manifest : certification = CERTIFIED | human_gate_required = False | safe: `gov update --apply` | target release is certified
+$ gov update --apply --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/probe-A2-04-jNjemV/alpha-r-a2-lock-ddbkeu5g/r16/releases/4.1.6/kernel
+  -> ok (exit 0) {"applied": true, "from": "4.1.5", "to": "4.1.6", "details": {"migrations": ["M-4.1.5-4.1.6"], "operations": [{"op": "note", "file": "", "dry_run": false}], "overlay_keys_changed": [], "overlay_reconciled": [], "index_manifest": "355f9b1a671e4368b421752055f2b00f0e1fe9b502c6a0bda85c991dd522a244", "doctor": "DEGRADED", "audit": "HEALTHY", "lock": {"release_commit": "1c738df2bd40068fa4afea6dd27e1487c5a58c5a", "source": "source:agentic-engineering-os@4.1.6"}, "release_authenticity": {"ingress": "update", "product": "agentic-engineering-os", "release_version": "4.1.6", "sequence": 20, "channel": "s…
+[L2] update applied without any Human Decision Gate: applied = True | to = 4.1.6
+[L2] human gates in the project after the update: []
+[L2] who may mint a CERTIFIED manifest: `gov release build --certification CERTIFIED` takes no project and no role
+[L2] release build as role research-agent (L1): ok = True | certification.status = CERTIFIED
+
+## [L3] what framework.lock does and does not record — authentic (provisioned) vs UNKNOWN (unprovisioned)
+[L3] unprovisioned authenticity = UNKNOWN
+[L3]   cli_version            authentic-install=4.1.5                                                unknown-install=4.1.5
+[L3]   framework              authentic-install=agentic-engineering-os                               unknown-install=agentic-engineering-os
+[L3]   installed_at           authentic-install=2026-09-18T23:33:18Z                                 unknown-install=2026-09-18T23:33:19Z
+[L3]   installed_at_commit    authentic-install=0a64174da3beb33395b04dd04efbfaf439e0b991             unknown-install=d3a9506afb6683a3f02583d39082016798ec4c7c
+[L3]   kernel_manifest_hash   authentic-install=3a93cc29327dd36612388e44b0d49e7c61be45d10bc979c674   unknown-install=3a93cc29327dd36612388e44b0d49e7c61be45d10bc979c674
+[L3]   lock_schema_version    authentic-install=1.1.0                                                unknown-install=1.1.0
+[L3]   release_commit         authentic-install=f00dfacef00dfacef00dfacef00dfacef00dface             unknown-install=d842f930315233c2025ccb8758185fb718d3baae
+[L3]   release_hash           authentic-install=e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6fa   unknown-install=e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6fa
+[L3]   source                 authentic-install=source:agentic-engineering-os@4.1.5                  unknown-install=source:agentic-engineering-os@4.1.5
+[L3]   version                authentic-install=4.1.5                                                unknown-install=4.1.5
+[L3] lock carries authenticity/sequence/channel/metadata digest: False
+
+## [L4] embedded payload + XDG_CACHE_HOME location (machine-specific path) -> recorded release identity
+[L4a] default cache ($HOME/.cache): source = embedded:agentic-engineering-os@4.1.5 | release_commit = 25dac6efcc4a0d8149d12b619b1776788f34dcaf
+[L4b] XDG_CACHE_HOME=<dir without '.cache'>: source = source:agentic-engineering-os@4.1.5 | release_commit = unknown
+[L4c] XDG_CACHE_HOME inside the consumer repo: source = source:agentic-engineering-os@4.1.5 | release_commit = d3a9506afb6683a3f02583d39082016798ec4c7c | consumer HEAD = d3a9506afb6683a3f02583d39082016798ec4c7c | release_commit == consumer HEAD: True | installed_at_commit = d3a9506afb6683a3f02583d39082016798ec4c7c
+[L4] same binary, same embedded payload, same release_hash: True
+
+DONE
+[A2-04 exit=0]

@@ -1,0 +1,104 @@
+# P2-AR-0020 WS08 probes, label=negative-control-base-c6b60bc
+# HEAD 39667f82079fb31b37f0dc1f04c99e6bc259b311 dirty-files: 1 date 2026-09-19T00:48:56Z
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/target-base/release/gov sha256 3271ce0e4e095561911e0d03d8641aa92fbeda39ef3c8a2ecb2a9f21cacbe81d
+
+=================== WS08-P1-post-install-integrity.py ===================
+## R1 provisioned machine: consistent rewrite of the installed AUTHORITY_POLICY after an authentic install
+[R1] init ok = True | authenticity = AUTHENTIC
+[R1] gate raised and presented before the rewrite: HDG-0001
+W R1a FAIL `gov kernel verify` detects the consistent rewrite and names the file -- {"ok": true, "modified": []}
+W R1b FAIL the installed kernel is untrusted T1: the embedded baseline is substituted (D-0007 rule 1) -- {"verified": true, "summary": "installed kernel 4.1.5 verified against KERNEL_MANIFEST.json and framework.lock"}
+W R1c FAIL an L1 worker still cannot record a human answer to a Human Decision Gate after the rewrite -- {"ok": true, "code": null}
+W R1d FAIL mutating operations fail closed (KERNEL_TAMPERED) -- null
+W R1e FAIL doctor is UNHEALTHY and D003 names the rewritten file -- {"verdict": "DEGRADED", "D003": [{"id": "D003", "name": "kernel payload integrity", "ok": true, "severity": "info", "message": "intact (4.1.5)", "remediation": "gov kernel reinstall --source <release> (kernel is immutable, INV-007)"}]}
+W R1f FAIL the rewritten installation is not presented as current -- CURRENT
+W R1h FAIL a reinstall against the rewritten pin is refused before anything moves, naming the pin this machine recorded -- {"code": "KERNEL_MISMATCH", "installation_unchanged": false, "recorded": {}}
+W R1g FAIL remedy: pin restored, `gov kernel reinstall --source <signed release>` restores a trusted kernel; the L3 floor is back -- {"reinstall": "KERNEL_MISMATCH", "verified": false, "gate_create": false, "l1_decide": "USAGE"}
+
+## R2 unprovisioned machine: consistent rewrite of a project this machine installed
+W R2a FAIL on the default posture the rewrite is REPORTED: kernel trust names the divergence and the presentation discloses it -- {"protected_record": {}, "presented_as": "CURRENT", "disclosure": ""}
+O R2b not enforced on the unprovisioned posture (OD-P2-02 is with the owner): kernel trust verified=True, task create -> True
+
+## R3 a second provisioned machine that did not install the project (git clone)
+W R3a FAIL machine B refuses privileged work on a kernel it never verified (ARCH-0003 §8) -- KERNEL_TAMPERED
+W R3b FAIL machine B does not present the unverified installation as current -- CURRENT
+W R3c FAIL after `gov kernel reinstall --source <the pinned signed release>` machine B works on it and presents it as current -- {"reinstall": "KERNEL_MISMATCH", "task_create": "KERNEL_TAMPERED", "presented_as": "CURRENT"}
+
+## R4 the same provisioned machine, the project copied to a new path
+W R4a FAIL the machine's verified-release ledger anchors a payload it verified, wherever the project now sits -- {"task_create": "KERNEL_TAMPERED", "protected_record": null}
+
+## R5 installed while unprovisioned, then the machine is provisioned
+W R5a FAIL an install made before provisioning is not a verification: privileged work waits for one -- true
+W R5b PASS verifying the pinned signed release anchors it -- {"reinstall": true, "task_create": true}
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/target-base/release/gov total=15 pass=1 fail=14 failed=['R1a', 'R1b', 'R1c', 'R1d', 'R1e', 'R1f', 'R1h', 'R1g', 'R2a', 'R3a', 'R3b', 'R3c', 'R4a', 'R5a']
+[WS08-P1-post-install-integrity.py exit=0]
+
+=================== WS08-P2-presentation.py ===================
+## P1 unprovisioned machine
+[P1] init from an unsigned release: ok = True | authenticity = UNKNOWN | envelope presented_as = CURRENT
+W P1a FAIL no command-result envelope presents the unauthenticated installation as current, and each carries the disclosure -- {"status": {"presented_as": "CURRENT", "disclosure": false}, "doctor": {"presented_as": "CURRENT", "disclosure": false}, "version": {"presented_as": "CURRENT", "disclosure": false}, "gate list": {"presented_as": "CURRENT", "disclosure": false}, "kernel trust": {"presented_as": "CURRENT", "disclosure": false}, "policy overrides": {"presented_as": "CURRENT", "disclosure": false}, "update --check": {"presented_as": "CURRENT", "disclosure": false}, "init": {"presented_as": "CURRENT", "disclosure": false}}
+W P1b FAIL `gov status` makes no `verified_release` claim for an install this machine never verified -- {"posture": "UNPROVISIONED", "authenticity": "UNKNOWN", "verified_release": "4.1.5", "verified_payload_hash": "67e8071e5bca4c1887c9a148a9f94e0acd2d31161101a7efda91f005921a8f5b", "currency": "UNKNOWN_BETWEEN_INGRESSES", "revocation_knowledge": "only revocations this machine has received; no claim about unseen or future revocations", "marking": null, "below_floor": false, "detail": "gov trust status"}
+W P1c FAIL `gov doctor`'s own report discloses that authenticity is not established -- {"presented_as": "CURRENT", "disclosure": null}
+O P1c-verdict doctor verdict = DEGRADED; a doctor CHECK that fails on it is WS-2's to add (IP-1: crate::srr::installation::doctor_check)
+W P1d FAIL `gov trust status` reports no verified release, and lists the installation with authenticity UNKNOWN -- {"installed_release": {"release_version": "4.1.5", "sequence": 0, "channel": "unspecified", "payload_hash": "67e8071e5bca4c1887c9a148a9f94e0acd2d31161101a7efda91f005921a8f5b", "kernel_manifest_hash": "31ffbd1ccf9076af991be36b54f16c2cd1a5233d63f4482d70c5823c2eff3428", "authenticity": "UNKNOWN", "verified_at": "2026-09-19T00:48:57Z"}, "installations": []}
+W P1e FAIL `gov update --check` neither calls the installation certified nor says there is nothing to do -- {"certification": "READY_FOR_INDEPENDENT_OS_VERIFICATION", "up_to_date": true, "recommendation": "nothing to do"}
+W P1f FAIL the embedded payload (the README path) on an unprovisioned machine is not presented as current either -- CURRENT
+
+## P2 control: provisioned machine, authentic install
+W P2a PASS an authenticated installation on a provisioned machine is presented as current -- {"status": "CURRENT", "doctor": "CURRENT", "version": "CURRENT", "gate list": "CURRENT"}
+
+## P3 control: no installation in context
+W P3a PASS a command that acts on no installation says nothing about one (R1 hv_b b2/b4 preserved) -- {"surface": "version", "below_floor": false, "marking": null, "presented_as": "CURRENT", "section_6_bullet": 7, "basis": "OWNER-DECISION-0006 \u00a76 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED \u2014 RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/target-base/release/gov total=8 pass=2 fail=6 failed=['P1a', 'P1b', 'P1c', 'P1d', 'P1e', 'P1f']
+[WS08-P2-presentation.py exit=0]
+
+=================== WS08-P3-certification-and-lock-identity.py ===================
+## C1/C2 provisioned machine, update gating
+W C1a FAIL an unsigned CERTIFIED claim does not waive the Human Decision Gate -- {"certification": "CERTIFIED", "human_gate_required": false, "certification_basis": null}
+W C1b FAIL `gov update --apply` stops at the gate; nothing is installed -- {"code": null, "lock_version": "4.1.6"}
+W C2a FAIL a certification bound by signed release metadata is authenticated against this machine's trust root -- {"certification": null, "human_gate_required": null, "certification_basis": null}
+W C2b FAIL that authenticated certification — and only it — lets the update proceed without a gate -- {"ok": false, "applied": null, "code": "NOT_INSTALLED"}
+
+## C3 minting a certification claim
+W C3a FAIL no role can mint a CERTIFIED release; the refusal precedes any write -- {"orchestrator": {"code": null, "written": true}, "research-agent": {"code": null, "written": true}}
+W C3b PASS a non-certifying status is still recorded (control) -- ok
+
+## C4 framework.lock identity (a fresh provisioned machine: C2 raised the first machine's floor to 4.1.6)
+W C4a FAIL the forged unsigned release_commit is not recorded; the verified identity and its basis are -- {"release_commit": "f00dfacef00dfacef00dfacef00dfacef00dface", "source": "source:agentic-engineering-os@4.1.5", "authenticity": null, "sequence": null, "channel": null, "release_metadata_sha256": null}
+W C4b FAIL a release commit bound by SIGNED metadata is recorded, with that basis -- {"release_commit": "37882e967f0e7cc75173007ce8a87766c9f376c8", "basis": null}
+
+## C5 embedded identity vs XDG_CACHE_HOME
+W C5a FAIL the same binary's embedded payload records one identity wherever its cache sits, never the consumer's HEAD -- {"default": {"version": "4.1.5", "release_hash": "e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6faac2d04e15c7f37", "release_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf", "source": "embedded:agentic-engineering-os@4.1.5", "consumer_head": "6d41b627e8d3cd08b578b77400846a7a673c55c1"}, "no-dot-cache": {"version": "4.1.5", "release_hash": "e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6faac2d04e15c7f37", "release_commit": "unknown", "source": "source:agentic-engineering-os@4.1.5", "consumer_head": "6d41b627e8d3cd08b578b77400846a7a673c55c1"}, "inside-consumer": {"version": "4.1.5", "release_hash": "e2e7b0cf2e360f60c7dc0ad2c713a654918f0ff3e68465b6faac2d04e15c7f37", "release_commit": "6d41b627e8d3cd08b578b77400846a7a673c55c1", "source": "source:agentic-engineering-os@4.1.5", "consumer_head": "6d41b627e8d3cd08b578b77400846a7a673c55c1"}}
+
+## C6 release verify
+W C6a FAIL `gov release verify` treats an unsigned CERTIFIED claim as uncertified -- {"certified_at": "", "implementer_evidence": "", "independent_verifier": "", "status": "CERTIFIED"}
+
+## C7 control: a self-identified unsigned source on a provisioned machine
+W C7a PASS the single verifier still refuses a source that regenerates its own identity; nothing is installed -- SRR_RELEASE_UNVERIFIED
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/target-base/release/gov total=11 pass=2 fail=9 failed=['C1a', 'C1b', 'C2a', 'C2b', 'C3a', 'C4a', 'C4b', 'C5a', 'C6a']
+[WS08-P3-certification-and-lock-identity.py exit=0]
+
+=================== WS08-P4-rollback-and-atomicity.py ===================
+## K1 provisioned rollback after a gated update
+W K1a PASS precondition: the update to authentic 4.1.6 is applied through its Human Decision Gate -- {"gate": "HDG-0001", "code": null, "lock": "4.1.6"}
+W K1b FAIL without break-glass the floor refuses the rollback (OWNER-DECISION-0006 §9) -- SRR_RELEASE_UNVERIFIED
+W K1c PASS the refused rollback leaves the installation as it found it (lock, trusted kernel, unconsumed snapshot) -- {"verified": true, "snapshots": ["4.1.6"]}
+W K1d FAIL `update --rollback --break-glass` restores 4.1.5, authenticated from this machine's own record of verifying it -- {"ok": false, "code": "SRR_RELEASE_UNVERIFIED", "lock": "4.1.6", "authenticity": null, "kernel_verified": true}
+W K1e FAIL the machine is marked DEGRADED — RECOVERY ONLY and no floor moved (OWNER-DECISION-0006 §4, §8) -- {"degraded": null, "high_water": {"version": "4.1.6", "sequence": 20}}
+
+## K2 [K6a] shape: break-glass reinstall of an older authentic release (a version change)
+W K2a FAIL refused as a version change; kernel, lock, trusted state and the protected installed record are exactly as before -- {"code": "KERNEL_MISMATCH", "kernel_unchanged": false, "verified": false}
+O K2b machine marking after the refused reinstall: DEGRADED — RECOVERY ONLY — the verifier enters break-glass before the pin is known to it; with IP-3 (cli/src/main.rs passes `.with_pinned_payload(framework.lock release_hash)`) the refusal precedes break-glass entry and no owner authorisation is consumed
+
+## K3 [V1]-[V3] shape: reinstall of a newer authentic release, no break-glass
+W K3a FAIL refused before the swap: the installed kernel is still 4.1.5 under a 4.1.5 lock and governed work continues -- {"code": "KERNEL_MISMATCH", "kernel": "4.1.6", "lock": "4.1.5", "task_create": "KERNEL_TAMPERED"}
+
+## K4 a refused update leaves no snapshot behind
+W K4a FAIL the unsigned update is refused by the single verifier and leaves no snapshot -- {"code": "KERNEL_TAMPERED", "snapshots": []}
+W K4b PASS `gov update --rollback` finds nothing to roll back and writes no false ledger entry -- {"code": "SNAPSHOT_MISSING", "ledger_events": []}
+
+## K5 transaction abort restores the protected record with the bytes
+W K5a PASS precondition: the update aborts in its post-install suite and restores the pre-update lock -- {"code": "OVERLAY_INVALID"}
+W K5b FAIL after the abort the restored kernel matches this machine's protected record and governed work continues -- {"verified": true, "summary": "installed kernel 4.1.4 verified against KERNEL_MANIFEST.json and framework.lock", "task_create": true}
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/target-base/release/gov total=11 pass=4 fail=7 failed=['K1b', 'K1d', 'K1e', 'K2a', 'K3a', 'K4a', 'K5b']
+[WS08-P4-rollback-and-atomicity.py exit=0]
