@@ -12,7 +12,7 @@ common_protocol_paths: [release/orchestration/phase-2/HANDOFFS/P2-HO-0031-repair
 active_gate: GATE-P2-REPAIR-1
 iteration: 1
 round: 3
-base_commit: null
+base_commit: 53897c1a44157e5af81b176017bc7ded6a63b9cd
 branch: phase2/repair-1-r3-ws03
 worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws03
 expected_output_path: release/capability-baseline/repair-1/r3-ws03/
