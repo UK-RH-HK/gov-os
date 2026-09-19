@@ -406,7 +406,10 @@ fn sha_opt(p: &Path) -> Value {
 
 /// This machine's trust state as the currency key sees it. Read-only: nothing is created.
 ///
-/// Covered: the provisioned trust anchor (`trust/root.json`), the provisioning latch and the break-glass marking.
+/// Covered: the provisioned trust anchor, the provisioning latch and the break-glass marking. The anchor is read only
+/// through the SRR verifier's reader (`srr::verifier::trusted_root`: the digest of the anchor file when it verifies,
+/// the refusal code when it does not) — the R1 census basis is that nothing outside `srr/state.rs` and
+/// `srr/verifier.rs` reaches the anchor path (AR-0031 `hx_a::a4`; integration P2-AR-0022).
 /// Not covered: `floors/` and `installed/` — they are advanced by the lifecycle transaction itself *after* its
 /// verification (init/update step 9) and the kernel content they bind is already keyed through `governance/kernel`
 /// and `framework.lock`. If kernel trust starts consulting the installed record (BC-P2-35), that record must be added
@@ -414,10 +417,17 @@ fn sha_opt(p: &Path) -> Value {
 pub fn machine_trust_state() -> Value {
     match crate::srr::state::resolve_state_root() {
         Ok(root) => {
-            let provisioned = root.join("trust").join("provisioned.json");
+            let ms = crate::srr::state::MachineState::read_only(&root);
+            let provisioned = ms.provisioned_path();
+            let now = crate::srr::metadata::local_clock_now();
+            let anchor = match crate::srr::verifier::trusted_root(&ms, &now) {
+                Ok(Some(r)) => json!(r.envelope.file_sha256),
+                Ok(None) => Value::Null,
+                Err(e) => json!(format!("UNVERIFIABLE:{}", e.code)),
+            };
             json!({
                 "posture": if provisioned.exists() { "PROVISIONED" } else { "UNPROVISIONED" },
-                "trust_anchor_sha256": sha_opt(&root.join("trust").join("root.json")),
+                "trust_anchor_sha256": anchor,
                 "provisioning_latch_sha256": sha_opt(&provisioned),
                 "break_glass_marking_sha256": sha_opt(&crate::srr::state::degraded_path_at(&root, crate::FRAMEWORK_NAME)),
             })
