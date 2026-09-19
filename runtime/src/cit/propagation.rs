@@ -570,8 +570,16 @@ fn save_set(
     let Some(r) = st.get_mut(id) else {
         return Ok(false);
     };
+    // Round-2 integration (P2-AR-0032; WS-5 IP-R3-3): a record whose T2 seal verifies (a close report, sealed by
+    // `tasks::close`) is OS state. Propagation's marker is itself an OS write, so the record is re-sealed after it,
+    // keeping the report honoured as recorded authorship and as T2 evidence. A record whose seal does not verify
+    // (unsealed, edited, foreign) is marked but never sealed: the OS does not bless content it did not write.
+    let was_sealed = crate::t2::verify_record(r).is_verified();
     if !f(r) {
         return Ok(false);
+    }
+    if was_sealed {
+        crate::t2::seal_record(r, "cit propagation")?;
     }
     touched.push(r.path.clone());
     save_record(&p.root, r)?;
