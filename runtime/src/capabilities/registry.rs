@@ -1,11 +1,23 @@
-//! Authoritative plugin registry (verifier V-H1; BC-P2-09 registry side, BC-P2-40).
+//! Authoritative plugin registry (verifier V-H1; BC-P2-09 registry side, BC-P2-40, BC-P2-31).
 //!
 //! A capability descriptor is *discovery*, never *authorisation*. Everything a descriptor says about its own
 //! standing — `approved_roles`, `provenance`, `status`, `registration_gate` — is attacker-controllable content in a
 //! file that any writer of the repository can create. Registration therefore lives outside the descriptor, in
-//! `governance/generated/plugin-registry.json`, which only `gov plugins register` writes after checking authority,
-//! health, the implementation binding and (for every executable plugin) an answered Human Decision Gate raised for
-//! exactly that registration.
+//! `governance/registry/plugin-registry.json` ([`REGISTRY_PATH`]), which only `gov plugins register` writes after
+//! checking authority, health, the implementation binding and (for every executable plugin) an answered Human
+//! Decision Gate raised for exactly that registration.
+//!
+//! **Where it lives (BC-P2-31; Contract v3 B1:188, B3:202, D6:352; D-0007 T2).** The registry is tracked,
+//! OS-written T2 state that nothing can rebuild, so it does not belong among the regenerable views of
+//! `governance/generated/` (T3), where deleting the directory — framework §19's rebuild procedure — would silently
+//! drop every registration. Its location is the kernel's declaration in [`crate::paths::OS_STORES`], resolved through
+//! [`crate::paths::store_path`]. A project whose registry is still at the legacy location
+//! ([`LEGACY_REGISTRY_PATH`]) keeps its registrations — the legacy file is read, under exactly the same per-entry seal
+//! rule, only while no registry exists at the location — and the next registry write moves it
+//! ([`relocate`], [`crate::paths::relocate_legacy`]: a tracked move of the bytes as they are). Moving never seals
+//! anything: an entry that was not honoured before the move is not honoured after it, and a registry copied or
+//! cloned into the location is honoured entry by entry only where its seal verifies on this machine. Once a
+//! registry exists at the location, a file at the legacy location is never read; if it differs it is reported.
 //!
 //! A registry entry binds, for one `plugin_id`:
 //!   * the exact `version` it was registered at, and its `capability`;
@@ -27,6 +39,11 @@
 //!
 //! Registration never lowers the authority floor: `TOOL_POLICY.plugins.min_authority` comes from verified kernel
 //! policy and applies to every execution.
+//!
+//! **T2 coverage (WS-2 R3-11).** [`t2_audit`] lists every registry entry — and the registry document — that no gov
+//! operation on this machine produced as it stands, in the row shape of [`crate::t2::audit`], so the T2 audit (and
+//! through it the `os_binding_integrity` family, doctor D033 and the `t2_bindings` currency class) covers the
+//! registry as it covers gates and decisions.
 use super::protocol::PluginDescriptor;
 use crate::t2::Binding;
 use crate::util::{now_iso, read_json, sha256_hex, write_json};
@@ -34,17 +51,92 @@ use crate::{Project, Result};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
-pub const REGISTRY_PATH: &str = "governance/generated/plugin-registry.json";
+/// The id of the plugin registry among the OS's non-rebuildable stores ([`crate::paths::OS_STORES`]).
+pub const STORE_ID: &str = "plugin-registry";
+/// Where the registry belongs (repository-relative): tracked OS-written T2 state, outside the regenerable views.
+pub const REGISTRY_PATH: &str = crate::paths::PLUGIN_REGISTRY_PATH;
+/// Where `gov plugins register` kept the registry before BC-P2-31 (inside `governance/generated/`, regenerable T3
+/// views). Read only while no registry exists at [`REGISTRY_PATH`]; moved by the next registry write.
+pub const LEGACY_REGISTRY_PATH: &str = "governance/generated/plugin-registry.json";
 pub const SCHEMA_VERSION: &str = "1.1.0";
 /// The operation name bound into every registry entry's seal.
 pub const SEAL_OPERATION: &str = "plugins register";
 
+/// The absolute location of the registry (where it belongs, whether or not it exists yet).
 pub fn path(p: &Project) -> PathBuf {
-    p.root.join(REGISTRY_PATH)
+    crate::paths::store_path(&p.root, STORE_ID).unwrap_or_else(|| p.root.join(REGISTRY_PATH))
 }
 
+/// The absolute legacy location (see [`LEGACY_REGISTRY_PATH`]).
+pub fn legacy_path(p: &Project) -> PathBuf {
+    p.root.join(LEGACY_REGISTRY_PATH)
+}
+
+/// The repository-relative file the registry is read from: [`REGISTRY_PATH`] when it exists; otherwise the legacy
+/// location when a registry is still kept there (a project whose registry has not been written since BC-P2-31);
+/// `None` when there is no registry. Reading never moves anything: only a registry write does ([`relocate`]).
+pub fn source(p: &Project) -> Option<&'static str> {
+    if path(p).exists() {
+        Some(REGISTRY_PATH)
+    } else if legacy_path(p).exists() {
+        Some(LEGACY_REGISTRY_PATH)
+    } else {
+        None
+    }
+}
+
+/// The registry file a message should name: the one it is read from, else where it belongs.
+pub fn shown_path(p: &Project) -> &'static str {
+    source(p).unwrap_or(REGISTRY_PATH)
+}
+
+fn empty() -> Value {
+    json!({"schema_version": SCHEMA_VERSION, "plugins": {}})
+}
+
+/// The registry document, read from [`source`]. An unreadable registry is an empty one: nothing in it is honoured,
+/// so every executable plugin fails closed until it is restored or re-registered.
 pub fn load(p: &Project) -> Value {
-    read_json(&path(p)).unwrap_or(json!({"schema_version": SCHEMA_VERSION, "plugins": {}}))
+    match source(p) {
+        Some(rel) => read_json(&p.root.join(rel)).unwrap_or_else(|_| empty()),
+        None => empty(),
+    }
+}
+
+/// **Move a registry kept at the legacy location to where it belongs** — the bytes as they are, every entry's seal
+/// and the document seal included, so nothing becomes honoured by moving and nothing is re-sealed. Called by every
+/// registry write before it reads the registry, and available to the upgrade/migration path. Idempotent.
+///
+/// When a registry already exists at the location and the legacy file differs from it, the location is
+/// authoritative: the legacy file is left in place (never read, never overwritten, never deleted by this call) and
+/// reported by [`location_findings`] — deleting or restoring a tracked file is the operator's decision.
+pub fn relocate(p: &Project) -> Result<Vec<Value>> {
+    match crate::paths::relocate_legacy(&p.root, STORE_ID) {
+        Ok(moved) => Ok(moved),
+        Err(e) if e.code == "STATE_LOCATION_CONFLICT" => Ok(vec![json!({
+            "store": STORE_ID, "from": LEGACY_REGISTRY_PATH, "to": REGISTRY_PATH, "action": "left in place",
+            "reason": "a registry already exists where it belongs and the legacy file differs from it; the registry at the location is authoritative and the legacy file is never read"})]),
+        Err(e) => Err(e),
+    }
+}
+
+/// Location anomalies for doctor D028 and the `plugin_governance` family: a second registry at the legacy location
+/// that differs from the authoritative one. It is never read, so no authorisation relies on it: it is disclosed at
+/// `low` severity (the availability rule of P2-HO-0031 — a finding that governs no reliance must not degrade the suite
+/// and refuse unrelated work). A registry that simply has not been moved yet is not a plugin finding — it is still
+/// honoured — and is reported by [`crate::paths::misplaced_os_state`].
+pub fn location_findings(p: &Project) -> Vec<Value> {
+    let (at, legacy) = (path(p), legacy_path(p));
+    if !(at.exists() && legacy.exists()) {
+        return vec![];
+    }
+    if std::fs::read(&at).ok() == std::fs::read(&legacy).ok() {
+        return vec![];
+    }
+    vec![
+        json!({"severity": "low", "plugin_id": "", "code": "PLUGIN_REGISTRY_LOCATION_CONFLICT", "path": LEGACY_REGISTRY_PATH,
+        "message": format!("a second plugin registry exists at the legacy location {LEGACY_REGISTRY_PATH} and differs from the registry at {REGISTRY_PATH}; it is never read (the registry at {REGISTRY_PATH} is authoritative). Remove it, or — if it is the one the OS last wrote — restore it over {REGISTRY_PATH} from version control and re-register what differs")}),
+    ]
 }
 
 /// The recorded entry for `plugin_id`, whatever its binding (callers that honour it must use [`standing`]).
@@ -148,8 +240,10 @@ pub struct Registration<'a> {
 }
 
 /// Record a registration and **seal the entry** as written by `gov plugins register` (T2). Written only by
-/// `capabilities::governance::register` after its governance checks.
+/// `capabilities::governance::register` after its governance checks. A registry still at the legacy location is
+/// moved first ([`relocate`]), so the registration is written where it survives deletion of the generated views.
 pub fn record(p: &Project, r: Registration) -> Result<Value> {
+    relocate(p)?;
     let mut doc = load(p);
     if !doc.is_object() {
         doc = json!({"schema_version": SCHEMA_VERSION, "plugins": {}});
@@ -182,18 +276,30 @@ pub fn record(p: &Project, r: Registration) -> Result<Value> {
     Ok(e)
 }
 
-/// Seal the registry document as a whole as well (in addition to each entry), so that a changed
-/// `governance/generated/plugin-registry.json` is provably an OS write for the G2 task-close mutation scope
-/// ([`crate::t2::classify_path`]) exactly when the file is what a gov operation wrote.
+/// Seal the registry document as a whole as well (in addition to each entry), so that a changed registry file is
+/// provably an OS write for the G2 task-close mutation scope ([`crate::t2::classify_path`]) exactly when the file is
+/// what a gov operation wrote. **Only when every entry in it is one a gov operation on this machine wrote**: the OS
+/// does not bless content it did not write, so a document that still carries a hand-written, edited, legacy or
+/// foreign entry is left without a document seal (the entry itself is never honoured and is reported).
 fn seal_document(doc: &mut Value, operation: &str) -> Result<()> {
     if let Some(o) = doc.as_object_mut() {
         o.remove(crate::t2::SEAL_FIELD);
     }
+    let all_bound = doc
+        .get("plugins")
+        .and_then(|m| m.as_object())
+        .map(|m| m.iter().all(|(k, e)| binding_of(k, e).is_verified()))
+        .unwrap_or(true);
+    if !all_bound {
+        return Ok(());
+    }
     crate::t2::seal_value(doc, "", operation)
 }
 
-/// Remove a registration (the descriptor keeps existing; it simply stops being registered).
+/// Remove a registration (the descriptor keeps existing; it simply stops being registered). A registry still at the
+/// legacy location is moved first ([`relocate`]).
 pub fn remove(p: &Project, plugin_id: &str) -> Result<bool> {
+    relocate(p)?;
     let mut doc = load(p);
     let existed = doc.get("plugins").and_then(|m| m.get(plugin_id)).is_some();
     if existed {
@@ -235,19 +341,55 @@ pub fn unbound_entries(p: &Project) -> Vec<(String, Binding)> {
         .unwrap_or_default()
 }
 
-/// The T2 binding of the registry document as a whole (what `t2::classify_path` sees for the file).
+/// The T2 binding of the registry document as a whole (what `t2::classify_path` sees for the file it is read from).
 pub fn document_binding(p: &Project) -> Binding {
-    if !path(p).exists() {
-        return Binding::Unsealed;
+    match source(p) {
+        Some(rel) => crate::t2::verify_file(&p.root, rel),
+        None => Binding::Unsealed,
     }
-    crate::t2::verify_file(&p.root, REGISTRY_PATH)
 }
 
-/// The registry as `gov plugins registry` shows it: every entry with its T2 binding stated beside it.
+/// **The registry's rows for the T2 audit (WS-2 R3-11; consumed by [`crate::t2::audit`], WS-3).** One row per
+/// registry entry that no gov operation on this machine produced as it stands (hand-written, edited, legacy
+/// unsealed, sealed by another machine), plus one row for the document when its own seal is present but does not
+/// verify (edited after the OS wrote it) while every entry verifies. Row shape as `t2::audit`'s: `id`, `type`,
+/// `path`, `t2`. An entry that verifies is not listed; an absent registry lists nothing.
+pub fn t2_audit(p: &Project) -> Vec<Value> {
+    let Some(rel) = source(p) else {
+        return vec![];
+    };
+    let doc = load(p);
+    let mut rows: Vec<Value> = doc
+        .get("plugins")
+        .and_then(|m| m.as_object())
+        .map(|m| {
+            m.iter()
+                .map(|(k, e)| (k, binding_of(k, e)))
+                .filter(|(_, b)| !b.is_verified())
+                .map(|(k, b)| json!({"id": format!("{STORE_ID}:{k}"), "type": "plugin-registration", "plugin_id": k, "path": rel, "t2": b.to_value()}))
+                .collect()
+        })
+        .unwrap_or_default();
+    if rows.is_empty() && doc.get(crate::t2::SEAL_FIELD).is_some() {
+        let b = crate::t2::verify_value(&doc, "");
+        if !b.is_verified() {
+            rows.push(
+                json!({"id": STORE_ID, "type": "plugin-registry", "path": rel, "t2": b.to_value()}),
+            );
+        }
+    }
+    rows
+}
+
+/// The registry as `gov plugins registry` shows it: every entry with its T2 binding stated beside it, the file it
+/// was read from and any location anomaly.
 pub fn report(p: &Project) -> Value {
     let whole = document_binding(p);
     let mut doc = load(p);
     doc["document_t2"] = whole.to_value();
+    doc["read_from"] = json!(source(p));
+    doc["location"] = json!(REGISTRY_PATH);
+    doc["location_findings"] = json!(location_findings(p));
     if let Some(m) = doc.get_mut("plugins").and_then(|m| m.as_object_mut()) {
         for (k, e) in m.iter_mut() {
             let b = binding_of(k, e);
@@ -258,4 +400,128 @@ pub fn report(p: &Project) -> Value {
         }
     }
     doc
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn project() -> Project {
+        let d = std::env::temp_dir().join(format!("gov-registry-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&d).unwrap();
+        Project::open(&d)
+    }
+
+    fn put(p: &Project, rel: &str, v: &Value) {
+        write_json(&p.root.join(rel), v).unwrap();
+    }
+
+    #[test]
+    fn the_location_and_the_legacy_location_are_the_kernel_store_declaration() {
+        let s = crate::paths::os_store(STORE_ID).expect("the registry is a declared OS store");
+        assert_eq!(s.moves, &[(LEGACY_REGISTRY_PATH, REGISTRY_PATH)]);
+        assert!(s.tracked && s.class == "authoritative");
+        assert!(!REGISTRY_PATH.starts_with("governance/generated/"));
+    }
+
+    /// Reading never moves anything; the legacy file is read only while no registry exists where it belongs.
+    #[test]
+    fn the_legacy_registry_is_read_only_until_one_exists_where_it_belongs() {
+        let p = project();
+        assert_eq!(source(&p), None);
+        assert_eq!(load(&p)["plugins"], json!({}));
+        put(
+            &p,
+            LEGACY_REGISTRY_PATH,
+            &json!({"schema_version": "1.1.0", "plugins": {"old": {"plugin_id": "old"}}}),
+        );
+        assert_eq!(source(&p), Some(LEGACY_REGISTRY_PATH));
+        assert!(load(&p)["plugins"]["old"].is_object());
+        assert!(
+            legacy_path(&p).exists() && !path(&p).exists(),
+            "a read moved the registry"
+        );
+        put(
+            &p,
+            REGISTRY_PATH,
+            &json!({"schema_version": "1.1.0", "plugins": {"new": {"plugin_id": "new"}}}),
+        );
+        assert_eq!(source(&p), Some(REGISTRY_PATH));
+        assert!(
+            load(&p)["plugins"]["old"].is_null(),
+            "the legacy file was read although a registry exists where it belongs"
+        );
+        assert_eq!(location_findings(&p).len(), 1);
+        let _ = std::fs::remove_dir_all(&p.root);
+    }
+
+    /// The move carries the bytes as they are (seals included, nothing re-sealed); a differing legacy file never
+    /// overwrites the registry and is left in place; an identical one is removed.
+    #[test]
+    fn relocation_moves_the_bytes_unchanged_and_never_overwrites() {
+        let p = project();
+        put(
+            &p,
+            LEGACY_REGISTRY_PATH,
+            &json!({"plugins": {"a": {"plugin_id": "a", "os_binding": {"mac": "x"}}}}),
+        );
+        let bytes = std::fs::read(legacy_path(&p)).unwrap();
+        let moved = relocate(&p).unwrap();
+        assert_eq!(moved[0]["action"], "moved");
+        assert_eq!(std::fs::read(path(&p)).unwrap(), bytes);
+        assert!(!legacy_path(&p).exists());
+        assert!(relocate(&p).unwrap().is_empty(), "idempotent");
+        // a differing legacy file: the registry where it belongs is authoritative
+        put(
+            &p,
+            LEGACY_REGISTRY_PATH,
+            &json!({"plugins": {"forged": {"plugin_id": "forged"}}}),
+        );
+        let legacy_bytes = std::fs::read(legacy_path(&p)).unwrap();
+        let r = relocate(&p).unwrap();
+        assert_eq!(r[0]["action"], "left in place");
+        assert_eq!(std::fs::read(path(&p)).unwrap(), bytes);
+        assert_eq!(std::fs::read(legacy_path(&p)).unwrap(), legacy_bytes);
+        assert_eq!(
+            location_findings(&p)[0]["code"],
+            "PLUGIN_REGISTRY_LOCATION_CONFLICT"
+        );
+        assert_eq!(location_findings(&p)[0]["severity"], "low");
+        // an identical copy is simply removed
+        std::fs::write(legacy_path(&p), &bytes).unwrap();
+        assert_eq!(
+            relocate(&p).unwrap()[0]["action"],
+            "removed identical legacy copy"
+        );
+        assert!(!legacy_path(&p).exists() && location_findings(&p).is_empty());
+        let _ = std::fs::remove_dir_all(&p.root);
+    }
+
+    /// WS-2 R3-11: every entry no gov operation produced as it stands is a T2 audit row (the cases below need no
+    /// machine key: an unsealed entry, and an entry recorded under another plugin's id).
+    #[test]
+    fn t2_audit_rows_name_every_entry_the_os_did_not_write() {
+        let p = project();
+        assert!(t2_audit(&p).is_empty());
+        put(
+            &p,
+            REGISTRY_PATH,
+            &json!({"plugins": {
+            "hand": {"plugin_id": "hand", "capability": "embed", "version": "1"},
+            "renamed": {"plugin_id": "other", "os_binding": {"alg": crate::t2::SEAL_ALG, "key_id": "k", "operation": SEAL_OPERATION, "at": "t", "mac": "00"}}}}),
+        );
+        let rows = t2_audit(&p);
+        assert_eq!(rows.len(), 2, "{rows:?}");
+        for r in &rows {
+            assert_eq!(r["type"], "plugin-registration");
+            assert_eq!(r["path"], REGISTRY_PATH);
+            assert_ne!(r["t2"]["binding"], "VERIFIED");
+        }
+        let hand = rows.iter().find(|r| r["plugin_id"] == "hand").unwrap();
+        assert_eq!(hand["t2"]["binding"], "UNSEALED");
+        assert_eq!(hand["id"], "plugin-registry:hand");
+        let renamed = rows.iter().find(|r| r["plugin_id"] == "renamed").unwrap();
+        assert_eq!(renamed["t2"]["binding"], "BROKEN");
+        let _ = std::fs::remove_dir_all(&p.root);
+    }
 }

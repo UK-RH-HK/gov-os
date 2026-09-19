@@ -38,13 +38,30 @@ entry must be held by the role. `gov capabilities plugins` lists usable / denied
 - The registration binds every byte the command executes, as the OS derives it: the program (resolved on `PATH`), every
   script argument, the whole top-level package of a `python3 -m <module>` command (including `__pycache__`), inline
   code (inside the descriptor), and any extra files or directories listed under `implementation:` (helpers the entry
-  point loads that the command does not name). A command whose implementation cannot be located is refused.
+  point loads that the command does not name). A symlink inside a bound tree binds where it points and the bytes it
+  resolves to; a symlinked directory is followed. A command whose implementation cannot be located is refused.
+- An `embed`/`rerank` plugin declares the model and inference runtime it loads from outside its own directory:
+  `model: {id?, revision?, artefacts: [paths]}` and `runtime: {id?, artefacts: [paths]}` (project-relative or
+  absolute; `{project_root}` / `{plugin_dir}` substituted). Every declared path must exist; for an executable plugin
+  their bytes are bound by the registration (roles `model` / `runtime`, shown in the registration gate), so a changed
+  model or runtime byte stops the plugin until a new approval, and the retrieval profile identifies the model and
+  runtime from the same files.
+- Unchanged files are not re-hashed at every authorisation within one `gov` process: a digest is reused only while
+  the file's device, inode, size, modification time, status-change time, mode and owner are exactly what they were
+  when it was hashed, and only when the file had not changed for a few seconds before it was read, no process held
+  it open for writing (Linux read-lease probe) and it lives on a kernel-maintained local filesystem. A bound file's
+  digest never leaves the process that computed it; only the digest labelling the running `gov` executable (used
+  where a plugin's program is that very file) is kept across processes, in the machine's protected state.
 - The plugin runs without the caller's loader variables (`PYTHONPATH`, `NODE_OPTIONS`, `LD_PRELOAD`, `BASH_ENV`, ...)
   and with `PYTHONDONTWRITEBYTECODE=1`; a module plugin must be importable from its working directory (`cwd:`) or the
   interpreter's own search path.
-- Registry entries (`governance/generated/plugin-registry.json`) are sealed by the registering operation on this
-  machine; a hand-written, edited or foreign entry is never honoured, and a fresh clone re-registers (a new gate whose
-  package states whether the implementation differs from the tracked registration).
+- The registry (`governance/registry/plugin-registry.json`, tracked OS-written state; not among the regenerable views of
+  `governance/generated/`, so deleting those never drops a registration) is written only by `gov plugins register` /
+  `unregister`. Its entries are sealed by the registering operation on this machine; a hand-written, edited or foreign
+  entry is never honoured, and a fresh clone re-registers (a new gate whose package states whether the implementation
+  differs from the tracked registration). A registry an earlier release kept at
+  `governance/generated/plugin-registry.json` is read — entry by entry, under the same seal rule — until the next
+  registry write moves it there unchanged; once moved, a file at the old location is ignored and reported.
 
 To register: `gov plugins register --descriptor <file>` (as an install-authority role) returns `human_gate`; render it
 with `gov gate present <gate>`; the product owner answers it (owner-signed answer, `gov decide <gate> --option A

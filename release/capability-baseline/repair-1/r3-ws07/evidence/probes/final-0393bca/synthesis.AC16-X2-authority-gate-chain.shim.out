@@ -1,0 +1,28 @@
+# P2-AR-0038 audit-of-record probe re-run (unedited): synthesis/AC16-X2-authority-gate-chain mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws07 HEAD 0393bca1a18635c9a1c97eea61211078603ca21c
+# probe sha256 83146c9ad2abf7e34fc2a2326c51c1ec2c499db164f2686738266bd300cf2808; gov 47a0ab591047574280337986c6f7a2047b04ac03b9f8079bf80101c4197722e3 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/probes-final-0393bca/mirror-ZtedqE/target/release/gov
+# date 2026-09-19T10:25:08Z
+# project x2: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/probes-final-0393bca/run-shim-synthesis-AC16-X2-authority-gate-chain-MLdHfo/x2-0775c7/proj
+$ gov init --name x2   [role=orchestrator session=S-synth exit=0]
+   init ok version=4.1.5
+   [probe wrote] spec/features/F-0001.yaml
+   [probe wrote] spec/requirements/REQ-0001.yaml
+   [probe wrote] spec/scenarios/SCN-0001.yaml
+   [probe wrote] spec/tasks/TST-0001.yaml
+$ gov rebuild-memory   [role=orchestrator session=S-synth exit=0]
+$ gov cit propose --proposal "Add a refusal criterion to REQ-0001" --trigger acceptance_criteria_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/probes-final-0393bca/run-shim-synthesis-AC16-X2-authority-gate-chain-MLdHfo/x2-0775c7/proj/.governance-runtime/x2-mf.json   [role=orchestrator session=S-synth exit=0]
+$ gov cit simulate CIT-0001   [role=orchestrator session=S-synth exit=0]
+NOTE CIT CIT-0001 radius=R1 human_gate=HDG-0001
+$ gov cit approve CIT-0001 --by owner --method human   [role=change-controller session=S-cc exit=1]
+   ERR {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0001 was never presented to the human (INV-008); run `gov gate present HDG-0001` and obtain the owner's answer"}
+X X2-L3-approve-refused-before-answer PASS before any answer, approval is refused -- GATE_NOT_PRESENTED
+$ gov task create --id TASK-W --class implementation --objective "worker task" --status READY --allowed src/**   [role=orchestrator session=S-synth exit=0]
+$ gov rebuild-memory   [role=orchestrator session=S-synth exit=0]
+$ gov task claim TASK-W   [role=backend-engineer session=S-worker exit=1]
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/probes-final-0393bca/mirror-ZtedqE/release/capability-baseline/audit-0/synthesis/evidence/AC16-X2-authority-gate-chain.py", line 48, in <module>
+    w.ok("task", "claim", "TASK-W", quiet=True)
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/probes-final-0393bca/mirror-ZtedqE/release/capability-baseline/audit-0/synthesis/evidence/lib/synth.py", line 109, in ok
+    raise RuntimeError(f"gov {' '.join(args)} failed: {v.get('error')}")
+RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed: the task DAG does not allow it (BLOCKED): TEST_POLICY.implementation_task_requires: no scenarios declared on the task or its feature; TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`', 'details': {'task': 'TASK-W', 'state': 'BLOCKED', 'reasons': ['TEST_POLICY.implementation_task_requires: no scenarios declared on the task or its feature', 'TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature'], 'gates': [], 'pending_gates': [], 'manifest': None}}
+[exit=1]

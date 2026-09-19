@@ -32,6 +32,11 @@ fn write_exec(root: &Path, rel: &str, text: &str) {
     std::fs::set_permissions(root.join(rel), std::fs::Permissions::from_mode(0o755)).unwrap();
 }
 
+/// Where the OS writes the plugin registry (BC-P2-31, WS-7 round 3: tracked T2 state outside the regenerable views).
+const REGISTRY: &str = "governance/registry/plugin-registry.json";
+/// Where it was kept before BC-P2-31.
+const LEGACY_REGISTRY: &str = "governance/generated/plugin-registry.json";
+
 const EMBED_OK: &str = r#"{"protocol":"gov-capability/1","ok":true,"provider":{"id":"p","version":"1"},"outputs":{"vectors":[],"dim":8}}"#;
 
 /// A shell plugin that records each execution in `marker` (and runs `extra`), so "did it run?" is observed.
@@ -300,7 +305,7 @@ fn a_registration_is_approved_only_by_a_gate_raised_for_exactly_it() {
     crate::ws03::human_decide(&g, &g2, "A");
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     assert_eq!(r["registered"], true, "{r}");
-    let e = &json(&root, "governance/generated/plugin-registry.json")["plugins"]["p1"];
+    let e = &json(&root, REGISTRY)["plugins"]["p1"];
     assert_eq!(e["registration_gate"], json!(g2));
     assert_eq!(
         e["registration_subject_sha256"],
@@ -657,7 +662,7 @@ fn registry_entries_are_honoured_only_as_the_os_wrote_them() {
         "--inputs",
         "{\"texts\": []}",
     ]);
-    let reg_path = "governance/generated/plugin-registry.json";
+    let reg_path = REGISTRY;
     let good = json(&root, reg_path);
     assert!(
         good["plugins"]["p1"]["os_binding"]["mac"].is_string(),
@@ -895,4 +900,460 @@ fn a_tool_installation_is_approved_only_for_that_installation() {
     );
     let path = row["failure_memory"]["path"].as_str().unwrap();
     assert!(read(&root, path).contains("TOOL-BROKEN-001"));
+}
+
+// ============================================================================================ round 3 (P2-AR-0038)
+
+fn invoke_ok(g: &Gov, id: &str) -> Value {
+    g.ok(&[
+        "capabilities",
+        "invoke",
+        "--plugin",
+        id,
+        "--inputs",
+        "{\"texts\": []}",
+    ])
+}
+
+fn set_old_mtime(path: &Path) {
+    let old = std::time::SystemTime::now() - std::time::Duration::from_secs(3600);
+    std::fs::File::options()
+        .write(true)
+        .open(path)
+        .unwrap()
+        .set_modified(old)
+        .unwrap();
+}
+
+/// BC-P2-31 (Contract v3 B1:188, B3:202, D6:352; D-0007 T2; WS-6 IP-R2-9, A0-D6-02): the OS-written plugin registry
+/// lives where deleting the regenerable views cannot lose it. A registry an earlier release kept among those views
+/// is still honoured — entry by entry, only where its seal verifies — until the next registry write moves it;
+/// reading never moves it; moving seals nothing (a forged entry stays refused, and the OS does not seal the document
+/// over it); once moved, a file at the legacy location is never read and is reported; a clone carries the registry
+/// where it belongs and another machine's seals are never honoured there.
+#[test]
+fn the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written() {
+    let (root, g) = fresh("ws07-r3-move");
+    let te = g.with_role("tooling-engineer");
+    let marker = root.join("ws07-marker.txt");
+    marker_plugin(&root, "tools/p.sh", &marker, "");
+    write_yaml(
+        &root,
+        "governance/project/plugins/p1.yaml",
+        &json!({"plugin_id": "p1", "capability": "embed", "version": "1", "command": ["sh", "tools/p.sh"]}),
+    );
+    register_approved(&te, &root.join("governance/project/plugins/p1.yaml"));
+    // 1. written where it belongs, sealed; nothing among the generated views; not reported as misplaced
+    assert!(exists(&root, REGISTRY) && !exists(&root, LEGACY_REGISTRY));
+    assert!(json(&root, REGISTRY)["os_binding"]["mac"].is_string());
+    assert!(gov_runtime::paths::misplaced_os_state(&root)
+        .iter()
+        .all(|m| m["store"] != "plugin-registry"));
+    // 2. deleting the whole generated-views directory (framework §19) keeps the registration
+    std::fs::remove_dir_all(root.join("governance/generated")).unwrap();
+    invoke_ok(&te, "p1");
+    assert_eq!(runs(&marker), 1);
+    // 3. a registry an earlier release kept at the legacy location is honoured as it stands, and reading it — a
+    //    listing, the registry view, doctor, the plugin_governance audit, an execution — never moves it
+    std::fs::create_dir_all(root.join("governance/generated")).unwrap();
+    std::fs::rename(root.join(REGISTRY), root.join(LEGACY_REGISTRY)).unwrap();
+    let legacy_bytes = std::fs::read(root.join(LEGACY_REGISTRY)).unwrap();
+    invoke_ok(&te, "p1");
+    assert!(te.ok(&["plugins", "list"])["usable"]
+        .to_string()
+        .contains("p1"));
+    te.ok(&["plugins", "registry"]);
+    doctor_check(&g, "D028");
+    g.run(&["audit", "--no-persist", "--family", "plugin_governance"]);
+    assert!(!exists(&root, REGISTRY), "a read moved the registry");
+    assert_eq!(
+        std::fs::read(root.join(LEGACY_REGISTRY)).unwrap(),
+        legacy_bytes
+    );
+    assert!(gov_runtime::paths::misplaced_os_state(&root)
+        .iter()
+        .any(|m| m["store"] == "plugin-registry"));
+    // a worker adds an entry to the legacy registry: not honoured there
+    marker_plugin(&root, "tools/n.sh", &marker, "");
+    write_yaml(
+        &root,
+        "governance/project/plugins/n1.yaml",
+        &json!({"plugin_id": "n1", "capability": "embed", "version": "1", "command": ["sh", "tools/n.sh"]}),
+    );
+    let dsha = gov_runtime::util::sha256_hex(
+        &std::fs::read(root.join("governance/project/plugins/n1.yaml")).unwrap(),
+    );
+    let mut reg = json(&root, LEGACY_REGISTRY);
+    reg["plugins"]["n1"] = json!({"plugin_id": "n1", "capability": "embed", "version": "1", "descriptor_sha256": dsha,
+        "approved_roles": ["all"], "registered_by_role": "human", "registered_at": "2026-09-19T00:00:00Z", "method": "gov plugins register"});
+    write_json(&root, LEGACY_REGISTRY, &reg);
+    assert_eq!(
+        invoke(&te, "n1").error_code(),
+        "PLUGIN_REGISTRATION_UNBOUND"
+    );
+    // 4. the next registry write moves it, bytes as they are: p1 is still honoured, n1 still is not, and the OS
+    //    does not seal the document over an entry it did not write
+    marker_plugin(&root, "tools/q.sh", &marker, "");
+    write_yaml(
+        &root,
+        "governance/project/plugins/q1.yaml",
+        &json!({"plugin_id": "q1", "capability": "embed", "version": "1", "command": ["sh", "tools/q.sh"]}),
+    );
+    register_approved(&te, &root.join("governance/project/plugins/q1.yaml"));
+    assert!(exists(&root, REGISTRY) && !exists(&root, LEGACY_REGISTRY));
+    let moved = json(&root, REGISTRY);
+    assert!(
+        moved["plugins"]["n1"].is_object() && moved["plugins"]["q1"].is_object(),
+        "{moved}"
+    );
+    assert!(
+        moved["os_binding"].is_null(),
+        "the OS sealed the registry document over a forged entry: {moved}"
+    );
+    invoke_ok(&te, "p1");
+    invoke_ok(&te, "q1");
+    assert_eq!(
+        invoke(&te, "n1").error_code(),
+        "PLUGIN_REGISTRATION_UNBOUND"
+    );
+    // removing the forged entry through gov lets the OS seal the document again
+    te.ok(&["plugins", "unregister", "n1"]);
+    assert!(json(&root, REGISTRY)["os_binding"]["mac"].is_string());
+    // 5. after the move, a registry at the legacy location is never read (this one would unregister everything),
+    //    is reported, and a registry write neither reads, overwrites nor deletes it
+    write_json(
+        &root,
+        LEGACY_REGISTRY,
+        &json!({"schema_version": "1.1.0", "plugins": {}}),
+    );
+    invoke_ok(&te, "p1");
+    let (ok28, msg28) = doctor_check(&g, "D028");
+    assert!(!ok28 && msg28.contains("legacy location"), "{msg28}");
+    te.ok(&["plugins", "unregister", "q1"]);
+    assert_eq!(json(&root, LEGACY_REGISTRY)["plugins"], json!({}));
+    let now = json(&root, REGISTRY);
+    assert!(now["plugins"]["p1"].is_object() && now["plugins"]["q1"].is_null());
+    assert_eq!(runs(&marker), 5, "n1 ran");
+    // 6. a clone carries the tracked registry where it belongs; this machine's seals are not the clone machine's
+    std::fs::remove_file(root.join(LEGACY_REGISTRY)).unwrap();
+    git_commit_all(&root, "registry where it belongs");
+    let b = tmp("ws07-r3-move-clone");
+    let (code, out) = git(
+        &root,
+        &[
+            "clone",
+            "-q",
+            root.to_str().unwrap(),
+            b.join("repo").to_str().unwrap(),
+        ],
+    );
+    assert_eq!(code, 0, "{out}");
+    let broot = b.join("repo");
+    assert!(exists(&broot, REGISTRY));
+    let gb = Gov::new(&broot, "S-ws7-b").with_role("tooling-engineer");
+    assert_eq!(
+        invoke(&gb, "p1").error_code(),
+        "PLUGIN_REGISTRATION_UNBOUND"
+    );
+    assert_eq!(runs(&marker), 5);
+}
+
+/// IP-R2-13 (BC-P2-30 with BC-P2-40): an embed plugin declares the model and inference-runtime artefacts it loads
+/// from outside its own directory. The kernel schema admits the declaration; the registration gate shows those
+/// artefacts and the registration binds their bytes (roles `model` / `runtime`); a changed model or runtime byte stops
+/// the plugin until a new approval and doctor names the file; a declared artefact that does not exist is refused
+/// before any gate is raised.
+#[test]
+fn declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves() {
+    let (root, g) = fresh("ws07-r3-model");
+    let te = g.with_role("tooling-engineer");
+    let marker = root.join("ws07-marker.txt");
+    let cache = tmp("ws07-r3-model-cache"); // outside the repository: a model cache, a runtime installation
+    std::fs::create_dir_all(cache.join("model")).unwrap();
+    std::fs::write(cache.join("model/weights.bin"), [0u8, 1, 2, 3]).unwrap();
+    std::fs::write(cache.join("model/tokenizer.json"), "{}").unwrap();
+    std::fs::write(cache.join("libinfer.so"), "runtime").unwrap();
+    marker_plugin(&root, "tools/m.sh", &marker, "");
+    let df = root.join("governance/project/plugins/m1.yaml");
+    write_yaml(
+        &root,
+        "governance/project/plugins/m1.yaml",
+        &json!({"plugin_id": "m1", "capability": "embed", "version": "1", "command": ["sh", "tools/m.sh"],
+            "model": {"id": "mini-embed", "revision": "2026-09", "artefacts": [cache.join("model").to_str().unwrap()]},
+            "runtime": {"id": "infer-1", "artefacts": [cache.join("libinfer.so").to_str().unwrap()]}}),
+    );
+    // the kernel schema admits the declaration (it rejected any field it did not know)
+    let l = te.ok(&["plugins", "list"]);
+    assert!(!l["rejected"].to_string().contains("m1"), "{l}");
+    // the gate shows what the plugin loads; the registration binds it
+    let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
+    let gate = r["human_gate"].as_str().unwrap().to_string();
+    let gy = yaml(&root, &format!("spec/decisions/{gate}.yaml"));
+    let impact = gy["impact"].as_str().unwrap_or("");
+    assert!(
+        impact.contains("weights.bin") && impact.contains("libinfer.so"),
+        "{impact}"
+    );
+    crate::ws03::human_decide(&g, &gate, "A");
+    let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
+    assert_eq!(r["registered"], true, "{r}");
+    let bound = r["registry_entry"]["implementation"].to_string();
+    for (role, file) in [
+        ("model", "weights.bin"),
+        ("model", "tokenizer.json"),
+        ("runtime", "libinfer.so"),
+    ] {
+        assert!(
+            r["registry_entry"]["implementation"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|f| f["role"] == role && f["path"].as_str().unwrap().ends_with(file)),
+            "{role} {file} not bound: {bound}"
+        );
+    }
+    invoke_ok(&te, "m1");
+    assert_eq!(runs(&marker), 1);
+    // a changed model byte stops the plugin, and doctor names the file
+    std::fs::write(cache.join("model/weights.bin"), [0u8, 1, 2, 4]).unwrap();
+    let e = invoke(&te, "m1");
+    assert_eq!(e.error_code(), "PLUGIN_PIN_MISMATCH", "{}", e.envelope);
+    assert!(e.envelope.to_string().contains("weights.bin"));
+    let (ok28, msg28) = doctor_check(&g, "D028");
+    assert!(!ok28 && msg28.contains("weights.bin"), "{msg28}");
+    // the approved bytes run again; a changed runtime byte stops it as well
+    std::fs::write(cache.join("model/weights.bin"), [0u8, 1, 2, 3]).unwrap();
+    invoke_ok(&te, "m1");
+    std::fs::write(cache.join("libinfer.so"), "runtimf").unwrap();
+    assert_eq!(invoke(&te, "m1").error_code(), "PLUGIN_PIN_MISMATCH");
+    assert_eq!(runs(&marker), 2);
+    // a declared model artefact that does not exist is refused before any gate
+    marker_plugin(&root, "tools/x.sh", &marker, "");
+    write_yaml(
+        &root,
+        "governance/project/plugins/x1.yaml",
+        &json!({"plugin_id": "x1", "capability": "embed", "version": "1", "command": ["sh", "tools/x.sh"],
+            "model": {"artefacts": ["models/absent.bin"]}}),
+    );
+    let before = gate_count(&root);
+    let e = te.err(&[
+        "plugins",
+        "register",
+        "--descriptor",
+        root.join("governance/project/plugins/x1.yaml")
+            .to_str()
+            .unwrap(),
+    ]);
+    assert_eq!(
+        e.error_code(),
+        "PLUGIN_IMPLEMENTATION_UNRESOLVED",
+        "{}",
+        e.envelope
+    );
+    assert!(e.envelope.to_string().contains("model artefact"));
+    assert_eq!(gate_count(&root), before);
+}
+
+/// BC-P2-40, WS-7 round 3 (authorisation no longer re-hashes unchanged files, and the pin is not weakened): the
+/// digest labelling the running `gov` binary is kept in the machine's protected state, so an OS capability-server
+/// plugin does not re-read a large binary in every `gov` process; the digest of a bound plugin file never leaves the
+/// process that computed it — nothing in any store, not even a forged entry naming the approved digest, makes changed
+/// bytes run. A same-size rewrite with the modification time put back, a change to the file a bound symlink points
+/// at, and a file replaced by another are all refused.
+#[test]
+fn a_cached_pin_never_approves_changed_bytes() {
+    let (root, g) = fresh("ws07-r3-cache");
+    let te = g.with_role("tooling-engineer");
+    let marker = root.join("ws07-marker.txt");
+    let outside = tmp("ws07-r3-cache-lib");
+    std::fs::write(outside.join("helper.sh"), "HELPER=1\n").unwrap();
+    std::fs::create_dir_all(root.join("tools/lib")).unwrap();
+    std::os::unix::fs::symlink(outside.join("helper.sh"), root.join("tools/lib/helper.sh"))
+        .unwrap();
+    marker_plugin(
+        &root,
+        "tools/c.sh",
+        &marker,
+        ". \"$(dirname \"$0\")/lib/helper.sh\"",
+    );
+    write_yaml(
+        &root,
+        "governance/project/plugins/c1.yaml",
+        &json!({"plugin_id": "c1", "capability": "embed", "version": "1", "command": ["sh", "tools/c.sh"], "implementation": ["tools/lib"]}),
+    );
+    // the OS's own capability server: its program is the running gov binary
+    let gov = gov_bin().to_string_lossy().to_string();
+    write_yaml(
+        &root,
+        "governance/project/plugins/os-embed.yaml",
+        &json!({"plugin_id": "os-embed", "capability": "embed", "version": "1", "languages": [],
+            "command": [gov, "capabilities", "serve-embed", "--id", "os-embed"]}),
+    );
+    // every bound file is quiescent before it is approved (the conditions under which a digest may be reused)
+    set_old_mtime(&root.join("tools/c.sh"));
+    set_old_mtime(&outside.join("helper.sh"));
+    std::thread::sleep(
+        gov_runtime::capabilities::pincache::QUIESCENCE + std::time::Duration::from_millis(300),
+    );
+    register_approved(&te, &root.join("governance/project/plugins/c1.yaml"));
+    invoke_ok(&te, "c1");
+    invoke_ok(&te, "os-embed");
+    assert_eq!(runs(&marker), 1);
+    let store = machine_state_dir(&root).join("plugin-pin-cache/cache.json");
+    let stored = std::fs::read_to_string(&store).unwrap_or_default();
+    let gov_c = std::fs::canonicalize(gov_bin()).unwrap();
+    assert!(
+        stored.contains(&*gov_c.to_string_lossy()),
+        "the running gov binary's digest was not kept in the machine's protected state ({}): {stored}",
+        store.display()
+    );
+    assert!(
+        !stored.contains("c.sh") && !stored.contains("helper.sh"),
+        "a bound plugin file's digest left the process: {stored}"
+    );
+    fn mentions(dir: &Path, needle: &str) -> bool {
+        std::fs::read_dir(dir)
+            .map(|rd| {
+                rd.flatten().any(|e| {
+                    e.file_name().to_string_lossy().contains(needle)
+                        || (e.file_type().map(|t| t.is_dir()).unwrap_or(false)
+                            && mentions(&e.path(), needle))
+                })
+            })
+            .unwrap_or(false)
+    }
+    assert!(
+        !mentions(&root, "plugin-pin-cache"),
+        "a pin cache inside the repository"
+    );
+    // 1. same size, modification time put back
+    let original = read(&root, "tools/c.sh");
+    let approved = gov_runtime::util::sha256_hex(original.as_bytes());
+    let tampered = original.replace("EXECUTED", "EXECUTEX");
+    assert_eq!(tampered.len(), original.len());
+    write(&root, "tools/c.sh", &tampered);
+    set_old_mtime(&root.join("tools/c.sh"));
+    assert_eq!(invoke(&te, "c1").error_code(), "PLUGIN_PIN_MISMATCH");
+    // ... even when the machine's store is made to name the approved digest under the tampered file's present key
+    // (what a process able to write the machine state could plant): no store supplies a bound file's digest
+    {
+        use std::os::unix::fs::MetadataExt;
+        let m = std::fs::metadata(root.join("tools/c.sh")).unwrap();
+        let key = json!({"dev": m.dev().to_string(), "ino": m.ino().to_string(), "size": m.size().to_string(),
+            "mtime_ns": (m.mtime() * 1_000_000_000 + m.mtime_nsec()).to_string(),
+            "ctime_ns": (m.ctime() * 1_000_000_000 + m.ctime_nsec()).to_string(), "mode": m.mode(), "uid": m.uid()});
+        let mut doc: Value = serde_json::from_str(&stored).unwrap_or(json!({"entries": {}}));
+        doc["entries"][format!("{}:{}", m.dev(), m.ino())] = json!({"key": key, "sha256": approved,
+            "path": root.join("tools/c.sh").to_string_lossy(), "at": "2026-09-19T00:00:00Z"});
+        std::fs::write(&store, doc.to_string()).unwrap();
+    }
+    assert_eq!(invoke(&te, "c1").error_code(), "PLUGIN_PIN_MISMATCH");
+    write(&root, "tools/c.sh", &original);
+    set_old_mtime(&root.join("tools/c.sh"));
+    invoke_ok(&te, "c1");
+    // 2. the file a bound symlink points at (outside the repository) changes
+    std::fs::write(outside.join("helper.sh"), "HELPER=2\n").unwrap();
+    set_old_mtime(&outside.join("helper.sh"));
+    let e = invoke(&te, "c1");
+    assert_eq!(e.error_code(), "PLUGIN_PIN_MISMATCH", "{}", e.envelope);
+    std::fs::write(outside.join("helper.sh"), "HELPER=1\n").unwrap();
+    invoke_ok(&te, "c1");
+    // 3. the file is replaced by another one (renamed over it)
+    write(&root, "tools/c.sh.new", &tampered);
+    std::fs::rename(root.join("tools/c.sh.new"), root.join("tools/c.sh")).unwrap();
+    set_old_mtime(&root.join("tools/c.sh"));
+    assert_eq!(invoke(&te, "c1").error_code(), "PLUGIN_PIN_MISMATCH");
+    assert_eq!(runs(&marker), 3, "changed bytes ran");
+}
+
+/// IP-W7-1 (BC-P2-41 with WS-5's sealed close reports; Contract v3 F3:416-423, F4:431): the report that closes a
+/// security-class task — written by the OS at close (T2-sealed), by another session and role, naming exactly this
+/// tool and version — is the governed security review that lets the installation proceed with no owner gate. It
+/// does not review another version, and a review the installer's own role wrote does not count.
+#[test]
+fn a_governed_security_review_by_another_role_lets_the_installation_proceed() {
+    let (root, g) = fresh("ws07-r3-review");
+    let te = g.with_role("tooling-engineer");
+    let sec = g.with_session("S-sec").with_role("security-engineer");
+    g.ok(&["rebuild-memory"]);
+    let t = g.ok(&[
+        "task",
+        "create",
+        "--class",
+        "security",
+        "--objective",
+        "Security review of TOOL-W7 1.0.0",
+        "--status",
+        "READY",
+    ])["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    sec.ok(&["task", "claim", &t]);
+    sec.ok(&["rebuild-memory", "--incremental"]);
+    let rep = crate::ws05::receipt_with(
+        &sec,
+        &root,
+        &t,
+        "ws07-sec-review",
+        "reviewed TOOL-W7 1.0.0",
+        &[],
+        "not_applicable_with_reason",
+        json!({"security_review": {"tool_id": "TOOL-W7", "version": "1.0.0", "verdict": "passed"}}),
+    );
+    let c = sec.ok(&["task", "close", &t, "--report", &rep]);
+    let rpt = c["report"].as_str().unwrap().to_string();
+    let rel = format!("spec/reports/{rpt}.yaml");
+    let ry = yaml(&root, &rel);
+    assert!(ry["os_binding"]["mac"].is_string(), "{ry}");
+    assert_eq!(ry["security_review"]["verdict"], "passed");
+    // installing exactly that tool and version, citing the review: it proceeds, and no gate is raised
+    let before = gate_count(&root);
+    let r = te.ok(&[
+        "tools",
+        "install",
+        "--descriptor",
+        tool_descriptor(&root, "rv", json!({"security_review_record": rpt}))
+            .to_str()
+            .unwrap(),
+    ]);
+    assert_eq!(security_check(&r)["ok"], true, "{r}");
+    assert_eq!(r["installed"], true, "{r}");
+    assert_eq!(gate_count(&root), before);
+    // the review does not cover another version
+    let r = te.ok(&[
+        "tools",
+        "install",
+        "--descriptor",
+        tool_descriptor(
+            &root,
+            "rv2",
+            json!({"security_review_record": rpt, "tool_id": "TOOL-W7V", "version_pin": "1.0.1"}),
+        )
+        .to_str()
+        .unwrap(),
+    ]);
+    assert_eq!(security_check(&r)["ok"], false, "{r}");
+    assert_eq!(r["installed"], false, "{r}");
+    // a review the installing role wrote is self-attestation
+    let r = sec.ok(&[
+        "tools",
+        "install",
+        "--descriptor",
+        tool_descriptor(
+            &root,
+            "rv3",
+            json!({"security_review_record": rpt, "tool_id": "TOOL-W7"}),
+        )
+        .to_str()
+        .unwrap(),
+    ]);
+    assert_eq!(security_check(&r)["ok"], false, "{r}");
+    assert!(
+        security_check(&r)["detail"]
+            .as_str()
+            .unwrap()
+            .contains("self-attested"),
+        "{r}"
+    );
 }

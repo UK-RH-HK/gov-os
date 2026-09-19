@@ -165,7 +165,8 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     // registration completes once the product owner answers A through the owner-signed channel
     let r = crate::ws07::register_approved(&l4, &df);
     assert_eq!(r["registered"], true, "{r}");
-    let reg = json(&root, "governance/generated/plugin-registry.json");
+    // BC-P2-31 (repair iteration 1, WS-7 round 3): the OS writes the registry outside the regenerable views
+    let reg = json(&root, "governance/registry/plugin-registry.json");
     let e = &reg["plugins"]["p-reg"];
     assert_eq!(e["version"], "1");
     assert!(e["descriptor_sha256"].as_str().unwrap().len() == 64);
@@ -242,8 +243,8 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     assert_eq!(r["registered"], false);
     let gate = r["human_gate"].as_str().unwrap().to_string();
     assert!(
-        !exists(&root, "governance/generated/plugin-registry.json")
-            || json(&root, "governance/generated/plugin-registry.json")["plugins"]["p-elev"]
+        !exists(&root, "governance/registry/plugin-registry.json")
+            || json(&root, "governance/registry/plugin-registry.json")["plugins"]["p-elev"]
                 .is_null()
     );
     l4.ok(&["gate", "present", &gate]);
@@ -255,7 +256,7 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     let r2 = l4.ok(&["plugins", "register", "--descriptor", df2.to_str().unwrap()]);
     assert_eq!(r2["registered"], true, "{r2}");
     assert_eq!(
-        json(&root, "governance/generated/plugin-registry.json")["plugins"]["p-elev"]
+        json(&root, "governance/registry/plugin-registry.json")["plugins"]["p-elev"]
             ["registration_gate"],
         gate
     );

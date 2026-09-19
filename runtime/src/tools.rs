@@ -5,8 +5,10 @@
 //! entry holds, and the security part of `licence_and_security_satisfied` holds only on a **governed security review
 //! of that tool identity and version** ([`security_review_evidence`]): an OS-written (T2-verified) report closing a
 //! `security`-class task, whose `security_review` block names this tool id and version with verdict `passed`, written
-//! by a session and role other than the installer's. Anything else — the descriptor's own `security_review: passed`,
-//! an unrelated record, a hand-written report — is a request, not evidence. When a condition fails, the approval is a
+//! by a session and role other than the installer's. `gov task close` writes and T2-seals that report
+//! (`orchestration::tasks::close`), so a review closed by another role is available as evidence with no owner gate
+//! (IP-W7-1, confirmed in round 3). Anything else — the descriptor's own `security_review: passed`, an unrelated
+//! record, a hand-written report — is a request, not evidence. When a condition fails, the approval is a
 //! Human Decision Gate raised for **exactly this installation** (`subject.kind: tool-installation`, the digest of the
 //! installation descriptor): a presented, owner-answered A on that gate lets the governed install proceed, a decline
 //! ends the request, a pending gate is returned instead of raising another, and a gate raised for anything else

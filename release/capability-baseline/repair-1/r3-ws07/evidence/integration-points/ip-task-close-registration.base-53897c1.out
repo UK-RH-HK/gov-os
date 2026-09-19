@@ -1,0 +1,16 @@
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/base-tree/target/release/gov
+registered: True governance/generated/plugin-registry.json
+# working-tree changes during the task:
+ M governance/generated/tool-registry.json
+?? governance/generated/index-manifest.json
+?? governance/generated/memory-manifest.json
+?? governance/generated/plugin-registry.json
+?? governance/project/plugins/
+?? spec/decisions/D-0001.yaml
+?? spec/decisions/HDG-0001.yaml
+?? spec/tasks/TASK-0001.yaml
+?? tools/
+
+close ok: False code: GOVERNANCE_SUITE_MISSING
+undeclared: null out_of_scope: null t2_violations: null
+message: governance-affecting work cannot close: no green governance record exists; run `gov health run` or `gov audit`

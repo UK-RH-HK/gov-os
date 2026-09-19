@@ -4,7 +4,7 @@
   "title": "plugin-registry",
   "x-schema-version": "1.1.0",
   "type": "object",
-  "description": "Authoritative record of capability-plugin registrations, written only by `gov plugins register`. Binds plugin identity, version, descriptor bytes, the implementation the OS derived (every bound file) and the registration subject its approving gate answered, and carries the T2 seal (os_binding) of the registering operation; an entry whose seal does not verify on this machine is never honoured.",
+  "description": "Authoritative record of capability-plugin registrations at governance/registry/plugin-registry.json (tracked OS-written T2 state, never a regenerable view: BC-P2-31; a registry still at the legacy location governance/generated/plugin-registry.json is read until the next registry write moves it), written only by `gov plugins register` / `gov plugins unregister`. Binds plugin identity, version, descriptor bytes, the implementation the OS derived (every bound file) and the registration subject its approving gate answered, and carries the T2 seal (os_binding) of the registering operation; an entry whose seal does not verify on this machine is never honoured.",
   "properties": {
     "schema_version": {
       "type": "string"
@@ -160,7 +160,7 @@
     },
     "os_binding": {
       "type": "object",
-      "description": "T2 seal of the last registry-writing operation over the whole document (task-close mutation scope); each entry carries its own seal as well"
+      "description": "T2 seal of the last registry-writing operation over the whole document (task-close mutation scope), present only when every entry is one a gov operation on this machine wrote; each entry carries its own seal as well"
     }
   },
   "required": [
