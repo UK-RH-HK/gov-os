@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/plugin-registry.schema.json",
   "title": "plugin-registry",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
-  "description": "Authoritative record of capability-plugin registrations, written only by `gov plugins register`. Binds plugin identity, version, descriptor bytes and implementation bytes to the governed act that registered them.",
+  "description": "Authoritative record of capability-plugin registrations, written only by `gov plugins register`. Binds plugin identity, version, descriptor bytes, the implementation the OS derived (every bound file) and the registration subject its approving gate answered, and carries the T2 seal (os_binding) of the registering operation; an entry whose seal does not verify on this machine is never honoured.",
   "properties": {
     "schema_version": {
       "type": "string"
@@ -33,10 +33,8 @@
             "type": "string"
           },
           "implementation_sha256": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string",
+            "description": "sha256 over every bound file (path, sha256); never null"
           },
           "implementation_files": {
             "type": "array",
@@ -76,6 +74,75 @@
           },
           "method": {
             "type": "string"
+          },
+          "execution_class": {
+            "type": "string",
+            "enum": [
+              "EXECUTABLE",
+              "OS_PROVIDED"
+            ]
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cwd": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "program": {
+            "type": "string",
+            "description": "the resolved program (absolute, symlinks followed)"
+          },
+          "implementation": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "sha256"
+              ]
+            }
+          },
+          "registration_subject_sha256": {
+            "type": "string",
+            "description": "the subject the approving gate's answer is bound to (identity, version, normalized descriptor, implementation)"
+          },
+          "os_binding": {
+            "type": "object",
+            "description": "T2 seal of the `plugins register` operation (runtime/src/t2.rs)",
+            "properties": {
+              "alg": {
+                "type": "string"
+              },
+              "key_id": {
+                "type": "string"
+              },
+              "operation": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string"
+              },
+              "mac": {
+                "type": "string"
+              }
+            }
           }
         },
         "required": [
@@ -83,10 +150,17 @@
           "capability",
           "version",
           "descriptor_sha256",
+          "implementation_sha256",
+          "registration_subject_sha256",
           "registered_at",
-          "registered_by_role"
+          "registered_by_role",
+          "os_binding"
         ]
       }
+    },
+    "os_binding": {
+      "type": "object",
+      "description": "T2 seal of the last registry-writing operation over the whole document (task-close mutation scope); each entry carries its own seal as well"
     }
   },
   "required": [

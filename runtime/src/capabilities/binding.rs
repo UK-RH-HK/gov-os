@@ -1,0 +1,823 @@
+//! # What a plugin execution is, and which bytes it runs (BC-P2-39, BC-P2-40)
+//!
+//! ## Execution class — elevation is never decided by the descriptor (BC-P2-39; Contract v3 F4:426, :430; ARCH-0003 §9)
+//!
+//! The host spawns a plugin as an ordinary child process of the invoking account ([`super::host::invoke`]). The OS has
+//! no run-time mechanism that confines what such a process does: `permissions: {network: false,
+//! filesystem_write: false}` and `required_permission_classes` are *declarations*, and nothing enforces them. A
+//! mechanism that could (an OS sandbox: namespaces, seccomp, Landlock, a container runtime) would be a new external
+//! dependency class and needs owner adoption (synthesis `owner-decisions-required.md` row 2); it is not chosen here.
+//!
+//! Therefore the OS classifies every plugin by **what it actually executes**, never by what it declares:
+//!
+//! | [`ExecutionClass`] | what runs | can it exceed the non-elevated floor? | what execution requires |
+//! |---|---|---|---|
+//! | `OsProvided` | this very `gov` binary (same file, or byte-identical) serving one of [`OS_CAPABILITY_SERVERS`] — code the verified release wrote, which reads one request on stdin and writes one response on stdout | no: its effects are the release's own, known and bounded | the authority floor and the role checks (D-0005 consequence 3's hand-declared allowance survives here) |
+//! | `Executable` | anything else: a script, an interpreter with a module or inline code, a binary | **yes, whatever the descriptor says** | an OS-written (T2-verified) registration **and** a presented, owner-answered gate raised for exactly that plugin identity, version, implementation and permission set, re-verified at every execution |
+//!
+//! Declared permissions still matter, but only in the direction that cannot widen anything: the acting role must hold
+//! every declared permission class, and the declarations are shown to the human who decides the registration gate.
+//!
+//! ## Implementation binding (BC-P2-40; Contract v3 F4:428-429)
+//!
+//! [`resolve`] derives, from the command vector alone, every file the execution loads by name and hashes each one:
+//!
+//! * the **program** (`command[0]`, resolved through `PATH` exactly as `exec` resolves it, symlinks followed): the
+//!   interpreter or binary that runs;
+//! * every **argument** that names an existing file (a script, a config the program is handed);
+//! * for the Python **module form** (`python3 [opts] -m pkg.mod`), the whole top-level package the interpreter would
+//!   import, found by asking the interpreter for its search path from the plugin's working directory and applying
+//!   Python's own finder order (regular package, then module file, then namespace portions) — including
+//!   `__pycache__`, because a planted byte-code file with a matching source stamp is loaded instead of the source;
+//! * every path the descriptor lists under `implementation:` (helper modules the entry point loads from elsewhere);
+//! * inline code (`sh -c '<code>'`, `python3 -c '<code>'`) lives in the descriptor, whose bytes the registration binds.
+//!
+//! A command whose implementation cannot be located (a module the interpreter cannot find, a declared path that does
+//! not exist, an unresolvable program) is refused, typed: nothing unbound ever runs.
+//!
+//! The environment a plugin inherits could otherwise substitute code without touching a bound byte (`PYTHONPATH`
+//! shadowing, a `sitecustomize` injected through it, `NODE_OPTIONS=--require`, `LD_PRELOAD`, `BASH_ENV`): the host
+//! removes [`LOADER_ENV_VARS`] from the plugin's environment ([`apply_plugin_env`]), and module resolution runs under
+//! the same environment. `PYTHONDONTWRITEBYTECODE=1` keeps an execution from changing the bytes it is bound to.
+//!
+//! **Stated limit.** Code an implementation reads and evaluates from a location it does not name (a script that
+//! `eval`s an arbitrary file, a module that imports a sibling it is not packaged with) is outside what a static
+//! reading of the command can find. The registration gate shows the approver the exact bound file set, and the
+//! descriptor's `implementation:` list is the way to bring such code inside the binding.
+use super::protocol::PluginDescriptor;
+use crate::util::{canonical_json, sha256_hex};
+use crate::{GovError, Result};
+use serde_json::{json, Value};
+use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
+use std::sync::{Mutex, OnceLock};
+
+/// OS capability servers: `gov` subcommands whose whole behaviour is "read one gov-capability/1 request from stdin,
+/// write one response to stdout, exit" (they open no project and write nothing). `(subcommand words, flags without a
+/// value, flags taking a value)`. A command vector that runs this binary with anything else is `Executable`.
+pub const OS_CAPABILITY_SERVERS: &[(&[&str], &[&str], &[&str])] =
+    &[(&["capabilities", "serve-embed"], &["--reverse"], &["--id"])];
+
+/// Environment variables through which a caller could make an interpreter or the dynamic loader run code that is not
+/// the plugin's bound implementation. Removed from every plugin execution and from module resolution.
+pub const LOADER_ENV_VARS: &[&str] = &[
+    "PYTHONPATH",
+    "PYTHONHOME",
+    "PYTHONSTARTUP",
+    "PYTHONUSERBASE",
+    "PYTHONINSPECT",
+    "PYTHONPYCACHEPREFIX",
+    "PYTHONSAFEPATH",
+    "PYTHONPLATLIBDIR",
+    "PYTHONEXECUTABLE",
+    "PYTHONWARNINGS",
+    "PYTHONBREAKPOINT",
+    "NODE_OPTIONS",
+    "NODE_PATH",
+    "PERL5LIB",
+    "PERLLIB",
+    "PERL5OPT",
+    "RUBYLIB",
+    "RUBYOPT",
+    "LD_PRELOAD",
+    "LD_LIBRARY_PATH",
+    "LD_AUDIT",
+    "DYLD_INSERT_LIBRARIES",
+    "DYLD_LIBRARY_PATH",
+    "DYLD_FRAMEWORK_PATH",
+    "BASH_ENV",
+    "ENV",
+    "JAVA_TOOL_OPTIONS",
+    "_JAVA_OPTIONS",
+    "JDK_JAVA_OPTIONS",
+    "CLASSPATH",
+];
+
+/// Bound on the files one implementation may comprise (a module tree larger than this is refused, not truncated).
+const MAX_BOUND_FILES: usize = 20_000;
+
+/// Descriptor fields that are requests or OS-written copies, never part of what a registration approves.
+const NON_SUBJECT_FIELDS: &[&str] = &["provenance", "registration_gate", "pin", "status"];
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExecutionClass {
+    /// This `gov` binary serving one of [`OS_CAPABILITY_SERVERS`]: non-elevated by construction.
+    OsProvided,
+    /// Anything else: an unsandboxed process that can exceed the non-elevated floor whatever it declares.
+    Executable,
+}
+
+impl ExecutionClass {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ExecutionClass::OsProvided => "OS_PROVIDED",
+            ExecutionClass::Executable => "EXECUTABLE",
+        }
+    }
+}
+
+/// One bound file: why it is bound, where it is (project-relative when inside the project), and its content hash.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct BoundFile {
+    pub role: String,
+    pub path: String,
+    pub sha256: String,
+}
+
+/// The implementation a plugin's command executes, as the OS derived it.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct Implementation {
+    #[serde(serialize_with = "ser_class")]
+    pub class: ExecutionClass,
+    /// The resolved program (absolute, symlinks followed).
+    pub program: String,
+    pub files: Vec<BoundFile>,
+    /// sha256 over the sorted `(path, sha256)` list: the implementation identity a registration binds.
+    pub sha256: String,
+    /// Where the plugin's own code lives (module package, script, or the program): the location `SRR-R0-L6` classifies.
+    #[serde(skip)]
+    pub primary: Option<PathBuf>,
+}
+
+fn ser_class<S: serde::Serializer>(
+    c: &ExecutionClass,
+    s: S,
+) -> std::result::Result<S::Ok, S::Error> {
+    s.serialize_str(c.as_str())
+}
+
+impl Implementation {
+    pub fn to_value(&self) -> Value {
+        json!({"execution_class": self.class.as_str(), "program": self.program, "sha256": self.sha256, "files": self.files})
+    }
+    pub fn paths(&self) -> Vec<String> {
+        self.files.iter().map(|f| f.path.clone()).collect()
+    }
+}
+
+fn unresolved(desc: &PluginDescriptor, why: String) -> GovError {
+    GovError::new(
+        "PLUGIN_IMPLEMENTATION_UNRESOLVED",
+        format!(
+            "plugin '{}': {why}. The OS binds every byte a plugin executes (Contract v3 F4:428); an implementation it \
+             cannot locate is never run. Fix the command, or list the implementation's files under `implementation:`.",
+            desc.plugin_id
+        ),
+    )
+    .with_details(json!({"plugin_id": desc.plugin_id, "command": desc.command}))
+}
+
+/// Remove the loader-controlling variables from a plugin's environment ([`LOADER_ENV_VARS`]) and keep an execution
+/// from writing byte-code into its own bound tree.
+pub fn apply_plugin_env(cmd: &mut std::process::Command) {
+    for v in LOADER_ENV_VARS {
+        cmd.env_remove(v);
+    }
+    cmd.env("PYTHONDONTWRITEBYTECODE", "1");
+}
+
+/// The command vector with `{project_root}` / `{plugin_dir}` substituted (exactly what the host executes).
+pub fn substituted_command(desc: &PluginDescriptor, root: &Path) -> Vec<String> {
+    let plugin_dir = Path::new(&desc.source)
+        .parent()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_default();
+    desc.command
+        .iter()
+        .map(|c| {
+            c.replace("{project_root}", &root.to_string_lossy())
+                .replace("{plugin_dir}", &plugin_dir)
+        })
+        .collect()
+}
+
+/// The working directory the host runs the plugin in.
+pub fn working_dir(desc: &PluginDescriptor, root: &Path) -> PathBuf {
+    desc.cwd
+        .as_ref()
+        .map(|c| root.join(c))
+        .unwrap_or_else(|| root.to_path_buf())
+}
+
+fn under(p: &Path, dir: &Path) -> Option<PathBuf> {
+    let d = dir.canonicalize().unwrap_or_else(|_| dir.to_path_buf());
+    p.strip_prefix(&d).ok().map(|r| r.to_path_buf())
+}
+
+fn display(p: &Path, root: &Path) -> String {
+    match under(p, root) {
+        Some(r) => r.to_string_lossy().replace('\\', "/"),
+        None => p.to_string_lossy().to_string(),
+    }
+}
+
+fn is_executable_file(p: &Path) -> bool {
+    let Ok(m) = std::fs::metadata(p) else {
+        return false;
+    };
+    if !m.is_file() {
+        return false;
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        m.permissions().mode() & 0o111 != 0
+    }
+    #[cfg(not(unix))]
+    {
+        true
+    }
+}
+
+/// Resolve `command[0]` the way `exec` does: a name containing `/` is a path (relative to the working directory);
+/// a bare name is searched on `PATH`.
+pub fn resolve_program(program: &str, cwd: &Path) -> Option<PathBuf> {
+    let found = if program.contains('/') {
+        let p = if Path::new(program).is_absolute() {
+            PathBuf::from(program)
+        } else {
+            cwd.join(program)
+        };
+        p.is_file().then_some(p)
+    } else {
+        let path = std::env::var_os("PATH")?;
+        std::env::split_paths(&path)
+            .map(|d| d.join(program))
+            .find(|c| is_executable_file(c))
+    }?;
+    Some(found.canonicalize().unwrap_or(found))
+}
+
+fn current_exe() -> &'static Option<PathBuf> {
+    static EXE: OnceLock<Option<PathBuf>> = OnceLock::new();
+    EXE.get_or_init(|| {
+        let exe = std::env::current_exe().ok()?;
+        Some(exe.canonicalize().unwrap_or(exe))
+    })
+}
+
+/// Whether `program` is this very `gov` binary (the same file, or a byte-identical copy).
+fn is_this_binary(program: &Path, program_sha: &str) -> bool {
+    let Some(exe) = current_exe() else {
+        return false;
+    };
+    if exe == program {
+        return true;
+    }
+    let same_size = match (std::fs::metadata(exe), std::fs::metadata(program)) {
+        (Ok(a), Ok(b)) => a.len() == b.len(),
+        _ => false,
+    };
+    same_size && hash_file(exe).as_deref() == Some(program_sha)
+}
+
+/// Whether `args` (after the program) invoke exactly one OS capability server with only its own flags.
+fn os_capability_server(args: &[String]) -> bool {
+    OS_CAPABILITY_SERVERS.iter().any(|(words, bare, valued)| {
+        if args.len() < words.len()
+            || args[..words.len()]
+                .iter()
+                .zip(words.iter())
+                .any(|(a, w)| a != w)
+        {
+            return false;
+        }
+        let mut i = words.len();
+        while i < args.len() {
+            let a = &args[i];
+            if bare.contains(&a.as_str()) {
+                i += 1;
+            } else if valued.contains(&a.as_str()) && i + 1 < args.len() {
+                i += 2;
+            } else if valued.iter().any(|v| a.starts_with(&format!("{v}="))) {
+                i += 1;
+            } else {
+                return false;
+            }
+        }
+        true
+    })
+}
+
+type FileStamp = (u64, i128, u64);
+
+/// Content hash of one file (a symlink is identified by its target). Hashes are memoised for the life of the process
+/// by (path, size, modification time, inode), so one command that authorises the same plugin several times (the
+/// plugin set, doctor, the registry view) reads a large interpreter or binary once; any change to the file changes
+/// the stamp and is hashed afresh.
+fn hash_file(p: &Path) -> Option<String> {
+    static CACHE: OnceLock<Mutex<BTreeMap<PathBuf, (FileStamp, String)>>> = OnceLock::new();
+    let meta = std::fs::symlink_metadata(p).ok()?;
+    if meta.file_type().is_symlink() {
+        let t = std::fs::read_link(p).ok()?;
+        return Some(sha256_hex(
+            format!("symlink:{}", t.to_string_lossy()).as_bytes(),
+        ));
+    }
+    let mtime = meta
+        .modified()
+        .ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map(|d| d.as_nanos() as i128)
+        .unwrap_or(-1);
+    #[cfg(unix)]
+    let ino = {
+        use std::os::unix::fs::MetadataExt;
+        meta.ino()
+    };
+    #[cfg(not(unix))]
+    let ino = 0u64;
+    let stamp: FileStamp = (meta.len(), mtime, ino);
+    let cache = CACHE.get_or_init(|| Mutex::new(BTreeMap::new()));
+    if let Some((st, h)) = cache.lock().ok().and_then(|c| c.get(p).cloned()) {
+        if st == stamp {
+            return Some(h);
+        }
+    }
+    let h = crate::util::sha256_file(p).ok()?;
+    if let Ok(mut c) = cache.lock() {
+        c.insert(p.to_path_buf(), (stamp, h.clone()));
+    }
+    Some(h)
+}
+
+/// Every file under `dir` (recursively, symlinked directories not followed), sorted.
+fn tree_files(dir: &Path, out: &mut Vec<PathBuf>) -> std::result::Result<(), String> {
+    let mut stack = vec![dir.to_path_buf()];
+    while let Some(d) = stack.pop() {
+        let rd = std::fs::read_dir(&d).map_err(|e| format!("cannot read {}: {e}", d.display()))?;
+        let mut entries: Vec<PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+        entries.sort();
+        for e in entries {
+            let ft = std::fs::symlink_metadata(&e)
+                .map(|m| m.file_type())
+                .map_err(|x| format!("cannot stat {}: {x}", e.display()))?;
+            if ft.is_dir() {
+                stack.push(e);
+            } else {
+                out.push(e);
+                if out.len() > MAX_BOUND_FILES {
+                    return Err(format!(
+                        "{} holds more than {MAX_BOUND_FILES} files; an implementation that large is not bound",
+                        dir.display()
+                    ));
+                }
+            }
+        }
+    }
+    out.sort();
+    Ok(())
+}
+
+fn is_python(name: &str) -> bool {
+    let base = Path::new(name)
+        .file_name()
+        .map(|b| b.to_string_lossy().to_string())
+        .unwrap_or_default();
+    base == "python"
+        || base
+            .strip_prefix("python")
+            .map(|rest| !rest.is_empty() && rest.chars().all(|c| c.is_ascii_digit() || c == '.'))
+            .unwrap_or(false)
+}
+
+type SearchKey = (PathBuf, Vec<String>, PathBuf);
+
+/// The interpreter's module search path from `cwd` (the list Python's `-m` resolves against), under the plugin
+/// environment. Cached per (interpreter, options, working directory) for the life of the process.
+fn python_search_path(
+    program: &Path,
+    opts: &[String],
+    cwd: &Path,
+) -> std::result::Result<Vec<PathBuf>, String> {
+    static CACHE: OnceLock<Mutex<BTreeMap<SearchKey, Vec<PathBuf>>>> = OnceLock::new();
+    let key = (program.to_path_buf(), opts.to_vec(), cwd.to_path_buf());
+    let cache = CACHE.get_or_init(|| Mutex::new(BTreeMap::new()));
+    if let Some(v) = cache.lock().ok().and_then(|c| c.get(&key).cloned()) {
+        return Ok(v);
+    }
+    let mut cmd = std::process::Command::new(program);
+    cmd.args(opts)
+        .arg("-c")
+        .arg("import sys, json; print(json.dumps(sys.path))")
+        .current_dir(cwd)
+        .stdin(std::process::Stdio::null());
+    apply_plugin_env(&mut cmd);
+    let out = cmd.output().map_err(|e| {
+        format!(
+            "cannot ask {} for its module search path: {e}",
+            program.display()
+        )
+    })?;
+    if !out.status.success() {
+        return Err(format!(
+            "{} could not report its module search path (exit {:?})",
+            program.display(),
+            out.status.code()
+        ));
+    }
+    let v: Vec<String> = serde_json::from_slice(&out.stdout).map_err(|e| {
+        format!(
+            "unreadable module search path from {}: {e}",
+            program.display()
+        )
+    })?;
+    let dirs: Vec<PathBuf> = v
+        .into_iter()
+        .map(|s| {
+            if s.is_empty() {
+                cwd.to_path_buf()
+            } else if Path::new(&s).is_absolute() {
+                PathBuf::from(s)
+            } else {
+                cwd.join(s)
+            }
+        })
+        .collect();
+    if let Ok(mut c) = cache.lock() {
+        c.insert(key, dirs.clone());
+    }
+    Ok(dirs)
+}
+
+/// Locate what `import <top>` loads, in Python's finder order over `search`: a regular package (a directory with an
+/// `__init__`), else a module file (source, byte-code or extension), else every namespace portion. Returns the
+/// paths to bind (a directory is bound as a whole tree).
+fn python_top_level(top: &str, search: &[PathBuf]) -> Vec<PathBuf> {
+    let mut portions = vec![];
+    for entry in search.iter().filter(|e| e.is_dir()) {
+        let pkg = entry.join(top);
+        if pkg.is_dir() {
+            let regular = std::fs::read_dir(&pkg)
+                .map(|rd| {
+                    rd.filter_map(|e| e.ok()).any(|e| {
+                        let n = e.file_name().to_string_lossy().to_string();
+                        n == "__init__.py" || n.starts_with("__init__.")
+                    })
+                })
+                .unwrap_or(false);
+            if regular {
+                return vec![pkg];
+            }
+        }
+        if let Ok(rd) = std::fs::read_dir(entry) {
+            let mut files: Vec<PathBuf> = rd
+                .filter_map(|e| e.ok())
+                .map(|e| e.path())
+                .filter(|p| {
+                    let n = p
+                        .file_name()
+                        .map(|n| n.to_string_lossy().to_string())
+                        .unwrap_or_default();
+                    p.is_file()
+                        && (n == format!("{top}.py")
+                            || n == format!("{top}.pyc")
+                            || n == format!("{top}.pyw")
+                            || (n.starts_with(&format!("{top}."))
+                                && (n.ends_with(".so") || n.ends_with(".pyd"))))
+                })
+                .collect();
+            if !files.is_empty() {
+                files.sort();
+                return files;
+            }
+        }
+        if pkg.is_dir() {
+            portions.push(pkg);
+        }
+    }
+    portions
+}
+
+/// **Derive the implementation of `desc` as the host would execute it from `root`** (see the module documentation).
+pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
+    let root_c = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
+    let cmd = substituted_command(desc, root);
+    let cwd = working_dir(desc, root);
+    let Some(first) = cmd.first() else {
+        return Err(unresolved(desc, "the command is empty".into()));
+    };
+    let program = resolve_program(first, &cwd).ok_or_else(|| {
+        unresolved(
+            desc,
+            format!("its program '{first}' does not resolve to a file (relative to its working directory, or on PATH)"),
+        )
+    })?;
+    let program_sha = hash_file(&program).ok_or_else(|| {
+        unresolved(
+            desc,
+            format!("its program {} is unreadable", program.display()),
+        )
+    })?;
+    let args: Vec<String> = cmd[1..].to_vec();
+    let mut bound: BTreeMap<String, BoundFile> = BTreeMap::new();
+    let mut add = |role: &str, p: &Path, sha: String| {
+        let path = display(p, &root_c);
+        bound.entry(path.clone()).or_insert(BoundFile {
+            role: role.to_string(),
+            path,
+            sha256: sha,
+        });
+    };
+    add("program", &program, program_sha.clone());
+    let class = if is_this_binary(&program, &program_sha) && os_capability_server(&args) {
+        ExecutionClass::OsProvided
+    } else {
+        ExecutionClass::Executable
+    };
+    let mut primary: Option<PathBuf> = None;
+    let mut trees: Vec<(String, PathBuf)> = vec![];
+    if class == ExecutionClass::Executable {
+        let python = is_python(first) || is_python(&program.to_string_lossy());
+        let mut i = 0;
+        let mut interpreter_opts = true;
+        while i < args.len() {
+            let a = &args[i];
+            if python && interpreter_opts && a == "-m" {
+                let Some(module) = args.get(i + 1) else {
+                    return Err(unresolved(desc, "`-m` names no module".into()));
+                };
+                let top = module.split('.').next().unwrap_or("").to_string();
+                if top.is_empty() {
+                    return Err(unresolved(desc, format!("module name '{module}' is empty")));
+                }
+                let search = python_search_path(&program, &args[..i], &cwd)
+                    .map_err(|e| unresolved(desc, e))?;
+                let found = python_top_level(&top, &search);
+                if found.is_empty() {
+                    return Err(unresolved(
+                        desc,
+                        format!(
+                            "module '{module}' is not on {}'s search path from {}",
+                            program.display(),
+                            cwd.display()
+                        ),
+                    ));
+                }
+                for f in found {
+                    let f = f.canonicalize().unwrap_or(f);
+                    if primary.is_none() {
+                        primary = Some(f.clone());
+                    }
+                    trees.push(("module".into(), f));
+                }
+                interpreter_opts = false;
+                i += 2;
+                continue;
+            }
+            if python && interpreter_opts && a == "-c" {
+                // inline code: it lives in the descriptor, whose bytes the registration binds
+                interpreter_opts = false;
+                i += 2;
+                continue;
+            }
+            if a.starts_with('-') {
+                i += 1;
+                continue;
+            }
+            interpreter_opts = false;
+            let p = if Path::new(a).is_absolute() {
+                PathBuf::from(a)
+            } else {
+                cwd.join(a)
+            };
+            if p.is_file() {
+                let p = p.canonicalize().unwrap_or(p);
+                if let Some(h) = hash_file(&p) {
+                    if primary.is_none() {
+                        primary = Some(p.clone());
+                    }
+                    add("argument", &p, h);
+                }
+            }
+            i += 1;
+        }
+        for d in desc
+            .raw
+            .get("implementation")
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default()
+        {
+            let Some(s) = d.as_str() else { continue };
+            let p = if Path::new(s).is_absolute() {
+                PathBuf::from(s)
+            } else {
+                root.join(s)
+            };
+            if !p.exists() {
+                return Err(unresolved(
+                    desc,
+                    format!("its declared implementation path '{s}' does not exist"),
+                ));
+            }
+            trees.push(("declared".into(), p.canonicalize().unwrap_or(p)));
+        }
+    }
+    for (role, t) in trees {
+        if t.is_dir() {
+            let mut files = vec![];
+            tree_files(&t, &mut files).map_err(|e| unresolved(desc, e))?;
+            for f in files {
+                let h = hash_file(&f)
+                    .ok_or_else(|| unresolved(desc, format!("{} is unreadable", f.display())))?;
+                add(&role, &f, h);
+            }
+        } else {
+            let h = hash_file(&t)
+                .ok_or_else(|| unresolved(desc, format!("{} is unreadable", t.display())))?;
+            add(&role, &t, h);
+        }
+    }
+    let files: Vec<BoundFile> = bound.into_values().collect();
+    let mut acc = String::new();
+    for f in &files {
+        acc.push_str(&format!("{}\t{}\n", f.path, f.sha256));
+    }
+    Ok(Implementation {
+        class,
+        program: program.to_string_lossy().to_string(),
+        sha256: sha256_hex(acc.as_bytes()),
+        files,
+        primary: primary.or(Some(program)),
+    })
+}
+
+/// The descriptor content a registration approves: the descriptor minus the fields that are requests or OS-written
+/// copies ([`NON_SUBJECT_FIELDS`]), with the registration defaults applied so the first and the confirming
+/// `gov plugins register` compute the same subject.
+pub fn normalized_descriptor(v: &Value) -> Value {
+    let mut d = v.clone();
+    if let Some(o) = d.as_object_mut() {
+        for k in NON_SUBJECT_FIELDS {
+            o.remove(*k);
+        }
+        o.remove(crate::t2::SEAL_FIELD);
+        o.entry("approved_roles").or_insert(json!(["all"]));
+        o.entry("health_check")
+            .or_insert(json!({"kind": "command_exists"}));
+    }
+    d
+}
+
+/// **The registration subject**: exactly what a registration gate approves — plugin identity and version, the
+/// normalized descriptor (command, working directory, declared permissions and classes, approved roles) and the
+/// implementation the OS derived (class, program, every bound file and its hash). Returns `(subject, sha256)`; the
+/// gate carries `subject.sha256` and `gates::human_approval_for` honours only an answer bound to it.
+pub fn registration_subject(descriptor: &Value, imp: &Implementation) -> (Value, String) {
+    let norm = normalized_descriptor(descriptor);
+    let doc = json!({
+        "kind": "plugin-registration",
+        "plugin_id": norm.get("plugin_id").cloned().unwrap_or(Value::Null),
+        "capability": norm.get("capability").cloned().unwrap_or(Value::Null),
+        "version": norm.get("version").map(|v| match v { Value::String(s) => s.clone(), other => other.to_string() }),
+        "descriptor": norm,
+        "implementation": imp.to_value(),
+    });
+    let sha = sha256_hex(canonical_json(&doc).as_bytes());
+    (doc, sha)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn desc(dir: &Path, command: Vec<&str>, extra: Value) -> PluginDescriptor {
+        let mut v =
+            json!({"plugin_id": "p", "capability": "embed", "version": "1", "command": command});
+        for (k, x) in extra.as_object().cloned().unwrap_or_default() {
+            v[k] = x;
+        }
+        PluginDescriptor::from_value(
+            &v,
+            &dir.join("governance/project/plugins/p.yaml")
+                .to_string_lossy(),
+        )
+        .unwrap()
+    }
+
+    fn tmp() -> PathBuf {
+        let d = std::env::temp_dir().join(format!("gov-bind-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(d.join("governance/project/plugins")).unwrap();
+        d
+    }
+
+    #[test]
+    fn a_script_binds_the_program_and_the_script_and_any_edit_changes_the_identity() {
+        let d = tmp();
+        std::fs::write(d.join("s.sh"), "echo one\n").unwrap();
+        let a = resolve(&desc(&d, vec!["sh", "s.sh"], json!({})), &d).unwrap();
+        assert_eq!(a.class, ExecutionClass::Executable);
+        assert!(
+            a.files
+                .iter()
+                .any(|f| f.path == "s.sh" && f.role == "argument"),
+            "{:?}",
+            a.files
+        );
+        assert!(a.files.iter().any(|f| f.role == "program"));
+        std::fs::write(d.join("s.sh"), "echo two\n").unwrap();
+        let b = resolve(&desc(&d, vec!["sh", "s.sh"], json!({})), &d).unwrap();
+        assert_ne!(a.sha256, b.sha256);
+    }
+
+    #[test]
+    fn inline_code_is_executable_and_bound_through_the_descriptor() {
+        let d = tmp();
+        let a = resolve(&desc(&d, vec!["sh", "-c", "echo hi"], json!({})), &d).unwrap();
+        assert_eq!(a.class, ExecutionClass::Executable);
+        let (_, s1) = registration_subject(
+            &json!({"plugin_id": "p", "command": ["sh", "-c", "echo hi"]}),
+            &a,
+        );
+        let (_, s2) = registration_subject(
+            &json!({"plugin_id": "p", "command": ["sh", "-c", "echo bye"]}),
+            &a,
+        );
+        assert_ne!(s1, s2, "the inline code is part of the approved subject");
+    }
+
+    #[test]
+    fn a_missing_program_or_declared_path_is_refused() {
+        let d = tmp();
+        assert_eq!(
+            resolve(&desc(&d, vec!["./nope.sh"], json!({})), &d)
+                .unwrap_err()
+                .code,
+            "PLUGIN_IMPLEMENTATION_UNRESOLVED"
+        );
+        assert_eq!(
+            resolve(
+                &desc(
+                    &d,
+                    vec!["sh", "-c", "true"],
+                    json!({"implementation": ["lib/missing.sh"]})
+                ),
+                &d
+            )
+            .unwrap_err()
+            .code,
+            "PLUGIN_IMPLEMENTATION_UNRESOLVED"
+        );
+    }
+
+    #[test]
+    fn the_os_capability_server_is_recognised_only_with_its_own_flags() {
+        assert!(os_capability_server(&[
+            "capabilities".into(),
+            "serve-embed".into()
+        ]));
+        assert!(os_capability_server(&[
+            "capabilities".into(),
+            "serve-embed".into(),
+            "--id".into(),
+            "x".into(),
+            "--reverse".into()
+        ]));
+        assert!(!os_capability_server(&[
+            "capabilities".into(),
+            "serve-embed".into(),
+            "--root".into(),
+            "/".into()
+        ]));
+        assert!(!os_capability_server(&[
+            "plugins".into(),
+            "register".into()
+        ]));
+        assert!(!os_capability_server(&["capabilities".into()]));
+    }
+
+    #[test]
+    fn python_names_are_recognised() {
+        for n in ["python", "python3", "/usr/bin/python3.12", "python3.11"] {
+            assert!(is_python(n), "{n}");
+        }
+        for n in ["pythonista", "sh", "python3-config"] {
+            assert!(!is_python(n), "{n}");
+        }
+    }
+
+    #[test]
+    fn python_finder_order_prefers_a_regular_package_then_a_module_then_namespace_portions() {
+        let d = tmp();
+        let a = d.join("a");
+        let b = d.join("b");
+        std::fs::create_dir_all(a.join("pkg")).unwrap(); // namespace portion (no __init__)
+        std::fs::create_dir_all(b.join("pkg")).unwrap();
+        std::fs::write(b.join("pkg/__init__.py"), "").unwrap(); // regular package later on the path
+        assert_eq!(
+            python_top_level("pkg", &[a.clone(), b.clone()]),
+            vec![b.join("pkg")]
+        );
+        std::fs::write(a.join("mod.py"), "").unwrap();
+        assert_eq!(
+            python_top_level("mod", &[a.clone(), b.clone()]),
+            vec![a.join("mod.py")]
+        );
+        std::fs::remove_file(b.join("pkg/__init__.py")).unwrap();
+        assert_eq!(
+            python_top_level("pkg", &[a.clone(), b.clone()]),
+            vec![a.join("pkg"), b.join("pkg")]
+        );
+    }
+}
