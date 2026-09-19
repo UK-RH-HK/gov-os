@@ -22,10 +22,12 @@ system_gate_package:
   budget_threshold: {cost_rework: "stopping forfeits only the spend already made; continuing adds spend beyond the delegated budget"}
   contradiction: {cost_rework: "work built on the rejected input must be re-planned; work already delivered on it is re-verified", why_now: "authoritative inputs contradict each other and deterministic precedence cannot choose between them"}
 # BC-P2-10: human answers and presentation receipts are owner-signed documents verified against the
-# administrator-provisioned `human-gate` anchor (the Signed Release Root's delegation when one is provisioned). On a
-# machine with no release root, a standalone administrator-provisioned anchor is honoured only while this is true;
-# a project may tighten it to false, never loosen it.
-human_channel: {standalone_anchor_when_unprovisioned: true}
+# administrator-provisioned `human-gate` anchor: the provisioned Signed Release Root's delegation of the `human-gate`
+# role. P2-ADJ-0001 (OWNER-DECISION-P2-0002: provision, then work; ARCH-0003 §2-§3: one trust chain) fixes the
+# standalone anchor OFF: on a machine with no release root a human answer is refused (HUMAN_CHANNEL_UNAVAILABLE,
+# remediation: provision a root that delegates `human-gate`; dev/test machines provision a throw-away root).
+# Strengthen-only (POLICY_PRECEDENCE): a lower layer may keep it false, never set it true.
+human_channel: {standalone_anchor_when_unprovisioned: false}
 prioritisation: [critical_path_effect, tasks_blocked, impact_radius, time_sensitivity, irreversibility]
 must_be_presented_in_chat: true
 continue_independent_work: true

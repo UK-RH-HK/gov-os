@@ -1,0 +1,154 @@
+# P2-AR-0024 (WS-3 + docs), repair iteration 1 round 2. Builder claims only (Contract v3 O3); acceptance is decided by
+# independent verifiers. Evidence paths are relative to release/capability-baseline/repair-1/r2-ws03/evidence/.
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0024
+workstream: WS-3 (+ docs)
+base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+branch: phase2/repair-1-r2-ws03
+work_commit: 7dcf2e0bcb1a998c9ce3e71a4266489e1dc00fe2
+product_code_digest: e84b9a91e9654e3e292eeed8d19476ef62891f603a9f7d7afbe914fbe3dbd504
+regression:
+  cargo_test_lib: {passed: 149, failed: 0, base: 146, evidence: regression/REGRESSION-lib.out}
+  cargo_test_certification: {passed: 103, failed: 0, base: 100, evidence: regression/REGRESSION-certification.out}
+  rustfmt_and_warnings: {rustfmt_hunks: 0, build_warnings: 0, evidence: regression/RUSTFMT-WARNINGS-DIFFSTAT.out}
+  r1_heldout_unedited:
+    evidence: r1-heldout/r1-heldout-final-7dcf2e0.out
+    runner: r1-heldout/run-r1-heldout.P2-AR-0024.sh (private scratch path; symlinks to this worktree printed)
+    AR-0027: {passed: 26, failed: 3, failing: [b1, b2, d3], baseline: same}
+    AR-0029: {passed: 26, failed: 2, failing: [b3, b6], not_compiling: [ho_f_preservation], baseline: same}
+    AR-0031: {passed: 27, failed: 7, failing: [a1, a5, a8, b6, c2, c3, d2], baseline: same}
+    AR-0033: {passed: 30, failed: 1, failing: [hv_a_derivation::a1], note: "scale pin 84 files / 740 functions; census of this tree 105 files / 1472 functions, 0 violations in every section-6 activity (labelled copy r1-heldout/hv_a_derivation.a1-unpinned.P2-AR-0024.rs.txt); derive.py agrees"}
+  section6_certification: green
+  srr_sources_changed: false
+probes:
+  round2_builder_probes: {final: "24/24 PASS", base_843d79c: "5/24 PASS (19 FAIL)", evidence: [probes/R2-WS03-probes.final.out, probes/R2-WS03-probes.base-843d79c.out], script: R2-WS03-probes.py}
+  round1_named_checks: {unedited_final: "15 PASS, 1 FAIL (O5-G0.freeze-writes: rebuild-memory, intended by O-4), then stops at standalone-anchor provisioning (P2-ADJ-0001)", derived_final: "39/39 PASS", evidence: [probes/ws03-named-checks.unedited.final.out, probes/ws03-named-checks.r2-derived.final.out]}
+  o5_g0_matrix_round1_derived: {result: "under FREEZE_WRITES and PAUSE only rebuild-memory, memory rebuild, pause, freeze-writes mutate", evidence: probes/O5-G0-guard-matrix.derived-r1.final.out}
+items:
+  - item: P2-ADJ-0001
+    status: REPAIRED_CLAIMED
+    requirement: "HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned defaults to false; on an unprovisioned machine a human answer is refused typed and observable with remediation provision; regression test"
+    files: [framework/policies/HUMAN_GATE_POLICY.yaml, runtime/src/orchestration/gates.rs, runtime/src/human_channel.rs, cli/src/main.rs, framework/policies/ENFORCEMENT_MAP.yaml]
+    product_checks:
+      - {check: "human_channel::anchor (HUMAN_CHANNEL_UNAVAILABLE, cause UNPROVISIONED, remediation, provision_command, standalone_anchor_present)", tier: G0}
+      - {check: "human_channel::provision_standalone (HUMAN_CHANNEL_STANDALONE_DISABLED)", tier: G0}
+      - {check: "gates::standalone_anchor_allowed default false; POLICY_PRECEDENCE strengthen-only (strict false)", tier: G0}
+    probes_rerun:
+      - {line: "R2 ADJ.a-ADJ.g", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+      - {line: "R2 ADJ.h (root without human-gate)", before: PASS, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    tests: [ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers, ws03::human_answers_come_only_from_the_owner_signed_channel, "unit human_channel::tests::the_embedded_kernel_keeps_the_standalone_anchor_off"]
+    tests_changed_because: "certification tests that answered gates on unprovisioned machines now provision a throw-away root first (update.rs, repair.rs update_approval, repair2.rs chain, greenfield.rs; ws03 helpers)"
+    integration_points: [IP-R2-4]
+    owner_decision_required: null
+  - item: O-1
+    class: BC-P2-45
+    status: REPAIRED_CLAIMED
+    requirement: "Contract v3 S5/A1: descriptive keys of a project on a shipped 4.1.4/4.1.5 kernel are recognised as descriptive; genuine floor weakening stays refused"
+    files: [runtime/src/policy_precedence.rs, runtime/src/policy.rs, framework/policies/POLICY_PRECEDENCE.yaml]
+    product_checks:
+      - {check: "policy_precedence::Governing::evaluate in PolicySet::load (installed kernel rules AND the binary's floor; a set silent on a label does not govern it)", tier: G0}
+      - {check: "doctor D027 / suite family policy_precedence / gov policy overrides (precedence.governing_sets)", tier: "G0/G5"}
+    probes_rerun:
+      - {line: "integration old_kernel_overlay_precedence.py (unedited): refused keys, D027", before: "7 refused, D027 CRITICAL, update rolled back", after: "none refused, D027 ok (the script's standalone-anchor answer step is refused by P2-ADJ-0001)", evidence: [probes/O1-integration-script.unedited.base-843d79c.out, probes/O1-integration-script.unedited.final.out]}
+      - {line: "R2 O1.a-O1.e (provisioned, signed shipped releases; floors still refused; update to 4.1.5 applied)", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    tests: [ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor, "unit policy_precedence::tests::a_rule_set_silent_on_a_label_does_not_govern_it_and_the_stricter_set_wins"]
+    integration_points: []
+    owner_decision_required: null
+  - item: O-4
+    class: BC-P2-08
+    status: REPAIRED_CLAIMED
+    decision: "rebuild-memory and memory rebuild are on both the FREEZE_WRITES and PAUSE recovery allow-lists: they rebuild only derived index state and its generated manifests, deterministically, from Git and the authoritative records (framework §19/§74; Contract v3 B3, D6, A5); governed failure-memory writes inside still pass guard_write"
+    files: [runtime/src/orchestration/control.rs]
+    product_checks:
+      - {check: "control::FROZEN_ALLOW_LIST / PAUSED_ALLOW_LIST (REBUILD_REASON)", tier: G0}
+    probes_rerun:
+      - {line: "R2 G0.d-freeze-writes / G0.d-pause", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+      - {line: "beta-r D6-rebuild-guarantee (unedited, shim)", before: "stops at the refused rebuild (integration round 1)", after: "runs to completion; D6-b1 PASS", evidence: probes/audit-shim/beta-r.D6-rebuild-guarantee.out}
+    tests: [ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations]
+    owner_decision_required: null
+  - item: BC-P2-08 remaining call-site and guard work
+    class: BC-P2-08
+    status: REPAIRED_CLAIMED
+    scope: "adopt A3/A4 record the declared actor (ws09-11 IP-3); tools install evaluates the acting role; every new label classified (memory miss/failures); G0 hard-block site (IP-WS02-08); evidence-command classes (IP-WS02-09); O-4"
+    files: [cli/src/main.rs, runtime/src/orchestration/control.rs, framework/policies/AUTHORITY_POLICY.yaml]
+    product_checks:
+      - {check: "control::g0 (COMMAND_GUARDS incl. memory miss / memory failures)", tier: G0}
+      - {check: "control::guard_write -> guard_health -> scheduler::guard", tier: G0}
+    probes_rerun:
+      - {line: "round-1 named checks (derived for P2-ADJ-0001 / O-4 only)", before: "37/37 (round 1)", after: "39/39", evidence: probes/ws03-named-checks.r2-derived.final.out}
+      - {line: "epsilon-r O5-G0-focus (unedited)", before: "every command FROZEN", after: "every command FROZEN", evidence: probes/audit-integrated/epsilon-r.O5-G0-focus.out}
+      - {line: "R2 CS.a (adopt producer)", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    tests: [ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals, ws03::every_cli_command_label_is_classified_by_g0]
+    owner_decision_required: null
+  - item: IP-WS02-08
+    status: REPAIRED_CLAIMED
+    scope: "G0 hard-block site in control::guard_write for task create, task claim (incl. continue --claim), task close, cit propose, handoff create"
+    deviation: "operations that apply a sanctioned change which may be the remedy (cit approve/execute, update --apply/--rollback, adopt migrate, release build) are left to their host call sites; guarded generically they refused their own remedy (brownfield D014 CIT, update of an older release via D006/D007, OWNER-DECISION-0006 §5 update --apply)"
+    files: [runtime/src/orchestration/control.rs]
+    product_checks:
+      - {check: "control::guard_health (HEALTH_HARD_BLOCK)", tier: G0}
+    probes_rerun:
+      - {line: "R2 G0.a (refused under the D027 block)", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+      - {line: "R2 G0.b/G0.c (remedies available; repair releases)", before: PASS, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    tests: [ws03::project_overlays_may_raise_floors_but_never_lower_them, repair2::project_policy_cannot_weaken_constitutional_floors, "unit control::tests::governed_work_labels_are_classified_writes_and_remedies_are_never_governed_work"]
+    integration_points: [IP-R2-2]
+    owner_decision_required: null
+  - item: IP-WS02-09
+    status: REPAIRED_CLAIMED
+    decision: "audit, verify governance|product, health run|product|close-check are Write/record_audit (L0); health skills --record Write/record_skill_binding (L3); refused under FREEZE_WRITES/PAUSE; audit --no-persist and health run --no-persist stay available (Read)"
+    files: [runtime/src/orchestration/control.rs, framework/policies/AUTHORITY_POLICY.yaml]
+    probes_rerun:
+      - {line: "R2 G0.e-freeze-writes / G0.e-pause", before: PASS, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    tests: [ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations]
+    owner_decision_required: null
+  - item: IP-WS02-11
+    status: NOT_REPAIRED
+    reason: "optional; needs framework/policies/TEST_POLICY.yaml and runtime/src/verification/currency.rs (WS-2's files this round)"
+    integration_points: [IP-R2-6]
+    owner_decision_required: null
+  - item: ws04 IP-6
+    status: PARTIAL
+    scope: "CLI side: continue opens the index as a context::IndexHandle; until status::continue_work (WS-5) accepts the handle an unavailable index is refused INDEX_UNAVAILABLE with remediation gov rebuild-memory"
+    files: [cli/src/main.rs]
+    probes_rerun:
+      - {line: "R2 CS.c", before: "DB_ERROR", after: "INDEX_UNAVAILABLE typed; rebuild restores", evidence: probes/R2-WS03-probes.final.out}
+    integration_points: [IP-R2-1]
+    owner_decision_required: null
+  - item: ws06 IP-6
+    status: REPAIRED_CLAIMED
+    files: [framework/policies/MEMORY_POLICY.yaml, framework/policies/ENFORCEMENT_MAP.yaml, framework/policies/POLICY_PRECEDENCE.yaml, framework/policies/AUTHORITY_POLICY.yaml, cli/src/main.rs, runtime/src/orchestration/control.rs]
+    product_checks:
+      - {check: "policy_enforcement_coverage family (failure_memory keys mapped)", tier: G5}
+      - {check: "gov memory miss (record_failure_memory L1, G0 Write) / gov memory failures (Read)", tier: G0}
+    probes_rerun:
+      - {line: "R2 CS.b", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    owner_decision_required: null
+  - item: ws08 IP-3
+    status: REPAIRED_CLAIMED
+    deviation: "the pin is bound only when unambiguous (framework.lock agrees with this machine's protected record, or no record exists); pinning framework.lock unconditionally masked KERNEL_PIN_REWRITTEN (ws08 consistent-rewrite test)"
+    files: [cli/src/main.rs]
+    probes_rerun:
+      - {line: "R2 CS.d (break-glass reinstall of another release: no marking, token not consumed)", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    tests: ["ws08::* (7/7)"]
+    integration_points: [IP-R2-3]
+    owner_decision_required: null
+  - item: ws09-11 IP-3
+    status: REPAIRED_CLAIMED
+    files: [cli/src/main.rs]
+    probes_rerun:
+      - {line: "R2 CS.a", before: FAIL, after: PASS, evidence: probes/R2-WS03-probes.final.out}
+    owner_decision_required: null
+  - item: docs (ws03 IP-11, ws05 IP-8)
+    status: REPAIRED_CLAIMED
+    files: [docs/ARCHITECTURE.md, docs/COMMANDS.md]
+    integration_points: [IP-R2-5]
+    owner_decision_required: null
+integration_points:
+  IP-R2-1: {owner: WS-5, file: runtime/src/status.rs, change: "continue_work(p, db: impl Into<context::IndexHandle<'a>>, claim); then cli continue_with_index body = gov_runtime::status::continue_work(p, index, claim)"}
+  IP-R2-2: {owner: "WS-2 (catalogue) with WS-4/WS-8/WS-9 hosts", change: "host hard-block guards must not refuse their own remedy: D014/schema_invariants vs the repairing cit execute; D006/D007 of an older release vs update --apply; OWNER-DECISION-0006 §5 update --apply/--rollback below floor"}
+  IP-R2-3: {owner: WS-8, file: runtime/src/srr/verifier.rs, change: "AdmissionRequest pin as the set {framework.lock pin, protected-record pin}"}
+  IP-R2-4: {owner: WS-8, file: tests/certification/common.rs, change: "harness root delegates human-gate to crate::ws03::owner(); keep either version of update.rs / repair.rs / repair2.rs / greenfield.rs provisioning at integration"}
+  IP-R2-5: {owner: docs owner (round 3), file: "docs/ARCHITECTURE.md §4.4a/§7, docs/COMMANDS.md", change: "document WS-8's round-2 admission (bootstrap mode, refused external ingress on unprovisioned machines)"}
+  IP-R2-6: {owner: WS-2, change: "optional IP-WS02-11"}
+owner_decision_required: []

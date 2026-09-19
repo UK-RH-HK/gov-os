@@ -1,0 +1,109 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0024
+role: capability-repair
+objective: Repair iteration 1, round 2, WS-3 (+ docs) — P2-ADJ-0001, round-1 integration O-1 and O-4, the BC-P2-08 remaining call-site/guard work, the integration points routed to WS-3 (IP-WS02-08/09/11, ws04 IP-6, ws06 IP-6, ws08 IP-3, ws09-11 IP-3) and the docs; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run authored
+  the WS-3 round-2 repair on phase2/repair-1-r2-ws03 only; it authored no audit, synthesis, integration or verification
+  run and grades nothing it built. It read P2-HO-0022, P2-HO-0020, P2-HO-0010, P2-ADJ-0001, OWNER-DECISION-P2-0001 and
+  -0002, the round-1 integration report and its O-1 evidence, the round-1 repair reports of ws02, ws03, ws04, ws05, ws06,
+  ws08 and ws09-11 (their integration-point sections), the round-2 handoffs P2-HO-0021/0024/0027 (for the signatures and
+  file ownership of the parallel workstreams), repair-delta.md §0-§3, AGENT_RUNS/README.md, the product source, framework,
+  docs and tests of this worktree, the audit-of-record probes and libraries and the prior R1 held-out suites (run
+  unedited). It did not read session or agent transcripts, task-output stores or user auto-memory; it spawned no
+  sub-agents, did not contact the product owner and touched no other branch or worktree.
+input:
+  base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+  candidate: "none (repair iteration 1, round 2 branch; no candidate minted)"
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0022-repair-1-r2-ws03.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0022-repair-1-r2-ws03.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0021-repair-1-r2-ws02.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0024-repair-1-r2-ws05.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0027-repair-1-r2-ws08.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0001-STANDALONE-HUMAN-GATE-ANCHOR.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001-AGENT-ROLE-IDENTITY.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md and evidence/ (observations, r1-heldout runner, audit-probe runner and shim, builder-probes/derived-ws08)
+  - "release/capability-baseline/repair-1/{ws02,ws03,ws04,ws05,ws06,ws08,ws09-11}/00-REPAIR-REPORT.md"
+  - release/capability-baseline/repair-1/ws03/claims.yaml and evidence/ (named checks, hc_owner.py, derived O5-G0 matrix)
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md (§0-§3)
+  - release/capability-baseline/audit-0/beta-r/evidence/D6-rebuild-guarantee.py and findings.yaml (A0-D6-01/02)
+  - release/capability-baseline/audit-0/alpha-r/evidence/lib/srr_mint.py (imported read-only by the evidence probes)
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests and 4.1.6-r1-4/evidence/derive.py (run unedited)
+  - "release/releases/4.1.2..4.1.5/kernel (shipped kernels: precedence rules and overlay templates)"
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (A5, B3, D6, O5), DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (§74)
+  - runtime/src, cli/src, framework/, docs/, tests/certification of this worktree
+produced:
+  - "runtime/src/policy_precedence.rs, runtime/src/policy.rs (O-1: Governing rule sets)"
+  - "runtime/src/human_channel.rs, runtime/src/orchestration/gates.rs, framework/policies/HUMAN_GATE_POLICY.yaml (P2-ADJ-0001)"
+  - "runtime/src/orchestration/control.rs (IP-WS02-08 guard_health; O-4 allow-lists; memory miss/failures labels)"
+  - "cli/src/main.rs (reinstall pin, continue IndexHandle, adopt actor, tools install role, memory miss/failures, human-channel policy default)"
+  - "framework/policies/{AUTHORITY_POLICY,ENFORCEMENT_MAP,MEMORY_POLICY(failure_memory keys),POLICY_PRECEDENCE}.yaml"
+  - "docs/ARCHITECTURE.md, docs/COMMANDS.md"
+  - "tests/certification/ws03.rs (helpers, 3 new tests, 3 updated), update.rs, repair.rs, repair2.rs, greenfield.rs"
+  - release/capability-baseline/repair-1/r2-ws03/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r2-ws03/claims.yaml
+  - release/capability-baseline/repair-1/r2-ws03/evidence/
+tests_or_attacks:
+  - id: REG-LIB
+    description: cargo test --lib at 7dcf2e0 (149 passed, 0 failed)
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/regression/REGRESSION-lib.out
+  - id: REG-CERT
+    description: cargo test --test certification at 7dcf2e0 (103 passed, 0 failed; includes section6, srr, ws03, ws08)
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/regression/REGRESSION-certification.out
+  - id: R1-HELDOUT
+    description: "prior R1 held-out suites unedited via a private scratch path: AR-0027 26/3, AR-0029 26/2 (+ho_f DNC), AR-0031 27/7, AR-0033 30/1 (hv_a::a1 size pin) — each its recorded baseline; hv_a census 105 files / 1472 functions, 0 violations"
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/r1-heldout/r1-heldout-final-7dcf2e0.out
+  - id: R2-PROBES
+    description: "round-2 builder probes O1.a-e, ADJ.a-h, G0.a-e, CS.a-d: final 24/24, base 843d79c 5/24"
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/probes/R2-WS03-probes.final.out
+  - id: O1-INTEGRATION-SCRIPT
+    description: "integration O-1 reproduction unedited: base 7 descriptive keys refused / D027 CRITICAL / update rolled back; final none refused / D027 ok (its standalone-anchor answer step is refused by P2-ADJ-0001)"
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/probes/O1-integration-script.unedited.final.out
+  - id: NAMED-CHECKS-R1
+    description: "round-1 WS-3 named checks: unedited 15 PASS / 1 intended FAIL (O-4) then stop at standalone provisioning (P2-ADJ-0001); labelled derived copy 39/39"
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/probes/ws03-named-checks.r2-derived.final.out
+  - id: O5-G0-MATRIX
+    description: "round-1 derived O5-G0 guard matrix unedited: under FREEZE_WRITES and PAUSE only rebuild-memory, memory rebuild, pause, freeze-writes mutate"
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/probes/O5-G0-guard-matrix.derived-r1.final.out
+  - id: D6-REBUILD
+    description: "beta-r D6-rebuild-guarantee unedited (shim): runs to completion, D6-b1 PASS; D6-b2-A-registry and D6-b2-B FAIL (A0-D6-02/-01, not WS-3 classes)"
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws03/evidence/probes/audit-shim/beta-r.D6-rebuild-guarantee.out
+findings: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-ws03
+  commit: 16499ec49b3a30cca6a41f5b607fead0268adf7c
+  evidence_path: release/capability-baseline/repair-1/r2-ws03/
+  product_commit: 7dcf2e0bcb1a998c9ce3e71a4266489e1dc00fe2
+  product_code_digest: e84b9a91e9654e3e292eeed8d19476ef62891f603a9f7d7afbe914fbe3dbd504
+  governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+claims_summary:
+  REPAIRED_CLAIMED: [P2-ADJ-0001, O-1 (BC-P2-45), O-4, BC-P2-08 remaining call-site/guard work, IP-WS02-08 (start/hand-off/complete operations; remedy-applying operations left to their hosts), IP-WS02-09, ws06 IP-6, ws08 IP-3 (pin bound when unambiguous), ws09-11 IP-3, docs (ws03 IP-11, ws05 IP-8)]
+  PARTIAL: [ws04 IP-6 (CLI side; WS-5 must accept the IndexHandle — IP-R2-1)]
+  NOT_REPAIRED: [IP-WS02-11 (optional; WS-2's files)]
+unresolved:
+  - "IP-R2-1 (WS-5): status::continue_work accepts context::IndexHandle; then the CLI continue_with_index body becomes one call"
+  - "IP-R2-2 (WS-2 catalogue x WS-4/WS-8/WS-9 hosts): host hard-block guards must not refuse their own remedy (D014 vs repairing CIT execute; D006/D007 vs update --apply; OWNER-DECISION-0006 §5 update --apply/--rollback)"
+  - "IP-R2-3 (WS-8): AdmissionRequest pin as the set {framework.lock, protected record}"
+  - "IP-R2-4 (WS-8 harness): harness root delegates human-gate to ws03::owner(); update.rs/repair.rs/repair2.rs/greenfield.rs provisioning may conflict textually with WS-8's rewrite — same properties either way"
+  - "IP-R2-5 (docs, round 3): document WS-8's round-2 admission posture"
+recommended_next_action: Integrate with the other round-2 branches (IP-R2-1..4 first), then continue to round 3.
+completed_at: "2026-09-19T04:58:12Z"

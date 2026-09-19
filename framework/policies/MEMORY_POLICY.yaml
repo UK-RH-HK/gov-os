@@ -38,6 +38,13 @@ regression:
   max_superseded_hit_rate: 0.0
 rebuild:
   must_reproduce_manifest_hash: true
+# BC-P2-32 (framework §11.8, §18): durable failure memory. An agent's logged query whose best returned evidence covers
+# less than `min_evidence_coverage` of the question (IDF-weighted) is recorded as a retrieval-miss memory-quality event;
+# tool failures observed while indexing and retrieving are recorded as governed evidence. Strengthen-only
+# (POLICY_PRECEDENCE): a project may raise the coverage threshold, never switch recording off.
+failure_memory:
+  retrieval_miss: {enabled: true, min_evidence_coverage: 0.5}
+  tool_failures: true
 namespaces:
   governance: {sensitivity: internal, roles: [all], retention: permanent, export: framework-lessons-only, embed: true}
   spec: {sensitivity: internal, roles: [all], retention: permanent, export: denied, embed: true}

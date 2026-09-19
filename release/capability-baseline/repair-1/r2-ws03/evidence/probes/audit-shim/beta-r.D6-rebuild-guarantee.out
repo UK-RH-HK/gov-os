@@ -1,0 +1,93 @@
+# P2-AR-0024 audit-of-record probe re-run (unedited): beta-r/D6-rebuild-guarantee mode=shim
+# worktree HEAD 7dcf2e0bcb1a998c9ce3e71a4266489e1dc00fe2; product files differing from HEAD: 0
+# probe sha256 72a246ee9b593c28b61c554c9bf34bc6d273cf6c4248f7659e2761b752d1eda5; gov c09bd5e5d23561ef2ab7d2b19e1a7e96a400b9fd0fffefed8ab33e96fc5ba9dd via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar0024/audit-private/mirror-shim/target/release/gov
+# date 2026-09-19T04:40:56Z
+$ gov --role orchestrator init --name orders-ledger --alias d6 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator task create --class implementation --objective 'Totals A' --feature F-0001 --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator task create --class implementation --objective 'Totals B' --status READY --allowed src/**  -> exit 0 ok=True
+$ gov --role orchestrator task claim TASK-0001  -> exit 0 ok=True
+$ gov --role orchestrator gate create --question 'Adopt nightly reconciliation window?' --fields '{"options": [{"id": "A", "description": "yes"}, {"id": "B", "description": "no"}], "impact_radius": "R2"}'  -> exit 0 ok=True
+$ gov --role orchestrator cit propose --proposal 'Tighten totals' --trigger behaviour_change --targets REQ-0001  -> exit 0 ok=True
+$ gov --role orchestrator checkpoint create --next-action 'continue totals' --task TASK-0001  -> exit 0 ok=True
+$ gov --role orchestrator plugins register --descriptor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar0024/audit-private/ap-shim-beta-r-D6-rebuild-guarantee-ecD8wI/d6-rerank.yaml  -> exit 0 ok=True
+register logging-reranker -> True None pin: {'sha256': '6b9ce14088ed5fc2d425bc2614ac6b10d039b6e43857e4a8588c13d48e655867', 'files': ['tools/probe-plugins/logging_reranker.py']}
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator freeze-writes --reason 'd6 probe: emergency state must survive derived-state deletion'  -> exit 0 ok=True
+PRE-DELETION SNAPSHOT: {"auth": ["eb4ec2dcc07c8352", 191], "manifest_hash": "c47705a3dae3be747ac6c1df82928e7f9c23773d7115c2dd65fbdf3af6272500", "derived": {"artifacts": "e5ab69450a1c12c2", "chunks": "afe10a13f3e25624", "vectors": "cea1de4a462faf4b", "edges": "2622bb064eb47410", "symbols": "41aaecc2cfccc249", "fts": "fe03bf9c60824f38"}, "status": {"records": 19, "next_task": "TASK-0001", "runnable": ["TASK-0001"], "counts": {"total": 2, "runnable": 1, "blocked": 1, "waiting_human": 0, "done": 0, "open": 2}, "gates": ["HDG-0001", "HDG-0002"], "open_cits": ["CIT-0001"], "latest_checkpoint": "CKPT-00001", "index_fresh": true, "next_action": "present human gate \"HDG-0001\" in chat (`gov gate present \"HDG-0001\"`), continue independent runnable work"}, "answers": {"REQ-0001": ["REQ-0001", "REQ-0001", "CIT-0001", "CIT-0001", "F-0001"], "why integer cents rationale": ["D-0102", "D-0102", "REQ-0001", "REQ-0001", "file:src/app/models.py"], "compute_total": ["file:src/app/models.py", "file:src/app/api.py", "file:src/app/models.py", "file:tests/test_models.py", "file:src/app/api.py"], "\"append-only ledger\"": ["ARCH-0101", "file:docs/runbook.md"], "what depends on F-0001": ["REQ-0001", "SCN-0001", "TASK-0001", "TST-0001", "CKPT-00001"]}, "claims": [["TASK-0001", "S-probe"]], "plugin_registry": ["logging-reranker"], "control": {"mode": "RUNNING", "writes_frozen": true}}
+
+====================================================================================================
+D6-A delete framework §19 derived state (index DB, graph, vectors, generated views)
+====================================================================================================
+deleted: ['.governance-runtime/state.db', 'governance/generated/index-manifest.json', 'governance/generated/plugin-registry.json', 'governance/generated/adapter-manifest.json', 'governance/generated/memory-manifest.json', 'governance/generated/tool-registry.json', 'governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md', 'governance/generated/adapters/cli/bootstrap-packet.json', 'governance/generated/adapters/api/system-instruction.txt', 'governance/generated/adapters/mcp/mcp-connections.json', 'governance/generated/adapters/ide/RULES.md', 'framework.json']
+$ gov --role orchestrator status  -> exit 0 ok=True
+gov status with derived state deleted -> True None present human gate "HDG-0001" in chat (`gov gate present "HDG-0001"`), continue independent runnable work
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+gov rebuild-memory -> True None 
+$ gov --role orchestrator adapters generate  -> exit 4 ok=False error={"code": "FROZEN", "message": "writes are frozen (FREEZE_WRITES active); 'adapters generate' refused. Run `gov resume` (L4) to lift.", "details": {"operation": "adapters generate", "control": {"agents_cancelled": false, "mode": "RUNNING", "reason": "d6 probe: emergency state must survive derived-state deletion", "role": "orchestrator", "session": "S-probe", "updated_at": "2026-09-19T04:40:58Z", "writes_frozen": true}, "allowed_while_frozen": [{"operation": "pause", "reason": "emergency control (framework \u00a774): the human can always escalate a freeze to a pause"}, {"operation": "freeze writ
+$ gov --role orchestrator tools registry  -> exit 4 ok=False error={"code": "FROZEN", "message": "writes are frozen (FREEZE_WRITES active); 'tools registry' refused. Run `gov resume` (L4) to lift.", "details": {"operation": "tools registry", "control": {"agents_cancelled": false, "mode": "RUNNING", "reason": "d6 probe: emergency state must survive derived-state deletion", "role": "orchestrator", "session": "S-probe", "updated_at": "2026-09-19T04:40:58Z", "writes_frozen": true}, "allowed_while_frozen": [{"operation": "pause", "reason": "emergency control (framework \u00a774): the human can always escalate a freeze to a pause"}, {"operation": "freeze writes", "
+[A] differences vs pre-deletion snapshot: {"plugin_registry": [["logging-reranker"], null]}
+plugin registrations before/after: ['logging-reranker'] None
+python-ast standing after rebuild: ['logging-reranker'] denied: []
+$ gov --role orchestrator memory query 'reconciliation procedure' --k 3  -> exit 1 ok=False error={"code": "PLUGIN_PIN_MISMATCH", "message": "plugin 'logging-reranker' is declared but not usable: plugin 'logging-reranker' implementation does not match its declared pin (sha256 6b9ce14088ed5fc2d425bc2614ac6b10d039b6e43857e4a8588c13d48e655867); re-register after review", "details": {"plugin_id": "logging-reranker", "capability": "rerank", "version": "1", "source": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar0024/audit-private/ap-shim-beta-r-D6-rebuild-guarantee-ecD8wI/d6/governance/project/plugins/logging-reranker.yaml", "code
+reranker implementation edited after registry deletion -> query: False PLUGIN_PIN_MISMATCH
+$ gov --role orchestrator memory query 'reconciliation procedure' --k 3  -> exit 1 ok=False error={"code": "PLUGIN_PIN_MISMATCH", "message": "plugin 'logging-reranker' is declared but not usable: plugin 'logging-reranker' implementation does not match its declared pin (sha256 6b9ce14088ed5fc2d425bc2614ac6b10d039b6e43857e4a8588c13d48e655867); re-register after review", "details": {"plugin_id": "logging-reranker", "capability": "rerank", "version": "1", "source": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar0024/audit-private/ap-shim-beta-r-D6-rebuild-guarantee-ecD8wI/d6/governance/project/plugins/logging-reranker.yaml", "code
+same edit with the registry restored from Git -> query: False PLUGIN_PIN_MISMATCH
+[FAIL] D6-b2-A-registry: the OS-written plugin registry (the only proof of registration, TOOL_POLICY.plugins.registry_path) survives deletion of generated views
+[PASS] D6-b2-A-pin: a tampered pinned plugin still fails closed after the registry is lost (the descriptor carries the pin written at registration)
+docs/ARCHITECTURE.md §4 states: ['`archive/`. Everything in `.governance-runtime/` is derived and rebuildable (`gov rebuild-memory`); the tracked']
+[PASS] D6-b1: all derived memory/index state (SQLite/FTS/vector/graph, manifests, generated views) can be deleted and rebuilt
+[PASS] D6-b2-A: after deleting framework §19 derived state: authoritative records, claims, emergency control state and governed status are preserved
+[PASS] D6-b1-identical: the rebuilt index is identical (manifest hash, derived-store content, retrieval answers)
+
+====================================================================================================
+D6-B delete the whole .governance-runtime/ (contract class `derived`)
+====================================================================================================
+REPOSITORY_CONTRACT rule for the runtime directory: [{'pattern': '.governance-runtime/**', 'class': 'derived', 'semantic_index': False, 'lexical_index': False, 'graph_index': False, 'namespace': 'runtime'}]
+runtime directory contents before deletion: ['.governance-runtime/claims.db', '.governance-runtime/control.json', '.governance-runtime/health', '.governance-runtime/plugins', '.governance-runtime/state.db', '.governance-runtime/tasks', '.governance-runtime/telemetry']
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+gov rebuild-memory -> True None
+[B] differences vs pre-deletion snapshot: {"claims": [[["TASK-0001", "S-probe"]], []], "control": [{"mode": "RUNNING", "writes_frozen": true}, {"mode": "RUNNING", "writes_frozen": false}]}
+[FAIL] D6-b2-B: deleting the directory the product itself classifies as derived preserves claims and emergency control state
+$ gov --role orchestrator resume  -> exit 0 ok=True
+
+====================================================================================================
+D6-b3 fresh-agent reconstruction after rebuild
+====================================================================================================
+fresh session gov status: {'records': 19, 'next_task': 'TASK-0001', 'runnable': ['TASK-0001'], 'counts': {'total': 2, 'runnable': 1, 'blocked': 1, 'waiting_human': 0, 'done': 0, 'open': 2}, 'gates': ['HDG-0001', 'HDG-0002'], 'open_cits': ['CIT-0001'], 'latest_checkpoint': 'CKPT-00001', 'index_fresh': True, 'next_action': 'present human gate "HDG-0001" in chat (`gov gate present "HDG-0001"`), continue independent runnable work'}
+$ gov --role orchestrator continue  -> exit 0 ok=True
+fresh session gov continue -> True NEXT_WORK TASK-0001 None
+[PASS] D6-b3: a fresh agent (no prior conversation) reconstructs the same governed state (records, gates, open CITs, checkpoint, runnable work) after the rebuild
+
+====================================================================================================
+D6-B consequences (run after the fresh-agent check so they do not perturb it)
+====================================================================================================
+$ gov --role orchestrator task claim TASK-0001  -> exit 0 ok=True
+after runtime deletion, another session claims the previously claimed task: True None
+$ gov --role orchestrator task create --class implementation --objective 'write under freeze' --allowed src/**  -> exit 4 ok=False error={"code": "FROZEN", "message": "writes are frozen (FREEZE_WRITES active); 'task create' refused. Run `gov resume` (L4) to lift.", "details": {"operation": "task create", "control": {"agents_cancelled": false, "mode": "RUNNING", "reason": "re-freeze to show the gate would have applied", "role": "orchestrator", "session": "S-probe", "updated_at": "2026-09-19T04:41:03Z", "writes_frozen": true}, "allowed_while_frozen": [{"operation": "pause", "reason": "emergency control (framework \u00a774): the human can always escalate a freeze to a pause"}, {"operation": "freeze writes", "reason": "emergency co
+with control.json present, a mutating command under freeze -> FROZEN
+
+====================================================================================================
+D6-b4 multi-machine / path-independent determinism
+====================================================================================================
+same path, two consecutive full rebuilds: manifest hashes equal: True
+$ gov --role orchestrator doctor  -> exit 0 ok=True
+machine B (different absolute path) gov doctor -> DEGRADED
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+machine B rebuild -> True None 
+manifest hash machine A: aa3f33a23bcfc4c82ee93eb2ddf0f945fcf7bf2c902e431ea107c053da7e228b machine B: aa3f33a23bcfc4c82ee93eb2ddf0f945fcf7bf2c902e431ea107c053da7e228b
+derived-store content A vs B: IDENTICAL
+chunks in machine B's index containing machine A's absolute path: 1
+[PASS] D6-b4: rebuilds are deterministic at the same path and at a different absolute path (identical manifest hash and derived content)
+
+=== SUMMARY ===
+FAIL  D6-b2-A-registry  the OS-written plugin registry (the only proof of registration, TOOL_POLICY.plugins.registry_path) survives deletion of generated views
+PASS  D6-b2-A-pin  a tampered pinned plugin still fails closed after the registry is lost (the descriptor carries the pin written at registration)
+PASS  D6-b1  all derived memory/index state (SQLite/FTS/vector/graph, manifests, generated views) can be deleted and rebuilt
+PASS  D6-b2-A  after deleting framework §19 derived state: authoritative records, claims, emergency control state and governed status are preserved
+PASS  D6-b1-identical  the rebuilt index is identical (manifest hash, derived-store content, retrieval answers)
+FAIL  D6-b2-B  deleting the directory the product itself classifies as derived preserves claims and emergency control state
+PASS  D6-b3  a fresh agent (no prior conversation) reconstructs the same governed state (records, gates, open CITs, checkpoint, runnable work) after the rebuild
+PASS  D6-b4  rebuilds are deterministic at the same path and at a different absolute path (identical manifest hash and derived content)
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar0024/audit-private/ap-shim-beta-r-D6-rebuild-guarantee-ecD8wI
+[exit=0]

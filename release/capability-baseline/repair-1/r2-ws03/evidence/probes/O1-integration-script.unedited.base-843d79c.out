@@ -1,0 +1,9 @@
+## P2-AR-0024: the integration builder's O-1 reproduction script, run UNEDITED, NEGATIVE CONTROL: round-1 integrated binary (843d79c) 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar0024/bin/gov-base-843d79c
+init from shipped 4.1.4: True
+refused overlay keys on the 4.1.4 kernel: ['PROJECT_POLICY.project.name', 'PROJECT_POLICY.project.alias', 'PROJECT_POLICY.project.created', 'PROJECT_POLICY.project.onboarding_mode', 'MODEL_ROUTING_OVERRIDES.schema_version', 'MODEL_ROUTING_OVERRIDES.providers', 'MODEL_ROUTING_OVERRIDES.preferences.prefer_lowest_cost_meeting_tier']
+  e.g.: PROJECT_POLICY.project.name: key is not declared overridable by the kernel precedence rules (deny by default) (POLICY_PRECEDENCE mode 'immutable', rule <default>)
+doctor verdict: UNHEALTHY | D027: [('D027', False, 'critical')]
+gate HDG-0001 answered through the owner-signed channel: True
+update 4.1.4 -> shipped 4.1.5: VERIFICATION_FAILED | doctor reports critical findings after update: D027 — update rolled back
+[exit=0]

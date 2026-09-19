@@ -658,12 +658,13 @@ fn expected_for(p: &Project, data: &Value) -> human_channel::Expected {
 }
 
 /// `HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned` (a kernel switch a project may only
-/// tighten to `false`).
+/// tighten to `false`). P2-ADJ-0001: off unless the verified kernel explicitly turns it on — a kernel that predates
+/// the key (the shipped 4.1.4/4.1.5) does not declare it, and its silence never enables a second authority domain.
 pub fn standalone_anchor_allowed(p: &Project) -> bool {
     p.policies().get_bool(
         "HUMAN_GATE_POLICY",
         "human_channel.standalone_anchor_when_unprovisioned",
-        true,
+        false,
     )
 }
 

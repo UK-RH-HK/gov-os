@@ -16,6 +16,10 @@ fn greenfield_end_to_end() {
         "Append-only order ledger with totals",
     ]);
     assert_eq!(r["version"], gov_runtime::VERSION);
+    // P2-ADJ-0001 / OWNER-DECISION-P2-0002 (round 2, P2-AR-0024): provision, then work. Human answers derive from a
+    // provisioned root's `human-gate` delegation, so this machine is provisioned (throw-away test root) and its kernel
+    // verified before any work is claimed
+    crate::ws03::human_channel(&g);
     for f in [
         "governance/framework.lock",
         "governance/kernel/KERNEL_MANIFEST.json",
