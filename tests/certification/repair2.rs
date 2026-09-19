@@ -1249,18 +1249,45 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     // Round-2 integration (P2-AR-0032): this machine is provisioned (WS-8 harness), so D032 (installation release
     // authenticity, P2-AR-0023) must pass here like every other structural check — its temporary unprovisioned-machine
     // allowance is removed
+    // BC-P2-44 (P2-AR-0033): D035 is not a structural check — it carries the repository verdict (the thirteen HEALTHY
+    // conditions from the governance-suite outcomes, and the Gate U SLOs). After the chain the only conditions it may
+    // name are H10 (the same currency prompt as D021) and H5 (retrieval: this fixture's held-out set has too few
+    // queries to measure recall, which the suite reports as UNMEASURED); every structural check must pass.
     let doc = g.ok(&["doctor"]);
     let failed: Vec<String> = doc["checks"]
         .as_array()
         .unwrap()
         .iter()
-        .filter(|c| c["ok"] == false)
+        .filter(|c| c["ok"] == false && c["id"] != "D035")
         .map(|c| c["id"].as_str().unwrap().to_string())
         .collect();
     assert!(
         failed.iter().all(|c| c == "D021"),
         "unexpected doctor failures after the 4.1.2 -> 4.1.3 -> 4.1.4 chain: {failed:?}"
     );
+    let d35 = doc["checks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["id"] == "D035")
+        .unwrap();
+    if d35["ok"] == false {
+        let conds: Vec<&str> = d35["repository"]["failing_conditions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|c| c.as_str())
+            .collect();
+        assert!(
+            conds.iter().all(|c| *c == "H5" || *c == "H10")
+                && d35["repository"]["crossed_slos"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|x| x["owner"] != "health_slos"),
+            "D035 after the chain: {d35}"
+        );
+    }
     // rollback 4.1.4 -> 4.1.3 leaves a ledger entry and consumes its snapshot; then 4.1.3 -> 4.1.2; then nothing left.
     // On a provisioned machine each rollback is below the protected release high-water, so it is refused without,
     // and admitted with, an owner-signed break-glass authorisation (ARCH-0003 §7; OWNER-DECISION-0006).

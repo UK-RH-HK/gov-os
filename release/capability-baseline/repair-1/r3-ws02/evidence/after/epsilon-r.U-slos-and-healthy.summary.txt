@@ -1,0 +1,85 @@
+##### after epsilon-r.U-slos-and-healthy.out
+== baseline
+   doctor DEGRADED: D032:medium
+   audit  HEALTHY: 
+== SLO-1 governance-suite freshness | computed doctor D021 (doctor.rs:567-585) | threshol
+   doctor DEGRADED: D021:medium, D032:medium
+   audit  HEALTHY: 
+== SLO-2 product-test health | computed only by gov verify product (verification/mod.rs:9
+   doctor UNHEALTHY: D021:medium, D030:high, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: product_test_health:high
+== SLO-3 retrieval Recall@K | computed retrieval::run_heldout_with | threshold MEMORY_POL
+== SLO-4 stale-index count | computed memory::manifest::freshness | threshold doctor D010
+   doctor DEGRADED: D010:medium, D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: index_freshness:medium
+== SLO-5 orphan-graph count | computed graph::orphan_nodes (shown in D015 message / graph
+   doctor UNHEALTHY: D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: health_slos:medium, research_experiment_data_lifecycle:medium, schema_invariants:high
+== SLO-6 unresolved contradictions | computed doctor D014 + schema_invariants supersessio
+   doctor UNHEALTHY: D014:high, D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: schema_invariants:high
+== SLO-7 unresolved human gates | computed gates::pending | threshold: D019 only for UNPR
+   doctor DEGRADED: D032:medium
+   audit  HEALTHY: 
+== SLO-8 task traceability % | computed product_traceability detail.task_traceability | t
+   doctor DEGRADED: D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: health_slos:medium
+== SLO-9 feature readiness coverage | computed orchestration::readiness::evaluate (gov st
+   doctor DEGRADED: D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: health_slos:medium
+== SLO-10 context packet size | computed context::compile (chars) + fresh_agent_reconstru
+   doctor DEGRADED: D032:medium, D035:medium
+   audit  DEGRADED: health_slos:medium
+== SLO-11 tokens / completed task | not computed anywhere
+== SLO-12 first-pass completion | computed observability::summary.first_pass_completion_r
+   doctor DEGRADED: D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: health_slos:medium
+== SLO-13 handoff failure | no rate computed; authority-violating returns → mutation_scop
+   doctor DEGRADED: D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: health_slos:medium
+   doctor DEGRADED: D021:medium, D032:medium, D035:medium
+   audit  UNHEALTHY: health_slos:medium, mutation_scope:high
+== SLO-14 memory rebuild success | computed recovery_rebuild (tracked vs live; --deep: tw
+   doctor DEGRADED: D009:medium, D032:medium
+   audit  DEGRADED: context_reproducibility:medium, graph_integrity:medium, index_content_coverage:medium, memory_retrieval_regression:medium, recovery_rebuild:medium, secrets_sensitivity_indexing:medium
+== SLO-15 fresh-agent reconstruction success | computed fresh_agent_reconstruction (reads
+   doctor DEGRADED: D021:medium, D032:medium
+   audit  DEGRADED: fresh_agent_reconstruction:medium
+== H1 authority unambiguous — superseded decision still ACTIVE (see SLO-6) and duplicate 
+   doctor UNHEALTHY: D010:medium, D014:high, D015:medium, D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: graph_integrity:medium, index_freshness:medium, schema_invariants:high
+== H2 no accidental legacy authority — a provider rules file appears in the active tree
+   doctor UNHEALTHY: D013:high, D021:medium, D032:medium, D035:high
+   audit  UNHEALTHY: legacy_authority:high
+== H3 deterministic state consistent — an unparsable record; an interrupted CIT
+   doctor UNHEALTHY: D021:medium, D031:high, D032:medium, D035:high, D023:high
+   audit  UNHEALTHY: schema_invariants:high
+== H4 graph/index freshness passes — dangling edge
+   doctor DEGRADED: D015:medium, D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: graph_integrity:medium
+== H5 retrieval meets thresholds — see SLO-3; doctor alone:
+   doctor DEGRADED: D021:medium, D032:medium
+   audit  UNHEALTHY: memory_retrieval_regression:high
+== H6 sensitive material isolated — secret in product source
+   doctor UNHEALTHY: D011:critical, D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: lineage_orphans:medium, path_map_compliance:critical
+== H7 feature readiness explicit — (a) feature with no readiness field; (b) readiness: {}
+   doctor UNHEALTHY: D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: feature_readiness:medium, health_slos:medium, schema_invariants:high
+   doctor DEGRADED: D021:medium, D032:medium, D035:medium
+   audit  DEGRADED: feature_readiness:medium, health_slos:medium
+== H8 task runnable/blocked state correct — dependency cycle
+   doctor UNHEALTHY: D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: graph_integrity:high
+== H9 tests/traceability satisfy policy — (a) DONE without report; (b) failing product su
+   doctor DEGRADED: D021:medium, D032:medium
+   audit  DEGRADED: product_traceability:medium
+== H10 governance suite current/green — see SLO-1 (doctor D021 only; audit cannot see it)
+== H11 no unresolved critical audit finding — (a) the suite's own persisted critical find
+   doctor UNHEALTHY: D021:medium, D031:high, D032:medium, D035:high
+   doctor UNHEALTHY: D021:medium, D031:high, D032:medium, D035:high
+   audit  UNHEALTHY: unresolved_audit_findings:high
+== H12 fresh strong agent reconstructs state within budget — see SLO-15 (proxy: count of 
+== H13 derived memory rebuildable — see SLO-14 (D009) and O2-governance-families.out 14/1
+== Aggregation: is any single verdict the conjunction of all 13 conditions?
+   audit  UNHEALTHY: memory_retrieval_regression:high

@@ -34,10 +34,46 @@ impl GovError {
             | "VERDICT_REQUIRED"
             | "FROZEN"
             | "PAUSED"
-            // a governed operation refused by an active health hard-block (scheduler G0 guard) is the same
-            // "blocked" class as emergency controls and unanswered gates (API-0002; IP-WS02-10)
-            | "HEALTH_HARD_BLOCK" => 4,
+            // a governed operation refused by an active health hard-block (scheduler G0 guard), or a remedy that
+            // did not clear the block it was admitted under, is the same "blocked" class as emergency controls and
+            // unanswered gates (API-0002; IP-WS02-10)
+            | "HEALTH_HARD_BLOCK"
+            | "HEALTH_REMEDY_INCOMPLETE"
+            // blocked by a Human Decision Gate (API-0002 exit 4 "blocked by ... human gate"; WS-5 IP-R3-7): the
+            // work's governing gate does not authorise it, is not answered yet, or was declined
+            | "GATE_NOT_AUTHORISED"
+            | "GATE_NOT_ANSWERED"
+            | "GATE_DECLINED" => 4,
             _ => 1,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn blocked_class_codes_exit_4() {
+        for c in [
+            "FROZEN",
+            "PAUSED",
+            "HUMAN_GATE_REQUIRED",
+            "HEALTH_HARD_BLOCK",
+            "HEALTH_REMEDY_INCOMPLETE",
+            "GATE_NOT_AUTHORISED",
+            "GATE_NOT_ANSWERED",
+            "GATE_DECLINED",
+        ] {
+            assert_eq!(GovError::new(c, "x").exit_code(), 4, "{c}");
+        }
+        // governance errors that are not a control-state or human-gate block stay in class 1
+        for c in [
+            "TASK_NOT_READY",
+            "CLAIM_BASELINE_UNBOUND",
+            "RECEIPT_INVALID",
+        ] {
+            assert_eq!(GovError::new(c, "x").exit_code(), 1, "{c}");
         }
     }
 }

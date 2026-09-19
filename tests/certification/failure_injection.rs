@@ -336,5 +336,46 @@ fn injected_failures_are_detected_and_recovered() {
         "INV_014"
     );
     g.ok(&["rebuild-memory"]);
-    assert_ne!(doctor_verdict(&g), "UNHEALTHY");
+    // BC-P2-44 (P2-AR-0033): the doctor verdict is HEALTHY only when the repository verdict is — D035 carries the
+    // thirteen HEALTHY conditions (Contract v3:995-1008) from the governance-suite outcomes and the Gate U SLOs. Every
+    // doctor check of its own has recovered (the property this scenario asserted before); what is left unhealthy is
+    // what the scenario injected and never undid — the task depending on the missing TASK-9999 (step 9), which makes
+    // the task DAG incorrect (H8, graph_integrity) — and D035 names it instead of reporting HEALTHY. The doctor now
+    // observes the mutations made since the last health run first (G1, BC-P2-07), so the hard-block that finding
+    // holds (subject-scoped: it refuses claiming or closing the tasks it names) is current and D031 names it too.
+    let d = g.run(&["doctor"]);
+    let rep = if d.ok() { d.result() } else { d.details() };
+    let checks = rep["checks"].as_array().unwrap();
+    let unhealthy: Vec<&str> = checks
+        .iter()
+        .filter(|c| c["ok"] == false && (c["severity"] == "high" || c["severity"] == "critical"))
+        .map(|c| c["id"].as_str().unwrap())
+        .collect();
+    assert!(
+        unhealthy.iter().all(|c| *c == "D035" || *c == "D031"),
+        "only the repository conjunction and the suite's active hard-block may remain unhealthy: {unhealthy:?}"
+    );
+    if let Some(d31) = checks
+        .iter()
+        .find(|c| c["id"] == "D031" && c["ok"] == false)
+    {
+        assert!(
+            d31["message"].as_str().unwrap().contains("graph_integrity"),
+            "{d31}"
+        );
+    }
+    let d35 = checks.iter().find(|c| c["id"] == "D035").unwrap();
+    assert_eq!(d35["ok"], false, "{d35}");
+    assert!(
+        d35["repository"]["failing_conditions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|c| c == "H8"),
+        "the unrecovered missing dependency fails H8: {d35}"
+    );
+    assert!(
+        d35["message"].as_str().unwrap().contains("graph_integrity"),
+        "{d35}"
+    );
 }

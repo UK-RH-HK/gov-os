@@ -103,7 +103,42 @@ pub fn human_gate_integrity(store: &RecordStore, f: &mut Family) {
             _ => {}
         }
     }
-    f.detail = json!({"pending": pending, "answered": answered});
+    // G3 (Contract v3:796 "claims/decisions/gates"): work claimed or in progress on a task an unanswered gate blocks
+    // (the gate lists it in `blocks_tasks`, or the task names the gate) — handing it off or checkpointing it carries
+    // work the human has not authorised yet (medium; closing it is refused by the gate itself)
+    let mut held = vec![];
+    for g in store.of_type("human-gate") {
+        if !matches!(g.get("gate_status").as_str(), "PENDING" | "PRESENTED") {
+            continue;
+        }
+        let mut tasks: BTreeSet<String> = g.list("blocks_tasks").into_iter().collect();
+        for t in store.of_type("task") {
+            if t.get("human_gate") == g.id() {
+                tasks.insert(t.id());
+            }
+        }
+        for t in tasks {
+            if let Some(task) = store.get(&t) {
+                let st = task.get("task_status");
+                if matches!(st.as_str(), "CLAIMED" | "IN_PROGRESS" | "REVIEW") {
+                    held.push(t.clone());
+                    let mut x = finding(
+                        "medium",
+                        &fam,
+                        format!(
+                            "{t} is {st} while {} (which blocks it) is still {}: work is in progress, and may be handed off or checkpointed, without the human decision it waits on",
+                            g.id(),
+                            g.get("gate_status")
+                        ),
+                        Some(task.path.clone()),
+                    );
+                    x["subjects"] = json!([t, g.id()]);
+                    f.findings.push(x);
+                }
+            }
+        }
+    }
+    f.detail = json!({"pending": pending, "answered": answered, "work_in_progress_on_unanswered_gates": held});
 }
 
 /// K: no CIT left EXECUTING; a COMMITTED CIT carries its approval and, where a human gate was required, that gate is
@@ -219,8 +254,41 @@ pub fn continuity_checkpoint_handoff(p: &Project, store: &RecordStore, f: &mut F
             )),
         }
     }
-    f.detail =
-        json!({"handoffs": handoffs.len(), "checkpoints": checkpoints.len(), "latest": pointer});
+    // G3 checkpoint freshness (Contract v3:796, W12 :1189; WS-4 R2-7): the latest checkpoint still describes the
+    // material state it captured. A stale latest checkpoint is disclosed; when it is the resume point of work in
+    // progress (its task is claimed) a fresh agent resuming from it would reconstruct stale inputs — medium.
+    let mut freshness = Value::Null;
+    if !checkpoints.is_empty() {
+        if let Ok(fr) = crate::checkpoints::freshness(p, None) {
+            if fr["state"] == "STALE" {
+                let ck = fr["checkpoint"].as_str().unwrap_or("?").to_string();
+                let task = store.get(&ck).map(|c| c.get("task")).unwrap_or_default();
+                let live = store
+                    .get(&task)
+                    .map(|t| {
+                        matches!(
+                            t.get("task_status").as_str(),
+                            "CLAIMED" | "IN_PROGRESS" | "REVIEW"
+                        )
+                    })
+                    .unwrap_or(false);
+                let mut x = finding(
+                    if live { "medium" } else { "low" },
+                    &fam,
+                    format!(
+                        "latest checkpoint {ck} is STALE: the material state it captured changed since ({}){}",
+                        fr["reasons"].as_array().map(|a| a.iter().map(|r| r["kind"].as_str().unwrap_or("?").to_string()).collect::<Vec<_>>().join(", ")).unwrap_or_default(),
+                        if live { format!("; it is the resume point of {task}, which is in progress — take a new checkpoint (`gov checkpoint create`)") } else { String::new() }
+                    ),
+                    store.get(&ck).map(|c| c.path.clone()),
+                );
+                x["subjects"] = json!([ck, task]);
+                f.findings.push(x);
+            }
+            freshness = json!({"checkpoint": fr["checkpoint"], "state": fr["state"], "reasons": fr["reasons"], "stale_checkpoints": fr["stale_checkpoints"]});
+        }
+    }
+    f.detail = json!({"handoffs": handoffs.len(), "checkpoints": checkpoints.len(), "latest": pointer, "latest_freshness": freshness});
 }
 
 fn tier_rank(t: &str) -> Option<u8> {

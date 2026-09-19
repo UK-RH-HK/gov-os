@@ -38,6 +38,16 @@ pub enum Extra {
     ContractSource,
     /// The commits that define the governance baseline (version-control history, not tree content).
     GovernanceBaseline,
+    /// This project's execution telemetry and routing evidence (`.governance-runtime/telemetry/events.jsonl`,
+    /// `.governance-runtime/routing/evidence.jsonl`): tokens, handoffs, retries.
+    Telemetry,
+    /// The context packets delivered to workers (`.governance-runtime/context/*.json`).
+    ContextPackets,
+    /// The current UTC hour: a result that depends on elapsed time (the age of an open human gate) is re-computed at
+    /// least hourly.
+    ClockHour,
+    /// The G6 qualification runs recorded on this machine (their measured metrics, e.g. orphan-detection recall).
+    Qualifications,
 }
 
 /// Where the check may run.
@@ -70,8 +80,9 @@ pub enum Cache {
     Never,
 }
 
-/// Governed operations a hard-block can refuse. The remedies (doctor, audit, health, recover, rebuild-memory,
-/// resume/pause/freeze, kernel reinstall/verify, gate present/answer, checkpoint) are never in this vocabulary.
+/// Governed operations a hard-block can refuse. The remedies that are never refused (doctor, audit, health, recover,
+/// rebuild-memory, resume/pause/freeze, kernel reinstall/verify, gate present/answer, checkpoint, `update --rollback`,
+/// direct repair of a file) are never in this vocabulary.
 pub mod ops {
     pub const TASK_CREATE: &str = "task.create";
     pub const TASK_CLAIM: &str = "task.claim";
@@ -95,6 +106,27 @@ pub mod ops {
         UPDATE_APPLY,
         ADOPT_MIGRATE,
     ];
+    /// Operations that **commit** a change the repository then relies on. A remedy admission of one of these carries
+    /// an obligation: the host confirms that the blocks it was admitted under are cleared after it applied its change
+    /// and before it commits (`scheduler::confirm_remedy`), and rolls back otherwise. The other operations only start,
+    /// hand off or propose work; nothing relies on the blocked state when they run, so a remedy admission of one of
+    /// them carries no obligation (the commit step is itself guarded).
+    pub const COMMITTING: &[&str] = &[
+        TASK_CLOSE,
+        CIT_EXECUTE,
+        RELEASE_BUILD,
+        UPDATE_APPLY,
+        ADOPT_MIGRATE,
+    ];
+    /// What `update --apply` changes: its subjects for admission (`scheduler::Request`). An update is the remedy of
+    /// a condition in the kernel, the lock, the overlay its migrations may add to, or the views it regenerates.
+    pub const UPDATE_SUBJECTS: &[&str] = &[
+        "governance/kernel/**",
+        "governance/framework.lock",
+        "governance/project/**",
+        "governance/generated/**",
+        "framework.json",
+    ];
 }
 
 /// Every governed-work operation: a critical integrity failure refuses all of them.
@@ -107,21 +139,76 @@ pub const RELY_ON_STATE: &[&str] = &[
     ops::UPDATE_APPLY,
 ];
 
-/// How a failure is scoped when it blocks.
+/// The remedies of a condition in named records or files: the change transaction that edits, retires or replaces
+/// them — proposed, approved and executed on exactly those subjects. (Starting, claiming or handing off work is never
+/// refused by a block that does not govern the whole repository, so it needs no remedy admission; under a critical
+/// block the repository is unreliable as a whole and only a change on the named subjects, an update, or a direct
+/// repair proceeds.)
+pub const WORK_REMEDIES: &[&str] = &[ops::CIT_PROPOSE, ops::CIT_APPROVE, ops::CIT_EXECUTE];
+/// [`WORK_REMEDIES`] plus `update --apply` (the remedy of a condition in the kernel, lock or overlay).
+pub const ALL_REMEDIES: &[&str] = &[
+    ops::CIT_PROPOSE,
+    ops::CIT_APPROVE,
+    ops::CIT_EXECUTE,
+    ops::UPDATE_APPLY,
+];
+
+/// **Block scope** (Contract v3 L4 "Independent runnable branches continue. Global stop only when policy or
+/// critical-path state requires"; O5 :807 "hard-block vs warning semantics are explicit"). A hard-block refuses the
+/// operations whose reliance it protects, **scoped to what the failing check governs**.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlockScope {
-    /// Every invocation of the listed operations.
+    /// Every invocation of the listed operations: the failing check governs the whole repository (kernel integrity,
+    /// secret leakage, policy precedence, an interrupted transaction, a release or update relying on everything).
     Global,
     /// Only invocations whose paths intersect the failing finding's `covers` globs (product-test families).
     CoveredPaths,
+    /// Only invocations whose **subjects** (the records and paths the operation starts, hands off, completes or
+    /// changes) reach the failing finding's subjects (the records and paths it names; a finding that names none is
+    /// scoped to the paths its check reads). Work on anything else stays available. An invocation that names no
+    /// subjects is judged as a whole, where subject-scoped blocks cannot be decided: they are decided where the
+    /// subjects are known (e.g. `verification::close_gate` names the closing task, its inputs and touched paths).
+    Subjects,
 }
 
-/// A hard-block rule: findings at or above `min_severity` refuse `operations`.
+impl BlockScope {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            BlockScope::Global => "global",
+            BlockScope::CoveredPaths => "covered-paths",
+            BlockScope::Subjects => "subjects",
+        }
+    }
+}
+
+/// A hard-block rule: findings at or above `min_severity` refuse `operations` within `scope`, and admit `remedies`.
+///
+/// **Remedy semantics** (the availability rule, P2-HO-0031): an operation in `remedies` whose subjects reach the
+/// block's subjects — the records and paths it *changes* — is the work that repairs the condition, and it stays
+/// available under the block. A remedy that
+/// commits (`ops::COMMITTING`) commits only if the block is cleared once its change is applied (the host confirms,
+/// `scheduler::confirm_remedy`, and rolls back otherwise); nothing commits under a block it does not clear. An
+/// operation that is not a remedy, or whose subjects do not reach the block, is refused wherever the scope applies.
 #[derive(Debug, Clone, Copy)]
 pub struct BlockRule {
     pub min_severity: &'static str,
     pub operations: &'static [&'static str],
     pub scope: BlockScope,
+    pub remedies: &'static [&'static str],
+}
+
+const fn rule(
+    min_severity: &'static str,
+    operations: &'static [&'static str],
+    scope: BlockScope,
+    remedies: &'static [&'static str],
+) -> BlockRule {
+    BlockRule {
+        min_severity,
+        operations,
+        scope,
+        remedies,
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -141,7 +228,10 @@ pub struct CheckDef {
 }
 
 /// Classes every check reads implicitly: the implementation, the constitutional policy/schema payload and the lock,
-/// and the project policy overlay (effective policy = kernel + overlay).
+/// the project policy overlay (effective policy = kernel + overlay), and this machine's trust state — whether the
+/// installed kernel is verified decides which payload the effective policy is read from (`PolicySet::load` reads
+/// `kernel_trust::trust(..).policy_root`: the installed kernel, or the embedded baseline), so a provisioning,
+/// installation or revocation re-evaluates what was judged under the previous trust state.
 pub const IMPLICIT_DEPS: &[&str] = &[
     currency::RUNTIME_IDENTITY,
     "kernel_policy",
@@ -149,6 +239,7 @@ pub const IMPLICIT_DEPS: &[&str] = &[
     "kernel_other",
     "framework_lock",
     "project_policy",
+    currency::MACHINE_TRUST,
 ];
 
 const KERNEL: &[&str] = &[
@@ -205,16 +296,58 @@ pub fn expand_deps(def: &CheckDef) -> Vec<&'static str> {
     out
 }
 
-const CRIT_ALL: BlockRule = BlockRule {
-    min_severity: "critical",
-    operations: GOVERNED_WORK,
-    scope: BlockScope::Global,
-};
-const HIGH_RELY: BlockRule = BlockRule {
-    min_severity: "high",
-    operations: RELY_ON_STATE,
-    scope: BlockScope::Global,
-};
+/// The paths a check governs: the path patterns of the input classes it **declares** (not the implicit ones every
+/// check reads). The subjects of a blocking finding that names no record or path of its own.
+pub fn governed_paths(def: &CheckDef) -> Vec<String> {
+    let mut declared: Vec<&'static str> = vec![];
+    for d in def.deps {
+        match *d {
+            "@kernel" => declared.extend_from_slice(KERNEL),
+            "@overlay" => declared.extend_from_slice(OVERLAY),
+            "@records" => declared.extend_from_slice(RECORDS),
+            "@files" => return vec!["**".to_string()],
+            other => declared.push(other),
+        }
+    }
+    if declared.is_empty() {
+        declared.extend_from_slice(IMPLICIT_DEPS);
+    }
+    let mut out: Vec<String> = vec![];
+    for c in declared {
+        if c == currency::SOURCE {
+            return vec!["**".to_string()];
+        }
+        if let Some(cd) = currency::PATH_CLASSES.iter().find(|x| x.id == c) {
+            out.extend(cd.patterns.iter().map(|s| s.to_string()));
+        }
+    }
+    out.sort();
+    out.dedup();
+    out
+}
+
+/// A critical integrity failure refuses every governed operation (the whole repository is unreliable), except the
+/// work that repairs exactly what it names.
+const CRIT_ALL: BlockRule = rule("critical", GOVERNED_WORK, BlockScope::Global, ALL_REMEDIES);
+/// A high finding about named records or files refuses the work that relies on them (closing a task whose inputs,
+/// outputs or record it names; executing a change on them), except the work that repairs them.
+const HIGH_RELY_WORK: BlockRule = rule(
+    "high",
+    &[ops::TASK_CLOSE, ops::CIT_EXECUTE],
+    BlockScope::Subjects,
+    WORK_REMEDIES,
+);
+/// Shipping and upgrading rely on the whole repository; an update is admitted when it is the remedy (the condition
+/// is in what it changes: kernel, lock, overlay, generated views) and must then clear it before it commits.
+const HIGH_RELY_SHIP: BlockRule = rule(
+    "high",
+    &[ops::RELEASE_BUILD, ops::UPDATE_APPLY],
+    BlockScope::Global,
+    &[ops::UPDATE_APPLY],
+);
+/// A release relies on the whole repository.
+const HIGH_SHIP: BlockRule = rule("high", &[ops::RELEASE_BUILD], BlockScope::Global, &[]);
+const HIGH_RELY: [BlockRule; 2] = [HIGH_RELY_WORK, HIGH_RELY_SHIP];
 
 use Tier::*;
 
@@ -231,28 +364,34 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::DoubleRun,
         cache: Cache::Cacheable,
         tiers: &[G1, G2, G4, G5, G6],
-        blocks: &[CRIT_ALL, HIGH_RELY],
+        blocks: &[CRIT_ALL, HIGH_RELY[0], HIGH_RELY[1]],
     },
     CheckDef {
         id: "graph_integrity",
         surface: Surface::Family,
-        duty: "relationship graph (dangling edges), records outside their canonical location (W1), stale lineage links (W8), task DAG (cycles, missing dependencies, `blocks` naming no task)",
-        deps: &["@records", "index_manifest"],
+        duty: "relationship graph (orphan, dangling, stale, reversed, ill-typed relationships and supersession cycles: memory::integrity), records outside their canonical location (W1), stale lineage links (W8), task DAG (cycles, missing dependencies, `blocks` naming no task)",
+        deps: &["@records", "index_manifest", "path_map"],
         extras: &[Extra::LiveIndex],
         isolation: Isolation::InProcess,
         repro: Repro::DoubleRun,
         cache: Cache::Cacheable,
         tiers: &[G1, G2, G4, G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::TASK_CLAIM, ops::TASK_CLOSE, ops::RELEASE_BUILD],
-            scope: BlockScope::Global,
-        }],
+        // a missing dependency or a cycle concerns the tasks it names: claiming or closing them (and the work that
+        // depends on them) is refused; every other task stays available (O-R2-2)
+        blocks: &[
+            rule(
+                "high",
+                &[ops::TASK_CLAIM, ops::TASK_CLOSE],
+                BlockScope::Subjects,
+                WORK_REMEDIES,
+            ),
+            HIGH_SHIP,
+        ],
     },
     CheckDef {
         id: "index_freshness",
         surface: Surface::Family,
-        duty: "tracked index manifest matches the working tree and the policy pins",
+        duty: "tracked index manifest matches the working tree and the policy pins; the live retrieval profile is governed (memory::profile)",
         deps: &["@files"],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -384,7 +523,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "recovery_rebuild",
         surface: Surface::Family,
-        duty: "tracked manifest matches the live index; deep: two full rebuilds in a sandbox reproduce the manifest hash",
+        duty: "tracked manifest matches the live index; deep: two full rebuilds in a sandbox reproduce the manifest hash; non-rebuildable OS state kept outside the derived directories (paths::misplaced_os_state)",
         deps: &["@files"],
         extras: &[Extra::LiveIndex, Extra::DeepMode],
         isolation: Isolation::Sandbox,
@@ -475,15 +614,12 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::DoubleRun,
         cache: Cache::Cacheable,
         tiers: &[G2, G4, G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::TASK_CLOSE],
-            scope: BlockScope::CoveredPaths,
-        }, BlockRule {
-            min_severity: "high",
-            operations: &[ops::RELEASE_BUILD, ops::UPDATE_APPLY],
-            scope: BlockScope::Global,
-        }],
+        // failing product tests refuse the close of the work they cover and a release; a kernel update does not rely
+        // on product behaviour (the availability rule: scoped to what the failing check governs)
+        blocks: &[
+            rule("high", &[ops::TASK_CLOSE], BlockScope::CoveredPaths, &[]),
+            HIGH_SHIP,
+        ],
     },
     CheckDef {
         id: "human_gate_integrity",
@@ -495,11 +631,10 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::DoubleRun,
         cache: Cache::Cacheable,
         tiers: &[G3, G4, G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::TASK_CLOSE, ops::RELEASE_BUILD],
-            scope: BlockScope::Global,
-        }],
+        blocks: &[
+            rule("high", &[ops::TASK_CLOSE], BlockScope::Subjects, WORK_REMEDIES),
+            HIGH_SHIP,
+        ],
     },
     CheckDef {
         id: "change_control_integrity",
@@ -511,17 +646,23 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::DoubleRun,
         cache: Cache::Cacheable,
         tiers: &[G3, G4, G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::CIT_PROPOSE, ops::CIT_EXECUTE, ops::TASK_CLOSE, ops::RELEASE_BUILD],
-            scope: BlockScope::Global,
-        }],
+        blocks: &[
+            rule(
+                "high",
+                &[ops::CIT_PROPOSE, ops::CIT_EXECUTE, ops::TASK_CLOSE],
+                BlockScope::Subjects,
+                WORK_REMEDIES,
+            ),
+            HIGH_SHIP,
+        ],
     },
     CheckDef {
         id: "continuity_checkpoint_handoff",
         surface: Surface::Family,
-        duty: "handoffs and checkpoints reference known tasks; the latest-checkpoint pointer resolves",
-        deps: &["continuity_records", "spec_tasks"],
+        duty: "handoffs and checkpoints reference known tasks; the latest-checkpoint pointer resolves; the latest checkpoint still describes the material state it captured (checkpoints::freshness)",
+        // checkpoint freshness compares the captured task inputs, pending decisions and open transactions with the
+        // records as they are now
+        deps: &["@records"],
         extras: &[],
         isolation: Isolation::InProcess,
         repro: Repro::DoubleRun,
@@ -557,23 +698,19 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "os_binding_integrity",
         surface: Surface::Family,
-        duty: "T2: gate/decision records and health evidence that no gov operation on this machine produced as they stand are reported and not honoured; tampering with sealed OS state is high",
-        deps: &["spec_decisions", "spec_tasks", currency::T2_BINDINGS],
+        duty: "T2: gate/decision records, CIT state, plugin-registry entries, the adoption baseline and health evidence that no gov operation on this machine produced as they stand are reported and not honoured; tampering with sealed OS state is high",
+        deps: &["spec_decisions", "spec_tasks", "tools_plugins", "adoption_evidence", currency::T2_BINDINGS],
         extras: &[],
         isolation: Isolation::InProcess,
         repro: Repro::SelfChecked,
         cache: Cache::Never,
         tiers: &[G1, G2, G3, G4, G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::RELEASE_BUILD],
-            scope: BlockScope::Global,
-        }],
+        blocks: &[HIGH_SHIP],
     },
     CheckDef {
         id: "installation_authenticity",
         surface: Surface::Family,
-        duty: "BC-P2-36: an installation whose release authenticity is not established is disclosed (low on an unprovisioned bootstrap machine, medium on a provisioned one)",
+        duty: "BC-P2-36: an installation whose release authenticity is not established is disclosed with its admission (low on an unprovisioned bootstrap machine, medium on a provisioned one)",
         deps: &["@kernel", currency::MACHINE_TRUST],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -592,11 +729,7 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::SelfChecked,
         cache: Cache::Cacheable,
         tiers: &[G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::RELEASE_BUILD],
-            scope: BlockScope::Global,
-        }],
+        blocks: &[HIGH_SHIP],
     },
     CheckDef {
         id: "index_content_coverage",
@@ -620,55 +753,175 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::SelfChecked,
         cache: Cache::Never,
         tiers: &[G2, G4, G5, G6],
-        blocks: &[BlockRule {
-            min_severity: "high",
-            operations: &[ops::RELEASE_BUILD],
-            scope: BlockScope::Global,
-        }],
+        blocks: &[HIGH_SHIP],
+    },
+    // ------------------------------- round-3 families: tier duties (BC-P2-07), W11 (BC-P2-23), Gate U (BC-P2-44)
+    CheckDef {
+        id: "upstream_change_propagation",
+        surface: Surface::Family,
+        duty: "G1/G4 dependency and lineage invalidation (W6, W12): authoritative inputs changed since dependent work consumed them and not yet propagated; completed work, evidence and packets invalidated by an upstream change and not yet revalidated",
+        deps: &["@records"],
+        // the consumption baseline of a task is its delivered packet, checkpoint or receipt
+        extras: &[Extra::ContextPackets],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G2, G3, G4, G5, G6],
+        // no hard-block: the close of work whose inputs changed underneath it is refused by the close host itself
+        // (`cit::propagation::require_current_inputs`, INPUTS_STALE / RETEST_EVIDENCE_REQUIRED, which also accepts a
+        // report acknowledging the current versions); a second, report-blind refusal here would duplicate it
+        blocks: &[],
+    },
+    CheckDef {
+        id: "authority_unambiguous",
+        surface: Surface::Family,
+        duty: "HEALTHY 1 / Gate U unresolved contradictions: contradictions between current authoritative records (context::contradictions) are reported by name until resolved",
+        // a contradiction is resolved only by an honoured (T2-verified, owner-signed) gate answer
+        deps: &["@records", currency::T2_BINDINGS],
+        extras: &[],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G3, G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "legacy_authority",
+        surface: Surface::Family,
+        duty: "HEALTHY 2: no legacy governance mechanism (provider rules files, legacy agent instructions) remains in the active tree without LEGACY registration",
+        deps: &["@files"],
+        extras: &[],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "feature_readiness",
+        surface: Surface::Family,
+        duty: "HEALTHY 7: every active feature states its readiness explicitly (orchestration::readiness); silent N/A and invalid cells reported",
+        deps: &["spec_requirements", "@overlay", "@kernel"],
+        extras: &[],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G2, G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "unresolved_audit_findings",
+        surface: Surface::Family,
+        duty: "HEALTHY 11: no unresolved critical finding in any current audit record other than the suite's own results (independent, adoption and imported audits)",
+        deps: &["adoption_evidence", "@records"],
+        extras: &[],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G3, G4, G5, G6],
+        blocks: &[HIGH_SHIP],
+    },
+    CheckDef {
+        id: "research_experiment_data_lifecycle",
+        surface: Surface::Family,
+        duty: "J1/J2/H4 (WS-10 lifecycle::suite_findings): research/experiment evidence complete before it is relied on or presented as evidence, influence backlinks, irreproducible experiments, scenario → data → test-data chain; experimental task output in the production tree",
+        deps: &["@records", "@files", currency::T2_BINDINGS],
+        extras: &[Extra::Claims],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G2, G4, G5, G6],
+        blocks: &[HIGH_SHIP],
+    },
+    CheckDef {
+        id: "artifact_flow_health",
+        surface: Surface::Family,
+        duty: "W11: the nine artifact-flow metrics — required-input delivery accuracy, current-version selection accuracy, superseded-input leakage rate, missing-required-input detection, staleness propagation accuracy, requirement→code and requirement→test traceability coverage, orphan-output detection recall/false positives, fresh-agent reconstruction correctness",
+        deps: &["@records", "@files"],
+        extras: &[
+            Extra::LiveIndex,
+            Extra::Claims,
+            Extra::ContextPackets,
+            Extra::Qualifications,
+        ],
+        isolation: Isolation::InProcess,
+        repro: Repro::SelfChecked,
+        cache: Cache::Cacheable,
+        tiers: &[G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "health_slos",
+        surface: Surface::Family,
+        duty: "Gate U: every framework-health SLO computed against its declared threshold (framework/health/HEALTH_SLOS.yaml); a crossed threshold is a finding unless the SLO's owning check already raises it",
+        deps: &["@files"],
+        extras: &[
+            Extra::LiveIndex,
+            Extra::Claims,
+            Extra::Telemetry,
+            Extra::ContextPackets,
+            Extra::ClockHour,
+        ],
+        isolation: Isolation::InProcess,
+        repro: Repro::SelfChecked,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G3, G4, G5, G6],
+        blocks: &[],
     },
     // ------------------------------------------------------------------------------------------ doctor checks
     doctor("D001", "framework.lock present", &["framework_lock"], &[CRIT_ALL]),
-    doctor("D002", "framework.lock schema", &["framework_lock"], &[HIGH_RELY]),
+    doctor("D002", "framework.lock schema", &["framework_lock"], &HIGH_RELY),
     doctor("D003", "kernel payload integrity", &["@kernel"], &[CRIT_ALL]),
     doctor("D004", "lock matches kernel manifest", &["@kernel"], &[CRIT_ALL]),
     doctor("D005", "CLI/kernel compatibility", &["@kernel"], &[CRIT_ALL]),
-    doctor("D006", "project overlay", &["@overlay"], &[HIGH_RELY]),
-    doctor("D007", "policies", &["@overlay"], &[HIGH_RELY]),
+    doctor("D006", "project overlay", &["@overlay"], &HIGH_RELY),
+    doctor("D007", "policies", &["@overlay"], &HIGH_RELY),
     doctor("D008", "framework.json in sync", &["path_map"], &[]),
     doctor("D009", "derived runtime", &["index_manifest"], &[]),
     doctor("D010", "index freshness", &["@files"], &[]),
     doctor("D011", "secrets outside secret class", &["@files"], &[CRIT_ALL]),
     doctor("D012", "no secrets in index", &["@files"], &[CRIT_ALL]),
     doctor("D013", "legacy governance mechanisms retired", &["@files"], &[]),
-    doctor("D014", "authority unambiguous", &["@records"], &[HIGH_RELY]),
+    doctor("D014", "authority unambiguous", &["@records"], &HIGH_RELY),
     doctor("D015", "graph integrity", &["@records"], &[]),
-    doctor("D016", "no interrupted transactions", &["spec_decisions"], &[BlockRule {
-        min_severity: "high",
-        operations: &[ops::CIT_PROPOSE, ops::CIT_EXECUTE, ops::TASK_CLOSE],
-        scope: BlockScope::Global,
-    }]),
+    // an interrupted transaction leaves the repository half-mutated: no other change transaction may start or
+    // execute (the remedy, `gov recover`, is never refused); closing work on what it touched is refused
+    doctor(
+        "D016",
+        "no interrupted transactions",
+        &["spec_decisions"],
+        &[
+            rule(
+                "high",
+                &[ops::CIT_PROPOSE, ops::CIT_EXECUTE],
+                BlockScope::Global,
+                &[],
+            ),
+            rule("high", &[ops::TASK_CLOSE], BlockScope::Subjects, &[]),
+        ],
+    ),
     doctor("D017", "session claims", &["spec_tasks"], &[]),
     doctor("D018", "control state", &["@overlay"], &[]),
     doctor("D019", "human gates presented", &["spec_decisions"], &[]),
     doctor("D020", "adapters current and conformant", &["generated_other", "@overlay"], &[]),
     doctor("D021", "governance suite green and current", &["@files"], &[]),
     doctor("D022", "native toolchains", &["source"], &[]),
-    doctor("D023", "records parse", &["@records"], &[HIGH_RELY]),
+    doctor("D023", "records parse", &["@records"], &HIGH_RELY),
     doctor("D024", ".governance-runtime ignored by git", &["source"], &[]),
-    doctor("D025", "semantic index consistent with pins", &["index_manifest"], &[]),
+    doctor("D025", "semantic index consistent with pins; retrieval profile governed; embedding runtime unchanged", &["index_manifest", "@overlay"], &[]),
     doctor("D026", "claims store present and intact", &[], &[]),
     doctor("D027", "policy precedence respected", &["@overlay"], &[CRIT_ALL]),
     doctor("D028", "capability plugins governed", &["tools_plugins"], &[]),
     doctor("D029", "constitutional policy read from a verified kernel", &["@kernel"], &[CRIT_ALL]),
-    doctor("D030", "product tests pass (recorded evidence)", &["source", "@overlay"], &[BlockRule {
-        min_severity: "high",
-        operations: &[ops::TASK_CLOSE],
-        scope: BlockScope::CoveredPaths,
-    }, BlockRule {
-        min_severity: "high",
-        operations: &[ops::RELEASE_BUILD, ops::UPDATE_APPLY],
-        scope: BlockScope::Global,
-    }]),
+    doctor(
+        "D030",
+        "product tests pass (recorded evidence)",
+        &["source", "@overlay"],
+        &[
+            rule("high", &[ops::TASK_CLOSE], BlockScope::CoveredPaths, &[]),
+            HIGH_SHIP,
+        ],
+    ),
     doctor("D031", "no active health hard-block", &[], &[]),
     doctor(
         "D032",
@@ -679,10 +932,16 @@ pub const CHECKS: &[CheckDef] = &[
     doctor(
         "D033",
         "OS-written records bound to gov operations (T2)",
-        &["spec_decisions", currency::T2_BINDINGS],
+        &["spec_decisions", "tools_plugins", "adoption_evidence", currency::T2_BINDINGS],
         &[],
     ),
     doctor("D034", "failure memory followed up", &["evidence_records"], &[]),
+    doctor(
+        "D035",
+        "repository HEALTHY: the thirteen Gate U conditions and the framework-health SLOs",
+        &["@files"],
+        &[],
+    ),
 ];
 
 const fn doctor(
@@ -733,15 +992,17 @@ pub fn rank(s: &str) -> u8 {
     severity_rank(s)
 }
 
-/// The declared enforcement of a check, as carried beside every result (`mode`: `hard-block` or `warning`).
+/// The declared enforcement of a check, as carried beside every result (`mode`: `hard-block` or `warning`), with each
+/// rule's scope and the operations it admits as remedies.
 pub fn enforcement(def: &CheckDef) -> Value {
     if def.blocks.is_empty() {
         return json!({"mode": "warning", "refuses": []});
     }
     json!({
         "mode": "hard-block",
-        "refuses": def.blocks.iter().map(|b| json!({"at_or_above": b.min_severity, "operations": b.operations, "scope": match b.scope { BlockScope::Global => "global", BlockScope::CoveredPaths => "covered-paths" }})).collect::<Vec<_>>(),
+        "refuses": def.blocks.iter().map(|b| json!({"at_or_above": b.min_severity, "operations": b.operations, "scope": b.scope.as_str(), "remedies": b.remedies})).collect::<Vec<_>>(),
         "below_threshold": "warning",
+        "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared",
     })
 }
 
@@ -772,8 +1033,12 @@ mod tests {
                 assert!(known.contains(&d), "{}: unknown class {d}", c.id);
             }
             for b in c.blocks {
-                for op in b.operations {
+                for op in b.operations.iter().chain(b.remedies.iter()) {
                     assert!(ops::ALL.contains(op), "{}: unknown operation {op}", c.id);
+                }
+                // a subject-scoped rule must say what it governs: its check declares inputs
+                if b.scope == BlockScope::Subjects {
+                    assert!(!governed_paths(c).is_empty(), "{}", c.id);
                 }
             }
         }
@@ -804,6 +1069,20 @@ mod tests {
             get("skill_regression").unwrap().isolation,
             Isolation::OwnSandboxes
         );
+    }
+
+    #[test]
+    fn committing_operations_and_update_subjects_are_known() {
+        for op in ops::COMMITTING {
+            assert!(ops::ALL.contains(op));
+        }
+        // the implicit subjects of an overlay check are the overlay's paths
+        let d006 = governed_paths(get("D006").unwrap());
+        assert!(
+            d006.iter().any(|x| x == "governance/project/**"),
+            "{d006:?}"
+        );
+        assert_eq!(governed_paths(get("D010").unwrap()), vec!["**".to_string()]);
     }
 
     #[test]

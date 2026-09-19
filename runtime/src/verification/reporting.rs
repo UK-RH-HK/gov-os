@@ -336,7 +336,107 @@ pub fn os_binding_integrity(p: &Project, store: &RecordStore, f: &mut Family) {
             h["path"].as_str().map(|s| s.to_string()),
         ));
     }
+    // the plugin registry (WS-7 seals every entry and the document; WS-2 R3-11): an entry the OS did not write as it
+    // stands is not honoured (plugin_governance/D028 refuse its use); here it is reported as T2 state
+    for (id, b) in plugin_registry_unbound(p) {
+        let code = b["binding"].as_str().unwrap_or("?").to_string();
+        *counts.entry(format!("plugin-registry:{code}")).or_insert(0) += 1;
+        let sev = registry_severity(&code);
+        let mut x = finding(
+            sev,
+            &fam,
+            format!("plugin-registry entry {id} is not the registration gov wrote on this machine (binding {code}{}); it is not honoured (D-0007 rule 2)", b["reason"].as_str().map(|r| format!(": {r}")).unwrap_or_default()),
+            Some(crate::capabilities::registry::path(p).strip_prefix(&p.root).map(|r| r.to_string_lossy().to_string()).unwrap_or_default()),
+        );
+        x["subjects"] = json!([id]);
+        f.findings.push(x);
+    }
+    // CIT state (WS-4 `cit::binding`): a transaction whose sealed state does not verify is not honoured
+    for c in crate::cit::bindings(p) {
+        if c["state"]["binding"] == "VERIFIED" || c["cit_status"] == "PROPOSED" {
+            continue;
+        }
+        let id = c["id"].as_str().unwrap_or("?").to_string();
+        let st = c["cit_status"].as_str().unwrap_or("?").to_string();
+        *counts
+            .entry(format!(
+                "cit:{}",
+                c["state"]["code"].as_str().unwrap_or("UNBOUND")
+            ))
+            .or_insert(0) += 1;
+        let in_force = matches!(st.as_str(), "APPROVED" | "EXECUTING");
+        let mut x = finding(
+            if in_force { "high" } else { "low" },
+            &fam,
+            format!(
+                "{id} ({st}): its change-control state is not the state gov sealed ({}): {}; the OS does not honour it{}",
+                c["state"]["code"].as_str().unwrap_or("UNBOUND"),
+                c["state"]["message"].as_str().unwrap_or(""),
+                if in_force { " and it is in force (an approval or execution relies on it)" } else { " (history)" }
+            ),
+            store.get(&id).map(|r| r.path.clone()),
+        );
+        x["subjects"] = json!([id]);
+        f.findings.push(x);
+    }
+    // the adoption record (WS-9 IP-R2-4): stage order, authorship and verdicts are honoured only as gov wrote them
+    if let Some((b, rel)) = adoption_baseline_binding(p) {
+        let code = b.code().to_string();
+        if code != "VERIFIED" {
+            *counts
+                .entry(format!("adoption-baseline:{code}"))
+                .or_insert(0) += 1;
+            let mut x = finding(
+                if code == "BROKEN" { "high" } else { "low" },
+                &fam,
+                format!("the adoption record {rel} is not the record gov adopt wrote (binding {code}): its stage order, authorship and independent verdicts are not honoured (adoption integrity){}", if code == "BROKEN" { " — it was modified after gov sealed it; restore it from version control" } else { "" }),
+                Some(rel.clone()),
+            );
+            x["subjects"] = json!([rel, crate::adopt::BASELINE_ID]);
+            f.findings.push(x);
+        }
+    }
     f.detail = json!({"unverified_by_binding": counts, "gates_unverified": gates_unverified, "binding_key": crate::t2::binding_key_id()});
+}
+
+fn registry_severity(code: &str) -> &'static str {
+    match code {
+        "BROKEN" => "high",
+        "UNSEALED" => "medium",
+        _ => "low",
+    }
+}
+
+/// Plugin-registry entries whose T2 binding does not verify, and the document binding when it does not (WS-7 API).
+pub fn plugin_registry_unbound(p: &Project) -> Vec<(String, Value)> {
+    let mut out: Vec<(String, Value)> = crate::capabilities::registry::unbound_entries(p)
+        .into_iter()
+        .map(|(id, b)| (id, b.to_value()))
+        .collect();
+    if crate::capabilities::registry::path(p).exists() {
+        let d = crate::capabilities::registry::document_binding(p);
+        if !d.is_verified() {
+            out.push(("(registry document)".into(), d.to_value()));
+        }
+    }
+    out.sort_by(|a, b| a.0.cmp(&b.0));
+    out
+}
+
+/// The T2 binding of the adoption record `spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml`, when it exists.
+pub fn adoption_baseline_binding(p: &Project) -> Option<(crate::t2::Binding, String)> {
+    let rel = format!("{}/00-BASELINE.yaml", crate::adopt::EVIDENCE);
+    let abs = p.root.join(&rel);
+    if !abs.exists() {
+        return None;
+    }
+    let b = match crate::util::read_yaml(&abs) {
+        Ok(v) => crate::t2::verify_value(&v, ""),
+        Err(e) => crate::t2::Binding::Broken {
+            reason: format!("{rel} is unreadable: {e}"),
+        },
+    };
+    Some((b, rel))
 }
 
 /// Is a T2 record in force as authority? A gate that is open or answered (its answer authorises work), or an ACTIVE
@@ -403,8 +503,12 @@ pub fn installation_authenticity(p: &Project, f: &mut Family) {
             sev,
             &fam,
             format!(
-                "installation authenticity not established ({} machine): {}",
+                "installation authenticity not established ({} machine; admission {}): {}",
                 pst["machine_posture"].as_str().unwrap_or("?"),
+                pst["admission"]["mode"]
+                    .as_str()
+                    .or_else(|| pst["admission"].as_str())
+                    .unwrap_or("not recorded"),
                 pst["disclosure"].as_str().unwrap_or("")
             ),
             Some("governance/framework.lock".into()),
@@ -606,6 +710,318 @@ pub fn task_contract_integrity(p: &Project, store: &RecordStore, f: &mut Family)
         ));
     }
     f.detail = json!({"production_merge_violations": pm});
+}
+
+// ======================================================================= round 3 (WS-2): tier duties, Gate U
+
+/// Is a record marked invalidated by an upstream change and not yet revalidated (`cit::propagation` markers)?
+pub fn stale_marked(r: &crate::records::Record) -> bool {
+    r.data["retest_required"] == true
+        || r.data["revalidation_required"] == true
+        || (r.data["staleness"].is_object()
+            && r.data["staleness"]["stale"] != false
+            && r.data["staleness"]["resolved"].is_null())
+}
+
+/// **G1/G4 dependency and lineage invalidation** (Contract v3:794 "index invalidation", W12 :1187 "G1 invalidates
+/// affected dependency/lineage evidence after material mutations", :1190 "G4 runs wider staleness/impact
+/// propagation", W6 :1134-1136; WS-4 R2-7 `propagation::detect`):
+/// * an authoritative input changed since dependent work consumed it and the change was **not propagated** (made
+///   outside change control, not yet detected by `gov cit propagate`) — medium, naming the task and the input;
+/// * **completed work invalidated** by a propagated upstream change and not yet revalidated (a DONE task, or its
+///   closing report, still carrying the staleness marker) — medium: its green evidence cannot stand merely because
+///   it closed (W6 :1135-1136);
+/// * open work marked for retest — disclosed (low): its close already requires evidence against the current inputs.
+pub fn upstream_change_propagation(p: &Project, store: &RecordStore, f: &mut Family) {
+    let fam = f.id.clone();
+    let pending = crate::cit::propagation::detect(p, store);
+    for (task, changes) in &pending {
+        let ids: Vec<String> = changes.iter().map(|c| c.id.clone()).collect();
+        let mut x = finding(
+            "medium",
+            &fam,
+            format!(
+                "{task} consumed {} which changed since (content hash {}); the upstream change has not been propagated to it — dependent evidence, packets and rework are not yet invalidated (W6; G1 dependency invalidation). Run `gov cit propagate`",
+                ids.join(", "),
+                changes
+                    .iter()
+                    .map(|c| format!("{}: {} → {}", c.id, c.from.as_deref().map(|h| &h[..h.len().min(12)]).unwrap_or("absent"), c.to.as_deref().map(|h| &h[..h.len().min(12)]).unwrap_or("absent")))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            ),
+            store.get(task).map(|t| t.path.clone()),
+        );
+        // the work that relied on the changed inputs is what this governs (its close); work consuming the inputs at
+        // their current version is not affected
+        x["subjects"] = json!([task]);
+        x["changed_inputs"] = json!(ids);
+        f.findings.push(x);
+    }
+    let mut invalidated_done = vec![];
+    let mut retest_open = vec![];
+    for t in store.of_type("task") {
+        if t.get("task_status") == "CANCELLED" || !stale_marked(t) {
+            continue;
+        }
+        let changed: Vec<String> = t.data["staleness"]["inputs_changed"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|c| {
+                        c["id"]
+                            .as_str()
+                            .or_else(|| c.as_str())
+                            .map(|s| s.to_string())
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+        if t.get("task_status") == "DONE" {
+            invalidated_done.push(t.id());
+            let mut x = finding(
+                "medium",
+                &fam,
+                format!(
+                    "{} is DONE but an upstream change invalidated it{}: its implementation/test evidence is stale until it is revalidated (W6 :1134-1136, `COMPLETE` does not imply permanently valid)",
+                    t.id(),
+                    if changed.is_empty() { String::new() } else { format!(" ({} changed)", changed.join(", ")) }
+                ),
+                Some(t.path.clone()),
+            );
+            let mut subj = vec![t.id(), t.get("closed_by_report")];
+            subj.retain(|s| !s.is_empty());
+            x["subjects"] = json!(subj);
+            x["changed_inputs"] = json!(changed);
+            f.findings.push(x);
+        } else {
+            retest_open.push(t.id());
+            f.findings.push(finding(
+                "low",
+                &fam,
+                format!(
+                    "{} ({}) is marked for retest after an upstream change{}: its close requires evidence against the current inputs",
+                    t.id(),
+                    t.get("task_status"),
+                    if changed.is_empty() { String::new() } else { format!(" ({} changed)", changed.join(", ")) }
+                ),
+                Some(t.path.clone()),
+            ));
+        }
+    }
+    let stale_reports: Vec<String> = store
+        .of_type("report")
+        .into_iter()
+        .filter(|r| stale_marked(r))
+        .map(|r| r.id())
+        .collect();
+    f.detail = json!({"unpropagated": pending.iter().map(|(t, cs)| json!({"task": t, "inputs": cs.iter().map(|c| json!({"id": c.id, "consumed": c.from, "current": c.to})).collect::<Vec<_>>()})).collect::<Vec<_>>(),
+                      "invalidated_completed_tasks": invalidated_done, "retest_open_tasks": retest_open, "stale_reports": stale_reports});
+}
+
+/// **HEALTHY 1 / Gate U "unresolved contradictions"** (Contract v3:985, :996; W3 :1100; BC-P2-18 detection, WS-4 R2-7
+/// `contradictions::detect_all`): every contradiction between current authoritative records that no honoured answer
+/// resolved is named (medium; a held contradiction — the answer holds dependent work — is named too).
+pub fn authority_unambiguous(p: &Project, store: &RecordStore, f: &mut Family) {
+    let fam = f.id.clone();
+    let all = crate::context::contradictions::detect_all(store);
+    let mut rows = vec![];
+    for c in &all {
+        let r = crate::context::contradictions::resolution(p, store, c);
+        rows.push(json!({"contradiction": c.to_value(), "resolution": r.to_value()}));
+        if r.blocks() {
+            let mut x = finding(
+                "medium",
+                &fam,
+                format!(
+                    "unresolved contradiction ({}) between {} on {}: {} (authority ambiguous; resolve it through the contradiction gate or a CIT)",
+                    c.kind,
+                    c.members.join(", "),
+                    c.subject,
+                    match &r {
+                        crate::context::contradictions::Resolution::Unresolved { gate: Some(g) } => format!("awaiting gate {g}"),
+                        crate::context::contradictions::Resolution::Unresolved { gate: None } => "no gate has been raised yet".to_string(),
+                        crate::context::contradictions::Resolution::Held { gate, .. } => format!("held by the answer to {gate} until the records are revised"),
+                        _ => String::new(),
+                    }
+                ),
+                c.members
+                    .first()
+                    .and_then(|m| store.get(m))
+                    .map(|r| r.path.clone()),
+            );
+            x["subjects"] = json!(c.members);
+            f.findings.push(x);
+        }
+    }
+    f.detail =
+        json!({"contradictions": rows.len(), "unresolved": f.findings.len(), "detail": rows});
+}
+
+/// **HEALTHY 2 "no accidental legacy authority"** (Contract v3:997; INV-004): a legacy governance mechanism (provider
+/// rules files, legacy agent instructions or memory) in the active tree without LEGACY registration is high — the
+/// same rule doctor D013 applies, now owned by the suite as well.
+pub fn legacy_authority(p: &Project, store: &RecordStore, f: &mut Family) {
+    let fam = f.id.clone();
+    let legacy = crate::migrations::classify::legacy_mechanisms(&p.root);
+    let registered: Vec<String> = store
+        .records
+        .iter()
+        .filter(|r| r.status() == "LEGACY" || r.rtype() == "legacy")
+        .flat_map(|r| {
+            let mut v = r.list("paths");
+            v.push(r.get("legacy_source"));
+            v.push(r.get("current_path"));
+            v
+        })
+        .filter(|s| !s.is_empty())
+        .collect();
+    let mut unmarked = vec![];
+    for l in &legacy {
+        if l.path.starts_with("archive/") || registered.iter().any(|r| r == &l.path) {
+            continue;
+        }
+        unmarked.push(l.path.clone());
+        f.findings.push(finding(
+            "high",
+            &fam,
+            format!(
+                "legacy governance mechanism {} ({}) is in the active tree without LEGACY registration: it may be read as authority (INV-004; retire it through adoption A8 or register it LEGACY / move it to archive/)",
+                l.path, l.kind
+            ),
+            Some(l.path.clone()),
+        ));
+    }
+    f.detail = json!({"legacy_mechanisms": legacy.len(), "unmarked": unmarked});
+}
+
+/// **HEALTHY 7 "feature readiness explicit"** (Contract v3:1002; framework §76.7): every ACTIVE feature states its
+/// readiness — a `readiness` block with at least one stated cell and no silent N/A or invalid cell
+/// (`orchestration::readiness`). The coverage of what it states is the Gate U SLO `feature_readiness_coverage`.
+pub fn feature_readiness(p: &Project, store: &RecordStore, f: &mut Family) {
+    let fam = f.id.clone();
+    let mut rows = vec![];
+    for fe in store.of_type("feature") {
+        if fe.status() != "ACTIVE" || fe.problems.iter().any(|x| x == "archived") {
+            continue;
+        }
+        let stated = fe.data["readiness"]
+            .as_object()
+            .map(|m| m.len())
+            .unwrap_or(0);
+        let v = crate::orchestration::readiness::evaluate(p, fe);
+        let problem = if fe
+            .data
+            .get("readiness")
+            .map(|x| x.is_null())
+            .unwrap_or(true)
+        {
+            Some("states no readiness at all".to_string())
+        } else if stated == 0 {
+            Some("states an empty readiness block (no dimension stated)".to_string())
+        } else if !v.invalid.is_empty() {
+            Some(format!(
+                "has invalid or silent N/A readiness cells: {}",
+                v.invalid.join("; ")
+            ))
+        } else {
+            None
+        };
+        if let Some(why) = &problem {
+            let mut x = finding(
+                "medium",
+                &fam,
+                format!("feature {} {why}: its readiness status is not explicit (Contract v3:1002; `gov readiness check {}`)", fe.id(), fe.id()),
+                Some(fe.path.clone()),
+            );
+            x["subjects"] = json!([fe.id()]);
+            f.findings.push(x);
+        }
+        rows.push(json!({"feature": fe.id(), "stated_cells": stated, "coverage": v.coverage, "pre_implementation_ok": v.pre_implementation_ok, "gaps": v.gaps.len(), "explicit": problem.is_none()}));
+    }
+    f.detail = json!({"active_features": rows.len(), "features": rows});
+}
+
+/// Health-system output scopes are the suite's own results; every other audit record is an audit of record.
+fn resolved_finding(x: &Value) -> bool {
+    let st = x["status"]
+        .as_str()
+        .or_else(|| x["resolution_status"].as_str())
+        .unwrap_or("")
+        .to_ascii_uppercase();
+    matches!(
+        st.as_str(),
+        "RESOLVED" | "CLOSED" | "FIXED" | "ACCEPTED" | "WAIVED" | "SUPERSEDED" | "WITHDRAWN"
+    ) || x["resolved"] == true
+        || !x["resolution"].is_null()
+}
+
+/// **HEALTHY 11 "no unresolved critical audit finding"** (Contract v3:1006): every current audit record other than
+/// the suite's own results (independent full audits, imported audits, adoption audits) is read for critical findings
+/// that are not resolved (`status: RESOLVED|CLOSED|…`, `resolved: true` or a `resolution`); each is high and refuses a
+/// release. The suite's own critical findings are its current outcome (they count through the repository verdict).
+pub fn unresolved_audit_findings(store: &RecordStore, f: &mut Family) {
+    let fam = f.id.clone();
+    let mut rows = vec![];
+    for a in store.of_type("audit") {
+        if super::currency::HEALTH_OUTPUT_SCOPES.contains(&a.get("scope").as_str())
+            || a.problems.iter().any(|x| x == "archived")
+            || !matches!(a.status().as_str(), "ACTIVE" | "PROVISIONAL" | "")
+        {
+            continue;
+        }
+        for x in a.data["findings"].as_array().cloned().unwrap_or_default() {
+            if x["severity"]
+                .as_str()
+                .map(|s| s.eq_ignore_ascii_case("critical"))
+                != Some(true)
+                || resolved_finding(&x)
+            {
+                continue;
+            }
+            let fid = x["id"].as_str().unwrap_or("?").to_string();
+            rows.push(json!({"audit": a.id(), "finding": fid, "scope": a.get("scope")}));
+            let mut y = finding(
+                "high",
+                &fam,
+                format!(
+                    "{} ({}) records an unresolved critical finding {fid}: {} (Contract v3:1006; resolve it and record the resolution on the finding)",
+                    a.id(),
+                    a.get("scope"),
+                    x["message"].as_str().or_else(|| x["title"].as_str()).unwrap_or("")
+                ),
+                Some(a.path.clone()),
+            );
+            y["subjects"] = json!([a.id()]);
+            f.findings.push(y);
+        }
+    }
+    f.detail = json!({"unresolved_critical": rows});
+}
+
+/// **J1/J2/H4 lifecycle findings at a G-tier** (WS-10 IP-WS10-06): `lifecycle::suite_findings` (research and
+/// experiment evidence completeness, reliance on ungoverned evidence, influence backlinks, irreproducible
+/// experiments, the scenario → data → test-data chain) and `lifecycle::experiment::task_merge_findings`
+/// (experimental task output in the production tree), each at the severity its owner declares.
+pub fn research_experiment_data_lifecycle(p: &Project, store: &RecordStore, f: &mut Family) {
+    let fam = f.id.clone();
+    let mut codes: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+    let mut all = crate::lifecycle::suite_findings(p, store);
+    all.extend(crate::lifecycle::experiment::task_merge_findings(p, store));
+    for x in all {
+        let code = x["code"].as_str().unwrap_or("LIFECYCLE").to_string();
+        *codes.entry(code.clone()).or_insert(0) += 1;
+        let mut y = finding(
+            x["severity"].as_str().unwrap_or("medium"),
+            &fam,
+            format!("[{code}] {}", x["message"].as_str().unwrap_or("")),
+            x["path"].as_str().map(|s| s.to_string()),
+        );
+        if let Some(r) = x["record"].as_str() {
+            y["subjects"] = json!([r]);
+        }
+        f.findings.push(y);
+    }
+    f.detail = json!({"by_code": codes});
 }
 
 #[cfg(test)]

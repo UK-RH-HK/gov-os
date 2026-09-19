@@ -59,7 +59,7 @@ fn chk(
 const ORDER: &[&str] = &[
     "D001", "D002", "D003", "D004", "D005", "D006", "D007", "D029", "D027", "D028", "D008", "D009",
     "D010", "D011", "D012", "D025", "D026", "D013", "D014", "D015", "D016", "D017", "D018", "D019",
-    "D020", "D021", "D030", "D031", "D032", "D033", "D034", "D022", "D023", "D024",
+    "D020", "D021", "D030", "D031", "D032", "D033", "D034", "D035", "D022", "D023", "D024",
 ];
 
 fn order_of(c: &Value) -> usize {
@@ -96,6 +96,9 @@ pub fn run(p: &Project) -> Result<Report> {
             health_result: Value::Null,
         });
     }
+    // G1 first (BC-P2-07): the mutations made since the last observation are observed and their G1 checks run, so the
+    // repository verdict (D035) reads suite outcomes that include them
+    let _ = crate::scheduler::observe(p);
     // Independent check groups run concurrently, each on its own project handle and database connection
     // (Contract v3:803). Every group is a pure reader of the live repository. Kernel trust is resolved once here, before
     // the groups start, so an embedded-baseline substitution is never materialised by two threads at once (see
@@ -152,6 +155,9 @@ pub fn run(p: &Project) -> Result<Report> {
         checks.extend(r?);
     }
     let snap = snap?;
+    // D035 — the repository verdict (Contract v3:995-1008; BC-P2-44): the thirteen HEALTHY conditions from this run's
+    // checks and the latest suite outcomes, and every Gate U SLO against its threshold
+    checks.push(check_repository_healthy(p, &checks, &snap));
     checks.sort_by_key(order_of);
     let rem: Vec<String> = checks
         .iter()
@@ -462,24 +468,96 @@ fn group_runtime(p: &Project) -> Result<Vec<Value>> {
                     .unwrap_or(0)
             )
         };
-        add(chk("D025", "semantic index consistent with pinned embedder/reranker", ok, if mixed { "critical" } else { "high" }, msg, Some("gov rebuild-memory (full rebuild re-embeds every chunk with the pinned implementation)")));
+        // WS-6 IP-R2-3: the embedding runtime the index was built with is the one that would run now (machine-local
+        // drift is invisible to the manifest core), and the live retrieval profile is governed
+        let mut drift: Option<String> = None;
+        let governed = crate::capabilities::governance::plugin_set(p);
+        let spec = crate::memory::embedder::EmbedSpec::from_policy(p);
+        if let (Ok(emb), Some(rec)) = (
+            crate::memory::embedder::Embedder::resolve(&spec, &governed),
+            d.get_meta("embedder_identity"),
+        ) {
+            let cur = crate::memory::profile::embedder_identity(p, &emb, Some(&rec));
+            if rec["runtime_digest"].as_str() != Some(cur.runtime_digest.as_str()) {
+                drift = Some(format!(
+                    "the embedding runtime changed since the index was built (recorded {}, now {}): vectors are not comparable with what would embed a query",
+                    rec["runtime_digest"].as_str().map(|h| &h[..h.len().min(12)]).unwrap_or("unrecorded"),
+                    &cur.runtime_digest[..cur.runtime_digest.len().min(12)]
+                ));
+            }
+        }
+        let prof = crate::memory::profile::status(p);
+        let prof_problem = (prof["governed"] != true).then(|| {
+            (
+                prof["severity"].as_str().unwrap_or("medium").to_string(),
+                format!(
+                    "retrieval profile {}: {}",
+                    prof["state"].as_str().unwrap_or("?"),
+                    prof["message"].as_str().unwrap_or("")
+                ),
+            )
+        });
+        let ok_all = ok && drift.is_none() && prof_problem.is_none();
+        let sev = if mixed {
+            "critical".to_string()
+        } else if !ok || drift.is_some() {
+            "high".to_string()
+        } else {
+            prof_problem
+                .as_ref()
+                .map(|(s, _)| s.clone())
+                .unwrap_or_else(|| "high".into())
+        };
+        let mut full = msg;
+        if let Some(dr) = &drift {
+            full.push_str(&format!("; {dr}"));
+        }
+        if let Some((_, m)) = &prof_problem {
+            full.push_str(&format!("; {m}"));
+        }
+        let mut c = chk("D025", "semantic index consistent with pinned embedder/reranker; retrieval profile governed; embedding runtime unchanged", ok_all, &sev, full, Some("gov rebuild-memory (full rebuild re-embeds every chunk with the pinned implementation); govern a profile change with gov memory benchmark + gov memory select"));
+        c["retrieval_profile"] = json!({"state": prof["state"], "governed": prof["governed"], "decision": prof["decision"]});
+        add(c);
     }
     // D026 claims store (deterministic concurrency state outside the derived index)
+    // WS-6 IP-R2-12: the store actually in use, and every non-rebuildable OS store still kept inside the derived
+    // runtime or generated-views directory (disclosed: lost if that directory is deleted; the audit reports it through
+    // `recovery_rebuild`; each writer relocates its store, `paths::relocate_legacy`)
+    let misplaced = crate::paths::misplaced_os_state(&p.root);
+    let misplaced_note = if misplaced.is_empty() {
+        String::new()
+    } else {
+        format!(
+            "; non-rebuildable OS state inside a derived directory: {}",
+            misplaced
+                .iter()
+                .map(|m| format!(
+                    "{} at {} (belongs at {})",
+                    m["store"].as_str().unwrap_or("?"),
+                    m["found_at"].as_str().unwrap_or("?"),
+                    m["belongs_at"].as_str().unwrap_or("?")
+                ))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    };
     match crate::memory::claims::ClaimsStore::open(p) {
         Ok(cs) => {
             let ok = cs.integrity_ok();
-            add(chk(
+            let mut c = chk(
                 "D026",
                 "claims store present and intact",
                 ok,
                 "high",
                 if ok {
-                    format!("{}", cs.path.display())
+                    format!("{}{misplaced_note}", cs.path.display())
                 } else {
-                    "claims.db corrupt".into()
+                    format!("claims.db corrupt{misplaced_note}")
                 },
                 Some("restore claims.db or gov claims sweep"),
-            ));
+            );
+            c["misplaced_os_state"] = json!(misplaced);
+            add(c);
         }
         Err(e) => add(chk(
             "D026",
@@ -498,7 +576,7 @@ fn group_runtime(p: &Project) -> Result<Vec<Value>> {
         .and_then(|v| v.as_array().cloned())
         .unwrap_or_default();
     let dups = store.duplicates.len();
-    add(chk(
+    let mut d014 = chk(
         "D014",
         "authority unambiguous (no supersession conflicts / duplicate ids)",
         conflicts.is_empty() && dups == 0,
@@ -509,43 +587,95 @@ fn group_runtime(p: &Project) -> Result<Vec<Value>> {
             dups
         ),
         Some("resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids"),
-    ));
-    // D015 graph: dangling edges, records outside their canonical location (W1), stale lineage links (W8), and the
-    // records with no edge at all — each named (WS-4 IP-7)
+    );
+    let mut subj: Vec<String> = vec![];
+    for c in &conflicts {
+        collect_ids(c, &mut subj);
+    }
+    for (id, paths) in &store.duplicates {
+        subj.push(id.clone());
+        subj.extend(paths.iter().cloned());
+    }
+    subj.sort();
+    subj.dedup();
+    d014["subjects"] = json!(subj);
+    add(d014);
+    // D015 graph (WS-6 IP-R2-1): the relationship graph through memory::integrity (orphan, dangling, stale, reversed,
+    // ill-typed relationships, supersession cycles), records outside their canonical location (W1) and stale lineage
+    // links of current work (W8) — each named. Fails on any finding above low. The AFFECTS link of a generated
+    // investigation whose subject was retired is not a defect (O-1) and is listed apart.
     if let Some(d) = &db {
-        let dang = crate::graph::dangling_edges(d).unwrap_or_default();
         let orph = crate::graph::orphan_nodes(d).unwrap_or_default();
         let misplaced = crate::graph::identity::misplaced_records(Some(p), &store);
         let stale = crate::verification::reporting::current_stale_links(&store);
-        let ok = dang.is_empty() && misplaced.is_empty() && stale.is_empty();
+        let mut named: Vec<String> = vec![];
+        let mut resolved = 0usize;
+        let mut counts: std::collections::BTreeMap<String, usize> =
+            std::collections::BTreeMap::new();
+        let mut failing = 0usize;
+        let mut worst = "low";
+        let mut subjects: Vec<String> = vec![];
+        match crate::memory::integrity::check(p, &store, Some(d)) {
+            Ok(gi) => {
+                for x in &gi.findings {
+                    let (src, et, dst) = (
+                        x["edge"]["src"].as_str().unwrap_or(""),
+                        x["edge"]["type"].as_str().unwrap_or(""),
+                        x["edge"]["dst"].as_str().unwrap_or(""),
+                    );
+                    if x["kind"] == "dangling"
+                        && crate::verification::lineage::is_resolved_investigation_edge(
+                            p, &store, src, et, dst,
+                        )
+                    {
+                        resolved += 1;
+                        continue;
+                    }
+                    let kind = x["kind"].as_str().unwrap_or("?").to_string();
+                    *counts.entry(kind.clone()).or_insert(0) += 1;
+                    let sev = x["severity"].as_str().unwrap_or("medium");
+                    if sev != "low" {
+                        failing += 1;
+                        if sev == "high" || sev == "critical" {
+                            worst = "high";
+                        } else if worst == "low" {
+                            worst = "medium";
+                        }
+                        named.push(format!("{kind}: {}", x["message"].as_str().unwrap_or("")));
+                        for v in [src, dst] {
+                            if !v.is_empty() {
+                                subjects.push(v.trim_start_matches("file:").to_string());
+                            }
+                        }
+                    }
+                }
+            }
+            Err(e) => {
+                failing += 1;
+                worst = "medium";
+                named.push(format!(
+                    "graph integrity could not be checked: {}",
+                    e.message
+                ));
+            }
+        }
         let list = |v: Vec<String>| -> String {
             let n = v.len();
-            let mut s = v.into_iter().take(8).collect::<Vec<_>>().join(", ");
+            let mut s = v.into_iter().take(8).collect::<Vec<_>>().join("; ");
             if n > 8 {
                 s.push_str(&format!(" (+{} more)", n - 8));
             }
             s
         };
-        let mut msg = format!("{} dangling edge(s)", dang.len());
-        if !dang.is_empty() {
-            msg.push_str(&format!(
-                " [{}]",
-                list(
-                    dang.iter()
-                        .map(|e| format!(
-                            "{} {} {}",
-                            e["src"].as_str().unwrap_or("?"),
-                            e["type"].as_str().unwrap_or("?"),
-                            e["dst"].as_str().unwrap_or("?")
-                        ))
-                        .collect()
-                )
-            ));
+        let ok = failing == 0 && misplaced.is_empty() && stale.is_empty();
+        if (!misplaced.is_empty() || !stale.is_empty()) && worst == "low" {
+            worst = "medium";
+        }
+        let mut msg = format!("{failing} relationship finding(s) above low {:?}", counts);
+        if !named.is_empty() {
+            msg.push_str(&format!(" [{}]", list(named)));
         }
         msg.push_str(&format!(", {} orphan record(s)", orph.len()));
-        if !orph.is_empty() {
-            msg.push_str(&format!(" [{}]", list(orph.clone())));
-        }
         if !misplaced.is_empty() {
             msg.push_str(&format!(
                 ", {} record(s) outside their canonical location [{}]",
@@ -574,15 +704,21 @@ fn group_runtime(p: &Project) -> Result<Vec<Value>> {
                 )
             ));
         }
+        if resolved > 0 {
+            msg.push_str(&format!(
+                ", {resolved} link(s) of completed investigations to retired orphans (not defects)"
+            ));
+        }
         let mut c = chk(
             "D015",
             "graph integrity",
             ok,
-            "medium",
+            worst,
             msg,
             Some("fix references in records or add missing records; move misplaced records to their canonical directory; re-point or revalidate work linked to superseded records (through a CIT)"),
         );
         c["orphan_records"] = json!(orph);
+        c["subjects"] = json!(subjects);
         add(c);
     }
     Ok(checks)
@@ -643,7 +779,10 @@ fn group_tree(p: &Project) -> Result<Vec<Value>> {
     } else {
         "high"
     };
-    add(chk("D011", "secrets outside secret class", wrong.is_empty(), d011_sev, if wrong.is_empty() { "none".into() } else { format!("{} file(s) contain secret patterns but are not secret-class: {}", wrong.len(), wrong.join(", ")) }, Some("move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile")));
+    let mut d011 = chk("D011", "secrets outside secret class", wrong.is_empty(), d011_sev, if wrong.is_empty() { "none".into() } else { format!("{} file(s) contain secret patterns but are not secret-class: {}", wrong.len(), wrong.join(", ")) }, Some("move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile"));
+    // the files it names are the block's subjects: the work that moves or reclassifies them is its remedy
+    d011["subjects"] = json!(wrong);
+    add(d011);
     // D013 legacy mechanisms
     let store = RecordStore::load(&p.root);
     let legacy = legacy_mechanisms(&p.root);
@@ -745,25 +884,32 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
     let mut add = |c: Value| checks.push(c);
     // D016 interrupted transactions
     let inter = crate::cit::interrupted(p);
-    add(chk(
-        "D016",
-        "no interrupted transactions",
-        inter.is_empty(),
-        "high",
-        if inter.is_empty() {
-            "none".into()
-        } else {
-            format!(
-                "{} CIT(s) left EXECUTING: {}",
-                inter.len(),
-                inter
-                    .iter()
-                    .map(|c| c["id"].as_str().unwrap_or("").to_string())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            )
-        },
-        Some("gov recover (classifies and rolls back/finishes interrupted mutations)"),
+    let mut inter_subjects: Vec<String> = vec![];
+    for c in &inter {
+        collect_ids(c, &mut inter_subjects);
+    }
+    add(with_subjects(
+        chk(
+            "D016",
+            "no interrupted transactions",
+            inter.is_empty(),
+            "high",
+            if inter.is_empty() {
+                "none".into()
+            } else {
+                format!(
+                    "{} CIT(s) left EXECUTING: {}",
+                    inter.len(),
+                    inter
+                        .iter()
+                        .map(|c| c["id"].as_str().unwrap_or("").to_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                )
+            },
+            Some("gov recover (classifies and rolls back/finishes interrupted mutations)"),
+        ),
+        inter_subjects,
     ));
     // D017 claims
     {
@@ -883,17 +1029,25 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
     // D023 records
     let store = RecordStore::load(&p.root);
     let rec_problems: Vec<String> = store.problems.clone();
-    add(chk(
-        "D023",
-        "records parse",
-        rec_problems.is_empty(),
-        "high",
-        if rec_problems.is_empty() {
-            format!("{} records", store.records.len())
-        } else {
-            rec_problems.join("; ")
-        },
-        Some("fix YAML/frontmatter errors"),
+    let problem_paths: Vec<String> = rec_problems
+        .iter()
+        .filter_map(|x| x.split(':').next().map(|s| s.trim().to_string()))
+        .filter(|s| s.contains('/') || s.ends_with(".yaml") || s.ends_with(".md"))
+        .collect();
+    add(with_subjects(
+        chk(
+            "D023",
+            "records parse",
+            rec_problems.is_empty(),
+            "high",
+            if rec_problems.is_empty() {
+                format!("{} records", store.records.len())
+            } else {
+                rec_problems.join("; ")
+            },
+            Some("fix YAML/frontmatter errors"),
+        ),
+        problem_paths,
     ));
     // D033 T2 binding (WS-3 IP-5): OS-written state that no gov operation on this machine produced as it stands,
     // with the suite's severities (`verification::reporting::t2_severity`): tampering (BROKEN) and an unsealed gate in
@@ -929,6 +1083,51 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
             ));
         } else {
             disclosed.push(id);
+        }
+    }
+    // plugin-registry entries (WS-7; WS-2 R3-11), change-control state (WS-4) and the adoption record (WS-9 IP-R2-4)
+    for (id, b) in crate::verification::reporting::plugin_registry_unbound(p) {
+        let code = b["binding"].as_str().unwrap_or("?");
+        match code {
+            "BROKEN" => failing.push((
+                format!("plugin-registry entry {id}"),
+                "high",
+                "modified after gov sealed the registration".into(),
+            )),
+            "UNSEALED" => failing.push((
+                format!("plugin-registry entry {id}"),
+                "medium",
+                "not written by gov (hand-written registration)".into(),
+            )),
+            _ => disclosed.push(format!("plugin-registry entry {id} ({code})")),
+        }
+    }
+    for c in crate::cit::bindings(p) {
+        if c["state"]["binding"] == "VERIFIED" || c["cit_status"] == "PROPOSED" {
+            continue;
+        }
+        let id = c["id"].as_str().unwrap_or("?").to_string();
+        if matches!(
+            c["cit_status"].as_str(),
+            Some("APPROVED") | Some("EXECUTING")
+        ) {
+            failing.push((
+                id,
+                "high",
+                format!(
+                    "change-control state not as gov sealed it ({}), in force",
+                    c["state"]["code"].as_str().unwrap_or("UNBOUND")
+                ),
+            ));
+        } else {
+            disclosed.push(id);
+        }
+    }
+    if let Some((b, rel)) = crate::verification::reporting::adoption_baseline_binding(p) {
+        match b.code() {
+            "VERIFIED" => {}
+            "BROKEN" => failing.push((rel, "high", "the adoption record was modified after gov adopt sealed it (stage order, authorship and verdicts not honoured)".into())),
+            other => disclosed.push(format!("{rel} ({other})")),
         }
     }
     let worst = if failing.iter().any(|(_, s, _)| *s == "high") {
@@ -990,6 +1189,177 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
         Some("investigate the failure and link its follow-up task (memory::failures::link_follow_up); repair or replace the failing tool"),
     ));
     Ok(checks)
+}
+
+/// Record ids and paths named anywhere in a JSON value (`id`, `task`, `targets`, `members`, `paths`, …).
+fn collect_ids(v: &Value, out: &mut Vec<String>) {
+    match v {
+        Value::String(s) => {
+            if crate::records::id_regex().is_match(s) || s.contains('/') {
+                out.push(s.clone());
+            }
+        }
+        Value::Array(a) => a.iter().for_each(|x| collect_ids(x, out)),
+        Value::Object(m) => m.values().for_each(|x| collect_ids(x, out)),
+        _ => {}
+    }
+}
+
+fn with_subjects(mut c: Value, subjects: Vec<String>) -> Value {
+    c["subjects"] = json!(subjects);
+    c
+}
+
+/// **D035 — the repository verdict** (Contract v3:995-1008 "A repository is HEALTHY only when"; BC-P2-44). The
+/// thirteen conditions from this doctor run's checks and the latest governance-suite outcomes, and every Gate U SLO
+/// against its declared threshold (`verification::slo`). The message states the verdict and every failing condition
+/// and crossed SLO. The check fails for what the doctor's own checks do not already fail on: a condition failing
+/// through a governance-suite outcome (at that outcome's severity, at most high — the owning check carries its own
+/// critical severity), an SLO whose owner is not a doctor check, or a condition no owning check has evaluated on this
+/// machine (low: HEALTHY is not established for it). With the doctor's own failures, the doctor verdict is therefore
+/// HEALTHY only when the repository verdict is.
+fn check_repository_healthy(
+    p: &Project,
+    doctor_now: &[Value],
+    snap: &crate::verification::currency::Snapshot,
+) -> Value {
+    let st = crate::scheduler::store::load_state(p);
+    let store = RecordStore::load(&p.root);
+    let db = if p.db_path().exists() {
+        RuntimeDb::open(&p.db_path()).ok()
+    } else {
+        None
+    };
+    let slos = crate::verification::slo::evaluate(&crate::verification::slo::SloCtx {
+        p,
+        store: &store,
+        db: db.as_ref(),
+        snapshot: Some(snap),
+        state: &st,
+    });
+    let conds = crate::verification::slo::conditions(&st, Some(doctor_now), None);
+    let v = crate::verification::slo::repository_verdict(&conds, &slos);
+    let failing: Vec<&Value> = conds.iter().filter(|c| c["status"] == "FAILS").collect();
+    let unknown: Vec<&Value> = conds.iter().filter(|c| c["status"] == "UNKNOWN").collect();
+    let crossed: Vec<Value> = v["crossed_slos"].as_array().cloned().unwrap_or_default();
+    let rank = crate::scheduler::catalogue::rank;
+    // what the doctor did not already know: a condition failing through a governance-suite outcome, or an SLO whose
+    // owner is not one of this run's doctor checks (a failing doctor check already fails on its own)
+    let doctor_id = |x: &Value| {
+        let id = x.as_str().unwrap_or("");
+        id.starts_with('D') && id.len() == 4
+    };
+    let mut worst = if unknown.is_empty() { "none" } else { "low" };
+    let mut beyond = !unknown.is_empty();
+    for c in &failing {
+        for f in c["failing"].as_array().cloned().unwrap_or_default() {
+            if doctor_id(&f["check"]) {
+                continue;
+            }
+            beyond = true;
+            let s = f["severity"].as_str().unwrap_or("medium");
+            let s = if rank(s) >= 3 {
+                "high"
+            } else if rank(s) == 2 {
+                "medium"
+            } else {
+                "low"
+            };
+            if rank(s) > rank(worst) {
+                worst = s;
+            }
+        }
+    }
+    for x in &crossed {
+        // an SLO another check owns is reflected through that check's condition (above), at its owner's severity
+        if x["owner"] != crate::verification::slo::FAMILY {
+            continue;
+        }
+        beyond = true;
+        let s = x["severity"].as_str().unwrap_or("medium");
+        let s = if rank(s) >= 3 { "high" } else { "medium" };
+        if rank(s) > rank(worst) {
+            worst = s;
+        }
+    }
+    let ok = !beyond;
+    let all_hold = failing.is_empty() && unknown.is_empty() && crossed.is_empty();
+    let msg = if all_hold {
+        "HEALTHY: all thirteen conditions hold and every Gate U SLO is within its threshold"
+            .to_string()
+    } else {
+        let mut parts = vec![];
+        if !failing.is_empty() {
+            parts.push(format!(
+                "condition(s) failing: {}",
+                failing
+                    .iter()
+                    .map(|c| format!(
+                        "{} {} ({})",
+                        c["id"].as_str().unwrap_or("?"),
+                        c["title"].as_str().unwrap_or(""),
+                        c["failing"]
+                            .as_array()
+                            .map(|a| a
+                                .iter()
+                                .map(|f| format!(
+                                    "{} {}",
+                                    f["check"].as_str().unwrap_or("?"),
+                                    f["severity"].as_str().unwrap_or("")
+                                ))
+                                .collect::<Vec<_>>()
+                                .join(", "))
+                            .unwrap_or_default()
+                    ))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            ));
+        }
+        if !crossed.is_empty() {
+            parts.push(format!(
+                "SLO threshold(s) crossed: {}",
+                crossed
+                    .iter()
+                    .map(|x| format!(
+                        "{} = {} (threshold {})",
+                        x["slo"].as_str().unwrap_or("?"),
+                        x["value"],
+                        x["threshold"]
+                    ))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            ));
+        }
+        if !unknown.is_empty() {
+            parts.push(format!(
+                "not established on this machine (no owning check evaluated): {}",
+                unknown
+                    .iter()
+                    .map(|c| format!(
+                        "{} {}",
+                        c["id"].as_str().unwrap_or("?"),
+                        c["title"].as_str().unwrap_or("")
+                    ))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
+        }
+        format!(
+            "repository verdict {}: {}",
+            v["verdict"].as_str().unwrap_or("?"),
+            parts.join(" | ")
+        )
+    };
+    let mut c = chk(
+        "D035",
+        "repository HEALTHY: the thirteen Gate U conditions and the framework-health SLOs",
+        ok,
+        if ok { "info" } else { worst },
+        msg,
+        Some("repair the failing owning checks; `gov health status` shows every condition, SLO and threshold; `gov health run` re-evaluates the suite"),
+    );
+    c["repository"] = json!({"verdict": v["verdict"], "failing_conditions": v["failing_conditions"], "unknown_conditions": v["unknown_conditions"], "crossed_slos": crossed});
+    c
 }
 
 fn group_currency_health(
