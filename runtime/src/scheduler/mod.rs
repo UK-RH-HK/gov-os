@@ -1176,6 +1176,9 @@ pub fn health_state(st: &Value) -> &'static str {
 pub struct Request {
     pub operation: String,
     pub subjects: Vec<String>,
+    /// The health checks the work this request starts says it repairs (a task's `remedies`): required for a
+    /// [`catalogue::DECLARED_REMEDY_OPS`] operation to be admitted as a block's remedy.
+    pub remedies: Vec<String>,
 }
 
 impl Request {
@@ -1183,6 +1186,7 @@ impl Request {
         Request {
             operation: operation.to_string(),
             subjects: vec![],
+            remedies: vec![],
         }
     }
     pub fn with_subjects<S: AsRef<str>>(mut self, subjects: &[S]) -> Self {
@@ -1190,8 +1194,14 @@ impl Request {
             .extend(subjects.iter().map(|s| s.as_ref().to_string()));
         self
     }
+    /// Declare the checks the work repairs (see [`catalogue::DECLARED_REMEDY_OPS`]).
+    pub fn with_remedies<S: AsRef<str>>(mut self, checks: &[S]) -> Self {
+        self.remedies
+            .extend(checks.iter().map(|s| s.as_ref().to_string()));
+        self
+    }
     pub fn to_value(&self) -> Value {
-        json!({"operation": self.operation, "subjects": self.subjects})
+        json!({"operation": self.operation, "subjects": self.subjects, "remedies": self.remedies})
     }
 }
 
@@ -1200,6 +1210,8 @@ impl Request {
 pub struct Admission {
     pub operation: String,
     pub subjects: Vec<String>,
+    /// The checks the request declared it remedies ([`Request::remedies`]).
+    pub remedies: Vec<String>,
     /// Active blocks this operation is admitted under **as their remedy** (empty: no block governs it). When the
     /// operation commits ([`Admission::obligation`]), it may commit only after [`confirm_remedy`] shows every one of
     /// them cleared.
@@ -1236,7 +1248,9 @@ pub fn subjects_reach(block_subjects: &[String], request: &[String]) -> bool {
         .any(|r| block_subjects.iter().any(|b| subject_matches(b, r)))
 }
 
-/// Add each named record's path and each record path's id, so ids and paths match either way.
+/// Add each named record's path and each record path's id, so ids and paths match either way. An empty id or path
+/// is never a subject (round-3 integration: a record that does not parse is loaded with an empty id, and an empty
+/// subject glob-matches every path — it made a block about that record "reach" every request).
 fn with_record_aliases(store: &RecordStore, subjects: &[String]) -> Vec<String> {
     let mut out: Vec<String> = subjects.to_vec();
     for s in subjects {
@@ -1246,6 +1260,7 @@ fn with_record_aliases(store: &RecordStore, subjects: &[String]) -> Vec<String> 
             out.push(r.id());
         }
     }
+    out.retain(|x| !x.trim().is_empty());
     out.sort();
     out.dedup();
     out
@@ -1286,7 +1301,12 @@ fn bearing(b: &Value, req: &Request, req_subjects: &[String], store: &RecordStor
     }
     let bsub = block_subjects(b, store);
     let reaches = !req_subjects.is_empty() && subjects_reach(&bsub, req_subjects);
-    if remedy_op && reaches {
+    // starting work is the remedy only of the conditions it declares it repairs (catalogue::DECLARED_REMEDY_OPS)
+    let declared = !catalogue::DECLARED_REMEDY_OPS.contains(&op)
+        || b["check"]
+            .as_str()
+            .is_some_and(|c| req.remedies.iter().any(|r| r == c));
+    if remedy_op && reaches && declared {
         return Bearing::Remedy;
     }
     if !refused_op {
@@ -1457,6 +1477,7 @@ pub fn admit(p: &Project, req: &Request) -> Result<Admission> {
         return Ok(Admission {
             operation: req.operation.clone(),
             subjects: req.subjects.clone(),
+            remedies: req.remedies.clone(),
             remedy_for: vec![],
             reevaluated: vec![],
             observed,
@@ -1471,6 +1492,7 @@ pub fn admit(p: &Project, req: &Request) -> Result<Admission> {
     Ok(Admission {
         operation: req.operation.clone(),
         subjects: req.subjects.clone(),
+        remedies: req.remedies.clone(),
         remedy_for: remedial,
         reevaluated,
         observed,
@@ -1490,6 +1512,7 @@ pub fn confirm_remedy(p: &Project, adm: &Admission) -> Result<Value> {
     let req = Request {
         operation: adm.operation.clone(),
         subjects: adm.subjects.clone(),
+        remedies: adm.remedies.clone(),
     };
     let store = RecordStore::load(&p.root);
     let (refusing, remedial) = classify_blocks(&store::load_state(p), &req, &store);
@@ -2137,6 +2160,40 @@ mod tests {
         assert!(r("cit.execute", &["spec/tasks/TASK-0001.yaml"])
             .0
             .is_empty());
+    }
+
+    /// Round-3 integration: a record that does not parse is loaded with an empty id; its block (D023, schema) must
+    /// still name only its path, so an update — whose subjects are the kernel, lock, overlay and views — is refused by
+    /// it, and is never admitted as its "remedy" through an empty alias that matches every path.
+    #[test]
+    fn a_block_about_an_unparseable_record_is_not_reached_by_every_request() {
+        let root =
+            std::env::temp_dir().join(format!("gov-sched-alias-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(root.join("spec/decisions")).unwrap();
+        std::fs::write(
+            root.join("spec/decisions/D-0777.yaml"),
+            "id: D-0777\ntype: decision\n  bad: [indent\n",
+        )
+        .unwrap();
+        let store = RecordStore::load(&root);
+        let d023 = catalogue::get("D023").unwrap();
+        let mut checks = Map::new();
+        checks.insert("D023".into(), json!({"surface": "doctor", "blocking_findings": blocking_findings(d023, &[json!({"severity": "high", "message": "record does not parse", "subjects": ["spec/decisions/D-0777.yaml"]})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let upd = Request::new(catalogue::ops::UPDATE_APPLY)
+            .with_subjects(catalogue::ops::UPDATE_SUBJECTS);
+        let (refusing, remedial) = classify_blocks(&st, &upd, &store);
+        assert!(remedial.is_empty(), "{remedial:?}");
+        assert!(
+            refusing.iter().any(|b| b["check"] == "D023"),
+            "{refusing:?}"
+        );
+        assert!(
+            with_record_aliases(&store, &["spec/decisions/D-0777.yaml".to_string()])
+                .iter()
+                .all(|x| !x.is_empty())
+        );
+        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]

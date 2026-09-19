@@ -144,14 +144,32 @@ pub const RELY_ON_STATE: &[&str] = &[
 /// refused by a block that does not govern the whole repository, so it needs no remedy admission; under a critical
 /// block the repository is unreliable as a whole and only a change on the named subjects, an update, or a direct
 /// repair proceeds.)
-pub const WORK_REMEDIES: &[&str] = &[ops::CIT_PROPOSE, ops::CIT_APPROVE, ops::CIT_EXECUTE];
+///
+/// Round-3 integration (WS-2 x WS-5, one availability host API): creating and claiming **the work that repairs the
+/// condition** are remedies as well — the availability rule's "work that remedies a block stays available" — but only
+/// for work that **declares** it remedies the block's check (a task's `remedies`, set by the work generator on the
+/// remediation it generates, or by the creator of repair work) **and** whose subjects reach the block's
+/// ([`DECLARED_REMEDY_OPS`]); its close commits only once the block is cleared (the close re-evaluates it).
+pub const WORK_REMEDIES: &[&str] = &[
+    ops::CIT_PROPOSE,
+    ops::CIT_APPROVE,
+    ops::CIT_EXECUTE,
+    ops::TASK_CREATE,
+    ops::TASK_CLAIM,
+];
 /// [`WORK_REMEDIES`] plus `update --apply` (the remedy of a condition in the kernel, lock or overlay).
 pub const ALL_REMEDIES: &[&str] = &[
     ops::CIT_PROPOSE,
     ops::CIT_APPROVE,
     ops::CIT_EXECUTE,
+    ops::TASK_CREATE,
+    ops::TASK_CLAIM,
     ops::UPDATE_APPLY,
 ];
+/// Remedy operations that are admitted as a block's remedy only when the request **declares** the block's check among
+/// the checks it remedies (`scheduler::Request::with_remedies`), besides reaching its subjects: starting work is the
+/// remedy only of the conditions that work says it repairs.
+pub const DECLARED_REMEDY_OPS: &[&str] = &[ops::TASK_CREATE, ops::TASK_CLAIM];
 
 /// **Block scope** (Contract v3 L4 "Independent runnable branches continue. Global stop only when policy or
 /// critical-path state requires"; O5 :807 "hard-block vs warning semantics are explicit"). A hard-block refuses the

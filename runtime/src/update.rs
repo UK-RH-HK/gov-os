@@ -162,95 +162,43 @@ fn snapshot_dir(p: &Project, target: &str) -> Result<std::path::PathBuf> {
     Ok(base.join(target))
 }
 
-/// Input classes (`crate::verification::currency`) an `update --apply` substantively replaces: the kernel payload
-/// (an authenticated release), the lock it writes, the overlay its migrations and template reconciliation change, and
-/// this machine's trust record of what is installed. `@kernel` and `@overlay` are the catalogue's groups of those
-/// classes, and `@files` (every repository file class) contains them. Derived outputs the update merely regenerates
-/// (the index, generated adapters) are not listed: regenerating them cannot repair a defect in what they are derived
-/// from.
-const UPDATE_REPLACES: &[&str] = &[
-    "@kernel",
-    "@overlay",
-    "@files",
-    "framework_lock",
-    "kernel_policy",
-    "kernel_schema",
-    "kernel_migration",
-    "kernel_skills",
-    "kernel_tools",
-    "kernel_other",
-    "project_policy",
-    "path_map",
-    "sensitivity",
-    "model_profile",
-    "tools_plugins",
-    "project_skills",
-    "overlay_other",
-    crate::verification::currency::MACHINE_TRUST,
-];
-
-/// Can `update --apply` be the remedy for a hard-block of `check`?
-///
-/// The availability rule (P2-HO-0031, Contract v3 L4/O5): a hard-block refuses the operations whose reliance it
-/// protects, **scoped to what the failing check governs**, and work that remedies a block stays available; a remedy
-/// that does not clear its block does not commit. What a check governs is what it declares it reads — its inputs in
-/// the scheduler catalogue ([`crate::scheduler::catalogue`]). When those include anything the update replaces
-/// ([`UPDATE_REPLACES`]), the failing condition may sit in exactly what the update replaces — an older kernel's
-/// overlay deficit (D006, or `schema_invariants` reporting "overlay file missing: PROJECT_EXCEPTIONS.yaml" on a 4.1.1
-/// installation whose migration adds the file), a tampered or policy-deficient kernel payload the update replaces
-/// with an authenticated release — so the update may be its remedy: it proceeds, and it commits only if the block is
-/// gone afterwards. A check that reads nothing the update replaces (records, source, claims, gate/decision bindings)
-/// cannot be repaired by it, and its block refuses the update at entry.
+/// Can `update --apply` be the remedy for a hard-block of `check`? — **the catalogue's declaration** (WS-8 r3
+/// IP-R3-WS08-4, round-3 integration): a block rule of the check lists `update.apply` among its remedies
+/// (`scheduler::catalogue`: `CRIT_ALL`, `HIGH_RELY_SHIP`). Whether an update *is* the remedy of a given block is then
+/// decided by the one availability host API ([`entry_guard`], `scheduler::admit`): the block's subjects must lie in
+/// what an update changes (`catalogue::ops::UPDATE_SUBJECTS`: kernel, lock, overlay, generated views) — an older
+/// kernel's overlay deficit (D006, `schema_invariants` "overlay file missing") is; a record that does not parse (D023)
+/// is not, and refuses the update at entry.
 pub fn update_can_remedy(check: &str) -> bool {
     crate::scheduler::catalogue::get(check)
-        .map(|def| def.deps.iter().any(|d| UPDATE_REPLACES.contains(d)))
+        .map(|def| {
+            def.blocks.iter().any(|r| {
+                r.remedies
+                    .contains(&crate::scheduler::catalogue::ops::UPDATE_APPLY)
+            })
+        })
         .unwrap_or(false)
 }
 
-/// **The G0 entry guard of `update --apply`** (IP-WS02-12 at entry; WS-8 r2 IP-R2-WS08-5), scoped by the
-/// availability rule. The scheduler's guard (`crate::scheduler::guard`, the one G0 API) evaluates every active
-/// hard-block that governs `update.apply`, re-evaluating stale ones first. Of those it reports:
-/// * a block the update may be the remedy for ([`update_can_remedy`]) does not refuse the update; it is carried as a
-///   remedy the update must clear, and the post-install run refuses and rolls back an update that does not clear it
-///   (`UPDATE_REMEDY_NOT_CLEARED`) — a remedy that does not clear its block does not commit;
+/// **The G0 entry guard of `update --apply`** (IP-WS02-12 at entry; WS-8 r2 IP-R2-WS08-5; WS-2 r3 IP-R3-WS02-02),
+/// on the one availability host API: `scheduler::admit` with the update's subjects
+/// (`catalogue::ops::UPDATE_SUBJECTS`), re-evaluating stale blocks first. Of the active hard-blocks that govern
+/// `update.apply`:
+/// * a block the update is the remedy for (the catalogue declares it, and its subjects lie in what the update changes)
+///   does not refuse the update; the admission carries it, and the update commits only if `scheduler::confirm_remedy`
+///   finds it cleared once the update is installed (`HEALTH_REMEDY_INCOMPLETE`, rolled back otherwise) — a remedy that
+///   does not clear its block does not commit;
 /// * any other block refuses the update here, before a Human Decision Gate is raised or a byte is staged, typed
-///   (`HEALTH_HARD_BLOCK`), naming each block, its check, its scope and the operations it governs.
-///
-/// Integration point (WS-2 round 3): when the catalogue declares remedy operations itself, [`update_can_remedy`]
-/// is replaced by that declaration; the host contract above stays.
-fn entry_guard(p: &Project) -> Result<Vec<Value>> {
-    match crate::scheduler::guard(p, crate::scheduler::catalogue::ops::UPDATE_APPLY, &[]) {
-        Ok(_) => Ok(vec![]),
-        Err(e) if e.code == "HEALTH_HARD_BLOCK" => {
-            let blocks = e.details["blocks"].as_array().cloned().unwrap_or_default();
-            let (remedies, governing): (Vec<Value>, Vec<Value>) = blocks
-                .into_iter()
-                .partition(|b| update_can_remedy(b["check"].as_str().unwrap_or("")));
-            if governing.is_empty() {
-                return Ok(remedies);
-            }
-            let first = &governing[0];
-            Err(GovError::new(
-                "HEALTH_HARD_BLOCK",
-                format!(
-                    "update.apply is refused: {} active hard-block(s) govern it and read nothing an update replaces, so no update can repair them, e.g. check {} ({}, scope {}): {}. Repair the condition, then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it",
-                    governing.len(),
-                    first["check"].as_str().unwrap_or("?"),
-                    first["severity"].as_str().unwrap_or("?"),
-                    first["scope"].as_str().unwrap_or("?"),
-                    first["message"].as_str().unwrap_or("")
-                ),
-            )
-            .with_details(json!({
-                "operation": "update.apply", "blocks": governing,
-                "remediable_by_this_update": remedies,
-                "rule": "a hard-block refuses the operations whose reliance it protects, scoped to what the failing check governs; a block whose check reads what the update replaces (kernel, lock, overlay) may be remedied by it and does not refuse it at entry, but the update commits only if that block is gone afterwards (P2-HO-0031 availability rule)",
-                "reevaluated": e.details["reevaluated"],
-                "remediation": "repair the failing condition; `gov health status` lists every active block and its check; `gov health run` re-evaluates",
-            })))
+///   (`HEALTH_HARD_BLOCK`), naming each block, its check, its scope, its subjects and the operations it governs.
+fn entry_guard(p: &Project) -> Result<crate::scheduler::Admission> {
+    use crate::scheduler::catalogue::ops;
+    let req = crate::scheduler::Request::new(ops::UPDATE_APPLY).with_subjects(ops::UPDATE_SUBJECTS);
+    crate::scheduler::admit(p, &req).map_err(|mut e| {
+        if e.code == "HEALTH_HARD_BLOCK" && e.details.is_object() {
+            e.details["rule"] = json!("a hard-block refuses the operations whose reliance it protects, scoped to what the failing check governs; a block whose subjects lie in what the update changes (kernel, lock, overlay, generated views) may be remedied by it and does not refuse it at entry, but the update commits only if that block is gone afterwards (P2-HO-0031 availability rule)");
         }
-        Err(e) => Err(e),
-    }
+        e
+    })
 }
 
 /// The gate raised for updating to `target`, if any.
@@ -306,7 +254,8 @@ pub fn apply_update_opts(
     // G0 at entry (IP-WS02-12, IP-R2-WS08-5): an active hard-block that governs `update.apply` and that the update
     // does not repair refuses it here, before a gate is raised for it or anything is staged; blocks the update is the
     // remedy for are carried and must be cleared by it (checked after the install, below).
-    let remedies = entry_guard(p)?;
+    let admission = entry_guard(p)?;
+    let remedies: Vec<Value> = admission.remedy_for.clone();
     if chk["human_gate_required"].as_bool().unwrap_or(true) {
         // INV-008: approval means a presented, answered gate record — never a CLI flag alone (verifier M3 / HV-11)
         let gate = match update_gate(p, &target_v) {
@@ -507,25 +456,12 @@ pub fn apply_update_opts(
             .as_str()
             .or_else(|| audit["health_state"].as_str())
             .unwrap_or("");
-        // A remedy that does not clear its block does not commit (P2-HO-0031): every block the entry guard let
-        // through as repairable by this update must be gone once the update is installed and re-checked.
-        let still_blocked: Vec<Value> = crate::scheduler::store::load_state(p)["blocks"]
-            .as_array()
-            .cloned()
-            .unwrap_or_default()
-            .into_iter()
-            .filter(|b| {
-                remedies
-                    .iter()
-                    .any(|r| r["check"] == b["check"] && r["severity"] == b["severity"])
-            })
-            .collect();
-        if !still_blocked.is_empty() {
-            return Err(GovError::new(
-                "UPDATE_REMEDY_NOT_CLEARED",
-                format!("the update was admitted as the remedy for {} active hard-block(s) (e.g. check {}), but the block persists on the updated installation; an update that does not clear the block it was let through for does not commit", still_blocked.len(), still_blocked[0]["check"].as_str().unwrap_or("?")),
-            )
-            .with_details(json!({"remedies": remedies, "still_blocked": still_blocked})));
+        // A remedy that does not clear its block does not commit (P2-HO-0031; WS-2 IP-R3-WS02-02): every block the
+        // entry guard admitted this update as the remedy for is re-evaluated, fresh, against the updated installation
+        // (`scheduler::confirm_remedy`); `HEALTH_REMEDY_INCOMPLETE` names the blocks left, and the transaction rolls
+        // back.
+        if admission.obligation() {
+            crate::scheduler::confirm_remedy(p, &admission)?;
         }
         if suite_verdict == "UNHEALTHY"
             || health_state == "RED"

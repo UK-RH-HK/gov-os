@@ -105,9 +105,15 @@ fn guard_paths(store: &RecordStore, cit: &Value) -> Vec<String> {
             None => v.push(x),
         }
     }
+    // the transaction's targets: a record by its path (the guard aliases ids and paths), and a file target as the
+    // path it is (WS-2 IP-R3-WS02-04, round-3 integration: a CIT repairing a file-level block — a secret in `src/…` —
+    // reaches that block's subjects and is admitted as its remedy)
     for t in cit["targets"].as_array().cloned().unwrap_or_default() {
-        if let Some(r) = t.as_str().and_then(|id| store.get(id)) {
-            v.push(r.path.clone());
+        if let Some(x) = t.as_str().filter(|x| !x.is_empty()) {
+            match store.get(x) {
+                Some(r) => v.push(r.path.clone()),
+                None => v.push(x.to_string()),
+            }
         }
     }
     v.sort();

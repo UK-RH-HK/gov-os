@@ -118,56 +118,42 @@ pub fn remedies_of(t: &Value) -> Vec<String> {
 /// **G0 at a work operation, under the availability rule** (round-3 common protocol, from Contract v3 L4
 /// "Independent runnable branches continue. Global stop only when policy or critical-path state requires" and O5
 /// "hard-block vs warning semantics are explicit"). The write guard (kernel trust, break-glass, emergency controls)
-/// always runs. The health half is the scheduler's G0 guard with the **paths the operation relies on**, so a
-/// path-scoped block governs only the work inside its scope; and a hard-block the work **remedies** (its `remedies`
-/// names the blocking check) does not refuse it — work that remedies a block stays available. The remedy still
-/// cannot commit without clearing its block: its close passes the same guard, which re-evaluates the block and
-/// refuses while it stands. Every refusal is the scheduler's typed `HEALTH_HARD_BLOCK`, naming each block, its check
-/// and its scope.
+/// always runs. The health half is WS-2's one availability host API (`scheduler::admit`, round-3 integration) with
+/// the work's **subjects** — the task, its declared inputs, feature and dependencies, and the paths it may change
+/// ([`work_subjects`]; WS-2 IP-R3-WS02-03) — so a subject- or path-scoped block governs only the work that reaches it
+/// and independent work stays available at the host as well as in the decision; and a hard-block the work
+/// **remedies** (its `remedies` names the blocking check, and its subjects reach the block's) admits it as the
+/// block's remedy (`scheduler::catalogue::DECLARED_REMEDY_OPS`) — work that remedies a block stays available. The
+/// remedy still cannot commit without clearing its block: its close passes the close gate, which re-evaluates the
+/// block and refuses while it stands. Every refusal is the scheduler's typed `HEALTH_HARD_BLOCK`, naming each block,
+/// its check, scope and subjects.
 pub fn guard_work(
     p: &Project,
     label: &str,
     op: &str,
-    paths: &[String],
+    subjects: &[String],
     remedies: &[String],
 ) -> Result<Value> {
-    if remedies.is_empty() {
-        control::guard_write(p, label)?;
-        return scheduler::guard(p, op, paths);
+    // the write guard (kernel trust, break-glass, FREEZE_WRITES / PAUSE); the health half is decided here, on the
+    // one availability host API, with the work's subjects and declared remedies in hand (round-3 integration)
+    control::guard_write_host(p, label)?;
+    let req = scheduler::Request::new(op)
+        .with_subjects(subjects)
+        .with_remedies(remedies);
+    let adm = scheduler::admit(p, &req)?;
+    let mut out = adm.to_value();
+    if adm.is_remedy() {
+        out["availability"] = json!({
+            "rule": "a hard-block does not refuse the work that remedies it (round-3 availability rule): work that declares the blocking check among its remedies and whose subjects reach the block's is admitted as its remedy; its close commits only once the block is cleared",
+            "remedies": remedies, "remedied_blocks": adm.remedy_for});
     }
-    // the same write guard without its generic (whole-operation) health half, which the scoped decision below owns
-    control::guard_write(p, &format!("{label} (remedy)"))?;
-    match scheduler::guard(p, op, paths) {
-        Ok(v) => Ok(v),
-        Err(e) if e.code == "HEALTH_HARD_BLOCK" => {
-            let blocks = e.details["blocks"].as_array().cloned().unwrap_or_default();
-            let (remedied, standing): (Vec<Value>, Vec<Value>) =
-                blocks.into_iter().partition(|b| {
-                    remedies
-                        .iter()
-                        .any(|r| Some(r.as_str()) == b["check"].as_str())
-                });
-            if standing.is_empty() {
-                return Ok(json!({"operation": op, "allowed": true, "availability": {
-                    "rule": "a hard-block does not refuse the work that remedies it (round-3 availability rule); the remedy commits only if its close finds the block cleared",
-                    "remedies": remedies, "remedied_blocks": remedied}}));
-            }
-            let first = &standing[0];
-            Err(GovError::new(
-                "HEALTH_HARD_BLOCK",
-                format!(
-                    "{op} is refused: {} active hard-block(s) this work does not remedy, e.g. check {} ({}, scope {}): {}. The work remedies {remedies:?}; repair the other condition(s), or remedy them in their own work",
-                    standing.len(),
-                    first["check"].as_str().unwrap_or("?"),
-                    first["severity"].as_str().unwrap_or("?"),
-                    first["scope"].as_str().unwrap_or("operation"),
-                    first["message"].as_str().unwrap_or("")
-                ),
-            )
-            .with_details(json!({"operation": op, "paths": paths, "blocks": standing, "remedied_blocks": remedied, "remedies": remedies})))
-        }
-        Err(e) => Err(e),
-    }
+    Ok(out)
+}
+
+/// The subjects a task operation presents to the G0 guard (WS-2 IP-R3-WS02-03): the task (id and record path), its
+/// declared inputs, its feature and dependencies (`verification::close_subjects`) and the paths it may change.
+fn work_subjects(task: &Value, paths: &[String]) -> Vec<String> {
+    crate::verification::close_subjects(task, paths)
 }
 
 pub fn create(p: &Project, fields: Value) -> Result<Value> {
@@ -183,7 +169,8 @@ pub fn create(p: &Project, fields: Value) -> Result<Value> {
                 .collect()
         })
         .unwrap_or_default();
-    let availability = guard_work(p, "task create", ops::TASK_CREATE, &paths, &remedies)?;
+    let subjects = work_subjects(&fields, &paths);
+    let availability = guard_work(p, "task create", ops::TASK_CREATE, &subjects, &remedies)?;
     authority::require(p, "create_task")?;
     let producer = json!({"producer": "gov task create", "session": p.session_id, "role": p.role, "created_at": now_iso()});
     let mut out = build_and_save(p, fields, producer, "task create", false)?;
@@ -697,14 +684,21 @@ fn independence_refusal(t: &Record, action: &str, reasons: &[String]) -> GovErro
 pub fn claim(p: &Project, id: &str) -> Result<Value> {
     // G0 (tier contract, BC-P2-06, IP-WS02-03) under the availability rule: scoped to the paths the claim reserves,
     // and a block the task remedies does not refuse its claim
-    let (remedies, scope_paths) = {
+    let (remedies, subjects) = {
         let store = RecordStore::load(&p.root);
         match store.get(id).filter(|t| t.rtype() == "task") {
-            Some(t) => (remedies_of(&t.data), t.list("allowed_paths")),
-            None => (vec![], vec![]),
+            Some(t) => {
+                let mut data = t.data.clone();
+                data["id"] = json!(id);
+                (
+                    remedies_of(&t.data),
+                    work_subjects(&data, &t.list("allowed_paths")),
+                )
+            }
+            None => (vec![], vec![id.to_string()]),
         }
     };
-    let availability = guard_work(p, "task claim", ops::TASK_CLAIM, &scope_paths, &remedies)?;
+    let availability = guard_work(p, "task claim", ops::TASK_CLAIM, &subjects, &remedies)?;
     authority::require(p, "claim_task")?;
     // an upstream change made outside change control reaches the work before it is picked (WS-4 R2-3, BC-P2-04):
     // detection is content-based (what each task's work consumed), never index freshness
