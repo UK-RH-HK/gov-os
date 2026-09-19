@@ -255,7 +255,7 @@ Evidence:
    - WS-10's H4 lifecycle findings (`SCENARIO_DATA_UNDECLARED`, `SCENARIO_WITHOUT_INDEPENDENT_TEST`, medium) now reach the suite through the IP-WS10-06 family. The fixture's baseline audit is therefore DEGRADED, and no green record is taken.
    - The matrix rows then pass vacuously against the init-time record.
    - **Currency itself holds.** The labelled derived copy `evidence/derived/FR-freshness-invalidation.h4-complete.P2-AR-0033.py` makes only the scenario H4-complete (a reasoned `data_requirements_not_applicable` plus one independent acceptance obligation). It gives **26/0 on both binaries**, with a green baseline.
-   - epsilon-r O4 §A–§E are identical on both binaries. §C's fresh green holds after the SLO population fix in `7c89135`.
+   - Every D021 judgement in epsilon-r O4 §A–§E is identical on both binaries; only the audit finding texts differ. §C's fresh green holds after the SLO population fix in `7c89135`. In §F, the pre-change green is the init-time record, because the scenario the section writes has H4 gaps. D021 is obsolete after the upstream change on both binaries.
    - alpha-r, beta-r, gamma-r and delta-r FRESH are unchanged, apart from gamma-r FRESH.4/5 now naming a hand-edited plugin registry (R3-11).
 2. **AC16-X1 `X1-O4-green-stale-after-direct-spec-change`**.
    - Its precondition is a green record, current right after the CIT that invalidated DONE work. In the same chain, `X1-UxO5` (BC-P2-44) requires that state not to be HEALTHY.
