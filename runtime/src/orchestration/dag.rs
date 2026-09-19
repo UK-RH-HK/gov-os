@@ -1,9 +1,16 @@
 //! Dynamic task DAG (framework §41-44): runnable/blocked sets, longest chain, cycles, human-gate dependencies, replan.
+//!
+//! Task-contract fields that order or gate work (Contract v3:563-566, BC-P2-14):
+//! * `dependencies` and `blocks` are both ordering edges — `A.blocks = [B]` means B waits for A exactly as if
+//!   `B.dependencies` contained A (cycles and the longest chain see both);
+//! * `required_data`, `required_tools` and `required_skills` gate readiness: a task whose required input does not
+//!   resolve ([`InputResolver`]) is blocked, with the reason, until it does.
 use crate::orchestration::readiness;
-use crate::records::{save_record, RecordStore};
+use crate::records::{save_record, Record, RecordStore};
 use crate::util::today;
 use crate::{Project, Result};
 use serde_json::{json, Value};
+use std::cell::OnceCell;
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -18,6 +25,189 @@ pub struct DagView {
     pub human_gate_dependencies: Vec<Value>,
     pub counts: Value,
     pub missing_dependencies: Vec<Value>,
+    /// `blocks` entries naming a task that does not exist.
+    pub dangling_blocks: Vec<Value>,
+}
+
+/// Lifecycle statuses that make a governed record unavailable as a current input (AUTHORITY_POLICY
+/// `retrieval_default_excludes_statuses`).
+fn excluded_statuses(p: &Project) -> Vec<String> {
+    let v = p
+        .policies()
+        .get_list("AUTHORITY_POLICY", "retrieval_default_excludes_statuses");
+    if v.is_empty() {
+        ["SUPERSEDED", "HISTORICAL", "REJECTED", "RETIRED", "LEGACY"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect()
+    } else {
+        v
+    }
+}
+
+/// Resolves a task's required inputs (Contract v3:564 "scenarios/data", :566 "required skills/tools"). Registries
+/// are read once per resolver and only when a task needs them.
+pub struct InputResolver<'a> {
+    p: &'a Project,
+    store: &'a RecordStore,
+    excluded: Vec<String>,
+    registry: OnceCell<BTreeMap<String, String>>,
+    plugins: OnceCell<BTreeMap<String, String>>,
+    skills: OnceCell<Vec<Value>>,
+    files: OnceCell<Vec<String>>,
+}
+
+impl<'a> InputResolver<'a> {
+    pub fn new(p: &'a Project, store: &'a RecordStore) -> Self {
+        InputResolver {
+            p,
+            store,
+            excluded: excluded_statuses(p),
+            registry: OnceCell::new(),
+            plugins: OnceCell::new(),
+            skills: OnceCell::new(),
+            files: OnceCell::new(),
+        }
+    }
+    /// A governed record (any type; typically `data`) in a current lifecycle status, or a repository path / glob
+    /// that exists. `Err` carries the reason it is unavailable.
+    pub fn data(&self, d: &str) -> std::result::Result<Value, String> {
+        if crate::records::id_regex().is_match(d) {
+            if let Some(r) = self.store.get(d) {
+                let st = r.status();
+                if self.excluded.contains(&st) {
+                    return Err(format!("required data {d} is {st} (not a current input)"));
+                }
+                return Ok(json!({"id": d, "resolved": "record", "path": r.path, "status": st}));
+            }
+        }
+        if std::path::Path::new(d).components().any(|c| {
+            !matches!(
+                c,
+                std::path::Component::Normal(_) | std::path::Component::CurDir
+            )
+        }) {
+            return Err(format!(
+                "required data {d} is neither a governed record nor a path inside the repository"
+            ));
+        }
+        if d.contains('*') || d.contains('?') {
+            let files = self.files.get_or_init(|| {
+                crate::paths::iter_repo_files(&self.p.root, false)
+                    .into_iter()
+                    .map(|(_, rel)| rel)
+                    .collect()
+            });
+            if let Some(f) = files.iter().find(|f| crate::util::glob_match(d, f)) {
+                return Ok(json!({"id": d, "resolved": "path", "path": f}));
+            }
+        } else if self.p.root.join(d).exists() {
+            return Ok(json!({"id": d, "resolved": "path", "path": d}));
+        }
+        Err(format!(
+            "required data {d} is not available (no governed record or repository path)"
+        ))
+    }
+    /// A tool registered in the kernel/project tool registry, the MCP registry or as a capability plugin, and active.
+    pub fn tool(&self, t: &str) -> std::result::Result<Value, String> {
+        let reg = self.registry.get_or_init(|| {
+            let mut m = BTreeMap::new();
+            let mut tools = crate::tools::kernel_tools(self.p);
+            tools.extend(crate::tools::project_tools(self.p));
+            for x in tools {
+                if let Some(id) = x["tool_id"].as_str() {
+                    m.insert(
+                        id.to_string(),
+                        x["status"].as_str().unwrap_or("").to_string(),
+                    );
+                }
+            }
+            for s in crate::tools::mcp_servers(self.p) {
+                if let Some(id) = s["id"].as_str() {
+                    m.entry(id.to_string())
+                        .or_insert(s["status"].as_str().unwrap_or("").to_string());
+                }
+            }
+            m
+        });
+        let status = match reg.get(t) {
+            Some(s) => Some(s.clone()),
+            None => self
+                .plugins
+                .get_or_init(|| {
+                    crate::tools::plugin_tools(self.p)
+                        .0
+                        .into_iter()
+                        .filter_map(|x| {
+                            x["tool_id"].as_str().map(|id| {
+                                (
+                                    id.to_string(),
+                                    x["status"].as_str().unwrap_or("").to_string(),
+                                )
+                            })
+                        })
+                        .collect()
+                })
+                .get(t)
+                .cloned(),
+        };
+        match status {
+            Some(s) if s == "active" => Ok(json!({"id": t, "status": s})),
+            Some(s) => Err(format!("required tool {t} is registered but {s}, not active")),
+            None => Err(format!("required tool {t} is not registered (tool registry, MCP registry or capability plugins); raise a tooling task or register it (`gov tools install`)")),
+        }
+    }
+    /// A kernel or project skill, not in a retired lifecycle status.
+    pub fn skill(&self, s: &str) -> std::result::Result<Value, String> {
+        let skills = self
+            .skills
+            .get_or_init(|| crate::skills::list_skills(self.p));
+        match skills.iter().find(|k| k["id"].as_str() == Some(s)) {
+            Some(k) => {
+                let st = k["status"].as_str().unwrap_or("ACTIVE").to_uppercase();
+                if self.excluded.contains(&st) {
+                    Err(format!("required skill {s} is {st}"))
+                } else {
+                    Ok(json!({"id": s, "version": k["version"], "source": k["_source"]}))
+                }
+            }
+            None => Err(format!("required skill {s} is not registered (capability gap: `gov skills resolve <task>`)")),
+        }
+    }
+    /// Every unavailable required input of `t`, as blocking reasons.
+    pub fn gaps(&self, t: &Record) -> Vec<String> {
+        let mut out = vec![];
+        for d in t.list("required_data") {
+            if let Err(e) = self.data(&d) {
+                out.push(e);
+            }
+        }
+        for x in t.list("required_tools") {
+            if let Err(e) = self.tool(&x) {
+                out.push(e);
+            }
+        }
+        for x in t.list("required_skills") {
+            if let Err(e) = self.skill(&x) {
+                out.push(e);
+            }
+        }
+        out
+    }
+}
+
+/// Resolution state of each required input of `t` (for presentation, e.g. the context packet).
+pub fn required_inputs(p: &Project, store: &RecordStore, t: &Record) -> Value {
+    let r = InputResolver::new(p, store);
+    let row = |id: &str, res: std::result::Result<Value, String>| match res {
+        Ok(v) => json!({"id": id, "available": true, "resolution": v}),
+        Err(e) => json!({"id": id, "available": false, "reason": e}),
+    };
+    json!({
+        "required_data": t.list("required_data").iter().map(|d| row(d, r.data(d))).collect::<Vec<_>>(),
+        "required_tools": t.list("required_tools").iter().map(|d| row(d, r.tool(d))).collect::<Vec<_>>(),
+        "required_skills": t.list("required_skills").iter().map(|d| row(d, r.skill(d))).collect::<Vec<_>>(),
+    })
 }
 
 pub fn compute(p: &Project) -> Result<DagView> {
@@ -39,6 +229,19 @@ pub fn compute(p: &Project) -> Result<DagView> {
         .iter()
         .map(|t| (t.id(), t.get("task_status")))
         .collect();
+    // `A.blocks = [B]` is the edge B -> A: B waits for A
+    let mut blocked_by: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut dangling_blocks = vec![];
+    for t in &tasks {
+        for b in t.list("blocks") {
+            if ids.contains(&b) {
+                blocked_by.entry(b).or_default().push(t.id());
+            } else {
+                dangling_blocks.push(json!({"task": t.id(), "blocks": b}));
+            }
+        }
+    }
+    let inputs = InputResolver::new(p, &store);
     let mut runnable = vec![];
     let mut blocked = vec![];
     let mut waiting = vec![];
@@ -72,6 +275,15 @@ pub fn compute(p: &Project) -> Result<DagView> {
                 }
             }
         }
+        for b in blocked_by.get(&id).cloned().unwrap_or_default() {
+            let s = status_of.get(&b).cloned().unwrap_or_default();
+            if s != "DONE" {
+                reasons.push(format!(
+                    "blocked by {b} (its `blocks` lists {id}); {b} is {s}"
+                ));
+            }
+        }
+        reasons.extend(inputs.gaps(t));
         let gate = t.get("human_gate");
         if !gate.is_empty() {
             let gs = gates.get(&gate).cloned().unwrap_or("MISSING".into());
@@ -179,13 +391,15 @@ pub fn compute(p: &Project) -> Result<DagView> {
     let deps: BTreeMap<String, Vec<String>> = tasks
         .iter()
         .map(|t| {
-            (
-                t.id(),
-                t.list("dependencies")
-                    .into_iter()
-                    .filter(|d| open.contains(d))
-                    .collect(),
-            )
+            let mut d: Vec<String> = t
+                .list("dependencies")
+                .into_iter()
+                .chain(blocked_by.get(&t.id()).cloned().unwrap_or_default())
+                .filter(|d| open.contains(d))
+                .collect();
+            d.sort();
+            d.dedup();
+            (t.id(), d)
         })
         .collect();
     let mut cycles = vec![];
@@ -265,6 +479,7 @@ pub fn compute(p: &Project) -> Result<DagView> {
         human_gate_dependencies: gate_deps,
         counts,
         missing_dependencies: missing,
+        dangling_blocks,
     })
 }
 

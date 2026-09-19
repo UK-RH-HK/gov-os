@@ -1,0 +1,49 @@
+== E1-authority.out: DIFF 8 lines
+   -REQ-0002 now: updated: '2026-09-18'
+   +REQ-0002 now: updated: '2026-09-19'
+   -exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=task TASK-W2: the repository shows mutations the report does not declare or the contract does not allow (undeclared: ["spec/<RND>/F-0002.yaml"]; out of scope: ["spec/<RND>/F-0002.yaml: outside allowed_paths [\"src/**\"] and not governed by a committed CIT"]); declare every chang
+   +exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=task TASK-W2: the repository shows mutations the report does not declare or the contract does not allow (undeclared: ["spec/<RND>/F-0002.yaml"]; out of scope: ["spec/<RND>/F-0002.yaml: outside allowed_paths [\"src/**\"] and not governed by a CIT executed while this task was clai
+   -exit=0 ok=true
+   +exit=1 ok=false code=ROLE_NOT_DESIGNATED msg=TASK-TD designates role 'independent-test-designer' (task contract `role`); the acting role 'backend-engineer' may not claim it — act as 'independent-test-designer' or have the task contract amended
+   -exit=0 ok=true
+   +exit=1 ok=false code=CLAIM_REQUIRED msg=TASK-TD is not claimed by session S-impl; claim it first (`gov task claim TASK-TD`) — the claim records the mutation baseline, scope and working tree the close is checked against
+== E2-roles.out: DIFF 1 lines
+   +runtime/src/orche<RND>/tasks.rs:109: return Err(GovError::new("UNKNOWN_ROLE", format!("task role '{r}' is not defined in the kernel ROLES.yaml; the designated role binds who may claim and close the task, so it must be a kernel role id (e.g. backend-engineer, independent-test-designer)")));
+== E3-handoffs.out: SAME(normalised)
+== E4-claims.out: DIFF 36 lines
+   -trial 1: successes=2 [ X:TASK_CLAIMED Y:OK Z:OK] final holder=['S-Y1']
+   -trial 2: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-Z2']
+   -trial 3: successes=2 [ X:OK Y:TASK_CLAIMED Z:OK] final holder=['S-X3']
+   -trial 4: successes=2 [ X:OK Y:TASK_CLAIMED Z:OK] final holder=['S-Z4']
+   -trial 5: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-X5']
+   -trial 6: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y6']
+   +trial 1: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y1']
+   +trial 2: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y2']
+   +trial 3: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X3']
+   +trial 4: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X4']
+   +trial 5: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X5']
+   +trial 6: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z6']
+   -trial 8: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-X8']
+   -trial 9: successes=2 [ X:TASK_CLAIMED Y:OK Z:OK] final holder=['S-Y9']
+   -trial 10: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-Y10']
+   -trial 11: successes=2 [ X:OK Y:TASK_CLAIMED Z:OK] final holder=['S-Z11']
+   -trial 12: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-Z12']
+   -trial 13: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z13']
+   -trial 14: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-Z14']
+   -trial 15: successes=3 [ X:OK Y:OK Z:OK] final holder=['S-X15']
+   -SUMMARY: trials=15 more-than-one-<SESSION>=12 exactly-one=3 none=0
+   +trial 8: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X8']
+   +trial 9: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y9']
+   +trial 10: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y10']
+   +trial 11: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X11']
+   +trial 12: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y12']
+   +trial 13: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X13']
+   +trial 14: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X14']
+   +trial 15: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y15']
+   +SUMMARY: trials=15 more-than-one-<SESSION>=0 exactly-one=15 none=0
+   -exit=0 ok=true
+   +exit=1 ok=false code=CLAIM_SCOPE_CONFLICT msg=TASK-D: its mutation scope unrestricted (the task declares no allowed_paths) overlaps live claim(s) of other sessions: TASK-C (session S-zeta, scope unrestricted (the task declares no allowed_paths)); parallel work is permitted only on disjoint mutation scopes — wait for them to clo
+   -exit=0 ok=true
+   +exit=1 ok=false code=CLAIM_SCOPE_CONFLICT msg=TASK-M2: its mutation scope ["src/**"] overlaps live claim(s) of other sessions: TASK-M1 (session S-m1, scope ["src/**"]); parallel work is permitted only on disjoint mutation scopes — wait for them to close or release, or narrow the task's allowed_paths
+   -exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=task TASK-M2: the repository shows mutations the report does not declare or the contract does not allow (undeclared: ["src/lib.rs"]; out of scope: []); declare every change in files_changed, route out-of-scope changes through a CIT, or amend the task contract
+   +exit=1 ok=false code=CLAIM_REQUIRED msg=TASK-M2 is not claimed by session S-m2; claim it first (`gov task claim TASK-M2`) — the claim records the mutation baseline, scope and working tree the close is checked against

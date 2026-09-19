@@ -1,0 +1,121 @@
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws05-scratch/fam-base/delta-r/j-1789776233-51d0ac/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## J1 (a) the product's own research producer: gov memory benchmark --record
+$ gov --json --session probe-27c87078 memory benchmark --candidate current --candidate builtin:128 --record
+  -> ok
+OBSERVE J1.a.record RES-0001 as written by the product: {"conclusion": "recommended: \"current\"", "confidence": 0.7, "influences": [], "measurements": "<2 rows>", "method": "For each candidate: full re-index into an isolated database, then the held-out set (14 queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.", "question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?", "reason": "framework \u00a714.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration", "sources": ["governance/tests/memory/heldout.yaml"], "state_class": "EVIDENCE", "status": "ACTIVE", "uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending"}
+CHECK J1.a.question PASS the benchmark research record carries a non-empty 'question'
+      detail: {"question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?"}
+CHECK J1.a.reason PASS the benchmark research record carries a non-empty 'reason'
+      detail: {"reason": "framework \u00a714.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration"}
+CHECK J1.a.method PASS the benchmark research record carries a non-empty 'method'
+      detail: {"method": "For each candidate: full re-index into an isolated database, then the held-out set (14 queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost."}
+CHECK J1.a.sources PASS the benchmark research record carries a non-empty 'sources'
+      detail: {"sources": ["governance/tests/memory/heldout.yaml"]}
+CHECK J1.a.measurements PASS the benchmark research record carries a non-empty 'measurements'
+      detail: {"measurements": "(rows)"}
+CHECK J1.a.uncertainty PASS the benchmark research record carries a non-empty 'uncertainty'
+      detail: {"uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending"}
+CHECK J1.a.conclusion PASS the benchmark research record carries a non-empty 'conclusion'
+      detail: {"conclusion": "recommended: \"current\""}
+CHECK J1.a.confidence PASS the benchmark research record carries a non-empty 'confidence'
+      detail: {"confidence": 0.7}
+CHECK J1.a.influences FAIL the benchmark research record carries a non-empty 'influences'
+      detail: {"influences": []}
+$ gov --json --session probe-27c87078 memory select builtin:128 --research RES-0001
+  -> ok
+CHECK J1.a.influence_backlink FAIL after the decision is taken on this research, the research output records the decision it influenced
+      detail: {"decision": "D-0001", "decision.derived_from": ["RES-0001"], "influences": []}
+$ gov --json --session probe-27c87078 memory graph RES-0001 --depth 1
+  -> ok
+CHECK J1.a.graph PASS the influence is at least recoverable through the graph (decision DERIVED_FROM research)
+      detail: [{"from": "RES-0001", "hop": 1, "node": "D-0001", "via": "\u2190DERIVED_FROM"}]
+
+## J1 (b) any other governed research output: what the product requires
+$ gov --json --session probe-27c87078 cit propose --proposal 'probe change res' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws05-scratch/fam-base/delta-r/j-1789776233-51d0ac/m-res.json --trigger behaviour_change
+  -> ok
+$ gov --json --session probe-27c87078 gate present HDG-0001
+  -> ok
+$ gov --json --session probe-27c87078 decide HDG-0001 --option A --rationale 'probe relay'
+  -> ok
+$ gov --json --session probe-27c87078 cit approve CIT-0001
+  -> ok
+$ gov --json --session probe-27c87078 cit execute CIT-0001
+  -> ok
+CHECK J1.b.accepted FAIL a research record with only question + conclusion (no method, sources, measurements, uncertainty, confidence) is refused as a governed research output
+      detail: {"execute": "COMMITTED"}
+# RECORD WRITE (direct file write, no gov command): spec/research/RES-0101.yaml
+# RECORD WRITE (direct file write, no gov command): spec/research/RES-0102.yaml
+$ gov --json --session probe-27c87078 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-27c87078 audit --no-persist
+  -> ok
+CHECK J1.b.audit FAIL the governance suite flags research outputs that lack reason/method/sources/measurements/uncertainty/confidence (RES-0100, RES-0101) or even a conclusion (RES-0102, question only)
+      detail: {"findings_on_research": [], "verdict": "HEALTHY"}
+$ gov --json --session probe-27c87078 memory query 'does caching halve latency'
+  -> ok
+OBSERVE J1.b.retrieval the unsupported research conclusion is retrievable as evidence: [["RES-0100", "EVIDENCE", "ACTIVE"], ["file:governance/kernel/policies/MODEL_ROUTING_POLICY.yaml", "AUTHORITATIVE", "ACTIVE"], ["file:spec/now/.gitkeep", "AUTHORITATIVE", "ACTIVE"]]
+$ gov --json --session probe-27c87078 gate create --question 'Adopt caching?' --fields '{"options": [{"id": "A", "description": "yes"}], "derived_from": ["RES-0101"]}'
+  -> ok
+$ gov --json --session probe-27c87078 gate present HDG-0002
+  -> ok
+$ gov --json --session probe-27c87078 decide HDG-0002 --option A --rationale 'RES-0101 says caching halves latency'
+  -> ok
+OBSERVE J1.b.decision a decision can be taken citing an unsupported research output; nothing checks the research completeness: {"decision": "D-0003"}
+
+## J2 experiment lifecycle
+OBSERVE J2.schema experiment schema: required fields and whether each J2 item has a field: {"additionalProperties": null, "data": true, "decision_influence": false, "hypothesis": true, "interpretation": false, "method": true, "reproducibility": false, "required": ["id", "type", "status"], "results": true}
+$ gov --session probe-27c87078 experiment --help
+OBSERVE J2.cli is there an experiment command surface?: {"exit": 2, "stderr": "error: unrecognized subcommand 'experiment'\n\nUsage: gov [OPTIONS] <COMMAND>\n\nFor more information, try '--help'.\n"}
+$ gov --json --session probe-27c87078 cit propose --proposal 'probe change exp' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws05-scratch/fam-base/delta-r/j-1789776233-51d0ac/m-exp.json --trigger behaviour_change
+  -> ok
+$ gov --json --session probe-27c87078 gate present HDG-0003
+  -> ok
+$ gov --json --session probe-27c87078 decide HDG-0003 --option A --rationale 'probe relay'
+  -> ok
+$ gov --json --session probe-27c87078 cit approve CIT-0002
+  -> ok
+$ gov --json --session probe-27c87078 cit execute CIT-0002
+  -> ok
+CHECK J2.empty FAIL an experiment record with no hypothesis, method, data, reproducibility, results or interpretation is refused
+      detail: {"execute": "COMMITTED"}
+# RECORD WRITE (direct file write, no gov command): spec/experiments/EXP-0002.yaml
+$ gov --json --session probe-27c87078 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-27c87078 audit --no-persist
+  -> ERROR [UNHEALTHY] governance suite UNHEALTHY: 0 critical, 1 high
+CHECK J2.merge.schema PASS an experiment record that declares production_merge_allowed: true is flagged by the suite (schema const false)
+      detail: [{"family": "schema_invariants", "id": "GF-0001", "message": "EXP-0002 (experiment): /production_merge_allowed: false was expected", "path": "spec/experiments/EXP-0002.yaml", "severity": "high"}]
+CHECK J2.incomplete.audit FAIL the suite flags the experiment record that has none of hypothesis/method/results/reproducibility/interpretation
+      detail: {"findings_on_EXP-0001": []}
+
+## J2 production merge prohibited where experimental
+$ gov --json --session probe-27c87078 task create --objective 'prototype async gateway client' --class experiment --status READY --allowed product/**
+  -> ok
+CHECK J2.merge.flag PASS an experiment-class task is created with production_merge_allowed: false
+      detail: {"production_merge_allowed": false}
+$ gov --json --session probe-27c87078 task create --objective sneak --class experiment --status READY --fields '{"production_merge_allowed": true}'
+  -> ok
+CHECK J2.merge.flag2 PASS the flag cannot be set true on an experiment task
+      detail: false
+$ gov --json --session probe-27c87078 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-27c87078 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-27c87078 task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws05-scratch/fam-base/delta-r/j-1789776233-51d0ac/rep-exp.json
+  -> ok
+CHECK J2.merge.enforced FAIL closing an experimental task whose output landed in the production tree (product/**) is refused or marked non-mergeable
+      detail: {"close": {"checkpoint": "CKPT-00003", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+$ gov --json --session probe-27c87078 status
+  -> ok
+$ gov --json --session probe-27c87078 doctor
+  -> ok
+$ gov --json --session probe-27c87078 doctor
+  -> ok
+OBSERVE J2.merge.after after the experimental code is committed into the production tree: {"doctor_failed_checks": ["D021"], "git_commit_rc": 0, "status_next_action": "gov continue \u2192 claim TASK-0002"}
+$ gov --json --session probe-27c87078 audit --no-persist
+  -> ERROR [UNHEALTHY] governance suite UNHEALTHY: 0 critical, 1 high
+CHECK J2.merge.detected FAIL the governance suite detects the experimental task's output merged into production (a finding naming the file or the experiment task)
+      detail: {"findings": ["EXP-0002 (experiment): /production_merge_allowed: false was expected", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"], "verdict": "UNHEALTHY"}
+SUMMARY checks=20 pass=12 fail=8 failed=['J1.a.influences', 'J1.a.influence_backlink', 'J1.b.accepted', 'J1.b.audit', 'J2.empty', 'J2.incomplete.audit', 'J2.merge.enforced', 'J2.merge.detected']
