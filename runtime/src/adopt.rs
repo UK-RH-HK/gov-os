@@ -1205,8 +1205,21 @@ pub fn a5_test_design_by(root: &Path, actor: &identity::Actor) -> Result<Value> 
                 .collect()
         })
         .unwrap_or_default();
-    for i in test_identities(&tests) {
-        if !known.contains(&i) {
+    // the planner's: the scaffold it generated now, and every test the file holds when the planner runs test-design —
+    // except tests an earlier independent approval recorded as the reviewer's own
+    let reviewers: Vec<String> = b["verdicts"]["A5"]["reviewer_test_identities"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    for i in test_identities(&tests)
+        .into_iter()
+        .chain(test_identities(&current))
+    {
+        if !known.contains(&i) && !reviewers.contains(&i) {
             known.push(i);
         }
     }
@@ -1329,6 +1342,7 @@ pub fn a5_review_by(
         .collect();
     let mut entry = verdict_actor(&who);
     for (k, v) in json!({"verdict": verdict, "at": now_iso(), "tests": n, "notes": notes, "reviewer_tests": reviewer_ids, "reviewer_tests_count": reviewer_tests.len(),
+        "reviewer_test_identities": reviewer_tests.iter().map(|t| verify::test_identity(t)).collect::<Vec<_>>(),
         "scaffold_tests": scaffold_kept, "scaffold_tests_removed": removed,
         "catalogue_sha256": bound["catalogue_sha256"], "catalogue_version": read_json(&catalogue_meta_path(root)).map(|m| m["version"].clone()).unwrap_or(Value::Null),
         "plan_id": plan["id"], "plan_version": plan["version"], "plan_sha256": bound["plan_sha256"], "tests_sha256": bound["tests_sha256"],
