@@ -1,0 +1,14 @@
+# P2-AR-0027 audit-of-record probe re-run (unedited): delta-r/L3-gate-presentation-attacks mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree HEAD (export of 843d79c)
+# probe sha256 7f85d45e2957964095ba2aa70e1be09acb08ce34c6637f08aaf9e33da1a7a6d0; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree/target/release/gov
+# date 2026-09-19T05:07:01Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/run-direct-delta-r-L3-gate-presentation-attacks-NV06pk/l3-1789794421-e8c090/proj
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree/release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.py", line 55, in <module>
+    p = Proj("l3")
+        ^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree/release/capability-baseline/audit-0/delta-r/evidence/harness.py", line 69, in __init__
+    assert r["ok"], r
+           ~^^^^^^
+AssertionError: {'ok': False, 'command': 'init', 'error': {'code': 'AUTHORITY_DENIED', 'message': "no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an orchestrator unless explicitly assigned that role); 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: declare the assigned role with the global `--role <kernel role id>` flag or GOV_ROLE.", 'details': {'role': 'undeclared', 'declared': False, 'level': 'L0', 'kernel_level': 'L0', 'required': 'L4', 'operation': 'install_kernel', 'cause': 'ROLE_UNDECLARED', 'remediation': 'declare the assigned role with the global `--role <kernel role id>` flag or GOV_ROLE'}}, 'session': 'probe-cfe3f606', 'release_trust': {'surface': 'init', 'below_floor': False, 'marking': None, 'presented_as': 'CURRENT', 'section_6_bullet': 7, 'basis': "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}, '_exit': 1}
+[exit=1]
