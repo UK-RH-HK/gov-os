@@ -235,7 +235,8 @@ new_integration_points:
   - {id: R3-WS5-5, owner: WS-2, where: "scheduler/sandbox.rs, currency input, doctor D017/D026", what: "read paths::store_path(root, \"claims\") (WS-6 IP-R2-12)"}
   - {id: R3-WS5-6, owner: WS-3, where: orchestration::control state, what: "store_path(root, \"emergency-control\") + relocate_legacy (WS-6 IP-R2-8); D6-b2-B control half"}
   - {id: R3-WS5-7, owner: "owner of runtime/src/recovery.rs", where: recovery report, what: "write evidence/discoveries/unresolved items as strings (report schema); pre-existing schema_invariants HIGH finding"}
-  - {id: R3-WS5-8, owner: "WS-4 / WS-10", where: "cit::propagation markers; lifecycle::record_influence", what: "attribute OS writes into governed records inside another task's claim window (latent, not observed)"}
+  - {id: R3-WS5-8, owner: "WS-4 / WS-10", where: "cit::propagation markers (incl. detect_and_propagate at claim); lifecycle::record_influence", what: "attribute OS writes into governed records inside another task's claim window (latent, not observed; extends WS-5 r2 IP-R3-3)"}
+  - {id: WS-5-r2-IP-R3-1-final-step, owner: WS-5 (after WS-3/WS-4 re-seal their task-record rewrites), where: "t2::SEALED_RECORD_TYPES; task record writers", what: "seal task records and add 'task' to the must-be-sealed kinds — not done this round"}
   - {id: R3-WS5-9, owner: WS-8, where: framework/KERNEL.yaml schema_versions, what: "task 1.2.0; add test-obligation 1.1.0"}
   - {id: R3-WS5-10, owner: WS-2, where: Gate U / SLOs, what: "measure per-write reconciliation and claim-time checkpoint cost"}
   - {id: R3-WS5-11, owner: "WS-2 / WS-6", where: memory_retrieval_regression in a health sandbox, what: "symbol route empty inside the sandbox; pre-existing, reproduced on the base binary"}

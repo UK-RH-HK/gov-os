@@ -238,6 +238,8 @@ block; remediation claimable under it).
 | WS-4 r2 R2-1..R2-6, IP-R3-6; round-1 WS-5 IP-3 | done (R2-4 = §2; R2-5 confirmed) |
 | WS-10 r2 IP-WS10-11/12/13 | done (§4) |
 | WS-6 r2 IP-R2-7 | done (§5) |
+| WS-5 r2 IP-R3-6 / IP-R3-10 (content-bound CIT coverage; BC-P2-24 and the BC-P2-13 hook) | done (§1, §2) |
+| WS-5 r2 IP-R3-1, final step (WS-5 seals task records and adds `task` to `t2::SEALED_RECORD_TYPES`) | **not done** — it follows WS-3's and WS-4's re-sealing of the task records they rewrite (same round, not integrated); sealing first would make those unsealed rewrites refusable at close. Generated tasks are written through the ordinary create path, unsealed like every other task record today |
 
 ### 7.2 New integration points (declared additive exceptions and follow-ups)
 
@@ -250,7 +252,7 @@ block; remediation claimable under it).
 | R3-WS5-5 | WS-2 | `scheduler/sandbox.rs`, currency input, doctor D017/D026 | read `paths::store_path(root, "claims")` (WS-6 IP-R2-12, still open) | the store moved this round |
 | R3-WS5-6 | WS-3 | `orchestration::control` state | `store_path(root, "emergency-control")` + `relocate_legacy` (WS-6 IP-R2-8) | D6-b2-B's remaining half |
 | R3-WS5-7 | owner of `runtime/src/recovery.rs` | `recovery::recover` report | write `evidence` / `discoveries` / `unresolved` items as strings (the report schema) | pre-existing: a recovery report fails `schema_invariants` (HIGH) and, once re-evaluated, hard-blocks `task.close` (seen in `failure_injection`) |
-| R3-WS5-8 | WS-4 / WS-10 | `cit::propagation` markers, `lifecycle::record_influence` | attribute OS writes made into governed records inside another task's claim window (seal or recorded write set) so that close never reads them as that worker's mutations | latent; not observed in the suites |
+| R3-WS5-8 | WS-4 / WS-10 | `cit::propagation` markers (incl. those `detect_and_propagate` now writes at claim), `lifecycle::record_influence` | attribute OS writes made into governed records inside another task's claim window (seal or recorded write set) so that close never reads them as that worker's mutations (extends WS-5 r2 IP-R3-3) | latent; not observed in the suites |
 | R3-WS5-9 | WS-8 | `framework/KERNEL.yaml` `schema_versions` | `task` 1.2.0 (was already 1.1.0 vs listed 1.0.0); add `test-obligation` 1.1.0 | schema version registry |
 | R3-WS5-10 | WS-2 | Gate U / SLO | measure the per-write reconciliation and claim-time checkpoint cost | performance of the event hooks |
 | R3-WS5-11 | WS-2 / WS-6 | `memory_retrieval_regression` in a health sandbox | symbol route returns nothing inside the sandbox (`isolated_in_sandbox: true`); reproduced with the base binary | pre-existing; hidden by the cache |
