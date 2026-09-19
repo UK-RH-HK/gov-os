@@ -66,6 +66,9 @@ pub struct ReferenceIndex {
     pub edges: Vec<RefEdge>,
     /// basename -> (from, line, role) for tokens naming a file by its bare file name only
     pub basename_mentions: HashMap<String, Vec<(String, usize, String)>>,
+    /// (pattern, from, line, role): glob patterns (`memory/*.sqlite`) and multi-segment directory references
+    /// (`data/memory/`) in code and configuration, which can reach a file without naming it
+    pub pattern_mentions: Vec<(String, String, usize, String)>,
     pub paths: BTreeSet<String>,
     pub scanned: usize,
     pub skipped_large: Vec<String>,
@@ -151,6 +154,11 @@ fn event_record(rel: &str, text: &str) -> bool {
         .map(|c| EVENT_RECORD_TYPES.contains(&&c[1]))
         .unwrap_or(false)
         || gate_answer.is_match(text)
+}
+
+fn pattern_rx() -> &'static Regex {
+    static R: OnceLock<Regex> = OnceLock::new();
+    R.get_or_init(|| Regex::new(r"[A-Za-z0-9_./\-*?]+").unwrap())
 }
 
 fn token_rx() -> &'static Regex {
@@ -309,6 +317,29 @@ pub fn build_with_ghosts(
                                 });
                             }
                         }
+                    }
+                }
+            }
+            if line_role == "code" || line_role == "config" {
+                for m in pattern_rx().find_iter(line) {
+                    let t = m.as_str().trim_end_matches(['.', ',', ':', ';']);
+                    let globbed = t.contains('*') || t.contains('?');
+                    // a directory reference counts only with at least two segments (`var/cache`, `data/memory/`):
+                    // a lone `docs/` in a comment or docstring is prose, not a dependency
+                    let inner = t.trim_matches('/');
+                    let multi_dir = !globbed
+                        && !t.contains('.')
+                        && inner.contains('/')
+                        && inner.split('/').all(|seg| !seg.is_empty());
+                    if (globbed && t.chars().filter(|c| c.is_alphanumeric()).count() >= 2)
+                        || multi_dir
+                    {
+                        idx.pattern_mentions.push((
+                            t.to_string(),
+                            f.rel.clone(),
+                            ln,
+                            line_role.clone(),
+                        ));
                     }
                 }
             }
@@ -496,6 +527,38 @@ impl ReferenceIndex {
                         line,
                         role,
                     });
+            }
+        }
+        // a glob or a directory reference in live code/configuration that reaches the subject is a dependency too
+        for s in subjects {
+            for (pat, from, line, role) in &self.pattern_mentions {
+                if all.contains(from) || !active.is_active(from) {
+                    continue;
+                }
+                let p = pat.trim_start_matches("./");
+                let dir = p.trim_end_matches('/');
+                let reaches = if p.contains('*') || p.contains('?') {
+                    crate::util::glob_match(p, s) || crate::util::glob_match(&format!("**/{p}"), s)
+                } else {
+                    !dir.is_empty() && s.starts_with(&format!("{dir}/"))
+                };
+                if reaches && !out.keys().any(|(f, l, _)| f == from && l == line) {
+                    out.insert(
+                        (from.clone(), *line, s.clone()),
+                        RefEdge {
+                            from: from.clone(),
+                            to: s.clone(),
+                            kind: "path_reference".into(),
+                            resolution: if p.contains('*') || p.contains('?') {
+                                "glob".into()
+                            } else {
+                                "directory".into()
+                            },
+                            line: *line,
+                            role: role.clone(),
+                        },
+                    );
+                }
             }
         }
         out.into_values().collect()
@@ -721,6 +784,42 @@ mod tests {
         // a bare file name counts (conservative)
         let p2 = dependency_proof(&idx, "memory/chat.sqlite", None, &act);
         assert_eq!(p2["result"], "ACTIVE_REFERENCES", "{p2}");
+        let _ = std::fs::remove_dir_all(&root);
+        // a glob or a directory reference in live code reaches a file without naming it
+        let root = tmp("proof-glob");
+        let fs = files(
+            &root,
+            &[
+                (
+                    "src/load.py",
+                    "import glob\nstores = glob.glob('memory/*.sqlite')\n",
+                    &["source"],
+                ),
+                ("deploy/app.yaml", "cache_dir: var/cache/\n", &["config"]),
+                ("memory/chat.sqlite", "x\n", &["chat_store"]),
+                ("var/cache/index.bin", "x\n", &["index_store"]),
+                ("docs/x.md", "the memory/ folder\n", &["doc"]),
+            ],
+        );
+        let idx = build(&root, &fs, false);
+        let act = ActiveSet {
+            root: &root,
+            os: &os,
+            archive_root: "archive".into(),
+            leaving: BTreeSet::new(),
+        };
+        let p3 = dependency_proof(&idx, "memory/chat.sqlite", None, &act);
+        assert!(
+            p3["active_references"].to_string().contains("src/load.py"),
+            "{p3}"
+        );
+        let p4 = dependency_proof(&idx, "var/cache/index.bin", None, &act);
+        assert!(
+            p4["active_references"]
+                .to_string()
+                .contains("deploy/app.yaml"),
+            "{p4}"
+        );
         let _ = std::fs::remove_dir_all(root);
     }
 }
