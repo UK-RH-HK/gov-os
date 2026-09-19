@@ -1,0 +1,276 @@
+# P2-AR-0040 R1 held-out re-run, label=adb9120-ar27
+# worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+# worktree HEAD: adb912009419eca1f8966fc6b6351221b41a4d66
+# product files differing from HEAD (runtime/ cli/ framework/ migrations/ tools/ Cargo.*): 0
+# private scratch root: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-2 -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-3 -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+#   /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify-4 -> /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11
+# tree census (.rs under runtime/src + cli/src): 118 files
+# date: 2026-09-19T09:43:39Z
+# byte-identity of copied suites (cmp):
+  identical ho27/heldout_srr.rs
+  identical ho27/heldout_srr2.rs
+  identical ho27/heldout_srr3.rs
+  identical ho27/heldout_srr4.rs
+  identical ho27/common/forge.rs
+  identical ho27/Cargo.toml
+  identical ho29/ho_a_allowlist.rs
+  identical ho29/ho_b_coverage.rs
+  identical ho29/ho_c_deadlock.rs
+  identical ho29/ho_d_expiry.rs
+  identical ho29/ho_e_rootexpiry.rs
+  identical ho29/ho_f_preservation.rs
+  identical ho29/common/mint.rs
+  identical ho29/Cargo.toml
+  identical ho31/hx_a_census.rs
+  identical ho31/hx_b_failopen.rs
+  identical ho31/hx_c_prior_evidence.rs
+  identical ho31/hx_d_acquisition_and_preservation.rs
+  identical ho31/common/bench.rs
+  identical ho31/Cargo.toml
+  identical ho33/hv_a_derivation.rs
+  identical ho33/hv_b_bullet7.rs
+  identical ho33/hv_c_failclosed.rs
+  identical ho33/hv_d_sinks_and_preservation.rs
+  identical ho33/common/mod.rs
+  identical ho33/Cargo.toml
+# (S1) derived copy vs the held-out hv_a_derivation.rs (the ONLY difference must be the two scale assertions):
+22,23c22,23
+<     assert_eq!(files.len(), 84, "the product tree is not the size the census claims");
+<     assert_eq!(funcs.len(), 740, "my splitter does not agree with the candidate's function count");
+---
+>     println!("DERIVED COPY (P2-AR-0032, round-2 integration): scale pin 84 files not asserted; measured {}", files.len());
+>     println!("DERIVED COPY (P2-AR-0032, round-2 integration): scale pin 740 functions not asserted; measured {}", funcs.len());
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 14.08s
+# candidate gov: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/target/debug/gov sha256 3f5772484fa265b82d30659e54b0c24b2d2dfc627b396ddfbef313f368f2b6ec
+===== AR-0027 :: heldout_srr =====
+    Updating crates.io index
+     Locking 164 packages to latest compatible versions
+      Adding ed25519-dalek v2.2.0 (available: v3.0.0)
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding sha2 v0.10.9 (available: v0.11.0)
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling version_check v0.9.5
+   Compiling stable_deref_trait v1.2.1
+   Compiling cfg-if v1.0.5
+   Compiling autocfg v1.5.1
+   Compiling syn v3.0.6
+   Compiling libc v0.2.189
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling synstructure v0.14.0
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling zerofrom v0.1.8
+   Compiling zerovec-derive v0.11.6
+   Compiling yoke v0.8.3
+   Compiling displaydoc v0.2.7
+   Compiling zerovec v0.11.8
+   Compiling tinystr v0.8.4
+   Compiling generic-array v0.14.7
+   Compiling writeable v0.6.4
+   Compiling serde v1.0.229
+   Compiling litemap v0.8.3
+   Compiling smallvec v1.16.1
+   Compiling memchr v2.8.3
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling serde_derive v1.0.229
+   Compiling typenum v1.20.1
+   Compiling icu_normalizer_data v2.3.0
+   Compiling getrandom v0.3.4
+   Compiling icu_properties_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling zerocopy v0.8.57
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling num-integer v0.1.47
+   Compiling ahash v0.8.12
+   Compiling syn v2.0.119
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling semver v1.0.28
+   Compiling once_cell v1.21.4
+   Compiling rustc_version v0.4.1
+   Compiling cc v1.4.7
+   Compiling icu_properties v2.3.0
+   Compiling num-bigint v0.4.8
+   Compiling icu_normalizer v2.3.0
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling aho-corasick v1.1.5
+   Compiling parking_lot_core v0.9.12
+   Compiling pkg-config v0.3.34
+   Compiling regex-syntax v0.8.11
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.2
+   Compiling zmij v1.0.23
+   Compiling getrandom v0.4.3
+   Compiling vcpkg v0.2.15
+   Compiling libsqlite3-sys v0.28.0
+   Compiling regex-automata v0.4.18
+   Compiling indexmap v2.14.2
+   Compiling digest v0.10.7
+   Compiling num-rational v0.4.2
+   Compiling idna_adapter v1.2.2
+   Compiling curve25519-dalek v4.1.3
+   Compiling num-iter v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling bit-vec v0.6.3
+   Compiling time-core v0.1.9
+   Compiling scopeguard v1.2.0
+   Compiling cpufeatures v0.2.17
+   Compiling percent-encoding v2.3.2
+   Compiling num-conv v0.2.2
+   Compiling anyhow v1.0.104
+   Compiling serde_json v1.0.151
+   Compiling itoa v1.0.18
+   Compiling time-macros v0.2.32
+   Compiling form_urlencoded v1.2.2
+   Compiling lock_api v0.4.14
+   Compiling bit-set v0.5.3
+   Compiling num v0.4.3
+   Compiling idna v1.1.0
+   Compiling hashbrown v0.14.5
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling nom v8.0.0
+   Compiling thiserror v1.0.69
+   Compiling lazy_static v1.5.0
+   Compiling signature v2.2.0
+   Compiling zeroize v1.9.0
+   Compiling deranged v0.5.8
+   Compiling powerfmt v0.2.0
+   Compiling subtle v2.6.1
+   Compiling time v0.3.55
+   Compiling ed25519 v2.2.3
+   Compiling fraction v0.15.4
+   Compiling iso8601 v0.6.6
+   Compiling hashlink v0.9.1
+   Compiling uuid v1.26.1
+   Compiling url v2.5.8
+   Compiling parking_lot v0.12.5
+   Compiling fancy-regex v0.13.0
+   Compiling sha2 v0.10.9
+   Compiling regex v1.13.1
+   Compiling thiserror-impl v1.0.69
+   Compiling ryu v1.0.23
+   Compiling bitflags v2.13.2
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify/runtime)
+   Compiling same-file v1.0.6
+   Compiling iana-time-zone v0.1.65
+   Compiling fallible-iterator v0.3.0
+   Compiling bytecount v0.6.9
+   Compiling base64 v0.22.1
+   Compiling rand_core v0.6.4
+   Compiling num-cmp v0.1.0
+   Compiling unsafe-libyaml v0.2.11
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling rusqlite v0.31.0
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling jsonschema v0.18.3
+   Compiling ed25519-dalek v2.2.0
+   Compiling chrono v0.4.45
+   Compiling walkdir v2.5.0
+   Compiling hex v0.4.3
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho27)
+14 | use gov_runtime::srr::metadata::{Envelope, Release, Root};
+20 | fn scratch(name: &str) -> PathBuf {
+36 | fn isolate(state_home: &Path) {
+45 | fn candidate_kernel() -> PathBuf {
+54 | fn measure(state_root: &Path) -> (String, String, BTreeMap<String, String>, String) {
+65 | fn write(p: &Path, s: &str) {
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 29s
+     Running tests/heldout_srr.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/heldout_srr-3fb2efd85064e501)
+running 12 tests
+test a10_malleable_and_small_order_signatures_are_refused_by_verify_strict ... ok
+test a11_unsupported_key_scheme_is_refused ... ok
+test a12_spec_version_and_role_type_confusion_are_refused ... ok
+test a1_signature_lifted_from_a_different_document_is_refused ... ok
+test a2_keyid_cannot_be_pointed_at_another_keys_material ... ok
+test a3_role_confusion_a_timestamp_key_cannot_authorise_a_release ... ok
+test a4_threshold_cannot_be_reached_by_repeating_one_key ... ok
+test a5_unsatisfiable_threshold_is_refused_at_parse_time ... ok
+test a6_zero_threshold_is_refused ... ok
+test a7_trailing_bytes_after_the_envelope_are_refused ... ok
+test a8_a_duplicate_signed_member_is_refused_rather_than_last_wins ... ok
+test a9_unsigned_and_empty_signature_lists_are_refused ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+===== AR-0027 :: heldout_srr2 =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify/runtime)
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho27)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.56s
+     Running tests/heldout_srr2.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/heldout_srr2-b4acd551849d7f54)
+running 8 tests
+test b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms ... FAILED
+test b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison ... FAILED
+test c1_floor_binds_a_non_rollback_ingress_after_a_verified_install ... ok
+test c2_identity_and_payload_binding_fail_closed ... ok
+test c3_provisioned_machine_refuses_unsigned_input_and_anchor_removal_fails_closed ... ok
+test c4_returning_a_machine_to_the_unprovisioned_posture ... ok
+test c5_environment_cannot_carry_authority ... ok
+test c6_floors_survive_project_deletion ... ok
+failures:
+---- b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms stdout ----
+AR-0027 B1 expiry findings:
+  offset form  '2026-09-17T13:00:00+14:00' (13h in the past) -> expired = true
+  lowercase    '2026-09-17t11:59:59z'      (1s in the past)  -> expired = true
+  absent `expires` member                                    -> expired = true
+thread 'b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms' (3313151) panicked at tests/heldout_srr2.rs:119:5:
+OBSERVED: a non-UTC RFC-3339 expiry that is genuinely in the past is NOT treated as expired
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+---- b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison stdout ----
+thread 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison' (3313158) panicked at tests/heldout_srr2.rs:138:5:
+a non-emitted-format expiry is accepted without complaint: Err(GovError { code: "SRR_METADATA_EXPIRED", message: "root version 1: `expires` is '2099-01-01T00:00:00+00:00', which is not the canonical UTC form YYYY-MM-DDTHH:MM:SSZ that this profile emits and compares; a non-canonical expiry is treated as expired (fail closed)", details: Null })
+failures:
+    b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms
+    b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.29s
+error: test failed, to rerun pass `--test heldout_srr2`
+===== AR-0027 :: heldout_srr3 =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify/runtime)
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho27)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.67s
+     Running tests/heldout_srr3.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/heldout_srr3-6510f67e89af1a98)
+running 5 tests
+test d1_break_glass_authority_cannot_be_manufactured ... ok
+test d2_valid_break_glass_enters_marks_and_is_single_use ... ok
+test d3_below_floor_refusal_surface_against_owner_decision_0006_section_6 ... FAILED
+test d4_exit_policy_is_one_point_at_the_stricter_reading ... ok
+test d5_break_glass_is_purely_local ... ok
+failures:
+---- d3_below_floor_refusal_surface_against_owner_decision_0006_section_6 stdout ----
+AR-0027 D3 — while marked `DEGRADED — RECOVERY ONLY`:
+  REFUSED   (32): ["upstream submit", "upstream export", "memory select", "gate create", "gate answer", "gate revoke", "gate present", "decide", "tools install", "replan", "plugins register", "plugins unregister", "handoff create", "handoff return", "readiness plan", "cit propose", "cit simulate", "cit approve", "cit reject", "cit execute", "adopt migrate", "adopt extract-legacy", "adopt build-memory", "task create", "task status", "task claim", "task close", "release build", "release certify", "trust provision", "trust root-update", "skills install"]
+  PERMITTED (3): ["checkpoint", "update --apply", "kernel reinstall"]
+thread 'd3_below_floor_refusal_surface_against_owner_decision_0006_section_6' (3317746) panicked at tests/heldout_srr3.rs:264:9:
+OBSERVED: 'cit approve' is permitted while the machine is marked DEGRADED — RECOVERY ONLY
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+failures:
+    d3_below_floor_refusal_surface_against_owner_decision_0006_section_6
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.70s
+error: test failed, to rerun pass `--test heldout_srr3`
+===== AR-0027 :: heldout_srr4 =====
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/wt/srr1-r1-verify/runtime)
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/ho27)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.62s
+     Running tests/heldout_srr4.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0040/r1-P2-AR-0040-private/target-ho/debug/deps/heldout_srr4-594ab83c7bc041d5)
+running 4 tests
+test e1_an_expired_trust_anchor_still_authorises_a_release_install ... ok
+test e2_timestamp_and_snapshot_are_optional_and_their_expiry_does_not_refuse ... ok
+test e3_install_transaction_is_atomic_and_replays_after_interruption ... ok
+test e4_intact_is_not_authentic_and_the_two_controls_are_independent ... ok
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.39s
+
+# SUMMARY (per test binary)
+AR-0027  heldout_srr                              passed= 12 failed=  0  []
+AR-0027  heldout_srr2                             passed=  6 failed=  2  ['b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms', 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison']
+AR-0027  heldout_srr3                             passed=  4 failed=  1  ['d3_below_floor_refusal_surface_against_owner_decision_0006_section_6']
+AR-0027  heldout_srr4                             passed=  4 failed=  0  []
+
+# SUMMARY (per suite)
+AR-0027: 26 passed / 3 failed; failing=['b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms', 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison', 'd3_below_floor_refusal_surface_against_owner_decision_0006_section_6']; not-compiling=[]

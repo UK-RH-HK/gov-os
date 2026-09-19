@@ -1,0 +1,89 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/runtime)
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws09-11/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.76s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-15a10c09d13f7815)
+
+running 52 tests
+test srr::an_unreadable_marking_is_read_the_same_way_by_every_consumer_and_still_exits ... ok
+test srr::the_no_bypass_and_no_signing_preservation_census_still_holds ... ok
+test srr::section_6_refusal_class_tables_are_partitioned_by_what_the_product_actually_enforces ... ok
+test srr::an_unsigned_source_is_refused_once_a_trust_anchor_exists ... ok
+test srr::root_succession_requires_both_quorums_no_gaps_and_revokes_by_omission ... ok
+test srr::expired_metadata_fails_closed_against_the_declared_local_clock ... ok
+test srr::the_capability_contract_source_chain_is_hash_bound_and_fails_closed ... ok
+test srr::wrong_key_wrong_product_and_wrong_channel_all_fail_closed ... ok
+test srr::modified_metadata_payload_and_migration_all_fail_closed ... ok
+test srr::an_interrupted_install_leaves_one_complete_version_and_never_advances_a_floor ... ok
+test srr::protected_floors_survive_uninstall_and_project_removal ... ok
+test srr::installed_integrity_authenticity_and_admissibility_stay_three_separate_predicates ... ok
+test ws03::every_cli_command_label_is_classified_by_g0 ... ok
+test srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target has been running for over 60 seconds
+test srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance has been running for over 60 seconds
+test srr::an_allow_listed_operation_cannot_create_a_human_gate_below_floor has been running for over 60 seconds
+test srr::below_floor_refusal_is_default_refuse_across_the_whole_operation_surface has been running for over 60 seconds
+test srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network has been running for over 60 seconds
+test srr::environment_repository_and_caller_inputs_cannot_create_trust_or_approval has been running for over 60 seconds
+test srr::replaying_older_metadata_is_refused_by_the_protected_high_water has been running for over 60 seconds
+test srr::section_6_effects_are_enforced_inside_their_sinks has been running for over 60 seconds
+test srr::the_floor_binds_every_ingress_and_only_owner_signed_break_glass_admits_a_below_floor_release has been running for over 60 seconds
+test update::update_from_previous_release_preserves_project_and_rolls_back has been running for over 60 seconds
+test upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet has been running for over 60 seconds
+test upstream::export_gate_fails_closed_on_content_whatever_the_name has been running for over 60 seconds
+test srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network ... ok
+test upstream::upstream_export_gate_fails_closed_and_sanitises has been running for over 60 seconds
+test ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate has been running for over 60 seconds
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor has been running for over 60 seconds
+test srr::an_allow_listed_operation_cannot_create_a_human_gate_below_floor ... ok
+test srr::environment_repository_and_caller_inputs_cannot_create_trust_or_approval ... ok
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment has been running for over 60 seconds
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment ... ok
+test ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere has been running for over 60 seconds
+test srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance ... ok
+test srr::section_6_effects_are_enforced_inside_their_sinks ... ok
+test ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere ... ok
+test srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target ... ok
+test srr::replaying_older_metadata_is_refused_by_the_protected_high_water ... ok
+test srr::below_floor_refusal_is_default_refuse_across_the_whole_operation_surface ... ok
+test ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate ... ok
+test srr::the_floor_binds_every_ingress_and_only_owner_signed_break_glass_admits_a_below_floor_release ... ok
+test upstream::export_gate_fails_closed_on_content_whatever_the_name ... ok
+test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
+test ws03::hand_written_gate_and_decision_records_are_not_honoured ... ok
+test ws03::presentation_is_recorded_only_from_an_owner_signed_receipt ... ok
+test upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet ... ok
+test ws03::blocked_work_is_released_only_by_an_authorising_answer has been running for over 60 seconds
+test ws03::cit_approval_consumes_only_honoured_gate_answers has been running for over 60 seconds
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations has been running for over 60 seconds
+test ws03::blocked_work_is_released_only_by_an_authorising_answer ... ok
+test ws03::human_answers_come_only_from_the_owner_signed_channel has been running for over 60 seconds
+test ws03::the_decision_package_is_enforced ... ok
+test ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them has been running for over 60 seconds
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers has been running for over 60 seconds
+test ws04r2::checkpoint_and_handoff_continuity has been running for over 60 seconds
+test ws04r2::cit_approval_binds_content_impact_and_transaction has been running for over 60 seconds
+test ws04r2::cit_approval_binds_content_impact_and_transaction ... ok
+test ws04r2::contradictions_are_blocked_and_routed ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them ... ok
+test ws03::cit_approval_consumes_only_honoured_gate_answers ... ok
+test ws04r2::materiality_is_derived_not_labelled ... ok
+test ws04r2::upstream_change_reaches_completed_work has been running for over 60 seconds
+test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor ... ok
+test ws05::releasing_a_claim_is_a_guarded_write ... ok
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers ... ok
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations ... ok
+test ws05::close_observes_os_written_state_no_os_operation_produced has been running for over 60 seconds
+test ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag ... ok
+test ws05::close_requires_and_persists_the_consumption_receipt has been running for over 60 seconds
+test ws05::close_requires_and_persists_the_consumption_receipt ... ok
+test ws05::status_shows_health_and_this_projects_release_trust ... ok
+test ws03::human_answers_come_only_from_the_owner_signed_channel ... ok
+test ws05::close_observes_os_written_state_no_os_operation_produced ... ok
+test ws05::gates_decide_runnability_and_completion ... ok
+test ws05::independence_is_established_from_recorded_authorship ... ok
+test ws04r2::checkpoint_and_handoff_continuity ... ok
+test ws04r2::upstream_change_reaches_completed_work ... ok
+
+test result: ok. 52 passed; 0 failed; 0 ignored; 0 measured; 85 filtered out; finished in 173.91s
+

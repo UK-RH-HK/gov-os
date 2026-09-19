@@ -2,21 +2,145 @@ id: M-4.1.5-4.1.6
 from_version: 4.1.5
 to_version: 4.1.6
 description: >
-  Prepared during Phase-2 repair iteration 1 for the next release (4.1.6); the release owner completes this record
-  when 4.1.6 is cut (every further overlay-template delta between the 4.1.5 payload and the 4.1.6 payload must carry an
-  operation here or an overlay_template_changes entry — `gov release build` refuses the release otherwise). This
-  migration delivers one repository-contract rule to already-installed projects: retrieval-miss failure records
-  (framework §18 failure memory, `failure_kind: retrieval-miss`) live in spec/reports/memory-quality/ as evidence that is
-  never indexed for retrieval, so the path map states what the product enforces. New installations receive the rule
-  from the REPOSITORY_CONTRACT overlay template.
+  Prepared during Phase-2 repair iteration 1 for the next release (4.1.6). Overlay-template changes reach installed
+  projects only through this migration: every overlay file a 4.1.5 project holds is converged with the overlay
+  template of the kernel being installed by `sync_overlay_template`, a three-way merge whose base is the 4.1.5
+  template carried below. Whatever the project never customised follows the new template (values, rules added,
+  rules removed, rule order, which decides a last-match repository contract); whatever it customised is kept, and a
+  customisation the new template also changed is kept and reported in the update result. A 4.1.5 overlay that was
+  never customised becomes byte-identical to a new 4.1.6 installation's; `gov release build` and the certification
+  suite simulate that for every template (migrations::framework::check_substance). The adapters and framework.json
+  projection are regenerated and every derived index is rebuilt. The release owner completes the kernel-payload part
+  of this record when 4.1.6 is cut (version, supported_from_versions, schema versions, lock fields), as recorded in
+  repair-1 r3-ws09-11 IP-R3-WS09-2.
 breaking: false
 human_gate: none
 affected_indexes: [lexical, semantic, graph, code]
 overlay_template_changes:
-  - {file: REPOSITORY_CONTRACT.yaml, handled_by: "op:set_overlay_rule", reason: "spec/reports/memory-quality/** is the canonical location of retrieval-miss failure records (evidence, all four index flags false); delivered explicitly so installed 4.1.5 projects converge with the template"}
+  - {file: REPOSITORY_CONTRACT.yaml, handled_by: "op:sync_overlay_template", reason: "the 4.1.6 repository contract states the BC-P2-31 classification (.governance-state/** operational, the plugin registry location authoritative, runtime-directory rules that do not match the OS's legacy store paths), the evidence class of spec/reports/memory-quality/** (retrieval-miss failure records, never indexed) and a rule order under which the specific spec/ rules decide their paths; delivered to installed 4.1.5 projects by the three-way template convergence below"}
 operations:
-  - {op: note, text: "Retrieval-miss failure records (spec/reports/memory-quality/**) are evidence that is never indexed: a record of what retrieval failed to find must not itself be served as retrieval evidence."}
-  - {op: set_overlay_rule, file: REPOSITORY_CONTRACT.yaml, list_key: paths, match: {pattern: "spec/reports/memory-quality/**"}, set: {class: evidence, semantic_index: false, lexical_index: false, graph_index: false, code_index: false, namespace: spec}, add_if_missing: true}
+  - {op: note, text: "4.1.6 converges each project overlay file with this release's overlay templates: what the project never customised follows the new template (values, rules added or removed, rule order); what it customised is kept, and a customisation the template also changed is kept and reported (update result, operations[].conflicts)."}
+  - {op: note, text: "Research and experiment records follow schema 1.1.0 (WS-10 IP-WS10-16): an incomplete research or experiment record presented as evidence is a HIGH schema finding after this update. Remediation: mark it state_class NARRATIVE, or complete it with `gov research conclude` / `gov experiment design`. The migration does not touch spec/ (INV-013), so such records are reported, never rewritten."}
+  - {op: note, text: "Non-rebuildable OS state (session claims, emergency-control state, claim-time trees, CIT, update and migration rollback snapshots) belongs in .governance-state/ (machine-local, ignored by Git, never derived) and the plugin registry in governance/registry/ (paths::OS_STORES, BC-P2-31). A store found at its earlier location inside .governance-runtime/ or governance/generated/ is moved there by its writer on first use and reported until then; adoption batch snapshots move to .governance-state/migration/."}
+  - op: sync_overlay_template
+    file: CAPABILITY_PROFILE.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      taxonomy_version: 1.0.0
+      categories:
+        product-outcome: {applicable: true}
+        ux: {applicable: true}
+        frontend: {applicable: true}
+        backend: {applicable: true}
+        database-storage: {applicable: true}
+        integration-api: {applicable: true}
+        devops-infrastructure: {applicable: true}
+        security-privacy: {applicable: true}
+        testing-quality: {applicable: true}
+        data-engineering: {applicable: false, reason: not yet in scope}
+        ai-ml-model: {applicable: false, reason: not yet in scope}
+        evaluation: {applicable: false, reason: not yet in scope}
+        observability-sre: {applicable: true}
+        performance-capacity: {applicable: true}
+        operations-recovery: {applicable: true}
+        scientific-rd: {applicable: false, reason: not yet in scope}
+  - op: sync_overlay_template
+    file: DATA_SENSITIVITY.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      default_class: internal
+      identifiers_to_strip: []
+      classifications: []
+  - op: sync_overlay_template
+    file: MODEL_ROUTING_OVERRIDES.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      providers: []
+      role_overrides: {}
+      task_class_overrides: {}
+      preferences: {prefer_lowest_cost_meeting_tier: true}
+  - op: sync_overlay_template
+    file: PROJECT_EXCEPTIONS.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      exceptions: []
+  - op: sync_overlay_template
+    file: PROJECT_POLICY.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      project: {name: '{{project_name}}', alias: '{{project_alias}}', created: '{{today}}', onboarding_mode: '{{mode}}'}
+      governance: {framework_lock: governance/framework.lock, kernel_dir: governance/kernel, overlay_dir: governance/project, generated_dir: governance/generated,
+        runtime_dir: .governance-runtime}
+      policy_overrides: {}
+      staleness: {on_stale_close: fail}
+      readiness: {enforce_pre_implementation_cells: true}
+      tests:
+        product_test_command: []
+        baseline_record: spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml
+      gates: {presentation_channel: chat}
+  - op: sync_overlay_template
+    file: REPOSITORY_CONTRACT.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      roots: {governance: governance/, spec: spec/, product: product/, archive: archive/}
+      paths:
+      - {pattern: governance/kernel/**, class: authoritative, owner_role: release-agent, mutation: prohibited, semantic_index: true, lexical_index: true, graph_index: false,
+        namespace: governance}
+      - {pattern: governance/project/**, class: authoritative, owner_role: change-controller, mutation: restricted, semantic_index: true, lexical_index: true,
+        graph_index: true, namespace: governance}
+      - {pattern: governance/generated/**, class: generated, owner_role: orchestrator, mutation: generated, semantic_index: false, lexical_index: false, graph_index: false,
+        namespace: governance}
+      - {pattern: governance/framework.lock, class: authoritative, owner_role: release-agent, mutation: restricted, semantic_index: false, lexical_index: true,
+        graph_index: false, namespace: governance}
+      - {pattern: governance/tests/**, class: authoritative, owner_role: memory-engineer, mutation: restricted, semantic_index: false, lexical_index: false, graph_index: false,
+        namespace: governance}
+      - {pattern: spec/decisions/**, class: authoritative, owner_role: change-controller, mutation: restricted, semantic_index: true, lexical_index: true, graph_index: true,
+        namespace: spec}
+      - {pattern: spec/reports/**, class: evidence, owner_role: orchestrator, semantic_index: true, lexical_index: true, graph_index: true, namespace: spec}
+      - {pattern: spec/lessons/**, class: evidence, owner_role: orchestrator, semantic_index: true, lexical_index: true, graph_index: true, namespace: spec}
+      - {pattern: spec/research/**, class: evidence, owner_role: research-agent, semantic_index: true, lexical_index: true, graph_index: true, namespace: spec}
+      - {pattern: spec/experiments/**, class: evidence, owner_role: research-agent, semantic_index: true, lexical_index: true, graph_index: true, namespace: spec}
+      - {pattern: spec/audits/**, class: evidence, owner_role: independent-auditor, semantic_index: true, lexical_index: true, graph_index: true, namespace: spec}
+      - {pattern: spec/**, class: authoritative, owner_role: product-spec-agent, semantic_index: true, lexical_index: true, graph_index: true, namespace: spec}
+      - {pattern: product/tests/**, class: test, owner_role: independent-test-designer, semantic_index: true, lexical_index: true, graph_index: true, code_index: true,
+        namespace: product}
+      - {pattern: product/**, class: source, owner_role: backend-engineer, semantic_index: true, lexical_index: true, graph_index: true, code_index: true, namespace: product}
+      - {pattern: archive/**, class: historical, owner_role: orchestrator, default_retrieval: false, mutation: restricted, semantic_index: false, lexical_index: true,
+        graph_index: false, namespace: archive}
+      - {pattern: '**/.env*', class: secret, semantic_index: false, lexical_index: false, graph_index: false, code_index: false, agent_read: prohibited, export: denied,
+        namespace: secret}
+      - {pattern: '**/secrets/**', class: secret, semantic_index: false, lexical_index: false, agent_read: prohibited, export: denied, namespace: secret}
+      - {pattern: .governance-runtime/**, class: derived, semantic_index: false, lexical_index: false, graph_index: false, namespace: runtime}
+  - op: sync_overlay_template
+    file: TOOL_PERMISSIONS.yaml
+    base_release: "4.1.5"
+    base:
+      schema_version: 1.0.0
+      roles:
+        orchestrator: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, NETWORK_READ]
+        change-controller: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+        backend-engineer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, PACKAGE_INSTALL]
+        frontend-engineer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, PACKAGE_INSTALL]
+        data-engineer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, DB_READ]
+        research-agent: [READ_REPO, NETWORK_READ]
+        independent-test-designer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+        test-execution-agent: [READ_REPO, RUN_TESTS]
+        independent-auditor: [READ_REPO, RUN_TESTS]
+        memory-engineer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+        tooling-engineer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, PACKAGE_INSTALL, NETWORK_READ]
+        devops-engineer: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, CI_TRIGGER, DEPLOY_STAGING]
+        security-engineer: [READ_REPO, RUN_TESTS, SECRET_READ]
+        release-agent: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+        migration-executor: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+      install_authority_roles: [tooling-engineer, orchestrator]
+      tool_allowlist: {}
+      mcp_servers: {}
   - {op: require_index_rebuild, index: all}
   - {op: regenerate_adapters}
 rollback: >

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/migration.schema.json",
   "title": "migration",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "id": {
@@ -49,7 +49,8 @@
               "require_index_rebuild",
               "regenerate_adapters",
               "note",
-              "set_overlay_rule"
+              "set_overlay_rule",
+              "sync_overlay_template"
             ]
           },
           "file": {
@@ -91,6 +92,14 @@
           },
           "template_rule": {
             "type": "object"
+          },
+          "base": {
+            "type": "object",
+            "description": "sync_overlay_template: the previous release's overlay template, parsed (the base of the three-way convergence of the project's file with the installing kernel's template)"
+          },
+          "base_release": {
+            "type": "string",
+            "description": "sync_overlay_template: the release whose template `base` is"
           }
         },
         "required": [

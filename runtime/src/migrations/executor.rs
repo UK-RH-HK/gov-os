@@ -1,4 +1,17 @@
 //! A6 controlled migration: batch snapshot → actions → reference updates → checks → ledger; rollback on failure.
+//!
+//! **Rollback material is non-rebuildable operational state (BC-P2-31; Contract v3 B1:188, B3:202, D6:352).** A batch
+//! snapshot is the only copy of what a batch replaced, so it lives in the OS store `migration-snapshots`
+//! ([`crate::paths::OS_STORES`]): `.governance-state/migration/batch-<n>/` — machine-local, self-ignored by Git, never
+//! walked, indexed or deleted by a rebuild — and not in the derived runtime directory, whose deletion (framework §19)
+//! must not take a rollback with it. A snapshot an earlier version kept at `.governance-runtime/migration/` is moved
+//! there once ([`crate::paths::relocate_legacy`]) before a batch runs or rolls back; while it cannot be moved it is
+//! still read where it is, so a rollback stays available.
+//!
+//! **A rollback restores only what its batch could have changed.** The snapshot is content on disk, and content never
+//! establishes what it may overwrite: a restore, a reversed move and a removal of created records are each confined
+//! to the paths the batch recorded as touched or created, and never reach an OS-owned location (the installed kernel,
+//! `framework.lock`, trust material, OS state, `.git`). Anything else in a snapshot is reported and left alone.
 use super::{identity, planner, references};
 use crate::records::{new_record, save_record};
 use crate::util::{copy_dir, now_iso, read_json, read_text, write_json, write_text};
@@ -6,10 +19,85 @@ use crate::{GovError, Result};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
+/// The OS store (BC-P2-31) that holds migration batch snapshots.
+pub const SNAPSHOT_STORE: &str = "migration-snapshots";
+
+/// Where batch snapshots are kept: the `migration-snapshots` store location (`.governance-state/migration`).
+pub fn snapshots_root(root: &Path) -> PathBuf {
+    crate::paths::store_path(root, SNAPSHOT_STORE)
+        .unwrap_or_else(|| root.join(crate::paths::STATE_DIR).join("migration"))
+}
+
+/// The snapshot directory of batch `batch` where it belongs (`.governance-state/migration/batch-<n>`).
 pub fn snapshot_dir(root: &Path, batch: i64) -> PathBuf {
+    snapshots_root(root).join(format!("batch-{batch}"))
+}
+
+/// Where an earlier version kept batch snapshots (inside the derived runtime directory).
+fn legacy_snapshot_dir(root: &Path, batch: i64) -> PathBuf {
     root.join(crate::RUNTIME_DIR)
         .join("migration")
         .join(format!("batch-{batch}"))
+}
+
+/// Prepare the snapshot store before a batch writes to it: move a legacy snapshot directory once (typed
+/// `STATE_LOCATION_CONFLICT` if both places hold different material; nothing is overwritten) and make sure the state
+/// directory ignores itself in Git.
+fn prepare_store(root: &Path) -> Result<Vec<Value>> {
+    let moved = crate::paths::relocate_legacy(root, SNAPSHOT_STORE)?;
+    crate::paths::ensure_state_dir(root)?;
+    Ok(moved)
+}
+
+/// The snapshot of `batch` to roll back from: where it belongs, after an attempt to move a legacy store there; a
+/// legacy snapshot that could not be moved is read where it is, so the rollback stays available.
+fn locate_snapshot(root: &Path, batch: i64) -> (PathBuf, Value) {
+    let relocation = match prepare_store(root) {
+        Ok(m) => json!({"moved": m}),
+        Err(e) => json!({"error": {"code": e.code, "message": e.message}}),
+    };
+    let here = snapshot_dir(root, batch);
+    let legacy = legacy_snapshot_dir(root, batch);
+    if !here.join("batch.json").exists() && legacy.join("batch.json").exists() {
+        return (legacy, relocation);
+    }
+    (here, relocation)
+}
+
+/// Repository-relative locations a migration batch never writes, so a rollback never restores, moves or removes
+/// anything there, whatever a snapshot claims: the installed kernel, the lock, trust material, the OS's own state
+/// and the VCS.
+const PROTECTED_PREFIXES: &[&str] = &[
+    ".git/",
+    "governance/kernel/",
+    "governance/trust/",
+    ".governance-state/",
+];
+const PROTECTED_FILES: &[&str] = &["governance/framework.lock", ".git", ".governance-state"];
+
+/// Whether a rollback may write `rel`: a plain repository-relative path (not absolute, no `..`, no backslash) outside
+/// every protected location and outside the derived runtime directory.
+fn rollback_may_write(rel: &str) -> bool {
+    if rel.is_empty()
+        || rel.starts_with('/')
+        || rel.contains('\\')
+        || rel.split('/').any(|c| c == "..")
+    {
+        return false;
+    }
+    let n = super::references::normalize_rel(rel);
+    !(n.is_empty()
+        || PROTECTED_FILES.contains(&n.as_str())
+        || PROTECTED_PREFIXES.iter().any(|p| n.starts_with(p))
+        || n == crate::RUNTIME_DIR
+        || n.starts_with(&format!("{}/", crate::RUNTIME_DIR)))
+}
+
+/// Whether `rel` is one of `roots` or lies under one of them.
+fn within(rel: &str, roots: &[String]) -> bool {
+    roots
+        .iter()
+        .any(|r| rel == r || rel.starts_with(&format!("{}/", r.trim_end_matches('/'))))
 }
 
 fn git_mv(root: &Path, from: &str, to: &str) -> Result<()> {
@@ -157,6 +245,8 @@ pub struct BatchResult {
     pub blocked: Vec<Value>,
     /// retirements executed under an answered gate while active references existed (references left as they were)
     pub retired_with_active_references: Vec<Value>,
+    /// legacy snapshot material moved into the `migration-snapshots` store before this batch (BC-P2-31)
+    pub snapshot_relocated: Vec<Value>,
 }
 
 /// What one batch run binds its ledger lines to, and how it proves and extracts.
@@ -211,6 +301,8 @@ pub fn apply_batch(
                     || e["extract_batch"].as_i64() == Some(batch))
         })
         .collect();
+    // BC-P2-31: rollback material lives in its OS store, moved there once from the derived runtime directory
+    let relocated = prepare_store(root)?;
     let snap = snapshot_dir(root, batch);
     crate::util::remove_dir_if_exists(&snap)?;
     std::fs::create_dir_all(&snap)?;
@@ -246,6 +338,7 @@ pub fn apply_batch(
         skipped: vec![],
         blocked: vec![],
         retired_with_active_references: vec![],
+        snapshot_relocated: relocated,
     };
     let ar = ctx.archive_root.trim_end_matches('/').to_string();
     // One fresh scan per batch, taken before any retirement of this batch relies on it.
@@ -465,7 +558,7 @@ pub fn apply_batch(
     result.references_updated = updated;
     write_json(
         &snap.join("batch.json"),
-        &json!({"batch": batch, "touched": touched, "moves": result.moves, "retirement_moves": retire_moves, "created": result.created, "references_updated": result.references_updated, "at": now_iso()}),
+        &json!({"batch": batch, "touched": touched, "moves": result.moves, "retirement_moves": retire_moves, "created": result.created, "references_updated": result.references_updated, "snapshot_relocated": result.snapshot_relocated, "at": now_iso()}),
     )?;
     ledger_lines.push(json!({"at": now_iso(), "batch": batch, "status": "batch_complete", "applied": result.applied.len(), "blocked": result.blocked.len(), "references_updated": result.references_updated.len(), "catalogue_version": ctx.catalogue_version, "plan_version": ctx.plan_version}));
     append_ledger(ledger, &ledger_lines)?;
@@ -489,27 +582,47 @@ fn append_ledger(ledger: &Path, lines: &[Value]) -> Result<()> {
 }
 
 /// Restore a batch from its snapshot: reverse moves, remove created files, restore originals.
+///
+/// The snapshot is read from the `migration-snapshots` store (a legacy snapshot is moved there first, or read where
+/// it is if it cannot be). Every write is confined to what the batch recorded — a reversed move must start from a
+/// path the batch snapshotted, a restored file must lie under one, a removed file must be one the batch created — and
+/// never reaches a protected location ([`rollback_may_write`]); whatever else the snapshot names is reported under
+/// `refused` and left alone.
 pub fn rollback_batch(root: &Path, batch: i64) -> Result<Value> {
-    let snap = snapshot_dir(root, batch);
+    let (snap, relocation) = locate_snapshot(root, batch);
     let meta = read_json(&snap.join("batch.json"))
         .unwrap_or(json!({"moves": [], "created": [], "touched": []}));
+    let touched: Vec<String> = meta["touched"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
     let mut restored = vec![];
     let mut removed = vec![];
+    let mut refused: Vec<Value> = vec![];
+    let mut reversed: Vec<(String, String)> = vec![];
     for m in meta["moves"].as_array().cloned().unwrap_or_default() {
         let (from, to) = (m[0].as_str().unwrap_or(""), m[1].as_str().unwrap_or(""));
+        if !(rollback_may_write(from) && rollback_may_write(to) && within(from, &touched)) {
+            refused.push(json!({"kind": "move", "from": to, "to": from, "reason": "not a move of a path this batch snapshotted, or it reaches a protected location"}));
+            continue;
+        }
         if root.join(to).exists() && !root.join(from).exists() {
             git_mv(root, to, from)?;
             restored.push(from.to_string());
         }
+        reversed.push((to.to_string(), from.to_string()));
     }
     for c in meta["created"].as_array().cloned().unwrap_or_default() {
         let p = c.as_str().unwrap_or("");
-        if root.join(p).exists()
-            && !meta["touched"]
-                .as_array()
-                .map(|a| a.iter().any(|t| t.as_str() == Some(p)))
-                .unwrap_or(false)
-        {
+        if !rollback_may_write(p) {
+            refused.push(json!({"kind": "remove", "path": p, "reason": "protected location"}));
+            continue;
+        }
+        if root.join(p).exists() && !touched.iter().any(|t| t == p) {
             let _ = git_rm(root, p);
             removed.push(p.to_string());
         }
@@ -527,6 +640,10 @@ pub fn rollback_batch(root: &Path, batch: i64) -> Result<Value> {
                 .unwrap()
                 .to_string_lossy()
                 .replace('\\', "/");
+            if !(rollback_may_write(&rel) && within(&rel, &touched)) {
+                refused.push(json!({"kind": "restore", "path": rel, "reason": "not under a path this batch snapshotted, or a protected location"}));
+                continue;
+            }
             let dst = root.join(&rel);
             if let Some(d) = dst.parent() {
                 std::fs::create_dir_all(d)?;
@@ -537,21 +654,153 @@ pub fn rollback_batch(root: &Path, batch: i64) -> Result<Value> {
             }
         }
     }
-    // references: re-run reverse replacement
-    let reverse: Vec<(String, String)> = meta["moves"]
-        .as_array()
-        .cloned()
-        .unwrap_or_default()
-        .iter()
-        .map(|m| {
-            (
-                m[1].as_str().unwrap_or("").to_string(),
-                m[0].as_str().unwrap_or("").to_string(),
-            )
-        })
-        .collect();
-    let refs = super::refs::update_references_opts(root, &reverse, false, &restored)?;
+    // references: re-run reverse replacement for the moves reversed
+    let refs = super::refs::update_references_opts(root, &reversed, false, &restored)?;
     Ok(
-        json!({"batch": batch, "restored": restored, "removed": removed, "references_reverted": refs}),
+        json!({"batch": batch, "restored": restored, "removed": removed, "references_reverted": refs, "refused": refused,
+               "snapshot": snap.to_string_lossy(), "snapshot_store": relocation}),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn project(tag: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("gov-exec-{tag}-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    fn ctx() -> BatchContext {
+        BatchContext {
+            archive_root: "archive".into(),
+            catalogue_version: json!(1),
+            plan_version: json!(1),
+            scanner: crate::security::secrets::SecretScanner::default_scanner(),
+        }
+    }
+
+    /// BC-P2-31 (WS-6 IP-R2-10): a batch snapshot is written to the `migration-snapshots` OS store, whose directory
+    /// ignores itself in Git, and survives deleting the whole derived runtime directory — the rollback still restores.
+    #[test]
+    fn batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory() {
+        let root = project("store");
+        write_text(&root.join("notes/api.md"), "# API\n\nthe api\n").unwrap();
+        std::fs::create_dir_all(root.join(crate::RUNTIME_DIR)).unwrap();
+        write_text(&root.join(crate::RUNTIME_DIR).join("state.db"), "derived").unwrap();
+        let cat = vec![
+            json!({"artifact_id": "ART-1", "current_path": "notes/api.md", "target_path": "spec/api.md", "action": "MOVE", "batch": 1}),
+        ];
+        let ledger = root.join("ledger.jsonl");
+        let r = apply_batch(&root, &cat, 1, &[], &ledger, &ctx()).unwrap();
+        assert_eq!(
+            PathBuf::from(&r.snapshot),
+            root.join(".governance-state/migration/batch-1")
+        );
+        assert!(root
+            .join(".governance-state/migration/batch-1/batch.json")
+            .exists());
+        assert!(root.join(".governance-state/.gitignore").exists());
+        assert!(root.join("spec/api.md").exists() && !root.join("notes/api.md").exists());
+        // the product never classifies the snapshot derived, and deleting what it does classify keeps it
+        let contract = crate::paths::RepositoryContract::load(
+            &Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../framework/overlay-templates/REPOSITORY_CONTRACT.yaml"),
+        )
+        .unwrap();
+        let rel = ".governance-state/migration/batch-1/batch.json";
+        assert_eq!(
+            contract.decide(rel).class(),
+            crate::paths::OPERATIONAL_CLASS
+        );
+        std::fs::remove_dir_all(root.join(crate::RUNTIME_DIR)).unwrap();
+        let rb = rollback_batch(&root, 1).unwrap();
+        assert!(
+            root.join("notes/api.md").exists() && !root.join("spec/api.md").exists(),
+            "{rb}"
+        );
+        assert_eq!(rb["refused"], json!([]));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// A snapshot an earlier version kept in the derived runtime directory is moved into the store once, and the
+    /// rollback it holds still works.
+    #[test]
+    fn a_legacy_snapshot_is_moved_into_the_store_and_still_rolls_back() {
+        let root = project("legacy");
+        let legacy = root.join(".governance-runtime/migration/batch-2");
+        write_text(
+            &legacy.join("files/lib/util.py"),
+            "def f():\n    return 1\n",
+        )
+        .unwrap();
+        write_json(
+            &legacy.join("batch.json"),
+            &json!({"batch": 2, "touched": ["lib/util.py"], "moves": [], "created": []}),
+        )
+        .unwrap();
+        let rb = rollback_batch(&root, 2).unwrap();
+        assert_eq!(
+            read_text(&root.join("lib/util.py")).unwrap(),
+            "def f():\n    return 1\n"
+        );
+        assert!(!root.join(".governance-runtime/migration").exists());
+        assert!(root
+            .join(".governance-state/migration/batch-2/batch.json")
+            .exists());
+        assert_eq!(rb["snapshot_store"]["moved"][0]["action"], "moved", "{rb}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// A rollback writes only what its batch recorded, and never an OS-owned location, whatever the snapshot on disk
+    /// says (a snapshot is content, not authority): a planted kernel file, lock, trust file, an unrecorded file, a
+    /// move of the kernel and the removal of the lock are refused and reported; the recorded file is restored.
+    #[test]
+    fn a_rollback_restores_only_what_its_batch_recorded() {
+        let root = project("confine");
+        write_text(
+            &root.join("governance/kernel/KERNEL.yaml"),
+            "version: 9.9.9\n",
+        )
+        .unwrap();
+        write_text(&root.join("governance/framework.lock"), "lock: installed\n").unwrap();
+        let snap = snapshot_dir(&root, 3);
+        for (rel, text) in [
+            ("product/app.py", "print('original')\n"),
+            ("governance/kernel/KERNEL.yaml", "version: 0.0.1\n"),
+            ("governance/framework.lock", "lock: planted\n"),
+            ("governance/trust/root.json", "{}\n"),
+            ("notes/unrecorded.md", "planted\n"),
+        ] {
+            write_text(&snap.join("files").join(rel), text).unwrap();
+        }
+        write_json(
+            &snap.join("batch.json"),
+            &json!({"batch": 3, "touched": ["product/app.py", "governance/kernel", "../outside"],
+                "moves": [["governance/kernel/KERNEL.yaml", "archive/K.yaml"], ["/etc/hosts", "archive/hosts"]],
+                "created": ["governance/framework.lock"]}),
+        )
+        .unwrap();
+        let rb = rollback_batch(&root, 3).unwrap();
+        assert_eq!(
+            read_text(&root.join("product/app.py")).unwrap(),
+            "print('original')\n"
+        );
+        assert_eq!(
+            read_text(&root.join("governance/kernel/KERNEL.yaml")).unwrap(),
+            "version: 9.9.9\n"
+        );
+        assert_eq!(
+            read_text(&root.join("governance/framework.lock")).unwrap(),
+            "lock: installed\n"
+        );
+        assert!(
+            !root.join("governance/trust").exists() && !root.join("notes/unrecorded.md").exists()
+        );
+        let refused = rb["refused"].as_array().unwrap();
+        assert_eq!(refused.len(), 7, "{rb}");
+        assert_eq!(rb["restored"], json!(["product/app.py"]));
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

@@ -1,0 +1,96 @@
+# P2-AR-0040 claims: repair 1, round 3, WS-9 + WS-11. Builder claims only; acceptance is decided by independent verification.
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0040
+workstream: WS-9 + WS-11
+round: 3
+base_commit: 53897c1a44157e5af81b176017bc7ded6a63b9cd
+work_commit: 16e4c0ba47018de2d4a652406b41a03cdf28bac1
+product_code_digest: 4dedf0279de64c5b070103a1efdb219e790e2dd96e60be968161131372ff7225
+evidence_standard: regression evidence only (Contract v3 O3)
+claims:
+  - class: BC-P2-31
+    item: WS-6 r2 IP-R2-10 (migration snapshots to the BC-P2-31 store path)
+    scope: the adoption batch-snapshot writer (migrations::executor); the other writers are WS-3/4/5/7/8's
+    status: REPAIRED_CLAIMED
+    files: [runtime/src/migrations/executor.rs, runtime/src/migrations/planner.rs, tests/certification/migration.rs]
+    product_checks:
+      - {check: "executor::snapshot_dir / prepare_store", stage: "every A6 batch", what: "snapshot at paths::store_path(root, migration-snapshots)/batch-<n> (.governance-state/migration); legacy .governance-runtime/migration relocated once (STATE_LOCATION_CONFLICT typed, nothing overwritten); state dir self-ignored by Git"}
+      - {check: "executor::locate_snapshot / rollback_batch", stage: "gov adopt rollback, gov recover, failed batch", what: "reads the store (or the legacy snapshot when it cannot move); restores/moves/removes only what the batch recorded, never governance/kernel, framework.lock, governance/trust, .governance-state, .git, the runtime dir, absolute or .. paths; everything else reported under refused"}
+    probes_rerun:
+      - {probe: "certification migration::path_migration_with_rollback_and_memory_rebuild (extended)", before: "snapshot in .governance-runtime/migration (deleted with the runtime directory)", after: ".governance-runtime deleted before adopt rollback --batch 2; byte-identical rollback; refused []"}
+      - {probe: "lib executor::tests (3)", before: "-", after: "PASS"}
+      - {probe: "tiny_unprovisioned_adoption.py SNAP", before: "-", after: "PASS (.governance-state/{.gitignore,migration}; nothing under .governance-runtime/migration)"}
+    tests_changed:
+      - {test: "migration::path_migration_with_rollback_and_memory_rebuild", why: "tree hash excludes .governance-state/** (OS operational state); asserts the store location; deletes the runtime directory before the rollback"}
+    integration_points: [IP-R3-WS09-3, IP-R3-WS09-5]
+    owner_decision_required: null
+  - class: BC-P2-31
+    item: WS-6 r2 IP-R2-11 (overlay template rules delivered to installed projects through a migration operation; framework.json projection)
+    scope: the migration side (operation, record, substance check); the template content and the projection are WS-6's (IP-R3-WS09-1)
+    status: REPAIRED_CLAIMED
+    files: [runtime/src/migrations/framework.rs, framework/schemas/migration.schema.json, migrations/M-4.1.5-4.1.6.yaml, migrations/README.md]
+    product_checks:
+      - {check: "migrations::framework op sync_overlay_template", stage: "gov update --check (dry run, impact R4) / --apply", what: "three-way convergence of each overlay file from the carried previous-release template to the installing kernel's template: untouched parts follow (values, rules added/removed, order), customisations kept, conflicts reported; exact convergence writes the template's bytes"}
+      - {check: "migrations::framework::check_substance (simulate_update)", stage: "gov release build; certification repair2::interface_contract…", what: "an untouched installed overlay must become exactly the new template through the migration's operations plus update's reconciliation; a sync base must be the previous release's template"}
+      - {check: "M-4.1.5-4.1.6", stage: "update 4.1.5 -> 4.1.6", what: "sync_overlay_template for every overlay template, base = the exact 4.1.5 template; regenerate_adapters (framework.json); rebuild all indexes"}
+    probes_rerun:
+      - {probe: "lib framework::tests (4)", before: "round-2 test: explicit memory-quality rule appended", after: "PASS: convergence from 4.1.5 templates, three-way merge semantics, substance simulation, dry run"}
+      - {probe: "synthesis AC16-X2 (unedited)", before: "X2-B1B3 FAIL (WS-6 r2)", after: "stops before X2-B1B3 (TASK_NOT_RUNNABLE, WS-5 BC-P2-16 premise); X2-B1B3 reads a new project's template (WS-6)"}
+    tests_changed:
+      - {test: "framework::tests::the_next_migration_delivers_the_memory_quality_contract_rule", why: "replaced: the migration delivers the template (incl. that rule once WS-6's template carries it), not a rule of its own"}
+    integration_points: [IP-R3-WS09-1, IP-R3-WS09-2, IP-R3-WS09-5]
+    owner_decision_required: null
+  - class: A3 (Contract v3, tool execution respects role/authority/permission boundaries)
+    item: WS-9 r2 observation — reviewer-written command test runs an arbitrary command at A6/A7 with the executor's privileges
+    status: REPAIRED_CLAIMED
+    files: [runtime/src/migrations/verify.rs, runtime/src/adopt.rs, tests/certification/migration.rs]
+    product_checks:
+      - {check: "verify::command_test_refusal / refuse_unpermitted_command_tests", stage: "A5 approval (vs the A7 verifier), A6 before any batch (vs the declared executor), A7 before any test", what: "command + directory exactly a governed product-test command (verification::product::plan, else ecosystem convention; or the A0 baseline); no argument extension; repository-relative cwd; executing role holds RUN_TESTS (TOOL_PERMISSIONS entry, or the A7 designated verifier's protocol duty when unlisted); typed TEST_COMMAND_NOT_PERMITTED, nothing executed"}
+      - {check: "verify::run_tests_file_as", stage: "every migration test run", what: "a refused command test does not run and fails with its refusal; a permitted one runs without GOV_ROLE/GOV_SESSION, stdin closed, and records who was authorised and why; no executing role -> no command test runs"}
+    probes_rerun:
+      - {probe: "certification migration::command_tests_execute_only_governed_commands_for_permitted_roles", before: "any command ran at A6/A7", after: "sh -c, git -c alias, governed+extra args, cwd ../ refused at approval (nothing ran); baseline ran authorised at A6 and A7; executor without RUN_TESTS refused before batch 1"}
+      - {probe: "lib verify::tests (2), adopt::tests::command_test_permissions_come_from_policy_and_the_designated_duty", before: "-", after: "PASS"}
+      - {probe: "tiny_unprovisioned_adoption.py CMD.1/CMD.2", before: "-", after: "PASS"}
+    tests_changed: []
+    integration_points: [IP-R3-WS09-4, IP-R3-WS09-5, IP-R3-WS09-6]
+    owner_decision_required: null
+  - class: BC-P2-36 (disclosure at A11)
+    item: WS-2 r2 R3-9 — A11 states the posture as the reason when D032 is its only doctor failure
+    status: REPAIRED_CLAIMED
+    files: [runtime/src/adopt.rs, framework/schemas/adoption-baseline.schema.json]
+    product_checks:
+      - {check: "adopt::verdict_reasons", stage: A11, what: "verdict_reasons for any verdict other than ADOPTED_HEALTHY; verdict_reason {kind: installation_authenticity, D032 posture, disclosure, remediation} when D032 is the only obstacle; recorded in the T2-sealed verdict and 12-ADOPTION-FINAL-REPORT.md"}
+    probes_rerun:
+      - {probe: "lib adopt::tests::a11_names_the_installation_posture_when_it_is_the_only_reason (real D032 check)", before: "NOT_ADOPTED_HEALTHY with no reason", after: "PASS"}
+      - {probe: "tiny_unprovisioned_adoption.py DOC", before: "-", after: "OBS: D032 posture UNPROVISIONED/UNKNOWN/BOOTSTRAP_EMBEDDED_PAYLOAD (A11 not reached: O-1)"}
+    tests_changed: []
+    integration_points: [IP-R3-WS09-5, IP-R3-WS09-6]
+    owner_decision_required: null
+  - class: coordination
+    item: migrations/M-4.1.5-4.1.6.yaml with WS-8's version/payload decision
+    status: DONE_THIS_SIDE
+    files: [migrations/M-4.1.5-4.1.6.yaml]
+    product_checks:
+      - {check: "check_substance on M-4.1.5-4.1.6 against release/releases/4.1.5 templates", stage: "release build; lib test", what: "converges by construction for any template change"}
+    integration_points: [IP-R3-WS09-2]
+    owner_decision_required: null
+additional_work:
+  - {item: "WS-10 r2 IP-WS10-16", what: "upgrade note in M-4.1.5-4.1.6 (research/experiment schema 1.1.0, remediation, INV-013)"}
+  - {item: "rollback confinement", what: "adoption batch rollback never writes kernel/lock/trust/OS state (the root-of-trust review's RV-M1 note on adoption rollback)"}
+integration_points:
+  - {id: IP-R3-WS09-1, owner: WS-6, file: "framework/overlay-templates/REPOSITORY_CONTRACT.yaml; paths::to_framework_json", change: "put the IP-R2-11/IP-R2-2 rules and order in the template; M-4.1.5-4.1.6 delivers exactly the template (no migration edit needed); framework.json re-projected through regenerate_adapters"}
+  - {id: IP-R3-WS09-2, owner: WS-8, file: "framework/KERNEL.yaml (+ lib.rs VERSION, release owner)", change: "if the tree becomes 4.1.6: version fields 4.1.6, supported_from_versions incl. 4.1.5, schema_versions migration 1.2.0 / adoption-baseline 1.2.0 / upstream-packet 1.2.0 / migration-catalogue-entry 1.1.0; do not keep 4.1.5 while templates change (the shipped M-4.1.4-4.1.5 must stay byte-identical); add any lock/payload op to M-4.1.5-4.1.6 before require_index_rebuild, leaving the sync ops"}
+  - {id: IP-R3-WS09-3, owner: WS-8, file: tests/certification/common.rs, change: "tree_hash default excludes .governance-state/**"}
+  - {id: IP-R3-WS09-4, owner: "TOOL_PERMISSIONS template owner (WS-7 or orchestrator)", file: framework/overlay-templates/TOOL_PERMISSIONS.yaml, change: "list migration-verifier [READ_REPO, RUN_TESTS], migration-reviewer [READ_REPO], memory-verifier [READ_REPO]"}
+  - {id: IP-R3-WS09-5, owner: WS-1, file: tests/governance/capability-evidence-map.yaml, change: "evidence owners for A3 command tests, adoption rollback material, template delivery, A11 disclosure"}
+  - {id: IP-R3-WS09-6, owner: "WS-3 (docs)", file: docs/COMMANDS.md, change: "document command-test rules, A11 verdict reasons, snapshot location, sync_overlay_template output"}
+observations:
+  - {id: O-1, owner: WS-6, what: "tiny unprovisioned adoption: A10 rejects on the builder's own starter query HQ-008 (exact_id of the migration plan, structured route); doctor also fails D010, D021"}
+  - {id: O-2, owner: WS-8, what: "update's reconcile_overlay_defaults runs regardless of declarations; a no-op after sync_overlay_template"}
+  - {id: O-3, owner: WS-6, what: "template rule order makes every spec/** path authoritative (WS-6 r2 O-1), incl. the adoption evidence tree"}
+regression:
+  lib: "217 passed / 0 failed"
+  certification: "137 passed / 0 failed (list 137)"
+  r1_heldout: "AR-0027 26/3, AR-0029 26/2 (+ho_f not compiling), AR-0031 27/7, AR-0033 30/1 (hv_a::a1 size pin); census 118 files / 2017 functions; 0 violations in every §6 activity; failure messages identical to the round-2 integration run"
+owner_decision_required: []
