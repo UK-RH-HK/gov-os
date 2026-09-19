@@ -7,7 +7,9 @@ raise_for: [product_direction, expensive_or_irreversible_architecture, privacy_s
 agent_resolvable_when: {max_radius: R1, min_confidence: 0.8, reversible: true, require_assessed: true, independent_assessment: true}
 # BC-P2-18 / framework §51: gates raised for these triggers are human decisions and never agent-resolvable (refused at
 # answer time and again when a consumer reads the answer). A project may add triggers, never remove them.
-human_only_triggers: [framework_update, destructive_migration, privilege_elevation, kernel_integrity_override, tool_install, budget_threshold]
+# Round 3: an upstream export (irreversible: lessons leave the project; WS-9/11 IP-R2-5) and an experiment promotion
+# (experimental output entering production; WS-10 IP-WS10-15) are human decisions too.
+human_only_triggers: [framework_update, destructive_migration, privilege_elevation, kernel_integrity_override, tool_install, budget_threshold, upstream_export, experiment_promotion]
 # BC-P2-49: every field must carry substantive content; permitted_next_actions are derived by the OS for each gate.
 decision_package_fields: [question, why_now, current_state, options, impact, reversibility, cost_rework, recommendation, confidence, permitted_next_actions]
 package_non_substantive_values: ["", "not assessed", "unassessed", "tbd", "todo", "?", "-", "...", "unknown"]

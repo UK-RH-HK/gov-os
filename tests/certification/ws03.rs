@@ -1657,8 +1657,11 @@ fn round_two_call_sites_use_the_declared_role_and_typed_refusals() {
     // round-2 integration (P2-AR-0032): WS-9/11 (P2-AR-0030) resolves every stage's actor against the process
     // declaration (`identity::resolve_actor`) and records where the session and role were declared; here both are the
     // invocation's flags, i.e. a declared session and role, never the A0 planner fallback
+    // round 3 (WS-9/11 r2 IP-R2-1): the CLI installs the session it parsed (`identity::install_declared_session`),
+    // so the runtime reads that one declaration instead of re-parsing the process arguments; the source is recorded as
+    // `installed` — still a declared session and role, never the A0 planner fallback
     assert_eq!(
-        first["producer"]["session_source"], "session: flag; role: flag",
+        first["producer"]["session_source"], "session: installed; role: flag",
         "{first}"
     );
     let plan = yaml(&root, "spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml");

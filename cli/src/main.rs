@@ -1324,6 +1324,21 @@ enum TrustCmd {
         #[arg(long)]
         provision: Option<String>,
     },
+    /// T2 binding (P2-ADJ-0002): whether OS-written facts sealed here are honoured on the owner's other provisioned
+    /// machines — the sealing scope, the installed binding authorities and whether this machine's root authorises them
+    T2Binding {
+        /// Administrator: install the owner's T2 binding authority (a `t2-binding-provisioning` bundle from the
+        /// administrator domain: the owner-signed authorisation and the binding key) on this provisioned machine
+        #[arg(long, conflicts_with = "reseal")]
+        provision: Option<String>,
+        /// Re-seal, under the binding authority, the records this machine sealed while provisioned (continuity for
+        /// records written before the authority was installed)
+        #[arg(long)]
+        reseal: bool,
+        /// With --reseal: report what would be resealed and write nothing
+        #[arg(long, requires = "reseal")]
+        dry_run: bool,
+    },
 }
 
 #[derive(Subcommand)]
@@ -1528,6 +1543,21 @@ fn g0_label(cmd: &Cmd) -> String {
                     "trust human-channel --provision"
                 } else {
                     "trust human-channel"
+                }
+            }
+            TrustCmd::T2Binding {
+                provision,
+                reseal,
+                dry_run,
+            } => {
+                if provision.is_some() {
+                    "trust t2-binding --provision"
+                } else if *reseal && *dry_run {
+                    "trust t2-binding --reseal --dry-run"
+                } else if *reseal {
+                    "trust t2-binding --reseal"
+                } else {
+                    "trust t2-binding"
                 }
             }
         }),
@@ -1838,6 +1868,14 @@ fn run(cli: &Cli) -> Result<Value> {
     // BC-P2-08: resolve the acting role once and make it the role of every Project this process opens — including
     // those `init` and every `adopt`/`migrate` stage open internally — then pass the G0 guard.
     gov_runtime::authority::install_acting_role(declared_role(cli)?)?;
+    // WS-9/11 r2 IP-R2-1 (BC-P2-08): the session this invocation declared (the global `--session`, else
+    // GOV_SESSION) is installed once, as parsed here, so the runtime's adoption authorship reads the same declaration
+    // the CLI resolved instead of re-parsing the process arguments
+    gov_runtime::migrations::identity::install_declared_session(
+        cli.session
+            .clone()
+            .or_else(|| std::env::var("GOV_SESSION").ok()),
+    )?;
     g0(cli)?;
     let acting = gov_runtime::authority::default_role_id();
     match &cli.cmd {
@@ -1921,6 +1959,12 @@ fn run(cli: &Cli) -> Result<Value> {
                         None => gov_runtime::human_channel::status(allowed),
                     }
                 }
+                // P2-ADJ-0002: the owner's T2 binding authority on this machine
+                TrustCmd::T2Binding { provision, reseal, dry_run } => match (provision, reseal) {
+                    (Some(f), _) => gov_runtime::t2::provision_authority(Path::new(f), project_root.as_deref()),
+                    (None, true) => { let p = open_project(cli, true)?; gov_runtime::t2::reseal(&p, *dry_run) }
+                    (None, false) => Ok(gov_runtime::t2::binding_status()),
+                },
             }
         }
         Cmd::Contract { op } => {
@@ -2132,7 +2176,8 @@ fn run(cli: &Cli) -> Result<Value> {
             PluginsCmd::Register { descriptor } => gov_runtime::capabilities::governance::register(&p, load_file_value(descriptor)?),
             PluginsCmd::List => { let set = gov_runtime::capabilities::governance::plugin_set(&p); Ok(json!({"role": p.role, "usable": set.usable, "denied": set.denied, "rejected": set.rejected})) }
             PluginsCmd::Unregister { plugin_id } => gov_runtime::capabilities::governance::unregister(&p, plugin_id),
-            PluginsCmd::Registry => Ok(gov_runtime::capabilities::registry::load(&p)),
+            // WS-7 r2 IP-W7-4: every entry with its T2 binding and whether it is honoured, and the document's binding
+            PluginsCmd::Registry => Ok(gov_runtime::capabilities::registry::report(&p)),
             PluginsCmd::Health { ping } => Ok(json!(gov_runtime::capabilities::governance::health(&p, *ping))) } }
         Cmd::Policy { op } => { let p = open_project(cli, true)?; let pol = p.policies(); match op {
             PolicyCmd::Overrides => Ok(json!({"applied": pol.applied_overrides, "refused": pol.refused_overrides, "precedence": pol.precedence, "kernel_trust": pol.kernel_trust, "problems": pol.problems})),
