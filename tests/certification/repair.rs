@@ -932,10 +932,20 @@ fn update_approval_requires_presented_answered_gate() {
     git_init_commit(&proj);
     let g = Gov::new(&proj, "S-rep");
     let prev = canonical_root().join("fixtures/update/previous-release/4.1.1");
+    // round 2 (P2-AR-0024): P2-ADJ-0001 / OWNER-DECISION-P2-0002 — provision (throw-away test root), then install
+    // signed releases; the human answer comes from the root's `human-gate` delegation
+    crate::ws03::provision(&g);
+    let prev_rel = crate::ws03::signed_release(&prev, &root.join("rel-prev"), 10);
+    let cur_rel = crate::ws03::signed_release(
+        &canonical_root().join("framework"),
+        &root.join("rel-cur"),
+        20,
+    );
+    let cur = cur_rel.to_str().unwrap();
     g.ok(&[
         "init",
         "--source",
-        prev.to_str().unwrap(),
+        prev_rel.to_str().unwrap(),
         "--name",
         "u",
         "--alias",
@@ -943,16 +953,32 @@ fn update_approval_requires_presented_answered_gate() {
         "--skip-index",
     ]);
     assert_eq!(
-        g.err(&["update", "--apply"]).error_code(),
+        g.err(&["update", "--apply", "--source", cur]).error_code(),
         "HUMAN_GATE_REQUIRED"
     );
-    let ap = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);
+    let ap = g.ok(&[
+        "update",
+        "--apply",
+        "--source",
+        cur,
+        "--approve",
+        "--by",
+        "owner",
+    ]);
     assert_eq!(ap["applied"], false);
     let gid = ap["human_gate"].as_str().unwrap().to_string();
     assert_eq!(yaml(&proj, "governance/framework.lock")["version"], "4.1.1");
     g.ok(&["gate", "present", &gid]);
     crate::ws03::human_decide(&g, &gid, "A");
-    let ap2 = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);
+    let ap2 = g.ok(&[
+        "update",
+        "--apply",
+        "--source",
+        cur,
+        "--approve",
+        "--by",
+        "owner",
+    ]);
     assert_eq!(ap2["applied"], true);
     assert_eq!(
         yaml(&proj, "governance/framework.lock")["version"],

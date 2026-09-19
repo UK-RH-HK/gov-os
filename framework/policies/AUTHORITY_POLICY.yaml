@@ -102,3 +102,4 @@ authority_levels_required:
   adoption_plan: L3          # adopt baseline / inventory / classify / map / plan / test-design
   adoption_review: L0        # adopt review / verify-migration / verify-memory / audit (independent L0 roles; a role must still be declared)
   record_skill_binding: L3   # health skills --record binds skill versions to content in governance/generated/skill-bindings.json (the level skills::record already applied as the undeclared-class default)
+  record_failure_memory: L1  # memory miss: a declared agent reports a retrieval miss as a memory-quality failure event (framework §18; never indexed, deduplicated by signature)

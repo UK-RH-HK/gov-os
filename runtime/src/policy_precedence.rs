@@ -3,11 +3,28 @@
 //! authority floors, sensitivity floors or human-gate requirements. The rules are kernel data
 //! (`policies/POLICY_PRECEDENCE.yaml`); an override that violates them is refused, recorded, and leaves the effective
 //! policy unchanged (fail closed). Keys without a rule are not overridable (deny by default).
+//!
+//! ## Which rules govern (round-2 integration observation O-1; Contract v3 S5 and A1)
+//!
+//! Two rule sets can speak about a key: the precedence rules of the **installed, verified kernel** and the
+//! **constitutional floor compiled into this binary** (the embedded kernel payload). [`Governing`] evaluates a key
+//! against every set that *declares* the key's policy or overlay label (has at least one rule for it), and accepts
+//! the key only when **every** declaring set accepts it — so a newer binary never lowers a floor an installed kernel
+//! declares, and an older installed kernel never lowers a floor this binary enforces.
+//!
+//! A set that declares **no rule at all** for a label predates that label's evaluation. The kernels shipped as 4.1.4
+//! and 4.1.5 are the case in point: their rules cover `policy_overrides` targets only, because those kernels did
+//! not evaluate the project overlay documents (`PROJECT_POLICY`, `MODEL_ROUTING_OVERRIDES`) key by key. Reading their
+//! silence as "deny every key" refused purely descriptive keys (`project.name`, `providers`, …), made doctor D027
+//! CRITICAL and rolled back an update to shipped 4.1.5. Such a set does not govern the label; the declaring set does
+//! (this binary's floor), so descriptive keys are recognised as descriptive while every floor it declares
+//! (readiness, tier, reasoning, the catch-all `immutable`) is still enforced. When no set declares a label, the
+//! installed kernel's default (deny) applies.
 use crate::util::read_yaml;
 use serde_json::{json, Value};
 use std::path::Path;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
     pub key: String,
     pub mode: String,
@@ -76,16 +93,114 @@ pub fn load(kernel_dir: &Path) -> Option<Precedence> {
             return Some(parse_rules(&doc, "installed kernel"));
         }
     }
+    embedded_with_source("embedded kernel (installed kernel has no POLICY_PRECEDENCE.yaml)")
+}
+
+/// The constitutional precedence rules compiled into this binary (its embedded kernel payload).
+pub fn embedded() -> Option<Precedence> {
+    embedded_with_source("constitutional floor of this binary (embedded kernel)")
+}
+
+fn embedded_with_source(source: &str) -> Option<Precedence> {
     let bytes = crate::kernel::embedded::files()
         .iter()
         .find(|(rel, _)| *rel == "policies/POLICY_PRECEDENCE.yaml")
         .map(|(_, b)| *b)?;
     let text = String::from_utf8_lossy(bytes);
     let doc: Value = serde_yaml::from_str(&text).ok()?;
-    Some(parse_rules(
-        &doc,
-        "embedded kernel (installed kernel has no POLICY_PRECEDENCE.yaml)",
-    ))
+    Some(parse_rules(&doc, source))
+}
+
+/// **Every rule set that governs precedence for a repository** (see the module documentation): the installed,
+/// verified kernel's rules (or the embedded fallback when it has none) and the constitutional floor compiled into
+/// this binary, the latter only when it differs from the former.
+#[derive(Debug, Clone)]
+pub struct Governing {
+    pub sets: Vec<Precedence>,
+}
+
+impl Governing {
+    /// The governing rule sets for a kernel directory (`None` when no rules exist anywhere: fail closed).
+    pub fn load(kernel_dir: &Path) -> Option<Governing> {
+        Self::from_sets(load(kernel_dir), embedded())
+    }
+
+    /// Compose an installed rule set with this binary's floor (exposed for tests and embedders).
+    pub fn from_sets(
+        installed: Option<Precedence>,
+        floor: Option<Precedence>,
+    ) -> Option<Governing> {
+        let mut sets: Vec<Precedence> = installed.into_iter().collect();
+        if let Some(f) = floor {
+            if !sets.iter().any(|s| s.same_rules(&f)) {
+                sets.push(f);
+            }
+        }
+        if sets.is_empty() {
+            None
+        } else {
+            Some(Governing { sets })
+        }
+    }
+
+    /// One rule set governing alone.
+    pub fn single(prec: Precedence) -> Governing {
+        Governing { sets: vec![prec] }
+    }
+
+    /// The sets that govern `label` (a kernel policy name or an overlay document label): those declaring at least
+    /// one rule for it; when none does, the first (installed) set with its default mode.
+    pub fn governing(&self, label: &str) -> Vec<&Precedence> {
+        let v: Vec<&Precedence> = self.sets.iter().filter(|s| s.declares(label)).collect();
+        if v.is_empty() {
+            self.sets.iter().take(1).collect()
+        } else {
+            v
+        }
+    }
+
+    /// [`evaluate`] against every governing set: accepted only when each accepts. The reported mode is the most
+    /// constraining one (a non-`overridable` mode wins); a refusal names the rule set that refused.
+    pub fn evaluate(
+        &self,
+        policy: &str,
+        key: &str,
+        kernel_value: Option<&Value>,
+        new_value: &Value,
+        via_exception: bool,
+    ) -> std::result::Result<String, String> {
+        let sets = self.governing(policy);
+        let several = self.sets.len() > 1;
+        let mut mode: Option<String> = None;
+        for s in sets {
+            match evaluate(s, policy, key, kernel_value, new_value, via_exception) {
+                Ok(m) => {
+                    if mode.as_deref().map(|x| x == "overridable").unwrap_or(true) {
+                        mode = Some(m);
+                    }
+                }
+                Err(reason) => {
+                    return Err(if several {
+                        format!("{reason} [rules: {}]", s.source)
+                    } else {
+                        reason
+                    })
+                }
+            }
+        }
+        Ok(mode.unwrap_or_else(|| "overridable".into()))
+    }
+
+    /// Deterministic summary: the first set as before, plus every governing set.
+    pub fn describe(&self) -> Value {
+        let mut d = describe(&self.sets[0]);
+        d["governing_sets"] = json!(self
+            .sets
+            .iter()
+            .map(|s| json!({"source": s.source, "rules": s.rules.len(), "default_mode": s.default_mode}))
+            .collect::<Vec<_>>());
+        d
+    }
 }
 
 /// Dotted-key pattern match: `*` matches exactly one segment; a trailing `*` matches one or more segments.
@@ -104,6 +219,19 @@ pub fn key_matches(pattern: &str, key: &str) -> bool {
 impl Precedence {
     pub fn rule_for(&self, full_key: &str) -> Option<&Rule> {
         self.rules.iter().find(|r| key_matches(&r.key, full_key))
+    }
+
+    /// Whether this set declares any rule for `label` (its first key segment is the label, or `*`).
+    pub fn declares(&self, label: &str) -> bool {
+        self.rules.iter().any(|r| {
+            let first = r.key.split('.').next().unwrap_or("");
+            first == label || first == "*"
+        })
+    }
+
+    /// Same rules and default (the source label aside).
+    pub fn same_rules(&self, other: &Precedence) -> bool {
+        self.rules == other.rules && self.default_mode == other.default_mode
     }
 }
 
@@ -301,9 +429,10 @@ fn overlay_leaves(prefix: &str, v: &Value, out: &mut Vec<(String, Value)>) {
 /// document `doc` (file label `label`, e.g. `PROJECT_POLICY`, `MODEL_ROUTING_OVERRIDES`) against the rules keyed
 /// `<label>.<dotted>`; `kernel_value_of(dotted)` supplies the kernel (or kernel-default) value the leaf may not
 /// weaken. Subtrees named in `skip` are evaluated elsewhere (e.g. `policy_overrides`). A leaf equal to its kernel
-/// value changes nothing and is accepted as is; every other leaf must satisfy its rule (deny by default).
+/// value changes nothing and is accepted as is; every other leaf must satisfy its rule in every rule set that
+/// governs `label` ([`Governing::evaluate`]; deny by default).
 pub fn evaluate_overlay(
-    prec: Option<&Precedence>,
+    prec: Option<&Governing>,
     label: &str,
     source: &str,
     doc: &Value,
@@ -328,7 +457,7 @@ pub fn evaluate_overlay(
             continue;
         }
         let verdict = match prec {
-            Some(pr) => evaluate(pr, label, &dotted, kernel.as_ref(), &value, false),
+            Some(pr) => pr.evaluate(label, &dotted, kernel.as_ref(), &value, false),
             None => Err(format!(
                 "{label}.{dotted}: precedence rules unavailable (fail closed)"
             )),
@@ -503,7 +632,8 @@ mod tests {
         };
         let doc = json!({"providers": [{"name": "x"}], "task_class_overrides": {"security": "T1", "docs": "T2"},
                          "role_overrides": {"orchestrator": {"default_reasoning": "low"}}, "unknown": 1, "empty": {}});
-        let v = evaluate_overlay(Some(&prec), "MRO", "MRO.yaml", &doc, &kernel, &[]);
+        let gov = Governing::single(prec);
+        let v = evaluate_overlay(Some(&gov), "MRO", "MRO.yaml", &doc, &kernel, &[]);
         let refused: Vec<&str> = v
             .refused
             .iter()
@@ -537,7 +667,7 @@ mod tests {
             .any(|a| a["key"] == "task_class_overrides.docs"));
         let pp = json!({"readiness": {"enforce": false}, "policy_overrides": {"X.y": 1}});
         let v = evaluate_overlay(
-            Some(&prec),
+            Some(&gov),
             "PP",
             "PP.yaml",
             &pp,
@@ -549,5 +679,127 @@ mod tests {
         // no rules at all: fail closed
         let v = evaluate_overlay(None, "PP", "PP.yaml", &pp, &kernel, &["policy_overrides"]);
         assert_eq!(v.effective["readiness"]["enforce"], true);
+    }
+
+    /// O-1: a kernel whose rules predate overlay-document evaluation (no rule for the label) does not govern it;
+    /// the floor that declares the label does. Where both declare a key, the stricter verdict holds either way.
+    #[test]
+    fn a_rule_set_silent_on_a_label_does_not_govern_it_and_the_stricter_set_wins() {
+        let rule = |key: &str, mode: &str, kind: &str| Rule {
+            key: key.into(),
+            mode: mode.into(),
+            kind: kind.into(),
+            order: vec![],
+            strict_value: if mode == "strengthen_only_bool" {
+                Some(json!(true))
+            } else {
+                None
+            },
+            exception_relaxable: false,
+        };
+        let set = |source: &str, rules: Vec<Rule>| Precedence {
+            rules,
+            default_mode: "immutable".into(),
+            layers: vec![],
+            source: source.into(),
+        };
+        // like the shipped 4.1.4/4.1.5 rules: kernel policies only, nothing for the overlay documents
+        let old = set(
+            "installed kernel",
+            vec![
+                rule("A.levels.*", "floor", "level"),
+                rule("A.*", "immutable", ""),
+                rule("M.*", "overridable", ""),
+            ],
+        );
+        let floor = set(
+            "floor",
+            vec![
+                rule("A.levels.*", "floor", "level"),
+                rule("A.*", "immutable", ""),
+                rule("M.guard", "strengthen_only_bool", ""),
+                rule("M.*", "overridable", ""),
+                rule("PP.readiness.*", "strengthen_only_bool", ""),
+                rule("PP.project.*", "overridable", ""),
+                rule("PP.*", "immutable", ""),
+            ],
+        );
+        let gov = Governing::from_sets(Some(old.clone()), Some(floor.clone())).unwrap();
+        assert_eq!(gov.sets.len(), 2);
+        let kernel = |k: &str| -> Option<Value> {
+            match k {
+                "readiness.enforce" => Some(json!(true)),
+                "project.name" => Some(json!("{{project_name}}")),
+                _ => None,
+            }
+        };
+        let doc = json!({"project": {"name": "shop"}, "readiness": {"enforce": false}, "governance": {"x": 1}});
+        let v = evaluate_overlay(Some(&gov), "PP", "PP.yaml", &doc, &kernel, &[]);
+        let refused: Vec<&str> = v
+            .refused
+            .iter()
+            .map(|r| r["key"].as_str().unwrap())
+            .collect();
+        assert!(
+            !refused.contains(&"project.name"),
+            "descriptive key recognised: {refused:?}"
+        );
+        assert!(
+            refused.contains(&"readiness.enforce"),
+            "floor still enforced: {refused:?}"
+        );
+        assert!(
+            refused.contains(&"governance.x"),
+            "catch-all still immutable: {refused:?}"
+        );
+        assert_eq!(v.effective["project"]["name"], "shop");
+        assert_eq!(v.effective["readiness"]["enforce"], true);
+        // the installed set alone (as before): deny by default for every overlay key
+        let alone = Governing::single(old.clone());
+        let v = evaluate_overlay(Some(&alone), "PP", "PP.yaml", &doc, &kernel, &[]);
+        assert_eq!(v.refused.len(), 3);
+        // a floor the binary adds is enforced even though the older installed set would allow the override
+        assert!(gov
+            .evaluate("M", "guard", Some(&json!(true)), &json!(false), false)
+            .is_err());
+        assert!(gov
+            .evaluate("M", "guard", Some(&json!(true)), &json!(true), false)
+            .is_ok());
+        assert!(gov
+            .evaluate("M", "other", Some(&json!(1)), &json!(2), false)
+            .is_ok());
+        // an installed set stricter than the floor is not overridden by it
+        let strict = set(
+            "installed kernel",
+            vec![
+                rule("PP.project.name", "immutable", ""),
+                rule("PP.*", "immutable", ""),
+            ],
+        );
+        let gov2 = Governing::from_sets(Some(strict), Some(floor.clone())).unwrap();
+        assert!(gov2
+            .evaluate("PP", "project.name", None, &json!("shop"), false)
+            .is_err());
+        // an installed set weaker than the floor does not lower it
+        let weak = set("installed kernel", vec![rule("PP.*", "overridable", "")]);
+        let gov3 = Governing::from_sets(Some(weak), Some(floor.clone())).unwrap();
+        let e = gov3
+            .evaluate(
+                "PP",
+                "readiness.enforce",
+                Some(&json!(true)),
+                &json!(false),
+                false,
+            )
+            .unwrap_err();
+        assert!(e.contains("[rules: floor]"), "{e}");
+        // identical sets are evaluated once
+        assert_eq!(
+            Governing::from_sets(Some(floor.clone()), Some(floor))
+                .unwrap()
+                .sets
+                .len(),
+            1
+        );
     }
 }

@@ -153,9 +153,12 @@ impl PolicySet {
         }
         // ---- constitutional precedence (framework §21, verifier H-N1): evaluate every override/exception against the
         // kernel rules before it touches the effective policy; refusals are recorded and leave the policy unchanged.
-        let prec = crate::policy_precedence::load(kernel_dir);
+        // The governing rules are the verified kernel's AND this binary's constitutional floor: a key is overridable
+        // only when every rule set that declares its policy/overlay label allows it (O-1: a kernel whose rules predate
+        // overlay-document evaluation does not govern those labels; `policy_precedence::Governing`).
+        let prec = crate::policy_precedence::Governing::load(kernel_dir);
         ps.precedence = prec.as_ref().map(|pr| {
-            let mut d = crate::policy_precedence::describe(pr);
+            let mut d = pr.describe();
             d["source"] = json!(trust.source.clone());
             d["kernel_verified"] = json!(trust.verified);
             d
@@ -174,14 +177,7 @@ impl PolicySet {
                 }
                 let kernel_value = ps.raw.get(pol).and_then(|k| deep_get(k, dotted).cloned());
                 let verdict = match &prec {
-                    Some(pr) => crate::policy_precedence::evaluate(
-                        pr,
-                        pol,
-                        dotted,
-                        kernel_value.as_ref(),
-                        value,
-                        false,
-                    ),
+                    Some(pr) => pr.evaluate(pol, dotted, kernel_value.as_ref(), value, false),
                     None => Err(format!("{key}: precedence rules unavailable")),
                 };
                 match verdict {
@@ -275,14 +271,7 @@ impl PolicySet {
             }
             let kernel_value = ps.raw.get(&pol).and_then(|k| deep_get(k, &key).cloned());
             let verdict = match &prec {
-                Some(pr) => crate::policy_precedence::evaluate(
-                    pr,
-                    &pol,
-                    &key,
-                    kernel_value.as_ref(),
-                    &value,
-                    true,
-                ),
+                Some(pr) => pr.evaluate(&pol, &key, kernel_value.as_ref(), &value, true),
                 None => Err(format!("{id}: precedence rules unavailable")),
             };
             match verdict {

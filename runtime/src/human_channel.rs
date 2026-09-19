@@ -15,11 +15,14 @@
 //! * **Authority**: Ed25519 keys of the `human-gate` role, held by the product owner **outside the machine the
 //!   agents run on** (the `gov` binary contains no signing code and no key). Threshold as delegated.
 //! * **Anchor** ([`anchor`]): on a machine with a provisioned Signed Release Root, the trusted root's delegation of
-//!   the `human-gate` role — the same administrator-provisioned anchor that governs releases and break-glass. On a
-//!   machine with no release root, a standalone human-channel anchor provisioned by the administrator into
-//!   protected machine state (`gov trust human-channel --provision`), permitted only while the kernel policy
-//!   `HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned` allows it. Once a release root exists
-//!   it alone governs, and a standalone anchor is ignored.
+//!   the `human-gate` role — the same administrator-provisioned anchor that governs releases and break-glass. A
+//!   standalone human-channel anchor (`gov trust human-channel --provision`) exists only behind the kernel switch
+//!   `HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned`, which is **off** (P2-ADJ-0001, following
+//!   OWNER-DECISION-P2-0002 "provision, then work" and ARCH-0003 §2-§3: one trust chain, no parallel authority
+//!   domain for Human Gate approval). With it off, a machine with no release root has no human channel: an answer is
+//!   refused `HUMAN_CHANNEL_UNAVAILABLE` (cause `UNPROVISIONED`, remediation: provision a Signed Release Root that
+//!   delegates `human-gate`), and provisioning a standalone anchor is refused `HUMAN_CHANNEL_STANDALONE_DISABLED`.
+//!   Once a release root exists it alone governs, and a standalone anchor is ignored.
 //! * **Answer**: an owner-signed `human-gate-answer` document binding the product, the gate id, the gate's OS-issued
 //!   instance nonce, the SHA-256 of the exact decision package the OS rendered, the chosen option, a nonce and an
 //!   expiry. It is placed out of band in the human-channel inbox (or passed by path — the path is not authority,
@@ -134,12 +137,28 @@ impl Anchor {
     }
 }
 
-fn unavailable(why: String, remediation: &str) -> GovError {
+/// The one command that provisions this machine's trust anchor (administrator domain).
+pub const PROVISION_COMMAND: &str =
+    "gov trust provision --anchor <root.json supplied from the administrator domain>";
+
+fn unavailable(cause: &str, why: String, remediation: &str) -> GovError {
     GovError::new(
         "HUMAN_CHANNEL_UNAVAILABLE",
         format!("no authenticated human channel exists on this machine: {why}. A human answer can only come from an owner-signed document verified against an administrator-provisioned anchor (BC-P2-10; OWNER-DECISION-0006 req. 2). Remediation: {remediation}"),
     )
-    .with_details(json!({"role": ROLE, "remediation": remediation, "inbox": inbox_dir().ok().map(|p| p.display().to_string())}))
+    .with_details(json!({"role": ROLE, "cause": cause, "remediation": remediation, "inbox": inbox_dir().ok().map(|p| p.display().to_string())}))
+}
+
+/// The kernel default of `HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned` as compiled into this
+/// binary (used where no governed project is open, e.g. `gov trust human-channel` outside a project). Absent or
+/// unreadable means off (P2-ADJ-0001).
+pub fn standalone_allowed_by_embedded_kernel() -> bool {
+    crate::kernel::embedded::files()
+        .iter()
+        .find(|(rel, _)| *rel == "policies/HUMAN_GATE_POLICY.yaml")
+        .and_then(|(_, b)| serde_yaml::from_slice::<Value>(b).ok())
+        .and_then(|d| d["human_channel"]["standalone_anchor_when_unprovisioned"].as_bool())
+        .unwrap_or(false)
 }
 
 /// Resolve this machine's human-channel anchor. `standalone_allowed` is the kernel policy switch
@@ -147,6 +166,7 @@ fn unavailable(why: String, remediation: &str) -> GovError {
 pub fn anchor(standalone_allowed: bool) -> Result<Anchor> {
     let ms = crate::srr::state::MachineState::open().map_err(|e| {
         unavailable(
+            "MACHINE_STATE_UNRESOLVED",
             format!(
                 "the protected machine state cannot be resolved ({}: {})",
                 e.code, e.message
@@ -158,6 +178,7 @@ pub fn anchor(standalone_allowed: bool) -> Result<Anchor> {
     if let Some(root) = crate::srr::verifier::trusted_root(&ms, &now)? {
         let Some(role) = root.roles.get(ROLE).cloned() else {
             return Err(unavailable(
+                "ROOT_DELEGATES_NO_HUMAN_GATE",
                 format!("this machine's provisioned Signed Release Root (version {}) delegates no `{ROLE}` role", root.version),
                 "have the owner's root quorum sign a successor root that delegates the `human-gate` role to the owner's human-gate key(s), and apply it with `gov trust root-update`",
             ));
@@ -178,14 +199,28 @@ pub fn anchor(standalone_allowed: bool) -> Result<Anchor> {
         });
     }
     if !standalone_allowed {
-        return Err(unavailable(
-            "this machine holds no Signed Release Root and HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned is false".into(),
-            "provision a Signed Release Root that delegates the `human-gate` role (`gov trust provision`)",
-        ));
+        // P2-ADJ-0001: no release root means no human channel. Typed and observable, with the one remediation.
+        let present = standalone_anchor_path()
+            .map(|p| p.exists())
+            .unwrap_or(false);
+        let mut e = unavailable(
+            "UNPROVISIONED",
+            format!(
+                "this machine holds no Signed Release Root, and human answers derive only from a provisioned root's `{ROLE}` delegation (HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned is false{})",
+                if present { "; the standalone human-channel anchor present in machine state is not honoured" } else { "" }
+            ),
+            "provision this machine: the administrator installs a Signed Release Root whose `human-gate` role delegates the product owner's key(s) (`gov trust provision --anchor <root.json>`); a dev/test machine provisions a throw-away root (OWNER-DECISION-P2-0002)",
+        );
+        e.details["provision_command"] = json!(PROVISION_COMMAND);
+        e.details["standalone_anchor_present"] = json!(present);
+        e.details["policy"] =
+            json!("HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned");
+        return Err(e);
     }
     let path = standalone_anchor_path()?;
     if !path.exists() {
         return Err(unavailable(
+            "NO_ANCHOR",
             format!("no human-channel anchor is provisioned ({} is absent)", path.display()),
             "the administrator installs the owner's public human-gate keys with `gov trust human-channel --provision <anchor.json>` (a self-signed `human-channel-anchor` document from the administrator domain), or provisions a Signed Release Root delegating `human-gate`",
         ));
@@ -278,11 +313,26 @@ fn parse_standalone(env: Envelope, now: Option<&str>) -> Result<Anchor> {
 /// repository content (ARCH-0003 §5, the same rule `gov trust provision` applies to a Signed Release Root), on a
 /// machine that holds a Signed Release Root (the root's delegation governs there), and when an anchor already exists
 /// (the product never re-anchors; replacing it is an administrator-domain action outside the product).
-pub fn provision_standalone(file: &Path, project_root: Option<&Path>) -> Result<Value> {
+///
+/// `standalone_allowed` is `HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned`; while it is false
+/// (the kernel default, P2-ADJ-0001) provisioning is refused `HUMAN_CHANNEL_STANDALONE_DISABLED`: an anchor that
+/// would never be honoured is not installed, and the remediation is to provision a Signed Release Root.
+pub fn provision_standalone(
+    file: &Path,
+    project_root: Option<&Path>,
+    standalone_allowed: bool,
+) -> Result<Value> {
     crate::srr::breakglass::guard_effect(
         crate::srr::breakglass::Effect::TrustPolicyMutation,
         "trust human-channel provision",
     )?;
+    if !standalone_allowed {
+        return Err(GovError::new(
+            "HUMAN_CHANNEL_STANDALONE_DISABLED",
+            format!("a standalone human-channel anchor is not a source of Human Gate authority: HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned is false (P2-ADJ-0001; OWNER-DECISION-P2-0002 \"provision, then work\"). Human answers derive from a provisioned Signed Release Root's `{ROLE}` delegation. Remediation: provision this machine ({PROVISION_COMMAND}) with a root whose `{ROLE}` role delegates the product owner's key(s); a dev/test machine provisions a throw-away root."),
+        )
+        .with_details(json!({"cause": "STANDALONE_ANCHOR_DISABLED", "policy": "HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned", "remediation": "provision a Signed Release Root that delegates the `human-gate` role", "provision_command": PROVISION_COMMAND})));
+    }
     refuse_repository_sourced_anchor(file, project_root)?;
     let ms = crate::srr::state::MachineState::open()?;
     let now = crate::srr::metadata::local_clock_now();
@@ -710,4 +760,47 @@ pub fn write_outbox(gate: &str, instance: &str, package_bytes: &[u8]) -> Result<
     std::fs::write(&p, package_bytes)
         .map_err(|e| GovError::io(&format!("write {}", p.display()), e))?;
     Ok(p)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// P2-ADJ-0001: the kernel compiled into this binary keeps the standalone anchor off, and the strengthen-only
+    /// precedence rule allows only `false` as an override.
+    #[test]
+    fn the_embedded_kernel_keeps_the_standalone_anchor_off() {
+        assert!(!standalone_allowed_by_embedded_kernel());
+        let prec = crate::policy_precedence::embedded().expect("embedded precedence rules");
+        let key = "human_channel.standalone_anchor_when_unprovisioned";
+        let kernel = json!(false);
+        assert!(crate::policy_precedence::evaluate(
+            &prec,
+            "HUMAN_GATE_POLICY",
+            key,
+            Some(&kernel),
+            &json!(true),
+            false
+        )
+        .is_err());
+        assert!(crate::policy_precedence::evaluate(
+            &prec,
+            "HUMAN_GATE_POLICY",
+            key,
+            Some(&kernel),
+            &json!(false),
+            false
+        )
+        .is_ok());
+        // a kernel that predates the key (no kernel value) cannot be switched on by a project either
+        assert!(crate::policy_precedence::evaluate(
+            &prec,
+            "HUMAN_GATE_POLICY",
+            key,
+            None,
+            &json!(true),
+            false
+        )
+        .is_err());
+    }
 }

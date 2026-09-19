@@ -374,18 +374,6 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         .unwrap()
         .iter()
         .all(|h| h["path"] != "product/data/customers.md"));
-    // visible in doctor, the governance suite and the context packet
-    let (ok27, msg27) = doctor_check(&g, "D027");
-    assert!(!ok27, "{msg27}");
-    let au = g.run(&["audit", "--no-persist"]);
-    let f = if au.ok() { au.result() } else { au.details() };
-    let crit: Vec<&Value> = f["findings"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|x| x["family"] == "policy_precedence" && x["severity"] == "critical")
-        .collect();
-    assert!(crit.len() >= 10, "{}", f["findings"]);
     let t = g.ok(&[
         "task",
         "create",
@@ -408,6 +396,29 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         layer3["policy_overrides_refused"].as_array().unwrap().len() >= 10,
         "{layer3}"
     );
+    // visible in doctor, the governance suite and the context packet
+    let (ok27, msg27) = doctor_check(&g, "D027");
+    assert!(!ok27, "{msg27}");
+    let au = g.run(&["audit", "--no-persist"]);
+    let f = if au.ok() { au.result() } else { au.details() };
+    let crit: Vec<&Value> = f["findings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|x| x["family"] == "policy_precedence" && x["severity"] == "critical")
+        .collect();
+    assert!(crit.len() >= 10, "{}", f["findings"]);
+    // round 2 (P2-AR-0024, IP-WS02-08): the CRITICAL precedence finding recorded above is a hard-block, so new
+    // governed work is refused at G0 until it is repaired (the context packet was compiled before the doctor run)
+    let e = g.err(&[
+        "task",
+        "create",
+        "--class",
+        "documentation",
+        "--objective",
+        "y",
+    ]);
+    assert_eq!(e.error_code(), "HEALTH_HARD_BLOCK", "{}", e.envelope);
     // exceptions follow the same rules and need a real governing decision (verifier V-M1). WS-3 / BC-P2-09: that
     // decision must be one a gov operation wrote — the human's owner-signed answer to a gate that asked for exactly
     // this scope — because a hand-written decision claiming human approval is a request, recorded and ignored.
@@ -882,10 +893,29 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     let rel412 = canonical_root().join("release/releases/4.1.2");
     let rel413 = canonical_root().join("release/releases/4.1.3");
     let (root, g) = setup_fixture("greenfield", "rep2-chain", "S-rep2");
+    // round 2 (P2-AR-0024): P2-ADJ-0001 / OWNER-DECISION-P2-0002 — provision (throw-away test root), then install
+    // releases signed by it; the update gates are answered through the root's `human-gate` delegation, and the
+    // below-floor rollbacks carry the owner's break-glass authorisation
+    crate::ws03::provision(&g);
+    let s412 = crate::ws03::signed_release(
+        &rel412.join("kernel"),
+        &crate::ws03::scratch_dir(&g, "rel-412"),
+        12,
+    );
+    let s413 = crate::ws03::signed_release(
+        &rel413.join("kernel"),
+        &crate::ws03::scratch_dir(&g, "rel-413"),
+        13,
+    );
+    let scur = crate::ws03::signed_release(
+        &canonical_root().join("framework"),
+        &crate::ws03::scratch_dir(&g, "rel-cur"),
+        20,
+    );
     let r = g.ok(&[
         "init",
         "--source",
-        rel412.join("kernel").to_str().unwrap(),
+        s412.to_str().unwrap(),
         "--name",
         "chain",
         "--alias",
@@ -952,14 +982,9 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         ])
     };
     // 4.1.2 -> 4.1.3 with the immutable 4.1.3 payload (its migration has no overlay op: reconciliation delivers it)
-    let chk = g.ok(&[
-        "update",
-        "--check",
-        "--source",
-        rel413.join("kernel").to_str().unwrap(),
-    ]);
+    let chk = g.ok(&["update", "--check", "--source", s413.to_str().unwrap()]);
     assert_eq!(chk["migration_path"], json!(["M-4.1.2-4.1.3"]));
-    let a1 = apply(&rel413.join("kernel"));
+    let a1 = apply(&s413);
     assert_eq!(a1["applied"], true);
     assert_eq!(a1["to"], "4.1.3");
     assert!(
@@ -971,14 +996,18 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     );
     let lock = yaml(&root, "governance/framework.lock");
     assert_eq!(lock["version"], "4.1.3");
-    // BC-P2-37 (P2-AR-0020): the 4.1.3 manifest.json is unsigned and this machine holds no trust anchor; its
-    // release_commit is not recorded as identity and the release is not labelled a verified `release:`.
+    // BC-P2-37 (P2-AR-0020): the 4.1.3 manifest.json is unsigned; its release_commit is not recorded as identity.
+    // Round 2 (P2-AR-0024): on this provisioned machine the release was admitted through signed release metadata, so
+    // the lock's basis is that verified release (`release:`), which the signed metadata — not manifest.json — names.
     assert_ne!(
         lock["release_commit"],
         json(&rel413, "manifest.json")["release_commit"]
     );
-    assert_eq!(lock["release_commit"], "unverified");
-    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["release_commit"], "unverified", "{lock}");
+    assert_eq!(
+        lock["source"], "release:agentic-engineering-os@4.1.3",
+        "{lock}"
+    );
     let rule = yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml")["paths"]
         .as_array()
         .unwrap()
@@ -1001,12 +1030,7 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     );
     git_commit_all(&root, "4.1.3");
     // 4.1.3 -> current release with the canonical kernel (M-4.1.3-4.1.4 carries the explicit set_overlay_rule)
-    let chk2 = g.ok(&[
-        "update",
-        "--check",
-        "--source",
-        canonical_root().join("framework").to_str().unwrap(),
-    ]);
+    let chk2 = g.ok(&["update", "--check", "--source", scur.to_str().unwrap()]);
     let chain2: Vec<String> = chk2["migration_path"]
         .as_array()
         .unwrap()
@@ -1034,7 +1058,7 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         ),
         "the chain must end at the current release: {chain2:?}"
     );
-    let a2 = apply(&canonical_root().join("framework"));
+    let a2 = apply(&scur);
     assert_eq!(a2["to"], gov_runtime::VERSION);
     let lock2 = yaml(&root, "governance/framework.lock");
     assert_eq!(lock2["version"], gov_runtime::VERSION);
@@ -1045,10 +1069,13 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         lock2["release_commit"].as_str().unwrap(),
         gov_runtime::kernel::embedded::commit()
     );
-    assert!(lock2["source"].as_str().unwrap().starts_with(&format!(
-        "embedded:agentic-engineering-os@{}",
-        gov_runtime::VERSION
-    )));
+    // round 2 (P2-AR-0024): admitted through signed release metadata on this provisioned machine, the basis the lock
+    // names is the verified release
+    assert_eq!(
+        lock2["source"].as_str().unwrap(),
+        format!("release:agentic-engineering-os@{}", gov_runtime::VERSION),
+        "{lock2}"
+    );
     assert_eq!(
         yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml")["paths"]
             .as_array()
@@ -1103,9 +1130,15 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         "unexpected doctor failures after the 4.1.2 -> 4.1.3 -> 4.1.4 chain: {failed:?}"
     );
     // rollback 4.1.4 -> 4.1.3 leaves a ledger entry and consumes its snapshot; then 4.1.3 -> 4.1.2; then nothing left
+    assert_eq!(
+        g.err(&["update", "--rollback"]).error_code(),
+        "SRR_BELOW_FLOOR"
+    );
+    crate::ws03::break_glass_for(&g, &s413, "chain-rb-1");
     let rb = g.with_role("orchestrator").ok(&[
         "update",
         "--rollback",
+        "--break-glass",
         "--reason",
         "verifier requested downgrade",
     ]);
@@ -1139,7 +1172,8 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     assert_eq!(rbe["reason"], "verifier requested downgrade");
     assert_eq!(rbe["resulting_lock"]["version"], "4.1.3");
     assert_eq!(yaml(&root, "governance/framework.lock")["version"], "4.1.3");
-    let rb2 = g.ok(&["update", "--rollback", "--reason", "again"]);
+    crate::ws03::break_glass_for(&g, &s412, "chain-rb-2");
+    let rb2 = g.ok(&["update", "--rollback", "--break-glass", "--reason", "again"]);
     assert_eq!(rb2["rolled_back_to"], "4.1.2");
     assert_eq!(yaml(&root, "governance/framework.lock")["version"], "4.1.2");
     let e = g.err(&["update", "--rollback"]);
