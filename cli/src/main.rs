@@ -1317,6 +1317,17 @@ enum TrustCmd {
     BreakGlass,
     /// Replay any interrupted install transaction and report what was done
     RecoverTransactions,
+    /// Administrator (P2-ADJ-0002): install the owner's T2 binding authority on this provisioned machine, so T2 facts
+    /// it writes are honoured on the owner's other provisioned machines
+    Bind {
+        /// Owner-signed `t2-binding-authority` document (signed by the root-delegated `t2-binding` role), from the
+        /// administrator domain
+        #[arg(long)]
+        authority: String,
+        /// A binding key the authority authorises (`key_hex`), from the administrator domain — never a repository
+        #[arg(long)]
+        key: String,
+    },
     /// The authenticated human channel for Human Decision Gate answers: anchor, inbox, what a signed answer binds
     HumanChannel {
         /// Administrator: install the owner's public `human-gate` keys (a self-signed `human-channel-anchor`
@@ -1523,6 +1534,7 @@ fn g0_label(cmd: &Cmd) -> String {
             TrustCmd::RootUpdate { .. } => "trust root-update",
             TrustCmd::BreakGlass => "trust break-glass",
             TrustCmd::RecoverTransactions => "trust recover-transactions",
+            TrustCmd::Bind { .. } => "trust bind",
             TrustCmd::HumanChannel { provision } => {
                 if provision.is_some() {
                     "trust human-channel --provision"
@@ -1901,6 +1913,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 TrustCmd::Provision { anchor } => gov_runtime::srr::provision::provision(Path::new(anchor), project_root.as_deref()),
                 TrustCmd::RootUpdate { anchor } => gov_runtime::srr::provision::root_update(Path::new(anchor), project_root.as_deref()),
                 TrustCmd::BreakGlass => gov_runtime::srr::provision::break_glass_status(),
+                TrustCmd::Bind { authority, key } => gov_runtime::srr::binding::bind(Path::new(authority), Path::new(key), project_root.as_deref()),
                 TrustCmd::RecoverTransactions => {
                     let ms = gov_runtime::srr::state::MachineState::open()?;
                     let r = gov_runtime::srr::staging::recover(&ms)?;

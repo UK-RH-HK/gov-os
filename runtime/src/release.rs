@@ -227,6 +227,33 @@ pub fn build(
         )
         .with_details(json!({"problems": substance})));
     }
+    // P2-AR-0039 — kernel payload/version consistency and hygiene, measured on the staged payload (the bytes the
+    // release ships). A NEW version is refused when the schema versions it declares are not the schema files it
+    // ships, or when the kernel's own secret scanner flags a payload file (it would be flagged in, and shipped into,
+    // every installation). Reproducing a historical version reports what its shipped payload carries and refuses
+    // nothing: an immutable release is what it is.
+    let schema_problems = crate::kernel::schema_version_problems(&kernel);
+    let secret_hits = crate::kernel::payload_secret_hits(&kernel);
+    if reproduced_from.is_none() && !schema_problems.is_empty() {
+        let _ = std::fs::remove_dir_all(&dir);
+        return Err(GovError::new(
+            "RELEASE_KERNEL_INCONSISTENT",
+            format!("release {version} refused: the kernel payload's declared schema versions are not the schema files it ships: {}", schema_problems.join("; ")),
+        )
+        .with_details(json!({"problems": schema_problems, "remediation": "make framework/KERNEL.yaml schema_versions list every schema file that declares an x-schema-version, at exactly that version"})));
+    }
+    if reproduced_from.is_none() && !secret_hits.is_empty() {
+        let _ = std::fs::remove_dir_all(&dir);
+        return Err(GovError::new(
+            "RELEASE_PAYLOAD_SECRET",
+            format!("release {version} refused: the kernel's own secret scanner flags {} payload location(s); every installation would carry and flag them", secret_hits.len()),
+        )
+        .with_details(json!({"hits": secret_hits, "remediation": "remove the secret-like value from the kernel file (a test value can be assembled at run time)"})));
+    }
+    let kernel_payload = json!({
+        "schema_versions_consistent": schema_problems.is_empty(), "schema_version_problems": schema_problems,
+        "secret_scan_hits": secret_hits,
+    });
     let notes_path = canonical_root
         .join("release")
         .join("notes")
@@ -243,7 +270,7 @@ pub fn build(
     let manifest = json!({
         "framework": FRAMEWORK_NAME, "version": version, "release_commit": commit, "release_hash": km["payload_hash"], "schema_versions": km["schema_versions"], "cli_version": CLI_VERSION, "runtime_version": RUNTIME_VERSION,
         "supported_from_versions": km["supported_from_versions"], "migration_ids": mig_ids, "adapter_versions": km["adapter_versions"], "required_index_rebuilds": rebuilds, "breaking_changes": breaking, "human_gates": gates,
-        "file_hashes": file_hashes, "release_notes": notes, "rollback_procedure": "gov update --rollback restores the previous kernel, overlay snapshot and framework.lock from .governance-runtime/update/<version>/ and rebuilds indexes; spec/ and product/ are never modified by an update.",
+        "file_hashes": file_hashes, "release_notes": notes, "rollback_procedure": "gov update --rollback restores the previous kernel, overlay snapshot and framework.lock from the update snapshot in .governance-state/update/<version>/ (non-rebuildable operational state, BC-P2-31) and rebuilds indexes; spec/ and product/ are never modified by an update.",
         "certification": {"status": certification_status, "implementer_evidence": evidence.unwrap_or(""), "independent_verifier": "", "certified_at": ""}, "built_at": now_iso(), "immutable": true,
         "provenance": {"release_branch": branch, "release_tag": format!("v{version}-rc1"), "reproduced_from_commit": reproduced_from, "kernel_source": if reproduced_from.is_some() { "git archive of release_commit" } else { "working tree" }, "migration_substance_problems": substance},
     });
@@ -286,6 +313,7 @@ pub fn build(
             && contract["verdict"] == "CONTRACT_SOURCE_BOUND",
         "capability_contract": contract,
         "health": health,
+        "kernel_payload": kernel_payload,
         "built_release_verified": {"ok": true, "release_hash_matches_kernel": built["release_hash_matches_kernel"]},
         "checked_at": now_iso(),
     });
@@ -400,4 +428,230 @@ pub fn verify(release_dir: &Path) -> Result<Value> {
         json!({"version": manifest["version"], "ok": modified.is_empty() && missing.is_empty() && added.is_empty() && hash_ok, "modified": modified, "missing": missing, "added": added, "release_hash_matches_kernel": hash_ok,
                "certification": {"effective_status": effective, "authenticated": basis.authenticated_status.is_some(), "basis": basis.basis, "unsigned_manifest_claim": manifest["certification"]}}),
     )
+}
+
+// ---------------------------------------------------------------------------------------- product release records
+
+/// The record type of a governed project's **product release** (WS-8 r2 IP-R2-WS08-7; Contract v3 W8: the lineage
+/// "outcome/feature → … → task → code → test → evidence → release"). Distinct from the Governance OS kernel releases
+/// [`build`] produces, which belong to no governed project. The type's canonical directory and prefix are registered
+/// in `records::TYPE_DIR`/`TYPE_PREFIX` (WS-4, round 3); the command and its G0 class are WS-3's (`gov release
+/// record`); until both land the writer refuses typed (`RECORD_TYPE_UNKNOWN`, or the G0 refusal of an unclassified
+/// label) and writes nothing.
+pub const PRODUCT_RELEASE_TYPE: &str = "release";
+/// The operation label (G0) and T2 seal operation of the writer.
+pub const PRODUCT_RELEASE_OPERATION: &str = "release record";
+
+/// A product release to record: what it is, what it was derived from and what validated it.
+#[derive(Debug, Clone, Default)]
+pub struct ProductRelease {
+    pub version: String,
+    pub title: String,
+    /// Tasks and reports the release was derived from (`derived_from`, edge `DERIVED_FROM`).
+    pub derived_from: Vec<String>,
+    /// Audit / evidence / report records that validated it (`validated_by`, edge `VALIDATED_BY`).
+    pub validated_by: Vec<String>,
+    pub notes: Option<String>,
+}
+
+/// Record types a product release may be derived from, and types that may validate one.
+const RELEASE_DERIVED_FROM_TYPES: &[&str] =
+    &["task", "report", "feature", "requirement", "decision"];
+const RELEASE_VALIDATED_BY_TYPES: &[&str] = &["audit", "report", "test-obligation", "scenario"];
+
+/// The record id of the product release `version` (`REL-<version>`).
+pub fn product_release_id(version: &str) -> String {
+    format!(
+        "REL-{}",
+        version
+            .chars()
+            .map(|c| if c.is_ascii_alphanumeric() || c == '.' || c == '-' {
+                c
+            } else {
+                '_'
+            })
+            .collect::<String>()
+    )
+}
+
+/// Compose (without writing) the product-release record for `spec` against the project's records in `store`:
+/// every referenced id must exist with a type that may stand in that relation; governed health evidence cited in
+/// `validated_by` must be honoured (T2-bound: written by a `gov` health operation as it stands); a release version
+/// is recorded once (releases are immutable).
+pub fn compose_product_release(
+    store: &crate::records::RecordStore,
+    spec: &ProductRelease,
+) -> Result<crate::records::Record> {
+    let version = spec.version.trim();
+    if version.is_empty() || spec.title.trim().is_empty() {
+        return Err(GovError::new(
+            "USAGE",
+            "a product release needs a version and a title",
+        ));
+    }
+    let id = product_release_id(version);
+    if store.get(&id).is_some() {
+        return Err(GovError::new(
+            "RELEASE_RECORD_EXISTS",
+            format!("product release {version} is already recorded as {id}; a release record is immutable — record the next version instead"),
+        ));
+    }
+    if spec.derived_from.is_empty() || spec.validated_by.is_empty() {
+        return Err(GovError::new(
+            "RELEASE_LINEAGE_INCOMPLETE",
+            format!("product release {version} must name what it was derived from (tasks/reports) and what validated it (audit/evidence): a release outside the lineage is exactly the W8 gap this record closes"),
+        ));
+    }
+    let check = |ids: &[String], allowed: &[&str], field: &str| -> Result<()> {
+        for rid in ids {
+            let Some(r) = store.get(rid) else {
+                return Err(GovError::new(
+                    "RELEASE_LINEAGE_UNKNOWN_RECORD",
+                    format!("{field}: {rid} is not a governed record of this project"),
+                ));
+            };
+            let t = r.rtype();
+            if !allowed.contains(&t.as_str()) {
+                return Err(GovError::new(
+                    "RELEASE_LINEAGE_WRONG_TYPE",
+                    format!(
+                        "{field}: {rid} is a {t} record; {field} takes {}",
+                        allowed.join(" | ")
+                    ),
+                ));
+            }
+            if t == "audit"
+                && crate::verification::currency::HEALTH_OUTPUT_SCOPES
+                    .contains(&r.get("scope").as_str())
+                && !crate::t2::verify_record(r).is_verified()
+            {
+                return Err(GovError::new(
+                    "T2_UNBOUND",
+                    format!("{field}: {rid} is health evidence no gov operation on this machine produced as it stands; it cannot validate a release"),
+                ));
+            }
+        }
+        Ok(())
+    };
+    check(
+        &spec.derived_from,
+        RELEASE_DERIVED_FROM_TYPES,
+        "derived_from",
+    )?;
+    check(
+        &spec.validated_by,
+        RELEASE_VALIDATED_BY_TYPES,
+        "validated_by",
+    )?;
+    let mut fields = json!({
+        "version": version,
+        "release_status": "RECORDED",
+        "derived_from": spec.derived_from,
+        "validated_by": spec.validated_by,
+    });
+    if let Some(n) = spec.notes.as_ref().filter(|n| !n.trim().is_empty()) {
+        fields["notes"] = json!(n);
+    }
+    Ok(crate::records::new_record(
+        PRODUCT_RELEASE_TYPE,
+        &id,
+        spec.title.trim(),
+        fields,
+    ))
+}
+
+/// **Record a governed project's product release** (the writer of IP-R2-WS08-7): G0 for the label, the declared
+/// role's authority, the composed record at its canonical location, T2-sealed as written by this operation, saved
+/// through the record sink.
+pub fn record_product_release(p: &crate::Project, spec: &ProductRelease) -> Result<Value> {
+    crate::orchestration::control::guard_write(p, PRODUCT_RELEASE_OPERATION)?;
+    crate::authority::require(p, "mutate_spec_other")?;
+    let store = crate::records::RecordStore::load(&p.root);
+    let mut rec = compose_product_release(&store, spec)?;
+    // the canonical location comes from the record-type table only; nothing is written for an unregistered type
+    rec.path = crate::records::record_path_for(PRODUCT_RELEASE_TYPE, &rec.id())?;
+    rec.data["recorded_by"] = json!({"session": p.session_id, "role": p.role, "at": now_iso()});
+    crate::t2::seal_record(&mut rec, PRODUCT_RELEASE_OPERATION)?;
+    crate::records::save_record(&p.root, &rec)?;
+    Ok(
+        json!({"recorded": true, "id": rec.id(), "path": rec.path, "version": rec.get("version"),
+              "derived_from": rec.list("derived_from"), "validated_by": rec.list("validated_by")}),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn store_with(records: &[(&str, &str)]) -> (std::path::PathBuf, crate::records::RecordStore) {
+        let root = std::env::temp_dir().join(format!("gov-rel-rec-{}", crate::util::short_uuid()));
+        for (rel, text) in records {
+            crate::util::write_text(&root.join(rel), text).unwrap();
+        }
+        let store = crate::records::RecordStore::load(&root);
+        (root, store)
+    }
+
+    #[test]
+    fn a_product_release_is_composed_only_inside_its_lineage() {
+        let (root, store) = store_with(&[
+            ("spec/tasks/TASK-0001.yaml", "id: TASK-0001\ntype: task\ntitle: t\nstatus: ACTIVE\n"),
+            ("spec/reports/RPT-0001.yaml", "id: RPT-0001\ntype: report\ntitle: r\nstatus: ACTIVE\n"),
+            ("spec/features/F-0001.yaml", "id: F-0001\ntype: feature\ntitle: f\nstatus: ACTIVE\n"),
+            (
+                "spec/audits/AUD-0001.yaml",
+                "id: AUD-0001\ntype: audit\ntitle: a\nstatus: ACTIVE\nscope: governance-suite\ngreen: true\n",
+            ),
+        ]);
+        let ok = ProductRelease {
+            version: "1.2.0".into(),
+            title: "Ledger 1.2".into(),
+            derived_from: vec!["TASK-0001".into(), "RPT-0001".into()],
+            validated_by: vec!["RPT-0001".into()],
+            notes: None,
+        };
+        let rec = compose_product_release(&store, &ok).unwrap();
+        assert_eq!(rec.id(), "REL-1.2.0");
+        assert_eq!(rec.rtype(), PRODUCT_RELEASE_TYPE);
+        assert_eq!(rec.list("derived_from"), vec!["TASK-0001", "RPT-0001"]);
+        assert_eq!(rec.list("validated_by"), vec!["RPT-0001"]);
+        // lineage required, references must exist and stand in a relation their type allows
+        let mut bad = ok.clone();
+        bad.validated_by = vec![];
+        assert_eq!(
+            compose_product_release(&store, &bad).unwrap_err().code,
+            "RELEASE_LINEAGE_INCOMPLETE"
+        );
+        let mut bad = ok.clone();
+        bad.derived_from = vec!["TASK-9999".into()];
+        assert_eq!(
+            compose_product_release(&store, &bad).unwrap_err().code,
+            "RELEASE_LINEAGE_UNKNOWN_RECORD"
+        );
+        let mut bad = ok.clone();
+        bad.validated_by = vec!["F-0001".into()];
+        assert_eq!(
+            compose_product_release(&store, &bad).unwrap_err().code,
+            "RELEASE_LINEAGE_WRONG_TYPE"
+        );
+        // health evidence that no gov health operation produced as it stands cannot validate a release
+        let mut bad = ok.clone();
+        bad.validated_by = vec!["AUD-0001".into()];
+        assert_eq!(
+            compose_product_release(&store, &bad).unwrap_err().code,
+            "T2_UNBOUND"
+        );
+        // a recorded version is immutable
+        crate::util::write_text(
+            &root.join("spec/releases/REL-1.2.0.yaml"),
+            "id: REL-1.2.0\ntype: release\ntitle: x\nstatus: ACTIVE\n",
+        )
+        .unwrap();
+        let store = crate::records::RecordStore::load(&root);
+        assert_eq!(
+            compose_product_release(&store, &ok).unwrap_err().code,
+            "RELEASE_RECORD_EXISTS"
+        );
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

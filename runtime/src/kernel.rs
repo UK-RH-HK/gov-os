@@ -373,6 +373,92 @@ pub fn stage_payload(source_dir: &Path, dest: &Path) -> Result<()> {
     Ok(())
 }
 
+/// **Kernel payload/version consistency** (P2-AR-0039; WS-8 r2 IP-R2-WS08-6, WS-9 r2 IP-R2-3, WS-7 r2 IP-W7-5): the
+/// schema versions a kernel payload declares (`KERNEL.yaml` `schema_versions`, copied into `KERNEL_MANIFEST.json`, the
+/// release manifest and every `framework.lock`) are the versions of the schema files it actually ships.
+///
+/// Two rules, each stated as a problem when broken:
+/// * every declared entry names a schema file of the payload (`schemas/<name>.schema.json`) whose
+///   `x-schema-version` is exactly the declared version;
+/// * every schema file of the payload that declares an `x-schema-version` is declared, so a schema that changes
+///   cannot drop out of the identity the payload carries.
+///
+/// `release::build` refuses a new release whose payload has any problem (`RELEASE_KERNEL_INCONSISTENT`).
+pub fn schema_version_problems(kernel_dir: &Path) -> Vec<String> {
+    let mut problems = vec![];
+    let declared = match kernel_meta(kernel_dir) {
+        Ok(m) => m
+            .get("schema_versions")
+            .and_then(|v| v.as_object())
+            .cloned()
+            .unwrap_or_default(),
+        Err(e) => return vec![format!("KERNEL.yaml unreadable: {}", e.message)],
+    };
+    let dir = kernel_dir.join("schemas");
+    let mut shipped: BTreeMap<String, Option<String>> = BTreeMap::new();
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        for e in rd.filter_map(|e| e.ok()) {
+            let name = e.file_name().to_string_lossy().to_string();
+            let Some(stem) = name.strip_suffix(".schema.json") else {
+                continue;
+            };
+            let v = read_json(&e.path())
+                .ok()
+                .and_then(|s| s["x-schema-version"].as_str().map(String::from));
+            shipped.insert(stem.to_string(), v);
+        }
+    }
+    for (name, v) in &declared {
+        let want = v
+            .as_str()
+            .map(String::from)
+            .unwrap_or_else(|| v.to_string());
+        match shipped.get(name) {
+            None => problems.push(format!("KERNEL.yaml declares schema '{name}' {want}, but the payload ships no schemas/{name}.schema.json")),
+            Some(None) => problems.push(format!("KERNEL.yaml declares schema '{name}' {want}, but schemas/{name}.schema.json declares no x-schema-version")),
+            Some(Some(have)) if *have != want => problems.push(format!("KERNEL.yaml declares schema '{name}' {want}, but schemas/{name}.schema.json is version {have}")),
+            _ => {}
+        }
+    }
+    for (name, v) in &shipped {
+        if let Some(have) = v {
+            if !declared.contains_key(name) {
+                problems.push(format!("schemas/{name}.schema.json is version {have}, but KERNEL.yaml schema_versions does not declare it"));
+            }
+        }
+    }
+    problems
+}
+
+/// **Kernel payload hygiene**: every text file of the payload scanned with the payload's own secret scanner (its
+/// `policies/SECURITY_POLICY.yaml` patterns, or the built-in patterns when it carries none). A kernel file the kernel's
+/// own scanner flags is flagged in every project that installs it (D011) and would ship a secret-like value into every
+/// installation, so `release::build` refuses a new release with any hit (`RELEASE_PAYLOAD_SECRET`). Hits name the file,
+/// line and pattern only; the matched text is never reported.
+pub fn payload_secret_hits(kernel_dir: &Path) -> Vec<Value> {
+    let policy =
+        read_yaml(&kernel_dir.join("policies").join("SECURITY_POLICY.yaml")).unwrap_or(Value::Null);
+    let scanner = crate::security::secrets::SecretScanner::from_policies(&policy, &json!({}));
+    let mut hits = vec![];
+    for e in walkdir::WalkDir::new(kernel_dir)
+        .sort_by_file_name()
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+    {
+        let rel = e
+            .path()
+            .strip_prefix(kernel_dir)
+            .unwrap_or(e.path())
+            .to_string_lossy()
+            .replace('\\', "/");
+        for h in scanner.scan_file(e.path(), &rel) {
+            hits.push(json!({"path": h.path, "line": h.line, "pattern": h.pattern_id}));
+        }
+    }
+    hits
+}
+
 /// Install a kernel payload into `governance/` from a **typed authenticated-release value**.
 ///
 /// ARCH-0003 §6: "Every privileged lifecycle adapter must call one verification policy and receive a typed
@@ -611,6 +697,57 @@ pub fn verify_kernel(kernel_dir: &Path) -> Result<KernelVerification> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// P2-AR-0039: the payload this runtime embeds declares exactly the schema versions it ships, and the kernel's
+    /// own secret scanner finds nothing in it; a drift in either direction and a planted secret are reported.
+    #[test]
+    fn the_payload_declares_the_schema_versions_it_ships_and_carries_no_secret() {
+        let base =
+            std::env::temp_dir().join(format!("gov-ws08-cons-{}", crate::util::short_uuid()));
+        let k = base.join("kernel");
+        for (rel, bytes) in embedded::files() {
+            let p = k.join(rel);
+            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+            std::fs::write(&p, bytes).unwrap();
+        }
+        assert_eq!(schema_version_problems(&k), Vec::<String>::new());
+        let staged = base.join("staged");
+        stage_payload(&k, &staged).unwrap();
+        assert_eq!(payload_secret_hits(&staged), Vec::<Value>::new());
+        // a schema file bumped without KERNEL.yaml
+        let sp = staged.join("schemas/task.schema.json");
+        let mut s: Value = read_json(&sp).unwrap();
+        s["x-schema-version"] = json!("7.7.7");
+        std::fs::write(&sp, serde_json::to_string(&s).unwrap()).unwrap();
+        let p = schema_version_problems(&staged);
+        assert!(
+            p.iter()
+                .any(|x| x.contains("'task'") && x.contains("7.7.7")),
+            "{p:?}"
+        );
+        // a versioned schema the kernel does not declare
+        std::fs::write(
+            staged.join("schemas/extra.schema.json"),
+            r#"{"x-schema-version": "1.0.0"}"#,
+        )
+        .unwrap();
+        assert!(schema_version_problems(&staged)
+            .iter()
+            .any(|x| x.contains("extra.schema.json")));
+        // a declared schema the payload does not ship
+        std::fs::remove_file(staged.join("schemas/decision.schema.json")).unwrap();
+        assert!(schema_version_problems(&staged)
+            .iter()
+            .any(|x| x.contains("'decision'")));
+        // a planted secret-like value (assembled here, never stored in a source file)
+        let literal = format!("AKIA{}", "IOSFODNN7EXAMPLE");
+        std::fs::write(staged.join("policies/NOTES.md"), format!("x {literal}\n")).unwrap();
+        let hits = payload_secret_hits(&staged);
+        assert_eq!(hits.len(), 1, "{hits:?}");
+        assert_eq!(hits[0]["path"], "policies/NOTES.md");
+        assert!(!hits[0].to_string().contains(&literal));
+        let _ = std::fs::remove_dir_all(&base);
+    }
 
     /// BC-P2-37: the embedded payload's identity is computed from its bytes and equals what staging would measure,
     /// so "is this the embedded payload?" is decided by content and never by a cache path.
