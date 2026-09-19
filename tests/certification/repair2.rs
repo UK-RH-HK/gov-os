@@ -1226,17 +1226,16 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
             ["MEMORY_POLICY.retrieval.default_k"],
         5
     );
-    // every structural check is healthy after the chain; only the "run gov audit" currency prompt (D021) may remain,
-    // and — on this unprovisioned test machine only — D032's disclosure that the installation's release authenticity
-    // is not established (BC-P2-36: an unauthenticated installation never yields a HEALTHY verdict without disclosing
-    // it; P2-AR-0023 wired D032, and the harness provisions a throw-away root in WS-8's round-2 change)
+    // every structural check is healthy after the chain; only the "run gov audit" currency prompt (D021) may remain.
+    // Round-2 integration (P2-AR-0032): this machine is provisioned (WS-8 harness), so D032 (installation release
+    // authenticity, P2-AR-0023) must pass here like every other structural check — its temporary unprovisioned-machine
+    // allowance is removed
     let doc = g.ok(&["doctor"]);
     let failed: Vec<String> = doc["checks"]
         .as_array()
         .unwrap()
         .iter()
         .filter(|c| c["ok"] == false)
-        .filter(|c| !(c["id"] == "D032" && c["posture"]["machine_posture"] == "UNPROVISIONED"))
         .map(|c| c["id"].as_str().unwrap().to_string())
         .collect();
     assert!(
