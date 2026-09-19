@@ -19,4 +19,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/r2-ws10/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0031.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 8c4e63488768a088f4bddad65785a708eaf6ffda
+  branch_tip_commit: c0d45c12a875ab45d5443dc09dea5739cb28e91a
+  branch_product_code_digest: 9456fb927f528f2e8d4d4fe52f32d07d854cb3fd84442e08a40cbf0169d0fe40
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-47': 'REPAIRED_CLAIMED', 'BC-P2-48': 'REPAIRED_CLAIMED', 'BC-P2-46': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: scope conforms (new runtime/src/lifecycle/**, three owned schemas; additive: WS-10 CLI block + g0_label arms, 20 COMMAND_GUARDS entries in control.rs, pub mod lifecycle); tasks.rs/verification/records.rs/gates.rs/memory untouched; lib 160/0, certification 100/0; R1 held-out via private path at baselines, census 109 files/1581 fns (= integration 105 + 4, proving own-tree measurement), 0 §6 violations. Design consequence for the verifier: incomplete research presented as evidence is a schema error (HIGH) and, via WS-2's scheduler, blocks close/CIT execute/release/update until completed or marked NARRATIVE
