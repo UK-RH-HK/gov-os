@@ -36,6 +36,9 @@ pub mod recovery;
 pub mod release;
 pub mod retrieval;
 pub mod routing;
+/// Governance Health Scheduler (Gate O5): tier contract, dependency-aware selection, concurrency, isolation, cache,
+/// hard-blocks and health-result provenance.
+pub mod scheduler;
 pub mod schemas;
 pub mod security;
 pub mod skills;
