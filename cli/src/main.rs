@@ -707,10 +707,14 @@ enum CitCmd {
 }
 #[derive(Subcommand)]
 enum ContextCmd {
-    Compile { task: String },
+    Compile {
+        task: String,
+    },
     // ---- WS-4 (P2-AR-0017, BC-P2-17/19/20): input manifest, delivery verification, receipt validation
     /// Resolve the task's mandatory input manifest (W3): what is required, what each id resolved to, what blocks
-    Manifest { task: String },
+    Manifest {
+        task: String,
+    },
     /// Verify a compiled packet still delivers the task's declared inputs at their current versions (W4/W10)
     Verify {
         task: String,
