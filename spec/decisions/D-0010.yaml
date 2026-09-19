@@ -1,0 +1,81 @@
+id: D-0010
+type: decision
+title: "Amendment of D-0005 consequence 3: only the OS's own capability server runs hand-declared; every executable plugin runs only with a registration approved for exactly it"
+status: ACTIVE
+state_class: AUTHORITATIVE
+created: "2026-09-19"
+updated: "2026-09-19"
+owner_role: orchestrator
+approved_by_role: orchestrator
+supersedes: []
+# An amendment by a new governed record: D-0005's text is unchanged; its consequence 3 is read as stated below.
+amends: [D-0005]
+amended_consequence: "D-0005 consequences[2] (consequence 3)"
+governed_by: [PRJ-0001, D-0002, D-0005, D-0007, D-0009]
+affects: [D-0005, API-0001]
+derived_from: [D-0005]
+question: >
+  D-0005 consequence 3 states: "Existing hand-declared descriptors keep working for roles at/above L2; lower roles need
+  a registered plugin." Contract v3 F4 requires that a descriptor cannot authorise itself, that registration and
+  provenance live in trusted OS state, that descriptor and implementation bytes are hash-bound and that drift fails
+  closed; ARCH-0003 §9 (owner-adopted) states that plugins are governed executables whose bytes and descriptor
+  identity are bound through kernel-owned registration and that descriptors cannot self-authorise. The Phase-2 repair
+  of BC-P2-39/40 (P2-AR-0028) implements F4: the OS classifies a plugin by what its command executes, never by what
+  its descriptor declares, and runs an executable plugin only with an approved registration. Which statement governs a
+  hand-declared descriptor?
+options:
+  - id: A
+    description: >-
+      Keep consequence 3 as written: a hand-declared executable plugin runs for a role at/above L2 on its own
+      declarations (contradicts Contract v3 F4:426-429 and ARCH-0003 §9; the synthesis of audit-0 found such a plugin
+      writing files it never declared, gamma-r F4.b1)
+  - id: B
+    description: >-
+      Narrow consequence 3 to the non-elevated remainder the normative sources allow: only the running gov binary's
+      own capability server (`capabilities serve-embed`, OS-provided code whose effects are the release's own) runs
+      hand-declared, for roles at/above TOOL_POLICY.plugins.min_authority; every other (executable) plugin runs only
+      with an OS-written, T2-verified registration approved by an owner-answered Human Decision Gate raised for exactly
+      that plugin identity, version, implementation and permission set, re-verified at every execution; the
+      registration's implementation binding replaces the per-version first-observed hash
+chosen_option: B
+rationale: |
+  The contradiction is between an orchestrator-approved record (D-0005, 2026-09-12) and the normative sources that
+  bind it: Contract v3 F4 (the capability acceptance contract) and ARCH-0003 §9 (owner-adopted, OWNER-DECISION-0009).
+  An orchestrator decision cannot relax either, so the record must be brought into conformance; the audit-0 synthesis
+  (owner-decisions-required.md row 2) determined this, and the repair implemented it (BC-P2-39: elevation is never
+  decided by a descriptor's own declaration; BC-P2-40: every executed byte is bound; BC-P2-11 plugin side: approval
+  binds exactly the registered subject).
+
+  Why the hand-declared allowance survives for the OS capability server: its command runs this very gov binary (same
+  file, or byte-identical) in a mode that reads one request and writes one response; its effects are the verified
+  release's own, known and non-elevated, so no descriptor declaration is being trusted. Everything else is an
+  unsandboxed child process with the invoking account's authority, so its declared permissions cannot be enforced and
+  only an approved registration can let it run. Enforcing declared permissions at run time (an OS sandbox) would
+  keep more hand-declared plugins usable but is a new external dependency class; it was not chosen and would need
+  owner adoption.
+
+  Authored as a governed amendment record within the orchestrator's delegated authority, exactly as D-0005 and D-0007
+  were approved, by the Phase-2 repair builder P2-AR-0034 (WS-3, integration point IP-W7-6 of P2-AR-0028). D-0005's
+  text is not edited: this record states how its consequence 3 now reads. The product owner may supersede it.
+consequences:
+  - >-
+    D-0005 consequence 3 reads, as amended: "The gov binary's own capability server (capabilities serve-embed) keeps
+    working hand-declared for roles at/above TOOL_POLICY.plugins.min_authority; every other plugin needs a
+    registration written by gov plugins register and approved by an owner-answered gate raised for exactly that plugin
+    identity, version, implementation and permission set, for every role." D-0005 consequences 1 and 2 are unchanged.
+  - >-
+    API-0001 1.2: the governance clause states the registration requirement, the implementation binding and the
+    refusal codes; its history records the 1.1 clause verbatim (amended_by D-0010). capabilities/PROTOCOL.md already
+    states the rule (P2-AR-0028).
+  - >-
+    Executable form (unchanged by this record, which documents it): capabilities::binding::resolve (execution class and
+    implementation binding), capabilities::governance::authorize and ::register (registration approved by a gate raised
+    for the subject, re-verified at execution), capabilities::registry::standing (T2-verified entries only), doctor D028
+    and the suite family plugin_governance (unregistered executable plugins reported).
+approved_by: "orchestrator (Phase-2 repair builder P2-AR-0034, within delegated authority, as D-0005 and D-0007 were approved; product owner may supersede)"
+approved_at: "2026-09-19"
+human_approved: false
+impact_radius: R3
+reversibility: medium
+confidence: 0.9
+evidence_refs: []
