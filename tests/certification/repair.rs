@@ -743,7 +743,10 @@ fn claims_survive_full_memory_rebuild() {
     assert_eq!(b.err(&["task", "claim", &tid]).error_code(), "TASK_CLAIMED");
     g.ok(&["recover"]);
     assert_eq!(g.ok(&["claims", "list"]).as_array().unwrap().len(), 1);
-    assert!(exists(&root, ".governance-runtime/claims.db") && doctor_check(&g, "D026").0);
+    // BC-P2-31 (P2-AR-0036): the claims store is non-rebuildable operational state, kept at
+    // `paths::store_path(root, "claims")`, outside the derived runtime directory
+    assert!(exists(&root, ".governance-state/claims.db") && doctor_check(&g, "D026").0);
+    assert!(!exists(&root, ".governance-runtime/claims.db"));
     // deleting the derived index alone never touches claims
     std::fs::remove_file(root.join(".governance-runtime/state.db")).unwrap();
     g.ok(&["rebuild-memory"]);

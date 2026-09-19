@@ -942,6 +942,12 @@ enum TaskCmd {
     },
     Dag,
     Replan,
+    /// WS-5 (P2-AR-0036, BC-P2-24) additive: generate the governed, linked work the recorded events call for
+    /// (`--dry-run` reports it and writes nothing)
+    Generate {
+        #[arg(long)]
+        dry_run: bool,
+    },
 }
 #[derive(Subcommand)]
 enum CitCmd {
@@ -1561,6 +1567,14 @@ fn g0_label(cmd: &Cmd) -> String {
             }
             TaskCmd::Dag => "task dag",
             TaskCmd::Replan => "replan",
+            // WS-5 (P2-AR-0036) additive arm
+            TaskCmd::Generate { dry_run } => {
+                if *dry_run {
+                    "task generate --dry-run"
+                } else {
+                    "task generate"
+                }
+            }
         }),
         Cmd::Cit { op } => s(match op {
             CitCmd::Propose { .. } => "cit propose",
@@ -1955,6 +1969,8 @@ fn run(cli: &Cli) -> Result<Value> {
                 TaskCmd::Close { id, report, force } => { let d = db(&p)?; let r = load_file_value(report)?; t::close(&p, &d, id, r, *force) }
                 TaskCmd::Dag => Ok(serde_json::to_value(gov_runtime::orchestration::dag::compute(&p)?)?),
                 TaskCmd::Replan => gov_runtime::orchestration::dag::replan(&p),
+                // WS-5 (P2-AR-0036, BC-P2-24) additive arm
+                TaskCmd::Generate { dry_run } => gov_runtime::orchestration::generation::reconcile(&p, &gov_runtime::orchestration::generation::Options { trigger: "task generate".into(), dry_run: *dry_run }),
             }
         }
         Cmd::Cit { op } => {
@@ -2257,6 +2273,27 @@ fn main() {
         .unwrap_or_default();
     let started = std::time::Instant::now();
     let result = run(&cli);
+    // WS-5 (P2-AR-0036, BC-P2-24) additive block — **governed work generated when the event occurs.** After a
+    // governed write command (its G0 class), the work its recorded events call for (failed tests, findings, health
+    // failures, discoveries, human decisions, CIT effects, lessons, missing tools/skills, failures, performance
+    // regressions) is generated into the task DAG, linked and idempotent (`orchestration::generation::after_command`).
+    // It runs whether the command succeeded or failed (a failing run may have recorded its event) but not after a
+    // refusal before dispatch; it never changes the command's result.
+    if !matches!(
+        result.as_ref().err().map(|e| e.code.as_str()),
+        Some(
+            "G0_UNCLASSIFIED"
+                | "AUTHORITY_DENIED"
+                | "FROZEN"
+                | "PAUSED"
+                | "USAGE"
+                | "ROLE_UNDECLARED"
+        )
+    ) {
+        if let Ok(p) = open_project(&cli, true) {
+            let _ = gov_runtime::orchestration::generation::after_command(&p, &g0_label(&cli.cmd));
+        }
+    }
     // telemetry span for every command when a project is available
     if let Ok(p) = open_project(&cli, true) {
         let _ = gov_runtime::observability::emit(

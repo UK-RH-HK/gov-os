@@ -69,7 +69,10 @@ fn greenfield_end_to_end() {
     write_yaml(
         &root,
         "spec/scenarios/SCN-0001.yaml",
-        &json!({"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}),
+        &json!({"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"],
+            // round 3 (P2-AR-0036, WS-10 IP-WS10-12): the scenario -> data link of the H4 chain is explicit; a silent N/A
+            // would be a gap that keeps implementation from becoming READY
+            "data_requirements_not_applicable": "the scenario's order lines are literal values constructed inside the acceptance test; no external or generated dataset is involved"}),
     );
     let t = g.ok(&[
         "task",

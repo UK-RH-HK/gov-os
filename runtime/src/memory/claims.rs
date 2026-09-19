@@ -1,5 +1,15 @@
-//! Session claims are deterministic concurrency state (framework §11.1): they live in their own store
-//! (`.governance-runtime/claims.db`) that derived-memory rebuilds never delete.
+//! Session claims are deterministic concurrency state (framework §11.1): they live in their own store that
+//! derived-memory rebuilds never delete.
+//!
+//! **Where the store lives (BC-P2-31; Contract v3:188, :202, :352).** Claims are non-rebuildable operational state,
+//! so the store is kept where the kernel says such state belongs — `paths::store_path(root, "claims")`,
+//! `.governance-state/claims.db` — and not inside the derived runtime directory, which framework §19 lets an operator
+//! delete and rebuild. A store an earlier release kept at `.governance-runtime/claims.db` is moved there the first
+//! time it is opened ([`ClaimsStore::open`]): its write-ahead log is folded into the database first, the files move
+//! with `paths::relocate_legacy`, and the location the store records is rebound to the new place, so every live
+//! claim survives the move (the move is the OS's own, not a copy — see "A copy is not the store" below). Once the store
+//! is in place, a file that reappears at the legacy path is not the store: it is never merged or allowed to overwrite
+//! it, and `paths::misplaced_os_state` keeps reporting it.
 //!
 //! **Atomicity (Contract v3:389, BC-P2-15).** Every read-decide-write on the claims table runs inside one
 //! `BEGIN IMMEDIATE` transaction: SQLite grants the write lock to one connection at a time, across processes, so
@@ -108,24 +118,156 @@ fn busy(e: rusqlite::Error, what: &str) -> GovError {
 }
 
 impl ClaimsStore {
-    /// The repository's claims store. For a project in the main worktree (or outside git) this is
-    /// `.governance-runtime/claims.db` under the project root. For a project in a **linked** git worktree it is the
-    /// same project's store in the repository's main worktree (or, for a bare repository, a store inside the git
-    /// common dir), so every worktree of one repository claims against one table.
+    /// The repository's claims store (BC-P2-31: `paths::store_path(root, "claims")`). For a project in the main
+    /// worktree (or outside git) this is `.governance-state/claims.db` under the project root. For a project in a
+    /// **linked** git worktree it is the same project's store in the repository's main worktree (or, for a bare
+    /// repository, a store inside the git common dir), so every worktree of one repository claims against one table.
     pub fn path_for(p: &Project) -> PathBuf {
+        match shared_store_root(&p.root) {
+            Some(SharedRoot::Worktree(main_project)) => {
+                crate::paths::store_path(&main_project, "claims")
+                    .unwrap_or_else(|| main_project.join(crate::paths::STATE_DIR).join("claims.db"))
+            }
+            Some(SharedRoot::GitCommon(state_dir, _)) => state_dir.join("claims.db"),
+            None => crate::paths::store_path(&p.root, "claims")
+                .unwrap_or_else(|| p.root.join(crate::paths::STATE_DIR).join("claims.db")),
+        }
+    }
+
+    /// Where a release before BC-P2-31 kept this repository's claims store (inside the derived runtime directory).
+    pub fn legacy_path_for(p: &Project) -> PathBuf {
         shared_runtime_dir(&p.root)
             .unwrap_or_else(|| p.runtime_dir())
             .join("claims.db")
     }
+
     pub fn open(p: &Project) -> Result<ClaimsStore> {
-        if let Some(shared) = shared_runtime_dir(&p.root) {
-            if !shared.exists() {
-                std::fs::create_dir_all(&shared)?;
-                // the store of a linked worktree lives in another checkout: keep it out of that tree's git status
-                let _ = std::fs::write(shared.join(".gitignore"), "*\n");
+        let target = Self::path_for(p);
+        Self::relocate_legacy_store(p, &target)?;
+        if let Some(d) = target.parent() {
+            // wherever the store lives, it never reaches `git status`, a commit or a task's mutation scope
+            match d.parent().filter(|_| {
+                d.file_name()
+                    .map(|n| n == crate::paths::STATE_DIR)
+                    .unwrap_or(false)
+            }) {
+                Some(root) => {
+                    crate::paths::ensure_state_dir(root)?;
+                }
+                None => {
+                    std::fs::create_dir_all(d)?;
+                    if !d.join(".gitignore").exists() {
+                        let _ = std::fs::write(
+                            d.join(".gitignore"),
+                            "# Governance OS non-rebuildable operational state (BC-P2-31). Do not delete.\n*\n",
+                        );
+                    }
+                }
             }
         }
-        Self::open_at(&Self::path_for(p))
+        Self::open_at(&target)
+    }
+
+    /// **Move a store kept at its pre-BC-P2-31 location to where it belongs, without losing a live claim.** Runs only
+    /// while nothing is at the target yet (a store already in place is the store; a file that reappears at the legacy
+    /// path is never merged into it or allowed to replace it). The legacy database's write-ahead log is folded into
+    /// the main file first (so the moved file carries every committed claim), the files move with
+    /// `paths::relocate_legacy` (identical copies removed, different copies never overwritten), and the location the
+    /// store records is rebound to the new place — the move is the OS's own, so its rows stay live (a *copy* of the
+    /// store opened elsewhere is still cleared, see [`ClaimsStore::open_at`]).
+    fn relocate_legacy_store(p: &Project, target: &Path) -> Result<Option<Value>> {
+        let legacy = Self::legacy_path_for(p);
+        if target.exists() || !legacy.is_file() {
+            return Ok(None);
+        }
+        let legacy_location = Self::canonical_location(&legacy);
+        // fold the WAL into the database; the file must already exist (never create one at the legacy path)
+        if let Ok(c) = Connection::open_with_flags(
+            &legacy,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX,
+        ) {
+            let _ = c.busy_timeout(BUSY_TIMEOUT);
+            let _ = c.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_| Ok(()));
+        }
+        let from_dir = legacy.parent().map(|d| d.to_path_buf()).unwrap_or_default();
+        let to_dir = target.parent().map(|d| d.to_path_buf()).unwrap_or_default();
+        let moved: Vec<Value> = match (
+            from_dir
+                .file_name()
+                .map(|n| n == crate::RUNTIME_DIR)
+                .unwrap_or(false),
+            to_dir
+                .file_name()
+                .map(|n| n == crate::paths::STATE_DIR)
+                .unwrap_or(false),
+        ) {
+            // the project layout the kernel declares (`paths::OS_STORES`): relocate through the declared moves
+            (true, true) if from_dir.parent() == to_dir.parent() => {
+                crate::paths::relocate_legacy(to_dir.parent().unwrap_or(Path::new("")), "claims")?
+            }
+            // a bare repository's shared store (inside the git common dir): the same rules, file by file
+            _ => {
+                std::fs::create_dir_all(&to_dir)?;
+                let mut out = vec![];
+                for suffix in ["", "-wal", "-shm"] {
+                    let f = PathBuf::from(format!("{}{suffix}", legacy.display()));
+                    let t = PathBuf::from(format!("{}{suffix}", target.display()));
+                    if !f.exists() {
+                        continue;
+                    }
+                    if t.exists() {
+                        return Err(GovError::new("STATE_LOCATION_CONFLICT", format!("the claims store exists both at {} and at {}; nothing was moved or overwritten", f.display(), t.display())));
+                    }
+                    std::fs::rename(&f, &t).or_else(|_| {
+                        std::fs::copy(&f, &t).map(|_| ())?;
+                        std::fs::remove_file(&f)
+                    })?;
+                    out.push(json!({"store": "claims", "from": f.display().to_string(), "to": t.display().to_string(), "action": "moved"}));
+                }
+                out
+            }
+        };
+        if moved.is_empty() || !target.exists() {
+            return Ok(None);
+        }
+        // rebind the recorded location: this is the store, moved by the OS, not a copy
+        let conn = Connection::open(target)?;
+        conn.busy_timeout(BUSY_TIMEOUT)?;
+        let here = Self::canonical_location(target);
+        let tx = Transaction::new_unchecked(&conn, TransactionBehavior::Immediate)
+            .map_err(|e| busy(e, "rebinding the relocated claims store"))?;
+        let has_meta = tx.query_row(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='store_meta'",
+            [],
+            |r| r.get::<_, i64>(0),
+        )? > 0;
+        if has_meta {
+            let recorded: Option<String> = tx
+                .query_row(
+                    "SELECT value FROM store_meta WHERE key='location'",
+                    [],
+                    |r| r.get::<_, String>(0),
+                )
+                .optional()?;
+            // only the location this very store recorded at its legacy place is rebound: a store that was itself
+            // a copy of another one keeps its foreign location and is cleared as a copy when opened
+            if recorded.as_deref() == Some(legacy_location.as_str()) || recorded.is_none() {
+                tx.execute(
+                    "INSERT OR REPLACE INTO store_meta(key, value) VALUES ('location', ?1)",
+                    params![here],
+                )?;
+                tx.execute(
+                    "INSERT OR REPLACE INTO store_meta(key, value) VALUES ('relocated_by_os', ?1)",
+                    params![format!(
+                        "{legacy_location} -> {here} at {} (BC-P2-31)",
+                        now_iso()
+                    )],
+                )?;
+            }
+        }
+        tx.commit()
+            .map_err(|e| busy(e, "rebinding the relocated claims store"))?;
+        Ok(Some(json!({"moved": moved, "location": here})))
     }
     pub fn open_at(path: &Path) -> Result<ClaimsStore> {
         if let Some(d) = path.parent() {
@@ -477,11 +619,73 @@ impl ClaimsStore {
     }
 }
 
+/// Where the worktrees of one repository share their non-rebuildable state (BC-P2-31).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SharedRoot {
+    /// The same project path in the repository's main worktree: its `paths::store_path` applies.
+    Worktree(PathBuf),
+    /// A bare repository: the state directory inside the git common dir, and the project's path relative to the
+    /// worktree root.
+    GitCommon(PathBuf, PathBuf),
+}
+
+/// For a project inside a **linked** git worktree, the root whose state the repository's worktrees share: the same
+/// project path in the main worktree (its `.governance-state/`), or `<git common dir>/governance-state/<project>`
+/// when the repository is bare. `None` for the main worktree, a plain checkout, a submodule or a project outside git.
+pub fn shared_store_root(root: &Path) -> Option<SharedRoot> {
+    let (common, rel) = linked_worktree(root)?;
+    if common.file_name().map(|n| n == ".git").unwrap_or(false) {
+        Some(SharedRoot::Worktree(common.parent()?.join(rel)))
+    } else {
+        Some(SharedRoot::GitCommon(
+            common.join("governance-state").join(&rel),
+            rel,
+        ))
+    }
+}
+
+/// For a project inside a linked git worktree: the canonical git common dir and the project's path relative to the
+/// worktree root. Pure filesystem reads (no git subprocess): a linked worktree's `.git` is a file `gitdir: <dir>`
+/// whose `commondir` names the shared git dir.
+fn linked_worktree(root: &Path) -> Option<(PathBuf, PathBuf)> {
+    let mut top = root.to_path_buf();
+    let dotgit = loop {
+        let g = top.join(".git");
+        if g.is_dir() {
+            return None;
+        }
+        if g.is_file() {
+            break g;
+        }
+        if !top.pop() {
+            return None;
+        }
+    };
+    let text = std::fs::read_to_string(&dotgit).ok()?;
+    let gitdir = text.lines().find_map(|l| l.strip_prefix("gitdir:"))?.trim();
+    let gitdir = if Path::new(gitdir).is_absolute() {
+        PathBuf::from(gitdir)
+    } else {
+        top.join(gitdir)
+    };
+    let common = std::fs::read_to_string(gitdir.join("commondir")).ok()?;
+    let common = common.trim();
+    let common = if Path::new(common).is_absolute() {
+        PathBuf::from(common)
+    } else {
+        gitdir.join(common)
+    };
+    let common = common.canonicalize().ok()?;
+    let rel = root.strip_prefix(&top).ok()?.to_path_buf();
+    Some((common, rel))
+}
+
 /// For a project inside a **linked** git worktree, the runtime directory the repository's worktrees share: the same
 /// project path in the main worktree, or a directory inside the git common dir when the repository is bare. `None`
 /// for the main worktree, a plain checkout, a submodule or a project outside git — they use their own runtime dir.
 /// Pure filesystem reads (no git subprocess): a linked worktree's `.git` is a file `gitdir: <dir>` whose `commondir`
-/// names the shared git dir.
+/// names the shared git dir. (Since BC-P2-31 this names only where a pre-BC-P2-31 release kept the shared claims
+/// store; the store itself is at [`shared_store_root`].)
 pub fn shared_runtime_dir(root: &Path) -> Option<PathBuf> {
     let mut top = root.to_path_buf();
     let dotgit = loop {

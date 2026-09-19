@@ -9,6 +9,7 @@ use crate::records::{new_record, save_record, Record, RecordStore};
 use crate::util::{now_iso, read_yaml};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ReadinessView {
@@ -32,9 +33,115 @@ pub fn dimensions(p: &Project) -> Vec<Value> {
     .unwrap_or_default()
 }
 
+/// Readiness cells the scenario chain determines (`lifecycle::scenario::readiness_cells`, WS-10 IP-WS10-12): their
+/// state is computed from the product's own records, not taken from what the feature asserts.
+pub const CHAIN_CELLS: &[&str] = &[
+    "success_criteria",
+    "failure_criteria",
+    "representative_test_data",
+    "independent_acceptance_tests",
+];
+
+/// The readiness cell a scenario-chain gap code belongs to (the same mapping `lifecycle::scenario::readiness_cells`
+/// applies), if any.
+pub fn chain_cell_of(code: &str) -> Option<&'static str> {
+    match code {
+        "SCENARIO_WITHOUT_SUCCESS_CRITERIA" => Some("success_criteria"),
+        "SCENARIO_WITHOUT_FAILURE_CRITERIA" => Some("failure_criteria"),
+        "SCENARIO_WITHOUT_TEST" | "SCENARIO_WITHOUT_INDEPENDENT_TEST" => {
+            Some("independent_acceptance_tests")
+        }
+        "SCENARIO_DATA_UNDECLARED"
+        | "DATA_REQUIREMENT_NOT_GOVERNED"
+        | "DATA_REQUIREMENT_UNRESOLVED"
+        | "DATA_REQUIREMENT_WRONG_TYPE"
+        | "DATA_REQUIREMENT_WITHOUT_TEST_DATA"
+        | "TEST_DATA_WITHOUT_PROVENANCE"
+        | "TEST_DATA_PROVENANCE_INVALID"
+        | "TEST_DATA_PROVENANCE_UNSTRUCTURED"
+        | "TEST_DATA_REAL_DATA_UNAPPROVED"
+        | "TEST_DATA_LOCATION_MISSING"
+        | "TEST_DATA_CHANGED"
+        | "TEST_DATA_UNDECLARED"
+        | "DATA_AUTHOR_NOT_INDEPENDENT"
+        | "DATA_AUTHOR_IS_TEST_AUTHOR" => Some("representative_test_data"),
+        _ => None,
+    }
+}
+
+/// Cells `feature` states not applicable with a reason (`{status: N/A_WITH_REASON, reason}`): explicit, reviewable
+/// statements the product honours (a silent N/A is invalid).
+pub fn not_applicable_cells(feature: &Record) -> Vec<String> {
+    feature
+        .data
+        .get("readiness")
+        .and_then(|r| r.as_object())
+        .map(|m| {
+            m.iter()
+                .filter(|(_, v)| {
+                    v.get("status").and_then(|s| s.as_str()) == Some("N/A_WITH_REASON")
+                        && v.get("reason")
+                            .and_then(|r| r.as_str())
+                            .map(|r| r.trim().len() >= 3)
+                            .unwrap_or(false)
+                })
+                .map(|(k, _)| k.clone())
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
 pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
+    let store = RecordStore::load(&p.root);
+    let lctx = crate::lifecycle::Ctx::new(p, &store);
+    evaluate_in(p, &lctx, feature)
+}
+
+/// Evaluate `feature`'s readiness against the kernel dimensions. The cells the scenario chain determines
+/// ([`CHAIN_CELLS`]) are **computed** from the feature's scenarios, data, test data and tests
+/// (`lifecycle::scenario::readiness_cells`) rather than taken on the feature's word: an assertion the chain
+/// contradicts (e.g. `PRESENT` while a scenario lacks failure criteria or its test data has no provenance) is
+/// `MISSING` with the chain's reasons; where the chain holds, the author's own statement stands (the chain never
+/// upgrades a cell the author keeps open). A cell the feature states `N/A_WITH_REASON` keeps that explicit
+/// statement. Each chain cell records what was asserted, what the chain found and where it came from.
+pub fn evaluate_in(p: &Project, lctx: &crate::lifecycle::Ctx, feature: &Record) -> ReadinessView {
     let dims = dimensions(p);
-    let readiness = feature.data.get("readiness").cloned().unwrap_or(json!({}));
+    let mut readiness = feature.data.get("readiness").cloned().unwrap_or(json!({}));
+    if !readiness.is_object() {
+        readiness = json!({});
+    }
+    let computed = crate::lifecycle::scenario::readiness_cells(lctx, feature);
+    let mut provenance: BTreeMap<String, Value> = BTreeMap::new();
+    for cell in CHAIN_CELLS {
+        let asserted = readiness.get(*cell).cloned().unwrap_or(json!("MISSING"));
+        let na = asserted.get("status").and_then(|s| s.as_str()) == Some("N/A_WITH_REASON");
+        let Some(c) = computed.get(*cell) else {
+            continue;
+        };
+        if na {
+            provenance.insert(cell.to_string(), json!({"asserted": asserted, "computed": c, "honoured": "the feature's explicit N/A_WITH_REASON"}));
+            continue;
+        }
+        let computed_state = c["state"].as_str().unwrap_or("MISSING").to_string();
+        // the chain refutes an assertion it contradicts; it never upgrades a cell the author keeps open
+        let state = if computed_state == "PRESENT" {
+            match &asserted {
+                Value::String(s) => s.clone(),
+                other => other
+                    .get("status")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or("MISSING")
+                    .to_string(),
+            }
+        } else {
+            computed_state.clone()
+        };
+        if state != "PRESENT" || asserted.as_str() != Some("PRESENT") {
+            readiness[*cell] = json!(state);
+        }
+        provenance.insert(cell.to_string(), json!({"asserted": asserted, "state": state, "chain_state": computed_state, "computed_from": c["computed_from"], "reasons": c["reasons"]}));
+    }
+    let readiness = readiness;
     let mut cells = vec![];
     let mut gaps = vec![];
     let mut pre_gaps = vec![];
@@ -74,7 +181,11 @@ pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
                 pre_gaps.push(id.clone());
             }
         }
-        cells.push(json!({"dimension": id, "state": state, "reason": reason, "pre_implementation": pre, "gap_task_class": d["gap_task_class"], "gap_task_role": d["gap_task_role"], "ok": ok}));
+        let mut row = json!({"dimension": id, "state": state, "reason": reason, "pre_implementation": pre, "gap_task_class": d["gap_task_class"], "gap_task_role": d["gap_task_role"], "ok": ok});
+        if let Some(pv) = provenance.get(&id) {
+            row["computed"] = pv.clone();
+        }
+        cells.push(row);
     }
     let coverage = if dims.is_empty() {
         1.0

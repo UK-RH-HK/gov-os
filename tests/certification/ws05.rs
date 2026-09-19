@@ -542,7 +542,9 @@ fn close_observes_os_written_state_no_os_operation_produced() {
     );
     std::fs::remove_file(root.join("spec/reports/RPT-0901.yaml")).unwrap();
     // the claim baseline is sealed: a rewritten baseline (hiding a change) is refused
-    let base = root.join(format!(".governance-runtime/tasks/{t2}/claim-tree.json"));
+    // BC-P2-31 (P2-AR-0036): claim baselines are non-rebuildable operational state at `paths::store_path(root,
+    // "claim-trees")`
+    let base = root.join(format!(".governance-state/tasks/{t2}/claim-tree.json"));
     let mut doc: Value = serde_json::from_str(&std::fs::read_to_string(&base).unwrap()).unwrap();
     doc["files"]["notes/second.txt"] = json!("0000");
     std::fs::write(&base, doc.to_string()).unwrap();
@@ -693,7 +695,9 @@ fn independence_is_established_from_recorded_authorship() {
     write_yaml(
         &root,
         "spec/scenarios/SCN-0200.yaml",
-        &json!({"id": "SCN-0200", "type": "scenario", "title": "total two orders", "status": "ACTIVE", "feature": "F-0200", "actor": "clerk", "given": ["a ledger"], "when": ["two orders"], "then": ["399"], "success_criteria": ["exact"], "failure_criteria": ["drift"]}),
+        &json!({"id": "SCN-0200", "type": "scenario", "title": "total two orders", "status": "ACTIVE", "feature": "F-0200", "actor": "clerk", "given": ["a ledger"], "when": ["two orders"], "then": ["399"], "success_criteria": ["exact"], "failure_criteria": ["drift"],
+                // round 3 (P2-AR-0036, WS-10 IP-WS10-12): the scenario's data link is explicit (the H4 chain gates READY)
+                "data_requirements_not_applicable": "orders are literal values inside the acceptance test"}),
     );
     // a hand-written acceptance obligation that declares itself independent
     let tst = json!({"id": "TST-0200", "type": "test-obligation", "title": "acceptance", "status": "ACTIVE", "feature": "F-0200", "scenario": "SCN-0200", "family": "acceptance", "author_role": "independent-test-designer", "independent_of_implementer": true});
@@ -714,7 +718,12 @@ fn independence_is_established_from_recorded_authorship() {
         "{}",
         blocked_reasons(&g, &imp)
     );
-    // produced through a test-design task closed by an independent role and session, it counts
+    // produced through a test-design task closed by an independent role and session, it counts. Round 3 (P2-AR-0036,
+    // BC-P2-13 in-task half): the designer *authors* the obligation in its task (initial authoring by
+    // specification-producing work); changing an existing acceptance obligation inside a task is a material
+    // acceptance-criteria change that completes only through a CIT, so the hand-written one is withdrawn first
+    std::fs::remove_file(root.join("spec/tasks/TST-0200.yaml")).unwrap();
+    git_commit_all(&root, "hand-written obligation withdrawn");
     let td = id(&create(
         &g,
         "test-design",

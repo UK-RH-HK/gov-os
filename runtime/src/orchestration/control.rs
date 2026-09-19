@@ -273,6 +273,10 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("task close --force", "force_close_task", Write),
     g("task dag", "read", Read),
     g("replan", "replan_tasks", Write),
+    // WS-5 (P2-AR-0036, BC-P2-24) additive: governed work generated from recorded events — an OS recomputation of
+    // the DAG like `replan` (the dry run reads only)
+    g("task generate", "replan_tasks", Write),
+    g("task generate --dry-run", "read", Read),
     g("cit propose", "propose_cit", Write),
     g("cit simulate", "simulate_cit", Write),
     g("cit approve", "approve_cit_auto", Write),

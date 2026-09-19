@@ -245,6 +245,9 @@ fn upstream_change_reaches_completed_work() {
         "p-alias",
     ]);
     spec(&root, &g);
+    // round 3 (P2-AR-0036, BC-P2-13 in-task half): work that changes product source is of a class contracted to
+    // change it (a `discovery` task writing src/** is refused MATERIAL_CHANGE_REQUIRES_CIT); `refactor` carries no
+    // readiness or TEST_POLICY gating, as `discovery` did here
     let fields = json!({"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"]}).to_string();
     let done = g.ok(&[
         "task",
@@ -252,7 +255,7 @@ fn upstream_change_reaches_completed_work() {
         "--objective",
         "implement totals",
         "--class",
-        "discovery",
+        "refactor",
         "--status",
         "READY",
         "--allowed",
@@ -269,7 +272,7 @@ fn upstream_change_reaches_completed_work() {
         "--objective",
         "tune totals",
         "--class",
-        "discovery",
+        "refactor",
         "--status",
         "READY",
         "--allowed",
