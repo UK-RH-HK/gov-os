@@ -486,7 +486,7 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
                 let mut confirmed: Vec<Value> = vec![];
                 let mut artefacts: Vec<Value> = vec![];
                 for g in v["gaps"].as_array().cloned().unwrap_or_default() {
-                    if gap_is_heading_marker_artefact(db, &g) {
+                    if gap_is_heading_marker_artefact(p, db, &g) {
                         artefacts.push(g);
                     } else {
                         confirmed.push(g);
@@ -540,36 +540,50 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
 
 /// `memory::coverage::verify` compares a Markdown heading line with its `#` markers removed against chunk lines, but a
 /// chunk may hold the heading **with** its markers (e.g. consecutive heading lines with no body between them); such a
-/// line is held, not missing (WS-6 integration point recorded in the report). A gap row is a verifier artefact when
-/// every uncovered line it lists is held by a chunk of that artefact once heading markers are removed on both sides,
-/// and the row lists every uncovered line it counts. Anything else is a confirmed gap.
-fn gap_is_heading_marker_artefact(db: &RuntimeDb, g: &Value) -> bool {
-    let lines = g["lines"].as_array().cloned().unwrap_or_default();
-    if lines.is_empty() || g["count"].as_u64().unwrap_or(0) as usize != lines.len() {
-        return false;
-    }
+/// line is held, not missing (WS-6 integration point recorded in the report). A gap row is a verifier artefact when,
+/// re-checking the artefact's whole current content the way the verifier does but with heading markers removed on
+/// both sides, every non-empty line is held by one of its chunks. Anything else is a confirmed gap.
+fn gap_is_heading_marker_artefact(p: &Project, db: &RuntimeDb, g: &Value) -> bool {
     let norm = |l: &str| -> String {
-        let t = l.trim();
-        let t = t.trim_start_matches('#');
+        let t = l.trim().trim_start_matches('#');
         t.split_whitespace().collect::<Vec<_>>().join(" ")
     };
     let aid = g["artifact_id"].as_str().unwrap_or("");
-    let held: std::collections::HashSet<String> = db
+    let rel = g["path"].as_str().unwrap_or("");
+    let Ok(text) = crate::util::read_text(&p.root.join(rel)) else {
+        return false;
+    };
+    let is_record = db
+        .query(
+            "SELECT record_type FROM artifacts WHERE artifact_id=?1",
+            &[&aid],
+        )
+        .ok()
+        .and_then(|r| r.first().map(|x| x["record_type"].as_str() != Some("file")))
+        .unwrap_or(false);
+    let expected = crate::memory::coverage::expected_content(rel, &text, is_record);
+    let chunks: Vec<String> = db
         .query("SELECT text FROM chunks WHERE artifact_id=?1", &[&aid])
         .unwrap_or_default()
         .iter()
-        .flat_map(|r| {
-            r["text"]
-                .as_str()
-                .unwrap_or("")
-                .lines()
-                .map(norm)
-                .collect::<Vec<_>>()
-        })
+        .map(|r| r["text"].as_str().unwrap_or("").to_string())
         .collect();
-    lines
+    if chunks.is_empty() {
+        return false;
+    }
+    let held: std::collections::HashSet<String> = chunks
         .iter()
-        .all(|l| held.contains(&norm(l["text"].as_str().unwrap_or(""))))
+        .flat_map(|c| c.lines().map(norm).collect::<Vec<_>>())
+        .collect();
+    expected.lines().all(|l| {
+        let n = norm(l);
+        if n.is_empty() || held.contains(&n) {
+            return true;
+        }
+        // a long line may be split across chunks: the verifier accepts it when a chunk holds its head
+        let head: String = l.trim().chars().take(300).collect();
+        l.trim().chars().count() > 600 && chunks.iter().any(|c| c.contains(&head))
+    })
 }
 
 // ------------------------------------------------------------------------------------ task_contract_integrity
@@ -651,21 +665,38 @@ mod tests {
     }
 
     #[test]
-    fn a_coverage_gap_is_confirmed_unless_the_line_is_held_with_its_heading_markers() {
-        let db = RuntimeDb::open_memory().unwrap();
-        db.init_schema().unwrap();
-        db.exec(
-            "INSERT INTO chunks(chunk_id, artifact_id, text) VALUES ('a#1', 'file:a.md', ?1)",
-            &[&"a.md\n# no input change\n# second heading"],
+    fn a_coverage_gap_is_confirmed_unless_every_line_is_held_with_its_heading_markers() {
+        let dir = std::env::temp_dir().join(format!("gov-cov-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("a.md"), "# no input change\n# second heading\n").unwrap();
+        std::fs::write(
+            dir.join("b.md"),
+            "# held heading\nbody line no chunk holds\n",
         )
         .unwrap();
-        let held = json!({"artifact_id": "file:a.md", "count": 1, "lines": [{"line": 1, "text": "no input change"}]});
-        assert!(gap_is_heading_marker_artefact(&db, &held));
-        let missing = json!({"artifact_id": "file:a.md", "count": 1, "lines": [{"line": 3, "text": "a line no chunk holds"}]});
-        assert!(!gap_is_heading_marker_artefact(&db, &missing));
-        // a row that lists fewer lines than it counts cannot be confirmed as an artefact
-        let partial = json!({"artifact_id": "file:a.md", "count": 7, "lines": [{"line": 1, "text": "no input change"}]});
-        assert!(!gap_is_heading_marker_artefact(&db, &partial));
+        let p = Project::open(&dir);
+        let db = RuntimeDb::open_memory().unwrap();
+        db.init_schema().unwrap();
+        for (aid, text) in [
+            ("file:a.md", "a.md\n# no input change\n# second heading"),
+            ("file:b.md", "b.md\n# held heading"),
+        ] {
+            db.exec(
+                "INSERT INTO artifacts(artifact_id, path, record_type, status) VALUES (?1, ?2, 'file', 'ACTIVE')",
+                &[&aid, &aid.trim_start_matches("file:")],
+            )
+            .unwrap();
+            db.exec(
+                "INSERT INTO chunks(chunk_id, artifact_id, text) VALUES (?1, ?1, ?2)",
+                &[&aid, &text],
+            )
+            .unwrap();
+        }
+        let a = json!({"artifact_id": "file:a.md", "path": "a.md", "count": 2, "lines": [{"line": 1, "text": "no input change"}]});
+        assert!(gap_is_heading_marker_artefact(&p, &db, &a));
+        let b = json!({"artifact_id": "file:b.md", "path": "b.md", "count": 1, "lines": [{"line": 2, "text": "body line no chunk holds"}]});
+        assert!(!gap_is_heading_marker_artefact(&p, &db, &b));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
