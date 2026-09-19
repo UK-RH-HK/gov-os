@@ -482,8 +482,11 @@ fn authority_levels_are_enforced_on_executable_paths() {
     ]);
     let be = g.with_role("backend-engineer");
     be.ok(&["task", "claim", t["id"].as_str().unwrap()]);
-    let rep = write_report(
+    // BC-P2-20 (P2-AR-0026): the close report is the worker's consumption receipt
+    let rep = crate::ws05::receipt(
+        &be,
         &root,
+        t["id"].as_str().unwrap(),
         "w",
         "wrote docs",
         &["README.md"],
@@ -528,6 +531,12 @@ fn authority_levels_are_enforced_on_executable_paths() {
 fn task_close_enforces_mutation_scope() {
     let (root, g) = setup_fixture("greenfield", "rep-scope", "S-rep");
     g.ok(&["init", "--name", "s", "--alias", "s-alias"]);
+    // P2-AR-0026 (BC-P2-16): a claim is granted only to a task the DAG finds runnable, and an implementation task
+    // needs its scenarios and acceptance tests declared (TEST_POLICY.implementation_task_requires); the receipt then
+    // traces the work to them (BC-P2-20)
+    let inputs = crate::ws05::traceable_inputs(&root, "0100");
+    git_commit_all(&root, "traceable inputs");
+    g.ok(&["rebuild-memory", "--incremental"]);
     let t = g.ok(&[
         "task",
         "create",
@@ -539,8 +548,11 @@ fn task_close_enforces_mutation_scope() {
         "READY",
         "--allowed",
         "src/**",
+        "--fields",
+        &inputs.to_string(),
     ]);
     let tid = t["id"].as_str().unwrap().to_string();
+    assert_eq!(t["task_status"], "READY", "{t}");
     g.ok(&["task", "claim", &tid]);
     write(
         &root,
@@ -594,12 +606,14 @@ fn task_close_enforces_mutation_scope() {
     g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
     g.ok(&["cit", "execute", &cid]);
     // the out-of-scope file is still on disk: observed mutations (not the report) decide, so close is refused ...
-    let good = write_report(
+    let good = crate::ws05::receipt(
+        &g,
         &root,
+        &tid,
         "good",
         "in scope + governed",
         &["src/lib.rs", "spec/now/NOW.md"],
-        "passed",
+        "not_applicable_with_reason",
     );
     g.ok(&["rebuild-memory", "--incremental"]);
     assert_eq!(

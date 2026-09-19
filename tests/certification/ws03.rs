@@ -1062,8 +1062,8 @@ fn project_overlays_may_raise_floors_but_never_lower_them() {
         r["reasoning"], "extra_high",
         "an overlay role default can never lower a task's declared minimum"
     );
-    let (ok27, _) = doctor_check(&g, "D027");
-    assert!(!ok27, "the refused weakening is reported");
+    // P2-AR-0026: the task is created (and its packet compiled) before doctor records the CRITICAL D027 result, because
+    // task creation is guarded by the G0 hard-block tier contract (IP-WS02-02) and D027 critical blocks it
     let t = g.ok(&[
         "task",
         "create",
@@ -1075,6 +1075,8 @@ fn project_overlays_may_raise_floors_but_never_lower_them() {
         "READY",
     ]);
     let ctx = g.ok(&["context", "compile", t["id"].as_str().unwrap()]);
+    let (ok27, _) = doctor_check(&g, "D027");
+    assert!(!ok27, "the refused weakening is reported");
     let layer3 = ctx["deterministic_authority"]["authority_layers"]
         .as_array()
         .unwrap()

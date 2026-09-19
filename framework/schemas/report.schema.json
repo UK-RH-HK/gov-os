@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/report.schema.json",
   "title": "report",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -266,11 +266,137 @@
     },
     "repair_count": {
       "type": "integer"
+    },
+    "context_packet_hash": {
+      "type": "string"
+    },
+    "inputs_consumed": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+(@.+)?$"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "content_hash": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "version": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "outputs_produced": {
+      "type": "array"
+    },
+    "requirements_implemented": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scenarios_implemented": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "features_implemented": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decisions_applied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraints_applied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptance_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "test": {
+            "type": "string"
+          },
+          "result": {
+            "enum": [
+              "passed",
+              "failed",
+              "not_applicable_with_reason"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "test",
+          "result"
+        ]
+      }
+    },
+    "deviations": {
+      "type": "array"
+    },
+    "receipt_validation": {
+      "type": "object",
+      "description": "the receipt verdict recorded at close (context::receipt::ReceiptCheck::summary)"
+    },
+    "observed_files_changed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "mutations observed since the claim baseline, independently of the report"
+    },
+    "mutation_evidence": {
+      "type": "object",
+      "description": "what the close accepted: the claim and its sealed baseline, observed content hashes (recorded authorship), CIT-covered and attributed paths, the OS-managed paths accepted as the OS's own writes, overrides"
+    },
+    "close_gate": {
+      "type": "object",
+      "description": "the health close gate's result (verification::close_gate: G2 health result, governance-affecting reasons) and the governing Human Decision Gates' authorisation"
+    },
+    "degraded": {
+      "type": "array",
+      "description": "degradations a forced or policy-permitted close recorded"
+    },
+    "os_binding": {
+      "type": "object",
+      "description": "T2 seal (t2::SEAL_FIELD) written by the close"
     }
   },
   "required": [
     "id",
     "type",
     "status"
-  ]
+  ],
+  "description": "A task-close report. The worker's structured return is the consumption receipt (Contract v3 W5): context::receipt::report_from_worker_return maps it losslessly (worker `status` -> `outcome`), and the receipt fields are validated at close against the task's manifest and the packet it names (context::receipt::require_valid). The OS adds the close fields and seals the record (T2): a report no close wrote is never honoured."
 }

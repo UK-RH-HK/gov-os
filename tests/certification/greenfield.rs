@@ -120,18 +120,56 @@ fn greenfield_end_to_end() {
             && classes.contains(&"performance".into()),
         "{classes:?}"
     );
-    // simulate doing the gap work: claim + close each with evidence; then mark cells PRESENT
-    for id in &created {
-        g.ok(&["task", "claim", id]);
-        let rep = write_report(
+    // simulate doing the gap work: each gap task is claimed and closed by the role its readiness dimension designates,
+    // from a session of its own (P2-AR-0026, BC-P2-34: independent tests and test data come from roles and sessions
+    // independent of the implementer). The independent test designer produces the acceptance obligation TST-0001
+    // through its task, so its authorship is recorded by the sealed close report rather than self-declared; every
+    // close report is the worker's consumption receipt (BC-P2-20). Then mark cells PRESENT.
+    let designated: Vec<(String, String)> = created
+        .iter()
+        .map(|id| {
+            let t = g.ok(&["task", "show", id]);
+            (
+                t["readiness_cell"].as_str().unwrap().to_string(),
+                t["role"].as_str().unwrap_or("").to_string(),
+            )
+        })
+        .collect();
+    assert!(
+        designated.contains(&(
+            "independent_acceptance_tests".into(),
+            "independent-test-designer".into()
+        )) && designated.contains(&("representative_test_data".into(), "data-author".into())),
+        "the readiness planner designates the independent roles: {designated:?}"
+    );
+    for (id, (cell, role)) in created.iter().zip(designated.iter()) {
+        let role = if role.is_empty() {
+            "orchestrator"
+        } else {
+            role
+        };
+        let worker = g.with_role(role).with_session(&format!("S-gap-{id}"));
+        worker.ok(&["task", "claim", id]);
+        let mut files: Vec<&str> = vec![];
+        if cell == "independent_acceptance_tests" {
+            write_yaml(
+                &root,
+                "spec/tasks/TST-0001.yaml",
+                &json!({"id": "TST-0001", "type": "test-obligation", "title": "Ledger acceptance tests", "status": "ACTIVE", "feature": "F-0001", "scenario": "SCN-0001", "family": "acceptance", "test_path": "tests/ledger_test.rs", "author_role": "independent-test-designer", "independent_of_implementer": true, "data_provenance": "synthetic"}),
+            );
+            files.push("spec/tasks/TST-0001.yaml");
+        }
+        let rep = crate::ws05::receipt(
+            &worker,
             &root,
             id,
+            id,
             "provided readiness cell",
-            &[],
+            &files,
             "not_applicable_with_reason",
         );
         g.ok(&["rebuild-memory", "--incremental"]);
-        g.ok(&["task", "close", id, "--report", &rep]);
+        worker.ok(&["task", "close", id, "--report", &rep]);
     }
     let mut f = yaml(&root, "spec/features/F-0001.yaml");
     f["readiness"] = readiness_all_present_except(
@@ -143,12 +181,8 @@ fn greenfield_end_to_end() {
     );
     f["acceptance_tests"] = json!(["TST-0001"]);
     write_yaml(&root, "spec/features/F-0001.yaml", &f);
-    // independent test author records the obligation
-    write_yaml(
-        &root,
-        "spec/tasks/TST-0001.yaml",
-        &json!({"id": "TST-0001", "type": "test-obligation", "title": "Ledger acceptance tests", "status": "ACTIVE", "feature": "F-0001", "scenario": "SCN-0001", "family": "acceptance", "test_path": "tests/ledger_test.rs", "author_role": "independent-test-designer", "independent_of_implementer": true, "data_provenance": "synthetic"}),
-    );
+    // the independent test author's obligation TST-0001 was produced (and its authorship recorded) by the test-design
+    // gap task above
     let rp = g.ok(&["task", "replan"]);
     assert!(
         rp["runnable"]
@@ -261,9 +295,11 @@ fn greenfield_end_to_end() {
     assert_eq!(rr["rows"][0]["task_class"], "implementation");
     let tel = g.ok(&["telemetry", "summary"]);
     assert!(tel["events"].as_u64().unwrap() > 5);
-    // --- close implementation task with evidence; checkpoint written ---
-    let rep = write_report(
+    // --- close implementation task with evidence (the worker's consumption receipt); checkpoint written ---
+    let rep = crate::ws05::receipt(
+        &be,
         &root,
+        &impl_id,
         "impl",
         "Implemented totals with checked arithmetic",
         &["src/lib.rs"],

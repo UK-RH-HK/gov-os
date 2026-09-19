@@ -1,7 +1,12 @@
 //! Feature/Capability Readiness Contract (framework §37-38): every cell explicit; gaps generate tasks in the same DAG.
+//!
+//! A generated gap task carries the designated role its dimension declares (`gap_task_role` in the kernel taxonomy
+//! `READINESS_DIMENSIONS.yaml`): independent acceptance tests go to the independent test designer and representative
+//! test data to the data author, so the designated role binds who may claim and close them (BC-P2-34, task-role
+//! side). Its stored status is the one the task DAG derives (READY only when runnable, BC-P2-16).
 use crate::orchestration::control;
 use crate::records::{new_record, save_record, Record, RecordStore};
-use crate::util::read_yaml;
+use crate::util::{now_iso, read_yaml};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 
@@ -69,7 +74,7 @@ pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
                 pre_gaps.push(id.clone());
             }
         }
-        cells.push(json!({"dimension": id, "state": state, "reason": reason, "pre_implementation": pre, "gap_task_class": d["gap_task_class"], "ok": ok}));
+        cells.push(json!({"dimension": id, "state": state, "reason": reason, "pre_implementation": pre, "gap_task_class": d["gap_task_class"], "gap_task_role": d["gap_task_role"], "ok": ok}));
     }
     let coverage = if dims.is_empty() {
         1.0
@@ -129,14 +134,43 @@ pub fn plan(p: &Project, feature_id: &str) -> Result<Value> {
             .as_str()
             .unwrap_or("specification")
             .to_string();
-        let rec = new_record(
+        let mut fields = json!({"class": class, "task_status": "READY", "feature": feature_id, "objective": format!("Fill readiness dimension '{dim}' for {feature_id} (currently {})", c["state"]), "readiness_cell": dim, "generated_by": "readiness-planner", "dependencies": [], "minimum_model_tier": crate::routing::tier_for_class(p, &class), "minimum_reasoning": "medium", "allowed_paths": ["spec/**"], "forbidden_paths": ["governance/kernel/**", "product/**"], "production_merge_allowed": false, "state_class": "AUTHORITATIVE",
+            "provenance": {"producer": "gov readiness plan", "session": p.session_id, "role": p.role, "created_at": now_iso()}});
+        // the dimension's designated role binds who may claim and close the gap task (independent tests, test data)
+        if let Some(role) = c["gap_task_role"]
+            .as_str()
+            .filter(|r| !r.is_empty() && crate::authority::is_kernel_role(p, r))
+        {
+            fields["role"] = json!(role);
+        }
+        let mut rec = new_record(
             "task",
             &id,
             &format!("{feature_id}: provide readiness cell '{dim}'"),
-            json!({"class": class, "task_status": "READY", "feature": feature_id, "objective": format!("Fill readiness dimension '{dim}' for {feature_id} (currently {})", c["state"]), "readiness_cell": dim, "generated_by": "readiness-planner", "dependencies": [], "minimum_model_tier": crate::routing::tier_for_class(p, &class), "minimum_reasoning": "medium", "allowed_paths": ["spec/**"], "forbidden_paths": ["governance/kernel/**", "product/**"], "production_merge_allowed": false, "state_class": "AUTHORITATIVE"}),
+            fields,
         );
         p.schemas()
             .validate("task", &rec.data, &format!("({id})"))?;
+        // READY is derived from the DAG (BC-P2-16)
+        let ctx = crate::orchestration::dag::DagCtx::new(p, &store);
+        let ev = crate::orchestration::dag::evaluate(&ctx, &rec, Some("READY"));
+        if !ev.runnable() {
+            let st = if ev.state == crate::orchestration::dag::TaskState::WaitingHuman {
+                "WAITING_HUMAN"
+            } else {
+                "BLOCKED"
+            };
+            rec.set("task_status", json!(st));
+            rec.set(
+                "status_note",
+                json!(format!(
+                    "the task DAG does not allow READY: {}",
+                    ev.reasons.join("; ")
+                )),
+            );
+        }
+        let stored = rec.get("task_status");
+        rec.set("status_source", json!({"operation": "readiness plan", "status": stored, "session": p.session_id, "role": p.role, "at": now_iso()}));
         save_record(&p.root, &rec)?;
         created.push(id.clone());
         if c["pre_implementation"].as_bool().unwrap_or(false) {

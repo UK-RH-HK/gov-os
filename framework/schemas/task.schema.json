@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/task.schema.json",
   "title": "task",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -94,7 +94,12 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": "string",
+            "description": "the reason for the dependency, when the relation declares an input (Contract v3 W3)"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "an input relation is required unless this is false"
           }
         },
         "required": [
@@ -161,7 +166,22 @@
       }
     },
     "provenance": {
-      "type": "object"
+      "type": "object",
+      "description": "OS-recorded producer of the record (W1): written by the operation that created it (`gov task create`, `gov readiness plan`); a caller-supplied value is kept as `provenance_requested` and proves nothing (D-0007 rule 2).",
+      "properties": {
+        "producer": {
+          "type": "string"
+        },
+        "session": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        }
+      }
     },
     "staleness": {
       "type": "object"
@@ -340,9 +360,190 @@
       "type": "string"
     },
     "role": {
-      "type": "string"
+      "type": "string",
+      "description": "The designated role: it binds who may claim and close the task (ROLE_NOT_DESIGNATED); independence of tests and test data from it is established from recorded authorship (BC-P2-34)."
     },
     "estimate": {
+      "type": "string"
+    },
+    "required_inputs": {
+      "type": "array",
+      "description": "Mandatory upstream inputs with their constraints and reasons (Contract v3 W3). A task whose required input is absent, superseded, conflicting, not current or constraint-violating is not runnable (orchestration::dag::evaluate).",
+      "items": {
+        "type": "object",
+        "description": "An entry of the explicit task-input manifest (Contract v3 W3; context-packet.schema.json $defs/task_input_declaration): the input id, whether it is required, the authority/lifecycle state and version/hash constraints it must meet, and the reason for the dependency.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "slot name, list-field name or record type the input must satisfy"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "required_status": {
+            "type": [
+              "string",
+              "array"
+            ]
+          },
+          "required_state_class": {
+            "type": [
+              "string",
+              "array"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "exact version, '*', or comparators: =X >=X >X <=X <X ^X ~X"
+          },
+          "content_hash": {
+            "type": "string",
+            "description": "SHA-256 of the record bytes (or a prefix of at least 12 hex characters)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "optional_inputs": {
+      "type": "array",
+      "description": "Optional upstream inputs (same entry shape; `required: false`).",
+      "items": {
+        "type": "object",
+        "description": "An entry of the explicit task-input manifest (Contract v3 W3; context-packet.schema.json $defs/task_input_declaration): the input id, whether it is required, the authority/lifecycle state and version/hash constraints it must meet, and the reason for the dependency.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "slot name, list-field name or record type the input must satisfy"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "required_status": {
+            "type": [
+              "string",
+              "array"
+            ]
+          },
+          "required_state_class": {
+            "type": [
+              "string",
+              "array"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "exact version, '*', or comparators: =X >=X >X <=X <X ^X ~X"
+          },
+          "content_hash": {
+            "type": "string",
+            "description": "SHA-256 of the record bytes (or a prefix of at least 12 hex characters)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "supplementary_context": {
+      "type": "array",
+      "description": "Supplementary context declared separately from the mandatory inputs (Contract v3 W3); delivered in the supplementary block, never as authority.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "architecture": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Architecture records this task must conform to (mandatory inputs)."
+    },
+    "interfaces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance_requested": {
+      "type": "object",
+      "description": "a provenance value the caller supplied at create (a request, recorded and ignored)"
+    },
+    "status_source": {
+      "type": "object",
+      "description": "The operation that last set task_status. A BLOCKED/WAITING_HUMAN set by `gov task status` is an explicit hold the DAG keeps until an explicit READY; every other source is derived and recomputed from the DAG.",
+      "properties": {
+        "operation": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "session": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "at": {
+          "type": "string"
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "report": {
+          "type": "string"
+        }
+      }
+    },
+    "status_note": {
+      "type": "string"
+    },
+    "closed_at": {
+      "type": "string"
+    },
+    "outputs_produced": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "What the task produced, as observed at its close (the task -> output lineage edges, Contract v3 W5/W8)."
+    },
+    "retest_reason": {
       "type": "string"
     }
   },
