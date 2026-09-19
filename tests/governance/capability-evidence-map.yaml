@@ -388,6 +388,7 @@ capabilities:
     - check:mutation_scope
     - test:certification:ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record
     - test:lib:srr::installation::tests::a_consistent_rewrite_diverges_from_the_protected_record_and_names_the_file
+    - test:certification:ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed
   - id: A2.5
     line: 147
     text: Source-release authentication detects pre-install tampering.
@@ -420,6 +421,7 @@ capabilities:
     automated_checks:
     - test:certification:srr::root_succession_requires_both_quorums_no_gaps_and_revokes_by_omission
     - test:certification:srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network
+    - test:certification:ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root
   - id: A2.10
     line: 152
     text: Release verification works offline after obtaining an authentic release envelope where designed.
@@ -502,6 +504,11 @@ capabilities:
     class: migration/rollback evidence
   - id: test:lib:srr::installation::tests::a_consistent_rewrite_diverges_from_the_protected_record_and_names_the_file
     class: unit/integration/system test
+  - id: test:certification:ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed
+    class: unit/integration/system test
+  - id: test:certification:ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root
+    class: unit/integration/system test
+    exercises: the binding authority rotates keys with retired-key standing and is admitted only from the provisioned root
   independent_verification:
   - id: heldout:release/verification/4.1.6-r1/evidence/heldout-tests
     class: independent held-out test
@@ -1205,6 +1212,9 @@ capabilities:
     - check:recovery_rebuild
     - test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration
     - test:certification:repair::claims_survive_full_memory_rebuild
+    - test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory
+    - test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory
+    - test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
   - id: B3.4
     line: 203
     text: Derived records carry provenance sufficient to reconstruct source hits.
@@ -1240,6 +1250,12 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:multi_machine::clone_rebuilds_identical_derived_state
     class: clean-clone/release evidence
+  - id: test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory
+    class: unit/integration/system test
+  - id: test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory
+    class: unit/integration/system test
+  - id: test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
+    class: unit/integration/system test
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -1769,6 +1785,7 @@ capabilities:
     automated_checks:
     - check:index_content_coverage
     - test:lib:memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk
+    - test:certification:ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap
   statements: []
   qualification_challenge_ids: []
   severity: null
@@ -1792,6 +1809,8 @@ capabilities:
     class: unit/integration/system test
     exercises: bare identifiers reach the symbol route
   - id: test:lib:memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk
+    class: unit/integration/system test
+  - id: test:certification:ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap
     class: unit/integration/system test
   independent_verification:
   - id: obligation:AC-12
@@ -2744,6 +2763,7 @@ capabilities:
     automated_checks:
     - check:index_content_coverage
     - test:lib:memory::chunking::tests::hierarchical_chunks
+    - test:lib:memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides
   - id: D3.2
     line: 325
     text: code file → module/class → function/symbol
@@ -2779,6 +2799,8 @@ capabilities:
   - id: test:lib:memory::chunking::tests::hierarchical_chunks
     class: unit/integration/system test
   - id: test:lib:memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line
+    class: unit/integration/system test
+  - id: test:lib:memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides
     class: unit/integration/system test
   independent_verification:
   - id: obligation:AC-12
@@ -3215,6 +3237,7 @@ capabilities:
     text: Lower roles cannot manufacture higher-trust facts.
     automated_checks:
     - test:certification:repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts
+    - test:certification:ws05::close_observes_os_written_state_no_os_operation_produced
   - id: E1.4
     line: 366
     text: Independent auditors/testers are appropriately constrained.
@@ -3266,6 +3289,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role
     class: unit/integration/system test
+  - id: test:certification:ws05::close_observes_os_written_state_no_os_operation_produced
+    class: unit/integration/system test
+    exercises: a worker writing OS-written (T2) state inside its task is refused at close
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -3429,7 +3455,6 @@ capabilities:
     line: 379
     text: files changed
     automated_checks:
-    - check:mutation_scope
     - test:lib:context::receipt::tests::worker_return_and_report_are_one_contract
     - test:lib:context::receipt::tests::worker_return_maps_to_a_schema_valid_report
     - test:certification:ws05::close_requires_and_persists_the_consumption_receipt
@@ -5307,6 +5332,8 @@ capabilities:
     automated_checks:
     - test:certification:repair::task_close_enforces_mutation_scope
     - test:certification:repair2::task_close_uses_observed_mutations_not_self_attestation
+    - test:certification:ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote
+    - test:lib:cit::binding::tests::coverage_is_bound_to_the_content_a_committed_cit_wrote
   - id: I2.9
     line: 569
     text: production-merge permission
@@ -5343,6 +5370,11 @@ capabilities:
   - id: test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them
     class: unit/integration/system test
     exercises: '`route --class` returns the minimum tier a task class requires'
+  - id: test:certification:ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote
+    class: unit/integration/system test
+    exercises: an out-of-scope path is covered only while its content is exactly what the in-window CIT wrote
+  - id: test:lib:cit::binding::tests::coverage_is_bound_to_the_content_a_committed_cit_wrote
+    class: unit/integration/system test
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -5909,12 +5941,14 @@ capabilities:
     line: 625
     text: Impact radius is produced.
     automated_checks:
+    - human-gate:cit simulate
     - test:certification:repair::cit_auto_simulation_and_secret_redaction
     - test:certification:greenfield::greenfield_end_to_end
   - id: K1.4
     line: 626
     text: Human-readable consequences are surfaced.
     automated_checks:
+    - human-gate:cit simulate
     - test:certification:greenfield::greenfield_end_to_end
   statements: []
   qualification_challenge_ids: []
@@ -5922,8 +5956,13 @@ capabilities:
   applicability: 'required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127'
   evidence_class:
   - unit/integration/system test
+  - human-gate evidence
   - independent audit evidence
   automated_checks:
+  - id: human-gate:cit simulate
+    class: human-gate evidence
+    record: human-gate
+    exercises: simulation produces the impact radius and, where the radius requires it, a Human Decision Gate that surfaces the consequences
   - id: test:certification:repair::cit_auto_simulation_and_secret_redaction
     class: unit/integration/system test
   - id: test:certification:ws04r2::materiality_is_derived_not_labelled
@@ -5937,7 +5976,9 @@ capabilities:
   - id: obligation:AC-12
     class: independent audit evidence
   freshness_triggers:
+  - governing contract/policy
   - runtime/kernel implementation
+  - authoritative spec/decision
   health_scheduler_tiers: []
   adoption_obligation:
     lifecycle_points:
@@ -5983,6 +6024,7 @@ capabilities:
     text: authoritative updates
     automated_checks:
     - test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken
+    - test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal
   - id: K2.4
     line: 632
     text: staleness/retest/rework propagation
@@ -6053,6 +6095,8 @@ capabilities:
   - id: test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task
     class: unit/integration/system test
   - id: test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken
+    class: unit/integration/system test
+  - id: test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal
     class: unit/integration/system test
   independent_verification:
   - id: obligation:AC-12
@@ -6212,6 +6256,8 @@ capabilities:
     line: 650
     text: R0-R5 or equivalent affects traversal/test scope/model tier/agents/human approval/rollback.
     automated_checks:
+    - human-gate:cit simulate
+    - test:certification:greenfield::greenfield_end_to_end
     - test:lib:orchestration::gates::tests::radii_are_validated
     - test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression
   statements: []
@@ -6220,8 +6266,16 @@ capabilities:
   applicability: 'required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127'
   evidence_class:
   - unit/integration/system test
+  - human-gate evidence
   - independent audit evidence
   automated_checks:
+  - id: human-gate:cit simulate
+    class: human-gate evidence
+    record: human-gate
+    exercises: an R2+ radius makes the simulated change require a human gate before approval
+  - id: test:certification:greenfield::greenfield_end_to_end
+    class: unit/integration/system test
+    exercises: a behaviour change simulates to radius R2 with a required human gate and an impact set naming the governed task
   - id: test:lib:orchestration::gates::tests::radii_are_validated
     class: unit/integration/system test
   - id: test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression
@@ -6231,7 +6285,9 @@ capabilities:
   - id: obligation:AC-12
     class: independent audit evidence
   freshness_triggers:
+  - governing contract/policy
   - runtime/kernel implementation
+  - authoritative spec/decision
   health_scheduler_tiers: []
   adoption_obligation:
     lifecycle_points:
@@ -6512,6 +6568,7 @@ capabilities:
     - check:human_gate_integrity
     - test:certification:repair2::cit_approval_derives_only_from_an_answered_gate
     - test:certification:repair::update_approval_requires_presented_answered_gate
+    - test:certification:ws05::gates_decide_runnability_and_completion
   - id: L3.4
     line: 678
     text: Declined/revoked/stale/other-CIT gates cannot authorise execution.
@@ -6520,6 +6577,7 @@ capabilities:
     - test:certification:repair2::cit_approval_derives_only_from_an_answered_gate
     - test:certification:ws03::cit_approval_consumes_only_honoured_gate_answers
     - test:certification:ws03::blocked_work_is_released_only_by_an_authorising_answer
+    - test:certification:ws05::gates_decide_runnability_and_completion
   - id: L3.5
     line: 679
     text: Human approval cannot be fabricated by agent/CLI metadata.
@@ -6583,6 +6641,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers
     class: unit/integration/system test
+  - id: test:certification:ws05::gates_decide_runnability_and_completion
+    class: unit/integration/system test
+    exercises: a declined or withdrawn gate returns the work to blocked; gated work cannot complete while its gate withholds authorisation
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -6794,7 +6855,6 @@ capabilities:
     line: 696
     text: low/medium/high/extra-high or equivalent minimum can be declared/enforced.
     automated_checks:
-    - check:model_routing_integrity
     - test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them
   statements: []
   qualification_challenge_ids: []
@@ -6802,15 +6862,8 @@ capabilities:
   applicability: 'required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127'
   evidence_class:
   - unit/integration/system test
-  - governance health check
   - independent audit evidence
   automated_checks:
-  - id: check:model_routing_integrity
-    class: governance health check
-    tiers:
-    - G4
-    - G5
-    - G6
   - id: test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them
     class: unit/integration/system test
     exercises: a task's declared minimum reasoning is enforced by routing
@@ -6818,30 +6871,19 @@ capabilities:
   - id: obligation:AC-12
     class: independent audit evidence
   freshness_triggers:
-  - governing contract/policy
   - runtime/kernel implementation
-  - schema
-  - migration
-  - tool/plugin
-  - model/retrieval profile
-  - authoritative spec/decision
-  health_scheduler_tiers:
-  - G4
-  - G5
-  - G6
+  health_scheduler_tiers: []
   adoption_obligation:
     lifecycle_points:
     - '`gov adopt`'
     - post-adoption acceptance
-    owners:
-    - check:model_routing_integrity
-    rule: 're-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)'
+    owners: []
+    rule: 'no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release''s own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)'
   operational_audit_obligation:
     lifecycle_points:
     - periodic operational governance-health audits
-    owners:
-    - check:model_routing_integrity
-    rule: re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)
+    owners: []
+    rule: 'no owner runs at a project''s periodic operational audit: the capability is re-established with each release''s evidence (Contract v3:126)'
   allowed_status:
   - PRESENT_AND_SUBSTANTIAL
   - PARTIAL
@@ -6849,7 +6891,7 @@ capabilities:
   - UNCLEAR
   - N/A_WITH_REASON
   na_requirements: N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)
-  remediation_rule: a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)
+  remediation_rule: 'a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate''s regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on'
 - capability: M3
   title: Role defaults
   gate: M
@@ -6861,7 +6903,6 @@ capabilities:
     line: 699
     text: orchestration/memory/audit default to strong enough tier.
     automated_checks:
-    - check:model_routing_integrity
     - test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them
   - id: M3.2
     line: 700
@@ -6874,15 +6915,8 @@ capabilities:
   applicability: 'required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127'
   evidence_class:
   - unit/integration/system test
-  - governance health check
   - independent audit evidence
   automated_checks:
-  - id: check:model_routing_integrity
-    class: governance health check
-    tiers:
-    - G4
-    - G5
-    - G6
   - id: test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them
     class: unit/integration/system test
     exercises: role default tiers/reasoning cannot be lowered by the overlay; provider names are mapped in MODEL_ROUTING_OVERRIDES
@@ -6890,30 +6924,19 @@ capabilities:
   - id: obligation:AC-12
     class: independent audit evidence
   freshness_triggers:
-  - governing contract/policy
   - runtime/kernel implementation
-  - schema
-  - migration
-  - tool/plugin
-  - model/retrieval profile
-  - authoritative spec/decision
-  health_scheduler_tiers:
-  - G4
-  - G5
-  - G6
+  health_scheduler_tiers: []
   adoption_obligation:
     lifecycle_points:
     - '`gov adopt`'
     - post-adoption acceptance
-    owners:
-    - check:model_routing_integrity
-    rule: 're-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)'
+    owners: []
+    rule: 'no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release''s own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)'
   operational_audit_obligation:
     lifecycle_points:
     - periodic operational governance-health audits
-    owners:
-    - check:model_routing_integrity
-    rule: re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)
+    owners: []
+    rule: 'no owner runs at a project''s periodic operational audit: the capability is re-established with each release''s evidence (Contract v3:126)'
   allowed_status:
   - PRESENT_AND_SUBSTANTIAL
   - PARTIAL
@@ -6921,7 +6944,7 @@ capabilities:
   - UNCLEAR
   - N/A_WITH_REASON
   na_requirements: N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)
-  remediation_rule: a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)
+  remediation_rule: 'a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate''s regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on'
 - capability: M4
   title: Empirical routing
   gate: M
@@ -7164,7 +7187,6 @@ capabilities:
     line: 730
     text: task transition
     automated_checks:
-    - check:continuity_checkpoint_handoff
     - test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers
   - id: N2.2
     line: 731
@@ -7208,17 +7230,8 @@ capabilities:
   applicability: 'required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127'
   evidence_class:
   - unit/integration/system test
-  - governance health check
   - independent audit evidence
   automated_checks:
-  - id: check:continuity_checkpoint_handoff
-    class: governance health check
-    tiers:
-    - G3
-    - G4
-    - G5
-    - G6
-    exercises: checkpoint freshness against material state
   - id: test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers
     class: unit/integration/system test
   - id: test:lib:checkpoints::tests::material_decisions_are_gate_derived_human_or_wide
@@ -7233,28 +7246,19 @@ capabilities:
   - id: obligation:AC-12
     class: independent audit evidence
   freshness_triggers:
-  - governing contract/policy
   - runtime/kernel implementation
-  - schema
-  - authoritative spec/decision
-  health_scheduler_tiers:
-  - G3
-  - G4
-  - G5
-  - G6
+  health_scheduler_tiers: []
   adoption_obligation:
     lifecycle_points:
     - '`gov adopt`'
     - post-adoption acceptance
-    owners:
-    - check:continuity_checkpoint_handoff
-    rule: 're-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)'
+    owners: []
+    rule: 'no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release''s own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)'
   operational_audit_obligation:
     lifecycle_points:
     - periodic operational governance-health audits
-    owners:
-    - check:continuity_checkpoint_handoff
-    rule: re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)
+    owners: []
+    rule: 'no owner runs at a project''s periodic operational audit: the capability is re-established with each release''s evidence (Contract v3:126)'
   allowed_status:
   - PRESENT_AND_SUBSTANTIAL
   - PARTIAL
@@ -7262,7 +7266,7 @@ capabilities:
   - UNCLEAR
   - N/A_WITH_REASON
   na_requirements: N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)
-  remediation_rule: a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)
+  remediation_rule: 'a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate''s regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on'
 - capability: N3
   title: Provider-independent checkpoint watchdog
   gate: N
@@ -8544,6 +8548,7 @@ capabilities:
     line: 851
     text: human approval where required
     automated_checks:
+    - human-gate:upstream prepare
     - test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises
     - test:certification:upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet
   - id: Q1.8
@@ -8557,8 +8562,13 @@ capabilities:
   applicability: 'required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127'
   evidence_class:
   - unit/integration/system test
+  - human-gate evidence
   - independent audit evidence
   automated_checks:
+  - id: human-gate:upstream prepare
+    class: human-gate evidence
+    record: human-gate
+    exercises: preparing an export raises the approval gate for exactly that packet
   - id: test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises
     class: unit/integration/system test
     exercises: a lesson's scope decides eligibility; export needs the owner's answer; an exported lesson is promoted
@@ -8571,7 +8581,9 @@ capabilities:
   - id: obligation:AC-12
     class: independent audit evidence
   freshness_triggers:
+  - governing contract/policy
   - runtime/kernel implementation
+  - authoritative spec/decision
   health_scheduler_tiers: []
   adoption_obligation:
     lifecycle_points:
@@ -9423,6 +9435,7 @@ capabilities:
     - human-gate:adopt migrate
     - test:certification:brownfield::brownfield_adoption_end_to_end
     - test:certification:migration::path_migration_with_rollback_and_memory_rebuild
+    - test:lib:migrations::executor::tests::a_rollback_restores_only_what_its_batch_recorded
   - id: S4.8
     line: 930
     text: A7 independent migration verification
@@ -9488,6 +9501,8 @@ capabilities:
     class: unit/integration/system test
   - id: test:lib:adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound
     class: unit/integration/system test
+  - id: test:lib:migrations::executor::tests::a_rollback_restores_only_what_its_batch_recorded
+    class: migration/rollback evidence
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -10931,6 +10946,7 @@ capabilities:
     automated_checks:
     - check:schema_invariants
     - test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct
+    - test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity
   - id: W1.2
     line: 1071
     text: artefact type
@@ -10964,6 +10980,7 @@ capabilities:
     group: 1069
     automated_checks:
     - test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct
+    - test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity
   - id: W1.7
     line: 1076
     text: producer/provenance
@@ -11028,6 +11045,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named
     class: unit/integration/system test
+  - id: test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity
+    class: unit/integration/system test
+    exercises: the migration plan and catalogue keep their identity across a re-run (WS-9 item 6)
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -11201,6 +11221,7 @@ capabilities:
     group: 1093
     automated_checks:
     - test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input
+    - test:lib:context::manifest::tests::a_specification_producer_is_not_held_to_what_its_feature_still_lacks
   - id: W3.2
     line: 1095
     text: required authority/lifecycle state
@@ -11233,7 +11254,6 @@ capabilities:
     text: Task cannot become READY if a mandatory input is absent.
     group: 1100
     automated_checks:
-    - check:context_reproducibility
     - test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block
     - test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag
   - id: W3.7
@@ -11289,6 +11309,8 @@ capabilities:
   - id: test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag
     class: unit/integration/system test
   - id: test:certification:ws04r2::contradictions_are_blocked_and_routed
+    class: unit/integration/system test
+  - id: test:lib:context::manifest::tests::a_specification_producer_is_not_held_to_what_its_feature_still_lacks
     class: unit/integration/system test
   independent_verification:
   - id: obligation:AC-12
@@ -11479,7 +11501,6 @@ capabilities:
     text: refuses missing mandatory traceability where required
     group: 1123
     automated_checks:
-    - check:product_traceability
     - test:certification:ws05::close_requires_and_persists_the_consumption_receipt
   - id: W5.8
     line: 1125

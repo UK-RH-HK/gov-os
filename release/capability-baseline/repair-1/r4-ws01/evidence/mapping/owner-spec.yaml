@@ -62,6 +62,8 @@ capabilities:
       - {id: "test:certification:ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current", items: [8]}
       - {id: "test:certification:ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified", items: [3], class: "migration/rollback evidence"}
       - {id: "test:lib:srr::installation::tests::a_consistent_rewrite_diverges_from_the_protected_record_and_names_the_file", items: [4]}
+      - {id: "test:certification:ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed", items: [4]}
+      - {id: "test:certification:ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root", items: [9], ex: "the binding authority rotates keys with retired-key standing and is admitted only from the provisioned root"}
     independent:
       - {id: *r1_27, tests: ["heldout_srr::a1_signature_lifted_from_a_different_document_is_refused", "heldout_srr2::c2_identity_and_payload_binding_fail_closed", "heldout_srr4::e4_intact_is_not_authentic_and_the_two_controls_are_independent"], ex: "AR-0027 held-out: signature, identity/payload binding, integrity vs authenticity"}
       - {id: *r1_29, tests: ["ho_e_rootexpiry::e2_root_rotation_is_possible_under_the_implemented_profile"], ex: "AR-0029 held-out: root rotation under the implemented profile"}
@@ -139,6 +141,9 @@ capabilities:
       - {id: "test:certification:repair::claims_survive_full_memory_rebuild", items: [3]}
       - {id: "test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated", items: [1, 2]}
       - {id: "test:certification:multi_machine::clone_rebuilds_identical_derived_state", items: [2], class: "clean-clone/release evidence"}
+      - {id: "test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory", items: [3]}
+      - {id: "test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory", items: [3]}
+      - {id: "test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion", items: [3]}
     independent:
       - {id: "obligation:AC-12"}
   # ================================================================ GATE C
@@ -185,6 +190,7 @@ capabilities:
       - {id: "test:lib:retrieval::tests::bare_file_names_reach_the_path_route", items: [3]}
       - {id: "test:certification:repair::implementation_prerequisites_and_symbol_route", items: [2], ex: "bare identifiers reach the symbol route"}
       - {id: "test:lib:memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk", items: [1, 6]}
+      - {id: "test:certification:ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap", items: [6]}
     independent:
       - {id: "obligation:AC-12"}
   C5:
@@ -276,6 +282,7 @@ capabilities:
       - {id: "check:index_content_coverage", items: [1, 2], ex: "every record section and code line is held by a chunk of the hierarchy"}
       - {id: "test:lib:memory::chunking::tests::hierarchical_chunks", items: [1, 2]}
       - {id: "test:lib:memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line", items: [2]}
+      - {id: "test:lib:memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides", items: [1]}
     independent:
       - {id: "obligation:AC-12"}
   D4:
@@ -326,6 +333,7 @@ capabilities:
       - {id: "test:certification:repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts", items: [3]}
       - {id: "test:lib:authority::tests::undeclared_is_level_zero_and_never_orchestrator", items: [1]}
       - {id: "test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role", items: [4]}
+      - {id: "test:certification:ws05::close_observes_os_written_state_no_os_operation_produced", items: [3], ex: "a worker writing OS-written (T2) state inside its task is refused at close"}
     independent:
       - {id: "obligation:AC-12"}
   E2:
@@ -341,7 +349,7 @@ capabilities:
   E3:
     owners:
       - {id: "check:continuity_checkpoint_handoff", items: [7], ex: "handoffs reference known tasks"}
-      - {id: "check:mutation_scope", items: [2], ex: "returned handoffs carry no authority violations"}
+      - {id: "check:mutation_scope", ex: "returned handoffs carry no authority violations"}
       - {id: "test:certification:ws04r2::checkpoint_and_handoff_continuity", ex: "a handoff on stale inputs is refreshed and explicitly degraded"}
       - {id: "test:lib:context::receipt::tests::worker_return_and_report_are_one_contract", items: [1, 2, 3, 4, 6]}
       - {id: "test:lib:context::receipt::tests::worker_return_maps_to_a_schema_valid_report", items: [1, 2, 3]}
@@ -500,6 +508,8 @@ capabilities:
       - {id: "test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input", items: [2, 3, 4]}
       - {id: "test:certification:ws05r3::an_experiment_task_closes_only_through_its_lifecycle", items: [9]}
       - {id: "test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them", items: [7], ex: "`route --class` returns the minimum tier a task class requires"}
+      - {id: "test:certification:ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote", items: [8], ex: "an out-of-scope path is covered only while its content is exactly what the in-window CIT wrote"}
+      - {id: "test:lib:cit::binding::tests::coverage_is_bound_to_the_content_a_committed_cit_wrote", items: [8]}
     independent:
       - {id: "obligation:AC-12"}
   I3:
@@ -550,6 +560,7 @@ capabilities:
   # ================================================================ GATE K
   K1:
     owners:
+      - {id: "human-gate:cit simulate", record: "human-gate", items: [3, 4], ex: "simulation produces the impact radius and, where the radius requires it, a Human Decision Gate that surfaces the consequences"}
       - {id: "test:certification:repair::cit_auto_simulation_and_secret_redaction", items: [1, 3]}
       - {id: "test:certification:ws04r2::materiality_is_derived_not_labelled", items: [1]}
       - {id: "test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact", items: [1]}
@@ -568,6 +579,7 @@ capabilities:
       - {id: "test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips", items: [6, 7, 8]}
       - {id: "test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task", items: [4]}
       - {id: "test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken", items: [3]}
+      - {id: "test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal", items: [3]}
     independent:
       - {id: "obligation:AC-12"}
   K3:
@@ -581,6 +593,8 @@ capabilities:
       - {id: "obligation:AC-12"}
   K4:
     owners:
+      - {id: "human-gate:cit simulate", record: "human-gate", items: [1], ex: "an R2+ radius makes the simulated change require a human gate before approval"}
+      - {id: "test:certification:greenfield::greenfield_end_to_end", items: [1], ex: "a behaviour change simulates to radius R2 with a required human gate and an impact set naming the governed task"}
       - {id: "test:lib:orchestration::gates::tests::radii_are_validated", items: [1]}
       - {id: "test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression", items: [1], ex: "the change-control gate for the change's radius is required"}
     independent:
@@ -619,6 +633,7 @@ capabilities:
       - {id: "test:certification:ws03::blocked_work_is_released_only_by_an_authorising_answer", items: [4]}
       - {id: "test:certification:repair::update_approval_requires_presented_answered_gate", items: [3]}
       - {id: "test:certification:ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers", items: [5]}
+      - {id: "test:certification:ws05::gates_decide_runnability_and_completion", items: [3, 4], ex: "a declined or withdrawn gate returns the work to blocked; gated work cannot complete while its gate withholds authorisation"}
     independent:
       - {id: "obligation:AC-12"}
   L4:
@@ -640,13 +655,11 @@ capabilities:
       - {id: "obligation:AC-12"}
   M2:
     owners:
-      - {id: "check:model_routing_integrity", items: [1]}
       - {id: "test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them", items: [1], ex: "a task's declared minimum reasoning is enforced by routing"}
     independent:
       - {id: "obligation:AC-12"}
   M3:
     owners:
-      - {id: "check:model_routing_integrity", items: [1]}
       - {id: "test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them", items: [1, 2], ex: "role default tiers/reasoning cannot be lowered by the overlay; provider names are mapped in MODEL_ROUTING_OVERRIDES"}
     independent:
       - {id: "obligation:AC-12"}
@@ -666,7 +679,6 @@ capabilities:
       - {id: "obligation:AC-12"}
   N2:
     owners:
-      - {id: "check:continuity_checkpoint_handoff", items: [1], ex: "checkpoint freshness against material state"}
       - {id: "test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers", items: [1, 2, 6]}
       - {id: "test:lib:checkpoints::tests::material_decisions_are_gate_derived_human_or_wide", items: [2]}
       - {id: "test:certification:ws06r3::a_significant_mutation_observed_at_rebuild_is_a_checkpoint_boundary", items: [4]}
@@ -773,6 +785,7 @@ capabilities:
   # ================================================================ GATE Q
   Q1:
     owners:
+      - {id: "human-gate:upstream prepare", record: "human-gate", items: [7], ex: "preparing an export raises the approval gate for exactly that packet"}
       - {id: "test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises", items: [4, 7, 8], ex: "a lesson's scope decides eligibility; export needs the owner's answer; an exported lesson is promoted"}
       - {id: "test:certification:ws05r3::every_event_source_generates_linked_governed_work_once", items: [2], ex: "a lesson candidate generates governed work"}
       - {id: "test:certification:upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet", items: [7]}
@@ -867,6 +880,7 @@ capabilities:
       - {id: "test:certification:migration::path_migration_with_rollback_and_memory_rebuild", items: [7, 10], class: "migration/rollback evidence"}
       - {id: "test:lib:adopt::tests::a11_names_the_installation_posture_when_it_is_the_only_reason", items: [12]}
       - {id: "test:lib:adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound", items: [8]}
+      - {id: "test:lib:migrations::executor::tests::a_rollback_restores_only_what_its_batch_recorded", items: [7], class: "migration/rollback evidence"}
     independent:
       - {id: "obligation:AC-12"}
   S5:
@@ -992,6 +1006,7 @@ capabilities:
       - {id: "test:lib:graph::tests::producer_and_report_edges_point_from_producer_to_product", items: [7]}
       - {id: "test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning", items: [8]}
       - {id: "test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named", items: [9]}
+      - {id: "test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity", items: [1, 6], ex: "the migration plan and catalogue keep their identity across a re-run (WS-9 item 6)"}
     independent:
       - {id: "obligation:AC-12"}
   W2:
@@ -1007,7 +1022,7 @@ capabilities:
       - {id: "obligation:AC-12"}
   W3:
     owners:
-      - {id: "check:context_reproducibility", items: [6, 9], ex: "every dispatchable task's delivered inputs verify against its declared manifest"}
+      - {id: "check:context_reproducibility", items: [9], ex: "every dispatchable task's delivered inputs verify against its declared manifest"}
       - {id: "test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input", items: [1, 4]}
       - {id: "test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block", items: [2, 6, 7]}
       - {id: "test:lib:context::manifest::tests::state_version_and_hash_constraints_are_enforced", items: [2, 3]}
@@ -1015,6 +1030,7 @@ capabilities:
       - {id: "test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations", items: [4, 5]}
       - {id: "test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag", items: [6]}
       - {id: "test:certification:ws04r2::contradictions_are_blocked_and_routed", items: [8]}
+      - {id: "test:lib:context::manifest::tests::a_specification_producer_is_not_held_to_what_its_feature_still_lacks", items: [1]}
     independent:
       - {id: "obligation:AC-12"}
   W4:
@@ -1027,7 +1043,7 @@ capabilities:
       - {id: "obligation:AC-12"}
   W5:
     owners:
-      - {id: "check:product_traceability", items: [3, 7, 8, 9], ex: "DONE tasks closed by a report; DONE implementation traces to its requirements (W5/W8)"}
+      - {id: "check:product_traceability", items: [3, 8, 9], ex: "DONE tasks closed by a report; DONE implementation traces to its requirements (W5/W8)"}
       - {id: "test:certification:ws05::close_requires_and_persists_the_consumption_receipt", items: [1, 2, 7]}
       - {id: "test:certification:ws04r3::untraceable_implementation_is_judged_on_what_was_produced", items: [8]}
       - {id: "test:lib:context::receipt::tests::worker_return_and_report_are_one_contract", items: [1, 2, 3, 4, 5, 6]}

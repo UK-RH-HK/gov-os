@@ -1,0 +1,17 @@
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01/target/P2-AR-0042/mutants/tree (git archive of 5aebf23c9d3b32ccdaa3a02596b82625d57192c6); target /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01/target/P2-AR-0042/mutants/target; 2026-09-19T17:44:23Z
+===== MUTATION E E1 owner=test:lib:authority::tests::undeclared_is_level_zero_and_never_orchestrator file=runtime/src/authority.rs
+control (unmutated): PASSED | test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.00s
+applied: '    if role == UNDECLARED_ROLE {\n        return Ok(0);\n    }' -> '    if role == UNDECLARED_ROLE {\n        return Ok(4);\n    }'
+mutant: FAILED | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.00s | thread 'authority::tests::undeclared_is_level_zero_and_never_orchestrator' (1358353) panicked at runtime/src/authority.rs:337:9: assertion `left == right` failed   left: 4 
+reverted: identical-to-HEAD
+===== MUTATION V V1 owner=test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected file=framework/qualification-oracle/qualification-oracle.schema.json
+control (unmutated): PASSED | test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 269 filtered out; finished in 3.67s
+applied: '"expected_detection", "expected_severity", ' -> '"expected_detection", '
+mutant: FAILED | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.95s | thread 'qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected' (1359356) panicked at runtime/src/qualification_oracle.rs:1367:17: 
+reverted: identical-to-HEAD
+===== MUTATION W W3 owner=test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block file=runtime/src/context/manifest.rs
+control (unmutated): PASSED | test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.01s
+applied: 'if !allowed_status.iter().any(|s| s == "SUPERSEDED") {' -> 'if false && !allowed_status.iter().any(|s| s == "SUPERSEDED") {'
+mutant: FAILED | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.01s | thread 'context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block' (1361192) panicked at runtime/src/context/manifest.rs:1362:9: assertion failed: code("REQ-0001").contains(&"SUPERSEDED") 
+reverted: identical-to-HEAD
+===== MUTATION P P1 owner=test:certification:greenfield::greenfield_end_to_end file=runtime/src/observability.rs

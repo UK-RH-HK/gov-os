@@ -3655,6 +3655,55 @@ pub fn test_index(repo_root: &Path, harness: &str) -> Option<BTreeMap<String, Te
     Some(out)
 }
 
+/// A digest of what owner references are resolved against in the tree: every test each harness runs (its path, file
+/// and whether it is `#[ignore]`d — not its line), every file of every independent held-out suite, and the frozen gate
+/// contract. A `verify` result computed before a test was renamed, ignored or removed, or a suite or criterion
+/// changed, is not current after it; a cache keyed by the contract chain alone would miss that (integration point for
+/// the `contract_binding` family's cache key).
+pub fn owner_sources_fingerprint(repo_root: &Path) -> String {
+    let mut v = Map::new();
+    for (h, _, _) in TEST_HARNESSES {
+        v.insert(
+            (*h).to_string(),
+            json!(test_index(repo_root, h).map(|idx| idx
+                .iter()
+                .map(|(k, s)| json!([k, s.file, s.ignored]))
+                .collect::<Vec<_>>())),
+        );
+    }
+    let mut suites: Vec<Value> = vec![];
+    if let Ok(rd) = std::fs::read_dir(repo_root.join(HELDOUT_ROOT)) {
+        let mut runs: Vec<PathBuf> = rd.flatten().map(|e| e.path()).collect();
+        runs.sort();
+        for run in runs {
+            let dir = run.join("evidence").join("heldout-tests");
+            let Ok(files) = std::fs::read_dir(&dir) else {
+                continue;
+            };
+            let mut files: Vec<PathBuf> = files.flatten().map(|e| e.path()).collect();
+            files.sort();
+            for f in files {
+                if let Ok(b) = std::fs::read(&f) {
+                    suites.push(json!([
+                        crate::util::rel_posix(&f, repo_root),
+                        crate::util::sha256_hex(&b)
+                    ]));
+                }
+            }
+        }
+    }
+    v.insert("heldout".into(), Value::Array(suites));
+    v.insert(
+        "gate_contract".into(),
+        json!(
+            std::fs::read_to_string(repo_root.join(FROZEN_GATE_CONTRACT))
+                .ok()
+                .map(|t| sha256_text(&t))
+        ),
+    );
+    crate::util::hash_value(&Value::Object(v))
+}
+
 /// The `#[test]` functions of one held-out suite file (`<suite>/<binary>.rs`), by `<binary>::<fn>`.
 fn heldout_tests(file: &Path, repo_root: &Path, binary: &str) -> BTreeMap<String, TestSite> {
     let mut out = BTreeMap::new();
@@ -6143,6 +6192,30 @@ mod tests {
         for c in m_ids() {
             assert!(md.contains(&format!("#### {c} — ")), "{c}");
         }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_owner_sources_fingerprint_follows_what_owners_resolve_against() {
+        let dir = std::env::temp_dir().join(format!("gov-owner-fp-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(dir.join("runtime/src")).unwrap();
+        let lib = |body: &str| std::fs::write(dir.join("runtime/src/lib.rs"), body).unwrap();
+        lib("#[cfg(test)]\nmod tests {\n    #[test]\n    fn owner() {}\n}\n");
+        let a = owner_sources_fingerprint(&dir);
+        // an edit that renames, ignores or removes nothing does not change it (line numbers are not part of it)
+        lib("// a comment\n#[cfg(test)]\nmod tests {\n    #[test]\n    fn owner() {}\n}\n");
+        assert_eq!(owner_sources_fingerprint(&dir), a);
+        lib("#[cfg(test)]\nmod tests {\n    #[test]\n    fn owner_renamed() {}\n}\n");
+        let b = owner_sources_fingerprint(&dir);
+        assert_ne!(b, a, "a renamed owner test changes the fingerprint");
+        lib(
+            "#[cfg(test)]\nmod tests {\n    #[test]\n    #[ignore]\n    fn owner_renamed() {}\n}\n",
+        );
+        assert_ne!(
+            owner_sources_fingerprint(&dir),
+            b,
+            "an ignored owner test changes it"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
