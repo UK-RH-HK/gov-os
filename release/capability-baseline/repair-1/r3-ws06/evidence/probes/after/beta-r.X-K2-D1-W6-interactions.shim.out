@@ -1,0 +1,44 @@
+# P2-AR-0037 audit-of-record probe re-run (unedited): beta-r/X-K2-D1-W6-interactions mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws06 HEAD 7cd1fbbe60d4afd67ed98b7e19d76b24f0f01f22
+# probe /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch2/mirror-PeWFok/release/capability-baseline/audit-0/beta-r/evidence/X-K2-D1-W6-interactions.py sha256 1ef74410c666b6b4b2b2fed9bc61a58748ad700bd6ab20f5c57584980fa569f6; gov ffb673b4b9b4b241185e8104ea7350280ea3e584b5350d15bf339010eaffb472 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch2/mirror-PeWFok/target/release/gov
+# date 2026-09-19T10:57:33Z
+$ gov --role orchestrator init --name orders-ledger --alias x-k2d1 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+K2-D1-1 governed change -> CIT-E refreshes the index
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Clarify REQ-0001 statement with the refund sign convention' --trigger acceptance_criteria_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch2/run-shim-beta-r-X-K2-D1-W6-interactions-GG8ENt/x-591133.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0001  -> exit 0 ok=True
+cit execute -> True COMMITTED None
+manifest REQ-0001 content hash changed: True | freshness after CIT-E: True | query for the new literal -> ['REQ-0001', 'CIT-0001', 'CIT-0001']
+[PASS] K2-D1-1: CIT-E refreshes the index inside the transaction and verifies freshness; the new content is retrievable immediately
+
+====================================================================================================
+K2-D1-2 index refresh failure inside CIT-E -> rollback
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Switch embedder via overlay edit' --trigger governance_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch2/run-shim-beta-r-X-K2-D1-W6-interactions-GG8ENt/x-362327.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0002  -> exit 1 ok=False error={"code": "EMBEDDER_UNAVAILABLE", "message": "embedding implementation 'no-such-embedder' is pinned by MEMORY_POLICY.embedding but no `embed` plugin with that id is declared under governance/project/plugins/ (no silent fallback to the built-in embedder) \u2014 rolled back (4 files restored)", "details": {"rollback": {"cit": "CIT-0002", "restored": ["governance/project/PROJECT_POLICY.yaml", "spec/features/F-0001.yaml", "spec/scenarios/SCN-0001.yaml", "spec/tasks/TST-0001.yaml"], "removed": []}, "details": {"pinned": {"id": "no-such-embedder", "version": "1", "dimensions": 512, "source": "plugin"
+cit execute -> False EMBEDDER_UNAVAILABLE embedding implementation 'no-such-embedder' is pinned by MEMORY_POLICY.embedding but no `embed` plugin with that id is declared under governance/project/plugins/ (no silent fallback to the built-in embedder) — rolled bac
+$ gov --role orchestrator memory query REFUND_SIGN_MARKER --k 3  -> exit 0 ok=True
+cit_status: ROLLED_BACK | overlay restored: True | freshness: True [] | retrieval still works: True
+[PASS] K2-D1-2: a failed index refresh aborts CIT-E atomically: the change is rolled back and the index remains usable
+$ gov --role orchestrator memory query 'why integer cents rationale' --route semantic --k 3  -> exit 0 ok=True
+semantic query after the CIT outcome -> True None
+OBSERVATION: cit::execute applies the manifest, then refreshes and verifies the index with the SAME Project value whose policies/contract were cached before the mutation (runtime/src/cit/mod.rs execute: no p.invalidate() after apply_op; project.rs OnceCell caches)
+
+====================================================================================================
+K2-D1-3 CIT reclassifies docs/** as historical -> committed index?
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Archive the old docs tree' --trigger governance_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch2/run-shim-beta-r-X-K2-D1-W6-interactions-GG8ENt/x-866393.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0003  -> exit 4 ok=False error={"code": "HEALTH_HARD_BLOCK", "message": "the repository is under hard-block(s) this transaction does not repair (cit.execute is refused: 5 active hard-block(s), e.g. check schema_invariants (high): EXP-0001 (experiment): <root>: \"experiment_state\" is a required property. Repair the condition, then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it); under a hard-block a transaction stands only when it repairs the blocking condition \u2014 rolled back", "details": {"blocks": {"operation": "cit.execute", "paths": ["governance/project/REPOSITORY_CONTRACT.yaml", "spec/requi
+cit execute -> False None HEALTH_HARD_BLOCK
+after the committed CIT: docs/runbook.md row: [('narrative', 'ACTIVE', 1, 'spec')] | freshness: True | archived runbook returned as current: True
+[FAIL] K2-D1-3: a path-map change committed through CIT-E is reflected in the refreshed index (no archive-as-current after COMMITTED)
+
+====================================================================================================
+D1-W6-1 ungoverned upstream edit -> index staleness -> task close blocked
+====================================================================================================
+$ gov --role orchestrator task create --class implementation --objective 'Implement refund sign' --feature F-0001 --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"]}'  -> exit 0 ok=True
+required command failed: gov task claim TASK-0003: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for), and its independence is not established from recorded authorship: no sealed close report produced its current content. `independent_of_implementer` / `author_role` are the artefact's own claims, not evidence; produce it through a test-design task closed by an independent role and session. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`", 'details': {'task': 'TASK-0003', 'state': 'BLOCKED', 'reasons': ["TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for), and its independence is not established from recorded authorship: no sealed close report produced its current content. `independent_of_implementer` / `author_role` are the artefact's own claims, not evidence; produce it through a test-design task closed by an independent role and session"], 'gates': [], 'pending_gates': [], 'manifest': None}}
+[exit=1]

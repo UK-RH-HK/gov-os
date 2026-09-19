@@ -1,0 +1,37 @@
+# P2-AR-0037 audit-of-record probe re-run (unedited): delta-r/J1-J2-research-experiments mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/base-tree HEAD (git archive export of 53897c1)
+# probe sha256 bc8172cafa31a43b70025ec3d87a36bc4096b7edc66ae73ba5e51d82e84bcac6; gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/mirror-RFAxpx/target/release/gov
+# date 2026-09-19T10:02:53Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/run-shim-delta-r-J1-J2-research-experiments-op5Gaw/j-1789812173-6ffa00/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+
+## J1 (a) the product's own research producer: gov memory benchmark --record
+$ gov --json --session probe-e1b6b11a memory benchmark --candidate current --candidate builtin:128 --record
+  -> ok
+OBSERVE J1.a.record RES-0001 as written by the product: {"conclusion": "recommended: \"current\"", "confidence": 0.7, "influences": [], "measurements": "<2 rows>", "method": "For each candidate: full re-index into an isolated database, then the held-out set (14 queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.", "question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?", "reason": "framework \u00a714.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration", "sources": ["governance/tests/memory/heldout.yaml"], "state_class": "EVIDENCE", "status": "ACTIVE", "uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending"}
+CHECK J1.a.question PASS the benchmark research record carries a non-empty 'question'
+      detail: {"question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?"}
+CHECK J1.a.reason PASS the benchmark research record carries a non-empty 'reason'
+      detail: {"reason": "framework \u00a714.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration"}
+CHECK J1.a.method PASS the benchmark research record carries a non-empty 'method'
+      detail: {"method": "For each candidate: full re-index into an isolated database, then the held-out set (14 queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost."}
+CHECK J1.a.sources PASS the benchmark research record carries a non-empty 'sources'
+      detail: {"sources": ["governance/tests/memory/heldout.yaml"]}
+CHECK J1.a.measurements PASS the benchmark research record carries a non-empty 'measurements'
+      detail: {"measurements": "(rows)"}
+CHECK J1.a.uncertainty PASS the benchmark research record carries a non-empty 'uncertainty'
+      detail: {"uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending"}
+CHECK J1.a.conclusion PASS the benchmark research record carries a non-empty 'conclusion'
+      detail: {"conclusion": "recommended: \"current\""}
+CHECK J1.a.confidence PASS the benchmark research record carries a non-empty 'confidence'
+      detail: {"confidence": 0.7}
+CHECK J1.a.influences FAIL the benchmark research record carries a non-empty 'influences'
+      detail: {"influences": []}
+$ gov --json --session probe-e1b6b11a memory select builtin:128 --research RES-0001
+  -> ok
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/mirror-RFAxpx/release/capability-baseline/audit-0/delta-r/evidence/J1-J2-research-experiments.py", line 31, in <module>
+    dec = p.record(sel["decision"])
+                   ~~~^^^^^^^^^^^^
+KeyError: 'decision'
+[exit=1]

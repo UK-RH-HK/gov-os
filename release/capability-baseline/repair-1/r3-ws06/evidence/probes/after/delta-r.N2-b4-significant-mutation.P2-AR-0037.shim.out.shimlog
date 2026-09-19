@@ -1,0 +1,3 @@
+(a) role declared: orchestrator for init --name n2
+(a) role declared: orchestrator for checkpoint create --next-action
+(a) role declared: orchestrator for rebuild-memory --incremental

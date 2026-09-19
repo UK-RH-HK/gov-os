@@ -1045,6 +1045,8 @@ pub fn select(
     crate::t2::require_verified(rec, "retrieval-profile benchmark evidence").map_err(|e| {
         GovError::new("PROFILE_EVIDENCE_UNBOUND", format!("{res_id} is not benchmark evidence the OS wrote on this machine as it stands ({}); re-run `gov memory benchmark --record`", e.message)).with_details(e.details)
     })?;
+    // J1: a decision may rely only on governed research evidence (WS-10 IP-WS10-03; `EVIDENCE_NOT_CITABLE`)
+    crate::lifecycle::require_citable(p, &store, &[res_id.to_string()])?;
     let hp = heldout_path(p);
     let held_sha = sha256_file(&hp).unwrap_or_default();
     if rec.data["benchmark"]["heldout_sha256"].as_str() != Some(held_sha.as_str()) {
@@ -1364,6 +1366,8 @@ pub fn select(
     );
     crate::t2::seal_record(&mut dec, "memory select")?;
     save_record(&p.root, &dec)?;
+    // J1 "influenced decisions": the benchmark research records the decision that adopted it (WS-10 IP-WS10-03)
+    let influenced = crate::lifecycle::record_influence(p, &[res_id.to_string()], &did)?;
     // the new decision and audit records are governed content: keep the derived index fresh
     let fin = crate::memory::indexer::rebuild(
         p,
@@ -1375,6 +1379,6 @@ pub fn select(
     Ok(
         json!({"applied": true, "decision": did, "audit": aid, "pinned": live.embedder, "reranker": live.reranker, "profile": live.digest,
               "rebuilt": fin.manifest_hash, "regression": summary_of(&result), "baseline": baseline.as_ref().map(summary_of),
-              "human_approved": approval["human_approved"], "approval": approval}),
+              "human_approved": approval["human_approved"], "approval": approval, "influence_recorded": influenced}),
     )
 }

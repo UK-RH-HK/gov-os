@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/index-manifest.schema.json",
   "title": "index-manifest",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "index_version": {
@@ -72,8 +72,37 @@
     "excluded": {
       "type": "array",
       "items": {
-        "type": "object"
-      }
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string",
+            "description": "SHA-256 of the content a content-level exclusion was decided on"
+          },
+          "derivation": {
+            "type": "string",
+            "description": "the derivation key (path decision, adapter, authority mapping, secret-scanning rules) it was decided under"
+          },
+          "id": {
+            "type": "string",
+            "description": "duplicate_id: the record id"
+          },
+          "kept": {
+            "type": "string",
+            "description": "duplicate_id: the path of the occurrence the index holds"
+          }
+        },
+        "required": [
+          "path",
+          "reason"
+        ]
+      },
+      "description": "Every file the index does not hold although the path map would index it, or holds out by the path map's own exclusion, with the reason and what decided it (R2-10: freshness judges exactly what a build indexes). Reasons: secret_class / sensitivity:<class> (path map; re-derived by freshness, never trusted from here), too_large, not_utf8, unreadable (a property of the file; re-read by freshness; the size is in the build report), secret_content and duplicate_id (content-level: carry the content_hash and derivation key they were decided under and hold only while both still match; a duplicate names the record id and the occurrence the index holds, which is the one the record store resolves the id to). Binary files are reported by the build, not listed. Part of the hashed core."
     },
     "components": {
       "type": "object",

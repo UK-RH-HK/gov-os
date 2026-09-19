@@ -1,0 +1,54 @@
+# P2-AR-0037 audit-of-record probe re-run (unedited): beta-r/C1-deterministic-structured-memory mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/base-tree HEAD (git archive export of 53897c1)
+# probe sha256 97db8f8666f66213aacf4b0560eae94b02b053a94707693a6ae065057f083a80; gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/mirror-HP5Yzw/target/release/gov
+# date 2026-09-19T09:57:20Z
+$ gov --role orchestrator init --name orders-ledger --alias c1 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator status  -> exit 0 ok=True
+
+====================================================================================================
+C1-b01 projects
+====================================================================================================
+artifacts row: ('PRJ-0001', 'project', 'ACTIVE', 'AUTHORITATIVE', 'spec/product/PRJ-0001.yaml')
+gov status .project: {'name': 'orders-ledger', 'alias': 'c1', 'root': '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/run-shim-beta-r-C1-deterministic-structured-memory-AM39IP/c1', 'commit': 'a35e9e2583c66f9c531b3d96cc59182f45b8f8a6', 'branch': 'main'}
+spec/product/PRJ-0001.yaml: {'id': 'PRJ-0001', 'type': 'project', 'title': 'orders-ledger', 'status': 'ACTIVE'}
+memory query PRJ-0001 routes/hits: ['structured', 'lexical'] ['PRJ-0001', 'PRJ-0001', 'AUD-0001'] (rank of PRJ-0001: 1 )
+[PASS] C1-b01: project record held (spec/product/PRJ-0001.yaml), in SQLite artifacts, returned by gov status and by structured ID lookup
+
+====================================================================================================
+C1-b02 features
+====================================================================================================
+artifacts row: ('F-0001', 'feature', 'ACTIVE', 'AUTHORITATIVE', 'spec/features/F-0001.yaml')
+$ gov --role orchestrator readiness check F-0001  -> exit 0 ok=True
+gov readiness check F-0001 -> {'feature': 'F-0001', 'coverage': 1.0, 'pre_implementation_ok': True} gaps: 0
+$ gov --role orchestrator status  -> exit 0 ok=True
+gov status .features: [{'id': 'F-0001', 'title': 'Order totals', 'coverage': 1.0, 'pre_implementation_ok': True, 'gaps': 0}]
+[PASS] C1-b02: feature record in SQLite, evaluated by gov readiness check, listed by gov status
+
+====================================================================================================
+C1-b03 requirements
+====================================================================================================
+artifacts row: ('REQ-0001', 'requirement', 'ACTIVE', 'AUTHORITATIVE', 'spec/requirements/REQ-0001.yaml')
+$ gov --role orchestrator task create --class implementation --objective 'Implement exact order totals' --feature F-0001 --status READY --allowed src/**,tests/** --fields '{"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator context compile TASK-0001  -> exit 0 ok=True
+context packet governing_requirements: ['REQ-0001']
+[PASS] C1-b03: requirement record in SQLite and delivered as current governing requirement in the deterministic authority block
+
+====================================================================================================
+C1-b04 decisions (current truth under supersession)
+====================================================================================================
+D-0101 row: ('D-0101', 'decision', 'SUPERSEDED', 'AUTHORITATIVE', 'spec/decisions/D-0101.yaml')
+D-0102 row: ('D-0102', 'decision', 'ACTIVE', 'AUTHORITATIVE', 'spec/decisions/D-0102.yaml')
+context packet active_decisions: ['D-0102'] conflicting: []
+default query hits: [('D-0102', 'ACTIVE'), ('PRJ-0001', 'ACTIVE'), ('file:docs/runbook.md', 'ACTIVE'), ('L-0101', 'ACTIVE'), ('D-0102', 'ACTIVE'), ('file:src/core/ledger.rs', 'ACTIVE'), ('ARCH-0101', 'ACTIVE'), ('file:src/core/ledger.rs', 'ACTIVE')]
+--include-historical hits: [('D-0101', 'SUPERSEDED', ['superseded_by:D-0102']), ('D-0102', 'ACTIVE', []), ('D-0101', 'SUPERSEDED', ['superseded_by:D-0102']), ('L-0101', 'ACTIVE', []), ('PRJ-0001', 'ACTIVE', []), ('D-0102', 'ACTIVE', []), ('file:docs/runbook.md', 'ACTIVE', []), ('file:src/core/ledger.rs', 'ACTIVE', [])]
+[PASS] C1-b04: decision current truth = D-0102; superseded D-0101 recorded superseded_by, excluded from authority and default retrieval, visible only on explicit historical request
+
+====================================================================================================
+C1-b05 tasks (current truth follows status change)
+====================================================================================================
+$ gov --role orchestrator task show TASK-0001  -> exit 0 ok=True
+task show before: {'id': 'TASK-0001', 'class': 'implementation', 'task_status': 'BLOCKED', 'feature': 'F-0001'}
+$ gov --role orchestrator task status TASK-0001 IN_PROGRESS --note probe  -> exit 1 ok=False error={"code": "TASK_STATUS_REQUIRES_OPERATION", "message": "task status IN_PROGRESS is reached only through `gov task claim <id>` (its evidence and claim checks cannot be skipped by setting the status)", "details": {"status": "IN_PROGRESS", "route": "gov task claim <id>"}}
+required command failed: gov task status TASK-0001 IN_PROGRESS --note probe: {'code': 'TASK_STATUS_REQUIRES_OPERATION', 'message': 'task status IN_PROGRESS is reached only through `gov task claim <id>` (its evidence and claim checks cannot be skipped by setting the status)', 'details': {'status': 'IN_PROGRESS', 'route': 'gov task claim <id>'}}
+[exit=1]

@@ -1173,6 +1173,9 @@ enum MemoryCmd {
         heldout: Option<PathBuf>,
         #[arg(long)]
         record: bool,
+        /// With --record: the task that commissioned the benchmark (recorded among the work the research influenced)
+        #[arg(long)]
+        task: Option<String>,
     },
     /// Change the retrieval profile through the governed path (BC-P2-30): benchmark evidence (--research), the
     /// change-control gate for its radius (raised on the first call; --gate once an answer authorises it), a full
@@ -1930,7 +1933,7 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::CancelAgents { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "CANCEL_AGENTS", reason.as_deref()) }
         Cmd::Resume => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "RESUME", None) }
         Cmd::Doctor => { let p = open_project(cli, false)?; let r = gov_runtime::doctor::run(&p)?; let v = serde_json::to_value(&r)?; if r.verdict == "UNHEALTHY" { return Err(GovError::new("UNHEALTHY", format!("doctor: UNHEALTHY ({} failed checks)", r.failed)).with_details(v)); } Ok(v) }
-        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
+        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
         Cmd::Recover { dry_run } => { let p = open_project(cli, true)?; if !*dry_run { gov_runtime::authority::require(&p, "recover")?; } gov_runtime::recovery::recover(&p, *dry_run) }
         Cmd::Adopt { stage } | Cmd::Migrate { stage } => {
             let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
@@ -2114,7 +2117,7 @@ fn run(cli: &Cli) -> Result<Value> {
             match op {
                 MemoryCmd::Query { query, k, route, include_historical } => { let d = db(&p)?; let r = gov_runtime::retrieval::retrieve(&p, &d, query, gov_runtime::retrieval::RetrieveOptions { k: *k, route: route.clone(), include_historical: *include_historical, log: true, ..Default::default() })?; gov_runtime::observability::emit(&p, "retrieval", json!({"routes": r.routes, "hits": r.hits.len(), "latency_ms": r.latency_ms}))?; Ok(serde_json::to_value(&r)?) }
                 MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if r["measured"].as_bool().unwrap_or(false) && !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
-                MemoryCmd::Benchmark { candidates, heldout, record } => gov_runtime::memory::benchmark::run(&p, candidates, heldout.clone(), *record),
+                MemoryCmd::Benchmark { candidates, heldout, record, task } => gov_runtime::memory::benchmark::run_for(&p, candidates, heldout.clone(), *record, task.as_deref()),
                 MemoryCmd::Select { candidate, research, by, gate } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), gate.as_deref(), by.as_deref().unwrap_or(&acting)),
                 MemoryCmd::Integrity => { let d = db(&p).ok(); let store = gov_runtime::records::RecordStore::load(&p.root); Ok(serde_json::to_value(gov_runtime::memory::integrity::check(&p, &store, d.as_ref())?)?) }
                 MemoryCmd::Profile => { let mut v = gov_runtime::memory::profile::status(&p); v["live_index"] = db(&p).ok().map(|d| json!({"embedder": d.get_meta("embedder"), "reranker": d.get_meta("reranker"), "components": {"embedder": d.get_meta("embedder_identity"), "reranker": d.get_meta("reranker_identity")}})).unwrap_or(Value::Null); Ok(v) }
@@ -2131,7 +2134,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 }
                 MemoryCmd::Failures => Ok(json!({"open": gov_runtime::memory::failures::open_failures(&p)})),
                 MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
-                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?)?),
+                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, ..Default::default() })?)?),
                 MemoryCmd::Graph { node, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::neighbours(&d, node, *depth)?)) }
                 MemoryCmd::Impact { seeds, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::impact_set(&d, &csv(&Some(seeds.clone())), *depth)?)) }
             }
