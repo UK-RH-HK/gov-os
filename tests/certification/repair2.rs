@@ -801,8 +801,17 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock = yaml(&root, "governance/framework.lock");
-    assert_eq!(lock["release_commit"], m["release_commit"], "{lock}");
-    assert_eq!(lock["source"], "release:agentic-engineering-os@4.1.3");
+    // BC-P2-37 (P2-AR-0020): the release's manifest.json is unsigned and this machine holds no trust anchor, so
+    // neither its release_commit nor a `release:` label is recorded as identity (Contract v3:149 "recorded, not
+    // invented"; D-0007 rule 2). The lock records what verification established and says why.
+    assert_ne!(lock["release_commit"], m["release_commit"], "{lock}");
+    assert_eq!(lock["release_commit"], "unverified", "{lock}");
+    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["authenticity"], "UNKNOWN", "{lock}");
+    assert!(lock["identity_basis"]["release_commit"]
+        .as_str()
+        .unwrap()
+        .contains("not recorded as identity"));
     assert_eq!(
         lock["installed_at_commit"].as_str().unwrap(),
         git(&root, &["rev-parse", "HEAD"]).1.trim()
@@ -820,15 +829,14 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock2 = yaml(&root2, "governance/framework.lock");
-    assert_eq!(
-        lock2["release_commit"].as_str().unwrap(),
-        git(&canonical_root(), &["rev-parse", "HEAD"]).1.trim()
-    );
+    // BC-P2-37 (P2-AR-0020): identity is decided by content, never by where the bytes came from. The checkout's
+    // payload is byte-identical to the payload embedded in this binary, so it records the embedded identity (equal to
+    // lock3 below), not the checkout's unauthenticated Git HEAD — and still never the consumer's commit.
     assert_ne!(lock2["release_commit"], lock2["installed_at_commit"]);
     assert!(lock2["source"]
         .as_str()
         .unwrap()
-        .starts_with("source:agentic-engineering-os@"));
+        .starts_with("embedded:agentic-engineering-os@"));
     // embedded payload: the commit baked into the binary; still never the consumer's HEAD
     let (root3, g3) = setup_fixture("greenfield", "rep2-lock-emb", "S-rep2");
     g3.with_env("GOV_CANONICAL_ROOT", "/nonexistent").ok(&[
@@ -840,6 +848,12 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock3 = yaml(&root3, "governance/framework.lock");
+    for k in ["release_commit", "release_hash", "source", "version"] {
+        assert_eq!(
+            lock2[k], lock3[k],
+            "same bytes, same recorded identity: {k}"
+        );
+    }
     assert!(lock3["source"]
         .as_str()
         .unwrap()
@@ -967,11 +981,14 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     );
     let lock = yaml(&root, "governance/framework.lock");
     assert_eq!(lock["version"], "4.1.3");
-    assert_eq!(
+    // BC-P2-37 (P2-AR-0020): the 4.1.3 manifest.json is unsigned and this machine holds no trust anchor; its
+    // release_commit is not recorded as identity and the release is not labelled a verified `release:`.
+    assert_ne!(
         lock["release_commit"],
         json(&rel413, "manifest.json")["release_commit"]
     );
-    assert_eq!(lock["source"], "release:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["release_commit"], "unverified");
+    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
     let rule = yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml")["paths"]
         .as_array()
         .unwrap()
@@ -1032,12 +1049,14 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     let lock2 = yaml(&root, "governance/framework.lock");
     assert_eq!(lock2["version"], gov_runtime::VERSION);
     assert_eq!(lock2["lock_schema_version"], "1.1.0");
+    // BC-P2-37 (P2-AR-0020): the canonical framework is byte-identical to this binary's embedded payload, so the
+    // recorded identity is the binary's own (decided by content), not the checkout's unauthenticated Git HEAD.
     assert_eq!(
         lock2["release_commit"].as_str().unwrap(),
-        git(&canonical_root(), &["rev-parse", "HEAD"]).1.trim()
+        gov_runtime::kernel::embedded::commit()
     );
     assert!(lock2["source"].as_str().unwrap().starts_with(&format!(
-        "source:agentic-engineering-os@{}",
+        "embedded:agentic-engineering-os@{}",
         gov_runtime::VERSION
     )));
     assert_eq!(

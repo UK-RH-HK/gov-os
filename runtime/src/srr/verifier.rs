@@ -250,6 +250,9 @@ pub struct AuthenticatedRelease {
     pub migrations: Vec<String>,
     pub delegations: Vec<metadata::Delegation>,
     pub notes: Vec<String>,
+    /// The signed release metadata's `evidence` block (digest references to provenance, SBOM, verification and
+    /// certification evidence, ARCH-0003 §4). `Null` unless the release was verified against signed metadata.
+    pub evidence: Value,
 }
 
 impl AuthenticatedRelease {
@@ -288,6 +291,11 @@ pub struct AdmissionRequest<'a> {
     pub request_break_glass: bool,
     /// Human-readable reason recorded alongside the ingress.
     pub reason: Option<String>,
+    /// `BC-P2-38` — the payload digest the project pins (`framework.lock.release_hash`). The reinstall ingress
+    /// restores the pinned release; when this is set, a candidate whose staged payload is any other payload is
+    /// refused right after measurement — before the floor check, before break-glass is entered and before an
+    /// owner authorisation is consumed — so a refused reinstall leaves the machine exactly as it found it.
+    pub pinned_payload: Option<String>,
 }
 
 impl<'a> AdmissionRequest<'a> {
@@ -299,7 +307,13 @@ impl<'a> AdmissionRequest<'a> {
             channel: None,
             request_break_glass: false,
             reason: None,
+            pinned_payload: None,
         }
+    }
+    /// Bind the request to the payload digest the project pins (see [`AdmissionRequest::pinned_payload`]).
+    pub fn with_pinned_payload(mut self, payload_hash: Option<String>) -> Self {
+        self.pinned_payload = payload_hash.filter(|h| !h.is_empty());
+        self
     }
     pub fn with_break_glass(mut self, yes: bool) -> Self {
         self.request_break_glass = yes;
@@ -473,29 +487,45 @@ fn admit_inner(
                         format!("no signed release metadata was found for this candidate and ingress `{}` may not fall back to the machine's protected installed record. This machine holds a trust anchor, so unsigned releases are refused.", req.ingress.as_str()),
                     ).with_details(json!({"candidate": req.candidate.display().to_string(), "searched": [".srr/", "../metadata/"]})));
                 }
-                let rec = InstalledRecord::load(ms, product).ok_or_else(|| {
-                    GovError::new(
-                        "SRR_RELEASE_UNVERIFIED",
-                        "no signed release metadata was found and this machine holds no protected record of a release it previously verified and installed; there is no non-circular basis for admitting these bytes (OWNER-DIRECTIVE-0004: the manifest and lock are not a first-install authenticity root)",
-                    )
-                })?;
+                // BC-P2-38: the protected record is this machine's verified-release LEDGER — every release it
+                // authenticated, by payload digest — not only the one it installed last. "the release identity it
+                // previously verified and installed" (ARCH-0003 §7) includes the release an update replaced, so
+                // the rollback ingress can restore it; the floor check below still decides admissibility.
+                let ledger = crate::srr::installation::verified_release(
+                    ms,
+                    product,
+                    &staged.payload_hash,
+                    &staged.kernel_manifest_hash,
+                );
+                let rec = InstalledRecord::load(ms, product);
                 // SRR2-R1-C2: matched on payload digests, not on the release version.
-                if !rec.vouches_for(&staged.payload_hash, &staged.kernel_manifest_hash) {
-                    return Err(GovError::new(
-                        "SRR_RELEASE_UNVERIFIED",
-                        "the candidate payload does not match the digests this machine previously verified and installed; its authenticity cannot be established offline (SRR2-R1-C2)",
-                    ).with_details(json!({
-                        "measured": {"payload_hash": staged.payload_hash, "kernel_manifest_hash": staged.kernel_manifest_hash},
-                        "previously_verified": {"payload_hash": rec.payload_hash, "kernel_manifest_hash": rec.kernel_manifest_hash, "release_version": rec.release_version},
-                    })));
-                }
+                let identity = match (ledger, rec.as_ref()) {
+                    (Some(v), _) => (v.release_version, v.sequence, v.channel),
+                    (None, Some(r))
+                        if r.vouches_for(&staged.payload_hash, &staged.kernel_manifest_hash) =>
+                    {
+                        (r.release_version.clone(), r.sequence, r.channel.clone())
+                    }
+                    (None, Some(r)) => {
+                        return Err(GovError::new(
+                            "SRR_RELEASE_UNVERIFIED",
+                            "the candidate payload does not match the digests of any release this machine previously verified and installed; its authenticity cannot be established offline (SRR2-R1-C2)",
+                        ).with_details(json!({
+                            "measured": {"payload_hash": staged.payload_hash, "kernel_manifest_hash": staged.kernel_manifest_hash},
+                            "previously_verified": {"payload_hash": r.payload_hash, "kernel_manifest_hash": r.kernel_manifest_hash, "release_version": r.release_version},
+                            "ledger": "no entry in this machine's verified-release ledger binds these digests",
+                        })));
+                    }
+                    (None, None) => {
+                        return Err(GovError::new(
+                            "SRR_RELEASE_UNVERIFIED",
+                            "no signed release metadata was found and this machine holds no protected record of a release it previously verified and installed; there is no non-circular basis for admitting these bytes (OWNER-DIRECTIVE-0004: the manifest and lock are not a first-install authenticity root)",
+                        ));
+                    }
+                };
                 authenticity = Authenticity::PreviouslyVerifiedByThisMachine;
                 currency = Currency::Unknown;
-                offline_identity = Some((
-                    rec.release_version.clone(),
-                    rec.sequence,
-                    rec.channel.clone(),
-                ));
+                offline_identity = Some(identity);
                 notes.push(
                     "no current metadata was reachable; authenticity comes from this machine's own protected record of the release it previously verified and installed. Currency is UNKNOWN: this client makes no claim about revocations it has not received."
                         .into(),
@@ -644,6 +674,19 @@ fn admit_inner(
         },
     };
 
+    // BC-P2-38: the reinstall ingress restores the pinned release. A different payload is refused here — after the
+    // bytes are measured and bound, before any floor is raised, before break-glass is entered and before an owner
+    // authorisation is consumed — so the refusal leaves the machine exactly as it found it.
+    if let Some(pinned) = req.pinned_payload.as_ref() {
+        if pinned != &staged.payload_hash {
+            return Err(GovError::new(
+                "KERNEL_MISMATCH",
+                format!("ingress `{}` restores the pinned release: the candidate's payload {} is not the payload framework.lock pins ({pinned}); use `gov update` for a version change or `gov update --rollback` to return to the previous release", req.ingress.as_str(), staged.payload_hash),
+            )
+            .with_details(json!({"pinned_release_hash": pinned, "candidate_payload_hash": staged.payload_hash, "candidate_release": release_version, "installation_changed": false})));
+        }
+    }
+
     // The signed minimum secure release is monotonic and is raised before the floor check, so a newly learned
     // higher minimum applies to the operation that learned it.
     if !min_secure.is_empty() && authenticity == Authenticity::Authentic {
@@ -752,6 +795,10 @@ fn admit_inner(
         migrations,
         delegations,
         notes: notes.clone(),
+        evidence: release
+            .as_ref()
+            .map(|r| r.evidence.clone())
+            .unwrap_or(Value::Null),
     })
 }
 
@@ -780,7 +827,10 @@ fn verify_metadata_chain(
         }
         if ts.envelope.is_expired(now) {
             currency = Currency::Stale;
-            notes.push(format!("timestamp metadata is not current ({}); currency is STALE", ts.envelope.expiry_fault(now).unwrap_or_default()));
+            notes.push(format!(
+                "timestamp metadata is not current ({}); currency is STALE",
+                ts.envelope.expiry_fault(now).unwrap_or_default()
+            ));
         }
         Some(ts)
     } else {
@@ -919,6 +969,128 @@ pub fn current_platform() -> String {
     format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH)
 }
 
+// ------------------------------------------------------------------------------- certification (BC-P2-37)
+
+/// What this machine can believe about a candidate release's certification.
+///
+/// `BC-P2-37` (Contract v3:150, :161; D-0007 rule 2): a certification claim is a trust-relaxing input — `gov update`
+/// skips its Human Decision Gate for a certified target — so it counts only when the trust root authenticates it.
+/// The one authenticated carrier is the **signed** release metadata's `evidence.certification.status` (ARCH-0003 §4:
+/// release metadata binds "optional digest references to … certification evidence"), verified against this
+/// machine's trusted root under the `release` role. `gov` never signs, so it can never mint one; the unsigned
+/// `manifest.json` beside a built release is reported as a claim and never believed.
+#[derive(Debug, Clone, Default)]
+pub struct CertificationBasis {
+    /// The status the signed release metadata binds; `None` when nothing authenticated binds one.
+    pub authenticated_status: Option<String>,
+    /// Digest of the verified `release.json` the status came from. A gate decision taken on it is bound to it.
+    pub release_metadata_sha256: String,
+    pub release_version: String,
+    pub basis: String,
+    /// A status claimed by an unsigned file beside the candidate. Reported, never believed.
+    pub unsigned_claim: Option<String>,
+}
+
+impl CertificationBasis {
+    pub fn to_value(&self) -> Value {
+        json!({
+            "authenticated": self.authenticated_status.is_some(),
+            "authenticated_status": self.authenticated_status,
+            "release_metadata_sha256": self.release_metadata_sha256,
+            "release_version": self.release_version,
+            "basis": self.basis,
+            "unsigned_claim": self.unsigned_claim,
+            "unsigned_claim_disposition": if self.unsigned_claim.is_some() { "a request, recorded and ignored (D-0007 rule 2): an unsigned certification claim is treated as uncertified everywhere" } else { "" },
+        })
+    }
+}
+
+/// The certification of a candidate as far as this machine's trust root establishes it. Read-only: nothing is
+/// staged, no floor is read for update or written, no state is created.
+pub fn certification_of(candidate: &Path) -> CertificationBasis {
+    let unsigned_claim = candidate
+        .parent()
+        .map(|p| p.join("manifest.json"))
+        .filter(|m| m.exists())
+        .and_then(|m| crate::util::read_json(&m).ok())
+        .and_then(|m| {
+            m.get("certification")
+                .and_then(|c| c.get("status"))
+                .and_then(|s| s.as_str())
+                .map(String::from)
+        });
+    let mut out = CertificationBasis {
+        unsigned_claim,
+        ..Default::default()
+    };
+    let ms = match crate::srr::state::resolve_state_root() {
+        Ok(r) => MachineState::read_only(&r),
+        Err(e) => {
+            out.basis = format!(
+                "protected machine state could not be resolved ({}); no certification can be authenticated",
+                e.code
+            );
+            return out;
+        }
+    };
+    let now = local_clock_now();
+    let root = match trusted_root(&ms, &now) {
+        Ok(Some(r)) => r,
+        Ok(None) => {
+            out.basis = "this machine holds no Signed Release Root trust anchor, so no certification claim can be authenticated; the candidate is treated as uncertified".into();
+            return out;
+        }
+        Err(e) => {
+            out.basis = format!("the trust anchor could not be loaded ({}); the candidate is treated as uncertified", e.code);
+            return out;
+        }
+    };
+    let Some(dir) = locate_metadata(candidate) else {
+        out.basis =
+            "no signed release metadata accompanies the candidate; it is treated as uncertified"
+                .into();
+        return out;
+    };
+    let rel = match Envelope::read(&dir.join(RELEASE_JSON)).and_then(|env| {
+        root.verify_role(ROLE_RELEASE, &env)?;
+        Release::parse(env)
+    }) {
+        Ok(r) => r,
+        Err(e) => {
+            out.basis = format!("the release metadata does not verify against this machine's trust root ({}); the candidate is treated as uncertified", e.code);
+            return out;
+        }
+    };
+    out.release_metadata_sha256 = rel.envelope.file_sha256.clone();
+    out.release_version = rel.release_version.clone();
+    if rel.product != FRAMEWORK_NAME {
+        out.basis = format!(
+            "the signed release metadata binds product '{}'; treated as uncertified",
+            rel.product
+        );
+        return out;
+    }
+    if rel.envelope.is_expired(&now) {
+        out.basis = "the signed release metadata is expired against the local clock; treated as uncertified".into();
+        return out;
+    }
+    match rel
+        .evidence
+        .get("certification")
+        .and_then(|c| c.get("status"))
+        .and_then(|s| s.as_str())
+    {
+        Some(s) => {
+            out.authenticated_status = Some(s.to_string());
+            out.basis = format!("certification status '{s}' is bound by release metadata signed under the `release` role of this machine's trusted root (release.json sha256 {})", rel.envelope.file_sha256);
+        }
+        None => {
+            out.basis = "the signed release metadata binds no certification evidence; treated as uncertified".into();
+        }
+    }
+    out
+}
+
 // ------------------------------------------------------------------------------- post-install floor advancement
 
 /// Durably record the install and advance the floors — **step (9) of the transaction ordering**, called only after
@@ -946,18 +1118,26 @@ pub fn record_installed(auth: &AuthenticatedRelease) -> Result<Value> {
         floors.raise_metadata(role, *v);
     }
     floors.save(ms)?;
-    InstalledRecord {
-        product: auth.product.clone(),
-        release_version: auth.release_version.clone(),
-        sequence: auth.sequence,
-        channel: auth.channel.clone(),
-        payload_hash: auth.payload_hash.clone(),
-        kernel_manifest_hash: auth.kernel_manifest_hash.clone(),
-        authenticity: auth.authenticity.as_str().to_string(),
-        verified_at: now_iso(),
-        release_metadata_sha256: auth.release_metadata_sha256.clone(),
+    // The single `installed/<product>.json` record is "what this machine VERIFIED and installed" (ARCH-0003 §7) and
+    // is read as such by the offline recovery path and by `gov status`. An install on a machine with no trust
+    // anchor verified nothing, so it no longer writes one (BC-P2-36: `gov status` presented such an install as
+    // `verified_release`). What was installed is still recorded, per project, in `crate::srr::installation`.
+    if auth.authenticity.is_authenticated() {
+        InstalledRecord {
+            product: auth.product.clone(),
+            release_version: auth.release_version.clone(),
+            sequence: auth.sequence,
+            channel: auth.channel.clone(),
+            payload_hash: auth.payload_hash.clone(),
+            kernel_manifest_hash: auth.kernel_manifest_hash.clone(),
+            authenticity: auth.authenticity.as_str().to_string(),
+            verified_at: now_iso(),
+            release_metadata_sha256: auth.release_metadata_sha256.clone(),
+        }
+        .save(ms)?;
     }
-    .save(ms)?;
+    // BC-P2-38: every release this machine authenticated enters its verified-release ledger (idempotent).
+    crate::srr::installation::record_verified(auth)?;
     // OWNER-DECISION-0006 §7 — the only break-glass exit attempt in the implementation.
     let exit = breakglass::try_exit(
         ms,
