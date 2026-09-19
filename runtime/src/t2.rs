@@ -124,12 +124,14 @@ pub const RESEAL_COMMAND: &str = "gov trust reseal [--dry-run]";
 const KEY_DIR: &str = "t2-binding";
 const KEY_FILE: &str = "key.json";
 
-/// Record types every instance of which is T2 state written only by OS operations (checked by [`audit`]).
+/// Record types every instance of which is T2 state written only by OS operations (checked by [`audit`], and by
+/// task close through `orchestration::tasks::sealed_kind`).
 ///
-/// `cit` joins this list once every CIT writer whole-record-seals (WS-5 r2 IP-R3-2, WS-4 round 3): until then an
-/// unsealed CIT record is legacy state, and adding it here would make every CIT written without a seal a T2
-/// violation at task close (`orchestration::tasks::sealed_kind`, `cit_record_honoured`).
-pub const SEALED_RECORD_TYPES: &[&str] = &["human-gate"];
+/// `cit` (round-3 integration, WS-5 r2 IP-R3-2 / IP-R3-WS03-2): every CIT writer whole-record-seals (WS-4 round 3,
+/// `cit::binding::seal`), and the gate operations that rewrite a CIT record re-seal it when it verified before (WS-3
+/// round 3, IP-R3-WS04-01) — so an unsealed CIT record is no OS write, and it covers nothing at close
+/// (`orchestration::tasks::cit_record_honoured`).
+pub const SEALED_RECORD_TYPES: &[&str] = &["human-gate", "cit"];
 
 /// Repository locations only the OS writes, as this module knows them (BC-P2-31 adds `governance/registry/`, where the
 /// OS-written plugin registry belongs — `paths::PLUGIN_REGISTRY_PATH`). The task-close mutation scope classifies a

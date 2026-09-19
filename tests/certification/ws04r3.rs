@@ -729,24 +729,25 @@ fn untraceable_implementation_is_judged_on_what_was_produced() {
     );
 }
 
-/// **Pending integration point IP-R3-WS04-01 (WS-3, `gates.rs`)** — ignored until it lands, then run at integration.
-/// A gate operation that writes a CIT record (`gates::answer` records the decision and marks a declined transaction
-/// REJECTED; `gates::revoke` returns it to SIMULATED) must re-seal the record when its seal verified before the write
-/// (`cit::binding::reseal_if_verified(c, was_verified, true, "gate answer")`), as every other OS writer does (O-7).
-/// Until then a CIT declined inside another task's claim window leaves a broken seal on an OS-managed path, and that
-/// task's close is refused as a T2 violation it did not commit.
+/// **Integration point IP-R3-WS04-01 (WS-3, `gates.rs`)** — un-ignored at the round-3 integration (P2-AR-0041), with
+/// `cit` in `t2::SEALED_RECORD_TYPES`. A gate operation that writes a CIT record (`gates::answer` records the decision
+/// and marks a declined transaction REJECTED; `gates::revoke` returns it to SIMULATED) re-seals the record when its
+/// seal verified before the write — WS-3's round-3 `t2::seal_if_verified(c, was_verified, "gate answer (cit)")`, the
+/// same rule as `cit::binding::reseal_if_verified(c, was_verified, true, ..)` — as every other OS writer does (O-7).
+/// So a CIT declined inside another task's claim window leaves a verifying seal on the OS-managed path, and that task's
+/// close is not refused as a T2 violation it did not commit.
 #[test]
-#[ignore = "IP-R3-WS04-01: gates::answer/revoke must re-seal the CIT records they write (WS-3); un-ignore at integration"]
 fn a_cit_declined_during_another_tasks_claim_does_not_block_its_close() {
     let (root, g) = fresh("ws4r3-decline");
     let f = json!({"requirements": ["REQ-0002"]}).to_string();
+    // the work writes product source: a source-changing class (WS-5's BC-P2-13 hook refuses `discovery` there)
     let t = id(&g.ok(&[
         "task",
         "create",
         "--objective",
         "refund log",
         "--class",
-        "discovery",
+        "refactor",
         "--status",
         "READY",
         "--allowed",
