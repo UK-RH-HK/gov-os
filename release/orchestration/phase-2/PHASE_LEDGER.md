@@ -177,3 +177,12 @@ actions only.
 
 `cargo build --release` ok; `cargo test --lib` **146/0**; `cargo test --test certification` **100/0** (191 s). Matches the
 integration builder's figures. Regression reproduction only — not a verdict.
+
+## P2-L-0017 — 2026-09-19 — Round 2: seven of nine builders complete; P2-ADJ-0002 (T2 cross-machine continuity)
+
+| Field | Value |
+|---|---|
+| Completed | P2-AR-0023 WS-2 (BC-22 + 20 IPs) · P2-AR-0024 WS-3 (P2-ADJ-0001 applied, O-1 compatibility, O-4, BC-08 remainder, docs) · P2-AR-0027 WS-6 (BC-28, 30 claimed; BC-31 PARTIAL — writer moves routed) · P2-AR-0028 WS-7 (BC-39, 40, 41, 11-plugin, 09-registry; D-0005 c3 narrowed → governed amendment routed) · P2-AR-0029 WS-8 (OWNER-DECISION-P2-0002 admission implemented; UNADMITTED state closes the clone/rewrite bypass; harness provisions a throw-away root; kernel-cache race fixed; found a planted `AKIA…EXAMPLE` literal in WS-2's `SKILL_SCENARIO_CHECKS.yaml`) · P2-AR-0030 WS-9/11 (BC-34 adoption side, adopt host sites, export approval) · P2-AR-0031 WS-10 (BC-46, 47, 48). All self-reported `claude-opus-5[1m]`; all R1 held-out runs measured on their own trees via private paths (census file/function counts recorded) and at baseline except the known `hv_a::a1` size pin with 0 §6 violations. |
+| Still running | P2-AR-0025 WS-4, P2-AR-0026 WS-5. |
+| P2-ADJ-0002 | `t2.rs` seals are machine-keyed: OS-written facts from machine A are `Foreign` (not honoured) on machine B. Conflicts with Contract v3 S6 / framework §1 continuity. Ruled **determined** (S6 + D-0007 rule 2 + ARCH-0003 §8 provisioning boundary + OWNER-DECISION-P2-0002): round 3 must make T2 facts portable across the owner's provisioned machines while forged/unauthorised records stay refused; mechanism is the builder's within the provisioning boundary. Recorded `GATES/P2-ADJ-0002-T2-CROSS-MACHINE-CONTINUITY.md`; owner-overridable. |
+| Integration notes collected | WS-2's three D032 test relaxations must be removed once WS-8's provisioned harness is merged; heavy test-setup overlap between WS-3, WS-8 and WS-9 round-2 test edits; WS-10/WS-6/WS-2/WS-7 added CLI subcommands and `COMMAND_GUARDS` entries additively. |
