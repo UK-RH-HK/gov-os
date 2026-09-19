@@ -60,7 +60,8 @@ separate, individually pinned concerns.
 │   ├── project/                   # project-owned overlay (7 files) + optional plugins/, tools/, skills/, mcp/
 │   ├── generated/                 # index-manifest.json, memory-manifest.json, tool-registry.json,
 │   │                              # adapter-manifest.json, adapters/<id>/… (incl. adapters/hooks/provider-hooks.json)
-│   ├── registry/plugin-registry.json  # where the OS-written plugin registry belongs (tracked T2; BC-P2-31)
+│   ├── registry/                  # OS-written tracked T2 state (BC-P2-31; template rule `governance/registry/**`:
+│   │                              # authoritative, os-only, never indexed): plugin-registry.json, skill-bindings.json
 │   ├── tests/memory/heldout.yaml  # held-out retrieval regression queries
 │   └── framework.lock             # version, release_hash, kernel_manifest_hash, source, schema versions
 ├── spec/{now,product,features,requirements,architecture,workflows,interfaces,scenarios,data,security,
@@ -76,13 +77,18 @@ separate, individually pinned concerns.
 
 **Classification of the OS's own stores (BC-P2-31).** The kernel declares the stores the OS keeps and cannot rebuild
 (`paths::OS_STORES`: claims, emergency control, claim-time tree snapshots, CIT/update/migration rollback snapshots —
-class `operational`, machine-local — and the plugin registry — class `authoritative`, tracked, OS-written T2) and
+class `operational`, machine-local — and the plugin registry and the first-seen skill content bindings — class
+`authoritative`, tracked, OS-written T2, in `governance/registry/`) and
 applies that classification after the overlay's rules, so no overlay rule (the template's blanket
 `.governance-runtime/**: derived`, a hostile `**: derived`) can make the product call them derived or generated: they
 are never indexed, retrieved or exported and are `mutation: os-only`, wherever they currently are. Writers resolve
 their location with `paths::store_path` and move a legacy copy once with `paths::relocate_legacy` (identical copies are
 removed; differing copies are `STATE_LOCATION_CONFLICT`, nothing overwritten); `paths::misplaced_os_state` lists every
-store still kept inside the derived runtime directory or `governance/generated/`.
+store still kept inside the derived runtime directory or `governance/generated/`. The tracked stores an earlier
+release kept in `governance/generated/` (the plugin registry, the skill bindings) are moved by `gov update` itself
+(migration op `relocate_os_stores`: bytes and seals unchanged, so nothing becomes honoured by moving; round 4,
+IP-W7R3-5), and the update snapshot covers `governance/registry/`, so `gov update --rollback` restores the layout the
+previous release reads; until an update moves them, their next write does.
 
 ## 4. Development Knowledge Fabric
 
@@ -136,9 +142,11 @@ so deleting the whole derived runtime directory never lifts a freeze or a pause.
 the runtime directory is still honoured — while both exist the stricter state is in force (frozen if either is frozen,
 paused if either is paused) — and the next control command (`pause`, `freeze-writes`, `cancel-agents`, `resume`) moves
 the state where it belongs and removes the legacy copy. The other writers (claims and claim trees, the CIT/update/
-migration snapshots, the plugin registry) resolve their locations through the same API as each moves; until then
-`paths::misplaced_os_state` reports them, and the classification above already keeps them out of every derived
-deletion set (doctor D026 checks the claims store). Because a rebuild changes only derived state, it stays available
+migration snapshots, the plugin registry, the skill bindings) resolve their locations through the same API
+(`paths::store_path`) and move a legacy copy on first use (the tracked stores also at `gov update`, §3); a store still
+at its legacy location is reported by `paths::misplaced_os_state`, and the classification above already keeps it out
+of every derived deletion set (doctor D026 checks the claims store). Rollback snapshots of a change transaction live in
+`.governance-state/cit/<CIT>/`, of an update in `.governance-state/update/<version>/`. Because a rebuild changes only derived state, it stays available
 under FREEZE_WRITES and PAUSE (§4.6).
 
 Failure memory (BC-P2-32, framework §18) is durable: tool failures observed while indexing or retrieving are governed
@@ -238,12 +246,19 @@ class and are refused under the controls; their non-persisting forms (`audit --n
 --no-persist`) stay available for diagnosis. The runtime guard `control::guard_write` (kernel trust, OWNER-DECISION-0006
 §6, emergency state) still runs inside every mutating path.
 
-**Hard-blocks at G0.** `control::guard_write` also passes governed work that starts, hands off or completes work —
-`task create|claim|close`, `cit propose`, `handoff create` — through the health scheduler's hard-blocks
-(`scheduler::guard`): while a check whose block rule governs the operation stands failed, the operation is refused
-`HEALTH_HARD_BLOCK` naming the check; a block whose inputs changed is re-evaluated first, so a repaired condition never
-keeps refusing work. Operations that apply a sanctioned change which may itself be the remedy (`cit approve|execute`,
-`update --apply`, `adopt migrate`, `release build`) are guarded at their own hosts with their targets, never here.
+**Hard-blocks at G0.** Governed work that starts, hands off or completes work — `task create|claim|close`, `cit
+propose`, `handoff create` — passes the health scheduler's hard-blocks at its host, with its subjects in hand
+(`scheduler::admit`, the one availability host API): while a check whose block rule governs the operation stands
+failed, the operation is refused `HEALTH_HARD_BLOCK` naming the check and its scope; a block whose inputs changed is
+re-evaluated first, so a repaired condition never keeps refusing work. Blocks are scoped to what the failing check
+governs (a critical integrity failure refuses every governed operation; a high finding about named records or files
+refuses only the work that relies on them), and **work that remedies a block stays available**: a change transaction
+proposed on the block's subjects, and — for work that declares the block's check among its `remedies` and whose
+subjects reach the block's — creating, claiming and handing off that work (`scheduler::catalogue::WORK_REMEDIES`,
+`DECLARED_REMEDY_OPS`; round 4, IP-R3-WS04-11). A remedy commits only where it commits (CIT-E, the close), once the
+block is cleared. An interrupted transaction (D016) refuses every new proposal until `gov recover`. Operations that apply
+a sanctioned change which may itself be the remedy (`cit approve|execute`, `update --apply`, `adopt migrate`, `release
+build`) are guarded at their own hosts with their targets.
 
 `framework/policies/ENFORCEMENT_MAP.yaml` maps every policy key to its enforcing function; `policy_coverage::report`
 verifies the map against the core and the `policy_enforcement_coverage` suite family fails on any unmapped key
@@ -273,7 +288,15 @@ added or removed byte, an edited descriptor, a version drift or a widened permis
 trust-on-first-use: nothing machine-local re-baselines a plugin. Plugins run without the caller's loader variables
 (`PYTHONPATH`, `LD_PRELOAD`, `NODE_OPTIONS`, …). Declared `permissions` / `required_permission_classes` only narrow (the
 acting role must hold them) and are shown in the gate package, raising its impact radius; they never decide whether
-approval is needed. `gov plugins registry` shows every entry with its T2 binding and whether it is honoured. Plugins
+approval is needed. **A registration is also a material governance and security change** (Contract v3 K3; INT3-O1,
+round 4): `gov plugins register` proposes the registration's change transaction itself (`origin: system`,
+`system.kind: plugin-registration`, one `register_plugin` manifest operation carrying the normalised descriptor and the
+registration subject; CIT-P simulated automatically, its own gate raised under CHANGE_POLICY), and the execution
+approval gate names that transaction and its gate. Once both are answered, repeating `gov plugins register` approves and
+executes the transaction; CIT-E alone writes the descriptor and the registry entry (`capabilities::governance::
+apply_registration`, which re-derives the request from the bytes, requires exactly the approved subject and re-verifies
+the execution approval), so neither approval stands in for the other and a registration made inside a claimed task
+closes on the transaction's recorded writes. `gov plugins registry` shows every entry with its T2 binding and whether it is honoured. Plugins
 appear in the generated Tool/Capability Registry as `type: plugin` (an unregistered executable as `unregistered`, with
 no approved roles); doctor D028 and the suite family `plugin_governance` report unregistered executables, drift,
 unbound entries and unapproved registrations. A tool installation's approval is likewise bound to that installation
@@ -322,7 +345,12 @@ seal verified immediately before the write — the OS never blesses content it d
 records, CIT propagation markers, lifecycle backlinks). `gov gate list` reports unverified gates separately, `gov gate
 show <HDG>` reports the binding and scope, the answer's verification and what the gate authorises, and `t2::audit`
 (suite family `os_binding_integrity`, doctor D033) lists every T2 record and plugin-registry entry no OS operation
-produced, with the severity of what it is (tampering in force is high).
+produced, with the severity of what it is (tampering in force is high). Both also report this machine's **binding
+status** (`t2::binding_status()`: bound, sealing scope and why, sealing key; round 4, IP-R3-WS03-6 / IP-R3-WS08-3): an
+installed binding authority that is not honoured now, or a bound machine not sealing with the authority's active key,
+is a medium finding; a provisioned machine sealing in its own machine scope is disclosed (low: what it writes is
+honoured there only); on a machine bound to the owner's authority a `FOREIGN` record is reported as written by a
+machine the owner did not authorise.
 
 **T2 facts across the owner's machines (P2-ADJ-0002).** A seal has a scope. *Machine scope* (`hmac-sha256/t2-v1`,
 the machine's own key) is honoured only on the machine that wrote it, and only while that machine is not bound to the
@@ -443,7 +471,21 @@ generated revalidation task, and closing reports, test obligations, scenarios, c
 are marked stale or `invalidated` (idempotently; normative-content hashing keeps bookkeeping edits from looking like
 upstream changes). `gov cit propagate [--dry-run]` detects direct changes from what each task consumed; `gov context
 staleness <TASK>` shows a task's stale inputs; a close is refused `INPUTS_STALE` / `RETEST_EVIDENCE_REQUIRED` until
-retested (the close-side call is the host's). A checkpoint records the task's mandatory inputs (ids, versions,
+retested (the close-side call is the host's). A direct change is propagated **when it is observed** (G1): by the next
+`task claim`, and by an index rebuild a host runs as its own operation (`gov rebuild-memory`, `gov memory rebuild`;
+INT3-O2, round 4), which writes the markers under the write guard of `cit propagate` — deferred and reported
+(`upstream_changes.deferred`) under FREEZE_WRITES, PAUSE or below floor, the rebuild itself still running — and brings
+the index current again; idempotent, so an input already propagated is not propagated twice. Every propagation outside
+CIT-E is recorded as a sealed **system transaction** (`origin: system`, `trigger: propagation`, no manifest, a policy
+approval and no gate) whose touched list and per-path writes cover the markers it wrote; `gov cit list` shows each
+transaction's `origin` and `record_seal`, and `gov artefact show <id>` its `t2_binding`. CIT-E verifies relationship
+integrity before and after the manifest (a reversed, ill-typed or stale relationship a record it wrote declares, or a
+new supersession cycle, rolls it back); experimental output reaches production only through a promotion the approved
+transaction names (`EXPERIMENT_NOT_PROMOTED` at approve and at execute). An OS writer re-seals a sealed record only
+when its seal verified immediately before the write. The task-input manifest delivers non-governed evidence for
+reference only (`EVIDENCE_NOT_GOVERNED`) and treats an input a specification-producing task only inherits from its
+feature as advisory (`INHERITED_INPUT_UNSATISFIED`); a traceability-class task that produced no production source is
+reported `NO_IMPLEMENTATION_PRODUCED` (a warning), not untraceable. A checkpoint records the task's mandatory inputs (ids, versions,
 content/normative hashes, what was delivered), a state reference taken after the index is current and the triggers
 observed since the previous one; it is stale when what it captured changed (`gov checkpoint freshness`). Handoffs refuse
 unsatisfied mandatory inputs (`HANDOFF_INPUTS_UNSATISFIED`) and re-deliver a stale packet as an explicitly degraded

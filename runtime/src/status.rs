@@ -118,6 +118,11 @@ pub fn status(p: &Project) -> Result<Value> {
         "below_floor": degraded.is_some(),
         "detail": "gov trust status",
     });
+    // WS-3 IP-R3-WS03-8 (round 4): how T2 facts written here are sealed — portable to the owner's other provisioned
+    // machines, or honoured on this machine only (P2-ADJ-0002) — the fresh agent's view; `gov trust status` has the rest
+    let b = crate::t2::binding_status();
+    let t2_sealing = json!({"scope": b["sealing"]["scope"], "bound": b["bound"], "portable": b["portable"],
+        "reason": b["sealing"]["reason"], "detail": "gov trust status (t2_binding)"});
     // the health state a fresh agent must see before relying on anything (BC-P2-06/43/44 reporting side)
     let health = crate::scheduler::status(p).unwrap_or_else(
         |e| json!({"state": "UNKNOWN", "error": {"code": e.code, "message": e.message}}),
@@ -125,6 +130,7 @@ pub fn status(p: &Project) -> Result<Value> {
     Ok(json!({
         "framework": {"name": lock["framework"], "version": lock["version"], "release_hash": lock["release_hash"], "cli_version": crate::CLI_VERSION, "installed_at": lock["installed_at"]},
         "release_trust": release_trust,
+        "t2_sealing": t2_sealing,
         "health": health,
         "project": {"name": p.project_name(), "alias": p.project_alias(), "root": p.root.display().to_string(), "commit": p.git_commit(), "branch": p.git_branch()},
         "control": ctl, "session": p.session_id, "role": p.role,

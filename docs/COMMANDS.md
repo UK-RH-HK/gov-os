@@ -13,7 +13,9 @@ writes are refused under FREEZE_WRITES (`FROZEN`) and PAUSE (`PAUSED`) except th
 emergency controls, `cit rollback`, `telemetry emit`, `rebuild-memory`/`memory rebuild`, and under PAUSE `gate
 present`), and the role must meet the command's authority class (`AUTHORITY_DENIED`, `details.cause` =
 `ROLE_UNDECLARED` | `HUMAN_ROLE_CLAIM` | `LEVEL_TOO_LOW`; `UNKNOWN_ROLE`). `task create|claim|close`, `cit propose` and
-`handoff create` are also refused while a health hard-block governs them (`HEALTH_HARD_BLOCK`; see `gov health status`).
+`handoff create` are also refused while a health hard-block governs what they rely on (`HEALTH_HARD_BLOCK`, naming the
+block and its scope; see `gov health status`); the work that remedies a block stays available (a change transaction on
+its subjects; creating, claiming and handing off work that declares the block's check among its `remedies`).
 
 ## Human surface (framework §34)
 | Command | Purpose |
@@ -37,9 +39,9 @@ present`), and the role must meet the command's authority class (`AUTHORITY_DENI
 | `gov trust status \| root-update --anchor f \| break-glass \| recover-transactions` | Posture, anchor, floors and any `DEGRADED — RECOVERY ONLY` marking; root succession; where an owner-signed break-glass authorisation goes; replay interrupted install transactions |
 | `gov init [--source] [--name] [--alias] [--intent] [--force] [--skip-index] [--channel] [--break-glass]` | Greenfield onboarding: kernel, lock, overlay, roots, `.gitignore`, held-out file, registry, adapters (incl. the provider hooks), index, doctor, conformance audit. `--source` is a release signed under the provisioned root (on an unprovisioned machine: embedded payload only, BOOTSTRAP) |
 | `gov adopt baseline\|inventory\|classify\|map\|plan\|test-design\|review\|migrate\|verify-migration\|extract-legacy\|build-memory\|verify-memory\|audit\|status\|rollback` | Stages A0–A11 (`gov migrate …` is an alias). Every stage needs a declared session (`--session`/`GOV_SESSION`, or `review --reviewer-session`) and records its declared role and session in the T2-sealed adoption record; A5/A7/A10/A11 are performed only by `migration-reviewer` / `migration-verifier` / `memory-verifier` / `independent-auditor` in a session and role that authored no planner, executor or builder stage; A5 needs reviewer-authored tests and binds catalogue, plan and tests (A6/A8 refuse `APPROVAL_STALE` after a change); A7 accepts only its computed verdict with ≥1 executed test; A10 needs verifier-authored held-out queries; A11 runs G5. `gov adopt status` shows authorship, verdicts and the record's binding |
-| `gov update --check [--source]` / `--apply [--source] [--approve] [--by]` / `--rollback [--break-glass] [--reason]` | Versioned, impact-checked kernel update; `--apply` needs the framework-update gate answered by the human (owner-signed); below-floor rollback needs break-glass |
+| `gov update --check [--source]` / `--apply [--source] [--approve] [--by]` / `--rollback [--break-glass] [--reason]` | Versioned, impact-checked kernel update; `--apply` needs the framework-update gate answered by the human (owner-signed); it moves the tracked OS stores an earlier release kept in `governance/generated/` (plugin registry, skill bindings) to `governance/registry/`, and `--rollback` restores the earlier layout; below-floor rollback needs break-glass |
 | `gov doctor` | Health checks with remediation; HEALTHY/DEGRADED/UNHEALTHY |
-| `gov rebuild-memory [--incremental]` | Rebuild derived memory; writes index/memory manifests (available under FREEZE_WRITES and PAUSE) |
+| `gov rebuild-memory [--incremental]` | Rebuild derived memory; writes index/memory manifests (available under FREEZE_WRITES and PAUSE). A direct upstream change it observes is propagated to its dependants (`upstream_changes`; a sealed system transaction), except under FREEZE_WRITES / PAUSE / below floor, where it is deferred and reported (`gov memory rebuild` likewise) |
 | `gov recover [--dry-run]` | Classify interrupted mutations (CIT, migration batch, corrupt DB, claims), repair, checkpoint, freeze on UNKNOWN |
 | `gov kernel verify \| trust \| override [--reason] \| reinstall [--source] [--break-glass]` | Kernel verification, trust verdict, L4 override gate, restore of the pinned release (`KERNEL_MISMATCH`, `KERNEL_PIN_REWRITTEN`) |
 | `gov release build --version V [--out] [--certification S] [--evidence] [--canonical]` / `verify <dir>` | Immutable release payload + manifest |
@@ -65,6 +67,10 @@ a harness wires to its own lifecycle events — `pre_compaction` → `gov checkp
 with the session's `GOV_ROLE`/`GOV_SESSION`, L1+).
 
 ## Health, change control and memory
+`gov plugins register --descriptor f` (install-authority role: returns the execution-approval gate `human_gate` and the
+registration's change transaction `change_transaction` with its own gate; present and have the owner answer both, then
+repeat: the transaction is approved and executed and alone writes the registration) · `gov plugins unregister <id> |
+registry | list | health [--ping]` ·
 `gov health run [--tier G1..G6] [--check c]… [--changed p]… [--event e] [--no-cache] [--deep] [--no-persist] | status |
 checks | history [--limit n] | show <HR-id> | guard <op> [--paths p]… | currency | product [--family f]… |
 skills [--skill s] [--record] [--include-deferred] | close-check <TASK> --report f | qualify --kind k --oracle f --report f

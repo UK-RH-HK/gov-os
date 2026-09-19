@@ -794,7 +794,9 @@ enum PluginsCmd {
     Unregister {
         plugin_id: String,
     },
-    /// The authoritative plugin registry (governance/generated/plugin-registry.json)
+    /// The authoritative plugin registry (governance/registry/plugin-registry.json; a registry an earlier release kept
+    /// in governance/generated/ is shown from there until it is moved): entries, their T2 binding, where it is read
+    /// from and any location finding
     Registry,
     List,
     Health {

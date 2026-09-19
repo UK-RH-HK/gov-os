@@ -1179,7 +1179,7 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
                 "no tampered OS state and no unsealed gate in force; {} record(s) not honoured on this machine (legacy, hand-written approval claims, or sealed elsewhere){}. {sealing_note}{}",
                 disclosed.len(),
                 if disclosed.is_empty() { String::new() } else { format!(": {}", disclosed.iter().take(10).cloned().collect::<Vec<_>>().join(", ")) },
-                if binding_notes.is_empty() { String::new() } else { format!(". {}", binding_notes.join("; ")) }
+                if binding_notes.is_empty() { String::new() } else { format!(" — {}", binding_notes.join("; ")) }
             )
         } else {
             format!(

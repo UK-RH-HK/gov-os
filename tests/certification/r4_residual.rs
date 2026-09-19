@@ -466,6 +466,8 @@ fn the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_
         !fam["findings"].to_string().contains("machine scope"),
         "{fam}"
     );
+    // IP-R3-WS03-8: the fresh agent's view (`gov status`) carries the sealing scope
+    assert_eq!(g.ok(&["status"])["t2_sealing"]["scope"], "provisioned");
     // a machine provisioned from the owner's root without the binding authority: machine scope, disclosed
     let (_c, gc) = clone_to_machine(&root, "r4-t2status-c", "S-C", MachineKind::AnchorOnly);
     verify_pinned_release(&gc, None);
@@ -488,6 +490,12 @@ fn the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_
         "{fam_c}"
     );
     assert_eq!(st_c["sealing"]["scope"], "machine", "{fam_c}");
+    let sc = gc.ok(&["status"])["t2_sealing"].clone();
+    assert_eq!(
+        (sc["scope"].as_str(), sc["portable"].as_bool()),
+        (Some("machine"), Some(false)),
+        "{sc}"
+    );
     let disclosure = fam_c["findings"]
         .as_array()
         .unwrap()
@@ -733,4 +741,78 @@ fn the_remediation_handoff_stays_available_under_the_block_it_repairs() {
             "{h}"
         );
     }
+}
+
+fn set_policy_overrides(root: &Path, over: Value) {
+    let mut pp = yaml(root, "governance/project/PROJECT_POLICY.yaml");
+    let mut cur = pp
+        .get("policy_overrides")
+        .cloned()
+        .filter(|v| v.is_object())
+        .unwrap_or(json!({}));
+    for (k, v) in over.as_object().unwrap() {
+        cur[k] = v.clone();
+    }
+    pp["policy_overrides"] = cur;
+    write_yaml(root, "governance/project/PROJECT_POLICY.yaml", &pp);
+}
+
+/// **WS-7 IP-W7R3-6 (IP-R2-13's consumer side; Contract v3 D4, D1).** The model and runtime artefacts an embed
+/// plugin declares — the files its registration binds — are part of the retrieval profile's component identity: a
+/// declared model artefact inside the repository is in the model identity the index manifest pins (portable), one
+/// outside it and every declared runtime artefact are in the machine-local runtime identity; the profile hashes them
+/// with the digest the registration pin uses. A changed declared model artefact is a pin mismatch the freshness check
+/// reports, and nothing is served under it.
+#[test]
+fn declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity() {
+    let (root, g) = fresh("r4-profile-declared");
+    write_exec(
+        &root,
+        "tools/emb/echo_embedder.sh",
+        &read(&canonical_root(), "capabilities/shell/echo_embedder.sh"),
+    );
+    write(&root, "models/mini/weights.bin", "weights v1\n");
+    let cache = tmp("r4-profile-runtime"); // a machine-local runtime installation, outside the repository
+    std::fs::create_dir_all(&cache).unwrap();
+    std::fs::write(cache.join("libinfer.so"), "runtime v1").unwrap();
+    let rel = "governance/project/plugins/echo-local.yaml";
+    write_yaml(
+        &root,
+        rel,
+        &json!({"plugin_id": "echo-local", "capability": "embed", "version": "1", "command": ["tools/emb/echo_embedder.sh"], "languages": [],
+            "model": {"id": "mini-embed", "revision": "2026-09", "artefacts": ["models/mini"]},
+            "runtime": {"id": "infer-1", "artefacts": [cache.join("libinfer.so").to_str().unwrap()]}}),
+    );
+    crate::ws07::register_approved(&g, &root.join(rel));
+    set_policy_overrides(
+        &root,
+        json!({"MEMORY_POLICY.embedding.provider": "echo-local", "MEMORY_POLICY.embedding.dimensions": 8}),
+    );
+    git_commit_all(&root, "a local embedder declaring its model and runtime");
+    let r = g.ok(&["rebuild-memory"]);
+    let e = &r["embedder"];
+    assert_eq!(e["model"]["id"], "mini-embed", "{e}");
+    assert_eq!(e["model"]["declared"], true, "{e}");
+    assert_eq!(e["runtime"]["declared_id"], "infer-1", "{e}");
+    let m = json(&root, "governance/generated/index-manifest.json");
+    let comp = &m["components"]["embedder"];
+    let arts = comp["model"]["artefacts"].to_string();
+    assert!(
+        arts.contains("models/mini/weights.bin") && arts.contains("\"declared\":true"),
+        "the declared in-repository model artefact is in the pinned model identity: {comp}"
+    );
+    assert!(
+        !arts.contains("libinfer.so"),
+        "a machine-local artefact never enters the portable model identity: {comp}"
+    );
+    assert_eq!(g.ok(&["memory", "freshness"])["fresh"], true);
+    // a changed declared model artefact is not served under the pinned identity
+    write(&root, "models/mini/weights.bin", "weights v2\n");
+    let fr = g.ok(&["memory", "freshness"]);
+    assert_eq!(fr["fresh"], false, "{fr}");
+    assert!(
+        !g.run(&["memory", "query", "totals", "--route", "semantic"])
+            .ok(),
+        "the changed model artefact was served"
+    );
 }
