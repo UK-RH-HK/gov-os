@@ -9,7 +9,7 @@ use crate::records::{new_record, save_record, Record, RecordStore};
 use crate::util::{now_iso, read_yaml};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ReadinessView {
@@ -91,6 +91,29 @@ pub fn not_applicable_cells(feature: &Record) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// `(state, reason)` of a readiness cell value as authored.
+fn cell_state(cell: &Value) -> (String, Option<String>) {
+    match cell {
+        Value::String(s) => (s.clone(), None),
+        Value::Object(o) => (
+            o.get("status")
+                .and_then(|v| v.as_str())
+                .unwrap_or("INVALID")
+                .to_string(),
+            o.get("reason")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string()),
+        ),
+        _ => ("INVALID".into(), None),
+    }
+}
+
+/// A silent N/A (no reason) or a malformed cell value: never honoured, and reported as invalid.
+fn silent_or_invalid(cell: &Value) -> bool {
+    let (state, reason) = cell_state(cell);
+    state == "N/A" || (state == "N/A_WITH_REASON" && reason.is_none()) || state == "INVALID"
+}
+
 pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
     let store = RecordStore::load(&p.root);
     let lctx = crate::lifecycle::Ctx::new(p, &store);
@@ -112,8 +135,13 @@ pub fn evaluate_in(p: &Project, lctx: &crate::lifecycle::Ctx, feature: &Record) 
     }
     let computed = crate::lifecycle::scenario::readiness_cells(lctx, feature);
     let mut provenance: BTreeMap<String, Value> = BTreeMap::new();
+    // an authored silent N/A or malformed value stays invalid when the chain computes the cell's state
+    let mut asserted_invalid: BTreeSet<String> = BTreeSet::new();
     for cell in CHAIN_CELLS {
         let asserted = readiness.get(*cell).cloned().unwrap_or(json!("MISSING"));
+        if silent_or_invalid(&asserted) {
+            asserted_invalid.insert(cell.to_string());
+        }
         let na = asserted.get("status").and_then(|s| s.as_str()) == Some("N/A_WITH_REASON");
         let Some(c) = computed.get(*cell) else {
             continue;
@@ -151,24 +179,11 @@ pub fn evaluate_in(p: &Project, lctx: &crate::lifecycle::Ctx, feature: &Record) 
         let id = d["id"].as_str().unwrap_or("").to_string();
         let pre = d["pre_implementation"].as_bool().unwrap_or(false);
         let cell = readiness.get(&id).cloned().unwrap_or(json!("MISSING"));
-        let (state, reason) = match &cell {
-            Value::String(s) => (s.clone(), None),
-            Value::Object(o) => (
-                o.get("status")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("INVALID")
-                    .to_string(),
-                o.get("reason")
-                    .and_then(|v| v.as_str())
-                    .map(|s| s.to_string()),
-            ),
-            _ => ("INVALID".into(), None),
-        };
+        let (state, reason) = cell_state(&cell);
         let ok = state == "PRESENT"
             || (state == "N/A_WITH_REASON"
                 && reason.as_ref().map(|r| r.len() >= 3).unwrap_or(false));
-        if state == "N/A" || (state == "N/A_WITH_REASON" && reason.is_none()) || state == "INVALID"
-        {
+        if silent_or_invalid(&cell) || asserted_invalid.contains(&id) {
             invalid.push(format!(
                 "{id}: silent N/A or invalid cell value is not allowed"
             ));
@@ -330,11 +345,14 @@ mod tests {
     #[test]
     fn every_pre_implementation_chain_gap_belongs_to_a_chain_cell() {
         for code in crate::lifecycle::scenario::PRE_IMPLEMENTATION_CODES {
-            let cell = chain_cell_of(code).unwrap_or_else(|| panic!("{code} maps to no readiness cell"));
+            let cell =
+                chain_cell_of(code).unwrap_or_else(|| panic!("{code} maps to no readiness cell"));
             assert!(CHAIN_CELLS.contains(&cell), "{code} -> {cell}");
         }
-        let taxonomy: Value =
-            serde_yaml::from_str(include_str!("../../../framework/taxonomy/READINESS_DIMENSIONS.yaml")).unwrap();
+        let taxonomy: Value = serde_yaml::from_str(include_str!(
+            "../../../framework/taxonomy/READINESS_DIMENSIONS.yaml"
+        ))
+        .unwrap();
         for cell in CHAIN_CELLS {
             let d = taxonomy["dimensions"]
                 .as_array()
@@ -363,5 +381,12 @@ mod tests {
             not_applicable_cells(&f),
             vec!["representative_test_data".to_string()]
         );
+        // a silent N/A stays invalid whether or not the chain computes the cell
+        let r = &f.data["readiness"];
+        assert!(!silent_or_invalid(&r["representative_test_data"]));
+        assert!(silent_or_invalid(&r["success_criteria"]));
+        assert!(silent_or_invalid(&r["failure_criteria"]));
+        assert!(!silent_or_invalid(&r["independent_acceptance_tests"]));
+        assert!(silent_or_invalid(&json!(3)));
     }
 }

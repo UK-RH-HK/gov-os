@@ -44,6 +44,13 @@ security_markers: ["secret", "credential", "private key", "password", "api key",
 # runtime, framework.json, generated adapters): their remedy is the OS regenerating them (`gov rebuild-memory`,
 # `gov adapters generate`), not governed work
 excluded_checks: [lineage_orphans, product_test_health, D030, D031, D034, D021, index_freshness, D008, D009, D010, D020]
+# checks whose remedy no project role can perform, with that remedy: the installation's trust posture belongs to the
+# administrator domain (provision a Signed Release Root anchor, then reinstall from a release signed under it;
+# OWNER-DECISION-P2-0002 admits a marked bootstrap installation meanwhile). Their failures stay reported by doctor,
+# status and the health state, and appear in the generation report under `skipped` with this remedy; they generate no
+# task that no agent could ever close
+outside_project_checks:
+  installation_authenticity: "administrator: gov trust provision --anchor <administrator root metadata>, then gov kernel reinstall --source <a release signed under that root> (OWNER-DECISION-P2-0002)"
 # a doctor check and a governance-suite family that report the same condition generate one piece of work
 same_condition: {D015: graph_integrity, D011: secrets_sensitivity_indexing, D012: secrets_sensitivity_indexing, D023: schema_invariants, D033: os_binding_integrity, D032: installation_authenticity}
 # report / worker-return items that say there is nothing to follow up

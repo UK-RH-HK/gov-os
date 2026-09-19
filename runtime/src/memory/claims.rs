@@ -1103,14 +1103,21 @@ mod tests {
             assert_eq!(s.list().unwrap().len(), 2);
         }
         let p = crate::Project::open(&root);
-        assert_eq!(ClaimsStore::legacy_path_for(&p), p.runtime_dir().join("claims.db"));
+        assert_eq!(
+            ClaimsStore::legacy_path_for(&p),
+            p.runtime_dir().join("claims.db")
+        );
         let target = ClaimsStore::path_for(&p);
         assert_eq!(target, crate::paths::store_path(&p.root, "claims").unwrap());
         let s = ClaimsStore::open(&p).unwrap();
         assert_eq!(s.path, target);
         assert!(!legacy.exists(), "the legacy store is moved, not copied");
         let rows = s.list().unwrap();
-        assert_eq!(rows.len(), 2, "every live claim survives the move: {rows:?}");
+        assert_eq!(
+            rows.len(),
+            2,
+            "every live claim survives the move: {rows:?}"
+        );
         assert_eq!(
             s.claim_exclusive(&req("T1", "S9", &iso("w"), &sc))
                 .unwrap_err()
@@ -1152,7 +1159,10 @@ mod tests {
             .map(|c| c["task_id"].as_str().unwrap().to_string())
             .collect();
         assert_eq!(ids, vec!["T1".to_string(), "T2".to_string()]);
-        assert!(legacy.exists(), "the stray legacy file is left for inspection");
+        assert!(
+            legacy.exists(),
+            "the stray legacy file is left for inspection"
+        );
         assert!(crate::paths::misplaced_os_state(&root)
             .iter()
             .any(|m| m["store"] == "claims"));

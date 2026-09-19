@@ -164,6 +164,12 @@ impl Config {
             .unwrap_or(id)
             .to_string()
     }
+    /// The remedy of a check that no project role can perform (`outside_project_checks`), if it is one.
+    fn outside_remedy(&self, check: &str) -> Option<String> {
+        self.raw["outside_project_checks"][check]
+            .as_str()
+            .map(|s| s.to_string())
+    }
     fn trivial(&self, item: &str) -> bool {
         let t = item.trim().trim_end_matches('.').to_lowercase();
         t.len() < 2 || self.list("trivial_items").iter().any(|x| *x == t)
@@ -363,6 +369,13 @@ pub enum Decision {
 /// cancelled task declines its occurrence; after a completed task, the subject generates again only on evidence
 /// newer than that completion (the remedy did not hold).
 pub fn decide(c: &Candidate, ex: &[Generated]) -> Decision {
+    // a condition whose remedy no project role can perform is reported, not turned into work no one can close
+    if c.detail["outside_governed_work"].is_string() {
+        return Decision::Skip {
+            reason: "its remedy is outside governed project work".into(),
+            task: None,
+        };
+    }
     let base = c.key();
     let same_subject: Vec<&Generated> = ex
         .iter()
@@ -823,7 +836,8 @@ pub fn health_failures(g: &GenCtx) -> Vec<Candidate> {
                 }
                 r
             },
-            detail: json!({"check": canonical, "members": members, "severity": sev, "findings": findings.iter().take(20).cloned().collect::<Vec<_>>(), "governance_suite_record": record, "health_state_at": at}),
+            detail: json!({"check": canonical, "members": members, "severity": sev, "findings": findings.iter().take(20).cloned().collect::<Vec<_>>(), "governance_suite_record": record, "health_state_at": at,
+                           "outside_governed_work": members.iter().chain(std::iter::once(&canonical)).find_map(|m| g.cfg.outside_remedy(m))}),
             ..Default::default()
         });
     }
@@ -1353,7 +1367,10 @@ pub fn reconcile(p: &Project, o: &Options) -> Result<Value> {
                 skipped
                     .entry(reason)
                     .or_default()
-                    .push(json!({"source": c.source, "subject": c.subject, "task": task}));
+                    .push(match c.detail["outside_governed_work"].as_str() {
+                        Some(remedy) => json!({"source": c.source, "subject": c.subject, "task": task, "remedy": remedy}),
+                        None => json!({"source": c.source, "subject": c.subject, "task": task}),
+                    });
             }
             Decision::Augment { task, add_blocks } => {
                 if o.dry_run || writable.is_err() {
@@ -1751,5 +1768,28 @@ mod tests {
         assert!(cfg.trivial(" n/a. "));
         assert!(!cfg.trivial("u32 overflows at 4.2M cents"));
         assert_eq!(cfg.canonical_check("D015"), "graph_integrity");
+    }
+
+    #[test]
+    fn a_condition_no_project_role_can_remedy_is_reported_not_generated() {
+        let cfg = Config::embedded();
+        // the installation's trust posture (D032 reports the same condition) is the administrator domain's
+        assert_eq!(cfg.canonical_check("D032"), "installation_authenticity");
+        let remedy = cfg.outside_remedy("installation_authenticity").unwrap();
+        assert!(remedy.contains("gov trust provision"), "{remedy}");
+        assert!(cfg.outside_remedy("secrets_sensitivity_indexing").is_none());
+        let c = Candidate {
+            source: "security-finding".into(),
+            subject: "installation_authenticity".into(),
+            occurrence: "o".into(),
+            detail: json!({"outside_governed_work": remedy}),
+            ..Default::default()
+        };
+        assert!(matches!(decide(&c, &[]), Decision::Skip { task: None, .. }));
+        let d = Candidate {
+            detail: json!({"outside_governed_work": null}),
+            ..c
+        };
+        assert!(matches!(decide(&d, &[]), Decision::Create { .. }));
     }
 }
