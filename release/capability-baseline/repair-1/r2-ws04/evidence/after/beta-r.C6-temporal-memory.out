@@ -1,0 +1,89 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): beta-r/C6-temporal-memory mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 234985ce3f61033ea6505215279cf2f96c1d438889f2fa3de9830fd9c8d2b495; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:43:44Z
+$ gov --role orchestrator init --name orders-ledger --alias c6 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+governed change: CIT-P / gate / CIT-E on REQ-0001
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Bound order totals to 10^12 cents after overflow incident INC-77' --trigger acceptance_criteria_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-C6-temporal-memory-SDAPjE/c6-manifest.json  -> exit 0 ok=True
+$ gov --role orchestrator cit simulate CIT-0001  -> exit 0 ok=True
+simulate: radius R2 human_gate_required True gate HDG-0001
+$ gov --role orchestrator gate present HDG-0001  -> exit 0 ok=True
+$ gov --role orchestrator decide HDG-0001 --option A --by owner --rationale 'overflow incident INC-77 requires a bound'  -> exit 0 ok=True
+$ gov --role orchestrator cit approve CIT-0001 --by owner --method human  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0001  -> exit 0 ok=True
+$ gov --role orchestrator cit show CIT-0001  -> exit 0 ok=True
+cit show keys: ['approval', 'cit_status', 'created', 'decision', 'execution', 'human_gate', 'id', 'impact', 'journal', 'materiality', 'mutation_manifest', 'os_state', 'proposal', 'proposed_by', 'state_class', 'status', 'targets', 'title', 'trigger', 'type', 'updated']
+journal: [{'at': '2026-09-19T06:43:45Z', 'event': 'proposed', 'session': 'S-probe'}, {'at': '2026-09-19T06:43:45Z', 'event': 'simulated', 'radius': 'R2', 'binding_sha256': '102bcc0094c9da63871ce4daf9adcd44f612b8745b41ba9b5e68a8387ddba370'}, {'at': '2026-09-19T06:43:45Z', 'event': 'simulated', 'radius': 'R2', 'binding_sha256': '102bcc0094c9da63871ce4daf9adcd44f612b8745b41ba9b5e68a8387ddba370'}, {'at': '2026-09-19T06:43:45Z', 'event': 'approved', 'by': 'owner', 'method': 'human', 'gate': 'HDG-0001', 'decision': 'D-0103', 'answered_by': 'product owner', 'answered_at': '2026-09-19T06:43:45Z'}, {'at': '2026-09-19T06:43:45Z', 'event': 'executing', 'gate': 'HDG-0001', 'decision': 'D-0103', 'session': 'S-probe'}, {'at': '2026-09-19T06:43:45Z', 'event': 'committed'}]
+execution: {'started': '2026-09-19T06:43:45Z', 'finished': '2026-09-19T06:43:45Z', 'result': 'committed', 'gate': 'HDG-0001', 'decision': 'D-0103', 'propagation': {'cause': {'kind': 'cit', 'cit': 'CIT-0001'}, 'inputs_changed': [{'id': 'REQ-0001', 'from': '47e96f8bc82aadf5a7fcebc96fd1528669e2c5b57ab4a57abdc75547ef50aa80', 'to': '098f06d0791f5f88223e34f63a51e81064c4c3c6dc11b88bf2d9fe4f7a2cf9fa', 'cause': 'CIT CIT-0001'}], 'retest_required': [], 'revalidation_required': [], 'revalidation_tasks': [], 'revalidation_pending': [], 'stale_reports': [], 'stale_tests': ['SCN-0001', 'TST-0001'], 'stale_checkpoints': [], 'stale_handoffs': [], 'invalidated_packets': [], 'plan': {'changed': ['REQ-0001'], 'open_tasks': [], 'completed_tasks': [], 'reports': [], 'tests': [{'id': 'SCN-0001', 'why': ['CIT-P tests_required', 'acceptance evidence of feature F-0001, whose requirements changed', 'validates feature F-0001, whose requirements changed']}, {'id': 'TST-0001', 'why': ['CIT-P tests_required', 'validates changed input(s) REQ-0001', 'validates feature F-0001, whose requirements changed']}], 'checkpoints': [], 'handoffs': [], 'packets': []}, 'touched': ['spec/requirements/REQ-0001.yaml', 'spec/scenarios/SCN-0001.yaml', 'spec/tasks/TST-0001.yaml']}}
+REQ-0001 after CIT: updated= 2026-09-19 statement= The ledger computes order totals as exact integer cents; totals above 10^12 cents are rejected.
+index-manifest content_hash REQ-0001 before/after: a81c5af733bc92c7 b5616d6b7cd27850
+
+====================================================================================================
+C6-b1 what changed
+====================================================================================================
+CIT touched paths: ['spec/requirements/REQ-0001.yaml', 'spec/scenarios/SCN-0001.yaml', 'spec/tasks/TST-0001.yaml'] ; mutation_manifest: [{'op': 'set_field', 'target': 'REQ-0001', 'field': 'statement', 'value': 'The ledger computes order totals as exact integer cents; totals above 10^12 cents are rejected.'}]
+[PASS] C6-b1: a governed change records exactly what changed (CIT manifest + touched paths) and the index manifest reflects the new content hash
+
+====================================================================================================
+C6-b2 when
+====================================================================================================
+journal timestamps: ['2026-09-19T06:43:45Z', '2026-09-19T06:43:45Z', '2026-09-19T06:43:45Z', '2026-09-19T06:43:45Z', '2026-09-19T06:43:45Z', '2026-09-19T06:43:45Z'] execution started/finished: 2026-09-19T06:43:45Z 2026-09-19T06:43:45Z
+[PASS] C6-b2: timestamps of proposal/simulation/approval/execution are recorded
+
+====================================================================================================
+C6-b3 why
+====================================================================================================
+$ gov --role orchestrator memory query 'why was the order total bounded after the overflow incident' --k 6  -> exit 0 ok=True
+CIT proposal: Bound order totals to 10^12 cents after overflow incident INC-77
+retrieval hits: [('CIT-0001', 'cit'), ('CIT-0001', 'cit'), ('D-0103', 'decision'), ('file:src/app/api.py', 'file'), ('F-0001', 'feature'), ('file:src/app/api.py', 'file')]
+[PASS] C6-b3: the reason for the change is recorded on the transaction and retrievable by a why-question
+
+====================================================================================================
+C6-b4 causal decision
+====================================================================================================
+approval: {'gate': 'HDG-0001', 'decision': 'D-0103', 'method': 'human', 'human_approved': True, 'answered_by': 'product owner', 'answered_by_kind': 'human', 'answered_at': '2026-09-19T06:43:45Z', 'answer_option': 'A', 'answer_rationale': 'owner decision', 'presented_at': '2026-09-19T06:43:45Z', 'presented_by': {'session': 'S-probe', 'role': 'orchestrator'}, 'human_evidence': {'signed_by_key_ids': ['fe812c12f3ab4ce6ac5db69ac352f906cb1b11ef43fb33e252ef7ff552263889'], 'anchor': {'source': 'standalone', 'role': 'human-gate', 'version': 1, 'anchor_sha256': 'e429c9ddba96e8c08dd72ddd6b667912db79f1210bc0f28f9c1e02320781c852', 'threshold': 1, 'key_ids': ['fe812c12f3ab4ce6ac5db69ac352f906cb1b11ef43fb33e252ef7ff552263889']}, 'envelope_sha256': '0ba02d1cdccbc61f39b926d30bb5842b860b2cea0ca61d548926902a2613335a'}, 'binding': {'subject_sha256': '102bcc0094c9da63871ce4daf9adcd44f612b8745b41ba9b5e68a8387ddba370', 'content_sha256': '55b85c7eb4a7cb63b9a4fa15231bad1496fbea6eeb656cc4eea306892949f973', 'impact_sha256': '46bf1a1ab5d7b034d87e27fc3094575467f82e346aa58b177d4ede9c47737cb4', 'verified': True}, 'recorded_by': 'owner', 'recorded_by_session': 'S-probe', 'recorded_by_role': 'orchestrator', 'at': '2026-09-19T06:43:45Z'}
+decision record: D-0103 retrievable: ['D-0103', 'D-0103', 'CKPT-00001']
+$ gov --role orchestrator memory graph REQ-0001 --depth 2  -> exit 0 ok=True
+gov memory graph REQ-0001 --depth 2: [('→USES', 'API-0101', 'F-0001'), ('←AFFECTS', 'CIT-0001', 'REQ-0001'), ('←AFFECTS', 'D-0101', 'F-0001'), ('←AFFECTS', 'D-0102', 'F-0001'), ('→GOVERNED_BY', 'D-0103', 'CIT-0001'), ('→REALISES', 'F-0001', 'REQ-0001'), ('←BLOCKS', 'HDG-0001', 'CIT-0001'), ('→VALIDATED_BY', 'SCN-0001', 'F-0001'), ('←TESTS', 'TST-0001', 'REQ-0001')]
+[PASS] C6-b4: the causal decision behind the change is recorded and navigable from the changed artefact (REQ-0001 -> CIT -> decision)
+
+====================================================================================================
+C6-b5 supersession / version lineage
+====================================================================================================
+$ gov --role orchestrator memory graph D-0101 --depth 1  -> exit 0 ok=True
+gov memory graph D-0101: [('←SUPERSEDES', 'D-0102'), ('→AFFECTS', 'F-0001'), ('←FAILED_BECAUSE', 'L-0101')]
+D-0101 hit flags: [('D-0101', 'SUPERSEDED', ['superseded_by:D-0102'])]
+[PASS] C6-b5: supersession lineage (D-0101 superseded by D-0102) is stored and surfaced on retrieval
+
+====================================================================================================
+governed task close: when/what/why on the report
+====================================================================================================
+$ gov --role orchestrator task create --class implementation --objective 'Reject oversize totals' --feature F-0001 --status READY --allowed src/**,tests/** --fields '{"requirements": ["REQ-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator task claim TASK-0001  -> exit 0 ok=True
+$ gov --role orchestrator task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-C6-temporal-memory-SDAPjE/c6-report.json  -> exit 0 ok=True
+report: {'task': 'TASK-0001', 'session': 'S-probe', 'role': 'orchestrator', 'work_completed': 'Added MAX_TOTAL_CENTS bound per CIT CIT-0001', 'files_changed': ['src/app/models.py'], 'observed_files_changed': ['src/app/models.py'], 'created': '2026-09-19'}
+task closed_at: 2026-09-19T06:43:46Z
+
+====================================================================================================
+ungoverned direct commit: what does the fabric know?
+====================================================================================================
+$ gov --role orchestrator memory query 'why was the settlement window extended to 120 minutes INC-91' --k 6  -> exit 0 ok=True
+hits: [('file:docs/runbook.md', 'Reconciliation procedure'), ('CIT-0001', 'Bound order totals to 10^12 cents after overflow incident INC-77'), ('CIT-0001', 'proposal'), ('D-0103', 'question'), ('file:config/settings.yaml', 'part 1'), ('file:spec/features/.gitkeep', 'spec/features/.gitkeep')]
+artifact row (content_hash, repo_commit at index time, indexed_at): [('97018cffbe814ebf4e2d0c5d8683317af84c40e666893ace51e609decacf9136', '3c63553d36bdbae83f022474aa30c162a1a5f57c', '2026-09-19T06:43:46Z')]
+git log (outside the fabric): 3c63553 Sat Sep 19 07:43:46 2026 +0100 Extend settlement window to 120 minutes because processor batches run late (INC-91)
+[FAIL] C6-ungoverned-why: the reason for an ungoverned commit (commit message) is available through the fabric
+NOTE: the runtime never reads git log/diff/blame (grep of runtime/src shows only rev-parse/ls-files/mv/rm)
+
+=== SUMMARY ===
+PASS  C6-b1  a governed change records exactly what changed (CIT manifest + touched paths) and the index manifest reflects the new content hash
+PASS  C6-b2  timestamps of proposal/simulation/approval/execution are recorded
+PASS  C6-b3  the reason for the change is recorded on the transaction and retrievable by a why-question
+PASS  C6-b4  the causal decision behind the change is recorded and navigable from the changed artefact (REQ-0001 -> CIT -> decision)
+PASS  C6-b5  supersession lineage (D-0101 superseded by D-0102) is stored and surfaced on retrieval
+FAIL  C6-ungoverned-why  the reason for an ungoverned commit (commit message) is available through the fabric
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-C6-temporal-memory-SDAPjE
+[exit=0]

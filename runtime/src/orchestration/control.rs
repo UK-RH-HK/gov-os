@@ -281,6 +281,12 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("cit rollback", "rollback_cit", Write),
     g("cit list", "read", Read),
     g("cit show", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-13): materiality classification of a manifest or of performed changes (read-only)
+    g("cit classify", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-04): propagating detected upstream changes writes staleness markers and revalidation
+    // tasks (the CIT-P analysis applied to a change already made); the dry run reads only
+    g("cit propagate", "simulate_cit", Write),
+    g("cit propagate --dry-run", "read", Read),
     g("context compile", "compile_context", Write),
     // integration P2-AR-0022 (WS-4, BC-P2-17/19/20): resolution, verification and display of the manifest and of the
     // packet history, and a dry-run receipt validation — none of them writes
@@ -288,8 +294,14 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("context verify", "read", Read),
     g("context show", "read", Read),
     g("context receipt", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-04): derived staleness of a task (reads records and the packet cache)
+    g("context staleness", "read", Read),
     g("checkpoint", "checkpoint", Write),
     g("checkpoint latest", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-05): derived freshness of a checkpoint (reads records and the packet cache)
+    g("checkpoint freshness", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-05): writes the before_session_close checkpoint (and any unobserved trigger's)
+    g("session close", "checkpoint", Write),
     g("skills list", "read", Read),
     g("skills resolve", "read", Read),
     g("tools list", "read", Read),

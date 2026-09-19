@@ -1,0 +1,136 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): delta-r/N3-N4-W9-watchdog-handoff mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 0fdc1b428fa86925f32d50048e35ad0d211d34550f3ab929533b05e72384c9f0; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:40:17Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n3-1789800017-53d908/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## N3 b1 the watchdog is a plain CLI (no provider hook needed) that fires on policy thresholds
+$ gov --json --session probe-cd785202 checkpoint watchdog --utilisation 0.5 --ops 3
+  -> ok
+CHECK N3.b1.1 PASS below CHECKPOINT_POLICY thresholds (0.75 / 25) the watchdog does not fire
+      detail: {"boundaries": [], "fired": false, "max_operations": 25, "observed": {"caller_ops": 3, "commands": 1, "files_changed": 0}, "threshold": 0.75}
+$ gov --json --session probe-cd785202 checkpoint watchdog --utilisation 0.8 --next-action 'resume at step 4'
+  -> ok
+CHECK N3.b1.2 PASS context utilisation >= 0.75 fires a watchdog checkpoint
+      detail: {"boundaries": [], "checkpoint": "CKPT-00001", "fired": true, "observed": {"caller_ops": 0, "commands": 1, "files_changed": 0}, "reason": "context_utilisation"}
+$ gov --json --session probe-cd785202 checkpoint watchdog --ops 25
+  -> ok
+CHECK N3.b1.3 PASS operations since the last checkpoint >= 25 fires
+      detail: {"boundaries": [], "checkpoint": "CKPT-00002", "fired": true, "observed": {"caller_ops": 25, "commands": 1, "files_changed": 0}, "reason": "operations"}
+$ gov --json --session probe-cd785202 checkpoint latest
+  -> ok
+CHECK N3.b1.4 PASS the watchdog checkpoint is a normal structured checkpoint (trigger watchdog)
+      detail: {"id": "CKPT-00002", "last_completed_step": "watchdog fired (utilisation 0.00, operations 25: 1 gov command(s) and 0 changed file(s) observed since the last checkpoint)", "next_action": "gov continue", "trigger": "watchdog"}
+
+## N3 b1 (cont.) does anything count execution boundaries, or does the watchdog rely on the caller's numbers?
+$ gov --json --session probe-cd785202 checkpoint watchdog
+  -> ok
+OBSERVE N3.b1.5 after 40 mutating gov commands since the last checkpoint, `gov checkpoint watchdog` with no caller-supplied counters: {"boundaries": [], "checkpoint": "CKPT-00003", "fired": true, "observed": {"caller_ops": 0, "commands": 40, "files_changed": 20}, "reason": "operations"}
+CHECK N3.b1.5 PASS the watchdog observes execution boundaries itself (40 mutating commands since the last checkpoint) rather than trusting caller-supplied counters
+      detail: {"boundaries": [], "checkpoint": "CKPT-00003", "fired": true, "observed": {"caller_ops": 0, "commands": 40, "files_changed": 20}, "reason": "operations"}
+$ gov --json --session probe-cd785202 policy overrides
+  -> ok
+$ gov --json --session probe-cd785202 policy overrides
+  -> ok
+CHECK N3.b1.6 PASS a project cannot relax the watchdog thresholds without an exception record (ceiling rules)
+      detail: [{"kernel_value": 0.75, "key": "watchdog.context_utilisation_threshold", "policy": "CHECKPOINT_POLICY", "reason": "CHECKPOINT_POLICY.watchdog.context_utilisation_threshold: 0.99 would weaken the kernel maximum 0.75 (POLICY_PRECEDENCE mode 'ceiling', rule CHECKPOINT_POLICY.watchdog.context_utilisation_threshold)", "source": "PROJECT_POLICY.policy_overrides", "value": 0.99}, {"kernel_value": 25, "key": "watchdog.max_operations_between_checkpoints", "policy": "CHECKPOINT_POLICY", "reason": "CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints: 1000 would weaken the kernel maximum 25 (POLICY_PRECEDENCE mode 'ceiling', rule CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints)", "source": "PROJECT_POLICY.policy_overrides", "value": 1000}]
+
+## N3 b2 marking a checkpoint stale when material state changed
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n3b-1789800020-de3dc8/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+$ gov --json --session probe-f73956da rebuild-memory
+  -> ok
+$ gov --json --session probe-f73956da task create --objective 'tune retries' --class discovery --status READY --allowed product/** --fields '{"requirements": ["REQ-0001"]}'
+  -> ok
+$ gov --json --session probe-f73956da task claim TASK-0001
+  -> ok
+$ gov --json --session probe-f73956da context compile TASK-0001
+  -> ok
+$ gov --json --session probe-f73956da checkpoint create --task TASK-0001 --next-action 'implement five retries' --step 'read REQ-0001'
+  -> ok
+$ gov --json --session probe-f73956da cit propose --proposal 'probe change chg' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n3b-1789800020-de3dc8/m-chg.json --trigger behaviour_change --targets REQ-0001
+  -> ok
+$ gov --json --session probe-f73956da gate present HDG-0001
+  -> ok
+$ gov --json --session probe-f73956da decide HDG-0001 --option A --rationale 'probe relay'
+  -> ok
+$ gov --json --session probe-f73956da cit approve CIT-0001
+  -> ok
+$ gov --json --session probe-f73956da cit execute CIT-0001
+  -> ok
+$ gov --json --session probe-f73956da gate create --question 'New pending decision after the checkpoint' --fields '{"options": [{"id": "A", "description": "x"}]}'
+  -> ok
+$ gov --json --session probe-f73956da status
+  -> ok
+$ gov --json --session probe-f73956da doctor
+  -> ok
+OBSERVE N3.b2.0 after the checkpoint: requirement changed by a committed CIT, a new gate raised: {"checkpoint_record_keys": ["claim", "context_packet_hash", "created", "created_at", "files_changed", "health", "id", "input_state", "inputs", "last_completed_step", "memory_snapshot", "mode", "next_action", "observed_state", "open_questions", "open_transactions", "pending_decisions", "role", "sequence", "session", "staleness", "state_class", "state_reference", "status", "task", "task_status", "tests_status", "title", "trigger", "triggers_observed", "type"], "cit": "CIT-0001", "doctor_checks_mentioning_checkpoint": [{"currency": {"changed_classes": [{"class": "continuity_records", "contract_class": "checkpoint/handoff records"}, {"class": "generated_other", "contract_class": "generated adapters/registries"}, {"class": "index_manifest", "contract_class": "relevant index manifest"}, {"class": "spec_decisions", "contract_class": "authoritative spec/decision"}, {"class": "spec_requirements", "contract_class": "authoritative spec/decision"}, {"class": "spec_tasks", "contract_class": "authoritative spec/decision (task manifests, test obligations)"}, {"class": "tools_plugins", "contract_class": "tool/plugin"}], "current": false, "green": "AUD-0001", "key": "2e0c69315f7a845f3efeb038959e164e340cf2d38629a9a6e3af6f365f842672", "message": "green record \"AUD-0001\" is obsolete (inputs changed: continuity_records, generated_other, index_manifest, spec_decisions, spec_requirements, spec_tasks, tools_plugins)", "recorded_key": "c55149eb43e3f1629fdbb50bc970d7a864bdabfed1db35ac2a0831730f70815c"}, "enforcement": {"mode": "warning", "refuses": []}, "id": "D021", "message": "green record \"AUD-0001\" is obsolete (inputs changed: continuity_records, generated_other, index_manifest, spec_decisions, spec_requirements, spec_tasks, tools_plugins)", "name": "governance suite green and current", "ok": false, "remediation": "gov health run (re-checks only the checks the changed inputs impact; gov audit runs the full suite)", "severity": "medium"}], "execute_ok": true, "new_gate": "HDG-0002", "
+$ gov --json --session probe-f73956da checkpoint latest
+  -> ok
+OBSERVE N3.b2.latest latest checkpoint is now: {"id": "CKPT-00002", "trigger": "accepted_cit"}
+CHECK N3.b2.1 PASS the task checkpoint that captured 'implement five retries' is marked stale once the requirement it relied on changed
+      detail: {"staleness": {"at": "2026-09-19T06:40:21Z", "causes": [{"cit": "CIT-0001", "kind": "cit"}], "inputs_changed": [{"cause": "CIT CIT-0001", "from": "521d62040e6afe1d07802a04881b88740f91df2fc8b163241b82acd4e51978ae", "id": "REQ-0001", "to": "510ab0f6240d871f349c854e33a13cd6e961e139853b2f0cb1f83e9a59e9e1b8"}], "reason": "CIT CIT-0001", "stale": true, "why": ["captured the state of TASK-0001", "recorded input(s) REQ-0001"]}}
+CHECK N3.b2.2 PASS doctor/status surface checkpoint staleness (a check exists and fails)
+
+## N3 b3 handoff / session close under stale checkpoint state
+$ gov --json --session probe-f73956da handoff create --to-role backend-engineer --task TASK-0001
+  -> ok
+$ gov --json --session probe-f73956da checkpoint latest
+  -> ok
+OBSERVE N3.b3.0 handoff created after material change: {"checkpoint_context_packet_hash": "2c2bd589261260f7a63a51e61ddc2103926e2d118a781948ddf0e2dc1aac7b25", "handoff": "HND-0001", "new_checkpoint": "CKPT-00003", "ok": true, "packet_hash_compiled_before_change": "b1ca0bc318058161cf208f46c337dd3b0a534deb5a9c2c268ccbfe5eba056056", "trigger": "before_handoff"}
+$ gov --json --session probe-f73956da context compile TASK-0001
+  -> ok
+CHECK N3.b3.1 PASS a handoff whose mandatory-input state is stale (context packet compiled before the requirement changed) is blocked, explicitly degraded, or re-checkpointed with the current packet
+      detail: {"checkpoint_ctx": "2c2bd589261260f7a63a51e61ddc2103926e2d118a781948ddf0e2dc1aac7b25", "current_ctx": "e5be1caea05caceb07a9b6df939d7744b6f76b2e2f50f5f03cfea9f15b5e547d", "degraded": ["work on TASK-0001 was in progress against stale inputs (REQ-0001); the receiving worker gets the current packet and must revalidate that work (the task is marked retest_required)"], "handoff_ok": true}
+CHECK N3.b3.2 PASS the handoff result states the checkpoint freshness it was created under
+      detail: {"handoff_keys": ["authority", "created", "degraded", "expected_outputs", "freshness", "from_role", "handoff_status", "health", "id", "inputs", "required_return", "stale_inputs", "state_class", "status", "task", "title", "to_role", "type"]}
+$ gov --json --session probe-f73956da session close
+  -> ok
+CHECK N3.b3.3 PASS a session-close operation exists that could be blocked/degraded on stale checkpoints
+      detail: 
+
+## N4 the structured worker result survives the worker's conversation/process
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n4-1789800023-bf4e83/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+$ gov --json --session probe-109eae62 task create --objective 'implement retry' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-109eae62 handoff create --to-role backend-engineer --task TASK-0001
+  -> ok
+$ gov --json --session worker-A --role backend-engineer handoff return HND-0001 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n4-1789800023-bf4e83/ret-bad.json
+  -> ERROR [SCHEMA_INVALID] schema validation failed for worker-return (worker return contract): <root>: "unresolved" is a required property
+CHECK N4.b1.1 PASS a return missing a contract field (unresolved) is refused by the worker-return schema
+      detail: {"code": "SCHEMA_INVALID", "details": {"errors": ["<root>: \"unresolved\" is a required property"]}, "message": "schema validation failed for worker-return (worker return contract): <root>: \"unresolved\" is a required property"}
+$ (worker process) gov --role backend-engineer --session worker-A handoff return ...   -- then the worker process is gone
+$ gov --json --session worker-A --role backend-engineer handoff return HND-0001 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n4-1789800023-bf4e83/ret-ok.json
+  -> ok
+CHECK N4.b1.2 PASS the structured return is accepted
+      detail: {"files_changed": ["product/retry.py"], "handoff": "HND-0001", "lessons_created": ["L-0001"], "receipt_validation": {"error_count": 2, "errors": ["RECEIPT_FIELDS_MISSING", "UNTRACEABLE_IMPLEMENTATION"], "errors_detail": [{"code": "RECEIPT_FIELDS_MISSING", "ids": ["context_packet_hash", "inputs_consumed", "deviations"], "message": "the consumption receipt lacks context_packet_hash, inputs_consumed, deviations; every field is required (an empty list states 'none')"}, {"code": "UNTRACEABLE_IMPLEMENTATION", "ids": ["product/retry.py"], "message": "TASK-0001 (discovery) produces implementation (product/retry.py) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification"}], "manifest_hash": "38a71485e5b48e0b0a4904e8066e6b2658ca41d3d8ac50712891bdbde3bc0b1a", "ok": false, "packet_hash": null, "traceability_required": true, "warning_count": 0}, "status": "RETURNED", "unresolved": ["load test pending"]}
+CHECK N4.b1.3 PASS a different session (the orchestrator) reads the full structured return from the governed record
+      detail: {"handoff_status": "RETURNED", "return_keys": ["discoveries", "evidence", "files_changed", "lessons", "proposed_decisions", "recommended_next_action", "risks", "status", "task", "tests", "unresolved", "work_completed"]}
+CHECK N4.b1.4 PASS lessons in the return became PROVISIONAL lesson records
+      detail: ["L-0001.yaml"]
+CHECK N4.b1.5 PASS discoveries and risks are persisted in the tracked record file (survive process exit, clone, rebuild)
+      detail: spec/planning/HND-0001.yaml
+$ gov --json --session probe-109eae62 rebuild-memory
+  -> ok
+$ gov --json --session probe-109eae62 memory query 'gateway returns 429'
+  -> ok
+OBSERVE N4.b1.6 cross-family note (C7/D2, not an N4 bullet): after a full rebuild, a lexical query for a discovery in the nested return does not retrieve the handoff record (return.* is not in the indexed text): {"handoff_retrieved": true, "top_hits": ["HND-0001", "HND-0001", "file:governance/kernel/adapters/generic/template.md", "CKPT-00001", "file:governance/kernel/schemas/worker-return.schema.json"]}
+CHECK N4.b1.6 PASS after a full derived-memory rebuild the structured return is intact in the authoritative record
+      detail: ["gateway returns 429"]
+$ gov --json --session fresh-agent status
+  -> ok
+OBSERVE N4.b1.7 does gov status (fresh-agent reconstruction) list returned/open handoffs?: {"mentions_handoff": true, "status_keys": ["control", "features", "framework", "fresh_agent_reads", "human_gates", "latest_checkpoint", "memory", "next_action", "next_task", "open_transactions", "project", "recent_reports", "records", "release_trust", "role", "session", "tasks"]}
+$ gov --json --session probe-109eae62 handoff create --to-role backend-engineer --task TASK-0001
+  -> ok
+$ gov --json --session worker-B --role backend-engineer handoff return HND-0002 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n4-1789800023-bf4e83/ret-scope.json
+  -> ERROR [MUTATION_SCOPE_VIOLATION] worker changed files outside its authority: governance/kernel/x.yaml: prohibited path
+CHECK N4.b1.8 PASS a return reporting out-of-authority changes is refused AND the violation is persisted on the record
+      detail: {"authority_violations": ["governance/kernel/x.yaml: prohibited path"], "error": "MUTATION_SCOPE_VIOLATION"}
+$ gov --json --session someone-else --role research-agent handoff return HND-0002 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N3-N4-W9-watchdog-handoff-61EOdm/n4-1789800023-bf4e83/ret-ok2.json
+  -> ok
+OBSERVE N4.b1.9 who may return a handoff: a different role/session than the one it was handed to (to_role backend-engineer): {"ok": true, "role": "research-agent"}
+SUMMARY checks=18 pass=18 fail=0 failed=[]
+[exit=0]

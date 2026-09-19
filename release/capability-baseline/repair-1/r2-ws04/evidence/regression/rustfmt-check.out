@@ -1,0 +1,20 @@
+# P2-AR-0025 rustfmt --check (edition 2021) of every Rust file touched since base 843d79c; HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee
+# for module roots (lib.rs, main.rs) only diffs IN the touched file are counted (rustfmt also walks their child modules; runtime/src/srr/breakglass.rs and srr/metadata.rs carry pre-existing diffs and were not touched)
+clean  cli/src/main.rs
+clean  runtime/src/checkpoints.rs
+clean  runtime/src/cit/binding.rs
+clean  runtime/src/cit/materiality.rs
+clean  runtime/src/cit/mod.rs
+clean  runtime/src/cit/propagation.rs
+clean  runtime/src/context/contradictions.rs
+clean  runtime/src/context/manifest.rs
+clean  runtime/src/context/mod.rs
+clean  runtime/src/context/receipt.rs
+clean  runtime/src/graph/identity.rs
+clean  runtime/src/lib.rs
+clean  runtime/src/orchestration/control.rs
+clean  runtime/src/orchestration/handoffs.rs
+clean  runtime/src/records.rs
+clean  tests/certification/main.rs
+clean  tests/certification/repair.rs
+clean  tests/certification/ws04r2.rs

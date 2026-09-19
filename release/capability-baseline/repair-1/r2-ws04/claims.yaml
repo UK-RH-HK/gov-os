@@ -1,0 +1,190 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0025
+workstream: WS-4
+iteration: 1
+round: 2
+base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+product_code_digest_before: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+product_commits:
+  - 172bf366026c296f7b95db76f8709398b9895ba9
+  - 6b68a174ef516821d027dda0c528d7d0977d7188
+  - e9e4e205dd6c3329ba61d93d47c63ad129f4c148
+  - 2fb66d505b68f5acc40804525eafb405c9d46bcf
+  - c4a16f610469050c75dd3d2512004badd4dba204
+  - cd02bfca3dd59f4e040b737d5569d97d17195aee
+product_code_digest_after: 65d804d81b844a10b9c79c648cd28cc579cd7a40dbf91085c20e30ef7e50aee1
+note: >-
+  Builder claims with regression evidence only (Contract v3 O3). Not acceptance. Each claim covers the WS-4 side of
+  the class; call sites in files owned by other workstreams are named in integration_points (00-REPAIR-REPORT.md §4)
+  and are not implemented here. Acceptance lines that stay FAIL are listed with the owner of the missing call site.
+probe_totals:
+  probes_rerun: 48
+  derived_probes: 3
+  fail_to_pass: 88
+  pass_to_fail: 4
+  pass_to_fail_lines: [K4.a.traversal, K4.b.semantic_breadth, K4.f.human_approval, K4.f.auto]
+  pass_to_fail_reason: "the unedited K4 probe varies radius by relabelling one requirement-statement edit; after BC-P2-13 that edit is behaviour (R2, gated) whatever its label; derived-rows copy 6/9 on both binaries"
+  before: evidence/before
+  after: evidence/after
+  compare: evidence/COMPARE-before-after.out
+  unmarked_diff: evidence/UNMARKED-normalised-diff.out
+regression:
+  cargo_test_lib: "160 passed / 0 failed (146 base + 14 new)"
+  cargo_test_certification: "105 passed / 0 failed (100 base + 5 ws04r2; section6 included)"
+  changed_builder_test: "tests/certification/repair.rs::cit_auto_simulation_and_secret_redaction — the editorial source-writing CIT is now human-gated (BC-P2-13); approval via the owner channel; still asserts SECRET_IN_MANIFEST"
+  rustfmt: clean on every touched file
+  evidence: evidence/regression/
+r1_heldout:
+  run: evidence/r1-heldout/r1-heldout-worktree-cd02bfc.out
+  private_scratch: scratchpad/ar25/r1-P2-AR-0025-run3 (symlinks srr1-r1-verify* -> this worktree)
+  AR-0027: {baseline: "26/3 (b1,b2,d3)", after: "26/3 (b1,b2,d3)"}
+  AR-0029: {baseline: "26/2 (b3,b6); ho_f_preservation does not compile", after: same}
+  AR-0031: {baseline: "27/7 (a1,a5,a8,b6,c2,c3,d2)", after: same}
+  AR-0033: {baseline: "31/0 (30/1 on any larger tree)", after: "30/1 — hv_a::a1 scale pin only (84/740 pinned; tree 109 files / 1580 functions)", unpinned_census: "0 violations in every §6 activity (labelled copy evidence/r1-heldout/hv_a_derivation.a1-unpinned.P2-AR-0025.rs.txt); derive.py agrees"}
+claims:
+  - class: BC-P2-11
+    scope: CIT side (approval bound to transaction content, simulated impact and CIT); plugin registration side is WS-7
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/cit/binding.rs (new)
+      - runtime/src/cit/mod.rs
+    product_checks:
+      - cit::binding sealed os_state (T2) verified at simulate/approve/execute/rollback (T2_UNBOUND, CIT_STATE_MISMATCH)
+      - system gate subject.sha256 = binding digest (content + impact + CIT), inside the signed package
+      - approve/execute refuse APPROVAL_STALE, GATE_MISMATCH, GATE_NOT_PRESENTED/NOT_ANSWERED/DECLINED (gates::verified_answer)
+    tier: G0 at cit.propose/approve/execute, then in-operation checks
+    probes_rerun:
+      - {probe: delta-r/L3-gate-presentation-attacks, lines: [L3.b4.s2, L3.b4.s3], before: FAIL, after: PASS}
+      - {probe: delta-r/L3-gate-presentation-attacks, lines: [L3.b4.o1, L3.b4.o2], before: PASS, after: PASS}
+      - {probe: delta-r/L3-gate-presentation-attacks, lines: [L3.b4.s1], before: FAIL, after: FAIL, reason: "gate re-answered by editing its record: refused T2_UNBOUND before the approval check (execution refused either way); not an acceptance line"}
+      - {probe: derived/ws04r2-scenarios S1, lines: 7, before: "1/7", after: "7/7"}
+    tests: [runtime/src/cit/binding.rs::tests::digests_are_stable_across_the_record_writer_and_sensitive_to_content, tests/certification/ws04r2.rs::cit_approval_binds_content_impact_and_transaction]
+    integration_points: []
+    owner_decision_required: false
+  - class: BC-P2-13
+    scope: CIT-P side (materiality derived from what a change touches; material changes reach CIT-P); in-task close-side refusal is WS-5 (R2-4)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/cit/materiality.rs (new)
+      - runtime/src/cit/mod.rs
+      - framework/policies/CHANGE_POLICY.yaml (comment)
+      - cli/src/main.rs (additive: gov cit classify)
+      - runtime/src/orchestration/control.rs (additive: COMMAND_GUARDS)
+    product_checks:
+      - cit::materiality::classify_manifest at propose and simulate (effective triggers = declared ∪ derived; auto-simulate, human gate and radius floor on effective triggers)
+      - appended records schema-validated at propose
+      - cit::materiality::classify_paths (performed changes; API for WS-5 task close) / gov cit classify
+    tier: in-operation (every CIT)
+    probes_rerun:
+      - {probe: delta-r/K3-auto-impact-simulation, lines: [K3.b1.mislabel, K3.b2.mislabel, K3.b3.mislabel, K3.b4.mislabel, K3.b6.mislabel, K3.b7.mislabel, K3.b8.mislabel], before: FAIL, after: PASS}
+      - {probe: delta-r/K3-auto-impact-simulation, lines: [K3.outside.1, K3.outside.2, K3.outside.3], before: FAIL, after: FAIL, reason: "material edit closed through an ordinary task: WS-5 tasks::close (R2-4)"}
+      - {probe: gamma-r/G1G2-command-surface, lines: ["G1.b3 (c)"], before: FAIL, after: FAIL, reason: "same (R2-4)"}
+      - {probe: delta-r/K4-impact-radius, lines: [K4.a.traversal, K4.b.semantic_breadth, K4.f.human_approval, K4.f.auto], before: PASS, after: FAIL, reason: "probe premise (label-driven radius) removed by this class; derived-rows copy 6/9 on both binaries"}
+      - {probe: derived/ws04r2-scenarios S2, lines: 7, before: "1/7", after: "7/7", note: "S2.declared-governance-target = SKL-IMPACT-ANALYSIS V1 (R5 + gate)"}
+    tests:
+      - runtime/src/cit/materiality.rs tests (4)
+      - tests/certification/ws04r2.rs::materiality_is_derived_not_labelled
+      - tests/certification/repair.rs::cit_auto_simulation_and_secret_redaction (updated)
+    integration_points: [R2-4, R2-9, R2-13]
+    owner_decision_required: false
+  - class: BC-P2-04
+    scope: propagation engine, CIT-E path, direct-change detection and propagation command, packet/receipt/checkpoint staleness, close-side API; host call sites at close/claim/show/rebuild/audit are WS-5/WS-6/WS-2 (R2-1..R2-3, R2-7)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/cit/propagation.rs (new)
+      - runtime/src/cit/mod.rs
+      - runtime/src/context/mod.rs
+      - runtime/src/context/receipt.rs
+      - runtime/src/records.rs (relation fields: revalidates -> TESTS)
+      - framework/policies/CHANGE_POLICY.yaml (propagation.* keys)
+      - framework/policies/CONTEXT_POLICY.yaml (authority field input_staleness)
+      - cli/src/main.rs (additive: gov cit propagate, gov context staleness)
+    product_checks:
+      - cit::propagation::apply inside CIT-E (open + completed consumers, revalidation tasks, reports/receipts, tests, scenarios, checkpoints, handoffs, packets; idempotent; normative hashes)
+      - cit::propagation::detect_and_propagate / gov cit propagate [--dry-run] (direct changes, from consumed baselines, not index freshness)
+      - cit::propagation::task_staleness / gov context staleness
+      - cit::propagation::require_current_inputs (INPUTS_STALE / RETEST_EVIDENCE_REQUIRED; API for WS-5 close)
+      - context::ensure_dispatchable refuses PACKET_INVALIDATED; verify_delivery normative
+    tier: G4 (CIT-E), dispatch
+    probes_rerun:
+      - {probe: zeta-r/W06-staleness-propagation, lines: ["W6-s6-completed-task-revalidated(CIT)", "W6-s6-completed-task-revalidated(CIT,R2)", "W6-s7-closed-task-evidence-not-green(CIT)", "W6-s2-test-evidence-invalidated(CIT)", "W6-s3-context-packets-invalidated(CIT)", "W6-s3-checkpoint-packet-ref-flagged(CIT)", "W6-s5-rework-tasks-generated(CIT)"], before: FAIL, after: PASS}
+      - {probe: delta-r/K2-cit-e, lines: [K2.b4.4, K2.b4.5, K2.b4.6, K2.w6.1, K2.w6.2, K2.b8.2], before: FAIL, after: PASS}
+      - {probe: synthesis/AC16-X1-upstream-change-chain, lines: [X1-K2xW6-done-task-revalidated, X1-K2xW6-done-evidence-stale, X1-K2xW6-rework-generated, X1-K2xW6-packet-invalidated], before: FAIL, after: PASS}
+      - {probe: zeta-r/W06-staleness-propagation, lines: ["W6-s1-open-dependent-task-stale(direct)", "W6-s6-completed-task-revalidated(direct)", "W6-s2-test-evidence-invalidated(direct)", "W6-s3-context-packets-invalidated(direct)", AC16-W6xD1-rebuild-does-not-license-stale-consumption, W6-s1-direct-change-forces-cit, "W6-s7-stale-evidence-surfaced(direct)", W6-s7-retest-flag-not-cleared-by-close], before: FAIL, after: FAIL, reason: "observed through task show/claim/close, memory rebuild and audit (WS-5, WS-6, WS-2): R2-1, R2-2, R2-3, R2-7"}
+      - {probe: epsilon-r/O4-suite-currency, lines: ["§F direct requirement edit -> task show"], before: FAIL, after: FAIL, reason: "task show / close host wiring (R2-1, R2-2)"}
+      - {probe: synthesis/AC16-X1-upstream-change-chain, lines: [X1-G1xW6-direct-change-cannot-be-licensed-by-rebuild, X1-UxO5-health-reflects-invalid-completed-work], before: FAIL, after: FAIL, reason: "close (R2-1) and doctor/audit (R2-7)"}
+      - {probe: derived/ws04r2-scenarios S3, lines: 12, before: "2/12", after: "12/12"}
+    tests:
+      - runtime/src/cit/propagation.rs tests (3: staleness_accumulates_changes_and_is_idempotent, normative_content_ignores_bookkeeping_and_tracks_content, receipts_name_consumed_hashes)
+      - tests/certification/ws04r2.rs::upstream_change_reaches_completed_work
+    integration_points: [R2-1, R2-2, R2-3, R2-7, R2-14]
+    owner_decision_required: false
+  - class: BC-P2-05
+    scope: checkpoint content/staleness/freshness, handoff and session-close continuity, watchdog, boundary observation; trigger call sites in task/gate/routing/indexer/adapters are WS-5/WS-3/WS-6/adapters (R2-6, R2-11, R2-12); doctor surface WS-2 (R2-7)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/checkpoints.rs
+      - runtime/src/orchestration/handoffs.rs
+      - framework/policies/CHECKPOINT_POLICY.yaml (fields)
+      - cli/src/main.rs (additive: gov session close, gov checkpoint freshness)
+      - runtime/src/orchestration/control.rs (additive: COMMAND_GUARDS)
+    product_checks:
+      - checkpoints::create (inputs, input_state, state_reference after index refresh, observed_state, triggers_observed, G3 health)
+      - checkpoints::freshness / gov checkpoint freshness
+      - handoffs::create refuses HANDOFF_INPUTS_UNSATISFIED; stale packet -> re-delivered, degraded, work marked retest
+      - checkpoints::session_close / gov session close (never refused; explicitly degraded)
+      - checkpoints::watchdog (self-observed commands and files) and observe_boundaries
+    tier: G3 (checkpoint, handoff), G0 at handoff create
+    probes_rerun:
+      - {probe: delta-r/N1-N2-checkpoints, lines: [N1.b4b, N1.b6, N2.b7], before: FAIL, after: PASS}
+      - {probe: delta-r/N3-N4-W9-watchdog-handoff, lines: [N3.b1.5, N3.b2.1, N3.b3.1, N3.b3.2, N3.b3.3], before: FAIL, after: PASS}
+      - {probe: zeta-r/W09-session-handoff-continuity, lines: [W9-c2-checkpoint-input-ids, W9-c2-state-reference-current-at-checkpoint, W9-c2-checkpoint-files-changed-paths-exist, W9-c6-handoff-missing-inputs-blocked-or-degraded, W9-c6-handoff-stale-inputs-blocked-or-degraded, AC16-NxW9-before-handoff-checkpoint-flags-stale-packet], before: FAIL, after: PASS}
+      - {probe: synthesis/AC16-X1-upstream-change-chain, lines: [X1-NxW9-checkpoint-stale-marked, X1-NxW9-handoff-blocked-or-degraded], before: FAIL, after: PASS}
+      - {probe: zeta-r/W12-scheduler-integration, lines: ["W12-G3-continuity-verified(checkpoint)"], before: FAIL, after: PASS}
+      - {probe: delta-r/N1-N2-checkpoints, lines: [N2.b1.other, N2.b2, N2.b4, N2.b6, N2.b8], before: FAIL, after: FAIL, reason: "trigger sites in tasks (WS-5), gate answer/routing (WS-3), indexer (WS-6), generated hooks (adapters): R2-6, R2-11, R2-12; observe_boundaries records them at the next boundary"}
+      - {probe: zeta-r/W09-session-handoff-continuity, lines: [AC16-NxW9-doctor-checkpoint-freshness], before: FAIL, after: FAIL, reason: "doctor check (WS-2): R2-7"}
+      - {probe: derived/ws04r2-scenarios S4, lines: 8, before: "0/8", after: "8/8"}
+    tests:
+      - runtime/src/checkpoints.rs tests (3)
+      - tests/certification/ws04r2.rs::checkpoint_and_handoff_continuity
+    integration_points: [R2-6, R2-7, R2-11, R2-12, R2-13]
+    owner_decision_required: false
+  - class: BC-P2-18
+    scope: detection side (detect, block delivery, route to a system gate, honour the verified answer); resolution rules WS-3; READY derivation WS-5 (R2-5)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/context/contradictions.rs (new)
+      - runtime/src/context/manifest.rs
+      - runtime/src/context/mod.rs
+      - runtime/src/graph/identity.rs
+      - runtime/src/records.rs (relation fields: conflicts_with/contradicts -> CONSTRAINS)
+      - framework/policies/CONTEXT_POLICY.yaml (authority field contradictions)
+    product_checks:
+      - context::manifest::apply_contradictions (CONTRADICTORY, blocking CONTRADICTION; SET_ASIDE_BY_RESOLUTION after the answer)
+      - context::contradictions::route / route_for_task at dispatch (system gate trigger contradiction, OS-assessed radius and confidence)
+      - context::contradictions::resolution via gates::verified_answer_in and subject.outcomes
+      - graph::identity::check reports contradictions with their resolution
+    tier: dispatch (packet compile), manifest resolution
+    probes_rerun:
+      - {probe: delta-r/L1-contradiction-resolution, lines: [L1.b1.6], before: FAIL, after: PASS}
+      - {probe: delta-r/L1-contradiction-resolution, lines: [L1.b2.neg.R2, L1.b2.neg.conf0.7, L1.b2.neg.irreversible, L1.b2.neg.no-reversibility, L1.b2.neg.L2role], before: PASS, after: PASS}
+      - {probe: zeta-r/W03-task-input-manifest, lines: [W3-r3-conflict-triggers-handling], before: FAIL, after: FAIL, reason: "supersession resolved by precedence (manifest BLOCKED, SUPERSEDED); observed via task replan -> READY: WS-5 READY derivation (R2-5)"}
+      - {probe: derived/ws04r2-scenarios S5, lines: 6, before: "0/6", after: "6/6"}
+    tests:
+      - runtime/src/context/contradictions.rs tests (2)
+      - tests/certification/ws04r2.rs::contradictions_are_blocked_and_routed
+    integration_points: [R2-5, R2-7]
+    owner_decision_required: false
+routed_integration_points:
+  - {ip: IP-WS02-05, from: ws02, status: IMPLEMENTED, deviation: "cit.execute runs in repair mode under an active hard-block: allowed only if the transaction clears it (guard re-run after apply; otherwise rolled back, HEALTH_HARD_BLOCK, block state re-established)"}
+  - {ip: IP-WS02-06, from: ws02, status: IMPLEMENTED, note: "tier_run(G4) after commit, recorded in execution.health"}
+  - {ip: IP-WS02-07, from: ws02, status: IMPLEMENTED, note: "G3 health at checkpoint and handoff create; guard(handoff.create)"}
+  - {ip: IP-4, from: ws03, status: IMPLEMENTED, note: "verified_answer only; create_system for CIT and contradiction gates; sealed CIT state; contradiction system gate"}
+  - {ip: IP-1, from: ws05, status: IMPLEMENTED, note: "task_contract (tasks::contract_enforcement) in the packet's deterministic authority"}
+  - {ip: IP-3, from: ws05, status: API_IMPLEMENTED, note: "execution.writes + binding::verified_writes; WS-5 consumes in round 3 (R2-4)"}
+  - {ip: IP-5, from: ws06, status: IMPLEMENTED, note: "failure -> spec/reports/failures, FAIL; retrieval-miss failures canonical in memory-quality dir"}
+  - {ip: IP-5, from: ws09-11, status: IMPLEMENTED, note: "migration-plan -> spec/audits/GOVERNANCE-ADOPTION, MPLAN"}
+  - {ip: IP-17, from: ws04, status: IMPLEMENTED, note: "INDEX_VERSION 4.1.5-idx4"}
+new_integration_points: [R2-1, R2-2, R2-3, R2-4, R2-5, R2-6, R2-7, R2-8, R2-9, R2-10, R2-11, R2-12, R2-13, R2-14, R2-15]
+owner_decision_required: false

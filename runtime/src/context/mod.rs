@@ -20,6 +20,7 @@
 //! `provenance` binds the packet to the repository commit it was compiled at. Every packet is kept under
 //! `.governance-runtime/context/packets/<task>/<packet_hash>.json`, so a packet hash recorded in a checkpoint,
 //! handoff or consumption receipt resolves back to exactly what was supplied ([`load_packet`]).
+pub mod contradictions;
 pub mod manifest;
 pub mod receipt;
 
@@ -88,11 +89,31 @@ fn input_value(r: &Record, e: &Entry) -> Value {
     v
 }
 
-/// An authority flag that makes a decision conflicting rather than active: superseded, not current, ambiguous.
+/// An authority flag that makes a decision conflicting rather than active: superseded, not current, ambiguous,
+/// contradicted by another current input (BC-P2-18), or set aside by a contradiction's resolution.
 fn currency_flag(f: &str) -> bool {
     f == "UNKNOWN_OR_CONFLICTING"
         || f == "AMBIGUOUS_DUPLICATE_ID"
+        || f == "CONTRADICTORY"
+        || f == "SET_ASIDE_BY_RESOLUTION"
         || crate::graph::lineage::NON_CURRENT_STATUSES.contains(&f)
+}
+
+/// Delivered inputs whose records carry an upstream-change staleness marker, and the task's own markers
+/// (`cit::propagation`, BC-P2-04): the worker sees what is stale without any lookup. Deterministic (records only).
+fn input_staleness(m: &Manifest, store: &RecordStore, task: &Record) -> Value {
+    let stale: Vec<Value> = m
+        .entries
+        .iter()
+        .filter(|e| e.delivered())
+        .filter_map(|e| store.get(&e.id).map(|r| (e, r)))
+        .filter(|(_, r)| r.data["staleness"]["stale"].as_bool() == Some(true))
+        .map(|(e, r)| json!({"id": e.id, "slot": e.slot.name(), "staleness": r.data["staleness"]}))
+        .collect();
+    json!({"stale_inputs": stale,
+        "task_retest_required": task.data.get("retest_required").cloned().unwrap_or(json!(false)),
+        "task_staleness": task.data.get("staleness").cloned().unwrap_or(Value::Null),
+        "task_revalidation": task.data.get("revalidation").cloned().unwrap_or(Value::Null)})
 }
 
 /// Open the runtime index the way every command does (creating an empty store when none exists).
@@ -117,11 +138,74 @@ impl<'a> From<&'a RuntimeDb> for IndexHandle<'a> {
 
 /// Compile the packet for `task_id`, opening the index itself and **tolerating its absence or damage**: the
 /// mandatory inputs never depend on the index (W10 line 1170). Use this at every dispatch boundary.
+///
+/// Dispatch is also where the product observes what the delivery changes (repair iteration 1, round 2):
+/// * every unresolved contradiction among the task's mandatory inputs is **routed** to its Human Decision Gate
+///   before the packet is compiled (BC-P2-18; `contradictions::route_for_task`), so the packet names the gate;
+/// * when a previous packet of the task delivered different input versions, that packet is **invalidated** (its
+///   history copy carries `invalidated` with the inputs that changed) and the new packet records `redelivery`
+///   (BC-P2-04 "affected context packets are invalidated");
+/// * a task that never started work is **acknowledged** current once the packet delivers every changed input at its
+///   current version (`cit::propagation::acknowledge_on_redelivery`).
 pub fn compile_tolerant(p: &Project, task_id: &str) -> Result<Value> {
-    match open_index(p) {
-        Ok(db) => compile(p, &db, task_id),
-        Err(e) => compile(p, IndexHandle::Unavailable(e), task_id),
+    let previous = crate::util::read_json(
+        &p.runtime_dir()
+            .join("context")
+            .join(format!("{task_id}.json")),
+    )
+    .ok();
+    let routed = contradictions::route_for_task(p, task_id);
+    let mut packet = match open_index(p) {
+        Ok(db) => compile(p, &db, task_id)?,
+        Err(e) => compile(p, IndexHandle::Unavailable(e), task_id)?,
+    };
+    if routed.as_array().map(|a| !a.is_empty()).unwrap_or(false) {
+        packet["contradiction_routing"] = routed;
     }
+    if let Some(prev) = previous {
+        // compared on normative content when both packets carry it (bookkeeping on an input is not a change)
+        let key = if prev.get("input_normative_hashes").is_some() {
+            "input_normative_hashes"
+        } else {
+            "input_hashes"
+        };
+        let old = prev[key].as_object().cloned().unwrap_or_default();
+        let new = packet[key].as_object().cloned().unwrap_or_default();
+        let mut changed: Vec<Value> = vec![];
+        for (id, h) in &old {
+            if new.get(id) != Some(h) {
+                changed.push(json!({"id": id, "delivered": h, "current": new.get(id)}));
+            }
+        }
+        for (id, h) in &new {
+            if !old.contains_key(id) {
+                changed.push(json!({"id": id, "delivered": Value::Null, "current": h}));
+            }
+        }
+        if !changed.is_empty() {
+            let prev_hash = prev["packet_hash"].as_str().unwrap_or("").to_string();
+            let hist = packets_dir(p, task_id).join(format!("{prev_hash}.json"));
+            if let Ok(mut h) = crate::util::read_json(&hist) {
+                if h.get("invalidated").map(|v| v.is_null()).unwrap_or(true) {
+                    h["invalidated"] = json!({"at": now_iso(), "cause": {"kind": "redelivery", "superseded_by_packet": packet["packet_hash"]}, "inputs": changed,
+                        "remediation": "this packet no longer delivers the task's current inputs; work done against it must be revalidated"});
+                    let _ = write_json(&hist, &h);
+                }
+            }
+            packet["redelivery"] = json!({"previous_packet": prev_hash, "previous_compiled_at": prev["compiled_at"], "inputs_changed": changed,
+                "previous_invalidated": prev.get("invalidated").cloned().unwrap_or(Value::Null)});
+            write_json(
+                &p.runtime_dir()
+                    .join("context")
+                    .join(format!("{task_id}.json")),
+                &packet,
+            )?;
+        }
+    }
+    if let Ok(true) = crate::cit::propagation::acknowledge_on_redelivery(p, task_id, &packet) {
+        packet["acknowledged_redelivery"] = json!(true);
+    }
+    Ok(packet)
 }
 
 fn degradation(stage: &str, e: &GovError) -> Value {
@@ -354,6 +438,13 @@ pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -
         "test_designs": delivered(Slot::TestDesign), "datasets": delivered(Slot::Dataset), "evidence_inputs": delivered(Slot::Evidence), "other_inputs": delivered(Slot::Other),
         "acceptance_criteria": acceptance, "allowed_writes": task.list("allowed_paths"), "prohibited_writes": prohibited, "required_skills": skills, "required_tools": task.list("required_tools"),
         "dependency_state": dependency_state, "minimum_model_tier": task.get("minimum_model_tier"), "minimum_reasoning": task.get("minimum_reasoning"),
+        // BC-P2-18: contradictions among the inputs and how each stands (members are never active authority while unresolved)
+        "contradictions": m.contradictions,
+        // BC-P2-04: which delivered inputs, and whether the task itself, carry an upstream-change staleness marker
+        "input_staleness": input_staleness(&m, &store, task),
+        // WS-5 IP-1: the enforcement state of the task contract (required data/tools/skills, blocked_by, designated
+        // role, production-merge permission, mutation scope)
+        "task_contract": crate::orchestration::tasks::contract_enforcement(p, &store, task),
     });
     let det = sorted(&det);
     let det_hash = hash_value(&det);
@@ -406,11 +497,20 @@ pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -
     if truncated > 0 {
         ret["truncated_slices"] = json!(truncated);
     }
+    // the content hashes of the delivered inputs; task dependencies are not content inputs (their record changes
+    // with every status transition; `dependency_state` carries what the task needs of them)
     let input_hashes: serde_json::Map<String, Value> = m
         .entries
         .iter()
-        .filter(|e| e.delivered())
+        .filter(|e| e.delivered() && e.slot != manifest::Slot::Dependency)
         .filter_map(|e| e.content_hash.clone().map(|h| (e.id.clone(), json!(h))))
+        .collect();
+    // the same inputs' normative hashes (bookkeeping excluded): what upstream-change staleness is judged on
+    let input_normative_hashes: serde_json::Map<String, Value> = m
+        .entries
+        .iter()
+        .filter(|e| e.delivered() && e.slot != manifest::Slot::Dependency)
+        .filter_map(|e| e.normative_hash.clone().map(|h| (e.id.clone(), json!(h))))
         .collect();
     let input_paths: Vec<String> = m
         .entries
@@ -422,7 +522,7 @@ pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -
         "delivery_state": m.delivery_state(),
         "supplementary_state": if degradations.is_empty() { "COMPLETE" } else { "DEGRADED" },
         "deterministic_authority": det, "deterministic_hash": det_hash,
-        "input_manifest": manifest_v, "manifest_hash": manifest_hash, "input_hashes": input_hashes,
+        "input_manifest": manifest_v, "manifest_hash": manifest_hash, "input_hashes": input_hashes, "input_normative_hashes": input_normative_hashes,
         "receipt_contract": contract,
         "retrieved_intelligence": ret, "index_version": crate::INDEX_VERSION});
     let ph = hash_value(
@@ -527,27 +627,41 @@ pub fn verify_delivery(p: &Project, packet: &Value) -> Result<Value> {
         .as_object()
         .cloned()
         .unwrap_or_default();
+    // staleness is judged on normative content when the packet carries it (bookkeeping on an input is not a change)
+    let normative = packet["input_normative_hashes"].as_object().cloned();
     let mut undelivered = vec![];
     let mut stale = vec![];
-    for e in m.entries.iter().filter(|e| e.required) {
+    for e in m
+        .entries
+        .iter()
+        .filter(|e| e.required && e.slot != manifest::Slot::Dependency)
+    {
         match supplied.get(&e.id).and_then(|v| v.as_str()) {
             None => undelivered
                 .push(json!({"id": e.id, "slot": e.slot.name(), "resolution_now": e.resolution})),
-            Some(h) if Some(h) != e.content_hash.as_deref() => {
-                stale.push(json!({"id": e.id, "supplied": h, "current": e.content_hash}))
+            Some(h) => {
+                let changed = match &normative {
+                    Some(n) => n.get(&e.id).and_then(|v| v.as_str()) != e.normative_hash.as_deref(),
+                    None => Some(h) != e.content_hash.as_deref(),
+                };
+                if changed {
+                    stale.push(json!({"id": e.id, "supplied": h, "current": e.content_hash, "normative_supplied": normative.as_ref().and_then(|n| n.get(&e.id).cloned()), "normative_current": e.normative_hash}));
+                }
             }
-            _ => {}
         }
     }
+    let invalidated = packet.get("invalidated").filter(|v| !v.is_null()).cloned();
     let ok = det_ok
         && undelivered.is_empty()
         && stale.is_empty()
+        && invalidated.is_none()
         && packet["delivery_state"] == "COMPLETE"
         && m.satisfied();
     Ok(
         json!({"task": task_id, "ok": ok, "packet_hash": packet["packet_hash"], "deterministic_hash_verified": det_ok,
         "declared_inputs": m.entries.iter().filter(|e| e.required).count(), "delivery_state_at_compile": packet["delivery_state"],
         "delivery_state_now": m.delivery_state(), "undelivered_inputs": undelivered, "stale_inputs": stale,
+        "invalidated": invalidated, "contradictions_now": m.contradictions,
         "missing_inputs_now": m.missing(), "input_violations_now": m.violations()}),
     )
 }
@@ -555,6 +669,14 @@ pub fn verify_delivery(p: &Project, packet: &Value) -> Result<Value> {
 /// Refuse to dispatch a packet whose mandatory inputs are unsatisfied (W4 line 1112). Integration point for
 /// `status::continue_work` and handoff creation (WS-5 / BC-P2-05).
 pub fn ensure_dispatchable(packet: &Value) -> Result<()> {
+    if let Some(inv) = packet.get("invalidated").filter(|v| !v.is_null()) {
+        let task = packet["task"].as_str().unwrap_or("?");
+        return Err(GovError::new(
+            "PACKET_INVALIDATED",
+            format!("the context packet for {task} was invalidated by an upstream change: it no longer delivers the current inputs; recompile it (`gov context compile {task}`) before dispatch"),
+        )
+        .with_details(json!({"task": task, "invalidated": inv, "packet_hash": packet["packet_hash"]})));
+    }
     if packet["delivery_state"] == "COMPLETE" {
         return Ok(());
     }

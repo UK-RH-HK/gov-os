@@ -400,7 +400,14 @@ pub fn validate(
             )),
             Some(h) => {
                 let hn = h.trim().trim_start_matches("sha256:").to_ascii_lowercase();
+                // the byte hash the packet delivered, or the normative hash (bookkeeping the OS later wrote into
+                // the input, such as a staleness marker, does not make a consumption stale)
                 let matches = (hn.len() >= 12 && current.starts_with(&hn))
+                    || (hn.len() >= 12
+                        && e.normative_hash
+                            .as_deref()
+                            .map(|n| n.starts_with(&hn))
+                            .unwrap_or(false))
                     || e.version.as_deref() == Some(h.trim());
                 if !matches {
                     stale.push(format!(

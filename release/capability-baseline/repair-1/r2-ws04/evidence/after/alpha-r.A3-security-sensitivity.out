@@ -1,0 +1,92 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): alpha-r/A3-security-sensitivity mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 04dd83bfeb652b78136d94147219db4646c54476713f310e26c890013b30bd68; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:43:17Z
+## [C1] classification carried by paths / datasets / namespaces / tools
+[C1] artifact ('product/app.py', 'product', 'internal', 'source', 1, 1, 1)
+[C1] artifact ('product/docs/pricing-confidential.md', 'product', 'confidential', 'source', 1, 1, 1)
+[C1] artifact ('spec/architecture/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/audits/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/audits/AUD-0001.yaml', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/data/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/decisions/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/experiments/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/features/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/interfaces/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/lessons/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/now/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/now/NOW.md', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/performance/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/planning/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/product/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/reports/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/reports/checkpoints/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/requirements/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/research/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/scenarios/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/security/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/tasks/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] artifact ('spec/workflows/.gitkeep', 'spec', 'internal', 'authoritative', 1, 1, 1)
+[C1] excluded: [('.env', 'secret_class'), ('config/credentials.json', 'secret_class'), ('product/data/customers/list.csv', 'sensitivity:restricted'), ('product/secrets/key.pem', 'secret_class'), ('product/settings.py', 'secret_content')]
+[C1] namespace classification (MEMORY_POLICY.namespaces): {"governance": {"sensitivity": "internal", "roles": ["all"], "export": "framework-lessons-only"}, "spec": {"sensitivity": "internal", "roles": ["all"], "export": "denied"}, "product": {"sensitivity": "internal", "roles": ["engineering"], "export": "denied"}, "archive": {"sensitivity": "internal", "roles": ["all"], "export": "denied"}, "secret": {"sensitivity": "secret", "roles": [], "export": "denied"}}
+[C1] tools carry access classification: [('TOOL-FS-001', ['all'], ['READ_REPO'], None), ('TOOL-GIT-001', ['all'], ['READ_REPO', 'WRITE_REPO_SCOPED'], None), ('TOOL-TEST-001', ['all'], ['RUN_TESTS'], None), ('TOOL-AST-001', ['all'], None, None), ('TOOL-CARGO-001', ['all'], ['RUN_TESTS'], None), ('TOOL-CARGO-002', ['all'], ['RUN_TESTS'], None)]
+[C1] tool fields present: ['approved_roles', 'capabilities', 'credential_scope', 'health_check', 'languages', 'license', 'license_review', 'name', 'package', 'permissions', 'purpose', 'required_permission_classes', 'reversible', 'security_review', 'source', 'status', 'tool_id', 'type', 'version', 'version_pin']
+
+## [C2] seeded secrets / credentials / restricted content are excluded
+[C2] 'AKIAABCDEFGHIJKLMNOP'       present in any indexed chunk: False
+[C2] 'hunter2hunter2'             present in any indexed chunk: False
+[C2] 'BEGIN RSA PRIVATE KEY'      present in any indexed chunk: False
+[C2] 'alice@example.invalid'      present in any indexed chunk: False
+[C2] 'zebra-quartz-17'            present in any indexed chunk: True
+[C2] memory query 'AKIAABCDEFGHIJKLMNOP'       -> []
+[C2] memory query 'hunter2hunter2'             -> []
+[C2] memory query 'alice@example.invalid'      -> []
+[C2] memory query 'zebra-quartz-17'            -> ['product/docs/pricing-confidential.md']
+[C2] secret_blocked (content scan): [{'path': 'product/settings.py', 'patterns': ['aws-access-key'], 'lines': [2]}]
+[C2] doctor D011/D012: [('D011', False, 'critical', '1 file(s) contain secret patterns but are not secret-class: product/settings.py'), ('D012', True, 'info', 'clean')]
+[C2] never_index_classes = ['secret', 'restricted'] | confidential is indexable but never exported: True
+
+## [C3] project-owned levers cannot weaken restricted / confidential / secret classification
+[C3a] contract rules re-classifying .env as source / customers as public: excluded = [('.env', 'secret_class'), ('config/credentials.json', 'secret_class'), ('product/data/customers/list.csv', 'sensitivity:restricted'), ('product/secrets/key.pem', 'secret_class'), ('product/settings.py', 'secret_content')]
+[C3a] customers list indexed: False | .env indexed: False
+[C3a] confidential doc row (sensitivity kept?): [('product/docs/pricing-confidential.md', 'product', 'confidential', 'source', 1, 1, 1)]
+[C3b] ALL secret rules removed from the project contract: excluded = [('.env', 'secret_class'), ('config/credentials.json', 'secret_class'), ('product/data/customers/list.csv', 'sensitivity:restricted'), ('product/secrets/key.pem', 'secret_class'), ('product/settings.py', 'secret_content')]
+[C3b] .env / credentials / key.pem indexed: []
+[C3c] the project DELETES its own restricted classification: customers list now indexed = True (the restricted class was project-declared; no higher layer declares it)
+[C3d] policy-override weakening attempts: applied = [] | refused = [('SECURITY_POLICY', 'never_index_classes'), ('SECURITY_POLICY', 'never_export_classes'), ('MEMORY_POLICY', 'namespaces.secret.default_retrieval'), ('MEMORY_POLICY', 'namespaces.secret.roles'), ('MEMORY_POLICY', 'namespaces.product.export'), ('SECURITY_POLICY', 'secret_path_patterns')]
+
+## [C4] tool / plugin execution respects role / authority / permission boundaries
+[C4] invoke echo as independent-auditor    -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'execute_plugin'; 'execute_plugin' requires L2 (AUTHORITY_POLI
+[C4] invoke echo as backend-engineer       -> REFUSED AUTHORITY_DENIED: role 'backend-engineer' (L1) may not perform 'execute_plugin'; 'execute_plugin' requires L2 (AUTHORITY_POLICY.
+[C4] invoke echo as product-spec-agent     -> ok
+[C4] invoke echo as orchestrator           -> ok
+[C4] invoke echo as not-a-role             -> REFUSED UNKNOWN_ROLE: role 'not-a-role' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-en
+[C4] descriptor narrows approved_roles to [orchestrator]; product-spec-agent (L2) -> REFUSED AUTHORITY_DENIED
+[C4] descriptor self-declares elevated SECRET_READ, unregistered; orchestrator -> REFUSED PLUGIN_NOT_AUTHORIZED: plugin 'echo' is declared but not usable: plugin 'echo' requires permission classes ["SECRET_READ"] that role 'orchestrator' does not hold (
+[C4] tools resolve secret_scan for independent-auditor: {"tools": [{"tool_id": "TOOL-SECRETS-001", "name": "secret-scanner", "type": "library", "version": "builtin", "languages": null, "available": null}], "capability_gap": false, "reason": ""}
+[C4] after the project overlay grants independent-auditor SECRET_READ/DEPLOY_PRODUCTION/NETWORK_WRITE: {"tools": [{"tool_id": "TOOL-SECRETS-001", "name": "secret-scanner", "type": "library", "version": "builtin", "languages": null, "available": null}], "capability_gap": false}
+[C4b] the same overlay grant for orchestrator + a descriptor self-declaring SECRET_READ (still UNREGISTERED): does it now execute?
+[C4b] invoke echo (requires SECRET_READ, unregistered) as orchestrator -> REFUSED PLUGIN_NOT_APPROVED: plugin 'echo' is declared but not usable: plugin 'echo' declares elevated permissions (["SECRET_READ"]/network/filesystem_write); it must be registered with `go
+[C4b] plugins list: {"usable": [], "denied": [["echo", "PLUGIN_NOT_APPROVED"]], "rejected": []}
+[C4] doctor/audit reaction to the elevated grant: [('D028', False, 'plugin descriptor echo declares its own authorisation (approved_roles: ["all"] (a descriptor cannot '), ('D010', False, 'stale: 2 changed, 1 added, 0 removed'), ('D011', False, '1 file(s) contain secret patterns but are not secret-class: product/settings.py'), ('D020', False, 'adapter manifest overlay_hash differs from current overlay (stale adapters)'), ('D021', False, 'no green governance record')]
+[C4] audit findings mentioning TOOL_PERMISSIONS / elevated: []
+
+## [C5] destructive / elevated operations require the correct gates
+[C5] cit propose: False None | status = None | error = cit.propose is refused: 2 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: product/settings.py. Repair the condition, then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/mirror-after/release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.py", line 146, in <module>
+    s = sb.gov("cit", "simulate", cid, cwd=p, quiet=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/mirror-after/release/capability-baseline/audit-0/alpha-r/evidence/lib/srr_mint.py", line 199, in gov
+    r = subprocess.run(cmd, cwd=cwd or self.dir, env=e, capture_output=True, text=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/usr/lib/python3.12/subprocess.py", line 1885, in _execute_child
+    self.pid = _fork_exec(
+               ^^^^^^^^^^^
+TypeError: expected str, bytes or os.PathLike object, not NoneType
+[exit=1]
