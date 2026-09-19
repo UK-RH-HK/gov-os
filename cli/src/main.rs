@@ -1321,6 +1321,25 @@ enum ContractCmd {
     Verify,
     /// Regenerate the compiled form, source lock, evidence map and generated view from the approved source
     Compile,
+    /// P2-AR-0042 (BC-P2-02, frozen AC-10): the suite-to-contract matrix — every capability, its evidence owners,
+    /// their tiers and their last-run evidence — generated from the evidence map after `contract verify` passes
+    Matrix {
+        /// `cargo test --lib` output to read the lib test owners' last runs from (repeatable)
+        #[arg(long = "lib-results")]
+        lib_results: Vec<String>,
+        /// `cargo test --test certification` output (repeatable)
+        #[arg(long = "certification-results")]
+        certification_results: Vec<String>,
+        /// Held-out re-run output with `===== <suite> :: <binary> =====` blocks (repeatable)
+        #[arg(long = "heldout-results")]
+        heldout_results: Vec<String>,
+        /// `gov --json health run` or `gov --json doctor` output (repeatable)
+        #[arg(long = "health-results")]
+        health_results: Vec<String>,
+        /// Write suite-to-contract.json and suite-to-contract.md into this directory
+        #[arg(long)]
+        out: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -1586,6 +1605,7 @@ fn g0_label(cmd: &Cmd) -> String {
         Cmd::Contract { op } => s(match op {
             ContractCmd::Verify => "contract verify",
             ContractCmd::Compile => "contract compile",
+            ContractCmd::Matrix { .. } => "contract matrix",
         }),
         Cmd::Upstream { op } => s(match op {
             UpstreamCmd::Prepare { .. } => "upstream prepare",
@@ -2005,6 +2025,15 @@ fn run(cli: &Cli) -> Result<Value> {
             match op {
                 ContractCmd::Verify => gov_runtime::contracts::verify(&repo),
                 ContractCmd::Compile => gov_runtime::contracts::generate(&repo),
+                // P2-AR-0042 (BC-P2-02): the suite-to-contract matrix, from the map and the supplied run outputs
+                ContractCmd::Matrix { lib_results, certification_results, heldout_results, health_results, out } => {
+                    let paths = |v: &Vec<String>| v.iter().map(PathBuf::from).collect::<Vec<_>>();
+                    let ev = gov_runtime::contracts::RunEvidence { lib: paths(lib_results), certification: paths(certification_results), heldout: paths(heldout_results), health: paths(health_results) };
+                    match out {
+                        Some(o) => gov_runtime::contracts::write_suite_to_contract(&repo, &ev, Path::new(o)),
+                        None => gov_runtime::contracts::suite_to_contract(&repo, &ev).map(|(m, _)| m),
+                    }
+                }
             }
         }
         Cmd::Upstream { op } => { let p = open_project(cli, true)?; match op { UpstreamCmd::Prepare { lesson } => gov_runtime::upstream::prepare(&p, lesson), UpstreamCmd::Submit { packet, destination, approved_by } => gov_runtime::upstream::submit(&p, packet, destination, approved_by.as_deref()) } }

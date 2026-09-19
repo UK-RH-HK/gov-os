@@ -339,6 +339,8 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("trust reseal --dry-run", "read", Read),
     outside("contract verify", "canonical-repository tooling: read-only"),
     outside("contract compile", "canonical-repository release tooling (regenerates the compiled contract views of the canonical repository, not a governed project)"),
+    // P2-AR-0042 (BC-P2-02): additive, like `contract verify` it opens no governed project
+    outside("contract matrix", "canonical-repository tooling: reads the contract chain and the run outputs it is given, and writes the suite-to-contract matrix only into the --out directory it is given, never a governed project"),
     g("upstream prepare", "upstream_prepare", Write),
     g("upstream submit", "upstream_submit", Write),
     g("task create", "create_task", Write),

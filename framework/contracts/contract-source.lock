@@ -8,17 +8,18 @@ canonical_import_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c
 compiled: framework/contracts/governance-capability-acceptance.yaml
 compiled_sha256: b7882fb71aff3ccd75e07405f98575cf8e7e18f0d317526f6f36519570de97af
 compiled_schema: framework/schemas/governance-capability-acceptance.schema.json
-compiled_schema_sha256: d1b49226b3adf56e10305191ca7c8651985e4a0ac95200bc2277a1a49ab9128b
+compiled_schema_sha256: fabe41ea575c4f8234690a3b58a4ede9178cf6db1388d1131cc3676adbe3e6ca
 evidence_map: tests/governance/capability-evidence-map.yaml
-evidence_map_source_sha256: 5582032ed6b181da2e1e3a450cc8f84b082ba139f7990290eac3f64524f76857
+evidence_map_source_sha256: bbdc1372aeca30856e9c84ef35211e9c972e77b8803c53cb15bba1cd19c67877
+evidence_map_governed_sha256: a394e29ffc4f2dd7d040fd73f6fd174d3ed74ffc48e718b70354bf85b30fb212
 generated_view: docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
-generated_view_sha256: ea93e9217002dcb7d76670f20e3d6d66338a67b2efcb2f8762a8b84a8e56e7b1
+generated_view_sha256: 9db4c91240513af50444227e1a98bb95bf9ab5a00e611ced3bafd71f2951c878
 universe:
   capabilities: 101
   gates: 23
   checklist_items: 713
   qualification_challenges: 8
   carried_source_lines: 1026
-binding: 'The compiled representation, the source-derived fields of the evidence map and the generated view are valid only while canonical_import_sha256 equals owner_source_sha256 and each equals a fresh derivation from that source (compiled_sha256: canonical-JSON digest of the compiled value; evidence_map_source_sha256: canonical-JSON digest of the evidence map with its governed fields removed; generated_view_sha256: SHA-256 of the view''s bytes). `gov contract verify` fails on any semantic difference (Contract v3, ''Contract authority model'').'
+binding: 'The compiled representation, the source-derived fields of the evidence map and the generated view are valid only while canonical_import_sha256 equals owner_source_sha256 and each equals a fresh derivation from that source (compiled_sha256: canonical-JSON digest of the compiled value; evidence_map_source_sha256: canonical-JSON digest of the evidence map with its governed fields removed; evidence_map_governed_sha256: canonical-JSON digest of its governed values — evidence owners and every field they determine — as `gov contract compile` last wrote them; generated_view_sha256: SHA-256 of the view''s bytes). `gov contract verify` fails on any semantic difference (Contract v3, ''Contract authority model'') and on a governed value changed without a recompile.'
 gate: GATE-OWNER-CAC-UPLOAD
 logged_precedence_conflict: The owner supplied the normative source at the repository root rather than at the destination path; an active owner directive outranks the frozen gate convention, so the root file is authoritative and the destination copy is a hash-bound canonical import.

@@ -787,6 +787,36 @@
           "items": {
             "$ref": "#/$defs/evidence_row"
           }
+        },
+        "freshness_invalidation": {
+          "description": "Governed (frozen AC-10, second sentence): for each Contract v3:97-109 evidence-freshness trigger in use, the owners that prove a change of that input makes prior green evidence stale.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "trigger",
+              "owners"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "trigger": {
+                "type": "string",
+                "minLength": 1
+              },
+              "owners": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^(check|doctor|g0|test|human-gate|release|heldout|obligation):.+$"
+                }
+              },
+              "proves": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
       }
     },
@@ -822,18 +852,11 @@
       }
     },
     "automated_checks": {
-      "description": "Governed: the automated check/test IDs that evidence this capability or checklist item (Contract v3:64). Empty until mapped.",
+      "description": "Governed: the evidence owners a checklist item is exercised by, named by the ids of its capability's owners (Contract v3:64). Empty until mapped.",
       "type": "array",
       "items": {
-        "anyOf": [
-          {
-            "type": "string",
-            "minLength": 1
-          },
-          {
-            "type": "object"
-          }
-        ]
+        "type": "string",
+        "minLength": 1
       }
     },
     "evidence_row": {
@@ -906,7 +929,7 @@
           }
         },
         "evidence_class": {
-          "description": "Governed: NOT_YET_MAPPED, or one or more evidence classes of Contract v3:81-91.",
+          "description": "Derived from the owners by `gov contract compile`: NOT_YET_MAPPED (no owner), or the Contract v3:81-91 evidence classes of its owners.",
           "anyOf": [
             {
               "type": "string",
@@ -923,13 +946,22 @@
           ]
         },
         "automated_checks": {
-          "$ref": "#/$defs/automated_checks"
+          "description": "Governed: the product and builder evidence owners (Contract v3:64 \"automated check/test IDs\"): tier checks, G0 guards, harness tests, Human Decision Gate and release evidence.",
+          "$ref": "#/$defs/evidence_owners"
         },
         "independent_verification": {
-          "description": "Governed: independent-verification obligation (Contract v3:65)."
+          "description": "Governed: the independent owners (Contract v3:65 \"independent-verification obligation\"): held-out suites and the frozen gate contract's independent-verification criteria. Never builder evidence.",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/evidence_owners"
+            }
+          ]
         },
         "freshness_triggers": {
-          "description": "Governed: evidence-freshness triggers, drawn from Contract v3:97-109.",
+          "description": "Derived from the owners by `gov contract compile`: the Contract v3:97-109 inputs whose change makes the owners' evidence stale.",
           "anyOf": [
             {
               "type": "null"
@@ -944,7 +976,7 @@
           ]
         },
         "health_scheduler_tiers": {
-          "description": "Governed: health-scheduler tiers, drawn from O5 (G0-G6).",
+          "description": "Derived from the owners by `gov contract compile`: the O5 tiers (G0-G6) its tier owners run at.",
           "anyOf": [
             {
               "type": "null"
@@ -953,7 +985,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "pattern": "^G[0-9]+$"
+                "pattern": "^G[0-6]$"
               }
             }
           ]
@@ -971,36 +1003,153 @@
           ]
         },
         "applicability": {
-          "description": "Governed: applicability rule (Contract v3:62)."
+          "description": "Governed: applicability rule (Contract v3:62).",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
         },
         "adoption_obligation": {
-          "description": "Governed: adoption verification obligation (Contract v3:69)."
+          "description": "Derived: adoption verification obligation (Contract v3:69).",
+          "$ref": "#/$defs/owner_obligation"
         },
         "operational_audit_obligation": {
-          "description": "Governed: periodic operational-audit obligation (Contract v3:70)."
+          "description": "Derived: periodic operational-audit obligation (Contract v3:70).",
+          "$ref": "#/$defs/owner_obligation"
         },
         "allowed_status": {
-          "description": "Governed: allowed status values (Contract v3:71).",
+          "description": "Governed: allowed status values (Contract v3:71), from the frozen gate contract §4 vocabulary.",
           "anyOf": [
             {
               "type": "null"
             },
             {
               "type": "array",
+              "minItems": 1,
               "items": {
-                "type": "string",
-                "minLength": 1
+                "enum": [
+                  "PRESENT_AND_SUBSTANTIAL",
+                  "PARTIAL",
+                  "ABSENT",
+                  "UNCLEAR",
+                  "N/A_WITH_REASON"
+                ]
               }
             }
           ]
         },
         "na_requirements": {
-          "description": "Governed: N/A requirements (Contract v3:72)."
+          "description": "Governed: N/A requirements (Contract v3:72).",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
         },
         "remediation_rule": {
-          "description": "Governed: remediation/task-generation rule (Contract v3:73)."
+          "description": "Derived from the owners by `gov contract compile`: remediation/task-generation rule (Contract v3:73).",
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
         }
       }
+    },
+    "evidence_owner": {
+      "description": "Governed (BC-P2-02, frozen AC-10): one evidence owner. `id` is `<kind>:<reference>`; `gov contract verify` resolves it against the product (scheduler catalogue and tiers, G0 command classification, the test harnesses' module trees, independent held-out suites, the frozen gate contract). `class` is a Contract v3:83-91 evidence class the kind produces; `tiers` (check, doctor, g0) equal what the product declares; `record` (human-gate, release) is the record type the command writes; `tests` (heldout) name `<binary>::<fn>` tests of the suite; `exercises` states what the owner exercises.",
+      "type": "object",
+      "required": [
+        "id",
+        "class"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(check|doctor|g0|test|human-gate|release|heldout|obligation):.+$"
+        },
+        "class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^G[0-6]$"
+          }
+        },
+        "record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]+::[A-Za-z0-9_]+$"
+          }
+        },
+        "exercises": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence_owners": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_owner"
+      }
+    },
+    "owner_obligation": {
+      "description": "Derived by `gov contract compile` from the capability's owners: the Contract v3:115-127 lifecycle points the obligation applies at, the owners that run there (G5), and the rule.",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "lifecycle_points",
+            "owners",
+            "rule"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "lifecycle_points": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "owners": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "rule": {
+              "type": "string"
+            }
+          }
+        }
+      ]
     }
   }
 }
