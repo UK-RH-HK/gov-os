@@ -582,13 +582,16 @@ fn authority_dirs(state_root: &Path) -> Vec<PathBuf> {
 }
 
 /// A digest of everything the authority set is derived from, so the per-process cache never serves a stale view.
+///
+/// The trust anchor itself is not read here (only `srr::state` composes its path and `srr::verifier` reads it — the R1
+/// census holds that): the provisioning record, which `MachineState::set_root_metadata` rewrites with the anchor's
+/// digest and version on every provisioning and root succession, stands for it.
 fn fingerprint(state_root: &Path) -> String {
-    let trust = state_root.join("trust");
+    let ms = crate::srr::state::MachineState::read_only(state_root);
     let mut parts = vec![
         state_root.display().to_string(),
-        file_digest(&trust.join("provisioned.json")),
-        file_digest(&trust.join("root.json")),
-        file_digest(&state_root.join("machine.json")),
+        canonical_json(&ms.provisioned_record()),
+        ms.machine_id.clone(),
     ];
     for d in authority_dirs(state_root) {
         parts.push(d.display().to_string());
