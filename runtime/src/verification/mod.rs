@@ -422,8 +422,8 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
             "context_reproducibility" => {
                 if let Some(db) = &db {
                     if let Some(t) = store.of_type("task").first() {
-                        let a = crate::context::compile(p, db, &t.id())?;
-                        let b = crate::context::compile(p, db, &t.id())?;
+                        let a = crate::context::compile(p, *db, &t.id())?;
+                        let b = crate::context::compile(p, *db, &t.id())?;
                         if a["deterministic_hash"] != b["deterministic_hash"] {
                             f.findings.push(finding(
                                 "high",
