@@ -214,6 +214,33 @@ impl MachineState {
         })
     }
 
+    /// A **read-only** view of the protected state at `root`: nothing is created, nothing is written.
+    ///
+    /// [`MachineState::at`] materialises the layout and a `machine.json` identity, which is right for an ingress
+    /// and wrong for a reader. Post-install integrity (`kernel_trust`, on every governed command) and presentation
+    /// (on every command result) consult protected state on machines that never ran an ingress; they must not
+    /// create state as a side effect of asking a question. The path helpers and [`MachineState::is_provisioned`]
+    /// work the same on this view.
+    pub fn read_only(root: &Path) -> MachineState {
+        let machine_id = read_opt(&root.join("machine.json"))
+            .and_then(|v| {
+                v.get("machine_id")
+                    .and_then(|x| x.as_str())
+                    .map(String::from)
+            })
+            .unwrap_or_default();
+        MachineState {
+            root: root.to_path_buf(),
+            machine_id,
+        }
+    }
+
+    /// `installed/<product>/` — the per-project installation records and the verified-release ledger
+    /// ([`crate::srr::installation`]). Beside, and distinct from, the single `installed/<product>.json` record.
+    pub fn installed_dir(&self, product: &str) -> PathBuf {
+        self.root.join("installed").join(safe(product))
+    }
+
     pub fn trust_dir(&self) -> PathBuf {
         self.root.join("trust")
     }
@@ -323,7 +350,8 @@ impl MachineState {
 /// root resolution: [`resolve_state_root`] and `default_state_root` are owner-closed by `OWNER-DECISION-0007` §1
 /// and are untouched.
 pub fn degraded_path_at(root: &Path, product: &str) -> PathBuf {
-    root.join("degraded").join(format!("{}.json", safe(product)))
+    root.join("degraded")
+        .join(format!("{}.json", safe(product)))
 }
 
 fn safe(s: &str) -> String {
@@ -601,8 +629,15 @@ impl InstalledRecord {
     }
 
     /// Does this record vouch for the given measured payload? Digest-bound, per `SRR2-R1-C2`.
+    ///
+    /// BC-P2-38: a record vouches only if it records a verification. A record made while the machine had no trust
+    /// anchor (authenticity `UNKNOWN`) says what was installed, not that it was verified, so it vouches for
+    /// nothing (ARCH-0003 §7: "the release identity it previously **verified** and installed"). Since this repair
+    /// [`crate::srr::verifier::record_installed`] no longer writes such a record; the check stays so that a record
+    /// written by an earlier build cannot be promoted to a verification after the machine is provisioned.
     pub fn vouches_for(&self, payload_hash: &str, kernel_manifest_hash: &str) -> bool {
-        !self.payload_hash.is_empty()
+        crate::srr::installation::records_a_verification(&self.authenticity)
+            && !self.payload_hash.is_empty()
             && self.payload_hash == payload_hash
             && (self.kernel_manifest_hash.is_empty()
                 || self.kernel_manifest_hash == kernel_manifest_hash)

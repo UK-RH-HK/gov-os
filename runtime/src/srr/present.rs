@@ -70,21 +70,55 @@ pub const PRESENTED_BELOW_FLOOR: &str = "BELOW_FLOOR_RECOVERY_ONLY";
 /// `presented_as` when the §6 check could not determine its subject (`AR31-B2`). Not current, because unknown is
 /// not "no".
 pub const PRESENTED_UNDETERMINED: &str = "UNDETERMINED";
+/// `presented_as` when an installation this command acts on has no established authenticity (`BC-P2-36`,
+/// Contract v3:150 "Bootstrap/dev/test trust modes cannot masquerade as certified production"; OWNER-DIRECTIVE-0004
+/// "cannot manufacture trust"). Not current, not verified, not certified — and the block says why.
+pub const PRESENTED_UNAUTHENTICATED: &str = "UNAUTHENTICATED";
 
 /// **The `OWNER-DECISION-0006` §6 bullet 7 sink.**
 ///
 /// `surface` names the caller for the refusal record — the command name at the CLI boundary, or the report name
 /// for a surface that carries the presentation in its own payload.
+///
+/// **`BC-P2-36` — no unauthenticated installation is presented as current.** The block also speaks about the
+/// installations this command acts on ([`crate::srr::installation::installations_in_context`]): the ones whose
+/// post-install integrity this process evaluated, and the one the working directory is in. If any of them has no
+/// established authenticity — a machine with no trust anchor, a kernel no protected record of a verification binds
+/// — `presented_as` is [`PRESENTED_UNAUTHENTICATED`] and `disclosure` says why and what to do. The break-glass
+/// marking keeps precedence: a below-floor machine is presented as below floor first. A command that acts on no
+/// installation (`gov version` outside a project) says nothing about one.
 pub fn presentation(surface: &str) -> Value {
     match breakglass::guard_effect(Effect::PresentBelowFloorReleaseAsCurrent, surface) {
-        Ok(_) => json!({
-            "surface": surface,
-            "below_floor": false,
-            "marking": Value::Null,
-            "presented_as": PRESENTED_CURRENT,
-            "section_6_bullet": 7,
-            "basis": "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses.",
-        }),
+        Ok(_) => {
+            // What is said here must not depend on where a project sits or which machine says it beyond what the
+            // posture itself is: the agent context packet hashes this block, and a clone rebuilt on another
+            // machine must reconstruct it identically (`multi_machine`). Per-installation detail — paths, the
+            // integrity record, the bound release — is reported by `gov kernel trust`, `gov trust status` and the
+            // doctor check (`crate::srr::installation::doctor_check`), never folded into this block.
+            let disclosure = crate::srr::installation::presentation_disclosures();
+            if disclosure.is_empty() {
+                json!({
+                    "surface": surface,
+                    "below_floor": false,
+                    "marking": Value::Null,
+                    "presented_as": PRESENTED_CURRENT,
+                    "section_6_bullet": 7,
+                    "basis": "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses.",
+                })
+            } else {
+                json!({
+                    "surface": surface,
+                    "below_floor": false,
+                    "marking": Value::Null,
+                    "presented_as": PRESENTED_UNAUTHENTICATED,
+                    "section_6_bullet": 7,
+                    "authenticity_established": false,
+                    "disclosure": disclosure,
+                    "detail": "gov kernel trust; gov trust status",
+                    "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 §6 bullet 7 was also asked and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking.",
+                })
+            }
+        }
         Err(e) => {
             let undetermined = e.code == "SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED";
             json!({
@@ -137,15 +171,32 @@ pub fn attach(surface: &str, report: &mut Value) {
                 )),
             );
         }
+    } else if pres["presented_as"] == PRESENTED_UNAUTHENTICATED {
+        // BC-P2-36: "nothing to do" is not true of an installation whose authenticity is not established. The
+        // recommendation is rewritten; `up_to_date` (whether the source offers a newer version) is a decision input
+        // of `update --apply` on every posture and is left as computed, next to this block.
+        if o.contains_key("recommendation") {
+            let was = o
+                .get("recommendation")
+                .and_then(|r| r.as_str())
+                .unwrap_or("")
+                .to_string();
+            o.insert(
+                "recommendation".into(),
+                json!(format!(
+                    "installation authenticity is not established, so it is not current, verified or certified (see `{PRESENTATION_KEY}.disclosure`): provision a trust anchor and install a signed release. Otherwise: {was}"
+                )),
+            );
+        }
     }
     o.insert(PRESENTATION_KEY.to_string(), pres);
 }
 
 /// Is this machine entitled to present its installed release as current right now?
+///
+/// Not when it is below floor, and not when an installation in context has no established authenticity.
 pub fn may_present_as_current(surface: &str) -> bool {
-    !presentation(surface)["below_floor"]
-        .as_bool()
-        .unwrap_or(true)
+    presentation(surface)["presented_as"] == PRESENTED_CURRENT
 }
 
 #[cfg(test)]
@@ -159,7 +210,10 @@ mod tests {
         assert!(v["below_floor"].is_boolean());
         assert!(matches!(
             v["presented_as"].as_str().unwrap(),
-            PRESENTED_CURRENT | PRESENTED_BELOW_FLOOR | PRESENTED_UNDETERMINED
+            PRESENTED_CURRENT
+                | PRESENTED_BELOW_FLOOR
+                | PRESENTED_UNDETERMINED
+                | PRESENTED_UNAUTHENTICATED
         ));
         assert_eq!(v["surface"], "unit-test");
     }
@@ -168,7 +222,8 @@ mod tests {
     /// rewritten whenever the guard refused, and is left alone when it cleared.
     #[test]
     fn attach_demotes_a_currency_claim_exactly_when_the_guard_refused() {
-        let mut r = json!({"current": "4.1.5", "up_to_date": true, "recommendation": "nothing to do"});
+        let mut r =
+            json!({"current": "4.1.5", "up_to_date": true, "recommendation": "nothing to do"});
         attach("unit-test", &mut r);
         assert!(r.get(PRESENTATION_KEY).is_some());
         let below = r[PRESENTATION_KEY]["below_floor"].as_bool().unwrap();
@@ -178,9 +233,21 @@ mod tests {
                 .as_str()
                 .unwrap()
                 .contains("OWNER-DECISION-0006 §6 bullet 7"));
-        } else {
+        } else if r[PRESENTATION_KEY]["presented_as"] == PRESENTED_CURRENT {
             assert_eq!(r["up_to_date"], true);
             assert_eq!(r["recommendation"], "nothing to do");
+        } else {
+            // BC-P2-36: an installation in context without established authenticity — the recommendation is
+            // rewritten, `up_to_date` (a decision input) is left as computed.
+            assert_eq!(
+                r[PRESENTATION_KEY]["presented_as"],
+                PRESENTED_UNAUTHENTICATED
+            );
+            assert_eq!(r["up_to_date"], true);
+            assert!(r["recommendation"]
+                .as_str()
+                .unwrap()
+                .contains("authenticity is not established"));
         }
         // an array report keeps its shape and loses nothing: the envelope carries the marking for it
         let mut arr = json!([1, 2, 3]);

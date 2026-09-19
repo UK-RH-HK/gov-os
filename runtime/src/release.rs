@@ -77,6 +77,24 @@ pub fn build(
         crate::srr::breakglass::Effect::ReleaseCertification,
         "release build",
     )?;
+    // BC-P2-37 — minting a certification claim is an authority-gated act, and the authority is the owner's
+    // `release`-role signing key (ARCH-0003 §4: signed release metadata binds certification evidence; §10: build
+    // provenance and certification evidence never replace release signatures). `gov` verifies and never signs
+    // (SRR-R0-L4), so it cannot mint an authenticated claim, and an unsigned one in `manifest.json` is exactly the
+    // masquerade Contract v3:150 forbids — any role could produce it (A0-A2-04). The request is refused before
+    // anything is written; non-certifying statuses (`READY_FOR_…`, `REJECTED`, `UNCERTIFIED`) are unaffected.
+    if crate::update::claims_certification(certification_status) {
+        return Err(GovError::new(
+            "RELEASE_CERTIFICATION_REQUIRES_SIGNED_METADATA",
+            format!("`--certification {certification_status}` refused: a certification claim is authenticated only by release metadata signed under the owner's `release` role (evidence.certification), and `gov` never signs. An unsigned certification written into manifest.json would be treated as uncertified everywhere and could only masquerade as certified production (Contract v3:150)."),
+        )
+        .with_details(json!({
+            "requested_status": certification_status,
+            "authority": "the `release` role of the administrator-provisioned trust root (ARCH-0003 §4)",
+            "carrier": "signed release metadata: evidence.certification.status, verified by `gov update --check` against this machine's trusted root",
+            "written": false,
+        })));
+    }
     let dir = out_root.join("releases").join(version);
     if dir.join("manifest.yaml").exists() {
         return Err(GovError::new(
@@ -262,7 +280,15 @@ pub fn verify(release_dir: &Path) -> Result<Value> {
         .collect();
     let km = crate::kernel::read_manifest(&kernel)?;
     let hash_ok = km["payload_hash"] == manifest["release_hash"];
+    // BC-P2-37: manifest.json is unsigned. Its certification block is reported as a claim; the effective status is
+    // what this machine's trust root authenticates from the signed release metadata, otherwise uncertified.
+    let basis = crate::srr::verifier::certification_of(&kernel);
+    let effective = basis
+        .authenticated_status
+        .clone()
+        .unwrap_or_else(|| crate::update::UNCERTIFIED.to_string());
     Ok(
-        json!({"version": manifest["version"], "ok": modified.is_empty() && missing.is_empty() && added.is_empty() && hash_ok, "modified": modified, "missing": missing, "added": added, "release_hash_matches_kernel": hash_ok, "certification": manifest["certification"]}),
+        json!({"version": manifest["version"], "ok": modified.is_empty() && missing.is_empty() && added.is_empty() && hash_ok, "modified": modified, "missing": missing, "added": added, "release_hash_matches_kernel": hash_ok,
+               "certification": {"effective_status": effective, "authenticated": basis.authenticated_status.is_some(), "basis": basis.basis, "unsigned_manifest_claim": manifest["certification"]}}),
     )
 }

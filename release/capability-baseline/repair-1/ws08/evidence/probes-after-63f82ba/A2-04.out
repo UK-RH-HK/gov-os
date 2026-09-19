@@ -1,0 +1,42 @@
+## [L1] signed release; unsigned manifest.json edited AFTER signing (release_commit forged, certification CERTIFIED)
+[L1] honest release_commit was c070c51a72d2457edc9d6d2eed273211f2255497
+[L1] init ok = True | authenticity = AUTHENTIC
+[L1] framework.lock.release_commit = 25dac6efcc4a0d8149d12b619b1776788f34dcaf | source = release:agentic-engineering-os@4.1.5
+[L1] lock keys: ['authenticity', 'channel', 'cli_version', 'framework', 'identity_basis', 'installed_at', 'installed_at_commit', 'kernel_manifest_hash', 'lock_schema_version', 'release_commit', 'release_hash', 'release_metadata_sha256', 'schema_versions', 'sequence', 'source', 'version']
+
+## [L2] update to a SIGNED 4.1.6 whose UNSIGNED manifest.json claims certification CERTIFIED
+[L2-control] honest manifest: certification = UNCERTIFIED | human_gate_required = True | review impact; approve with `gov update --apply --approve --by <human>`
+[L2] edited manifest : certification = UNCERTIFIED | human_gate_required = True | review impact; approve with `gov update --apply --approve --by <human>` | target release is NOT certified: human approval required
+$ gov update --apply --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0020/probe-A2-04-gqDezQ/alpha-r-a2-lock-4s77enmg/r16/releases/4.1.6/kernel
+  -> REFUSED (exit 4) code=HUMAN_GATE_REQUIRED msg=update requires human approval: gate HDG-0001 created; present it (`gov gate present HDG-0001`), record the answer (`gov decide HDG-0001 --option A --by <human>`), then re-run `gov update --apply --approve`
+[L2] human gates in the project after the update: [{"id": "HDG-0001", "question": "Approve framework update \"4.1.5\" \u2192 \"4.1.6\"?", "gate_status": "PENDING", "presented_in_chat": false, "priority_score": 9.0, "batchable": false, "blocks_tasks": [], "cit": "", "trigger": "framework_update"}]
+[L2] who may mint a CERTIFIED manifest: `gov release build --certification CERTIFIED` takes no project and no role
+[L2] release build as role research-agent (L1): ok = False | certification.status = None
+
+## [L3] what framework.lock does and does not record — authentic (provisioned) vs UNKNOWN (unprovisioned)
+[L3] unprovisioned authenticity = UNKNOWN
+[L3]   authenticity           authentic-install=AUTHENTIC                                            unknown-install=UNKNOWN
+[L3]   channel                authentic-install=stable                                               unknown-install=None
+[L3]   cli_version            authentic-install=4.1.5                                                unknown-install=4.1.5
+[L3]   framework              authentic-install=agentic-engineering-os                               unknown-install=agentic-engineering-os
+[L3]   identity_basis         authentic-install={'established_by': "this machine's protected insta   unknown-install={'established_by': 'not established: installed on 
+[L3]   installed_at           authentic-install=2026-09-19T00:57:08Z                                 unknown-install=2026-09-19T00:57:09Z
+[L3]   installed_at_commit    authentic-install=95c23b58d3b64cd44b9feb059abf275a431e771a             unknown-install=95c23b58d3b64cd44b9feb059abf275a431e771a
+[L3]   kernel_manifest_hash   authentic-install=31ffbd1ccf9076af991be36b54f16c2cd1a5233d63f4482d70   unknown-install=31ffbd1ccf9076af991be36b54f16c2cd1a5233d63f4482d70
+[L3]   lock_schema_version    authentic-install=1.1.0                                                unknown-install=1.1.0
+[L3]   release_commit         authentic-install=25dac6efcc4a0d8149d12b619b1776788f34dcaf             unknown-install=25dac6efcc4a0d8149d12b619b1776788f34dcaf
+[L3]   release_hash           authentic-install=67e8071e5bca4c1887c9a148a9f94e0acd2d31161101a7efda   unknown-install=67e8071e5bca4c1887c9a148a9f94e0acd2d31161101a7efda
+[L3]   release_metadata_sha256 authentic-install=d9d456d2df973e9361be7a00ab378a7212282cd01503728ed9   unknown-install=None
+[L3]   sequence               authentic-install=10                                                   unknown-install=None
+[L3]   source                 authentic-install=release:agentic-engineering-os@4.1.5                 unknown-install=embedded:agentic-engineering-os@4.1.5
+[L3]   version                authentic-install=4.1.5                                                unknown-install=4.1.5
+[L3] lock carries authenticity/sequence/channel/metadata digest: True
+
+## [L4] embedded payload + XDG_CACHE_HOME location (machine-specific path) -> recorded release identity
+[L4a] default cache ($HOME/.cache): source = embedded:agentic-engineering-os@4.1.5 | release_commit = 25dac6efcc4a0d8149d12b619b1776788f34dcaf
+[L4b] XDG_CACHE_HOME=<dir without '.cache'>: source = embedded:agentic-engineering-os@4.1.5 | release_commit = 25dac6efcc4a0d8149d12b619b1776788f34dcaf
+[L4c] XDG_CACHE_HOME inside the consumer repo: source = embedded:agentic-engineering-os@4.1.5 | release_commit = 25dac6efcc4a0d8149d12b619b1776788f34dcaf | consumer HEAD = ed5a8548253620ac61ac3f9281a81ae3385d3055 | release_commit == consumer HEAD: False | installed_at_commit = ed5a8548253620ac61ac3f9281a81ae3385d3055
+[L4] same binary, same embedded payload, same release_hash: True
+
+DONE
+[A2-04 exit=0]

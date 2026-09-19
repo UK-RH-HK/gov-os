@@ -14,6 +14,23 @@
 //! 5. mutating operations fail closed with `KERNEL_TAMPERED` until `gov kernel reinstall`, or an L4+ role answers a
 //!    presented Human Decision Gate bound to the exact observed kernel state.
 //!
+//! **`BC-P2-35` — intact against a record the repository cannot rewrite.** Steps 1-3 compare three files that all
+//! live in the project, so a mutually consistent rewrite of payload, `KERNEL_MANIFEST.json` and `framework.lock`
+//! passed them (A0-A2-01). The installed payload is now also measured against this machine's own protected
+//! installation record ([`crate::srr::installation`]), by digest and only by digest (ARCH-0003 §2):
+//!
+//! * the record binds the measured payload → intact;
+//! * the record names a different payload and this machine holds a trust anchor → the kernel is not intact
+//!   (`KERNEL_TAMPERED`), whatever the manifest and the lock say, and the files that differ are named;
+//! * no record binds it and this machine holds a trust anchor → the installed kernel has not been verified here
+//!   (`KERNEL_UNANCHORED`, D-0007 rule 1: "when T1 cannot be authenticated"); `gov kernel reinstall --source
+//!   <signed release>` verifies the pinned release and records it (ARCH-0003 §8);
+//! * no trust anchor → manifest and lock decide, as before. The record this machine keeps is then itself
+//!   unauthenticated, and that sub-case is OD-P2-02, with the owner: a divergence from it is reported
+//!   (`DIVERGED_NOT_ENFORCED`, in `protected_record` and in the presentation), not enforced.
+//!
+//! This module still establishes only *intact*. It reads digests from protected state and never a verdict of the
+//! Signed Release Root about where the bytes came from; D-0007's text is unchanged.
 //! Security-critical consumers (`policy::PolicySet`, `policy_precedence`, `authority`, routing, handoffs, adapters,
 //! migration verification) resolve their kernel content through `trusted_root`/`policy_root` rather than reading
 //! `governance/kernel/**` directly.
@@ -62,6 +79,14 @@ pub struct KernelTrust {
     pub trusted_version: String,
     /// Identifies the exact untrusted state, so an override gate cannot outlive the state it approved.
     pub fingerprint: String,
+    /// Digest of the payload files on disk (what staging would measure), not what the manifest claims.
+    pub measured_payload_hash: String,
+    /// Digest of the installed `KERNEL_MANIFEST.json` (what `framework.lock.kernel_manifest_hash` should bind).
+    pub manifest_hash: String,
+    /// `BC-P2-35`: how the installed payload stands against this machine's protected installation record —
+    /// `MATCHED`, `DIVERGED`, `UNRECORDED`, `UNRECORDED_REQUIRED` or `UNDETERMINED`.
+    pub protected_record: String,
+    pub protected_record_basis: String,
 }
 
 impl KernelTrust {
@@ -80,16 +105,39 @@ impl KernelTrust {
             installed_version: String::new(),
             trusted_version: String::new(),
             fingerprint: String::new(),
+            measured_payload_hash: String::new(),
+            manifest_hash: String::new(),
+            protected_record: String::new(),
+            protected_record_basis: String::new(),
         }
     }
+    /// The verdict as data. It is embedded in agent context packets, which a clone rebuilt on another machine must
+    /// reproduce, so the machine-local protected-record state is included only when it bears on the verdict (the
+    /// kernel is untrusted because of it) or is itself a disclosure (a divergence reported but not enforced). A
+    /// record that simply holds — present on the installing machine, absent on a clean clone of an unprovisioned
+    /// project — changes nothing and is described by [`KernelTrust::summary`] instead.
     pub fn to_value(&self) -> Value {
-        json!({
+        let mut v = json!({
             "installed": self.installed, "verified": self.verified, "source": self.source,
             "substituted_embedded_baseline": self.substituted, "manifest_matches_lock": self.manifest_matches_lock,
             "modified": self.modified, "missing": self.missing, "added": self.added,
             "installed_version": self.installed_version, "trusted_version": self.trusted_version,
             "problems": self.problems, "fingerprint": self.fingerprint,
-        })
+            "measured_payload_hash": self.measured_payload_hash, "manifest_hash": self.manifest_hash,
+        });
+        if self.protected_record_bears() {
+            v["protected_record"] =
+                json!({"state": self.protected_record, "basis": self.protected_record_basis});
+        }
+        v
+    }
+
+    /// Does the protected-record state bear on the verdict, or is it a disclosure in its own right?
+    pub fn protected_record_bears(&self) -> bool {
+        matches!(
+            self.protected_record.as_str(),
+            "DIVERGED" | "UNRECORDED_REQUIRED" | "DIVERGED_NOT_ENFORCED" | "UNDETERMINED"
+        )
     }
     /// One-line diagnostic for doctor / audit / context packets.
     pub fn summary(&self) -> String {
@@ -97,10 +145,20 @@ impl KernelTrust {
             return "no installed kernel".into();
         }
         if self.verified {
-            return format!(
-                "installed kernel {} verified against KERNEL_MANIFEST.json and framework.lock",
-                self.installed_version
-            );
+            return match self.protected_record.as_str() {
+                "MATCHED" => format!(
+                    "installed kernel {} intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record",
+                    self.installed_version
+                ),
+                "UNDETERMINED" => format!(
+                    "installed kernel {} matches KERNEL_MANIFEST.json and framework.lock; this machine's protected installation record could not be consulted ({})",
+                    self.installed_version, self.protected_record_basis
+                ),
+                _ => format!(
+                    "installed kernel {} matches KERNEL_MANIFEST.json and framework.lock only; nothing the repository cannot rewrite anchors it on this machine ({})",
+                    self.installed_version, self.protected_record_basis
+                ),
+            };
         }
         format!(
             "installed kernel FAILED verification ({}); constitutional policy is read from the embedded baseline {} and mutating operations are refused (KERNEL_TAMPERED)",
@@ -110,9 +168,26 @@ impl KernelTrust {
     }
 }
 
-fn cache() -> &'static Mutex<HashMap<PathBuf, KernelTrust>> {
-    static C: OnceLock<Mutex<HashMap<PathBuf, KernelTrust>>> = OnceLock::new();
+/// Cached verdicts, keyed by repository root **and** the protected state they were computed against, so a process
+/// that changes machine (tests, CI runners) never reads a verdict computed for another machine's records.
+fn cache() -> &'static Mutex<HashMap<(PathBuf, String), KernelTrust>> {
+    static C: OnceLock<Mutex<HashMap<(PathBuf, String), KernelTrust>>> = OnceLock::new();
     C.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+/// Every repository root whose kernel this process has evaluated. Not cleared by [`clear`]: it names the
+/// installations this process is acting on, which is what the presentation layer must speak about (`BC-P2-36`).
+fn evaluated() -> &'static Mutex<std::collections::BTreeSet<PathBuf>> {
+    static E: OnceLock<Mutex<std::collections::BTreeSet<PathBuf>>> = OnceLock::new();
+    E.get_or_init(|| Mutex::new(std::collections::BTreeSet::new()))
+}
+
+/// The repository roots this process has evaluated (see [`evaluated`]).
+pub fn evaluated_roots() -> Vec<PathBuf> {
+    evaluated()
+        .lock()
+        .map(|s| s.iter().cloned().collect())
+        .unwrap_or_default()
 }
 
 /// Drop every cached verdict. Called whenever the installed kernel or the lock changes.
@@ -131,16 +206,24 @@ fn compute(root: &Path) -> KernelTrust {
     let mut problems = vec![];
     let (mut modified, mut missing, mut added) = (vec![], vec![], vec![]);
     let mut payload_ok = false;
+    let mut measured_payload_hash = String::new();
     match verify_kernel(&kernel_dir) {
         Ok(v) => {
             payload_ok = v.ok;
             modified = v.modified.clone();
             missing = v.missing.clone();
             added = v.added.clone();
-            if !v.ok {
+            measured_payload_hash = v.measured_payload_hash.clone();
+            if !v.matches_manifest {
                 problems.push(format!(
                     "kernel payload does not match KERNEL_MANIFEST.json: modified {:?} missing {:?} added {:?}",
                     v.modified, v.missing, v.added
+                ));
+            }
+            if v.protected_record_enforced {
+                problems.push(format!(
+                    "kernel payload is not the payload this machine committed into this project ({}), whatever KERNEL_MANIFEST.json and framework.lock say: modified {:?} missing {:?} added {:?}. A post-install rewrite, or a change made without an ingress on this machine: verify the release framework.lock pins with `gov kernel reinstall --source <signed release>`",
+                    v.protected_record_payload_hash, v.modified, v.missing, v.added
                 ));
             }
         }
@@ -166,10 +249,41 @@ fn compute(root: &Path) -> KernelTrust {
             if lock_hash.is_empty() { "(absent)" } else { lock_hash.as_str() }
         ));
     }
-    let verified = payload_ok && manifest_matches_lock;
+    // BC-P2-35: the installed payload against this machine's protected installation record, by digest.
+    let anchor = crate::srr::installation::anchor_for(root, &measured_payload_hash, &actual_hash);
+    let anchor_holds = anchor.holds();
+    if let crate::srr::installation::Anchor::Unrecorded {
+        required: true,
+        basis,
+    } = &anchor
+    {
+        problems.push(basis.clone());
+    } else if let crate::srr::installation::Anchor::Diverged {
+        basis,
+        enforced: true,
+        ..
+    } = &anchor
+    {
+        if !problems
+            .iter()
+            .any(|p| p.contains("this machine committed"))
+        {
+            problems.push(basis.clone());
+        }
+    }
+    let verified = payload_ok && manifest_matches_lock && anchor_holds;
+    // The anchor state enters the fingerprint only when it is why the kernel is untrusted, so an override gate is
+    // bound to it then, and a trusted kernel's fingerprint stays a function of its bytes alone.
     let fingerprint = sha256_text(&format!(
-        "{installed_version}|{actual_hash}|{lock_hash}|{modified:?}|{missing:?}|{added:?}"
+        "{installed_version}|{actual_hash}|{lock_hash}|{modified:?}|{missing:?}|{added:?}|{}",
+        if anchor_holds {
+            String::new()
+        } else {
+            format!("{measured_payload_hash}|{}", anchor.state())
+        }
     ));
+    let protected_record = anchor.state().to_string();
+    let protected_record_basis = anchor.basis().to_string();
     if verified {
         return KernelTrust {
             installed: true,
@@ -185,6 +299,10 @@ fn compute(root: &Path) -> KernelTrust {
             trusted_version: installed_version.clone(),
             installed_version,
             fingerprint,
+            measured_payload_hash,
+            manifest_hash: actual_hash,
+            protected_record,
+            protected_record_basis,
         };
     }
     // fail closed to the immutable baseline embedded in this binary — explicitly, never mixed with the untrusted one
@@ -213,6 +331,10 @@ fn compute(root: &Path) -> KernelTrust {
                 installed_version,
                 trusted_version: tv,
                 fingerprint,
+                measured_payload_hash,
+                manifest_hash: actual_hash,
+                protected_record,
+                protected_record_basis,
             }
         }
         Err(e) => {
@@ -233,6 +355,10 @@ fn compute(root: &Path) -> KernelTrust {
                 installed_version,
                 trusted_version: String::new(),
                 fingerprint,
+                measured_payload_hash,
+                manifest_hash: actual_hash,
+                protected_record,
+                protected_record_basis,
             }
         }
     }
@@ -240,7 +366,10 @@ fn compute(root: &Path) -> KernelTrust {
 
 /// Verified trust verdict for a repository (cached per process; `clear()` on any kernel/lock change).
 pub fn trust(root: &Path) -> KernelTrust {
-    let key = root.to_path_buf();
+    if let Ok(mut e) = evaluated().lock() {
+        e.insert(root.to_path_buf());
+    }
+    let key = (root.to_path_buf(), crate::srr::installation::state_key());
     if let Ok(c) = cache().lock() {
         if let Some(t) = c.get(&key) {
             return t.clone();
@@ -302,6 +431,24 @@ pub fn guard(p: &Project, operation: &str) -> Result<()> {
             );
             return Ok(());
         }
+    }
+    if t.protected_record == "UNRECORDED_REQUIRED"
+        && t.modified.is_empty()
+        && t.missing.is_empty()
+        && t.added.is_empty()
+        && t.manifest_matches_lock
+    {
+        return Err(GovError::new(
+            "KERNEL_UNANCHORED",
+            format!(
+                "'{operation}' refused: this machine holds a Signed Release Root trust anchor and has no protected record of verifying the installed kernel ({}). A machine verifies the release a project pins before privileged work (ARCH-0003 §8); until then constitutional policy is read from the embedded baseline. Verify it: `gov kernel reinstall --source <the signed release framework.lock pins>`.",
+                t.problems.join("; ")
+            ),
+        )
+        .with_details(json!({
+            "operation": operation, "kernel_trust": t.to_value(),
+            "remediation": ["gov kernel trust", "gov kernel reinstall --source <signed release pinned by framework.lock>", "gov kernel override --reason <why> (L4+, raises a gate)"],
+        })));
     }
     Err(GovError::new(
         "KERNEL_TAMPERED",

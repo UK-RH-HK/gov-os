@@ -17,7 +17,7 @@
 //!
 //! | predicate | means | established by | lives in |
 //! |---|---|---|---|
-//! | **intact** | the local copy is unmodified | payload ↔ `KERNEL_MANIFEST.json` ↔ `framework.lock.kernel_manifest_hash` | [`crate::kernel_trust`] (D-0007, ACTIVE, unchanged) |
+//! | **intact** | the local copy is unmodified | payload ↔ `KERNEL_MANIFEST.json` ↔ `framework.lock.kernel_manifest_hash`, and — where this machine recorded what it committed into the project — payload ↔ that protected record, by digest (`BC-P2-35`) | [`crate::kernel_trust`] (D-0007, ACTIVE, text unchanged) |
 //! | **authentic** | the bytes are an authorised release | signed metadata chaining to the machine's root anchor, or this machine's own protected record of what it previously verified | [`verifier::Authenticity`] |
 //! | **admissible** | it may be installed now | at or above both protected floors | [`verifier::AuthenticatedRelease::below_floor`] |
 //!
@@ -32,6 +32,7 @@
 //! are deliberately absent: `gov` verifies signatures and never creates them.
 pub mod breakglass;
 pub mod crypto;
+pub mod installation;
 pub mod metadata;
 pub mod plugins;
 pub mod present;
@@ -87,6 +88,7 @@ pub fn status() -> Result<Value> {
             "local_clock": now,
             "clock_assumption": "ARCH-0003 §1: the local time source is inside the trusted local boundary. No signed, attested or monotonic time is assumed, required or provided. If the clock is materially wrong, expiry/staleness/currency are wrong in the corresponding direction; no floor is lowered, no unauthorised release is admitted and the verified-byte binding is unaffected.",
         },
+        "installations": installations_recorded(&ms, product),
         "degraded": degraded.map(|d| json!({"marking": d.marking, "entered_at": d.entered_at, "record": d.record})),
         "break_glass": {
             "marking": breakglass::DEGRADED_TOKEN,
@@ -102,4 +104,32 @@ pub fn status() -> Result<Value> {
             "admissible": "the floor check in the one verification policy",
         },
     }))
+}
+
+/// `BC-P2-36`: every project this machine has installed a kernel into, with what the single verifier decided — so a
+/// machine with no trust anchor reports its installations as authenticity `UNKNOWN` instead of reporting nothing,
+/// and `installed_release` above stays what it says it is: a release this machine *verified*.
+fn installations_recorded(ms: &state::MachineState, product: &str) -> Value {
+    let dir = ms.installed_dir(product).join("projects");
+    let mut out: Vec<Value> = vec![];
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        let mut paths: Vec<std::path::PathBuf> =
+            rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+        paths.sort();
+        for p in paths {
+            if let Ok(v) = crate::util::read_json(&p) {
+                let cur = v.get("current").cloned().unwrap_or(Value::Null);
+                out.push(json!({
+                    "project_root": v.get("project_root").cloned().unwrap_or(Value::Null),
+                    "release_version": cur.get("release_version").cloned().unwrap_or(Value::Null),
+                    "payload_hash": cur.get("payload_hash").cloned().unwrap_or(Value::Null),
+                    "authenticity": cur.get("authenticity").cloned().unwrap_or(Value::Null),
+                    "ingress": cur.get("ingress").cloned().unwrap_or(Value::Null),
+                    "at": cur.get("at").cloned().unwrap_or(Value::Null),
+                    "pending": v.get("pending").map(|x| !x.is_null()).unwrap_or(false),
+                }));
+            }
+        }
+    }
+    Value::Array(out)
 }

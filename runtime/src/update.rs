@@ -26,27 +26,38 @@ fn migrations_for_source(src: &Path) -> Vec<Value> {
         .unwrap_or_default()
 }
 
-fn source_manifest(src: &Path) -> Result<Value> {
-    // A built release dir has manifest.json next to kernel/; a raw framework/ dir has KERNEL.yaml only.
-    if let Some(parent) = src.parent() {
-        let m = parent.join("manifest.json");
-        if m.exists() {
-            return read_json(&m);
-        }
-    }
+/// The one spelling of the certified status. Only this file compares against it; `release::build` refuses to mint
+/// it (`BC-P2-37`).
+pub const CERTIFIED: &str = "CERTIFIED";
+/// The status every unauthenticated certification claim is treated as.
+pub const UNCERTIFIED: &str = "UNCERTIFIED";
+
+/// Does a status string claim certification (`CERTIFIED`, any case, or a `CERTIFIED…` variant)?
+pub fn claims_certification(status: &str) -> bool {
+    status.trim().to_ascii_uppercase().starts_with(CERTIFIED)
+}
+
+/// The candidate's identity and compatibility, from the candidate **payload** — its `KERNEL.yaml` — and never from
+/// the unsigned `manifest.json` a built release carries beside `kernel/` (`BC-P2-37`, D-0007 rule 2). These are the
+/// bytes admission measures and, on a provisioned machine, binds to signed metadata; the decision taken here is
+/// re-bound to the admitted release in [`bind_decision_to_admitted`].
+fn candidate_identity(src: &Path) -> Result<Value> {
     let meta = read_yaml(&src.join("KERNEL.yaml"))?;
-    let migs = migrations_for_source(src);
-    let ver = meta["version"].as_str().unwrap_or("0").to_string();
-    Ok(
-        json!({"version": ver, "supported_from_versions": meta["supported_from_versions"], "migration_ids": migs.iter().filter(|m| m["to_version"].as_str() == Some(&ver)).map(|m| m["id"].clone()).collect::<Vec<_>>(), "breaking_changes": migs.iter().filter(|m| m["breaking"].as_bool().unwrap_or(false)).map(|m| m["description"].clone()).collect::<Vec<_>>(), "human_gates": migs.iter().filter_map(|m| m["human_gate"].as_str().filter(|g| *g != "none").map(|s| json!(s))).collect::<Vec<_>>(), "required_index_rebuilds": [], "release_notes": "(unreleased framework source)", "certification": {"status": "UNCERTIFIED"}}),
-    )
+    let ver = match &meta["version"] {
+        Value::String(v) => v.clone(),
+        Value::Null => "0".into(),
+        other => other.to_string(),
+    };
+    Ok(json!({"version": ver, "supported_from_versions": meta["supported_from_versions"]}))
 }
 
 /// CIT-P for a framework update against this project.
 pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
     p.require_installed()?;
     let src = resolve_kernel_source(source.map(Path::new))?;
-    let avail = source_manifest(&src)?;
+    let avail = candidate_identity(&src)?;
+    // BC-P2-37: certification counts only when this machine's trust root authenticates it.
+    let certification = crate::srr::verifier::certification_of(&src);
     let current = p.framework_version();
     let target = avail["version"].as_str().unwrap_or("0").to_string();
     let ord = compare_versions(&current, &target);
@@ -79,10 +90,13 @@ pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
                 .map(|s| json!(s))
         })
         .collect();
-    let cert = avail["certification"]["status"]
-        .as_str()
-        .unwrap_or("UNCERTIFIED")
-        .to_string();
+    // An unauthenticated certification is treated as uncertified everywhere (BC-P2-37; Contract v3:150, :161): the
+    // unsigned manifest.json claim is reported in `certification_basis.unsigned_claim` and never decides anything.
+    let cert = certification
+        .authenticated_status
+        .clone()
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|| UNCERTIFIED.to_string());
     let radius = if !breaking.is_empty() {
         "R5"
     } else if !dry.overlay_keys_changed.is_empty() {
@@ -96,7 +110,7 @@ pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
         format!("kernel {current} → {target} ({} migration step(s))", chain.len()), "spec/ and product/ are not touched (INV-013)", if dry.index_rebuild { "all derived indexes are rebuilt after install" } else { "no index rebuild required" },
         if cert == "CERTIFIED" { "target release is certified" } else { "target release is NOT certified: human approval required" }]});
     let mut out = json!({"current": current, "available": target, "source": src.display().to_string(), "up_to_date": ord != std::cmp::Ordering::Less, "downgrade": ord == std::cmp::Ordering::Greater, "compatible": compatible, "migration_path": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "migration_path_complete": !chain.is_empty() || current == target,
-        "certification": cert, "impact": impact, "human_gate_required": human_gate_required, "recommendation": if ord != std::cmp::Ordering::Less { "nothing to do" } else if !compatible { "unsupported upgrade path: adopt an intermediate release" } else if human_gate_required { "review impact; approve with `gov update --apply --approve --by <human>`" } else { "safe: `gov update --apply`" }});
+        "certification": cert, "certification_basis": certification.to_value(), "impact": impact, "human_gate_required": human_gate_required, "recommendation": if ord != std::cmp::Ordering::Less { "nothing to do" } else if !compatible { "unsupported upgrade path: adopt an intermediate release" } else if human_gate_required { "review impact; approve with `gov update --apply --approve --by <human>`" } else { "safe: `gov update --apply`" }});
     // **`OWNER-DECISION-0006` §6 bullet 7** (`AR31-B1`). `gov update --check` used to emit
     // `{"current": <below-floor version>, "up_to_date": true, "recommendation": "nothing to do"}` on a machine
     // marked `DEGRADED — RECOVERY ONLY` — the bullet in the decision's own words, and the opposite of what is
@@ -229,6 +243,9 @@ pub fn apply_update_opts(
         &json!({"from": chk["current"], "to": target, "at": now_iso(), "checkpoint": ck.as_ref().map(|c| c["id"].clone()), "migrations": chk["migration_path"], "by": by, "session": p.session_id, "role": p.role, "source": source_label(src), "release_commit": release_commit_for_source(src)}),
     )?;
     let (overlay_before, _) = hash_tree(&p.overlay_dir(), &[])?;
+    // BC-P2-38: this machine's protected record for the project, as it stands before the transaction; an abort puts
+    // it back together with the bytes it describes.
+    let prior_record = crate::srr::installation::read_project_record_raw(&p.root);
     // Privileged lifecycle ingress `update`: the one verification policy. Admission happens BEFORE any protected
     // write, and the floor check inside it binds this ingress exactly as it binds `rollback`.
     let auth = crate::srr::admit(
@@ -236,7 +253,17 @@ pub fn apply_update_opts(
             .with_channel(channel)
             .with_break_glass(break_glass)
             .with_reason(Some(format!("gov update --apply to {target}"))),
-    )?;
+    )
+    // A0-S5-01 / BC-P2-38: a refused update leaves nothing behind. The snapshot was taken for this attempt only;
+    // left in place, `gov update --rollback` would "roll back" an update that never happened.
+    .inspect_err(|_| {
+        let _ = remove_dir_if_exists(&snap);
+    })?;
+    if let Err(e) = bind_decision_to_admitted(&chk, &auth, &target) {
+        crate::srr::staging::abandon(&auth.machine, &auth.staged, &e.message);
+        let _ = remove_dir_if_exists(&snap);
+        return Err(e);
+    }
     let result: Result<Value> = (|| {
         let manifest = install_kernel(&auth, &p.governance_dir())?;
         let migs = load_migrations(&p.kernel_dir());
@@ -351,14 +378,15 @@ pub fn apply_update_opts(
         // and only after the post-install governance suite has accepted the result.
         let protected = crate::srr::record_installed(&auth)?;
         Ok(
-            json!({"migrations": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "operations": out.applied, "overlay_keys_changed": out.overlay_keys_changed, "overlay_reconciled": reconciled, "index_manifest": rebuilt, "doctor": doc.verdict, "audit": audit["verdict"], "lock": {"release_commit": release_commit_for_source(src), "source": source_label(src)}, "release_authenticity": auth.to_value(), "protected_state": protected}),
+            json!({"migrations": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "operations": out.applied, "overlay_keys_changed": out.overlay_keys_changed, "overlay_reconciled": reconciled, "index_manifest": rebuilt, "doctor": doc.verdict, "audit": audit["verdict"], "lock": lock_identity_summary(p), "release_authenticity": auth.to_value(), "protected_state": protected}),
         )
     })();
     match result {
         Ok(v) => {
             let ledger = p.root.join("spec/reports/framework-updates.jsonl");
             let mut text = crate::util::read_text(&ledger).unwrap_or_default();
-            text.push_str(&serde_json::to_string(&json!({"at": now_iso(), "event": "update", "from": chk["current"], "to": target, "by": by, "session": p.session_id, "role": p.role, "result": "committed", "release_commit": release_commit_for_source(src), "source": source_label(src), "details": v}))?);
+            let lk = lock_identity_summary(p);
+            text.push_str(&serde_json::to_string(&json!({"at": now_iso(), "event": "update", "from": chk["current"], "to": target, "by": by, "session": p.session_id, "role": p.role, "result": "committed", "release_commit": lk["release_commit"], "source": lk["source"], "authenticity": lk["authenticity"], "details": v}))?);
             text.push('\n');
             crate::util::write_text(&ledger, &text)?;
             let db2 = RuntimeDb::open(&p.db_path())?;
@@ -387,6 +415,9 @@ pub fn apply_update_opts(
                 true,
                 false,
             )?;
+            // The pre-update bytes are back; so is the protected record that describes them (BC-P2-35/38).
+            crate::srr::installation::restore_project_record(&p.root, prior_record.clone())?;
+            crate::kernel_trust::clear();
             Err(
                 GovError::new(&e.code, format!("{} — update rolled back", e.message))
                     .with_details(json!({"rollback": rb, "details": e.details})),
@@ -474,6 +505,17 @@ fn rollback_internal(
                 .with_reason(reason.map(|r| r.to_string())),
         )?)
     };
+    // BC-P2-38 (failure atomicity): the verified kernel is committed FIRST. If that fails, the atomic transaction
+    // has already put the previous tree back and nothing else has been touched yet, so the refused rollback leaves
+    // the installation as it found it. The overlay, generated files and lock follow only once the kernel is in.
+    match auth.as_ref() {
+        // Verified bytes in, verified bytes installed, atomically.
+        Some(a) => {
+            crate::kernel::install_kernel(a, &p.governance_dir())?;
+        }
+        // Transaction abort: restore the tree the floors already describe (below).
+        None => {}
+    }
     for sub in ["project", "generated"] {
         let s = dir.join(sub);
         let d = p.governance_dir().join(sub);
@@ -482,19 +524,12 @@ fn rollback_internal(
             copy_dir(&s, &d)?;
         }
     }
-    match auth.as_ref() {
-        // Verified bytes in, verified bytes installed, atomically.
-        Some(a) => {
-            crate::kernel::install_kernel(a, &p.governance_dir())?;
-        }
-        // Transaction abort: restore the tree the floors already describe.
-        None => {
-            let s = dir.join("kernel");
-            let d = p.governance_dir().join("kernel");
-            if s.exists() {
-                remove_dir_if_exists(&d)?;
-                copy_dir(&s, &d)?;
-            }
+    if auth.is_none() {
+        let s = dir.join("kernel");
+        let d = p.governance_dir().join("kernel");
+        if s.exists() {
+            remove_dir_if_exists(&d)?;
+            copy_dir(&s, &d)?;
         }
     }
     std::fs::copy(dir.join("framework.lock"), p.lock_path())?;
@@ -535,4 +570,86 @@ fn rollback_internal(
     Ok(
         json!({"rolled_back_to": meta["from"], "from": version_before, "kernel_ok": ok, "doctor": entry["verification"]["doctor"], "index_manifest": r.manifest_hash, "ledger_entry": entry, "snapshot_consumed": true, "release_authenticity": auth.as_ref().map(|a| a.to_value()), "protected_state": protected}),
     )
+}
+
+/// `BC-P2-37` — the decision `check` took is bound to the release admission actually admitted.
+///
+/// `check` reads the candidate before admission stages it, so the candidate could change in between. Three facts the
+/// decision rested on are re-established from the admitted release before a byte is installed:
+/// * the version the impact check was taken for is the admitted version;
+/// * if the Human Decision Gate was not required because the target is certified, the certification came from the
+///   exact signed `release.json` admission verified (by its digest), and admission authenticated it;
+/// * if the gate was not required, the admitted payload's own migrations still do not require one.
+fn bind_decision_to_admitted(
+    chk: &Value,
+    auth: &crate::srr::AuthenticatedRelease,
+    target: &str,
+) -> Result<()> {
+    if auth.release_version != target {
+        return Err(GovError::new(
+            "UPDATE_TARGET_CHANGED",
+            format!("the impact check was taken for {target}, but admission admitted {}; re-run `gov update --check`", auth.release_version),
+        ));
+    }
+    if chk["human_gate_required"].as_bool().unwrap_or(true) {
+        return Ok(());
+    }
+    let bound_sha = chk["certification_basis"]["release_metadata_sha256"]
+        .as_str()
+        .unwrap_or("");
+    if chk["certification"].as_str() != Some(CERTIFIED)
+        || auth.authenticity != crate::srr::Authenticity::Authentic
+        || bound_sha.is_empty()
+        || auth.release_metadata_sha256 != bound_sha
+    {
+        return Err(GovError::new(
+            "UPDATE_CERTIFICATION_NOT_BOUND",
+            "the Human Decision Gate was waived for a certified target, but the admitted release is not the one whose signed metadata carried that certification; the gate is required",
+        )
+        .with_details(json!({"checked_release_metadata_sha256": bound_sha, "admitted_release_metadata_sha256": auth.release_metadata_sha256, "admitted_authenticity": auth.authenticity.as_str()})));
+    }
+    let migs = load_migrations(auth.verified_payload());
+    let chain = migration_path(&migs, chk["current"].as_str().unwrap_or(""), target);
+    let needs_gate = chain.iter().any(|m| {
+        m["breaking"].as_bool().unwrap_or(false)
+            || m["human_gate"]
+                .as_str()
+                .map(|g| g != "none")
+                .unwrap_or(false)
+    });
+    if needs_gate {
+        return Err(GovError::new(
+            "UPDATE_GATE_CHANGED",
+            "the admitted release's own migrations require a Human Decision Gate that the impact check did not; re-run `gov update --check`",
+        ));
+    }
+    Ok(())
+}
+
+/// The identity the written `framework.lock` records (for results and the update ledger), rather than a
+/// re-derivation from the source path.
+fn lock_identity_summary(p: &Project) -> Value {
+    let lock = read_yaml(&p.lock_path()).unwrap_or(Value::Null);
+    json!({"release_commit": lock["release_commit"], "source": lock["source"], "authenticity": lock["authenticity"], "version": lock["version"]})
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// BC-P2-37: what counts as claiming certification (and so may be minted only through signed metadata).
+    #[test]
+    fn certification_claims_are_recognised_in_every_spelling() {
+        for yes in ["CERTIFIED", "certified", " Certified ", "CERTIFIED_R2"] {
+            assert!(claims_certification(yes), "{yes}");
+        }
+        for no in [
+            "UNCERTIFIED",
+            "READY_FOR_INDEPENDENT_OS_VERIFICATION",
+            "REJECTED",
+            "",
+        ] {
+            assert!(!claims_certification(no), "{no}");
+        }
+    }
 }

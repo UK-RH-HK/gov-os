@@ -24,8 +24,41 @@ pub mod embedded {
     }
 }
 
-/// Materialise the embedded payload into a per-user cache directory (idempotent, content-addressed).
-pub fn embedded_kernel_dir() -> Result<PathBuf> {
+/// The payload digest the embedded kernel produces when staged, computed from the embedded bytes alone.
+///
+/// `BC-P2-37`: whether an installed payload *is* this binary's embedded payload is a property of its bytes, not of
+/// the directory it was copied from. The recorded identity of an embedded install therefore cannot vary with
+/// `XDG_CACHE_HOME`, `GOV_KERNEL_CACHE` or where a cache happens to sit (Contract v3:149, :950). The selection
+/// mirrors [`stage_payload`] exactly: `KERNEL.yaml` plus every file under a `payload_dirs` entry.
+pub fn embedded_payload_hash() -> String {
+    static H: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    H.get_or_init(|| {
+        let files = embedded::files();
+        let dirs: Vec<String> = files
+            .iter()
+            .find(|(p, _)| *p == "KERNEL.yaml")
+            .and_then(|(_, b)| serde_yaml::from_slice::<Value>(b).ok())
+            .and_then(|m| m.get("payload_dirs").and_then(|v| v.as_array()).cloned())
+            .unwrap_or_default()
+            .iter()
+            .filter_map(|d| d.as_str().map(String::from))
+            .collect();
+        let mut map: BTreeMap<String, String> = BTreeMap::new();
+        for (rel, bytes) in files {
+            let first = rel.split('/').next().unwrap_or("");
+            if *rel == "KERNEL.yaml"
+                || (rel.contains('/') && dirs.iter().any(|d| d == first) && *rel != KERNEL_MANIFEST)
+            {
+                map.insert(rel.to_string(), crate::util::sha256_hex(bytes));
+            }
+        }
+        hash_value(&serde_json::to_value(&map).unwrap_or(Value::Null))
+    })
+    .clone()
+}
+
+/// Where [`embedded_kernel_dir`] materialises the embedded payload, computed without writing anything.
+fn embedded_kernel_path() -> Result<PathBuf> {
     let files = embedded::files();
     let mut listing: Vec<(String, String)> = files
         .iter()
@@ -47,15 +80,29 @@ pub fn embedded_kernel_dir() -> Result<PathBuf> {
                 .map(|h| PathBuf::from(h).join(".cache").join("gov"))
         })
         .unwrap_or(std::env::temp_dir().join("gov-cache"));
-    let dir = base
+    Ok(base
         .join("kernels")
-        .join(format!("{}-{}", embedded::version(), &id[..12]));
+        .join(format!("{}-{}", embedded::version(), &id[..12])))
+}
+
+/// Materialise the embedded payload into a per-user cache directory (idempotent, content-addressed).
+pub fn embedded_kernel_dir() -> Result<PathBuf> {
+    let files = embedded::files();
+    let mut listing: Vec<(String, String)> = files
+        .iter()
+        .map(|(p, b)| (p.to_string(), crate::util::sha256_hex(b)))
+        .collect();
+    listing.sort();
+    let id = crate::util::sha256_text(&serde_json::to_string(&listing)?);
+    let dir = embedded_kernel_path()?;
     if dir.join("KERNEL.yaml").exists() && dir.join(".complete").exists() {
         return Ok(dir);
     }
-    let staging = base
-        .join("kernels")
-        .join(format!(".staging-{}", std::process::id()));
+    let kernels = dir
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_else(|| std::env::temp_dir().join("gov-cache").join("kernels"));
+    let staging = kernels.join(format!(".staging-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&staging);
     for (rel, bytes) in files {
         let p = staging.join(rel);
@@ -108,49 +155,41 @@ pub fn resolve_kernel_source(source: Option<&Path>) -> Result<PathBuf> {
     ))
 }
 
-/// Whether `src` is the materialised embedded payload (per-user cache).
+/// Whether `src` is the directory this binary materialises its embedded payload into.
+///
+/// `BC-P2-37`: decided by identity with [`embedded_kernel_dir`]'s own location, never by a path pattern. The old
+/// test (`/kernels/` and `.cache` in the path) made the recorded identity depend on where `XDG_CACHE_HOME` pointed
+/// (A0-A2-03). What is finally recorded in `framework.lock` is decided by content in [`crate::lock::write_lock`].
 pub fn is_embedded_dir(src: &Path) -> bool {
-    let s = src.to_string_lossy();
-    (s.contains("/kernels/") && s.contains(".cache"))
-        || s.contains("gov-cache")
-        || std::env::var("GOV_KERNEL_CACHE")
-            .map(|c| !c.is_empty() && s.starts_with(&c))
-            .unwrap_or(false)
+    let canon = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+    match embedded_kernel_path() {
+        Ok(e) => canon(src) == canon(&e),
+        Err(_) => false,
+    }
 }
 
-/// The framework release commit for a kernel source (verifier M-N1): the release manifest next to `kernel/`, the
-/// commit embedded in this binary for the embedded payload, or the HEAD of the checkout containing a framework/ dir.
-/// Never the consumer repository's HEAD.
+/// Marker recorded wherever a release commit is not established by anything verification can stand on.
+pub const RELEASE_COMMIT_UNVERIFIED: &str = "unverified";
+
+/// The framework release commit for a kernel source (verifier M-N1), **as far as verification can establish it**.
+///
+/// `BC-P2-37` (Contract v3:149 "recorded, not invented"; D-0007 rule 2): the commit baked into this binary is
+/// returned for its own embedded payload; nothing else a source directory carries — an unsigned `manifest.json`
+/// beside `kernel/`, the Git HEAD of a checkout — is authenticated, so neither is returned as identity. A release
+/// commit bound by **signed** release metadata is recorded by [`crate::lock::write_lock`] from this machine's
+/// protected installation record. Never the consumer repository's HEAD.
 pub fn release_commit_for_source(src: &Path) -> String {
-    if let Some(parent) = src.parent() {
-        let m = parent.join("manifest.json");
-        if m.exists() {
-            if let Ok(v) = crate::util::read_json(&m) {
-                if let Some(c) = v["release_commit"].as_str().filter(|c| !c.is_empty()) {
-                    return c.to_string();
-                }
-            }
-        }
-    }
     if is_embedded_dir(src) {
         return embedded::commit().to_string();
     }
-    let out = std::process::Command::new("git")
-        .args(["rev-parse", "HEAD"])
-        .current_dir(src)
-        .output();
-    if let Ok(o) = out {
-        if o.status.success() {
-            let c = String::from_utf8_lossy(&o.stdout).trim().to_string();
-            if !c.is_empty() {
-                return c;
-            }
-        }
-    }
-    "unknown".into()
+    RELEASE_COMMIT_UNVERIFIED.into()
 }
 
-/// Logical, machine-independent source label recorded in framework.lock.
+/// Logical, machine-independent source label (a *kind*, not an authenticated identity).
+///
+/// `embedded:` for this binary's own payload directory, otherwise `source:`. `release:` is reserved for a release
+/// authenticated by signed metadata and is assigned only by [`crate::lock::write_lock`] from the protected
+/// installation record; a path segment such as `/release/releases/` no longer produces it (Contract v3:950).
 pub fn source_label(src: &Path) -> String {
     let meta = kernel_meta(src).unwrap_or(serde_json::json!({}));
     let ver = meta
@@ -160,17 +199,8 @@ pub fn source_label(src: &Path) -> String {
             o => o.to_string(),
         })
         .unwrap_or("unknown".into());
-    let s = src.to_string_lossy();
-    if s.contains("/kernels/") && s.contains(".cache")
-        || s.contains("gov-cache")
-        || std::env::var("GOV_KERNEL_CACHE")
-            .map(|c| s.starts_with(&c))
-            .unwrap_or(false)
-    {
+    if is_embedded_dir(src) {
         return format!("embedded:{}@{}", FRAMEWORK_NAME, ver);
-    }
-    if s.contains("/release/releases/") {
-        return format!("release:{}@{}", FRAMEWORK_NAME, ver);
     }
     format!("source:{}@{}", FRAMEWORK_NAME, ver)
 }
@@ -258,7 +288,29 @@ fn install_kernel_inner(
     governance_dir: &Path,
 ) -> Result<Value> {
     let dest = governance_dir.join("kernel");
-    crate::srr::staging::commit_tree(&auth.machine, &auth.staged, &dest)?;
+    // BC-P2-38 — the reinstall ingress restores the release the project pins; it is not a version change. The
+    // refusal used to come from the caller only AFTER the swap, leaving the new payload under the old lock (a mixed
+    // installation, A2-08 [V1]-[V3], A2-05 [K6a]). It is taken here, before a single byte moves, and the staging
+    // area is abandoned, so a refused reinstall leaves the installation exactly as it found it. The caller's own
+    // check stays as a second line; it can no longer be reached with a committed payload.
+    pinned_release_check(auth, governance_dir).inspect_err(|e| {
+        crate::srr::staging::abandon(&auth.machine, &auth.staged, &e.message);
+    })?;
+    // BC-P2-35 — this machine's protected record of what it commits into this project. `pending` is durable
+    // before the swap and `current` after its verification, so whichever tree an interrupted install recovers to
+    // is bound by one of them.
+    let project_root = crate::srr::installation::project_root_of_governance_dir(governance_dir);
+    if let Some(root) = project_root.as_ref() {
+        crate::srr::installation::bind_pending(auth, root).inspect_err(|e| {
+            crate::srr::staging::abandon(&auth.machine, &auth.staged, &e.message);
+        })?;
+    }
+    if let Err(e) = crate::srr::staging::commit_tree(&auth.machine, &auth.staged, &dest) {
+        if let Some(root) = project_root.as_ref() {
+            crate::srr::installation::clear_pending(auth, root);
+        }
+        return Err(e);
+    }
     let manifest = read_manifest(&dest)?;
     // The installed payload must be the verified payload, byte for byte.
     if manifest["payload_hash"].as_str() != Some(auth.payload_hash.as_str()) {
@@ -267,7 +319,65 @@ fn install_kernel_inner(
             "the installed kernel payload digest differs from the verified release payload digest",
         ));
     }
+    if let Some(root) = project_root.as_ref() {
+        crate::srr::installation::bind_committed(auth, root)?;
+    }
     Ok(manifest)
+}
+
+/// `KERNEL_MISMATCH`, before the swap, when the reinstall ingress is handed a payload other than the pinned one.
+///
+/// Only the reinstall ingress is bound by the project's pin: init, adopt and update install a new pin, and rollback
+/// and recovery restore an earlier one. A project with no lock yet has nothing pinned.
+fn pinned_release_check(
+    auth: &crate::srr::AuthenticatedRelease,
+    governance_dir: &Path,
+) -> Result<()> {
+    if auth.ingress != crate::srr::Ingress::Reinstall {
+        return Ok(());
+    }
+    let Ok(lock) = read_yaml(&governance_dir.join("framework.lock")) else {
+        return Ok(());
+    };
+    let pinned = lock
+        .get("release_hash")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    if pinned.is_empty() || pinned == auth.payload_hash {
+        return Ok(());
+    }
+    // BC-P2-35: on a machine with a trust anchor, this machine's protected record of what it committed into the
+    // project is the authority for what "the pinned release" was, not a framework.lock the repository can rewrite. A
+    // candidate that IS the recorded payload while the lock pins something else means the pin itself was rewritten
+    // (with the payload and manifest). That is refused precisely, with the values to restore, before anything moves.
+    if auth.posture == crate::srr::verifier::Posture::Provisioned {
+        let recorded = governance_dir
+            .parent()
+            .and_then(crate::srr::installation::project_record)
+            .and_then(|r| r.current);
+        if let Some(r) = recorded.filter(|r| r.payload_hash == auth.payload_hash) {
+            return Err(GovError::new(
+                "KERNEL_PIN_REWRITTEN",
+                "framework.lock pins a payload this machine never committed into this project, while the candidate is exactly the payload it did commit: the pin was rewritten together with the kernel. Restore framework.lock's release_hash and kernel_manifest_hash to the recorded values (from version control, or as given in the details), then re-run `gov kernel reinstall`.",
+            )
+            .with_details(json!({
+                "framework_lock_pins": {"release_hash": pinned, "kernel_manifest_hash": lock.get("kernel_manifest_hash")},
+                "this_machine_committed": {"release_hash": r.payload_hash, "kernel_manifest_hash": r.kernel_manifest_hash, "release_version": r.release_version, "ingress": r.ingress, "at": r.at},
+                "installation_changed": false,
+            })));
+        }
+    }
+    Err(GovError::new(
+        "KERNEL_MISMATCH",
+        "reinstalled payload hash differs from framework.lock release_hash; use gov update for a version change",
+    )
+    .with_details(json!({
+        "pinned_release_hash": pinned,
+        "candidate_payload_hash": auth.payload_hash,
+        "candidate_release": auth.release_version,
+        "installation_changed": false,
+        "note": "refused before the atomic swap: the installed kernel, framework.lock and this machine's protected records are unchanged (BC-P2-38). `gov kernel reinstall` restores the pinned release; `gov update --apply` changes version and `gov update --rollback` returns to the previous one.",
+    })))
 }
 
 pub fn read_manifest(kernel_dir: &Path) -> Result<Value> {
@@ -299,8 +409,27 @@ pub struct KernelVerification {
     pub added: Vec<String>,
     pub payload_hash: String,
     pub version: String,
+    /// Digest of the payload files actually on disk, measured exactly as staging measures them. `payload_hash`
+    /// above is what `KERNEL_MANIFEST.json` *claims*.
+    pub measured_payload_hash: String,
+    /// The files match `KERNEL_MANIFEST.json` (the original D-0007 comparison, on its own).
+    pub matches_manifest: bool,
+    /// `BC-P2-35`: the installed files differ from what this machine committed into this project (its protected
+    /// installation record), whatever `KERNEL_MANIFEST.json` and `framework.lock` say. When the divergence is
+    /// enforced (the machine holds a trust anchor) the differing files are included in `modified` / `missing` /
+    /// `added` and `ok` is false; otherwise (OD-P2-02) they are reported in `protected_record_divergence` only.
+    pub diverges_from_protected_record: bool,
+    pub protected_record_enforced: bool,
+    pub protected_record_payload_hash: String,
+    pub protected_record_divergence: Value,
 }
 
+/// D-0007 post-install integrity of an installed kernel directory.
+///
+/// Intact means: the payload matches `KERNEL_MANIFEST.json` file for file **and**, where this machine holds a
+/// protected record of what it committed into the project (`<root>/governance/kernel`), the payload is exactly that
+/// record. The second clause is `BC-P2-35` (Contract v3:146): the manifest and the lock live in the repository and a
+/// mutually consistent rewrite of payload, manifest and lock satisfied the first clause alone.
 pub fn verify_kernel(kernel_dir: &Path) -> Result<KernelVerification> {
     let manifest = read_manifest(kernel_dir)?;
     let actual = payload_files(kernel_dir)?;
@@ -308,23 +437,41 @@ pub fn verify_kernel(kernel_dir: &Path) -> Result<KernelVerification> {
         .get("files")
         .and_then(|f| serde_json::from_value(f.clone()).ok())
         .unwrap_or_default();
-    let modified: Vec<String> = expected
+    let mut modified: Vec<String> = expected
         .iter()
         .filter(|(p, h)| actual.get(*p).map(|a| a != *h).unwrap_or(false))
         .map(|(p, _)| p.clone())
         .collect();
-    let missing: Vec<String> = expected
+    let mut missing: Vec<String> = expected
         .keys()
         .filter(|p| !actual.contains_key(*p))
         .cloned()
         .collect();
-    let added: Vec<String> = actual
+    let mut added: Vec<String> = actual
         .keys()
         .filter(|p| !expected.contains_key(*p))
         .cloned()
         .collect();
+    let measured_payload_hash = hash_value(&serde_json::to_value(&actual)?);
+    let matches_manifest = modified.is_empty() && missing.is_empty() && added.is_empty();
+    let divergence = crate::srr::installation::divergence(kernel_dir, &actual);
+    let enforced = divergence.as_ref().map(|d| d.enforced).unwrap_or(false);
+    if let Some(d) = divergence.as_ref().filter(|d| d.enforced) {
+        for (into, from) in [
+            (&mut modified, &d.modified),
+            (&mut missing, &d.missing),
+            (&mut added, &d.added),
+        ] {
+            for p in from {
+                if !into.contains(p) {
+                    into.push(p.clone());
+                }
+            }
+            into.sort();
+        }
+    }
     Ok(KernelVerification {
-        ok: modified.is_empty() && missing.is_empty() && added.is_empty(),
+        ok: modified.is_empty() && missing.is_empty() && added.is_empty() && !enforced,
         modified,
         missing,
         added,
@@ -338,5 +485,39 @@ pub fn verify_kernel(kernel_dir: &Path) -> Result<KernelVerification> {
             .and_then(|v| v.as_str())
             .unwrap_or("")
             .to_string(),
+        measured_payload_hash,
+        matches_manifest,
+        diverges_from_protected_record: divergence.is_some(),
+        protected_record_enforced: enforced,
+        protected_record_payload_hash: divergence
+            .as_ref()
+            .map(|d| d.recorded_payload_hash.clone())
+            .unwrap_or_default(),
+        protected_record_divergence: divergence
+            .map(|d| json!({"modified": d.modified, "missing": d.missing, "added": d.added, "enforced": d.enforced}))
+            .unwrap_or(Value::Null),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// BC-P2-37: the embedded payload's identity is computed from its bytes and equals what staging would measure,
+    /// so "is this the embedded payload?" is decided by content and never by a cache path.
+    #[test]
+    fn the_embedded_payload_digest_is_what_staging_measures() {
+        let base = std::env::temp_dir().join(format!("gov-ws08-emb-{}", crate::util::short_uuid()));
+        let src = base.join("src");
+        for (rel, bytes) in embedded::files() {
+            let p = src.join(rel);
+            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+            std::fs::write(&p, bytes).unwrap();
+        }
+        let dst = base.join("staged");
+        stage_payload(&src, &dst).unwrap();
+        let m = build_manifest(&dst).unwrap();
+        assert_eq!(m["payload_hash"].as_str().unwrap(), embedded_payload_hash());
+        let _ = std::fs::remove_dir_all(&base);
+    }
 }
