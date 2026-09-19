@@ -1,0 +1,538 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agentic-engineering-os/qualification-oracle/qualification-oracle.schema.json",
+  "title": "Governance OS Qualification Oracle format (Contract v3 Gate V: V1-V4)",
+  "description": "Machine-checkable format of the verifier-owned hidden oracle of a sophisticated qualification repository (Contract v3:1012-1062) and of the quantitative qualification score report computed against it. Two document kinds: 'qualification-oracle' carries V1 (fault manifest), V2 (hidden path-map oracle, required for a brownfield repository) and V3 (hidden memory oracle) for exactly one qualification repository at one commit; 'qualification-score-report' carries V4 (quantitative scoring) for one candidate run, bound to the oracle by its canonical digest (SHA-256 of the canonical JSON of the whole oracle document: keys sorted, no insignificant whitespace, UTF-8). This file is a FORMAT: it contains no fault, no oracle content and no qualification repository. It is kept separate from the permanent public qualification suite (Contract v3:1062): oracle documents are stored by the fresh verifier outside the public suite and outside the qualification repository, and `gov oracle validate` refuses an oracle stored inside either or any trace of it found in either. Every document names the digest of the format definition it was authored against (format_sha256), so a hidden fault can only be written against a format version whose acceptance (Contract v3:1206; frozen gate contract AC-6) can be checked. Validation = this JSON Schema plus the semantic rules `gov oracle validate` enforces (unique ids; capability ids, challenge ids and G-tiers drawn from the owner source; path-map action/target consistency; contradiction-free memory oracle; V2/V3 consistency; score arithmetic and oracle binding).",
+  "x-format": "governance-os.qualification-oracle",
+  "x-format-version": 1,
+  "x-format-status": "PROPOSED — no hidden fault may be generated against this format until a fresh independent oracle-format reviewer issues QUALIFICATION_ORACLE_FORMAT_ACCEPTED for this format_sha256 (Contract v3:1206; frozen gate contract AC-6, section 9.2).",
+  "x-contract-crosswalk": [
+    { "element": "L1014", "kind": "qualification-oracle", "text": "The sophisticated qualification repositories must have a verifier-owned hidden oracle.", "fields": ["/custody", "/visibility", "/repository"] },
+    { "element": "L1017", "kind": "qualification-oracle", "text": "Each injected defect records:", "fields": ["/fault_manifest/faults"] },
+    { "element": "V1.1", "kind": "qualification-oracle", "text": "fault ID", "fields": ["/fault_manifest/faults/*/fault_id"] },
+    { "element": "V1.2", "kind": "qualification-oracle", "text": "class", "fields": ["/fault_manifest/faults/*/class"] },
+    { "element": "V1.3", "kind": "qualification-oracle", "text": "hidden authoritative truth", "fields": ["/fault_manifest/faults/*/hidden_authoritative_truth"] },
+    { "element": "V1.4", "kind": "qualification-oracle", "text": "injected repository state", "fields": ["/fault_manifest/faults/*/injected_repository_state"] },
+    { "element": "V1.5", "kind": "qualification-oracle", "text": "expected detection", "fields": ["/fault_manifest/faults/*/expected_detection"] },
+    { "element": "V1.6", "kind": "qualification-oracle", "text": "expected severity", "fields": ["/fault_manifest/faults/*/expected_severity"] },
+    { "element": "V1.7", "kind": "qualification-oracle", "text": "expected impacted artefacts/nodes", "fields": ["/fault_manifest/faults/*/expected_impacted"] },
+    { "element": "V1.8", "kind": "qualification-oracle", "text": "expected governed action", "fields": ["/fault_manifest/faults/*/expected_governed_action"] },
+    { "element": "V1.9", "kind": "qualification-oracle", "text": "forbidden outcomes", "fields": ["/fault_manifest/faults/*/forbidden_outcomes"] },
+    { "element": "L1029", "kind": "qualification-oracle", "text": "For brownfield Repo B:", "fields": ["/repository/adoption_mode", "/path_map_oracle"] },
+    { "element": "V2.1", "kind": "qualification-oracle", "text": "current artefact", "fields": ["/path_map_oracle/entries/*/current_artefact"] },
+    { "element": "V2.2", "kind": "qualification-oracle", "text": "correct classification", "fields": ["/path_map_oracle/entries/*/correct_classification"] },
+    { "element": "V2.3", "kind": "qualification-oracle", "text": "authority", "fields": ["/path_map_oracle/entries/*/authority"] },
+    { "element": "V2.4", "kind": "qualification-oracle", "text": "expected target path", "fields": ["/path_map_oracle/entries/*/expected_target_paths"] },
+    { "element": "V2.5", "kind": "qualification-oracle", "text": "KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE", "fields": ["/path_map_oracle/entries/*/action"] },
+    { "element": "V2.6", "kind": "qualification-oracle", "text": "expected references/consumers", "fields": ["/path_map_oracle/entries/*/expected_references", "/path_map_oracle/entries/*/expected_consumers"] },
+    { "element": "V2.7", "kind": "qualification-oracle", "text": "sensitivity/indexing expectation", "fields": ["/path_map_oracle/entries/*/sensitivity", "/path_map_oracle/entries/*/indexing_expectation"] },
+    { "element": "V3.1", "kind": "qualification-oracle", "text": "which material must be indexed", "fields": ["/memory_oracle/must_be_indexed"] },
+    { "element": "V3.2", "kind": "qualification-oracle", "text": "which must never be indexed", "fields": ["/memory_oracle/must_never_be_indexed"] },
+    { "element": "V3.3", "kind": "qualification-oracle", "text": "expected authority namespace", "fields": ["/memory_oracle/expected_authority_namespaces"] },
+    { "element": "V3.4", "kind": "qualification-oracle", "text": "expected current/superseded status", "fields": ["/memory_oracle/expected_status"] },
+    { "element": "V3.5", "kind": "qualification-oracle", "text": "expected graph relationships", "fields": ["/memory_oracle/expected_graph_relationships"] },
+    { "element": "V3.6", "kind": "qualification-oracle", "text": "expected code symbols", "fields": ["/memory_oracle/expected_code_symbols"] },
+    { "element": "V3.7", "kind": "qualification-oracle", "text": "expected retrieval results", "fields": ["/memory_oracle/expected_retrieval_results"] },
+    { "element": "L1048", "kind": "qualification-score-report", "text": "Report:", "fields": ["/metrics"] },
+    { "element": "V4.1", "kind": "qualification-score-report", "text": "injected defect detection recall", "fields": ["/metrics/injected_defect_detection_recall"] },
+    { "element": "V4.2", "kind": "qualification-score-report", "text": "false positives", "fields": ["/metrics/false_positives"] },
+    { "element": "V4.3", "kind": "qualification-score-report", "text": "severity accuracy", "fields": ["/metrics/severity_accuracy"] },
+    { "element": "V4.4", "kind": "qualification-score-report", "text": "impact-map accuracy", "fields": ["/metrics/impact_map_accuracy"] },
+    { "element": "V4.5", "kind": "qualification-score-report", "text": "path-map accuracy", "fields": ["/metrics/path_map_accuracy"] },
+    { "element": "V4.6", "kind": "qualification-score-report", "text": "missed authoritative artefacts", "fields": ["/metrics/missed_authoritative_artefacts"] },
+    { "element": "V4.7", "kind": "qualification-score-report", "text": "wrong-indexing count", "fields": ["/metrics/wrong_indexing_count"] },
+    { "element": "V4.8", "kind": "qualification-score-report", "text": "stale-index count", "fields": ["/metrics/stale_index_count"] },
+    { "element": "V4.9", "kind": "qualification-score-report", "text": "retrieval metrics", "fields": ["/metrics/retrieval_metrics"] },
+    { "element": "V4.10", "kind": "qualification-score-report", "text": "recovery/chaos pass rate", "fields": ["/metrics/recovery_chaos_pass_rate"] },
+    { "element": "V4.11", "kind": "qualification-score-report", "text": "human-gate correctness", "fields": ["/metrics/human_gate_correctness"] },
+    { "element": "V4.12", "kind": "qualification-score-report", "text": "task/readiness correctness", "fields": ["/metrics/task_readiness_correctness"] },
+    { "element": "L1062", "kind": "qualification-oracle", "text": "The permanent public qualification suite and fresh verifier hidden oracle must remain separate.", "fields": ["/separation"] },
+    { "element": "W12.7", "kind": "qualification-oracle", "text": "G6 injects hidden artifact-flow failures in sophisticated qualification.", "fields": ["/fault_manifest/faults/*/artifact_flow"] },
+    { "element": "AQC-W12", "kind": "qualification-oracle", "text": "The hidden oracle defines the correct required input/version and expected downstream propagation.", "fields": ["/fault_manifest/faults/*/artifact_flow/required_inputs", "/fault_manifest/faults/*/artifact_flow/expected_propagation"] },
+    { "element": "PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.6", "kind": "qualification-oracle", "text": "Qualification Oracle format is accepted before generating hidden faults.", "fields": ["/format_sha256"] },
+    { "element": "PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.6", "kind": "qualification-score-report", "text": "Qualification Oracle format is accepted before generating hidden faults.", "fields": ["/format_sha256"] }
+  ],
+  "type": "object",
+  "required": ["format", "format_version", "format_sha256", "kind", "purpose"],
+  "properties": {
+    "format": { "const": "governance-os.qualification-oracle" },
+    "format_version": { "const": 1 },
+    "format_sha256": { "description": "SHA-256 of the bytes of the format definition this document was authored against (`gov oracle format` prints it). A document written against any other version of the format is refused.", "$ref": "#/$defs/sha256" },
+    "kind": { "enum": ["qualification-oracle", "qualification-score-report"] },
+    "purpose": { "description": "QUALIFICATION: a real hidden oracle / score report. FORMAT_SAMPLE: a synthetic document that exists only to exercise the format; it describes no qualification repository and is never scored against.", "enum": ["QUALIFICATION", "FORMAT_SAMPLE"] }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "qualification-oracle" } }, "required": ["kind"] }, "then": { "$ref": "#/$defs/oracle" } },
+    { "if": { "properties": { "kind": { "const": "qualification-score-report" } }, "required": ["kind"] }, "then": { "$ref": "#/$defs/score_report" } }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "git_commit": { "type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$" },
+    "timestamp": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "ref": { "description": "A repository-relative path, a stable artefact id, a graph node id or a symbol — whatever the repository names the thing by.", "type": "string", "minLength": 1, "pattern": "\\S" },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+    "document_id": { "description": "At least 8 characters, so that its appearance inside the public suite or the qualification repository is a meaningful leakage signal.", "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,}$" },
+    "token": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+    "capability_id": { "description": "A capability id of the owner source (Contract v3), including 'U'.", "type": "string", "pattern": "^[A-Z]+[0-9]*$" },
+    "tier": { "description": "A Governance Health Scheduler tier of Contract v3 O5 (G0-G6).", "type": "string", "pattern": "^G[0-9]+$" },
+    "severity": { "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"] },
+    "unit": { "type": "number", "minimum": 0, "maximum": 1 },
+    "custody": {
+      "description": "Contract v3:1014 'verifier-owned hidden oracle': who owns and authored the document.",
+      "type": "object",
+      "required": ["owner_role", "owner_run_id", "authored_independently_of_implementation", "created_at"],
+      "additionalProperties": false,
+      "properties": {
+        "owner_role": { "const": "FRESH_INDEPENDENT_VERIFIER" },
+        "owner_run_id": { "$ref": "#/$defs/text" },
+        "authored_independently_of_implementation": { "const": true },
+        "created_at": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "repository": {
+      "description": "The one qualification repository, at the one commit, whose injected state this oracle describes.",
+      "type": "object",
+      "required": ["id", "adoption_mode", "commit"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "adoption_mode": { "description": "BROWNFIELD repositories (Contract v3:1029 'For brownfield Repo B') require the V2 hidden path-map oracle.", "enum": ["GREENFIELD", "BROWNFIELD"] },
+        "commit": { "$ref": "#/$defs/git_commit" },
+        "label": { "$ref": "#/$defs/text" }
+      }
+    },
+    "separation": {
+      "description": "Contract v3:1062: the permanent public qualification suite and the fresh verifier hidden oracle remain separate. Locations are paths or URIs; oracle_storage may not lie inside, or contain, either of the others.",
+      "type": "object",
+      "required": ["public_qualification_suite", "qualification_repository", "oracle_storage"],
+      "additionalProperties": false,
+      "properties": {
+        "public_qualification_suite": { "$ref": "#/$defs/text" },
+        "qualification_repository": { "$ref": "#/$defs/text" },
+        "oracle_storage": { "$ref": "#/$defs/text" }
+      }
+    },
+    "state_change": {
+      "type": "object",
+      "required": ["path", "change"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "$ref": "#/$defs/ref" },
+        "change": { "enum": ["ADDED", "MODIFIED", "DELETED", "MOVED", "RENAMED", "METADATA", "INDEX_STATE", "RUNTIME_STATE"] },
+        "from_path": { "$ref": "#/$defs/ref" },
+        "content_sha256": { "$ref": "#/$defs/sha256" },
+        "note": { "$ref": "#/$defs/text" }
+      },
+      "if": { "properties": { "change": { "enum": ["MOVED", "RENAMED"] } }, "required": ["change"] },
+      "then": { "required": ["from_path"] }
+    },
+    "impacted": {
+      "type": "object",
+      "required": ["ref", "ref_kind", "relation"],
+      "additionalProperties": false,
+      "properties": {
+        "ref": { "$ref": "#/$defs/ref" },
+        "ref_kind": { "enum": ["PATH", "ARTEFACT_ID", "GRAPH_NODE", "SYMBOL", "TASK", "RECORD", "INDEX", "CONTEXT_PACKET", "EVIDENCE"] },
+        "relation": { "enum": ["DIRECT", "TRANSITIVE"] }
+      }
+    },
+    "governed_action": {
+      "type": "object",
+      "required": ["action", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "action": { "enum": ["REFUSE_OPERATION", "BLOCK_TASK", "BLOCK_CLOSE", "RAISE_HUMAN_DECISION_GATE", "GENERATE_TASK", "MARK_EVIDENCE_STALE", "INVALIDATE_CONTEXT", "REINDEX", "QUARANTINE", "ROLLBACK", "DEGRADE_EXPLICITLY", "RECORD_FINDING", "OTHER"] },
+        "target": { "$ref": "#/$defs/ref" },
+        "description": { "$ref": "#/$defs/text" }
+      }
+    },
+    "forbidden_outcome": {
+      "type": "object",
+      "required": ["outcome", "observable"],
+      "additionalProperties": false,
+      "properties": {
+        "outcome": { "$ref": "#/$defs/text" },
+        "observable": { "description": "How a scorer observes that the outcome occurred.", "$ref": "#/$defs/text" }
+      }
+    },
+    "artifact_flow": {
+      "description": "W12 'G6 injects hidden artifact-flow failures' and the Gate W challenge: 'The hidden oracle defines the correct required input/version and expected downstream propagation.' Required for every fault whose class challenges a Gate W capability.",
+      "type": "object",
+      "required": ["required_inputs", "expected_propagation"],
+      "additionalProperties": false,
+      "properties": {
+        "required_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["artefact_id"],
+            "additionalProperties": false,
+            "properties": {
+              "artefact_id": { "$ref": "#/$defs/ref" },
+              "version": { "$ref": "#/$defs/text" },
+              "content_sha256": { "$ref": "#/$defs/sha256" },
+              "reason": { "$ref": "#/$defs/text" }
+            },
+            "anyOf": [{ "required": ["version"] }, { "required": ["content_sha256"] }]
+          }
+        },
+        "expected_propagation": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["ref", "expected_state"],
+            "additionalProperties": false,
+            "properties": {
+              "ref": { "$ref": "#/$defs/ref" },
+              "expected_state": { "enum": ["STALE", "INVALIDATED", "REWORK_TASK_GENERATED", "BLOCKED", "RETESTED", "UNCHANGED"] }
+            }
+          }
+        }
+      }
+    },
+    "fault": {
+      "description": "V1: one injected defect (Contract v3:1016-1026).",
+      "type": "object",
+      "required": ["fault_id", "class", "hidden_authoritative_truth", "injected_repository_state", "expected_detection", "expected_severity", "expected_impacted", "expected_governed_action", "forbidden_outcomes"],
+      "additionalProperties": false,
+      "properties": {
+        "fault_id": { "$ref": "#/$defs/id" },
+        "class": {
+          "description": "The fault class, and the owner-source capabilities (and advanced-qualification challenge ids) it challenges — the hidden-oracle fault class of the Qualification Coverage Matrix.",
+          "type": "object",
+          "required": ["id", "capabilities"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/token" },
+            "capabilities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/capability_id" } },
+            "challenge_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^AQC-[A-Z]+[0-9]*(-[0-9]+)?$" } }
+          }
+        },
+        "hidden_authoritative_truth": {
+          "type": "object",
+          "required": ["statement", "authoritative_refs"],
+          "additionalProperties": false,
+          "properties": {
+            "statement": { "$ref": "#/$defs/text" },
+            "authoritative_refs": { "type": "array", "items": { "$ref": "#/$defs/ref" } }
+          }
+        },
+        "injected_repository_state": {
+          "type": "object",
+          "required": ["description", "changes"],
+          "additionalProperties": false,
+          "properties": {
+            "description": { "$ref": "#/$defs/text" },
+            "changes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/state_change" } }
+          }
+        },
+        "expected_detection": {
+          "type": "object",
+          "required": ["tiers", "signals", "must_detect_before"],
+          "additionalProperties": false,
+          "properties": {
+            "tiers": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/tier" } },
+            "signals": { "description": "Observable detection signals: error codes, finding ids, health states.", "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+            "must_detect_before": { "description": "The latest point at which detection must occur (e.g. before task close, before work relies on the evidence).", "$ref": "#/$defs/text" }
+          }
+        },
+        "expected_severity": { "$ref": "#/$defs/severity" },
+        "expected_impacted": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/impacted" } },
+        "expected_governed_action": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/governed_action" } },
+        "forbidden_outcomes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/forbidden_outcome" } },
+        "artifact_flow": { "$ref": "#/$defs/artifact_flow" }
+      },
+      "if": { "properties": { "class": { "properties": { "capabilities": { "contains": { "pattern": "^W[0-9]+$" } } }, "required": ["capabilities"] } }, "required": ["class"] },
+      "then": { "required": ["artifact_flow"] }
+    },
+    "path_entry": {
+      "description": "V2: the hidden path-map truth for one current artefact of a brownfield repository (Contract v3:1028-1036).",
+      "type": "object",
+      "required": ["current_artefact", "correct_classification", "authority", "expected_target_paths", "action", "expected_references", "expected_consumers", "sensitivity", "indexing_expectation"],
+      "additionalProperties": false,
+      "properties": {
+        "current_artefact": {
+          "type": "object",
+          "required": ["path"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/$defs/ref" },
+            "content_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "correct_classification": { "$ref": "#/$defs/text" },
+        "authority": { "$ref": "#/$defs/text" },
+        "expected_target_paths": { "description": "KEEP: [current path]; MOVE/RENAME: exactly one other path; SPLIT: two or more; MERGE: exactly one; EXTRACT: one or more; RETIRE: none or one archive location; DELETE_FROM_ACTIVE_TREE: none.", "type": "array", "items": { "$ref": "#/$defs/ref" } },
+        "action": { "description": "Contract v3:1034 (KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE) and B2's DELETE_FROM_ACTIVE_TREE (Contract v3:192), so the oracle can express every target action the product's path map supports.", "enum": ["KEEP", "MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT", "RETIRE", "DELETE_FROM_ACTIVE_TREE"] },
+        "expected_references": { "type": "array", "items": { "$ref": "#/$defs/ref" } },
+        "expected_consumers": { "type": "array", "items": { "$ref": "#/$defs/ref" } },
+        "sensitivity": { "$ref": "#/$defs/text" },
+        "indexing_expectation": { "enum": ["INDEX_CURRENT", "INDEX_HISTORICAL", "NEVER_INDEX"] }
+      }
+    },
+    "memory_oracle": {
+      "description": "V3: the hidden memory oracle (Contract v3:1038-1045).",
+      "type": "object",
+      "required": ["must_be_indexed", "must_never_be_indexed", "expected_authority_namespaces", "expected_status", "expected_graph_relationships", "expected_code_symbols", "expected_retrieval_results"],
+      "additionalProperties": false,
+      "properties": {
+        "must_be_indexed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["ref"],
+            "additionalProperties": false,
+            "properties": {
+              "ref": { "$ref": "#/$defs/ref" },
+              "routes": { "type": "array", "uniqueItems": true, "items": { "enum": ["STRUCTURED", "LEXICAL", "SEMANTIC", "GRAPH", "CODE"] } }
+            }
+          }
+        },
+        "must_never_be_indexed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["ref", "reason"],
+            "additionalProperties": false,
+            "properties": { "ref": { "$ref": "#/$defs/ref" }, "reason": { "$ref": "#/$defs/text" } }
+          }
+        },
+        "expected_authority_namespaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["ref", "namespace"],
+            "additionalProperties": false,
+            "properties": { "ref": { "$ref": "#/$defs/ref" }, "namespace": { "$ref": "#/$defs/text" } }
+          }
+        },
+        "expected_status": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["ref", "status"],
+            "additionalProperties": false,
+            "properties": {
+              "ref": { "$ref": "#/$defs/ref" },
+              "status": { "enum": ["CURRENT", "SUPERSEDED", "HISTORICAL"] },
+              "superseded_by": { "$ref": "#/$defs/ref" }
+            },
+            "if": { "properties": { "status": { "const": "SUPERSEDED" } }, "required": ["status"] },
+            "then": { "required": ["superseded_by"] }
+          }
+        },
+        "expected_graph_relationships": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["from", "relation", "to"],
+            "additionalProperties": false,
+            "properties": { "from": { "$ref": "#/$defs/ref" }, "relation": { "$ref": "#/$defs/token" }, "to": { "$ref": "#/$defs/ref" } }
+          }
+        },
+        "expected_code_symbols": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "symbol", "symbol_kind"],
+            "additionalProperties": false,
+            "properties": {
+              "path": { "$ref": "#/$defs/ref" },
+              "symbol": { "$ref": "#/$defs/text" },
+              "symbol_kind": { "$ref": "#/$defs/text" },
+              "language": { "$ref": "#/$defs/text" }
+            }
+          }
+        },
+        "expected_retrieval_results": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["query_id", "query", "top_k", "must_include", "must_not_include"],
+            "additionalProperties": false,
+            "properties": {
+              "query_id": { "$ref": "#/$defs/id" },
+              "query": { "$ref": "#/$defs/text" },
+              "route": { "enum": ["STRUCTURED", "LEXICAL", "SEMANTIC", "GRAPH", "CODE", "FUSED"] },
+              "top_k": { "type": "integer", "minimum": 1 },
+              "must_include": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ref" } },
+              "must_not_include": { "type": "array", "items": { "$ref": "#/$defs/ref" } }
+            }
+          }
+        }
+      }
+    },
+    "oracle": {
+      "description": "Kind 'qualification-oracle': the verifier-owned hidden oracle of one qualification repository.",
+      "type": "object",
+      "required": ["oracle_id", "custody", "visibility", "repository", "separation", "fault_manifest", "memory_oracle"],
+      "additionalProperties": false,
+      "properties": {
+        "format": true,
+        "format_version": true,
+        "format_sha256": true,
+        "kind": true,
+        "purpose": true,
+        "oracle_id": { "$ref": "#/$defs/document_id" },
+        "custody": { "$ref": "#/$defs/custody" },
+        "visibility": { "const": "HIDDEN" },
+        "repository": { "$ref": "#/$defs/repository" },
+        "separation": { "$ref": "#/$defs/separation" },
+        "fault_manifest": {
+          "description": "V1 (Contract v3:1016-1026).",
+          "type": "object",
+          "required": ["faults"],
+          "additionalProperties": false,
+          "properties": { "faults": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/fault" } } }
+        },
+        "path_map_oracle": {
+          "description": "V2 (Contract v3:1028-1036). Required when repository.adoption_mode is BROWNFIELD.",
+          "type": "object",
+          "required": ["entries"],
+          "additionalProperties": false,
+          "properties": { "entries": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/path_entry" } } }
+        },
+        "memory_oracle": { "$ref": "#/$defs/memory_oracle" }
+      },
+      "if": { "properties": { "repository": { "properties": { "adoption_mode": { "const": "BROWNFIELD" } }, "required": ["adoption_mode"] } }, "required": ["repository"] },
+      "then": { "required": ["path_map_oracle"] }
+    },
+    "ratio": {
+      "description": "numerator / denominator, with value equal to that quotient.",
+      "type": "object",
+      "required": ["numerator", "denominator", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "numerator": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 1 },
+        "value": { "$ref": "#/$defs/unit" }
+      }
+    },
+    "not_applicable": {
+      "description": "An explicit, reasoned N/A — never a silent omission.",
+      "type": "object",
+      "required": ["applicable", "reason"],
+      "additionalProperties": false,
+      "properties": { "applicable": { "const": false }, "reason": { "$ref": "#/$defs/text" } }
+    },
+    "ratio_or_na": { "oneOf": [{ "$ref": "#/$defs/ratio" }, { "$ref": "#/$defs/not_applicable" }] },
+    "count_metric": {
+      "type": "object",
+      "required": ["count", "refs"],
+      "additionalProperties": false,
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "refs": { "description": "The artefacts counted; count equals their number.", "type": "array", "items": { "$ref": "#/$defs/ref" } }
+      }
+    },
+    "outcome": {
+      "description": "The observed outcome for one fault of the oracle's fault manifest.",
+      "type": "object",
+      "required": ["fault_id", "detected", "detected_at_tier", "detection_signal", "observed_severity", "severity_correct", "impacted_expected", "impacted_found", "governed_action_correct", "forbidden_outcomes_observed"],
+      "additionalProperties": false,
+      "properties": {
+        "fault_id": { "$ref": "#/$defs/id" },
+        "detected": { "type": "boolean" },
+        "detected_at_tier": { "anyOf": [{ "$ref": "#/$defs/tier" }, { "type": "null" }] },
+        "detection_signal": { "anyOf": [{ "$ref": "#/$defs/text" }, { "type": "null" }] },
+        "observed_severity": { "anyOf": [{ "$ref": "#/$defs/severity" }, { "type": "null" }] },
+        "severity_correct": { "type": "boolean" },
+        "impacted_expected": { "type": "integer", "minimum": 0 },
+        "impacted_found": { "type": "integer", "minimum": 0 },
+        "governed_action_correct": { "type": "boolean" },
+        "forbidden_outcomes_observed": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "score_report": {
+      "description": "Kind 'qualification-score-report': V4 quantitative qualification scoring (Contract v3:1047-1060) of one candidate run against one sealed oracle.",
+      "type": "object",
+      "required": ["report_id", "custody", "binding", "metrics", "per_fault_outcomes"],
+      "additionalProperties": false,
+      "properties": {
+        "format": true,
+        "format_version": true,
+        "format_sha256": true,
+        "kind": true,
+        "purpose": true,
+        "report_id": { "$ref": "#/$defs/document_id" },
+        "custody": { "$ref": "#/$defs/custody" },
+        "binding": {
+          "type": "object",
+          "required": ["oracle_id", "oracle_sha256", "repository", "candidate", "run_id", "scored_at"],
+          "additionalProperties": false,
+          "properties": {
+            "oracle_id": { "$ref": "#/$defs/document_id" },
+            "oracle_sha256": { "description": "Canonical digest of the sealed oracle document scored against.", "$ref": "#/$defs/sha256" },
+            "repository": {
+              "type": "object",
+              "required": ["id", "commit"],
+              "additionalProperties": false,
+              "properties": { "id": { "$ref": "#/$defs/id" }, "commit": { "$ref": "#/$defs/git_commit" } }
+            },
+            "candidate": {
+              "type": "object",
+              "required": ["commit", "product_code_digest"],
+              "additionalProperties": false,
+              "properties": { "commit": { "$ref": "#/$defs/git_commit" }, "product_code_digest": { "$ref": "#/$defs/sha256" } }
+            },
+            "run_id": { "$ref": "#/$defs/text" },
+            "scored_at": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "required": ["injected_defect_detection_recall", "false_positives", "severity_accuracy", "impact_map_accuracy", "path_map_accuracy", "missed_authoritative_artefacts", "wrong_indexing_count", "stale_index_count", "retrieval_metrics", "recovery_chaos_pass_rate", "human_gate_correctness", "task_readiness_correctness"],
+          "additionalProperties": false,
+          "properties": {
+            "injected_defect_detection_recall": { "description": "Detected injected faults / injected faults.", "$ref": "#/$defs/ratio" },
+            "false_positives": {
+              "description": "Findings raised that correspond to no injected fault and no genuine defect.",
+              "type": "object",
+              "required": ["count", "findings"],
+              "additionalProperties": false,
+              "properties": { "count": { "type": "integer", "minimum": 0 }, "findings": { "type": "array", "items": { "$ref": "#/$defs/text" } } }
+            },
+            "severity_accuracy": { "description": "Detected faults whose observed severity equals the expected severity / detected faults (N/A only when nothing was detected).", "$ref": "#/$defs/ratio_or_na" },
+            "impact_map_accuracy": { "description": "Expected impacted artefacts/nodes the candidate identified / all expected impacted artefacts/nodes.", "$ref": "#/$defs/ratio_or_na" },
+            "path_map_accuracy": { "description": "Path-map oracle entries the candidate mapped correctly (classification, authority, action and targets) / path-map oracle entries. N/A only when the oracle has no path-map oracle.", "$ref": "#/$defs/ratio_or_na" },
+            "missed_authoritative_artefacts": { "$ref": "#/$defs/count_metric" },
+            "wrong_indexing_count": { "$ref": "#/$defs/count_metric" },
+            "stale_index_count": { "$ref": "#/$defs/count_metric" },
+            "retrieval_metrics": {
+              "description": "Over the memory oracle's expected retrieval results (D5: Recall@K/MRR/precision/stale-hit/latency).",
+              "type": "object",
+              "required": ["k", "queries", "recall_at_k", "mrr", "precision_at_k", "stale_hit_rate"],
+              "additionalProperties": false,
+              "properties": {
+                "k": { "type": "integer", "minimum": 1 },
+                "queries": { "type": "integer", "minimum": 1 },
+                "recall_at_k": { "$ref": "#/$defs/unit" },
+                "mrr": { "$ref": "#/$defs/unit" },
+                "precision_at_k": { "$ref": "#/$defs/unit" },
+                "stale_hit_rate": { "$ref": "#/$defs/unit" },
+                "superseded_hit_rate": { "$ref": "#/$defs/unit" },
+                "latency_ms_p50": { "type": "number", "minimum": 0 },
+                "latency_ms_p95": { "type": "number", "minimum": 0 }
+              }
+            },
+            "recovery_chaos_pass_rate": { "$ref": "#/$defs/ratio_or_na" },
+            "human_gate_correctness": { "$ref": "#/$defs/ratio_or_na" },
+            "task_readiness_correctness": { "$ref": "#/$defs/ratio_or_na" }
+          }
+        },
+        "per_fault_outcomes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/outcome" } },
+        "notes": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

@@ -296,6 +296,31 @@ enum Cmd {
         #[command(subcommand)]
         op: HealthCmd,
     },
+    /// Qualification Oracle format (Contract v3 Gate V, V1-V4): print the format, or validate an oracle / score report
+    Oracle {
+        #[command(subcommand)]
+        op: OracleCmd,
+    },
+}
+/// `gov oracle` (P2-AR-0014, BC-P2-51). Read-only: it validates documents and changes no governed state.
+#[derive(Subcommand)]
+enum OracleCmd {
+    /// Print the format definition, its digest and the crosswalk from every Contract v3 V1-V4 element to its field
+    Format,
+    /// Validate a qualification-oracle or qualification-score-report document (JSON or YAML); fails closed, typed
+    Validate {
+        /// The document to validate
+        file: PathBuf,
+        /// For a score report: the sealed oracle it was scored against (binding, fault coverage, arithmetic)
+        #[arg(long)]
+        oracle: Option<PathBuf>,
+        /// Public qualification suite root: refuse an oracle stored inside it, or any trace of the oracle found in it
+        #[arg(long = "public-suite")]
+        public_suite: Vec<PathBuf>,
+        /// Qualification repository root: refuse an oracle stored inside it, or any trace of the oracle found in it
+        #[arg(long)]
+        repository: Vec<PathBuf>,
+    },
 }
 // ---- WS-2 (P2-AR-0015) additive block
 #[derive(Subcommand)]
@@ -1592,6 +1617,22 @@ fn run(cli: &Cli) -> Result<Value> {
             gov_runtime::lessons::cluster(&inbox, &proposals, &policy, *write)
         } },
         Cmd::Health { op } => health_cmd(cli, op), // WS-2 additive arm
+        Cmd::Oracle { op } => match op {
+            OracleCmd::Format => gov_runtime::qualification_oracle::format_definition(),
+            OracleCmd::Validate {
+                file,
+                oracle,
+                public_suite,
+                repository,
+            } => gov_runtime::qualification_oracle::validate_file(
+                file,
+                &gov_runtime::qualification_oracle::ValidateOptions {
+                    oracle: oracle.clone(),
+                    public_suites: public_suite.clone(),
+                    repositories: repository.clone(),
+                },
+            ),
+        },
         Cmd::Mcp { .. } => Err(GovError::new("MCP_NOT_IMPLEMENTED", "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)")),
     }.inspect(|_v| { let _ = name; })
 }
@@ -1666,6 +1707,7 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Policy { .. } => "policy",
         Cmd::Artefact { .. } => "artefact",
         Cmd::Health { .. } => "health", // WS-2 additive arm
+        Cmd::Oracle { .. } => "oracle",
     }
 }
 
