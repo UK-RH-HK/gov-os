@@ -16,4 +16,22 @@ branch: phase2/repair-1-r3-integration
 expected_output_path: release/capability-baseline/repair-1/integration-3/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: e2498f481ef23adb00332411e6edcbf7a31e52e0
+  report_commit: c6c608d
+  product_tip_commit: e3b6cfbcaefafa4f538f604be52dcde41c581e85
+  integration_merge_commit: e4cb662b64564b7cd5030d5fc2c0d72e710c6a9e
+  product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+  governed_state_digest: 2514b9fb46b140351f2898fbd99965a99cff4f19823c667c5affa200373235be
+  evidence_path: release/capability-baseline/repair-1/integration-3/
+  agent_model_self_reported: claude-opus-5[1m]
+  product_changes_beyond_merges: [0b80c87 schema cache reset on invalidate + KERNEL.yaml mirror + health payload, fcb049e one P2-ADJ-0002 mechanism (srr/binding.rs; gov trust bind/reseal; trust t2-binding removed; WS-8 expiry/rotation semantics kept), 77157f1 CIT sealed elsewhere disclosed not tampering, 5f86937 cit sealed kind + WS-4 declined-CIT test un-ignored, 68f2e4a task records sealed + governance/registry OS-managed + generated work not an adoption dependant, f1cb985 one availability host API + empty-alias fix + research L1, 22d43ce IP-R3-WS02-07/-08/-09 R3-WS5-4/-7 release record CLI tree_hash docs]
+  test_changes: [8b3fd14 ws04r3 observes claim-time propagation, e3b6cfb integration_r3 G2 readiness behind WS-5 materiality, ws03_r3 moved to one harness with typed codes of the kept command]
+  tests: {lib: 262/0, certification: 189/0/0 (166/17 straight after merges), python: 4/4, g0_round3_labels: 20/20}
+  r1_heldout: {AR-0027: 26/3 baseline, AR-0029: 26/2 baseline (ho_f n/c), AR-0031: 27/7 baseline, AR-0033: 30/1 (hv_a::a1 size pin; census 123 files/2304 fns, 0 violations; derive.py agrees)}
+  stopped: [R3-WS5-11 not reproduced (recall 1.0 in sandbox)]
+  routed_to_round_4: [INT3-O1 -> P2-HO-0042 (Contract v3 K3/F4 both hold), INT3-O2 -> P2-HO-0042, remaining WS-2/3/4/6/7/8/9 IPs -> P2-HO-0042, evidence-map IPs -> P2-HO-0041]
+  orchestrator_reproduction: {at: e4cb662, release_build: ok 0 warnings, lib: 262/0, certification: 189/0/0 (813 s)}
+  not_routed: [INT3-O4 legacy unsealed records reported not refused (for the verifier)]
