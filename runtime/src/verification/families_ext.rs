@@ -219,8 +219,41 @@ pub fn continuity_checkpoint_handoff(p: &Project, store: &RecordStore, f: &mut F
             )),
         }
     }
-    f.detail =
-        json!({"handoffs": handoffs.len(), "checkpoints": checkpoints.len(), "latest": pointer});
+    // G3 checkpoint freshness (Contract v3:796, W12 :1189; WS-4 R2-7): the latest checkpoint still describes the
+    // material state it captured. A stale latest checkpoint is disclosed; when it is the resume point of work in
+    // progress (its task is claimed) a fresh agent resuming from it would reconstruct stale inputs — medium.
+    let mut freshness = Value::Null;
+    if !checkpoints.is_empty() {
+        if let Ok(fr) = crate::checkpoints::freshness(p, None) {
+            if fr["state"] == "STALE" {
+                let ck = fr["checkpoint"].as_str().unwrap_or("?").to_string();
+                let task = store.get(&ck).map(|c| c.get("task")).unwrap_or_default();
+                let live = store
+                    .get(&task)
+                    .map(|t| {
+                        matches!(
+                            t.get("task_status").as_str(),
+                            "CLAIMED" | "IN_PROGRESS" | "REVIEW"
+                        )
+                    })
+                    .unwrap_or(false);
+                let mut x = finding(
+                    if live { "medium" } else { "low" },
+                    &fam,
+                    format!(
+                        "latest checkpoint {ck} is STALE: the material state it captured changed since ({}){}",
+                        fr["reasons"].as_array().map(|a| a.iter().map(|r| r["kind"].as_str().unwrap_or("?").to_string()).collect::<Vec<_>>().join(", ")).unwrap_or_default(),
+                        if live { format!("; it is the resume point of {task}, which is in progress — take a new checkpoint (`gov checkpoint create`)") } else { String::new() }
+                    ),
+                    store.get(&ck).map(|c| c.path.clone()),
+                );
+                x["subjects"] = json!([ck, task]);
+                f.findings.push(x);
+            }
+            freshness = json!({"checkpoint": fr["checkpoint"], "state": fr["state"], "reasons": fr["reasons"], "stale_checkpoints": fr["stale_checkpoints"]});
+        }
+    }
+    f.detail = json!({"handoffs": handoffs.len(), "checkpoints": checkpoints.len(), "latest": pointer, "latest_freshness": freshness});
 }
 
 fn tier_rank(t: &str) -> Option<u8> {

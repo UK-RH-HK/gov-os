@@ -190,7 +190,15 @@ fn embedder_pin_change_escalates_to_full_rebuild_without_mixed_index() {
         json(&root, "governance/generated/index-manifest.json")["embedder"]["dimensions"],
         64
     );
-    assert!(doctor_check(&g, "D025").0 && doctor_check(&g, "D010").0);
+    // WS-6 IP-R2-3 (BC-P2-30), wired by P2-AR-0033: the index is consistent with the pins again, but the embedder pin
+    // was changed in the project overlay directly — not through `gov memory benchmark` + `gov memory select` — so D025
+    // now also reports the retrieval profile as ungoverned. The index-consistency property this test asserts holds.
+    assert!(doctor_check(&g, "D010").0);
+    let (ok25, msg25) = doctor_check(&g, "D025");
+    assert!(
+        !ok25 && msg25.starts_with("consistent:") && msg25.contains("UNGOVERNED"),
+        "{msg25}"
+    );
     assert!(g.ok(&["memory", "freshness"])["fresh"] == true);
 }
 

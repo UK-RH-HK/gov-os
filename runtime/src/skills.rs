@@ -535,8 +535,19 @@ pub fn execute_check(p: &Project, gov: &Path, label: &str, check: &Value) -> Res
                 if let Some(d) = dst.parent() {
                     std::fs::create_dir_all(d).map_err(|e| e.to_string())?;
                 }
+                // `text_parts` are joined at run time, so a probe value the scenario plants (e.g. a secret-like
+                // literal) never exists whole in a kernel file the kernel's own scanner reads (WS-8 IP-R2-WS08-6)
                 let body = if let Some(t) = w.get("text").and_then(|t| t.as_str()) {
                     subst(t, &vars)
+                } else if let Some(parts) = w.get("text_parts").and_then(|t| t.as_array()) {
+                    subst(
+                        &parts
+                            .iter()
+                            .filter_map(|x| x.as_str())
+                            .collect::<Vec<_>>()
+                            .concat(),
+                        &vars,
+                    )
                 } else {
                     serde_json::to_string_pretty(&subst_value(&w["json"], &vars))
                         .map_err(|e| e.to_string())?

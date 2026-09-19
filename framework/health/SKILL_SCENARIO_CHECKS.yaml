@@ -7,7 +7,8 @@
 #
 # mode:
 #   executable     `check.steps` run by the gov binary itself against a disposable copy of the project (never the
-#                  live repository). Step kinds: `gov` (argv; optional role, expect, save), `write` (path + text|json),
+#                  live repository). Step kinds: `gov` (argv; optional role, expect, save), `write` (path + text|json,
+#                  or `text_parts` joined at run time — a planted probe value is never a whole literal in this file),
 #                  `yaml_set` (path + key path + value). A `gov` step without `expect` must succeed. Expectations:
 #                  ok, error_code, equals, one_of, nonempty over dotted paths (`body.` = result, or error details).
 #   agent          the expectation is about agent behaviour or agent-authored content; executed by the G6
@@ -68,8 +69,8 @@ checks:
   - skill: SKL-IMPACT-ANALYSIS
     scenario: V1
     statement_sha256: 36dbafb730dab117ab79909ab1b5f94a64ba6204bdfe0c4a3dbce090698dd230
-    mode: deferred
-    reason: "the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands."
+    mode: executable
+    reason: "executable since BC-P2-13 (WS-4, round 2): a CIT-P on governance/project/PROJECT_POLICY.yaml is classified material from what it touches and yields radius R5 with a human gate (IP-WS02-20 / WS-4 R2-9)"
     check:
       steps:
         - gov: [cit, propose, --proposal, "skill scenario SKL-IMPACT-ANALYSIS V1: change the project policy overlay", --targets, governance/project/PROJECT_POLICY.yaml]
@@ -85,7 +86,8 @@ checks:
     mode: executable
     check:
       steps:
-        - write: {path: config/.env.skill-scenario, text: "AWS_SECRET_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE\n"}
+        # the planted credential is assembled at run time (text_parts), so no kernel file carries a scannable literal
+        - write: {path: config/.env.skill-scenario, text_parts: ["AWS_SECRET_ACCESS_KEY=AKIA", "IOSFODNN7", "EXAMPLE\n"]}
         - gov: [rebuild-memory]
         - gov: [doctor]
           expect: {equals: {"body.checks[id=D012].ok": true}}
@@ -102,8 +104,8 @@ checks:
   - skill: SKL-RESEARCH-BENCHMARK
     scenario: V1
     statement_sha256: e50b4791495ea2887f6b98151f0fcc76d4cb965f02e002abb20e184b63a438b9
-    mode: deferred
-    reason: "the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands."
+    mode: executable
+    reason: "executable since BC-P2-47 (WS-10, round 2): research presented as evidence without its method fails schema validation (IP-WS02-21 / IP-WS10-07)"
     check:
       steps:
         - write: {path: spec/research/RES-9901.yaml, text: "id: RES-9901\ntype: research\ntitle: Skill scenario research without method\nstatus: ACTIVE\nquestion: does the research record need a method?\n"}
