@@ -588,6 +588,44 @@ fn anonymise(v: &Value, sandbox_root: &Path) -> Value {
     crate::scheduler::sandbox::relocate_paths(v, sandbox_root, Path::new("<sandbox>"))
 }
 
+/// Execute scenario checks concurrently (each in its own sandbox and processes), at most four at a time.
+fn run_checks(
+    p: &Project,
+    gov: &Path,
+    jobs: Vec<(String, Value)>,
+) -> std::collections::BTreeMap<String, Result<(bool, Value)>> {
+    use std::sync::Mutex;
+    let queue = Mutex::new(jobs);
+    let out = Mutex::new(std::collections::BTreeMap::new());
+    let (root, session, role) = (p.root.clone(), p.session_id.clone(), p.role.clone());
+    let n = queue.lock().map(|q| q.len()).unwrap_or(0).min(4);
+    std::thread::scope(|s| {
+        for w in 0..n {
+            let (queue, out, root, session, role) = (&queue, &out, &root, &session, &role);
+            let _ = std::thread::Builder::new()
+                .name(format!("gov-skill-{w}"))
+                .spawn_scoped(s, move || loop {
+                    let job = queue.lock().ok().and_then(|mut q| q.pop());
+                    let Some((label, check)) = job else { break };
+                    let tp =
+                        Project::open(root).with_session(Some(session.clone()), Some(role.clone()));
+                    let r = execute_check(&tp, gov, &label, &check);
+                    if let Ok(mut o) = out.lock() {
+                        o.insert(label, r);
+                    }
+                });
+        }
+    });
+    // anything a worker could not take (spawn failure) runs here
+    let rest: Vec<(String, Value)> = queue.into_inner().unwrap_or_default();
+    let mut out = out.into_inner().unwrap_or_default();
+    for (label, check) in rest {
+        let r = execute_check(p, gov, &label, &check);
+        out.insert(label, r);
+    }
+    out
+}
+
 /// Options for [`regression`].
 #[derive(Debug, Clone, Default)]
 pub struct RegressionOptions {
@@ -623,6 +661,36 @@ pub fn regression(p: &Project, opts: &RegressionOptions) -> (Vec<Value>, Value) 
         gov_binary()
     } else {
         None
+    };
+    // every executable check (and, on request, every deferred one) runs first, concurrently
+    let mut jobs: Vec<(String, Value)> = vec![];
+    if runner.is_some() {
+        for s in &skills {
+            let id = s["id"].as_str().unwrap_or("?");
+            let active = matches!(s["status"].as_str(), Some("ACTIVE") | Some("VALIDATED"));
+            for sc in s["validation_scenarios"]
+                .as_array()
+                .cloned()
+                .unwrap_or_default()
+            {
+                let scid = sc["id"].as_str().unwrap_or("?");
+                match scenario_plan(s, &sc, &kernel_checks) {
+                    ScenarioPlan::Executable(check) if active => {
+                        jobs.push((format!("{id}-{scid}"), check))
+                    }
+                    ScenarioPlan::Declared {
+                        check: Some(check), ..
+                    } if opts.include_deferred => {
+                        jobs.push((format!("{id}-{scid}-deferred"), check))
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+    let mut results = match &runner {
+        Some(gov) if !jobs.is_empty() => run_checks(p, gov, jobs),
+        _ => Default::default(),
     };
     let mut rows = vec![];
     let (mut passed, mut failed, mut declared, mut unexecutable, mut not_run) = (0, 0, 0, 0, 0);
@@ -685,8 +753,14 @@ pub fn regression(p: &Project, opts: &RegressionOptions) -> (Vec<Value>, Value) 
                 ScenarioPlan::Executable(check) => {
                     if !active {
                         json!({"scenario": scid, "status": "skipped (skill not ACTIVE/VALIDATED)"})
-                    } else if let Some(gov) = &runner {
-                        match execute_check(p, gov, &format!("{id}-{scid}"), &check) {
+                    } else if runner.is_some() {
+                        let _ = &check;
+                        match results.remove(&format!("{id}-{scid}")).unwrap_or_else(|| {
+                            Err(GovError::new(
+                                "SCENARIO_NOT_RUN",
+                                "the scenario was not scheduled",
+                            ))
+                        }) {
                             Ok((true, t)) => {
                                 passed += 1;
                                 json!({"scenario": scid, "status": "passed", "transcript": t})
@@ -734,14 +808,15 @@ pub fn regression(p: &Project, opts: &RegressionOptions) -> (Vec<Value>, Value) 
                     declared += 1;
                     findings.push(f("low", format!("{id} {scid}: not executed by the governance suite — declared {mode}: {reason}"), path.clone()));
                     let mut row = json!({"scenario": scid, "status": format!("declared-{mode}"), "reason": reason});
-                    if let (true, Some(check), Some(gov)) = (opts.include_deferred, check, &runner)
-                    {
-                        row["deferred_check"] = match execute_check(
-                            p,
-                            gov,
-                            &format!("{id}-{scid}-deferred"),
-                            &check,
-                        ) {
+                    if let (true, Some(_), Some(_)) = (opts.include_deferred, check, &runner) {
+                        row["deferred_check"] = match results
+                            .remove(&format!("{id}-{scid}-deferred"))
+                            .unwrap_or_else(|| {
+                                Err(GovError::new(
+                                    "SCENARIO_NOT_RUN",
+                                    "the scenario was not scheduled",
+                                ))
+                            }) {
                             Ok((ok, t)) => {
                                 json!({"executed_on_request": true, "expectation_met": ok, "transcript": t})
                             }
