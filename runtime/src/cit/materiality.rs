@@ -953,6 +953,33 @@ pub fn changes_of_manifest(p: &Project, store: &RecordStore, cit: &Value) -> Vec
             _ => {}
         }
     }
+    // Declared targets that are repository paths (not record ids) and that no manifest op already covers: what the
+    // CIT says it touches is classified by location even when it carries no manifest (content not stated, so only
+    // the path-based rules can fire). A path escaping the root is classified by name only and never read.
+    let covered: std::collections::BTreeSet<String> = out
+        .iter()
+        .map(|c| match c {
+            Change::Record { path, .. } | Change::File { path, .. } => path.clone(),
+        })
+        .collect();
+    for t in cit["targets"].as_array().cloned().unwrap_or_default() {
+        let Some(t) = t.as_str().map(|s| s.trim().to_string()) else {
+            continue;
+        };
+        if t.is_empty() || store.get(&t).is_some() || covered.contains(&t) {
+            continue;
+        }
+        if !(t.contains('/') || t.contains('.')) {
+            continue;
+        }
+        let escapes = t.starts_with('/') || t.split('/').any(|seg| seg == "..");
+        let now = if escapes { None } else { read_opt(p, &t) };
+        out.push(Change::File {
+            path: t,
+            before: now.clone(),
+            after: now,
+        });
+    }
     out
 }
 
@@ -1183,5 +1210,37 @@ mod tests {
         let none = Materiality::default();
         assert_eq!(none.effective_trigger("security_change"), "security_change");
         assert_eq!(none.effective_triggers("editorial"), Vec::<String>::new());
+    }
+
+    #[test]
+    fn declared_path_targets_are_classified_without_a_manifest() {
+        let root =
+            std::env::temp_dir().join(format!("gov-ws04r2-tgt-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(root.join("governance/project")).unwrap();
+        std::fs::write(
+            root.join("governance/project/PROJECT_POLICY.yaml"),
+            "x: 1\n",
+        )
+        .unwrap();
+        let p = Project::open(&root);
+        let store = RecordStore::load(&root);
+        let cit = json!({"targets": ["governance/project/PROJECT_POLICY.yaml", "REQ-9999", "../outside/secrets/x.pem"],
+                         "mutation_manifest": []});
+        let m = classify_manifest(&p, &store, &cit);
+        let classes = m.classes();
+        assert!(classes.contains(&"governance_change"), "{classes:?}");
+        // a path escaping the root is classified by name only (never read) and a bare id is not a path
+        assert!(classes.contains(&"security_change"), "{classes:?}");
+        assert!(m.findings.iter().all(|f| f.subject != "REQ-9999"));
+        // a target a manifest op already covers is not classified twice
+        let cit2 = json!({"targets": ["governance/project/PROJECT_POLICY.yaml"],
+                          "mutation_manifest": [{"op": "write_file", "path": "governance/project/PROJECT_POLICY.yaml", "content": "x: 2\n"}]});
+        let n = classify_manifest(&p, &store, &cit2)
+            .findings
+            .iter()
+            .filter(|f| f.class == "governance_change")
+            .count();
+        assert_eq!(n, 1);
+        let _ = std::fs::remove_dir_all(&root);
     }
 }
