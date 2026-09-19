@@ -29,8 +29,15 @@
 //!   import, found by asking the interpreter for its search path from the plugin's working directory and applying
 //!   Python's own finder order (regular package, then module file, then namespace portions) — including
 //!   `__pycache__`, because a planted byte-code file with a matching source stamp is loaded instead of the source;
-//! * every path the descriptor lists under `implementation:` (helper modules the entry point loads from elsewhere);
+//! * every path the descriptor lists under `implementation:` (helper modules the entry point loads from elsewhere),
+//!   and under `model.artefacts` / `runtime.artefacts` (the model an embed/rerank plugin loads and the inference
+//!   runtime it runs on, IP-R2-13: [`declared_paths`]) — so the component identity of the retrieval profile
+//!   (BC-P2-30) is identity of bytes the registration approved;
 //! * inline code (`sh -c '<code>'`, `python3 -c '<code>'`) lives in the descriptor, whose bytes the registration binds.
+//!
+//! A symlink inside a bound tree binds where it points *and* the bytes it resolves to; a symlinked directory is
+//! followed. Digests are recomputed at every authorisation unless the pin cache proves the bytes cannot have changed
+//! since they were hashed ([`super::pincache`]; [`content_sha256`]).
 //!
 //! A command whose implementation cannot be located (a module the interpreter cannot find, a declared path that does
 //! not exist, an unresolvable program) is refused, typed: nothing unbound ever runs.
@@ -274,10 +281,13 @@ fn file_identity(p: &Path) -> Option<(u64, u64, u64)> {
     }
 }
 
-/// The content hash of the running binary, read once per process from the running file itself.
+/// The content hash of the running binary, read from the running file itself — at most once per process, and not at
+/// all when the machine's pin cache holds a digest stored under the running file's present stat key
+/// ([`super::pincache`]: a running executable cannot be open for writing, and any later change of its bytes changes
+/// its key).
 fn running_exe_sha() -> Option<&'static str> {
     static SHA: OnceLock<Option<String>> = OnceLock::new();
-    SHA.get_or_init(|| crate::util::sha256_file(&running_exe()).ok())
+    SHA.get_or_init(|| super::pincache::sha256_of(&running_exe()))
         .as_deref()
 }
 
@@ -325,23 +335,48 @@ fn os_capability_server(args: &[String]) -> bool {
     })
 }
 
-/// Content hash of one file (a symlink is identified by its target). Never memoised: every authorisation reads the
-/// bytes it is about to approve.
+/// **The content hash of the file at `p`, as the implementation binding computes it** (symlinks followed): the
+/// digest every pin compares, reused only under the pin cache's rules ([`super::pincache`]). Other components that
+/// identify the same files — the retrieval profile's runtime and model identity (BC-P2-30) — use this instead of
+/// re-hashing, so a large program or model is read once, not once per consumer (call [`super::pincache::flush`]
+/// after a batch so new digests reach the machine's store). `None` when `p` is not a readable regular file.
+pub fn content_sha256(p: &Path) -> Option<String> {
+    if let (Some(run), Some(file)) = (file_identity(&running_exe()), file_identity(p)) {
+        if cfg!(unix) && run.0 == file.0 && run.1 == file.1 {
+            return running_exe_sha().map(String::from);
+        }
+    }
+    super::pincache::sha256_of(p)
+}
+
+/// Content hash of one bound file. A symlink binds both where it points and the bytes it resolves to, so re-pointing
+/// it and changing the file it points at are both changes (a symlink identified by its target text alone would let
+/// the target's bytes change unseen). The bytes are read afresh unless the pin cache proves they cannot have changed.
 fn hash_file(p: &Path) -> Option<String> {
     let meta = std::fs::symlink_metadata(p).ok()?;
     if meta.file_type().is_symlink() {
         let t = std::fs::read_link(p).ok()?;
+        let content = if std::fs::metadata(p).map(|m| m.is_file()).unwrap_or(false) {
+            content_sha256(p)?
+        } else {
+            "unresolved".to_string()
+        };
         return Some(sha256_hex(
-            format!("symlink:{}", t.to_string_lossy()).as_bytes(),
+            format!("symlink:{}\ncontent:{content}", t.to_string_lossy()).as_bytes(),
         ));
     }
-    crate::util::sha256_file(p).ok()
+    content_sha256(p)
 }
 
-/// Every file under `dir` (recursively, symlinked directories not followed), sorted.
+/// Every file under `dir`, sorted, recursively. A symlinked directory inside the tree is followed (an interpreter
+/// imports through it) and its link is bound as well; each directory is entered once (cycles end there).
 fn tree_files(dir: &Path, out: &mut Vec<PathBuf>) -> std::result::Result<(), String> {
     let mut stack = vec![dir.to_path_buf()];
+    let mut entered: std::collections::BTreeSet<PathBuf> = std::collections::BTreeSet::new();
     while let Some(d) = stack.pop() {
+        if !entered.insert(d.canonicalize().unwrap_or_else(|_| d.clone())) {
+            continue;
+        }
         let rd = std::fs::read_dir(&d).map_err(|e| format!("cannot read {}: {e}", d.display()))?;
         let mut entries: Vec<PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
         entries.sort();
@@ -351,14 +386,17 @@ fn tree_files(dir: &Path, out: &mut Vec<PathBuf>) -> std::result::Result<(), Str
                 .map_err(|x| format!("cannot stat {}: {x}", e.display()))?;
             if ft.is_dir() {
                 stack.push(e);
-            } else {
-                out.push(e);
-                if out.len() > MAX_BOUND_FILES {
-                    return Err(format!(
-                        "{} holds more than {MAX_BOUND_FILES} files; an implementation that large is not bound",
-                        dir.display()
-                    ));
-                }
+                continue;
+            }
+            if ft.is_symlink() && std::fs::metadata(&e).map(|m| m.is_dir()).unwrap_or(false) {
+                stack.push(e.clone());
+            }
+            out.push(e);
+            if out.len() > MAX_BOUND_FILES {
+                return Err(format!(
+                    "{} holds more than {MAX_BOUND_FILES} files; an implementation that large is not bound",
+                    dir.display()
+                ));
             }
         }
     }
@@ -486,6 +524,62 @@ fn python_top_level(top: &str, search: &[PathBuf]) -> Vec<PathBuf> {
     portions
 }
 
+/// Descriptor fields that declare files beyond the command vector, and the role their bound files carry:
+/// `implementation:` (helpers the entry point loads), and — for the retrieval components' identity (BC-P2-30,
+/// IP-R2-13) — `model.artefacts` (weights, tokenizer, configuration the plugin loads) and `runtime.artefacts` (the
+/// inference runtime it loads: libraries, a model server, an environment's packages).
+pub const DECLARED_FIELDS: &[(&str, &str)] = &[
+    ("implementation", "declared"),
+    ("model", "model"),
+    ("runtime", "runtime"),
+];
+
+/// One path a descriptor declares ([`DECLARED_FIELDS`]).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct DeclaredPath {
+    /// `declared` (from `implementation:`), `model` or `runtime`: the role its bound files carry.
+    pub role: String,
+    /// The path as the descriptor writes it.
+    pub declared: String,
+    /// Where it resolves: `{project_root}` / `{plugin_dir}` substituted, a relative path taken from the project root.
+    pub abs: PathBuf,
+    /// Inside the repository (content every clone carries) rather than machine-local.
+    pub in_repository: bool,
+}
+
+/// **Every path `desc` declares beyond its command** — `implementation:`, `model.artefacts`, `runtime.artefacts` —
+/// resolved as [`resolve`] binds them, whether or not they exist. For an executable plugin every one of them is bound
+/// by the registration (its bytes are part of the implementation identity; a missing one is refused), so the
+/// retrieval profile (BC-P2-30) can identify the model and runtime from the files the registration binds.
+pub fn declared_paths(desc: &PluginDescriptor, root: &Path) -> Vec<DeclaredPath> {
+    let plugin_dir = Path::new(&desc.source)
+        .parent()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let root_c = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
+    let mut out = vec![];
+    for (field, role) in DECLARED_FIELDS {
+        for s in desc.declared_paths(field) {
+            let sub = s
+                .replace("{project_root}", &root.to_string_lossy())
+                .replace("{plugin_dir}", &plugin_dir);
+            let abs = if Path::new(&sub).is_absolute() {
+                PathBuf::from(&sub)
+            } else {
+                root.join(&sub)
+            };
+            let canon = abs.canonicalize().unwrap_or_else(|_| abs.clone());
+            out.push(DeclaredPath {
+                role: role.to_string(),
+                declared: s.clone(),
+                in_repository: canon.starts_with(&root_c),
+                abs,
+            });
+        }
+    }
+    out
+}
+
 /// **Derive the implementation of `desc` as the host would execute it from `root`** (see the module documentation).
 pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
     let root_c = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
@@ -593,26 +687,19 @@ pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
             }
             i += 1;
         }
-        for d in desc
-            .raw
-            .get("implementation")
-            .and_then(|v| v.as_array())
-            .cloned()
-            .unwrap_or_default()
-        {
-            let Some(s) = d.as_str() else { continue };
-            let p = if Path::new(s).is_absolute() {
-                PathBuf::from(s)
-            } else {
-                root.join(s)
-            };
-            if !p.exists() {
+        for d in declared_paths(desc, root) {
+            if !d.abs.exists() {
+                let what = match d.role.as_str() {
+                    "model" => "model artefact",
+                    "runtime" => "runtime artefact",
+                    _ => "implementation path",
+                };
                 return Err(unresolved(
                     desc,
-                    format!("its declared implementation path '{s}' does not exist"),
+                    format!("its declared {what} '{}' does not exist", d.declared),
                 ));
             }
-            trees.push(("declared".into(), p.canonicalize().unwrap_or(p)));
+            trees.push((d.role.clone(), d.abs.canonicalize().unwrap_or(d.abs)));
         }
     }
     for (role, t) in trees {
@@ -630,6 +717,7 @@ pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
             add(&role, &t, h);
         }
     }
+    super::pincache::flush();
     let files: Vec<BoundFile> = bound.into_values().collect();
     let mut acc = String::new();
     for f in &files {
@@ -760,6 +848,96 @@ mod tests {
             .code,
             "PLUGIN_IMPLEMENTATION_UNRESOLVED"
         );
+    }
+
+    /// IP-R2-13: the model and runtime artefacts a descriptor declares (typically outside the plugin's directory)
+    /// are bound with their roles, any change to them changes the implementation identity, and a missing one is
+    /// refused before anything runs.
+    #[test]
+    fn declared_model_and_runtime_artefacts_are_bound_with_their_roles() {
+        let d = tmp();
+        let ext = tmp(); // outside the project: a model cache, a runtime installation
+        std::fs::write(d.join("s.sh"), "echo embed\n").unwrap();
+        std::fs::create_dir_all(ext.join("model")).unwrap();
+        std::fs::write(ext.join("model/weights.bin"), [1u8, 2, 3]).unwrap();
+        std::fs::write(ext.join("model/tokenizer.json"), "{}").unwrap();
+        std::fs::write(ext.join("libinfer.so"), "elf").unwrap();
+        let extra = json!({"model": {"id": "m", "artefacts": [ext.join("model").to_string_lossy()]},
+                           "runtime": {"artefacts": [ext.join("libinfer.so").to_string_lossy()]}});
+        let dp = desc(&d, vec!["sh", "s.sh"], extra);
+        let paths = declared_paths(&dp, &d);
+        assert_eq!(
+            paths.iter().map(|p| p.role.as_str()).collect::<Vec<_>>(),
+            vec!["model", "runtime"]
+        );
+        assert!(paths.iter().all(|p| !p.in_repository));
+        let a = resolve(&dp, &d).unwrap();
+        let role_of = |imp: &Implementation, name: &str| {
+            imp.files
+                .iter()
+                .find(|f| f.path.ends_with(name))
+                .map(|f| f.role.clone())
+        };
+        assert_eq!(role_of(&a, "weights.bin").as_deref(), Some("model"));
+        assert_eq!(role_of(&a, "tokenizer.json").as_deref(), Some("model"));
+        assert_eq!(role_of(&a, "libinfer.so").as_deref(), Some("runtime"));
+        std::fs::write(ext.join("model/weights.bin"), [1u8, 2, 4]).unwrap();
+        let b = resolve(&dp, &d).unwrap();
+        assert_ne!(
+            a.sha256, b.sha256,
+            "a changed model byte must change the identity"
+        );
+        std::fs::write(ext.join("libinfer.so"), "elg").unwrap();
+        let c = resolve(&dp, &d).unwrap();
+        assert_ne!(
+            b.sha256, c.sha256,
+            "a changed runtime byte must change the identity"
+        );
+        let missing = desc(
+            &d,
+            vec!["sh", "s.sh"],
+            json!({"model": {"artefacts": ["models/absent.bin"]}}),
+        );
+        let e = resolve(&missing, &d).unwrap_err();
+        assert_eq!(e.code, "PLUGIN_IMPLEMENTATION_UNRESOLVED");
+        assert!(e.message.contains("model artefact"), "{}", e.message);
+        let _ = std::fs::remove_dir_all(&ext);
+    }
+
+    /// A symlink inside a bound tree binds the bytes it resolves to (changing the target file is a change), and a
+    /// symlinked directory is followed (a file added under it is a change).
+    #[cfg(unix)]
+    #[test]
+    fn symlinked_files_and_directories_inside_a_bound_tree_are_bound_by_content() {
+        let d = tmp();
+        let outside = tmp();
+        std::fs::write(outside.join("helper.py"), "X = 1\n").unwrap();
+        std::fs::create_dir_all(outside.join("sub")).unwrap();
+        std::fs::write(outside.join("sub/mod.py"), "Y = 1\n").unwrap();
+        std::fs::create_dir_all(d.join("lib")).unwrap();
+        std::os::unix::fs::symlink(outside.join("helper.py"), d.join("lib/helper.py")).unwrap();
+        std::os::unix::fs::symlink(outside.join("sub"), d.join("lib/sub")).unwrap();
+        std::fs::write(d.join("s.sh"), "echo x\n").unwrap();
+        let dp = desc(&d, vec!["sh", "s.sh"], json!({"implementation": ["lib"]}));
+        let a = resolve(&dp, &d).unwrap();
+        assert!(
+            a.files.iter().any(|f| f.path.ends_with("lib/sub/mod.py")),
+            "{:?}",
+            a.files
+        );
+        std::fs::write(outside.join("helper.py"), "X = 2\n").unwrap();
+        let b = resolve(&dp, &d).unwrap();
+        assert_ne!(
+            a.sha256, b.sha256,
+            "the symlink target's bytes changed unseen"
+        );
+        std::fs::write(outside.join("sub/extra.py"), "Z = 1\n").unwrap();
+        let c = resolve(&dp, &d).unwrap();
+        assert_ne!(
+            b.sha256, c.sha256,
+            "a file added under a symlinked directory changed nothing"
+        );
+        let _ = std::fs::remove_dir_all(&outside);
     }
 
     #[test]

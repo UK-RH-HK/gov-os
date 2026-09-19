@@ -387,7 +387,7 @@ pub fn authorize(p: &Project, desc: &PluginDescriptor) -> Result<Value> {
                 why.clone(),
                 desc,
                 &checks,
-                json!({"registry": registry::REGISTRY_PATH}),
+                json!({"registry": registry::shown_path(p)}),
             ));
         }
         Standing::Unbound { binding } => {
@@ -396,7 +396,7 @@ pub fn authorize(p: &Project, desc: &PluginDescriptor) -> Result<Value> {
             );
             return Err(refuse("PLUGIN_REGISTRATION_UNBOUND", format!(
                 "plugin '{}' has a registry entry in {} that no `gov plugins register` on this machine produced as it stands (T2 binding {}): a hand-written, edited, legacy or foreign registration is a request, recorded and ignored (D-0007 rule 2). Re-register it with `gov plugins register`.",
-                desc.plugin_id, registry::REGISTRY_PATH, binding.code()), desc, &checks, json!({"t2": binding.to_value(), "registry": registry::REGISTRY_PATH})));
+                desc.plugin_id, registry::shown_path(p), binding.code()), desc, &checks, json!({"t2": binding.to_value(), "registry": registry::shown_path(p)})));
         }
         _ => {}
     }
@@ -405,7 +405,7 @@ pub fn authorize(p: &Project, desc: &PluginDescriptor) -> Result<Value> {
         _ => None,
     };
     let registered = reg.is_some();
-    checks.push(json!({"check": "registry_binding", "ok": true, "detail": if registered { format!("registered in {} (T2-verified; identity, version and descriptor content bound)", registry::REGISTRY_PATH) } else { "hand-declared descriptor (no registration record)".to_string() }, "descriptor_claims_ignored": claims}));
+    checks.push(json!({"check": "registry_binding", "ok": true, "detail": if registered { format!("registered in {} (T2-verified; identity, version and descriptor content bound)", registry::shown_path(p)) } else { "hand-declared descriptor (no registration record)".to_string() }, "descriptor_claims_ignored": claims}));
 
     // 1. authority floor from verified kernel policy: applies to every execution, registered or not, and cannot be
     //    widened by anything inside the descriptor (verifier V-H1)
@@ -593,6 +593,19 @@ fn gate_package(
         .iter()
         .map(|f| format!("{} ({}) sha256 {}", f.path, f.role, f.sha256))
         .collect();
+    let declared_of = |role: &str| -> Vec<String> {
+        imp.files
+            .iter()
+            .filter(|f| f.role == role)
+            .map(|f| f.path.clone())
+            .collect()
+    };
+    let (model, runtime) = (declared_of("model"), declared_of("runtime"));
+    let components = if model.is_empty() && runtime.is_empty() {
+        String::new()
+    } else {
+        format!(" It loads the declared model artefacts {model:?} and runtime artefacts {runtime:?} (bound above: a changed model or runtime byte stops the plugin until a new approval).")
+    };
     let prior = previous
         .and_then(|e| e.get("implementation_sha256").and_then(|v| v.as_str()))
         .map(|h| {
@@ -611,7 +624,7 @@ fn gate_package(
             {"id": "A", "description": format!("approve execution of exactly this implementation (subject {subject})")},
             {"id": "B", "description": "refuse: the plugin stays unregistered and never runs"}
         ],
-        "impact": format!("implementation sha256 {} = {}; declared permissions {} and permission classes {:?} are shown for review and are NOT enforced at run time; roles allowed to trigger it: {:?}",
+        "impact": format!("implementation sha256 {} = {}; declared permissions {} and permission classes {:?} are shown for review and are NOT enforced at run time; roles allowed to trigger it: {:?}.{components}",
             imp.sha256, files.join("; "), desc.raw.get("permissions").cloned().unwrap_or(json!({})), required,
             if desc.approved_roles.is_empty() { vec!["all (subject to TOOL_POLICY.plugins.min_authority)".to_string()] } else { desc.approved_roles.clone() }),
         "reversibility": "reversible: gov plugins unregister, or gov gate revoke on this gate, stops the plugin at its next execution",
@@ -810,7 +823,7 @@ pub fn integrity(p: &Project, desc: &PluginDescriptor) -> Option<(String, String
         Standing::Unbound { binding } => {
             return Some(("PLUGIN_REGISTRATION_UNBOUND".into(), "high".into(), format!(
                 "plugin {id}: its entry in {} is not what `gov plugins register` wrote on this machine (T2 binding {}: {}); a forged, edited, legacy or foreign registration is never honoured — re-register it",
-                registry::REGISTRY_PATH, binding.code(), binding.to_value()["reason"].as_str().unwrap_or(""))));
+                registry::shown_path(p), binding.code(), binding.to_value()["reason"].as_str().unwrap_or(""))));
         }
         Standing::Mismatched(why) => {
             return Some((
@@ -960,7 +973,7 @@ pub fn findings(p: &Project) -> Vec<Value> {
         let standing = registry::standing(p, d);
         if matches!(standing, Standing::Unregistered) && !claims.is_empty() {
             out.push(json!({"severity": "high", "plugin_id": d.plugin_id,
-                "message": format!("plugin descriptor {} declares its own authorisation ({}) but no record exists in {}; the claims are ignored by the executable paths and the descriptor must be registered with `gov plugins register` or the fields removed", d.plugin_id, claims.join(", "), registry::REGISTRY_PATH),
+                "message": format!("plugin descriptor {} declares its own authorisation ({}) but no record exists in {}; the claims are ignored by the executable paths and the descriptor must be registered with `gov plugins register` or the fields removed", d.plugin_id, claims.join(", "), registry::shown_path(p)),
                 "path": d.source}));
             continue;
         }
@@ -980,8 +993,10 @@ pub fn findings(p: &Project) -> Vec<Value> {
         if declared.contains(&id) {
             continue; // reported above with its descriptor
         }
-        out.push(json!({"severity": "high", "plugin_id": id, "code": "PLUGIN_REGISTRATION_UNBOUND", "message": format!("plugin registry records '{id}' but no gov operation on this machine produced that entry as it stands (T2 binding {}); it is never honoured", b.code()), "path": registry::REGISTRY_PATH}));
+        out.push(json!({"severity": "high", "plugin_id": id, "code": "PLUGIN_REGISTRATION_UNBOUND", "message": format!("plugin registry records '{id}' but no gov operation on this machine produced that entry as it stands (T2 binding {}); it is never honoured", b.code()), "path": registry::shown_path(p)}));
     }
+    // BC-P2-31: a second, differing registry at the legacy location (never read; reported)
+    out.extend(registry::location_findings(p));
     for id in registry::orphans(p, &declared) {
         if out
             .iter()
@@ -989,7 +1004,7 @@ pub fn findings(p: &Project) -> Vec<Value> {
         {
             continue;
         }
-        out.push(json!({"severity": "medium", "plugin_id": id, "message": format!("plugin registry records '{id}' but no descriptor declares it (stale registration; run `gov plugins unregister {id}`)"), "path": registry::REGISTRY_PATH}));
+        out.push(json!({"severity": "medium", "plugin_id": id, "message": format!("plugin registry records '{id}' but no descriptor declares it (stale registration; run `gov plugins unregister {id}`)"), "path": registry::shown_path(p)}));
     }
     for d in &set.denied {
         let id = d["plugin_id"].as_str().unwrap_or("");

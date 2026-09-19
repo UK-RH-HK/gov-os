@@ -3,5 +3,6 @@ pub mod binding;
 pub mod ecosystems;
 pub mod governance;
 pub mod host;
+pub mod pincache;
 pub mod protocol;
 pub mod registry;

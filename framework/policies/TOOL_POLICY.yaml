@@ -35,7 +35,10 @@ plugins:
   # A descriptor is discovery, never authorisation (D-0007). The floor below applies to EVERY plugin execution,
   # registered or not, and nothing inside a descriptor (approved_roles, provenance, status) can widen it.
   min_authority: L2                 # minimum authority level to trigger any capability plugin
-  registry_path: governance/generated/plugin-registry.json   # OS-written; the only proof of registration
+  # OS-written, tracked T2 state and the only proof of registration. It is not a regenerable view, so it does not
+  # live under governance/generated/ (BC-P2-31: deleting the generated views must not drop registrations); a registry
+  # still at the legacy location governance/generated/plugin-registry.json is read until the next registry write moves it.
+  registry_path: governance/registry/plugin-registry.json
   registration_binds: [plugin_id, version, descriptor_sha256, implementation_sha256, registration_subject_sha256, registration_gate]
   # declared elevation is shown to the approver (and raises the registration gate's stated impact); it is not what
   # makes approval necessary - every executable plugin needs it

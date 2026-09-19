@@ -638,12 +638,19 @@ fn deleting_everything_classified_derived_keeps_claims_control_and_registration(
         .iter()
         .map(|m| m["store"].as_str().unwrap().to_string())
         .collect();
-    for s in ["claims", "emergency-control", "plugin-registry"] {
+    for s in ["claims", "emergency-control"] {
         assert!(
             misplaced.iter().any(|m| m == s),
             "{s} is reported while its writer keeps it in the legacy location: {misplaced:?}"
         );
     }
+    // WS-7 round 3 (IP-R2-9): the registry's writer resolves its location through `paths::store_path`, so a new
+    // registration is written where it belongs and is not misplaced
+    assert!(
+        !misplaced.iter().any(|m| m == "plugin-registry"),
+        "{misplaced:?}"
+    );
+    assert!(exists(&root, gov_runtime::paths::PLUGIN_REGISTRY_PATH));
     for f in &del {
         std::fs::remove_file(root.join(f)).unwrap();
     }
@@ -660,7 +667,7 @@ fn deleting_everything_classified_derived_keeps_claims_control_and_registration(
         "{claims}"
     );
     assert!(
-        json(&root, "governance/generated/plugin-registry.json")["plugins"]["shell-rerank"]
+        json(&root, gov_runtime::paths::PLUGIN_REGISTRY_PATH)["plugins"]["shell-rerank"]
             .is_object()
     );
     g.ok(&["resume"]);
