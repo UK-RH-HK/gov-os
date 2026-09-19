@@ -54,11 +54,19 @@ const INSPECTION_COMMANDS: &[&str] = &[
     "cli.session",
 ];
 
-/// Repository files changed (tracked modified/added/deleted and untracked), from `git status --porcelain -z`.
+/// Untracked files of one wholly untracked directory listed individually in a checkpoint; a larger untracked tree
+/// (an unpacked archive, a vendored dependency) is recorded as the directory itself.
+const UNTRACKED_DIR_EXPANSION_LIMIT: usize = 20;
+
+/// Repository paths changed (tracked modified/added/deleted, and untracked), from `git status --porcelain -z`. Every
+/// changed file is named; a wholly untracked directory is expanded to its files unless it holds more than
+/// [`UNTRACKED_DIR_EXPANSION_LIMIT`] of them, when it is recorded as `dir/` — so the checkpoint stays proportionate on
+/// a brownfield tree (listing every untracked file made checkpoints, and the adoption artefacts that cite them, grow
+/// with the repository). The watchdog counts changed files separately (`files_changed_since`).
 pub fn working_tree_changes(p: &Project) -> Vec<String> {
     let Some(out) = crate::cit::materiality::git_output(
         &p.root,
-        &["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+        &["status", "--porcelain=v1", "-z", "--untracked-files=normal"],
     ) else {
         return vec![];
     };
@@ -69,6 +77,30 @@ pub fn working_tree_changes(p: &Project) -> Vec<String> {
             continue;
         }
         let (st, path) = (&e[..2], &e[3..]);
+        if st == "??" && path.ends_with('/') && !path.starts_with(".governance-runtime/") {
+            let files: Vec<String> = crate::cit::materiality::git_output(
+                &p.root,
+                &[
+                    "ls-files",
+                    "--others",
+                    "--exclude-standard",
+                    "-z",
+                    "--",
+                    path,
+                ],
+            )
+            .map(|o| {
+                o.split('\0')
+                    .filter(|f| !f.is_empty())
+                    .map(String::from)
+                    .collect()
+            })
+            .unwrap_or_default();
+            if !files.is_empty() && files.len() <= UNTRACKED_DIR_EXPANSION_LIMIT {
+                v.extend(files);
+                continue;
+            }
+        }
         v.push(path.to_string());
         if st.starts_with('R') || st.starts_with('C') {
             it.next();
@@ -835,6 +867,36 @@ pub fn session_close(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn files_changed_names_files_and_bounds_large_untracked_trees() {
+        let root =
+            std::env::temp_dir().join(format!("gov-ws04r2-wtc-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(root.join("src")).unwrap();
+        let git = |args: &[&str]| {
+            std::process::Command::new("git")
+                .args(args)
+                .current_dir(&root)
+                .output()
+                .unwrap()
+        };
+        git(&["init", "-q"]);
+        git(&["config", "user.email", "t@e.x"]);
+        git(&["config", "user.name", "t"]);
+        std::fs::write(root.join("src/lib.rs"), "a\n").unwrap();
+        git(&["add", "-A"]);
+        git(&["commit", "-qm", "base"]);
+        std::fs::write(root.join("src/lib.rs"), "b\n").unwrap();
+        std::fs::create_dir_all(root.join("small")).unwrap();
+        std::fs::write(root.join("small/a.txt"), "x").unwrap();
+        std::fs::create_dir_all(root.join("big")).unwrap();
+        for i in 0..(UNTRACKED_DIR_EXPANSION_LIMIT + 5) {
+            std::fs::write(root.join(format!("big/f{i}.txt")), "x").unwrap();
+        }
+        let v = working_tree_changes(&Project::open(&root));
+        assert_eq!(v, vec!["big/", "small/a.txt", "src/lib.rs"], "{v:?}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
 
     #[test]
     fn transitions_decisions_and_routing_changes_are_triggers() {
