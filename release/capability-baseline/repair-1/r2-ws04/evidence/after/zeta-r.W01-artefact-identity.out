@@ -1,0 +1,703 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): zeta-r/W01-artefact-identity mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 bf7006e914fd632ccf8490f97bd6b11a1224e1d2521db379aa2deef0f2557cb0; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:41:37Z
+# project w1: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-zeta-r-W01-artefact-identity-aFpoyS/w1-800097606
+$ gov init --name w1 --alias z-w1    [session=S-zeta role=orchestrator exit=0 0.8s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Ledger totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["total_cents sums quantity*unit_cents"]}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Ledger totals are exact integer cents with currency", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "supersedes": ["REQ-0001"], "acceptance_criteria": ["total_cents per currency"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use integer cents", "status": "ACTIVE", "question": "money type?", "chosen_option": "A", "rationale": "exactness", "affects": ["F-0001"]}
+  [probe wrote record] spec/data/DATA-0001.yaml: {"id": "DATA-0001", "type": "data", "title": "Representative order dataset", "status": "ACTIVE", "consumers": ["TASK-0001"]}
+  [probe wrote record] spec/experiments/EXP-0001.yaml: {"id": "EXP-0001", "type": "experiment", "title": "Rounding experiment", "status": "ACTIVE", "hypothesis": "no drift", "method": "sum", "result": "no drift"}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger is append-only", "status": "ACTIVE", "summary": "append-only ledger"}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Ledger API", "status": "ACTIVE", "version": "1.2.0", "contract": {"signature": "fn total_cents() -> i64"}, "consumers": ["TASK-0001"], "producers": ["TASK-0000"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement Ledger totals" --feature F-0001 --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0002\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"required_data\": [\"DATA-0001\"], \"interfaces\": [\"API-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+  ok=true result={
+ "allowed_paths": [
+  "src/**",
+  "tests/**"
+ ],
+ "class": "implementation",
+ "created": "2026-09-19",
+ "decisions": [
+  "D-0001"
+ ],
+ "feature": "F-0001",
+ "forbidden_paths": [
+  "governance/kernel/**"
+ ],
+ "id": "TASK-0001",
+ "interfaces": [
+  "API-0001"
+ ],
+ "minimum_model_tier": "T2",
+ "minimum_reasoning": "medium",
+ "objective": "Implement Ledger totals",
+ "production_merge_allowed": true,
+ "required_data": [
+  "DATA-0001"
+ ],
+ "requirements": [
+  "REQ-0002"
+ ],
+ "scenarios": [
+  "SCN-0001"
+ ],
+ "status": "ACTIVE",
+ "task_status": "READY",
+ "title": "Implement Ledger totals",
+ "type": "task"
+}
+task record as persisted by the product:
+id: TASK-0001
+type: task
+title: Implement Ledger totals
+status: ACTIVE
+created: '2026-09-19'
+requirements:
+- REQ-0002
+scenarios:
+- SCN-0001
+decisions:
+- D-0001
+required_data:
+- DATA-0001
+interfaces:
+- API-0001
+objective: Implement Ledger totals
+class: implementation
+feature: F-0001
+allowed_paths:
+- src/**
+- tests/**
+task_status: READY
+forbidden_paths:
+- governance/kernel/**
+production_merge_allowed: true
+minimum_model_tier: T2
+minimum_reasoning: medium
+
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "counts": {
+  "artifacts": 170,
+  "chunks": 388,
+  "edges": 26,
+  "excluded": 0,
+  "symbol_refs": 15,
+  "symbols": 12,
+  "vectors": 382
+ },
+ "coverage": {
+  "checked_artifacts": 21,
+  "complete": true,
+  "gaps": [],
+  "uncovered_lines": 0
+ },
+ "degradations": [],
+ "duration_ms": 133,
+ "ecosystems": {
+  "count": 1,
+  "ecosystems": [
+   {
+    "available": false,
+    "build": {
+     "available": false,
+     "command": [
+      "cargo",
+      "build"
+     ]
+    },
+    "dir": "",
+    "format": {
+     "available": false,
+     "command": [
+      "cargo",
+      "fmt",
+      "--check"
+     ]
+    },
+    "gap": "native tool 'cargo' not on PATH: capability gap (raise tooling task or human gate)",
+    "id": "rust-cargo",
+    "languages": [
+     "rust"
+    ],
+    "lint": {
+     "available": false,
+     "command": [
+      "cargo",
+      "clippy"
+     ]
+    },
+    "manifest": "Cargo.toml",
+    "metadata": {
+     "available": false,
+     "command": [
+      "cargo",
+      "metadata",
+      "--format-version",
+      "1",
+      "--no-deps"
+     ]
+    },
+    "required_binary": "cargo",
+    "test": {
+     "available": false,
+     "command": [
+      "cargo",
+      "test"
+     ]
+    }
+   }
+  ]
+ },
+ "embedder": {
+  "dimensions": 512,
+  "id": "hashed-ngram",
+  "source": "builtin",
+  "version": "1"
+ },
+ "escalated_to_full": null,
+ "excluded": [],
+ "failures": [],
+ "indexed": 170,
+ "manifest_hash": "d97dc532c63539138181b7575d9eda935cfeab009a72d1456c02a3702301f06b",
+ "mode": "full",
+ "moved": [],
+ "pro
+... [truncated 284 chars]
+index manifest top-level keys: ['artifacts', 'built_at', 'chunking', 'counts', 'embedder', 'excluded', 'index_version', 'lexical', 'manifest_hash', 'repo_commit', 'reranker']
+
+--- specification(requirement): manifest entry for spec/requirements/REQ-0001.yaml: {"artifact_id": "REQ-0001", "content_hash": "054a96e9b7493668b2cca47678dbf4356aaa853a068b78debfcb662f336ac444", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "requirement", "state_class": "AUTHORITATIVE", "status": "ACTIVE", "superseded_by": "REQ-0002"}
+OBS W1-b1-specification(requirement): PASS -- artifact_id=REQ-0001
+OBS W1-b2-specification(requirement): PASS -- record_type=requirement
+OBS W1-b3-specification(requirement): PASS -- path=spec/requirements/REQ-0001.yaml canonical_dir_for_type=spec/requirements
+OBS W1-b4-specification(requirement): PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-specification(requirement): PASS -- status=ACTIVE
+OBS W1-b6-specification(requirement): PASS -- content_hash=054a96e9b7493668...
+OBS W1-b7-specification(requirement): FAIL -- producer/provenance keys present in persisted record: []
+
+--- specification(feature): manifest entry for spec/features/F-0001.yaml: {"artifact_id": "F-0001", "content_hash": "7610914a392dfafbb58906acbf77b0b14e8aee5be2e2fb01a5e1a396ba0be36e", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "feature", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-specification(feature): PASS -- artifact_id=F-0001
+OBS W1-b2-specification(feature): PASS -- record_type=feature
+OBS W1-b3-specification(feature): PASS -- path=spec/features/F-0001.yaml canonical_dir_for_type=spec/features
+OBS W1-b4-specification(feature): PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-specification(feature): PASS -- status=ACTIVE
+OBS W1-b6-specification(feature): PASS -- content_hash=7610914a392dfafb...
+OBS W1-b7-specification(feature): FAIL -- producer/provenance keys present in persisted record: []
+
+--- scenario: manifest entry for spec/scenarios/SCN-0001.yaml: {"artifact_id": "SCN-0001", "content_hash": "a9e79a55c878a7cf1f4d87be8d2ea1f052931f9cc0fe8b284caa24434012c4fe", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "scenario", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-scenario: PASS -- artifact_id=SCN-0001
+OBS W1-b2-scenario: PASS -- record_type=scenario
+OBS W1-b3-scenario: PASS -- path=spec/scenarios/SCN-0001.yaml canonical_dir_for_type=spec/scenarios
+OBS W1-b4-scenario: PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-scenario: PASS -- status=ACTIVE
+OBS W1-b6-scenario: PASS -- content_hash=a9e79a55c878a7cf...
+OBS W1-b7-scenario: FAIL -- producer/provenance keys present in persisted record: []
+
+--- decision: manifest entry for spec/decisions/D-0001.yaml: {"artifact_id": "D-0001", "content_hash": "6c8f57cd39bc2b29c99dcc21dec2c837416f1c9b4e31b4f2b4fe8262aaa7a860", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "decision", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-decision: PASS -- artifact_id=D-0001
+OBS W1-b2-decision: PASS -- record_type=decision
+OBS W1-b3-decision: PASS -- path=spec/decisions/D-0001.yaml canonical_dir_for_type=spec/decisions
+OBS W1-b4-decision: PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-decision: PASS -- status=ACTIVE
+OBS W1-b6-decision: PASS -- content_hash=6c8f57cd39bc2b29...
+OBS W1-b7-decision: FAIL -- producer/provenance keys present in persisted record: []
+
+--- dataset: manifest entry for spec/data/DATA-0001.yaml: {"artifact_id": "DATA-0001", "content_hash": "4eeb616fdf704ad436cb636525f4c3fa210be02ad924f190abd1495451dd6e9a", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "data", "state_class": "NARRATIVE", "status": "ACTIVE"}
+OBS W1-b1-dataset: PASS -- artifact_id=DATA-0001
+OBS W1-b2-dataset: PASS -- record_type=data
+OBS W1-b3-dataset: PASS -- path=spec/data/DATA-0001.yaml canonical_dir_for_type=spec/data
+OBS W1-b4-dataset: PASS -- state_class=NARRATIVE
+OBS W1-b5-dataset: PASS -- status=ACTIVE
+OBS W1-b6-dataset: PASS -- content_hash=4eeb616fdf704ad4...
+OBS W1-b7-dataset: FAIL -- producer/provenance keys present in persisted record: []
+
+--- experiment: manifest entry for spec/experiments/EXP-0001.yaml: {"artifact_id": "EXP-0001", "content_hash": "6dc35c1119c40cb85661f4b8625e4fa877d2a35a11b072ec88ff0719481f3213", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "experiment", "state_class": "EVIDENCE", "status": "ACTIVE"}
+OBS W1-b1-experiment: PASS -- artifact_id=EXP-0001
+OBS W1-b2-experiment: PASS -- record_type=experiment
+OBS W1-b3-experiment: PASS -- path=spec/experiments/EXP-0001.yaml canonical_dir_for_type=spec/experiments
+OBS W1-b4-experiment: PASS -- state_class=EVIDENCE
+OBS W1-b5-experiment: PASS -- status=ACTIVE
+OBS W1-b6-experiment: PASS -- content_hash=6dc35c1119c40cb8...
+OBS W1-b7-experiment: FAIL -- producer/provenance keys present in persisted record: []
+
+--- architecture record: manifest entry for spec/architecture/ARCH-0001.yaml: {"artifact_id": "ARCH-0001", "content_hash": "beeca13385f62e0c86110dda21329fe9e8c363e8c056e6dcae6afddb47be64af", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "architecture", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-architecture record: PASS -- artifact_id=ARCH-0001
+OBS W1-b2-architecture record: PASS -- record_type=architecture
+OBS W1-b3-architecture record: PASS -- path=spec/architecture/ARCH-0001.yaml canonical_dir_for_type=spec/architecture
+OBS W1-b4-architecture record: PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-architecture record: PASS -- status=ACTIVE
+OBS W1-b6-architecture record: PASS -- content_hash=beeca13385f62e0c...
+OBS W1-b7-architecture record: FAIL -- producer/provenance keys present in persisted record: []
+
+--- interface: manifest entry for spec/interfaces/API-0001.yaml: {"artifact_id": "API-0001", "content_hash": "3167326f88d3adbb5363850d5b167e39378b5ad198b78779f0a53f61beaf146f", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "interface", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-interface: PASS -- artifact_id=API-0001
+OBS W1-b2-interface: PASS -- record_type=interface
+OBS W1-b3-interface: PASS -- path=spec/interfaces/API-0001.yaml canonical_dir_for_type=spec/interfaces
+OBS W1-b4-interface: PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-interface: PASS -- status=ACTIVE
+OBS W1-b6-interface: PASS -- content_hash=3167326f88d3adbb...
+OBS W1-b7-interface: FAIL -- producer/provenance keys present in persisted record: []
+
+--- test design: manifest entry for spec/tasks/TST-0001.yaml: {"artifact_id": "TST-0001", "content_hash": "9f3fc81ed1ae050168fba712c8e1e33fddf67bcf6ef799436a489d538bb5906a", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "test-obligation", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-test design: PASS -- artifact_id=TST-0001
+OBS W1-b2-test design: PASS -- record_type=test-obligation
+OBS W1-b3-test design: PASS -- path=spec/tasks/TST-0001.yaml canonical_dir_for_type=spec/tasks
+OBS W1-b4-test design: PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-test design: PASS -- status=ACTIVE
+OBS W1-b6-test design: PASS -- content_hash=9f3fc81ed1ae0501...
+OBS W1-b7-test design: FAIL -- producer/provenance keys present in persisted record: []
+
+--- task: manifest entry for spec/tasks/TASK-0001.yaml: {"artifact_id": "TASK-0001", "content_hash": "21e914ebedcd75b15e88388462fc4035a86377e85ba643f638fadb4b3d9e739e", "derivation": "10ca641bf3e4e5c26741010705887c60", "namespace": "spec", "path_class": "authoritative", "record_type": "task", "state_class": "AUTHORITATIVE", "status": "ACTIVE"}
+OBS W1-b1-task: PASS -- artifact_id=TASK-0001
+OBS W1-b2-task: PASS -- record_type=task
+OBS W1-b3-task: PASS -- path=spec/tasks/TASK-0001.yaml canonical_dir_for_type=spec/tasks
+OBS W1-b4-task: PASS -- state_class=AUTHORITATIVE
+OBS W1-b5-task: PASS -- status=ACTIVE
+OBS W1-b6-task: PASS -- content_hash=21e914ebedcd75b1...
+OBS W1-b7-task: FAIL -- producer/provenance keys present in persisted record: []
+OBS W1-b8-superseded_by-computed: PASS -- REQ-0001 superseded_by=REQ-0002 (REQ-0002 declares supersedes:[REQ-0001])
+$ gov memory graph REQ-0002 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+  ok=true result=[
+ {
+  "from": "REQ-0002",
+  "hop": 1,
+  "node": "F-0001",
+  "via": "\u2192REALISES"
+ },
+ {
+  "from": "REQ-0002",
+  "hop": 1,
+  "node": "REQ-0001",
+  "via": "\u2192SUPERSEDES"
+ },
+ {
+  "from": "REQ-0002",
+  "hop": 1,
+  "node": "TASK-0001",
+  "via": "\u2190CONSUMES"
+ }
+]
+OBS W1-b8-SUPERSEDES-edge: PASS -- graph REQ-0002 neighbours: [('F-0001', '→REALISES'), ('REQ-0001', '→SUPERSEDES'), ('TASK-0001', '←CONSUMES')]
+$ gov memory graph API-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+  ok=true result=[
+ {
+  "from": "API-0001",
+  "hop": 1,
+  "node": "TASK-0000",
+  "via": "\u2190PRODUCES"
+ },
+ {
+  "from": "API-0001",
+  "hop": 1,
+  "node": "TASK-0001",
+  "via": "\u2190CONSUMES"
+ }
+]
+OBS W1-b9-consumers-recorded: PASS -- API-0001 graph neighbours: [('TASK-0000', '←PRODUCES'), ('TASK-0001', '←CONSUMES')]
+$ gov memory graph DATA-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+  ok=true result=[
+ {
+  "from": "DATA-0001",
+  "hop": 1,
+  "node": "TASK-0001",
+  "via": "\u2190CONSUMES"
+ }
+]
+OBS W1-b9-dataset-consumers-recorded: PASS -- DATA-0001 graph neighbours: [('TASK-0001', '←CONSUMES')]
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  ok=true result={
+ "counts": {
+  "artifacts": 170,
+  "chunks": 388,
+  "edges": 26,
+  "excluded": 0,
+  "symbol_refs": 15,
+  "symbols": 12,
+  "vectors": 382
+ },
+ "coverage": {
+  "checked_artifacts": 1,
+  "complete": true,
+  "gaps": [],
+  "uncovered_lines": 0
+ },
+ "degradations": [],
+ "duration_ms": 53,
+ "ecosystems": {
+  "count": 1,
+  "ecosystems": [
+   {
+    "available": false,
+    "build": {
+     "available": false,
+     "command": [
+      "cargo",
+      "build"
+     ]
+    },
+    "dir": "",
+    "format": {
+     "available": false,
+     "command": [
+      "cargo",
+      "fmt",
+      "--check"
+     ]
+    },
+    "gap": "native tool 'cargo' not on PATH: capability gap (raise tooling task or human gate)",
+    "id": "rust-cargo",
+    "languages": [
+     "rust"
+    ],
+    "lint": {
+     "available": false,
+     "command": [
+      "cargo",
+      "clippy"
+     ]
+    },
+    "manifest": "Cargo.toml",
+    "metadata": {
+     "available": false,
+     "command": [
+      "cargo",
+      "metadata",
+      "--format-version",
+      "1",
+      "--no-deps"
+     ]
+    },
+    "required_binary": "cargo",
+    "test": {
+     "available": false,
+     "command": [
+      "cargo",
+      "test"
+     ]
+    }
+   }
+  ]
+ },
+ "embedder": {
+  "dimensions": 512,
+  "id": "hashed-ngram",
+  "source": "builtin",
+  "version": "1"
+ },
+ "escalated_to_full": null,
+ "excluded": [],
+ "failures": [],
+ "indexed": 1,
+ "manifest_hash": "9db03e873801291d312b0e72a4910ad1ecbbb60e40db1deab535e446ec5f92c8",
+ "mode": "incremental",
+ "moved": [
+  {
+
+... [truncated 424 chars]
+OBS W1-move-keeps-id: PASS -- after git mv: manifest entry {'artifact_id': 'REQ-0002', 'content_hash': '935b235c64a17b0623d1a1ecafa701e18164c629f8697049489d4deb4c364765', 'derivation': '10ca641bf3e4e5c26741010705887c60', 'namespace': 'spec', 'path_class': 'authoritative', 'record_type': 'requirement', 'state_class': 'AUTHORITATIVE', 'status': 'ACTIVE'}; rebuild report moved=[{'artifact_id': 'REQ-0002', 'from': 'spec/requirements/REQ-0002.yaml', 'to': 'spec/requirements/moved/REQ-0002.yaml'}]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W1-move-still-delivered: PASS -- context packet governing_requirements after move: [('REQ-0001', 'spec/requirements/REQ-0001.yaml'), ('REQ-0002', 'spec/requirements/moved/REQ-0002.yaml')]
+  [probe wrote record] spec/scenarios/REQ-0003.yaml: {"id": "REQ-0003", "type": "requirement", "title": "Misplaced requirement", "status": "ACTIVE", "feature": "F-0001"}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov doctor    [session=S-zeta role=orchestrator exit=3 0.1s]
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=3 0.5s]
+all audit finding messages: ["REQ-0001 is superseded by REQ-0002 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)", "1 dangling edge(s) reference unknown artefacts (e.g. \"API-0001\" \"PRODUCED_BY\" \"TASK-0000\")", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands.", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared deferred: the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands.", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34", "SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness"]
+OBS W1-b3-noncanonical-location-flagged: FAIL -- audit/doctor messages naming the misplaced REQ-0003 (requirement stored under spec/scenarios/): []
+$ gov gate create --question "Adopt integer cents?" --fields "{\"options\": [{\"id\": \"A\", \"description\": \"yes\"}, {\"id\": \"B\", \"description\": \"no\"}], \"why_now\": \"w1 probe\", \"impact\": \"low\", \"reversibility\": \"reversible\", \"recommendation\": \"A\", \"confidence\": 0.8, \"current_state\": \"open\"}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov gate present HDG-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov decide HDG-0001 --option A --by owner --rationale "w1 probe"    [session=S-zeta role=human exit=0 0.2s]
+  ok=true result={
+ "answered_by": "product owner",
+ "answered_by_kind": "human",
+ "authorises_blocked_work": true,
+ "blocked_tasks": [],
+ "cit": null,
+ "decision": "D-0002",
+ "gate": "HDG-0001",
+ "option": "A",
+ "unblocked_tasks": []
+}
+gate-derived decision record D-0002:
+id: D-0002
+type: decision
+title: 'Decision for HDG-0001: option A'
+status: ACTIVE
+created: '2026-09-19'
+question: Adopt integer cents?
+options:
+- id: A
+  description: yes
+  authorises_blocked_work: true
+- id: B
+  description: no
+  authorises_blocked_work: false
+chosen_option: A
+rationale: owner decision
+approved_by: product owner
+approved_at: '2026-09-19T06:41:39Z'
+human_approved: true
+impact_radius: R2
+reversibility: reversible
+confidence: 1.0
+derived_from:
+- HDG-0001
+evidence_refs: []
+state_class: AUTHORITATIVE
+approved_by_kind: human
+approved_by_role: orchestrator
+human_approval_evidence:
+  gate: HDG-0001
+  envelope_sha256: 05a4ab566cd341f9a518a7e94c745881bed7ff304ae738fd332481f1a8617894
+  signed_by_key_ids:
+  - fe812c12f3ab4ce6ac5db69ac352f906cb1b11ef43fb33e252ef7ff552263889
+  anchor:
+    source: standalone
+    role: human-gate
+    version: 1
+    anchor_sha256: e429c9ddba96e8c08dd72ddd6b667912db79f1210bc0f28f9c1e02320781c852
+    threshold: 1
+    key_ids:
+    - fe812c12f3ab4ce6ac5db69ac352f906cb1b11ef43fb33e252ef7ff552263889
+os_binding:
+  alg: hmac-sha256/t2-v1
+  key_id: bfa52f6063101061
+  operation: gate answer
+  at: '2026-09-19T06:41:39Z'
+  mac: 570a72567d276b195c3e571fac21b357f9f7f9bdef8deeb1e9b765c11f91d3e6
+
+OBS W1-b7-gate-decision-provenance: PASS -- decision minted by `gov decide` carries approved_by/derived_from
+$ gov audit    [session=S-zeta role=orchestrator exit=3 0.2s]
+audit AUD-0002 finding ids/messages: [('GF-0001', 'REQ-0001 is superseded by REQ-0002 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)'), ('GF-0002', '1 dangling edge(s) reference unknown artefacts (e.g. "API-0001" "PRODUCED_BY" "TASK-0000")'), ('GF-0003', 'index stale: 0 changed, 2 added, 1 removed'), ('GF-0004', 'SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family'), ('GF-0005', 'SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness'), ('GF-0006', 'SKL-IMPACT-ANALYSIS V1: not executed by the governance suite — declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands.'), ('GF-0007', 'SKL-LIVE-MIGRATION V1: not executed by the governance suite — declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run'), ('GF-0008', 'SKL-REPO-ADOPTION V1: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run'), ('GF-0009', 'SKL-REPO-ADOPTION V2: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run'), ('GF-0010', 'SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite — declared deferred: the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands.'), ('GF-0011', 'SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34'), ('GF-0012', 'SKL-THREAT-MODEL V1: not executed by the governance suite — declared agent: the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness')]
+OBS W1-b7-audit-provenance: PASS -- audit record AUD-0002 carries auditor_role/session
+  [probe wrote record] spec/requirements/AAA-0001.yaml: {"id": "AAA-0001", "type": "requirement", "title": "x", "status": "BOGUS"}
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=3 0.2s]
+OBS W1-b1-audit-finding-id-stable: FAIL -- same finding message received a different id on the next run: [('REQ-0001 is superseded by REQ-0002 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)', 'GF-0001', 'GF-0003'), ('1 dangling edge(s) reference unknown artefacts (e.g. "API-0001" "PRODUCED_BY" "TASK-0000")', 'GF-0002', 'GF-0004'), ('SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family', 'GF-0004', 'GF-0006'), ('SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness', 'GF-0005', 'GF-0007'), ('SKL-IMPACT-ANALYSIS V1: not executed by the governance suite — declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands.', 'GF-0006', 'GF-0008')]
+$ gov memory heldout-starter    [session=S-zeta role=orchestrator exit=2 0.0s]
+heldout-starter: {
+ "command": "memory",
+ "error": {
+  "code": "USAGE",
+  "details": null,
+  "message": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-zeta-r-W01-artefact-identity-aFpoyS/w1-800097606/governance/tests/memory/heldout.yaml already has 19 queries (use --force to overwrite)"
+ },
+ "ok": false,
+ "release_trust": {
+  "authenticity_established": false,
+  "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 \u00a76 bullet 7 was also asked and cleared: this machine carries no `DEGRADED \u2014 RECOVERY ONLY` marking.",
+  "below_floor": false,
+  "detail": "gov kernel trust; gov trust sta
+... [truncated 537 chars]
+$ gov memory benchmark --candidate current --candidate builtin:32 --record    [session=S-zeta role=orchestrator exit=0 0.4s]
+  ok=true result={
+ "heldout": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-zeta-r-W01-artefact-identity-aFpoyS/w1-800097606/governance/tests/memory/heldout.yaml",
+ "note": "recall@k, MRR, precision@k, stale/superseded rates, symbol recall, latency and index cost per candidate on the held-out set; selection is a governed decision (gov memory benchmark --select <candidate>)",
+ "queries": 19,
+ "recommended": "current",
+ "research_record": "RES-0001",
+ "rows": [
+  {
+   "avg_query_latency_ms": 0.7647058823529411,
+   "by_category": [
+    {
+     "category": "symbol",
+     "queries": 5,
+     "recall": 1.0
+    },
+    {
+     "category": "lexical_literal",
+     "queries": 6,
+     "recall": 1.0
+    },
+    {
+     "category": "exact_path",
+     "queries": 6,
+     "recall": 1.0
+    }
+   ],
+   "candidate": "current",
+   "dimensions": 512,
+   "embedder": {
+    "dimensions": 512,
+    "id": "hashed-ngram",
+    "source": "builtin",
+    "version": "1"
+   },
+   "forbidden_violations": 0,
+   "index_ms": 152,
+   "measured": true,
+   "mrr": 1.0,
+   "precision_at_k": 0.980392156862745,
+   "queries": 17,
+   "recall_at_k": 1.0,
+   "reranker": null,
+   "stale_hit_rate": 0.0,
+   "superseded_hit_rate": 0.0,
+   "symbol_recall": 1.0,
+   "usable": true,
+   "vectors": 444
+  },
+  {
+   "avg_query_latency_ms": 0.058823529411764705,
+   "by_category": [
+    {
+     "category": "exact_path",
+     "queries": 6,
+     "recall": 1.0
+    },
+    {
+     "category
+... [truncated 631 chars]
+benchmark research record RES-0001:
+id: RES-0001
+type: research
+title: Embedding/reranker benchmark (2 candidates)
+status: ACTIVE
+created: '2026-09-19'
+question: Which embedding/reranking implementation best serves this repository's held-out retrieval queries?
+reason: 'framework §14.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration'
+method: 'For each candidate: full re-index into an isolated database, then the held-out set (19 queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.'
+sources:
+- governance/tests/memory/heldout.yaml
+measurements:
+  rows:
+  - candidate: current
+    usable: true
+    embedder:
+      id: hashed-ngram
+      version: '1'
+      dimensions: 512
+      source: builtin
+    reranker: null
+    recall_at_k: 1.0
+    mrr: 1.0
+    precision_at_k: 0.980392156862745
+    stale_hit_rate: 0.0
+    superseded_hit_rate: 0.0
+    forbidden_violations: 0
+    symbol_recall: 1.0
+    avg_query_latency_ms: 0.7647058823529411
+    index_ms: 152
+    vectors: 444
+    dimensions: 512
+    measured: true
+    queries: 17
+    by_category:
+    - category: symbol
+      queries: 5
+      recall: 1.0
+    - category: lexical_literal
+      queries: 6
+      recall: 1.0
+    - category: exact_path
+      queries: 6
+      recall: 1.0
+  - candidate: builtin:32
+    usable: true
+    embedder:
+      id: hashed-ngram
+      version: '1'
+      dimensions: 32
+      source: builtin
+    reranker: null
+    recall_at_k: 1.0
+    mrr: 1.0
+    pr
+OBS W1-benchmark-result-has-id: PASS -- benchmark results persisted as research record RES-0001
+OBS W1-b7-benchmark-provenance: PASS -- research record has sources/method
+OBS W1-b6-benchmark-hash-in-record: FAIL -- top-level keys of the research record (artefact version/hash only via index manifest): ['conclusion', 'confidence', 'created', 'id', 'influences', 'measurements', 'method', 'question', 'reason', 'sources', 'state_class', 'status', 'title', 'type', 'uncertainty']
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W1-b6-benchmark-hash-in-manifest: PASS -- index-manifest entry for RES-0001: [{'artifact_id': 'RES-0001', 'content_hash': '6d591dfa73c9190fffd6c8c4890507c4a994692424942b82d6498b3b032ecbee', 'derivation': '10ca641bf3e4e5c26741010705887c60', 'namespace': 'spec', 'path_class': 'authoritative', 'record_type': 'research', 'state_class': 'EVIDENCE', 'status': 'ACTIVE'}]
+
+==== SUMMARY ====
+W1-b1-specification(requirement): PASS
+W1-b2-specification(requirement): PASS
+W1-b3-specification(requirement): PASS
+W1-b4-specification(requirement): PASS
+W1-b5-specification(requirement): PASS
+W1-b6-specification(requirement): PASS
+W1-b7-specification(requirement): FAIL
+W1-b1-specification(feature): PASS
+W1-b2-specification(feature): PASS
+W1-b3-specification(feature): PASS
+W1-b4-specification(feature): PASS
+W1-b5-specification(feature): PASS
+W1-b6-specification(feature): PASS
+W1-b7-specification(feature): FAIL
+W1-b1-scenario: PASS
+W1-b2-scenario: PASS
+W1-b3-scenario: PASS
+W1-b4-scenario: PASS
+W1-b5-scenario: PASS
+W1-b6-scenario: PASS
+W1-b7-scenario: FAIL
+W1-b1-decision: PASS
+W1-b2-decision: PASS
+W1-b3-decision: PASS
+W1-b4-decision: PASS
+W1-b5-decision: PASS
+W1-b6-decision: PASS
+W1-b7-decision: FAIL
+W1-b1-dataset: PASS
+W1-b2-dataset: PASS
+W1-b3-dataset: PASS
+W1-b4-dataset: PASS
+W1-b5-dataset: PASS
+W1-b6-dataset: PASS
+W1-b7-dataset: FAIL
+W1-b1-experiment: PASS
+W1-b2-experiment: PASS
+W1-b3-experiment: PASS
+W1-b4-experiment: PASS
+W1-b5-experiment: PASS
+W1-b6-experiment: PASS
+W1-b7-experiment: FAIL
+W1-b1-architecture record: PASS
+W1-b2-architecture record: PASS
+W1-b3-architecture record: PASS
+W1-b4-architecture record: PASS
+W1-b5-architecture record: PASS
+W1-b6-architecture record: PASS
+W1-b7-architecture record: FAIL
+W1-b1-interface: PASS
+W1-b2-interface: PASS
+W1-b3-interface: PASS
+W1-b4-interface: PASS
+W1-b5-interface: PASS
+W1-b6-interface: PASS
+W1-b7-interface: FAIL
+W1-b1-test design: PASS
+W1-b2-test design: PASS
+W1-b3-test design: PASS
+W1-b4-test design: PASS
+W1-b5-test design: PASS
+W1-b6-test design: PASS
+W1-b7-test design: FAIL
+W1-b1-task: PASS
+W1-b2-task: PASS
+W1-b3-task: PASS
+W1-b4-task: PASS
+W1-b5-task: PASS
+W1-b6-task: PASS
+W1-b7-task: FAIL
+W1-b8-superseded_by-computed: PASS
+W1-b8-SUPERSEDES-edge: PASS
+W1-b9-consumers-recorded: PASS
+W1-b9-dataset-consumers-recorded: PASS
+W1-move-keeps-id: PASS
+W1-move-still-delivered: PASS
+W1-b3-noncanonical-location-flagged: FAIL
+W1-b7-gate-decision-provenance: PASS
+W1-b7-audit-provenance: PASS
+W1-b1-audit-finding-id-stable: FAIL
+W1-benchmark-result-has-id: PASS
+W1-b7-benchmark-provenance: PASS
+W1-b6-benchmark-hash-in-record: FAIL
+W1-b6-benchmark-hash-in-manifest: PASS
+total=84 pass=71 fail=13
+[exit=0]

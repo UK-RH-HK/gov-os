@@ -1,0 +1,88 @@
+(a) role declared: orchestrator for init --name k2
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task claim TASK-0002
+(a) role declared: orchestrator for rebuild-memory --incremental
+(a) role declared: orchestrator for task close TASK-0002
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for context compile TASK-0001
+(a) role declared: orchestrator for checkpoint create --task
+(a) role declared: orchestrator for task list
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for gate present HDG-0001
+(a) role declared: orchestrator for decide HDG-0001 --option
+(b) human channel provisioned from /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-lMiJsw/tmp/p2ar0022-admin-a9lyh7d0/anchor.json: True
+(b) decide HDG-0001 --option A: owner-signed answer relayed by orchestrator (probe role was orchestrator)
+(a) role declared: orchestrator for cit approve CIT-0001
+(a) role declared: orchestrator for cit execute CIT-0001
+(a) role declared: orchestrator for cit show CIT-0001
+(a) role declared: orchestrator for cit show D-0001
+(a) role declared: orchestrator for cit show REQ-0001
+(a) role declared: orchestrator for cit show REQ-0002
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for cit simulate CIT-0002
+(a) role declared: orchestrator for cit approve CIT-0002
+(a) role declared: orchestrator for cit execute CIT-0002
+(a) role declared: orchestrator for cit show REQ-0003
+(a) role declared: orchestrator for cit show TASK-0001
+(a) role declared: orchestrator for cit show TST-0001
+(a) role declared: orchestrator for cit show SCN-0001
+(a) role declared: orchestrator for cit show TASK-0002
+(a) role declared: orchestrator for cit show RPT-0001
+(a) role declared: orchestrator for task dag
+(a) role declared: orchestrator for task list
+(a) role declared: orchestrator for context compile TASK-0001
+(a) role declared: orchestrator for checkpoint latest
+(a) role declared: orchestrator for cit show CKPT-00002
+(a) role declared: orchestrator for memory freshness
+(a) role declared: orchestrator for memory query retries a failed charge at most three times
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for gate present HDG-0002
+(a) role declared: orchestrator for decide HDG-0002 --option
+(b) decide HDG-0002 --option A: owner-signed answer relayed by orchestrator (probe role was orchestrator)
+(a) role declared: orchestrator for cit approve CIT-0003
+(a) role declared: orchestrator for cit execute CIT-0003
+(a) role declared: orchestrator for cit show CIT-0003
+(a) role declared: orchestrator for cit show TASK-0001
+(a) role declared: orchestrator for cit show REQ-0001
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for gate present HDG-0003
+(a) role declared: orchestrator for decide HDG-0003 --option
+(b) decide HDG-0003 --option A: owner-signed answer relayed by orchestrator (probe role was orchestrator)
+(a) role declared: orchestrator for cit approve CIT-0004
+(a) role declared: orchestrator for cit execute CIT-0004
+(a) role declared: orchestrator for cit show REQ-0001
+(a) role declared: orchestrator for cit show CIT-0004
+(a) role declared: orchestrator for cit show REQ-0001
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for gate present HDG-0004
+(a) role declared: orchestrator for decide HDG-0004 --option
+(b) decide HDG-0004 --option A: owner-signed answer relayed by orchestrator (probe role was orchestrator)
+(a) role declared: orchestrator for cit approve CIT-0005
+(a) role declared: orchestrator for cit execute CIT-0005
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for gate present HDG-0005
+(a) role declared: orchestrator for decide HDG-0005 --option
+(b) decide HDG-0005 --option A: owner-signed answer relayed by orchestrator (probe role was orchestrator)
+(a) role declared: orchestrator for cit approve CIT-0006
+(a) role declared: orchestrator for cit execute CIT-0006
+(a) role declared: orchestrator for cit show CIT-0006
+(a) role declared: orchestrator for cit show CIT-0006
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for recover --dry-run
+(a) role declared: orchestrator for recover
+(a) role declared: orchestrator for cit show CIT-0006
+(a) role declared: orchestrator for cit show CIT-0006
+(a) role declared: orchestrator for cit rollback CIT-0001
+(a) role declared: orchestrator for cit show REQ-0001
+(a) role declared: orchestrator for cit show REQ-0002
+(a) role declared: orchestrator for cit show D-0001
+(a) role declared: orchestrator for cit show REQ-0001
+(a) role declared: orchestrator for cit show REQ-0002
+(a) role declared: orchestrator for cit show D-0001
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for cit simulate CIT-0007
+(a) role declared: orchestrator for cit approve CIT-0007
+(a) role declared: orchestrator for cit execute CIT-0007

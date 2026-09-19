@@ -1,0 +1,73 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): gamma-r/E3-handoffs mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 63e01a019469577f2b36b25d132a8ddfee072e3092ea3df13a585a8a69561a6b; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:40:47Z
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-gamma-r-E3-handoffs-j3Zumq/e3
+
+==== E3.0 handoff creation is typed and persisted (session S-orch, process 1) ====
+  ok= True id= HND-0001
+    from_role = "orchestrator"
+    to_role = "backend-engineer"
+    task = "TASK-H1"
+    inputs = {"spec": "F-0001", "scenarios": ["SCN-0001"], "context_packet_hash": "ad94235bfa1d061277086a10dd606924f32576eba8afad07de9bee8835b069d9"}
+    expected_outputs = ["implementation", "evidence"]
+    authority = {"allowed": ["src/**"], "prohibited": ["governance/kernel/**"]}
+    required_return = ["changed_files", "tests", "discoveries", "unresolved"]
+    handoff_status = "OPEN"
+    state_class = "DERIVED"
+  on disk: HND-0001.yaml
+  mandatory checkpoint before_handoff: CKPT-00001.yaml
+
+==== E3.1 the worker return contract is enforced field by field (each bullet's field removed -> typed refusal) ====
+  without work_completed           exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "work_completed" is a required property
+  without files_changed            exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "files_changed" is a required property
+  without evidence                 exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "evidence" is a required property
+  without tests                    exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "tests" is a required property
+  without discoveries              exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "discoveries" is a required property
+  without risks                    exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "risks" is a required property
+  without lessons                  exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "lessons" is a required property
+  without proposed_decisions       exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "proposed_decisions" is a required property
+  without unresolved               exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "unresolved" is a required property
+  without recommended_next_action  exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): <root>: "recommended_next_action" is a required property
+  status: 'done' (not in enum)     exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for worker-return (worker return contract): /status: "done" is not one of ["success","partial","failed","
+  handoff status after refused returns: handoff_status: OPEN
+
+==== E3.2 a complete return is recorded (worker session S-worker, process N) ====
+  ok= True {"handoff": "HND-0001", "status": "RETURNED", "files_changed": ["src/lib.rs"], "unresolved": ["currency conversion"], "lessons_created": ["L-0001"], "receipt_validation": {"ok": false, "errors": ["RECEIPT_FIELDS_MISSING", "UNTRACEABLE_IMPLEMENTATION"], "error_count": 2, "warning_count": 0, "manifest_hash": "c36b097155a4a11aa3a29775599933021304817ca400fc1e36a591105f6cf2b5", "packet_hash": null, "tr
+
+==== E3.3 persistence beyond the conversation: a fresh session/process reads every returned field from the governed record ====
+  handoff_status= RETURNED returned_at= 2026-09-19T06:40:49Z
+   [work completed    ] work_completed           = "implemented totals"
+   [files changed     ] files_changed            = ["src/lib.rs"]
+   [evidence          ] evidence                 = ["cargo test: 3 passed"]
+   [tests             ] tests                    = {"status": "passed", "command": "cargo test"}
+   [discoveries       ] discoveries              = ["overflow at u32"]
+   [risks             ] risks                    = ["rounding"]
+   [lessons           ] lessons                  = ["check arithmetic width before implementing totals"]
+   [proposed decisions] proposed_decisions       = ["use u64 cents"]
+   [unresolved items  ] unresolved               = ["currency conversion"]
+   [next action       ] recommended_next_action  = "independent test design for totals"
+  lessons in the return became governed lesson records (evidence, never authority):
+   L-0001.yaml: status: PROVISIONAL state_class: EVIDENCE scope: PROJECT 
+$ derived memory deleted and rebuilt: the handoff record is unaffected and is found by structured lookup
+  routes= ['structured', 'lexical'] top hit= ['spec/planning/HND-0001.yaml', 'spec/planning/HND-0001.yaml']
+$ git commit + fresh clone on another path (another machine/session): the full return is present
+  clone: HND-0001.yaml status RETURNED fields: ['discoveries', 'evidence', 'files_changed', 'lessons', 'proposed_decisions', 'recommended_next_action', 'risks', 'status', 'task', 'tests', 'unresolved', 'work_completed']
+
+==== E3.4 authority on the return: files outside the handoff's authority are refused and recorded ====
+exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=worker changed files outside its authority: governance/kernel/policies/AUTHORITY_POLICY.yaml: prohibited path; docs/x.md: outside allowed paths
+  authority_violations:
+  - 'governance/kernel/policies/AUTHORITY_POLICY.yaml: prohibited path'
+  - 'docs/x.md: outside allowed paths'
+  suite mutation_scope: ['HND-0002 returned with authority violations: ["governance/kernel/policies/AUTHORITY_POLICY.yaml: prohibited path","docs/']
+
+==== E3.5 binding of a return to its handoff (recipient role / session / single return) ====
+$ HND-0003 is addressed to backend-engineer; a frontend-engineer session returns it
+exit=0 ok=true
+$ a second, different return to the same (already RETURNED) handoff
+exit=0 ok=true
+  record now: work_completed='SECOND RETURN overwrote the first' unresolved=[]
+$ return to an unknown handoff id
+exit=1 ok=false code=HANDOFF_NOT_FOUND msg=HND-9999 not found
+END
+[exit=0]

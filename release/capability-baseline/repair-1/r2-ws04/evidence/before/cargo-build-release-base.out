@@ -1,0 +1,9 @@
+   Compiling ed25519-dalek v2.2.0
+   Compiling hex v0.4.3
+   Compiling clap v4.6.6
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/cli)
+    Finished `release` profile [optimized] target(s) in 2m 24s
+
+real	2m32.149s
+user	3m52.942s
+sys	0m11.164s

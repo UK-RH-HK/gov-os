@@ -1,0 +1,198 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): zeta-r/W09-session-handoff-continuity mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 fc3563afa0db7708a6156b402ed1272ec08545d9cb245278d017d8453fbb94b8; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:42:31Z
+# project w9: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-zeta-r-W09-session-handoff-continuity-l9wKGk/w9-800151339
+$ gov init --name w9 --alias z-w9    [session=S-zeta role=orchestrator exit=0 0.8s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 398"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+$ gov checkpoint create --next-action "implement totals" --task TASK-0001 --trigger before_session_close    [session=S-one role=orchestrator exit=0 0.2s]
+checkpoint at session close: {"id": "CKPT-00001", "type": "checkpoint", "title": "Checkpoint 1 (before_session_close)", "status": "ACTIVE", "created": "2026-09-19", "next_action": "implement totals", "task": "TASK-0001", "trigger": "before_session_close", "session": "S-one", "role": "orchestrator", "sequence": 1, "mode": "RUNNING", "pending_decisions": [], "open_transactions": [], "open_questions": [], "files_changed": ["governance/generated/index-manifest.json", "governance/generated/memory-manifest.json"], "tests_status": "unknown", "context_packet_hash": "c65abb9d6c230fbd4549a86a39ed17292803a90b79d3ffd6e9fa94bac860d507", "task_status": "READY", "inputs": [{"id": "F-0001", "slot": "feature", "required": true, "resolution": "RESOLVED", "version": null, "content_hash": "7610914a392dfafbb58906acbf77b0b14e8aee5be2e2fb01a5e1a396ba0be36e", "normative_hash": "af8dab9e9b4dbbdab4fde6af781c69de4eefae19d1609ba82daba6df4ddd48d3", "delivered_hash": "7610914a392dfafbb58906acbf77b0b14e8aee5be2e2fb01a5e1a396ba0be36e", "delivered_normative_hash": "af8dab9e9b4dbbdab4fde6af781c69de4eefae19d1609ba82daba6df4ddd48d3", "stale": false}, {"id": "REQ-0001", "slot": "requirement", "required": true, "resolution": "RESOLVED", "version": null, "content_hash": "d14c5ebfbbeaa10f79a3999bb62d11940edd8065ab71eae7f018bf7673e38c3e", "normative_hash": "1e311366711eea63c38db08cbcb9db72ebb5291428bf89a29907a702593a7f7d", "delivered_hash": "d14c5ebfbbeaa10f79a3999bb62d11940edd8065ab71eae7f018bf7673e38c3e", "delivered_normative_hash": "1e311366711eea63c38db08cbcb9db72ebb5291428bf89a29907a702593a7f7d", "stale": false}, {"id": "D-0001", "slot": "decision", "required": true, "resolution": "RESOLVED", "version": null, "content_hash": "8e792866431fda4f785b4eeb2bd3d35bdf2bad0df22087eef3639d6e5380a483", "normative_hash": "016bc9587beb4004503a65f36e71a34171498b770f1ab480c5c3afc0f0f3424b", "delivered_hash": "8e792866431fda4f785b4eeb2bd3d35bdf2bad0df22087eef3639d6e5380a483", "delivered_normative_hash": "016bc9587beb4004503a65f36e71a34171498b770f1ab480c5c3afc0f0f3424b", "stale": false}, {"id": "SCN-0001", "slot": "scenario", "required": true, "resolution": "RESOLVED", "version": null, "content_hash": "a9e79a55c878a7cf1f4d87be8d2ea1f052931f9cc0fe8b284caa24434012c4fe", "normative_hash": "e9df3504513d4a30bf89a771db10a8000c73ad1bd8f53c0bd82b63cc3fbb63f3", "delivered_hash": "a9e79a55c878a7cf1f4d87be8d2ea1f052931f9cc0fe8b284caa24434012c4fe", "delivered_normative_hash": "e9df3504513d4a30bf89a771db10a8000c73ad1bd8f53c0bd82b63cc3fbb63f3", "stale": false}, {"id": "TST-0001", "slot": "test_design", "required": true, "resolution": "RESOLVED", "version": null, "content_hash": "9f3fc81ed1ae050168fba712c8e1e33fddf67bcf6ef799436a489d538bb5906a", "normative_hash": "f7d2970781d2ca56c1cdf51acbf2eeb751133a06f6204a1a1dca5e328e7ddbaa", "delivered_hash": "9f3fc81ed1ae050168fba712c8e1e33fddf67bcf6ef799436a489d538bb5906a", "delivered_normative_hash": "f7d2970781d2ca56c1cdf51acbf2eeb751133a06f6204a1a1dca5e328e7ddbaa", "stale": false}], "input_state": {"task": "TASK-0001", "task_status": "READY", "delivery_state": "COMPLETE", "packet_hash": "c65abb9d6c230fbd4549a86a39ed17292803a90b79d3ffd6e9fa94bac860d507", "packet_compiled_at": "2026-09-19T06:42:32Z", "packet_invalidated": false, "packet_current": true, "stale_inputs": [], "missing_inputs": [], "input_violations": [], "contradictions": []}, "memory_snapshot": {"index_manifest_hash": "4a1ba2c4750c2f2dfba7e9b19b782bb58acf33c613bb9c00f2c6113382dd5ae0", "index_version": "4.1.5-idx4", "fresh": true, "stale_before_checkpoint": 0}, "state_reference": {"repo_commit": "23bf6baf39a1863cd04756f8f75cd3a75c109ea7", "governed_state_digest": "7cd1496c3e243747f4e95509a0ef3502559dac10c39c858975dba48575b60ff6", "index": {"index_manifest_hash": "4a1ba2c4750c2f2dfba7e9b19b782bb58acf33c613bb9c00f2c6113382dd5ae0", "index_version": "4.1.5-idx4", "fresh": true, "stale_before_checkpoint": 0}, "taken_at": "2026-09-19T06:42:32Z"}, "observed_state": {"at": "2026-09-19T06:42:32Z", "task_states": {"TASK-0001": "READY"}, "material_decisions": [], "routing_digest": "9be971ad34793e659044807ba3a420f91ecd316b48602b19b7d98f6492c90e17", "telemetry_events": 6}, "triggers_observed": [], "health": {"tier": "G3", "verdict": "HEALTHY", "health_result": "HR-20260919T064232556Z-90018fbd", "counts": {"critical": 0, "high": 0, "medium": 0, "low": 0}}, "state_class": "EVIDENCE", "created_at": "2026-09-19T06:42:32Z"}
+$ gov task show TASK-0001    [session=S-two-fresh role=orchestrator exit=0 0.0s]
+OBS W9-c1-manifest-persists: PASS -- fresh session reads TASK-0001 requirements=['REQ-0001'] scenarios=['SCN-0001'] from the governed task record
+OBS W9-c2-checkpoint-input-ids: PASS -- checkpoint keys: ['context_packet_hash', 'created', 'created_at', 'files_changed', 'health', 'id', 'input_state', 'inputs', 'memory_snapshot', 'mode', 'next_action', 'observed_state', 'open_questions', 'open_transactions', 'pending_decisions', 'role', 'sequence', 'session', 'state_class', 'state_reference', 'status', 'task', 'task_status', 'tests_status', 'title', 'trigger', 'triggers_observed', 'type']; mentions REQ-0001: True
+OBS W9-c2-checkpoint-state-reference: PASS -- context_packet_hash=c65abb9d6c23 (== packet c65abb9d6c23); memory_snapshot={'index_manifest_hash': '4a1ba2c4750c2f2dfba7e9b19b782bb58acf33c613bb9c00f2c6113382dd5ae0', 'index_version': '4.1.5-idx4', 'fresh': True, 'stale_before_checkpoint': 0}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 398"], "statement": "Totals SHALL round to whole units."}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+$ gov checkpoint create --next-action "implement totals" --task TASK-0001    [session=S-one role=orchestrator exit=0 0.2s]
+OBS W9-c2-packet-hash-tracks-input-content: PASS -- checkpoint context_packet_hash before/after REQ-0001 statement change: c65abb9d6c23 / 792d1c89b081; deterministic_hash before/after: 50f1c900498a / f3af5b11b9a0 (packet_hash moved only because the RETRIEVED block's excerpts changed: False)
+OBS W9-c2-index-hash-tracks-input-content: PASS -- checkpoint memory_snapshot.index_manifest_hash before/after: 4a1ba2c4750c / af41240d8612
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 398", "negative quantities rejected"], "statement": "Totals SHALL round to whole units."}
+$ gov memory freshness    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov checkpoint create --next-action "implement totals" --task TASK-0001    [session=S-one role=orchestrator exit=0 0.2s]
+OBS W9-c2-state-reference-current-at-checkpoint: PASS -- live index_manifest_hash just before REQ-0001 changed=a80becad5bf8; index freshness when the checkpoint was taken: fresh=False stale=['spec/requirements/REQ-0001.yaml']; checkpoint CKPT-00003 records f54cbf91bd02 (equal to the pre-change state: False); checkpoints::create records memory_snapshot before its own incremental rebuild
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+OBS W9-c2-checkpoint-files-changed-paths-exist: PASS -- checkpoint files_changed as recorded: ['governance/generated/index-manifest.json', 'governance/generated/memory-manifest.json']; paths that do not exist in the repository: []
+$ gov checkpoint create --next-action "resume on another provider" --task TASK-0001 --trigger before_model_switch    [session=S-one role=orchestrator exit=0 0.2s]
+OBS W9-c3-before-model-switch-checkpoint: PASS -- checkpoint trigger=before_model_switch id=CKPT-00004
+$ gov context compile TASK-0001    [session=S-model-0 role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-model-1 role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-model-2 role=orchestrator exit=0 0.1s]
+OBS W9-c3-provider-switch-same-inputs: PASS -- deterministic_hash under three provider/model environments and sessions: ['18587d304ff9', '18587d304ff9', '18587d304ff9']
+$ gov context compile TASK-0001    [session=S-role role=backend-engineer exit=0 0.1s]
+OBS W9-c3-role-switch-same-inputs: PASS -- backend-engineer vs orchestrator: mandatory input lists identical=True (whole deterministic_hash differs by acting role: True)
+$ gov status    [session=S-fresh-agent role=orchestrator exit=0 0.1s]
+$ gov continue    [session=S-fresh-agent role=orchestrator exit=0 0.1s]
+OBS W9-c4-fresh-agent-reconstructs: PASS -- fresh session: status.next_action='gov continue → claim TASK-0001'; continue -> task TASK-0001; mandatory inputs identical to the prior session's packet: True
+$ gov checkpoint create --next-action "continue after compaction" --task TASK-0001 --trigger before_compaction    [session=S-one role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-post-compaction role=orchestrator exit=0 0.1s]
+OBS W9-c5-compaction-cannot-remove-state: PASS -- before_compaction checkpoint CKPT-00005; post-'compaction' session (no conversational state) rebuilds identical mandatory inputs: True
+$ gov task create --id TASK-0002 --class implementation --objective "Implement refunds" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-9999\"], \"decisions\": [\"D-9999\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov handoff create --to-role backend-engineer --task TASK-0002    [session=S-zeta role=orchestrator exit=1 0.0s]
+  ok=false error={
+ "code": "HANDOFF_INPUTS_UNSATISFIED",
+ "details": {
+  "contradictions": [],
+  "input_violations": [],
+  "missing_inputs": [
+   {
+    "declared_in": [
+     "task.requirements"
+    ],
+    "id": "REQ-9999",
+    "problems": [
+     {
+      "blocking": true,
+      "code": "ABSENT",
+      "message": "REQ-9999 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+     }
+    ],
+    "reason": null,
+    "required": true,
+    "resolution": "ABSENT",
+    "slot": "requirement",
+    "type": ""
+   },
+   {
+    "declared_in": [
+     "task.decisions"
+    ],
+    "id": "D-9999",
+    "problems": [
+     {
+      "blocking": true,
+      "code": "ABSENT",
+      "message": "D-9999 is declared as a decision input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+     }
+    ],
+    "reason": null,
+    "required": true,
+    "resolution": "ABSENT",
+    "slot": "decision",
+    "type": ""
+   }
+  ],
+  "policy": "handoff: unsatisfied mandatory inputs -> refused (HANDOFF_INPUTS_UNSATISFIED); stale packet -> re-delivered at current inputs, degraded when work was in progress on the stale inputs; session close: never refused, degraded when the session's work has stale/missing/contradictory mandatory inputs (checkpoints::FRESHNESS_POLICY)",
+  "task": "TASK-0002"
+ },
+ "message": "TASK-0002 cannot be handed off: mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT); D-9999 (decision: ABSENT). A worker must not receive a task whose mandatory inputs are missing, superseded, contradictory or outside their declared constraints (Contract v3 W9 line 1160); `gov context manifest TASK-0002` shows the resolution"
+}
+OBS W9-c6-handoff-missing-inputs-blocked-or-degraded: PASS -- handoff for TASK-0002 (REQ-9999, D-9999 absent; no packet ever compiled) -> ok=False; inputs=None; packet file exists: False
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 400 (whole units)"], "statement": "Totals SHALL round to whole units."}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov handoff create --to-role backend-engineer --task TASK-0001    [session=S-zeta role=orchestrator exit=0 0.3s]
+  ok=true result={
+ "authority": {
+  "allowed": [
+   "src/**"
+  ],
+  "prohibited": [
+   "governance/kernel/**"
+  ]
+ },
+ "created": "2026-09-19",
+ "degraded": [],
+ "expected_outputs": [
+  "implementation",
+  "evidence"
+ ],
+ "freshness": {
+  "delivery_state": "COMPLETE",
+  "packet_hash": "3152e97eea79b7af20a322a378bbd5751f629c8b1a148861116f850ae7935dad",
+  "policy": "handoff: unsatisfied mandatory inputs -> refused (HANDOFF_INPUTS_UNSATISFIED); stale packet -> re-delivered at current inputs, degraded when work was in progress on the stale inputs; session close: never refused, degraded when the session's work has stale/missing/contradictory mandatory inputs (checkpoints::FRESHNESS_POLICY)",
+  "previous_packet_hash": "75a5759528a687689682f17838fdd5f42d4118a74bb754553fcea85751a62a47",
+  "previous_packet_invalidated": false,
+  "propagation": null,
+  "stale_inputs": [
+   {
+    "current": "a59ec194fd84a9010b3c515825bcd6a290b22e57ea326e42924776fad88abe5b",
+    "delivered": "148f4aabd5ff59381f8332ae4e10752ba1fcd7f33ede5d1498729fbc5a737482",
+    "id": "REQ-0001"
+   }
+  ],
+  "state": "REFRESHED",
+  "work_in_progress": false
+ },
+ "from_role": "orchestrator",
+ "handoff_status": "OPEN",
+ "health": {
+  "counts": {
+   "critical": 0,
+   "high": 0,
+   "low": 0,
+   "medium": 0
+  },
+  "health_result": "HR-20260919T064234665Z-cf69994d",
+  "tier": "G3",
+  "verdict": "HEALTHY"
+ },
+ "id": "HND-0001",
+ "inputs": {
+  "context_packet": ".governance-runtime/context/TASK-0001.json",
+  "context_packet_hash": "3152e97eea79b7af20a322a378bbd5751f629c8b1a148861116f850ae7935dad",
+  "task": "TASK-0001"
+ },
+ "required_return": [
+  "changed_files",
+  "tests",
+  "discoveries",
+  "unresolved"
+ ],
+ "stale_inputs": [
+  {
+   "current": "a59ec194fd84a9010b3c515825bcd6a290b22e57ea326e42924776fad88abe5b",
+   "delivered": "148f4aabd5ff59381f8332ae4e10752ba1fcd7f33ede5d1498729fbc5a737482",
+   "id": "REQ-0001"
+  }
+ ],
+ "state_class": "DERIVED",
+ "status": "ACTIVE",
+ "task": "TASK-0001",
+ "title": "Handoff orchestrator \u2192 backend-engineer for TASK-0001",
+ "to_role": "backend-engineer",
+ "type": "handoff"
+}
+OBS W9-c6-handoff-stale-inputs-blocked-or-degraded: PASS -- handoff for TASK-0001 after its requirement changed -> ok=True; handed-off packet still carries pre-change criterion: False; packet unchanged: False
+$ gov checkpoint latest    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS AC16-NxW9-before-handoff-checkpoint-flags-stale-packet: PASS -- before_handoff checkpoint CKPT-00006 trigger=before_handoff context_packet_hash=3152e97eea79 == stale packet hash 3152e97eea79: True; staleness marker: True
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS AC16-NxW9-doctor-checkpoint-freshness: FAIL -- doctor checks about checkpoints: []
+
+==== SUMMARY ====
+W9-c1-manifest-persists: PASS
+W9-c2-checkpoint-input-ids: PASS
+W9-c2-checkpoint-state-reference: PASS
+W9-c2-packet-hash-tracks-input-content: PASS
+W9-c2-index-hash-tracks-input-content: PASS
+W9-c2-state-reference-current-at-checkpoint: PASS
+W9-c2-checkpoint-files-changed-paths-exist: PASS
+W9-c3-before-model-switch-checkpoint: PASS
+W9-c3-provider-switch-same-inputs: PASS
+W9-c3-role-switch-same-inputs: PASS
+W9-c4-fresh-agent-reconstructs: PASS
+W9-c5-compaction-cannot-remove-state: PASS
+W9-c6-handoff-missing-inputs-blocked-or-degraded: PASS
+W9-c6-handoff-stale-inputs-blocked-or-degraded: PASS
+AC16-NxW9-before-handoff-checkpoint-flags-stale-packet: PASS
+AC16-NxW9-doctor-checkpoint-freshness: FAIL
+total=16 pass=15 fail=1
+[exit=0]
