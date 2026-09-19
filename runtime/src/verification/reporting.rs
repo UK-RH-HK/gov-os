@@ -480,49 +480,49 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
         return;
     };
     match crate::memory::coverage::verify(p, db) {
-        Ok(v) => {
+        Ok(mut v) => {
             if !v["complete"].as_bool().unwrap_or(false) {
+                let contract = p.contract();
+                let mut confirmed: Vec<Value> = vec![];
+                let mut artefacts: Vec<Value> = vec![];
+                for g in v["gaps"].as_array().cloned().unwrap_or_default() {
+                    if gap_is_heading_marker_artefact(db, &g) {
+                        artefacts.push(g);
+                    } else {
+                        confirmed.push(g);
+                    }
+                }
+                let listed: u64 = v["gaps"]
+                    .as_array()
+                    .map(|a| a.iter().map(|g| g["count"].as_u64().unwrap_or(0)).sum())
+                    .unwrap_or(0);
+                let unlisted = v["uncovered_lines"].as_u64().unwrap_or(0) > listed;
+                let shown = |g: &Value| {
+                    format!(
+                        "{} ({} line(s))",
+                        g["path"].as_str().unwrap_or("?"),
+                        g["count"]
+                    )
+                };
+                let historical = |g: &&Value| {
+                    contract.decide(g["path"].as_str().unwrap_or("")).class() == "historical"
+                };
                 // a gap in current material (records, code, docs retrieved by default) degrades health; a gap only in
                 // historical material (archive: excluded from default retrieval) is disclosed without degrading
-                let contract = p.contract();
-                let gap_rows = v["gaps"].as_array().cloned().unwrap_or_default();
-                let listed: u64 = gap_rows
+                let current: Vec<String> = confirmed
                     .iter()
-                    .map(|g| g["count"].as_u64().unwrap_or(0))
-                    .sum();
-                let current: Vec<String> = gap_rows
-                    .iter()
-                    .filter(|g| {
-                        contract.decide(g["path"].as_str().unwrap_or("")).class() != "historical"
-                    })
-                    .map(|g| {
-                        format!(
-                            "{} ({} line(s))",
-                            g["path"].as_str().unwrap_or("?"),
-                            g["count"]
-                        )
-                    })
+                    .filter(|g| !historical(g))
+                    .map(shown)
                     .collect();
-                let historical: Vec<String> = gap_rows
-                    .iter()
-                    .filter(|g| {
-                        contract.decide(g["path"].as_str().unwrap_or("")).class() == "historical"
-                    })
-                    .map(|g| {
-                        format!(
-                            "{} ({} line(s))",
-                            g["path"].as_str().unwrap_or("?"),
-                            g["count"]
-                        )
-                    })
-                    .collect();
-                let unlisted = v["uncovered_lines"].as_u64().unwrap_or(0) > listed;
+                let old: Vec<String> = confirmed.iter().filter(historical).map(shown).collect();
                 if !current.is_empty() || unlisted {
                     f.findings.push(finding("medium", &fam, format!("index content coverage incomplete: indexed line(s) of current material held by no chunk: {}{} (BC-P2-25; rebuild the index: `gov rebuild-memory`; a gap that survives a full rebuild is a chunker defect)", names(&current, 6), if unlisted { " (more gaps beyond the listed ones)" } else { "" }), None));
                 }
-                if !historical.is_empty() {
-                    f.findings.push(finding("low", &fam, format!("index content coverage incomplete in historical (archived) material only: {} (BC-P2-25; excluded from default retrieval)", names(&historical, 6)), None));
+                if !old.is_empty() {
+                    f.findings.push(finding("low", &fam, format!("index content coverage incomplete in historical (archived) material only: {} (BC-P2-25; excluded from default retrieval)", names(&old, 6)), None));
                 }
+                v["verifier_heading_marker_artefacts"] = json!(artefacts);
+                v["confirmed_gaps"] = json!(confirmed.len());
             }
             f.detail = v;
         }
@@ -536,6 +536,40 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
             None,
         )),
     }
+}
+
+/// `memory::coverage::verify` compares a Markdown heading line with its `#` markers removed against chunk lines, but a
+/// chunk may hold the heading **with** its markers (e.g. consecutive heading lines with no body between them); such a
+/// line is held, not missing (WS-6 integration point recorded in the report). A gap row is a verifier artefact when
+/// every uncovered line it lists is held by a chunk of that artefact once heading markers are removed on both sides,
+/// and the row lists every uncovered line it counts. Anything else is a confirmed gap.
+fn gap_is_heading_marker_artefact(db: &RuntimeDb, g: &Value) -> bool {
+    let lines = g["lines"].as_array().cloned().unwrap_or_default();
+    if lines.is_empty() || g["count"].as_u64().unwrap_or(0) as usize != lines.len() {
+        return false;
+    }
+    let norm = |l: &str| -> String {
+        let t = l.trim();
+        let t = t.trim_start_matches('#');
+        t.split_whitespace().collect::<Vec<_>>().join(" ")
+    };
+    let aid = g["artifact_id"].as_str().unwrap_or("");
+    let held: std::collections::HashSet<String> = db
+        .query("SELECT text FROM chunks WHERE artifact_id=?1", &[&aid])
+        .unwrap_or_default()
+        .iter()
+        .flat_map(|r| {
+            r["text"]
+                .as_str()
+                .unwrap_or("")
+                .lines()
+                .map(norm)
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    lines
+        .iter()
+        .all(|l| held.contains(&norm(l["text"].as_str().unwrap_or(""))))
 }
 
 // ------------------------------------------------------------------------------------ task_contract_integrity
