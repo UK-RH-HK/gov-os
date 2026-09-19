@@ -73,7 +73,16 @@ fn denial(g: &Gov, id: &str) -> String {
 #[test]
 fn plugin_descriptors_can_never_authorise_themselves() {
     let (root, g) = setup_fixture("greenfield", "rep3-plug", "S-rep3");
-    g.ok(&["init", "--name", "p", "--alias", "p-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "p",
+        "--alias",
+        "p-alias",
+        "--skip-index",
+    ]);
     let marker = root.join("v3-marker.txt");
     probe(&root, &marker);
     write(&root, "src/probe.py", "def f():\n    return 1\n");
@@ -261,7 +270,15 @@ fn plugin_descriptors_can_never_authorise_themselves() {
 #[test]
 fn constitutional_floors_require_a_verified_kernel() {
     let (root, g) = setup_fixture("greenfield", "rep3-kernel", "S-rep3");
-    g.ok(&["init", "--name", "k", "--alias", "k-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "k",
+        "--alias",
+        "k-alias",
+    ]);
     let l0 = g.with_role("independent-auditor");
     // healthy baseline
     assert!(doctor_check(&g, "D029").0);
@@ -459,7 +476,16 @@ fn constitutional_floors_require_a_verified_kernel() {
 #[test]
 fn policy_exceptions_require_a_real_governing_decision() {
     let (root, g) = setup_fixture("greenfield", "rep3-exc", "S-rep3");
-    g.ok(&["init", "--name", "e", "--alias", "e-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "e",
+        "--alias",
+        "e-alias",
+        "--skip-index",
+    ]);
     let key = "defaults.max_tool_calls";
     let set_exceptions = |items: Value| {
         let mut ex = yaml(&root, "governance/project/PROJECT_EXCEPTIONS.yaml");
@@ -676,7 +702,15 @@ fn policy_exceptions_require_a_real_governing_decision() {
 #[test]
 fn lower_trust_inputs_cannot_manufacture_higher_trust_facts() {
     let (root, g) = setup_fixture("greenfield", "rep3-trust", "S-rep3");
-    g.ok(&["init", "--name", "t", "--alias", "t-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "t",
+        "--alias",
+        "t-alias",
+    ]);
     // 1. a tool descriptor cannot self-certify its security review: the condition fails and a gate is raised
     let td = root.join("tool.json");
     std::fs::write(&td, json!({"tool_id": "selfcert", "name": "selfcert", "type": "CLI", "capabilities": ["run_tests"],

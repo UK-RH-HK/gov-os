@@ -17,3 +17,5 @@ Starting from a healthy `gov init` project, the harness injects faults one at a 
 | Missing overlay file | D006 | restore file |
 | Failing embed plugin | rebuild fails closed with a typed error (EMBEDDER_BAD_OUTPUT / PLUGIN_*), the previous index stays intact, doctor D025/D028 report it; never a silent fallback to the built-in embedder | fix or re-register the plugin, or re-pin and rebuild |
 | Gate answered without presentation | `GATE_NOT_PRESENTED` (INV-008) | `gov gate present` |
+
+**First-run path: provision, then install (OWNER-DECISION-P2-0002).** The harness provisions each scenario machine with the certification suite's throw-away test root (`tests/certification/common.rs::provision`, published-seed keys — never a production root) and installs a release signed under it (`gov init --source <signed release>`; `common::signed_source`). A machine with no trust anchor refuses kernel material from any external source; only the `gov` binary's own embedded payload may be installed there, as a marked bootstrap installation that is never presented as current, verified or certified.

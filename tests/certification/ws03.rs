@@ -278,6 +278,25 @@ pub fn package(extra: Value) -> String {
 
 fn fresh(tag: &str) -> (PathBuf, Gov) {
     let (root, g) = setup_fixture("greenfield", tag, "S-ws3");
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        tag,
+        "--alias",
+        &format!("a-{tag}"),
+    ]);
+    git_commit_all(&root, "after init");
+    (root, g)
+}
+
+/// [`fresh`] on a machine with NO Signed Release Root — for the scenario about the standalone human-channel anchor,
+/// which exists only on such a machine (a provisioned machine's channel is its root's `human-gate` delegation). The
+/// install is the binary's own embedded payload, the one kernel OWNER-DECISION-P2-0002 lets such a machine admit
+/// (as a marked bootstrap installation).
+fn fresh_unprovisioned(tag: &str) -> (PathBuf, Gov) {
+    let (root, g) = setup_fixture_unprovisioned("greenfield", tag, "S-ws3");
     g.ok(&["init", "--name", tag, "--alias", &format!("a-{tag}")]);
     git_commit_all(&root, "after init");
     (root, g)
@@ -310,17 +329,27 @@ fn an_undeclared_invocation_carries_no_privileged_authority_anywhere() {
     let (root, g) = setup_fixture("greenfield", "ws3-undeclared", "S-ws3");
     let none = g.with_role("");
     // first install: refused before anything is written
-    let e = none.err(&["init", "--name", "u"]);
+    let e = none.err(&["init", "--source", signed_source(), "--name", "u"]);
     assert_eq!(e.error_code(), "AUTHORITY_DENIED");
     assert_eq!(e.details()["cause"], "ROLE_UNDECLARED");
     assert!(!exists(&root, "governance/framework.lock") && !exists(&root, "governance/kernel"));
     // declared through the environment instead: the same resolution
     let env_l0 = g.with_role("").with_env("GOV_ROLE", "independent-auditor");
     assert_eq!(
-        env_l0.err(&["init", "--name", "u"]).details()["cause"],
+        env_l0
+            .err(&["init", "--source", signed_source(), "--name", "u"])
+            .details()["cause"],
         "LEVEL_TOO_LOW"
     );
-    g.ok(&["init", "--name", "u", "--alias", "a-u"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "u",
+        "--alias",
+        "a-u",
+    ]);
     // installed: every privileged path refuses the undeclared caller; reads still work
     for args in [
         vec!["gate", "revoke", "HDG-0001"],
@@ -336,7 +365,7 @@ fn an_undeclared_invocation_carries_no_privileged_authority_anywhere() {
         vec!["resume"],
         vec!["memory", "heldout-starter", "--force"],
         vec!["task", "replan"],
-        vec!["init", "--force"],
+        vec!["init", "--source", signed_source(), "--force"],
     ] {
         let e = none.err(&args);
         assert_eq!(
@@ -349,12 +378,14 @@ fn an_undeclared_invocation_carries_no_privileged_authority_anywhere() {
     assert!(none.run(&["status"]).ok());
     assert!(none.run(&["gate", "list"]).ok());
     // --role on init / init --force is honoured exactly like GOV_ROLE (A0-E1-01, A0-S4-03)
-    let e = g.with_role("independent-auditor").err(&["init", "--force"]);
+    let e =
+        g.with_role("independent-auditor")
+            .err(&["init", "--source", signed_source(), "--force"]);
     assert_eq!(e.error_code(), "AUTHORITY_DENIED");
     let e = g
         .with_role("")
         .with_env("GOV_ROLE", "independent-auditor")
-        .err(&["init", "--force"]);
+        .err(&["init", "--source", signed_source(), "--force"]);
     assert_eq!(e.error_code(), "AUTHORITY_DENIED");
     // a declared `human` role is a claim, not an identity: it carries L0
     let e = g.with_role("human").err(&["gate", "revoke", "HDG-0001"]);
@@ -402,7 +433,7 @@ fn g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations
         vec!["task", "replan"],
         vec!["task", "release", "TASK-G0"],
         vec!["continue"],
-        vec!["init", "--force"],
+        vec!["init", "--source", signed_source(), "--force"],
     ];
     let snapshot = |r: &Path| tree_hash(r, &[".governance-runtime/**"]);
     for (mode, code) in [("freeze-writes", "FROZEN"), ("pause", "PAUSED")] {
@@ -516,7 +547,7 @@ fn every_cli_command_label_is_classified_by_g0() {
 /// against the administrator-provisioned anchor. Every local means an agent controls is refused.
 #[test]
 fn human_answers_come_only_from_the_owner_signed_channel() {
-    let (root, g) = fresh("ws3-hc");
+    let (root, g) = fresh_unprovisioned("ws3-hc");
     let gid = gate(&g, "Adopt vendor X?", json!({}));
     let (inst, sha) = render(&g, &gid);
     // P2-ADJ-0001: a machine with no Signed Release Root has no human channel — refused typed, with the remediation

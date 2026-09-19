@@ -70,6 +70,10 @@
       ],
       "description": "sha256 of the verified release.json, when the release was verified against signed metadata; null otherwise"
     },
+    "admission": {
+      "type": "string",
+      "description": "what admitted the installed bytes on the installing machine (SIGNED_RELEASE_METADATA | PROTECTED_RECORD_OF_AN_EARLIER_VERIFICATION | BOOTSTRAP_EMBEDDED_PAYLOAD | NOT_ESTABLISHED). BOOTSTRAP_EMBEDDED_PAYLOAD marks the bootstrap installation of a gov binary's embedded payload that OWNER-DECISION-P2-0002 permits on a machine with no trust anchor; it is never presented as current, verified or certified. A record, never an input"
+    },
     "identity_basis": {
       "type": "object",
       "description": "the basis on which each identity field was recorded (BC-P2-37: the lock records identity and its basis; it never establishes trust)"

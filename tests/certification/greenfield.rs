@@ -8,6 +8,8 @@ fn greenfield_end_to_end() {
     let (root, g) = setup_fixture("greenfield", "greenfield", "S-alpha");
     let r = g.ok(&[
         "init",
+        "--source",
+        signed_source(),
         "--name",
         "orders-ledger",
         "--alias",

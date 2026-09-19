@@ -10,7 +10,16 @@ fn upstream_export_gate_fails_closed_and_sanitises() {
     write(&proj, "README.md", "# shipping-quotes internal\n");
     git_init_commit(&proj);
     let g = Gov::new(&proj, "S-up");
-    g.ok(&["init", "--name", "shipping-quotes", "--alias", "proj-alpha"]);
+    provision(&g);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "shipping-quotes",
+        "--alias",
+        "proj-alpha",
+    ]);
     let mut ds = yaml(&proj, "governance/project/DATA_SENSITIVITY.yaml");
     ds["identifiers_to_strip"] = json!(["Acme Freight Ltd", "shipping-quotes"]);
     write_yaml(&proj, "governance/project/DATA_SENSITIVITY.yaml", &ds);
@@ -176,7 +185,16 @@ fn export_gate_fails_closed_on_content_whatever_the_name() {
     );
     git_init_commit(&proj);
     let g = Gov::new(&proj, "S-up");
-    g.ok(&["init", "--name", "svc", "--alias", "proj-beta"]);
+    provision(&g);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "svc",
+        "--alias",
+        "proj-beta",
+    ]);
     g.ok(&["rebuild-memory"]);
     let lesson = |id: &str, files: serde_json::Value| {
         json!({"id": id, "type": "lesson", "title": "t", "status": "ACTIVE", "scope": "FRAMEWORK", "lifecycle": "corroborated", "category": "c",

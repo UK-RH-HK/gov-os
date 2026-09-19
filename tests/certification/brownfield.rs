@@ -128,6 +128,8 @@ fn brownfield_adoption_end_to_end() {
     let mig = executor.ok(&[
         "adopt",
         "migrate",
+        "--source",
+        signed_source(),
         "--name",
         "shipping-quotes",
         "--alias",

@@ -1,0 +1,8 @@
+# P2-AR-0029 round-1 WS-8 probes, label=after-dev, tree=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws08
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws08/target/release/gov sha256 8d94a48a9beb8cc3b345c9faaeaa0d1b4fc1a1bf30dfc825e0c8e9fab7a53e9c, invoked through /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws08/release/capability-baseline/repair-1/ws03/evidence/gov-role-shim.sh
+# date 2026-09-19T04:47:06Z
+  e51080eebc9e2888d2112fe38d66e4ffbaf60312880813fd8f601136b3c60c6a  release/capability-baseline/repair-1/ws08/evidence/WS08-P2-presentation.py
+  4257423f0abaac50361f1f4bc930341fc895f3d23b2005e729008a83ee222887  release/capability-baseline/repair-1/ws08/evidence/WS08-P3-certification-and-lock-identity.py
+  b0b77579443087e7f4ee5285613bbe693532f3f95b59b127b5d8c2f110400b3a  release/capability-baseline/repair-1/integration/evidence/builder-probes/derived-ws08/WS08-P1-post-install-integrity.py
+  fe4688638c61ceda3d2480daf5c6c72ce8aa3d0dcbda4db2fb113bdc2a20b497  release/capability-baseline/repair-1/integration/evidence/builder-probes/derived-ws08/WS08-P4-rollback-and-atomicity.py
+  ceee0d0abcd6930b56f38d67d54504a9a5039b324814b94022375484cca70d24  release/capability-baseline/repair-1/integration/evidence/builder-probes/derived-ws08/ws08_common.py

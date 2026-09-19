@@ -188,9 +188,11 @@ pub fn commit_tree(ms: &MachineState, staged: &Staged, dest: &Path) -> Result<Va
     // (2) build the complete new tree beside the destination, on the same filesystem so the rename is atomic
     remove_dir_if_exists(&newp)?;
     copy_dir(&staged.payload_dir, &newp)?;
-    // The manifest is written into the new tree before the swap, so the committed tree is complete on arrival.
-    let mut manifest = staged.manifest.clone();
-    manifest["built_at"] = json!(now_iso());
+    // The manifest is written into the new tree before the swap, so the committed tree is complete on arrival. It is
+    // a pure function of the verified payload: no install timestamp (`framework.lock.installed_at` records when), so
+    // a second machine that verifies the release a clone pins (ARCH-0003 §8, `gov kernel reinstall`) re-commits
+    // byte-identical files and leaves the repository unchanged.
+    let manifest = staged.manifest.clone();
     crate::util::write_json(&newp.join(crate::kernel::KERNEL_MANIFEST), &manifest)?;
     fsync_dir(&newp);
     fsync_dir(parent);

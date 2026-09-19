@@ -95,6 +95,12 @@ pub fn build(
             "written": false,
         })));
     }
+    // IP-2 (WS-1/12, BC-P2-01) — a release is built only from a canonical tree whose capability-contract chain is
+    // bound to the owner's approved source: the canonical import, the compiled form, the evidence map, the generated
+    // view and the source lock all verify (`contracts::verify`). Checked before anything is written.
+    let contract = pre_release_contract(canonical_root, version)?;
+    // IP-WS02-13 — G0 and G5 of the health tier contract before minting (Contract v3:798, BC-P2-07; A0-O5-09).
+    let health = pre_release_health(canonical_root, version)?;
     let dir = out_root.join("releases").join(version);
     if dir.join("manifest.yaml").exists() {
         return Err(GovError::new(
@@ -253,7 +259,110 @@ pub fn build(
     if let Some(t) = _scratch {
         let _ = std::fs::remove_dir_all(t);
     }
-    Ok(manifest)
+    // The built release is verified as written — every payload file against the manifest's hashes, and the kernel
+    // manifest against the release hash — before it is reported as built. A release that does not verify is removed.
+    let built = verify(&dir)?;
+    if built["ok"] != true {
+        let _ = std::fs::remove_dir_all(&dir);
+        return Err(GovError::new(
+            "RELEASE_VERIFICATION_FAILED",
+            format!("release {version} was written but does not verify against its own manifest; it has been removed"),
+        )
+        .with_details(built));
+    }
+    // The pre-release checks are evidence of how this release was built; they are kept beside the immutable
+    // manifest (not inside it, so a reproduction of an earlier release still reproduces its manifest).
+    // OWNER-DECISION-P2-0002 requirement 4: release-relevant evidence runs on provisioned machines. The build states
+    // the posture of the machine it ran on, so evidence from a machine with no trust anchor cannot pass for it.
+    let machine_posture = match crate::srr::state::resolve_state_root() {
+        Ok(r) if crate::srr::state::MachineState::read_only(&r).is_provisioned() => "PROVISIONED",
+        Ok(_) => "UNPROVISIONED",
+        Err(_) => "UNDETERMINED",
+    };
+    let checks = json!({
+        "version": version,
+        "machine_posture": machine_posture,
+        "release_evidence_eligible": machine_posture == "PROVISIONED"
+            && contract["verdict"] == "CONTRACT_SOURCE_BOUND",
+        "capability_contract": contract,
+        "health": health,
+        "built_release_verified": {"ok": true, "release_hash_matches_kernel": built["release_hash_matches_kernel"]},
+        "checked_at": now_iso(),
+    });
+    write_json(&dir.join("PRE_RELEASE_CHECKS.json"), &checks)?;
+    let mut out = manifest;
+    out["pre_release_checks"] = checks;
+    Ok(out)
+}
+
+/// IP-2 — the canonical tree's capability-contract binding, as `release::build` requires it.
+///
+/// The IP's purpose is that "a release must not ship derived contract views that diverge from the owner source".
+/// A chain that is present and does not verify — the import, compiled form, evidence map, generated view, schema or
+/// lock diverging from the approved source, or unreadable — refuses the build (`RELEASE_CONTRACT_NOT_BOUND`). A tree
+/// that does not carry the whole chain (a payload-only canonical tree — framework/, migrations/, tools/ — which is how
+/// release tooling and every root-of-trust probe builds releases) cannot ship a divergent view it does not have: that
+/// is recorded as `INCOMPLETE_IN_THIS_TREE`, never as bound, and such a build is not release-evidence eligible. The
+/// kernel payload itself carries no contract view (`framework/contracts` is not a payload directory).
+fn pre_release_contract(canonical_root: &Path, version: &str) -> Result<Value> {
+    match crate::contracts::verify(canonical_root) {
+        Ok(v) if v["verdict"] == "CONTRACT_SOURCE_BOUND" => Ok(json!({"verdict": v["verdict"], "owner_source_sha256": v["owner_source_sha256"], "capability_count": v["capability_count"], "checklist_item_count": v["checklist_item_count"]})),
+        Ok(v) => Err(GovError::new(
+            "RELEASE_CONTRACT_NOT_BOUND",
+            format!("release {version} refused: contracts::verify returned {} rather than CONTRACT_SOURCE_BOUND", v["verdict"]),
+        )),
+        Err(e) if e.code.ends_with("_MISSING") => Ok(json!({
+            "verdict": "INCOMPLETE_IN_THIS_TREE",
+            "missing": e.code,
+            "message": e.message,
+            "note": "the canonical tree does not carry the whole capability-contract chain, so no contract binding is claimed for this build; a present chain that diverges refuses the build",
+        })),
+        Err(e) => Err(GovError::new(
+            "RELEASE_CONTRACT_NOT_BOUND",
+            format!("release {version} refused: the canonical tree's capability-contract chain does not verify ({}: {}). A release must not be built from a tree whose derived contract views diverge from the owner's approved source.", e.code, e.message),
+        )
+        .with_details(json!({"contract_error": e.code, "contract_details": e.details, "remediation": "gov contract verify; regenerate the derived views from the approved source with gov contract compile"}))),
+    }
+}
+
+/// IP-WS02-13 — the health tier contract at release build.
+///
+/// When the canonical root is a governed installation, G0 (`scheduler::guard("release.build")`) refuses under an
+/// active hard-block and G5 runs the full governance suite, fresh; an `UNHEALTHY` verdict or a `RED` health state
+/// refuses the build. When it is not — the Governance OS source repository is the framework's own source, not a
+/// project governed by an installed kernel — the governed-project suite has no subject, and that is reported as
+/// exactly that rather than as a pass; the release-level checks ([`pre_release_contract`] and the verification of
+/// the built release) run instead.
+fn pre_release_health(canonical_root: &Path, version: &str) -> Result<Value> {
+    let p = crate::Project::open(canonical_root);
+    if !p.is_installed() {
+        return Ok(json!({
+            "tier": "G5",
+            "ran": false,
+            "reason": "the canonical root is not a governed installation (no governance/framework.lock), so the governed-project suite has no subject there; the release-level checks ran instead: the capability-contract binding (contracts::verify) and the verification of the built release against its manifest",
+        }));
+    }
+    crate::scheduler::guard(&p, crate::scheduler::catalogue::ops::RELEASE_BUILD, &[])?;
+    let mut o = crate::scheduler::RunOptions::new(
+        crate::scheduler::Tier::G5,
+        crate::scheduler::Trigger::new("release.build").with_subject(version),
+    );
+    o.surface = "tier:G5".into();
+    o.record = crate::scheduler::RecordPolicy::Never;
+    let r = crate::verification::audit_with(&p, &o)?;
+    let verdict = r["verdict"].as_str().unwrap_or("UNHEALTHY").to_string();
+    let state = r["state"].as_str().unwrap_or("").to_string();
+    if verdict == "UNHEALTHY" || state == "RED" || r["counts"]["critical"].as_u64().unwrap_or(0) > 0
+    {
+        return Err(GovError::new(
+            "RELEASE_HEALTH_REFUSED",
+            format!("release {version} refused: the G5 full governance suite on the canonical installation is not acceptable (verdict {verdict}, health {state})"),
+        )
+        .with_details(r));
+    }
+    Ok(
+        json!({"tier": "G5", "ran": true, "verdict": verdict, "state": state, "health_result": r["health_result"], "counts": r["counts"]}),
+    )
 }
 
 pub fn verify(release_dir: &Path) -> Result<Value> {

@@ -13,3 +13,7 @@ Exercised by `tests/certification/migration.rs`: inventory → classification �
 review gate → batched execution with link/import rewrites and ledger → independent verification against reality →
 rollback of a batch restores a byte-identical tree → memory rebuild after path stabilisation produces an index that
 references only canonical paths.
+
+**First-run path: provision, then install (OWNER-DECISION-P2-0002).** The harness provisions each scenario machine with the certification suite's throw-away test root (`tests/certification/common.rs::provision`, published-seed keys — never a production root) and installs a release signed under it (`gov init --source <signed release>`; `common::signed_source`). A machine with no trust anchor refuses kernel material from any external source; only the `gov` binary's own embedded payload may be installed there, as a marked bootstrap installation that is never presented as current, verified or certified.
+
+Adoption installs its kernel at A6 batch 0 through the same ingress, from the signed release (`gov adopt migrate --source <signed release>`).

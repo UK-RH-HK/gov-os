@@ -1,0 +1,131 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0029
+role: capability-repair
+objective: Repair iteration 1, round 2, WS-8 — BC-P2-36 admission per OWNER-DECISION-P2-0002 (Option A) with harness/fixture/docs provisioning, the unprovisioned sub-case of BC-P2-35, the embedded-kernel cache race root cause and the lifecycle-host integration points (IP-WS02-12..16, IP-2, IP-7, IP-16), without weakening any SRR control; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), a fresh capability-repair builder. This run
+  authored the product changes, the certification-harness provisioning, the builder tests and the scripts listed
+  below; it authored none of the Phase-2 audits, the synthesis, the owner decisions, the R1 reviews or their held-out
+  suites, and it grades none of its own work (every claim is REPAIRED_CLAIMED, PARTIAL or NOT_REPAIRED; acceptance is
+  for fresh independent verifiers). It did not read any session or agent transcript, any task-output store (every long
+  command ran in the foreground with output redirected into its evidence directory), or user auto-memory; it did not
+  spawn sub-agents or contact the product owner. It edited only WS-8's assigned files (runtime/src/{kernel_trust,kernel,
+  lock,init,update,release}.rs, runtime/src/srr/** except plugins.rs, framework/schemas/framework-lock.schema.json,
+  tests/certification/common.rs and the fixtures' provisioning documentation) plus the declared additive exceptions
+  (other certification test files calling the new harness helpers, one `mod` line in tests/certification/main.rs, a new
+  tests/certification/ws08_r2.rs) and its own output directory. framework/KERNEL.yaml was changed and reverted (see
+  IP-WS02-16). No file under release/verification/, release/root-of-trust/, release/releases/,
+  release/orchestration/phase-1/, release/capability-baseline/audit-0/ or another repair-1/<ws>/ directory, no docs/
+  file and no cli/src/main.rs line was modified; D-0007 and the Contract v3 source are untouched (governed_state_digest
+  unchanged). R1 held-out suites were built and run against this worktree only, from a private scratch root named with
+  this run id.
+input:
+  base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+  candidate: null
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0027-repair-1-r2-ws08.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0027-repair-1-r2-ws08.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.run.yaml
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md (§0, root-of-trust classes, §2, §3, §4)
+  - release/capability-baseline/audit-0/synthesis/owner-decisions-required.md (rows 3-4, OD-P2-02)
+  - release/capability-baseline/audit-0/synthesis/findings.yaml (A0-O5-09, A0-O5-15)
+  - release/capability-baseline/audit-0/alpha-r/evidence/ and synthesis/evidence/AC16-X3 (probe sources; run unedited)
+  - release/capability-baseline/audit-0/epsilon-r/evidence/O5-tiers-G1-G6.sh, O5-G5-update.sh
+  - release/capability-baseline/audit-0/zeta-r/evidence/W08-lineage.py
+  - spec/architecture/ARCH-0003.yaml
+  - release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md, 01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/orchestration/phase-1/GATES/OWNER-DECISION-0006-BELOW-FLOOR-RECOVERY.md, OWNER-DECISION-0007-R1-QUESTIONS.md
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md and evidence/ (r1-heldout runner, audit-probe adapter, builder-probe runner, derived WS-8 probes, cold-cache probe)
+  - release/capability-baseline/repair-1/ws08/00-REPAIR-REPORT.md, claims.yaml, evidence/
+  - release/capability-baseline/repair-1/ws02/00-REPAIR-REPORT.md (§2, §6 IP-WS02-12..17)
+  - release/capability-baseline/repair-1/ws01-12/00-REPAIR-REPORT.md (§4 IP-2)
+  - release/capability-baseline/repair-1/ws03/00-REPAIR-REPORT.md (§8 APIs, §9 IP-7)
+  - release/capability-baseline/repair-1/ws04/00-REPAIR-REPORT.md (IP-16)
+  - release/verification/4.1.6-r1*/evidence/REPRODUCTION.md and heldout-tests/ (all four suites; run unedited)
+  - runtime/src/ (srr/*, kernel, kernel_trust, lock, init, update, release, recovery, contracts::verify, scheduler guard/tier_run/catalogue, verification::audit_with, orchestration/gates verified_answer, orchestration/control g0, authority, human_channel, adopt install path)
+  - runtime/build.rs, cli/src/main.rs, framework/KERNEL.yaml, framework/health/SKILL_SCENARIO_CHECKS.yaml
+  - tests/certification/ (every file)
+  - fixtures/*/README.md, docs/FIXTURES.md, docs/COMMANDS.md, README.md
+produced:
+  - runtime/src/srr/verifier.rs
+  - runtime/src/srr/installation.rs
+  - runtime/src/srr/mod.rs
+  - runtime/src/srr/staging.rs
+  - runtime/src/kernel.rs
+  - runtime/src/kernel_trust.rs
+  - runtime/src/lock.rs
+  - runtime/src/init.rs
+  - runtime/src/update.rs
+  - runtime/src/release.rs
+  - framework/schemas/framework-lock.schema.json
+  - tests/certification/common.rs
+  - tests/certification/ws08_r2.rs
+  - tests/certification/main.rs
+  - tests/certification/{arch,brownfield,failure_injection,greenfield,migration,multi_machine,repair,repair2,repair3,update,upstream,ws03}.rs
+  - fixtures/{brownfield,failure-injection,greenfield,migration,multi-machine,update,upstream-learning}/README.md
+  - release/capability-baseline/repair-1/r2-ws08/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r2-ws08/claims.yaml
+  - release/capability-baseline/repair-1/r2-ws08/evidence/
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.report.yaml
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib at cf13dee: 147/0 default and xdgcache (base 146/0); two srr::installation unit tests replaced because OWNER-DECISION-P2-0002 reverses their asserted behaviour, one kernel cache test added", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/regression-after-cf13dee-default-lib.out}
+  - {id: REG-CERT, description: "cargo test --test certification at cf13dee: 110/0 default and 110/0 xdgcache (34 + 76 parts, --list = 110; base 100/0); section6.rs and srr.rs green; every scenario machine provisioned with the suite's throw-away root", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/regression-after-cf13dee-default-cert-b.out}
+  - {id: R1-AR0027, description: "AR-0027 held-out suite unedited, private scratch root: 26 pass / 3 fail (b1, b2, d3) = recorded baseline and base; messages identical", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/r1-heldout/r1-heldout-after-cf13dee.out}
+  - {id: R1-AR0029, description: "AR-0029 held-out suite unedited: 26 / 2 (b3, b6), ho_f_preservation does not compile = recorded baseline and base", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/r1-heldout/r1-heldout-after-cf13dee.out}
+  - {id: R1-AR0031, description: "AR-0031 held-out suite unedited: 27 / 7 (a1, a5, a8, b6, c2, c3, d2) = recorded baseline and base", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/r1-heldout/r1-heldout-after-cf13dee.out}
+  - {id: R1-AR0033, description: "AR-0033 held-out suite unedited: 30 / 1 — only hv_a::a1's size pin (84/740) against this tree's census 105 files / 1468 functions (base 30/1 at 105/1457); the labelled a1-unpinned derived copy and derive.py: 0 violations in every §6 activity", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/r1-heldout/r1-heldout-after-cf13dee.out}
+  - {id: R1-INVARIANTS, description: "four ingress/floor properties and the §5 allow-list: 5 admit / 5 install_kernel sites, one by_admit, floor-check block and ingress predicates byte-identical, breakglass.rs/state.rs unchanged, PERMITTED_OPERATIONS the same four entries, kernel_trust free of SRR vocabulary", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/r1-invariants-after-cf13dee.out}
+  - {id: X3a-S3xA2, description: "AC16-X3 X3a-S3xA2-unprovisioned-refuses-unauthenticated: FAIL (base) -> PASS", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/COMPARE-probes-before-base-843d79c-vs-after-cf13dee.out}
+  - {id: X3b-X3c, description: "AC16-X3 X3b and X3c-* (provisioned refusal, consistent rewrite detected): PASS before and after", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/probes-after-cf13dee/AC16-X3.out}
+  - {id: A2-01, description: "alpha-r A2-01 [U2] tampered release on an unprovisioned machine: admitted UNKNOWN (base) -> refused typed before staging; [U3] embedded payload: bootstrap, UNKNOWN", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/probes-after-cf13dee/A2-01.out}
+  - {id: A2-PROVISIONED, description: "alpha-r A2-02, A2-03, A2-05, A2-08, S6 on provisioned machines: identical before/after modulo payload digests (provisioned behaviour unchanged)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/COMPARE-probes-before-base-843d79c-vs-after-cf13dee.out}
+  - {id: S5-update, description: "alpha-r S5-update installs shipped 4.1.4 on an unprovisioned machine: refused under Option A, so the probe stops at [U0]; S5 is re-established on provisioned machines by repair2 genuine chain and update.rs", result: NOT_RUN, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/probes-after-cf13dee/S5-update.out}
+  - {id: WS08-ROUND1, description: "round-1 WS-8 probes: P1 14/15 (R2a asserts round-1 report-only behaviour, now enforced by design), P2 8/8, P3 11/11, P4 K1-K4 9/9 then K5 precondition refused by Option A; base 45/45", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/ws08-round1-probes-after-cf13dee/}
+  - {id: COLD-CACHE, description: "integration cold-cache concurrency probe, unedited, on the repaired binary: 17/17", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/concurrency/cold_cache_scheduler.after-cf13dee.out}
+  - {id: WS08R2-TESTS, description: "10 new builder tests (refusal at every ingress, bootstrap marking, no bootstrap when provisioned, unprovisioned rewrite enforced, unadmitted kernel, cache race, verified update answer, G5 refusal and rollback, release contract/health/verification, §5 restoration by update below floor)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws08/evidence/regression-after-cf13dee-default-cert-b.out}
+findings: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-ws08
+  commit: b9cdc888eb69e7310ca6cd423e3a8a35a21b770b
+  evidence_path: release/capability-baseline/repair-1/r2-ws08/
+  product_commit: cf13deeb3f88feacf993a126e9c8f33e2c6db155
+  product_code_digest: 37087f1308754f86a20d505da9474d11b2ff7d27d36eb09ce148a316ab4c4966
+  governed_state_digest: 4981437f0dca482b0d7d2aba2d48378260a93eaace20f1ea15bb5761ec4c227d
+  claims:
+    BC-P2-36 (admission): REPAIRED_CLAIMED
+    BC-P2-35 (unprovisioned sub-case): REPAIRED_CLAIMED
+    OWNER-DECISION-P2-0002 requirement 3 (harness/fixtures/docs): PARTIAL — harness and fixtures done; docs outside fixtures/ are unowned (IP-R2-WS08-1)
+    OWNER-DECISION-P2-0002 requirement 4: PARTIAL — release build records posture; G6 entry is WS-2's (IP-R2-WS08-8)
+    IP-WS02-12: REPAIRED_CLAIMED (entry guard not taken; IP-R2-WS08-5)
+    IP-WS02-13: REPAIRED_CLAIMED
+    IP-WS02-14: REPAIRED_CLAIMED
+    IP-WS02-15: REPAIRED_CLAIMED
+    IP-WS02-16: NOT_REPAIRED (planted secret literal; KERNEL.yaml pinned by release 4.1.5; IP-R2-WS08-6)
+    IP-2: REPAIRED_CLAIMED (divergent chain refused; absent chain recorded, not bound)
+    IP-7: REPAIRED_CLAIMED
+    IP-16: NOT_REPAIRED (outside WS-8 files; IP-R2-WS08-7)
+unresolved:
+  - IP-R2-WS08-1 documentation (README.md, docs/COMMANDS.md, docs/FIXTURES.md, docs/ARCHITECTURE.md) — provision-then-install first-run text
+  - IP-R2-WS08-2/3 doctor check and audit finding for unestablished authenticity incl. admission (WS-2; round-1 IP-1/IP-2)
+  - IP-R2-WS08-4 installed records may join machine_trust (WS-2)
+  - IP-R2-WS08-5 update.apply entry guard vs remedy blocks (WS-2, then WS-8)
+  - IP-R2-WS08-6 IP-WS02-16 health payload dir (WS-2 + release owner)
+  - IP-R2-WS08-7 IP-16 product-release governed records (WS-4 + WS-3 + WS-8)
+  - IP-R2-WS08-8 qualification runs on provisioned machines only (WS-2)
+  - IP-R2-WS08-9 round-1 IP-3 pinned payload on kernel reinstall (WS-3)
+  - IP-R2-WS08-10 round-1 IP-4 status release_trust from posture_of (WS-5)
+  - IP-R2-WS08-11 capability-evidence-map rows (WS-1)
+  - IP-R2-WS08-12 harness convention for new tests; ws03 standalone-channel test vs P2-ADJ-0001 (WS-3)
+  - IP-R2-WS08-13 probes that install external material on unprovisioned machines must run provisioned (verifiers)
+recommended_next_action: Round-3 builders apply IP-R2-WS08-1..12 (docs routing to the orchestrator); the integration builder merges and re-runs the R1 held-out suites from a private path; the AC-14 R1-preservation verifier re-establishes the frozen R1 items for srr/**, kernel.rs, kernel_trust.rs, lock.rs, init.rs, update.rs, release.rs.
+completed_at: "2026-09-19T05:23:46Z"

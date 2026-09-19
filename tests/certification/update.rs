@@ -16,21 +16,14 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
     write(&proj, "README.md", "# upd project\n");
     git_init_commit(&proj);
     let g = Gov::new(&proj, "S-upd");
-    // round 2 (P2-AR-0024): P2-ADJ-0001 makes the provisioned root's `human-gate` delegation the only human channel,
-    // and OWNER-DECISION-P2-0002 makes "provision, then install" the path: this machine is provisioned with the
-    // throw-away test root and both releases are signed by it. Every property below is asserted as before.
-    crate::ws03::provision(&g);
-    let prev_rel = crate::ws03::signed_release(&prev, &root.join("rel-prev"), 10);
-    let cur_rel = crate::ws03::signed_release(
-        &canonical_root().join("framework"),
-        &root.join("rel-cur"),
-        20,
-    );
-    let cur = cur_rel.to_str().unwrap();
+    // provision, then install (OWNER-DECISION-P2-0002): the synthetic 4.1.1 and the current release are both signed
+    // under the suite's throw-away root, in version order
+    provision(&g);
+    let prev = signed_copy(&prev, "update-4.1.1", sequence_of("4.1.1"));
     let r = g.ok(&[
         "init",
         "--source",
-        prev_rel.to_str().unwrap(),
+        prev.to_str().unwrap(),
         "--name",
         "upd-project",
         "--alias",
@@ -62,7 +55,7 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
     git_commit_all(&proj, "4.1.1 state");
     let overlay_before = tree_hash(&proj.join("governance/project"), &[]);
     // --- check (CIT-P) ---
-    let chk = g.ok(&["update", "--check", "--source", cur]);
+    let chk = g.ok(&["update", "--check", "--source", signed_source()]);
     assert_eq!(chk["current"], "4.1.1");
     assert_eq!(chk["available"], gov_runtime::VERSION);
     assert_eq!(chk["migration_path"][0], "M-4.1.1-4.1.2");
@@ -76,7 +69,7 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
         .to_string()
         .contains("not touched"));
     // --- apply without approval → gate; --approve without an answered gate does nothing (INV-008) ---
-    let e = g.err(&["update", "--apply", "--source", cur]);
+    let e = g.err(&["update", "--apply", "--source", signed_source()]);
     assert_eq!(e.error_code(), "HUMAN_GATE_REQUIRED");
     let gid = e.details()["gate"].as_str().unwrap().to_string();
     assert_eq!(
@@ -84,7 +77,7 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
             "update",
             "--apply",
             "--source",
-            cur,
+            signed_source(),
             "--approve",
             "--by",
             "owner"
@@ -99,7 +92,7 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
         "update",
         "--apply",
         "--source",
-        cur,
+        signed_source(),
         "--approve",
         "--by",
         "owner",
@@ -154,13 +147,13 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
         g.ok(&["status"])["framework"]["version"],
         gov_runtime::VERSION
     );
-    // --- rollback --- on a provisioned machine 4.1.1 is below this machine's release floor: refused without the
-    // owner's break-glass authorisation, restored with it (OWNER-DECISION-0006)
+    // --- rollback --- on a provisioned machine 4.1.1 is below the protected release high-water, so the rollback is
+    // refused by default and admitted under the owner's break-glass authorisation (ARCH-0003 §7, OWNER-DECISION-0006)
     assert_eq!(
         g.err(&["update", "--rollback"]).error_code(),
         "SRR_BELOW_FLOOR"
     );
-    crate::ws03::break_glass_for(&g, &prev_rel, "upd-rollback");
+    break_glass(&g, &prev, "update-rollback");
     let rb = g.ok(&["update", "--rollback", "--break-glass"]);
     assert_eq!(rb["rolled_back_to"], "4.1.1");
     assert_eq!(rb["kernel_ok"], true);

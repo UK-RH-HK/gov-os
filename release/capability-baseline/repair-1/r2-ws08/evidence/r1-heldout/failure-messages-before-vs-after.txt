@@ -1,0 +1,64 @@
+# P2-AR-0029: failure/observation messages of the R1 held-out suites, before (base 843d79c) vs after (cf13dee)
+# normalisation: absolute /tmp paths removed, thread ids removed, integers of 3+ digits -> N (census sizes, pids)
+# command: grep -E 'panicked at|^[A-Za-z].*(OBSERVED|failed|not |census)' <out> | grep -v '^test |running|Running|Compiling|Finished' | sed -E 's#/tmp/[^ ]*##g; s/\([0-9]+\)//g; s/[0-9]{3,}/N/g'
+# lines before: 58  lines after: 58
+# diff (empty = identical):
+# --- normalised messages (after) ---
+thread 'b1_expiry_comparison_against_valid_but_non_emitted_rfcN_forms'  panicked at tests/heldout_srr2.rs:N:5:
+thread 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison'  panicked at tests/heldout_srr2.rs:N:5:
+a non-emitted-format expiry is accepted without complaint: Err(GovError { code: "SRR_METADATA_EXPIRED", message: "root version 1: `expires` is 'N-01-01T00:00:00+00:00', which is not the canonical UTC form YYYY-MM-DDTHH:MM:SSZ that this profile emits and compares; a non-canonical expiry is treated as expired (fail closed)", details: Null })
+error: test failed, to rerun pass `--test heldout_srr2`
+thread 'd3_below_floor_refusal_surface_against_owner_decision_N_section_6'  panicked at tests/heldout_srr3.rs:N:9:
+error: test failed, to rerun pass `--test heldout_srr3`
+thread 'b3_census_of_section_6_operations_against_their_enforcement_points'  panicked at tests/ho_b_coverage.rs:N:5:
+root_update unexpectedly guards; re-derive this census
+thread 'b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls'  panicked at tests/ho_b_coverage.rs:N:5:
+error: test failed, to rerun pass `--test ho_b_coverage`
+error: cannot construct `AuthenticatedRelease` with struct literal syntax due to private fields
+error: could not compile `srr-heldout-arN` (test "ho_f_preservation") due to 1 previous error
+thread 'a1_the_census_is_a_total_function_over_the_section_6_activities'  panicked at tests/hx_a_census.rs:40:5:
+assertion `left == right` failed: the set of bullets claiming no primitive changed
+thread 'a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module'  panicked at tests/hx_a_census.rs:N:5:
+OBSERVED: `section_6_effects_are_enforced_inside_their_sinks` A6 polices the bullet-2 census with one source grep for the literal `new_record("human-gate"`. Three constructions demonstrated above reach the same durable artefact without spelling it: `new_record` through a non-literal type argument, `Record::set("type", ...)` on any existing record, and a `Record` struct literal (all fields `pub`). None needs a `Clearance`, because the compile-time guarantee binds only functions inside `gates.rs` where `build` is private. No such path exists in the product today (measured: the literal occurs once), so this is the census clause being weaker than its stated form, not a live bypass.
+thread 'a8_bullet_7_claims_every_reporting_surface_carries_the_marking'  panicked at tests/hx_a_census.rs:N:5:
+assertion `left == right` failed
+error: test failed, to rerun pass `--test hx_a_census`
+thread 'b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution'  panicked at tests/hx_b_failopen.rs:N:5:
+assertion `left == right` failed: expected the fail-open in exactly `guard_light` and `guard_effect`; found 0
+error: test failed, to rerun pass `--test hx_b_failopen`
+thread 'c2_the_dropped_malleability_check_is_reproduced_and_still_holds'  panicked at tests/hx_c_prior_evidence.rs:91:5:
+OBSERVED: `ho_f::f1`'s behavioural half — a malleated S+L signature must be refused by BOTH `crypto::verify` and `crypto::verify_strict`, with the same error code — was not reproduced when the census moved into the product suite. `ho_f` no longer compiles, so that check runs nowhere in the candidate's evidence. It is reproduced below by this verifier; the underlying property still holds, so this is a loss of assurance coverage, not a live defect.
+thread 'c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds'  panicked at tests/hx_c_prior_evidence.rs:N:5:
+OBSERVED: `ho_f::f2`'s second half — no `skip_verify` / `allow_unsigned` / `force_unsigned` relaxation switch appears anywhere in product source outside `REFUSED_AUTHORITY_ENV` — was not reproduced in the move. `grep -rn 'skip_verify|allow_unsigned|force_unsigned' tests/` finds nothing, so this check runs nowhere in the candidate's evidence. Reproduced below; the property still holds.
+error: test failed, to rerun pass `--test hx_c_prior_evidence`
+thread 'd2_the_descriptor_decides_whether_section_6_is_consulted_at_all'  panicked at tests/hx_d_acquisition_and_preservation.rs:47:5:
+baseline: an unprivileged remote capability is not a §6 bullet 5 effect
+error: test failed, to rerun pass `--test hx_d_acquisition_and_preservation`
+thread 'a1_the_derived_census_reproduces_independently_at_the_claimed_scale'  panicked at tests/hv_a_derivation.rs:22:5:
+assertion `left == right` failed: the product tree is not the size the census claims
+error: test failed, to rerun pass `--test hv_a_derivation`
+AR-N  heldout_srr                              passed= 12 failed=  0  []
+AR-N  heldout_srr2                             passed=  6 failed=  2  ['b1_expiry_comparison_against_valid_but_non_emitted_rfcN_forms', 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison']
+AR-N  heldout_srr3                             passed=  4 failed=  1  ['d3_below_floor_refusal_surface_against_owner_decision_N_section_6']
+AR-N  heldout_srr4                             passed=  4 failed=  0  []
+AR-N  ho_a_allowlist                           passed=  6 failed=  0  []
+AR-N  ho_b_coverage                            passed=  4 failed=  2  ['b3_census_of_section_6_operations_against_their_enforcement_points', 'b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls']
+AR-N  ho_c_deadlock                            passed=  5 failed=  0  []
+AR-N  ho_d_expiry                              passed=  5 failed=  0  []
+AR-N  ho_e_rootexpiry                          passed=  6 failed=  0  []
+AR-N  ho_f_preservation                        passed=  0 failed=  0 DOES_NOT_COMPILE []
+AR-N  hx_a_census                              passed=  5 failed=  3  ['a1_the_census_is_a_total_function_over_the_section_6_activities', 'a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module', 'a8_bullet_7_claims_every_reporting_surface_carries_the_marking']
+AR-N  hx_b_failopen                            passed=  5 failed=  1  ['b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution']
+AR-N  hx_c_prior_evidence                      passed=  6 failed=  2  ['c2_the_dropped_malleability_check_is_reproduced_and_still_holds', 'c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds']
+AR-N  hx_d_acquisition_and_preservation        passed= 11 failed=  1  ['d2_the_descriptor_decides_whether_section_6_is_consulted_at_all']
+AR-N  hv_a_derivation                          passed=  9 failed=  1  ['a1_the_derived_census_reproduces_independently_at_the_claimed_scale']
+AR-N  hv_b_bullet7                             passed=  7 failed=  0  []
+AR-N  hv_c_failclosed                          passed=  6 failed=  0  []
+AR-N  hv_d_sinks_and_preservation              passed=  8 failed=  0  []
+AR-N: 26 passed / 3 failed; failing=['b1_expiry_comparison_against_valid_but_non_emitted_rfcN_forms', 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison', 'd3_below_floor_refusal_surface_against_owner_decision_N_section_6']; not-compiling=[]
+AR-N: 26 passed / 2 failed; failing=['b3_census_of_section_6_operations_against_their_enforcement_points', 'b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls']; not-compiling=['ho_f_preservation']
+AR-N: 27 passed / 7 failed; failing=['a1_the_census_is_a_total_function_over_the_section_6_activities', 'a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module', 'a8_bullet_7_claims_every_reporting_surface_carries_the_marking', 'b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution', 'c2_the_dropped_malleability_check_is_reproduced_and_still_holds', 'c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds', 'd2_the_descriptor_decides_whether_section_6_is_consulted_at_all']; not-compiling=[]
+AR-N: 30 passed / 1 failed; failing=['a1_the_derived_census_reproduces_independently_at_the_claimed_scale']; not-compiling=[]
+DERIVED COPY (P2-AR-N, WS-8 round 2): scale pin 84 files not asserted; measured N
+DERIVED COPY (P2-AR-N, WS-8 round 2): scale pin N functions not asserted; measured N
+AR-N independent §6 census:

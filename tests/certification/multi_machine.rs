@@ -7,6 +7,8 @@ fn clone_rebuilds_identical_derived_state() {
     let (a, ga) = setup_fixture("greenfield", "mm-a", "S-machineA");
     ga.ok(&[
         "init",
+        "--source",
+        signed_source(),
         "--name",
         "orders-ledger",
         "--alias",
@@ -58,11 +60,17 @@ fn clone_rebuilds_identical_derived_state() {
     let broot = b.join("repo");
     assert!(!exists(&broot, ".governance-runtime"));
     let gb = Gov::new(&broot, "S-machineB");
+    // machine B is provisioned by its administrator (OWNER-DECISION-P2-0002: provision, then install)
+    provision(&gb);
     let (ok, msg) = doctor_check(&gb, "D009");
     assert!(
         !ok && msg.contains("absent"),
         "doctor must report the missing runtime: {msg}"
     );
+    // ... and verifies the release the clone pins before relying on its installed kernel (ARCH-0003 §8). The
+    // verification reinstalls byte-identical bytes: nothing tracked changes.
+    gb.ok(&["kernel", "reinstall", "--source", signed_source()]);
+    assert_eq!(git(&broot, &["status", "--porcelain"]).1, "");
     let rb = gb.ok(&["rebuild-memory"]);
     assert_eq!(
         rb["manifest_hash"], manifest_a,

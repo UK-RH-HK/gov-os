@@ -1,0 +1,25 @@
+## K1 provisioned rollback after a gated update
+W K1a PASS precondition: the update to authentic 4.1.6 is applied through its Human Decision Gate -- {"gate": "HDG-0001", "code": null, "lock": "4.1.6"}
+W K1b PASS without break-glass the floor refuses the rollback (OWNER-DECISION-0006 §9) -- SRR_BELOW_FLOOR
+W K1c PASS the refused rollback leaves the installation as it found it (lock, trusted kernel, unconsumed snapshot) -- {"verified": true, "snapshots": ["4.1.6"]}
+W K1d PASS `update --rollback --break-glass` restores 4.1.5, authenticated from this machine's own record of verifying it -- {"ok": true, "code": null, "lock": "4.1.5", "authenticity": "PREVIOUSLY_VERIFIED_BY_THIS_MACHINE", "kernel_verified": true}
+W K1e PASS the machine is marked DEGRADED — RECOVERY ONLY and no floor moved (OWNER-DECISION-0006 §4, §8) -- {"degraded": "DEGRADED \u2014 RECOVERY ONLY", "high_water": {"version": "4.1.6", "sequence": 20}}
+
+## K2 [K6a] shape: break-glass reinstall of an older authentic release (a version change)
+W K2a PASS refused as a version change; kernel, lock, trusted state and the protected installed record are exactly as before -- {"code": "KERNEL_MISMATCH", "kernel_unchanged": true, "verified": true}
+O K2b machine marking after the refused reinstall: DEGRADED — RECOVERY ONLY — the verifier enters break-glass before the pin is known to it; with IP-3 (cli/src/main.rs passes `.with_pinned_payload(framework.lock release_hash)`) the refusal precedes break-glass entry and no owner authorisation is consumed
+
+## K3 [V1]-[V3] shape: reinstall of a newer authentic release, no break-glass
+W K3a PASS refused before the swap: the installed kernel is still 4.1.5 under a 4.1.5 lock and governed work continues -- {"code": "KERNEL_MISMATCH", "kernel": "4.1.5", "lock": "4.1.5", "task_create": true}
+
+## K4 a refused update leaves no snapshot behind
+W K4a PASS the unsigned update is refused by the single verifier and leaves no snapshot -- {"code": "SRR_RELEASE_UNVERIFIED", "snapshots": []}
+W K4b PASS `gov update --rollback` finds nothing to roll back and writes no false ledger entry -- {"code": "SNAPSHOT_MISSING", "ledger_events": []}
+
+## K5 transaction abort restores the protected record with the bytes
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws08/release/capability-baseline/repair-1/integration/evidence/builder-probes/derived-ws08/WS08-P4-rollback-and-atomicity.py", line 141, in <module>
+    lock_before = open(os.path.join(pu, "governance/framework.lock")).read()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0029-ws08probes/after-dev-WS08-P4-bssEtI/alpha-r-ws08-p4-U-9433txpu/pu/governance/framework.lock'
+[exit=1]
