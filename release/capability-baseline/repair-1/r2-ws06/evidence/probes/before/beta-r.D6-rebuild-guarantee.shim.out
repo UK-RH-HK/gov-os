@@ -1,0 +1,43 @@
+# P2-AR-0027 audit-of-record probe re-run (unedited): beta-r/D6-rebuild-guarantee mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree HEAD (export of 843d79c)
+# probe sha256 72a246ee9b593c28b61c554c9bf34bc6d273cf6c4248f7659e2761b752d1eda5; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/mirror-Wkdsrr/target/release/gov
+# date 2026-09-19T04:50:19Z
+$ gov --role orchestrator init --name orders-ledger --alias d6 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator task create --class implementation --objective 'Totals A' --feature F-0001 --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator task create --class implementation --objective 'Totals B' --status READY --allowed src/**  -> exit 0 ok=True
+$ gov --role orchestrator task claim TASK-0001  -> exit 0 ok=True
+$ gov --role orchestrator gate create --question 'Adopt nightly reconciliation window?' --fields '{"options": [{"id": "A", "description": "yes"}, {"id": "B", "description": "no"}], "impact_radius": "R2"}'  -> exit 0 ok=True
+$ gov --role orchestrator cit propose --proposal 'Tighten totals' --trigger behaviour_change --targets REQ-0001  -> exit 0 ok=True
+$ gov --role orchestrator checkpoint create --next-action 'continue totals' --task TASK-0001  -> exit 0 ok=True
+$ gov --role orchestrator plugins register --descriptor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/run-shim-beta-r-D6-rebuild-guarantee-0jYTee/d6-rerank.yaml  -> exit 0 ok=True
+register logging-reranker -> True None pin: {'sha256': '6b9ce14088ed5fc2d425bc2614ac6b10d039b6e43857e4a8588c13d48e655867', 'files': ['tools/probe-plugins/logging_reranker.py']}
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator freeze-writes --reason 'd6 probe: emergency state must survive derived-state deletion'  -> exit 0 ok=True
+PRE-DELETION SNAPSHOT: {"auth": ["a45eab799255dc55", 191], "manifest_hash": "a220d77002efe877770d2d434daf4f5c519ce8b1bdd66add2d558aaaf91dc88c", "derived": {"artifacts": "93f28c952e6e40e7", "chunks": "a1d93cfb45a5f8fd", "vectors": "4b6f03fecd52ea99", "edges": "2622bb064eb47410", "symbols": "41aaecc2cfccc249", "fts": "2077684cea192016"}, "status": {"records": 19, "next_task": "TASK-0001", "runnable": ["TASK-0001"], "counts": {"total": 2, "runnable": 1, "blocked": 1, "waiting_human": 0, "done": 0, "open": 2}, "gates": ["HDG-0001", "HDG-0002"], "open_cits": ["CIT-0001"], "latest_checkpoint": "CKPT-00001", "index_fresh": true, "next_action": "present human gate \"HDG-0001\" in chat (`gov gate present \"HDG-0001\"`), continue independent runnable work"}, "answers": {"REQ-0001": ["REQ-0001", "REQ-0001", "CIT-0001", "CIT-0001", "F-0001"], "why integer cents rationale": ["D-0102", "D-0102", "REQ-0001", "REQ-0001", "file:src/app/models.py"], "compute_total": ["file:src/app/models.py", "file:src/app/api.py", "file:src/app/models.py", "file:tests/test_models.py", "file:src/app/api.py"], "\"append-only ledger\"": ["ARCH-0101", "file:docs/runbook.md"], "what depends on F-0001": ["REQ-0001", "SCN-0001", "TASK-0001", "TST-0001", "CKPT-00001"]}, "claims": [["TASK-0001", "S-probe"]], "plugin_registry": ["logging-reranker"], "control": {"mode": "RUNNING", "writes_frozen": true}}
+
+====================================================================================================
+D6-A delete framework §19 derived state (index DB, graph, vectors, generated views)
+====================================================================================================
+deleted: ['.governance-runtime/state.db', 'governance/generated/index-manifest.json', 'governance/generated/plugin-registry.json', 'governance/generated/adapter-manifest.json', 'governance/generated/memory-manifest.json', 'governance/generated/tool-registry.json', 'governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md', 'governance/generated/adapters/cli/bootstrap-packet.json', 'governance/generated/adapters/api/system-instruction.txt', 'governance/generated/adapters/mcp/mcp-connections.json', 'governance/generated/adapters/ide/RULES.md', 'framework.json']
+$ gov --role orchestrator status  -> exit 0 ok=True
+gov status with derived state deleted -> True None present human gate "HDG-0001" in chat (`gov gate present "HDG-0001"`), continue independent runnable work
+$ gov --role orchestrator rebuild-memory  -> exit 4 ok=False error={"code": "FROZEN", "message": "writes are frozen (FREEZE_WRITES active); 'rebuild-memory' refused. Run `gov resume` (L4) to lift.", "details": {"operation": "rebuild-memory", "control": {"agents_cancelled": false, "mode": "RUNNING", "reason": "d6 probe: emergency state must survive derived-state deletion", "role": "orchestrator", "session": "S-probe", "updated_at": "2026-09-19T04:50:21Z", "writes_frozen": true}, "allowed_while_frozen": [{"operation": "pause", "reason": "emergency control (framework \u00a774): the human can always escalate a freeze to a pause"}, {"operation": "freeze writes", "
+gov rebuild-memory -> False FROZEN writes are frozen (FREEZE_WRITES active); 'rebuild-memory' refused. Run `gov resume` (L4) to lift.
+$ gov --role orchestrator adapters generate  -> exit 4 ok=False error={"code": "FROZEN", "message": "writes are frozen (FREEZE_WRITES active); 'adapters generate' refused. Run `gov resume` (L4) to lift.", "details": {"operation": "adapters generate", "control": {"agents_cancelled": false, "mode": "RUNNING", "reason": "d6 probe: emergency state must survive derived-state deletion", "role": "orchestrator", "session": "S-probe", "updated_at": "2026-09-19T04:50:21Z", "writes_frozen": true}, "allowed_while_frozen": [{"operation": "pause", "reason": "emergency control (framework \u00a774): the human can always escalate a freeze to a pause"}, {"operation": "freeze writ
+$ gov --role orchestrator tools registry  -> exit 4 ok=False error={"code": "FROZEN", "message": "writes are frozen (FREEZE_WRITES active); 'tools registry' refused. Run `gov resume` (L4) to lift.", "details": {"operation": "tools registry", "control": {"agents_cancelled": false, "mode": "RUNNING", "reason": "d6 probe: emergency state must survive derived-state deletion", "role": "orchestrator", "session": "S-probe", "updated_at": "2026-09-19T04:50:21Z", "writes_frozen": true}, "allowed_while_frozen": [{"operation": "pause", "reason": "emergency control (framework \u00a774): the human can always escalate a freeze to a pause"}, {"operation": "freeze writes", "
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/mirror-Wkdsrr/release/capability-baseline/audit-0/beta-r/evidence/D6-rebuild-guarantee.py", line 127, in <module>
+    SA = full_snapshot(g, root)
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/mirror-Wkdsrr/release/capability-baseline/audit-0/beta-r/evidence/D6-rebuild-guarantee.py", line 86, in full_snapshot
+    return {"auth": tracked_authoritative(), "manifest_hash": json.loads((r / "governance/generated/index-manifest.json").read_text())["manifest_hash"],
+                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/run-shim-beta-r-D6-rebuild-guarantee-0jYTee/d6/governance/generated/index-manifest.json'
+[exit=1]

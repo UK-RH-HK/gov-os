@@ -20,7 +20,7 @@
 use crate::authority::role_in;
 use crate::graph;
 use crate::memory::db::RuntimeDb;
-use crate::memory::embedder::{for_query, Reranker};
+use crate::memory::embedder::Reranker;
 use crate::memory::embeddings::{cosine, tokenize};
 use crate::{GovError, Project, Result};
 use regex::Regex;
@@ -41,6 +41,9 @@ pub struct RetrieveOptions {
     /// Benchmark-only: query against an index built with this spec instead of the policy pin.
     pub embed_override: Option<crate::memory::embedder::EmbedSpec>,
     pub rerank_override: Option<String>,
+    /// The governed plugin set, when the caller already classified it for this acting role (a held-out run asks many
+    /// queries in one command; classifying every declared plugin re-hashes its implementation).
+    pub plugins: Option<crate::capabilities::governance::PluginSet>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -724,7 +727,12 @@ fn evidence_coverage(db: &RuntimeDb, query: &str, hits: &[Hit]) -> (f64, Vec<Str
 fn is_tool_failure(e: &GovError) -> bool {
     !matches!(
         e.code.as_str(),
-        "EMBEDDER_MISMATCH" | "RERANKER_MISMATCH" | "INDEX_MISSING" | "USAGE"
+        "EMBEDDER_MISMATCH"
+            | "RERANKER_MISMATCH"
+            | "EMBEDDER_REVISION_MISMATCH"
+            | "RERANKER_REVISION_MISMATCH"
+            | "INDEX_MISSING"
+            | "USAGE"
     )
 }
 
@@ -749,6 +757,10 @@ pub fn retrieve(
 ) -> Result<RetrievalResult> {
     let started = std::time::Instant::now();
     let pol = p.policies();
+    let plugins = opts
+        .plugins
+        .clone()
+        .unwrap_or_else(|| crate::capabilities::governance::plugin_set(p));
     let k = if opts.k == 0 {
         pol.get_i64("MEMORY_POLICY", "retrieval.default_k", 8) as usize
     } else {
@@ -924,12 +936,9 @@ pub fn retrieve(
                                 "benchmark index does not match the candidate spec",
                             ));
                         }
-                        crate::memory::embedder::Embedder::resolve(
-                            spec,
-                            &crate::capabilities::governance::plugin_set(p),
-                        )?
+                        crate::memory::embedder::Embedder::resolve(spec, &plugins)?
                     }
-                    None => match for_query(p, db) {
+                    None => match crate::memory::embedder::for_query_with(p, db, &plugins) {
                         Ok(e) => e,
                         Err(e) => {
                             if is_tool_failure(&e) {
@@ -1044,33 +1053,13 @@ pub fn retrieve(
     };
     apply_primary(&mut ordered);
     // --- reranker hook (pinned plugin): only admitted candidates ever reach it
-    let plugins = crate::capabilities::governance::plugin_set(p);
     let mut reranker_used = json!({"provider": "none"});
     let mut rerank_scores: HashMap<String, f64> = HashMap::new();
     let reranker = match &opts.rerank_override {
-        Some(id) => {
-            let desc = match plugins.find("rerank", None, Some(id)) {
-                Some(d) => d,
-                None => {
-                    return Err(plugins.refusal(id).unwrap_or_else(|| {
-                        GovError::new(
-                            "RERANKER_UNAVAILABLE",
-                            format!("rerank plugin '{id}' not declared"),
-                        )
-                    }))
-                }
-            };
-            Some(Reranker {
-                desc,
-                spec: crate::memory::embedder::RerankSpec {
-                    provider: id.clone(),
-                    version: "1".into(),
-                    candidates: pol
-                        .get_i64("MEMORY_POLICY", "retrieval.rerank_candidates", 24)
-                        .max(1) as usize,
-                },
-            })
-        }
+        // a benchmark candidate `+rerank:none` is measured without any reranker
+        Some(id) if id == "none" => None,
+        // a benchmark candidate `+rerank:<id>`: the plugin at the revision it declares (never a hard-coded one)
+        Some(id) => Some(Reranker::resolve_id(p, &plugins, id)?),
         None => match Reranker::resolve(p, &plugins) {
             Ok(r) => r,
             Err(e) => {
@@ -1088,6 +1077,10 @@ pub fn retrieve(
             && live_rr.get("provider") != Some(&json!(rr.spec.provider))
         {
             return Err(GovError::new("RERANKER_MISMATCH", format!("MEMORY_POLICY pins reranker '{}' but the live index was built with {}; run gov rebuild-memory", rr.spec.provider, live_rr)));
+        }
+        if opts.rerank_override.is_none() {
+            // BC-P2-30: the reranker that scores must be, component for component, the one the index recorded
+            crate::memory::profile::verify_live_reranker(p, db, &rr)?;
         }
         let n = rr.spec.candidates.min(ordered.len());
         let cands: Vec<(String, String)> = ordered
@@ -1124,7 +1117,7 @@ pub fn retrieve(
                 return Err(e);
             }
         }
-        reranker_used = rr.spec.to_value();
+        reranker_used = json!({"provider": rr.spec.provider, "version": rr.desc.version, "pinned_version": rr.spec.version});
         if !rerank_scores.is_empty() {
             let (mut scored, rest): (Vec<_>, Vec<_>) = ordered
                 .into_iter()
@@ -1349,6 +1342,7 @@ pub fn run_heldout_with(
     embed_override: Option<crate::memory::embedder::EmbedSpec>,
     rerank_override: Option<String>,
 ) -> Result<Value> {
+    let plugins = crate::capabilities::governance::plugin_set(p);
     let all: Vec<Value> = heldout
         .get("queries")
         .and_then(|q| q.as_array())
@@ -1412,6 +1406,7 @@ pub fn run_heldout_with(
                 route,
                 embed_override: embed_override.clone(),
                 rerank_override: rerank_override.clone(),
+                plugins: Some(plugins.clone()),
                 ..Default::default()
             },
         )?;

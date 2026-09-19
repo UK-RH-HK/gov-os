@@ -1,0 +1,44 @@
+# P2-AR-0027 audit-of-record probe re-run (unedited): beta-r/D5-model-selection mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws06 HEAD 0a9390788bb2c977f93d2626c7a585b783a59616
+# probe sha256 352a2d8875545f1745937776e7587f17306bb567f612f254b26fa2e3ba661634; gov 1bd70fc50d8344f8d245ee9f5456d641f2f9e11327e01855cc0e8d00b7954bf6 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/mirror-iONIxQ/target/release/gov
+# date 2026-09-19T05:20:18Z
+$ gov --role orchestrator init --name orders-ledger --alias d5 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+D5-b3 golden / held-out retrieval queries
+====================================================================================================
+held-out file: governance/tests/memory/heldout.yaml | non-pending queries by category: {'exact_id': 1, 'exact_path': 6, 'symbol': 8, 'lexical_literal': 6, 'semantic_paraphrase': 5} | pending: 2
+$ gov --role orchestrator memory verify  -> exit 0 ok=True
+gov memory verify (current baseline): PASS recall 0.9615384615384616 mrr 0.9230769230769231 failed: ['HQ-P1']
+[PASS] D5-b3: held-out retrieval queries exist (generated starter + authored paraphrase set) and are measured
+
+====================================================================================================
+D5-b1/b2/b4 benchmark: multiple candidates compared on the held-out set
+====================================================================================================
+$ gov --role orchestrator memory benchmark --candidate current --candidate builtin:64 --candidate plugin:concept-embedder:256 --candidate plugin:concept-embedder:256+rerank:logging-reranker --candidate plugin:bad-dim:64 --record  -> exit 0 ok=True
+  current                                              recall@k=0.962 mrr=0.923 p@k=0.798 stale=0.0 superseded=0.0 forbidden=0 sym=1.0 lat=0.81ms index_ms=135 vectors=433 dims=512
+      by category: [('exact_path', 1.0), ('semantic_paraphrase', 0.8), ('symbol', 1.0), ('lexical_literal', 1.0), ('exact_id', 1.0)]
+  builtin:64                                           recall@k=0.846 mrr=0.808 p@k=0.767 stale=0.0 superseded=0.0 forbidden=0 sym=1.0 lat=0.19ms index_ms=104 vectors=433 dims=64
+      by category: [('semantic_paraphrase', 0.2), ('lexical_literal', 1.0), ('exact_id', 1.0), ('exact_path', 1.0), ('symbol', 1.0)]
+  plugin:concept-embedder:256                          recall@k=1.000 mrr=0.912 p@k=0.821 stale=0.0 superseded=0.0 forbidden=0 sym=1.0 lat=4.42ms index_ms=170 vectors=433 dims=256
+      by category: [('exact_id', 1.0), ('symbol', 1.0), ('lexical_literal', 1.0), ('exact_path', 1.0), ('semantic_paraphrase', 1.0)]
+  plugin:concept-embedder:256+rerank:logging-reranker  recall@k=1.000 mrr=0.936 p@k=0.829 stale=0.0 superseded=0.0 forbidden=0 sym=1.0 lat=23.31ms index_ms=167 vectors=433 dims=256
+      by category: [('exact_id', 1.0), ('symbol', 1.0), ('lexical_literal', 1.0), ('exact_path', 1.0), ('semantic_paraphrase', 1.0)]
+  plugin:bad-dim:64                                    UNUSABLE: [EMBEDDER_BAD_OUTPUT] plugin bad-dim returned a 3-d vector; pinned dimensionality is 64
+recommended: plugin:concept-embedder:256+rerank:logging-reranker | research record: RES-0102
+[PASS] D5-b1: a benchmark mechanism exists and records its measurements as a governed research record
+[PASS] D5-b2: several embedders/runtimes (+reranker) are compared side by side; an unusable candidate is reported, not silently dropped
+[PASS] D5-b4: Recall@K, MRR, precision, stale-hit, latency and resource (index time, vector count/dims) metrics exist per candidate
+resource metrics present: ['dimensions', 'index_ms', 'vectors'] (no memory/disk footprint measurement)
+
+====================================================================================================
+D5-b5 selected embedder / reranker revisions are pinned
+====================================================================================================
+$ gov --role orchestrator memory select plugin:concept-embedder:256+rerank:logging-reranker --research RES-0102 --by owner  -> exit 0 ok=True
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/mirror-iONIxQ/release/capability-baseline/audit-0/beta-r/evidence/D5-model-selection.py", line 72, in <module>
+    dec = yaml.safe_load((root / f"spec/decisions/{sel['decision']}.yaml").read_text())
+                                                   ~~~^^^^^^^^^^^^
+KeyError: 'decision'
+[exit=1]

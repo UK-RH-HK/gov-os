@@ -138,7 +138,8 @@ pub fn freshness(p_in: &Project) -> Freshness {
             reclassified: vec![],
         };
     };
-    let expected = crate::memory::indexer::expected_pins(p);
+    let governed = crate::capabilities::governance::plugin_set(p);
+    let expected = crate::memory::indexer::expected_pins_with(p, &governed);
     let live = json!({"embedder": m.get("embedder"), "chunking": m.get("chunking"), "lexical": m.get("lexical"), "index_version": m.get("index_version")});
     let pin_mismatch = crate::memory::indexer::pin_differences(&expected, &live);
     let age_hours = m
@@ -172,7 +173,6 @@ pub fn freshness(p_in: &Project) -> Freshness {
         .unwrap_or_default();
     let contract = p.contract();
     let scanner = p.secret_scanner();
-    let governed = crate::capabilities::governance::plugin_set(p);
     let derive = crate::memory::indexer::DerivationContext::new(p, &governed.usable);
     let mut stale = vec![];
     let mut reclassified = vec![];

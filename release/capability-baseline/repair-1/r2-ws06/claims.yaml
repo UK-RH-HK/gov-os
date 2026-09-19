@@ -1,0 +1,104 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0027
+workstream: WS-6
+iteration: 1
+round: 2
+base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+work_commit: 0a9390788bb2c977f93d2626c7a585b783a59616
+product_code_digest: 99704522e6a85cd077521e34eb35a722a49c50afd428d34a9ce1fa70420ea262
+note: Builder claims only (Contract v3 O3). Nothing here claims acceptance, verification or closure.
+claims:
+  - class: BC-P2-28
+    status: REPAIRED_CLAIMED
+    requirement: "Integrity checks raise orphan, stale (superseded/retired/historical target), reversed and ill-typed relationships per relation type (Contract v3 C2:231, :356; A0-C2-01)"
+    files:
+      - runtime/src/memory/integrity.rs
+      - runtime/src/memory/indexer.rs
+      - runtime/src/memory/mod.rs
+      - cli/src/main.rs (additive: memory integrity)
+      - runtime/src/orchestration/control.rs (additive: G0 label)
+      - tests/certification/ws06.rs
+    product_checks:
+      - {check: "memory::integrity::check at every index build (meta graph_integrity, rebuild report graph_integrity)", tier: G1-equivalent}
+      - {check: "gov memory integrity", tier: on-demand}
+      - {check: "audit family graph_integrity / doctor D015 / CIT-E verification", tier: G5 / doctor / CIT-E, status: "integration points IP-R2-1 (WS-2), IP-R2-2 (WS-4)"}
+    probes_rerun:
+      - {probe: beta-r C2-relationship-graph (unedited), before: "7 PASS / 3 FAIL", after: "7 PASS / 3 FAIL", note: "the 3 FAIL lines read only gov audit / doctor D015 (WS-2 files) -> IP-R2-1"}
+      - {probe: derived C2-relationship-graph.integrity.P2-AR-0027, after: "14 PASS / 3 FAIL", note: "all 7 added product-surface lines PASS; the 3 unedited audit/doctor lines FAIL as above"}
+      - {probe: SUPP-ws06-r2 R6, after: PASS}
+    tests: [memory::integrity::tests::signatures_judge_direction_and_type, ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles]
+    integration_points: [IP-R2-1, IP-R2-2, IP-R2-4]
+    routed_ips_implemented: [WS-4 IP-12]
+    owner_decision_required: null
+  - class: BC-P2-30
+    status: REPAIRED_CLAIMED
+    requirement: "Embedding model artefact and inference runtime separately identified and content-bound in the index manifest; pins bind the executed revision and fail closed; a profile change needs benchmark evidence for the chosen candidate, a recorded held-out regression after re-indexing and the change-control gate for its radius; ungoverned pin edits detected; a re-pin does not withhold deterministic inputs (framework 14.2-14.3; Contract v3 D1, D4, D5; frozen contract 9.1; A0-D4-01, A0-D5-01, A0-D5-02)"
+    files:
+      - runtime/src/memory/profile.rs
+      - runtime/src/memory/embedder.rs
+      - runtime/src/memory/indexer.rs
+      - runtime/src/memory/manifest.rs
+      - runtime/src/memory/benchmark.rs
+      - runtime/src/retrieval/mod.rs
+      - framework/schemas/index-manifest.schema.json
+      - cli/src/main.rs (additive: memory select --gate, memory profile)
+      - runtime/src/orchestration/control.rs (additive: G0 label)
+      - tests/certification/ws06.rs
+      - tests/certification/repair.rs (select step follows the governed flow)
+    product_checks:
+      - {check: "component identity (adapter, model artefact, runtime) bound in the manifest core / runtime meta at every build; incremental escalates to full on drift", tier: G1-equivalent}
+      - {check: "query-time binding: EMBEDDER_MISMATCH / RERANKER_MISMATCH naming the changed component; EMBEDDER_/RERANKER_REVISION_MISMATCH", tier: every query}
+      - {check: "freshness pin_mismatch includes the identity (task close, status, doctor D025 via pin_differences)", tier: G2 / doctor}
+      - {check: "gov memory select: T2-bound evidence, radius gate with gates::human_approval_for, full re-index, recorded regression audit, rollback", tier: the only pin writer}
+      - {check: "profile::governance (UNGOVERNED / UNGOVERNED_CHANGE / GOVERNED_UNVERIFIED) at every build and gov memory profile", tier: G1-equivalent / on-demand}
+      - {check: "audit/doctor surface of the governance state", tier: G5 / doctor, status: "integration point IP-R2-3 (WS-2)"}
+    probes_rerun:
+      - {probe: beta-r D4-component-separation (unedited), before: "9 PASS / 2 FAIL", after: "11 PASS / 0 FAIL", turned: [D4-b2-identified, D4-b2-drift]}
+      - {probe: beta-r D5-model-selection (unedited), before: "7 PASS / 4 FAIL", after: "stops at D5-b5 (select raises the R5 change gate; the probe never answers gates)"}
+      - {probe: derived D5-model-selection.owner-channel.P2-AR-0027, after: "11 PASS / 1 FAIL", note: "D5-b6-ungoverned reads gov audit findings only -> IP-R2-3; the added D5-b6-ungoverned-product line PASS"}
+      - {probe: zeta-r W10 W10-a4-embedder-repinned-before-reindex (+continue), before: PASS, after: PASS}
+      - {probe: zeta-r W01 W1-b6-benchmark-hash-in-record, before: FAIL, after: PASS}
+      - {probe: SUPP-ws06-r2 R1-R4, after: "6/6 PASS"}
+    tests: [ws06::embedder_components_are_identified_bound_and_fail_closed_on_change, ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression, repair::benchmark_records_evidence_and_selection_pins_through_decision]
+    integration_points: [IP-R2-3, IP-R2-4, IP-R2-5, IP-R2-6, IP-R2-13]
+    routed_ips_implemented: [WS-3 IP-8, WS-4 IP-13]
+    owner_decision_required: null
+  - class: BC-P2-31
+    status: PARTIAL
+    requirement: "Claims, emergency-control state and OS plugin registration survive deletion of every path the product classifies derived or generated; the repository contract and documentation classify their storage truthfully (Contract v3 B1:188, B3:202, D6:352; D-0007 T2; A0-D6-01, A0-D6-02, S0-B1B3-01)"
+    done:
+      - "the product's classification (RepositoryContract::decide) never calls claims, emergency control, claim trees, rollback snapshots or the plugin registry derived/generated, wherever their writers keep them (kernel OS_STORES rules after the overlay's)"
+      - "deleting every file the product classifies derived or generated keeps claims, the freeze and the registration (certification ws06::deleting_everything_*)"
+      - "location API for the writers (.governance-state/ self-ignored; governance/registry/plugin-registry.json), relocation with conflict detection, misplaced-state detector at every build"
+    not_done:
+      - "writers still create the stores at their legacy paths (WS-5, WS-3, WS-7, WS-4, WS-8, WS-9: IP-R2-7..10, IP-R2-12), so deleting the whole .governance-runtime/ or governance/generated/ still loses them (beta-r D6-B, A)"
+      - "the overlay template REPOSITORY_CONTRACT.yaml and its migration operation (IP-R2-11: migrations/** is WS-9's this round) and docs/ARCHITECTURE.md (WS-3's this round, IP-R2-8)"
+    files:
+      - runtime/src/paths.rs
+      - runtime/src/memory/indexer.rs (os_state in the build report)
+      - tests/certification/ws06.rs
+    product_checks:
+      - {check: "RepositoryContract::decide applies the kernel OS_STORES classification", tier: structural}
+      - {check: "paths::misplaced_os_state in every build report (os_state)", tier: G1-equivalent}
+      - {check: "doctor/audit finding", tier: doctor / G5, status: "integration point IP-R2-12 (WS-2)"}
+    probes_rerun:
+      - {probe: beta-r D6-rebuild-guarantee (unedited), before: "stops at gate create (GATE_PACKAGE_INCOMPLETE)", after: same}
+      - {probe: beta-r D6-rebuild-guarantee (integration adapter), before: "stops: rebuild-memory refused FROZEN (integration O-4)", after: same}
+      - {probe: synthesis AC16-X2 X2-B1B3-nonrebuildable-state-not-classified-derived, before: FAIL, after: FAIL, note: "reads the overlay file (template) with any-match semantics -> IP-R2-11"}
+      - {probe: SUPP-ws06-r2 R5, after: PASS}
+    tests: [paths::tests::os_stores_are_never_classified_derived_or_generated, paths::tests::legacy_stores_relocate_and_are_reported_until_moved, ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration]
+    integration_points: [IP-R2-7, IP-R2-8, IP-R2-9, IP-R2-10, IP-R2-11, IP-R2-12, IP-R2-4]
+    owner_decision_required: null
+routed_integration_points:
+  - {ip: IP-8, from: WS-3, status: DONE, where: "runtime/src/memory/profile.rs select: human_approved only from gates::human_approval_for(p, gate, subject_sha256)"}
+  - {ip: IP-12, from: WS-4, status: DONE, where: "runtime/src/memory/integrity.rs: record edges through Record::edges() / graph::canonical_of"}
+  - {ip: IP-13, from: WS-4, status: DONE, where: "runtime/src/memory/benchmark.rs: research record version, content_hash, benchmark.result_sha256 (zeta-r W1-b6 FAIL->PASS)"}
+new_integration_points: [IP-R2-1, IP-R2-2, IP-R2-3, IP-R2-4, IP-R2-5, IP-R2-6, IP-R2-7, IP-R2-8, IP-R2-9, IP-R2-10, IP-R2-11, IP-R2-12, IP-R2-13]
+regression:
+  cargo_test_lib: "149 passed / 0 failed"
+  cargo_test_certification: "104 passed / 0 failed"
+  audit_probes: "0 PASS->FAIL over every beta-r probe, zeta-r W01/W10, synthesis AC16-X2, delta-r L3 (direct and shim)"
+  round1_supplementary: "19/19"
+  r1_heldout: "AR-0027 26/3, AR-0029 26/2 (+ho_f not compiling), AR-0031 27/7, AR-0033 30/1 (hv_a::a1 size pin only; census 107 files / 1527 functions, 0 violations)"
+owner_decision_required: []
