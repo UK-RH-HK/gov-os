@@ -1,0 +1,193 @@
+
+==== gamma-r I3-generation (BC-P2-24 accept: >=1 linked task per source) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+  [I3.b1 readiness gaps  ] gov readiness plan F-0001                                  tasks before=0   after=2   generated=2
+  [I3.b2 failed tests    ] gov verify product (a product test now fails)              tasks before=2   after=2   generated=0
+  [I3.b2 failed tests    ] task close reporting tests.status=failed                   tasks before=3   after=3   generated=0
+  [I3.b3 audit findings  ] gov audit (suite reports findings)                         tasks before=3   after=3   generated=0
+  [I3.b3 audit findings  ] gov doctor                                                 tasks before=3   after=3   generated=0
+  [I3.b4 research discoveries] handoff return with discoveries/unresolved/proposed decision tasks before=3   after=3   generated=0
+  [I3.b5 human decisions ] gov decide HDG-0001 --option A (human)                     tasks before=3   after=3   generated=0
+  [I3.b5 human decisions ] gov decide HDG-0002 --option B (human declines)            tasks before=3   after=3   generated=0
+  [I3.b6 CIT effects     ] gov cit execute CIT-0001 (affects TASK-AFF)                tasks before=4   after=4   generated=0
+  [I3.b7 lessons         ] (lesson L-0001 created by the handoff return above)        tasks before=4   after=4   generated=0
+  [I3.b7 lessons         ] upstream prepare of a PROJECT lesson (only path lessons take) tasks before=4   after=4   generated=0
+  [I3.b8 missing tools/skills] gov tools resolve --capability quantum_compile (gap)       tasks before=5   after=5   generated=0
+  [I3.b8 missing tools/skills] gov skills resolve TASK-NEED (missing skill)               tasks before=5   after=5   generated=0
+  [I3.b8 missing tools/skills] gov continue (next work carries a skills gap)              tasks before=5   after=5   generated=0
+  [I3.b9 retrieval failures] gov memory verify (held-out query fails)                   tasks before=5   after=5   generated=0
+  [I3.b9 retrieval failures] gov memory query with zero hits                            tasks before=5   after=5   generated=0
+  [I3.b10 security findings] gov audit with a seeded secret in src/creds.rs             tasks before=5   after=6   generated=1
+  [I3.b11 performance regressions] telemetry of a slow operation (latency 99999 ms)           tasks before=6   after=6   generated=0
+  [I3.b11 performance regressions] gov telemetry summary                                      tasks before=6   after=6   generated=0
+-- after-shim (real gov 82e3a9bc7f1f)
+  [I3.b1 readiness gaps  ] gov readiness plan F-0001                                  tasks before=0   after=6   generated=6
+  [I3.b2 failed tests    ] gov verify product (a product test now fails)              tasks before=6   after=7   generated=1
+  [I3.b2 failed tests    ] task close reporting tests.status=failed                   tasks before=8   after=8   generated=0
+  [I3.b3 audit findings  ] gov audit (suite reports findings)                         tasks before=8   after=9   generated=1
+  [I3.b3 audit findings  ] gov doctor                                                 tasks before=9   after=9   generated=0
+  [I3.b4 research discoveries] handoff return with discoveries/unresolved/proposed decision tasks before=9   after=13  generated=4
+  [I3.b5 human decisions ] gov decide HDG-0001 --option A (human)                     tasks before=13  after=14  generated=1
+  [I3.b5 human decisions ] gov decide HDG-0002 --option B (human declines)            tasks before=14  after=15  generated=1
+  [I3.b6 CIT effects     ] gov cit execute CIT-0001 (affects TASK-AFF)                tasks before=16  after=16  generated=0
+  [I3.b7 lessons         ] (lesson L-0001 created by the handoff return above)        tasks before=16  after=16  generated=0
+  [I3.b7 lessons         ] upstream prepare of a PROJECT lesson (only path lessons take) tasks before=16  after=16  generated=0
+  [I3.b8 missing tools/skills] gov tools resolve --capability quantum_compile (gap)       tasks before=19  after=19  generated=0
+  [I3.b8 missing tools/skills] gov skills resolve TASK-NEED (missing skill)               tasks before=19  after=19  generated=0
+  [I3.b8 missing tools/skills] gov continue (next work carries a skills gap)              tasks before=19  after=19  generated=0
+  [I3.b9 retrieval failures] gov memory verify (held-out query fails)                   tasks before=19  after=19  generated=0
+  [I3.b9 retrieval failures] gov memory query with zero hits                            tasks before=19  after=19  generated=0
+  [I3.b10 security findings] gov audit with a seeded secret in src/creds.rs             tasks before=19  after=22  generated=3
+  [I3.b11 performance regressions] telemetry of a slow operation (latency 99999 ms)           tasks before=22  after=23  generated=1
+  [I3.b11 performance regressions] gov telemetry summary                                      tasks before=23  after=23  generated=0
+
+==== epsilon-r O5-scheduler-requirements S8 (BC-P2-24 accept) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+task records before/after doctor+audit+continue+replan: 0 / 0
+telemetry event names in this project: ['cli.checkpoint', 'cli.doctor', 'cli.init', 'cli.status', 'cli.task', 'health.run']
+-- after-shim (real gov 82e3a9bc7f1f)
+exit=0 {"blocked": 0, "changed": [], "cycles": [], "generated_work": {"augmented": [], "created": [], "error": null, "not_generated": null}, "runnable": ["TASK-0001", "TASK-0002"], "waiting_human": 0}
+task records before/after doctor+audit+continue+replan: 0 / 2
+telemetry event names in this project: ['cli.checkpoint', 'cli.doctor', 'cli.init', 'cli.status', 'cli.task', 'health.run']
+
+==== delta-r K3-auto-impact-simulation (BC-P2-13 accept: K3.b*.mislabel, K3.outside.*) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+CHECK K3.b1.mislabel PASS a material change to the architecture record ARCH-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b3.mislabel PASS a material change to the interface record API-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b7.mislabel PASS a material change to the acceptance criterion of SCN-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b2.mislabel PASS a material change to the product behaviour (retry bound 5 -> 50), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b4.mislabel PASS a material change to the security control (signature check removed), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b6.mislabel PASS a material change to the infrastructure cost (db small -> 8xlarge), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b8.mislabel PASS a material change to the data migration (drop a column), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.outside.1 PASS an architecture + interface + acceptance-criterion change closed through an ordinary task either is refused or triggers CIT-P
+CHECK K3.outside.3 PASS behaviour + security + infrastructure-cost + data-migration changes closed through an ordinary task are refused or trigger CIT-P
+CHECK K3.outside.2 FAIL a governance/policy change closed through an ordinary task is refused or triggers CIT-P (not only a green-audit check)
+-- after-shim (real gov 82e3a9bc7f1f)
+CHECK K3.b1.mislabel PASS a material change to the architecture record ARCH-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b3.mislabel PASS a material change to the interface record API-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b7.mislabel PASS a material change to the acceptance criterion of SCN-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b2.mislabel PASS a material change to the product behaviour (retry bound 5 -> 50), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b4.mislabel PASS a material change to the security control (signature check removed), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b6.mislabel PASS a material change to the infrastructure cost (db small -> 8xlarge), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.b8.mislabel PASS a material change to the data migration (drop a column), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+CHECK K3.outside.1 PASS an architecture + interface + acceptance-criterion change closed through an ordinary task either is refused or triggers CIT-P
+CHECK K3.outside.3 PASS behaviour + security + infrastructure-cost + data-migration changes closed through an ordinary task are refused or trigger CIT-P
+CHECK K3.outside.2 PASS a governance/policy change closed through an ordinary task is refused or triggers CIT-P (not only a green-audit check)
+
+==== gamma-r G1G2-command-surface G1.b3 (BC-P2-13 accept) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+$ (c) a consequential change made through an ordinary task (allowed_paths spec/**) closes with no impact simulation and no gate
+exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0001" is obsolete (inputs changed: evidence_records, index_manifest, source, spec_decisions, spec_requirements, spec_tasks); run `gov health run` (re-checks only the checks the changed inputs impact) 
+  CIT records before/after close: 2 / 2; REQ-0001 now: {"id": "REQ-0001", "type": "requirement", "title": "r", "status": "ACTIVE", "kind": "functional", "acceptance_criteria": ["totals may be approximate (floating point)"]}
+-- after-shim (real gov 82e3a9bc7f1f)
+$ (c) a consequential change made through an ordinary task (allowed_paths spec/**) closes with no impact simulation and no gate
+exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-SPEC made material change(s) outside change control: acceptance_criteria_change REQ-0001 (spec/requirements/REQ-0001.yaml). Contract v3:638-647 / framework §47-48: a material change completes only through CIT-P/CIT-E, whatever task it is made in. Restore these path
+  CIT records before/after close: 2 / 2; REQ-0001 now: {"id": "REQ-0001", "type": "requirement", "title": "r", "status": "ACTIVE", "kind": "functional", "acceptance_criteria": ["totals may be approximate (floating point)"]}
+
+==== gamma-r FRESH-invalidation (task closes that touch governance files) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+  close TASK-GOV1 (declares governance/project/NOTES.md): exit=0 ok=true
+  close TASK-GOV2 (declares governance/project/NOTES.md,governance/project/TOOL_PERMISSIONS.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0003" is obsolete (inputs changed: index_manifest, tools_plugins); run `gov health run` (re-checks on
+  close TASK-GOV3 (declares governance/project/NOTES.md,governance/project/skills/SKL-P.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: index_manifest, project_skills); run `gov health run` (re-checks only 
+  close TASK-GOV4 (declares governance/project/NOTES.md): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: generated_other, index_manifest, overlay_other, project_skills, spec_decisions, spec_tasks); run `gov healt
+  close TASK-GOV5 (declares governance/project/NOTES.md): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: generated_other, index_manifest, overlay_other, project_skills, spec_decisions, spec_tasks, tools_plugins);
+  close TASK-GOV6 (declares governance/project/NOTES.md,spec/features/F-9.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: generated_other, index_manifest, overlay_other, project_skills, spec_decisions, spec
+-- after-shim (real gov 82e3a9bc7f1f)
+  close TASK-GOV1 (declares governance/project/NOTES.md): exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-GOV1 made material change(s) outside change control: governance_change governance/project/NOTES.md (governance/project/NOTES.md). Contract v3:638-647 / framework §47-48: a material change completes only thro
+  close TASK-GOV2 (declares governance/project/NOTES.md,governance/project/TOOL_PERMISSIONS.yaml): exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-GOV2 made material change(s) outside change control: governance_change governance/project/NOTES.md (governance/project/NOTES.md); governance_change governance/project/
+  close TASK-GOV3 (declares governance/project/NOTES.md,governance/project/skills/SKL-P.yaml): exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-GOV3 made material change(s) outside change control: governance_change governance/project/NOTES.md (governance/project/NOTES.md); governance_change governance/project/skil
+  close TASK-GOV4 (declares governance/project/NOTES.md): exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-GOV4 made material change(s) outside change control: governance_change governance/project/NOTES.md (governance/project/NOTES.md). Contract v3:638-647 / framework §47-48: a material change completes only thro
+  close TASK-GOV5 (declares governance/project/NOTES.md): exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-GOV5 made material change(s) outside change control: governance_change governance/project/NOTES.md (governance/project/NOTES.md). Contract v3:638-647 / framework §47-48: a material change completes only thro
+  close TASK-GOV6 (declares governance/project/NOTES.md,spec/features/F-9.yaml): exit=1 ok=false code=MATERIAL_CHANGE_REQUIRES_CIT msg=task TASK-GOV6 made material change(s) outside change control: governance_change governance/project/NOTES.md (governance/project/NOTES.md); behaviour_change F-9 (spec/features/F-9.yaml). Contract
+
+==== gamma-r H2H3-readiness (computed chain cells; silent N/A) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+  representative_test_data     given "N/A" (silent)                     -> state=N/A              ok=False
+  invalid (silent-N/A / malformed) list: ['data_model_schema: silent N/A or invalid cell value is not allowed', 'representative_test_data: silent N/A or invalid cell value is not allowed']
+  pre_implementation_ok: False  coverage: 0.692
+-- after-shim (real gov 82e3a9bc7f1f)
+  representative_test_data     given "N/A" (silent)                     -> state=MISSING          ok=False
+  invalid (silent-N/A / malformed) list: ['data_model_schema: silent N/A or invalid cell value is not allowed', 'representative_test_data: silent N/A or invalid cell value is not allowed']
+  pre_implementation_ok: False  coverage: 0.577
+
+==== gamma-r E4-claims unedited (claims store location; E4.b4 ages the lease in the OLD file) ====
+-- base-shim (real gov 5ff6ce9cbf7c)
+  claim store: claims.db
+$ claims live in .governance-runtime/claims.db: a fresh clone (no runtime dir) has no claims (derived runtime is machine-local)
+  suite concurrency_claims: {'ok': True, 'findings': 1, 'detail': {'claims': 1, 'expired': 1}, 'status': 'executed', 'cached_from': None} ['1 expired claim(s) not swept']
+  dry-run items: [{'kind': 'claims', 'expired': 1, 'classification': 'COMPLETE_UNVERIFIED'}]
+  recover ok= True actions= [{'claims_swept': 1}] report= None
+-- after-shim (real gov 82e3a9bc7f1f)
+  claim store: 
+$ claims live in .governance-runtime/claims.db: a fresh clone (no runtime dir) has no claims (derived runtime is machine-local)
+  suite concurrency_claims: {'ok': True, 'findings': 0, 'detail': {'claims': 1, 'expired': 0}, 'status': 'executed', 'cached_from': None} []
+  dry-run items: []
+  recover ok= True actions= [] report= None
+
+==== gamma-r E4-claims DERIVED (store path .governance-state/claims.db; after only — the base keeps the old location) ====
+  claim store: claims.db
+  clone claims: []
+  suite concurrency_claims: {'ok': True, 'findings': 1, 'detail': {'claims': 1, 'expired': 1}, 'status': 'executed', 'cached_from': None} ['1 expired claim(s) not swept']
+  dry-run items: [{'kind': 'claims', 'expired': 1, 'classification': 'COMPLETE_UNVERIFIED'}]
+  recover ok= True actions= [{'claims_swept': 1}] report= None
+
+==== zeta-r W03 unedited: observations that differ ====
+6,7c6,7
+< OBS W3-m4-relations-note-dependency-delivered: PASS
+< OBS W3-m5-supplementary-declared-separately: PASS
+---
+> OBS W3-m4-relations-note-dependency-delivered: FAIL
+> OBS W3-m5-supplementary-declared-separately: FAIL
+
+==== zeta-r W03 DERIVED (explicit ids renamed): observations that differ (none expected) ====
+(identical)
+
+==== zeta-r W06 unedited: result ====
+-- base-shim: 19 PASS / 8 FAIL; 
+-- after-shim: 0 PASS / 0 FAIL;     raise RuntimeError(f"gov {' '.join(args)} failed: {e.get('error')}")
+
+==== zeta-r W06 DERIVED (chain cells N/A_WITH_REASON; B1 claim outcome recorded): observations ====
+19,24d18
+< OBS AC16-W6xD1-stale-index-blocks-close: PASS
+< OBS W6-s3-context-packets-invalidated(direct): FAIL
+< OBS AC16-W6xD1-rebuild-does-not-license-stale-consumption: FAIL
+< OBS W6-s1-direct-change-forces-cit: FAIL
+< OBS AC16-W6xO4-green-goes-stale-on-requirement-change: PASS
+< OBS W6-s7-stale-evidence-surfaced(direct): FAIL
+26c20
+< OBS W6-s7-retest-flag-not-cleared-by-close: FAIL
+---
+> OBS W6-s7-retest-flag-not-cleared-by-close: PASS
+OBS DERIVED-W6-B1-claim-of-stale-task: PASS -- claim of TASK-0001 after the ungoverned change to its governing requirement -> ok=False TASK_NOT_RUNNABLE: TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): retest required after upstream change propagation (direct change (not through a CIT)): work that has not started re-delivers its context at the current inputs (`gov context compile TASK-0001`); s
+
+==== delta-r N1-N2-checkpoints (R2-6): marks and where each run stops ====
+-- base-shim: 14 PASS; stops at: unexpected failure: gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-
+-- after-shim: 14 PASS; stops at: unexpected failure: gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-after-shim-delta-r
+
+==== beta-r D6-rebuild-guarantee: where each run stops ====
+-- base-shim: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent
+-- after-shim: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): feature F-0001 pre-implementation readiness cells missing: representative_test_data; scenario ch
+
+==== beta-r D6 DERIVED (claimed task not feature implementation; reranker override not applied): checks and B-deletion diff ====
+-- base-shim
+[B] differences vs pre-deletion snapshot: {"claims": [[["TASK-0001", "S-probe"]], []], "control": [{"mode": "RUNNING", "writes_frozen": true}, {"mode": "RUNNING", "writes_frozen": false}]}
+after runtime deletion, another session claims the previously claimed task: True None
+PASS  D6-b2-A-registry  the OS-written plugin registry (the only proof of registration, TOOL_POLICY.plugins.registry_path) survives deletion of generated views
+FAIL  D6-b2-A-pin  a tampered pinned plugin still fails closed after the registry is lost (the descriptor carries the pin written at registration)
+PASS  D6-b1  all derived memory/index state (SQLite/FTS/vector/graph, manifests, generated views) can be deleted and rebuilt
+PASS  D6-b2-A  after deleting framework §19 derived state: authoritative records, claims, emergency control state and governed status are preserved
+PASS  D6-b1-identical  the rebuilt index is identical (manifest hash, derived-store content, retrieval answers)
+FAIL  D6-b2-B  deleting the directory the product itself classifies as derived preserves claims and emergency control state
+PASS  D6-b3  a fresh agent (no prior conversation) reconstructs the same governed state (records, gates, open CITs, checkpoint, runnable work) after the rebuild
+PASS  D6-b4  rebuilds are deterministic at the same path and at a different absolute path (identical manifest hash and derived content)
+-- after-shim
+[B] differences vs pre-deletion snapshot: {"control": [{"mode": "RUNNING", "writes_frozen": true}, {"mode": "RUNNING", "writes_frozen": false}]}
+after runtime deletion, another session claims the previously claimed task: False TASK_CLAIMED
+PASS  D6-b2-A-registry  the OS-written plugin registry (the only proof of registration, TOOL_POLICY.plugins.registry_path) survives deletion of generated views
+FAIL  D6-b2-A-pin  a tampered pinned plugin still fails closed after the registry is lost (the descriptor carries the pin written at registration)
+PASS  D6-b1  all derived memory/index state (SQLite/FTS/vector/graph, manifests, generated views) can be deleted and rebuilt
+PASS  D6-b2-A  after deleting framework §19 derived state: authoritative records, claims, emergency control state and governed status are preserved
+PASS  D6-b1-identical  the rebuilt index is identical (manifest hash, derived-store content, retrieval answers)
+FAIL  D6-b2-B  deleting the directory the product itself classifies as derived preserves claims and emergency control state
+PASS  D6-b3  a fresh agent (no prior conversation) reconstructs the same governed state (records, gates, open CITs, checkpoint, runnable work) after the rebuild
+PASS  D6-b4  rebuilds are deterministic at the same path and at a different absolute path (identical manifest hash and derived content)

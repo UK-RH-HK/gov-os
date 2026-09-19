@@ -1,0 +1,40 @@
+2c2
+< # P2-AR-0032 (round-2 integration builder, repair iteration 1) — re-run EVERY prior R1 held-out suite UNEDITED against THIS worktree.
+---
+> # P2-AR-0036 (round-3 WS-5 repair builder, repair iteration 1) — re-run EVERY prior R1 held-out suite UNEDITED against THIS worktree.
+6c6
+< # every path is PRIVATE to this run. The scratch root defaults to a directory named with this run id (P2-AR-0032), the
+---
+> # every path is PRIVATE to this run. The scratch root defaults to a directory named with this run id (P2-AR-0036), the
+16c16
+< #        the labelled derived copy hv_a_derivation.a1-unpinned.P2-AR-0032.rs.txt beside this script, run from a
+---
+> #        the labelled derived copy hv_a_derivation.a1-unpinned.P2-AR-0036.rs.txt beside this script, run from a
+25c25
+< SCR="${P2AR0032_SCRATCH:-/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/r1-P2-AR-0032-private}"
+---
+> SCR="${P2AR0036_SCRATCH:-/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/r1-P2-AR-0036-private}"
+28c28
+< export CARGO_BUILD_JOBS=6
+---
+> export CARGO_BUILD_JOBS=2
+58c58
+< cp "$HERE/hv_a_derivation.a1-unpinned.P2-AR-0032.rs.txt" "$SCR/ho33u/tests/hv_a_derivation_a1_unpinned.rs"
+---
+> cp "$HERE/hv_a_derivation.a1-unpinned.P2-AR-0036.rs.txt" "$SCR/ho33u/tests/hv_a_derivation_a1_unpinned.rs"
+63c63
+<   echo "# P2-AR-0032 R1 held-out re-run, label=$LABEL"
+---
+>   echo "# P2-AR-0036 R1 held-out re-run, label=$LABEL"
+129c129
+<   echo; echo "===== SUPPLEMENTARY (S1) :: hv_a_derivation_a1_unpinned (derived copy P2-AR-0032; scale pins printed, not asserted) ====="
+---
+>   echo; echo "===== SUPPLEMENTARY (S1) :: hv_a_derivation_a1_unpinned (derived copy P2-AR-0036; scale pins printed, not asserted) ====="
+137,139c137,139
+<   sed "s|^ROOT = .*|ROOT = \"$WT\"|" "$V/4.1.6-r1-4/evidence/derive.py" > "$SCR/derive_p2ar0032.py"
+<   echo "# diff of the copy against the evidence file:"; diff "$V/4.1.6-r1-4/evidence/derive.py" "$SCR/derive_p2ar0032.py"
+<   ( cd "$SCR" && python3 derive_p2ar0032.py )
+---
+>   sed "s|^ROOT = .*|ROOT = \"$WT\"|" "$V/4.1.6-r1-4/evidence/derive.py" > "$SCR/derive_p2ar0036.py"
+>   echo "# diff of the copy against the evidence file:"; diff "$V/4.1.6-r1-4/evidence/derive.py" "$SCR/derive_p2ar0036.py"
+>   ( cd "$SCR" && python3 derive_p2ar0036.py )

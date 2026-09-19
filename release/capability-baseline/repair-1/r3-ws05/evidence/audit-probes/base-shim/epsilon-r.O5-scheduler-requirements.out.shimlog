@@ -1,0 +1,1 @@
+(d) task close ERR:{"code": "HEALTH_HARD_BLOCK", "message": "task.create is refused: 1 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: src/creds.rs. Repair the condition, then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it", "detail: packet could not be compiled; report passed through unchanged
