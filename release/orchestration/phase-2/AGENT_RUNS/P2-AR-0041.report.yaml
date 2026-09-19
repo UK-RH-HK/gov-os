@@ -1,0 +1,149 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0041
+role: capability-repair
+objective: Repair iteration 1, round 3 integration builder — merge the eight round-3 repair branches in the P2-HO-0040 order, reconcile the two P2-ADJ-0002 implementations into ONE mechanism, converge every host on one availability API, apply every routed integration point (IP-R3-WS04-01 ordered, task-record sealing ordered after it, R3-WS5-1..11, IP-R3-WS02-01..10, P2-ADJ-0003, IP-R3-WS03-4, kernel mirroring, health payload, product-release CLI, template/migration convergence, tree_hash, store relocations, harness convergence), run every suite and every prior R1 held-out suite through a private path; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run (the session context
+  was compacted once; work continued from the repository). This run is the round-3 integration builder: it merged the
+  eight round-3 branches and authored only the integration commits listed in 00-INTEGRATION-REPORT.md §2 (eight product
+  commits and one test commit) and the integration evidence (runners, labelled derived probe copies, a G0 probe, a cost
+  measurement and a reproduction script); it authored none of the round-1..3 repairs, no audit, synthesis or
+  verification run, and it grades no repair. It read P2-HO-0040, P2-HO-0030, P2-HO-0019, P2-HO-0031, P2-HO-0020,
+  P2-HO-0010, P2-ADJ-0002, P2-ADJ-0003, the round-1 and round-2 integration reports, the eight round-3
+  00-REPAIR-REPORT.md files and their evidence scripts and outputs, the product source and tests of the merged tree, and
+  the prior R1 held-out suites (run unedited). Other branches were read with git show / git diff only. It did not read
+  session or agent transcripts, task-output stores or user auto-memory; it spawned no sub-agents and did not contact
+  the product owner.
+input:
+  base_commit: a53d15b6cef813bc474f03aa8ca39cbfcc6e0b57
+  candidate: "none (integration branch of repair iteration 1, round 3; no candidate minted)"
+  product_code_digest: 797da37c8532528e1b8f3d924e2b7b7a304bb567bd928ce80126e8e120161fe1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0040-integration-3.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0040-integration-3.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0030-integration-2.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0019-integration-1.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0031 (availability rule), P2-HO-0020, P2-HO-0010
+  - release/orchestration/phase-2/GATES/P2-ADJ-0002-T2-CROSS-MACHINE-CONTINUITY.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md
+  - release/capability-baseline/repair-1/integration/ and integration-2/ (reports, runners, adapters)
+  - "release/capability-baseline/repair-1/r3-{ws02,ws03,ws04,ws05,ws06,ws07,ws08,ws09-11}/00-REPAIR-REPORT.md and evidence/"
+  - "branches phase2/repair-1-r3-{ws03,ws08,ws05,ws04,ws02,ws06,ws07,ws09-11} (tips 7d0e0e0, a88d268, 0403458, 6094199, 65c3bd7, 3694df8, d3809db, 2ec4656)"
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests and 4.1.6-r1-4/evidence/derive.py (run unedited)
+  - "release/capability-baseline/audit-0/{zeta-r,synthesis,beta-r}/evidence (run unedited and via labelled derived copies)"
+  - runtime/src, cli/src, framework/, migrations/, tests/certification of the merged tree
+produced:
+  - "merge commits 26f9a7d (ws03), 020d6fd (ws08), f656cb7 (ws05), 09cfc78 (ws04), 7726854 (ws02), e26dd1b (ws06), 73ac04b (ws07), 8972c16 (ws09-11)"
+  - "0b80c87: schema registry reset on Project::invalidate; KERNEL.yaml schema_versions mirror + health in payload_dirs; ws04r3 premise (class refactor)"
+  - "fcb049e: ONE P2-ADJ-0002 mechanism (srr/binding.rs + t2.rs; gov trust bind / trust status t2_binding / trust reseal; trust t2-binding removed; ws03_r3 on the one harness)"
+  - "77157f1: CIT state sealed on another machine disclosed, not tampering (cit::binding::sealed_elsewhere; D033; os_binding_integrity)"
+  - "8b3fd14: ws04r3 direct-propagation test observes the claim-time propagation"
+  - "5f86937: IP-R3-WS04-01 end state — cit a sealed record kind; WS-4's declined-CIT test un-ignored"
+  - "68f2e4a: task records sealed on every OS write, task a sealed kind; legacy-aware close classification; governance/registry/ OS-managed (IP-W7R3-1); OS-generated work not an adoption dependant; tests/certification/integration_r3.rs"
+  - "f1cb985: one availability host API (tasks guard_work, DECLARED_REMEDY_OPS, update entry_guard/confirm_remedy, cit guard_paths, empty-alias fix + unit test); record_research_evidence L1 (IP-R3-WS03-4)"
+  - "22d43ce: IP-R3-WS02-07/-08/-09, R3-WS5-4/-7, release record CLI, generation hook skip list, tree_hash, migration description, docs"
+  - "e3b6cfb: integration_r3 test — WS-2's G2 readiness duty at close reached behind WS-5's in-task materiality"
+  - release/capability-baseline/repair-1/integration-3/00-INTEGRATION-REPORT.md
+  - release/capability-baseline/repair-1/integration-3/evidence/
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib at e3b6cfb: 262 passed, 0 failed (207 round-2 integration + 54 round-3 builders + 1 integration unit test)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/regression/cargo-test-lib.e3b6cfb.out}
+  - {id: REG-CERT, description: "cargo test --test certification at e3b6cfb: 189 passed, 0 failed, 0 ignored (136 + 48 round-3 builders incl. the un-ignored WS-4 test + 5 integration_r3)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/regression/cargo-test-certification.e3b6cfb.out}
+  - {id: REG-CERT-AFTER-MERGES, description: "straight after the merges (8972c16): lib 260/1, certification 166/17 (1 ignored) — the failures the integration commits addressed", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/regression/cargo-test-certification.after-merges-8972c16.out}
+  - {id: REG-PY, description: "Python plugin tests (capabilities/tests): 4 passed", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/regression/python-plugin-tests.out}
+  - {id: REG-FMT-WARN, description: "rustfmt --check (edition 2021) on every Rust file changed after the merges: clean (two rc=1 lines are hunks in untouched child modules); cargo build --release, cargo build and cargo test --no-run: 0 warnings", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/regression/rustfmt-check.out}
+  - {id: R1-AR0027, description: "AR-0027 unedited, private path: 26/3 (b1, b2, d3) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/r1-heldout/r1-heldout-integrated-22d43ce.out}
+  - {id: R1-AR0029, description: "AR-0029 unedited: 26/2 (b3, b6), ho_f_preservation does not compile = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/r1-heldout/r1-heldout-integrated-22d43ce.out}
+  - {id: R1-AR0031, description: "AR-0031 unedited: 27/7 (a1, a5, a8, b6, c2, c3, d2) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/r1-heldout/r1-heldout-integrated-22d43ce.out}
+  - {id: R1-AR0033, description: "AR-0033 unedited: 30/1 — only hv_a_derivation::a1, which pins 84 files / 740 functions (this tree: 123 / 2304)", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/r1-heldout/r1-heldout-integrated-22d43ce.out}
+  - {id: R1-AR0033-A1-UNPINNED, description: "labelled copy of hv_a::a1 with only the two size asserts printed: census 123 files / 2304 functions, 0 violations in all seven section-6 activities (human_gate_create 49/44/1/0); AR-0033 derive.py: 0 violations in three splitter configurations", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/r1-heldout/r1-heldout-integrated-22d43ce.out}
+  - {id: R1-FAILURE-MESSAGES, description: "normalised failure messages of the unedited suites identical (42 lines, empty diff) to the round-2 integration final run", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/r1-heldout/failure-messages-vs-integration-2.txt}
+  - {id: R1-INVARIANTS, description: "WS-8's structural R1 invariants on the integrated tree: identical to WS-8's record except floors_path( outside state.rs = 1, WS-2's read-only floors digest in the currency fingerprint (not a writer)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/builder-probes/unedited/ws08-r1-invariants.out}
+  - {id: G0-ROUND3-LABELS, description: "trust reseal, task generate, release record, research record (Write) refused FROZEN/PAUSED and AUTHORITY_DENIED without a role, writing nothing; trust reseal --dry-run and task generate --dry-run (Read) not refused by the controls; no work generated after refusals (20/20)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/g0/round3_labels_g0_probe.out}
+  - {id: BUILDER-PROBES, description: "round-3 builders' own probes on the integrated binary, unedited and (where a surface was unified by design or a fixture premise changed by another repair) through labelled derived copies: WS-2 64/65 (AV.2b-e2e now PASS; G2.a refused earlier by WS-5 materiality), WS-3 26/26, WS-4 22/0, WS-6 16/16, WS-7 11/11, WS-8 invariants as recorded (one read-only line), WS-9/11 5 PASS 2 OBS 0 FAIL", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/builder-probes/COMPARE-builder-probes.out}
+  - {id: BUILDER-PROBES-UNEDITED, description: "unedited builder probes fail only on the removed trust t2-binding surface (WS-3 10/26), on fixture premises other merged repairs changed (WS-2 51/54 scenario chain; WS-4 obs_b BC-P2-13), and on WS-7's IP probe descriptor (INT3-O1)", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/builder-probes/COMPARE-builder-probes.out}
+  - {id: AUDIT-W12-X1-D6, description: "zeta-r W12 unedited identical to WS-2's record (W12-G1-dependency-evidence-invalidated FAIL as written; derived next-claim observation PASS); AC16-X1 derived chain-na 14/15 with X1-G1xW6 FAIL->PASS (X1-O4 precondition per P2-ADJ-0003); beta-r D6 (WS-3's and WS-5's derived copies) 7/1 with D6-b2-B FAIL->PASS", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/audit-probes/COMPARE-audit-probes.out}
+  - {id: R3-WS5-10-COST, description: "release gov, minimal project, median ms: status 155, task list 18, generate --dry-run 122, task create 419, claim 457, release 445; Gate U (HEALTH_SLOS.yaml) declares no latency SLO — reported, not judged", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/slo-cost/generation-cost.22d43ce.out}
+  - {id: R3-WS5-11-REPRO, description: "memory_retrieval_regression executed in its sandbox (--no-cache) on a minimal project and the greenfield fixture: PASS, recall 1.0, every symbol query found — WS-5's observation not reproduced", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-3/evidence/ws5-11/repro.22d43ce.out}
+findings:
+  - id: P2-AR-0041-INT3-O1
+    severity: MEDIUM
+    capability: E1, W5
+    blocking: false
+    blocker_class: BC-P2-13
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-5 x WS-7: a plugin registered inside a claimed task is refused at close MATERIAL_CHANGE_REQUIRES_CIT for its descriptor under governance/project/plugins/ although `gov plugins register` passed its own owner gate (IP-W7R3-1's registry part is done); decide whether an owner-approved registration is change control for its own descriptor or registrations go through a CIT; routed to WS-5 and WS-7"
+    path: release/capability-baseline/repair-1/integration-3/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0041-INT3-O2
+    severity: LOW
+    capability: W12, W6
+    blocking: false
+    blocker_class: BC-P2-07
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "zeta-r W12-G1-dependency-evidence-invalidated reads the retest flag right after an incremental rebuild; direct-change propagation runs at the next claim (which refuses the stale task and stores retest_required). Either the reading moves to the claim or detect_and_propagate also runs at rebuild; routed to WS-2"
+    path: release/capability-baseline/repair-1/integration-3/evidence/audit-probes/COMPARE-audit-probes.out
+  - id: P2-AR-0041-INT3-O3
+    severity: INFO
+    capability: S4
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-8's R1-invariant grep counts WS-2's read-only floors digest in the currency fingerprint (currency.rs:460); optionally route it through a srr::state helper so the structural invariant stays exact"
+    path: release/capability-baseline/repair-1/integration-3/evidence/builder-probes/unedited/ws08-r1-invariants.out
+  - id: P2-AR-0041-INT3-O4
+    severity: INFO
+    capability: E1, S4
+    blocking: false
+    blocker_class: BC-P2-09
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "legacy unsealed task/CIT records that gov rewrites inside a claim window are reported (os_managed_unbound), not refused; they stay unsealed (never blessed) until a governed re-issue"
+    path: release/capability-baseline/repair-1/integration-3/00-INTEGRATION-REPORT.md
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r3-integration
+  commit: e2498f481ef23adb00332411e6edcbf7a31e52e0
+  product_tip: e3b6cfbcaefafa4f538f604be52dcde41c581e85
+  product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+  governed_state_digest: 2514b9fb46b140351f2898fbd99965a99cff4f19823c667c5affa200373235be
+  evidence_path: release/capability-baseline/repair-1/integration-3/evidence
+test_counts:
+  lib: {passed: 262, failed: 0, ignored: 0}
+  certification: {passed: 189, failed: 0, ignored: 0}
+  python_plugin_tests: {passed: 4, failed: 0}
+  warnings: 0
+r1_heldout:
+  AR-0027: {passed: 26, failed: 3, baseline: "26/3"}
+  AR-0029: {passed: 26, failed: 2, not_compiling: [ho_f_preservation], baseline: "26/2, ho_f non-compiling"}
+  AR-0031: {passed: 27, failed: 7, baseline: "27/7"}
+  AR-0033: {passed: 30, failed: 1, failing: [hv_a_derivation::a1 size pin], baseline: "30/1"}
+  census: {files: 123, functions: 2304, section_6_violations: 0, private_path: "…/scratchpad/P2-AR-0041/r1-P2-AR-0041-private"}
+p2_adj_0002_unification: >-
+  One role (t2-binding), one document format (WS-8's versioned t2-binding-authority: keys by id + commitment, one active,
+  retired keys, optional machine list), one provisioning command (gov trust bind; WS-3's repository check added), one
+  keyring API (srr::binding::keyring/keyring_at/held_keys, re-verified at use incl. expiry and machine list), consumed
+  by t2.rs; WS-3's hmac-sha256/t2-v2 portable seal (extended with the key id) and gov trust reseal continuity kept; the
+  machine key is never replaced; a bound machine honours only owner facts. Removed: gov trust t2-binding
+  [--provision|--reseal], WS-3's bundle/authorities store/second verifier, srr::binding::status(). Expiry: WS-8's
+  fail-closed rule kept (stronger revocation; renewal re-honours). Every property either builder's tests assert kept.
+availability_host_api: >-
+  WS-2's scheduler API everywhere (Request/admit/confirm_remedy/guard/subjects_reach); task create/claim admit with the
+  task's subjects (IP-R3-WS02-03) and declared remedies (task.create/task.claim = DECLARED_REMEDY_OPS: remedy only when the
+  work declares the block's check AND reaches its subjects); update entry = admit(UPDATE_APPLY, UPDATE_SUBJECTS) then
+  confirm_remedy before commit; cit propose guarded by its host with its paths.
+stopped:
+  - "R3-WS5-11 (sandbox memory_retrieval_regression symbol route returns nothing): not reproduced on the integrated binary (minimal project and greenfield fixture, executed in the sandbox, --no-cache); stopped with evidence (evidence/ws5-11/)"
+unresolved:
+  - "INT3-O1 (WS-5 x WS-7): plugin descriptor inside a claimed task needs a CIT at close despite the registration gate"
+  - "INT3-O2 (WS-2): W12-G1 as written reads after rebuild; propagation is at claim"
+  - "IP-R3-WS02-10 not retired (would delete WS-2's unit test; with IP-R3-WS06-4); IP-R3-WS02-11 optional, not done"
+  - "WS-3 IP-R3-WS03-6/-7/-8/-9; WS-8 IP-R3-WS08-3 (now via t2::binding_status)/-9/-10; WS-6 IP-R3-WS06-4/-6/-7; WS-9 IP-R3-WS09-4/-5; WS-7 IP-W7R3-3/-5/-6/-7/-9/-10; WS-4 IP-R3-WS04-03/-06/-09/-10/-11 (incl. the handoff.create remedy for remediation handoffs)"
+  - "AR-0033 hv_a::a1 size pin: the AC-14 verifier judges it on property (census 0 violations)"
+recommended_next_action: "Hand the integrated tip (work commit e2498f4, product tip e3b6cfb, product_code_digest 1d3e9f59…85df7) to independent capability verification; route INT3-O1 to WS-5/WS-7, INT3-O2 to WS-2, and the listed builder IPs to round 4."
+completed_at: "2026-09-19T16:20:15Z"
