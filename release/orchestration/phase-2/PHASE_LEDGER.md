@@ -162,3 +162,18 @@ actions only.
 | Totals | 36 class claims across 8 branches (35 REPAIRED_CLAIMED + BC-21 catalogue side PARTIAL). None is acceptance. |
 | Integration | Fresh integration builder **P2-AR-0022** (P2-HO-0019): merge all eight (WS-3 first), resolve `main.rs` unions, register every new subcommand with WS-3's G0 guard, reconcile the two known semantic conflicts (migration-plan `consumers`; `semantic_candidates`) and WS-3's role-default fallout in other workstreams' tests without weakening, register `framework/health` in the kernel payload if needed, run all suites and every R1 held-out suite. The orchestrator's trial branch `phase2/integration-1` was a probe only and is superseded. |
 | Next action | Await P2-AR-0022; then round 2. |
+
+## P2-L-0015 — 2026-09-19 — Round-1 integration merged; round 2 dispatched
+
+| Field | Value |
+|---|---|
+| Integration | P2-AR-0022 (fresh, `claude-opus-5[1m]`), work `9126a07`, report `90fe225`, product tip `811317b`. All eight round-1 branches merged `--no-ff` in order (WS-3 first); textual conflicts only in `tests/certification/main.rs` and `cli/src/main.rs`, resolved as unions. Eight declared product commits beyond the merges (+163/−18, none in an R1-listed file): compile reconciliation; G0 registration of every round-1 subcommand (146 labels; `verify product` reclassified Write/`record_audit` so it cannot write evidence under FREEZE_WRITES); migration-plan consumers moved to `expected_consumers` (WS-9 × WS-4); packet carries `semantic_candidates`; migration re-pointing never rewrites a T2-sealed record (WS-3 × WS-9); WS-8/WS-9 tests answer gates via the owner-signed channel; rustfmt; **`currency.rs` reads the trust anchor through `srr::verifier::trusted_root`** — WS-2's hand-built path had failed R1 AR-0031 `hx_a::a4`, undetected because WS-2's recorded R1 re-run measured another builder's tree via shared scratch symlinks. |
+| Results | lib 146/0, certification 100/0 (95/5 straight after the merges), Python 4/4; R1 held-out AR-0027 26/3, AR-0029 26/2 (`ho_f` n/c), AR-0031 27/7, AR-0033 30/1 (`hv_a::a1` size pin; census with only the size assertions removed: 0 violations in all seven §6 activities; AR-0033 `derive.py` agrees). No integration regression against any builder's own probes; 152 audit-of-record probe runs re-run with every difference explained. Kernel-cache race not tripped (5 cold-cache trials). |
+| Merge | `phase2/repair-1-integration` → `release/4.1.6-rc1` at **`b7e6d52`**; `product_code_digest` `b1ab1c8c…fbb1`. The orchestrator reproduced `cargo test --lib` 146/0 at the merged HEAD (certification reproduction recorded in P2-L-0016). |
+| Routed forward | O-1 (WS-3: shipped 4.1.4/4.1.5 kernels' descriptive policy keys refused → D027 CRITICAL, update rollback — S5/A1), O-4 (WS-3: `rebuild-memory` under FREEZE_WRITES), O-2/O-6 (WS-2), O-5 (R1 re-runs must use private paths — added to the round-2 common protocol and to every future verifier handoff), O-8 (P2-ADJ-0001 → WS-3). |
+| Round 2 | Nine fresh builders from `b7e6d52`: P2-AR-0023 WS-2 · P2-AR-0024 WS-3(+docs) · P2-AR-0025 WS-4 · P2-AR-0026 WS-5 · P2-AR-0027 WS-6 · P2-AR-0028 WS-7 · P2-AR-0029 WS-8 (OWNER-DECISION-P2-0002 admission + harness provisioning + kernel-cache race) · P2-AR-0030 WS-9/11 · P2-AR-0031 WS-10. Handoffs P2-HO-0020…0029. Checkpoint P2-CP-0004. |
+
+## P2-L-0016 — 2026-09-19 — Orchestrator regression reproduction at merged round-1 HEAD `b7e6d52`
+
+`cargo build --release` ok; `cargo test --lib` **146/0**; `cargo test --test certification` **100/0** (191 s). Matches the
+integration builder's figures. Regression reproduction only — not a verdict.

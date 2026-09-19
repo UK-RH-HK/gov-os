@@ -30,6 +30,13 @@ report `release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.m
 5. **Nine builders run in parallel** (WS-2, WS-3, WS-4, WS-5, WS-6, WS-7, WS-8, WS-9/11, WS-10). File ownership is as in
    repair-delta §3, with the round-2 assignments stated in each handoff. `export CARGO_BUILD_JOBS=2`.
 6. **Output directory**: `release/capability-baseline/repair-1/r2-<ws>/`; run report as named in your handoff.
+7. **R1 held-out re-runs must measure your own tree.** The round-1 integration found that builders' R1 re-runs shared
+   scratch symlink paths, so at least one builder's recorded R1 run measured another builder's tree (integration report,
+   O-5). When you run the R1 held-out suites, build them against **your worktree** through a private, uniquely named path
+   (e.g. under your worktree's own `target/` or a directory named with your run id), and record the file/function census
+   the run reports so it can be matched to your tree. AR-0033 `hv_a::a1` fails on any tree larger than candidate 4 (it pins
+   84 files / 740 functions); report it and run AR-0033's census with only the size assertions removed in a labelled copy
+   under your evidence directory.
 
 A round-3 builder set, then a fresh integration builder, follow round 2. Nothing becomes a candidate until all rounds are
 integrated; then `cap2-candidate-1` is minted and independently verified.

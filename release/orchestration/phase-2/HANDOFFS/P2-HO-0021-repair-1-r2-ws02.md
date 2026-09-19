@@ -33,6 +33,11 @@ BC-P2-22 (orphan/unexplained outputs detected — Gate W W7), and the reporting 
 - from **ws05** (§5): IP-2 (production-merge findings, dangling blocks), IP-7 (D017 message names the real claims store).
 - from **ws06** (§8): IP-2 (index content coverage check at G1/G5; persisted regression misses into failure memory; open failures reported), IP-8 (index manifest in the currency key).
 - from **ws08** (§6): IP-1 (doctor posture check), IP-2 (audit finding for unestablished authenticity).
+- from the **round-1 integration report** (`release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md`):
+  **O-2** — doctor D019 reports gates that were rendered but not acknowledged as "exist only in files"; align its wording and
+  semantics with WS-3's presentation rule (presented = signed answer or signed receipt). **O-6** — stale comment in
+  `skills.rs` about `record_skill_binding` (now declared at L3). Note the integration fix `811317b`: `currency.rs` must read
+  the trust anchor through `srr::verifier::trusted_root`, never by a hand-built path (R1 AR-0031 `hx_a::a4`).
 - from **ws09-11**: IP-1 (`assign_finding_ids` replaces positional `GF-` ids — reconcile with ws04 IP-10 into one stable-id scheme).
 
 ## Notes

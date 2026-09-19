@@ -32,6 +32,13 @@ P2-ADJ-0001 (standalone human-gate anchor defaults to off), the BC-P2-08 remaini
 - from **ws06** (§8): IP-6 (ENFORCEMENT_MAP entries for `MEMORY_POLICY.failure_memory.*` if declared; optional `gov memory miss|failures`).
 - from **ws08** (§6): IP-3 (`KernelCmd::Reinstall` carries the pinned payload so the pin refusal precedes break-glass entry).
 - from **ws09-11**: IP-3 (adopt arms call `a3_map_by`/`a4_plan_by` with `Actor::declared(session, role)` and pass the declared role to every stage).
+- from the **round-1 integration report** (`release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md`):
+  **O-1** — projects on the shipped 4.1.4/4.1.5 kernels have their descriptive policy keys refused; doctor D027 goes
+  CRITICAL and an update to shipped 4.1.5 is rolled back (reproduces on WS-3's branch alone). Contract v3 S5 (preserve
+  project overlay; compatibility/migration) and A1 (weakening refused, not description) both bind: descriptive keys from a
+  shipped kernel must be recognised as descriptive, while genuine floor-weakening overrides stay refused. **O-4** — decide,
+  with the reason, whether `rebuild-memory` (derived-state rebuild) belongs on the FREEZE_WRITES recovery allow-list
+  (framework §74; Contract v3 A5 "Recovery from emergency controls is auditable"). **O-8** — P2-ADJ-0001 (below).
 - **CLI for round-2 features of others:** WS-7, WS-9, WS-10 may need new subcommands; they add them additively and must classify them in `g0_label`/`COMMAND_GUARDS` — review their additions at integration, not now.
 - **Docs** (ws03 IP-11, ws05 IP-8): `docs/ARCHITECTURE.md` §4.8 and `docs/COMMANDS.md` describe the round-1 behaviour (role resolution and G0, human channel, T2, new refusal codes, claims, context, artefact, oracle, health). You own `docs/**` except `docs/generated/**` in round 2.
 

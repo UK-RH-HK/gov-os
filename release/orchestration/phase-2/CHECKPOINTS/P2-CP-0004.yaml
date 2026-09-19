@@ -1,0 +1,22 @@
+schema: governance-os.phase-2.checkpoint
+schema_version: 1
+checkpoint: P2-CP-0004
+trigger: significant mutation (repair iteration 1 round 1 integrated into the release branch) + task transition (round 2 dispatch)
+date: '2026-09-19'
+lifecycle_state: P2_REPAIR_ITERATION_1
+loop_status: P2_REPAIR_1_ROUND_2_RUNNING
+round_1:
+  builders: [P2-AR-0014, P2-AR-0015, P2-AR-0016, P2-AR-0017, P2-AR-0018, P2-AR-0019, P2-AR-0020, P2-AR-0021]
+  integration_run: P2-AR-0022
+  integration_work_commit: 9126a07e72b1e03d3ed18ba0a72e7ba3664c69a9
+  release_branch_merge_commit: b7e6d5244cdbd45ba9275d6fe24a94b45cb743b4
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  class_claims: 36 (35 REPAIRED_CLAIMED + BC-P2-21 catalogue side PARTIAL); none is acceptance
+  integration_tests: {lib: 146/0, certification: 100/0, python: 4/4}
+  r1_heldout_at_integration: {AR-0027: 26/3, AR-0029: 26/2 (ho_f n/c), AR-0031: 27/7, AR-0033: 30/1 (hv_a::a1 size pin; census 0 violations)}
+not_a_candidate: true
+candidate_note: nothing is minted until rounds 2 and 3 are integrated; cap2-candidate-1 follows
+owner_decisions_in_force: [OWNER-DECISION-P2-0001 (OD-P2-01 A), OWNER-DECISION-P2-0002 (OD-P2-02 A)]
+orchestrator_adjudications: [P2-ADJ-0001 (standalone human-gate anchor default false; routed to round 2 WS-3)]
+running_work: [P2-AR-0023, P2-AR-0024, P2-AR-0025, P2-AR-0026, P2-AR-0027, P2-AR-0028, P2-AR-0029, P2-AR-0030, P2-AR-0031]
+next_deterministic_action: AWAIT_REPAIR_1_ROUND_2 (see ORCHESTRATOR_STATE.yaml)

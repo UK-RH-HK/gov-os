@@ -19,7 +19,7 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/ws06/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0019.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: COMPLETED_AWAITING_INTEGRATION
+status: COMPLETED_INTEGRATED
 outcome:
   verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
   work_commit: 84f3a108ae6e0455107e0319d68c639f35b81601

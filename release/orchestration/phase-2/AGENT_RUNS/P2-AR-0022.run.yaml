@@ -16,4 +16,20 @@ branch: phase2/repair-1-integration
 expected_output_path: release/capability-baseline/repair-1/integration/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0022.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 9126a07e72b1e03d3ed18ba0a72e7ba3664c69a9
+  report_commit: 90fe2253954db66397b4f906048db0416a0d75c9
+  product_tip_commit: 811317b5bbf93cd2a71c911d895c4ce67c44114a
+  integration_merge_commit: b7e6d5244cdbd45ba9275d6fe24a94b45cb743b4
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  evidence_path: release/capability-baseline/repair-1/integration/
+  agent_model_self_reported: claude-opus-5[1m]
+  merges: eight --no-ff merges in handoff order; textual conflicts in tests/certification/main.rs and cli/src/main.rs resolved as unions
+  product_changes_beyond_merges: [963e715 compile reconciliation, 38811b8 G0 registration of round-1 subcommands (146 labels; verify product -> Write/record_audit; record_skill_binding declared at L3), 6de7214 migration plan consumers -> expected_consumers, b683f77 packet carries semantic_candidates, 488a735 migration re-pointing never rewrites a T2-sealed record, 875aac1 WS-8/WS-9 tests answer via owner-signed channel, 2cafbdc rustfmt, 811317b currency reads trust anchor via srr::verifier::trusted_root (R1 AR-0031 hx_a::a4)]
+  tests: {lib: 146/0, certification: 100/0, python: 4/4}
+  r1_heldout: {AR-0027: 26/3 baseline, AR-0029: 26/2 baseline (ho_f n/c), AR-0031: 27/7 baseline (26/8 before 811317b), AR-0033: 30/1 (hv_a::a1 size pin only; census 0 violations in all seven §6 activities)}
+  integration_regressions_vs_builder_probes: none
+  routed: [O-1 WS-3 shipped-kernel descriptive policy keys refused, O-2 WS-2 D019 wording, O-4 WS-3 rebuild-memory under FREEZE_WRITES, O-5 R1 re-runs must use private paths, O-6 WS-2 stale comment, O-7 open IPs to round 2, O-8 P2-ADJ-0001 to round 2]
+  notable: WS-2's recorded R1 re-run measured another builder's tree (shared scratch symlink paths) — builder R1 claims are not relied on; AC-14 verifier uses private paths

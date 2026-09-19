@@ -1,0 +1,22 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0030
+role: capability-repair
+workstream: WS-9+WS-11
+scope: BC-P2-34 adoption side + adopt host IPs + export approval
+objective: Repair iteration 1, round 2 — repair-delta waves 2-3 classes and the integration points routed to this workstream; claims only, never acceptance.
+agent_model: claude-opus-5 (pinned explicitly at dispatch)
+fresh_context: true
+independent_of: [all auditors and verifiers; round-1 builders P2-AR-0014..0022]
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0028-repair-1-r2-ws09-11.md
+common_protocol_paths: [release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md, release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md]
+active_gate: GATE-P2-REPAIR-1
+iteration: 1
+round: 2
+base_commit: null
+branch: phase2/repair-1-r2-ws09-11
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws09-11
+expected_output_path: release/capability-baseline/repair-1/r2-ws09-11/
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0030.report.yaml
+required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
+status: RUNNING
