@@ -73,6 +73,20 @@ const DEFAULT_TAXONOMY: &str = include_str!("../../../framework/taxonomy/WORK_GE
 /// Producer of W7 investigation tasks (`verification::lineage::GENERATOR`), adopted.
 const W7_GENERATOR: &str = "health:lineage_orphans";
 
+/// Is `rec` governed work the **OS generated from an event** — a task record whose T2 seal verifies (so its
+/// OS-owned `provenance` is what an OS operation wrote) and whose producer is the work generator or the W7
+/// remediation of the health suite? Its text quotes the event it was generated from (a health finding, a report, a
+/// decision), the way an audit or report does; consumers that read mentions of paths as dependencies treat it as
+/// event-derived (round-3 integration: adoption's dependency proof, `migrations::references`).
+pub fn is_os_generated(rec: &Record) -> bool {
+    if rec.rtype() != "task" {
+        return false;
+    }
+    let producer = rec.data["provenance"]["producer"].as_str().unwrap_or("");
+    (producer == GENERATOR || producer.starts_with("gov health ("))
+        && crate::t2::verify_record(rec).is_verified()
+}
+
 /// Set once this process has reconciled, so the post-command site does not repeat an operation's own reconciliation.
 static RECONCILED: AtomicBool = AtomicBool::new(false);
 
@@ -1685,6 +1699,7 @@ fn augment(p: &Project, task: &str, add: &[String]) -> Result<()> {
     let t = store
         .get_mut(task)
         .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{task} not found")))?;
+    let was_verified = crate::t2::verify_record(t).is_verified();
     let mut b = t.list("blocks");
     for x in add {
         if !b.contains(x) {
@@ -1693,7 +1708,7 @@ fn augment(p: &Project, task: &str, add: &[String]) -> Result<()> {
     }
     t.set("blocks", json!(b));
     t.set("updated", json!(crate::util::today()));
-    crate::records::save_record(&p.root, t)
+    crate::orchestration::tasks::save_task(p, t, was_verified, "work generation")
 }
 
 /// **The post-command site** (`cli/src/main.rs::main`, after the command ran — whether it succeeded or failed, since

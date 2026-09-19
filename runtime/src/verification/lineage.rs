@@ -1200,7 +1200,7 @@ fn remediate(
         let id = crate::util::next_id(crate::records::prefix_for("task"), &ids, 4);
         ids.push(id.clone());
         let title = format!("Investigate orphan {}: {}", o.kind, o.subject);
-        let rec = crate::records::new_record(
+        let mut rec = crate::records::new_record(
             "task",
             &id,
             &title,
@@ -1222,6 +1222,8 @@ fn remediate(
         );
         p.schemas()
             .validate("task", &rec.data, &format!("({id})"))?;
+        // task records are T2 state the OS writes (IP-R3-WS04-05, round-3 integration): sealed as this operation's
+        crate::t2::seal_record(&mut rec, "health (lineage remediation)")?;
         crate::records::save_record(&p.root, &rec)?;
         created.push(json!({"task": id, "kind": o.kind, "subject": o.subject, "key": o.key()}));
     }

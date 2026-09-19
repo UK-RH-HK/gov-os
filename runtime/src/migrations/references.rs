@@ -156,6 +156,23 @@ fn event_record(rel: &str, text: &str) -> bool {
         || gate_answer.is_match(text)
 }
 
+/// Governed work the OS generated from an event (a health finding, a report, a decision), recognised by its verifying
+/// T2 seal and OS-owned provenance (`orchestration::generation::is_os_generated`): the paths it mentions quote that
+/// event, like an audit or report record, and are not dependencies on them (round-3 integration: a remediation task
+/// generated from a `legacy_authority` finding names the legacy file it asks to retire).
+fn os_generated_work(rel: &str, text: &str) -> bool {
+    if !rel.starts_with("spec/tasks/") || !(rel.ends_with(".yaml") || rel.ends_with(".yml")) {
+        return false;
+    }
+    if !text.contains("provenance") || !text.contains("os_binding") {
+        return false;
+    }
+    crate::records::parse_record_text(text, rel)
+        .filter(|r| r.problems.is_empty())
+        .map(|r| crate::orchestration::generation::is_os_generated(&r))
+        .unwrap_or(false)
+}
+
 fn pattern_rx() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"[A-Za-z0-9_./\-*?]+").unwrap())
@@ -290,7 +307,7 @@ pub fn build_with_ghosts(
         }
         let Ok(text) = read_text(&abs) else { continue };
         idx.scanned += 1;
-        let evidence = event_record(&f.rel, &text);
+        let evidence = event_record(&f.rel, &text) || os_generated_work(&f.rel, &text);
         let role = role_of(&f.rel, &f.kinds).to_string();
         let docs = doc_like(&f.rel, &f.kinds);
         let dir = dir_of(&f.rel);

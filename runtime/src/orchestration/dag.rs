@@ -1092,12 +1092,15 @@ pub fn replan(p: &Project) -> Result<Value> {
             continue;
         }
         if st != target {
+            let was_verified = crate::t2::verify_record(rec).is_verified();
             rec.set("task_status", json!(target));
             rec.set("updated", json!(today()));
             rec.set(
                 "status_source",
                 json!({"operation": "replan", "status": target, "session": p.session_id, "role": p.role, "at": now_iso()}),
             );
+            // the OS re-seal rule (task records are T2 state): re-sealed when it verified before, never blessed
+            crate::t2::seal_if_verified(rec, was_verified, "replan")?;
             save_record(&p.root, rec)?;
             changed.push(json!({"task": id, "from": st, "to": target}));
         }

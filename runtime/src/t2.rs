@@ -131,7 +131,13 @@ const KEY_FILE: &str = "key.json";
 /// `cit::binding::seal`), and the gate operations that rewrite a CIT record re-seal it when it verified before (WS-3
 /// round 3, IP-R3-WS04-01) — so an unsealed CIT record is no OS write, and it covers nothing at close
 /// (`orchestration::tasks::cit_record_honoured`).
-pub const SEALED_RECORD_TYPES: &[&str] = &["human-gate", "cit"];
+///
+/// `task` (round-3 integration, WS-5 r2 IP-R3-1, final step): every OS writer of a task record seals a record it
+/// creates and re-seals one it rewrites when it verified before (`tasks::save_task`, `dag::replan`,
+/// `readiness::plan`, `generation`, `verification::lineage::remediate`; `gates` and `cit::propagation` since round 3),
+/// so a hand-written or seal-stripped task record is refused at a concurrent close. Records of these kinds that were
+/// unsealed before the claim began (legacy) are reported, not refused (`tasks::LEGACY_SEALED_KINDS`).
+pub const SEALED_RECORD_TYPES: &[&str] = &["human-gate", "cit", "task"];
 
 /// Repository locations only the OS writes, as this module knows them (BC-P2-31 adds `governance/registry/`, where the
 /// OS-written plugin registry belongs — `paths::PLUGIN_REGISTRY_PATH`). The task-close mutation scope classifies a

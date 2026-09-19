@@ -331,6 +331,9 @@ fn build_and_save(
         "status_source",
         json!({"operation": operation, "status": stored, "session": p.session_id, "role": p.role, "at": now_iso()}),
     );
+    // a task record is T2 state the OS writes (WS-5 r2 IP-R3-1, round-3 integration): sealed as written by this
+    // operation, so a hand edit of it — or a task record written outside gov — is refused at a concurrent close
+    crate::t2::seal_record(&mut rec, operation)?;
     save_record(&p.root, &rec)?;
     let mut out = rec.data.clone();
     if !ready_check.is_null() {
@@ -424,6 +427,7 @@ pub fn set_status(p: &Project, id: &str, status: &str, note: Option<&str>) -> Re
         }
     }
     let rec = store.get_mut(id).unwrap();
+    let was_verified = crate::t2::verify_record(rec).is_verified();
     rec.set("task_status", json!(status));
     rec.set("updated", json!(today()));
     if let Some(n) = note {
@@ -433,8 +437,8 @@ pub fn set_status(p: &Project, id: &str, status: &str, note: Option<&str>) -> Re
         "status_source",
         json!({"operation": "task status", "status": status, "session": p.session_id, "role": p.role, "at": now_iso(), "note": note}),
     );
+    save_task(p, rec, was_verified, "task status")?;
     let mut data = rec.data.clone();
-    save_record(&p.root, rec)?;
     // a status change is a task transition: observed as a mandatory checkpoint trigger now (WS-4 R2-6)
     data["boundaries"] = observe_boundaries(p, "gov continue");
     Ok(data)
@@ -837,6 +841,7 @@ fn set_status_internal(
     let rec = store
         .get_mut(id)
         .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
+    let was_verified = crate::t2::verify_record(rec).is_verified();
     rec.set("task_status", json!(status));
     rec.set("updated", json!(today()));
     if let Some(n) = note {
@@ -846,9 +851,17 @@ fn set_status_internal(
         "status_source",
         json!({"operation": operation, "status": status, "session": p.session_id, "role": p.role, "at": now_iso()}),
     );
-    let data = rec.data.clone();
-    save_record(&p.root, rec)?;
-    Ok(data)
+    save_task(p, rec, was_verified, operation)?;
+    Ok(rec.data.clone())
+}
+
+/// Persist a task record an OS operation rewrote, under the OS re-seal rule (integration O-7; WS-5 r2 IP-R3-1): the
+/// record is re-sealed as written by `operation` when its seal verified immediately before this write
+/// (`was_verified`), and written unsealed otherwise — the OS never blesses content it did not write (a legacy or
+/// hand-edited task record stays unhonoured).
+pub fn save_task(p: &Project, rec: &mut Record, was_verified: bool, operation: &str) -> Result<()> {
+    crate::t2::seal_if_verified(rec, was_verified, operation)?;
+    save_record(&p.root, rec)
 }
 
 /// Release a claim. The mutations the claim window produced stay attributed to the task: they are carried into the
@@ -905,6 +918,9 @@ pub fn release(p: &Project, id: &str, force: bool) -> Result<bool> {
 /// write only when [`classify_os_path`] can tell it apart from a worker's.
 const OS_MANAGED_PREFIXES: &[&str] = &[
     "governance/generated/",
+    // BC-P2-31 (WS-7 round 3, IP-W7R3-1 / IP-R3-WS03-3): the OS-written plugin registry's home
+    // (`paths::PLUGIN_REGISTRY_PATH`); a registration made inside a claim is recognised by its seal at close
+    "governance/registry/",
     "spec/reports/",
     "spec/audits/",
     "spec/planning/",
@@ -977,9 +993,21 @@ fn sealed_kind(p: &Project, path: &str) -> Option<String> {
     None
 }
 
+/// Record kinds that became sealed kinds after records of them could exist unsealed (task records: WS-5 r2 IP-R3-1;
+/// CIT records: IP-R3-2 — both at the round-3 integration). See [`write_baseline`] and [`classify_os_path_in`].
+pub const LEGACY_SEALED_KINDS: &[&str] = &["task", "cit"];
+
 /// Classify a changed OS-managed path (BC-P2-09 close side, `t2::classify_path`): the OS's own write is recognised by
 /// its seal, never by its location.
 pub fn classify_os_path(p: &Project, path: &str) -> OsWrite {
+    classify_os_path_in(p, path, &BTreeSet::new())
+}
+
+/// [`classify_os_path`] against a claim baseline: `legacy_unsealed` names the records of [`LEGACY_SEALED_KINDS`] that
+/// were already unsealed when the claim began (legacy, or appended by a governed change). Such a record, rewritten
+/// without a seal inside the window, is the OS's unblessed write of content it never sealed — reported, not the
+/// worker's T2 violation. Anything else unsealed of a sealed kind is a violation.
+pub fn classify_os_path_in(p: &Project, path: &str, legacy_unsealed: &BTreeSet<String>) -> OsWrite {
     use crate::t2::Binding;
     if !p.root.join(path).exists() {
         return if path.starts_with("spec/") {
@@ -991,6 +1019,7 @@ pub fn classify_os_path(p: &Project, path: &str) -> OsWrite {
     match crate::t2::classify_path(&p.root, path) {
         Binding::Verified { .. } => OsWrite::Bound,
         Binding::Unsealed => match sealed_kind(p, path) {
+            Some(kind) if legacy_unsealed.contains(path) => OsWrite::Unbound(format!("{path} is {kind} that carried no seal when this claim began (written before the OS sealed its kind, or appended by a governed change): rewritten inside the window without a seal, since the OS never seals content it did not write; reported, not this task's T2 violation")),
             Some(kind) => OsWrite::Violation(format!("{path} is {kind}: only a gov operation writes it and every such write is sealed (T2), but this one carries no seal")),
             None => OsWrite::Unbound(format!("{path}: OS-managed location, record kind not yet sealed by every writer")),
         },
@@ -1158,9 +1187,25 @@ fn write_baseline(
         }
     }
     let contract = store.get(id).map(contract_snapshot).unwrap_or(Value::Null);
+    // records of the kinds sealed since round 3 (LEGACY_SEALED_KINDS) that carry no seal at the baseline: written
+    // before the OS sealed their kind, or appended by a governed change. An OS write into one inside this window
+    // cannot re-seal it (the OS never blesses content it did not write), so at close such a record is reported, not
+    // refused as this task's T2 violation; a seal stripped, or such a record created, inside the window is refused.
+    let unsealed_os_records: Vec<String> = store
+        .records
+        .iter()
+        .filter(|r| {
+            LEGACY_SEALED_KINDS.contains(&r.rtype().as_str())
+                && r.data
+                    .get(crate::t2::SEAL_FIELD)
+                    .map(|v| v.is_null())
+                    .unwrap_or(true)
+        })
+        .map(|r| r.path.clone())
+        .collect();
     let mut doc = json!({"task": id, "at": now_iso(), "commit": p.git_commit(), "session": p.session_id, "role": p.role, "worktree": claims::worktree_id(p),
         "files": files, "carried": carried.keys().collect::<Vec<_>>(), "cits_committed": cits_committed, "reports_present": reports_present,
-        "contract": contract,
+        "contract": contract, "unsealed_os_records": unsealed_os_records,
         "method": "git ls-files -co --exclude-standard + sha256 (walk fallback); mutations of earlier claim windows carried"});
     crate::t2::seal_value(&mut doc, "", "task claim baseline")?;
     let path = claim_tree_path(p, id);
@@ -1486,8 +1531,13 @@ pub fn observe(p: &Project, store: &RecordStore, t: &Record) -> Observation {
 }
 
 /// Sort a changed path under an OS-managed location into the observation (see [`observe`]).
-fn classify_into(p: &Project, f: &str, obs: &mut Observation) -> bool {
-    match classify_os_path(p, f) {
+fn classify_into(
+    p: &Project,
+    f: &str,
+    obs: &mut Observation,
+    legacy_unsealed: &BTreeSet<String>,
+) -> bool {
+    match classify_os_path_in(p, f, legacy_unsealed) {
         OsWrite::Bound => {
             obs.os_bound.push(f.to_string());
             false
@@ -1516,7 +1566,9 @@ fn observe_against(
         // changes
         let mut obs = Observation::default();
         for f in uncommitted_paths(p) {
-            if contract_generated(p, &f) || (os_managed(p, &f) && !classify_into(p, &f, &mut obs)) {
+            if contract_generated(p, &f)
+                || (os_managed(p, &f) && !classify_into(p, &f, &mut obs, &BTreeSet::new()))
+            {
                 continue;
             }
             obs.current_of.insert(f.clone(), now.get(&f).cloned());
@@ -1535,6 +1587,14 @@ fn observe_against(
         })
         .unwrap_or_default();
     let window_start = doc["at"].as_str().and_then(epoch_of);
+    let legacy_unsealed: BTreeSet<String> = doc["unsealed_os_records"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default();
     // what the in-window CITs wrote, bound to content (IP-R3-6): a path is the CIT's governed change only while its
     // current content is what the CIT left
     let cit_writes = cit_window_writes(store, Some(doc));
@@ -1592,7 +1652,7 @@ fn observe_against(
         if os_managed(p, &f) {
             // the OS's own writes are recognised by their seal; an in-window CIT may rewrite OS-written records
             // (e.g. propagation marks), which is its governed change, not the worker's
-            if !classify_into(p, &f, &mut obs) {
+            if !classify_into(p, &f, &mut obs, &legacy_unsealed) {
                 continue;
             }
             if cit_covered.contains(&f) {
@@ -2210,6 +2270,7 @@ pub fn close(
         .collect();
     let mut store2 = RecordStore::load(&p.root);
     let tr = store2.get_mut(id).unwrap();
+    let tr_verified = crate::t2::verify_record(tr).is_verified();
     tr.set("task_status", json!("DONE"));
     tr.set("closed_by_report", json!(rpt_id));
     tr.set("updated", json!(today()));
@@ -2232,7 +2293,7 @@ pub fn close(
             tr.set("staleness", s);
         }
     }
-    save_record(&p.root, tr)?;
+    save_task(p, tr, tr_verified, "task close")?;
     // a revalidation task's close revalidates the completed work it names (BC-P2-04 / BC-P2-24: "a revalidation
     // task's close clears the revalidation of the task it names")
     let revalidated = resolve_revalidation(p, t, &rpt_id, &closed_at);
@@ -2290,6 +2351,7 @@ fn resolve_revalidation(p: &Project, t: &Record, report: &str, at: &str) -> Valu
     if !required || r.get("task_status") != "DONE" {
         return Value::Null;
     }
+    let was_verified = crate::t2::verify_record(r).is_verified();
     let mut rv = r.data.get("revalidation").cloned().unwrap_or(json!({}));
     if !rv.is_object() {
         rv = json!({});
@@ -2306,7 +2368,7 @@ fn resolve_revalidation(p: &Project, t: &Record, report: &str, at: &str) -> Valu
         r.set("staleness", s);
     }
     r.set("updated", json!(today()));
-    match save_record(&p.root, r) {
+    match save_task(p, r, was_verified, "task close (revalidation)") {
         Ok(()) => json!({"task": target, "resolved_by": t.id(), "report": report}),
         Err(e) => json!({"task": target, "error": {"code": e.code, "message": e.message}}),
     }

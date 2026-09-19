@@ -7,6 +7,7 @@ mod brownfield;
 mod common;
 mod failure_injection;
 mod greenfield;
+mod integration_r3;
 mod migration;
 mod multi_machine;
 mod repair;

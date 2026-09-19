@@ -297,6 +297,8 @@ pub fn plan(p: &Project, feature_id: &str) -> Result<Value> {
         }
         let stored = rec.get("task_status");
         rec.set("status_source", json!({"operation": "readiness plan", "status": stored, "session": p.session_id, "role": p.role, "at": now_iso()}));
+        // a task record is T2 state the OS writes (round-3 integration): sealed as written by this operation
+        crate::t2::seal_record(&mut rec, "readiness plan")?;
         save_record(&p.root, &rec)?;
         created.push(id.clone());
         if c["pre_implementation"].as_bool().unwrap_or(false) {
@@ -321,10 +323,12 @@ pub fn plan(p: &Project, feature_id: &str) -> Result<Value> {
             }
         }
         if deps.len() != before {
+            let was_verified = crate::t2::verify_record(t).is_verified();
             t.set("dependencies", json!(deps));
             if t.get("task_status") == "READY" {
                 t.set("task_status", json!("BLOCKED"));
             }
+            crate::t2::seal_if_verified(t, was_verified, "readiness plan")?;
             save_record(&p.root, t)?;
             linked.push(tid);
         }
