@@ -543,7 +543,10 @@ pub fn a4_plan(root: &Path) -> Result<Value> {
     a4_plan_by(root, &identity::Actor::from_env_or_baseline(&b))
 }
 
-/// The downstream consumers the migration plan declares (W1 "expected consumers", Contract v3:1076-1078).
+/// The downstream consumers the migration plan declares (W1 "expected consumers", Contract v3:1076-1078). They are
+/// stage artefacts (a stage, the role acting in it and the evidence file it reads the plan into), not governed records,
+/// so the plan declares them under `expected_consumers`: `consumers` is the record relation field whose every entry is
+/// the id of a record that consumes this one (`<id> CONSUMES <plan>`, `record.schema.json`; BC-P2-21 edge semantics).
 fn plan_consumers() -> Value {
     json!([
         {"stage": "A5", "role": "independent migration reviewer / test author", "artefact": format!("{EVIDENCE}/06-migration-tests.yaml")},
@@ -603,7 +606,7 @@ pub fn a4_plan_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
             write_json(&snap, &old)?;
         }
         let mut p = json!({"id": PLAN_ID, "type": "migration-plan", "title": "Adoption/migration plan", "status": "ACTIVE", "state_class": "DERIVED",
-            "version": version, "content_hash": content_hash, "producer": identity::producer("A4", "gov adopt plan", actor), "consumers": plan_consumers(),
+            "version": version, "content_hash": content_hash, "producer": identity::producer("A4", "gov adopt plan", actor), "expected_consumers": plan_consumers(),
             "supersedes": if prev_version > 0 { json!([format!("{PLAN_ID}@v{prev_version}")]) } else { json!([]) },
             "supersedes_detail": if prev_version > 0 { json!([{"version": prev_version, "content_hash": prev.as_ref().map(|p| p["content_hash"].clone()).unwrap_or(Value::Null), "snapshot": format!("{EVIDENCE}/{PLAN_STEM}.versions/v{prev_version:04}.json")}]) } else { json!([]) },
             "history": format!("{EVIDENCE}/{PLAN_STEM}.versions/"), "created_at": now_iso()});
