@@ -141,18 +141,31 @@ pub fn current_stale_links(store: &RecordStore) -> Vec<Value> {
 
 // ---------------------------------------------------------------------------- product_traceability additions
 
-/// DONE tasks whose implementation does not trace (W5 line 1122).
+/// DONE tasks whose implementation does not trace (W5 line 1122; W8 missing lineage link).
+///
+/// Severity follows whether the close could have required the trace: a task closed under the consumption-receipt
+/// contract (its closing report carries `receipt_validation`, `context::receipt::require_valid`) and still untraced
+/// bypassed traceability — `medium`, health is not HEALTHY. A task closed before the receipt contract was enforced
+/// (no `receipt_validation`: legacy or pre-receipt close) cannot be re-traced by any governed operation on a closed
+/// task; it is disclosed (`low`) and its re-validation is governed work, not a permanent health failure.
 pub fn untraceable_findings(p: &Project, store: &RecordStore, fam: &str) -> (Vec<Value>, Value) {
     let un = crate::context::receipt::untraceable_closed_tasks(p, store);
+    let mut rows = vec![];
     let out = un
         .iter()
         .map(|u| {
+            let under_contract = store
+                .get(u["closed_by_report"].as_str().unwrap_or(""))
+                .map(|r| r.data.get("receipt_validation").is_some())
+                .unwrap_or(false);
+            rows.push(json!({"task": u["task"], "closed_under_receipt_contract": under_contract}));
             finding(
-                "medium",
+                if under_contract { "medium" } else { "low" },
                 fam,
                 format!(
-                    "untraced implementation: {} (W5 untraceable implementation)",
-                    u["message"].as_str().unwrap_or("")
+                    "untraced implementation: {} — what it produced has no lineage link to the requirements/scenarios it implements (W5 untraceable implementation; W8 missing lineage link){}",
+                    u["message"].as_str().unwrap_or(""),
+                    if under_contract { "" } else { "; closed before the consumption-receipt contract was enforced" }
                 ),
                 store
                     .get(u["task"].as_str().unwrap_or(""))
@@ -160,7 +173,7 @@ pub fn untraceable_findings(p: &Project, store: &RecordStore, fam: &str) -> (Vec
             )
         })
         .collect();
-    (out, json!(un.len()))
+    (out, json!(rows))
 }
 
 // ---------------------------------------------------------------------------- context_reproducibility additions

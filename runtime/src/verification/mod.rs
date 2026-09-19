@@ -151,6 +151,12 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                         continue;
                     }
                     let t = r.rtype();
+                    // a governed record that is hidden Qualification Oracle material (an oracle document, a fault
+                    // manifest, a hidden path-map or memory oracle): the verifier-owned oracle must never live in the
+                    // governed repository (Contract v3:1014, :1062; ws01-12 IP-5)
+                    if crate::qualification_oracle::is_hidden_oracle_material(&r.data) {
+                        f.findings.push(finding("high", &fam, format!("{} ({t}) is hidden Qualification Oracle material inside the governed repository: the verifier-owned hidden oracle must stay in verifier custody, separate from the qualification repository (Contract v3:1014, :1062); remove it from the repository and its history, and re-seal the oracle", r.id()), Some(r.path.clone())));
+                    }
                     let schema = if p.schemas().has(&t) {
                         t.clone()
                     } else {
@@ -409,10 +415,15 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                 let mut unknown = 0;
                 let mut secrets_wrong = vec![];
                 let mut oracle_material = vec![];
+                let record_paths: std::collections::BTreeSet<&str> =
+                    store.records.iter().map(|r| r.path.as_str()).collect();
                 for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) {
                     // hidden Qualification Oracle material must never live in a governed repository
-                    // (Contract v3:1014, :1062; ws01-12 IP-5)
-                    if reporting::hidden_oracle_material(&abs) {
+                    // (Contract v3:1014, :1062; ws01-12 IP-5); governed records are checked by schema_invariants,
+                    // every other file here
+                    if !record_paths.contains(rel.as_str())
+                        && reporting::hidden_oracle_material(&abs)
+                    {
                         oracle_material.push(rel.clone());
                     }
                     let d = contract.decide(&rel);

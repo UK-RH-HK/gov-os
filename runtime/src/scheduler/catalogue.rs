@@ -224,7 +224,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "schema_invariants",
         surface: Surface::Family,
-        duty: "records and overlay valid against kernel schemas; lifecycle/state classes; duplicate ids; superseded-but-ACTIVE authority",
+        duty: "records and overlay valid against kernel schemas; lifecycle/state classes; duplicate ids; superseded-but-ACTIVE authority; no hidden Qualification Oracle record in the governed repository",
         deps: &["@kernel", "@overlay", "@records"],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -236,7 +236,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "graph_integrity",
         surface: Surface::Family,
-        duty: "relationship graph (dangling edges) and task DAG (cycles, missing dependencies)",
+        duty: "relationship graph (dangling edges), records outside their canonical location (W1), stale lineage links (W8), task DAG (cycles, missing dependencies, `blocks` naming no task)",
         deps: &["@records", "index_manifest"],
         extras: &[Extra::LiveIndex],
         isolation: Isolation::InProcess,
@@ -300,7 +300,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "path_map_compliance",
         surface: Surface::Family,
-        duty: "every governed file matches a repository-contract rule; no secret content outside secret-class paths",
+        duty: "every governed file matches a repository-contract rule; no secret content outside secret-class paths; no hidden Qualification Oracle material in any file",
         deps: &["@files"],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -312,7 +312,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "context_reproducibility",
         surface: Surface::Family,
-        duty: "deterministic authority block of a compiled context packet is reproducible and carries the policy fields",
+        duty: "deterministic authority block of a compiled context packet is reproducible and carries the policy fields; every dispatchable task's delivered inputs verify against its declared manifest (W4)",
         deps: &["@records", "@overlay", "index_manifest"],
         extras: &[Extra::LiveIndex],
         isolation: Isolation::Sandbox,
@@ -408,7 +408,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "product_traceability",
         surface: Surface::Family,
-        duty: "test obligations within policy families and independence; DONE tasks closed by a report; features have scenarios/tests",
+        duty: "test obligations within policy families and independence; DONE tasks closed by a report; features have scenarios/tests; DONE implementation traces to its requirements (W5/W8)",
         deps: &["@records", "@overlay"],
         extras: &[],
         isolation: Isolation::InProcess,
