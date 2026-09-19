@@ -1,0 +1,62 @@
+# project fr: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/fr-773521393
+$ gov init --name fr --alias z-fr    [session=S-zeta role=orchestrator exit=0 0.5s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "acceptance_criteria": ["2 x 199 = 398"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Ledger API", "status": "ACTIVE", "contract": {"sig": "total()"}}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger crate owns totals", "status": "ACTIVE"}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"], \"decisions\": [\"D-0001\"], \"interfaces\": [\"API-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov audit    [session=S-zeta role=orchestrator exit=0 0.3s]
+baseline audit AUD-0002: verdict=HEALTHY green=True findings=["context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-baseline-green-current: PASS -- D021 at baseline: green record "AUD-0002" current
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[governing policy (PROJECT_POLICY override)]: PASS -- (gate-W relevant: CONTEXT_POLICY drives delivery) D021 after change: ok=False message='green record "AUD-0002" is obsolete (inputs changed)'
+  [probe wrote file] governance/kernel/schemas/context-packet.schema.json (866 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=3 0.1s]
+OBS FR-invalidates[schema (installed kernel schema)]: PASS -- (context-packet schema) D021 after change: ok=False message='green record "AUD-0002" is obsolete (inputs changed)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[model/retrieval profile (MEMORY_POLICY pin)]: PASS -- (retrieval profile) D021 after change: ok=False message='green record "AUD-0002" is obsolete (inputs changed)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[project path map (REPOSITORY_CONTRACT)]: PASS -- (path map) D021 after change: ok=False message='green record "AUD-0002" is obsolete (inputs changed)'
+  [probe wrote file] governance/project/DATA_SENSITIVITY.yaml (336 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[security/sensitivity policy (DATA_SENSITIVITY)]: PASS -- (sensitivity) D021 after change: ok=False message='green record "AUD-0002" is obsolete (inputs changed)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[authoritative decision (spec/decisions)]: PASS -- (mandatory input of TASK-0001) D021 after change: ok=False message='green record "AUD-0002" is obsolete (inputs changed)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[authoritative requirement (spec/requirements)]: FAIL -- (mandatory input of TASK-0001) D021 after change: ok=True message='green record "AUD-0002" current'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[authoritative interface (spec/interfaces)]: FAIL -- (mandatory input of TASK-0001) D021 after change: ok=True message='green record "AUD-0002" current'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[authoritative architecture (spec/architecture)]: FAIL -- (delivered to every task) D021 after change: ok=True message='green record "AUD-0002" current'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[task input manifest (spec/tasks)]: FAIL -- (TASK-0001 declared inputs) D021 after change: ok=True message='green record "AUD-0002" current'
+  [probe wrote file] src/lib.rs (1094 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[relevant source file (src/)]: FAIL -- (traced implementation) D021 after change: ok=True message='green record "AUD-0002" current'
+  [probe wrote file] governance/generated/index-manifest.json (65254 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS FR-invalidates[relevant index manifest (governance/generated)]: FAIL -- (retrieval supplement) D021 after change: ok=True message='green record "AUD-0002" current'
+runtime/kernel implementation (the gov binary itself): not attempted - the audited binary is the pinned candidate; inputs_hash() (runtime/src/verification/mod.rs:54-71) hashes governance/kernel, governance/project, governance/tests, spec/decisions and governance/framework.lock only
+
+==== SUMMARY ====
+FR-baseline-green-current: PASS
+FR-invalidates[governing policy (PROJECT_POLICY override)]: PASS
+FR-invalidates[schema (installed kernel schema)]: PASS
+FR-invalidates[model/retrieval profile (MEMORY_POLICY pin)]: PASS
+FR-invalidates[project path map (REPOSITORY_CONTRACT)]: PASS
+FR-invalidates[security/sensitivity policy (DATA_SENSITIVITY)]: PASS
+FR-invalidates[authoritative decision (spec/decisions)]: PASS
+FR-invalidates[authoritative requirement (spec/requirements)]: FAIL
+FR-invalidates[authoritative interface (spec/interfaces)]: FAIL
+FR-invalidates[authoritative architecture (spec/architecture)]: FAIL
+FR-invalidates[task input manifest (spec/tasks)]: FAIL
+FR-invalidates[relevant source file (src/)]: FAIL
+FR-invalidates[relevant index manifest (governance/generated)]: FAIL
+total=13 pass=7 fail=6
