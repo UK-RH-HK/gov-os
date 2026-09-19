@@ -1,6 +1,10 @@
 policy: CHECKPOINT_POLICY
 version: 1.0.0
-fields: [session, role, task, mode, claim, last_completed_step, next_action, pending_decisions, open_questions, open_transactions, files_changed, tests_status, context_packet_hash, memory_snapshot]
+# inputs/input_state (W9 line 1156): the task's mandatory inputs (id, version, current and delivered hash) and delivery
+# state; state_reference: commit, governed-record digest and the index reference taken after bringing the index
+# current; observed_state/triggers_observed: what the product observed at the boundary and the mandatory triggers that
+# occurred since the previous checkpoint (checkpoints::observe_boundaries). Freshness: checkpoints::freshness.
+fields: [session, role, task, mode, claim, last_completed_step, next_action, pending_decisions, open_questions, open_transactions, files_changed, tests_status, context_packet_hash, memory_snapshot, inputs, input_state, state_reference, observed_state, triggers_observed]
 mandatory_triggers: [task_transition, material_decision, accepted_cit, significant_mutation, before_handoff, before_model_switch, before_session_close, before_compaction]
 watchdog:
   context_utilisation_threshold: 0.75

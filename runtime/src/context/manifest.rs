@@ -356,6 +356,9 @@ pub struct Manifest {
     pub entries: Vec<Entry>,
     /// Declared supplementary context: `{id, reason, resolution, type, status, path}` — never authority.
     pub supplementary: Vec<Value>,
+    /// Contradictions among the task's inputs that deterministic precedence cannot resolve, each with how it stands
+    /// (`context::contradictions`, BC-P2-18). Filled by [`resolve`] (it needs the project to read gate answers).
+    pub contradictions: Vec<Value>,
 }
 
 impl Manifest {
@@ -414,6 +417,7 @@ impl Manifest {
             "input_violations": self.violations(),
             "advisories": self.advisories(),
             "supplementary_context": self.supplementary,
+            "contradictions": self.contradictions,
             "counts": {"declared": self.entries.len(), "required": self.entries.iter().filter(|e| e.required).count(),
                        "satisfied": self.entries.iter().filter(|e| e.required && e.satisfied()).count()},
         })
@@ -697,7 +701,7 @@ fn resolve_entry(
     let req = e.required;
     let mut flag: Option<String> = None;
     let mut probs: Vec<Problem> = vec![];
-    if crate::graph::identity::in_canonical_location(None, &e.record_type, &e.path) == Some(false) {
+    if crate::graph::identity::record_in_canonical_location(None, r) == Some(false) {
         probs.push(Problem {
             code: "NON_CANONICAL_LOCATION",
             message: format!(
@@ -988,10 +992,100 @@ pub fn resolve_with(
         task: tid,
         entries,
         supplementary,
+        contradictions: vec![],
     }
 }
 
-/// Resolve the manifest of `task` in project `p`.
+/// Flag the members of every contradiction among the delivered inputs (BC-P2-18): an unresolved or held
+/// contradiction blocks every required member (`CONTRADICTION`) and delivers it as conflicting, never as active
+/// authority; a resolution sets the non-governing members aside (`SET_ASIDE_BY_RESOLUTION`), blocking only where the
+/// task explicitly declared a set-aside record.
+fn apply_contradictions(p: &Project, store: &RecordStore, m: &mut Manifest) {
+    use crate::context::contradictions::{detect_among, resolution, Resolution};
+    let ids: Vec<String> = m
+        .entries
+        .iter()
+        .filter(|e| e.delivered() && e.slot != Slot::Dependency)
+        .map(|e| e.id.clone())
+        .collect();
+    let found = detect_among(store, &ids);
+    let mut out = vec![];
+    for c in &found {
+        let res = resolution(p, store, c);
+        let gate_hint = match &res {
+            Resolution::Unresolved { gate: Some(g) } => format!("answer human gate {g}"),
+            Resolution::Unresolved { gate: None } => {
+                "it is routed to a Human Decision Gate at the next dispatch (`gov context compile`)"
+                    .to_string()
+            }
+            Resolution::Held { gate, .. } => format!(
+                "gate {gate} holds the work until the records are revised through change control"
+            ),
+            _ => String::new(),
+        };
+        for e in m.entries.iter_mut().filter(|e| c.members.contains(&e.id)) {
+            let others: Vec<&String> = c.members.iter().filter(|x| **x != e.id).collect();
+            let explicit = e.sources.iter().any(|s| s.starts_with("task."));
+            match &res {
+                Resolution::Unresolved { .. } | Resolution::Held { .. } => {
+                    e.authority_flag = Some("CONTRADICTORY".into());
+                    e.problems.push(Problem {
+                        code: "CONTRADICTION",
+                        message: format!("{} contradicts {} ({}: {}); deterministic precedence cannot resolve it, so neither is delivered as authority — {gate_hint}", e.id, others.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "), c.kind, c.subject),
+                        blocking: e.required,
+                    });
+                }
+                Resolution::Prevails {
+                    gate,
+                    prevailing,
+                    set_aside,
+                    ..
+                } => {
+                    if set_aside.contains(&e.id) {
+                        e.authority_flag = Some("SET_ASIDE_BY_RESOLUTION".into());
+                        e.problems.push(Problem {
+                            code: "CONTRADICTION_RESOLVED",
+                            message: format!("{} was set aside by the resolution of gate {gate} ({} governs); depend on the governing record", e.id, prevailing.join(", ")),
+                            blocking: e.required && explicit,
+                        });
+                    } else {
+                        e.problems.push(Problem {
+                            code: "CONTRADICTION_RESOLVED",
+                            message: format!(
+                                "{} governs over {} (gate {gate})",
+                                e.id,
+                                set_aside.join(", ")
+                            ),
+                            blocking: false,
+                        });
+                    }
+                }
+                Resolution::Compatible { gate, .. } => {
+                    e.problems.push(Problem {
+                        code: "CONTRADICTION_RESOLVED",
+                        message: format!(
+                            "{} and {} were answered compatible (gate {gate})",
+                            e.id,
+                            others
+                                .iter()
+                                .map(|s| s.as_str())
+                                .collect::<Vec<_>>()
+                                .join(", ")
+                        ),
+                        blocking: false,
+                    });
+                }
+            }
+        }
+        let mut v = c.to_value();
+        v["resolution"] = res.to_value();
+        v["blocks"] = json!(res.blocks());
+        out.push(v);
+    }
+    m.contradictions = out;
+}
+
+/// Resolve the manifest of `task` in project `p`, contradictions among its inputs included.
 pub fn resolve(p: &Project, store: &RecordStore, task: &Record) -> Manifest {
     let authority = p
         .policies()
@@ -999,7 +1093,9 @@ pub fn resolve(p: &Project, store: &RecordStore, task: &Record) -> Manifest {
         .get("AUTHORITY_POLICY")
         .cloned()
         .unwrap_or(json!({}));
-    resolve_with(&p.root, &authority, store, task)
+    let mut m = resolve_with(&p.root, &authority, store, task);
+    apply_contradictions(p, store, &mut m);
+    m
 }
 
 /// Resolve the manifest of task `task_id` (typed refusal when it is not a task).

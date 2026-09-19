@@ -62,6 +62,28 @@ pub fn canonical_dir(p: Option<&Project>, rtype: &str) -> Option<String> {
     record_dir_for(rtype).ok().map(|d| d.to_string())
 }
 
+/// The canonical directory of one governed record. As [`canonical_dir`], except where a type's canonical location
+/// depends on the record: a `failure` record of kind `retrieval-miss` is a memory-quality event, whose canonical
+/// location is `spec/reports/memory-quality/` (never indexed; `memory::failures`), not the failures directory.
+pub fn canonical_dir_of(p: Option<&Project>, r: &Record) -> Option<String> {
+    let t = r.rtype();
+    if t == crate::memory::failures::RECORD_TYPE && r.get("failure_kind") == "retrieval-miss" {
+        return Some(crate::memory::failures::MEMORY_QUALITY_DIR.to_string());
+    }
+    canonical_dir(p, &t)
+}
+
+/// Is the record `r` stored in its canonical location? `None` when its type has none.
+pub fn record_in_canonical_location(p: Option<&Project>, r: &Record) -> Option<bool> {
+    if NON_CANONICAL_ROOTS
+        .iter()
+        .any(|root| r.path.starts_with(root))
+    {
+        return Some(true);
+    }
+    canonical_dir_of(p, r).map(|d| within(&r.path, &d))
+}
+
 /// Is `path` inside `dir` (the directory itself or any subdirectory of it)?
 fn within(path: &str, dir: &str) -> bool {
     let d = dir.trim_end_matches('/');
@@ -96,7 +118,7 @@ pub fn misplaced_records(p: Option<&Project>, store: &RecordStore) -> Vec<Value>
         {
             continue;
         }
-        let Some(dir) = canonical_dir(p, &t) else {
+        let Some(dir) = canonical_dir_of(p, r) else {
             continue;
         };
         if !within(&r.path, &dir) {
@@ -163,7 +185,7 @@ pub fn identity(p: &Project, store: &RecordStore, id: &str) -> Result<Value> {
         .get("AUTHORITY_POLICY")
         .cloned()
         .unwrap_or(json!({}));
-    let dir = canonical_dir(Some(p), &t);
+    let dir = canonical_dir_of(Some(p), r);
     let succ = super::lineage::successor_map(store);
     let declared_prov: serde_json::Map<String, Value> = PROVENANCE_FIELDS
         .iter()
@@ -208,9 +230,22 @@ pub fn check(p: &Project, store: &RecordStore) -> Value {
         .collect();
     let stale = super::lineage::stale_links(store);
     let unconsumed = super::lineage::unconsumed_outputs(store);
-    let ok = misplaced.is_empty() && duplicates.is_empty() && stale.is_empty();
+    // contradictions among current authoritative records that precedence cannot resolve (BC-P2-18), with how each
+    // stands; an unresolved one is an authority problem
+    let contradictions: Vec<Value> = crate::context::contradictions::detect_all(store)
+        .iter()
+        .map(|c| {
+            let res = crate::context::contradictions::resolution(p, store, c);
+            let mut v = c.to_value();
+            v["resolution"] = res.to_value();
+            v["blocks"] = json!(res.blocks());
+            v
+        })
+        .collect();
+    let unresolved = contradictions.iter().any(|c| c["blocks"] == true);
+    let ok = misplaced.is_empty() && duplicates.is_empty() && stale.is_empty() && !unresolved;
     json!({"ok": ok, "records": store.records.len(), "misplaced": misplaced, "duplicate_ids": duplicates,
-           "stale_links": stale, "unconsumed_outputs": unconsumed})
+           "stale_links": stale, "unconsumed_outputs": unconsumed, "contradictions": contradictions})
 }
 
 #[cfg(test)]
@@ -257,6 +292,36 @@ mod tests {
         assert_eq!(m.len(), 1, "{m:?}");
         assert_eq!(m[0]["id"], "REQ-0003");
         assert_eq!(m[0]["canonical_dir"], "spec/requirements");
+    }
+
+    #[test]
+    fn failure_and_plan_records_have_canonical_locations() {
+        let miss = parse_record_text(
+            "id: FAIL-0001\ntype: failure\nfailure_kind: retrieval-miss\nstatus: ACTIVE\n",
+            "spec/reports/memory-quality/FAIL-0001.yaml",
+        )
+        .unwrap();
+        let tool = parse_record_text(
+            "id: FAIL-0002\ntype: failure\nfailure_kind: tool-failure\nstatus: ACTIVE\n",
+            "spec/reports/failures/FAIL-0002.yaml",
+        )
+        .unwrap();
+        let misfiled = parse_record_text(
+            "id: FAIL-0003\ntype: failure\nfailure_kind: tool-failure\nstatus: ACTIVE\n",
+            "spec/reports/memory-quality/FAIL-0003.yaml",
+        )
+        .unwrap();
+        let plan = parse_record_text(
+            "id: MPLAN-GOVERNANCE-ADOPTION\ntype: migration-plan\nstatus: ACTIVE\n",
+            "spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml",
+        )
+        .unwrap();
+        assert_eq!(record_in_canonical_location(None, &miss), Some(true));
+        assert_eq!(record_in_canonical_location(None, &tool), Some(true));
+        assert_eq!(record_in_canonical_location(None, &misfiled), Some(false));
+        assert_eq!(record_in_canonical_location(None, &plan), Some(true));
+        assert_eq!(crate::records::prefix_for("failure"), "FAIL");
+        assert_eq!(crate::records::prefix_for("migration-plan"), "MPLAN");
     }
 
     #[test]

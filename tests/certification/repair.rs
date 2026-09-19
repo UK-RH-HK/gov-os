@@ -913,8 +913,14 @@ fn cit_auto_simulation_and_secret_redaction() {
         doctor_check(&g, "D011").0,
         "no secret outside secret class after redaction"
     );
-    g.ok(&["cit", "simulate", &cid]);
-    g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
+    // WS-4 round 2 (BC-P2-13): writing product source is a behaviour change whatever the declared label, so this
+    // `editorial` CIT is human-gated; the approval goes through the owner channel, and execution is still refused
+    let sim = g.ok(&["cit", "simulate", &cid]);
+    assert_eq!(sim["impact"]["human_gate_required"], true, "{sim}");
+    let gate = sim["human_gate"].as_str().unwrap().to_string();
+    g.ok(&["gate", "present", &gate]);
+    crate::ws03::human_decide(&g, &gate, "A");
+    g.ok(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     assert_eq!(
         g.err(&["cit", "execute", &cid]).error_code(),
         "SECRET_IN_MANIFEST"

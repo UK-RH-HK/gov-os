@@ -301,6 +301,24 @@ enum Cmd {
         #[command(subcommand)]
         op: OracleCmd,
     },
+    // ---- WS-4 (P2-AR-0025, BC-P2-05) additive block: session boundary
+    /// Session boundary: checkpoint before the session closes, degraded when its work's inputs are stale or missing
+    Session {
+        #[command(subcommand)]
+        op: SessionCmd,
+    },
+}
+// ---- WS-4 (P2-AR-0025, BC-P2-05) additive block
+#[derive(Subcommand)]
+enum SessionCmd {
+    /// Close the session: checkpoint every unobserved trigger, then write the before_session_close checkpoint and
+    /// state the input freshness it closed under (never refused; explicitly degraded when inputs are stale/missing)
+    Close {
+        #[arg(long, default_value = "gov continue")]
+        next_action: String,
+        #[arg(long)]
+        task: Option<String>,
+    },
 }
 /// `gov oracle` (P2-AR-0014, BC-P2-51). Read-only: it validates documents and changes no governed state.
 #[derive(Subcommand)]
@@ -704,6 +722,23 @@ enum CitCmd {
     Show {
         id: String,
     },
+    // ---- WS-4 (P2-AR-0025, BC-P2-13/04) additive variants
+    /// Materiality of a CIT's manifest, or of changes already made to the given paths (read-only; BC-P2-13)
+    Classify {
+        /// a CIT id: classify its mutation manifest
+        #[arg(long)]
+        id: Option<String>,
+        /// comma-separated repository paths: classify their change since --base (default HEAD)
+        #[arg(long)]
+        paths: Option<String>,
+        #[arg(long)]
+        base: Option<String>,
+    },
+    /// Detect upstream changes made outside change control and propagate them as CIT-E would (BC-P2-04)
+    Propagate {
+        #[arg(long)]
+        dry_run: bool,
+    },
 }
 #[derive(Subcommand)]
 enum ContextCmd {
@@ -733,6 +768,11 @@ enum ContextCmd {
         task: String,
         #[arg(long)]
         file: String,
+    },
+    // ---- WS-4 (P2-AR-0025, BC-P2-04) additive variant
+    /// Derived staleness of a task: what its work consumed, which inputs changed since, whether that was propagated
+    Staleness {
+        task: String,
     },
 }
 // ---- WS-4 (P2-AR-0017, BC-P2-21): artefact identity and record-level lineage
@@ -777,6 +817,11 @@ enum CheckpointCmd {
         task: Option<String>,
         #[arg(long, default_value = "gov continue")]
         next_action: String,
+    },
+    // ---- WS-4 (P2-AR-0025, BC-P2-05) additive variant
+    /// Whether a checkpoint (default: the latest) still describes the material state it captured
+    Freshness {
+        id: Option<String>,
     },
 }
 #[derive(Subcommand)]
@@ -1213,6 +1258,14 @@ fn g0_label(cmd: &Cmd) -> String {
             CitCmd::Rollback { .. } => "cit rollback",
             CitCmd::List => "cit list",
             CitCmd::Show { .. } => "cit show",
+            CitCmd::Classify { .. } => "cit classify",
+            CitCmd::Propagate { dry_run } => {
+                if *dry_run {
+                    "cit propagate --dry-run"
+                } else {
+                    "cit propagate"
+                }
+            }
         }),
         Cmd::Context { op } => s(match op {
             ContextCmd::Compile { .. } => "context compile",
@@ -1220,10 +1273,12 @@ fn g0_label(cmd: &Cmd) -> String {
             ContextCmd::Verify { .. } => "context verify",
             ContextCmd::Show { .. } => "context show",
             ContextCmd::Receipt { .. } => "context receipt",
+            ContextCmd::Staleness { .. } => "context staleness",
         }),
         Cmd::Checkpoint { op } => s(match op {
             CheckpointCmd::Create { .. } | CheckpointCmd::Watchdog { .. } => "checkpoint",
             CheckpointCmd::Latest => "checkpoint latest",
+            CheckpointCmd::Freshness { .. } => "checkpoint freshness",
         }),
         Cmd::Skills { op } => s(match op {
             SkillsCmd::List => "skills list",
@@ -1355,6 +1410,10 @@ fn g0_label(cmd: &Cmd) -> String {
         Cmd::Oracle { op } => s(match op {
             OracleCmd::Format => "oracle format",
             OracleCmd::Validate { .. } => "oracle validate",
+        }),
+        // WS-4 (P2-AR-0025) additive arm
+        Cmd::Session { op } => s(match op {
+            SessionCmd::Close { .. } => "session close",
         }),
     }
 }
@@ -1530,6 +1589,9 @@ fn run(cli: &Cli) -> Result<Value> {
                 CitCmd::Rollback { id, reason } => c::rollback(&p, id, reason.as_deref()),
                 CitCmd::List => Ok(json!(c::list(&p))),
                 CitCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found"))) }
+                // WS-4 (P2-AR-0025) additive arms
+                CitCmd::Classify { id, paths, base } => c::classify(&p, id.as_deref(), &csv(paths), base.as_deref()),
+                CitCmd::Propagate { dry_run } => c::propagate_detected(&p, *dry_run),
             }
         }
         // WS-4 (P2-AR-0017): the context commands do not require the derived index — mandatory inputs are resolved
@@ -1543,6 +1605,8 @@ fn run(cli: &Cli) -> Result<Value> {
                 ContextCmd::Verify { task, hash } => { let pk = ctx::load_packet(&p, task, hash.as_deref())?; ctx::verify_delivery(&p, &pk) }
                 ContextCmd::Show { task, hash } => ctx::load_packet(&p, task, hash.as_deref()),
                 ContextCmd::Receipt { task, file } => { let s = gov_runtime::records::RecordStore::load(&p.root); Ok(ctx::receipt::validate(&p, &s, task, &load_file_value(file)?)?.to_value()) }
+                // WS-4 (P2-AR-0025) additive arm
+                ContextCmd::Staleness { task } => { let s = gov_runtime::records::RecordStore::load(&p.root); gov_runtime::cit::propagation::task_staleness(&p, &s, task) }
             }
         }
         Cmd::Artefact { op } => {
@@ -1565,6 +1629,15 @@ fn run(cli: &Cli) -> Result<Value> {
                 CheckpointCmd::Create { next_action, task, trigger, step, tests_status } => gov_runtime::checkpoints::create(&p, &d, json!({"next_action": next_action, "task": task, "trigger": trigger, "last_completed_step": step, "tests_status": tests_status})),
                 CheckpointCmd::Latest => Ok(gov_runtime::checkpoints::latest(&p).unwrap_or(Value::Null)),
                 CheckpointCmd::Watchdog { utilisation, ops, task, next_action } => gov_runtime::checkpoints::watchdog(&p, &d, *utilisation, *ops, task.as_deref(), next_action),
+                // WS-4 (P2-AR-0025) additive arm
+                CheckpointCmd::Freshness { id } => gov_runtime::checkpoints::freshness(&p, id.as_deref()),
+            }
+        }
+        // WS-4 (P2-AR-0025, BC-P2-05) additive arm
+        Cmd::Session { op } => {
+            let p = open_project(cli, true)?; let d = db(&p)?;
+            match op {
+                SessionCmd::Close { next_action, task } => gov_runtime::checkpoints::session_close(&p, &d, next_action, task.as_deref()),
             }
         }
         Cmd::Skills { op } => { let p = open_project(cli, true)?; match op { SkillsCmd::List => Ok(json!(gov_runtime::skills::list_skills(&p))), SkillsCmd::Resolve { task } => { let s = gov_runtime::records::RecordStore::load(&p.root); let t = s.get(task).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{task} not found")))?; gov_runtime::skills::resolve(&p, &t) } } }
@@ -1751,6 +1824,7 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Artefact { .. } => "artefact",
         Cmd::Health { .. } => "health", // WS-2 additive arm
         Cmd::Oracle { .. } => "oracle",
+        Cmd::Session { .. } => "session", // WS-4 additive arm
     }
 }
 
