@@ -202,3 +202,13 @@ integration builder's figures. Regression reproduction only — not a verdict.
 
 `cargo build --release` ok; `cargo test --lib` **207/0**; `cargo test --test certification` **136/0** (260 s). Matches the
 integration builder. Regression reproduction only — not a verdict.
+
+## P2-L-0020 — 2026-09-19 — Owner-requested progress and model/context telemetry snapshot (observational only)
+
+| Field | Value |
+|---|---|
+| Request | Product owner: a non-disruptive Phase-2 status plus model/context telemetry snapshot; routing and execution unchanged. |
+| Produced | `PHASE_2_PROGRESS_AND_MODEL_TELEMETRY.md` and machine-readable `PHASE_2_PROGRESS_AND_MODEL_TELEMETRY.yaml`. Sources: committed durable state and the harness completion notices (`subagent_tokens`, `tool_uses`, `duration_ms`). Input/output token split, subagent reasoning level, context utilisation, compaction and cost are recorded as NOT_OBSERVABLE. |
+| Headline | 40 agents launched, 37 completed, 3 running, 0 failed; 6 superseded (first-pass audits). Round 3 of 4 in repair iteration 1. 52 classes / 134 blocking findings all OPEN pending independent verification; 48 of 52 carry at least one builder claim. Convergence counter 0 of 3. Merged tree `e8e1ff2`: lib 207/0, certification 136/0; R1 held-out at baselines. |
+| Record defects found and repaired | 17 run records were unparseable YAML (orchestrator recorder wrote notes unquoted) — quoted, content unchanged; `check_state.py verify` now refuses unparseable or duplicate-key run records (reports of runs awaiting integration are checked on their branch); `running_work` pruned to the three truly running runs. |
+| Routing | Unchanged. Round 3 continues. |

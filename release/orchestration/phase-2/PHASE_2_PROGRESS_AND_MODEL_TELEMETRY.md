@@ -1,0 +1,349 @@
+# Phase 2 — progress status and model/context telemetry snapshot
+
+| Field | Value |
+|---|---|
+| Snapshot | 2026-09-19, taken while repair round 3 was running (observational only — no routing or execution changed) |
+| Sources | committed durable state (`ORCHESTRATOR_STATE.yaml`, `AGENT_RUNS/`, `GATES/`, ledger, repair/integration reports) and the harness's completion notice for each finished agent (`subagent_tokens`, `tool_uses`, `duration_ms`) |
+| Machine-readable twin | `PHASE_2_PROGRESS_AND_MODEL_TELEMETRY.yaml` (same directory) |
+| Rule | Nothing is estimated where the harness does not expose it: such fields read **NOT_OBSERVABLE**. Inferences are labelled as inferences. |
+
+---
+
+# A. Phase-2 progress and status
+
+## A1. Where Phase 2 is
+
+- **Round:** repair iteration 1, **round 3 of 4**. Round 4 is the single BC-P2-02 evidence-map round.
+- **Round-3 objective:** close the remaining dependency-wave classes (BC-P2-07 tier duties, BC-P2-13 in-task hook, BC-P2-23 W11 metrics, BC-P2-24 work generation, BC-P2-31 store moves, BC-P2-44 SLOs and the HEALTHY conjunction), every round-3 integration point, **P2-ADJ-0002** (T2 cross-machine continuity), and the **L4/O5 availability rule** (a health block refuses only what it protects, never its own remedy).
+- **Lifecycle:** `P2_REPAIR_ITERATION_1`, loop `P2_REPAIR_1_ROUND_3_RUNNING`.
+
+## A2. Agents
+
+| Count | Value |
+|---|---|
+| Launched | **40** (P2-AR-0001 … P2-AR-0040) |
+| Completed | **37** |
+| Running | **3** — P2-AR-0033 (WS-2), P2-AR-0035 (WS-4), P2-AR-0036 (WS-5), all round-3 repair builders |
+| Failed / INCOMPLETE | **0** |
+| Completed but not relied on | **6** — the first-pass family audits P2-AR-0001…0006: five ruled `COMPLETED_NONCONFORMING`, one `COMPLETED_MODEL_DEVIATION`; all superseded by pinned-model re-audits |
+
+| Kind | Runs |
+|---|---|
+| First-pass audit (superseded) | P2-AR-0001, 0002, 0003, 0004, 0005, 0006 |
+| Re-audit (audits of record) | P2-AR-0008 ε, 0009 β, 0010 γ, 0011 δ, 0012 ζ, 0013 α |
+| Synthesis / verdict | P2-AR-0007 → `GOVERNANCE_CAPABILITY_BASELINE_REJECTED` on `cap2-candidate-0` |
+| Repair round 1 | P2-AR-0014…0021 (8) → integrated by P2-AR-0022 → merged `b7e6d52` |
+| Repair round 2 | P2-AR-0023…0031 (9) → integrated by P2-AR-0032 → merged `e8e1ff2` |
+| Repair round 3 | P2-AR-0033…0040 (8): 5 done (0034 WS-3, 0037 WS-6, 0038 WS-7, 0039 WS-8, 0040 WS-9/11), 3 running |
+| Independent re-verification | **none yet** — iteration-1 verification follows `cap2-candidate-1` |
+
+## A3. Workstreams (round 3)
+
+| Workstream | Run | Status | Scope |
+|---|---|---|---|
+| WS-2 health/verification | P2-AR-0033 | RUNNING | BC-07, BC-23, BC-44; availability API in the catalogue; IF-1 |
+| WS-3 authority/gates/T2/docs/spec | P2-AR-0034 | DONE, awaiting integration | P2-ADJ-0002 (WS-3 side), T2 completeness, control-state move, D-0010, docs, adapters |
+| WS-4 change control/context | P2-AR-0035 | RUNNING | seal-writer completeness (O-7), product-release record type |
+| WS-5 tasks/DAG/work generation | P2-AR-0036 | RUNNING | BC-24, BC-13 hook, WS-4 API wiring, claims-store move |
+| WS-6 knowledge fabric | P2-AR-0037 | DONE, awaiting integration | freshness fix, heading chunks, template order, store classification |
+| WS-7 plugin/tool trust | P2-AR-0038 | DONE, awaiting integration | registry move, artefact binding, pin cache |
+| WS-8 root of trust | P2-AR-0039 | DONE, awaiting integration | P2-ADJ-0002 provisioning, 4.1.6 payload/version, update remedy |
+| WS-9/11 adoption/export | P2-AR-0040 | DONE, awaiting integration | snapshots move, template migration op, command-test bound |
+## A4. Open blockers
+
+The iteration-0 inventory: **134 blocking findings in 52 blocker classes**. By each class's maximum severity: **39 HIGH, 13 MEDIUM**.
+**All 52 remain OPEN** until an independent verifier grades them; builder claims are regression evidence only (Contract v3 O3).
+
+Builder-claim coverage: **48 of 52 classes** have at least one builder claim. No claim yet:
+- **BC-P2-02**: round 4.
+- **BC-P2-23** and **BC-P2-44**: WS-2 round 3, running.
+- **BC-P2-24**: WS-5 round 3, running.
+
+| Class | Max severity | Findings | Builder claims (round/workstream:status) |
+|---|---|---|---|
+| BC-P2-01 Compiled contract views lose owner-source semantics and verification is self-referential | HIGH | 9 | r1/ws01-12:REPAIRED_CLAIMED |
+| BC-P2-02 Evidence map declares no evidence owner for any capability | HIGH | 7 | — none yet |
+| BC-P2-03 Green governance evidence currency: key omits relevant input classes and enforcement is path-keyed | HIGH | 6 | r1/ws02:REPAIRED_CLAIMED |
+| BC-P2-04 Upstream change does not invalidate completed work, its evidence or compiled packets | HIGH | 6 | r2/ws04:REPAIRED_CLAIMED |
+| BC-P2-05 Checkpoint and handoff continuity: triggers, staleness and handoff blocking | HIGH | 3 | r2/ws04:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED |
+| BC-P2-06 Health scheduler mechanics absent | HIGH | 6 | r1/ws02:REPAIRED_CLAIMED |
+| BC-P2-07 Health tiers G1-G6 do not perform their duties at their trigger events (incl. Gate-W duties) | HIGH | 6 | r2/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-08 Acting-role resolution and G0 guard coverage on privileged/mutating paths | HIGH | 6 | r1/ws03:REPAIRED_CLAIMED; r2/ws03:REPAIRED_CLAIMED; r2/ws03:REPAIRED_CLAIMED; r2/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-09 OS-written (T2) records honoured without binding to an OS operation; lower-role writes exempt at task close | HIGH | 3 | r1/ws03:REPAIRED_CLAIMED; r2/ws07:REPAIRED_CLAIMED |
+| BC-P2-10 Human approval and presentation derived from caller-declared metadata | HIGH | 4 | r1/ws03:REPAIRED_CLAIMED; r2/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-11 Gate approval not bound to the subject and content it authorises | HIGH | 2 | r2/ws04:REPAIRED_CLAIMED; r2/ws07:REPAIRED_CLAIMED |
+| BC-P2-12 Task-blocking gate semantics | HIGH | 1 | r1/ws03:REPAIRED_CLAIMED; r2/ws05:REPAIRED_CLAIMED |
+| BC-P2-13 Material changes escape change control (materiality self-declared, in-task edits bypass CIT) | HIGH | 2 | r2/ws04:REPAIRED_CLAIMED |
+| BC-P2-14 Task-contract fields and path scope not enforced | HIGH | 2 | r1/ws05:REPAIRED_CLAIMED |
+| BC-P2-15 Claim atomicity and claim scope | HIGH | 2 | r1/ws05:REPAIRED_CLAIMED |
+| BC-P2-16 Runnable / claimable / READY state not derived from the DAG | HIGH | 3 | r2/ws05:REPAIRED_CLAIMED |
+| BC-P2-17 Mandatory task-input manifest semantics | HIGH | 3 | r1/ws04:REPAIRED_CLAIMED |
+| BC-P2-18 Contradiction detection and resolution | MEDIUM | 3 | r1/ws03:REPAIRED_CLAIMED; r2/ws04:REPAIRED_CLAIMED |
+| BC-P2-19 Context-packet delivery, provenance and outage behaviour | HIGH | 4 | r1/ws04:REPAIRED_CLAIMED |
+| BC-P2-20 Consumption receipt and implementation traceability | HIGH | 4 | r1/ws04:REPAIRED_CLAIMED; r2/ws05:REPAIRED_CLAIMED |
+| BC-P2-21 Artefact identity and relation-edge semantics | MEDIUM | 3 | r1/ws04:REPAIRED_CLAIMED; r1/ws09-11:PARTIAL |
+| BC-P2-22 Orphan / unexplained output detection | HIGH | 1 | r2/ws02:REPAIRED_CLAIMED |
+| BC-P2-23 Artifact-flow quantitative health absent | HIGH | 1 | — none yet |
+| BC-P2-24 Governed work not generated from events | HIGH | 2 | — none yet |
+| BC-P2-25 Index content coverage and chunk granularity | HIGH | 3 | r1/ws06:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED |
+| BC-P2-26 Retrieval pipeline ordering, routing and de-duplication | HIGH | 4 | r1/ws06:REPAIRED_CLAIMED |
+| BC-P2-27 Code-structural extraction | HIGH | 2 | r1/ws06:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED |
+| BC-P2-28 Graph integrity detection | MEDIUM | 1 | r2/ws06:REPAIRED_CLAIMED |
+| BC-P2-29 Incremental index invalidation | HIGH | 3 | r1/ws06:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED |
+| BC-P2-30 Retrieval-profile component identity and change governance | HIGH | 3 | r2/ws06:REPAIRED_CLAIMED |
+| BC-P2-31 Non-rebuildable authoritative state stored in, or classified as, derived/generated state | MEDIUM | 2 | r2/ws06:PARTIAL; r3/ws03:REPAIRED_CLAIMED; r3/ws03:PARTIAL; r3/ws06:REPAIRED_CLAIMED; r3/ws07:REPAIRED_CLAIMED; r3/ws08:REPAIRED_CLAIMED; r3/ws09-11:REPAIRED_CLAIMED; r3/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-32 Failure memory not durable | MEDIUM | 1 | r1/ws06:REPAIRED_CLAIMED |
+| BC-P2-33 Legacy identification, extraction and retirement | HIGH | 4 | r1/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-34 Independence of test, review and verification authorship is self-attested | HIGH | 4 | r2/ws05:REPAIRED_CLAIMED; r2/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-35 Post-install kernel integrity anchored only in repository-controlled records | HIGH | 1 | r1/ws08:REPAIRED_CLAIMED; r2/ws08:REPAIRED_CLAIMED |
+| BC-P2-36 Unauthenticated installation presented as current/verified (default posture) | HIGH | 1 | r1/ws08:REPAIRED_CLAIMED; r2/ws08:REPAIRED_CLAIMED; r3/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-37 Trust decisions and identity records taken from unauthenticated release fields | HIGH | 2 | r1/ws08:REPAIRED_CLAIMED |
+| BC-P2-38 Provisioned-machine rollback/reinstall | MEDIUM | 1 | r1/ws08:REPAIRED_CLAIMED |
+| BC-P2-39 Plugin elevation decided by descriptor self-declaration | MEDIUM | 1 | r2/ws07:REPAIRED_CLAIMED |
+| BC-P2-40 Plugin implementation bytes not bound | HIGH | 2 | r2/ws07:REPAIRED_CLAIMED |
+| BC-P2-41 Tool acquisition: review evidence and approval not bound to the tool installation | HIGH | 2 | r2/ws07:REPAIRED_CLAIMED |
+| BC-P2-42 Skill regression never executed | MEDIUM | 2 | r1/ws02:REPAIRED_CLAIMED |
+| BC-P2-43 Product-test results not governed | HIGH | 1 | r1/ws02:REPAIRED_CLAIMED |
+| BC-P2-44 Health SLO thresholds and the HEALTHY conjunction | HIGH | 2 | — none yet |
+| BC-P2-45 Project overlay files bypass POLICY_PRECEDENCE | MEDIUM | 2 | r1/ws03:REPAIRED_CLAIMED; r2/ws03:REPAIRED_CLAIMED |
+| BC-P2-46 Scenario -> data -> test-data lineage and provenance | MEDIUM | 2 | r2/ws10:REPAIRED_CLAIMED |
+| BC-P2-47 Research output completeness | MEDIUM | 1 | r2/ws10:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED; r3/ws06:REPAIRED_CLAIMED |
+| BC-P2-48 Experiment lifecycle absent | HIGH | 1 | r2/ws10:REPAIRED_CLAIMED |
+| BC-P2-49 Human Decision Gate package not enforced | MEDIUM | 1 | r1/ws03:REPAIRED_CLAIMED |
+| BC-P2-50 Upstream export gate fails open on content | HIGH | 1 | r1/ws09-11:REPAIRED_CLAIMED |
+| BC-P2-51 Qualification Oracle format absent | HIGH | 1 | r1/ws01-12:REPAIRED_CLAIMED |
+| BC-P2-52 Path map does not represent documentation citations | MEDIUM | 1 | r1/ws09-11:REPAIRED_CLAIMED |
+
+## A5. Closing existing findings, or introducing new classes?
+
+- **Convergence counter:** 0 verifier iterations since the baseline, so `consecutive_new_class_iterations = 0`. The threshold is **3**, and it is **not approaching**. No independent verification has run since the baseline; the counter moves only on verifier verdicts.
+- **Rounds 1–3 are closing inventoried classes by claim.** Repair also surfaced or introduced issues that a verifier has not yet labelled:
+  1. **T2 cross-machine continuity (S6).** It regressed because of the round-1 BC-P2-09 design. Adjudicated as P2-ADJ-0002 and in repair in round 3.
+  2. **Health-block availability deadlocks.** The BC-P2-06 scheduler and the host guards could refuse remedies and all claims. The L4/O5 rule addresses this in round 3.
+  3. **Kernel-cache materialisation race.** It was latent and exposed by concurrency; fixed in round 2.
+  4. **R1 held-out AR-0031 `hx_a::a4` regression.** It was introduced twice (WS-2 round 1, WS-3 round 3), and both times caught and fixed before merge.
+  5. **Backward compatibility for shipped 4.1.4/4.1.5 kernels (O-1).** Introduced in round 1 and fixed in round 2.
+  6. **IF-1.** W7 treats consumption as implementation; in WS-2 round 3.
+- **Most likely to be argued materially new** at iteration 1, if not fully closed: items 1, 2 and 5.
+
+## A6. Candidate, gates and tests
+
+- **Candidate:**
+  - `cap2-candidate-0` (`57177a3`) was **rejected** by P2-AR-0007.
+  - `cap2-candidate-1` is **not yet minted**.
+  - The latest integrated tree `e8e1ff2` has `product_code_digest` `797da37c…1fe1`; it is not a candidate.
+- **Gates:**
+
+  | Gate | Status |
+  |---|---|
+  | GATE-P2-ENTRY | SATISFIED |
+  | GATE-P2-FROZEN-CONTRACT | SATISFIED |
+  | GATE-P2-BASELINE-AUDIT-0 | SATISFIED (verdict REJECTED) |
+  | GATE-P2-ORACLE-FORMAT | NOT_SATISFIED (format built; independent review pending) |
+  | GATE-P2-R1-PRESERVATION | re-opens for candidate 1 |
+  | GATE-P2-CAPABILITY-BASELINE-ACCEPT | NOT_SATISFIED |
+  | HG-P2-0001 | ANSWERED (OD-P2-01 A, OD-P2-02 A) |
+  | GATE-P2-REPAIR-1 | OPEN |
+
+- **Tests at merged HEAD `e8e1ff2`** (orchestrator-reproduced):
+  - `cargo test --lib`: **207/0**.
+  - `cargo test --test certification`: **136/0**.
+- **R1 held-out suites:** at their recorded baselines.
+  - AR-0027: 26/3.
+  - AR-0029: 26/2, with `ho_f` not compiling.
+  - AR-0031: 27/7.
+  - AR-0033: 30/1. The one failure is `hv_a::a1`, which pins candidate 4's census size. The census with that pin removed shows 0 §6 violations.
+- **Round-3 branches:** each builder reports its own tree green; not yet integrated.
+
+## A7. Duplicated work
+
+1. **First-pass audits.** Six ran, then six re-audits: a deliberate protocol-conformance re-run after the first pass came back self-reported `claude-opus-4-6` with status/finding contradictions.
+2. **P2-ADJ-0002 was implemented twice in round 3.** WS-3 and WS-8 each built a full provisioning mechanism: `gov trust t2-binding --provision` versus `gov trust bind`. This is an **orchestrator routing ambiguity**: each handoff named a side, and each builder completed the whole mechanism. The round-3 integration handoff (P2-HO-0040) requires unifying them into one.
+3. **No other duplication observed.**
+
+## A8. Next deterministic action and remaining work
+
+- **Next:** `AWAIT_REPAIR_1_ROUND_3`. Then integration-3 (P2-HO-0040), then round 4 (BC-P2-02), then mint `cap2-candidate-1`, then verification iteration 1.
+- **Remaining work, counted in agents rather than time:**
+  - **Round 3:** 3 builders running, then 1 integrator.
+  - **Round 4:** 1 builder, then a merge.
+  - **Verification iteration 1, about 9 agents:** AC-14 R1-preservation, AC-6 oracle-format review, 6 family verifiers, and 1 synthesis verifier. It must be a full re-audit: product code changed broadly, so under Contract v3 freshness all evidence is stale.
+  - **If rejected:** repair iteration 2 (size unknown) and verification iteration 2.
+
+---
+
+# B. Model, context and usage telemetry
+
+## B1. What is and is not observable
+
+| Metric | Availability |
+|---|---|
+| Provider | Anthropic, via Claude Code's Agent tool |
+| Exact model | Each agent's self-report in its run report, plus the dispatch parameter: `default` means the model parameter was omitted; `opus` means pinned |
+| `subagent_tokens`, tool calls, wall-clock | The harness completion notice. **What `subagent_tokens` counts (cumulative, final context, or output) is not documented.** |
+| Input tokens, output tokens, input/output split | **NOT_OBSERVABLE** |
+| Reasoning/thinking level of subagents | **NOT_OBSERVABLE** |
+| Peak context utilisation | **NOT_OBSERVABLE** |
+| Compaction events | **NOT_OBSERVABLE** |
+| Cost | **NOT_OBSERVABLE** |
+| Retries/restarts | Observable at orchestration level only: 6 superseded runs; no agent was restarted mid-run |
+
+## B2. Per agent
+
+| Run | Phase | Role | WS/family | Dispatch | Model (self-reported) | subagent_tokens | Tool calls | Hours | Outcome | Yield |
+|---|---|---|---|---|---|---|---|---|---|---|
+| P2-AR-0001 | audit-0 first pass | family-auditor | alpha | default | claude-opus-4-6 | 63,277 | 116 | 0.50 | COMPLETED_NONCONFORMING | 4 findings / 0 blocking |
+| P2-AR-0002 | audit-0 first pass | family-auditor | beta | default | claude-opus-4-6 | 69,863 | 79 | 0.47 | COMPLETED_NONCONFORMING | 4 findings / 0 blocking |
+| P2-AR-0003 | audit-0 first pass | family-auditor | gamma | default | claude-opus-4-6 | 64,479 | 100 | 0.46 | COMPLETED_MODEL_DEVIATION | 3 findings / 0 blocking |
+| P2-AR-0004 | audit-0 first pass | family-auditor | delta | default | claude-opus-4-6 | 69,460 | 81 | 0.45 | COMPLETED_NONCONFORMING | 4 findings / 0 blocking |
+| P2-AR-0005 | audit-0 first pass | family-auditor | epsilon | default | claude-opus-4-6 | 69,715 | 74 | 0.43 | COMPLETED_NONCONFORMING | 7 findings / 1 blocking |
+| P2-AR-0006 | audit-0 first pass | family-auditor | zeta | default | claude-opus-4-6 | 81,169 | 89 | 0.44 | COMPLETED_NONCONFORMING | 5 findings / 0 blocking |
+| P2-AR-0008 | audit-0 re-audit | family-auditor | epsilon | opus | claude-opus-5[1m] | 678,030 | 185 | 0.82 | COMPLETED | 36 findings / 27 blocking |
+| P2-AR-0009 | audit-0 re-audit | family-auditor | beta | opus | claude-opus-5[1m] | 955,317 | 261 | 1.20 | COMPLETED | 30 findings / 22 blocking |
+| P2-AR-0010 | audit-0 re-audit | family-auditor | gamma | opus | claude-opus-5[1m] | 929,426 | 219 | 1.13 | COMPLETED | 36 findings / 19 blocking |
+| P2-AR-0011 | audit-0 re-audit | family-auditor | delta | opus | claude-opus-5[1m] | 727,452 | 179 | 0.92 | COMPLETED | 26 findings / 17 blocking |
+| P2-AR-0012 | audit-0 re-audit | family-auditor | zeta | opus | claude-opus-5[1m] | 772,313 | 180 | 1.00 | COMPLETED | 27 findings / 24 blocking |
+| P2-AR-0013 | audit-0 re-audit | family-auditor | alpha | opus | claude-opus-5[1m] | 368,601 | 285 | 1.33 | COMPLETED | 25 findings / 7 blocking |
+| P2-AR-0007 | audit-0 synthesis | baseline-synthesis | all | opus | claude-opus-5[1m] | 894,062 | 156 | 1.27 | COMPLETED (REJECTED verdict) | 10 findings / 8 blocking |
+| P2-AR-0014 | repair r1 | repair-builder | WS-1/12 | opus | claude-opus-5[1m] | 644,373 | 146 | 1.18 | COMPLETED_INTEGRATED | 2 claimed, 0 partial, 0 not |
+| P2-AR-0015 | repair r1 | repair-builder | WS-2 | opus | claude-opus-5[1m] | 892,479 | 286 | 2.27 | COMPLETED_INTEGRATED | 4 claimed, 0 partial, 0 not |
+| P2-AR-0016 | repair r1 | repair-builder | WS-3 | opus | claude-opus-5[1m] | 244,051 | 343 | 2.21 | COMPLETED_INTEGRATED | 7 claimed, 0 partial, 0 not |
+| P2-AR-0017 | repair r1 | repair-builder | WS-4 | opus | claude-opus-5[1m] | 726,000 | 208 | 1.52 | COMPLETED_INTEGRATED | 4 claimed, 0 partial, 0 not |
+| P2-AR-0018 | repair r1 | repair-builder | WS-5 | opus | claude-opus-5[1m] | 679,943 | 230 | 1.78 | COMPLETED_INTEGRATED | 2 claimed, 0 partial, 0 not |
+| P2-AR-0019 | repair r1 | repair-builder | WS-6 | opus | claude-opus-5[1m] | 785,452 | 212 | 1.62 | COMPLETED_INTEGRATED | 5 claimed, 0 partial, 0 not |
+| P2-AR-0020 | repair r1 | repair-builder | WS-8 | opus | claude-opus-5[1m] | 928,942 | 247 | 1.99 | COMPLETED_INTEGRATED | 4 claimed, 0 partial, 0 not |
+| P2-AR-0021 | repair r1 | repair-builder | WS-9/11 | opus | claude-opus-5[1m] | 850,682 | 249 | 2.03 | COMPLETED_INTEGRATED | 3 claimed, 1 partial, 0 not |
+| P2-AR-0022 | repair r1 integration | integration-builder | all | opus | claude-opus-5[1m] | 865,332 | 318 | 1.72 | COMPLETED_MERGED | — |
+| P2-AR-0023 | repair r2 | repair-builder | WS-2 | opus | claude-opus-5[1m] | 936,671 | 319 | 3.09 | COMPLETED_INTEGRATED | 1 claimed, 0 partial, 0 not |
+| P2-AR-0024 | repair r2 | repair-builder | WS-3 | opus | claude-opus-5[1m] | 786,274 | 266 | 1.85 | COMPLETED_INTEGRATED | 10 claimed, 1 partial, 1 not |
+| P2-AR-0025 | repair r2 | repair-builder | WS-4 | opus | claude-opus-5[1m] | 449,313 | 437 | 3.89 | COMPLETED_INTEGRATED | 5 claimed, 0 partial, 0 not |
+| P2-AR-0026 | repair r2 | repair-builder | WS-5 | opus | claude-opus-5[1m] | 203,868 | 365 | 3.16 | COMPLETED_INTEGRATED | 4 claimed, 0 partial, 0 not |
+| P2-AR-0027 | repair r2 | repair-builder | WS-6 | opus | claude-opus-5[1m] | 804,652 | 265 | 2.32 | COMPLETED_INTEGRATED | 2 claimed, 1 partial, 0 not |
+| P2-AR-0028 | repair r2 | repair-builder | WS-7 | opus | claude-opus-5[1m] | 783,088 | 222 | 2.27 | COMPLETED_INTEGRATED | 5 claimed, 0 partial, 0 not |
+| P2-AR-0029 | repair r2 | repair-builder | WS-8 | opus | claude-opus-5[1m] | 918,895 | 306 | 2.26 | COMPLETED_INTEGRATED | 2 claimed, 2 partial, 0 not |
+| P2-AR-0030 | repair r2 | repair-builder | WS-9/11 | opus | claude-opus-5[1m] | 787,654 | 226 | 1.60 | COMPLETED_INTEGRATED | 5 claimed, 0 partial, 0 not |
+| P2-AR-0031 | repair r2 | repair-builder | WS-10 | opus | claude-opus-5[1m] | 877,925 | 231 | 2.06 | COMPLETED_INTEGRATED | 3 claimed, 0 partial, 0 not |
+| P2-AR-0032 | repair r2 integration | integration-builder | all | opus | claude-opus-5[1m] | 835,855 | 284 | 1.35 | COMPLETED_MERGED | — |
+| P2-AR-0034 | repair r3 | repair-builder | WS-3 | opus | claude-opus-5[1m] | 140,375 | 309 | 3.26 | COMPLETED_AWAITING_INTEGRATION | 13 claimed, 3 partial, 1 not |
+| P2-AR-0037 | repair r3 | repair-builder | WS-6 | opus | claude-opus-5[1m] | 808,403 | 278 | 2.63 | COMPLETED_AWAITING_INTEGRATION | 8 claimed, 0 partial, 0 not |
+| P2-AR-0038 | repair r3 | repair-builder | WS-7 | opus | claude-opus-5[1m] | 810,731 | 286 | 2.32 | COMPLETED_AWAITING_INTEGRATION | 5 claimed, 0 partial, 0 not |
+| P2-AR-0039 | repair r3 | repair-builder | WS-8 | opus | claude-opus-5[1m] | 825,364 | 262 | 2.93 | COMPLETED_AWAITING_INTEGRATION | 6 claimed, 3 partial, 0 not |
+| P2-AR-0040 | repair r3 | repair-builder | WS-9/11 | opus | claude-opus-5[1m] | 610,209 | 203 | 2.27 | COMPLETED_AWAITING_INTEGRATION | 5 claimed, 0 partial, 0 not |
+| P2-AR-0033 | repair r3 | repair-builder | WS-2 | opus | PENDING | PENDING | PENDING | PENDING | RUNNING | — |
+| P2-AR-0035 | repair r3 | repair-builder | WS-4 | opus | PENDING | PENDING | PENDING | PENDING | RUNNING | — |
+| P2-AR-0036 | repair r3 | repair-builder | WS-5 | opus | PENDING | PENDING | PENDING | PENDING | RUNNING | — |
+
+**For every row:** reasoning level, input tokens, output tokens, peak context utilisation and compaction events are **NOT_OBSERVABLE**.
+
+**Inference, not measurement:** five runs report `subagent_tokens` anomalously low relative to their tool calls.
+- The clearest is P2-AR-0034: 140,375 tokens for 309 calls.
+- The others are P2-AR-0016, P2-AR-0026, P2-AR-0025 and P2-AR-0013.
+- If the metric reflects final context size, this is consistent with in-run compaction. It does not prove it.
+
+## B3. Aggregates
+
+### By model (self-reported)
+
+| Group | Agents | subagent_tokens total | mean | median | tool calls total | mean | wall-clock h total | mean | median |
+|---|---|---|---|---|---|---|---|---|---|
+| claude-opus-4-6 | 6 | 417,963 | 69,660 | 69,588 | 539 | 89.8 | 2.75 | 0.46 | 0.46 |
+| claude-opus-5[1m] | 31 | 22,521,732 | 726,507 | 787,654 | 7,963 | 256.9 | 61.24 | 1.98 | 1.99 |
+
+### By role
+
+| Group | Agents | subagent_tokens total | mean | median | tool calls total | mean | wall-clock h total | mean | median |
+|---|---|---|---|---|---|---|---|---|---|
+| baseline-synthesis | 1 | 894,062 | 894,062 | 894,062 | 156 | 156 | 1.27 | 1.27 | 1.27 |
+| family-auditor | 12 | 4,849,102 | 404,092 | 224,885 | 1,848 | 154 | 9.16 | 0.76 | 0.66 |
+| integration-builder | 2 | 1,701,187 | 850,594 | 850,594 | 602 | 301 | 3.07 | 1.54 | 1.54 |
+| repair-builder | 22 | 15,495,344 | 704,334 | 786,964 | 5,896 | 268 | 50.49 | 2.3 | 2.26 |
+
+### By phase
+
+| Group | Agents | subagent_tokens total | mean | median | tool calls total | mean | wall-clock h total | mean | median |
+|---|---|---|---|---|---|---|---|---|---|
+| audit-0 first pass | 6 | 417,963 | 69,660 | 69,588 | 539 | 89.8 | 2.75 | 0.46 | 0.46 |
+| audit-0 re-audit | 6 | 4,431,139 | 738,523 | 749,882 | 1,309 | 218.2 | 6.4 | 1.07 | 1.07 |
+| audit-0 synthesis | 1 | 894,062 | 894,062 | 894,062 | 156 | 156 | 1.27 | 1.27 | 1.27 |
+| repair r1 | 8 | 5,751,922 | 718,990 | 755,726 | 1,921 | 240.1 | 14.59 | 1.82 | 1.89 |
+| repair r1 integration | 1 | 865,332 | 865,332 | 865,332 | 318 | 318 | 1.72 | 1.72 | 1.72 |
+| repair r2 | 9 | 6,548,340 | 727,593 | 787,654 | 2,637 | 293 | 22.5 | 2.5 | 2.27 |
+| repair r2 integration | 1 | 835,855 | 835,855 | 835,855 | 284 | 284 | 1.35 | 1.35 | 1.35 |
+| repair r3 | 5 | 3,195,082 | 639,016 | 808,403 | 1,338 | 267.6 | 13.41 | 2.68 | 2.63 |
+
+### By workstream / family
+
+| Group | Agents | subagent_tokens total | mean | median | tool calls total | mean | wall-clock h total | mean | median |
+|---|---|---|---|---|---|---|---|---|---|
+| WS-1/12 | 1 | 644,373 | 644,373 | 644,373 | 146 | 146 | 1.18 | 1.18 | 1.18 |
+| WS-10 | 1 | 877,925 | 877,925 | 877,925 | 231 | 231 | 2.06 | 2.06 | 2.06 |
+| WS-2 | 2 | 1,829,150 | 914,575 | 914,575 | 605 | 302.5 | 5.36 | 2.68 | 2.68 |
+| WS-3 | 3 | 1,170,700 | 390,233 | 244,051 | 918 | 306 | 7.31 | 2.44 | 2.21 |
+| WS-4 | 2 | 1,175,313 | 587,656 | 587,656 | 645 | 322.5 | 5.41 | 2.71 | 2.71 |
+| WS-5 | 2 | 883,811 | 441,906 | 441,906 | 595 | 297.5 | 4.94 | 2.47 | 2.47 |
+| WS-6 | 3 | 2,398,507 | 799,502 | 804,652 | 755 | 251.7 | 6.56 | 2.19 | 2.32 |
+| WS-7 | 2 | 1,593,819 | 796,910 | 796,910 | 508 | 254 | 4.59 | 2.3 | 2.3 |
+| WS-8 | 3 | 2,673,201 | 891,067 | 918,895 | 815 | 271.7 | 7.18 | 2.39 | 2.26 |
+| WS-9/11 | 3 | 2,248,545 | 749,515 | 787,654 | 678 | 226 | 5.89 | 1.96 | 2.03 |
+| all | 3 | 2,595,249 | 865,083 | 865,332 | 758 | 252.7 | 4.34 | 1.45 | 1.35 |
+| alpha | 2 | 431,878 | 215,939 | 215,939 | 401 | 200.5 | 1.83 | 0.91 | 0.91 |
+| beta | 2 | 1,025,180 | 512,590 | 512,590 | 340 | 170 | 1.67 | 0.84 | 0.84 |
+| delta | 2 | 796,912 | 398,456 | 398,456 | 260 | 130 | 1.37 | 0.68 | 0.68 |
+| epsilon | 2 | 747,745 | 373,872 | 373,872 | 259 | 129.5 | 1.25 | 0.63 | 0.63 |
+| gamma | 2 | 993,905 | 496,952 | 496,952 | 319 | 159.5 | 1.59 | 0.8 | 0.8 |
+| zeta | 2 | 853,482 | 426,741 | 426,741 | 269 | 134.5 | 1.44 | 0.72 | 0.72 |
+
+**All 37 completed agents:**
+- **`subagent_tokens`:** 22,939,695 total; mean 619,992; median 783,088.
+- **Tool calls:** 8,502 in total.
+- **Wall-clock:** 63.99 agent-hours. Many agents ran in parallel, so this is not elapsed time.
+
+**Input tokens, output tokens and context utilisation:** NOT_OBSERVABLE for every group.
+
+## B4. Completion, finding yield and repair success
+
+| Measure | Value |
+|---|---|
+| Completion rate | 37 of 37 finished runs produced a durable typed report (100%); 31 of 37 are relied on (84%) |
+| First-pass audit yield (default tier, self-reported `claude-opus-4-6`) | 27 findings, **1 blocking**, across 6 families |
+| Re-audit yield (pinned, `claude-opus-5[1m]`) | 180 findings, **116 blocking**, across the same 6 families |
+| Synthesis | reviewed 180 family findings: 165 confirmed, 15 corrected, 0 refuted; added 10 (8 blocking); **134 blocking in 52 classes** |
+| Builder claims (rounds 1–3 so far) | 105 items REPAIRED_CLAIMED, 11 PARTIAL, 2 NOT_REPAIRED |
+| Independent repair success rate | **NOT_OBSERVABLE** until iteration-1 verification |
+
+## B5. Does the task need frontier reasoning?
+
+- **Family audits and synthesis: frontier required (observed).** On the same scope, the default-tier first pass found 1 blocking finding and the pinned frontier re-audit found 116. The synthesis reproduced the frontier findings (1,680 probe outcomes identical).
+- **Integration builders: frontier justified by yield.** Both found real defects the builders missed: an R1 held-out regression, and cross-workstream seal/schema conflicts. The purely textual part of a merge could plausibly use a lower tier.
+- **Repair builders: frontier plausibly required.** The work is trust-boundary and security design, and builders self-caught security flaws (for example, WS-7's operator-writable pin cache). Documentation, schema-version bookkeeping and evidence-map population are lower-tier candidates, but that is **not demonstrated: INCONCLUSIVE**.
+
+## B6. Repeated context loading
+
+Every fresh agent re-reads the common protocol, the frozen gate contract, the repair delta, the owner records and large parts of the codebase. This is by design: independence, and no shared memory between roles. Evidence: every handoff instructs these reads. Magnitude: **NOT_OBSERVABLE**.
+
+## B7. Estimated avoidable frontier usage
+
+- **Quantified:** NOT_OBSERVABLE (no cost or token split).
+- **Qualitative:**
+  1. **First-pass audits.** They cost 417,963 `subagent_tokens` and 2.75 agent-hours and produced no relied-on evidence. The fix would have been pinning the frontier model from the start, not downgrading.
+  2. **Duplicate P2-ADJ-0002 work** in P2-AR-0034 and P2-AR-0039. The share is NOT_OBSERVABLE; a single-owner handoff would have avoided it.
+  3. **Possible lower-tier sub-work** (docs, bookkeeping, textual merges). Not demonstrated.
+
+## B8. Orchestrator session
+
+| Field | Value |
+|---|---|
+| Model | `claude-opus-5[1m]` (system-declared) |
+| Reasoning level | the harness shows the orchestrator a hint of 40 in some turns; semantics not documented |
+| Budget indicator | the harness "total_tokens left" read 15,000,000 at start, 14,154,890 just before this request, and 15,000,000 on the next turn; semantics not documented |
+| Input/output tokens, context utilisation, tool calls, compaction | NOT_OBSERVABLE |
+
+---
+
+## Record-keeping defects found while taking this snapshot (repaired)
+
+1. **Unparseable run records.** 17 `AGENT_RUNS/*.run.yaml` files were not valid YAML. The orchestrator's recorder wrote free-text notes unquoted, so an embedded `": "` broke parsing. `check_state.py` did not parse run records, so this went undetected.
+   - **Repaired** by quoting the affected note fields; the content is unchanged.
+   - `check_state.py verify` now refuses any unparseable or duplicate-key run record.
+   - The recorders now quote their notes.
+2. **Stale `running_work`.** It still listed five completed round-3 runs; now pruned to the three truly running.

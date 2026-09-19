@@ -111,11 +111,22 @@ def verify(text, state):
             d = product_code_digest(commit)
             if d != cand["product_code_digest"]:
                 problems.append(f"candidate {cand.get('id')}: product_code_digest recomputes to {d}")
+    for rf in sorted(os.listdir(os.path.join(PHASE_DIR, "AGENT_RUNS"))):
+        if rf.endswith(".yaml"):
+            try:
+                with open(os.path.join(PHASE_DIR, "AGENT_RUNS", rf)) as fh:
+                    yaml.load(fh, Loader=UniqueKeyLoader)
+            except yaml.YAMLError as e:
+                problems.append(f"AGENT_RUNS/{rf} is not valid YAML (or has duplicate keys): {str(e).splitlines()[0]}")
     for run in state.get("agent_runs", []):
-        if run.get("status") == "COMPLETED":
+        if str(run.get("status", "")).startswith("COMPLETED"):
             rp = os.path.join(PHASE_DIR, "AGENT_RUNS", f"{run['run_id']}.report.yaml")
             if not os.path.isfile(rp):
-                problems.append(f"run {run['run_id']} COMPLETED but {rp} missing")
+                # a run completed but not yet integrated keeps its report on its own branch until merged
+                rel = os.path.relpath(rp, root)
+                on_branch = run.get("branch") and git(root, "cat-file", "-e", f"{run['branch']}:{rel}").returncode == 0
+                if not (run["status"] == "COMPLETED_AWAITING_INTEGRATION" and on_branch):
+                    problems.append(f"run {run['run_id']} {run['status']} but its report is missing (checked tree and branch)")
     for path, value in leaves(state):
         key = key_of(path)
         if not isinstance(value, str):
