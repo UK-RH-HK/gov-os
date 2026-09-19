@@ -1006,6 +1006,20 @@ mod tests {
         );
     }
 
+    /// IP-1 (WS-2 doctor): the check comes back in doctor's own `chk()` shape, and an installation whose
+    /// authenticity is not established can never be `ok` (so the doctor verdict cannot be HEALTHY without it).
+    #[test]
+    fn the_doctor_check_is_in_doctor_shape_and_fails_when_authenticity_is_not_established() {
+        let dir = tmp("doctor-check");
+        let c = doctor_check(&dir, "D0XX");
+        for k in ["id", "name", "ok", "severity", "message", "remediation"] {
+            assert!(c.get(k).is_some(), "missing {k}: {c}");
+        }
+        assert_eq!(c["id"], "D0XX");
+        assert_eq!(c["ok"], false);
+        assert_eq!(c["severity"], "medium");
+    }
+
     /// BC-P2-38: the single installed record vouches only for a verification.
     #[test]
     fn an_unknown_installed_record_vouches_for_nothing() {
