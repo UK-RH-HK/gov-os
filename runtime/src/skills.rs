@@ -854,6 +854,9 @@ fn short(s: &str) -> String {
 /// pass to its content in the tracked `skill-bindings.json`. A version already bound to different content is refused.
 pub fn record(p: &Project, only: Option<&str>) -> Result<Value> {
     crate::orchestration::control::guard_write(p, "skills record")?;
+    // binding a version to its content is a governed write to OS-written state; the operation class is not yet
+    // declared in AUTHORITY_POLICY, so `authority::required_level` applies its conservative default (L3)
+    crate::authority::require(p, "record_skill_binding")?;
     let (findings, detail) = regression(
         p,
         &RegressionOptions {
