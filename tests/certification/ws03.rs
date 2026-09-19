@@ -1716,9 +1716,18 @@ fn round_two_call_sites_use_the_declared_role_and_typed_refusals() {
         again["status"], "existing",
         "deduplicated by signature: {again}"
     );
+    // round 3 (P2-AR-0036, BC-P2-24): the recorded miss generates its follow-up work when it is recorded, linked both
+    // ways (the failure's `follow_up.task`, the task's `generation`), so it is no longer an *open* failure — one
+    // without follow-up work
+    let rec = yaml(&root, &path);
+    assert_eq!(rec["follow_up"]["status"], "linked", "{rec}");
+    let follow = rec["follow_up"]["task"].as_str().unwrap().to_string();
+    let t = g.ok(&["task", "show", &follow]);
+    assert_eq!(t["generation"]["source"], "retrieval-failure", "{t}");
+    assert_eq!(t["generation"]["subject"], m["id"], "{t}");
     let open = g.ok(&["memory", "failures"]);
     assert!(
-        open["open"].to_string().contains(m["id"].as_str().unwrap()),
+        !open["open"].to_string().contains(m["id"].as_str().unwrap()),
         "{open}"
     );
     g.ok(&["freeze-writes", "--reason", "incident"]);

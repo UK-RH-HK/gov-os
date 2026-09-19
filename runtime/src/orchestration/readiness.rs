@@ -9,6 +9,7 @@ use crate::records::{new_record, save_record, Record, RecordStore};
 use crate::util::{now_iso, read_yaml};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ReadinessView {
@@ -32,9 +33,143 @@ pub fn dimensions(p: &Project) -> Vec<Value> {
     .unwrap_or_default()
 }
 
+/// Readiness cells the scenario chain determines (`lifecycle::scenario::readiness_cells`, WS-10 IP-WS10-12): their
+/// state is computed from the product's own records, not taken from what the feature asserts.
+pub const CHAIN_CELLS: &[&str] = &[
+    "success_criteria",
+    "failure_criteria",
+    "representative_test_data",
+    "independent_acceptance_tests",
+];
+
+/// The readiness cell a scenario-chain gap code belongs to (the same mapping `lifecycle::scenario::readiness_cells`
+/// applies), if any.
+pub fn chain_cell_of(code: &str) -> Option<&'static str> {
+    match code {
+        "SCENARIO_WITHOUT_SUCCESS_CRITERIA" => Some("success_criteria"),
+        "SCENARIO_WITHOUT_FAILURE_CRITERIA" => Some("failure_criteria"),
+        "SCENARIO_WITHOUT_TEST" | "SCENARIO_WITHOUT_INDEPENDENT_TEST" => {
+            Some("independent_acceptance_tests")
+        }
+        "SCENARIO_DATA_UNDECLARED"
+        | "DATA_REQUIREMENT_NOT_GOVERNED"
+        | "DATA_REQUIREMENT_UNRESOLVED"
+        | "DATA_REQUIREMENT_WRONG_TYPE"
+        | "DATA_REQUIREMENT_WITHOUT_TEST_DATA"
+        | "TEST_DATA_WITHOUT_PROVENANCE"
+        | "TEST_DATA_PROVENANCE_INVALID"
+        | "TEST_DATA_PROVENANCE_UNSTRUCTURED"
+        | "TEST_DATA_REAL_DATA_UNAPPROVED"
+        | "TEST_DATA_LOCATION_MISSING"
+        | "TEST_DATA_CHANGED"
+        | "TEST_DATA_UNDECLARED"
+        | "DATA_AUTHOR_NOT_INDEPENDENT"
+        | "DATA_AUTHOR_IS_TEST_AUTHOR" => Some("representative_test_data"),
+        _ => None,
+    }
+}
+
+/// Cells `feature` states not applicable with a reason (`{status: N/A_WITH_REASON, reason}`): explicit, reviewable
+/// statements the product honours (a silent N/A is invalid).
+pub fn not_applicable_cells(feature: &Record) -> Vec<String> {
+    feature
+        .data
+        .get("readiness")
+        .and_then(|r| r.as_object())
+        .map(|m| {
+            m.iter()
+                .filter(|(_, v)| {
+                    v.get("status").and_then(|s| s.as_str()) == Some("N/A_WITH_REASON")
+                        && v.get("reason")
+                            .and_then(|r| r.as_str())
+                            .map(|r| r.trim().len() >= 3)
+                            .unwrap_or(false)
+                })
+                .map(|(k, _)| k.clone())
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// `(state, reason)` of a readiness cell value as authored.
+fn cell_state(cell: &Value) -> (String, Option<String>) {
+    match cell {
+        Value::String(s) => (s.clone(), None),
+        Value::Object(o) => (
+            o.get("status")
+                .and_then(|v| v.as_str())
+                .unwrap_or("INVALID")
+                .to_string(),
+            o.get("reason")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string()),
+        ),
+        _ => ("INVALID".into(), None),
+    }
+}
+
+/// A silent N/A (no reason) or a malformed cell value: never honoured, and reported as invalid.
+fn silent_or_invalid(cell: &Value) -> bool {
+    let (state, reason) = cell_state(cell);
+    state == "N/A" || (state == "N/A_WITH_REASON" && reason.is_none()) || state == "INVALID"
+}
+
 pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
+    let store = RecordStore::load(&p.root);
+    let lctx = crate::lifecycle::Ctx::new(p, &store);
+    evaluate_in(p, &lctx, feature)
+}
+
+/// Evaluate `feature`'s readiness against the kernel dimensions. The cells the scenario chain determines
+/// ([`CHAIN_CELLS`]) are **computed** from the feature's scenarios, data, test data and tests
+/// (`lifecycle::scenario::readiness_cells`) rather than taken on the feature's word: an assertion the chain
+/// contradicts (e.g. `PRESENT` while a scenario lacks failure criteria or its test data has no provenance) is
+/// `MISSING` with the chain's reasons; where the chain holds, the author's own statement stands (the chain never
+/// upgrades a cell the author keeps open). A cell the feature states `N/A_WITH_REASON` keeps that explicit
+/// statement. Each chain cell records what was asserted, what the chain found and where it came from.
+pub fn evaluate_in(p: &Project, lctx: &crate::lifecycle::Ctx, feature: &Record) -> ReadinessView {
     let dims = dimensions(p);
-    let readiness = feature.data.get("readiness").cloned().unwrap_or(json!({}));
+    let mut readiness = feature.data.get("readiness").cloned().unwrap_or(json!({}));
+    if !readiness.is_object() {
+        readiness = json!({});
+    }
+    let computed = crate::lifecycle::scenario::readiness_cells(lctx, feature);
+    let mut provenance: BTreeMap<String, Value> = BTreeMap::new();
+    // an authored silent N/A or malformed value stays invalid when the chain computes the cell's state
+    let mut asserted_invalid: BTreeSet<String> = BTreeSet::new();
+    for cell in CHAIN_CELLS {
+        let asserted = readiness.get(*cell).cloned().unwrap_or(json!("MISSING"));
+        if silent_or_invalid(&asserted) {
+            asserted_invalid.insert(cell.to_string());
+        }
+        let na = asserted.get("status").and_then(|s| s.as_str()) == Some("N/A_WITH_REASON");
+        let Some(c) = computed.get(*cell) else {
+            continue;
+        };
+        if na {
+            provenance.insert(cell.to_string(), json!({"asserted": asserted, "computed": c, "honoured": "the feature's explicit N/A_WITH_REASON"}));
+            continue;
+        }
+        let computed_state = c["state"].as_str().unwrap_or("MISSING").to_string();
+        // the chain refutes an assertion it contradicts; it never upgrades a cell the author keeps open
+        let state = if computed_state == "PRESENT" {
+            match &asserted {
+                Value::String(s) => s.clone(),
+                other => other
+                    .get("status")
+                    .and_then(|x| x.as_str())
+                    .unwrap_or("MISSING")
+                    .to_string(),
+            }
+        } else {
+            computed_state.clone()
+        };
+        if state != "PRESENT" || asserted.as_str() != Some("PRESENT") {
+            readiness[*cell] = json!(state);
+        }
+        provenance.insert(cell.to_string(), json!({"asserted": asserted, "state": state, "chain_state": computed_state, "computed_from": c["computed_from"], "reasons": c["reasons"]}));
+    }
+    let readiness = readiness;
     let mut cells = vec![];
     let mut gaps = vec![];
     let mut pre_gaps = vec![];
@@ -44,24 +179,11 @@ pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
         let id = d["id"].as_str().unwrap_or("").to_string();
         let pre = d["pre_implementation"].as_bool().unwrap_or(false);
         let cell = readiness.get(&id).cloned().unwrap_or(json!("MISSING"));
-        let (state, reason) = match &cell {
-            Value::String(s) => (s.clone(), None),
-            Value::Object(o) => (
-                o.get("status")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("INVALID")
-                    .to_string(),
-                o.get("reason")
-                    .and_then(|v| v.as_str())
-                    .map(|s| s.to_string()),
-            ),
-            _ => ("INVALID".into(), None),
-        };
+        let (state, reason) = cell_state(&cell);
         let ok = state == "PRESENT"
             || (state == "N/A_WITH_REASON"
                 && reason.as_ref().map(|r| r.len() >= 3).unwrap_or(false));
-        if state == "N/A" || (state == "N/A_WITH_REASON" && reason.is_none()) || state == "INVALID"
-        {
+        if silent_or_invalid(&cell) || asserted_invalid.contains(&id) {
             invalid.push(format!(
                 "{id}: silent N/A or invalid cell value is not allowed"
             ));
@@ -74,7 +196,11 @@ pub fn evaluate(p: &Project, feature: &Record) -> ReadinessView {
                 pre_gaps.push(id.clone());
             }
         }
-        cells.push(json!({"dimension": id, "state": state, "reason": reason, "pre_implementation": pre, "gap_task_class": d["gap_task_class"], "gap_task_role": d["gap_task_role"], "ok": ok}));
+        let mut row = json!({"dimension": id, "state": state, "reason": reason, "pre_implementation": pre, "gap_task_class": d["gap_task_class"], "gap_task_role": d["gap_task_role"], "ok": ok});
+        if let Some(pv) = provenance.get(&id) {
+            row["computed"] = pv.clone();
+        }
+        cells.push(row);
     }
     let coverage = if dims.is_empty() {
         1.0
@@ -206,4 +332,61 @@ pub fn plan(p: &Project, feature_id: &str) -> Result<Value> {
     Ok(
         json!({"feature": feature_id, "created_tasks": created, "pre_implementation_gap_tasks": pre_task_ids, "implementation_tasks_blocked": linked, "gaps": view.gaps, "coverage": view.coverage}),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::records::new_record;
+
+    /// Every pre-implementation gap of the scenario chain (`lifecycle::scenario`) belongs to a chain readiness cell,
+    /// and every chain cell is a pre-implementation dimension of the kernel taxonomy: the DAG's chain gating and the
+    /// computed readiness cells cannot disagree.
+    #[test]
+    fn every_pre_implementation_chain_gap_belongs_to_a_chain_cell() {
+        for code in crate::lifecycle::scenario::PRE_IMPLEMENTATION_CODES {
+            let cell =
+                chain_cell_of(code).unwrap_or_else(|| panic!("{code} maps to no readiness cell"));
+            assert!(CHAIN_CELLS.contains(&cell), "{code} -> {cell}");
+        }
+        let taxonomy: Value = serde_yaml::from_str(include_str!(
+            "../../../framework/taxonomy/READINESS_DIMENSIONS.yaml"
+        ))
+        .unwrap();
+        for cell in CHAIN_CELLS {
+            let d = taxonomy["dimensions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|d| d["id"].as_str() == Some(cell))
+                .unwrap_or_else(|| panic!("{cell} is not a kernel readiness dimension"));
+            assert_eq!(d["pre_implementation"], true, "{cell}");
+        }
+    }
+
+    /// A not-applicable cell is honoured only as an explicit statement with a reason (a silent N/A is invalid).
+    #[test]
+    fn not_applicable_cells_need_a_reason() {
+        let f = new_record(
+            "feature",
+            "F-0001",
+            "f",
+            json!({"readiness": {
+                "representative_test_data": {"status": "N/A_WITH_REASON", "reason": "pure arithmetic, literal inputs"},
+                "success_criteria": {"status": "N/A_WITH_REASON"},
+                "failure_criteria": "N/A",
+                "independent_acceptance_tests": "PRESENT"}}),
+        );
+        assert_eq!(
+            not_applicable_cells(&f),
+            vec!["representative_test_data".to_string()]
+        );
+        // a silent N/A stays invalid whether or not the chain computes the cell
+        let r = &f.data["readiness"];
+        assert!(!silent_or_invalid(&r["representative_test_data"]));
+        assert!(silent_or_invalid(&r["success_criteria"]));
+        assert!(silent_or_invalid(&r["failure_criteria"]));
+        assert!(!silent_or_invalid(&r["independent_acceptance_tests"]));
+        assert!(silent_or_invalid(&json!(3)));
+    }
 }

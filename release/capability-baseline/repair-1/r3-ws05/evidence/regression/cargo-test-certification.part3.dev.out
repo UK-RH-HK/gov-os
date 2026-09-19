@@ -1,0 +1,108 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws05/runtime)
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws05/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.29s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-15a10c09d13f7815)
+
+running 61 tests
+test ws03::every_cli_command_label_is_classified_by_g0 ... ok
+test ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate ... ok
+test ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere ... ok
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor has been running for over 60 seconds
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment has been running for over 60 seconds
+test ws03::blocked_work_is_released_only_by_an_authorising_answer has been running for over 60 seconds
+test ws03::cit_approval_consumes_only_honoured_gate_answers has been running for over 60 seconds
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations has been running for over 60 seconds
+test ws03::hand_written_gate_and_decision_records_are_not_honoured has been running for over 60 seconds
+test ws03::human_answers_come_only_from_the_owner_signed_channel has been running for over 60 seconds
+test ws03::presentation_is_recorded_only_from_an_owner_signed_receipt has been running for over 60 seconds
+test ws03::project_overlays_may_raise_floors_but_never_lower_them has been running for over 60 seconds
+test ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals has been running for over 60 seconds
+test ws03::the_decision_package_is_enforced has been running for over 60 seconds
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers has been running for over 60 seconds
+test ws04r2::checkpoint_and_handoff_continuity has been running for over 60 seconds
+test ws04r2::cit_approval_binds_content_impact_and_transaction has been running for over 60 seconds
+test ws04r2::contradictions_are_blocked_and_routed has been running for over 60 seconds
+test ws04r2::materiality_is_derived_not_labelled has been running for over 60 seconds
+test ws04r2::upstream_change_reaches_completed_work has been running for over 60 seconds
+test ws05::close_observes_os_written_state_no_os_operation_produced has been running for over 60 seconds
+test ws03::hand_written_gate_and_decision_records_are_not_honoured ... ok
+test ws03::presentation_is_recorded_only_from_an_owner_signed_receipt ... ok
+test ws04r2::contradictions_are_blocked_and_routed ... ok
+test ws03::blocked_work_is_released_only_by_an_authorising_answer ... ok
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment ... ok
+test ws03::the_decision_package_is_enforced ... ok
+test ws04r2::cit_approval_binds_content_impact_and_transaction ... ok
+test ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them ... ok
+test ws04r2::materiality_is_derived_not_labelled ... ok
+test ws03::cit_approval_consumes_only_honoured_gate_answers ... ok
+test ws05::releasing_a_claim_is_a_guarded_write ... ok
+test ws05::close_requires_and_persists_the_consumption_receipt has been running for over 60 seconds
+test ws05::status_shows_health_and_this_projects_release_trust ... ok
+test ws05::gates_decide_runnability_and_completion has been running for over 60 seconds
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations ... ok
+test ws05r3::a_failing_product_test_family_generates_repair_work ... ok
+test ws05::independence_is_established_from_recorded_authorship has been running for over 60 seconds
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers ... ok
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor ... ok
+test ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag has been running for over 60 seconds
+test ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag ... ok
+test ws05::close_requires_and_persists_the_consumption_receipt ... ok
+test ws03::human_answers_come_only_from_the_owner_signed_channel ... ok
+test ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block has been running for over 60 seconds
+test ws05r3::an_experiment_task_closes_only_through_its_lifecycle has been running for over 60 seconds
+test ws05::close_observes_os_written_state_no_os_operation_produced ... ok
+test ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote has been running for over 60 seconds
+test ws05r3::claims_and_claim_baselines_survive_deleting_the_derived_runtime has been running for over 60 seconds
+test ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles ... ok
+test ws05r3::every_event_source_generates_linked_governed_work_once has been running for over 60 seconds
+test ws04r2::upstream_change_reaches_completed_work ... ok
+test ws05r3::claims_and_claim_baselines_survive_deleting_the_derived_runtime ... ok
+test ws05r3::an_experiment_task_closes_only_through_its_lifecycle ... ok
+test ws05::gates_decide_runnability_and_completion ... ok
+test ws04r2::checkpoint_and_handoff_continuity ... ok
+test ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record ... ok
+test ws05r3::every_event_source_generates_linked_governed_work_once ... ok
+test ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration ... ok
+test ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block ... ok
+test ws08::a_machine_that_did_not_install_the_project_verifies_the_pinned_release_first ... ok
+test ws08_r2::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written ... ok
+test ws08::framework_lock_records_the_verified_identity_and_its_basis ... ok
+test ws08::certification_is_taken_only_from_the_trust_root ... ok
+test ws05r3::material_changes_inside_a_task_complete_only_through_change_control has been running for over 60 seconds
+test ws05::independence_is_established_from_recorded_authorship ... ok
+test ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote ... ok
+test ws07::a_tool_installation_is_approved_only_for_that_installation ... ok
+test ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence has been running for over 60 seconds
+test ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression has been running for over 60 seconds
+test ws07::registry_entries_are_honoured_only_as_the_os_wrote_them ... ok
+test ws08_r2::a_provisioned_machine_never_installs_in_bootstrap_mode ... ok
+test ws06::embedder_components_are_identified_bound_and_fail_closed_on_change ... ok
+test ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it ... ok
+test ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it ... ok
+test ws07::an_executable_plugin_never_runs_on_its_own_declarations ... ok
+test ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression ... ok
+test ws08_r2::update_applies_only_on_a_verified_authorising_answer ... ok
+test ws07::every_byte_a_plugin_executes_is_bound has been running for over 60 seconds
+test ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence ... ok
+test ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed ... ok
+test ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified ... ok
+test ws05r3::material_changes_inside_a_task_complete_only_through_change_control ... ok
+test ws08::an_unauthenticated_installation_is_never_presented_as_current ... ok
+test ws08_r2::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress ... ok
+test ws07::every_byte_a_plugin_executes_is_bound ... ok
+test ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back ... ok
+test ws08_r2::an_unprovisioned_machine_does_not_trust_kernel_material_it_never_admitted ... ok
+test ws08_r2::a_corrupt_or_racing_embedded_kernel_cache_is_never_installed has been running for over 60 seconds
+test ws08_r2::a_corrupt_or_racing_embedded_kernel_cache_is_never_installed ... ok
+test ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite has been running for over 60 seconds
+test ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current has been running for over 60 seconds
+test ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite ... ok
+test ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current ... ok
+
+test result: ok. 61 passed; 0 failed; 0 ignored; 0 measured; 83 filtered out; finished in 234.88s
+
+
+real	4m28.556s
+user	46m20.734s
+sys	1m55.719s

@@ -27,6 +27,19 @@
 //! * **independence** (BC-P2-34, task-role side) — independence of tests and test data from the implementer is taken
 //!   from recorded authorship ([`AuthorshipIndex`]: the sealed close reports), never from what an artefact says about
 //!   itself; one session does not both implement a feature and author its independent tests or test data.
+//! * **material changes** (BC-P2-13 in-task half) — what a task changed is classified at its close by what changed
+//!   (`cit::materiality::classify_paths`), never by the task's label; a material change completes only through
+//!   CIT-P/CIT-E (a CIT committed inside the claim window that wrote exactly that content), except the initial
+//!   authoring of specification by specification work ([`material_changes`]);
+//! * **current inputs** (BC-P2-04 close side) — work done against an input that changed since it was consumed does not
+//!   close, and a re-test flag is cleared only by re-test evidence (`cit::propagation::require_current_inputs`); a
+//!   claim first propagates changes made outside change control (`detect_and_propagate`), and the DAG shows them;
+//! * **work generation** (BC-P2-24) — the events a close records (discoveries, unresolved items, proposed decisions)
+//!   generate linked work (`orchestration::generation`); generated work is created by [`create_generated`];
+//! * **where claim evidence lives** (BC-P2-31) — claim baselines and carried sets at `paths::store_path(root,
+//!   "claim-trees")`, the claims store at `paths::store_path(root, "claims")`, never in the derived runtime directory;
+//! * **availability** (round-3 rule) — a hard-block does not refuse creating or claiming the work that remedies it
+//!   ([`guard_work`]); every other applicable block refuses, typed, naming the block and its scope.
 use crate::authority;
 use crate::checkpoints;
 use crate::memory::claims::ClaimRequest;
@@ -85,15 +98,127 @@ fn derived_status(ev: &dag::TaskEval) -> &'static str {
     }
 }
 
-pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
-    control::guard_write(p, "task create")?;
+// ------------------------------------------------------------------------------------------------ availability
+
+/// The health checks a task declares it remedies: its contract field `remedies` (check ids of the health scheduler
+/// catalogue — the work generator sets it on the remediation work it generates for a failing check; a creator may
+/// declare it on work it opens to repair a block).
+pub fn remedies_of(t: &Value) -> Vec<String> {
+    t.get("remedies")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.trim().to_string()))
+                .filter(|s| !s.is_empty())
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// **G0 at a work operation, under the availability rule** (round-3 common protocol, from Contract v3 L4
+/// "Independent runnable branches continue. Global stop only when policy or critical-path state requires" and O5
+/// "hard-block vs warning semantics are explicit"). The write guard (kernel trust, break-glass, emergency controls)
+/// always runs. The health half is the scheduler's G0 guard with the **paths the operation relies on**, so a
+/// path-scoped block governs only the work inside its scope; and a hard-block the work **remedies** (its `remedies`
+/// names the blocking check) does not refuse it — work that remedies a block stays available. The remedy still
+/// cannot commit without clearing its block: its close passes the same guard, which re-evaluates the block and
+/// refuses while it stands. Every refusal is the scheduler's typed `HEALTH_HARD_BLOCK`, naming each block, its check
+/// and its scope.
+pub fn guard_work(
+    p: &Project,
+    label: &str,
+    op: &str,
+    paths: &[String],
+    remedies: &[String],
+) -> Result<Value> {
+    if remedies.is_empty() {
+        control::guard_write(p, label)?;
+        return scheduler::guard(p, op, paths);
+    }
+    // the same write guard without its generic (whole-operation) health half, which the scoped decision below owns
+    control::guard_write(p, &format!("{label} (remedy)"))?;
+    match scheduler::guard(p, op, paths) {
+        Ok(v) => Ok(v),
+        Err(e) if e.code == "HEALTH_HARD_BLOCK" => {
+            let blocks = e.details["blocks"].as_array().cloned().unwrap_or_default();
+            let (remedied, standing): (Vec<Value>, Vec<Value>) =
+                blocks.into_iter().partition(|b| {
+                    remedies
+                        .iter()
+                        .any(|r| Some(r.as_str()) == b["check"].as_str())
+                });
+            if standing.is_empty() {
+                return Ok(json!({"operation": op, "allowed": true, "availability": {
+                    "rule": "a hard-block does not refuse the work that remedies it (round-3 availability rule); the remedy commits only if its close finds the block cleared",
+                    "remedies": remedies, "remedied_blocks": remedied}}));
+            }
+            let first = &standing[0];
+            Err(GovError::new(
+                "HEALTH_HARD_BLOCK",
+                format!(
+                    "{op} is refused: {} active hard-block(s) this work does not remedy, e.g. check {} ({}, scope {}): {}. The work remedies {remedies:?}; repair the other condition(s), or remedy them in their own work",
+                    standing.len(),
+                    first["check"].as_str().unwrap_or("?"),
+                    first["severity"].as_str().unwrap_or("?"),
+                    first["scope"].as_str().unwrap_or("operation"),
+                    first["message"].as_str().unwrap_or("")
+                ),
+            )
+            .with_details(json!({"operation": op, "paths": paths, "blocks": standing, "remedied_blocks": remedied, "remedies": remedies})))
+        }
+        Err(e) => Err(e),
+    }
+}
+
+pub fn create(p: &Project, fields: Value) -> Result<Value> {
+    // G0 (tier contract, BC-P2-06, IP-WS02-02) under the availability rule: an active hard-block governing task
+    // creation refuses it — except for work that remedies that block (`remedies`)
+    let remedies = remedies_of(&fields);
+    let paths: Vec<String> = fields
+        .get("allowed_paths")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default();
+    let availability = guard_work(p, "task create", ops::TASK_CREATE, &paths, &remedies)?;
     authority::require(p, "create_task")?;
-    // G0 (tier contract): an active hard-block governing task creation refuses it (BC-P2-06, IP-WS02-02)
-    scheduler::guard(p, ops::TASK_CREATE, &[])?;
+    let producer = json!({"producer": "gov task create", "session": p.session_id, "role": p.role, "created_at": now_iso()});
+    let mut out = build_and_save(p, fields, producer, "task create", false)?;
+    if availability.get("availability").is_some() {
+        out["availability"] = availability["availability"].clone();
+    }
+    Ok(out)
+}
+
+/// **Create work the Governance OS generates from an event** (BC-P2-24; `orchestration::generation`): the same
+/// record, defaults, schema and DAG-derived status as [`create`], with the generator's provenance and `generation`
+/// block. The write guard applies (kernel trust, break-glass, FREEZE_WRITES / PAUSE: nothing is generated while
+/// writes are frozen); the acting role's `create_task` authority and the health hard-block do not — generated work is
+/// the OS's reaction to an event, not the caller's request, and remediation stays available under the block it
+/// remedies (availability rule; it still commits only by clearing it).
+pub fn create_generated(p: &Project, fields: Value, trigger: &str) -> Result<Value> {
+    control::guard_write(p, "work generation")?;
+    let producer = json!({"producer": crate::orchestration::generation::GENERATOR, "trigger": trigger, "session": p.session_id, "role": p.role, "created_at": now_iso()});
+    build_and_save(p, fields, producer, "work generation", true)
+}
+
+/// Build, validate and persist a task record: defaults, routing and role checks, OS-owned provenance, the status the
+/// DAG derives (READY is never asserted), and the influence backlinks of the evidence it relies on.
+fn build_and_save(
+    p: &Project,
+    mut fields: Value,
+    producer: Value,
+    operation: &str,
+    generated: bool,
+) -> Result<Value> {
     let store = RecordStore::load(&p.root);
     let id = fields
         .get("id")
         .and_then(|v| v.as_str())
+        .filter(|_| !generated)
         .map(|s| s.to_string())
         .unwrap_or_else(|| store.next_id("task"));
     if store.get(&id).is_some() {
@@ -108,6 +233,9 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
         .or(fields.get("objective").and_then(|v| v.as_str()))
         .unwrap_or("untitled task")
         .to_string();
+    if !fields.is_object() {
+        return Err(GovError::new("USAGE", "task fields must be a JSON object"));
+    }
     let obj = fields.as_object_mut().unwrap();
     obj.entry("task_status").or_insert(json!("DRAFT"));
     let requested = obj
@@ -165,10 +293,13 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     if let Some(claimed) = obj.remove("provenance") {
         obj.insert("provenance_requested".into(), claimed);
     }
-    obj.insert(
-        "provenance".into(),
-        json!({"producer": "gov task create", "session": p.session_id, "role": p.role, "created_at": now_iso()}),
-    );
+    obj.insert("provenance".into(), producer);
+    // which event generated the work is the work generator's record (BC-P2-24), never the caller's
+    if !generated {
+        if let Some(claimed) = obj.remove("generation") {
+            obj.insert("generation_requested".into(), claimed);
+        }
+    }
     obj.remove("status_source");
     obj.remove("id");
     obj.remove("title");
@@ -198,14 +329,67 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     let stored = rec.get("task_status");
     rec.set(
         "status_source",
-        json!({"operation": "task create", "status": stored, "session": p.session_id, "role": p.role, "at": now_iso()}),
+        json!({"operation": operation, "status": stored, "session": p.session_id, "role": p.role, "at": now_iso()}),
     );
     save_record(&p.root, &rec)?;
     let mut out = rec.data.clone();
     if !ready_check.is_null() {
         out["ready_check"] = ready_check;
     }
+    // J1/J2 influence backlinks (WS-10 IP-WS10-13): research and experiment records this work relies on record it
+    let cited = cited_evidence_ids(&rec);
+    if !cited.is_empty() {
+        match crate::lifecycle::record_influence(p, &cited, &id) {
+            Ok(u) if !u.is_empty() => out["influence_recorded"] = json!(u),
+            Ok(_) => {}
+            Err(e) => out["influence_not_recorded"] = json!({"code": e.code, "message": e.message}),
+        }
+    }
     Ok(out)
+}
+
+/// Evidence ids a task relies on (`derived_from`, `required_inputs`, `optional_inputs`, input relations): what an
+/// influence backlink names (IP-WS10-13).
+pub fn cited_evidence_ids(t: &Record) -> Vec<String> {
+    let mut out: Vec<String> = t.list("derived_from");
+    for k in ["required_inputs", "optional_inputs"] {
+        for e in t
+            .data
+            .get(k)
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default()
+        {
+            match e {
+                Value::String(s) => out.push(s),
+                Value::Object(o) => {
+                    if let Some(s) = o.get("id").and_then(|v| v.as_str()) {
+                        out.push(s.to_string())
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+    for rel in t
+        .data
+        .get("relations")
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default()
+    {
+        if matches!(
+            rel["type"].as_str(),
+            Some("DERIVED_FROM") | Some("CONSUMES") | Some("USES")
+        ) {
+            if let Some(s) = rel["target"].as_str() {
+                out.push(s.to_string());
+            }
+        }
+    }
+    let mut seen = BTreeSet::new();
+    out.retain(|x| !x.is_empty() && seen.insert(x.clone()));
+    out
 }
 
 /// `gov task status <id> <status>`. DONE / CLAIMED / IN_PROGRESS are refused (their operations are `close` and
@@ -249,15 +433,51 @@ pub fn set_status(p: &Project, id: &str, status: &str, note: Option<&str>) -> Re
         "status_source",
         json!({"operation": "task status", "status": status, "session": p.session_id, "role": p.role, "at": now_iso(), "note": note}),
     );
-    let data = rec.data.clone();
+    let mut data = rec.data.clone();
     save_record(&p.root, rec)?;
+    // a status change is a task transition: observed as a mandatory checkpoint trigger now (WS-4 R2-6)
+    data["boundaries"] = observe_boundaries(p, "gov continue");
     Ok(data)
 }
 
+/// `gov task list`: every task with its status, and — for open work — the inputs that changed since its work
+/// consumed them (`cit::propagation::stale_inputs`, WS-4 R2-2), so direct-change staleness is visible where work is
+/// picked; generated work names the event it was generated from (BC-P2-24).
 pub fn list(p: &Project, status: Option<&str>) -> Vec<Value> {
     let store = RecordStore::load(&p.root);
     store.of_type("task").into_iter().filter(|t| status.map(|s| t.get("task_status") == s).unwrap_or(true))
-        .map(|t| json!({"id": t.id(), "title": t.title(), "class": t.get("class"), "task_status": t.get("task_status"), "feature": t.get("feature"), "dependencies": t.list("dependencies"), "human_gate": t.get("human_gate"), "retest_required": t.data.get("retest_required").and_then(|v| v.as_bool()).unwrap_or(false), "path": t.path})).collect()
+        .map(|t| {
+            let mut v = json!({"id": t.id(), "title": t.title(), "class": t.get("class"), "task_status": t.get("task_status"), "feature": t.get("feature"), "dependencies": t.list("dependencies"), "human_gate": t.get("human_gate"), "retest_required": t.data.get("retest_required").and_then(|v| v.as_bool()).unwrap_or(false), "path": t.path});
+            if !matches!(t.get("task_status").as_str(), "DONE" | "CANCELLED") {
+                let (_, stale) = crate::cit::propagation::stale_inputs(p, &store, t);
+                if !stale.is_empty() {
+                    v["stale_inputs"] = json!(stale.iter().map(|(c, prop)| json!({"id": c.id, "consumed": c.from, "current": c.to, "propagated": prop})).collect::<Vec<_>>());
+                }
+            }
+            if let Some(g) = crate::orchestration::generation::source_of(t) {
+                v["generated_from"] = g;
+            }
+            v
+        }).collect()
+}
+
+/// `gov task show` with what the product derives about the task (integration point for the CLI arm, which today
+/// prints the record as stored): the record, its DAG evaluation, its derived staleness
+/// (`cit::propagation::task_staleness`, WS-4 R2-2) and the event it was generated from (BC-P2-24).
+pub fn show(p: &Project, id: &str) -> Result<Value> {
+    let store = RecordStore::load(&p.root);
+    let t = store
+        .get(id)
+        .filter(|t| t.rtype() == "task")
+        .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
+    let mut out = t.data.clone();
+    let ctx = DagCtx::new(p, &store);
+    out["derived"] = json!({
+        "dag": dag::evaluate(&ctx, t, None).to_value(),
+        "staleness": crate::cit::propagation::task_staleness(p, &store, id).unwrap_or(Value::Null),
+        "generated_from": crate::orchestration::generation::source_of(t),
+    });
+    Ok(out)
 }
 
 /// The task's designated role, if any, refuses every other acting role. `claimed` is the contract recorded in the
@@ -471,17 +691,31 @@ fn independence_refusal(t: &Record, action: &str, reasons: &[String]) -> GovErro
 /// check are decided in one claims-store transaction; the designated role and recorded-authorship independence bind
 /// who may claim it.
 pub fn claim(p: &Project, id: &str) -> Result<Value> {
-    control::guard_write(p, "task claim")?;
+    // G0 (tier contract, BC-P2-06, IP-WS02-03) under the availability rule: scoped to the paths the claim reserves,
+    // and a block the task remedies does not refuse its claim
+    let (remedies, scope_paths) = {
+        let store = RecordStore::load(&p.root);
+        match store.get(id).filter(|t| t.rtype() == "task") {
+            Some(t) => (remedies_of(&t.data), t.list("allowed_paths")),
+            None => (vec![], vec![]),
+        }
+    };
+    let availability = guard_work(p, "task claim", ops::TASK_CLAIM, &scope_paths, &remedies)?;
     authority::require(p, "claim_task")?;
-    // G0 (tier contract): an active hard-block governing claims refuses it (BC-P2-06, IP-WS02-03)
-    scheduler::guard(p, ops::TASK_CLAIM, &[])?;
+    // an upstream change made outside change control reaches the work before it is picked (WS-4 R2-3, BC-P2-04):
+    // detection is content-based (what each task's work consumed), never index freshness
+    let propagation = crate::cit::propagation::detect_and_propagate(p, "task claim", false)
+        .map(|v| {
+            json!({"changes": v["changes"], "propagated": v["propagated"], "retest_required": v["propagation"]["retest_required"], "revalidation_tasks": v["propagation"]["revalidation_tasks"]})
+        })
+        .unwrap_or_else(|e| json!({"error": {"code": e.code, "message": e.message}}));
     let store = RecordStore::load(&p.root);
     let t = store
         .get(id)
         .filter(|t| t.rtype() == "task")
         .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
     // the DAG decides (BC-P2-16): dependencies, blocks, required inputs, the mandatory manifest, gates, readiness,
-    // TEST_POLICY, re-test, explicit holds, DRAFT/DONE/CANCELLED
+    // TEST_POLICY, stale inputs, re-test, explicit holds, DRAFT/DONE/CANCELLED
     let ctx = DagCtx::new(p, &store);
     let ev = dag::evaluate(&ctx, t, None);
     if !ev.runnable() {
@@ -559,7 +793,37 @@ pub fn claim(p: &Project, id: &str) -> Result<Value> {
     set_status_internal(p, id, "IN_PROGRESS", None, "task claim")?;
     let store = RecordStore::load(&p.root);
     c["baseline"] = establish_baseline(p, &store, id, renewed)?;
+    if availability.get("availability").is_some() {
+        c["availability"] = availability["availability"].clone();
+    }
+    if propagation["changes"].as_u64().unwrap_or(0) > 0 || propagation.get("error").is_some() {
+        c["upstream_changes"] = propagation;
+    }
+    // the transition is a mandatory checkpoint trigger, observed by the product now (WS-4 R2-6, BC-P2-05)
+    c["boundaries"] = observe_boundaries(p, &format!("gov task close {id} --report <receipt>"));
     Ok(c)
+}
+
+/// **Observe execution boundaries right after a transition** (WS-4 R2-6; BC-P2-05, Contract v3:729-742): every
+/// mandatory checkpoint trigger that occurred since the latest checkpoint (a task transition, a material decision,
+/// a significant mutation, a routing switch) becomes a checkpoint now, not only at the next boundary. Never fails
+/// the transition it follows: an index that cannot be opened, or a checkpoint that cannot be written, is reported.
+pub fn observe_boundaries(p: &Project, next_action: &str) -> Value {
+    // a health-check sandbox is a disposable copy of the project, not a working session: its transitions are not
+    // the project's continuity (and every file of a fresh copy would read as a significant mutation)
+    if crate::scheduler::sandbox::inside_sandbox() {
+        return json!({"observed": false, "reason": "inside a health-check sandbox (a copy, not a session)"});
+    }
+    let db = match RuntimeDb::open(&p.db_path()).and_then(|d| d.init_schema().map(|_| d)) {
+        Ok(d) => d,
+        Err(e) => {
+            return json!({"observed": false, "reason": format!("[{}] {}", e.code, e.message)})
+        }
+    };
+    match checkpoints::observe_boundaries(p, &db, next_action) {
+        Ok(v) => json!({"observed": true, "checkpoints": v}),
+        Err(e) => json!({"observed": false, "reason": format!("[{}] {}", e.code, e.message)}),
+    }
 }
 
 fn set_status_internal(
@@ -628,6 +892,8 @@ pub fn release(p: &Project, id: &str, force: bool) -> Result<bool> {
                 );
             }
         }
+        // releasing is a task transition (WS-4 R2-6)
+        let _ = observe_boundaries(p, "gov continue");
     }
     Ok(released.is_some())
 }
@@ -753,7 +1019,10 @@ pub fn tree_listing(p: &Project) -> std::collections::BTreeMap<String, String> {
             .collect()
     };
     for rel in paths {
-        if rel.starts_with(".governance-runtime/") || rel.starts_with(".git/") {
+        if rel.starts_with(".governance-runtime/")
+            || rel.starts_with(".git/")
+            || rel.starts_with(&format!("{}/", crate::paths::STATE_DIR))
+        {
             continue;
         }
         let abs = p.root.join(&rel);
@@ -764,8 +1033,31 @@ pub fn tree_listing(p: &Project) -> std::collections::BTreeMap<String, String> {
     out
 }
 
+/// **Where claim baselines and carried-mutation sets live (BC-P2-31).** They are the evidence a task close is checked
+/// against and cannot be rebuilt, so they are kept where the kernel puts non-rebuildable operational state —
+/// `paths::store_path(root, "claim-trees")`, `.governance-state/tasks/` — not in the derived runtime directory an
+/// operator may delete (framework §19). A directory an earlier release kept at `.governance-runtime/tasks/` is moved
+/// there once (`paths::relocate_legacy`) while nothing is at the new place; afterwards a directory reappearing at the
+/// legacy path is not the store and is reported by `paths::misplaced_os_state`, never merged.
+pub fn claim_trees_dir(p: &Project) -> std::path::PathBuf {
+    let target = crate::paths::store_path(&p.root, "claim-trees")
+        .unwrap_or_else(|| p.root.join(crate::paths::STATE_DIR).join("tasks"));
+    if !target.exists() && p.runtime_dir().join("tasks").is_dir() {
+        let _ = crate::paths::relocate_legacy(&p.root, "claim-trees");
+    }
+    target
+}
+
 fn task_runtime_dir(p: &Project, id: &str) -> std::path::PathBuf {
-    p.runtime_dir().join("tasks").join(id)
+    claim_trees_dir(p).join(id)
+}
+
+/// Create the directory a claim-tree file is written to, inside the self-ignored state directory.
+fn ensure_task_state_dir(p: &Project, id: &str) -> Result<std::path::PathBuf> {
+    crate::paths::ensure_state_dir(&p.root)?;
+    let d = task_runtime_dir(p, id);
+    std::fs::create_dir_all(&d)?;
+    Ok(d)
 }
 fn claim_tree_path(p: &Project, id: &str) -> std::path::PathBuf {
     task_runtime_dir(p, id).join("claim-tree.json")
@@ -872,7 +1164,7 @@ fn write_baseline(
         "method": "git ls-files -co --exclude-standard + sha256 (walk fallback); mutations of earlier claim windows carried"});
     crate::t2::seal_value(&mut doc, "", "task claim baseline")?;
     let path = claim_tree_path(p, id);
-    std::fs::create_dir_all(path.parent().unwrap())?;
+    ensure_task_state_dir(p, id)?;
     crate::util::write_json(&path, &doc)?;
     let _ = std::fs::remove_file(carried_path(p, id));
     Ok(
@@ -908,7 +1200,7 @@ fn read_carried(p: &Project, id: &str) -> BTreeMap<String, Option<String>> {
 fn write_carried(p: &Project, id: &str, carried: &BTreeMap<String, Option<String>>) -> Result<()> {
     let mut doc = json!({"task": id, "carried": carried, "at": now_iso()});
     crate::t2::seal_value(&mut doc, "", "task release (carried mutations)")?;
-    std::fs::create_dir_all(task_runtime_dir(p, id))?;
+    ensure_task_state_dir(p, id)?;
     crate::util::write_json(&carried_path(p, id), &doc)
 }
 
@@ -988,8 +1280,9 @@ pub struct Observation {
     pub baseline_of: BTreeMap<String, Option<String>>,
     /// For each observed path not covered by a CIT: its current hash (None = deleted).
     pub current_of: BTreeMap<String, Option<String>>,
-    /// Every path a Change-Impact Transaction executed inside the claim window touched (what may lie outside the
-    /// task's scope because a CIT governing that change covers it).
+    /// Every path a Change-Impact Transaction executed inside the claim window wrote **and whose current content is
+    /// what that CIT left** ([`cit_window_writes`], IP-R3-6): what may lie outside the task's scope because a CIT
+    /// governing that specific change covers it.
     pub cit_window: BTreeSet<String>,
     /// The observed paths among `cit_window`.
     pub cit_covered: BTreeSet<String>,
@@ -1064,6 +1357,59 @@ pub fn cit_window_paths(store: &RecordStore, baseline: Option<&Value>) -> BTreeS
         {
             if let Some(t) = c.data["execution"]["propagation"]["touched"].as_array() {
                 out.extend(t.iter().filter_map(|x| x.as_str().map(|s| s.to_string())));
+            }
+        }
+    }
+    out
+}
+
+/// **What the CITs committed inside a claim window wrote, bound to content** (WS-5 IP-R3-6 / WS-4 IP-3, BC-P2-14
+/// "a mutation outside a task's allowed paths is accepted only when a CIT governing that specific change covers it"):
+/// path -> the SHA-256 each in-window write left (`None` = the CIT removed the path). Only a COMMITTED transaction
+/// whose sealed state and recorded writes verify (`cit::binding::verified_writes`) counts; a path is governed by it
+/// only while its current content is what the CIT wrote — a later edit of the same path is the worker's again.
+/// In-window = committed now and not already committed when the baseline was taken (a baseline written before that
+/// list existed: finished at or after the window start).
+pub fn cit_window_writes(
+    store: &RecordStore,
+    baseline: Option<&Value>,
+) -> BTreeMap<String, BTreeSet<Option<String>>> {
+    let mut out: BTreeMap<String, BTreeSet<Option<String>>> = BTreeMap::new();
+    let Some(doc) = baseline else {
+        return out;
+    };
+    let before: Option<BTreeSet<&str>> = doc["cits_committed"]
+        .as_array()
+        .map(|a| a.iter().filter_map(|x| x.as_str()).collect());
+    let since = doc["at"].as_str().and_then(epoch_of);
+    for c in store.of_type("cit") {
+        if c.get("cit_status") != "COMMITTED" {
+            continue;
+        }
+        let inside = match &before {
+            Some(set) => !set.contains(c.id().as_str()),
+            None => {
+                let ex = &c.data["execution"];
+                match (
+                    since,
+                    ex["finished"]
+                        .as_str()
+                        .or(ex["started"].as_str())
+                        .and_then(epoch_of),
+                ) {
+                    (Some(s), Some(a)) => a >= s,
+                    _ => false,
+                }
+            }
+        };
+        if !inside {
+            continue;
+        }
+        if let Ok(writes) = crate::cit::binding::verified_writes(c) {
+            for w in writes {
+                if !w.path.is_empty() {
+                    out.entry(w.path).or_default().insert(w.sha256);
+                }
             }
         }
     }
@@ -1189,7 +1535,14 @@ fn observe_against(
         })
         .unwrap_or_default();
     let window_start = doc["at"].as_str().and_then(epoch_of);
-    let cit_covered = cit_window_paths(store, Some(doc));
+    // what the in-window CITs wrote, bound to content (IP-R3-6): a path is the CIT's governed change only while its
+    // current content is what the CIT left
+    let cit_writes = cit_window_writes(store, Some(doc));
+    let cit_covered: BTreeSet<String> = cit_writes
+        .iter()
+        .filter(|(path, hashes)| hashes.contains(&now.get(*path).cloned()))
+        .map(|(path, _)| path.clone())
+        .collect();
     let mut changed: BTreeSet<String> = BTreeSet::new();
     for (rel, h) in &now {
         if baseline.get(rel) != Some(h) {
@@ -1276,8 +1629,15 @@ fn observe_against(
         obs.current_of.insert(f.clone(), cur);
         obs.observed.push(f);
     }
+    // paths an in-window CIT wrote whose content has changed since: no longer the CIT's governed change
+    let cit_superseded: Vec<String> = cit_writes
+        .keys()
+        .filter(|k| !cit_covered.contains(*k) && obs.observed.contains(*k))
+        .cloned()
+        .collect();
     obs.evidence = json!({"baseline": format!("claim baseline {} (commit {})", doc["at"].as_str().unwrap_or("?"), doc["commit"].as_str().unwrap_or("?")),
         "observed": obs.observed, "carried": doc["carried"], "attributed_elsewhere": obs.attributed, "cit_covered": obs.cit_covered,
+        "cit_writes_changed_since": cit_superseded, "cit_coverage": "content-bound (cit::binding::verified_writes)",
         "t2_violations": obs.t2_violations, "os_managed_bound": obs.os_bound, "os_managed_unbound": obs.os_unbound});
     obs
 }
@@ -1297,6 +1657,7 @@ fn uncommitted_paths(p: &Project) -> Vec<String> {
                     .split('\0')
                     .map(|s| s.trim_matches('\n'))
                     .filter(|s| !s.is_empty())
+                    .filter(|s| !s.starts_with(&format!("{}/", crate::paths::STATE_DIR)))
                     .map(|s| s.to_string()),
             );
         }
@@ -1470,16 +1831,22 @@ pub fn is_production_path(p: &Project, path: &str) -> bool {
 /// | 8 | every governing Human Decision Gate authorises the work (BC-P2-12) | `GATE_NOT_AUTHORISED` | **no**: a human gate is not an L3 decision |
 /// | 9 | observed mutations: declared, in scope (as recorded and as claimed), and no change to OS-written state that no OS operation produced (`t2::classify_path`, BC-P2-09) | `MUTATION_SCOPE_VIOLATION` | no |
 /// | 10 | production-merge permission | `PRODUCTION_MERGE_NOT_ALLOWED` | no |
+/// | 10a | material changes made inside the task complete only through change control ([`material_changes`], BC-P2-13) | `MATERIAL_CHANGE_REQUIRES_CIT` | no |
+/// | 10b | an experiment task is linked to an OS-written experiment with a recorded run (`lifecycle::experiment::task_lifecycle_refusal`, J2) | `EXPERIMENT_LIFECYCLE_REQUIRED` | overridden, recorded |
 /// | 11 | index pins and freshness | `INDEX_PIN_MISMATCH`, `INDEX_STALE` | stale only (degraded) |
 /// | 12 | the consumption receipt against the manifest and packet (`context::receipt::require_valid`, W5) | `RECEIPT_INVALID` | no |
+/// | 12a | the inputs are current and a re-test flag is backed by re-test evidence (`cit::propagation::require_current_inputs`, BC-P2-04) | `INPUTS_STALE`, `RETEST_EVIDENCE_REQUIRED` | no |
 /// | 13 | the health close gate (`verification::close_gate`): G0 hard-blocks, G2 re-check, governance-evidence currency (O4), product-test outcome from recorded evidence (O1) | `HEALTH_HARD_BLOCK`, `GOVERNANCE_SUITE_STALE`/`_MISSING`, `PRODUCT_TEST*` | currency only (degraded) |
 ///
 /// Why this order: who may close (2, 4-7) and whether the work may complete at all (8) are decided before any
-/// evidence is weighed; the repository's own state (9-10), observed independently of the worker, is weighed before
-/// the worker's account of it (12), so an incomplete receipt never masks an out-of-scope or forged mutation; the
+/// evidence is weighed; the repository's own state (9-10b: scope, merge permission, materiality, experiment
+/// lifecycle), observed independently of the worker, is weighed before the worker's account of it (12, 12a), so an
+/// incomplete receipt never masks an out-of-scope, forged or material mutation; the
 /// evidence payload (3) keeps its long-standing place so a malformed report is refused as such; the health gate
 /// (13) runs last because it may execute checks and record a governance-suite result, which nothing before it
-/// should cause for a close that is refused anyway.
+/// should cause for a close that is refused anyway. After the task is DONE: its report is sealed, a re-test it
+/// evidenced is cleared ([`require_current_inputs`](crate::cit::propagation::require_current_inputs)), a revalidation
+/// task resolves the completed work it revalidates, and the work its report calls for is generated (BC-P2-24).
 pub fn close(
     p: &Project,
     db: &RuntimeDb,
@@ -1708,6 +2075,48 @@ pub fn close(
             return Err(GovError::new("PRODUCTION_MERGE_NOT_ALLOWED", format!("task {id} ({}) may not merge into production (production_merge_allowed: false) but its mutations landed in the production tree: {landed:?}; keep experimental output outside the production tree (spec/experiments/** or a path the repository contract classifies as evidence) and promote it through a CIT", t.get("class"))).with_details(json!({"task": id, "class": t.get("class"), "production_paths": landed, "observed": observed, "evidence": evidence})));
         }
     }
+    // --- 10a. material changes made inside the task (BC-P2-13 in-task half; WS-4 R2-4): a material change completes
+    //          only through CIT-P/CIT-E — observed, classified by what changed (never by a label), and accepted only
+    //          when an in-window CIT wrote exactly this content, or when it is the task's contracted authoring
+    let task_class = claimed_contract
+        .as_ref()
+        .and_then(|c| c["class"].as_str())
+        .filter(|c| !c.is_empty())
+        .map(|c| c.to_string())
+        .unwrap_or_else(|| t.get("class"));
+    let base_commit = bound
+        .as_ref()
+        .and_then(|d| d["commit"].as_str())
+        .filter(|c| !c.is_empty())
+        .map(|c| c.to_string());
+    let material = material_changes(p, t, &task_class, &obs, base_commit.as_deref());
+    if !material.refused.is_empty() {
+        let what: Vec<String> = material
+            .refused
+            .iter()
+            .map(|f| {
+                format!(
+                    "{} {} ({})",
+                    f["class"].as_str().unwrap_or("?"),
+                    f["subject"].as_str().unwrap_or("?"),
+                    f["path"].as_str().unwrap_or("?")
+                )
+            })
+            .collect();
+        return Err(GovError::new("MATERIAL_CHANGE_REQUIRES_CIT", format!("task {id} made material change(s) outside change control: {}. Contract v3:638-647 / framework §47-48: a material change completes only through CIT-P/CIT-E, whatever task it is made in. Restore these paths and propose the change as a Change-Impact Transaction (`gov cit propose --targets … --manifest …`, simulate, approve, execute) while this task is claimed — its recorded writes then cover exactly this content — or narrow the work to non-material changes", what.join("; "))).with_details(json!({"task": id, "class": task_class, "refused": material.refused, "accepted": material.accepted, "rule_source": "cit::materiality (kernel floor) at task close", "remediation": "gov cit propose / simulate / approve / execute inside the claim window"})));
+    }
+    // --- 10b. experiments are governed through their lifecycle (WS-10 IP-WS10-11, Contract v3 J2): an experiment task
+    //          closes only when linked to an OS-written experiment record with a recorded run
+    if let Some(e) = crate::lifecycle::experiment::task_lifecycle_refusal(
+        &crate::lifecycle::Ctx::new(p, &store),
+        t,
+    ) {
+        if !force {
+            return Err(e);
+        }
+        overrides
+            .push(json!({"override": "experiment_lifecycle", "code": e.code, "reason": e.message}));
+    }
     let unobserved: Vec<String> = files_changed
         .iter()
         .filter(|f| !observed.contains(f))
@@ -1734,6 +2143,10 @@ pub fn close(
     }
     // --- 12. the consumption receipt (BC-P2-20, W5): validated against the manifest and the packet it names
     report = require_receipt(p, &store, t, &report)?;
+    // --- 12a. current inputs (BC-P2-04 close side; WS-4 R2-1): work done against an input that has changed since it
+    //          was consumed cannot close, and a re-test flag is cleared only by evidence of the re-test against the
+    //          changed inputs (never by closing, never by an index rebuild)
+    let currency = crate::cit::propagation::require_current_inputs(p, &store, id, &report)?;
     // --- 13. the health close gate (G0 hard-block, G2 re-check, O4 currency, O1 product tests from evidence)
     // what this task touched: what it declares and what it was observed to change — not the paths an in-window CIT
     // changed, which are that CIT's governed mutations (its own G4 tier covers them)
@@ -1775,8 +2188,15 @@ pub fn close(
             "observed_hashes": obs.current_of, "cit_covered": obs.cit_covered, "attributed_elsewhere": obs.attributed,
             "os_managed_bound": obs.os_bound, "os_managed_unbound": obs.os_unbound,
             "carried": evidence["carried"], "claim": claim.as_ref().map(|c| json!({"session": c["session_id"], "role": c["role"], "worktree": c["worktree"], "branch": c["branch"], "head": c["head"], "scope": c["scope"], "claimed_at": c["claimed_at"]})),
-            "claimed_contract": claimed_contract, "closing_worktree": wt, "overrides": overrides}),
+            "claimed_contract": claimed_contract, "closing_worktree": wt, "overrides": overrides,
+            "material_changes": {"accepted": material.accepted.clone(), "classified_paths": material.classified, "rule_source": "cit::materiality at task close (BC-P2-13)"}}),
     );
+    if currency["clears_retest"].as_bool() == Some(true) {
+        robj.insert(
+            "revalidated_inputs".into(),
+            currency["revalidated_inputs"].clone(),
+        );
+    }
     let title = format!("Report for {id}: {}", t.title());
     let mut rec = new_record("report", &rpt_id, &title, Value::Object(robj.clone()));
     p.schemas()
@@ -1800,10 +2220,22 @@ pub fn close(
         "status_source",
         json!({"operation": "task close", "status": "DONE", "session": p.session_id, "role": p.role, "at": closed_at, "report": rpt_id}),
     );
-    if tr.data.get("retest_required").is_some() {
+    // a re-test flag is cleared only by the evidence `require_current_inputs` accepted (WS-4 R2-1): the re-tested
+    // inputs are recorded, and the staleness it resolved says how
+    if currency["clears_retest"].as_bool() == Some(true) {
         tr.set("retest_required", json!(false));
+        tr.set("revalidated_inputs", currency["revalidated_inputs"].clone());
+        let mut s = tr.data.get("staleness").cloned().unwrap_or(json!({}));
+        if s.is_object() {
+            s["stale"] = json!(false);
+            s["resolved"] = json!({"by": "task close with re-test evidence", "report": rpt_id, "inputs": currency["revalidated_inputs"], "at": closed_at});
+            tr.set("staleness", s);
+        }
     }
     save_record(&p.root, tr)?;
+    // a revalidation task's close revalidates the completed work it names (BC-P2-04 / BC-P2-24: "a revalidation
+    // task's close clears the revalidation of the task it names")
+    let revalidated = resolve_revalidation(p, t, &rpt_id, &closed_at);
     let _ = claims::release(p, id, &p.session_id, force);
     let _ = std::fs::remove_file(claim_tree_path(p, id));
     let _ = std::fs::remove_file(carried_path(p, id));
@@ -1819,10 +2251,236 @@ pub fn close(
             ..Default::default()
         },
     );
-    Ok(
-        json!({"task": id, "task_status": "DONE", "report": rpt_id, "checkpoint": ck["id"], "degraded": degraded, "overrides": overrides,
-               "receipt_validation": robj["receipt_validation"], "close_gate": {"governance_affecting": gate["governance_affecting"], "g2": gate["g2"]}}),
+    // governed work the completed work calls for (its discoveries, unresolved items and proposed decisions) is
+    // generated now, linked to the sealed report (BC-P2-24)
+    let generated = crate::orchestration::generation::reconcile(
+        p,
+        &crate::orchestration::generation::Options::triggered_by("task close"),
     )
+    .unwrap_or_else(|e| json!({"error": {"code": e.code, "message": e.message}}));
+    let mut out = json!({"task": id, "task_status": "DONE", "report": rpt_id, "checkpoint": ck["id"], "degraded": degraded, "overrides": overrides,
+               "receipt_validation": robj["receipt_validation"], "close_gate": {"governance_affecting": gate["governance_affecting"], "g2": gate["g2"]}});
+    if currency["clears_retest"].as_bool() == Some(true) {
+        out["revalidated_inputs"] = currency["revalidated_inputs"].clone();
+    }
+    if !revalidated.is_null() {
+        out["revalidated_task"] = revalidated;
+    }
+    if !material.accepted.is_empty() {
+        out["material_changes_accepted"] = json!(material.accepted);
+    }
+    out["generated_work"] = crate::orchestration::generation::summary(&generated);
+    Ok(out)
+}
+
+/// A revalidation task (`revalidates: <task>`, generated by upstream-change propagation or the work generator)
+/// revalidates the completed work it names when it closes: that task's `revalidation` becomes resolved, its re-test
+/// flag and staleness are cleared, each naming the closing report. Returns what was resolved (`Null` when nothing).
+fn resolve_revalidation(p: &Project, t: &Record, report: &str, at: &str) -> Value {
+    let target = t.get("revalidates");
+    if target.is_empty() {
+        return Value::Null;
+    }
+    let mut store = RecordStore::load(&p.root);
+    let Some(r) = store.get_mut(&target).filter(|r| r.rtype() == "task") else {
+        return Value::Null;
+    };
+    let required = r.data["revalidation"]["required"].as_bool() == Some(true)
+        || r.data.get("retest_required").and_then(|v| v.as_bool()) == Some(true);
+    if !required || r.get("task_status") != "DONE" {
+        return Value::Null;
+    }
+    let mut rv = r.data.get("revalidation").cloned().unwrap_or(json!({}));
+    if !rv.is_object() {
+        rv = json!({});
+    }
+    rv["required"] = json!(false);
+    rv["resolved_by"] = json!({"task": t.id(), "report": report, "at": at});
+    r.set("revalidation", rv);
+    r.set("retest_required", json!(false));
+    let mut s = r.data.get("staleness").cloned().unwrap_or(json!({}));
+    if s.is_object() {
+        s["stale"] = json!(false);
+        s["resolved"] =
+            json!({"by": "revalidation task", "task": t.id(), "report": report, "at": at});
+        r.set("staleness", s);
+    }
+    r.set("updated", json!(today()));
+    match save_record(&p.root, r) {
+        Ok(()) => json!({"task": target, "resolved_by": t.id(), "report": report}),
+        Err(e) => json!({"task": target, "error": {"code": e.code, "message": e.message}}),
+    }
+}
+
+/// Task classes contracted to change the product's behaviour (its source): a behaviour change to product source made
+/// by a task of any other class is outside its contract, so it is material for it (BC-P2-13).
+pub const SOURCE_CHANGING_CLASSES: &[&str] = &[
+    "implementation",
+    "integration",
+    "refactor",
+    "repair",
+    "performance",
+    "security",
+    "experiment",
+];
+
+/// Record types whose **initial authoring** is specification work: a new record of one of these types that no
+/// earlier record is replaced by is the output a specification-producing task is contracted to make, not a change to
+/// existing authority (there is no consumer whose basis it changes).
+pub const AUTHORED_SPEC_TYPES: &[&str] = &[
+    "requirement",
+    "scenario",
+    "test-obligation",
+    "feature",
+    "data",
+];
+
+/// Material classes an initially authored specification record may carry.
+const AUTHORING_CLASSES: &[&str] = &[
+    "behaviour_change",
+    "acceptance_criteria_change",
+    "data_migration",
+];
+
+/// The in-task materiality verdict of a close ([`material_changes`]).
+#[derive(Debug, Clone, Default)]
+pub struct MaterialCheck {
+    /// Findings the close must refuse: `{path, class, subject, rule, evidence}`.
+    pub refused: Vec<Value>,
+    /// Material findings accepted, each with why (`via`).
+    pub accepted: Vec<Value>,
+    /// Paths classified.
+    pub classified: usize,
+}
+
+/// **Material changes made inside a task (BC-P2-13 close side; WS-4 R2-4; Contract v3:446, :638-647; framework
+/// §47-48).** Every path the task was observed to change since its claim is classified by what changed
+/// (`cit::materiality::classify_paths` against the claim-time commit), never by the task's label. A finding that
+/// must pass change control (`requires_cit_in_task`, and a behaviour change to product source made by a task not
+/// contracted to change it, [`SOURCE_CHANGING_CLASSES`]) is accepted only when:
+///
+/// 1. **a CIT governed exactly this change** — a transaction committed inside the claim window wrote the path and its
+///    content is still what that CIT left (`cit::binding::verified_writes`, [`cit_window_writes`]); or
+/// 2. **it is initial authoring** — a specification record of [`AUTHORED_SPEC_TYPES`] that did not exist when the
+///    task was claimed and supersedes nothing, created by a task that produces specification
+///    (`dag::produces_feature_specification`), carrying only [`AUTHORING_CLASSES`]; or
+/// 3. **it is the task's own readiness cell** — a readiness gap task changing only its cell of its feature's
+///    `readiness` map.
+///
+/// Everything else is refused. Architecture, interface, security, governance, infrastructure and migration changes
+/// are never exempt: they are material whatever task makes them and however new the file is.
+pub fn material_changes(
+    p: &Project,
+    t: &Record,
+    task_class: &str,
+    obs: &Observation,
+    base_commit: Option<&str>,
+) -> MaterialCheck {
+    let mut out = MaterialCheck::default();
+    let producer = crate::orchestration::dag::produces_feature_specification(t)
+        || crate::orchestration::dag::SPECIFICATION_PRODUCING_CLASSES.contains(&task_class);
+    for path in &obs.observed {
+        if obs.cit_covered.contains(path) {
+            out.accepted.push(json!({"path": path, "via": "a CIT committed inside the claim window wrote exactly this content (verified writes)"}));
+            continue;
+        }
+        out.classified += 1;
+        let m = crate::cit::materiality::classify_paths(p, std::slice::from_ref(path), base_commit);
+        let created = matches!(obs.baseline_of.get(path), Some(None));
+        let current = std::fs::read_to_string(p.root.join(path))
+            .ok()
+            .and_then(|txt| crate::records::parse_record_text(&txt, path));
+        for f in &m.findings {
+            let outside_contract = f.class == "behaviour_change"
+                && f.rule == "product source"
+                && !SOURCE_CHANGING_CLASSES.contains(&task_class);
+            if !f.requires_cit_in_task && !outside_contract {
+                continue;
+            }
+            let row = json!({"path": path, "class": f.class, "subject": f.subject, "rule": f.rule, "evidence": f.evidence});
+            // 2. initial authoring of specification by specification-producing work
+            let authored = producer
+                && created
+                && AUTHORING_CLASSES.contains(&f.class)
+                && match &current {
+                    Some(r) => {
+                        AUTHORED_SPEC_TYPES.contains(&r.rtype().as_str())
+                            && r.list("supersedes").is_empty()
+                            && !r.relations().iter().any(|(ty, _)| ty == "SUPERSEDES")
+                    }
+                    // an executable acceptance criterion (Gherkin) newly written by specification work
+                    None => f.rule == "executable acceptance criteria",
+                };
+            if authored {
+                let mut a = row.clone();
+                a["via"] = json!("initial authoring by specification-producing work (created in this claim window, supersedes nothing)");
+                out.accepted.push(a);
+                continue;
+            }
+            // 3. the readiness gap task's own cell of its feature
+            if own_readiness_cell_only(p, t, path, current.as_ref(), base_commit) {
+                let mut a = row.clone();
+                a["via"] = json!(format!(
+                    "the readiness gap task's own cell ({}) of its feature",
+                    t.get("readiness_cell")
+                ));
+                out.accepted.push(a);
+                continue;
+            }
+            out.refused.push(row);
+        }
+    }
+    out
+}
+
+/// Did a readiness gap task change nothing of `path` but its own readiness cell of its own feature?
+fn own_readiness_cell_only(
+    p: &Project,
+    t: &Record,
+    path: &str,
+    current: Option<&Record>,
+    base_commit: Option<&str>,
+) -> bool {
+    let (cell, feature) = (t.get("readiness_cell"), t.get("feature"));
+    let Some(cur) = current else {
+        return false;
+    };
+    if cell.is_empty() || feature.is_empty() || cur.id() != feature || cur.rtype() != "feature" {
+        return false;
+    }
+    let base = base_commit.unwrap_or("HEAD");
+    let Some(before) =
+        crate::cit::materiality::git_output(&p.root, &["show", &format!("{base}:{path}")])
+            .and_then(|txt| crate::records::parse_record_text(&txt, path))
+    else {
+        return false;
+    };
+    let (b, a) = (&before.data, &cur.data);
+    let keys: BTreeSet<String> = b
+        .as_object()
+        .into_iter()
+        .chain(a.as_object())
+        .flat_map(|m| m.keys().cloned())
+        .collect();
+    for k in keys {
+        if b.get(&k) == a.get(&k)
+            || crate::cit::materiality::BOOKKEEPING_FIELDS.contains(&k.as_str())
+        {
+            continue;
+        }
+        if k != "readiness" {
+            return false;
+        }
+        let strip = |v: Option<&Value>| -> Value {
+            let mut m = v.and_then(|x| x.as_object()).cloned().unwrap_or_default();
+            m.remove(&cell);
+            Value::Object(m)
+        };
+        if strip(b.get("readiness")) != strip(a.get("readiness")) {
+            return false;
+        }
+    }
+    true
 }
 
 /// **The consumption receipt at close** (BC-P2-20 close side): `context::receipt::validate` against the task's
@@ -1997,6 +2655,25 @@ mod tests {
         ] {
             assert!(operation_only(s).is_none(), "{s}");
         }
+    }
+
+    /// The evidence a task relies on — what its influence backlinks name (IP-WS10-13) — and the checks it declares it
+    /// remedies (availability rule) are read from its contract fields.
+    #[test]
+    fn cited_evidence_and_remedies_are_read_from_the_contract() {
+        let t = crate::records::new_record(
+            "task",
+            "TASK-0001",
+            "t",
+            json!({"derived_from": ["RES-0001", "EXP-0001"], "required_inputs": ["RES-0001", {"id": "D-0001", "reason": "r"}],
+                   "optional_inputs": [{"id": "RES-0002"}], "relations": [{"type": "CONSUMES", "target": "RES-0003"}, {"type": "AFFECTS", "target": "F-0001"}],
+                   "remedies": ["graph_integrity", " ", "D011"]}),
+        );
+        assert_eq!(
+            cited_evidence_ids(&t),
+            vec!["RES-0001", "EXP-0001", "D-0001", "RES-0002", "RES-0003"]
+        );
+        assert_eq!(remedies_of(&t.data), vec!["graph_integrity", "D011"]);
     }
 
     #[test]

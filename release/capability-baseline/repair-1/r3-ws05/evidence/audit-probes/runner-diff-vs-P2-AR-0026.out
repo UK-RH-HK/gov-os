@@ -1,0 +1,59 @@
+# diff of the round-2 WS-5 runner (repair-1/r2-ws05/evidence/audit-probes/run-audit-probe.sh, P2-AR-0026) against this run's run-audit-probe.sh
+2,6c2,12
+< # P2-AR-0026 — re-run audit-of-record probes (release/capability-baseline/audit-0/<family>/evidence/), UNEDITED, against
+< # this worktree's binary and against the round-2 base binary (negative control), in one of four modes; output to
+< # ./<mode>/<family>.<probe>.out only. Derived from the round-1 integration runner
+< # (repair-1/integration/evidence/audit-probes/run-audit-probe.sh, P2-AR-0022); the family invocation conventions are
+< # unchanged.
+---
+> # P2-AR-0036 — re-run audit-of-record probes (release/capability-baseline/audit-0/<family>/evidence/), UNEDITED, against
+> # this worktree's binary and against the round-3 base binary (negative control: the integrated round-2 tree 53897c1 built
+> # in scratch), in one of four modes; output to ./<mode>/<family>.<probe>.out only. DERIVED COPY of WS-5's round-2 runner
+> # (repair-1/r2-ws05/evidence/audit-probes/run-audit-probe.sh, P2-AR-0026). Changes, and nothing else: the run id and
+> # environment names (P2AR0036_*), and the evidence adapter is the round-2 integration builder's root-channel copy of
+> # that runner's adapter (repair-1/integration-2/evidence/builder-probes/derived/gov-adapter.ws05.root-channel.P2-AR-0032.py,
+> # referenced in place, unmodified) because P2-ADJ-0001 turned the standalone human-channel anchor off. The family
+> # invocation conventions are unchanged. Base modes mirror the BASE TREE (the scratch export of 53897c1 whose build is
+> # $P2AR0036_BASE_GOV; default: two directories above that binary's target/release), not this worktree, so the base binary
+> # is paired with its own framework payload (an `init --source <root>/framework` against this worktree's changed framework
+> # is correctly refused by the base binary as an external source, which would mask the base behaviour).
+12c18
+< #   base        the round-2 base binary ($P2AR0026_BASE_GOV: the integrated round-1 tree 843d79c built in scratch),
+---
+> #   base        the round-3 base binary ($P2AR0036_BASE_GOV: the integrated round-2 tree 53897c1 built in scratch),
+15c21
+< # Usage: P2AR0026_SCRATCH=<dir> [P2AR0026_BASE_GOV=<gov>] run-audit-probe.sh <mode> <family> <probe> [<probe> ...]
+---
+> # Usage: P2AR0036_SCRATCH=<dir> [P2AR0036_BASE_GOV=<gov>] run-audit-probe.sh <mode> <family> <probe> [<probe> ...]
+21c27
+< SCRB="${P2AR0026_SCRATCH:?set P2AR0026_SCRATCH}"
+---
+> SCRB="${P2AR0036_SCRATCH:?set P2AR0036_SCRATCH}"
+25,26c31,32
+< mirror() {  # $1 = mirror dir, $2 = real gov, $3 = adapter|direct
+<   local ROOTM="$1" REALG="$2" KIND="$3"
+---
+> mirror() {  # $1 = mirror dir, $2 = real gov, $3 = adapter|direct, $4 = tree the mirror links to
+>   local ROOTM="$1" REALG="$2" KIND="$3" SRC="$4"
+29c35
+<     for e in $(ls -A "$WT"); do [ "$e" = target ] || ln -sfn "$WT/$e" "$ROOTM/$e"; done
+---
+>     for e in $(ls -A "$SRC"); do [ "$e" = target ] || [ "$e" = .git ] || ln -sfn "$SRC/$e" "$ROOTM/$e"; done
+35c41
+< exec python3 "$WT/release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/gov-adapter.py" "\$@"
+---
+> exec python3 "$WT/release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/gov-adapter.ws05.root-channel.P2-AR-0032.py" "\$@"
+46,48c52,56
+<   after-shim) REAL="$WT/target/release/gov"; ROOT="$(mirror "$SCRB/mirror-after-shim" "$REAL" adapter)" ;;
+<   base)      REAL="${P2AR0026_BASE_GOV:?set P2AR0026_BASE_GOV}"; ROOT="$(mirror "$SCRB/mirror-base" "$REAL" direct)" ;;
+<   base-shim) REAL="${P2AR0026_BASE_GOV:?set P2AR0026_BASE_GOV}"; ROOT="$(mirror "$SCRB/mirror-base-shim" "$REAL" adapter)" ;;
+---
+>   after-shim) REAL="$WT/target/release/gov"; ROOT="$(mirror "$SCRB/mirror-after-shim" "$REAL" adapter "$WT")" ;;
+>   base)      REAL="${P2AR0036_BASE_GOV:?set P2AR0036_BASE_GOV}"; BT="${P2AR0036_BASE_TREE:-$(cd "$(dirname "$REAL")/../.." && pwd)}"
+>              ROOT="$(mirror "$SCRB/mirror-base" "$REAL" direct "$BT")" ;;
+>   base-shim) REAL="${P2AR0036_BASE_GOV:?set P2AR0036_BASE_GOV}"; BT="${P2AR0036_BASE_TREE:-$(cd "$(dirname "$REAL")/../.." && pwd)}"
+>              ROOT="$(mirror "$SCRB/mirror-base-shim" "$REAL" adapter "$BT")" ;;
+58c66
+<     echo "# P2-AR-0026 audit-of-record probe re-run (unedited): $FAM/$P mode=$MODE"
+---
+>     echo "# P2-AR-0036 audit-of-record probe re-run (unedited): $FAM/$P mode=$MODE"

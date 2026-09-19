@@ -655,6 +655,14 @@ fn deleting_everything_classified_derived_keeps_claims_control_and_registration(
             s.id
         );
     }
+    // round 3 (P2-AR-0036, BC-P2-31): the claims store's writer (WS-5) keeps it where it belongs,
+    // `paths::store_path(root, "claims")`, so it is no longer misplaced — and it lives outside every directory the
+    // product classifies derived or generated
+    assert!(
+        !misplaced.iter().any(|m| m == "claims"),
+        "the claims store is at its BC-P2-31 location: {misplaced:?}"
+    );
+    assert!(exists(&root, ".governance-state/claims.db"));
     for f in &del {
         std::fs::remove_file(root.join(f)).unwrap();
     }

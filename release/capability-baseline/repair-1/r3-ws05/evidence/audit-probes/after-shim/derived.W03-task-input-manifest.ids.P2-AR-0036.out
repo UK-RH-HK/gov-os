@@ -1,0 +1,461 @@
+# P2-AR-0036 derived probe re-run: zeta-r derived/W03-task-input-manifest.ids.P2-AR-0036.py mode=after-shim
+# worktree HEAD a7bb4d2ea473e1fb39d5888563d4d051bf796cd1; product files differing from HEAD: 0
+# derived probe sha256 ea3cd7055e628f31296a9e86d2cfacaf413fa048fd42647fb5269eaeccb81606; real gov 82e3a9bc7f1f077d7a77d11614c82eb4bcbab6590402ba221f8c5b1862ce1a3e via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/mirror-after-shim/target/release/gov
+# date 2026-09-19T13:13:22Z
+# project w3: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-after-shim-derived-W03-task-input-manifest.ids.P2-AR-0036-SFXNps/w3-823602324
+$ gov init --name w3 --alias z-w3    [session=S-zeta role=orchestrator exit=0 1.0s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up (legacy)", "status": "SUPERSEDED", "feature": "F-0001", "kind": "functional", "superseded_by": "REQ-0002"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "supersedes": ["REQ-0001"], "acceptance_criteria": ["2.5 -> 2"]}
+  [probe wrote record] spec/requirements/REQ-0005.yaml: {"id": "REQ-0005", "type": "requirement", "title": "Totals are computed per currency", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Half-up rounding", "status": "ACTIVE", "chosen_option": "A"}
+  [probe wrote record] spec/decisions/D-0002.yaml: {"id": "D-0002", "type": "decision", "title": "Banker's rounding", "status": "ACTIVE", "chosen_option": "B", "supersedes": ["D-0001"]}
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task create --id TASK-0101 --class implementation --objective "Implement totals TASK-0101" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"decisions\": [\"D-0002\"], \"scenarios\": [\"SCN-0001\"], \"dependencies\": []}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "allowed_paths": [
+  "src/**"
+ ],
+ "class": "implementation",
+ "created": "2026-09-19",
+ "decisions": [
+  "D-0002"
+ ],
+ "dependencies": [],
+ "feature": "F-0001",
+ "forbidden_paths": [
+  "governance/kernel/**"
+ ],
+ "id": "TASK-0101",
+ "minimum_model_tier": "T2",
+ "minimum_reasoning": "medium",
+ "objective": "Implement totals TASK-0101",
+ "production_merge_allowed": true,
+ "provenance": {
+  "created_at": "2026-09-19T13:13:23Z",
+  "producer": "gov task create",
+  "role": "orchestrator",
+  "session": "S-zeta"
+ },
+ "ready_check": {
+  "dag": {
+   "gates": [],
+   "manifest": null,
+   "pending_gates": [],
+   "reasons": [
+    "feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests",
+    "scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)"
+   ],
+   "state": "BLOCKED",
+   "task": "TASK-0101"
+  },
+  "requested_status": "READY",
+  "stored_status": "BLOCKED"
+ },
+ "requirements": [
+  "REQ-0002"
+ ],
+ "scenarios": [
+  "SCN-0001"
+ ],
+ "status": "ACTIVE",
+ "status_note": "READY was requested; the task DAG does not allow it: feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests; scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)",
+ "status_source": {
+  "at": "2026-09-19T13:13:23Z",
+  "operation": "task create",
+  "role": "orchestrator",
+  "session": "S-zeta",
+  "status": "BLOCKED"
+ },
+ "task_status": "BLOCKED",
+ "title": "Implement totals TASK-0101",
+ "type": "task"
+}
+$ gov context compile TASK-0101    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-m1-input-ids-declared-and-consumed: PASS -- declared requirement/decision IDs appear in the compiled deterministic block
+$ gov task create --id TASK-0102 --class implementation --objective "Implement totals TASK-0102" --feature F-0001 --status READY --allowed src/** --fields "{\"required_inputs\": [{\"id\": \"REQ-0005\", \"required_status\": \"ACTIVE\", \"content_hash\": \"0000000000000000000000000000000000000000000000000000000000000000\", \"reason\": \"per-currency totals drive the API\"}], \"requirements\": [\"REQ-0005\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "allowed_paths": [
+  "src/**"
+ ],
+ "class": "implementation",
+ "created": "2026-09-19",
+ "feature": "F-0001",
+ "forbidden_paths": [
+  "governance/kernel/**"
+ ],
+ "id": "TASK-0102",
+ "minimum_model_tier": "T2",
+ "minimum_reasoning": "medium",
+ "objective": "Implement totals TASK-0102",
+ "production_merge_allowed": true,
+ "provenance": {
+  "created_at": "2026-09-19T13:13:23Z",
+  "producer": "gov task create",
+  "role": "orchestrator",
+  "session": "S-zeta"
+ },
+ "ready_check": {
+  "dag": {
+   "gates": [],
+   "manifest": {
+    "blocking": [
+     "REQ-0005"
+    ],
+    "delivery_state": "BLOCKED",
+    "input_violations": [
+     {
+      "declared_in": [
+       "task.requirements",
+       "task.required_inputs"
+      ],
+      "id": "REQ-0005",
+      "problems": [
+       {
+        "blocking": true,
+        "code": "HASH_MISMATCH",
+        "message": "REQ-0005 content hash is da65418d3a5f7efb431cc601d9afcc30f415c601effa5acdba028cd6c3b7425a; the input is pinned to 0000000000000000000000000000000000000000000000000000000000000000 \u2014 the pinned version is no longer the governed content"
+       }
+      ],
+      "reason": "per-currency totals drive the API",
+      "required": true,
+      "resolution": "RESOLVED",
+      "slot": "requirement",
+      "type": "requirement"
+     }
+    ],
+    "missing_inputs": []
+   },
+   "pending_gates": [],
+   "reasons": [
+    "mandatory inputs unsatisfied: REQ-0005 (requirement: HASH_MISMATCH)",
+    "feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests",
+    "scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)"
+   ],
+   "state": "BLOCKED",
+   "task": "TASK-0102"
+  },
+  "requested_status": "READY",
+  "stored_status": "BLOCKED"
+ },
+ "required_inputs": [
+  {
+   "content_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+   "id": "REQ-0005",
+   "reason": "per-currency totals drive the API",
+   "required_status": "ACTIVE"
+  }
+ ],
+ "requirements": [
+  "REQ-0005"
+ ],
+ "scenarios": [
+  "SCN-0001"
+ ],
+ "status": "ACTIVE",
+ "status_note": "READY was requested; the task DAG does not allow it: mandatory inputs unsatisfied: REQ-0005 (requirement: HASH_MISMATCH); feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests; scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)",
+ "status_source": {
+  "at": "2026-09-19T13:13:23Z",
+  "operation": "task create",
+  "role": "orchestrator",
+  "session": "S-zeta",
+  "status": "BLOCKED"
+ },
+ "task_status": "BLOCKED",
+ "title": "Implement totals TASK-0102",
+ "type": "task"
+}
+OBS W3-m2m3m4-manifest-fields-schema: PASS -- task schema accepts (does not reject) required_inputs with status/hash/reason (additionalProperties open)
+  [probe wrote record] spec/requirements/REQ-0005.yaml: {"id": "REQ-0005", "type": "requirement", "title": "Totals are computed per currency (DEPRECATED)", "status": "DEPRECATED", "feature": "F-0001", "kind": "functional"}
+$ gov task dag    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-m2-required-state-enforced: PASS -- TASK-0102 requires REQ-0005 ACTIVE; REQ-0005 is now DEPRECATED; TASK-0102 in runnable set: False; blocked entry: [{'task': 'TASK-0102', 'reasons': ['mandatory inputs unsatisfied: REQ-0005 (requirement: LIFECYCLE_STATE,HASH_MISMATCH)', 'feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests', 'scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)']}]
+OBS W3-m3-hash-pin-enforced: PASS -- TASK-0102 pins REQ-0005 content_hash 000..0 (never matches); runnable: False
+$ gov context compile TASK-0102    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-m4-reason-delivered: PASS -- dependency reason visible in the compiled packet: [{'authority_flag': 'DEPRECATED', 'content': {'feature': 'F-0001', 'id': 'REQ-0005', 'kind': 'functional', 'status': 'DEPRECATED', 'title': 'Totals are computed per currency (DEPRECATED)', 'type': 'requirement'}, 'content_hash': 'f50d9c4f1452012a90b87d3d942f8a27e71215f770ef55a93afdfb6581be3b23', 'declared_in': ['task.requirements', 'task.required_inputs'], 'id': 'REQ-0005', 'kind': 'functional', 'path': 'spec/requirements/REQ-0005.yaml', 'problems': [{'blocking': True, 'code': 'LIFECYCLE_STATE', 'message': 'REQ-0005 is DEPRECATED but the input requires ACTIVE; historical or non-current material cannot replace a current authoritative input'}, {'blocking': True, 'code': 'HASH_MISMATCH', 'message': 'REQ-0005 content hash is f50d9c4f1452012a90b87d3d942f8a27e71215f770ef55a93afdfb6581be3b23; the input is pinned to 0000000000000000000000000000000000000000000000000000000000000000 — the pinned version is no longer the governed content'}], 'reason': 'per-currency totals drive the API', 'required': True, 'state_class': 'AUTHORITATIVE', 'status': 'DEPRECATED', 'title': 'Totals are computed per currency (DEPRECATED)', 'type': 'requirement', 'version': None}]
+$ gov task create --id TASK-0093 --class implementation --objective "Implement totals TASK-0093" --feature F-0001 --status READY --allowed src/** --fields "{\"relations\": [{\"type\": \"GOVERNED_BY\", \"target\": \"REQ-0002\", \"note\": \"rounding rule this task implements\"}], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0093    [session=S-zeta role=orchestrator exit=0 0.1s]
+TASK-0093 (dependency declared only via relations[] with note) governing_requirements: [{"acceptance_criteria": ["2.5 -> 2"], "content": {"acceptance_criteria": ["2.5 -> 2"], "feature": "F-0001", "id": "REQ-0002", "kind": "functional", "status": "ACTIVE", "supersedes": ["REQ-0001"], "title": "Totals use banker's rounding", "type": "requirement"}, "content_hash": "5142ed15c3bc2b178aca7e30e2a28c8dee4a308c8620ec57b507c476baa9abc2", "declared_in": ["feature F-0001.requirements", "task.relations[GOVERNED_BY]"], "id": "REQ-0002", "kind": "functional", "path": "spec/requirements/REQ-0002.yaml", "reason": "inherited from feature F-0001; rounding rule this task implements", "required": true, "state_class": "AUTHORITATIVE", "status": "ACTIVE", "title": "Totals use banker's rounding", "type": "requirement", "version": null}]
+OBS W3-m4-relations-note-dependency-delivered: PASS -- a dependency declared through the schema's relations[{type,target,note}] reaches the packet with its reason
+$ gov task create --id TASK-0094 --class implementation --objective "Implement totals TASK-0094" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"supplementary_context\": [\"RES-9999\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0094    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-m5-supplementary-declared-separately: PASS -- task-declared supplementary context reaches retrieved_intelligence: True; packet blocks: ['budget', 'chars', 'compiled_at', 'delivery_state', 'deterministic_authority', 'deterministic_hash', 'index_version', 'input_hashes', 'input_manifest', 'input_normative_hashes', 'manifest_hash', 'packet_hash', 'packet_id', 'provenance', 'receipt_contract', 'retrieved_intelligence', 'supplementary_state', 'task']
+$ gov task create --id TASK-0201 --class implementation --objective "Implement totals TASK-0201" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-9999\"], \"decisions\": [\"D-9999\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "allowed_paths": [
+  "src/**"
+ ],
+ "class": "implementation",
+ "created": "2026-09-19",
+ "decisions": [
+  "D-9999"
+ ],
+ "feature": "F-0001",
+ "forbidden_paths": [
+  "governance/kernel/**"
+ ],
+ "id": "TASK-0201",
+ "minimum_model_tier": "T2",
+ "minimum_reasoning": "medium",
+ "objective": "Implement totals TASK-0201",
+ "production_merge_allowed": true,
+ "provenance": {
+  "created_at": "2026-09-19T13:13:24Z",
+  "producer": "gov task create",
+  "role": "orchestrator",
+  "session": "S-zeta"
+ },
+ "ready_check": {
+  "dag": {
+   "gates": [],
+   "manifest": {
+    "blocking": [
+     "REQ-9999",
+     "D-9999"
+    ],
+    "delivery_state": "BLOCKED",
+    "input_violations": [],
+    "missing_inputs": [
+     {
+      "declared_in": [
+       "task.requirements"
+      ],
+      "id": "REQ-9999",
+      "problems": [
+       {
+        "blocking": true,
+        "code": "ABSENT",
+        "message": "REQ-9999 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+       }
+      ],
+      "reason": null,
+      "required": true,
+      "resolution": "ABSENT",
+      "slot": "requirement",
+      "type": ""
+     },
+     {
+      "declared_in": [
+       "task.decisions"
+      ],
+      "id": "D-9999",
+      "problems": [
+       {
+        "blocking": true,
+        "code": "ABSENT",
+        "message": "D-9999 is declared as a decision input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+       }
+      ],
+      "reason": null,
+      "required": true,
+      "resolution": "ABSENT",
+      "slot": "decision",
+      "type": ""
+     }
+    ]
+   },
+   "pending_gates": [],
+   "reasons": [
+    "mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT); D-9999 (decision: ABSENT)",
+    "feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests",
+    "scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)"
+   ],
+   "state": "BLOCKED",
+   "task": "TASK-0201"
+  },
+  "requested_status": "READY",
+  "stored_status": "BLOCKED"
+ },
+ "requirements": [
+  "REQ-9999"
+ ],
+ "scenarios": [
+  "SCN-0001"
+ ],
+ "status": "ACTIVE",
+ "status_note": "READY was requested; the task DAG does not allow it: mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT); D-9999 (decision: ABSENT); feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests; scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)",
+ "status_source": {
+  "at": "2026-09-19T13:13:24Z",
+  "operation": "task create",
+  "role": "orchestrator",
+  "session": "S-zeta",
+  "status": "BLOCKED"
+ },
+ "task_status": "BLOCKED",
+ "title": "Implement totals TASK-0201",
+ "type": "task"
+}
+OBS W3-r1-create-READY-with-missing-input: PASS -- task create --status READY with REQ-9999/D-9999 absent -> ok=True task_status=BLOCKED
+$ gov task create --id TASK-0202 --class implementation --objective "Implement totals TASK-0202" --feature F-0001 --status BLOCKED --allowed src/** --fields "{\"requirements\": [\"REQ-9998\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=1 0.1s]
+$ gov task replan    [session=S-zeta role=orchestrator exit=0 0.1s]
+replan changed: []
+OBS W3-r1-replan-READY-with-missing-input: PASS -- replan transitions for TASK-0202 (REQ-9998 absent): []
+$ gov task create --id TASK-0203 --class implementation --objective "Implement totals TASK-0203" --feature F-0001 --status DRAFT --allowed src/** --fields "{\"requirements\": [\"REQ-9997\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task status TASK-0203 READY    [session=S-zeta role=orchestrator exit=1 0.1s]
+  ok=false error={
+ "code": "TASK_NOT_READY",
+ "details": {
+  "gates": [],
+  "manifest": {
+   "blocking": [
+    "REQ-9997"
+   ],
+   "delivery_state": "BLOCKED",
+   "input_violations": [],
+   "missing_inputs": [
+    {
+     "declared_in": [
+      "task.requirements"
+     ],
+     "id": "REQ-9997",
+     "problems": [
+      {
+       "blocking": true,
+       "code": "ABSENT",
+       "message": "REQ-9997 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+      }
+     ],
+     "reason": null,
+     "required": true,
+     "resolution": "ABSENT",
+     "slot": "requirement",
+     "type": ""
+    }
+   ]
+  },
+  "pending_gates": [],
+  "reasons": [
+   "mandatory inputs unsatisfied: REQ-9997 (requirement: ABSENT)",
+   "feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests",
+   "scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)"
+  ],
+  "state": "BLOCKED",
+  "task": "TASK-0203"
+ },
+ "message": "TASK-0203 cannot be set READY: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: REQ-9997 (requirement: ABSENT); feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests; scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap). Resolve the reasons (`gov task dag`); READY is derived, not asserted"
+}
+OBS W3-r1-status-READY-with-missing-input: PASS -- gov task status TASK-0203 READY (REQ-9997 absent) -> ok=False error={'code': 'TASK_NOT_READY', 'message': 'TASK-0203 cannot be set READY: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: REQ-9997 (requirement: ABSENT); feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests; scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap). Resolve the reasons (`gov task dag`); READY is derived, not asserted', 'details': {'task': 'TASK-0203', 'state': 'BLOCKED', 'reasons': ['mandatory inputs unsatisfied: REQ-9997 (requirement: ABSENT)', 'feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests', 'scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)'], 'gates': [], 'pending_gates': [], 'manifest': {'delivery_state': 'BLOCKED', 'missing_inputs': [{'id': 'REQ-9997', 'slot': 'requirement', 'required': True, 'declared_in': ['task.requirements'], 'reason': None, 'resolution': 'ABSENT', 'type': '', 'problems': [{'code': 'ABSENT', 'message': 'REQ-9997 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration', 'blocking': True}]}], 'input_violations': [], 'blocking': ['REQ-9997']}}}
+$ gov task dag    [session=S-zeta role=orchestrator exit=0 0.1s]
+dag runnable: ["TASK-0103", "TASK-0104", "TASK-0105", "TASK-0202"] missing_dependencies: []
+$ gov task claim TASK-0201    [session=S-zeta role=orchestrator exit=1 0.2s]
+  ok=false error={
+ "code": "TASK_NOT_RUNNABLE",
+ "details": {
+  "gates": [],
+  "manifest": {
+   "blocking": [
+    "REQ-9999",
+    "D-9999"
+   ],
+   "delivery_state": "BLOCKED",
+   "input_violations": [],
+   "missing_inputs": [
+    {
+     "declared_in": [
+      "task.requirements"
+     ],
+     "id": "REQ-9999",
+     "problems": [
+      {
+       "blocking": true,
+       "code": "ABSENT",
+       "message": "REQ-9999 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+      }
+     ],
+     "reason": null,
+     "required": true,
+     "resolution": "ABSENT",
+     "slot": "requirement",
+     "type": ""
+    },
+    {
+     "declared_in": [
+      "task.decisions"
+     ],
+     "id": "D-9999",
+     "problems": [
+      {
+       "blocking": true,
+       "code": "ABSENT",
+       "message": "D-9999 is declared as a decision input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+      }
+     ],
+     "reason": null,
+     "required": true,
+     "resolution": "ABSENT",
+     "slot": "decision",
+     "type": ""
+    }
+   ]
+  },
+  "pending_gates": [],
+  "reasons": [
+   "mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT); D-9999 (decision: ABSENT)",
+   "feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests",
+   "scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)"
+  ],
+  "state": "BLOCKED",
+  "task": "TASK-0201"
+ },
+ "message": "TASK-0201 cannot be claimed: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT); D-9999 (decision: ABSENT); feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests; scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap). `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`"
+}
+OBS W3-r1-claim-with-missing-input: PASS -- gov task claim TASK-0201 (REQ-9999, D-9999 absent) -> ok=False
+$ gov task create --id TASK-0204 --class implementation --objective "Implement totals TASK-0204" --feature F-0001 --status BLOCKED --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"dependencies\": [\"TASK-9999\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task dag    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-r1-contrast-missing-task-dependency-blocks: PASS -- TASK-0204 depends on absent TASK-9999: blocked=[{'task': 'TASK-0204', 'reasons': ['dependency TASK-9999 missing', 'mandatory inputs unsatisfied: TASK-9999 (task_dependency: ABSENT)', 'feature F-0001 pre-implementation readiness cells missing: representative_test_data, independent_acceptance_tests', 'scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): SCENARIO_DATA_UNDECLARED: scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)']}]
+$ gov task create --id TASK-0205 --class implementation --objective "Implement totals TASK-0205" --feature F-0001 --status DRAFT --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"dependencies\": [\"TASK-9998\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task status TASK-0205 READY    [session=S-zeta role=orchestrator exit=1 0.1s]
+$ gov task claim TASK-0205    [session=S-zeta role=orchestrator exit=1 0.2s]
+OBS W3-r1-missing-task-dependency-bypass-via-status: PASS -- TASK-0205 depends on absent TASK-9998: task status READY ok=False; claim ok=False (claim checks task_status only)
+$ gov task create --id TASK-0301 --class implementation --objective "Implement totals TASK-0301" --feature F-0001 --status BLOCKED --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task replan    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0301    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-r2-superseded-input-not-silent: PASS -- TASK-0301 declares SUPERSEDED REQ-0001: replan->READY=False; delivered as [('REQ-0001', 'SUPERSEDED', 'SUPERSEDED')]
+$ gov task create --id TASK-0401 --class implementation --objective "Implement totals TASK-0401" --feature F-0001 --status BLOCKED --allowed src/** --fields "{\"decisions\": [\"D-0001\", \"D-0002\"], \"requirements\": [\"REQ-0002\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov gate list    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task replan    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0401    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov gate list    [session=S-zeta role=orchestrator exit=0 0.1s]
+TASK-0401 conflicting_decisions: [{"authority_flag": "UNKNOWN_OR_CONFLICTING", "chosen_option": "A", "content": {"chosen_option": "A", "id": "D-0001", "status": "ACTIVE", "title": "Half-up rounding", "type": "decision"}, "content_hash": "137eae76a86b9658cfbbf4f2bddfca2255a58f370c4239db79daa5cdd43d6ab7", "declared_in": ["task.decisions"], "id": "D-0001", "path": "spec/decisions/D-0001.yaml", "problems": [{"blocking": true, "code": "SUPERSEDED", "message": "D-0001 is superseded by D-0002; a superseded input cannot satisfy a current requirement \u2014 depend on D-0002 (or resolve the supersession via CIT)"}], "reason": null, "required": true, "state_class": "AUTHORITATIVE", "status": "ACTIVE", "superseded_by": "D-0002", "title": "Half-up rounding", "type": "decision", "version": null}]
+OBS W3-r3-conflict-flagged-in-packet: PASS -- superseded-but-ACTIVE D-0001 flagged UNKNOWN_OR_CONFLICTING in the packet
+OBS W3-r3-conflict-triggers-handling: PASS -- TASK-0401 with conflicting mandatory decisions: replan->READY=False; human gates before=0 after=0
+  [probe wrote record] spec/requirements/extra/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals round half down (conflicting copy)", "status": "ACTIVE", "feature": "F-0001"}
+$ gov task create --id TASK-0392 --class implementation --objective "Implement totals TASK-0392" --feature F-0001 --status BLOCKED --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task replan    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0392    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-r3-duplicate-id-conflict-handled: PASS -- two different REQ-0002 records (spec/requirements/ and spec/requirements/extra/): replan->READY=False; packet delivers [('REQ-0002', "Totals use banker's rounding", 'spec/requirements/REQ-0002.yaml')]; entries carrying a conflict/duplicate marker: [{'acceptance_criteria': ['2.5 -> 2'], 'authority_flag': 'AMBIGUOUS_DUPLICATE_ID', 'content': {'acceptance_criteria': ['2.5 -> 2'], 'feature': 'F-0001', 'id': 'REQ-0002', 'kind': 'functional', 'status': 'ACTIVE', 'supersedes': ['REQ-0001'], 'title': "Totals use banker's rounding", 'type': 'requirement'}, 'content_hash': '5142ed15c3bc2b178aca7e30e2a28c8dee4a308c8620ec57b507c476baa9abc2', 'declared_in': ['task.requirements', 'feature F-0001.requirements'], 'duplicate_paths': ['spec/requirements/REQ-0002.yaml', 'spec/requirements/extra/REQ-0002.yaml'], 'id': 'REQ-0002', 'kind': 'functional', 'path': 'spec/requirements/REQ-0002.yaml', 'problems': [{'blocking': True, 'code': 'AMBIGUOUS_ID', 'message': 'REQ-0002 resolves to 2 records (spec/requirements/REQ-0002.yaml, spec/requirements/extra/REQ-0002.yaml); the input is ambiguous until the duplicate is removed or re-identified'}], 'reason': 'inherited from feature F-0001', 'required': True, 'state_class': 'AUTHORITATIVE', 'status': 'ACTIVE', 'title': "Totals use banker's rounding", 'type': 'requirement', 'version': None}]
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=3 0.6s]
+OBS W3-r3-conflicts-detected-by-audit: PASS -- gov audit (G5-class) findings naming the conflicting inputs: ['duplicate record id REQ-0002 at spec/requirements/REQ-0002.yaml, spec/requirements/extra/REQ-0002.yaml', 'D-0001 is superseded by D-0002 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)', 'stale lineage link: TASK-0301 is linked (CONSUMES) to REQ-0001, which is SUPERSEDED and superseded by REQ-0002 (W8 stale lineage link)', 'stale lineage link: TASK-0301 is linked (GOVERNED_BY) to REQ-0001, which is SUPERSEDED and superseded by REQ-0002 (W8 stale lineage link)', 'stale lineage link: TASK-0401 is linked (CONSUMES) to D-0001, which is ACTIVE and superseded by D-0002 (W8 stale lineage link)', 'stale lineage link: TASK-0401 is linked (GOVERNED_BY) to D-0001, which is ACTIVE and superseded by D-0002 (W8 stale lineage link)']
+$ gov doctor    [session=S-zeta role=orchestrator exit=3 0.2s]
+OBS W3-r3-conflicts-detected-by-doctor: PASS -- gov doctor D014: [{'id': 'D014', 'name': 'authority unambiguous (no supersession conflicts / duplicate ids)', 'ok': False, 'severity': 'high', 'message': '1 supersession conflict(s), 1 duplicate id(s)', 'remediation': 'resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids', 'enforcement': {'mode': 'hard-block', 'refuses': [{'at_or_above': 'high', 'operations': ['task.close', 'cit.execute', 'release.build', 'update.apply'], 'scope': 'global'}], 'below_threshold': 'warning'}}]
+$ gov context compile TASK-0101    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0101    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0101    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W3-r4-deterministic-resolution: PASS -- deterministic_hash with full index=355787df84f1 / vectors+FTS wiped=355787df84f1 / rebuilt=355787df84f1
+
+==== SUMMARY ====
+W3-m1-input-ids-declared-and-consumed: PASS
+W3-m2m3m4-manifest-fields-schema: PASS
+W3-m2-required-state-enforced: PASS
+W3-m3-hash-pin-enforced: PASS
+W3-m4-reason-delivered: PASS
+W3-m4-relations-note-dependency-delivered: PASS
+W3-m5-supplementary-declared-separately: PASS
+W3-r1-create-READY-with-missing-input: PASS
+W3-r1-replan-READY-with-missing-input: PASS
+W3-r1-status-READY-with-missing-input: PASS
+W3-r1-claim-with-missing-input: PASS
+W3-r1-contrast-missing-task-dependency-blocks: PASS
+W3-r1-missing-task-dependency-bypass-via-status: PASS
+W3-r2-superseded-input-not-silent: PASS
+W3-r3-conflict-flagged-in-packet: PASS
+W3-r3-conflict-triggers-handling: PASS
+W3-r3-duplicate-id-conflict-handled: PASS
+W3-r3-conflicts-detected-by-audit: PASS
+W3-r3-conflicts-detected-by-doctor: PASS
+W3-r4-deterministic-resolution: PASS
+total=20 pass=20 fail=0
+[exit=0]

@@ -3,6 +3,7 @@ pub mod claims;
 pub mod control;
 pub mod dag;
 pub mod gates;
+pub mod generation;
 pub mod handoffs;
 pub mod intents;
 pub mod readiness;

@@ -1199,10 +1199,29 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         &root,
         "governance/kernel/policies/POLICY_PRECEDENCE.yaml"
     ));
+    // round 3 (P2-AR-0036, BC-P2-24): governed work the OS generates from events inside this window (the held-out
+    // marker queries' retrieval misses, a health failure of the installed older kernel) is OS-written work, like the
+    // audits/reports/decisions excluded above — not something an update wrote. Those task records are excluded by
+    // exact path; every other spec/ file must be untouched.
+    let generated: Vec<String> = std::fs::read_dir(root.join("spec/tasks"))
+        .map(|rd| {
+            rd.filter_map(|e| e.ok())
+                .map(|e| e.file_name().to_string_lossy().to_string())
+                .filter(|n| {
+                    n.ends_with(".yaml")
+                        && yaml(&root, &format!("spec/tasks/{n}"))["generated_by"]
+                            == "gov work generation"
+                })
+                .map(|n| format!("tasks/{n}"))
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut after_excl: Vec<&str> = spec_excl.to_vec();
+    after_excl.extend(generated.iter().map(|s| s.as_str()));
     assert_eq!(
-        tree_hash(&root.join("spec"), spec_excl),
+        tree_hash(&root.join("spec"), &after_excl),
         spec_before,
-        "spec/ untouched by updates (INV-013)"
+        "spec/ untouched by updates (INV-013); generated work excluded: {generated:?}"
     );
     assert_eq!(
         yaml(&root, "spec/decisions/D-0001.yaml")["title"],

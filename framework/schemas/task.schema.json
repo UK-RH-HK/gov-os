@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/task.schema.json",
   "title": "task",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "id": {
@@ -348,7 +348,8 @@
       "type": "string"
     },
     "generated_by": {
-      "type": "string"
+      "type": "string",
+      "description": "The OS operation that generated this work (e.g. `gov work generation`, `readiness-planner`, `health:lineage_orphans`, `cit::propagation (upstream change)`); absent for work an operator created."
     },
     "retest_required": {
       "type": "boolean"
@@ -545,6 +546,91 @@
     },
     "retest_reason": {
       "type": "string"
+    },
+    "generation": {
+      "type": "object",
+      "description": "OS-owned (BC-P2-24; Contract v3:571-583): the event this work was generated from, written by the work generator (`orchestration::generation`) and never by a caller (a caller-supplied value is kept as `generation_requested`). `key` is the occurrence key (source, subject, what occurred): at most one task exists per key and at most one open task per source subject.",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "failed-tests, audit-finding, health-failure, security-finding, memory-health, research-discovery, proposed-decision, human-decision, cit-effect, lesson, missing-tool, missing-skill, retrieval-failure, tool-failure, failure, performance-regression (framework taxonomy WORK_GENERATION.yaml)"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "base_key": {
+          "type": "string"
+        },
+        "occurrence": {
+          "type": "string"
+        },
+        "recurrence": {
+          "type": "integer"
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Governed source records (also in derived_from when they are indexed records)."
+        },
+        "failure": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Failure-memory record whose follow_up.task names this task."
+        },
+        "evidence_at": {
+          "type": "string"
+        },
+        "detected_by": {
+          "type": "string"
+        },
+        "detected_at": {
+          "type": "string"
+        },
+        "contract": {
+          "type": "string"
+        },
+        "detail": {}
+      }
+    },
+    "generation_requested": {
+      "description": "A caller-supplied `generation` block, kept for inspection; it proves nothing (D-0007 rule 2)."
+    },
+    "remedies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Health checks (scheduler catalogue ids) this work remedies. Under the round-3 availability rule a hard-block does not refuse creating or claiming the work that remedies it; the remedy commits only if its close finds the block cleared."
+    },
+    "revalidates": {
+      "type": "string",
+      "description": "The completed task whose work this task revalidates after an upstream change (BC-P2-04); closing this task resolves that task's `revalidation`."
+    },
+    "revalidation_of": {
+      "type": "object",
+      "description": "The completed work being revalidated: task, closing report, cause, changed inputs."
+    },
+    "revalidation": {
+      "type": "object",
+      "description": "OS-owned (BC-P2-04): set on completed work an upstream change made stale (`required`, `cause`, `task`, `at`); `resolved_by` names the revalidation task and report that resolved it."
+    },
+    "revalidated_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Inputs whose change the close re-tested (`cit::propagation::require_current_inputs`); the re-test flag is cleared only with this evidence."
+    },
+    "investigates": {
+      "type": "object",
+      "description": "W7 orphan investigation (verification::lineage): kind, subject, key, path, detected_by, detected_at."
     }
   },
   "required": [
