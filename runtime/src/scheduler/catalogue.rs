@@ -228,7 +228,10 @@ pub struct CheckDef {
 }
 
 /// Classes every check reads implicitly: the implementation, the constitutional policy/schema payload and the lock,
-/// and the project policy overlay (effective policy = kernel + overlay).
+/// the project policy overlay (effective policy = kernel + overlay), and this machine's trust state — whether the
+/// installed kernel is verified decides which payload the effective policy is read from (`PolicySet::load` reads
+/// `kernel_trust::trust(..).policy_root`: the installed kernel, or the embedded baseline), so a provisioning,
+/// installation or revocation re-evaluates what was judged under the previous trust state.
 pub const IMPLICIT_DEPS: &[&str] = &[
     currency::RUNTIME_IDENTITY,
     "kernel_policy",
@@ -236,6 +239,7 @@ pub const IMPLICIT_DEPS: &[&str] = &[
     "kernel_other",
     "framework_lock",
     "project_policy",
+    currency::MACHINE_TRUST,
 ];
 
 const KERNEL: &[&str] = &[

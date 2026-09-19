@@ -622,7 +622,20 @@ pub fn run_suite(p: &Project, opts: &RunOptions) -> Result<SuiteOutcome> {
         Some(s) => s.clone(),
         None => Snapshot::take(p)?,
     };
-    let families = suite_families(p);
+    let mut families = suite_families(p);
+    // a check named explicitly runs even when the effective suite list does not name it: a block recorded under an
+    // earlier effective policy (another kernel became the verified one, an update changed the list) is re-evaluated —
+    // and cleared — only by the check that recorded it (`reevaluate`)
+    if let Selection::Explicit(ids) = &opts.selection {
+        for id in ids {
+            let family = catalogue::get(id)
+                .map(|d| d.surface == Surface::Family)
+                .unwrap_or(false);
+            if family && !families.contains(id) {
+                families.push(id.clone());
+            }
+        }
+    }
     let mut extras = Extras {
         p,
         deep: opts.deep,
