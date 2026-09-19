@@ -14,6 +14,8 @@ fn fresh(tag: &str) -> (PathBuf, Gov) {
     let (root, g) = setup_fixture("greenfield", tag, "S-ws7");
     g.ok(&[
         "init",
+        "--source",
+        signed_source(),
         "--name",
         tag,
         "--alias",

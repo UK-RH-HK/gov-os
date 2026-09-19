@@ -44,7 +44,15 @@ fn edit(root: &Path, rel: &str, f: impl FnOnce(&mut Value)) {
 #[test]
 fn cit_approval_binds_content_impact_and_transaction() {
     let (root, g) = setup_fixture("greenfield", "ws04r2-bind", "S-bind");
-    g.ok(&["init", "--name", "b", "--alias", "b-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "b",
+        "--alias",
+        "b-alias",
+    ]);
     spec(&root, &g);
     let mf = manifest(
         &root,
@@ -120,7 +128,15 @@ fn cit_approval_binds_content_impact_and_transaction() {
 #[test]
 fn materiality_is_derived_not_labelled() {
     let (root, g) = setup_fixture("greenfield", "ws04r2-mat", "S-mat");
-    g.ok(&["init", "--name", "m", "--alias", "m-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "m",
+        "--alias",
+        "m-alias",
+    ]);
     spec(&root, &g);
     write(
         &root,
@@ -219,7 +235,15 @@ fn materiality_is_derived_not_labelled() {
 #[test]
 fn upstream_change_reaches_completed_work() {
     let (root, g) = setup_fixture("greenfield", "ws04r2-prop", "S-prop");
-    g.ok(&["init", "--name", "p", "--alias", "p-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "p",
+        "--alias",
+        "p-alias",
+    ]);
     spec(&root, &g);
     let fields = json!({"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"]}).to_string();
     let done = g.ok(&[
@@ -260,7 +284,18 @@ fn upstream_change_reaches_completed_work() {
     g.ok(&["task", "claim", &done]);
     write(&root, "src/totals.rs", "pub fn t() -> i64 { 398 }\n");
     g.ok(&["rebuild-memory", "--incremental"]);
-    let rep = write_report(&root, "done", "totals", &["src/totals.rs"], "passed");
+    // round-2 integration (P2-AR-0032): WS-5 (BC-P2-20) — the close report is the consumption receipt of the
+    // packet's receipt_contract; with WS-2's close gate (BC-P2-43) a `passed` claim needs recorded product-test
+    // evidence, which this scenario never runs, so the report states `not_applicable_with_reason` (WS-5's convention)
+    let rep = crate::ws05::receipt(
+        &g,
+        &root,
+        &done,
+        "done",
+        "totals",
+        &["src/totals.rs"],
+        "not_applicable_with_reason",
+    );
     let closed = g.ok(&["task", "close", &done, "--report", &rep]);
     g.ok(&["context", "compile", &open]);
     let ck = g.ok(&[
@@ -366,7 +401,15 @@ fn upstream_change_reaches_completed_work() {
 #[test]
 fn checkpoint_and_handoff_continuity() {
     let (root, g) = setup_fixture("greenfield", "ws04r2-cont", "S-cont");
-    g.ok(&["init", "--name", "c", "--alias", "c-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "c",
+        "--alias",
+        "c-alias",
+    ]);
     spec(&root, &g);
     let t1 = g.ok(&[
         "task",
@@ -478,7 +521,15 @@ fn checkpoint_and_handoff_continuity() {
 #[test]
 fn contradictions_are_blocked_and_routed() {
     let (root, g) = setup_fixture("greenfield", "ws04r2-contra", "S-contra");
-    g.ok(&["init", "--name", "k", "--alias", "k-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "k",
+        "--alias",
+        "k-alias",
+    ]);
     spec(&root, &g);
     write_yaml(
         &root,

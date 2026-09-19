@@ -108,7 +108,15 @@ pub fn traceable_inputs(root: &Path, tag: &str) -> Value {
 
 fn fresh(tag: &str) -> (std::path::PathBuf, Gov) {
     let (root, g) = setup_fixture("greenfield", tag, "S-ws5");
-    g.ok(&["init", "--name", tag, "--alias", &format!("a-{tag}")]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        tag,
+        "--alias",
+        &format!("a-{tag}"),
+    ]);
     git_commit_all(&root, "after init");
     (root, g)
 }

@@ -46,7 +46,16 @@ fn findings_of<'a>(r: &'a Value, kind: &str) -> Vec<&'a Value> {
 #[test]
 fn embedder_components_are_identified_bound_and_fail_closed_on_change() {
     let (root, g) = setup_fixture("greenfield", "ws06-components", "S-ws06");
-    g.ok(&["init", "--name", "c", "--alias", "c-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "c",
+        "--alias",
+        "c-alias",
+        "--skip-index",
+    ]);
     write(
         &root,
         "tools/emb/echo_embedder.sh",
@@ -64,6 +73,9 @@ fn embedder_components_are_identified_bound_and_fail_closed_on_change() {
     write(&root, "tools/emb/model.bin", "weights v1\n");
     let desc = json!({"plugin_id": "echo-local", "capability": "embed", "version": "1", "command": ["tools/emb/echo_embedder.sh"], "languages": []});
     write_yaml(&root, "governance/project/plugins/echo-local.yaml", &desc);
+    // round-2 integration (P2-AR-0032): WS-7 (BC-P2-39) — an executable plugin runs only registered, against a gate
+    // raised for exactly it and answered by the owner
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/echo-local.yaml"));
     set_overrides(
         &root,
         json!({"MEMORY_POLICY.embedding.provider": "echo-local", "MEMORY_POLICY.embedding.dimensions": 8}),
@@ -146,6 +158,15 @@ fn embedder_components_are_identified_bound_and_fail_closed_on_change() {
     let mut d2 = desc.clone();
     d2["version"] = json!("2");
     write_yaml(&root, "governance/project/plugins/echo-local.yaml", &d2);
+    // round-2 integration (P2-AR-0032): under WS-7 (BC-P2-39/40) the edited descriptor is not the registered one, so it
+    // never executes at all; the owner approves the revision-2 registration, and what still refuses it is the index's
+    // revision-1 pin (this test's property)
+    assert!(
+        !g.run(&["memory", "query", "integer cents", "--route", "semantic"])
+            .ok(),
+        "an unregistered descriptor revision executed"
+    );
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/echo-local.yaml"));
     git_commit_all(&root, "descriptor revision 2 under a revision-1 pin");
     let q = g.err(&["memory", "query", "integer cents", "--route", "semantic"]);
     assert_eq!(
@@ -170,7 +191,15 @@ fn embedder_components_are_identified_bound_and_fail_closed_on_change() {
 #[test]
 fn a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression() {
     let (root, g) = setup_fixture("greenfield", "ws06-select", "S-ws06");
-    let r = g.ok(&["init", "--name", "s", "--alias", "s-alias"]);
+    let r = g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "s",
+        "--alias",
+        "s-alias",
+    ]);
     assert!(r["heldout_generated"].as_u64().unwrap() >= 5, "{r}");
     assert_eq!(
         g.err(&["memory", "select", "builtin:64"]).error_code(),
@@ -375,7 +404,16 @@ fn a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression() {
 #[test]
 fn graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles() {
     let (root, g) = setup_fixture("greenfield", "ws06-integrity", "S-ws06");
-    g.ok(&["init", "--name", "i", "--alias", "i-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "i",
+        "--alias",
+        "i-alias",
+        "--skip-index",
+    ]);
     let rec = |rel: &str, v: Value| write_yaml(&root, rel, &v);
     // a well-formed chain
     rec(
@@ -514,7 +552,20 @@ fn graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles() {
 #[test]
 fn deleting_everything_classified_derived_keeps_claims_control_and_registration() {
     let (root, g) = setup_fixture("greenfield", "ws06-state", "S-ws06");
-    g.ok(&["init", "--name", "st", "--alias", "st-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "st",
+        "--alias",
+        "st-alias",
+    ]);
+    // round-2 integration (P2-AR-0032): WS-5 (BC-P2-16) — an implementation task is claimable only when the DAG finds
+    // it runnable, which needs its scenarios and acceptance tests declared
+    let inputs = crate::ws05::traceable_inputs(&root, "0600");
+    git_commit_all(&root, "traceable inputs");
+    g.ok(&["rebuild-memory", "--incremental"]);
     let t = g.ok(&[
         "task",
         "create",
@@ -526,13 +577,17 @@ fn deleting_everything_classified_derived_keeps_claims_control_and_registration(
         "READY",
         "--allowed",
         "src/**",
+        "--fields",
+        &inputs.to_string(),
     ]);
     let tid = t["id"].as_str().unwrap().to_string();
     g.ok(&["task", "claim", &tid]);
     write(&root, "tools/rr/rerank.sh", "#!/usr/bin/env bash\ncat >/dev/null; printf '{\"protocol\":\"gov-capability/1\",\"ok\":true,\"outputs\":{\"scores\":[]}}'\n");
     let df = root.parent().unwrap().join("ws06-state-rerank.yaml");
     std::fs::write(&df, "plugin_id: shell-rerank\ncapability: rerank\nversion: \"1\"\ncommand: [\"bash\", \"tools/rr/rerank.sh\"]\nlanguages: []\n").unwrap();
-    let reg = g.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
+    // round-2 integration (P2-AR-0032): WS-7 (BC-P2-11 plugin side) — the registration is approved by the owner's
+    // answer to the gate raised for exactly it
+    let reg = crate::ws07::register_approved(&g, &df);
     assert_eq!(reg["registered"], true, "{reg}");
     git_commit_all(&root, "live state");
     g.ok(&["rebuild-memory"]);

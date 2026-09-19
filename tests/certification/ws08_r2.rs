@@ -65,6 +65,16 @@ fn newer_external(tag: &str) -> PathBuf {
         );
     std::fs::write(&ky, text).unwrap();
     let mig = dir.parent().unwrap().join("migrations");
+    // round-2 integration (P2-AR-0032): the canonical tree now also carries a prepared migration from the current
+    // version to the next, unreleased one (WS-9/11, `M-4.1.5-4.1.6`); a hypothetical 9.9.9 release declares its own
+    // step from the current version, so the copied tree keeps no other step from it (the chain resolver follows the
+    // first step from the installed version)
+    for e in std::fs::read_dir(&mig).unwrap().filter_map(|e| e.ok()) {
+        let n = e.file_name().to_string_lossy().to_string();
+        if n.starts_with(&format!("M-{}-", gov_runtime::VERSION)) {
+            std::fs::remove_file(e.path()).unwrap();
+        }
+    }
     std::fs::write(
         mig.join(format!("M-{}-9.9.9.yaml", gov_runtime::VERSION)),
         format!("id: M-{v}-9.9.9\nfrom_version: {v}\nto_version: 9.9.9\ndescription: hypothetical external release\nbreaking: false\nhuman_gate: none\naffected_indexes: []\noverlay_template_changes: []\noperations:\n  - {{op: note, text: \"hypothetical\"}}\nrollback: gov update --rollback\n", v = gov_runtime::VERSION),
@@ -218,6 +228,8 @@ fn an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingr
     ] {
         planner.ok(&["adopt", s]);
     }
+    // round-2 integration (P2-AR-0032): WS-9/11 (BC-P2-34) — the designated reviewer approves with tests of its own
+    crate::migration::reviewer_authors_tests(&mroot);
     planner
         .with_session("S-rev")
         .with_role("migration-reviewer")

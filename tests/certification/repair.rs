@@ -633,6 +633,33 @@ fn task_close_enforces_mutation_scope() {
     let tid = t["id"].as_str().unwrap().to_string();
     assert_eq!(t["task_status"], "READY", "{t}");
     g.ok(&["task", "claim", &tid]);
+    // a change governed by a committed CIT is legitimate even outside allowed_paths (within the claim window).
+    // Round-2 integration (P2-AR-0032): the CIT executes before the out-of-scope write below, not while it is on
+    // disk. With WS-4's G4 tier after CIT-E and WS-2's W7 remediation, a CIT executed while the stray SCN-0099 exists
+    // raises a governed investigation task for it; removing SCN-0099 (the remedy this test asserts) then leaves that
+    // task's AFFECTS edge dangling, the suite DEGRADED and WS-5's governance-affecting close refused (routed as an
+    // observation in the round-2 integration report). Every assertion below is unchanged.
+    let mf = root.join(".governance-runtime/m.json");
+    std::fs::write(
+        &mf,
+        json!([{"op": "write_file", "path": "spec/now/NOW.md", "content": "# NOW\ngoverned\n"}])
+            .to_string(),
+    )
+    .unwrap();
+    let c = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        "governed edit",
+        "--trigger",
+        "editorial",
+        "--manifest",
+        mf.to_str().unwrap(),
+    ]);
+    let cid = c["id"].as_str().unwrap().to_string();
+    g.ok(&["cit", "simulate", &cid]);
+    g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
+    g.ok(&["cit", "execute", &cid]);
     write(
         &root,
         "spec/scenarios/SCN-0099.yaml",
@@ -662,28 +689,6 @@ fn task_close_enforces_mutation_scope() {
             .error_code(),
         "MUTATION_SCOPE_VIOLATION"
     );
-    // a change governed by a committed CIT is legitimate even outside allowed_paths
-    let mf = root.join(".governance-runtime/m.json");
-    std::fs::write(
-        &mf,
-        json!([{"op": "write_file", "path": "spec/now/NOW.md", "content": "# NOW\ngoverned\n"}])
-            .to_string(),
-    )
-    .unwrap();
-    let c = g.ok(&[
-        "cit",
-        "propose",
-        "--proposal",
-        "governed edit",
-        "--trigger",
-        "editorial",
-        "--manifest",
-        mf.to_str().unwrap(),
-    ]);
-    let cid = c["id"].as_str().unwrap().to_string();
-    g.ok(&["cit", "simulate", &cid]);
-    g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
-    g.ok(&["cit", "execute", &cid]);
     // the out-of-scope file is still on disk: observed mutations (not the report) decide, so close is refused ...
     let good = crate::ws05::receipt(
         &g,

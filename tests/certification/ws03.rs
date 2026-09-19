@@ -5,7 +5,7 @@
 //! produced here with a **published test seed** (TEST MATERIAL ONLY, like `srr_material`).
 #![allow(dead_code)]
 use crate::common::*;
-use crate::srr_material::{envelope, far_future, key, key_entry, root_doc, Publisher, TestKey};
+use crate::srr_material::{envelope, far_future, key, key_entry, TestKey};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
@@ -51,7 +51,7 @@ pub fn human_channel(g: &Gov) {
     assert_eq!(
         posture, "UNPROVISIONED",
         "this machine holds a trust root without a `human-gate` delegation to the test owner: provision a root that \
-         delegates it (ws08 `provision_with_human_gate`, ws03 `throwaway_root`) — {}",
+         delegates it (the harness's `common::provision` / `setup_fixture`, or `ws03::throwaway_root`) — {}",
         st.envelope
     );
     let f = throwaway_root(g);
@@ -67,38 +67,19 @@ pub fn human_channel(g: &Gov) {
 /// A throw-away Signed Release Root for a dev/test machine (TEST MATERIAL ONLY: the `srr_material` Publisher's
 /// published-seed keys at 2-of-3, plus the test owner's `human-gate` key). Written outside the project, as
 /// administrator-domain material.
-pub fn throwaway_root(g: &Gov) -> PathBuf {
-    let p = Publisher::new();
-    let mut doc = root_doc(
-        1,
-        &far_future(),
-        &[&p.root_a, &p.root_b, &p.root_c],
-        2,
-        &[&p.release],
-        &p.snapshot,
-        &p.timestamp,
-        Some(&p.recovery),
-    );
-    let o = owner();
-    let (kid, entry) = key_entry(&o);
-    doc["keys"][kid.as_str()] = entry;
-    doc["roles"]["human-gate"] = json!({"keyids": [o.keyid.clone()], "threshold": 1});
-    scratch_file(
-        g,
-        "throwaway-root-1.json",
-        &envelope(&doc, &[&p.root_a, &p.root_b]),
-    )
+///
+/// Round-2 integration (P2-AR-0032, WS-3 IP-R2-4): this is the certification harness's single suite root
+/// (`common::suite_root_file`, WS-8), which carries exactly this key material and `human-gate` delegation, so every
+/// scenario machine — harness-provisioned or provisioned here — trusts one root.
+pub fn throwaway_root(_g: &Gov) -> PathBuf {
+    crate::common::suite_root_file()
 }
 
 /// Provision this simulated machine with the throw-away root ([`throwaway_root`]) before anything is installed —
-/// the documented first-run path "provision, then install" (OWNER-DECISION-P2-0002 req. 3).
+/// the documented first-run path "provision, then install" (OWNER-DECISION-P2-0002 req. 3). Idempotent: a machine the
+/// harness already provisioned with the suite root stays as it is (`common::provision`).
 pub fn provision(g: &Gov) {
-    g.ok(&[
-        "trust",
-        "provision",
-        "--anchor",
-        throwaway_root(g).to_str().unwrap(),
-    ]);
+    crate::common::provision(g);
 }
 
 /// A signed release of the kernel source `src` at `<dir>/kernel`, published with the throw-away root's release keys
@@ -107,34 +88,13 @@ pub fn provision(g: &Gov) {
 pub fn signed_release(src: &Path, dir: &Path, sequence: u64) -> PathBuf {
     std::fs::create_dir_all(dir).unwrap();
     gov_runtime::kernel::stage_payload(src, &dir.join("kernel")).unwrap();
-    Publisher::new().publish(dir, sequence, sequence, "stable", &far_future(), "", 0);
-    dir.join("kernel")
+    crate::common::sign_release(dir, sequence)
 }
 
 /// The owner's break-glass authorisation (the throw-away root's `recovery` key) to restore `release_kernel` below
 /// floor, placed in this machine's break-glass inbox (OWNER-DECISION-0006: below-floor restoration needs it).
 pub fn break_glass_for(g: &Gov, release_kernel: &Path, nonce: &str) {
-    let inbox = PathBuf::from(g.ok(&["trust", "break-glass"])["inbox"].as_str().unwrap());
-    let mid = g.ok(&["trust", "status"])["machine_id"]
-        .as_str()
-        .unwrap()
-        .to_string();
-    let (_, payload_hash, kmh, ver) = crate::srr_material::measure(release_kernel);
-    let tok = crate::srr_material::break_glass_doc(
-        &mid,
-        nonce,
-        "restore the previous release (certification)",
-        &far_future(),
-        &ver,
-        &payload_hash,
-        &kmh,
-    );
-    std::fs::create_dir_all(&inbox).unwrap();
-    std::fs::write(
-        inbox.join(format!("{nonce}.json")),
-        envelope(&tok, &[&Publisher::new().recovery]),
-    )
-    .unwrap();
+    crate::common::break_glass(g, release_kernel, nonce);
 }
 
 /// On a machine provisioned after the project was installed, the installed kernel has never been verified here
@@ -164,7 +124,7 @@ pub fn reanchor_installed_kernel(g: &Gov) {
         .unwrap()
         .join(format!("reanchor-{}", gov_runtime::util::short_uuid()));
     gov_runtime::kernel::stage_payload(&src, &rel.join("kernel")).unwrap();
-    Publisher::new().publish(&rel, 1, 1, "stable", &far_future(), "", 0);
+    crate::common::sign_release(&rel, 1);
     g.with_role("orchestrator").ok(&[
         "kernel",
         "reinstall",
@@ -1459,7 +1419,8 @@ fn cit_approval_consumes_only_honoured_gate_answers() {
 /// `human-gate`, the same owner's signed answer is honoured and re-verifies against that root.
 #[test]
 fn the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers() {
-    let (root, g) = fresh("ws3-adj1");
+    // a scenario about the unprovisioned posture itself: the harness's unprovisioned fixture (WS-8 convention)
+    let (root, g) = fresh_unprovisioned("ws3-adj1");
     let eff = g.ok(&["policy", "effective", "HUMAN_GATE_POLICY"]);
     assert_eq!(
         eff["kernel"]["human_channel"]["standalone_anchor_when_unprovisioned"], false,
@@ -1693,7 +1654,13 @@ fn round_two_call_sites_use_the_declared_role_and_typed_refusals() {
     let first: Value = serde_json::from_str(cat.lines().next().unwrap()).unwrap();
     assert_eq!(first["producer"]["session"], "S-planner-r2", "{first}");
     assert_eq!(first["producer"]["role"], "orchestrator", "{first}");
-    assert_eq!(first["producer"]["session_source"], "declared", "{first}");
+    // round-2 integration (P2-AR-0032): WS-9/11 (P2-AR-0030) resolves every stage's actor against the process
+    // declaration (`identity::resolve_actor`) and records where the session and role were declared; here both are the
+    // invocation's flags, i.e. a declared session and role, never the A0 planner fallback
+    assert_eq!(
+        first["producer"]["session_source"], "session: flag; role: flag",
+        "{first}"
+    );
     let plan = yaml(&root, "spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml");
     assert_eq!(plan["producer"]["session"], "S-planner-r2", "{plan}");
     assert_eq!(plan["producer"]["role"], "orchestrator");
