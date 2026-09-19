@@ -1,0 +1,30 @@
+98a99,115
+> # DERIVED COPY, second generation (P2-AR-0030, round 2): P2-AR-0022's owner-channel copy of P2-AR-0021's probe, with ONE
+> # further change — every approval is preceded by `reviewer_test(...)`, because after BC-P2-34 (round 2) an A5 approval
+> # requires at least one test the independent reviewer authored (the planner's scaffold is regression evidence). The
+> # reviewer's test asserts that a product file the plan keeps in place is still present; no probe assertion changed.
+> def reviewer_test(root):
+>     import yaml as _y
+>     tf_ = os.path.join(root, EV, "06-migration-tests.yaml")
+>     t_ = _y.safe_load(open(tf_))
+>     if any(str(x_.get("id", "")).startswith("RT-") for x_ in t_["tests"]):
+>         return
+>     keep = [e for e in cat(root) if e.get("action") == "KEEP_IN_PLACE" and not e.get("requires_human_gate") and e.get("sensitivity") != "secret"]
+>     keep.sort(key=lambda e: (e.get("current_class") not in ("PRODUCT_SOURCE", "PRODUCT_TEST"), e["current_path"]))
+>     if keep:
+>         t_["tests"].append({"id": "RT-001", "kind": "path_present", "path": keep[0]["current_path"], "description": "reviewer: a file the plan keeps in place survives the migration"})
+>         open(tf_, "w").write(_y.safe_dump(t_))
+> 
+> 
+103c120
+<     rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True)
+---
+>     (reviewer_test(rv.root), rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True))[1]
+214c231
+< r1 = rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True)
+---
+> r1 = (reviewer_test(rv.root), rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True))[1]
+218c235
+< rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True)
+---
+> (reviewer_test(rv.root), rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True))[1]

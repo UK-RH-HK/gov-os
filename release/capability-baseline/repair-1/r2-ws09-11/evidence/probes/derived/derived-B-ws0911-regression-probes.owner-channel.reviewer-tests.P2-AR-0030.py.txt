@@ -1,0 +1,370 @@
+#!/usr/bin/env python3
+"""P2-AR-0021 (repair-1 WS-9/11) builder regression probes — REGRESSION EVIDENCE ONLY (Contract v3 O3), not acceptance.
+
+Scenarios written by the builder beyond the audit-of-record probes, to show the repairs hold generally rather than for
+the probes' fixtures. Each prints `X <id> PASS|FAIL <statement> -- <detail>`; run against a candidate binary and against
+the base binary (negative control: the lines must FAIL there).
+
+  S1  BC-P2-33 dependency proof over code, configuration and docs; gated retirement never re-points; A7 detects a
+      reference re-pointed into the archive by hand
+  S2  BC-P2-33 a dependant that appears after the gate was answered blocks the retirement
+  S3  BC-P2-33 Governance OS state is never legacy (re-run, root projection, evidence tree, an uninstalled OS layout);
+      a planted adapter manifest does not exempt a legacy file
+  S4  BC-P2-33 plan/test agreement; a secret-bearing legacy store is planned, tested, retired and kept secret consistently
+  S5  BC-P2-33 extraction is not cue-word gated (research, skill, evidence, uncued facts; secrets withheld)
+  S6  BC-P2-52 citations (markdown, reference-style, HTML, reStructuredText, relative) at both ends of the path map
+  S7  BC-P2-21 ids survive an inserted artefact; catalogue/plan versions and supersession; ledger ids resolve
+  S8  BC-P2-50 content gate: one changed line, never-export data, integer-zero vector dump, raw code in a fenced block
+      with a trivial fixture, submit-time tamper; a synthetic control passes
+
+Run from the worktree root:  GOV_BIN=<gov> SYNTH_SCRATCH=<scratch> python3 <this file>
+"""
+import json
+import os
+import sqlite3
+import subprocess
+import sys
+import uuid
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+WT = os.path.abspath(os.path.join(HERE, "..", "..", "..", "..", ".."))
+sys.path.insert(0, os.path.join(WT, "release/capability-baseline/audit-0/synthesis/evidence/lib"))
+import synth  # noqa: E402
+from synth import Gov, commit, git, log, note, summary, x  # noqa: E402
+
+EV = "spec/audits/GOVERNANCE-ADOPTION"
+
+
+def repo(tag, files):
+    os.makedirs(synth.SCRATCH, exist_ok=True)
+    base = os.path.join(synth.SCRATCH, f"{tag}-{uuid.uuid4().hex[:6]}")
+    root, home = os.path.join(base, "proj"), os.path.join(base, "home")
+    os.makedirs(root)
+    os.makedirs(home)
+    for rel, text in files.items():
+        p = os.path.join(root, rel)
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        open(p, "w").write(text)
+    git(root, "init", "-q")
+    git(root, "config", "user.email", "b@example.invalid")
+    git(root, "config", "user.name", "b")
+    commit(root, "baseline")
+    log(f"# repo {tag}: {root}")
+    return root, Gov(root, home)
+
+
+def cat(root):
+    p = os.path.join(root, EV, "04-TARGET-PATH-MAP.jsonl")
+    return [json.loads(l) for l in open(p)] if os.path.exists(p) else []
+
+
+def entry(root, path):
+    return next((e for e in cat(root) if e["current_path"] == path), {})
+
+
+def rd(root, rel):
+    p = os.path.join(root, rel)
+    return open(p).read() if os.path.exists(p) else None
+
+
+def roles(g):
+    return (g.as_(role="orchestrator", session="S-plan"), g.as_(role="migration-reviewer", session="S-review"),
+            g.as_(role="migration-executor", session="S-exec"), g.as_(role="migration-verifier", session="S-verify"))
+
+
+# DERIVED COPY (P2-AR-0022, integration): the ONLY change to P2-AR-0021's probe is this function. After WS-3 (BC-P2-10)
+# a human answer is an owner-signed document relayed by a declared L3 role, never `--role human --by owner`; the owner
+# is WS-3's test-material reference signer (repair-1/ws03/evidence/hc_owner.py, published seed), anchored on this
+# unprovisioned probe machine by a standalone anchor placed outside the repository.
+HC_OWNER = os.path.join(WT, "release", "capability-baseline", "repair-1", "ws03", "evidence", "hc_owner.py")
+
+
+def answer_all(g, root, option):
+    ex = g.as_(role="migration-executor", session="S-exec")
+    st = ex.run("trust", "human-channel", quiet=True)
+    if not (st.get("ok") and (st.get("result") or {}).get("available")):
+        af = os.path.join(os.path.dirname(root), f"anchor-{uuid.uuid4().hex[:6]}.json")
+        subprocess.run([sys.executable, HC_OWNER, "anchor", af, "7"], check=True, capture_output=True)
+        ex.run("trust", "human-channel", "--provision", af, quiet=True)
+    for e in cat(root):
+        if e.get("requires_human_gate") and e.get("human_gate"):
+            r = ex.run("gate", "present", e["human_gate"], quiet=True)
+            gg = (r.get("result") or {}).get("gate") or {}
+            f = os.path.join(os.path.dirname(root), f"answer-{e['human_gate']}-{uuid.uuid4().hex[:6]}.json")
+            subprocess.run([sys.executable, HC_OWNER, "answer", f, e["human_gate"], gg.get("gate_instance", ""),
+                            gg.get("package_sha256", ""), option], check=True, capture_output=True)
+            ex.run("decide", e["human_gate"], "--option", option, "--answer-file", f, quiet=True)
+
+
+# DERIVED COPY, second generation (P2-AR-0030, round 2): P2-AR-0022's owner-channel copy of P2-AR-0021's probe, with ONE
+# further change — every approval is preceded by `reviewer_test(...)`, because after BC-P2-34 (round 2) an A5 approval
+# requires at least one test the independent reviewer authored (the planner's scaffold is regression evidence). The
+# reviewer's test asserts that a product file the plan keeps in place is still present; no probe assertion changed.
+def reviewer_test(root):
+    import yaml as _y
+    tf_ = os.path.join(root, EV, "06-migration-tests.yaml")
+    t_ = _y.safe_load(open(tf_))
+    if any(str(x_.get("id", "")).startswith("RT-") for x_ in t_["tests"]):
+        return
+    keep = [e for e in cat(root) if e.get("action") == "KEEP_IN_PLACE" and not e.get("requires_human_gate") and e.get("sensitivity") != "secret"]
+    keep.sort(key=lambda e: (e.get("current_class") not in ("PRODUCT_SOURCE", "PRODUCT_TEST"), e["current_path"]))
+    if keep:
+        t_["tests"].append({"id": "RT-001", "kind": "path_present", "path": keep[0]["current_path"], "description": "reviewer: a file the plan keeps in place survives the migration"})
+        open(tf_, "w").write(_y.safe_dump(t_))
+
+
+def to_a6(g, name="svc"):
+    pl, rv, ex, _ = roles(g)
+    for s in ["baseline", "inventory", "classify", "map", "plan", "test-design"]:
+        pl.run("adopt", s, quiet=True)
+    (reviewer_test(rv.root), rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True))[1]
+    return ex.run("adopt", "migrate", "--name", name, "--alias", f"fx-{name}", quiet=True)
+
+
+# ------------------------------------------------------------------------------------------------------------ S1
+S1_FILES = {
+    "README.md": "# svc\nAgents follow .cursorrules for style.\n",
+    "src/app/__init__.py": "",
+    "src/app/main.py": "from app.rules import load\n\n\ndef main():\n    return load()\n",
+    "src/app/rules.py": "def load():\n    return open('.cursorrules').read()\n",
+    "config/app.yaml": "style_rules: .cursorrules\n",
+    ".cursorrules": "Use tabs. This file is the source of truth.\n",
+    "CLAUDE.md": "Old assistant notes nobody links to.\n",
+}
+R, g = repo("s1", S1_FILES)
+m = to_a6(g, "s1")
+e = entry(R, ".cursorrules")
+roles_found = sorted({r.get("role") for r in (e.get("dependency_proof") or {}).get("active_references", [])})
+x("S1-proof-covers-code-config-docs", roles_found == ["code", "config", "docs"],
+  "the dependency proof of a retirement covers code, configuration and docs", {"roles": roles_found, "gate_reasons": e.get("gate_reasons")})
+x("S1-unreferenced-legacy-retired", not os.path.exists(os.path.join(R, "CLAUDE.md")) and os.path.exists(os.path.join(R, "archive/governance/legacy-rules/CLAUDE.md")),
+  "(control) an unreferenced legacy rule file is retired in its batch", {"migrate_ok": m.get("ok")})
+x("S1-referenced-legacy-not-retired-without-gate", os.path.exists(os.path.join(R, ".cursorrules")),
+  "a legacy file with active references is not retired without an answered gate", {})
+before = {p: S1_FILES[p] for p in ["src/app/rules.py", "config/app.yaml", "README.md"]}  # as authored, before adoption
+answer_all(g, R, "A")
+b7 = g.as_(role="migration-executor", session="S-exec").run("adopt", "migrate", "--batch", "7", quiet=True)
+after = {p: rd(R, p) for p in before}
+x("S1-gate-A-retires-without-repointing", not os.path.exists(os.path.join(R, ".cursorrules")) and before == after,
+  "an answered gate retires it and leaves every active reference exactly as it was (never re-pointed at the archive)",
+  {"batch7_ok": b7.get("ok"), "unchanged": before == after})
+v = g.as_(role="migration-verifier", session="S-verify").run("adopt", "verify-migration", quiet=True).get("result") or {}
+acc = json.dumps(v.get("retired_with_accepted_active_references"))
+x("S1-A7-reports-accepted-dangling", v.get("verdict") == "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD" and "src/app/rules.py" in acc and "config/app.yaml" in acc,
+  "A7 accepts and reports every dependant the gate accepted", {"verdict": v.get("verdict")})
+open(os.path.join(R, "src/app/rules.py"), "w").write("def load():\n    return open('archive/governance/legacy-rules/.cursorrules').read()\n")
+v2 = g.as_(role="migration-verifier", session="S-verify2").run("adopt", "verify-migration", quiet=True).get("result") or {}
+x("S1-A7-detects-repoint-into-archive", v2.get("verdict") == "MIGRATION_REJECTED_NEEDS_REPAIR" and "archive/governance/legacy-rules/.cursorrules" in json.dumps(v2.get("catalogue_problems")),
+  "live code re-pointed at archived legacy material (as the pre-repair executor did) is a verification failure", {"problems": v2.get("catalogue_problems")})
+
+# ------------------------------------------------------------------------------------------------------------ S2
+R, g = repo("s2", {
+    "src/app/__init__.py": "",
+    "src/app/main.py": "from app.rules import load\n\n\ndef main():\n    return load()\n",
+    "src/app/rules.py": "def load():\n    return open('.cursorrules').read()\n",
+    ".cursorrules": "Use tabs.\n",
+})
+to_a6(g, "s2")
+open(os.path.join(R, "src/app/extra.py"), "w").write("RULES = '.cursorrules'\n")
+answer_all(g, R, "A")
+b7 = g.as_(role="migration-executor", session="S-exec").run("adopt", "migrate", "--batch", "7", quiet=True)
+led = [json.loads(l) for l in open(os.path.join(R, EV, "migration-ledger.jsonl"))]
+blocked = [l for l in led if l.get("status") == "blocked" and l.get("path") == ".cursorrules"]
+x("S2-new-dependant-blocks-retirement", os.path.exists(os.path.join(R, ".cursorrules")) and bool(blocked),
+  "a dependant that appeared after the gate was answered blocks the retirement (the gate did not see it)",
+  {"blocked_rows": len(blocked), "dependants": [r.get("from") for r in (blocked[-1]["dependency_proof"]["active_references"] if blocked else [])]})
+
+# ------------------------------------------------------------------------------------------------------------ S3
+R, g = repo("s3", {"README.md": "# svc\n", ".cursorrules": "legacy rules\n", "src/app/__init__.py": "", "src/app/main.py": "print(1)\n"})
+to_a6(g, "s3")
+answer_all(g, R, "A")
+g.as_(role="migration-executor", session="S-exec").run("adopt", "migrate", "--batch", "7", quiet=True)
+commit(R, "after pass 1")
+pl = g.as_(role="orchestrator", session="S-plan2")
+for s in ["baseline", "inventory", "classify", "map"]:
+    pl.run("adopt", s, quiet=True)
+os_paths = {e["current_path"]: e for e in cat(R) if e["current_path"].startswith("governance/") or e["current_path"] in ("framework.json",) or e["current_path"].startswith(EV)}
+bad = {p: (e["action"], e["authority"]) for p, e in os_paths.items() if e["action"] != "KEEP_IN_PLACE" or e["authority"] == "LEGACY"}
+x("S3-os-state-never-legacy-on-rerun", os_paths and not bad and "governance/generated/adapters/ide/RULES.md" in os_paths and "framework.json" in os_paths,
+  "on a re-run every Governance OS path (kernel, overlay, generated adapters, root projection, adoption evidence) is kept as current",
+  {"os_paths": len(os_paths), "bad": bad})
+R2, g2 = repo("s3b", {"governance/generated/adapters/ide/RULES.md": "# Governance OS generated IDE rules (interrupted install)\n", "README.md": "# svc\n"})
+pl2 = g2.as_(role="orchestrator", session="S-plan")
+for s in ["baseline", "inventory", "classify", "map"]:
+    pl2.run("adopt", s, quiet=True)
+e2 = entry(R2, "governance/generated/adapters/ide/RULES.md")
+x("S3-uninstalled-os-layout-not-archived", e2.get("action") == "KEEP_IN_PLACE" and e2.get("authority") != "LEGACY",
+  "an interrupted install's OS layout is never planned for the legacy archive", {k: e2.get(k) for k in ("current_class", "authority", "action", "os_owned")})
+R3, g3 = repo("s3c", {"README.md": "# svc\n", "src/lib.rs": "pub fn f() {}\n", "Cargo.toml": "[package]\nname = \"svc\"\nversion = \"0.1.0\"\nedition = \"2021\"\n"})
+g3.run("init", "--name", "s3c", quiet=True)
+open(os.path.join(R3, ".cursorrules"), "w").write("legacy rules\n")
+mp = os.path.join(R3, "governance/generated/adapter-manifest.json")
+man = json.load(open(mp))
+man["adapters"]["planted"] = {"version": "1", "output": ".cursorrules", "hash": ""}
+json.dump(man, open(mp, "w"))
+commit(R3, "planted manifest")
+pl3 = g3.as_(role="orchestrator", session="S-plan")
+for s in ["baseline", "inventory", "classify"]:
+    pl3.run("adopt", s, quiet=True)
+cl = {json.loads(l)["path"]: json.loads(l) for l in open(os.path.join(R3, EV, "02-CLASSIFICATION.jsonl"))}
+x("S3-planted-manifest-does-not-exempt", cl.get(".cursorrules", {}).get("authority") == "LEGACY",
+  "(control guarding the new OS-ownership exemption; holds on the base too) an adapter manifest entry the installed kernel does not declare cannot exempt a legacy file", {k: cl.get(".cursorrules", {}).get(k) for k in ("class", "authority", "os_owned")})
+
+# ------------------------------------------------------------------------------------------------------------ S4
+R, g = synth.new_project("s4", fixture="brownfield", init=False)  # memory/chat_history.sql left as a secret-bearing text dump
+pl, rv, ex, vf = roles(g)
+for s in ["baseline", "inventory", "classify", "map", "plan"]:
+    pl.run("adopt", s, quiet=True)
+td = pl.run("adopt", "test-design", quiet=True).get("result") or {}
+st = entry(R, "memory/chat_history.sql")
+tests = synth.yload(R, f"{EV}/06-migration-tests.yaml")["tests"]
+contradict = [t for t in tests if t.get("path") == "memory/chat_history.sql"]
+x("S4-secret-legacy-store-plan-and-tests-agree", st.get("action") == "EXTRACT" and "secret_material_move" in (st.get("gate_reasons") or []) and not contradict and td.get("plan_test_disagreements") == [],
+  "a secret-bearing legacy chat store is planned as a gated A8 extraction and no scaffolded test contradicts it",
+  {"entry": {k: st.get(k) for k in ("action", "batch", "gate_reasons", "sensitivity")}, "tests_on_path": contradict})
+tf = os.path.join(R, EV, "06-migration-tests.yaml")
+orig = open(tf).read()
+import yaml  # noqa: E402
+y = yaml.safe_load(orig)
+y["tests"].append({"id": "MT-X", "kind": "legacy_not_active", "path": "memory/chat_history.sql", "pattern": "memory/chat_history.sql", "after_batch": 1})
+open(tf, "w").write(yaml.safe_dump(y))
+r1 = (reviewer_test(rv.root), rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True))[1]
+x("S4-contradicting-test-blocks-approval", (r1.get("error") or {}).get("code") == "PLAN_TEST_DISAGREEMENT",
+  "a reviewer test contradicting the plan's disposition cannot be approved against it", {"error": (r1.get("error") or {}).get("code")})
+open(tf, "w").write(orig)
+(reviewer_test(rv.root), rv.run("adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED", quiet=True))[1]
+m = ex.run("adopt", "migrate", "--name", "s4", "--alias", "fx-s4", quiet=True)
+answer_all(g, R, "A")
+ex.run("adopt", "migrate", "--batch", "7", quiet=True)
+v = vf.run("adopt", "verify-migration", quiet=True).get("result") or {}
+a8 = ex.run("adopt", "extract-legacy", quiet=True).get("result") or {}
+contract = rd(R, "governance/project/REPOSITORY_CONTRACT.yaml") or ""
+recs = " ".join(rd(R, p) or "" for p in a8.get("created_records", []))
+x("S4-secret-store-retired-and-kept-secret", v.get("verdict") == "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD" and os.path.exists(os.path.join(R, "archive/governance/memory-stores/chat_history.sql"))
+  and "archive/governance/memory-stores/chat_history.sql" in contract and "sk_live" not in recs,
+  "the store is retired under its gate, its archive location is classified secret, and no secret reaches an extracted record",
+  {"migrate_ok": m.get("ok"), "A7": v.get("verdict"), "stores": [(s.get("path"), s.get("disposition"), s.get("skipped_secret_strings")) for s in a8.get("stores", [])]})
+
+# ------------------------------------------------------------------------------------------------------------ S5
+chat = "\n".join(json.dumps({"role": "assistant", "content": c}) for c in [
+    "Benchmarked the pricing API last quarter: throughput 900 requests per second, p99 at 40 ms under load.",
+    "Runbook for rotating the gateway key: 1) create the new key 2) deploy it to staging 3) revoke the old key.",
+    "The audit AUD-7 showed backups restore in twelve minutes from the eu-west snapshot.",
+    "Customer invoices are archived in bucket inv-prod-eu for seven years because finance asked for it.",
+    "api key for staging: AKIAIOSFODNN7EXAMPLE",
+]) + "\n"
+R, g = repo("s5", {".chat/history.jsonl": chat, "src/app/__init__.py": "", "src/app/main.py": "print(1)\n", "README.md": "# svc\n"})
+to_a6(g, "s5")
+answer_all(g, R, "A")
+g.as_(role="migration-executor", session="S-exec").run("adopt", "migrate", "--batch", "7", quiet=True)
+g.as_(role="migration-verifier", session="S-verify").run("adopt", "verify-migration", quiet=True)
+a8 = g.as_(role="migration-executor", session="S-exec").run("adopt", "extract-legacy", quiet=True).get("result") or {}
+created = a8.get("created_records", [])
+texts = {p: rd(R, p) or "" for p in created}
+has = lambda needle, d=None: [p for p, t in texts.items() if needle in t and (d is None or p.startswith(d))]  # noqa: E731
+x("S5-research-extracted", bool(has("900 requests per second", "spec/research/")), "a measurement without the probe's wording becomes a research record", has("900 requests"))
+x("S5-skill-extracted", bool(has("revoke the old key", "spec/lessons/")), "a numbered procedure becomes a skill candidate", has("revoke the old key"))
+x("S5-evidence-extracted", bool(has("restore in twelve minutes", "spec/reports/")), "an evidence claim becomes a report record", has("twelve minutes"))
+x("S5-uncued-fact-registered", bool(has("inv-prod-eu", "spec/reports/RPT-LK")), "an uncued unique fact is listed for review", has("inv-prod-eu"))
+x("S5-secret-withheld", not has("AKIAIOSFODNN7EXAMPLE") and any((s.get("skipped_secret_strings") or 0) >= 1 for s in a8.get("stores", [])),
+  "a secret unit is withheld and counted", [(s.get("path"), s.get("skipped_secret_strings")) for s in a8.get("stores", [])])
+
+# ------------------------------------------------------------------------------------------------------------ S6
+R, g = repo("s6", {
+    "README.md": "# svc\n\nRead the [guide][g] and the <a href='docs/api.md'>API</a>.\n\n[g]: docs/guide.md\n",
+    "docs/guide.md": "# Guide\nBack to the [readme](../README.md).\n",
+    "docs/api.md": "# API\n",
+    "docs/index.rst": "See `the guide <guide.md>`_ for details.\n",
+    "src/app/__init__.py": "", "src/app/main.py": "print(1)\n",
+})
+pl = g.as_(role="orchestrator", session="S-plan")
+for s in ["baseline", "inventory", "classify", "map"]:
+    pl.run("adopt", s, quiet=True)
+rm_, gd, api = entry(R, "README.md"), entry(R, "docs/guide.md"), entry(R, "docs/api.md")
+x("S6-citations-both-ends", "docs/guide.md" in rm_.get("citations", []) and "docs/api.md" in rm_.get("citations", []) and "README.md" in gd.get("references", [])
+  and "README.md" in gd.get("cited_by", []) and "docs/index.rst" in gd.get("cited_by", []) and "README.md" in api.get("references", []),
+  "reference-style, HTML, reStructuredText and relative links appear at both ends of the path map",
+  {"README.citations": rm_.get("citations"), "guide.cited_by": gd.get("cited_by"), "api.references": api.get("references")})
+
+# ------------------------------------------------------------------------------------------------------------ S7
+R, g = repo("s7", {"README.md": "# svc\n", "docs/b.md": "# b\n", "docs/c.md": "# c\n", "src/app/__init__.py": "", "src/app/main.py": "print(1)\n", ".cursorrules": "x\n"})
+pl = g.as_(role="orchestrator", session="S-plan")
+for s in ["baseline", "inventory", "classify", "map", "plan"]:
+    pl.run("adopt", s, quiet=True)
+ids1 = {e["current_path"]: e["artifact_id"] for e in cat(R)}
+plan1 = synth.yload(R, f"{EV}/05-plan.yaml")
+pl.run("adopt", "plan", quiet=True)
+plan1b = synth.yload(R, f"{EV}/05-plan.yaml")
+open(os.path.join(R, "docs/a-first.md"), "w").write("# sorts first\n")
+commit(R, "insert an artefact that sorts first")
+for s in ["inventory", "classify", "map", "plan"]:
+    pl.run("adopt", s, quiet=True)
+ids2 = {e["current_path"]: e["artifact_id"] for e in cat(R)}
+plan2 = synth.yload(R, f"{EV}/05-plan.yaml")
+mp_ = os.path.join(R, EV, "04-TARGET-PATH-MAP.meta.json")
+meta = json.load(open(mp_)) if os.path.exists(mp_) else {}
+changed = {p: (ids1[p], ids2[p]) for p in ids1 if p in ids2 and ids1[p] != ids2[p]}
+x("S7-ids-survive-inserted-artefact", not changed and "docs/a-first.md" in ids2, "inserting an artefact that sorts first changes no other artefact's id", {"changed": changed})
+x("S7-plan-versions", plan1b.get("version") == plan1.get("version") == 1 and plan2.get("version") == 2 and plan2.get("supersedes") == ["MPLAN-GOVERNANCE-ADOPTION@v1"]
+  and os.path.exists(os.path.join(R, EV, "05-plan.versions/v0001.json")) and meta.get("version") == 2,
+  "an identical re-plan keeps its version; a changed plan becomes version 2, superseding v1 which stays retrievable",
+  {"v1": plan1.get("version"), "v1_again": plan1b.get("version"), "v2": plan2.get("version"), "supersedes": plan2.get("supersedes"), "catalogue_version": meta.get("version")})
+
+# ------------------------------------------------------------------------------------------------------------ S8
+R, g = repo("s8", {
+    "README.md": "# svc\n",
+    "Cargo.toml": "[package]\nname = \"svc\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+    "src/lib.rs": "pub fn price_for(weight_grams: u64) -> u64 {\n    let per_kilo = 145_u64;\n    let handling_fee_cents = 99_u64;\n    weight_grams * per_kilo / 1000 + handling_fee_cents\n}\n",
+    "data/customers/export.csv": "id,name,address\n1,Jane Example,12 Harbour Street Inverness IV1 1AA\n",
+})
+g.run("init", "--name", "s8", "--alias", "proj-s8", quiet=True)
+ds = synth.yload(R, "governance/project/DATA_SENSITIVITY.yaml")
+ds["classifications"] = [{"pattern": "data/customers/**", "class": "restricted"}]
+open(os.path.join(R, "governance/project/DATA_SENSITIVITY.yaml"), "w").write(yaml.safe_dump(ds))
+g.run("rebuild-memory", quiet=True)
+commit(R, "classified")
+
+
+def lesson(lid, files, body=None):
+    d = {"id": lid, "type": "lesson", "title": "t", "status": "ACTIVE", "scope": "FRAMEWORK", "lifecycle": "corroborated", "category": "c",
+         "problem_statement": "p", "generic_failure_mode": "g", "impact": "i", "suggested_change": "s", "sources": ["RPT-1"],
+         "synthetic_reproducer": {"synthetic": True, "description": "d", "files": files}}
+    if body:
+        d["body"] = body
+    open(os.path.join(R, f"spec/lessons/{lid}.yaml"), "w").write(yaml.safe_dump(d))
+    return g.run("upstream", "prepare", lid, quiet=True)
+
+
+src = rd(R, "src/lib.rs")
+edited = src.replace("145_u64", "146_u64")
+db = sqlite3.connect(os.path.join(R, ".governance-runtime/state.db"))
+vec = json.loads(db.execute("SELECT vec FROM vectors WHERE chunk_id LIKE 'file:src/%' LIMIT 1").fetchone()[0])
+best = max(range(len(vec) - 40), key=lambda i: sum(1 for v in vec[i:i + 40] if v != 0))
+dump = "[" + ",".join("0" if v == 0 else repr(v) for v in vec[best:best + 40]) + "]"
+cases = [
+    ("L-0201", {"repro.rs": edited}, "a copy with one line changed"),
+    ("L-0202", {"sample.csv": "1,Jane Example,12 Harbour Street Inverness IV1 1AA\n"}, "one line of never-export (restricted) customer data"),
+    ("L-0203", {"weights.txt": dump}, "40 stored vector components with zeros written as integers"),
+]
+for lid, files, what in cases:
+    r = lesson(lid, files)
+    x(f"S8-{lid}-blocked", (r.get("error") or {}).get("code") == "UPSTREAM_BLOCKED", f"the export gate fails closed on {what}",
+      (r.get("error") or {}).get("details", {}).get("reasons"))
+r = lesson("L-0204", {"scenario.yaml": "steps:\n  - index a record\n  - change it after indexing\n"},
+           body="The failure reproduces with:\n```rust\n" + "\n".join(src.splitlines()[:4]) + "\n```\n")
+x("S8-fenced-raw-code-with-trivial-fixture-blocked", (r.get("error") or {}).get("code") == "UPSTREAM_BLOCKED",
+  "raw project code in a fenced block of the lesson text is blocked even when a synthetic fixture is present", (r.get("error") or {}).get("details", {}).get("reasons"))
+r = lesson("L-0205", {"scenario.yaml": "steps:\n  - index a record\n  - change it after indexing\n  - try to close the task\n"})
+pkt = (r.get("result") or {}).get("packet_id")
+x("S8-synthetic-control-passes", bool(pkt), "(control) a genuinely synthetic reproducer is still exportable", r.get("error"))
+if pkt:
+    inbox = os.path.join(synth.SCRATCH, f"canon-{uuid.uuid4().hex[:6]}", "lessons", "inbox")
+    os.makedirs(inbox)
+    pp = os.path.join(R, ".governance-runtime/outbound", pkt, "packet.yaml")
+    pk = yaml.safe_load(open(pp))
+    pk["synthetic_fixture"]["files"]["scenario.yaml"] = src
+    open(pp, "w").write(yaml.safe_dump(pk))
+    s = g.run("upstream", "submit", pkt, "--destination", inbox, "--approved-by", "owner", quiet=True)
+    x("S8-submit-time-tamper-blocked", (s.get("error") or {}).get("code") == "UPSTREAM_BLOCKED" and not os.listdir(inbox),
+      "a packet edited after prepare (fixture replaced by project source) is refused at submission and nothing leaves", s.get("error"))
+summary()
