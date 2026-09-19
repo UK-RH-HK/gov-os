@@ -1,0 +1,158 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0029
+workstream: WS-8 (repair iteration 1, round 2)
+base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+work_commit: cf13deeb3f88feacf993a126e9c8f33e2c6db155
+product_code_digest: 37087f1308754f86a20d505da9474d11b2ff7d27d36eb09ce148a316ab4c4966
+governed_state_digest: 4981437f0dca482b0d7d2aba2d48378260a93eaace20f1ea15bb5761ec4c227d
+note: >-
+  Builder claims only (Contract v3 O3). REPAIRED_CLAIMED means the builder believes the stated requirement is met by the
+  listed product checks, with the listed evidence; acceptance is decided by fresh independent verifiers. Evidence paths
+  are relative to release/capability-baseline/repair-1/r2-ws08/.
+claims:
+  - class: BC-P2-36
+    part: admission (OWNER-DECISION-P2-0002 requirements 1 and 2)
+    title: No external-source kernel ingress on an unprovisioned machine; the embedded payload only as marked bootstrap
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/srr/verifier.rs
+      - runtime/src/srr/installation.rs
+      - runtime/src/srr/mod.rs
+      - runtime/src/kernel.rs
+      - runtime/src/lock.rs
+      - runtime/src/update.rs
+      - framework/schemas/framework-lock.schema.json
+    product_checks:
+      - srr::verifier::admit (unprovisioned branch) at every privileged ingress — SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED unless the staged payload digest is kernel::embedded_payload_hash(); otherwise bootstrap admission with kernel::binary_identity()
+      - srr::verifier::refuse_external_source_if_unprovisioned — update --apply before its Human Decision Gate; update --check `admission`
+      - srr::installation::{posture_of, presentation_disclosures} via srr::present::presentation — BOOTSTRAP / NOT ADMITTED disclosures on every envelope, doctor payload, update --check, context packet
+      - lock::release_identity — framework.lock `admission`
+      - srr::status — `admission_policy`, installations' `admission`
+    probes_rerun:
+      - probe: synthesis AC16-X3 X3a-S3xA2-unprovisioned-refuses-unauthenticated
+        before: FAIL (init_ok true, authenticity UNKNOWN)
+        after: PASS (refused SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED)
+        evidence: evidence/COMPARE-probes-before-base-843d79c-vs-after-cf13dee.out
+      - probe: alpha-r A2-01 [U2] / [U3]
+        before: "[U2] tampered release admitted UNKNOWN, never_index_classes []; [U3] embedded ok UNKNOWN"
+        after: "[U2] refused typed before staging; [U3] embedded ok UNKNOWN (bootstrap admission)"
+        evidence: evidence/probes-after-cf13dee/A2-01.out
+      - probe: alpha-r A2-04 [L3]
+        before: unknown-install established_by 'installed on a machine with no ... anchor'
+        after: admission BOOTSTRAP_EMBEDDED_PAYLOAD, established_by 'a BOOTSTRAP installation ...'; authentic row SIGNED_RELEASE_METADATA
+        evidence: evidence/probes-after-cf13dee/A2-04.out
+      - probe: round-1 WS08-P2 (presentation)
+        before: 8/8
+        after: 8/8
+        evidence: evidence/ws08-round1-probes-after-cf13dee/WS08-P2.out
+    tests:
+      - tests/certification/ws08_r2.rs::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress
+      - tests/certification/ws08_r2.rs::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current
+      - tests/certification/ws08_r2.rs::a_provisioned_machine_never_installs_in_bootstrap_mode
+    integration_points: [IP-R2-WS08-2, IP-R2-WS08-3, IP-R2-WS08-10, IP-R2-WS08-11]
+    owner_decision_required: false
+  - class: BC-P2-35
+    part: unprovisioned sub-case (OWNER-DECISION-P2-0002 Effect paragraph)
+    title: Post-install integrity on an unprovisioned machine is held to the bootstrap record / the binary's payload
+    status: REPAIRED_CLAIMED
+    scope_note: >-
+      Confirmed that no external-source install remains possible on an unprovisioned machine. The residual report-only
+      cases of round 1 (a consistent rewrite of an installation this machine made; kernel material it never admitted)
+      are now enforced (DIVERGED / UNADMITTED), because leaving them report-only would let external kernel material act
+      as T1 without passing an ingress. Provisioned decisions unchanged.
+    files:
+      - runtime/src/srr/installation.rs
+      - runtime/src/kernel_trust.rs
+      - runtime/src/kernel.rs
+    product_checks:
+      - srr::installation::anchor_posture / divergence_posture — MATCHED (bootstrap record or embedded payload), DIVERGED enforced, UNADMITTED
+      - kernel_trust::guard — KERNEL_TAMPERED (divergence), KERNEL_UNANCHORED with OWNER-DECISION-P2-0002 remediation (UNADMITTED)
+      - kernel_trust::trusted_root — embedded baseline substituted while untrusted
+    probes_rerun:
+      - probe: synthesis AC16-X3 X3c-* (provisioned consistent rewrite)
+        before: PASS
+        after: PASS
+        evidence: evidence/probes-after-cf13dee/AC16-X3.out
+      - probe: round-1 WS08-P1 R2a
+        before: PASS (round-1 report-only behaviour)
+        after: FAIL by design (divergence now enforced on an unprovisioned machine)
+        evidence: evidence/ws08-round1-probes-after-cf13dee/WS08-P1.out
+    tests:
+      - tests/certification/ws08_r2.rs::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed
+      - tests/certification/ws08_r2.rs::an_unprovisioned_machine_does_not_trust_kernel_material_it_never_admitted
+      - runtime/src/srr/installation.rs::tests::an_unprovisioned_divergence_is_enforced_since_owner_decision_p2_0002
+      - runtime/src/srr/installation.rs::tests::an_unprovisioned_machine_admits_only_a_bootstrap_installation_or_the_embedded_payload
+    integration_points: [IP-R2-WS08-11]
+    owner_decision_required: false
+  - class: OWNER-DECISION-P2-0002-R3
+    title: Harness, fixtures and documentation provision a throw-away root ("provision, then install")
+    status: PARTIAL
+    scope_note: >-
+      Harness (tests/certification/common.rs, every certification test's setup) and fixture READMEs done. The
+      documentation outside fixtures/ (README.md, docs/COMMANDS.md, docs/FIXTURES.md, docs/ARCHITECTURE.md) is owned by no
+      workstream in this round and was not edited; the exact text is IP-R2-WS08-1.
+    files:
+      - tests/certification/common.rs
+      - tests/certification/{arch,brownfield,failure_injection,greenfield,migration,multi_machine,repair,repair2,repair3,update,upstream,ws03}.rs (calls to the helpers)
+      - fixtures/*/README.md
+    product_checks: []
+    probes_rerun: []
+    tests:
+      - "cargo test --test certification: 110/110 default and xdgcache (evidence/regression-after-cf13dee-*-cert-{a,b}.out)"
+    integration_points: [IP-R2-WS08-1, IP-R2-WS08-12]
+    owner_decision_required: false
+  - class: OWNER-DECISION-P2-0002-R4
+    title: Release-relevant evidence runs on provisioned machines
+    status: PARTIAL
+    scope_note: release build records the building machine's posture and eligibility; the qualification (G6) entry is WS-2's (IP-R2-WS08-8)
+    files: [runtime/src/release.rs]
+    product_checks: [release::build — PRE_RELEASE_CHECKS.json machine_posture / release_evidence_eligible]
+    probes_rerun: []
+    tests: [tests/certification/ws08_r2.rs::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written]
+    integration_points: [IP-R2-WS08-8]
+    owner_decision_required: false
+integration_points_routed_to_ws08:
+  - id: IP-WS02-12
+    status: REPAIRED_CLAIMED
+    note: G5 full suite replaces the four-family post-install audit (refuse UNHEALTHY/RED/critical, rolled back); entry guard not taken because it refuses the update that remedies kernel/overlay blocks (D006 on 4.1.1) — IP-R2-WS08-5; abort-path record ordering fixed
+    files: [runtime/src/update.rs]
+    tests: [tests/certification/ws08_r2.rs::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back, tests/certification/ws08_r2.rs::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite]
+  - id: IP-WS02-13
+    status: REPAIRED_CLAIMED
+    note: G0 guard + G5 when the canonical root is a governed installation; otherwise the absence is recorded, never claimed
+    files: [runtime/src/release.rs]
+    tests: [tests/certification/ws08_r2.rs::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written]
+  - id: IP-WS02-14
+    status: REPAIRED_CLAIMED
+    note: init advances the floors before its conformance run; WS-2 may add the installed records to machine_trust (IP-R2-WS08-4)
+    files: [runtime/src/init.rs]
+  - id: IP-WS02-15
+    status: REPAIRED_CLAIMED
+    note: embedded kernel cache verified against the listing before re-use; per-call private staging; atomic publish
+    files: [runtime/src/kernel.rs]
+    tests: [runtime/src/kernel.rs::tests::a_kernel_cache_is_reused_only_when_it_is_exactly_the_embedded_listing, tests/certification/ws08_r2.rs::a_corrupt_or_racing_embedded_kernel_cache_is_never_installed]
+    probes_rerun: [{probe: integration cold_cache_scheduler.py, after: 17/17, evidence: evidence/concurrency/cold_cache_scheduler.after-cf13dee.out}]
+  - id: IP-WS02-16
+    status: NOT_REPAIRED
+    reason: the scenario-check file carries a planted AKIA secret literal that the kernel's own scanner flags once installed (7 certification tests failed), and KERNEL.yaml of 4.1.5 is pinned by release/releases/4.1.5; routed as IP-R2-WS08-6
+  - id: IP-2
+    status: REPAIRED_CLAIMED
+    note: a present capability-contract chain that does not verify refuses the release build; a tree without the chain is recorded INCOMPLETE_IN_THIS_TREE (not bound, not evidence-eligible) because the payload ships no contract view and release tooling builds from payload-only trees; built release verified as written
+    files: [runtime/src/release.rs]
+    tests: [tests/certification/ws08_r2.rs::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written]
+  - id: IP-7
+    status: REPAIRED_CLAIMED
+    note: update honours its gate only through gates::verified_answer (a verified declining answer declines); init checks authority at the ingress with the embedded-kernel resolution
+    files: [runtime/src/update.rs, runtime/src/init.rs]
+    tests: [tests/certification/ws08_r2.rs::update_applies_only_on_a_verified_authorising_answer]
+  - id: IP-16
+    status: NOT_REPAIRED
+    reason: a product-release governed record needs a record type/relations (WS-4) and a classified CLI command (WS-3); release.rs builds Governance OS kernel releases, which belong to no governed project; routed as IP-R2-WS08-7
+r1_preservation_evidence:
+  heldout_suites_before: {AR-0027: "26/3 (b1,b2,d3)", AR-0029: "26/2 (b3,b6); ho_f does not compile", AR-0031: "27/7 (a1,a5,a8,b6,c2,c3,d2)", AR-0033: "30/1 (hv_a::a1 size pin)", census: "105 files / 1457 functions"}
+  heldout_suites_after: {AR-0027: "26/3 (b1,b2,d3)", AR-0029: "26/2 (b3,b6); ho_f does not compile", AR-0031: "27/7 (a1,a5,a8,b6,c2,c3,d2)", AR-0033: "30/1 (hv_a::a1 size pin)", census: "105 files / 1468 functions"}
+  a1_unpinned_derived_copy: "0 violations in every §6 activity (evidence/r1-heldout/r1-heldout-after-cf13dee.out, S1/S2)"
+  failure_messages: identical after normalisation (evidence/r1-heldout/failure-messages-before-vs-after.txt)
+  invariants: evidence/r1-invariants-after-cf13dee.out
+  section6_and_srr: green (110/110 certification, both modes)

@@ -1,0 +1,17 @@
+# P2-AR-0029 probe re-run label=before-base-843d79c
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0029-base (HEAD 288beb1225790a6050f4d27272cd9e4a39372d73 dirty-files: 0)
+# date 2026-09-19T04:40:39Z
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0029-base/target/release/gov sha256 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 (reached via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0029-probes/mirror-before-base-843d79c/target/release/gov = the integration evidence adapter)
+# adapter sha256 5f9a4685a8d45fdcacaed73344c8be610db14fc6ff58b44a5add4e413955055a
+# probe sources (sha256; identical in both trees = the audit-of-record files):
+  f19b17c8c25869e2a6a075b3846a40b5a947e48cabb3cb1839ce8b329560ef8d  alpha-r/evidence/A2-01-unprovisioned-posture.py  (worktree copy: f19b17c8c25869e2a6a075b3846a40b5a947e48cabb3cb1839ce8b329560ef8d)
+  384367c01940efb6ffc348cbcc3080329295a0dc02cd838a88a353193bfd2451  alpha-r/evidence/A2-02-provisioned-ingress.py  (worktree copy: 384367c01940efb6ffc348cbcc3080329295a0dc02cd838a88a353193bfd2451)
+  c4c21a777dd27be22b1d473ace7d6cbe8d215a76eed01253eb7fc555f17e59ce  alpha-r/evidence/A2-03-post-install-tamper.py  (worktree copy: c4c21a777dd27be22b1d473ace7d6cbe8d215a76eed01253eb7fc555f17e59ce)
+  c3e30dc30814f98a4a8171d0529069ffebec5fe2ac62af51a9cf3dbcb5528166  alpha-r/evidence/A2-04-lock-identity-and-masquerade.py  (worktree copy: c3e30dc30814f98a4a8171d0529069ffebec5fe2ac62af51a9cf3dbcb5528166)
+  01e3d5f2bcc8b71d35eb000619b1ebcc2dcb9af7f72edfcd68576043f82a2623  alpha-r/evidence/A2-05-rotation-revocation-recovery.py  (worktree copy: 01e3d5f2bcc8b71d35eb000619b1ebcc2dcb9af7f72edfcd68576043f82a2623)
+  5e9e6e9c09039c5c14069016c8ba3e399db8247da9af50a9a44d182429358a13  alpha-r/evidence/A2-08-reinstall-version-change.py  (worktree copy: 5e9e6e9c09039c5c14069016c8ba3e399db8247da9af50a9a44d182429358a13)
+  24d478c76fa6f769fd9cec001894aeb4665fe552fa2dcadab8eae5ced0084a3e  alpha-r/evidence/S5-update.py  (worktree copy: 24d478c76fa6f769fd9cec001894aeb4665fe552fa2dcadab8eae5ced0084a3e)
+  76f16326984c857929d59cbe1bb84a4888f44e1cf64433f676434926ca38ff65  alpha-r/evidence/S6-cross-machine.py  (worktree copy: 76f16326984c857929d59cbe1bb84a4888f44e1cf64433f676434926ca38ff65)
+  01aa7697573d3a571cb6b3cd21b6509e0210c751f5096121a8ab92a6c5df33bd  alpha-r/evidence/lib/srr_mint.py  (worktree copy: 01aa7697573d3a571cb6b3cd21b6509e0210c751f5096121a8ab92a6c5df33bd)
+  2d2bb70b93398d42200ba12f515a6a23331830d885c26ac43c19d9d0c25197e4  alpha-r/evidence/lib/env.sh  (worktree copy: 2d2bb70b93398d42200ba12f515a6a23331830d885c26ac43c19d9d0c25197e4)
+  2cad374e5421bea403387545dd92c19878afa4134ee49377c64dc907b43f7493  synthesis/evidence/AC16-X3-ingress-root-of-trust-chain.py  (worktree copy: 2cad374e5421bea403387545dd92c19878afa4134ee49377c64dc907b43f7493)

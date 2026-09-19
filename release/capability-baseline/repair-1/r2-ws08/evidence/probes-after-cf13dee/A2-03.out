@@ -1,0 +1,28 @@
+## [T1] naive post-install tamper: one installed kernel file edited
+[T1] gov kernel verify: ok=False modified=['policies/SECURITY_POLICY.yaml'] trust.verified=False substituted=True
+[T1] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted']
+[T1] mutating op `gov task create`: REFUSED KERNEL_TAMPERED
+[T1] doctor verdict=UNHEALTHY D003=[(False, 'modified=["policies/SECURITY_POLICY.yaml"] missing=[] added=[]'), (True, 'match'), (False, 'installed kernel FAILED verification (kernel payload does not match KERNEL_MANIFEST.json: ')]
+[T1] status.framework.release_hash=4c335e89f07e8c66… status.release_trust.verified_payload_hash=4c335e89f07e8c66… authenticity=AUTHENTIC
+[T1] audit mutation_scope verdict=UNHEALTHY findings=['kernel payload modified in place (INV-007): modified ["policies/SECURITY_POLICY.yaml"] missing [] ad']
+[T1] remedy: gov kernel reinstall --source <authentic release>
+[T1] reinstall ok = True | authenticity = AUTHENTIC
+[T1-after-reinstall] gov kernel verify: ok=True modified=[] trust.verified=True substituted=False
+[T1-after-reinstall] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted']
+[T1-after-reinstall] mutating op `gov task create`: ok
+[T1-after-reinstall] doctor verdict=DEGRADED D003=[(True, 'intact (4.1.5)'), (True, 'match'), (True, 'installed kernel 4.1.5 intact: matches KERNEL_MANIFEST.json, framework.lock and this machi')]
+[T1-after-reinstall] status.framework.release_hash=4c335e89f07e8c66… status.release_trust.verified_payload_hash=4c335e89f07e8c66… authenticity=AUTHENTIC
+[T1-after-reinstall] audit mutation_scope verdict=HEALTHY findings=[]
+
+## [T2] consistent post-install tamper: kernel file + KERNEL_MANIFEST.json + framework.lock rewritten to agree
+[T2] rewrote KERNEL_MANIFEST.json payload_hash -> 891f0fa997d5dc16 … and framework.lock release_hash/kernel_manifest_hash
+[T2] gov kernel verify: ok=False modified=['policies/SECURITY_POLICY.yaml'] trust.verified=False substituted=True
+[T2] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted']
+[T2] mutating op `gov task create`: REFUSED KERNEL_TAMPERED
+[T2] doctor verdict=UNHEALTHY D003=[(False, 'modified=["policies/SECURITY_POLICY.yaml"] missing=[] added=[]'), (True, 'match'), (False, 'installed kernel FAILED verification (kernel payload is not the payload this machine commi')]
+[T2] status.framework.release_hash=891f0fa997d5dc16… status.release_trust.verified_payload_hash=4c335e89f07e8c66… authenticity=AUTHENTIC
+[T2] audit mutation_scope verdict=UNHEALTHY findings=['kernel payload modified in place (INV-007): modified ["policies/SECURITY_POLICY.yaml"] missing [] ad']
+[T2] protected machine record (authenticated at install): payload_hash = 4c335e89f07e8c66 … ; installed payload now = 891f0fa997d5dc16 …; equal = False
+
+DONE
+[A2-03 exit=0]
