@@ -6,9 +6,11 @@
 //! * every repository file (everything [`crate::paths::iter_repo_files`] sees — the same universe the suite reads) is
 //!   assigned to exactly one **input class** by an ordered path partition ([`PATH_CLASSES`]); a file that matches no
 //!   specific class is `source` ("relevant source files"). Nothing in the tree is silently outside the key;
-//! * two non-file classes cover what the tree cannot show: the **runtime implementation identity** (the executing
-//!   `gov` binary's SHA-256 plus the crate versions) and the **machine trust state** (the trust anchor, the
-//!   provisioning latch and the break-glass marking of the protected machine state root);
+//! * three non-file classes cover what the tree cannot show: the **runtime implementation identity** (the executing
+//!   `gov` binary's SHA-256 plus the crate versions), the **machine trust state** (the trust anchor, the
+//!   provisioning latch and the break-glass marking of the protected machine state root) and the **T2 binding state**
+//!   (which gate/decision records no `gov` operation on this machine produced as they stand, `crate::t2`);
+//! * only health records bound to the health operation that wrote them are honoured as evidence ([`honoured`]);
 //! * the only files excluded are the health system's **own outputs** (governance-suite and product-test result
 //!   records): a result cannot be an input to itself. Their entries are also removed from the index manifest before it
 //!   is digested, so indexing a new result does not make the result stale ([`normalized_index_manifest`]).
@@ -216,6 +218,15 @@ pub const SOURCE: &str = "source";
 pub const RUNTIME_IDENTITY: &str = "runtime_identity";
 /// Non-file class: this machine's protected trust state (anchor, provisioning latch, break-glass marking).
 pub const MACHINE_TRUST: &str = "machine_trust";
+/// Non-file class: the OS-operation binding (T2, BC-P2-09) of every T2 record as this machine verifies it — which
+/// gate and decision records no `gov` operation on this machine produced as they stand (`crate::t2::audit`). A
+/// forged, edited or foreign T2 record, or a replaced machine binding key, changes it, so green evidence computed
+/// over the previous binding state is stale (WS-3 IP-5).
+pub const T2_BINDINGS: &str = "t2_bindings";
+
+/// The classes that are not repository file classes (they are digested from outside the tree or from verification
+/// state), so a check's `@files` group never includes them.
+pub const NON_FILE_CLASSES: &[&str] = &[RUNTIME_IDENTITY, MACHINE_TRUST, T2_BINDINGS];
 
 /// Record scopes the health system writes. A record of one of these scopes is an output, never an input.
 pub const HEALTH_OUTPUT_SCOPES: &[&str] = &["governance-suite", "product-tests"];
@@ -236,8 +247,7 @@ pub const GOVERNANCE_AFFECTING_TASK_CLASSES: &[&str] = &[
 pub fn all_class_ids() -> Vec<&'static str> {
     let mut v: Vec<&'static str> = PATH_CLASSES.iter().map(|c| c.id).collect();
     v.push(SOURCE);
-    v.push(RUNTIME_IDENTITY);
-    v.push(MACHINE_TRUST);
+    v.extend_from_slice(NON_FILE_CLASSES);
     v
 }
 
@@ -247,6 +257,7 @@ pub fn contract_class_of(id: &str) -> &'static str {
         SOURCE => "relevant source files",
         RUNTIME_IDENTITY => "runtime/kernel implementation",
         MACHINE_TRUST => "machine trust state",
+        T2_BINDINGS => "machine trust state (OS-operation binding of T2 records)",
         _ => PATH_CLASSES
             .iter()
             .find(|c| c.id == id)
@@ -436,6 +447,26 @@ pub fn machine_trust_state() -> Value {
     }
 }
 
+/// The T2 binding state of the project's T2 records on this machine: every gate/decision record that no `gov`
+/// operation on this machine produced as it stands, with its binding verdict (`crate::t2::audit`). Verified records
+/// are covered by their file digests; what this adds is the verdict itself, which also depends on this machine's
+/// binding key (a clone, a replaced key or a hand-written record changes it).
+pub fn t2_binding_state(p: &Project) -> Value {
+    let mut rows: Vec<Value> = crate::t2::audit(p)
+        .into_iter()
+        .map(|r| {
+            json!({"id": r["id"], "path": r["path"], "binding": r["t2"]["binding"], "key_id": r["t2"]["key_id"]})
+        })
+        .collect();
+    rows.sort_by(|a, b| {
+        a["path"]
+            .as_str()
+            .unwrap_or("")
+            .cmp(b["path"].as_str().unwrap_or(""))
+    });
+    json!({"unverified": rows})
+}
+
 /// The tracked index/memory manifests with the fields that describe *when* or *from which commit* they were built,
 /// and every entry for a health-system output, removed. What remains is what the index was built from and with.
 pub fn normalized_index_manifest(root: &Path, rel: &str, v: &Value) -> Value {
@@ -498,6 +529,8 @@ pub struct Snapshot {
     pub excluded: Vec<String>,
     pub runtime: Value,
     pub machine_trust: Value,
+    /// The T2 binding state ([`t2_binding_state`]) digested as [`T2_BINDINGS`].
+    pub t2_bindings: Value,
 }
 
 impl Snapshot {
@@ -536,11 +569,13 @@ impl Snapshot {
         }
         let runtime = runtime_identity().clone();
         let machine_trust = machine_trust_state();
+        let t2_bindings = t2_binding_state(p);
         let mut classes = BTreeMap::new();
         for (id, entries) in per_class {
             let d = match id.as_str() {
                 RUNTIME_IDENTITY => runtime_digest(),
                 MACHINE_TRUST => hash_value(&machine_trust),
+                T2_BINDINGS => hash_value(&t2_bindings),
                 _ => hash_value(&json!(entries)),
             };
             classes.insert(id, d);
@@ -551,6 +586,7 @@ impl Snapshot {
             excluded,
             runtime,
             machine_trust,
+            t2_bindings,
         })
     }
 
@@ -630,6 +666,7 @@ impl Snapshot {
             "excluded_health_outputs": self.excluded,
             "runtime": self.runtime,
             "machine_trust": self.machine_trust,
+            "t2_bindings": self.t2_bindings,
         })
     }
 }
@@ -641,7 +678,35 @@ pub fn inputs_hash(p: &Project) -> String {
         .unwrap_or_else(|e| format!("unavailable:{}", e.code))
 }
 
-/// The latest green governance-suite record (by id order), if any.
+/// The T2 operation name a health-system record is sealed under, per scope.
+pub fn seal_operation(scope: &str) -> String {
+    format!("health:{scope}")
+}
+
+/// Is a health-system record honoured? Only when its bytes are exactly what a `gov` health operation on this machine
+/// wrote (the T2 binding, `crate::t2`; ws02 IP-WS02-22): a hand-written, edited, legacy-unsealed or foreign
+/// governance-suite / product-test record is a request, recorded and ignored (D-0007 rule 2).
+pub fn honoured(rec: &crate::records::Record) -> bool {
+    crate::t2::verify_record(rec).is_verified()
+}
+
+/// Health-system output records (governance-suite and product-test records) that are **not** honoured, with their
+/// binding verdict: for the suite's OS-binding family and doctor.
+pub fn unhonoured_health_outputs(store: &RecordStore) -> Vec<Value> {
+    store
+        .of_type("audit")
+        .into_iter()
+        .filter(|a| HEALTH_OUTPUT_SCOPES.contains(&a.get("scope").as_str()))
+        .filter_map(|a| {
+            let b = crate::t2::verify_record(a);
+            (!b.is_verified()).then(|| {
+                json!({"id": a.id(), "scope": a.get("scope"), "path": a.path, "green": a.data["green"], "t2": b.to_value()})
+            })
+        })
+        .collect()
+}
+
+/// The latest green governance-suite record (by id order) that the OS honours (T2-bound, [`honoured`]), if any.
 pub fn latest_green(p: &Project) -> Option<Value> {
     let store = RecordStore::load(&p.root);
     let mut audits: Vec<&crate::records::Record> = store
@@ -650,6 +715,7 @@ pub fn latest_green(p: &Project) -> Option<Value> {
         .filter(|a| {
             a.data["green"].as_bool().unwrap_or(false) && a.get("scope") == "governance-suite"
         })
+        .filter(|a| honoured(a))
         .collect();
     audits.sort_by_key(|a| a.id());
     audits.last().map(|a| a.data.clone())
@@ -663,11 +729,18 @@ pub struct Currency {
     pub changed_classes: Vec<String>,
     pub key: String,
     pub recorded_key: Option<String>,
+    /// Green governance-suite records that are not honoured (no valid T2 binding on this machine).
+    pub unhonoured_green: Vec<String>,
 }
 
 impl Currency {
     pub fn evaluate(p: &Project, snap: &Snapshot) -> Currency {
         let key = snap.key();
+        let unhonoured_green: Vec<String> = unhonoured_health_outputs(&RecordStore::load(&p.root))
+            .into_iter()
+            .filter(|r| r["scope"] == "governance-suite" && r["green"].as_bool().unwrap_or(false))
+            .filter_map(|r| r["id"].as_str().map(|s| s.to_string()))
+            .collect();
         match latest_green(p) {
             Some(g) => {
                 let rk = g["inputs_hash"].as_str().map(|s| s.to_string());
@@ -683,6 +756,7 @@ impl Currency {
                     changed_classes: changed,
                     key,
                     recorded_key: rk,
+                    unhonoured_green,
                 }
             }
             None => Currency {
@@ -691,26 +765,36 @@ impl Currency {
                 changed_classes: vec![],
                 key,
                 recorded_key: None,
+                unhonoured_green,
             },
         }
     }
     /// One-line description used by doctor D021 and the close gate.
     pub fn message(&self) -> String {
+        let ignored = if self.unhonoured_green.is_empty() {
+            String::new()
+        } else {
+            format!(
+                "; {} green record(s) not honoured (not bound to a gov operation on this machine): {}",
+                self.unhonoured_green.len(),
+                self.unhonoured_green.join(", ")
+            )
+        };
         match (&self.green, self.current) {
-            (Some(g), true) => format!("green record \"{g}\" current"),
+            (Some(g), true) => format!("green record \"{g}\" current{ignored}"),
             (Some(g), false) => format!(
-                "green record \"{g}\" is obsolete (inputs changed: {})",
+                "green record \"{g}\" is obsolete (inputs changed: {}){ignored}",
                 if self.changed_classes.is_empty() {
                     "unknown".to_string()
                 } else {
                     self.changed_classes.join(", ")
                 }
             ),
-            (None, _) => "no green governance record".into(),
+            (None, _) => format!("no green governance record{ignored}"),
         }
     }
     pub fn to_value(&self) -> Value {
-        json!({"green": self.green, "current": self.current, "changed_classes": self.changed_classes.iter().map(|c| json!({"class": c, "contract_class": contract_class_of(c)})).collect::<Vec<_>>(), "key": self.key, "recorded_key": self.recorded_key, "message": self.message()})
+        json!({"green": self.green, "current": self.current, "changed_classes": self.changed_classes.iter().map(|c| json!({"class": c, "contract_class": contract_class_of(c)})).collect::<Vec<_>>(), "key": self.key, "recorded_key": self.recorded_key, "unhonoured_green": self.unhonoured_green, "message": self.message()})
     }
 }
 
@@ -971,6 +1055,26 @@ mod tests {
             normalized_index_manifest(&dir, rel, &a),
             normalized_index_manifest(&dir, rel, &d)
         );
+        // WS-6 IP-8: the per-artefact derivation key (policy/path-map/adapter identity an entry was derived under) is
+        // an input of memory/index evidence — a reclassification or adapter change alone changes the digest
+        let mut e = a.clone();
+        e["artifacts"]["src/lib.rs"]["derivation"] = json!({"key": "k1"});
+        let mut f = e.clone();
+        f["artifacts"]["src/lib.rs"]["derivation"] = json!({"key": "k2"});
+        assert_ne!(
+            normalized_index_manifest(&dir, rel, &e),
+            normalized_index_manifest(&dir, rel, &f)
+        );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn non_file_classes_are_keyed_and_never_file_classes() {
+        let ids = all_class_ids();
+        for c in NON_FILE_CLASSES {
+            assert!(ids.contains(c), "{c}");
+            assert!(!PATH_CLASSES.iter().any(|p| p.id == *c), "{c}");
+            assert_ne!(contract_class_of(c), "unknown", "{c}");
+        }
     }
 }

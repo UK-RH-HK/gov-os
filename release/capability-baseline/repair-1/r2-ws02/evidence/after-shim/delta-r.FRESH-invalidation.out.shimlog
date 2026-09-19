@@ -1,0 +1,27 @@
+(a) role declared: orchestrator for init --name fresh
+(a) role declared: orchestrator for cit show AUD-0001
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for init --name fresh2
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task claim TASK-0001
+(a) role declared: orchestrator for rebuild-memory --incremental
+(a) role declared: orchestrator for task close TASK-0001
+(a) role declared: orchestrator for adapters generate
+(a) role declared: orchestrator for audit
+(a) role declared: orchestrator for task close TASK-0001
+(a) role declared: orchestrator for init --name fresh3
+(a) role declared: orchestrator for cit show AUD-0001
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for cit show AUD-0001
+(a) role declared: orchestrator for cit show AUD-0001
+(a) role declared: orchestrator for cit show AUD-0001
+(a) role declared: orchestrator for cit show AUD-0001
+(a) role declared: orchestrator for audit --no-persist

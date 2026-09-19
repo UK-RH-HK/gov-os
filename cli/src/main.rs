@@ -406,6 +406,27 @@ enum HealthCmd {
         #[arg(long)]
         report: String,
     },
+    // WS-2 round 2 (P2-AR-0023) additive: the G6 entry point (ws01-12 IP-4)
+    /// G6: record the health of a qualification run (synthetic repository, chaos, soak, hidden test) — only when its hidden oracle conforms and is separate, and its score report is bound to that oracle
+    Qualify {
+        /// synthetic-repository | chaos | soak | hidden-test
+        #[arg(long, default_value = "synthetic-repository")]
+        kind: String,
+        /// The verifier-owned hidden oracle (qualification-oracle document)
+        #[arg(long)]
+        oracle: PathBuf,
+        /// The candidate run's qualification-score-report, scored against that oracle
+        #[arg(long)]
+        report: PathBuf,
+        /// Public qualification suite root the oracle must be kept out of
+        #[arg(long = "public-suite")]
+        public_suite: Vec<PathBuf>,
+        /// Other qualification repository roots the oracle must be kept out of (this repository always is)
+        #[arg(long)]
+        repository: Vec<PathBuf>,
+        #[arg(long)]
+        run_id: Option<String>,
+    },
 }
 fn health_cmd(cli: &Cli, op: &HealthCmd) -> Result<Value> {
     use gov_runtime::scheduler as sch;
@@ -492,6 +513,24 @@ fn health_cmd(cli: &Cli, op: &HealthCmd) -> Result<Value> {
             }
             gov_runtime::verification::close_gate(&p, &t, &rep, &touched, false)
         }
+        HealthCmd::Qualify {
+            kind,
+            oracle,
+            report,
+            public_suite,
+            repository,
+            run_id,
+        } => sch::qualification_run(
+            &p,
+            &sch::QualificationRun {
+                kind: kind.clone(),
+                run_id: run_id.clone(),
+                oracle: oracle.clone(),
+                score_report: report.clone(),
+                public_suites: public_suite.clone(),
+                repositories: repository.clone(),
+            },
+        ),
         HealthCmd::Skills {
             skill,
             record,
@@ -1444,6 +1483,7 @@ fn g0_label(cmd: &Cmd) -> String {
                 }
             }
             HealthCmd::CloseCheck { .. } => "health close-check",
+            HealthCmd::Qualify { .. } => "health qualify",
         }),
         Cmd::Oracle { op } => s(match op {
             OracleCmd::Format => "oracle format",

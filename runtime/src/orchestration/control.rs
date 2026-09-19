@@ -385,6 +385,9 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("health skills", "read", Read),
     g("health skills --record", "record_skill_binding", Write),
     g("health close-check", "record_audit", Write),
+    // WS-2 round 2 (P2-AR-0023): the G6 entry point validates the oracle/report (read-only) and records the
+    // qualification run's health as a governance-suite EVIDENCE record, exactly as `health run` does
+    g("health qualify", "record_audit", Write),
     // WS-1/12 (BC-P2-51): the Qualification Oracle format tool reads documents held in verifier custody and the
     // format compiled into this binary; it opens no project
     outside("oracle format", "qualification tooling: prints the Qualification Oracle format compiled into this binary; opens no project"),

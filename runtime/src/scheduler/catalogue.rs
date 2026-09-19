@@ -33,6 +33,11 @@ pub enum Extra {
     PluginObservations,
     /// The deep flag (a deep run measures something different from a normal run).
     DeepMode,
+    /// The owner-source contract chain `contracts::verify` binds (in the audited repository or the developer checkout
+    /// named by `GOV_CANONICAL_ROOT`), which may lie outside the project tree.
+    ContractSource,
+    /// The commits that define the governance baseline (version-control history, not tree content).
+    GovernanceBaseline,
 }
 
 /// Where the check may run.
@@ -187,7 +192,7 @@ pub fn expand_deps(def: &CheckDef) -> Vec<&'static str> {
             "@records" => out.extend_from_slice(RECORDS),
             "@files" => {
                 for id in currency::all_class_ids() {
-                    if id != currency::RUNTIME_IDENTITY && id != currency::MACHINE_TRUST {
+                    if !currency::NON_FILE_CLASSES.contains(&id) {
                         out.push(id);
                     }
                 }
@@ -219,7 +224,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "schema_invariants",
         surface: Surface::Family,
-        duty: "records and overlay valid against kernel schemas; lifecycle/state classes; duplicate ids; superseded-but-ACTIVE authority",
+        duty: "records and overlay valid against kernel schemas; lifecycle/state classes; duplicate ids; superseded-but-ACTIVE authority; no hidden Qualification Oracle record in the governed repository",
         deps: &["@kernel", "@overlay", "@records"],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -231,7 +236,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "graph_integrity",
         surface: Surface::Family,
-        duty: "relationship graph (dangling edges) and task DAG (cycles, missing dependencies)",
+        duty: "relationship graph (dangling edges), records outside their canonical location (W1), stale lineage links (W8), task DAG (cycles, missing dependencies, `blocks` naming no task)",
         deps: &["@records", "index_manifest"],
         extras: &[Extra::LiveIndex],
         isolation: Isolation::InProcess,
@@ -295,7 +300,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "path_map_compliance",
         surface: Surface::Family,
-        duty: "every governed file matches a repository-contract rule; no secret content outside secret-class paths",
+        duty: "every governed file matches a repository-contract rule; no secret content outside secret-class paths; no hidden Qualification Oracle material in any file",
         deps: &["@files"],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -307,7 +312,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "context_reproducibility",
         surface: Surface::Family,
-        duty: "deterministic authority block of a compiled context packet is reproducible and carries the policy fields",
+        duty: "deterministic authority block of a compiled context packet is reproducible and carries the policy fields; every dispatchable task's delivered inputs verify against its declared manifest (W4)",
         deps: &["@records", "@overlay", "index_manifest"],
         extras: &[Extra::LiveIndex],
         isolation: Isolation::Sandbox,
@@ -403,7 +408,7 @@ pub const CHECKS: &[CheckDef] = &[
     CheckDef {
         id: "product_traceability",
         surface: Surface::Family,
-        duty: "test obligations within policy families and independence; DONE tasks closed by a report; features have scenarios/tests",
+        duty: "test obligations within policy families and independence; DONE tasks closed by a report; features have scenarios/tests; DONE implementation traces to its requirements (W5/W8)",
         deps: &["@records", "@overlay"],
         extras: &[],
         isolation: Isolation::InProcess,
@@ -536,6 +541,91 @@ pub const CHECKS: &[CheckDef] = &[
         tiers: &[G4, G5, G6],
         blocks: &[],
     },
+    // ---------------------------------------- round-2 families: the reporting side of other workstreams' checks
+    CheckDef {
+        id: "lineage_orphans",
+        surface: Surface::Family,
+        duty: "W7: every orphan by name — unconsumed outputs, specs without implementation/test path, research never consumed by a decision, acceptance tests without requirement/scenario, code without active spec justification; generates linked investigation work",
+        deps: &["@records", "@files"],
+        extras: &[Extra::LiveIndex, Extra::GovernanceBaseline],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "os_binding_integrity",
+        surface: Surface::Family,
+        duty: "T2: gate/decision records and health evidence that no gov operation on this machine produced as they stand are reported and not honoured; tampering with sealed OS state is high",
+        deps: &["spec_decisions", "spec_tasks", currency::T2_BINDINGS],
+        extras: &[],
+        isolation: Isolation::InProcess,
+        repro: Repro::SelfChecked,
+        cache: Cache::Never,
+        tiers: &[G1, G2, G3, G4, G5, G6],
+        blocks: &[BlockRule {
+            min_severity: "high",
+            operations: &[ops::RELEASE_BUILD],
+            scope: BlockScope::Global,
+        }],
+    },
+    CheckDef {
+        id: "installation_authenticity",
+        surface: Surface::Family,
+        duty: "BC-P2-36: an installation whose release authenticity is not established is disclosed (low on an unprovisioned bootstrap machine, medium on a provisioned one)",
+        deps: &["@kernel", currency::MACHINE_TRUST],
+        extras: &[],
+        isolation: Isolation::InProcess,
+        repro: Repro::SelfChecked,
+        cache: Cache::Never,
+        tiers: &[G1, G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "contract_binding",
+        surface: Surface::Family,
+        duty: "BC-P2-01: the compiled contract views, evidence map and generated view are semantically identical to the owner source (`gov contract verify`), where the contract chain is present",
+        deps: &[],
+        extras: &[Extra::ContractSource],
+        isolation: Isolation::InProcess,
+        repro: Repro::SelfChecked,
+        cache: Cache::Cacheable,
+        tiers: &[G5, G6],
+        blocks: &[BlockRule {
+            min_severity: "high",
+            operations: &[ops::RELEASE_BUILD],
+            scope: BlockScope::Global,
+        }],
+    },
+    CheckDef {
+        id: "index_content_coverage",
+        surface: Surface::Family,
+        duty: "BC-P2-25: every governed record's content and every non-empty line of indexed code is held by at least one chunk of the live index",
+        deps: &["@files"],
+        extras: &[Extra::LiveIndex],
+        isolation: Isolation::InProcess,
+        repro: Repro::DoubleRun,
+        cache: Cache::Cacheable,
+        tiers: &[G1, G4, G5, G6],
+        blocks: &[],
+    },
+    CheckDef {
+        id: "task_contract_integrity",
+        surface: Surface::Family,
+        duty: "task contracts hold in the tree: output of a task whose contract forbids production merge (every experiment) is not in the production tree",
+        deps: &["@files"],
+        extras: &[Extra::Claims],
+        isolation: Isolation::InProcess,
+        repro: Repro::SelfChecked,
+        cache: Cache::Never,
+        tiers: &[G2, G4, G5, G6],
+        blocks: &[BlockRule {
+            min_severity: "high",
+            operations: &[ops::RELEASE_BUILD],
+            scope: BlockScope::Global,
+        }],
+    },
     // ------------------------------------------------------------------------------------------ doctor checks
     doctor("D001", "framework.lock present", &["framework_lock"], &[CRIT_ALL]),
     doctor("D002", "framework.lock schema", &["framework_lock"], &[HIGH_RELY]),
@@ -580,6 +670,19 @@ pub const CHECKS: &[CheckDef] = &[
         scope: BlockScope::Global,
     }]),
     doctor("D031", "no active health hard-block", &[], &[]),
+    doctor(
+        "D032",
+        "installation authenticity established (else disclosed)",
+        &["@kernel", currency::MACHINE_TRUST],
+        &[],
+    ),
+    doctor(
+        "D033",
+        "OS-written records bound to gov operations (T2)",
+        &["spec_decisions", currency::T2_BINDINGS],
+        &[],
+    ),
+    doctor("D034", "failure memory followed up", &["evidence_records"], &[]),
 ];
 
 const fn doctor(

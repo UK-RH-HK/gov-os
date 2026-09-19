@@ -81,10 +81,21 @@ pub fn human_gate_integrity(store: &RecordStore, f: &mut Family) {
                     }
                 }
                 if !presented {
+                    // WS-3's rule: rendering (`gov gate present`) is not presentation; a gate is presented only on
+                    // the owner's signed receipt or signed answer (integration observation O-2)
+                    let rendered = g
+                        .data
+                        .get("presentation")
+                        .map(|x| !x.is_null())
+                        .unwrap_or(false);
                     f.findings.push(finding(
                         "low",
                         &fam,
-                        format!("{} is pending and not yet presented to the human", g.id()),
+                        if rendered {
+                            format!("{} is pending: rendered to the human channel, awaiting the owner's signed receipt or answer (not yet evidenced as presented)", g.id())
+                        } else {
+                            format!("{} is pending and was never rendered to the human channel: it exists only in files (INV-008)", g.id())
+                        },
                         Some(g.path.clone()),
                     ));
                 }

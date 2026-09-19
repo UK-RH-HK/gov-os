@@ -33,7 +33,10 @@ impl GovError {
             | "HUMAN_GATE_REQUIRED"
             | "VERDICT_REQUIRED"
             | "FROZEN"
-            | "PAUSED" => 4,
+            | "PAUSED"
+            // a governed operation refused by an active health hard-block (scheduler G0 guard) is the same
+            // "blocked" class as emergency controls and unanswered gates (API-0002; IP-WS02-10)
+            | "HEALTH_HARD_BLOCK" => 4,
             _ => 1,
         }
     }

@@ -1,0 +1,48 @@
+# P2-AR-0023 audit-of-record probe re-run (unedited): beta-r/FRESH-evidence-invalidation label=before mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/base-tree (HEAD 3e2809a18975e062beb3cf605b02864e53f51ab8)
+# probe sha256 d9e7e12e3c4afd7fc2cfa996eb02515068e85a576cc8d76c19772a0e10240c1e; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/base-tree/target/release/gov
+# date 2026-09-19T04:28:48Z
+$ gov --role orchestrator init --name orders-ledger --alias fresh --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator audit  -> exit 0 ok=True
+baseline audit: AUD-0002 HEALTHY green: True inputs_hash: e55b3ecebb625c3e
+baseline memory_retrieval_regression detail: {'status': 'PASS', 'recall_at_k': 1.0, 'mrr': 0.9761904761904762, 'precision_at_k': 0.9404761904761904, 'queries': 21, 'pending': 2, 'failed': [], 'isolated_in_sandbox': True}
+
+====================================================================================================
+inputs that DO invalidate
+====================================================================================================
+[model/retrieval profile] MEMORY_POLICY retrieval profile override (embedding dims): green record STALE=True | re-run verdict DEGRADED recall=1.0 (baseline recall=1.0) failed=[]
+[project path map] path map: docs/** no longer semantically indexed: green record STALE=True | re-run verdict DEGRADED recall=1.0 (baseline recall=1.0) failed=[]
+[governing contract/policy (test inputs)] held-out set edited: green record STALE=True | re-run verdict HEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+
+====================================================================================================
+inputs that do NOT invalidate (content the memory families measure)
+====================================================================================================
+held-out target chosen for deletion: src/app/models.py | queries expecting it: ['HQ-008', 'HQ-011']
+[relevant source files] relevant source file deleted (src/app/models.py, a held-out target): green record STALE=True | re-run verdict HEALTHY recall=0.9047619047619048 (baseline recall=1.0) failed=['HQ-008', 'HQ-011']
+[authoritative spec] authoritative spec (requirement) rewritten: green record STALE=True | re-run verdict HEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+[relevant index manifest] index manifest changed by a rebuild of new content: green record STALE=True | re-run verdict HEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+
+====================================================================================================
+summary
+====================================================================================================
+  model/retrieval profile                    STALE=True  result-changed-on-rerun=True  MEMORY_POLICY retrieval profile override (embedding dims)
+  project path map                           STALE=True  result-changed-on-rerun=True  path map: docs/** no longer semantically indexed
+  governing contract/policy (test inputs)    STALE=True  result-changed-on-rerun=False held-out set edited
+  relevant source files                      STALE=True  result-changed-on-rerun=True  relevant source file deleted (src/app/models.py, a held-out target)
+  authoritative spec                         STALE=True  result-changed-on-rerun=False authoritative spec (requirement) rewritten
+  relevant index manifest                    STALE=True  result-changed-on-rerun=False index manifest changed by a rebuild of new content
+[PASS] FRESH-profile: a retrieval-profile change invalidates prior green governance evidence
+[PASS] FRESH-pathmap: a path-map change invalidates prior green governance evidence
+[PASS] FRESH-source: a relevant source change that alters memory regression results invalidates prior green evidence
+[PASS] FRESH-spec: an authoritative spec change invalidates prior green evidence for the memory families
+[PASS] FRESH-manifest: an index-manifest change invalidates prior green index/memory evidence
+
+=== SUMMARY ===
+PASS  FRESH-profile  a retrieval-profile change invalidates prior green governance evidence
+PASS  FRESH-pathmap  a path-map change invalidates prior green governance evidence
+PASS  FRESH-source  a relevant source change that alters memory regression results invalidates prior green evidence
+PASS  FRESH-spec  an authoritative spec change invalidates prior green evidence for the memory families
+PASS  FRESH-manifest  an index-manifest change invalidates prior green index/memory evidence
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-before-beta-r-FRESH-evidence-invalidation-sQpo9q
+[exit=0]

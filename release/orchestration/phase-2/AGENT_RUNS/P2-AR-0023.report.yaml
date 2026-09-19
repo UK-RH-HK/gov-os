@@ -1,0 +1,125 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0023
+role: capability-repair
+objective: Repair iteration 1, round 2, WS-2 - repair BC-P2-22 (W7 orphan / unexplained-output detection and governed remediation) and implement the reporting side of every check other workstreams built (the 20 integration points routed by P2-HO-0021); claims only.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]). This run is a builder: it authored the WS-2
+  round-2 product changes listed under `produced` and grades none of them; its evidence is regression evidence
+  (Contract v3 O3). It authored none of the audits, syntheses or verifications of Phase 1 or Phase 2 and no other
+  repair workstream's work. It read its handoff P2-HO-0021, P2-HO-0020, P2-HO-0010, repair-delta.md (§0-§4 and the
+  classes it touches), blocker-classes.yaml and findings.yaml for BC-P2-22 / A0-W7-01, the round-1 integration report,
+  the round-1 builder reports whose integration points were routed here (ws01-12, ws02, ws03, ws04, ws05, ws06, ws08,
+  ws09-11), the other round-2 handoffs (to avoid their files), OWNER-DECISION-P2-0002, the named audit-of-record probes
+  and outputs, Contract v3 (Gate W, U, O4/O5, A2), the AGENT_RUNS README, the R1 held-out runner of P2-AR-0022 and the
+  product source it changed or called. It did not read session or agent transcripts, task-output stores (including its
+  own) or user auto-memory; it spawned no sub-agent and did not contact the product owner. Audit-of-record probes were
+  re-run unedited; the only adapter used is P2-AR-0022's evidence adapter, unedited, applied to both binaries alike.
+input:
+  base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+  candidate: none (repair iteration 1, round 2; integrated round-1 tree)
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0021-repair-1-r2-ws02.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0021-repair-1-r2-ws02.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0022..0029 (file ownership of the parallel round-2 builders)
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml (BC-P2-22)
+  - release/capability-baseline/audit-0/synthesis/findings.yaml (A0-W7-01)
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+  - release/capability-baseline/repair-1/{ws01-12,ws02,ws03,ws04,ws05,ws06,ws08,ws09-11}/00-REPAIR-REPORT.md
+  - release/capability-baseline/audit-0/{zeta-r,delta-r,epsilon-r,synthesis,alpha-r,beta-r,gamma-r}/evidence (named probes)
+  - release/capability-baseline/repair-1/integration/evidence/{audit-probes/gov-owner-channel-shim.py,r1-heldout/run-r1-heldout.sh}
+  - release/verification/4.1.6-r1*/evidence/heldout-tests (copied byte-identically into private scratch)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - runtime/src/** and cli/src/main.rs (read; changed only where listed under produced)
+produced:
+  - runtime/src/verification/lineage.rs
+  - runtime/src/verification/reporting.rs
+  - runtime/src/verification/mod.rs
+  - runtime/src/verification/currency.rs
+  - runtime/src/verification/product.rs
+  - runtime/src/verification/families_ext.rs
+  - runtime/src/scheduler/mod.rs
+  - runtime/src/scheduler/catalogue.rs
+  - runtime/src/doctor.rs
+  - runtime/src/error.rs (exit-code mapping only)
+  - runtime/src/skills.rs (comment only)
+  - framework/policies/TEST_POLICY.yaml
+  - framework/schemas/audit.schema.json
+  - cli/src/main.rs (additive: HealthCmd::Qualify, its arm, g0_label "health qualify")
+  - runtime/src/orchestration/control.rs (additive: COMMAND_GUARDS "health qualify")
+  - tests/certification/brownfield.rs
+  - tests/certification/migration.rs
+  - tests/certification/repair2.rs
+  - release/capability-baseline/repair-1/r2-ws02/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r2-ws02/claims.yaml
+  - release/capability-baseline/repair-1/r2-ws02/evidence/
+tests_or_attacks:
+  - {id: RERUN-zeta-r-W07, description: "W7 orphan detection 12/12 (base 3/12): every W7 class named; one investigation task per orphan (tasks 1 -> 10); no deletion", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/after/zeta-r.W07-orphan-detection.out}
+  - {id: RERUN-zeta-r-W01, description: "W1-b3 misplaced record named (IP-7); W1-b1 finding ids stable (IP-10 / ws09-11 IP-1) FAIL->PASS", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/zeta-r.W01-artefact-identity.out}
+  - {id: RERUN-zeta-r-W05-W08, description: "W5-c2 untraceable implementation reported by audit, W8-l3 missing lineage link, W8-l4 stale link to superseded FAIL->PASS (IP-7/IP-8)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/after/zeta-r.W08-lineage.out}
+  - {id: RERUN-zeta-r-W10-W12, description: "W10-a5 delivery against declaration; W12-G5 superseded consumption, missing-input, end-to-end lineage FAIL->PASS (IP-9/IP-7)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/zeta-r.W12-scheduler-integration.out}
+  - {id: RERUN-delta-r-J2, description: "J2.merge.detected FAIL->PASS (ws05 IP-2)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.J1-J2-research-experiments.out}
+  - {id: RERUN-synthesis-X2-L3xU, description: "the governance suite reports approval records no gate operation produced FAIL->PASS (ws03 IP-5)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/synthesis.AC16-X2-authority-gate-chain.out}
+  - {id: RERUN-currency-regression, description: "BC-P2-03 held: zeta-r FR 26/0, beta-r FRESH 10/10, alpha-r FRESH unchanged, delta-r FRESH 12/1 via adapter (F.impl.1 adapter artefact, both binaries), synthesis X1-O4 PASS->PASS", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/COMPARE-probes.out}
+  - {id: RERUN-all-48, description: "48 audit-of-record runs, base vs repaired binary: 27 FAIL->PASS, 0 PASS->FAIL (incidental flips J1.b.audit, W6-s7, W11-m1/m8, X1-UxO5 disclosed, not claimed)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/COMPARE-probes.out}
+  - {id: SUPP-WS02-r2, description: "builder probe 51/51: W7 18 (with negative controls), T2 8, CUR 1, IDS 2, EXIT 1, G6 5, DOC 7, SUITE 9", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/WS02-r2-supplementary.out}
+  - {id: REG-lib, description: "cargo test --lib 151/0 at 91d7092 (base 146 + 5 new)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/regression/cargo-test-lib.out}
+  - {id: REG-certification, description: "cargo test --test certification 100/0 at 91d7092 (three assertions updated for BC-P2-36 D032 on unprovisioned test machines, sole-reason only)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/regression/cargo-test-certification.out}
+  - {id: R1-heldout, description: "private run-named path measuring this worktree at 91d7092: AR-0027 26/3, AR-0029 26/2 + ho_f no-compile, AR-0031 27/7, AR-0033 30/1 (hv_a::a1 size pin only); census 107 files / 1510 functions, 0 violations in every §6 activity (unpinned labelled copy and derive.py)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/r1-heldout/r1-heldout-ws02-r2-final.out}
+  - {id: REG-rustfmt-hotspots, description: "rustfmt clean on all 16 touched Rust files; 0 build warnings; 0 lines removed from hot-spot files", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/regression/rustfmt-and-hotspots.out}
+findings: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-ws02
+  commit: 3fe8ba3461b3d41ba9e46e686749d7cacdd15144
+  final_product_commit: 91d709264279061d8b1992a53949dae64c6ab7aa
+  product_code_digest: adfd1988c78e9f1856ecc931041040864edc2957a9a82939044439887282c893
+  evidence_path: release/capability-baseline/repair-1/r2-ws02/evidence/
+claims:
+  classes:
+    BC-P2-22: REPAIRED_CLAIMED
+  integration_points:
+    ws01-12 IP-1: DONE
+    ws01-12 IP-4: DONE
+    ws01-12 IP-5: DONE
+    ws03 IP-5: DONE
+    ws02 IP-WS02-10: DONE
+    ws02 IP-WS02-17: DONE
+    ws02 IP-WS02-22: DONE
+    ws04 IP-7: DONE
+    ws04 IP-8: DONE
+    ws04 IP-9: DONE
+    ws04 IP-10: DONE
+    ws09-11 IP-1: DONE
+    ws05 IP-2: DONE
+    ws05 IP-7: DONE
+    ws06 IP-2: DONE
+    ws06 IP-8: DONE
+    ws08 IP-1: DONE
+    ws08 IP-2: DONE
+    integration O-2: DONE
+    integration O-6: DONE
+unresolved:
+  - "R3-1 WS-4: cit rollback leaves the approval decision's T2 seal BROKEN (re-seal after marking REJECTED)"
+  - "R3-2 WS-4: stale_links reports a completed CIT's own change subjects (filtered on the reporting side)"
+  - "R3-3 WS-4: decision evidence_refs is not a relation field"
+  - "R3-4 WS-6: coverage verifier reports held Markdown heading lines as gaps (confirmed on the reporting side)"
+  - "R3-5 WS-5: BC-P2-24 engine to adopt the W7 investigation tasks"
+  - "R3-6 WS-1: evidence-map owners for the new checks"
+  - "R3-7 WS-8 harness provisioning: remove the three D032 relaxations in certification tests"
+  - "R3-8 WS-2 round 3: BC-P2-23 W11 metrics and BC-P2-44 SLO thresholds / HEALTHY conjunction"
+  - "R3-9 WS-9: A11 should name unestablished authenticity as the reason on a bootstrap machine"
+  - "R3-10 WS-3/docs: document gov health qualify, D032-D034, the new families and T2-honoured evidence"
+  - "R3-11 WS-7/WS-3: include sealed plugin-registry entries in t2::audit"
+  - "R3-12 WS-10: expose the research/experiment completeness predicate for lineage::unconsumed_research"
+recommended_next_action: "Round-3 builders apply R3-1..R3-12 (WS-2 round 3: BC-P2-07/23/44); after WS-8 provisions the harness, restore the strict adoption/doctor assertions (R3-7); then integrate round 2."
+completed_at: "2026-09-19T06:13:00Z"
