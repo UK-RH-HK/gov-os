@@ -1,0 +1,36 @@
+--- a/runtime/src/orchestration/gates.rs	2026-09-19 10:34:16.360545908 +0100
++++ b/runtime/src/orchestration/gates.rs	2026-09-19 10:34:16.408323660 +0100
+@@ -1566,6 +1566,8 @@
+     {
+         let mut sc = RecordStore::load(&p.root);
+         if let Some(c) = sc.get_mut(cit_id) {
++            // O-7 (IP-R3-WS04-01): the answer is an OS write into a sealed CIT record; re-seal it when it verified before
++            let was_verified = crate::cit::binding::verified_before(c);
+             if option == "A" {
+                 if c.get("decision").is_empty() {
+                     c.set("decision", json!(did));
+@@ -1584,6 +1586,7 @@
+                     j.push(json!({"at": now_iso(), "event": "rejected_by_gate", "gate": id, "option": option, "by": by, "by_kind": kind}));
+                 }
+             }
++            crate::cit::binding::reseal_if_verified(c, was_verified, true, "gate answer")?;
+             save_record(&p.root, c)?;
+         }
+     }
+@@ -1669,6 +1672,8 @@
+     {
+         let mut s3 = RecordStore::load(&p.root);
+         if let Some(c) = s3.get_mut(cit_id) {
++            // O-7 (IP-R3-WS04-01): as for the answer
++            let was_verified = crate::cit::binding::verified_before(c);
+             if c.get("cit_status") == "APPROVED" {
+                 c.set("cit_status", json!("SIMULATED"));
+             }
+@@ -1678,6 +1683,7 @@
+             if let Some(j) = c.data["journal"].as_array_mut() {
+                 j.push(json!({"at": now_iso(), "event": "approval_revoked", "gate": id, "reason": reason, "by_session": p.session_id}));
+             }
++            crate::cit::binding::reseal_if_verified(c, was_verified, true, "gate revoke")?;
+             save_record(&p.root, c)?;
+             touched["cit"] = json!({"id": cit_id, "cit_status": c.get("cit_status")});
+         }

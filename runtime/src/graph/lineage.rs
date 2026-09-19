@@ -80,14 +80,26 @@ fn is_current(r: &Record) -> bool {
         && r.get("task_status") != "CANCELLED"
 }
 
+/// Change-Impact Transaction states in which the transaction is finished: its links (the records it changed or
+/// superseded, the gate and decision that approved or declined it) record what it did, not what anything relies on
+/// now.
+pub const FINISHED_CIT_STATES: &[&str] = &["COMMITTED", "ROLLED_BACK", "REJECTED"];
+
+/// Is `r` a finished Change-Impact Transaction (see [`FINISHED_CIT_STATES`])?
+pub fn finished_transaction(r: &Record) -> bool {
+    r.rtype() == "cit" && FINISHED_CIT_STATES.contains(&r.get("cit_status").as_str())
+}
+
 /// **Stale lineage links** (W8 line 1151): a current record whose relation points at a record that is not current
 /// — superseded (by status or by a successor), historical, deprecated, retired, rejected or legacy. Supersession
-/// edges themselves are not stale links (they are how currency is expressed).
+/// edges themselves are not stale links (they are how currency is expressed), and neither are the links of a
+/// finished Change-Impact Transaction ([`finished_transaction`]; WS-2 R3-2): a committed CIT that superseded a
+/// requirement, or a rolled-back one whose approval decision is now REJECTED, links to those records as history.
 pub fn stale_links(store: &RecordStore) -> Vec<Value> {
     let succ = successor_map(store);
     let mut out = vec![];
     for r in &store.records {
-        if !is_current(r) || r.id().is_empty() {
+        if !is_current(r) || r.id().is_empty() || finished_transaction(r) {
             continue;
         }
         let me = r.id();
@@ -246,5 +258,26 @@ mod tests {
         let un = unconsumed_outputs(&s);
         assert!(un.iter().any(|x| x["record"] == "DATA-0001"), "{un:?}");
         assert_eq!(consumers_of(&s, "REQ-0009"), vec!["TASK-0003".to_string()]);
+    }
+
+    #[test]
+    fn a_finished_transactions_links_are_history_not_stale_links() {
+        let s = store(vec![
+            rec("id: REQ-0009\ntype: requirement\nstatus: SUPERSEDED\nsuperseded_by: REQ-0001\n", "spec/requirements/REQ-0009.yaml"),
+            rec("id: REQ-0001\ntype: requirement\nstatus: ACTIVE\nsupersedes: [REQ-0009]\n", "spec/requirements/REQ-0001.yaml"),
+            rec("id: D-0007\ntype: decision\nstatus: REJECTED\nrollback_of: CIT-0002\n", "spec/decisions/D-0007.yaml"),
+            // the transaction that superseded REQ-0009 and the rolled-back one whose approval is now REJECTED
+            rec("id: CIT-0001\ntype: cit\nstatus: ACTIVE\ncit_status: COMMITTED\ntargets: [REQ-0009]\n", "spec/decisions/CIT-0001.yaml"),
+            rec("id: CIT-0002\ntype: cit\nstatus: ACTIVE\ncit_status: ROLLED_BACK\ntargets: [REQ-0009]\ndecision: D-0007\n", "spec/decisions/CIT-0002.yaml"),
+            // an open transaction still relies on what it targets
+            rec("id: CIT-0003\ntype: cit\nstatus: ACTIVE\ncit_status: SIMULATED\ntargets: [REQ-0009]\n", "spec/decisions/CIT-0003.yaml"),
+        ]);
+        let st = stale_links(&s);
+        let from: Vec<&str> = st.iter().filter_map(|x| x["record"].as_str()).collect();
+        assert!(
+            !from.contains(&"CIT-0001") && !from.contains(&"CIT-0002"),
+            "{st:?}"
+        );
+        assert!(from.contains(&"CIT-0003"), "{st:?}");
     }
 }

@@ -1,0 +1,82 @@
+(a) role declared: orchestrator for init --name n3
+(a) role declared: orchestrator for checkpoint watchdog --utilisation
+(a) role declared: orchestrator for checkpoint watchdog --utilisation
+(a) role declared: orchestrator for checkpoint watchdog --ops
+(a) role declared: orchestrator for checkpoint latest
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for checkpoint watchdog
+(a) role declared: orchestrator for policy overrides
+(a) role declared: orchestrator for policy overrides
+(a) role declared: orchestrator for init --name n3b
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for task claim TASK-0001
+(a) role declared: orchestrator for context compile TASK-0001
+(a) role declared: orchestrator for checkpoint create --task
+(a) role declared: orchestrator for cit propose --proposal
+(a) role declared: orchestrator for gate present HDG-0001
+(a) role declared: orchestrator for decide HDG-0001 --option
+(b') human channel: throw-away root delegating human-gate provisioned from /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N3-N4-W9-watchdog-handoff-49Loxo/tmp/p2ar0032-admin-8qtsd94i: provisioned
+(b) decide HDG-0001 --option A: owner-signed answer relayed by orchestrator (probe role was orchestrator)
+(a) role declared: orchestrator for cit approve CIT-0001
+(a) role declared: orchestrator for cit execute CIT-0001
+(a) role declared: orchestrator for gate create --question
+(c) gate create: package fields added ['why_now', 'current_state', 'impact', 'reversibility', 'cost_rework', 'recommendation', 'confidence', 'impact_radius']
+(a) role declared: orchestrator for cit show CKPT-00001
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for checkpoint latest
+(a) role declared: orchestrator for handoff create --to-role
+(a) role declared: orchestrator for checkpoint latest
+(a) role declared: orchestrator for context compile TASK-0001
+(a) role declared: orchestrator for session close
+(a) role declared: orchestrator for init --name n4
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for handoff create --to-role
+(a) role declared: orchestrator for cit show HND-0001
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for memory query gateway returns 429
+(a) role declared: orchestrator for cit show HND-0001
+(a) role declared: orchestrator for cit show HND-0001
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for handoff create --to-role
+(a) role declared: orchestrator for cit show HND-0002

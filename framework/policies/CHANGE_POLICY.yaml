@@ -27,7 +27,13 @@ propagation:
   mark_evidence_stale: true
   mark_checkpoints_stale: true
   invalidate_context_packets: true
+  # round 3 (O-7): propagation outside CIT-E (a detected direct change) is recorded as a sealed system transaction
+  # (origin: system) whose touched list and per-path writes cover the markers it wrote
+# graph_integrity: no new dangling edge, and (round 3, WS-6 IP-R2-2) no new reversed, ill-typed or stale relationship
+# declared by a record the manifest wrote, and no new supersession cycle (memory::integrity::check before and after)
 verification_required: [schema_validation, graph_integrity, index_freshness]
 rollback:
   snapshot_before_execute: true
+  # snapshots are kept in the non-rebuildable OS store .governance-state/cit/ (BC-P2-31), never in the derived
+  # runtime directory
   keep_snapshots: 20

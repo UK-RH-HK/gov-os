@@ -1,0 +1,177 @@
+# P2-AR-0035 audit-of-record probe re-run (unedited, through the P2-AR-0032 root-channel adapter): delta-r/N1-N2-checkpoints mode=after
+# worktree HEAD bda16a23dbcc316b69c7efc782d4181ec18faf60; product files differing from HEAD: 0
+# probe sha256 1d563d61fd23aaa5b44813671ed6cf874a7fa1b84a7153bc3d692768717bf36e; real gov 4ca382dc1a784d931f01626bdfab1641a8ec3285b9daf52e63e7b2bf20540858 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws04/target/debug/gov)
+# adapter sha256 bf5fd618c2f90dd973da4a79b1233f20420f3000e5e50cb5c3c904db654fed6c
+# date 2026-09-19T11:15:25Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n1-1789816525-1a2873/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+
+## N1 a checkpoint taken mid-task
+$ gov --json --session probe-1c96fbc9 task create --objective 'tune backoff' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-1c96fbc9 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-1c96fbc9 gate create --question 'Which backoff curve?' --fields '{"options": [{"id": "A", "description": "exp"}]}'
+  -> ok
+$ gov --json --session probe-1c96fbc9 cit propose --proposal 'probe change open' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n1-1789816525-1a2873/m-open.json --trigger behaviour_change
+  -> ok
+$ gov --json --session probe-1c96fbc9 context compile TASK-0001
+  -> ok
+$ gov --json --session probe-1c96fbc9 checkpoint create --task TASK-0001 --next-action 'run load test' --step 'wrote backoff.txt' --tests-status 'failing: test_backoff'
+  -> ok
+---- checkpoint record ----
+{
+ "claim": {
+  "branch": "main",
+  "claimed_at": "2026-09-19T11:16:58Z",
+  "expires_at": "2026-09-19T15:16:58Z",
+  "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n1-1789816525-1a2873/proj/.git",
+  "head": "cca2da1c02682dcbc153863e7d021c57a29dfdaf",
+  "role": "orchestrator",
+  "scope": [
+   "product/**"
+  ],
+  "session_id": "probe-1c96fbc9",
+  "task_id": "TASK-0001",
+  "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n1-1789816525-1a2873/proj"
+ },
+ "context_packet_hash": "a8784e7c32104b8c14588e025309afe9d27dddd46b03e34ce7a2c675e0fe9713",
+ "created": "2026-09-19",
+ "created_at": "2026-09-19T11:17:23Z",
+ "files_changed": [
+  "governance/generated/index-manifest.json",
+  "governance/generated/memory-manifest.json",
+  "product/backoff.txt",
+  "spec/decisions/CIT-0001.yaml",
+  "spec/decisions/HDG-0001.yaml",
+  "spec/decisions/HDG-0002.yaml",
+  "spec/reports/memory-quality/FAIL-0001.yaml",
+  "spec/tasks/TASK-0001.yaml"
+ ],
+ "health": {
+  "counts": {
+   "critical": 0,
+   "high": 0,
+   "low": 3,
+   "medium": 0
+  },
+  "health_result": "HR-20260919T111717347Z-43e2f3d2",
+  "tier": "G3",
+  "verdict": "HEALTHY"
+ },
+ "id": "CKPT-00001",
+ "input_state": {
+  "contradictions": [],
+  "delivery_state": "COMPLETE",
+  "input_violations": [],
+  "missing_inputs": [],
+  "packet_compiled_at": "2026-09-19T11:17:06Z",
+  "packet_current": true,
+  "packet_hash": "a8784e7c32104b8c14588e025309afe9d27dddd46b03e34ce7a2c675e0fe9713",
+  "packet_invalidated": false,
+  "stale_inputs": [],
+  "task": "TASK-0001",
+  "task_status": "IN_PROGRESS"
+ },
+ "inputs": [],
+ "last_completed_step": "wrote backoff.txt",
+ "memory_snapshot": {
+  "fresh": true,
+  "index_manifest_hash": "a66f7761c2109ad8691bf8a14675112be7df53804a8b01d6dfac8fb5d67eadfa",
+  "index_version": "4.1.5-idx5",
+  "stale_before_checkpoint": 5
+ },
+ "mode": "RUNNING",
+ "next_action": "run load test",
+ "observed_state": {
+  "at": "2026-09-19T11:17:17Z",
+  "material_decisions": [],
+  "routing_digest": "9be971ad34793e659044807ba3a420f91ecd316b48602b19b7d98f6492c90e17",
+  "task_states": {
+   "TASK-0001": "IN_PROGRESS"
+  },
+  "telemetry_events": 9
+ },
+ "open_questions": [
+  "HDG-0001: Which backoff curve?",
+  "HDG-0002: Approve change CIT-0001: probe change open"
+ ],
+ "open_transactions": [
+  "CIT-0001"
+ ],
+ "os_binding": {
+  "alg": "hmac-sha256/t2-v1",
+  "at": "2026-09-19T11:17:23Z",
+  "key_id": "7a13e4aba79708c1",
+  "mac": "e041b3360272f44426b41a6c024f32e70e215d28cbc965026908d7c7ca69f03c",
+  "operation": "checkpoint create"
+ },
+ "pending_decisions": [
+  "HDG-0001",
+  "HDG-0002"
+ ],
+ "record_binding": {
+  "sealed": true
+ },
+ "role": "orchestrator",
+ "sequence": 1,
+ "session": "probe-1c96fbc9",
+ "state_class": "EVIDENCE",
+ "state_reference": {
+  "governed_state_digest": "4976140dfec8f95c765c94
+CHECK N1.b1 PASS session, role, task, mode and the live claim are recorded
+      detail: {"claim": {"branch": "main", "claimed_at": "2026-09-19T11:16:58Z", "expires_at": "2026-09-19T15:16:58Z", "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n1-1789816525-1a2873/proj/.git", "head": "cca2da1c02682dcbc153863e7d021c57a29dfdaf", "role": "orchestrator", "scope": ["product/**"], "session_id": "probe-1c96fbc9", "task_id": "TASK-0001", "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n1-1789816525-1a2873/proj"}, "mode": "RUNNING", "role": "orchestrator", "session": "probe-1c96fbc9", "task": "TASK-0001"}
+CHECK N1.b2 PASS last completed step
+      detail: wrote backoff.txt
+CHECK N1.b3 PASS next action
+      detail: run load test
+CHECK N1.b4a PASS pending decisions = the open Human Decision Gates
+      detail: ["HDG-0001", "HDG-0002"]
+CHECK N1.b4b PASS open questions can be recorded (the CLI accepts them)
+      detail: {"open_questions": ["HDG-0001: Which backoff curve?", "HDG-0002: Approve change CIT-0001: probe change open"]}
+CHECK N1.b5 PASS open transactions = CITs not yet committed/rejected
+      detail: ["CIT-0001"]
+CHECK N1.b6 PASS files changed (uncommitted working-tree changes)
+      detail: ["governance/generated/index-manifest.json", "governance/generated/memory-manifest.json", "product/backoff.txt", "spec/decisions/CIT-0001.yaml", "spec/decisions/HDG-0001.yaml", "spec/decisions/HDG-0002.yaml", "spec/reports/memory-quality/FAIL-0001.yaml", "spec/tasks/TASK-0001.yaml"]
+CHECK N1.b7 PASS test status
+      detail: failing: test_backoff
+CHECK N1.b8 PASS context packet hash of the task's compiled packet
+      detail: {"checkpoint": "a8784e7c32104b8c14588e025309afe9d27dddd46b03e34ce7a2c675e0fe9713", "packet": "a8784e7c32104b8c14588e025309afe9d27dddd46b03e34ce7a2c675e0fe9713"}
+$ gov --json --session probe-1c96fbc9 memory freshness
+  -> ok
+CHECK N1.b9 PASS memory snapshot reference (index manifest hash + index version)
+      detail: {"fresh": true, "index_manifest_hash": "a66f7761c2109ad8691bf8a14675112be7df53804a8b01d6dfac8fb5d67eadfa", "index_version": "4.1.5-idx5", "stale_before_checkpoint": 5}
+$ gov --json --session probe-1c96fbc9 checkpoint create --next-action 
+  -> ERROR [USAGE] checkpoint requires next_action
+CHECK N1.guard.1 PASS a checkpoint without a next action is refused
+      detail: {"code": "USAGE", "details": null, "message": "checkpoint requires next_action"}
+$ gov --json --session probe-1c96fbc9 checkpoint create --next-action x --trigger whenever
+  -> ERROR [USAGE] unknown checkpoint trigger 'whenever' (policy triggers: ["task_transition", "material_decision", "accepted_cit", "significant_mutation", "before_handoff", "before_model_switch", "before_session_close", "before_compaction"])
+CHECK N1.guard.2 PASS an unknown trigger is refused
+      detail: {"code": "USAGE", "details": null, "message": "unknown checkpoint trigger 'whenever' (policy triggers: [\"task_transition\", \"material_decision\", \"accepted_cit\", \"significant_mutation\", \"before_handoff\", \"before_model_switch\", \"before_session_close\", \"before_compaction\"])"}
+$ gov --json --session probe-1c96fbc9 checkpoint latest
+  -> ok
+CHECK N1.latest PASS gov checkpoint latest returns it (LATEST pointer)
+      detail: CKPT-00001
+$ gov --json --session fresh-agent-2 status
+  -> ok
+CHECK N1.fresh PASS a fresh session reconstructs the checkpoint through gov status
+      detail: {"id": "CKPT-00001", "next_action": "run load test", "session": "probe-1c96fbc9", "task": "TASK-0001"}
+
+## N2 which triggers actually produce a checkpoint
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n2-1789816653-1bbe8a/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+$ gov --json --session probe-bd139f62 task create --objective 'transition probe' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-bd139f62 task status TASK-0001 BLOCKED --note waiting
+  -> ok
+$ gov --json --session probe-bd139f62 task status TASK-0001 READY
+  -> ok
+$ gov --json --session probe-bd139f62 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-bd139f62 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-bd139f62 task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n2-1789816653-1bbe8a/rep1.json
+  -> ERROR [RECEIPT_INVALID] TASK-0001: the consumption receipt does not trace this completion to its inputs (UNTRACEABLE_IMPLEMENTATION). Remediation: return the fields in the packet's receipt_contract — TASK-0001 (discovery) produced implementation (product/a.txt) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification
+unexpected failure: gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-after-delta-r-N1-N2-checkpoints-ca0Ewl/n2-1789816653-1bbe8a/rep1.json: {'code': 'RECEIPT_INVALID', 'message': "TASK-0001: the consumption receipt does not trace this completion to its inputs (UNTRACEABLE_IMPLEMENTATION). Remediation: return the fields in the packet's receipt_contract — TASK-0001 (discovery) produced implementation (product/a.txt) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification", 'details': {'task': 'TASK-0001', 'ok': False, 'errors': [{'code': 'UNTRACEABLE_IMPLEMENTATION', 'message': 'TASK-0001 (discovery) produced implementation (product/a.txt) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification', 'ids': ['product/a.txt']}], 'warnings': [], 'manifest_hash': '38a71485e5b48e0b0a4904e8066e6b2658ca41d3d8ac50712891bdbde3bc0b1a', 'packet_hash': 'a00e63250cbaf2b844909dfc4ac3dc656103d80971d1639b42492516428b4705', 'traceability_required': True, 'receipt': {'context_packet_hash': 'a00e63250cbaf2b844909dfc4ac3dc656103d80971d1639b42492516428b4705', 'inputs_consumed': [], 'outputs_produced': ['product/a.txt'], 'requirements_implemented': [], 'scenarios_implemented': [], 'features_implemented': [], 'decisions_applied': [], 'constraints_applied': [], 'acceptance_evidence': [], 'deviations': [], 'unresolved': []}}}
+[exit=1]

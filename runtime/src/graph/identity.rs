@@ -208,6 +208,9 @@ pub fn identity(p: &Project, store: &RecordStore, id: &str) -> Result<Value> {
         "version": r.data.get("version").cloned().unwrap_or(Value::Null),
         "content_hash": content_hash(&p.root, r),
         "provenance": {"declared": declared_prov, "version_control": git_provenance(p, &r.path)},
+        // which gov operation wrote the record as it stands, when its T2 seal verifies (round 3, O-7): OS-written
+        // records are recognisable by their seal, and an OS write after a hand edit never re-seals it
+        "t2_binding": crate::t2::verify_record(r).to_value(),
         "supersedes": r.list("supersedes"),
         "superseded_by": succ.get(id).cloned(),
         "expected_consumers": r.list("consumers"),
@@ -322,6 +325,83 @@ mod tests {
         assert_eq!(record_in_canonical_location(None, &plan), Some(true));
         assert_eq!(crate::records::prefix_for("failure"), "FAIL");
         assert_eq!(crate::records::prefix_for("migration-plan"), "MPLAN");
+    }
+
+    #[test]
+    fn a_product_release_is_a_governed_record_in_the_lineage() {
+        // WS-8 IP-R2-WS08-7 (record side): type, canonical location, id prefix, relation fields and schema rule
+        assert_eq!(crate::records::prefix_for("release"), "REL");
+        let rel = parse_record_text(
+            "id: REL-0001\ntype: release\nstatus: ACTIVE\nversion: '1.4.0'\nderived_from: [TASK-0001, RPT-0003]\nvalidated_by: [AUD-0002]\n",
+            "spec/releases/REL-0001.yaml",
+        )
+        .unwrap();
+        assert_eq!(record_in_canonical_location(None, &rel), Some(true));
+        let e = rel.edges();
+        for want in [
+            ("REL-0001", "DERIVED_FROM", "TASK-0001"),
+            ("REL-0001", "DERIVED_FROM", "RPT-0003"),
+            ("REL-0001", "VALIDATED_BY", "AUD-0002"),
+        ] {
+            assert!(
+                e.contains(&(want.0.into(), want.1.into(), want.2.into())),
+                "{want:?} not in {e:?}"
+            );
+        }
+        let schemas = crate::schemas::SchemaRegistry::new(
+            &std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../framework/schemas"),
+        );
+        assert!(
+            !schemas.has("release"),
+            "a release is validated by the record schema"
+        );
+        assert!(schemas.errors("record", &rel.data).unwrap().is_empty());
+        let mut bare = rel.data.clone();
+        bare.as_object_mut().unwrap().remove("validated_by");
+        assert!(
+            !schemas.errors("record", &bare).unwrap().is_empty(),
+            "a release names the evidence that validated it"
+        );
+        // the rule binds release records only
+        let other = json!({"id": "LEG-0001", "type": "legacy", "status": "ACTIVE"});
+        assert!(schemas.errors("record", &other).unwrap().is_empty());
+    }
+
+    #[test]
+    fn citation_and_scenario_chain_fields_are_relation_edges() {
+        // WS-2 R3-3 and WS-10 IP-WS10-08
+        let d = parse_record_text(
+            "id: D-0004\ntype: decision\nstatus: ACTIVE\nevidence_refs: [RES-0002, AUD-0001]\n",
+            "spec/decisions/D-0004.yaml",
+        )
+        .unwrap();
+        assert!(d
+            .edges()
+            .contains(&("D-0004".into(), "DERIVED_FROM".into(), "RES-0002".into())));
+        let scn = parse_record_text(
+            "id: SCN-0002\ntype: scenario\nstatus: ACTIVE\ndata_requirements: [DATA-0001]\n",
+            "spec/scenarios/SCN-0002.yaml",
+        )
+        .unwrap();
+        assert!(scn
+            .edges()
+            .contains(&("SCN-0002".into(), "CONSUMES".into(), "DATA-0001".into())));
+        let tst = parse_record_text(
+            "id: TST-0003\ntype: test-obligation\nstatus: ACTIVE\ntest_data: [TD-0001]\n",
+            "spec/tasks/TST-0003.yaml",
+        )
+        .unwrap();
+        assert!(tst
+            .edges()
+            .contains(&("TST-0003".into(), "CONSUMES".into(), "TD-0001".into())));
+        let td = parse_record_text(
+            "id: TD-0001\ntype: data\nstatus: ACTIVE\nrealises: [DATA-0001]\n",
+            "spec/data/TD-0001.yaml",
+        )
+        .unwrap();
+        assert!(td
+            .edges()
+            .contains(&("TD-0001".into(), "IMPLEMENTS".into(), "DATA-0001".into())));
     }
 
     #[test]

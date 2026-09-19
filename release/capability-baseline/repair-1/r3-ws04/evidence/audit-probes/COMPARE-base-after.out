@@ -1,0 +1,25 @@
+== beta-r.C2-relationship-graph: base 9/10 PASS, after 9/10 PASS
+== beta-r.D6-rebuild-guarantee: base 0/0 PASS, after 0/0 PASS
+== builder.ws05_r2_supplementary.root-channel: base 37/37 PASS, after 37/37 PASS
+== builder.ws10_supplementary.root-channel: base 34/34 PASS, after 34/34 PASS
+== delta-r.J1-J2-research-experiments: base 8/9 PASS, after 8/9 PASS
+== delta-r.K2-cit-e: base 11/26 PASS, after 11/26 PASS
+== delta-r.K3-auto-impact-simulation: base 18/19 PASS, after 18/19 PASS
+== delta-r.L3-gate-presentation-attacks: base 33/39 PASS, after 33/39 PASS
+== delta-r.N1-N2-checkpoints: base 14/14 PASS, after 14/14 PASS
+== delta-r.N3-N4-W9-watchdog-handoff: base 18/18 PASS, after 18/18 PASS
+== derived.AC16-X2-authority-gate-chain.derived.P2-AR-0026: base 6/11 PASS, after 6/11 PASS
+== derived.K2-cit-e.valid-fixture.P2-AR-0025: base 26/26 PASS, after 26/26 PASS
+== derived.ws04r2-scenarios.held-task.P2-AR-0032: base 40/40 PASS, after 40/40 PASS
+== gamma-r.H4-scenarios-data-tests: base 0/0 PASS, after 0/0 PASS
+== synthesis.AC16-X1-upstream-change-chain: base 12/15 PASS, after 12/15 PASS
+== synthesis.AC16-X2-authority-gate-chain: base 1/1 PASS, after 1/1 PASS
+== zeta-r.W03-task-input-manifest: base 20/20 PASS, after 20/20 PASS
+== zeta-r.W05-consumption-receipt: base 13/17 PASS, after 13/17 PASS
+== zeta-r.W06-staleness-propagation: base 18/26 PASS, after 18/26 PASS
+== zeta-r.W08-lineage: base 22/24 PASS, after 22/24 PASS
+TOTAL FAIL->PASS 0  PASS->FAIL 0
+base builder.ws05_r2_supplementary.root-channel: 37 PASS 0 FAIL
+base builder.ws10_supplementary.root-channel: 35 PASS 0 FAIL
+after builder.ws05_r2_supplementary.root-channel: 37 PASS 0 FAIL
+after builder.ws10_supplementary.root-channel: 35 PASS 0 FAIL
