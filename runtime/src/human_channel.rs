@@ -274,14 +274,16 @@ fn parse_standalone(env: Envelope, now: Option<&str>) -> Result<Anchor> {
 
 /// **Administrator action**: install the standalone human-channel anchor (the owner's public `human-gate` keys).
 ///
-/// Refused below floor (it is a trust-policy mutation: `OWNER-DECISION-0006` §6 bullet 4), on a machine that holds a
-/// Signed Release Root (the root's delegation governs there), and when an anchor already exists (the product never
-/// re-anchors; replacing it is an administrator-domain action outside the product).
-pub fn provision_standalone(file: &Path) -> Result<Value> {
+/// Refused below floor (it is a trust-policy mutation: `OWNER-DECISION-0006` §6 bullet 4), for an anchor file that is
+/// repository content (ARCH-0003 §5, the same rule `gov trust provision` applies to a Signed Release Root), on a
+/// machine that holds a Signed Release Root (the root's delegation governs there), and when an anchor already exists
+/// (the product never re-anchors; replacing it is an administrator-domain action outside the product).
+pub fn provision_standalone(file: &Path, project_root: Option<&Path>) -> Result<Value> {
     crate::srr::breakglass::guard_effect(
         crate::srr::breakglass::Effect::TrustPolicyMutation,
         "trust human-channel provision",
     )?;
+    refuse_repository_sourced_anchor(file, project_root)?;
     let ms = crate::srr::state::MachineState::open()?;
     let now = crate::srr::metadata::local_clock_now();
     if let Some(root) = crate::srr::verifier::trusted_root(&ms, &now)? {
@@ -313,6 +315,39 @@ pub fn provision_standalone(file: &Path) -> Result<Value> {
     Ok(
         json!({"provisioned": true, "anchor": a.describe(), "path": dest.display().to_string(), "provisioned_at": now_iso()}),
     )
+}
+
+/// ARCH-0003 §5 / OWNER-DIRECTIVE-0004: a verification anchor comes from the administrator installation boundary,
+/// never from repository content. Mirrors the rule `srr::provision` applies to a Signed Release Root (that helper is
+/// private to `srr/**`, which this workstream does not edit): a file inside the governed project, or under any `.git`
+/// or `governance` directory, is refused.
+fn refuse_repository_sourced_anchor(file: &Path, project_root: Option<&Path>) -> Result<()> {
+    let abs = file.canonicalize().unwrap_or_else(|_| file.to_path_buf());
+    let refuse = |why: String| {
+        GovError::new(
+            "HUMAN_CHANNEL_ANCHOR_FROM_REPOSITORY_REFUSED",
+            format!("{} {why}. The human-channel anchor comes from the platform/administrator installation boundary, never from repository content (ARCH-0003 §5, OWNER-DIRECTIVE-0004).", abs.display()),
+        )
+        .with_details(json!({"anchor_file": abs.display().to_string()}))
+    };
+    if let Some(pr) = project_root {
+        let pabs = pr.canonicalize().unwrap_or_else(|_| pr.to_path_buf());
+        if crate::project::find_root(&pabs).is_some_and(|r| abs.starts_with(&r))
+            || abs.starts_with(&pabs)
+        {
+            return Err(refuse(format!(
+                "is inside the governed project at {}",
+                pabs.display()
+            )));
+        }
+    }
+    for part in abs.components() {
+        let s = part.as_os_str().to_string_lossy();
+        if s == ".git" || s == "governance" {
+            return Err(refuse("is repository-controlled content".into()));
+        }
+    }
+    Ok(())
 }
 
 /// Whether `path` can be written by the invoking account (the premise check reported by [`status`]).

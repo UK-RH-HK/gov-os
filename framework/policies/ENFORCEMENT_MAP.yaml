@@ -108,6 +108,7 @@ keys:
   HUMAN_GATE_POLICY.agent_resolvable_when.*: {enforced_by: [gates::answer]}
   HUMAN_GATE_POLICY.decision_package_fields: {enforced_by: [gates::build]}
   HUMAN_GATE_POLICY.package_non_substantive_values: {enforced_by: [gates::build]}
+  HUMAN_GATE_POLICY.human_only_triggers: {enforced_by: [gates::answer, gates::verified_answer_in]}
   HUMAN_GATE_POLICY.system_gate_package.*: {enforced_by: [gates::build]}
   HUMAN_GATE_POLICY.human_channel.*: {enforced_by: [gates::standalone_anchor_allowed, human_channel::anchor]}
   HUMAN_GATE_POLICY.prioritisation: {enforced_by: [gates::build]}

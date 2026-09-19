@@ -38,6 +38,7 @@ rules:
   - {key: HUMAN_GATE_POLICY.agent_resolvable_when.independent_assessment, mode: strengthen_only_bool, strict_value: true}
   - {key: HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned, mode: strengthen_only_bool, strict_value: false}
   - {key: HUMAN_GATE_POLICY.package_non_substantive_values, mode: additive}
+  - {key: HUMAN_GATE_POLICY.human_only_triggers, mode: additive}
   - {key: HUMAN_GATE_POLICY.batch_low_priority, mode: overridable}
   - {key: HUMAN_GATE_POLICY.continue_independent_work, mode: overridable}
   - {key: HUMAN_GATE_POLICY.*, mode: immutable}

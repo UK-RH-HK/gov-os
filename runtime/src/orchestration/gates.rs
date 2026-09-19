@@ -100,6 +100,30 @@ fn package_fields(p: &Project) -> Vec<String> {
     }
 }
 
+/// Gate triggers that are human decisions by their nature (framework §51: governance/framework change, destructive
+/// data action, security/privilege, spend and new executable capability): never agent-resolvable — refused when an
+/// agent answers ([`answer`]) **and** refused when a consumer reads the answer ([`verified_answer_in`]), so a record
+/// that claims an agent resolution of such a gate is not honoured even when its T2 seal verifies. This is the kernel
+/// floor; `HUMAN_GATE_POLICY.human_only_triggers` may add to it (POLICY_PRECEDENCE `additive`), never remove from it.
+pub const HUMAN_ONLY_TRIGGERS: &[&str] = &[
+    "framework_update",
+    "destructive_migration",
+    "privilege_elevation",
+    "kernel_integrity_override",
+    "tool_install",
+    "budget_threshold",
+];
+
+/// Whether gates raised for `trigger` may only be answered by the human (see [`HUMAN_ONLY_TRIGGERS`]).
+pub fn human_only_trigger(p: &Project, trigger: &str) -> bool {
+    !trigger.is_empty()
+        && (HUMAN_ONLY_TRIGGERS.contains(&trigger)
+            || p.policies()
+                .get_list("HUMAN_GATE_POLICY", "human_only_triggers")
+                .iter()
+                .any(|t| t == trigger))
+}
+
 fn non_substantive(p: &Project) -> Vec<String> {
     let mut v: Vec<String> = p
         .policies()
@@ -975,6 +999,11 @@ pub fn verified_answer_in(
             {
                 return Err(GovError::new("GATE_STATE_INVALID", format!("human gate {gate_id} records an agent answer without its resolution record")));
             }
+            // use-time rule, independent of the seal: a human-only gate is never honoured on an agent's answer
+            let trigger = g.get("trigger");
+            if human_only_trigger(p, &trigger) {
+                return Err(GovError::new("GATE_STATE_INVALID", format!("human gate {gate_id} (trigger '{trigger}') records an agent resolution, but gates raised for '{trigger}' are human decisions (framework §51); only an owner-signed human answer is honoured")).with_details(json!({"gate": gate_id, "trigger": trigger, "rule": "HUMAN_GATE_POLICY.human_only_triggers"})));
+            }
         }
         other => {
             return Err(GovError::new(
@@ -1422,6 +1451,10 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
         }
         if need_indep && source != "os" && declared_by == p.session_id {
             why.push("the assessment rests solely on the resolving session's own declaration (it raised this gate); another session or the OS must have assessed it".into());
+        }
+        let trigger = g.get("trigger");
+        if human_only_trigger(p, &trigger) {
+            why.push(format!("gates raised for '{trigger}' are human decisions (framework §51; HUMAN_GATE_POLICY.human_only_triggers) and are never agent-resolvable"));
         }
         if !why.is_empty() {
             return Err(GovError::new("AUTHORITY_DENIED", format!("agent '{by}' may not resolve {id}: {} (HUMAN_GATE_POLICY.agent_resolvable_when; framework §50). It needs a human answer.", why.join("; "))).with_details(json!({"operation": "answer_gate_as_agent", "role": p.role, "level": format!("L{acting}"), "reasons": why, "assessment": a, "effective_radius": radius})));

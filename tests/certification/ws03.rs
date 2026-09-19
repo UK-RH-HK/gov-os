@@ -31,13 +31,17 @@ pub fn human_channel(g: &Gov) {
     if st.ok() && st.result()["available"] == true {
         return;
     }
-    let k = owner();
-    let (kid, entry) = key_entry(&k);
+    let f = scratch_file(g, "anchor.json", &anchor_doc(&owner(), &owner()));
+    g.ok(&["trust", "human-channel", "--provision", f.to_str().unwrap()]);
+}
+
+/// A `human-channel-anchor` document installing `installed`'s public key, signed by `signer`.
+fn anchor_doc(installed: &TestKey, signer: &TestKey) -> String {
+    let (kid, entry) = key_entry(installed);
     let signed = json!({"_type": "human-channel-anchor", "spec_version": "srr/1", "product": gov_runtime::FRAMEWORK_NAME,
         "version": 1, "expires": far_future(), "owner": "certification owner (published test seed)", "threshold": 1,
         "keys": {kid: entry}});
-    let f = scratch_file(g, "anchor.json", &envelope(&signed, &[&k]));
-    g.ok(&["trust", "human-channel", "--provision", f.to_str().unwrap()]);
+    envelope(&signed, &[signer])
 }
 
 /// Render the gate (the OS records what it showed) and return (gate_instance, package_sha256).
@@ -359,7 +363,44 @@ fn human_answers_come_only_from_the_owner_signed_channel() {
     // no channel on this machine yet: nothing can record a human answer
     let e = g.err(&["decide", &gid, "--option", "A"]);
     assert_eq!(e.error_code(), "HUMAN_CHANNEL_UNAVAILABLE");
+    // the anchor is administrator-domain material: never repository content, never an unsigned key list
+    let in_repo = root.join("governance").join("hc-anchor.json");
+    std::fs::write(&in_repo, anchor_doc(&owner(), &owner())).unwrap();
+    assert_eq!(
+        g.err(&[
+            "trust",
+            "human-channel",
+            "--provision",
+            in_repo.to_str().unwrap()
+        ])
+        .error_code(),
+        "HUMAN_CHANNEL_ANCHOR_FROM_REPOSITORY_REFUSED"
+    );
+    let not_self_signed = scratch_file(&g, "anchor-bad.json", &anchor_doc(&owner(), &key(0x66)));
+    assert_eq!(
+        g.err(&[
+            "trust",
+            "human-channel",
+            "--provision",
+            not_self_signed.to_str().unwrap()
+        ])
+        .error_code(),
+        "HUMAN_CHANNEL_ANCHOR_INVALID"
+    );
+    std::fs::remove_file(&in_repo).unwrap();
     human_channel(&g);
+    // once anchored, the product never re-anchors (an agent cannot swap in its own key through the product)
+    let agent_anchor = scratch_file(&g, "anchor-agent.json", &anchor_doc(&key(0x66), &key(0x66)));
+    assert_eq!(
+        g.err(&[
+            "trust",
+            "human-channel",
+            "--provision",
+            agent_anchor.to_str().unwrap()
+        ])
+        .error_code(),
+        "HUMAN_CHANNEL_ALREADY_PROVISIONED"
+    );
     // CLI metadata, defaults, role claims and the environment
     assert_eq!(
         g.err(&["decide", &gid, "--option", "A"]).error_code(),
@@ -784,6 +825,27 @@ fn agent_resolution_needs_an_assessed_and_independent_assessment() {
             "{tag}"
         );
     }
+    // framework §51: a gate raised for a human-only trigger is never agent-resolvable, however it is assessed
+    let mut v = low.clone();
+    v["trigger"] = json!("tool_install");
+    let tool = gate(&other, "Install jq for the parser task?", v);
+    g.ok(&["gate", "present", &tool]);
+    let e = g.err(&[
+        "decide",
+        &tool,
+        "--option",
+        "A",
+        "--by",
+        "orchestrator",
+        "--rationale",
+        "x",
+    ]);
+    assert_eq!(e.error_code(), "AUTHORITY_DENIED");
+    assert!(
+        e.envelope.to_string().contains("never agent-resolvable"),
+        "{}",
+        e.envelope
+    );
 }
 
 // ============================================================================================ BC-P2-49

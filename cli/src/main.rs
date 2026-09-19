@@ -1171,7 +1171,7 @@ fn run(cli: &Cli) -> Result<Value> {
                     Ok(json!({"replayed": r}))
                 }
                 TrustCmd::HumanChannel { provision } => match provision {
-                    Some(f) => gov_runtime::human_channel::provision_standalone(Path::new(f)),
+                    Some(f) => gov_runtime::human_channel::provision_standalone(Path::new(f), project_root.as_deref()),
                     None => {
                         // the project's policy (when there is one) may only tighten the standalone-anchor switch
                         let allowed = project_root
