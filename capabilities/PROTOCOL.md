@@ -46,10 +46,12 @@ entry must be held by the role. `gov capabilities plugins` lists usable / denied
   their bytes are bound by the registration (roles `model` / `runtime`, shown in the registration gate), so a changed
   model or runtime byte stops the plugin until a new approval, and the retrieval profile identifies the model and
   runtime from the same files.
-- Unchanged files are not re-hashed at every authorisation: a digest is reused only while the file's device, inode,
-  size, modification time, status-change time, mode and owner are exactly what they were when it was hashed, and it
-  is stored only when the file had not changed for a few seconds before it was read and no process held it open for
-  writing (Linux read-lease probe). Digests are kept in the machine's protected state, never in the repository.
+- Unchanged files are not re-hashed at every authorisation within one `gov` process: a digest is reused only while
+  the file's device, inode, size, modification time, status-change time, mode and owner are exactly what they were
+  when it was hashed, and only when the file had not changed for a few seconds before it was read, no process held
+  it open for writing (Linux read-lease probe) and it lives on a kernel-maintained local filesystem. A bound file's
+  digest never leaves the process that computed it; only the digest labelling the running `gov` executable (used
+  where a plugin's program is that very file) is kept across processes, in the machine's protected state.
 - The plugin runs without the caller's loader variables (`PYTHONPATH`, `NODE_OPTIONS`, `LD_PRELOAD`, `BASH_ENV`, ...)
   and with `PYTHONDONTWRITEBYTECODE=1`; a module plugin must be importable from its working directory (`cwd:`) or the
   interpreter's own search path.

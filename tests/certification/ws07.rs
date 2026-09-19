@@ -1154,10 +1154,12 @@ fn declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves() {
     assert_eq!(gate_count(&root), before);
 }
 
-/// BC-P2-40, WS-7 round 3 (authorisation no longer re-hashes unchanged files): once a registered plugin's bound
-/// files have been hashed and their digests stored, a same-size rewrite with the modification time put back, a
-/// change to the file a bound symlink points at, and a file replaced by another are all still refused. The digests
-/// live in the machine's protected state, never in the repository.
+/// BC-P2-40, WS-7 round 3 (authorisation no longer re-hashes unchanged files, and the pin is not weakened): the
+/// digest labelling the running `gov` binary is kept in the machine's protected state, so an OS capability-server
+/// plugin does not re-read a large binary in every `gov` process; the digest of a bound plugin file never leaves the
+/// process that computed it — nothing in any store, not even a forged entry naming the approved digest, makes changed
+/// bytes run. A same-size rewrite with the modification time put back, a change to the file a bound symlink points
+/// at, and a file replaced by another are all refused.
 #[test]
 fn a_cached_pin_never_approves_changed_bytes() {
     let (root, g) = fresh("ws07-r3-cache");
@@ -1179,7 +1181,15 @@ fn a_cached_pin_never_approves_changed_bytes() {
         "governance/project/plugins/c1.yaml",
         &json!({"plugin_id": "c1", "capability": "embed", "version": "1", "command": ["sh", "tools/c.sh"], "implementation": ["tools/lib"]}),
     );
-    // every bound file is quiescent before it is approved, so its digest is stored at the first execution
+    // the OS's own capability server: its program is the running gov binary
+    let gov = gov_bin().to_string_lossy().to_string();
+    write_yaml(
+        &root,
+        "governance/project/plugins/os-embed.yaml",
+        &json!({"plugin_id": "os-embed", "capability": "embed", "version": "1", "languages": [],
+            "command": [gov, "capabilities", "serve-embed", "--id", "os-embed"]}),
+    );
+    // every bound file is quiescent before it is approved (the conditions under which a digest may be reused)
     set_old_mtime(&root.join("tools/c.sh"));
     set_old_mtime(&outside.join("helper.sh"));
     std::thread::sleep(
@@ -1187,14 +1197,19 @@ fn a_cached_pin_never_approves_changed_bytes() {
     );
     register_approved(&te, &root.join("governance/project/plugins/c1.yaml"));
     invoke_ok(&te, "c1");
-    invoke_ok(&te, "c1");
-    assert_eq!(runs(&marker), 2);
+    invoke_ok(&te, "os-embed");
+    assert_eq!(runs(&marker), 1);
     let store = machine_state_dir(&root).join("plugin-pin-cache/cache.json");
     let stored = std::fs::read_to_string(&store).unwrap_or_default();
+    let gov_c = std::fs::canonicalize(gov_bin()).unwrap();
     assert!(
-        stored.contains("tools/c.sh") && stored.contains("helper.sh"),
-        "digests were not stored in the machine's protected state: {}",
+        stored.contains(&*gov_c.to_string_lossy()),
+        "the running gov binary's digest was not kept in the machine's protected state ({}): {stored}",
         store.display()
+    );
+    assert!(
+        !stored.contains("c.sh") && !stored.contains("helper.sh"),
+        "a bound plugin file's digest left the process: {stored}"
     );
     fn mentions(dir: &Path, needle: &str) -> bool {
         std::fs::read_dir(dir)
@@ -1213,10 +1228,25 @@ fn a_cached_pin_never_approves_changed_bytes() {
     );
     // 1. same size, modification time put back
     let original = read(&root, "tools/c.sh");
+    let approved = gov_runtime::util::sha256_hex(original.as_bytes());
     let tampered = original.replace("EXECUTED", "EXECUTEX");
     assert_eq!(tampered.len(), original.len());
     write(&root, "tools/c.sh", &tampered);
     set_old_mtime(&root.join("tools/c.sh"));
+    assert_eq!(invoke(&te, "c1").error_code(), "PLUGIN_PIN_MISMATCH");
+    // ... even when the machine's store is made to name the approved digest under the tampered file's present key
+    // (what a process able to write the machine state could plant): no store supplies a bound file's digest
+    {
+        use std::os::unix::fs::MetadataExt;
+        let m = std::fs::metadata(root.join("tools/c.sh")).unwrap();
+        let key = json!({"dev": m.dev().to_string(), "ino": m.ino().to_string(), "size": m.size().to_string(),
+            "mtime_ns": (m.mtime() * 1_000_000_000 + m.mtime_nsec()).to_string(),
+            "ctime_ns": (m.ctime() * 1_000_000_000 + m.ctime_nsec()).to_string(), "mode": m.mode(), "uid": m.uid()});
+        let mut doc: Value = serde_json::from_str(&stored).unwrap_or(json!({"entries": {}}));
+        doc["entries"][format!("{}:{}", m.dev(), m.ino())] = json!({"key": key, "sha256": approved,
+            "path": root.join("tools/c.sh").to_string_lossy(), "at": "2026-09-19T00:00:00Z"});
+        std::fs::write(&store, doc.to_string()).unwrap();
+    }
     assert_eq!(invoke(&te, "c1").error_code(), "PLUGIN_PIN_MISMATCH");
     write(&root, "tools/c.sh", &original);
     set_old_mtime(&root.join("tools/c.sh"));
@@ -1233,7 +1263,7 @@ fn a_cached_pin_never_approves_changed_bytes() {
     std::fs::rename(root.join("tools/c.sh.new"), root.join("tools/c.sh")).unwrap();
     set_old_mtime(&root.join("tools/c.sh"));
     assert_eq!(invoke(&te, "c1").error_code(), "PLUGIN_PIN_MISMATCH");
-    assert_eq!(runs(&marker), 4, "changed bytes ran");
+    assert_eq!(runs(&marker), 3, "changed bytes ran");
 }
 
 /// IP-W7-1 (BC-P2-41 with WS-5's sealed close reports; Contract v3 F3:416-423, F4:431): the report that closes a

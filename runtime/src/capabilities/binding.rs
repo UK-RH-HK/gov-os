@@ -281,19 +281,27 @@ fn file_identity(p: &Path) -> Option<(u64, u64, u64)> {
     }
 }
 
-/// The content hash of the running binary, read from the running file itself — at most once per process, and not at
-/// all when the machine's pin cache holds a digest stored under the running file's present stat key
-/// ([`super::pincache`]: a running executable cannot be open for writing, and any later change of its bytes changes
-/// its key).
+/// The digest labelling the running binary where a plugin's program IS the running file (same device and inode): at
+/// most once per process, and not at all when the machine's store holds a digest under the running file's present
+/// stat key ([`super::pincache::running_binary_sha256`]: what executes there is the running image, whatever label).
 fn running_exe_sha() -> Option<&'static str> {
     static SHA: OnceLock<Option<String>> = OnceLock::new();
-    SHA.get_or_init(|| super::pincache::sha256_of(&running_exe()))
+    SHA.get_or_init(|| super::pincache::running_binary_sha256(&running_exe()))
+        .as_deref()
+}
+
+/// The content hash of the running binary read from the running image by this process — for the byte-identical-copy
+/// test, which decides whether a DIFFERENT file may be treated as this binary: never a stored digest.
+fn running_exe_sha_read() -> Option<&'static str> {
+    static SHA: OnceLock<Option<String>> = OnceLock::new();
+    SHA.get_or_init(|| super::pincache::fresh_sha256(&running_exe()))
         .as_deref()
 }
 
 /// `Some(sha)` when `program` is the running `gov` binary — the very same file (device and inode), or a byte-identical
 /// copy — with its content hash; `None` otherwise. The same-file case needs no re-hash: an executable cannot be
-/// rewritten in place while it runs (ETXTBSY), and a replaced path is a different inode.
+/// rewritten in place while it runs (ETXTBSY), and a replaced path is a different inode. A copy is compared with the
+/// running image as this process reads it, never with a stored digest.
 fn this_binary(program: &Path) -> Option<String> {
     let run = file_identity(&running_exe())?;
     let prog = file_identity(program)?;
@@ -304,7 +312,7 @@ fn this_binary(program: &Path) -> Option<String> {
         return None;
     }
     let h = hash_file(program)?;
-    (Some(h.as_str()) == running_exe_sha()).then_some(h)
+    (Some(h.as_str()) == running_exe_sha_read()).then_some(h)
 }
 
 /// Whether `args` (after the program) invoke exactly one OS capability server with only its own flags.
@@ -338,8 +346,8 @@ fn os_capability_server(args: &[String]) -> bool {
 /// **The content hash of the file at `p`, as the implementation binding computes it** (symlinks followed): the
 /// digest every pin compares, reused only under the pin cache's rules ([`super::pincache`]). Other components that
 /// identify the same files — the retrieval profile's runtime and model identity (BC-P2-30) — use this instead of
-/// re-hashing, so a large program or model is read once, not once per consumer (call [`super::pincache::flush`]
-/// after a batch so new digests reach the machine's store). `None` when `p` is not a readable regular file.
+/// re-hashing, so a large program or model is read once per process, not once per consumer. `None` when `p` is not
+/// a readable regular file.
 pub fn content_sha256(p: &Path) -> Option<String> {
     if let (Some(run), Some(file)) = (file_identity(&running_exe()), file_identity(p)) {
         if cfg!(unix) && run.0 == file.0 && run.1 == file.1 {
@@ -717,7 +725,6 @@ pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
             add(&role, &t, h);
         }
     }
-    super::pincache::flush();
     let files: Vec<BoundFile> = bound.into_values().collect();
     let mut acc = String::new();
     for f in &files {

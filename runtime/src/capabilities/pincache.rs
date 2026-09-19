@@ -4,12 +4,13 @@
 //! every execution and every `plugin_set` classification ([`super::binding::resolve`]), and compares it with the
 //! registered and declared pins (Contract v3 F4:428-429: drift fails closed). Hashing every bound file every time is
 //! what makes a plugin whose program is a large binary slow (the debug `gov` binary serving embeddings is ~170 MB:
-//! ~2.3 s per classification). This module lets a digest be reused — within a process and across processes — only
-//! when reuse cannot return the digest of bytes other than the file's current bytes.
+//! ~2.3 s per `gov` process). This module lets a digest be reused only when reuse cannot return the digest of bytes
+//! other than the file's current bytes, and never lets anything outside the `gov` process decide which bytes an
+//! approval covers.
 //!
 //! ## The key, and why a changed byte cannot keep it
 //!
-//! A digest is stored with the file's [`StatKey`]: device, inode, size, modification time, **status-change time
+//! A digest is kept with the file's [`StatKey`]: device, inode, size, modification time, **status-change time
 //! (`ctime`)**, mode and owner. It is reused only when a fresh `stat` returns exactly the same key. Every way of
 //! changing a file's bytes changes that key:
 //!
@@ -19,36 +20,46 @@
 //! * replacing the file (write-then-rename, delete-and-recreate) gives a different inode, and a reused inode number
 //!   is a new file whose `ctime` is its creation time.
 //!
-//! That holds where the kernel maintains the timestamps itself. A digest is therefore stored only for a file on a
+//! That holds where the kernel maintains the timestamps itself. A digest is therefore kept only for a file on a
 //! **local filesystem** whose inode times the running kernel keeps ([`local_fs`]: ext2/3/4, XFS, Btrfs, F2FS, ZFS,
 //! tmpfs, ramfs, overlayfs). On network and user-space filesystems (NFS, SMB, FUSE such as sshfs, 9p/drvfs) the
 //! times come from elsewhere — a remote `touch -d` can leave `ctime` untouched — so nothing there is ever cached.
 //!
-//! Two gaps would remain with that key alone, and both are closed before a digest is stored:
+//! Two gaps would remain with that key alone, and both are closed before a digest is kept for reuse:
 //!
 //! 1. **Same-tick rewrites** (the defect found in round 2: a same-size rewrite inside one filesystem timestamp tick
-//!    kept `(size, mtime, inode)`). A digest is stored only when the file's `ctime` and `mtime` lie at least
+//!    kept `(size, mtime, inode)`). A digest is kept only when the file's `ctime` and `mtime` lie at least
 //!    [`QUIESCENCE`] before the moment its bytes are read ([`quiescent`]) — longer than the coarsest timestamp
 //!    granularity of a local filesystem (FAT/exFAT: 2 s; the Linux coarse clock: ≤ 10 ms). Any later change is
-//!    stamped at or after that moment, so it cannot reproduce the stored `ctime`.
+//!    stamped at or after that moment, so it cannot reproduce the kept `ctime`.
 //! 2. **A writer that already holds the file open for writing** (a shared writable mapping whose pages are already
-//!    dirty can change bytes without a new timestamp until write-back). A digest is stored only when the OS proves no
+//!    dirty can change bytes without a new timestamp until write-back). A digest is kept only when the OS proves no
 //!    process holds the file open for writing at the moment it is read ([`no_writer`]): on Linux a *read lease*
 //!    cannot be granted on a file that is open for writing anywhere (`fcntl(F_SETLEASE, F_RDLCK)` fails `EAGAIN`);
 //!    the lease is released at once (a lease break is routed to `SIGURG`, whose default disposition is to ignore it).
 //!    A file the caller does not own cannot be leased; it is proven writer-free only when it is owned by root and
 //!    writable by nobody else (only root could have it open for writing — outside this threat model). Otherwise
-//!    nothing is stored and the file is hashed every time.
+//!    nothing is kept and the file is hashed every time.
 //!
-//! Finally the `stat` is repeated after the bytes are read; a file that changed while being read is never stored.
+//! Finally the `stat` is repeated after the bytes are read; a file that changed while being read is never kept.
 //!
-//! ## Where digests are kept
+//! ## Where digests are kept, and why only one kind leaves the process
 //!
-//! In process memory, and in the machine's protected state (`<state root>/plugin-pin-cache/cache.json`, the same
-//! root as the T2 binding key and the trust floors), which no repository writer can reach: a forged entry there would
-//! need the machine's own state, and the entry is still used only for a file whose `stat` key matches. The store is a
-//! cache: losing it, or a machine without a resolvable state root, only costs a re-hash. New digests are written to
-//! it in one batch per implementation resolved ([`flush`]).
+//! **Bound plugin files: in this process's memory only** ([`sha256_of`]). A store outside the process is at best as
+//! protected as the machine's state root, and a process running with the operator's own account can write that
+//! root. With a stored digest for a plugin file, such a process could make the OS report the approved implementation
+//! for changed bytes — turning the owner-signed approval of exact bytes, which holds even against an
+//! operator-privileged process (the answer is signed by a key the machine does not hold), into a detection-grade
+//! check. So no file, no store and no earlier process ever supplies the digest of a bound plugin file: each `gov`
+//! process reads those bytes itself, at most once while they are unchanged.
+//!
+//! **The running `gov` executable: also across processes** ([`running_binary_sha256`], in
+//! `<state root>/plugin-pin-cache/cache.json`, beside the T2 binding key and the trust floors). It is used only where
+//! the program a plugin runs *is* the running file (same device and inode): what executes there is the running image
+//! whatever digest labels it (an executable cannot be open for writing while it runs), so a stored digest can change
+//! how the program is labelled, never which bytes run. The byte-identical-copy test — a different file claiming to be
+//! this binary, which decides the `OS_PROVIDED` class — never uses a stored digest ([`fresh_sha256`]). Losing the
+//! store, or a machine without a resolvable state root, only costs a re-hash.
 //!
 //! **What this does not change.** Authorisation still reads the current `stat` of every bound file at every
 //! execution, still enumerates every bound directory afresh (an added or removed file is a change), and still
@@ -62,16 +73,14 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-/// How long before its bytes are read a file must have last changed for its digest to be stored.
+/// How long before its bytes are read a file must have last changed for its digest to be kept for reuse.
 pub const QUIESCENCE: Duration = Duration::from_secs(3);
-/// Upper bound on persisted entries (the oldest are dropped first).
-const MAX_PERSISTED: usize = 16_384;
-/// Pending digests beyond this are written without waiting for [`flush`].
-const MAX_PENDING: usize = 1_024;
+/// Upper bound on persisted entries — one per running `gov` executable (the oldest are dropped first).
+const MAX_PERSISTED: usize = 64;
 const CACHE_DIR: &str = "plugin-pin-cache";
 const CACHE_FILE: &str = "cache.json";
 
-/// What a stored digest is valid for: the file's identity and every timestamp a change of its bytes updates.
+/// What a kept digest is valid for: the file's identity and every timestamp a change of its bytes updates.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StatKey {
     pub dev: u64,
@@ -244,18 +253,103 @@ struct Entry {
     at: String,
 }
 
-#[derive(Default)]
-struct Cache {
-    /// slot (`dev:ino`) -> entry
-    entries: BTreeMap<String, Entry>,
-    persistent_loaded: bool,
-    /// Stored in memory, not yet written to the machine's store.
-    pending: Vec<Entry>,
+/// In-process digests: slot (`dev:ino`) -> entry. Every bound file's digest is reused only from here.
+fn memo() -> &'static Mutex<BTreeMap<String, Entry>> {
+    static C: OnceLock<Mutex<BTreeMap<String, Entry>>> = OnceLock::new();
+    C.get_or_init(|| Mutex::new(BTreeMap::new()))
 }
 
-fn cache() -> &'static Mutex<Cache> {
-    static C: OnceLock<Mutex<Cache>> = OnceLock::new();
-    C.get_or_init(|| Mutex::new(Cache::default()))
+fn memo_get(k: &StatKey) -> Option<String> {
+    memo()
+        .lock()
+        .ok()?
+        .get(&k.slot())
+        .filter(|e| &e.key == k)
+        .map(|e| e.sha256.clone())
+}
+
+fn memo_put(e: Entry) {
+    if let Ok(mut c) = memo().lock() {
+        c.insert(e.key.slot(), e);
+    }
+}
+
+/// Hash `p` and say whether the digest may be reused under `before` (rules 1 and 2, a stable `stat` across the read,
+/// a kernel-maintained local filesystem).
+fn hash_checked(p: &Path, before: &StatKey) -> Option<(String, bool)> {
+    let read_start = SystemTime::now();
+    let writer_free = no_writer(p, before);
+    let sha = stream_sha256(p)?;
+    let stable = stat_key(p).as_ref() == Some(before);
+    Some((
+        sha,
+        writer_free && stable && quiescent(before, read_start) && local_fs(p),
+    ))
+}
+
+/// **The SHA-256 of the bytes of the regular file at `p` (symlinks followed)**, reusing a digest only from this
+/// process's memory and only under the rules in the module documentation. `None` when `p` is not a readable regular
+/// file. Nothing outside the process — no file, no store — ever supplies the digest of a bound plugin file.
+pub fn sha256_of(p: &Path) -> Option<String> {
+    let Some(before) = stat_key(p) else {
+        // not a regular file we can key (or no unix metadata): hash it, never reuse
+        return stream_sha256(p);
+    };
+    if let Some(sha) = memo_get(&before) {
+        return Some(sha);
+    }
+    let (sha, reusable) = hash_checked(p, &before)?;
+    if reusable {
+        memo_put(Entry {
+            key: before,
+            sha256: sha.clone(),
+            path: p.to_string_lossy().to_string(),
+            at: now_iso(),
+        });
+    }
+    Some(sha)
+}
+
+/// The SHA-256 of the bytes at `p`, read now, never reused and never stored.
+pub fn fresh_sha256(p: &Path) -> Option<String> {
+    stream_sha256(p)
+}
+
+/// **The digest that labels the running `gov` executable** (`exe`: `/proc/self/exe`), kept across processes in the
+/// machine's store so that a large program is not re-read by every `gov` process. Used only where the program a
+/// plugin runs *is* the running file (same device and inode): what executes there is the running image whatever
+/// digest labels it (an executable cannot be open for writing while it runs), so a stored digest can change how the
+/// program is labelled, never which bytes run. The byte-identical-copy test — a *different* file claiming to be this
+/// binary — never uses it ([`fresh_sha256`]).
+pub fn running_binary_sha256(exe: &Path) -> Option<String> {
+    let Some(before) = stat_key(exe) else {
+        return stream_sha256(exe);
+    };
+    let file = store_file();
+    if let Some(e) = file
+        .as_deref()
+        .and_then(|f| read_store(f).remove(&before.slot()))
+        .filter(|e| e.key == before)
+    {
+        return Some(e.sha256);
+    }
+    let (sha, reusable) = hash_checked(exe, &before)?;
+    if reusable {
+        if let Some(f) = file {
+            persist(
+                &f,
+                Entry {
+                    key: before,
+                    sha256: sha.clone(),
+                    path: std::fs::read_link(exe)
+                        .map(|t| t.to_string_lossy().to_string())
+                        .unwrap_or_else(|_| exe.to_string_lossy().to_string()),
+                    at: now_iso(),
+                },
+            );
+        }
+    }
+    Some(sha)
 }
 
 fn store_file() -> Option<PathBuf> {
@@ -301,14 +395,9 @@ fn read_store(file: &Path) -> BTreeMap<String, Entry> {
     out
 }
 
-fn persist(new: &[Entry]) {
-    let Some(file) = store_file() else {
-        return;
-    };
-    let mut all = read_store(&file);
-    for e in new {
-        all.insert(e.key.slot(), e.clone());
-    }
+fn persist(file: &Path, new: Entry) {
+    let mut all = read_store(file);
+    all.insert(new.key.slot(), new);
     if all.len() > MAX_PERSISTED {
         let mut by_age: Vec<(String, String)> =
             all.iter().map(|(s, e)| (e.at.clone(), s.clone())).collect();
@@ -318,7 +407,7 @@ fn persist(new: &[Entry]) {
         }
     }
     let doc = json!({
-        "purpose": "cache of content hashes of plugin-bound files (capabilities::pincache, BC-P2-40); an entry is used only for a file whose stat key (device, inode, size, mtime, ctime, mode, owner) is unchanged. Deleting this file only costs a re-hash.",
+        "purpose": "digests labelling running gov executables (capabilities::pincache::running_binary_sha256, BC-P2-40); an entry is used only for the running executable whose stat key (device, inode, size, mtime, ctime, mode, owner) is unchanged. Digests of plugin-bound files are never stored here. Deleting this file only costs a re-hash.",
         "entries": all.iter().map(|(s, e)| (s.clone(), json!({"key": e.key.to_value(), "sha256": e.sha256, "path": e.path, "at": e.at}))).collect::<serde_json::Map<String, Value>>(),
     });
     let Some(dir) = file.parent() else {
@@ -339,79 +428,15 @@ fn persist(new: &[Entry]) {
             use std::os::unix::fs::PermissionsExt;
             let _ = std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(0o600));
         }
-        if std::fs::rename(&tmp, &file).is_err() {
+        if std::fs::rename(&tmp, file).is_err() {
             let _ = std::fs::remove_file(&tmp);
         }
     }
 }
 
-fn lookup(k: &StatKey) -> Option<String> {
-    let mut c = cache().lock().ok()?;
-    if !c.persistent_loaded {
-        c.persistent_loaded = true;
-        if let Some(f) = store_file() {
-            for (s, e) in read_store(&f) {
-                c.entries.entry(s).or_insert(e);
-            }
-        }
-    }
-    c.entries
-        .get(&k.slot())
-        .filter(|e| &e.key == k)
-        .map(|e| e.sha256.clone())
-}
-
-/// **The SHA-256 of the bytes of the regular file at `p` (symlinks followed)**, reusing a stored digest only under
-/// the rules in the module documentation. `None` when `p` is not a readable regular file.
-pub fn sha256_of(p: &Path) -> Option<String> {
-    let Some(before) = stat_key(p) else {
-        // not a regular file we can key (or no unix metadata): hash it, never store
-        return stream_sha256(p);
-    };
-    if let Some(sha) = lookup(&before) {
-        return Some(sha);
-    }
-    let read_start = SystemTime::now();
-    let writer_free = no_writer(p, &before);
-    let sha = stream_sha256(p)?;
-    let stable = stat_key(p).as_ref() == Some(&before);
-    if writer_free && stable && quiescent(&before, read_start) && local_fs(p) {
-        let e = Entry {
-            key: before.clone(),
-            sha256: sha.clone(),
-            path: p.to_string_lossy().to_string(),
-            at: now_iso(),
-        };
-        let overflow = match cache().lock() {
-            Ok(mut c) => {
-                c.entries.insert(before.slot(), e.clone());
-                c.pending.push(e);
-                c.pending.len() > MAX_PENDING
-            }
-            Err(_) => false,
-        };
-        if overflow {
-            flush();
-        }
-    }
-    Some(sha)
-}
-
-/// Write the digests stored since the last flush to the machine's store (one read-merge-write). Called once per
-/// implementation resolved; a consumer hashing a batch of files through [`sha256_of`] calls it after the batch.
-pub fn flush() {
-    let pending: Vec<Entry> = match cache().lock() {
-        Ok(mut c) => std::mem::take(&mut c.pending),
-        Err(_) => return,
-    };
-    if !pending.is_empty() {
-        persist(&pending);
-    }
-}
-
-/// Whether a digest for the file at `p` is currently stored under its present key (diagnostics and tests).
+/// Whether this process holds a reusable digest for the file at `p` under its present key (diagnostics and tests).
 pub fn is_cached(p: &Path) -> bool {
-    stat_key(p).and_then(|k| lookup(&k)).is_some()
+    stat_key(p).and_then(|k| memo_get(&k)).is_some()
 }
 
 #[cfg(test)]
