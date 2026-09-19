@@ -1,7 +1,7 @@
 //! Tracked reproducibility manifests (governance/generated/index-manifest.json, memory-manifest.json) and freshness.
 use crate::memory::db::RuntimeDb;
 use crate::paths::iter_repo_files;
-use crate::util::{hash_value, is_text_file, read_json, sha256_file, sorted, write_json};
+use crate::util::{hash_value, read_json, sha256_file, sha256_hex, sorted, write_json};
 use crate::{Project, Result, INDEX_VERSION};
 use serde_json::{json, Map, Value};
 
@@ -58,9 +58,25 @@ pub fn build_index_manifest(
         }
         artifacts.insert(path, Value::Object(e));
     }
+    // each exclusion with what decided it: a content-level exclusion (secret content, duplicate record id) carries
+    // the content hash and derivation key it was decided under — freshness honours it only while both still match —
+    // and a duplicate names the id and the occurrence the index holds; a size exclusion records the size
     let mut ex: Vec<Value> = excluded
         .iter()
-        .map(|e| json!({"path": e.get("path"), "reason": e.get("reason")}))
+        .map(|e| {
+            let mut o = json!({"path": e.get("path"), "reason": e.get("reason")});
+            let detail: Value = e
+                .get("detail")
+                .and_then(|d| d.as_str())
+                .and_then(|d| serde_json::from_str(d).ok())
+                .unwrap_or(Value::Null);
+            for k in ["content_hash", "derivation", "id", "kept", "size"] {
+                if let Some(v) = detail.get(k).filter(|v| !v.is_null()) {
+                    o[k] = v.clone();
+                }
+            }
+            o
+        })
         .collect();
     ex.sort_by_key(|a| a.to_string());
     let mut m = json!({"index_version": INDEX_VERSION, "embedder": embedder, "reranker": reranker, "chunking": chunking, "lexical": lexical, "repo_commit": p.git_commit(),
@@ -116,11 +132,21 @@ pub struct Freshness {
     pub reclassified: Vec<String>,
 }
 
-/// Compare the tracked index manifest with the working tree (indexable, non-secret, text files only), with the
-/// policy pins (embedder, chunking, lexical engine, index format) and with each entry's derivation key (path-map
-/// decision, code-intelligence adapter, authority mapping — BC-P2-29). A pin mismatch or a reclassified entry is
-/// never "fresh". Evaluated against the policy set and path map on disk now (`indexer::current_view`), never a view
-/// cached before a mutation.
+/// Compare the tracked index manifest with the working tree, with the policy pins (embedder, chunking, lexical
+/// engine, index format) and with each entry's derivation key (path-map decision, code-intelligence adapter,
+/// authority mapping, secret-scanning rules — BC-P2-29). A pin mismatch or a reclassified entry is never "fresh".
+/// Evaluated against the policy set and path map on disk now (`indexer::current_view`), never a view cached before
+/// a mutation.
+///
+/// **Freshness judges exactly what a build would index (R2-10).** Each file goes through the indexer's own admission
+/// ([`crate::memory::indexer::admit`]): what the path map keeps out of the index, a binary file, a file over
+/// [`crate::memory::indexer::MAX_INDEXED_FILE_BYTES`], a file that is not UTF-8 text or cannot be read is never
+/// expected in the index — so a file the indexer skips is not "added" forever. A candidate file must be an entry
+/// with its current content hash and derivation key (and, for research/experiment records, the standing the index
+/// holds it under, IP-WS10-05), or be excluded for its content — secret content, or a record id the index holds at
+/// another path — by an exclusion recorded under the same content hash and derivation key. An exclusion the manifest
+/// records for different content, under other rules, or for a reason the path map decides (re-derived here, never
+/// trusted from the manifest) never hides a file the index should hold.
 pub fn freshness(p_in: &Project) -> Freshness {
     let view = crate::memory::indexer::current_view(p_in);
     let p = &view;
@@ -158,60 +184,68 @@ pub fn freshness(p_in: &Project) -> Freshness {
         .and_then(|a| a.as_object())
         .cloned()
         .unwrap_or_default();
-    let excluded: std::collections::HashSet<String> = m
+    // content-level exclusions, honoured only while the content and derivation key they were decided under hold
+    let content_excluded: std::collections::HashMap<String, Value> = m
         .get("excluded")
         .and_then(|a| a.as_array())
         .map(|a| {
             a.iter()
-                .filter_map(|e| {
-                    e.get("path")
-                        .and_then(|p| p.as_str())
-                        .map(|s| s.to_string())
+                .filter(|e| {
+                    crate::memory::indexer::CONTENT_EXCLUSIONS
+                        .contains(&e["reason"].as_str().unwrap_or(""))
                 })
+                .filter_map(|e| e["path"].as_str().map(|s| (s.to_string(), e.clone())))
                 .collect()
         })
         .unwrap_or_default();
     let contract = p.contract();
     let scanner = p.secret_scanner();
     let derive = crate::memory::indexer::DerivationContext::new(p, &governed.usable);
+    let evidence_store: std::cell::OnceCell<crate::records::RecordStore> =
+        std::cell::OnceCell::new();
     let mut stale = vec![];
     let mut reclassified = vec![];
     let mut added = vec![];
     let mut seen = std::collections::HashSet::new();
     let mut checked = 0usize;
     for (abs, rel) in iter_repo_files(&p.root, false) {
-        if crate::memory::failures::is_memory_quality_path(&rel) {
-            continue; // never indexed (memory::failures::MEMORY_QUALITY_DIR)
-        }
         let d = contract.decide(&rel);
-        if d.is_never_index() || scanner.path_is_secret(&rel) {
+        let crate::memory::indexer::Admission::Candidate { text, .. } =
+            crate::memory::indexer::admit(&abs, &rel, &d, scanner)
+        else {
             continue;
-        }
-        if !(d.flag("lexical_index")
-            || d.flag("semantic_index")
-            || d.flag("graph_index")
-            || d.flag("code_index"))
-        {
-            continue;
-        }
-        if excluded.contains(&rel) || !is_text_file(&abs) {
-            continue;
-        }
+        };
         checked += 1;
         seen.insert(rel.clone());
-        let h = sha256_file(&abs).unwrap_or_default();
+        let h = sha256_hex(text.as_bytes());
+        let key = derive.key(&d, &rel);
         match arts.get(&rel) {
             Some(e) => {
                 if e.get("content_hash").and_then(|v| v.as_str()) != Some(h.as_str()) {
                     stale.push(rel.clone());
-                } else if e.get("derivation").and_then(|v| v.as_str())
-                    != Some(derive.key(&d, &rel).as_str())
+                } else if e.get("derivation").and_then(|v| v.as_str()) != Some(key.as_str())
+                    || !crate::memory::indexer::recorded_state_class_holds(
+                        p,
+                        &evidence_store,
+                        e,
+                        &rel,
+                        &text,
+                        &d.class(),
+                    )
                 {
                     stale.push(rel.clone());
                     reclassified.push(rel.clone());
                 }
             }
-            None => added.push(rel.clone()),
+            None => {
+                let still_excluded = content_excluded.get(&rel).map(|x| {
+                    x["content_hash"].as_str() == Some(h.as_str())
+                        && x["derivation"].as_str() == Some(key.as_str())
+                });
+                if still_excluded != Some(true) {
+                    added.push(rel.clone());
+                }
+            }
         }
     }
     // an entry is removed when its file is gone or no longer indexable under the current path map

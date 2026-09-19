@@ -93,6 +93,19 @@ impl SecretScanner {
             identifiers,
         }
     }
+    /// Identity of what this scanner excludes from the index: its content patterns (id and expression) and its
+    /// secret path patterns. Part of every artefact's index derivation key (`memory::indexer::DerivationContext`),
+    /// so a change of the secret-scanning policy re-derives — and re-scans — every artefact instead of leaving
+    /// content indexed (or excluded) under the previous rules.
+    pub fn signature(&self) -> String {
+        let pats: Vec<String> = self
+            .patterns
+            .iter()
+            .map(|(id, rx)| format!("{id}\u{1f}{}", rx.as_str()))
+            .collect();
+        let v = serde_json::json!({"content": pats, "paths": self.path_patterns});
+        crate::util::sha256_hex(v.to_string().as_bytes())[..32].to_string()
+    }
     pub fn path_is_secret(&self, relpath: &str) -> bool {
         self.path_patterns.iter().any(|p| glob_match(p, relpath))
     }

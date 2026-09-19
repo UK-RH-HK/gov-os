@@ -10,7 +10,11 @@ use std::sync::OnceLock;
 
 /// Identity of the chunking algorithm. It is part of the chunking pin (`indexer::chunking_config`), so an index
 /// built by a different chunker is reported incompatible and is fully rebuilt rather than mixed.
-pub const CHUNKER_VERSION: &str = "2";
+///
+/// Version 3 (repair-1 round 3, WS-2 R3-4): a Markdown heading is one line (an ATX heading, [`atx_heading`]) and
+/// every heading is held by a chunk without its `#` markers — including a heading with no content of its own (a
+/// title directly followed by a sub-heading, or a trailing heading), which version 2 dropped.
+pub const CHUNKER_VERSION: &str = "3";
 /// Name of the section holding code that belongs to no structural unit.
 pub const MODULE_SECTION: &str = "__module__";
 
@@ -23,9 +27,16 @@ pub struct Chunk {
     pub parent_ordinal: Option<usize>,
 }
 
-fn heading_rx() -> &'static Regex {
+/// **The one definition of a Markdown heading** used by the chunker and by the coverage check
+/// (`memory::coverage`): an ATX heading — one to six `#` at the start of the line followed by a space or tab (or
+/// nothing: an empty heading). Returns the heading's text without its markers (trimmed), `None` for any other line.
+/// A heading never spans lines.
+pub fn atx_heading(line: &str) -> Option<&str> {
     static RX: OnceLock<Regex> = OnceLock::new();
-    RX.get_or_init(|| Regex::new(r"(?m)^(#{1,6})\s+(.*)$").unwrap())
+    let rx = RX.get_or_init(|| Regex::new(r"^#{1,6}(?:[ \t]+(.*))?$").unwrap());
+    let line = line.strip_suffix('\r').unwrap_or(line);
+    rx.captures(line)
+        .map(|c| c.get(1).map(|m| m.as_str().trim()).unwrap_or(""))
 }
 
 fn split_long(text: &str, max_chars: usize, overlap: usize) -> Vec<String> {
@@ -74,33 +85,58 @@ pub fn chunk_markdown(title: &str, body: &str, max_chars: usize, overlap: usize)
         ordinal: 0,
         parent_ordinal: None,
     });
-    let mut sections: Vec<(String, String)> = vec![];
-    let mut pos = 0usize;
-    let mut last_title = title.to_string();
-    for m in heading_rx().captures_iter(body) {
-        let whole = m.get(0).unwrap();
-        let seg = body[pos..whole.start()].trim().to_string();
-        if !seg.is_empty() {
-            sections.push((last_title.clone(), seg));
+    // (section title, headings with no content of their own directly before it, section text)
+    let mut sections: Vec<(String, Vec<String>, String)> = vec![];
+    let mut pending: Vec<String> = vec![];
+    let mut cur_title = title.to_string();
+    let mut cur: Vec<&str> = vec![];
+    let mut flush = |t: &str, lines: &mut Vec<&str>, pending: &mut Vec<String>| {
+        let seg = lines.join("\n").trim().to_string();
+        lines.clear();
+        if seg.is_empty() {
+            return false;
         }
-        last_title = m[2].trim().to_string();
-        pos = whole.end();
+        sections.push((t.to_string(), std::mem::take(pending), seg));
+        true
+    };
+    let mut first = true;
+    for line in body.lines() {
+        match atx_heading(line) {
+            Some(h) => {
+                let had_content = flush(&cur_title, &mut cur, &mut pending);
+                // a heading whose section is empty is still content: it is carried into the next section's chunk
+                if !had_content && !first && !cur_title.is_empty() {
+                    pending.push(cur_title.clone());
+                }
+                cur_title = h.to_string();
+                first = false;
+            }
+            None => cur.push(line),
+        }
     }
-    let tail = body[pos..].trim().to_string();
-    if !tail.is_empty() {
-        sections.push((last_title, tail));
+    let had_content = flush(&cur_title, &mut cur, &mut pending);
+    if !had_content && !first && !cur_title.is_empty() {
+        pending.push(cur_title.clone());
     }
-    if sections.is_empty() && !body.trim().is_empty() {
-        sections.push((title.to_string(), body.trim().to_string()));
+    if !pending.is_empty() {
+        // headings with no content after them (a document of headings only, or trailing headings)
+        let last = pending.last().cloned().unwrap_or_default();
+        let held = pending.join("\n");
+        sections.push((last, vec![], held));
     }
     let mut ordinal = 1usize;
-    for (sec_title, sec_text) in sections {
+    for (sec_title, context, sec_text) in sections {
         let sec_ord = ordinal;
         let head: String = sec_text.chars().take(max_chars).collect();
+        let lead = if context.is_empty() {
+            String::new()
+        } else {
+            format!("{}\n", context.join("\n"))
+        };
         chunks.push(Chunk {
             level: "section".into(),
             section: sec_title.clone(),
-            text: format!("{sec_title}\n{head}"),
+            text: format!("{lead}{sec_title}\n{head}"),
             ordinal: sec_ord,
             parent_ordinal: Some(0),
         });
@@ -494,18 +530,41 @@ fn emit_gaps(
 
 /// Non-empty lines of `source` that no chunk holds (each line compared trimmed against the trimmed lines of the
 /// chunk texts; a line longer than `max_chars / 2` may legitimately be held split and is only checked as a
-/// substring). Used by the coverage check (`memory::coverage`) and by the unit tests of the chunker.
+/// substring). Used by the coverage check (`memory::coverage`) and by the unit tests of the chunker. Code and
+/// plain text are compared as they are; Markdown content through [`uncovered_lines_with`].
 pub fn uncovered_lines(source: &str, chunks: &[Chunk], max_chars: usize) -> Vec<(usize, String)> {
-    let mut held: std::collections::HashSet<&str> = std::collections::HashSet::new();
+    uncovered_lines_with(source, chunks, max_chars, false)
+}
+
+/// [`uncovered_lines`], and with `markdown` both sides are read as Markdown: a heading line ([`atx_heading`]) is
+/// compared by its text, whether the source or a chunk holds it with or without its `#` markers (the chunker holds
+/// headings as section titles, without markers; a document's lead paragraph may hold one with them). Every
+/// uncovered line is returned (WS-2 R3-4).
+pub fn uncovered_lines_with(
+    source: &str,
+    chunks: &[Chunk],
+    max_chars: usize,
+    markdown: bool,
+) -> Vec<(usize, String)> {
+    let norm = |l: &str| -> String {
+        let t = l.trim();
+        if markdown {
+            if let Some(h) = atx_heading(t) {
+                return h.to_string();
+            }
+        }
+        t.to_string()
+    };
+    let mut held: std::collections::HashSet<String> = std::collections::HashSet::new();
     for c in chunks {
         for l in c.text.lines() {
-            held.insert(l.trim());
+            held.insert(norm(l));
         }
     }
     let mut out = vec![];
     for (i, l) in source.lines().enumerate() {
-        let t = l.trim();
-        if t.is_empty() || held.contains(t) {
+        let t = norm(l);
+        if t.is_empty() || held.contains(&t) {
             continue;
         }
         if t.chars().count() > max_chars / 2 {
@@ -514,7 +573,7 @@ pub fn uncovered_lines(source: &str, chunks: &[Chunk], max_chars: usize) -> Vec<
                 continue;
             }
         }
-        out.push((i + 1, t.to_string()));
+        out.push((i + 1, l.trim().to_string()));
     }
     out
 }
@@ -612,6 +671,68 @@ mod tests {
         assert_eq!(m.parent_ordinal, Some(class_chunk.ordinal));
         assert!(m.text.contains("def reconcile_quarantine"));
         assert!(chunks.iter().any(|c| c.text.contains("MIDDLE_CONSTANT")));
+    }
+
+    /// WS-2 R3-4 / BC-P2-25: every Markdown heading is held — a title followed directly by a sub-heading, runs of
+    /// headings, a trailing heading, a document of headings only — and the coverage comparison reads headings the
+    /// same way on both sides, so a held heading is never reported as a gap while a missing body line still is.
+    #[test]
+    fn every_heading_is_held_and_headings_compare_the_same_way_on_both_sides() {
+        assert_eq!(atx_heading("## Scope"), Some("Scope"));
+        assert_eq!(atx_heading("#\tTabbed  "), Some("Tabbed"));
+        assert_eq!(atx_heading("#"), Some(""));
+        assert_eq!(atx_heading("#hashtag"), None);
+        assert_eq!(atx_heading("####### seven"), None);
+        assert_eq!(atx_heading("  # indented"), None);
+        let docs = [
+            "# Title\n\n## Sub\nbody line one\n",
+            "# no input change\n# second heading\n",
+            "intro paragraph\n# A\n## B\n### C\ntext under C\n## D\n",
+            "# Only\n## Headings\n### Here\n",
+            "#\nplain after an empty heading\n",
+            "lead\n## X\n\n\n## Y\n  \n## Z\ntail\n",
+        ];
+        for body in docs {
+            let chunks = chunk_markdown("doc.md", body, 1200, 120);
+            let expected = body
+                .lines()
+                .map(|l| atx_heading(l).unwrap_or(l).to_string())
+                .collect::<Vec<_>>()
+                .join("\n");
+            let miss = uncovered_lines_with(&expected, &chunks, 1200, true);
+            assert!(miss.is_empty(), "{body:?}: {miss:?} {chunks:?}");
+            // the raw source (markers kept) is held too when compared as Markdown
+            assert!(uncovered_lines_with(body, &chunks, 1200, true).is_empty());
+        }
+        let c = chunk_markdown("doc.md", "# Title\n\n## Sub\nbody\n", 1200, 120);
+        let sub = c.iter().find(|x| x.section == "Sub").unwrap();
+        assert!(sub.text.starts_with("Title\nSub\n"), "{}", sub.text);
+        // a body line no chunk holds is still a gap, and every uncovered line is listed
+        let partial = vec![Chunk {
+            level: "section".into(),
+            section: "x".into(),
+            text: "# held heading".into(),
+            ordinal: 1,
+            parent_ordinal: Some(0),
+        }];
+        let miss = uncovered_lines_with(
+            "held heading\nmissing one\nmissing two\n",
+            &partial,
+            1200,
+            true,
+        );
+        assert_eq!(
+            miss,
+            vec![
+                (2, "missing one".to_string()),
+                (3, "missing two".to_string())
+            ]
+        );
+        // code keeps its `#` lines literally (a Python comment is not a heading)
+        assert_eq!(
+            uncovered_lines("# a comment\nx = 1\n", &partial, 1200).len(),
+            2
+        );
     }
 
     /// BC-P2-25: list-valued and nested record fields (scenario steps, acceptance criteria, a worker's nested

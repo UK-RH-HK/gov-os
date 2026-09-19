@@ -22,7 +22,7 @@ use crate::capabilities::ecosystems;
 use crate::capabilities::governance::plugin_set;
 use crate::capabilities::protocol::PluginDescriptor;
 use crate::code_intelligence;
-use crate::memory::chunking::{chunk_code, chunk_plain, chunk_record, uncovered_lines, Chunk};
+use crate::memory::chunking::{chunk_code, chunk_plain, chunk_record, uncovered_lines_with, Chunk};
 use crate::memory::db::RuntimeDb;
 use crate::memory::embedder::{EmbedSpec, Embedder, RerankSpec, Reranker};
 use crate::memory::manifest::{build_index_manifest, read_index_manifest, write_manifests};
@@ -45,6 +45,16 @@ pub struct IndexOptions {
     /// Record the tool failures this build observes in failure memory (`memory::failures`). Default: yes, except
     /// for benchmark builds (a failing candidate is a benchmark result, recorded in its research record).
     pub record_failures: Option<bool>,
+    /// **Observe checkpoint boundaries (R2-11; WS-4 BC-P2-05, Contract v3 N2 "significant mutation").** When the
+    /// build finds that at least `CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints` artefacts were
+    /// added, changed or removed since the previous index build, every mandatory trigger not yet checkpointed is
+    /// turned into a checkpoint (`checkpoints::observe_boundaries`) and, if none of them is the significant
+    /// mutation itself, a `significant_mutation` checkpoint is written. For a build a host runs **as its own
+    /// operation** (`gov rebuild-memory`, `gov memory rebuild`): the index refresh inside another governed operation
+    /// (change-transaction execution, task close, update, adoption, a checkpoint's own refresh) stays off, because
+    /// that operation records its own boundary (accepted CIT, task transition, migration batch) and a record written
+    /// in the middle of it would become part of what it verifies. Default: off.
+    pub observe_boundaries: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Default)]
@@ -81,6 +91,9 @@ pub struct IndexReport {
     /// Non-rebuildable OS state still kept inside the derived runtime or generated directory (BC-P2-31,
     /// `paths::misplaced_os_state`).
     pub os_state: Vec<Value>,
+    /// With `IndexOptions::observe_boundaries`: the mutation this build observed and the checkpoints it wrote
+    /// (`null` otherwise).
+    pub boundaries: Value,
 }
 
 pub fn lexical_config(p: &Project) -> Value {
@@ -138,6 +151,9 @@ pub fn current_view(p: &Project) -> Project {
 pub struct DerivationContext {
     plugins: Vec<PluginDescriptor>,
     authority_sig: String,
+    /// What the secret scanner excludes (`SecretScanner::signature`): a secret-scanning policy change re-derives,
+    /// and so re-scans, every artefact (an excluded or indexed file is never judged under the previous rules).
+    scanner_sig: String,
     provider_cache: std::cell::RefCell<HashMap<String, String>>,
 }
 
@@ -153,6 +169,7 @@ impl DerivationContext {
         DerivationContext {
             plugins: plugins.to_vec(),
             authority_sig: hash_value(&authority),
+            scanner_sig: p.secret_scanner().signature(),
             provider_cache: std::cell::RefCell::new(HashMap::new()),
         }
     }
@@ -182,9 +199,258 @@ impl DerivationContext {
             "default_retrieval": d.default_retrieval(), "never_index": d.is_never_index(),
             "flags": [d.flag("lexical_index"), d.flag("semantic_index"), d.flag("graph_index"), d.flag("code_index")],
             "provider": provider, "authority": if record_like { self.authority_sig.as_str() } else { "" },
+            "secret_scanner": self.scanner_sig,
         });
         sha256_hex(v.to_string().as_bytes())[..32].to_string()
     }
+}
+
+// ---------------------------------------------------------------------------------------------- admission
+
+/// Largest file the index holds, in bytes. A larger file is excluded (`too_large`); `manifest::freshness` applies
+/// the same limit, so such a file is never reported as unindexed.
+pub const MAX_INDEXED_FILE_BYTES: u64 = 2_000_000;
+
+/// Reasons recorded in the index manifest's `excluded` list whose truth depends on the file's **content** (not on
+/// its path or a property freshness can re-read cheaply). Each such entry carries the content hash and derivation
+/// key it was decided under; it justifies the file's absence from the index only while both still match.
+pub const CONTENT_EXCLUSIONS: &[&str] = &["secret_content", "duplicate_id"];
+
+/// **How the index treats one repository file** — the single admission decision the indexer
+/// ([`rebuild`]) and `memory::manifest::freshness` share (R2-10: a file the indexer skips must never read as
+/// "unindexed" to freshness). Content-level exclusions (secret content, a duplicate record id) are decided after
+/// admission, on the candidate's text.
+#[derive(Debug)]
+pub enum Admission {
+    /// Not part of the index by its path: a memory-quality event (`Some` reason, reported) or a path-map decision
+    /// with no index flag (`None`).
+    Outside(Option<&'static str>),
+    /// Excluded by the path map or the sensitivity rules (`secret_class`, `sensitivity:<class>`); recorded in the
+    /// manifest's `excluded` list with the deciding rule.
+    PathExcluded { reason: String, rule: String },
+    /// Excluded by a property of the file itself: `binary` (report only), `too_large`, `not_utf8`, `unreadable`
+    /// (recorded in `excluded`).
+    FileExcluded { reason: &'static str, size: u64 },
+    /// An indexable text file.
+    Candidate { text: String, size: u64 },
+}
+
+/// The admission of the file at `abs` (`rel` from the project root) under path decision `d`.
+pub fn admit(
+    abs: &Path,
+    rel: &str,
+    d: &PathDecision,
+    scanner: &crate::security::secrets::SecretScanner,
+) -> Admission {
+    if crate::memory::failures::is_memory_quality_path(rel) {
+        // memory-quality events never feed back into retrieval (like the held-out set)
+        return Admission::Outside(Some("memory_quality_event"));
+    }
+    if d.is_never_index() || scanner.path_is_secret(rel) {
+        let reason = if d.is_secret() || scanner.path_is_secret(rel) {
+            "secret_class".to_string()
+        } else {
+            format!("sensitivity:{}", d.sensitivity())
+        };
+        return Admission::PathExcluded {
+            reason,
+            rule: d.rule_pattern.clone().unwrap_or_default(),
+        };
+    }
+    if !(d.flag("lexical_index")
+        || d.flag("semantic_index")
+        || d.flag("graph_index")
+        || d.flag("code_index"))
+    {
+        return Admission::Outside(None);
+    }
+    let size = abs.metadata().map(|m| m.len()).unwrap_or(0);
+    if !is_text_file(abs) {
+        return Admission::FileExcluded {
+            reason: "binary",
+            size,
+        };
+    }
+    if size > MAX_INDEXED_FILE_BYTES {
+        return Admission::FileExcluded {
+            reason: "too_large",
+            size,
+        };
+    }
+    match std::fs::read(abs) {
+        Err(_) => Admission::FileExcluded {
+            reason: "unreadable",
+            size,
+        },
+        Ok(bytes) => match String::from_utf8(bytes) {
+            Ok(text) => Admission::Candidate { text, size },
+            Err(_) => Admission::FileExcluded {
+                reason: "not_utf8",
+                size,
+            },
+        },
+    }
+}
+
+/// True for a file the indexer parses as a record.
+pub fn record_like(rel: &str) -> bool {
+    rel.ends_with(".yaml") || rel.ends_with(".yml") || rel.ends_with(".md")
+}
+
+/// Which of several files declaring the same record id the index holds — the one the record store resolves the id
+/// to (`records::RecordStore::load`): a record outside `archive/` before an archived one, then `spec/` before
+/// `governance/project/` before any other location, then walk order. A function of the tree alone, so a full and
+/// an incremental build keep the same occurrence (BC-P2-29) and the index serves the record governance resolves.
+fn record_rank(rel: &str, walk_index: usize) -> (u8, u8, usize) {
+    let archived = rel.starts_with("archive/");
+    let root = if rel.starts_with("spec/") {
+        0
+    } else if rel.starts_with("governance/project/") {
+        1
+    } else {
+        2
+    };
+    (archived as u8, root, walk_index)
+}
+
+/// The research/experiment state class the index holds (IP-WS10-05): non-governed evidence is held reference-only
+/// (`lifecycle::indexed_state_class`). `None` for other record types.
+fn evidence_state_class(
+    p: &Project,
+    store: &std::cell::OnceCell<crate::records::RecordStore>,
+    r: &Record,
+) -> Option<String> {
+    if !crate::lifecycle::EVIDENCE_TYPES.contains(&r.rtype().as_str()) {
+        return None;
+    }
+    let store = store.get_or_init(|| crate::records::RecordStore::load(&p.root));
+    let ctx = crate::lifecycle::Ctx::new(p, store);
+    Some(crate::lifecycle::indexed_state_class(&ctx, r))
+}
+
+/// The state class the index derives for a record at a path of class `path_class`.
+fn record_state_class(
+    p: &Project,
+    store: &std::cell::OnceCell<crate::records::RecordStore>,
+    r: &Record,
+    path_class: &str,
+    authority: &Value,
+) -> String {
+    if path_class == "historical" {
+        return "HISTORICAL".into();
+    }
+    evidence_state_class(p, store, r).unwrap_or_else(|| state_class_for(r, authority))
+}
+
+/// For an artefact whose content and derivation key are unchanged: does the state class the index recorded still
+/// hold? Only research and experiment records derive it from other state (their standing, IP-WS10-05); for them the
+/// standing is re-evaluated, so an incremental build and freshness see a standing change (incremental equals full).
+pub fn recorded_state_class_holds(
+    p: &Project,
+    store: &std::cell::OnceCell<crate::records::RecordStore>,
+    entry: &Value,
+    rel: &str,
+    text: &str,
+    path_class: &str,
+) -> bool {
+    let rtype = entry
+        .get("record_type")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    if !crate::lifecycle::EVIDENCE_TYPES.contains(&rtype) || path_class == "historical" {
+        return true;
+    }
+    let Some(r) = parse_record_text(text, rel) else {
+        return false;
+    };
+    let now = evidence_state_class(p, store, &r).unwrap_or_default();
+    entry.get("state_class").and_then(|v| v.as_str()) == Some(now.as_str())
+}
+
+/// A declared `code_intel` adapter the acting role may not execute — denied (unregistered, pin drift, changed
+/// implementation, not authorised) or rejected (schema-invalid). Files of its languages are analysed by the
+/// built-in extractor: a degradation that is recorded, never silent (D-0005; WS-7 IP-W7-2).
+#[derive(Debug, Clone)]
+struct RefusedAdapter {
+    plugin_id: String,
+    version: String,
+    code: String,
+    message: String,
+    /// Empty: every language.
+    languages: Vec<String>,
+}
+
+impl RefusedAdapter {
+    fn covers(&self, language: &str) -> bool {
+        self.languages.is_empty() || self.languages.iter().any(|l| l == language)
+    }
+    fn failure_message(&self) -> String {
+        format!(
+            "code_intel plugin {} v{} is declared but refused ({}): {}; files of {} are analysed by the built-in extractor",
+            self.plugin_id,
+            self.version,
+            self.code,
+            self.message,
+            if self.languages.is_empty() {
+                "every language".to_string()
+            } else {
+                self.languages.join(", ")
+            }
+        )
+    }
+}
+
+/// What the id-ranking pass learned about a record-like candidate it read (reused by the build loop when the
+/// file's bytes are unchanged).
+struct PreScan {
+    hash: String,
+    hits: Vec<crate::security::secrets::SecretHit>,
+    record: Option<Record>,
+}
+
+fn refused_code_intel(
+    governed: &crate::capabilities::governance::PluginSet,
+) -> Vec<RefusedAdapter> {
+    let mut out = vec![];
+    for entry in governed.denied.iter().chain(governed.rejected.iter()) {
+        let source = entry["source"].as_str().unwrap_or("");
+        let desc = crate::util::read_yaml(Path::new(source)).unwrap_or(Value::Null);
+        let capability = entry["capability"]
+            .as_str()
+            .or_else(|| desc["capability"].as_str())
+            .unwrap_or("");
+        if capability != "code_intel" {
+            continue;
+        }
+        let plugin_id = entry["plugin_id"]
+            .as_str()
+            .or_else(|| desc["plugin_id"].as_str())
+            .unwrap_or("?")
+            .to_string();
+        let version = entry["version"]
+            .as_str()
+            .or_else(|| desc["version"].as_str())
+            .unwrap_or("")
+            .to_string();
+        let (code, message) = match governed.refusal(&plugin_id) {
+            Some(e) => (e.code, e.message),
+            None => (
+                entry["code"]
+                    .as_str()
+                    .unwrap_or("PLUGIN_NOT_AUTHORIZED")
+                    .to_string(),
+                entry["reason"].as_str().unwrap_or("").to_string(),
+            ),
+        };
+        out.push(RefusedAdapter {
+            plugin_id,
+            version,
+            code,
+            message,
+            languages: crate::util::str_list(&desc, "languages"),
+        });
+    }
+    out
 }
 
 // ---------------------------------------------------------------------------------------------- import resolution
@@ -889,13 +1155,23 @@ struct CoverageTally {
 }
 
 impl CoverageTally {
-    fn check(&mut self, rel: &str, expected: &str, chunks: &[Chunk], max_chars: usize) {
+    /// `markdown`: the content is a record's or a document's (headings compared by their text on both sides,
+    /// `memory::coverage`).
+    fn check(
+        &mut self,
+        rel: &str,
+        expected: &str,
+        chunks: &[Chunk],
+        max_chars: usize,
+        markdown: bool,
+    ) {
         self.checked += 1;
-        let miss = uncovered_lines(expected, chunks, max_chars);
+        let miss = uncovered_lines_with(expected, chunks, max_chars, markdown);
         if !miss.is_empty() {
             self.uncovered += miss.len();
             if self.gaps.len() < 20 {
-                self.gaps.push(json!({"path": rel, "lines": miss.iter().take(5).map(|(n, l)| json!({"line": n, "text": l.chars().take(120).collect::<String>()})).collect::<Vec<_>>(), "count": miss.len()}));
+                self.gaps
+                    .push(crate::memory::coverage::gap_row(None, rel, &miss));
             }
         }
     }
@@ -1038,16 +1314,32 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         .to_string();
     let db = RuntimeDb::open(&build_path)?;
     db.init_schema_with(&tokenizer)?;
-    let prev = if incremental {
-        read_index_manifest(p)
-    } else {
+    // the index as it stood before this build: the basis of an incremental build, and of the mutation this build
+    // observes (R2-11) in either mode
+    let before = if benchmark_mode {
         None
+    } else {
+        read_index_manifest(p)
     };
+    let prev = if incremental { before.clone() } else { None };
     let prev_arts: BTreeMap<String, Value> = prev
         .as_ref()
         .and_then(|m| m.get("artifacts"))
         .and_then(|a| a.as_object())
         .map(|o| o.iter().map(|(k, v)| (k.clone(), v.clone())).collect())
+        .unwrap_or_default();
+    // content-level exclusions of the previous build (secret content, duplicate id), valid while content and
+    // derivation key are unchanged
+    let prev_excluded: BTreeMap<String, Value> = prev
+        .as_ref()
+        .and_then(|m| m.get("excluded"))
+        .and_then(|a| a.as_array())
+        .map(|a| {
+            a.iter()
+                .filter(|e| CONTENT_EXCLUSIONS.contains(&e["reason"].as_str().unwrap_or("")))
+                .filter_map(|e| e["path"].as_str().map(|s| (s.to_string(), e.clone())))
+                .collect()
+        })
         .unwrap_or_default();
     let chunking = chunking_config(p);
     let max_chars = chunking["max_chars"].as_i64().unwrap_or(1200) as usize;
@@ -1069,68 +1361,199 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
     let repo_commit = p.git_commit();
     let now = now_iso();
     let files = iter_repo_files(&p.root, false);
+    let file_set: HashSet<&str> = files.iter().map(|(_, r)| r.as_str()).collect();
     let resolver = ImportResolver::new(&p.root, &files, &product_roots);
+    // the record store research/experiment standing is read against (IP-WS10-05), loaded only when needed
+    let evidence_store: std::cell::OnceCell<crate::records::RecordStore> =
+        std::cell::OnceCell::new();
+    // declared code-intelligence adapters the acting role may not execute (WS-7 IP-W7-2)
+    let refused_adapters = refused_code_intel(&governed);
+    let mut languages_seen: BTreeSet<String> = BTreeSet::new();
+    // --- which file the index holds for each record id: ranked over the whole tree before anything is written, so
+    // the choice is a function of the tree (a full and an incremental build agree, BC-P2-29) and equals the record
+    // store's. Content the previous build derived under the same derivation key is not re-read for its id (the
+    // manifest records it); everything else is scanned and parsed once here and reused by the loop below.
+    let mut claims: HashMap<String, Option<String>> = HashMap::new();
+    let mut scanned: HashMap<String, PreScan> = HashMap::new();
+    let mut holder: HashMap<String, ((u8, u8, usize), String)> = HashMap::new();
+    for (walk_index, (abs, rel)) in files.iter().enumerate() {
+        if !record_like(rel) {
+            continue;
+        }
+        let d = contract.decide(rel);
+        let Admission::Candidate { text, .. } = admit(abs, rel, &d, scanner) else {
+            continue;
+        };
+        let hash = sha256_hex(text.as_bytes());
+        let dkey = derive.key(&d, rel);
+        let same = |e: &Value| {
+            e.get("content_hash").and_then(|v| v.as_str()) == Some(hash.as_str())
+                && e.get("derivation").and_then(|v| v.as_str()) == Some(dkey.as_str())
+        };
+        let reused: Option<Option<String>> = if let Some(e) = prev_arts.get(rel).filter(|e| same(e))
+        {
+            Some(
+                e.get("record_type")
+                    .and_then(|v| v.as_str())
+                    .filter(|t| *t != "file")
+                    .and_then(|_| e.get("artifact_id").and_then(|v| v.as_str()))
+                    .map(String::from),
+            )
+        } else {
+            prev_excluded.get(rel).filter(|x| same(x)).map(|x| {
+                if x["reason"] == "duplicate_id" {
+                    x["id"].as_str().map(String::from)
+                } else {
+                    None
+                }
+            })
+        };
+        let id = match reused {
+            Some(id) => id,
+            None => {
+                let hits = scanner.scan_text(&text, rel);
+                let record = if hits.is_empty() {
+                    parse_record_text(&text, rel)
+                        .filter(|r| !r.id().is_empty() && !r.rtype().is_empty())
+                } else {
+                    None
+                };
+                let id = record.as_ref().map(|r| r.id());
+                scanned.insert(
+                    rel.clone(),
+                    PreScan {
+                        hash: hash.clone(),
+                        hits,
+                        record,
+                    },
+                );
+                id
+            }
+        };
+        if let Some(id) = &id {
+            let rank = record_rank(rel, walk_index);
+            if holder.get(id).map(|(r, _)| rank < *r).unwrap_or(true) {
+                holder.insert(id.clone(), (rank, rel.clone()));
+            }
+        }
+        claims.insert(rel.clone(), id);
+    }
     let mut seen_paths: HashSet<String> = HashSet::new();
-    let mut seen_ids: HashSet<String> = HashSet::new();
     let mut excluded_now: HashSet<String> = HashSet::new();
     let mut pending_vectors: Vec<(String, String, String)> = vec![];
     let mut coverage = CoverageTally::default();
     let mut adapter_failures = AdapterFailures::default();
     let mut in_batch = 0usize;
+    // record an exclusion (with what decided it) and drop whatever the index held for the path
+    let exclude = |db: &RuntimeDb, rel: &str, reason: &str, detail: Value| -> Result<()> {
+        db.exec(
+            "INSERT OR REPLACE INTO excluded(path, reason, detail) VALUES (?1,?2,?3)",
+            &[&rel, &reason, &detail.to_string()],
+        )?;
+        if let Some(a) = db.artifact_by_path(rel)? {
+            db.delete_artifact(a["artifact_id"].as_str().unwrap_or(""))?;
+        }
+        Ok(())
+    };
     db.begin()?;
     for (abs, rel) in &files {
-        if crate::memory::failures::is_memory_quality_path(rel) {
-            // memory-quality events never feed back into retrieval (like the held-out set)
-            report
-                .excluded
-                .push(json!({"path": rel, "reason": "memory_quality_event"}));
-            continue;
-        }
         let d = contract.decide(rel);
-        if d.is_never_index() || scanner.path_is_secret(rel) {
-            let reason = if d.is_secret() || scanner.path_is_secret(rel) {
-                "secret_class".to_string()
-            } else {
-                format!("sensitivity:{}", d.sensitivity())
-            };
-            report.excluded.push(json!({"path": rel, "reason": reason}));
-            excluded_now.insert(rel.clone());
-            db.exec(
-                "INSERT OR REPLACE INTO excluded(path, reason, detail) VALUES (?1,?2,?3)",
-                &[rel, &reason, &d.rule_pattern.clone().unwrap_or_default()],
-            )?;
+        let text = match admit(abs, rel, &d, scanner) {
+            Admission::Outside(reason) => {
+                if let Some(r) = reason {
+                    report.excluded.push(json!({"path": rel, "reason": r}));
+                }
+                continue;
+            }
+            Admission::PathExcluded { reason, rule } => {
+                report.excluded.push(json!({"path": rel, "reason": reason}));
+                excluded_now.insert(rel.clone());
+                exclude(&db, rel, &reason, json!({"rule": rule}))?;
+                continue;
+            }
+            Admission::FileExcluded { reason, size } => {
+                // not read into the index; an artefact it had is removed with the unseen ones below
+                report
+                    .excluded
+                    .push(json!({"path": rel, "reason": reason, "size": size}));
+                if reason != "binary" {
+                    excluded_now.insert(rel.clone());
+                    db.exec(
+                        "INSERT OR REPLACE INTO excluded(path, reason, detail) VALUES (?1,?2,?3)",
+                        &[rel, &reason, &json!({"size": size}).to_string()],
+                    )?;
+                }
+                continue;
+            }
+            Admission::Candidate { text, .. } => text,
+        };
+        let size = text.len();
+        let hash = sha256_hex(text.as_bytes());
+        let dkey = derive.key(&d, rel);
+        let ext = Path::new(rel)
+            .extension()
+            .map(|e| e.to_string_lossy().to_lowercase())
+            .unwrap_or_default();
+        let language = ecosystems::language_for_ext(&ext);
+        if let (true, Some(lang)) = (d.flag("code_index"), language) {
+            languages_seen.insert(lang.to_string());
+        }
+        // --- a record id the index holds at another path: this occurrence is a duplicate (the held one is named)
+        if let Some(Some(id)) = claims.get(rel) {
+            if let Some((_, kept)) = holder.get(id).filter(|(_, k)| k != rel) {
+                report.problems.push(format!(
+                    "duplicate record id {id} at {rel} (the index holds {kept})"
+                ));
+                report
+                    .excluded
+                    .push(json!({"path": rel, "reason": "duplicate_id", "id": id, "kept": kept}));
+                excluded_now.insert(rel.clone());
+                exclude(
+                    &db,
+                    rel,
+                    "duplicate_id",
+                    json!({"content_hash": hash, "derivation": dkey, "id": id, "kept": kept}),
+                )?;
+                continue;
+            }
+        }
+        // --- unchanged since the previous build: content, derivation key and, for research/experiment records, the
+        // standing the index holds them under (the secret-scanning rules are part of the key)
+        if incremental {
+            if let Some(prev_e) = prev_arts.get(rel) {
+                let same_content =
+                    prev_e.get("content_hash").and_then(|v| v.as_str()) == Some(hash.as_str());
+                let same_derivation =
+                    prev_e.get("derivation").and_then(|v| v.as_str()) == Some(dkey.as_str());
+                if same_content
+                    && same_derivation
+                    && recorded_state_class_holds(
+                        p,
+                        &evidence_store,
+                        prev_e,
+                        rel,
+                        &text,
+                        &d.class(),
+                    )
+                {
+                    seen_paths.insert(rel.clone());
+                    report.unchanged += 1;
+                    continue;
+                }
+                if same_content {
+                    report.rederived.push(rel.clone());
+                }
+            }
             if let Some(a) = db.artifact_by_path(rel)? {
                 db.delete_artifact(a["artifact_id"].as_str().unwrap_or(""))?;
             }
-            continue;
         }
-        let (lex, sem, gr, code) = (
-            d.flag("lexical_index"),
-            d.flag("semantic_index"),
-            d.flag("graph_index"),
-            d.flag("code_index"),
-        );
-        if !(lex || sem || gr || code) {
-            continue;
-        }
-        if !is_text_file(abs) {
-            report
-                .excluded
-                .push(json!({"path": rel, "reason": "binary"}));
-            continue;
-        }
-        let size = abs.metadata().map(|m| m.len()).unwrap_or(0);
-        if size > 2_000_000 {
-            report
-                .excluded
-                .push(json!({"path": rel, "reason": "too_large"}));
-            continue;
-        }
-        let text = match read_text(abs) {
-            Ok(t) => t,
-            Err(_) => continue,
+        // --- secret content is never indexed (fail closed); the exclusion holds while content and key are unchanged
+        let pre = scanned.remove(rel).filter(|s| s.hash == hash);
+        let hits = match &pre {
+            Some(s) => s.hits.clone(),
+            None => scanner.scan_text(&text, rel),
         };
-        let hits = scanner.scan_text(&text, rel);
         if !hits.is_empty() {
             let ids: Vec<String> = hits
                 .iter()
@@ -1143,49 +1566,23 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                 .push(json!({"path": rel, "reason": "secret_content", "patterns": ids}));
             report.secret_blocked.push(json!({"path": rel, "patterns": ids, "lines": hits.iter().map(|h| h.line).collect::<Vec<_>>()}));
             excluded_now.insert(rel.clone());
-            db.exec(
-                "INSERT OR REPLACE INTO excluded(path, reason, detail) VALUES (?1,?2,?3)",
-                &[rel, &"secret_content", &ids.join(",")],
+            exclude(
+                &db,
+                rel,
+                "secret_content",
+                json!({"content_hash": hash, "derivation": dkey, "patterns": ids}),
             )?;
-            if let Some(a) = db.artifact_by_path(rel)? {
-                db.delete_artifact(a["artifact_id"].as_str().unwrap_or(""))?;
-            }
             continue;
         }
-        let hash = sha256_hex(text.as_bytes());
-        let dkey = derive.key(&d, rel);
         seen_paths.insert(rel.clone());
-        if incremental {
-            if let Some(prev_e) = prev_arts.get(rel) {
-                let same_content =
-                    prev_e.get("content_hash").and_then(|v| v.as_str()) == Some(hash.as_str());
-                let same_derivation =
-                    prev_e.get("derivation").and_then(|v| v.as_str()) == Some(dkey.as_str());
-                if same_content && same_derivation {
-                    report.unchanged += 1;
-                    if let Some(id) = prev_e.get("artifact_id").and_then(|v| v.as_str()) {
-                        seen_ids.insert(id.to_string());
-                    }
-                    continue;
-                }
-                if same_content {
-                    report.rederived.push(rel.clone());
-                }
+        let record = if record_like(rel) {
+            match pre {
+                Some(s) => s.record,
+                None => parse_record_text(&text, rel),
             }
-            if let Some(a) = db.artifact_by_path(rel)? {
-                db.delete_artifact(a["artifact_id"].as_str().unwrap_or(""))?;
-            }
-        }
-        let record = if rel.ends_with(".yaml") || rel.ends_with(".yml") || rel.ends_with(".md") {
-            parse_record_text(&text, rel)
         } else {
             None
         };
-        let ext = Path::new(rel)
-            .extension()
-            .map(|e| e.to_string_lossy().to_lowercase())
-            .unwrap_or_default();
-        let language = ecosystems::language_for_ext(&ext);
         let (
             artifact_id,
             record_type,
@@ -1209,35 +1606,49 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         let mut symbols: Vec<code_intelligence::Symbol> = vec![];
         let mut sym_refs: Vec<(String, String, String, usize)> = vec![];
         let mut provider = String::new();
+        let (lex, sem, gr, code) = (
+            d.flag("lexical_index"),
+            d.flag("semantic_index"),
+            d.flag("graph_index"),
+            d.flag("code_index"),
+        );
         match record {
             Some(r) if !r.id().is_empty() && !r.rtype().is_empty() => {
                 let id = r.id();
-                if seen_ids.contains(&id) {
+                // the file changed after the ranking and now claims an id another file holds
+                if let Some((_, kept)) = holder.get(&id).filter(|(_, k)| k != rel) {
                     report.problems.push(format!(
-                        "duplicate record id {id} at {rel} (first occurrence kept)"
+                        "duplicate record id {id} at {rel} (the index holds {kept})"
                     ));
+                    report.excluded.push(
+                        json!({"path": rel, "reason": "duplicate_id", "id": id, "kept": kept}),
+                    );
+                    seen_paths.remove(rel);
+                    excluded_now.insert(rel.clone());
+                    exclude(
+                        &db,
+                        rel,
+                        "duplicate_id",
+                        json!({"content_hash": hash, "derivation": dkey, "id": id, "kept": kept}),
+                    )?;
                     continue;
                 }
                 if incremental {
                     if let Some(a) = db.artifact(&id)? {
                         let old_path = a["path"].as_str().unwrap_or("").to_string();
                         if old_path != *rel {
-                            if p.root.join(&old_path).exists()
-                                && !seen_paths.contains(&old_path)
-                                && files.iter().any(|(_, r)| r == &old_path)
-                            {
-                                report.problems.push(format!("duplicate record id {id} at {rel} (first occurrence {old_path} kept)"));
-                                continue;
-                            }
-                            // relocation (git mv / rename): the record keeps its identity and provenance at the new path
+                            // the id's artefact lives at another path: a relocation (git mv / rename) when that path
+                            // is gone — the record keeps its identity and provenance at the new path — or an
+                            // occurrence this one now outranks (excluded where it is walked)
                             db.delete_artifact(&id)?;
-                            report
-                                .moved
-                                .push(json!({"artifact_id": id, "from": old_path, "to": rel}));
+                            if !file_set.contains(old_path.as_str()) {
+                                report
+                                    .moved
+                                    .push(json!({"artifact_id": id, "from": old_path, "to": rel}));
+                            }
                         }
                     }
                 }
-                seen_ids.insert(id.clone());
                 artifact_id = id.clone();
                 record_type = r.rtype();
                 title = r.title();
@@ -1246,11 +1657,7 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                 } else {
                     r.status()
                 };
-                state_class = if d.class() == "historical" {
-                    "HISTORICAL".into()
-                } else {
-                    state_class_for(&r, &authority)
-                };
+                state_class = record_state_class(p, &evidence_store, &r, &d.class(), &authority);
                 data_json = serde_json::to_string(&r.data)?;
                 // BC-P2-25: every content field — list-valued and nested ones included — is a named section
                 let sections = r.text_sections();
@@ -1267,7 +1674,7 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                     .chain(std::iter::once(body_lines.as_str()))
                     .collect::<Vec<_>>()
                     .join("\n");
-                coverage.check(rel, &expected, &chunks, max_chars);
+                coverage.check(rel, &expected, &chunks, max_chars, true);
                 for (t, target) in r.relations() {
                     edges.push((id.clone(), t.clone(), target.clone()));
                 }
@@ -1284,7 +1691,7 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                     "ACTIVE".into()
                 };
                 state_class = match d.class().as_str() {
-                    "source" | "test" | "devops" | "tooling" => "EVIDENCE",
+                    "source" | "test" | "devops" | "tooling" | "evidence" => "EVIDENCE",
                     "historical" => "HISTORICAL",
                     "generated" | "derived" => "DERIVED",
                     "authoritative" => "AUTHORITATIVE",
@@ -1294,6 +1701,24 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                 data_json = "{}".into();
                 superseded_by = None;
                 if let (true, Some(lang)) = (code, language) {
+                    // a declared adapter for this language that may not run: the built-in extractor analyses the
+                    // file, and that is a recorded degradation (D-0005; WS-7 IP-W7-2), never a silent fallback
+                    if !refused_adapters.is_empty()
+                        && crate::capabilities::host::find(&plugins, "code_intel", Some(lang), None)
+                            .is_none()
+                    {
+                        for a in refused_adapters.iter().filter(|a| a.covers(lang)) {
+                            report.degradations.push(format!(
+                                "{rel}: code_intel plugin {} refused ({}); built-in extractor used",
+                                a.plugin_id, a.code
+                            ));
+                            let e = adapter_failures
+                                .by_key
+                                .entry((a.plugin_id.clone(), a.version.clone(), a.code.clone()))
+                                .or_insert((a.failure_message(), vec![]));
+                            e.1.push(rel.clone());
+                        }
+                    }
                     let facts = code_intelligence::analyze(rel, lang, &text, &plugins, &p.root);
                     provider = facts.provider.clone();
                     if let Some(dg) = &facts.degraded {
@@ -1317,7 +1742,7 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                         }
                     }
                     chunks = chunk_code(rel, &text, &chunk_units(&facts), max_chars, overlap);
-                    coverage.check(rel, &text, &chunks, max_chars);
+                    coverage.check(rel, &text, &chunks, max_chars, false);
                     symbols = facts.symbols.clone();
                     for rt in &facts.routes {
                         symbols.push(code_intelligence::Symbol {
@@ -1374,7 +1799,13 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                 } else if ext == "md" || ext == "txt" || ext == "rst" {
                     chunks =
                         crate::memory::chunking::chunk_markdown(rel, &text, max_chars, overlap);
-                    coverage.check(rel, &without_heading_markers(&text), &chunks, max_chars);
+                    coverage.check(
+                        rel,
+                        &without_heading_markers(&text),
+                        &chunks,
+                        max_chars,
+                        true,
+                    );
                 } else {
                     chunks = chunk_plain(rel, &text, max_chars, overlap);
                 }
@@ -1423,6 +1854,36 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
             db.begin()?;
             in_batch = 0;
         }
+    }
+    // a refused adapter is a standing degradation of every build while files of its languages exist, whether or
+    // not this build re-analysed one of them (WS-7 IP-W7-2)
+    for a in &refused_adapters {
+        let langs: Vec<&String> = languages_seen
+            .iter()
+            .filter(|l| {
+                a.covers(l)
+                    && crate::capabilities::host::find(&plugins, "code_intel", Some(l), None)
+                        .is_none()
+            })
+            .collect();
+        if langs.is_empty() {
+            continue;
+        }
+        report.degradations.push(format!(
+            "code_intel plugin {} v{} refused ({}): {} files are analysed by the built-in extractor (D-0005)",
+            a.plugin_id,
+            a.version,
+            a.code,
+            langs
+                .iter()
+                .map(|l| l.as_str())
+                .collect::<Vec<_>>()
+                .join(", ")
+        ));
+        adapter_failures
+            .by_key
+            .entry((a.plugin_id.clone(), a.version.clone(), a.code.clone()))
+            .or_insert((a.failure_message(), vec![]));
     }
     if incremental {
         // artefacts no longer part of the index (deleted, reclassified out of every index, now binary/too large)
@@ -1518,7 +1979,10 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         // BC-P2-31: non-rebuildable OS state still kept where the derived runtime directory is rebuilt
         report.os_state = crate::paths::misplaced_os_state(&p.root);
     }
-    let excluded_all = db.query("SELECT path, reason FROM excluded ORDER BY path", &[])?;
+    let excluded_all = db.query(
+        "SELECT path, reason, detail FROM excluded ORDER BY path",
+        &[],
+    )?;
     let mut manifest = build_index_manifest(
         p,
         &db,
@@ -1593,14 +2057,200 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
             report.counts = again.counts;
         }
     }
+    // --- R2-11: a significant mutation this build observed is a checkpoint boundary (for the builds a host runs as
+    // an operation of its own; see `IndexOptions::observe_boundaries`)
+    if opts.observe_boundaries && !benchmark_mode {
+        if let Some(before) = &before {
+            let after = read_index_manifest(p).unwrap_or(Value::Null);
+            report.boundaries = observe_significant_mutation(p, &final_db, before, &after);
+            if let Some(h) = report.boundaries["manifest_hash_after"].as_str() {
+                report.manifest_hash = h.to_string();
+            }
+            if let Some(e) = report.boundaries.get("error") {
+                report.problems.push(format!(
+                    "CHECKPOINT_NOT_WRITTEN: a significant mutation was observed but its checkpoint could not be written ({}: {})",
+                    e["code"].as_str().unwrap_or("?"),
+                    e["message"].as_str().unwrap_or("")
+                ));
+            }
+        }
+    }
     report.duration_ms = started.elapsed().as_millis();
     let _ = PluginDescriptor::from_value(&Value::Null, "");
     Ok(report)
 }
 
+/// The artefacts an index build added, changed (content hash) or removed relative to the index before it, by path.
+/// A re-derivation of unchanged content is not a mutation of the repository and is not counted.
+pub fn content_changes(before: &Value, after: &Value) -> Vec<String> {
+    let empty = serde_json::Map::new();
+    let b = before["artifacts"].as_object().unwrap_or(&empty);
+    let a = after["artifacts"].as_object().unwrap_or(&empty);
+    let hash = |e: &Value| e["content_hash"].as_str().unwrap_or("").to_string();
+    let mut out: Vec<String> = a
+        .iter()
+        .filter(|(k, e)| b.get(*k).map(|x| hash(x) != hash(e)).unwrap_or(true))
+        .map(|(k, _)| k.clone())
+        .collect();
+    out.extend(b.keys().filter(|k| !a.contains_key(*k)).cloned());
+    out.sort();
+    out
+}
+
+/// R2-11: turn a significant mutation the build observed into a checkpoint boundary (see
+/// [`IndexOptions::observe_boundaries`]). The next action is carried forward from the latest checkpoint (the
+/// product observed the boundary; it does not know a new plan). Never fails the build: a checkpoint that cannot be
+/// written (authority, emergency control) is reported with its typed error.
+fn observe_significant_mutation(
+    p: &Project,
+    db_path: &Path,
+    before: &Value,
+    after: &Value,
+) -> Value {
+    let changed = content_changes(before, after);
+    let threshold = p
+        .policies()
+        .get_i64(
+            "CHECKPOINT_POLICY",
+            "watchdog.max_operations_between_checkpoints",
+            25,
+        )
+        .max(1) as usize;
+    let significant = changed.len() >= threshold;
+    let mut out = json!({"significant_mutation": significant, "changed_artifacts": changed.len(),
+        "threshold": threshold, "policy": "CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints", "checkpoints": []});
+    if !significant {
+        return out;
+    }
+    let err = |e: &GovError| json!({"code": e.code, "message": e.message});
+    let db = match RuntimeDb::open(db_path) {
+        Ok(d) => d,
+        Err(e) => {
+            out["error"] = err(&e);
+            return out;
+        }
+    };
+    let next_action = crate::checkpoints::latest(p)
+        .and_then(|c| c["next_action"].as_str().map(String::from))
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or_else(|| {
+            "review the significant mutation observed at the index rebuild and continue the current work".into()
+        });
+    let detail = json!({"changed_artifacts": changed.len(), "threshold": threshold, "observed_by": "index rebuild",
+        "examples": changed.iter().take(10).collect::<Vec<_>>()});
+    let mut written: Vec<Value> = vec![];
+    match crate::checkpoints::observe_boundaries(p, &db, &next_action) {
+        Ok(v) => written.extend(v),
+        Err(e) => out["error"] = err(&e),
+    }
+    if out.get("error").is_none()
+        && !written
+            .iter()
+            .any(|c| c["trigger"] == "significant_mutation")
+    {
+        let fields = json!({"trigger": "significant_mutation", "next_action": next_action,
+            "last_completed_step": format!("observed boundary: significant_mutation ({} artefact(s) added, changed or removed since the previous index build; threshold {threshold})", changed.len()),
+            "observed_boundary": {"trigger": "significant_mutation", "detail": detail}});
+        match crate::checkpoints::create(p, &db, fields) {
+            Ok(c) => written.push(
+                json!({"checkpoint": c["id"], "trigger": "significant_mutation", "detail": detail}),
+            ),
+            Err(e) => out["error"] = err(&e),
+        }
+    }
+    out["checkpoints"] = json!(written);
+    // a checkpoint brings the index current again (`checkpoints::create`): report the index as it now stands
+    out["manifest_hash_after"] = read_index_manifest(p)
+        .and_then(|m| m.get("manifest_hash").cloned())
+        .unwrap_or(Value::Null);
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// R2-10: the admission freshness and the indexer share — every skip reason is decided from the file itself, the
+    /// same way for both; a candidate carries its text.
+    #[test]
+    fn admission_decides_every_skip_reason_from_the_file() {
+        let dir = std::env::temp_dir().join(format!("gov-admit-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(dir.join("product")).unwrap();
+        let c = crate::paths::RepositoryContract::new(json!({"paths": [
+            {"pattern": "product/**", "class": "source"},
+            {"pattern": "product/secrets/**", "class": "secret"},
+            {"pattern": "product/quiet/**", "class": "derived"}]}));
+        let scanner = crate::security::secrets::SecretScanner::default_scanner();
+        let put = |rel: &str, bytes: &[u8]| {
+            let p = dir.join(rel);
+            std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+            std::fs::write(&p, bytes).unwrap();
+            p
+        };
+        let cases: Vec<(&str, Vec<u8>, &str)> = vec![
+            ("product/a.txt", b"plain text\n".to_vec(), "candidate"),
+            ("product/latin1.txt", b"caf\xe9\n".to_vec(), "not_utf8"),
+            ("product/img.bin", b"\x89PNG\x00\x01".to_vec(), "binary"),
+            (
+                "product/big.txt",
+                "y".repeat(MAX_INDEXED_FILE_BYTES as usize + 1).into_bytes(),
+                "too_large",
+            ),
+            ("product/secrets/k.txt", b"k\n".to_vec(), "secret_class"),
+            ("product/quiet/x.txt", b"x\n".to_vec(), "outside"),
+            (
+                "spec/reports/memory-quality/FAIL-1.yaml",
+                b"id: FAIL-1\n".to_vec(),
+                "memory_quality_event",
+            ),
+        ];
+        for (rel, bytes, want) in cases {
+            let abs = put(rel, &bytes);
+            let got = match admit(&abs, rel, &c.decide(rel), &scanner) {
+                Admission::Candidate { text, .. } => {
+                    assert_eq!(text.as_bytes(), &bytes[..]);
+                    "candidate".to_string()
+                }
+                Admission::FileExcluded { reason, .. } => reason.to_string(),
+                Admission::PathExcluded { reason, .. } => reason,
+                Admission::Outside(Some(r)) => r.to_string(),
+                Admission::Outside(None) => "outside".to_string(),
+            };
+            assert_eq!(got, want, "{rel}");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The occurrence the index holds for a record id is the one the record store resolves it to, whatever the
+    /// order files were met in; the mutation a build observes counts content changes only.
+    #[test]
+    fn record_rank_follows_the_record_store_and_changes_count_content_only() {
+        let mut ranked = [
+            ("archive/REQ-1.yaml", 0),
+            ("governance/project/x/REQ-1.yaml", 1),
+            ("docs/REQ-1.md", 2),
+            ("spec/z/REQ-1.yaml", 4),
+            ("spec/a/REQ-1.yaml", 3),
+        ]
+        .iter()
+        .map(|(p, i)| (record_rank(p, *i), p.to_string()))
+        .collect::<Vec<_>>();
+        ranked.sort();
+        let order: Vec<&str> = ranked.iter().map(|(_, p)| p.as_str()).collect();
+        assert_eq!(
+            order,
+            vec![
+                "spec/a/REQ-1.yaml",
+                "spec/z/REQ-1.yaml",
+                "governance/project/x/REQ-1.yaml",
+                "docs/REQ-1.md",
+                "archive/REQ-1.yaml"
+            ]
+        );
+        let before = json!({"artifacts": {"a": {"content_hash": "1", "derivation": "k"}, "b": {"content_hash": "2"}, "c": {"content_hash": "3"}}});
+        let after = json!({"artifacts": {"a": {"content_hash": "1", "derivation": "k2"}, "b": {"content_hash": "9"}, "d": {"content_hash": "4"}}});
+        assert_eq!(content_changes(&before, &after), vec!["b", "c", "d"]);
+    }
 
     #[test]
     fn test_paths_by_convention() {

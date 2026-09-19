@@ -1602,9 +1602,19 @@ fn interface_contract_kernel_yaml_and_migration_substance_are_consistent() {
         let d = dup_keys(&std::fs::read_to_string(&abs).unwrap());
         assert!(d.is_empty(), "duplicate keys {d:?} in framework/{rel}");
     }
-    // migration substance: every migration into the current version accounts for the template changes it spans
+    // migration substance: every migration into the current version accounts for the template changes it spans.
+    // Once the current version is released (its payload under release/releases/<VERSION> is immutable), a change to
+    // the working tree's templates belongs to the NEXT version: the migrations into VERSION are checked against the
+    // payload they shipped with, and every migration from VERSION must account for the working tree's changes since
+    // that payload (repair-1 round 3, WS-6: a template change reaches installed projects only through the next
+    // migration's operations). Before the version is released the working tree is its payload, as before.
     let migs = gov_runtime::migrations::framework::load_migrations(&croot.join("migrations"));
     let cur = gov_runtime::VERSION;
+    let working = croot.join("framework/overlay-templates");
+    let released = croot
+        .join("release/releases")
+        .join(cur)
+        .join("kernel/overlay-templates");
     let into: Vec<&Value> = migs.iter().filter(|m| m["to_version"] == cur).collect();
     assert!(!into.is_empty(), "no migration into {cur}");
     for m in into {
@@ -1614,12 +1624,31 @@ fn interface_contract_kernel_yaml_and_migration_substance_are_consistent() {
             .join(from)
             .join("kernel/overlay-templates");
         assert!(old.is_dir(), "previous release {from} payload missing");
-        let problems = gov_runtime::migrations::framework::check_substance(
-            m,
-            &old,
-            &croot.join("framework/overlay-templates"),
-        );
+        let new = if released.is_dir() {
+            released.clone()
+        } else {
+            working.clone()
+        };
+        let problems = gov_runtime::migrations::framework::check_substance(m, &old, &new);
         assert!(problems.is_empty(), "{problems:?}");
+    }
+    if released.is_dir() {
+        let differs = std::fs::read_dir(&working)
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .any(|e| {
+                std::fs::read(e.path()).ok() != std::fs::read(released.join(e.file_name())).ok()
+            });
+        let next: Vec<&Value> = migs.iter().filter(|m| m["from_version"] == cur).collect();
+        assert!(
+            !differs || !next.is_empty(),
+            "overlay templates changed since the released {cur} payload, and no migration from {cur} delivers them"
+        );
+        for m in next {
+            let problems =
+                gov_runtime::migrations::framework::check_substance(m, &released, &working);
+            assert!(problems.is_empty(), "{problems:?}");
+        }
     }
     let bad = json!({"id": "M-x", "from_version": "4.1.3", "to_version": cur, "description": "tightens the contract", "operations": [{"op": "note", "text": "nothing"}]});
     let problems = gov_runtime::migrations::framework::check_substance(

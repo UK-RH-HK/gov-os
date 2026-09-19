@@ -21,6 +21,7 @@ mod ws03;
 mod ws04r2;
 mod ws05;
 mod ws06;
+mod ws06r3;
 mod ws07;
 mod ws08;
 mod ws08_r2;
