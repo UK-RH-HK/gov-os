@@ -1,0 +1,123 @@
+# P2-AR-0023 audit-of-record probe re-run (unedited): gamma-r/H2H3-readiness label=before mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/base-tree (HEAD 3e2809a18975e062beb3cf605b02864e53f51ab8)
+# probe sha256 6713e1b439ffe4d8584eba12f9a9b2995c149d23928f0ed3d7aad173c78a0248; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/base-tree/target/release/gov
+# date 2026-09-19T05:15:42Z
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-before-gamma-r-H2H3-readiness-mgAEK5/h2h3
+
+==== H2.dims every dimension is tracked explicitly: feature F-ALL with an EMPTY readiness map (each line = one dimension) ====
+  dim  1 intent_outcome                 state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim  2 user_actor                     state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim  3 journey_workflow               state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim  4 scenarios                      state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim  5 inputs                         state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim  6 data_model_schema              state=MISSING  pre_implementation=True  gap_task_class=data
+  dim  7 representative_test_data       state=MISSING  pre_implementation=True  gap_task_class=data
+  dim  8 processing_algorithm           state=MISSING  pre_implementation=True  gap_task_class=research
+  dim  9 expected_outputs               state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim 10 functional_requirements        state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim 11 non_functional_requirements    state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim 12 ux_interactions                state=MISSING  pre_implementation=False gap_task_class=specification
+  dim 13 backend_service_behaviour      state=MISSING  pre_implementation=False gap_task_class=architecture
+  dim 14 database_state_requirements    state=MISSING  pre_implementation=False gap_task_class=architecture
+  dim 15 interface_api_event_contracts  state=MISSING  pre_implementation=True  gap_task_class=architecture
+  dim 16 security_privacy               state=MISSING  pre_implementation=True  gap_task_class=security
+  dim 17 integrations                   state=MISSING  pre_implementation=False gap_task_class=architecture
+  dim 18 devops_runtime                 state=MISSING  pre_implementation=False gap_task_class=devops
+  dim 19 observability                  state=MISSING  pre_implementation=False gap_task_class=devops
+  dim 20 performance_capacity           state=MISSING  pre_implementation=True  gap_task_class=performance
+  dim 21 cost_constraints               state=MISSING  pre_implementation=False gap_task_class=decision-preparation
+  dim 22 recovery_fallback              state=MISSING  pre_implementation=False gap_task_class=architecture
+  dim 23 success_criteria               state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim 24 failure_criteria               state=MISSING  pre_implementation=True  gap_task_class=specification
+  dim 25 independent_acceptance_tests   state=MISSING  pre_implementation=True  gap_task_class=test-design
+  dim 26 documentation_operations       state=MISSING  pre_implementation=False gap_task_class=documentation
+  cells=26 coverage=0.0 pre_implementation_ok=False invalid=[]
+
+==== H2.statuses one cell per status/form on feature F-ST (others PRESENT) ====
+  intent_outcome               given PRESENT                            -> state=PRESENT          ok=True 
+  user_actor                   given MISSING                            -> state=MISSING          ok=False
+  journey_workflow             given PROVISIONAL                        -> state=PROVISIONAL      ok=False
+  scenarios                    given BLOCKED                            -> state=BLOCKED          ok=False
+  inputs                       given N/A_WITH_REASON + reason           -> state=N/A_WITH_REASON  ok=True 
+  data_model_schema            given N/A_WITH_REASON, no reason (silent) -> state=N/A_WITH_REASON  ok=False
+  representative_test_data     given "N/A" (silent)                     -> state=N/A              ok=False
+  processing_algorithm         given unknown status "DONE"              -> state=DONE             ok=False
+  expected_outputs             given object {status: PRESENT}           -> state=PRESENT          ok=True 
+  functional_requirements      given N/A_WITH_REASON, 2-char reason     -> state=N/A_WITH_REASON  ok=False
+  non_functional_requirements  given cell absent                        -> state=MISSING          ok=False
+  invalid (silent-N/A / malformed) list: ['data_model_schema: silent N/A or invalid cell value is not allowed', 'representative_test_data: silent N/A or invalid cell value is not allowed']
+  gaps: ['user_actor', 'journey_workflow', 'scenarios', 'data_model_schema', 'representative_test_data', 'processing_algorithm', 'functional_requirements', 'non_functional_requirements']
+  pre_implementation_ok: False  coverage: 0.692
+$ does the governance suite flag the malformed cells? (feature F-ST against the kernel feature schema)
+   [('schema_invariants', 'high', 'F-ST (feature): /readiness/data_model_schema: {"status":"N/A_WITH_REASON"} is not valid under any of the schemas listed in the \'oneOf\' keyword'), ('schema_invariants', 'high', 'F-ST (feature): /readiness/expected_outputs: {"status":"PRESENT"} is not valid under any of the schemas listed in the \'oneOf\' keyword'), ('schema_invariants', 'high', 'F-ST (feature): /readiness/functional_requirements: {"status":"N/A_WITH_REASON","reason":"ok"} is not valid under any of the schemas listed in the \'oneOf\' keyword'), ('product_traceability', 'low', 'feature F-ST has no scenarios'), ('product_traceability', 'low', 'feature F-ST has no test obligations/acceptance tests')]
+$ status/feature views
+   {'id': 'F-ALL', 'title': 'probe feature F-ALL', 'coverage': 0.0, 'pre_implementation_ok': False, 'gaps': 26}
+   {'id': 'F-ST', 'title': 'probe feature F-ST', 'coverage': 0.6923076923076923, 'pre_implementation_ok': False, 'gaps': 8}
+
+==== H3 readiness generates work (readiness plan F-ALL): one generated task per missing cell, in the same DAG ====
+  created: 26 pre-implementation gap tasks: 17 implementation tasks now blocked: ['TASK-IMPL-ALL']
+  TASK-0001  cell=intent_outcome                 class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0002  cell=user_actor                     class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0003  cell=journey_workflow               class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0004  cell=scenarios                      class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0005  cell=inputs                         class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0006  cell=data_model_schema              class=data                 status=READY  role=None allowed=['spec/**']
+  TASK-0007  cell=representative_test_data       class=data                 status=READY  role=None allowed=['spec/**']
+  TASK-0008  cell=processing_algorithm           class=research             status=READY  role=None allowed=['spec/**']
+  TASK-0009  cell=expected_outputs               class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0010  cell=functional_requirements        class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0011  cell=non_functional_requirements    class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0012  cell=ux_interactions                class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0013  cell=backend_service_behaviour      class=architecture         status=READY  role=None allowed=['spec/**']
+  TASK-0014  cell=database_state_requirements    class=architecture         status=READY  role=None allowed=['spec/**']
+  TASK-0015  cell=interface_api_event_contracts  class=architecture         status=READY  role=None allowed=['spec/**']
+  TASK-0016  cell=security_privacy               class=security             status=READY  role=None allowed=['spec/**']
+  TASK-0017  cell=integrations                   class=architecture         status=READY  role=None allowed=['spec/**']
+  TASK-0018  cell=devops_runtime                 class=devops               status=READY  role=None allowed=['spec/**']
+  TASK-0019  cell=observability                  class=devops               status=READY  role=None allowed=['spec/**']
+  TASK-0020  cell=performance_capacity           class=performance          status=READY  role=None allowed=['spec/**']
+  TASK-0021  cell=cost_constraints               class=decision-preparation status=READY  role=None allowed=['spec/**']
+  TASK-0022  cell=recovery_fallback              class=architecture         status=READY  role=None allowed=['spec/**']
+  TASK-0023  cell=success_criteria               class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0024  cell=failure_criteria               class=specification        status=READY  role=None allowed=['spec/**']
+  TASK-0025  cell=independent_acceptance_tests   class=test-design          status=READY  role=None allowed=['spec/**']
+  TASK-0026  cell=documentation_operations       class=documentation        status=READY  role=None allowed=['spec/**']
+$ H3.b1 data / b2 performance / b3 security / b4 independent test-design: the generated classes for those cells
+  [H3.b1 missing data              ] data_model_schema            -> ('TASK-0006', 'data', 'Fill readiness dimension \'data_model_schema\' for F-ALL (currently "MISSING")')
+  [H3.b1 missing data              ] representative_test_data     -> ('TASK-0007', 'data', 'Fill readiness dimension \'representative_test_data\' for F-ALL (currently "MISSING")')
+  [H3.b2 missing performance target] performance_capacity         -> ('TASK-0020', 'performance', 'Fill readiness dimension \'performance_capacity\' for F-ALL (currently "MISSING")')
+  [H3.b3 missing security analysis ] security_privacy             -> ('TASK-0016', 'security', 'Fill readiness dimension \'security_privacy\' for F-ALL (currently "MISSING")')
+  [H3.b4 missing independent test  ] independent_acceptance_tests -> ('TASK-0025', 'test-design', 'Fill readiness dimension \'independent_acceptance_tests\' for F-ALL (currently "MISSING")')
+$ skills the generated performance / test-design tasks resolve to (is the performance task a benchmark/research task? is the test-design task bound to an independent author?)
+  performance_capacity         TASK-0020 skills=[]
+  independent_acceptance_tests TASK-0025 skills=['SKL-TEST-DESIGN']
+$ who may take the generated independent test-design task TASK-0025? the implementer role
+exit=0 ok=true
+$ re-planning does not duplicate gap tasks (idempotent)
+  second plan created: [] existing gap tasks linked: 17
+
+==== H3.b5 production implementation does not become READY before prerequisite cells satisfy policy ====
+$ the DAG computes it BLOCKED; replan persists BLOCKED; continue never offers it
+  runnable contains TASK-IMPL5: False
+  blocked reasons: [['feature F-5 pre-implementation readiness cells missing: security_privacy, performance_capacity']]
+  stored: task_status: BLOCKED
+$ an L2 role sets it READY directly (task status), and an implementer claims it
+exit=0 ok=true
+  stored: task_status: READY
+exit=0 ok=true
+  stored: task_status: IN_PROGRESS
+$ the same at creation: task create --status READY on an unready feature is accepted
+exit=0 ok=true
+  stored: task_status: READY
+$ the project overlay can switch the rule off (PROJECT_POLICY.readiness.enforce_pre_implementation_cells: false)
+  with enforcement off: TASK-IMPL5 runnable: False
+  policy overrides report applied= [] refused= [{'policy': 'PROJECT_POLICY', 'key': 'readiness.enforce_pre_implementation_cells', 'value': False, 'source': 'PROJECT_POLICY.yaml', 'kernel_value': True, 'reason': "PROJECT_POLICY.readiness.enforce_pre_implementation_cells: only the strict value true is allowed (POLICY_PRECEDENCE mode 'strengthen_only_bool', rule PROJECT_POLICY.readiness.enforce_pre_implementation_cells)"}]
+  doctor mentions the readiness switch: ['D027', 'D026']
+$ cells satisfied -> the DAG makes it runnable (replan READY)
+  runnable contains TASK-IMPL5: True [{'task': 'TASK-IMPL5', 'from': 'BLOCKED', 'to': 'READY'}]
+$ which kernel file defines the dimensions, and what happens when it is tampered/removed in the installed kernel
+  dims file removed -> readiness check: cells= 0 coverage= 1.0 pre_implementation_ok= True
+  dag: TASK-IMPL5 runnable: True
+exit=1 ok=false code=KERNEL_TAMPERED msg='task claim' refused: the installed kernel does not match the release it claims to be (kernel payload does not match KERNEL_MANIFEST.json: modified [] missing ["taxonomy/READINESS_DIMENSIONS.yaml"] added []). Constitutional policy is being read from the embedded baseline; restore the payload with `g
+END
+[exit=0]

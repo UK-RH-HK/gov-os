@@ -1,0 +1,18 @@
+22,25c22,25
+<   trial  3: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y3']
+<   trial  4: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X4']
+<   trial  5: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z5']
+<   trial  6: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y6']
+---
+>   trial  3: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X3']
+>   trial  4: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z4']
+>   trial  5: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X5']
+>   trial  6: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z6']
+27c27
+<   trial  8: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y8']
+---
+>   trial  8: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X8']
+34c34
+<   trial 15: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z15']
+---
+>   trial 15: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X15']

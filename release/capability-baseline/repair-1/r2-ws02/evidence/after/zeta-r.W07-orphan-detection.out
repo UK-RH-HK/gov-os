@@ -1,0 +1,120 @@
+# P2-AR-0023 audit-of-record probe re-run (unedited): zeta-r/W07-orphan-detection label=after mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws02 (HEAD 91d709264279061d8b1992a53949dae64c6ab7aa)
+# probe sha256 1b3de184a479209a5e32943ee355f15d14fe71c165a70b8731368891ae5c68bf; gov 37fab1175b85edd141496977e7a89f94544958bfcf501f1dd5a0d6c3e3ae0106 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws02/target/release/gov
+# date 2026-09-19T05:59:34Z
+# project w7: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-after-zeta-r-W07-orphan-detection-VxOmU1/w7-797574788
+$ gov init --name w7 --alias z-w7    [session=S-zeta role=orchestrator exit=0 2.6s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Ledger export API", "status": "ACTIVE", "contract": {"sig": "export()"}, "consumers": ["TASK-0001"]}
+  [probe wrote record] spec/interfaces/API-0002.yaml: {"id": "API-0002", "type": "interface", "title": "Ledger import API", "status": "ACTIVE", "contract": {"sig": "import()"}, "consumers": ["TASK-0077"]}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals are auditable (ORPHAN REQUIREMENT)", "status": "ACTIVE", "kind": "functional"}
+  [probe wrote record] spec/research/RES-0001.yaml: {"id": "RES-0001", "type": "research", "title": "Research: currency rounding (ORPHAN RESEARCH)", "status": "ACTIVE", "question": "which rounding?", "conclusion": "banker's", "influences": ["D-0001"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Rounding mode", "status": "ACTIVE", "chosen_option": "A", "rationale": "no research consulted"}
+  [probe wrote record] spec/tasks/TST-0009.yaml: {"id": "TST-0009", "type": "test-obligation", "title": "Orphan acceptance test", "status": "ACTIVE", "family": "acceptance", "independent_of_implementer": true}
+  [probe wrote record] spec/requirements/REQ-0003.yaml: {"id": "REQ-0003", "type": "requirement", "title": "Totals are signed (LINKED-TO-FEATURE, NO IMPL/TEST)", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/research/RES-0002.yaml: {"id": "RES-0002", "type": "research", "title": "Research: overflow (AFFECTS FEATURE, NEVER CONSUMED BY A DECISION)", "status": "ACTIVE", "question": "overflow?", "conclusion": "i64 suffices", "affects": ["F-0001"]}
+  [probe wrote record] spec/tasks/TST-0010.yaml: {"id": "TST-0010", "type": "test-obligation", "title": "Acceptance test tied to feature only, no requirement/scenario", "status": "ACTIVE", "family": "acceptance", "feature": "F-0001", "independent_of_implementer": true}
+  [probe wrote file] src/orphan_module.rs (42 chars)
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.5s]
+$ gov task list    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov audit    [session=S-zeta role=orchestrator exit=0 2.8s]
+gov audit verdict=DEGRADED findings=[
+ "graph_integrity: 1 dangling edge(s) reference unknown artefacts (e.g. \"API-0002\" \"CONSUMED_BY\" \"TASK-0077\")",
+ "skill_regression: SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family",
+ "skill_regression: SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness",
+ "skill_regression: SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands.",
+ "skill_regression: SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run",
+ "skill_regression: SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run",
+ "skill_regression: SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run",
+ "skill_regression: SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared deferred: the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands.",
+ "skill_regression: SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34",
+ "skill_regression: SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness",
+ "lineage_orphans: orphan requirement: REQ-0002 (ACTIVE) has no downstream implementation or test path \u2014 no task, report, change or code implements it and no test obligation or test validates it (W7 requirement/spec without downstream path)",
+ "lineage_orphans: orphan requirement: REQ-0003 (ACTIVE) has no downstream implementation or test path \u2014 no task, report, change or code implements it and no test obligation or test validates it (W7 requirement/spec without downstream path)",
+ "lineage_orphans: orphan output: API-0001 (interface) declares expected consumers [TASK-0001] but no record consumes it; declared consumer(s) TASK-0001 do not declare it as an input (W7 unconsumed output)",
+ "lineage_orphans: orphan output: API-0002 (interface) declares expected consumers [TASK-0077] but no record consumes it; declared consumer(s) TASK-0077 do not exist (W7 unconsumed output)",
+ "lineage_orphans: orphan research: RES-0001 is complete but never consumed by a decision: D-0001 was decided without consuming it (it declares that it feeds D-0001) (W7 research expected to feed a decision)",
+ "lineage_orphans: orphan research: RES-0002 is complete but never consumed by a decision: no decision consumes it and it names no decision it feeds (W7 research expected to feed a decision)",
+ "lineage_orphans: orphan acceptance test: TST-0009 (family 'acceptance') validates no requirement or scenario \u2014 it is linked to nothing governed (W7 acceptance test without requirement/scenario)",
+ "lineage_orphans: orphan acceptance test: TST-0010 (family 'acceptance') validates no requirement or scenario \u2014 its only links are to features, tasks or other records (W7 acceptance test without requirement/scenario)",
+ "lineage_orphans: unexplained code: src/orphan_module.rs has no active requirement/decision/spec justification \u2014 no governed work produced it (report/task outputs traced to a current specification), no current specification names it, no committed change transaction wrote it, no justified code depends on it, and it is not part of the governance baseline (W7 unexplained output)",
+ "lineage_orphans: 2 source/test file(s) predate governance (governance baseline) and are not yet linked to an active requirement/decision/spec: src/lib.rs, tests/ledger_test.rs (W7 baseline code; adopted as it was, not produced by governed work)",
+ "installation_authenticity: installation authenticity not established (UNPROVISIONED machine): release authenticity of this installation is UNKNOWN: this machine holds no provisioned Signed Release Root trust anchor, so nothing installed on it can be authenticated. It is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision`) and reinstall from a signed release (`gov kernel reinstall --source <signed release>`)."
+]
+graph_integrity detail: {"ok": false, "findings": 1, "detail": {"dangling": 1, "orphans": 1, "orphan_records": ["AUD-0001"], "dangling_edges": [{"src": "API-0002", "type": "CONSUMED_BY", "dst": "TASK-0077", "source_artifact": "API-0002"}], "edge_types": {"AFFECTS": 11, "CALLS": 1, "CONSUMES": 4, "GOVERNED_BY": 2, "IMPORTS": 1, "REALISES": 6, "TESTS": 2, "VALIDATED_BY": 3}, "lineage": {"misplaced_records": 0, "stale_links": 0, "dangling_blocks": 0}}, "status": "executed", "cached_from": null}
+product_traceability detail: {"ok": true, "findings": 0, "detail": {"tasks": 10, "done": 0, "task_traceability": 0.1, "features": 1, "untraceable_closed_tasks": []}, "status": "executed", "cached_from": null}
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.2s]
+gov doctor checks: [
+ "D001 ok=True: present",
+ "D002 ok=True: valid",
+ "D003 ok=True: intact (4.1.5)",
+ "D004 ok=True: match",
+ "D005 ok=True: match",
+ "D006 ok=True: 7 overlay files valid",
+ "D007 ok=True: 14 policies loaded, 0 overrides",
+ "D029 ok=True: installed kernel 4.1.5 intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record",
+ "D027 ok=True: 0 override(s) applied within POLICY_PRECEDENCE; rules from installed kernel (verified)",
+ "D028 ok=True: no plugin problems",
+ "D008 ok=True: in sync",
+ "D009 ok=True: state.db ok (184 artefacts)",
+ "D010 ok=True: fresh (184 artefacts)",
+ "D011 ok=True: none",
+ "D012 ok=True: clean",
+ "D025 ok=True: consistent: hashed-ngram (514 vectors)",
+ "D026 ok=True: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-after-zeta-r-W07-orphan-detection-VxOmU1/w7-797574788/.governance-runtime/claims.db",
+ "D013 ok=True: 0 legacy mechanism(s), all marked LEGACY/archived",
+ "D014 ok=True: 0 supersession conflict(s), 0 duplicate id(s)",
+ "D015 ok=False: 1 dangling edge(s) [API-0002 CONSUMED_BY TASK-0077], 2 orphan record(s) [AUD-0001, AUD-0002]",
+ "D016 ok=True: none",
+ "D017 ok=True: 0 claim(s), 0 expired (claims store: .governance-runtime/claims.db, survives rebuilds)",
+ "D018 ok=True: mode \"RUNNING\" writes_frozen false",
+ "D019 ok=True: 0 pending gate(s): 0 presented (owner-signed receipt or answer)",
+ "D020 ok=True: 5 adapters verified",
+ "D021 ok=False: green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, research_experiments, source, spec_architecture, spec_decisions, spec_requirements, spec_tasks)",
+ "D030 ok=True: no product test command configured or detectable",
+ "D031 ok=True: health state YELLOW",
+ "D032 ok=False: release authenticity of this installation is UNKNOWN: this machine holds no provisioned Signed Release Root trust anchor, so nothing installed on it can be authenticated. It is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision`) and reinstall from a signed release (`gov kernel reinstall --source <signed release>`).",
+ "D033 ok=True: no tampered OS state and no unsealed gate in force; 0 record(s) not honoured on this machine (legacy, hand-written approval claims, or sealed elsewhere)",
+ "D034 ok=True: no open failure records",
+ "D022 ok=False: capability gap: rust-cargo (cargo)",
+ "D023 ok=True: 25 records",
+ "D024 ok=True: ignored"
+]
+$ gov status    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task dag    [session=S-zeta role=orchestrator exit=0 0.0s]
+[read-only query of the product's own graph::orphan_nodes definition against state.db] orphan records: ["AUD-0001", "AUD-0002"]
+OBS W7-o1-expected-consumer-not-consuming: PASS -- API-0001 declares consumer TASK-0001, which never references it; surfaces naming API-0001: ['API-0001']
+OBS W7-o1-expected-consumer-missing: PASS -- API-0002 declares consumer TASK-0077 (absent); surfaces naming it: ['API-0002', 'TASK-0077'] (dangling-edge finding text: ['graph_integrity: 1 dangling edge(s) reference unknown artefacts (e.g. "API-0002" "CONSUMED_BY" "TASK-0077")'])
+OBS W7-o2-requirement-without-impl-or-test: PASS -- REQ-0002 has no task/test/code path; surfaces naming it: ['REQ-0002']; present in graph orphan list: False
+OBS W7-o3-research-never-consumed: PASS -- RES-0001 expected to influence D-0001, never consumed; surfaces naming it: ['RES-0001']
+OBS W7-o4-acceptance-test-without-requirement: PASS -- TST-0009 has no requirement/scenario/feature; surfaces naming it: ['TST-0009']
+OBS W7-o2b-linked-requirement-without-impl-or-test: PASS -- REQ-0003 (feature link only) named by a surface: ['REQ-0003']; counted as graph orphan: False
+OBS W7-o3b-linked-research-never-consumed: PASS -- RES-0002 (affects feature, no decision consumes it) named: ['RES-0002']; counted as graph orphan: False
+OBS W7-o4b-feature-only-acceptance-test: PASS -- TST-0010 (feature only) named: ['TST-0010']; counted as graph orphan: False
+OBS W7-orphan-count-surfaced: PASS -- anonymous orphan count surfaces: doctor ['D015 ok=False: 1 dangling edge(s) [API-0002 CONSUMED_BY TASK-0077], 2 orphan record(s) [AUD-0001, AUD-0002]']; audit graph_integrity.detail.orphans=1 (count of records with no edge at all; ids not reported)
+OBS W7-o5-unjustified-code: PASS -- src/orphan_module.rs has no requirement/decision/spec justification; surfaces naming it: ['src/orphan_module.rs', 'orphan_module']
+$ gov task list    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov gate list    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W7-o6-orphans-produce-governed-remediation: PASS -- tasks before audit/doctor=1 after=10; human gates=0
+OBS W7-o6-no-silent-deletion: PASS -- orphan artefacts still on disk after audit/doctor/rebuild: True
+
+==== SUMMARY ====
+W7-o1-expected-consumer-not-consuming: PASS
+W7-o1-expected-consumer-missing: PASS
+W7-o2-requirement-without-impl-or-test: PASS
+W7-o3-research-never-consumed: PASS
+W7-o4-acceptance-test-without-requirement: PASS
+W7-o2b-linked-requirement-without-impl-or-test: PASS
+W7-o3b-linked-research-never-consumed: PASS
+W7-o4b-feature-only-acceptance-test: PASS
+W7-orphan-count-surfaced: PASS
+W7-o5-unjustified-code: PASS
+W7-o6-orphans-produce-governed-remediation: PASS
+W7-o6-no-silent-deletion: PASS
+total=12 pass=12 fail=0
+[exit=0]
