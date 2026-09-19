@@ -295,8 +295,9 @@ pub fn apply_dependency_proofs(
     }
 }
 
-/// Fields that define an entry's content for identity/versioning (everything except bookkeeping).
-fn material(e: &Value) -> Value {
+/// Fields that define an entry's content for identity/versioning (everything except bookkeeping, including the
+/// `human_gate` id the OS assigns when it raises the entry's gate).
+pub fn material(e: &Value) -> Value {
     let mut m = e.clone();
     if let Some(o) = m.as_object_mut() {
         for k in [
@@ -329,6 +330,31 @@ fn gate_subject(e: &Value) -> Value {
         e["gate_reasons"],
         e["dependency_proof"]["dependants_digest"]
     ])
+}
+
+/// Digest of what a Human Decision Gate raised for catalogue entry `e` decides: the artefact's path, action, target,
+/// gate reasons and the dependants its dependency proof found. The gate records it as `subject.sha256`, and an
+/// answer is honoured for an entry only while the entry still asks exactly that question (BC-P2-11 for adoption).
+pub fn gate_subject_sha256(e: &Value) -> String {
+    identity::content_hash(&json!({"artifact_id": e["artifact_id"], "subject": gate_subject(e)}))
+}
+
+/// Digest of the catalogue **as reviewed**: every entry's material content (recomputed here, never read from a
+/// stored `entry_hash`), keyed by artefact id and order-independent. The OS's own bookkeeping (entry versions,
+/// producers, the gate id it assigns) is excluded, so executing the approved plan never changes it; any change to
+/// what an entry says will happen to an artefact does (BC-P2-34: execution bound to the approved artefacts).
+pub fn catalogue_digest(catalogue: &[Value]) -> String {
+    let mut rows: Vec<(String, String)> = catalogue
+        .iter()
+        .map(|e| {
+            (
+                e["artifact_id"].as_str().unwrap_or("").to_string(),
+                identity::content_hash(&material(e)),
+            )
+        })
+        .collect();
+    rows.sort();
+    identity::content_hash(&json!(rows))
 }
 
 /// W1 identity for catalogue entries (BC-P2-21): type, content hash, version, producer, supersession lineage, lineage

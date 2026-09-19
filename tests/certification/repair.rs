@@ -1135,6 +1135,7 @@ fn freeze_writes_is_honoured_by_adopt_and_upstream() {
     ] {
         planner.ok(&["adopt", s]);
     }
+    crate::migration::reviewer_authors_tests(&root); // BC-P2-34: the reviewer approves with tests of its own
     planner
         .with_session("S-rev")
         .with_role("migration-reviewer")

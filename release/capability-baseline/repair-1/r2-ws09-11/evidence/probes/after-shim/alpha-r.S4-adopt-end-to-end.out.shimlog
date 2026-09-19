@@ -1,0 +1,10 @@
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt review --verdict

@@ -5,6 +5,9 @@ lesson_lifecycle: [candidate, corroborated, classified, proposed, validated, app
 corroboration_min_sources: 1
 upstream_eligible_scopes: [FRAMEWORK]
 upstream:
+  # human: export only on the product owner's owner-signed answer (authenticated human channel) authorising the packet's
+  # export gate (trigger upstream_export, subject bound to packet id + lesson + payload hash); --approved-by is a claim,
+  # never an approval (BC-P2-10). policy: no human approval is asserted; the automated export gate alone decides.
   approval: human                     # human | policy
   allowed_payload: [packet, synthetic_fixture]
   aggregate_metrics_enabled: false

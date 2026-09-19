@@ -1,0 +1,12 @@
+  trust_policy_mutation                      derived   8 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived  10 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0
+--- indentation splitter, NO cfg(test) cut: 105 files, 1708 functions
+  human_gate_create                          derived  46 / writers  39 / exempt 1 / violations 0
+  human_gate_approve                         derived   1 / writers   1 / exempt 0 / violations 0
+  release_certification                      derived   1 / writers   1 / exempt 0 / violations 0
+  trust_policy_mutation                      derived   8 / writers   1 / exempt 0 / violations 0
+  privileged_plugin_acquisition              derived  13 / writers   2 / exempt 0 / violations 0
+  floor_lower_or_reset                       derived   3 / writers   1 / exempt 0 / violations 0
+  present_below_floor_release_as_current     derived   1 / writers   1 / exempt 0 / violations 0

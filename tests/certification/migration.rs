@@ -94,13 +94,21 @@ fn path_migration_with_rollback_and_memory_rebuild() {
     let reviewer = planner
         .with_session("S-reviewer")
         .with_role("migration-reviewer");
+    // BC-P2-34: an approval records tests the reviewer authored (the planner's scaffold is regression evidence)
+    assert_eq!(
+        reviewer
+            .err(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"])
+            .error_code(),
+        "INDEPENDENT_TESTS_REQUIRED"
+    );
+    reviewer_authors_tests(&root);
     reviewer.ok(&[
         "adopt",
         "review",
         "--verdict",
         "MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS",
         "--notes",
-        "added behaviour-preservation command test",
+        "added native-layout preservation tests",
     ]);
     // --- controlled migration, batch by batch, with a rollback proof ---
     let executor = planner
@@ -296,12 +304,26 @@ fn path_migration_with_rollback_and_memory_rebuild() {
     );
     let e4 = executor.err(&["adopt", "verify-memory"]);
     assert_eq!(e4.error_code(), "INDEPENDENCE");
-    let mv = verifier
+    // BC-P2-34: A10 is the designated memory verifier's, on held-out queries it authored
+    let memverifier = planner
         .with_session("S-memverifier")
-        .ok(&["adopt", "verify-memory"]);
+        .with_role("memory-verifier");
+    assert_eq!(
+        memverifier.err(&["adopt", "verify-memory"]).error_code(),
+        "INDEPENDENT_HELDOUT_REQUIRED"
+    );
+    assert!(verifier_authors_heldout(&root) >= 5);
+    let mv = memverifier.ok(&["adopt", "verify-memory"]);
     assert_eq!(mv["verdict"], "MEMORY_ACCEPTED_FOR_V4_AUDIT", "{mv}");
     assert_eq!(mv["reproducible"], true);
-    let au = executor.ok(&["adopt", "audit"]);
+    assert_eq!(
+        executor.err(&["adopt", "audit"]).error_code(),
+        "INDEPENDENCE"
+    );
+    let au = planner
+        .with_session("S-auditor")
+        .with_role("independent-auditor")
+        .ok(&["adopt", "audit"]);
     assert!(
         au["verdict"] == "ADOPTED_HEALTHY"
             || au["verdict"] == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS"
@@ -321,6 +343,72 @@ fn catalogue(root: &std::path::Path) -> Vec<serde_json::Value> {
     .lines()
     .map(|l| serde_json::from_str(l).unwrap())
     .collect()
+}
+
+/// The independent migration reviewer (Role B, `migration-reviewer`) authors acceptance tests of its own before it
+/// approves (A5; adoption protocol §10): here, that native-layout product files the plan keeps in place are still
+/// present after migration. Returns the number of tests added. (Test harness standing in for the reviewer.)
+pub fn reviewer_authors_tests(root: &std::path::Path) -> usize {
+    let tf = "spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml";
+    let mut t = yaml(root, tf);
+    let keep: Vec<String> = catalogue(root)
+        .iter()
+        .filter(|e| {
+            e["action"] == "KEEP_IN_PLACE"
+                && e["requires_human_gate"] != true
+                && e["sensitivity"] != "secret"
+                && matches!(
+                    e["current_class"].as_str().unwrap_or(""),
+                    "PRODUCT_SOURCE" | "PRODUCT_TEST"
+                )
+        })
+        .filter_map(|e| e["current_path"].as_str().map(String::from))
+        .take(2)
+        .collect();
+    assert!(
+        !keep.is_empty(),
+        "no kept product file to write a reviewer test for"
+    );
+    for (i, path) in keep.iter().enumerate() {
+        t["tests"].as_array_mut().unwrap().push(serde_json::json!({"id": format!("RT-{:03}", i + 1), "kind": "path_present", "path": path,
+            "description": "reviewer: the native product layout the plan keeps in place survives the migration"}));
+    }
+    write_yaml(root, tf, &t);
+    keep.len()
+}
+
+/// The independent memory verifier (Role F, `memory-verifier`) authors held-out queries of its own before A10
+/// (adoption protocol §15): exact-path queries for indexed files the builder's starter set does not ask about.
+/// Returns the number of queries added. (Test harness standing in for the verifier.)
+pub fn verifier_authors_heldout(root: &std::path::Path) -> usize {
+    let hf = "governance/tests/memory/heldout.yaml";
+    let mut h = yaml(root, hf);
+    let asked: Vec<String> = h["queries"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|q| q["query"].as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    let db = gov_runtime::memory::db::RuntimeDb::open(&root.join(".governance-runtime/state.db"))
+        .unwrap();
+    let rows = db
+        .query("SELECT artifact_id, path FROM artifacts WHERE record_type='file' AND path_class IN ('source','test','authoritative','evidence') ORDER BY path DESC LIMIT 60", &[])
+        .unwrap();
+    drop(db);
+    let mut n = 0;
+    for r in rows {
+        let path = r["path"].as_str().unwrap_or("").to_string();
+        if path.is_empty() || asked.contains(&path) || n >= 6 {
+            continue;
+        }
+        n += 1;
+        h["queries"].as_array_mut().unwrap().push(serde_json::json!({"id": format!("VQ-{n:03}"), "category": "exact_path", "query": path,
+            "expected_refs": [r["artifact_id"]], "forbidden": [], "k": 8, "route": "path", "author": "independent memory verifier"}));
+    }
+    write_yaml(root, hf, &h);
+    n
 }
 
 /// Repair-1 WS-9 regression (builder evidence, not acceptance): the path map represents document citations
@@ -450,6 +538,7 @@ fn adoption_dependency_proof_citations_and_rerun_identity() {
         "PLAN_TEST_DISAGREEMENT"
     );
     write_yaml(&root, tf, &original);
+    reviewer_authors_tests(&root);
     reviewer.ok(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"]);
     let executor = planner
         .with_session("S-exec")
@@ -579,4 +668,379 @@ fn adopted_but_for_unprovisioned_posture(g: &Gov, au: &serde_json::Value) -> boo
             .map(|f| !f.is_empty() && f.iter().all(|x| x["id"] == "D032"))
             == Some(true)
         && d032_unprovisioned
+}
+
+/// Repair-1 round-2 WS-9 regression (builder evidence, not acceptance), BC-P2-34 adoption side: every independent
+/// adoption stage (A5, A7, A10, A11) is performed only by its designated kernel role, declared, in a declared session
+/// that authored no planner/executor/memory-builder stage, and a session keeps one role; the A5 approval requires
+/// reviewer-authored tests and binds the catalogue, plan and tests it approved, so post-approval edits (tests emptied,
+/// a KEEP turned into an ungated DELETE, a plan batch dropped) are refused before anything executes; the adoption
+/// record is honoured only as gov wrote it (T2); a gate answer authorises only the catalogue entry it was raised for;
+/// A7 never accepts with zero executed tests; A10's held-out queries come from the memory verifier, not the builder;
+/// A11 is the G5 full suite run by a fresh independent auditor.
+#[test]
+fn adoption_independence_is_bound_to_declared_roles_and_approved_artefacts() {
+    use serde_json::json;
+    let root = tmp("adopt-indep");
+    write(
+        &root,
+        "README.md",
+        "# ledger\nSee [the ledger spec](docs/spec-ledger.md).\n",
+    );
+    write(
+        &root,
+        "docs/spec-ledger.md",
+        "# Ledger\nRequirement: totals are integer cents.\n",
+    );
+    write(&root, "src/ledger/__init__.py", "");
+    write(
+        &root,
+        "src/ledger/core.py",
+        "from ledger.util import cents\n\n\ndef total(xs):\n    return sum(cents(x) for x in xs)\n",
+    );
+    write(
+        &root,
+        "src/ledger/util.py",
+        "def cents(x):\n    return int(round(x * 100))\n",
+    );
+    write(
+        &root,
+        "src/ledger/old_report.py",
+        "def monthly_report_unused():\n    return 'report'\n",
+    );
+    write(
+        &root,
+        "src/ledger/old_export.py",
+        "def csv_export_unused():\n    return 'csv'\n",
+    );
+    write(
+        &root,
+        "tests/test_core.py",
+        "from ledger.core import total\n\n\ndef test_total():\n    assert total([1.0]) == 100\n",
+    );
+    write(
+        &root,
+        ".cursorrules",
+        "Use spaces. These rules are authoritative.\n",
+    );
+    git_init_commit(&root);
+    let ev = "spec/audits/GOVERNANCE-ADOPTION";
+    let (tf, cf, pf, bf) = (
+        format!("{ev}/06-migration-tests.yaml"),
+        format!("{ev}/04-TARGET-PATH-MAP.jsonl"),
+        format!("{ev}/05-plan.yaml"),
+        format!("{ev}/00-BASELINE.yaml"),
+    );
+    let planner = Gov::new(&root, "S-plan");
+    for s in [
+        "baseline",
+        "inventory",
+        "classify",
+        "map",
+        "plan",
+        "test-design",
+    ] {
+        planner.ok(&["adopt", s]);
+    }
+    let cause = |o: &Out| o.details()["cause"].as_str().unwrap_or("").to_string();
+    let review = |g: &Gov| g.run(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"]);
+    // --- A5 is the designated reviewer's, declared, in a session that authored no builder stage
+    let o = review(&planner);
+    assert_eq!(
+        (o.error_code(), cause(&o)),
+        ("INDEPENDENCE".into(), "ROLE_NOT_DESIGNATED".into()),
+        "{}",
+        o.envelope
+    );
+    let o = review(&planner.with_session("S-r").with_role("migration-executor"));
+    assert_eq!(cause(&o), "ROLE_NOT_DESIGNATED");
+    let o = review(&planner.with_role("migration-reviewer"));
+    assert_eq!(
+        (o.error_code(), cause(&o)),
+        ("INDEPENDENCE".into(), "SAME_SESSION_AS_BUILDER".into()),
+        "{}",
+        o.envelope
+    );
+    let o = review(&planner.with_session("").with_role("migration-reviewer"));
+    assert_eq!(
+        o.error_code(),
+        "ADOPTION_SESSION_UNDECLARED",
+        "{}",
+        o.envelope
+    );
+    let o = planner
+        .with_session("S-r")
+        .with_role("migration-reviewer")
+        .run(&[
+            "adopt",
+            "review",
+            "--verdict",
+            "MIGRATION_PLAN_APPROVED",
+            "--reviewer-session",
+            "S-other",
+        ]);
+    assert_eq!(o.error_code(), "SESSION_CONFLICT", "{}", o.envelope);
+    let reviewer = planner
+        .with_session("S-rev")
+        .with_role("migration-reviewer");
+    // --- the planner's scaffold is not the reviewer's tests, relabelled or not
+    let scaffold = read(&root, &tf);
+    assert_eq!(review(&reviewer).error_code(), "INDEPENDENT_TESTS_REQUIRED");
+    let mut t = yaml(&root, &tf);
+    t["tests"][0]["id"] = json!("RT-RELABELLED");
+    t["tests"][0]["description"] = json!("reviewer: kernel pinned");
+    write_yaml(&root, &tf, &t);
+    assert_eq!(review(&reviewer).error_code(), "INDEPENDENT_TESTS_REQUIRED");
+    write(&root, &tf, &scaffold);
+    let mut t = yaml(&root, &tf);
+    t["tests"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!({"id": "RT-BAD", "kind": "looks_fine", "path": "README.md"}));
+    write_yaml(&root, &tf, &t);
+    assert_eq!(review(&reviewer).error_code(), "INDEPENDENT_TESTS_INVALID");
+    write(&root, &tf, &scaffold);
+    assert!(reviewer_authors_tests(&root) >= 1);
+    let a5 = reviewer.ok(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"])["verdict"]
+        .clone();
+    assert_eq!(a5["role"], "migration-reviewer");
+    assert_eq!(a5["session"], "S-rev");
+    assert_eq!(a5["independence"]["established"], true);
+    assert!(a5["reviewer_tests_count"].as_u64().unwrap() >= 1);
+    for k in ["catalogue_sha256", "plan_sha256", "tests_sha256"] {
+        assert_eq!(a5[k].as_str().map(|x| x.len()), Some(64), "{k}: {a5}");
+    }
+    // --- execution is bound to exactly what was approved (alpha-r [N2])
+    let executor = planner
+        .with_session("S-exec")
+        .with_role("migration-executor");
+    let approved_tests = read(&root, &tf);
+    let mut t = yaml(&root, &tf);
+    t["tests"] = json!([]);
+    write_yaml(&root, &tf, &t);
+    let o = executor.run(&[
+        "adopt", "migrate", "--name", "ledger", "--alias", "fx-indep",
+    ]);
+    assert_eq!(o.error_code(), "APPROVAL_STALE", "{}", o.envelope);
+    assert!(o.details()["changed"].to_string().contains("tests"));
+    assert!(
+        !exists(&root, "governance/framework.lock"),
+        "nothing executed"
+    );
+    write(&root, &tf, &approved_tests);
+    let approved_catalogue = read(&root, &cf);
+    let cat: Vec<serde_json::Value> = catalogue(&root)
+        .into_iter()
+        .map(|mut e| {
+            if e["current_path"] == "src/ledger/util.py" {
+                assert_eq!(e["action"], "KEEP_IN_PLACE");
+                e["action"] = json!("DELETE_FROM_ACTIVE_TREE");
+                e["batch"] = json!(2);
+                e["requires_human_gate"] = json!(false);
+            }
+            e
+        })
+        .collect();
+    write(
+        &root,
+        &cf,
+        &cat.iter().map(|e| format!("{e}\n")).collect::<String>(),
+    );
+    let o = executor.run(&[
+        "adopt", "migrate", "--name", "ledger", "--alias", "fx-indep",
+    ]);
+    assert_eq!(o.error_code(), "APPROVAL_STALE", "{}", o.envelope);
+    assert!(o.details()["changed"].to_string().contains("catalogue"));
+    write(&root, &cf, &approved_catalogue);
+    let approved_plan = read(&root, &pf);
+    let mut plan = yaml(&root, &pf);
+    plan["batches"].as_array_mut().unwrap().pop();
+    write_yaml(&root, &pf, &plan);
+    let o = executor.run(&[
+        "adopt", "migrate", "--name", "ledger", "--alias", "fx-indep",
+    ]);
+    assert_eq!(o.error_code(), "APPROVAL_STALE", "{}", o.envelope);
+    assert!(o.details()["changed"].to_string().contains("plan"));
+    write(&root, &pf, &approved_plan);
+    // --- the adoption record is honoured only as gov wrote it (T2)
+    let record = read(&root, &bf);
+    let mut b = yaml(&root, &bf);
+    b["verdicts"]["A5"]["tests_sha256"] = json!("0".repeat(64));
+    write_yaml(&root, &bf, &b);
+    assert_eq!(
+        executor
+            .run(&["adopt", "migrate", "--name", "ledger", "--alias", "fx-indep"])
+            .error_code(),
+        "T2_UNBOUND"
+    );
+    write(&root, &bf, &record);
+    let mig = executor.ok(&[
+        "adopt", "migrate", "--name", "ledger", "--alias", "fx-indep",
+    ]);
+    assert_eq!(mig["approval"]["tests_sha256"], a5["tests_sha256"]);
+    // --- a gate answer authorises only the entry it was raised for
+    let cat = catalogue(&root);
+    let dead: Vec<serde_json::Value> = cat
+        .iter()
+        .filter(|e| e["requires_human_gate"] == true && e["action"] == "DELETE_FROM_ACTIVE_TREE")
+        .cloned()
+        .collect();
+    assert!(dead.len() >= 2, "{dead:?}");
+    let (e1, e2) = (&dead[0], &dead[1]);
+    let (g1, g2) = (
+        e1["human_gate"].as_str().unwrap().to_string(),
+        e2["human_gate"].as_str().unwrap().to_string(),
+    );
+    crate::ws03::human_decide(&executor, &g1, "A");
+    crate::ws03::human_decide(&executor, &g2, "B");
+    let own = read(&root, &cf);
+    let swapped: String = cat
+        .iter()
+        .map(|e| {
+            let mut e = e.clone();
+            if e["artifact_id"] == e2["artifact_id"] {
+                e["human_gate"] = json!(g1);
+            }
+            format!("{e}\n")
+        })
+        .collect();
+    write(&root, &cf, &swapped);
+    executor.ok(&["adopt", "migrate", "--batch", "7"]);
+    assert!(
+        !exists(&root, e1["current_path"].as_str().unwrap()),
+        "answered A for its own entry: executed"
+    );
+    assert!(
+        exists(&root, e2["current_path"].as_str().unwrap()),
+        "another entry's answered gate authorises nothing"
+    );
+    write(&root, &cf, &own);
+    // --- A7: the designated verifier only; a session keeps its role; no acceptance from zero tests
+    assert_eq!(
+        cause(&executor.run(&["adopt", "verify-migration"])),
+        "ROLE_NOT_DESIGNATED"
+    );
+    assert_eq!(
+        planner
+            .with_session("S-v")
+            .with_role("backend-engineer")
+            .run(&["adopt", "verify-migration"])
+            .error_code(),
+        "INDEPENDENCE"
+    );
+    assert_eq!(
+        planner
+            .with_session("S-rev")
+            .with_role("migration-verifier")
+            .run(&["adopt", "verify-migration"])
+            .error_code(),
+        "ADOPTION_ROLE_INCONSISTENT"
+    );
+    let verifier = planner
+        .with_session("S-ver")
+        .with_role("migration-verifier");
+    let mut t = yaml(&root, &tf);
+    t["tests"] = json!([]);
+    write_yaml(&root, &tf, &t);
+    let o = verifier.run(&[
+        "adopt",
+        "verify-migration",
+        "--verdict",
+        "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD",
+    ]);
+    assert_eq!(o.error_code(), "VERDICT_CONFLICT", "{}", o.envelope);
+    let v = verifier.ok(&["adopt", "verify-migration"]);
+    assert_eq!(v["verdict"], "MIGRATION_REJECTED_NEEDS_REPAIR");
+    assert!(
+        v["approval_problems"]
+            .to_string()
+            .contains("no independent test was executed"),
+        "{v}"
+    );
+    write(&root, &tf, &approved_tests);
+    let v = verifier.ok(&["adopt", "verify-migration"]);
+    assert_eq!(v["verdict"], "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD", "{v}");
+    assert!(v["tests"]["executed"].as_u64().unwrap() >= 1);
+    executor.ok(&["adopt", "extract-legacy"]);
+    executor.ok(&["adopt", "build-memory"]);
+    // --- A10: held-out queries authored by the memory verifier; the builder's starter set, relabelled, is not
+    let mv = planner.with_session("S-memv").with_role("memory-verifier");
+    assert_eq!(
+        mv.run(&["adopt", "verify-memory"]).error_code(),
+        "INDEPENDENT_HELDOUT_REQUIRED"
+    );
+    let hf = "governance/tests/memory/heldout.yaml";
+    let starter = read(&root, hf);
+    let mut h = yaml(&root, hf);
+    let copies: Vec<serde_json::Value> = h["queries"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|q| q["pending"] != true)
+        .enumerate()
+        .map(|(i, q)| {
+            let mut c = q.clone();
+            c["id"] = json!(format!("VQ-COPY-{i}"));
+            c["k"] = json!(5);
+            c["category"] = json!("verifier");
+            c
+        })
+        .collect();
+    h["queries"].as_array_mut().unwrap().extend(copies);
+    write_yaml(&root, hf, &h);
+    assert_eq!(
+        mv.run(&["adopt", "verify-memory"]).error_code(),
+        "INDEPENDENT_HELDOUT_REQUIRED"
+    );
+    write(&root, hf, &starter);
+    assert!(verifier_authors_heldout(&root) >= 5);
+    let m = mv.ok(&["adopt", "verify-memory"]);
+    assert_eq!(m["verdict"], "MEMORY_ACCEPTED_FOR_V4_AUDIT", "{m}");
+    assert!(m["independent_heldout"]["queries"].as_u64().unwrap() >= 5);
+    // --- A11: a fresh independent auditor, as the G5 full suite
+    assert_eq!(
+        cause(&executor.run(&["adopt", "audit"])),
+        "ROLE_NOT_DESIGNATED"
+    );
+    assert_eq!(
+        cause(
+            &planner
+                .with_session("S-exec")
+                .with_role("independent-auditor")
+                .run(&["adopt", "audit"])
+        ),
+        "SAME_SESSION_AS_BUILDER"
+    );
+    let au = planner
+        .with_session("S-aud")
+        .with_role("independent-auditor")
+        .ok(&["adopt", "audit"]);
+    assert_eq!(au["tier"], "G5", "{au}");
+    assert!(au["audit"].as_str().map(|a| !a.is_empty()).unwrap_or(false));
+    assert!(au["checks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(
+            |c| c["criterion"] == "comprehensive audit by a fresh independent auditor"
+                && c["ok"] == true
+        ));
+    let st = planner.ok(&["adopt", "status"]);
+    assert_eq!(st["honoured"], true);
+    for (stage, role) in [
+        ("A5", "migration-reviewer"),
+        ("A7", "migration-verifier"),
+        ("A10", "memory-verifier"),
+        ("A11", "independent-auditor"),
+    ] {
+        let s = st["stages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|s| s["stage"] == stage)
+            .unwrap()
+            .clone();
+        assert_eq!(s["by"]["role"], role, "{s}");
+        assert_eq!(s["by"]["independence_established"], true, "{s}");
+    }
 }

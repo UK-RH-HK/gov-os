@@ -1,0 +1,146 @@
+# P2-AR-0030 audit-of-record probe re-run (unedited): alpha-r/S4-adopt-end-to-end tree=before mode=shim label=raw-sql extra-env: RAW_SQL_STORE=1
+# tree HEAD 889382957160780f93f02cca6cb9b93c33f7585b (after) / base 843d79c (before); probe sha256 f8b8814c78b8cda216f9c3f72f65d8760a0185a4e12e001e5b865ac592d05fc4
+# gov e09eb5dc1b140d9644359d9ebd84f941fae66944394f060fcab7d58f10bc4880 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0030/probes/shim-before/gov
+# date 2026-09-19T04:17:05Z
+[SETUP] RAW_SQL_STORE=1: memory/chat_history.sql left as a text dump
+## [ORDER] a later stage before A0
+[ORDER] REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+
+## [A0] safety baseline (the tree is made dirty first; one uncommitted edit)
+[A0] ok {"stage": "A0", "evidence": "spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml", "commit": "afcbbf9a11729db2586a8cb83461bf13fd502585", "dirty_files": 1, "interrupted": false, "baseline_tests": "failed", "freeze_advice": "clean baseline"}
+[A0] 00-BASELINE: commit = afcbbf9a1172 | branch = main | dirty_files = ['rc/app/main.py'] | baseline_tests = {"ran": true, "ecosystem": "python", "command": ["python3", "-m", "pytest", "-q"], "exit": 1, "status": "failed", "stdout_tail": "", "stderr_tail": "/usr/bin/python3: No module named pytest"}
+[A0] interrupted_work = {"detected": false, "items": []}
+[A0] adoption branch/worktree created? branches before: ['*', 'main'] after: ['*', 'main'] | worktrees: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0030/probes/p-before-shim-alpha-r-S4-adopt-end-to-end-UR1Ttg/alpha-r-s4-vh3zju5w/brown  afcbbf9 [main]
+[A0] working tree snapshotted/cleaned? stash before: '' after: '' | main.py still dirty: True
+
+## [A1] cold inventory
+[A1] ok {"summary": {"files": 35, "tracked": 34, "by_kind": {"chat_store": 2, "config": 9, "data": 1, "doc": 7, "entrypoint": 1, "index_store": 2, "old_governance": 2, "package_manifest": 2, "provider_rules": 3, "report": 1, "secret": 4, "source": 10, "spec_doc": 5, "test": 4, "unknown": 1}, "bytes": 8322}}
+[A1] inventory entries = 35 | every git-tracked file inventoried: True | missing: []
+[A1]   .cursorrules                             kinds=['provider_rules'] tracked=None
+[A1]   .github/copilot-instructions.md          kinds=['provider_rules', 'doc'] tracked=None
+[A1]   .chat/sessions.jsonl                     kinds=['chat_store', 'data'] tracked=None
+[A1]   memory/chat_history.sql                  kinds=['chat_store', 'source', 'secret'] tracked=None
+[A1]   memory/chat_history.sqlite               kinds=None tracked=None
+[A1]   .index/vectors.json                      kinds=['index_store', 'config'] tracked=None
+[A1]   .env                                     kinds=['unknown', 'secret'] tracked=None
+[A1]   config/secrets.yaml                      kinds=['config', 'secret'] tracked=None
+[A1]   pyproject.toml                           kinds=['package_manifest'] tracked=None
+[A1]   web/package.json                         kinds=['package_manifest'] tracked=None
+[A1]   src/app/main.py                          kinds=['entrypoint', 'source'] tracked=None
+[A1]   tests/test_retry.py                      kinds=['test'] tracked=None
+[A1]   AGENT_RULES_v2.md                        kinds=['provider_rules', 'doc'] tracked=None
+[A1] inventory record fields: ['ext', 'git_tracked', 'hash', 'kinds', 'path', 'secret_patterns', 'size']
+
+## [A2] classification
+[A2] ok {"classified": 35, "by_class": {"DEAD_OR_UNUSED": 2, "DECISION": 5, "GENERATED": 2, "GOVERNANCE_LEGACY": 3, "HISTORICAL": 2, "PRODUCT_SOURCE": 6, "PRODUCT_TEST": 4, "REPORT_EVIDENCE": 1, "SECRET": 3, "SPEC_AUTHORITATIVE": 2, "SPEC_DERIVED": 1, "TOOLING": 4}, "by_authority": {"ACTIVE": 21, "LEGACY": 8, "PROVISIONAL": 2, "SUPERSEDED": 1, "UNKNOWN_OR_CONFLICTING": 3}, "unknown": 0, "conflicting": 3}
+[A2] every inventoried artefact classified: True | every entry has class+authority+artifact_id: True
+[A2]   .cursorrules                       class=GOVERNANCE_LEGACY authority=LEGACY
+[A2]   AGENT_RULES_v2.md                  class=GOVERNANCE_LEGACY authority=LEGACY
+[A2]   .chat/sessions.jsonl               class=HISTORICAL authority=LEGACY
+[A2]   .index/vectors.json                class=GENERATED authority=LEGACY
+[A2]   .env                               class=SECRET authority=ACTIVE
+[A2]   docs/DECISIONS.md                  class=DECISION authority=SUPERSEDED
+[A2]   docs/old/decision-2-copy.yaml      class=DECISION authority=ACTIVE
+[A2]   src/app/old_export.py              class=DEAD_OR_UNUSED authority=UNKNOWN_OR_CONFLICTING
+[A2]   src/specs/feature-login.md         class=SPEC_AUTHORITATIVE authority=PROVISIONAL
+[A2]   specs/requirements.md              class=SPEC_AUTHORITATIVE authority=PROVISIONAL
+[A2]   src/app/main.py                    class=PRODUCT_SOURCE authority=ACTIVE
+[A2]   tests/test_retry.py                class=PRODUCT_TEST authority=ACTIVE
+[A2] 03-LEGACY-GOVERNANCE-MAP.md present: True
+
+## [A3] target path map (B2)
+[A3] ok {"entries": 35, "actions": {"DELETE_FROM_ACTIVE_TREE": 4, "EXTRACT": 4, "KEEP_IN_PLACE": 20, "MOVE": 7}, "unknown_blocking_destructive": 0, "schema_problems": []}
+[A3] one map entry per classified artefact: 35 vs 35
+[A3] map entry fields: ['action', 'artifact_id', 'authority', 'batch', 'catalogue_version', 'citations', 'cited_by', 'confidence', 'consumers', 'current_class', 'current_path', 'dependency_proof', 'entry_hash', 'entry_version', 'finding_state', 'gate_reasons', 'imports', 'index_policy', 'path_references', 'producer', 'reason', 'reference_edges', 'references', 'requires_human_gate', 'rollback', 'sensitivity', 'supersedes', 'target_class', 'target_path', 'type', 'verification']
+[A3]   .cursorrules                       -> MOVE                     target=archive/governance/legacy-rules/.cursorrules batch=1 gate=False refs=['AGENT_RULES_v2.md'] imports=[] consumers=['AGENT_RULES_v2.md']
+[A3]   .chat/sessions.jsonl               -> EXTRACT                  target=archive/governance/memory-stores/sessions.jsonl batch=6 gate=False refs=[] imports=[] consumers=[]
+[A3]   memory/chat_history.sqlite         -> None                     target=None batch=None gate=None refs=None imports=None consumers=None
+[A3]   .index/vectors.json                -> DELETE_FROM_ACTIVE_TREE  target=None batch=6 gate=False refs=[] imports=[] consumers=[]
+[A3]   src/app/old_export.py              -> DELETE_FROM_ACTIVE_TREE  target=None batch=7 gate=True refs=[] imports=[] consumers=[]
+[A3]   src/app/main.py                    -> KEEP_IN_PLACE            target=None batch=0 gate=False refs=['src/app/billing.py', 'src/app/config.py', 'src/app/retry.p imports=['src/app/billing.py', 'src/app/config.py', 'src/a consumers=[]
+[A3]   src/specs/feature-login.md         -> MOVE                     target=spec/requirements/feature-login.md batch=2 gate=False refs=[] imports=[] consumers=[]
+[A3]   docs/decisions/ADR-001-retries.md  -> EXTRACT                  target=spec/decisions/ batch=2 gate=False refs=[] imports=[] consumers=[]
+[A3]   docs/test_utils.py                 -> MOVE                     target=tests/test_utils.py batch=4 gate=False refs=['src/app/billing.py'] imports=['src/app/billing.py'] consumers=[]
+[A3]   docs/legacy_module.py              -> DELETE_FROM_ACTIVE_TREE  target=None batch=7 gate=True refs=[] imports=[] consumers=[]
+[A3] files moved during mapping (git status): []
+
+## [A4] migration plan
+[A4] ok {"stage": "A4", "plan": {"id": "MPLAN-GOVERNANCE-ADOPTION", "version": 1, "content_hash": "b1bd2e50ca8d5a2c17d10a00618c08bc04aa516e1db45a54eca0a1d3649d38f1", "regenerated_unchanged": false}, "batches": [{"batch": 0, "entries": 0, "human_gate": false}, {"batch": 1, "entries": 2, "human_gate": false}, {"batch": 2, "entries": 5, "human_gate": false}, {"batch": 3, "entries": 0, "human_gate": false}, {"batch": 4, "entries": 1, "human_gate": false}, {"batch": 5, "entries": 0, "human_gate": false}, {"batch": 6, "entries": 4, "human_gate": true}, {"batch": 7, "entries": 3, "human_gate": true}], "human_gates_created": [], "evidence": ["spec/audits/GOVERNANCE-ADOPTION/05-ADOPTION-MIGRATION-PLAN.md", "
+[A4] batches: [(0, 0, False, 'snapshot batch-0'), (1, 2, False, 'snapshot batch-1'), (2, 5, False, 'snapshot batch-2'), (3, 0, False, 'snapshot batch-3'), (4, 1, False, 'snapshot batch-4'), (5, 0, False, 'snapshot batch-5'), (6, 4, True, 'snapshot batch-6'), (7, 3, True, 'snapshot batch-7')] | unknown_blocking = 0
+
+## [A5] independent migration review / test authoring
+[A6-before-review] REFUSED VERDICT_REQUIRED: independent verdict 'A5' must be one of ["MIGRATION_PLAN_APPROVED", "MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS"] (current: '')
+[A5-design] ok {"stage": "A5", "tests_file": "spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml", "scaffolded_tests": 40, "plan_test_disagreements": [], "next": "independent reviewer extends tests and runs `gov adopt review --verdict MIGRATION_PLAN_APPROVED --session <fresh-session>`"}
+[A5] scaffolded tests: 40 | kinds: ['legacy_not_active', 'no_secret_in_index', 'path_absent', 'path_present', 'retirement_references']
+[A5-same-session] REFUSED INDEPENDENCE: reviewer session must differ from the planner session (fresh independent context, protocol Role B)
+[A5-role-not-a-reviewer] ok {"stage": "A5", "verdict": {"verdict": "MIGRATION_PLAN_REJECTED", "session": "S-x", "role": "migration-executor", "at": "2026-09-19T04:17:07Z", "tests": 40, "notes": null}}
+[A5]   ^ a REJECTED verdict recorded by a reviewer whose declared role is migration-executor; current A5 = {'verdict': 'MIGRATION_PLAN_REJECTED', 'session': 'S-x', 'role': 'migration-executor', 'at': '2026-09-19T04:17:07Z', 'tests': 40, 'notes': None}
+[A5-arbitrary-role] REFUSED UNKNOWN_ROLE: role 'definitely-not-a-kernel-role' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-engineer, change-controller)
+[A5] ok {"stage": "A5", "verdict": {"verdict": "MIGRATION_PLAN_APPROVED", "session": "S-review", "role": "orchestrator", "at": "2026-09-19T04:17:07Z", "tests": 40, "notes": "reviewed map and scaffold"}}
+[A5] A5 verdict record: {'verdict': 'MIGRATION_PLAN_APPROVED', 'session': 'S-review', 'role': 'orchestrator', 'at': '2026-09-19T04:17:07Z', 'tests': 40, 'notes': 'reviewed map and scaffold'}
+[A5] does the verdict bind the reviewed test set / catalogue by digest? False
+
+## [A6] controlled migration
+[A6] ok {"complete": true}
+[A6]   batch 0 | installed = 4.1.5 | applied = None | moves = None | skipped = [] | tests = {'ok': True, 'pass': 4, 'fail': 0}
+[A6]   batch 1 | installed = None | applied = 2 | moves = [['.cursorrules', 'archive/governance/legacy-rules/.cursorrules'], ['.github/copilot-instructions.md', 'archive/governan | skipped = [] | tests = {'ok': True, 'pass': 12, 'fail': 0}
+[A6]   batch 2 | installed = None | applied = 5 | moves = [['docs/DECISIONS.md', 'archive/spec/legacy-docs/docs__DECISIONS.md'], ['docs/decisions/ADR-001-retries.md', 'archive/sp | skipped = [] | tests = {'ok': True, 'pass': 24, 'fail': 0}
+[A6]   batch 3 | installed = None | applied = 0 | moves = [] | skipped = [] | tests = {'ok': True, 'pass': 24, 'fail': 0}
+[A6]   batch 4 | installed = None | applied = 1 | moves = [['docs/test_utils.py', 'tests/test_utils.py']] | skipped = [] | tests = {'ok': True, 'pass': 26, 'fail': 0}
+[A6]   batch 5 | installed = None | applied = 0 | moves = [] | skipped = [] | tests = {'ok': True, 'pass': 26, 'fail': 0}
+[A6]   batch 6 | installed = None | applied = 2 | moves = [] | skipped = [('ART-04f22cc0c94e', 'legacy memory store: extraction and retirement hap'), ('ART-60f823df01cd', 'human gate HDG-0003 pending (present it in chat an')] | tests = {'ok': True, 'pass': 32, 'fail': 0}
+[A6]   batch 7 | installed = None | applied = 0 | moves = [] | skipped = [('ART-df67c6b84c9f', 'human gate HDG-0001 pending (present it in chat an'), ('ART-7a7201a0da64', 'human gate HDG-0002 pending (present it in chat an'), ('ART-b46fc48678ce', 'human gate HDG-0004 pending (present it in chat an')] | tests = {'ok': True, 'pass': 32, 'fail': 0}
+[A6] migration ledger entries: 21 | statuses: ['applied', 'batch_complete', 'skipped']
+[A6] destructive-entry gates pending: [('HDG-0001', None), ('HDG-0002', None), ('HDG-0003', None), ('HDG-0004', None)]
+[A6-batch7-after-gates] ok {"complete": true}
+[A6] adopt status: [('A0', 'done'), ('A1', 'done'), ('A2', 'done'), ('A3', 'done'), ('A4', 'done'), ('A5', 'done'), ('A6', 'done'), ('A7', 'pending'), ('A8', 'pending'), ('A9', 'pending'), ('A10', 'pending'), ('A11', 'pending')]
+
+## [A7] independent migration verification
+[A7-executor-session] REFUSED INDEPENDENCE: migration verifier session must differ from the executor session (Role D)
+[A7-claims-accept] ok {"verdict": "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD", "tests": {"pass": 40, "fail": 0}, "secrets_isolated": true, "kernel_intact": true}
+[A7] ok {"verdict": "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD", "catalogue_problems": [], "broken_links": [], "legacy_in_active_tree": [], "tests": {"pass": 40, "fail": 0}, "secrets_isolated": true, "kernel_intact": true}
+[A8-before-A7-accept?] ok {"stage": "A8", "stores": [{"path": ".chat/sessions.jsonl", "artifact_id": "ART-04f22cc0c94e", "kind": "jsonl", "strings": 3, "extracted": 2, "registered_for_review": 1, "skipped_secret_strings": 0, "duplicates": 0, "by_kind": {"decision": 1, "lesson": 1, "question": 1}, "records": ["spec/decisions/D-Ce62807fbe0.yaml", "spec/lessons/L-C31c74ba4df.yaml"], "register": "spec/reports/RPT-LK7ee75d5706.yaml", "disposition": "RETIRE", "archived_to": "archive/governance/memory-stores/sessions.jsonl", "dependency_proof": {"subject": ".chat/sessions.jsonl", "archive_target": "archive/governance/memory-stores/sessions.jsonl", "scope": ["code", "config", "docs"], "scanned_files": 232, "skipped_large_fil
+
+## [A8] legacy memory extraction / retirement
+[A8] ok {"stores": [{"path": ".chat/sessions.jsonl", "artifact_id": "ART-04f22cc0c94e", "kind": "jsonl", "strings": 3, "extracted": 2, "registered_for_review": 1, "skipped_secret_strings": 0, "duplicates": 0, "by_kind": {"decision": 1, "lesson": 1, "question": 1}, "records": ["spec/decisions/D-Ce62807fbe0.yaml", "spec/lessons/L-C31c74ba4df.yaml"], "register": "spec/reports/RPT-LK7ee75d5706.yaml", "disposition": "RETIRE", "archived_to": "archive/governance/memory-stores/sessions.jsonl", "dependency_proof": null, "retired_with_active_references": null}, {"path": "memory/chat_history.sql", "artifact_id": "ART-60f823df01cd", "kind": "sql_dump", "strings": 5, "extracted": 3, "registered_for_review": 1, "
+[A8]   record spec/decisions/D-Ce62807fbe0.yaml | status = PROVISIONAL | provenance = {"extracted_from": ".chat/sessions.jsonl", "store_kind": "jsonl", "unit": 2, "extracted_at": "2026-09-19T04:17:28Z", "method": "gov adopt extract-legacy (A8)", 
+[A8]   record spec/lessons/L-C31c74ba4df.yaml | status = PROVISIONAL | provenance = {"extracted_from": ".chat/sessions.jsonl", "store_kind": "jsonl", "unit": 3, "extracted_at": "2026-09-19T04:17:28Z", "method": "gov adopt extract-legacy (A8)", 
+[A8]   record spec/reports/RPT-LK7ee75d5706.yaml | status = PROVISIONAL | provenance = {"extracted_from": ".chat/sessions.jsonl", "store_kind": "jsonl", "unit": 0, "extracted_at": "2026-09-19T04:17:28Z", "method": "gov adopt extract-legacy (A8)", 
+[A8]   record spec/decisions/D-Cc4f7cd76d2.yaml | status = PROVISIONAL | provenance = {"extracted_from": "memory/chat_history.sql", "store_kind": "sql_dump", "unit": 2, "extracted_at": "2026-09-19T04:17:28Z", "method": "gov adopt extract-legacy (
+
+## [A9] new Knowledge Fabric
+[A9] ok {"counts": {"artifacts": 225, "chunks": 756, "vectors": 729, "edges": 20, "symbols": 16, "symbol_refs": 18, "excluded": 4}, "excluded": 4, "secret_blocked": [], "heldout_generated": 31}
+[A9] held-out set now has 31 queries | generated_by: gov adopt build-memory
+
+## [A10] independent memory verification
+[A10-builder-session] REFUSED INDEPENDENCE: memory verifier session must differ from the memory builder session (Role F)
+[A10] ok {"verdict": "MEMORY_ACCEPTED_FOR_V4_AUDIT", "heldout": {"recall_at_k": 0.8620689655172413, "mrr": 0.8448275862068966, "pass": true, "queries": 29, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0, "forbidden_violations": 0, "failed": [{"id": "HQ-021", "query": "\"rationale: legacy gateway rate limits\"", "category": "lexical_literal", "routes": ["lexical_exact"], "expected": ["D-0001"], "got": ["D-L96e47cdee6", "D-L96e47cdee6"], "recall": 0.0, "precision": 0.0, "rr": 0.0, "forbidden_hits": [], "latency_ms": 2, "pass": false}, {"id": "HQ-022", "query": "\"How many times should gateway calls be retried?\"", "category": "lexical_literal", "routes": ["lexical_exact"], "expected": ["D-0001"], "g
+
+## [A11] full project audit
+[A11] ok {"verdict": "NOT_ADOPTED_HEALTHY", "audit_verdict": "UNHEALTHY", "doctor": "UNHEALTHY", "findings": {"critical": 0, "high": 2, "medium": 2, "low": 10}}
+[A11]    OK  migration baseline pinned
+[A11]    OK  every material artefact classified
+[A11]    OK  target path map explicit
+[A11]    OK  migration plan independently reviewed
+[A11]    OK  independent migration tests exist
+[A11]    OK  migrated paths/imports/links pass
+[A11]    OK  behaviour baseline preserved or changed by decision
+[A11]    OK  legacy governance has no accidental authority
+[A11]    OK  unique knowledge extracted from retired stores
+[A11]    OK  memory built on stable canonical paths
+[A11]    OK  independent memory verifier passed
+[A11]    OK  comprehensive v4 audit completed
+[A11]    OK  installed release pinned in framework.lock
+[A11]    OK  project overlay separate from kernel
+[A11]    OK  clean machine can reconstruct derived runtime
+[A11] doctor_failed: [('D010', 'stale: 0 changed, 1 added, 0 removed'), ('D014', '1 supersession conflict(s), 1 duplicate id(s)'), ('D015', '1 dangling edge(s), 25 orphan record(s)'), ('D021', 'no green governance record'), ('D031', 'schema_invariants (high) refuses ["task.close","cit.execute","release.build","up')]
+
+## [T3] adoption evidence tree
+[T3] files: ['00-BASELINE.yaml', '01-COLD-INVENTORY.jsonl', '01-COLD-INVENTORY.md', '02-CLASSIFICATION.jsonl', '03-LEGACY-GOVERNANCE-MAP.md', '04-TARGET-PATH-MAP.jsonl', '04-TARGET-PATH-MAP.meta.json', '04-TARGET-PATH-MAP.versions', '05-ADOPTION-MIGRATION-PLAN.md', '05-plan.versions', '05-plan.yaml', '06-INDEPENDENT-MIGRATION-TEST-DESIGN.md', '06-migration-tests.yaml', '07-MIGRATION-EXECUTION-REPORT.md', '08-INDEPENDENT-MIGRATION-VERIFICATION.md', '09-LEGACY-MEMORY-EXTRACTION.md', '10-MEMORY-IMPLEMENTATION-REPORT.md', '11-INDEPENDENT-MEMORY-VERIFICATION.md', '12-ADOPTION-FINAL-REPORT.md', 'migration-ledger.jsonl']
+[T3] protocol §5 files missing: []
+[T3] stage_status: {'A0': 'done', 'A1': 'done', 'A2': 'done', 'A3': 'done', 'A4': 'done', 'A5': 'done', 'A6': 'done', 'A7': 'done', 'A8': 'done', 'A9': 'done', 'A10': 'done', 'A11': 'done'}
+[T3] verdicts: {'A5': ('MIGRATION_PLAN_APPROVED', 'S-review', 'orchestrator'), 'A7': ('MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD', 'S-verify', 'orchestrator'), 'A10': ('MEMORY_ACCEPTED_FOR_V4_AUDIT', 'S-memv', 'orchestrator'), 'A11': ('NOT_ADOPTED_HEALTHY', None, None)}
+[T3] sessions recorded: planner S-plan | executor S-exec | memory builder S-mem
+
+DONE
+# exit 0

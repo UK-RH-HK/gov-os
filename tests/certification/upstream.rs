@@ -42,6 +42,11 @@ fn upstream_export_gate_fails_closed_and_sanitises() {
     let p1 = g.ok(&["upstream", "prepare", "L-0001"]);
     assert_eq!(p1["export_allowed"], true);
     assert_eq!(p1["packet_id"], "PKT-0001");
+    // BC-P2-10: human approval is asked for exactly this packet through its export gate
+    let gate1 = p1["approval_gate"]
+        .as_str()
+        .expect("an export-approval gate is raised for the packet")
+        .to_string();
     let packet_path = p1["path"].as_str().unwrap().to_string();
     let e = g.err(&[
         "upstream",
@@ -75,6 +80,21 @@ fn upstream_export_gate_fails_closed_and_sanitises() {
         "owner",
     ]);
     assert_eq!(e3.error_code(), "UPSTREAM_DESTINATION");
+    // `--approved-by` is a claim, not the human's approval
+    assert_eq!(
+        g.err(&[
+            "upstream",
+            "submit",
+            "PKT-0001",
+            "--destination",
+            inbox.to_str().unwrap(),
+            "--approved-by",
+            "owner",
+        ])
+        .error_code(),
+        "HUMAN_GATE_REQUIRED"
+    );
+    crate::ws03::human_decide(&g, &gate1, "A");
     let s = g.ok(&[
         "upstream",
         "submit",
@@ -84,7 +104,10 @@ fn upstream_export_gate_fails_closed_and_sanitises() {
         "--approved-by",
         "owner",
     ]);
-    assert_eq!(s["approved_by"], "owner");
+    assert_eq!(s["approved_by"], "certification owner");
+    assert_eq!(s["approved_by_claim"], "owner");
+    assert_eq!(s["approval"]["authenticated"], true);
+    assert_eq!(s["approval"]["gate"], gate1.as_str());
     let dest = std::path::PathBuf::from(s["destination"].as_str().unwrap());
     assert!(dest.join("packet.yaml").exists() && dest.join("fixture/scenario.yaml").exists());
     let sent: Vec<String> = gov_runtime::paths::iter_repo_files(&dest, false)
@@ -134,6 +157,7 @@ fn upstream_export_gate_fails_closed_and_sanitises() {
         !text.contains("Acme") && !text.contains("shipping-quotes"),
         "identifiers must be redacted: {text}"
     );
+    crate::ws03::human_decide(&g, p4["approval_gate"].as_str().unwrap(), "A");
     g.ok(&[
         "upstream",
         "submit",
@@ -314,6 +338,7 @@ fn export_gate_fails_closed_on_content_whatever_the_name() {
     ]);
     assert_eq!(e.error_code(), "UPSTREAM_BLOCKED");
     write(&proj, &pp, &original);
+    crate::ws03::human_decide(&g, ok["approval_gate"].as_str().unwrap(), "A");
     let s = g.ok(&[
         "upstream",
         "submit",
@@ -323,7 +348,122 @@ fn export_gate_fails_closed_on_content_whatever_the_name() {
         "--approved-by",
         "owner",
     ]);
-    assert_eq!(s["approval"]["authenticated"], false);
+    assert_eq!(s["approval"]["authenticated"], true);
     assert_eq!(s["approval"]["binds"]["packet_id"], pkt.as_str());
     assert_eq!(s["approval"]["binds"]["payload_hash"], s["payload_hash"]);
+}
+
+/// Repair-1 round-2 WS-11 regression (builder evidence, not acceptance), BC-P2-10 export use: an upstream export is
+/// approved only by the product owner's owner-signed answer authorising **that packet's** export gate. `--approved-by`,
+/// an agent's own resolution, a hand-edited gate record, a declining answer, another packet's approval and an approval
+/// of different content (payload changed and re-hashed after the answer) all refuse, typed, and nothing leaves.
+#[test]
+fn export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet() {
+    let root = tmp("upstream-approval");
+    let proj = root.join("project");
+    std::fs::create_dir_all(&proj).unwrap();
+    write(&proj, "README.md", "# svc\n");
+    git_init_commit(&proj);
+    let g = Gov::new(&proj, "S-up");
+    g.ok(&["init", "--name", "svc", "--alias", "proj-gamma"]);
+    let inbox = root.join("canonical").join("lessons").join("inbox");
+    std::fs::create_dir_all(&inbox).unwrap();
+    let lesson = |id: &str, what: &str| {
+        json!({"id": id, "type": "lesson", "title": "t", "status": "ACTIVE", "scope": "FRAMEWORK", "lifecycle": "corroborated", "category": "gates",
+            "problem_statement": format!("{what} was recorded without a presented gate"), "generic_failure_mode": "approval asserted by the acting agent",
+            "impact": "unreviewed changes", "suggested_change": "derive approval from an answered gate", "sources": ["RPT-1"]})
+    };
+    write_yaml(
+        &proj,
+        "spec/lessons/L-0201.yaml",
+        &lesson("L-0201", "an export"),
+    );
+    write_yaml(
+        &proj,
+        "spec/lessons/L-0202.yaml",
+        &lesson("L-0202", "a release"),
+    );
+    let p1 = g.ok(&["upstream", "prepare", "L-0201"]);
+    let p2 = g.ok(&["upstream", "prepare", "L-0202"]);
+    let (k1, g1) = (
+        p1["packet_id"].as_str().unwrap().to_string(),
+        p1["approval_gate"].as_str().unwrap().to_string(),
+    );
+    let (k2, g2) = (
+        p2["packet_id"].as_str().unwrap().to_string(),
+        p2["approval_gate"].as_str().unwrap().to_string(),
+    );
+    let gate = yaml(&proj, &format!("spec/decisions/{g1}.yaml"));
+    assert_eq!(gate["trigger"], "upstream_export");
+    assert_eq!(gate["subject"]["id"], k1.as_str());
+    assert_eq!(gate["subject"]["payload_hash"], p1["payload_hash"]);
+    let submit = |k: &str, by: &str| {
+        g.run(&[
+            "upstream",
+            "submit",
+            k,
+            "--destination",
+            inbox.to_str().unwrap(),
+            "--approved-by",
+            by,
+        ])
+    };
+    let inbox_count = || std::fs::read_dir(&inbox).map(|r| r.count()).unwrap_or(0);
+    // a claim is not an approval
+    let e = submit(&k1, "product-owner");
+    assert_eq!(e.error_code(), "HUMAN_GATE_REQUIRED", "{}", e.envelope);
+    assert_eq!(e.details()["gates"][0], g1.as_str());
+    // an agent cannot resolve an irreversible export decision, and nothing it records is an approval
+    g.ok(&["gate", "present", &g1]);
+    let r = g.run(&["decide", &g1, "--option", "A", "--rationale", "looks fine"]);
+    assert!(!r.ok(), "{}", r.envelope);
+    assert_eq!(
+        submit(&k1, "orchestrator").error_code(),
+        "HUMAN_GATE_REQUIRED"
+    );
+    // a hand-edited gate record is not an OS-written answer (T2)
+    let gp = format!("spec/decisions/{g1}.yaml");
+    let original = read(&proj, &gp);
+    let mut forged = yaml(&proj, &gp);
+    forged["gate_status"] = json!("ANSWERED");
+    forged["answer"] = json!({"option": "A", "by": "owner", "by_kind": "human"});
+    write_yaml(&proj, &gp, &forged);
+    assert_eq!(submit(&k1, "owner").error_code(), "T2_UNBOUND");
+    write(&proj, &gp, &original);
+    // the human declines packet 1 and approves packet 2: packet 2's approval does not export packet 1
+    crate::ws03::human_decide(&g, &g1, "B");
+    crate::ws03::human_decide(&g, &g2, "A");
+    assert_eq!(submit(&k1, "owner").error_code(), "GATE_DECLINED");
+    assert_eq!(
+        inbox_count(),
+        0,
+        "nothing leaves without the human's approval of that packet"
+    );
+    // an approval binds the content: packet 2 changed and re-hashed after the answer is not the approved packet
+    let pp = format!(".governance-runtime/outbound/{k2}/packet.yaml");
+    let approved = read(&proj, &pp);
+    let mut changed = yaml(&proj, &pp);
+    changed["suggested_framework_change"] =
+        json!("derive approval from an answered gate and log it twice");
+    changed["payload_hash"] = json!(gov_runtime::upstream::payload_hash_of(&changed));
+    write_yaml(&proj, &pp, &changed);
+    let e = submit(&k2, "owner");
+    assert_eq!(e.error_code(), "APPROVAL_STALE", "{}", e.envelope);
+    assert_eq!(inbox_count(), 0);
+    // the approved packet exports, recording the verified human approval
+    write(&proj, &pp, &approved);
+    let s = submit(&k2, "someone-else");
+    assert!(s.ok(), "{}", s.envelope);
+    let s = s.result();
+    assert_eq!(s["approved_by"], "certification owner");
+    assert_eq!(s["approved_by_claim"], "someone-else");
+    assert_eq!(s["approval"]["channel"], "human-gate");
+    assert_eq!(s["approval"]["gate"], g2.as_str());
+    assert!(s["approval"]["decision"]
+        .as_str()
+        .unwrap()
+        .starts_with("D-"));
+    assert_eq!(inbox_count(), 1);
+    let ledger = read(&proj, "spec/reports/upstream-ledger.jsonl");
+    assert!(ledger.contains(&g2) && ledger.contains("\"authenticated\":true"));
 }

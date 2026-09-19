@@ -1,0 +1,5 @@
+(a) role declared: orchestrator for init --name t1
+(a) role declared: orchestrator for adopt migrate
+(a) role declared: orchestrator for adopt extract-legacy
+(a) role declared: orchestrator for adopt build-memory
+(a) role declared: orchestrator for adopt audit --accept-exceptions

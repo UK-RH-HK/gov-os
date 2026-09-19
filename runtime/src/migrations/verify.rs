@@ -5,11 +5,41 @@ use crate::Result;
 use serde_json::{json, Value};
 use std::path::Path;
 
+/// The verified answer of the Human Decision Gate raised for catalogue entry `e` — only while the gate's recorded
+/// subject is still this entry's question (see `adopt::entry_gate_answer`).
 fn gate_answer(project: &crate::project::Project, e: &Value) -> Option<String> {
-    e["human_gate"]
-        .as_str()
-        .filter(|g| !g.is_empty())
-        .and_then(|g| crate::orchestration::gates::answered_option(project, g))
+    crate::adopt::entry_gate_answer(project, e)
+}
+
+/// The test kinds [`run_tests_file`] executes. An independent test of any other kind cannot pass.
+pub const TEST_KINDS: &[&str] = &[
+    "path_present",
+    "path_absent",
+    "link_resolves",
+    "text_present",
+    "text_absent",
+    "command",
+    "legacy_not_active",
+    "retirement_references",
+    "no_secret_in_index",
+];
+
+/// What a migration test checks, independent of its label: the test without `id`, `description` and `note`. Two
+/// tests with the same identity are the same test whoever renamed it (BC-P2-34: a planner-scaffolded test relabelled
+/// is still the planner's).
+pub fn test_identity(t: &Value) -> String {
+    let mut m = t.clone();
+    if let Some(o) = m.as_object_mut() {
+        for k in ["id", "description", "note", "author", "authored_by"] {
+            o.remove(k);
+        }
+    }
+    crate::util::hash_value(&m)
+}
+
+/// Digest of a migration test file exactly as it stands (every test and field).
+pub fn tests_digest(tests: &Value) -> String {
+    crate::util::hash_value(tests)
 }
 
 fn read_ledger(root: &Path) -> Vec<Value> {
@@ -394,7 +424,10 @@ pub fn run_tests_file_upto(
                 .iter()
                 .find(|e| e["artifact_id"].as_str() == Some(aid));
             let gate = entry.and_then(|e| e["human_gate"].as_str()).unwrap_or("");
-            match crate::orchestration::gates::answered_option(&project, gate).as_deref() {
+            match entry
+                .and_then(|e| crate::adopt::entry_gate_answer(&project, e))
+                .as_deref()
+            {
                 Some("A") => {}
                 Some(other) => {
                     deferred += 1;

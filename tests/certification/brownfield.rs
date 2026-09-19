@@ -120,6 +120,8 @@ fn brownfield_adoption_end_to_end() {
     let reviewer = planner
         .with_session("S-reviewer")
         .with_role("migration-reviewer");
+    // BC-P2-34: the independent reviewer approves with tests of its own
+    crate::migration::reviewer_authors_tests(&root);
     reviewer.ok(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"]);
     // A6: everything except the destructive dead-code batch (needs an answered human gate) — dead code is skipped
     let executor = planner
@@ -290,14 +292,19 @@ fn brownfield_adoption_end_to_end() {
     let manifest = json(&root, "governance/generated/index-manifest.json");
     let excluded = manifest["excluded"].to_string();
     assert!(excluded.contains(".env") && excluded.contains("src/app/config.py"));
-    // A10 independent memory verification
+    // A10 independent memory verification, on held-out queries the memory verifier authored (BC-P2-34)
+    crate::migration::verifier_authors_heldout(&root);
     let mv = planner
         .with_session("S-memverifier")
         .with_role("memory-verifier")
         .ok(&["adopt", "verify-memory"]);
     assert_eq!(mv["verdict"], "MEMORY_ACCEPTED_FOR_V4_AUDIT", "{mv}");
+    // A11 by the comprehensive independent auditor in a fresh session (Role G), as the G5 full suite
+    let auditor = planner
+        .with_session("S-auditor")
+        .with_role("independent-auditor");
     // A11 first audit: contradictions and the planted secret must block a healthy verdict
-    let au1 = executor.ok(&["adopt", "audit"]);
+    let au1 = auditor.ok(&["adopt", "audit"]);
     assert_eq!(au1["verdict"], "NOT_ADOPTED_HEALTHY", "{au1}");
     assert!(
         au1["findings"]["high"].as_u64().unwrap() >= 1,
@@ -349,8 +356,8 @@ fn brownfield_adoption_end_to_end() {
         ids.contains(&"D-0002".to_string()) && !ids.contains(&"D-0001".to_string()),
         "{ids:?}"
     );
-    // re-audit: remediated repository
-    let au2 = executor.ok(&["adopt", "audit"]);
+    // independent re-audit: remediated repository
+    let au2 = auditor.ok(&["adopt", "audit"]);
     assert!(
         au2["verdict"] == "ADOPTED_HEALTHY"
             || au2["verdict"] == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS"
