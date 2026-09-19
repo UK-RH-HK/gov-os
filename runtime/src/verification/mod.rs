@@ -14,7 +14,9 @@ use serde_json::{json, Value};
 
 pub mod currency;
 pub mod families_ext;
+pub mod lineage;
 pub mod product;
+pub mod reporting;
 
 pub const KNOWN_CLI: &[&str] = &[
     "status",
@@ -243,7 +245,7 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                         ));
                     }
                     let o = graph::orphan_nodes(db)?;
-                    f.detail = json!({"dangling": d.len(), "orphans": o.len(), "edge_types": graph::edge_type_counts(db)?});
+                    f.detail = json!({"dangling": d.len(), "orphans": o.len(), "orphan_records": o, "dangling_edges": d.iter().take(20).collect::<Vec<_>>(), "edge_types": graph::edge_type_counts(db)?});
                 } else {
                     f.findings.push(finding(
                         "medium",
@@ -253,6 +255,14 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                     ));
                 }
                 let dag = crate::orchestration::dag::compute(p)?;
+                // W1 canonical path, W8 stale lineage links, `blocks` naming no task (ws04 IP-7, ws05 IP-2)
+                let (lf, ld) = reporting::graph_lineage_findings(p, store, &dag, &fam);
+                f.findings.extend(lf);
+                if let Some(o) = f.detail.as_object_mut() {
+                    o.insert("lineage".into(), ld);
+                } else {
+                    f.detail = json!({"lineage": ld});
+                }
                 if !dag.cycles.is_empty() {
                     f.findings.push(finding(
                         "high",
@@ -308,7 +318,10 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                     } else if !r["pass"].as_bool().unwrap_or(false) {
                         f.findings.push(finding("high", &fam, format!("held-out retrieval regression failed: recall@k {:.2} mrr {:.2} stale {:.2} superseded {:.2} forbidden {}", r["recall_at_k"].as_f64().unwrap_or(0.0), r["mrr"].as_f64().unwrap_or(0.0), r["stale_hit_rate"].as_f64().unwrap_or(0.0), r["superseded_hit_rate"].as_f64().unwrap_or(0.0), r["forbidden_violations"]), None));
                     }
-                    f.detail = json!({"status": r["status"], "recall_at_k": r["recall_at_k"], "mrr": r["mrr"], "precision_at_k": r["precision_at_k"], "queries": r["queries"], "pending": r["pending_queries"], "failed": r["results"].as_array().map(|a| a.iter().filter(|x| !x["pass"].as_bool().unwrap_or(false)).map(|x| x["id"].clone()).collect::<Vec<_>>())});
+                    // the failing results travel with the result so a persisted run can record them in failure
+                    // memory (memory::failures::record_heldout_misses, ws06 IP-2) — only `audit_with` persists them
+                    let failing: Vec<Value> = r["results"].as_array().map(|a| a.iter().filter(|x| !x["pass"].as_bool().unwrap_or(false)).map(|x| json!({"id": x["id"], "query": x["query"], "expected": x["expected"], "got": x["got"], "recall": x["recall"], "routes": x["routes"], "forbidden_hits": x["forbidden_hits"], "pass": false})).collect()).unwrap_or_default();
+                    f.detail = json!({"status": r["status"], "recall_at_k": r["recall_at_k"], "mrr": r["mrr"], "precision_at_k": r["precision_at_k"], "queries": r["queries"], "pending": r["pending_queries"], "failed": failing.iter().map(|x| x["id"].clone()).collect::<Vec<_>>(), "failed_results": failing});
                 } else if !hp.exists() {
                     f.findings.push(finding(
                         "medium",
@@ -395,7 +408,13 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                 let contract = p.contract();
                 let mut unknown = 0;
                 let mut secrets_wrong = vec![];
+                let mut oracle_material = vec![];
                 for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) {
+                    // hidden Qualification Oracle material must never live in a governed repository
+                    // (Contract v3:1014, :1062; ws01-12 IP-5)
+                    if reporting::hidden_oracle_material(&abs) {
+                        oracle_material.push(rel.clone());
+                    }
                     let d = contract.decide(&rel);
                     if d.rule_pattern.is_none()
                         && (rel.starts_with("spec/")
@@ -417,7 +436,10 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                 for s in &secrets_wrong {
                     f.findings.push(finding("critical", &fam, "secret content in a non-secret-class path (blocked from index; must be moved or classified secret)".into(), Some(s.clone())));
                 }
-                f.detail = json!({"unmatched": unknown, "secret_content_outside_secret_class": secrets_wrong});
+                for m in &oracle_material {
+                    f.findings.push(finding("high", &fam, format!("hidden Qualification Oracle material inside the governed repository at {m}: the verifier-owned hidden oracle must stay in verifier custody, separate from the qualification repository (Contract v3:1014, :1062); remove it from the repository and its history, and re-seal the oracle"), Some(m.clone())));
+                }
+                f.detail = json!({"unmatched": unknown, "secret_content_outside_secret_class": secrets_wrong, "hidden_oracle_material": oracle_material});
             }
             "context_reproducibility" => {
                 if let Some(db) = &db {
@@ -453,6 +475,14 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                             }
                         }
                         f.detail = json!({"task": t.id(), "deterministic_hash": a["deterministic_hash"], "chars": a["chars"]});
+                    }
+                    // W4 / W12 G5: every dispatchable task's delivered inputs against its declared manifest (ws04 IP-9)
+                    let (df, dd) = reporting::delivery_findings(p, db, store, &fam);
+                    f.findings.extend(df);
+                    if let Some(o) = f.detail.as_object_mut() {
+                        o.insert("delivery".into(), dd);
+                    } else {
+                        f.detail = json!({"delivery": dd});
                     }
                 } else {
                     f.findings
@@ -848,7 +878,10 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                         .count() as f64
                         / tasks.len() as f64
                 };
-                f.detail = json!({"tasks": tasks.len(), "done": done.len(), "task_traceability": pct, "features": features.len()});
+                // W5: DONE work whose implementation does not trace to its requirements (ws04 IP-8)
+                let (uf, un) = reporting::untraceable_findings(p, store, &fam);
+                f.findings.extend(uf);
+                f.detail = json!({"tasks": tasks.len(), "done": done.len(), "task_traceability": pct, "features": features.len(), "untraceable_closed_tasks": un});
             }
             "audit_reproducibility" => {
                 f.detail = json!({"note": "result hash compared across two consecutive in-process runs by `gov audit` (see audit record result_hash)"});
@@ -864,6 +897,12 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                 families_ext::continuity_checkpoint_handoff(p, store, &mut f)
             }
             "model_routing_integrity" => families_ext::model_routing_integrity(p, store, &mut f),
+            "lineage_orphans" => reporting::lineage_orphans(p, store, db, &mut f),
+            "os_binding_integrity" => reporting::os_binding_integrity(p, store, &mut f),
+            "installation_authenticity" => reporting::installation_authenticity(p, &mut f),
+            "contract_binding" => reporting::contract_binding(p, &mut f),
+            "index_content_coverage" => reporting::index_content_coverage(p, db, &mut f),
+            "task_contract_integrity" => reporting::task_contract_integrity(p, store, &mut f),
             other => {
                 f.findings.push(finding(
                     "low",
@@ -930,18 +969,57 @@ pub fn audit(p: &Project, opts: &SuiteOptions, persist: bool) -> Result<Value> {
     audit_with(p, &o)
 }
 
+/// Does this run produce W7 remediation (BC-P2-22 / Contract v3:1144)? Only a run that may persist evidence (not
+/// `--no-persist`, not a G0 re-evaluation), at a tier that audits lineage and orphan states (G4-G6), and that selects
+/// the lineage family.
+fn generates_remediation(p: &Project, o: &RunOptions) -> bool {
+    if o.record == RecordPolicy::Never || !matches!(o.tier, Tier::G4 | Tier::G5 | Tier::G6) {
+        return false;
+    }
+    if !scheduler::suite_families(p)
+        .iter()
+        .any(|f| f == lineage::FAMILY)
+    {
+        return false;
+    }
+    match &o.selection {
+        Selection::All => true,
+        Selection::Tier(t) => scheduler::catalogue::get(lineage::FAMILY)
+            .map(|d| d.tiers.contains(t))
+            .unwrap_or(false),
+        Selection::Explicit(ids) => ids.iter().any(|x| x == lineage::FAMILY),
+    }
+}
+
 /// Run the suite under `o` and shape the result as an audit (the envelope every caller of [`audit`] relies on),
 /// persisting a governance-suite record according to `o.record`.
+///
+/// Round-2 additions (WS-2):
+/// * **W7 remediation** — before the run, every orphan without an investigation gets one linked governed
+///   investigation task ([`lineage::generate_remediation`]); the run then evaluates the state that includes it, so
+///   the evidence written is current for it (`--no-persist` and G0-G3 runs generate nothing);
+/// * **stable finding ids** — one scheme for every finding the product mints: `migrations::identity::assign_finding_ids`
+///   (family, message, path), shared with the adoption audit (ws04 IP-10 × ws09-11 IP-1);
+/// * **T2-bound evidence** — the governance-suite record is sealed as written by this health operation
+///   (`crate::t2`), and only sealed records are honoured as green evidence (IP-WS02-22);
+/// * **failure memory** — a persisted run whose held-out retrieval regression failed records each missed query in
+///   durable failure memory (`memory::failures::record_heldout_misses`, ws06 IP-2).
 pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
+    let remediation = if generates_remediation(p, o) {
+        let detected_by = format!("{} ({})", o.trigger.event, o.tier.as_str());
+        Some(
+            lineage::generate_remediation(p, &detected_by)
+                .unwrap_or_else(|e| json!({"error": e.code, "message": e.message})),
+        )
+    } else {
+        None
+    };
     let mut out = scheduler::run_suite(p, o)?;
     let wanted = out.wanted_families();
     let mut findings: Vec<Value> = vec![];
-    let mut n = 0;
     for f in &wanted {
         for x in &f.findings {
-            n += 1;
             let mut y = x.clone();
-            y["id"] = json!(format!("GF-{n:04}"));
             if let Some(obj) = y.as_object_mut() {
                 if obj.get("path").map(|v| v.is_null()).unwrap_or(false) {
                     obj.remove("path");
@@ -953,6 +1031,7 @@ pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
             findings.push(y);
         }
     }
+    crate::migrations::identity::assign_finding_ids(&mut findings);
     let reproducible = !out.runs.iter().any(|r| r.reproducible == Some(false));
     let verdict = out.result["verdict"]
         .as_str()
@@ -996,7 +1075,30 @@ pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
         "repository": out.result["repository"], "actor": out.result["actor"], "started_at": out.result["started_at"],
         "finished_at": out.result["finished_at"],
     });
+    // failure memory: missed held-out queries of a persisted run whose regression executed now and failed
+    let mut failure_memory = Value::Null;
+    if o.record != RecordPolicy::Never {
+        if let Some(r) = out.runs.iter().find(|r| {
+            r.id == "memory_retrieval_regression" && r.status == scheduler::Status::Executed
+        }) {
+            // only a failing regression result is persisted into failure memory (WS-6 IP-2): individual misses of a
+            // regression that meets its thresholds stay in the result detail
+            if let Some(fam) = r.family.as_ref().filter(|f| !f.ok) {
+                let failing = fam.detail["failed_results"].clone();
+                if failing.as_array().map(|a| !a.is_empty()).unwrap_or(false) {
+                    let recorded = crate::memory::failures::record_heldout_misses(
+                        p,
+                        &json!({"results": failing}),
+                        &format!("health {} ({})", o.surface, o.tier.as_str()),
+                    );
+                    failure_memory =
+                        json!(recorded.iter().map(|x| x.to_value()).collect::<Vec<_>>());
+                }
+            }
+        }
+    }
     let mut id = String::new();
+    let mut record_binding = Value::Null;
     if write {
         let store = RecordStore::load(&p.root);
         id = store.next_id("audit");
@@ -1006,12 +1108,28 @@ pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
                 m.insert(k.clone(), v.clone());
             }
         }
-        let rec = new_record(
+        if let Some(q) = &o.qualification {
+            fields["qualification"] = q.clone();
+        }
+        if let Some(r) = &remediation {
+            fields["remediation"] = r.clone();
+        }
+        let mut rec = new_record(
             "audit",
             &id,
             &format!("Governance suite audit {id} ({verdict})"),
             fields,
         );
+        // T2: this record is honoured as evidence only while it is exactly what this health operation wrote
+        record_binding = match crate::t2::seal_record(
+            &mut rec,
+            &currency::seal_operation("governance-suite"),
+        ) {
+            Ok(()) => json!({"sealed": true}),
+            Err(e) => {
+                json!({"sealed": false, "code": e.code, "message": e.message, "consequence": "the record is written but not honoured as green evidence on this machine"})
+            }
+        };
         save_record(&p.root, &rec)?;
         out.result["record"] = json!(id);
         if o.ledger {
@@ -1035,6 +1153,8 @@ pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
         "health_result": out.result["id"], "tier": o.tier.as_str(), "summary": out.result["summary"],
         "parallelism": out.result["parallelism"], "cache_mode": o.cache.as_str(), "state": out.result["state"], "blocks": out.result["blocks"],
         "runtime": out.result["runtime"], "repository": out.result["repository"],
+        "record_binding": record_binding, "remediation": remediation, "failure_memory": failure_memory,
+        "qualification": o.qualification,
     }))
 }
 

@@ -294,7 +294,9 @@ fn path_migration_with_rollback_and_memory_rebuild() {
     assert_eq!(mv["reproducible"], true);
     let au = executor.ok(&["adopt", "audit"]);
     assert!(
-        au["verdict"] == "ADOPTED_HEALTHY" || au["verdict"] == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS",
+        au["verdict"] == "ADOPTED_HEALTHY"
+            || au["verdict"] == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS"
+            || adopted_but_for_unprovisioned_posture(&executor, &au),
         "{au}"
     );
     assert_eq!(au["findings"]["critical"], 0);
@@ -526,4 +528,36 @@ fn adoption_dependency_proof_citations_and_rerun_identity() {
         )["status"],
         "SUPERSEDED"
     );
+}
+
+/// P2-AR-0023 (BC-P2-36 wired into doctor as D032): on an unprovisioned machine the installation's release
+/// authenticity is not established, so doctor is never HEALTHY and A11 cannot say ADOPTED_HEALTHY. This accepts that
+/// verdict only when it is the **sole** reason: every adoption criterion holds, the audit is HEALTHY, and the only
+/// failing doctor check is D032 disclosing the unprovisioned posture. On a provisioned machine (WS-8's round-2
+/// harness) the strict ADOPTED_* verdicts apply unchanged.
+fn adopted_but_for_unprovisioned_posture(g: &Gov, au: &serde_json::Value) -> bool {
+    let doc = g.run(&["doctor"]);
+    let d = if doc.ok() {
+        doc.result()
+    } else {
+        doc.details()
+    };
+    let d032_unprovisioned = d["checks"].as_array().map(|a| {
+        a.iter().any(|c| {
+            c["id"] == "D032"
+                && c["ok"] == false
+                && c["posture"]["machine_posture"] == "UNPROVISIONED"
+        })
+    }) == Some(true);
+    au["verdict"] == "NOT_ADOPTED_HEALTHY"
+        && au["audit_verdict"] == "HEALTHY"
+        && au["checks"]
+            .as_array()
+            .map(|c| c.iter().all(|x| x["ok"] == true))
+            == Some(true)
+        && au["doctor_failed"]
+            .as_array()
+            .map(|f| !f.is_empty() && f.iter().all(|x| x["id"] == "D032"))
+            == Some(true)
+        && d032_unprovisioned
 }

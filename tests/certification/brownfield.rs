@@ -350,7 +350,9 @@ fn brownfield_adoption_end_to_end() {
     // re-audit: remediated repository
     let au2 = executor.ok(&["adopt", "audit"]);
     assert!(
-        au2["verdict"] == "ADOPTED_HEALTHY" || au2["verdict"] == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS",
+        au2["verdict"] == "ADOPTED_HEALTHY"
+            || au2["verdict"] == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS"
+            || adopted_but_for_unprovisioned_posture(&executor, &au2),
         "{au2}\nfindings: {}",
         au2["finding_messages"]
     );
@@ -380,4 +382,36 @@ fn brownfield_adoption_end_to_end() {
         .unwrap()
         .iter()
         .any(|t| t == "TASK-0100"));
+}
+
+/// P2-AR-0023 (BC-P2-36 wired into doctor as D032): on an unprovisioned machine the installation's release
+/// authenticity is not established, so doctor is never HEALTHY and A11 cannot say ADOPTED_HEALTHY. This accepts that
+/// verdict only when it is the **sole** reason: every adoption criterion holds, the audit is HEALTHY, and the only
+/// failing doctor check is D032 disclosing the unprovisioned posture. On a provisioned machine (WS-8's round-2
+/// harness) the strict ADOPTED_* verdicts apply unchanged.
+fn adopted_but_for_unprovisioned_posture(g: &Gov, au: &serde_json::Value) -> bool {
+    let doc = g.run(&["doctor"]);
+    let d = if doc.ok() {
+        doc.result()
+    } else {
+        doc.details()
+    };
+    let d032_unprovisioned = d["checks"].as_array().map(|a| {
+        a.iter().any(|c| {
+            c["id"] == "D032"
+                && c["ok"] == false
+                && c["posture"]["machine_posture"] == "UNPROVISIONED"
+        })
+    }) == Some(true);
+    au["verdict"] == "NOT_ADOPTED_HEALTHY"
+        && au["audit_verdict"] == "HEALTHY"
+        && au["checks"]
+            .as_array()
+            .map(|c| c.iter().all(|x| x["ok"] == true))
+            == Some(true)
+        && au["doctor_failed"]
+            .as_array()
+            .map(|f| !f.is_empty() && f.iter().all(|x| x["id"] == "D032"))
+            == Some(true)
+        && d032_unprovisioned
 }

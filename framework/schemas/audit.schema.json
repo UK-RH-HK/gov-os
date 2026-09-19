@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/audit.schema.json",
   "title": "audit",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "id": {
@@ -212,6 +212,10 @@
           },
           "accepted_exception": {
             "type": "string"
+          },
+          "orphan": {
+            "type": "object",
+            "description": "W7 orphan detection (lineage_orphans family, BC-P2-22): kind (unconsumed-output | spec-without-downstream-path | unconsumed-research | unjustified-acceptance-test | unjustified-code), subject, subject_type, stable key, Contract v3 line, remediation, detail, and the investigation task generated for it"
           }
         },
         "required": [
@@ -413,6 +417,18 @@
       "items": {
         "type": "string"
       }
+    },
+    "os_binding": {
+      "type": "object",
+      "description": "T2 seal written by the health operation that produced this record (crate::t2; operation health:governance-suite or health:product-tests). Only records whose seal verifies on this machine are honoured as green / product-test evidence (IP-WS02-22)"
+    },
+    "remediation": {
+      "type": "object",
+      "description": "W7 remediation of the run that wrote this record: investigation tasks created for orphans that had none (created, existing, orphans, generated), or why none could be created"
+    },
+    "qualification": {
+      "type": "object",
+      "description": "G6 only: the qualification run this record observes (kind, run_id, one-way oracle commitment, oracle purpose and format digest, score-report digest, numeric V4 metrics, counts_as_qualification). Carries no oracle id, digest, fault identity or truth (Contract v3:1062)"
     }
   },
   "required": [

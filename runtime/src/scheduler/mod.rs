@@ -128,6 +128,10 @@ impl Trigger {
             .with_subject(cit)
             .with_paths(paths)
     }
+    /// A G6 qualification run (synthetic repository, chaos, soak or hidden-test run) identified by `run_id`.
+    pub fn qualification(kind: &str, run_id: &str) -> Self {
+        Trigger::new(&format!("qualification.{kind}")).with_subject(run_id)
+    }
     pub fn to_value(&self) -> Value {
         json!({"event": self.event, "subject": self.subject, "paths": self.paths})
     }
@@ -179,6 +183,9 @@ pub struct RunOptions {
     pub workers: Option<usize>,
     /// Write the ledger result and state (false only for the compatibility `verification::run`).
     pub ledger: bool,
+    /// G6 only: the validated qualification run this health result observes ([`qualification_run`]), recorded with
+    /// the result and the governance-suite record.
+    pub qualification: Option<Value>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -205,6 +212,7 @@ impl RunOptions {
             record: RecordPolicy::WhenCompleteAndStale,
             workers: None,
             ledger: true,
+            qualification: None,
         }
     }
 }
@@ -396,6 +404,18 @@ impl<'a> Extras<'a> {
                 sha_of_files(&[self.p.runtime_dir().join("plugins").join("observed.json")])
             }
             Extra::DeepMode => self.deep.to_string(),
+            Extra::ContractSource => match crate::verification::reporting::contract_root(self.p) {
+                Some(root) => sha_of_files(
+                    &crate::verification::reporting::contract_files()
+                        .iter()
+                        .map(|f| root.join(f))
+                        .collect::<Vec<_>>(),
+                ),
+                None => "not-applicable".into(),
+            },
+            Extra::GovernanceBaseline => hash_value(&json!(
+                crate::verification::lineage::baseline_commits(self.p)
+            )),
         };
         self.memo.insert(name, v.clone());
         v
@@ -867,6 +887,7 @@ fn assemble_result(
         "verdict": verdict_of(&wanted_findings),
         "suite_verdict": if complete { json!(verdict_of(&all_findings)) } else { json!("INCOMPLETE") },
         "record": Value::Null,
+        "qualification": opts.qualification,
     })
 }
 
@@ -1214,7 +1235,20 @@ pub fn status(p: &Project) -> Result<Value> {
         "last_result": st["last_result"],
         "updated_at": st["updated_at"],
         "product_tests": crate::verification::product::status(p, Some(&snap)),
+        "failure_memory": failure_memory_summary(p),
     }))
+}
+
+/// Open failure-memory records (retrieval misses, tool failures) awaiting follow-up, by kind (ws06 IP-2).
+pub fn failure_memory_summary(p: &Project) -> Value {
+    let open = crate::memory::failures::open_failures(p);
+    let mut by_kind: BTreeMap<String, usize> = BTreeMap::new();
+    for f in &open {
+        *by_kind
+            .entry(f["failure_kind"].as_str().unwrap_or("?").to_string())
+            .or_insert(0) += 1;
+    }
+    json!({"open": open.len(), "by_kind": by_kind, "records": open.iter().take(20).map(|f| json!({"id": f["id"], "failure_kind": f["failure_kind"], "title": f["title"]})).collect::<Vec<_>>()})
 }
 
 /// **Tier contract entry point for hosts.** Runs tier `tier` for `trigger` with the tier's defaults (see the module
@@ -1228,6 +1262,149 @@ pub fn tier_run(p: &Project, tier: Tier, trigger: Trigger) -> Result<Value> {
     let mut o = RunOptions::new(tier, trigger);
     o.surface = format!("tier:{}", tier.as_str());
     crate::verification::audit_with(p, &o)
+}
+
+/// A G6 qualification run to observe: the verifier-owned hidden oracle, the score report of the candidate run, and
+/// the directories the oracle must be kept out of.
+#[derive(Debug, Clone, Default)]
+pub struct QualificationRun {
+    /// `synthetic-repository`, `chaos`, `soak` or `hidden-test` (Contract v3:799).
+    pub kind: String,
+    pub run_id: Option<String>,
+    pub oracle: std::path::PathBuf,
+    pub score_report: std::path::PathBuf,
+    pub public_suites: Vec<std::path::PathBuf>,
+    pub repositories: Vec<std::path::PathBuf>,
+}
+
+/// Qualification run kinds G6 observes (Contract v3:799 "synthetic repos/chaos/soak/hidden tests").
+pub const QUALIFICATION_KINDS: &[&str] = &["synthetic-repository", "chaos", "soak", "hidden-test"];
+
+/// **G6 entry point (tier contract; Contract v3:799; ws01-12 IP-4).** Accepts a qualification run and records its
+/// health — only when the run's evidence is sound:
+///
+/// 1. the hidden oracle conforms to the Qualification Oracle format and is **separate** from the public suite, the
+///    given qualification repositories **and this governed repository** (`ORACLE_RECORD_INVALID`,
+///    `ORACLE_SEPARATION_VIOLATED`);
+/// 2. the score report conforms and is **bound** to that oracle — identity, digest, every injected fault scored,
+///    arithmetic (`ORACLE_SCORE_BINDING_MISMATCH`).
+///
+/// Then the G6 tier runs every check fresh (compared with the cache) and the health result and governance-suite
+/// record carry the qualification: kind, run id, oracle id/digest/purpose, the report's binding and metrics. A
+/// `FORMAT_SAMPLE` oracle is recorded with `counts_as_qualification: false`.
+pub fn qualification_run(p: &Project, q: &QualificationRun) -> Result<Value> {
+    use crate::qualification_oracle as qo;
+    if !QUALIFICATION_KINDS.contains(&q.kind.as_str()) {
+        return Err(GovError::new(
+            "USAGE",
+            format!(
+                "unknown qualification run kind '{}' (expected one of {:?})",
+                q.kind, QUALIFICATION_KINDS
+            ),
+        ));
+    }
+    let mut repos = q.repositories.clone();
+    repos.push(p.root.clone());
+    let oracle = qo::validate_file(
+        &q.oracle,
+        &qo::ValidateOptions {
+            oracle: None,
+            public_suites: q.public_suites.clone(),
+            repositories: repos,
+        },
+    )?;
+    if oracle["kind"] != qo::KIND_ORACLE {
+        return Err(GovError::new(
+            "QUALIFICATION_ORACLE_REQUIRED",
+            format!(
+                "{} is a {} document, not a qualification-oracle; G6 records a run only against the hidden oracle it was scored against",
+                q.oracle.display(),
+                oracle["kind"].as_str().unwrap_or("?")
+            ),
+        ));
+    }
+    let report = qo::validate_file(
+        &q.score_report,
+        &qo::ValidateOptions {
+            oracle: Some(q.oracle.clone()),
+            ..Default::default()
+        },
+    )?;
+    if report["kind"] != qo::KIND_SCORE_REPORT {
+        return Err(GovError::new(
+            "QUALIFICATION_REPORT_REQUIRED",
+            format!(
+                "{} is a {} document, not a qualification-score-report",
+                q.score_report.display(),
+                report["kind"].as_str().unwrap_or("?")
+            ),
+        ));
+    }
+    let report_doc: Value = crate::util::read_text(&q.score_report)
+        .ok()
+        .and_then(|t| serde_yaml::from_str(&t).ok())
+        .unwrap_or(Value::Null);
+    let oracle_doc: Value = crate::util::read_text(&q.oracle)
+        .ok()
+        .and_then(|t| serde_yaml::from_str(&t).ok())
+        .unwrap_or(Value::Null);
+    let run_id = q
+        .run_id
+        .clone()
+        .or_else(|| {
+            report_doc["binding"]["run_id"]
+                .as_str()
+                .map(|s| s.to_string())
+        })
+        .unwrap_or_else(|| format!("QR-{}", crate::util::short_uuid()));
+    let purpose = oracle["purpose"].as_str().unwrap_or("").to_string();
+    // What is recorded lives in the qualification repository, so it must not carry the hidden oracle: no oracle id,
+    // no oracle digest, no fault identities or truths (Contract v3:1062; the separation scan would — rightly — find
+    // them). The oracle is referred to by a one-way commitment its custodian can recompute from the oracle digest;
+    // the score report is recorded by its own digest and the numeric V4 metrics only.
+    let commitment = |d: &Value| {
+        crate::util::sha256_hex(
+            format!(
+                "governance-os/g6-oracle-commitment\n{}",
+                d.as_str().unwrap_or("")
+            )
+            .as_bytes(),
+        )
+    };
+    let _ = &oracle_doc;
+    let metrics: Map<String, Value> = report_doc["metrics"]
+        .as_object()
+        .map(|m| {
+            m.iter()
+                .map(|(k, v)| {
+                    let shown = if v.get("applicable") == Some(&json!(false)) {
+                        json!({"applicable": false})
+                    } else if let Some(x) = v.get("value") {
+                        json!({"value": x})
+                    } else if let Some(x) = v.get("count") {
+                        json!({"count": x})
+                    } else if v.is_number() {
+                        v.clone()
+                    } else {
+                        json!({"recorded": true})
+                    };
+                    (k.clone(), shown)
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let qualification = json!({
+        "kind": q.kind, "run_id": run_id,
+        "oracle": {"commitment_sha256": commitment(&oracle["canonical_sha256"]), "purpose": purpose, "format_sha256": oracle["format_sha256"], "separation_checked": oracle["separation"]["scanned"]},
+        "score_report": {"canonical_sha256": report["canonical_sha256"], "binding_verified": report["binding_verified"].is_object(), "metrics": metrics},
+        "counts_as_qualification": purpose == "QUALIFICATION",
+    });
+    let mut o = RunOptions::new(Tier::G6, Trigger::qualification(&q.kind, &run_id));
+    o.surface = "qualification".into();
+    o.record = RecordPolicy::Always;
+    o.qualification = Some(qualification.clone());
+    let r = crate::verification::audit_with(p, &o)?;
+    Ok(json!({"qualification": qualification, "health": r}))
 }
 
 /// Every declared check, the tiers and the operation vocabulary (`gov health checks`).
