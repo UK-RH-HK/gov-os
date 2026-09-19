@@ -1,0 +1,19 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0041
+role: capability-repair (integration builder)
+objective: Integrate the eight round-3 repair branches into one tree that builds and passes every suite; unify the two P2-ADJ-0002 mechanisms into one delegation role, authority format, provisioning command and keyring API with no signing inside gov; converge the availability host API; apply the ordered CIT/task re-sealing items; implement every routed integration point in P2-HO-0040; report R1 held-out counts with census. Claims only.
+agent_model: claude-opus-5 (pinned explicitly at dispatch)
+fresh_context: true
+independent_of: [all auditors, verifiers, builders P2-AR-0014..0040, integrators P2-AR-0022 and P2-AR-0032]
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0040-integration-3.md
+active_gate: GATE-P2-REPAIR-1
+iteration: 1
+round: 3
+branches: [phase2/repair-1-r3-ws03, phase2/repair-1-r3-ws08, phase2/repair-1-r3-ws05, phase2/repair-1-r3-ws04, phase2/repair-1-r3-ws02, phase2/repair-1-r3-ws06, phase2/repair-1-r3-ws07, phase2/repair-1-r3-ws09-11]
+base_commit: a53d15b
+branch: phase2/repair-1-r3-integration
+expected_output_path: release/capability-baseline/repair-1/integration-3/
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.report.yaml
+required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, INCOMPLETE]
+status: RUNNING

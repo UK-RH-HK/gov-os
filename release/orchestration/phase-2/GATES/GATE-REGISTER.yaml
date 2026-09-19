@@ -77,7 +77,7 @@ gates:
     title: Repair iteration 1 — all rounds integrated into a new immutable candidate cap2-candidate-1
     status: OPEN
     satisfier: capability-repair builders (claims only) + orchestrator integration; never an acceptance
-    rounds: {round_1: INTEGRATED (P2-AR-0022, merge b7e6d52, product_code_digest b1ab1c8c...fbb1), round_2: INTEGRATED (P2-AR-0032, merge e8e1ff2, product_code_digest 797da37c...1fe1), round_3: BUILDERS_COMPLETE (P2-AR-0033..0040 recorded; integration P2-AR-0041 next), round_4: NOT_STARTED (BC-P2-02 evidence map)}
+    rounds: {round_1: INTEGRATED (P2-AR-0022, merge b7e6d52, product_code_digest b1ab1c8c...fbb1), round_2: INTEGRATED (P2-AR-0032, merge e8e1ff2, product_code_digest 797da37c...1fe1), round_3: INTEGRATING (builders P2-AR-0033..0040 recorded; integration P2-AR-0041 running), round_4: NOT_STARTED (BC-P2-02 evidence map)}
 
   - id: GATE-P3-PROVISIONAL-RETRIEVAL
     title: Phase 3 — PROVISIONAL_RETRIEVAL_PROFILE_READY
