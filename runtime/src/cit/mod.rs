@@ -561,6 +561,12 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     if r.data.get("approval").is_some() {
         r.data.as_object_mut().unwrap().remove("approval");
     }
+    // the decision an earlier gate's answer recorded belongs to that gate: it does not survive a change of gate
+    if existing.as_deref() != gate_id.as_deref() {
+        if let Some(o) = r.data.as_object_mut() {
+            o.remove("decision");
+        }
+    }
     match &gate_id {
         Some(g) => r.set("human_gate", json!(g)),
         None => {

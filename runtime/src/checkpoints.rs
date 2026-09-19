@@ -274,19 +274,33 @@ pub fn task_inputs(p: &Project, store: &RecordStore, task_id: &str) -> Option<(V
         .as_ref()
         .and_then(|k| k["input_hashes"].as_object().cloned())
         .unwrap_or_default();
+    // staleness on normative content when the packet carries it (bookkeeping on an input is not a change)
+    let delivered_norm = pk
+        .as_ref()
+        .and_then(|k| k["input_normative_hashes"].as_object().cloned());
     let mut stale = vec![];
     let inputs: Vec<Value> = m
         .entries
         .iter()
-        .filter(|e| e.delivered() || e.required)
+        .filter(|e| (e.delivered() || e.required) && e.slot != crate::context::manifest::Slot::Dependency)
         .map(|e| {
             let d = delivered.get(&e.id).and_then(|v| v.as_str()).map(String::from);
-            let is_stale = pk.is_some() && d.as_deref() != e.content_hash.as_deref();
+            let dn = delivered_norm
+                .as_ref()
+                .and_then(|n| n.get(&e.id))
+                .and_then(|v| v.as_str())
+                .map(String::from);
+            let is_stale = pk.is_some()
+                && match &delivered_norm {
+                    Some(_) => dn.as_deref() != e.normative_hash.as_deref(),
+                    None => d.as_deref() != e.content_hash.as_deref(),
+                };
             if is_stale {
-                stale.push(json!({"id": e.id, "delivered": d, "current": e.content_hash}));
+                stale.push(json!({"id": e.id, "delivered": d, "current": e.content_hash, "delivered_normative": dn, "current_normative": e.normative_hash}));
             }
             json!({"id": e.id, "slot": e.slot.name(), "required": e.required, "resolution": e.resolution, "version": e.version,
-                   "content_hash": e.content_hash, "delivered_hash": d, "stale": is_stale})
+                   "content_hash": e.content_hash, "normative_hash": e.normative_hash, "delivered_hash": d,
+                   "delivered_normative_hash": dn, "stale": is_stale})
         })
         .collect();
     let invalidated = pk
@@ -571,13 +585,25 @@ fn freshness_of(p: &Project, store: &RecordStore, ck: &Record) -> Value {
                 .iter()
                 .map(|e| (e.id.clone(), e.content_hash.clone()))
                 .collect();
+            let now_norm: BTreeMap<String, Option<String>> = m
+                .entries
+                .iter()
+                .map(|e| (e.id.clone(), e.normative_hash.clone()))
+                .collect();
             for x in ck.data["inputs"].as_array().cloned().unwrap_or_default() {
                 let id = x["id"].as_str().unwrap_or("");
-                let then = x["content_hash"].as_str();
-                match now.get(id) {
-                    Some(cur) if cur.as_deref() != then => reasons.push(json!({"kind": "input_changed", "id": id, "recorded": then, "current": cur})),
-                    None => reasons.push(json!({"kind": "input_no_longer_declared", "id": id})),
-                    _ => {}
+                // compared on normative content when the checkpoint recorded it
+                let (then, cur) = match x["normative_hash"].as_str() {
+                    Some(h) => (Some(h.to_string()), now_norm.get(id).cloned().flatten()),
+                    None => (
+                        x["content_hash"].as_str().map(String::from),
+                        now.get(id).cloned().flatten(),
+                    ),
+                };
+                if !now.contains_key(id) {
+                    reasons.push(json!({"kind": "input_no_longer_declared", "id": id}));
+                } else if cur != then {
+                    reasons.push(json!({"kind": "input_changed", "id": id, "recorded": then, "current": cur}));
                 }
             }
         } else {

@@ -163,14 +163,14 @@ pub fn compile_tolerant(p: &Project, task_id: &str) -> Result<Value> {
         packet["contradiction_routing"] = routed;
     }
     if let Some(prev) = previous {
-        let old = prev["input_hashes"]
-            .as_object()
-            .cloned()
-            .unwrap_or_default();
-        let new = packet["input_hashes"]
-            .as_object()
-            .cloned()
-            .unwrap_or_default();
+        // compared on normative content when both packets carry it (bookkeeping on an input is not a change)
+        let key = if prev.get("input_normative_hashes").is_some() {
+            "input_normative_hashes"
+        } else {
+            "input_hashes"
+        };
+        let old = prev[key].as_object().cloned().unwrap_or_default();
+        let new = packet[key].as_object().cloned().unwrap_or_default();
         let mut changed: Vec<Value> = vec![];
         for (id, h) in &old {
             if new.get(id) != Some(h) {
@@ -497,11 +497,20 @@ pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -
     if truncated > 0 {
         ret["truncated_slices"] = json!(truncated);
     }
+    // the content hashes of the delivered inputs; task dependencies are not content inputs (their record changes
+    // with every status transition; `dependency_state` carries what the task needs of them)
     let input_hashes: serde_json::Map<String, Value> = m
         .entries
         .iter()
-        .filter(|e| e.delivered())
+        .filter(|e| e.delivered() && e.slot != manifest::Slot::Dependency)
         .filter_map(|e| e.content_hash.clone().map(|h| (e.id.clone(), json!(h))))
+        .collect();
+    // the same inputs' normative hashes (bookkeeping excluded): what upstream-change staleness is judged on
+    let input_normative_hashes: serde_json::Map<String, Value> = m
+        .entries
+        .iter()
+        .filter(|e| e.delivered() && e.slot != manifest::Slot::Dependency)
+        .filter_map(|e| e.normative_hash.clone().map(|h| (e.id.clone(), json!(h))))
         .collect();
     let input_paths: Vec<String> = m
         .entries
@@ -513,7 +522,7 @@ pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -
         "delivery_state": m.delivery_state(),
         "supplementary_state": if degradations.is_empty() { "COMPLETE" } else { "DEGRADED" },
         "deterministic_authority": det, "deterministic_hash": det_hash,
-        "input_manifest": manifest_v, "manifest_hash": manifest_hash, "input_hashes": input_hashes,
+        "input_manifest": manifest_v, "manifest_hash": manifest_hash, "input_hashes": input_hashes, "input_normative_hashes": input_normative_hashes,
         "receipt_contract": contract,
         "retrieved_intelligence": ret, "index_version": crate::INDEX_VERSION});
     let ph = hash_value(
@@ -618,16 +627,27 @@ pub fn verify_delivery(p: &Project, packet: &Value) -> Result<Value> {
         .as_object()
         .cloned()
         .unwrap_or_default();
+    // staleness is judged on normative content when the packet carries it (bookkeeping on an input is not a change)
+    let normative = packet["input_normative_hashes"].as_object().cloned();
     let mut undelivered = vec![];
     let mut stale = vec![];
-    for e in m.entries.iter().filter(|e| e.required) {
+    for e in m
+        .entries
+        .iter()
+        .filter(|e| e.required && e.slot != manifest::Slot::Dependency)
+    {
         match supplied.get(&e.id).and_then(|v| v.as_str()) {
             None => undelivered
                 .push(json!({"id": e.id, "slot": e.slot.name(), "resolution_now": e.resolution})),
-            Some(h) if Some(h) != e.content_hash.as_deref() => {
-                stale.push(json!({"id": e.id, "supplied": h, "current": e.content_hash}))
+            Some(h) => {
+                let changed = match &normative {
+                    Some(n) => n.get(&e.id).and_then(|v| v.as_str()) != e.normative_hash.as_deref(),
+                    None => Some(h) != e.content_hash.as_deref(),
+                };
+                if changed {
+                    stale.push(json!({"id": e.id, "supplied": h, "current": e.content_hash, "normative_supplied": normative.as_ref().and_then(|n| n.get(&e.id).cloned()), "normative_current": e.normative_hash}));
+                }
             }
-            _ => {}
         }
     }
     let invalidated = packet.get("invalidated").filter(|v| !v.is_null()).cloned();

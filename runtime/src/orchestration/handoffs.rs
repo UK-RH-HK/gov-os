@@ -35,11 +35,26 @@ fn handoff_freshness(p: &Project, task: &str) -> Result<(Value, Vec<String>)> {
     }
     let packet_file = p.runtime_dir().join("context").join(format!("{task}.json"));
     let previous = read_json(&packet_file).ok();
+    // compared on normative content (bookkeeping on an input is not a change); a packet from before normative
+    // hashes existed is compared on bytes
+    let normative = previous
+        .as_ref()
+        .map(|k| k.get("input_normative_hashes").is_some())
+        .unwrap_or(false);
     let now: std::collections::BTreeMap<String, Option<String>> = m
         .entries
         .iter()
-        .filter(|e| e.delivered())
-        .map(|e| (e.id.clone(), e.content_hash.clone()))
+        .filter(|e| e.delivered() && e.slot != crate::context::manifest::Slot::Dependency)
+        .map(|e| {
+            (
+                e.id.clone(),
+                if normative {
+                    e.normative_hash.clone()
+                } else {
+                    e.content_hash.clone()
+                },
+            )
+        })
         .collect();
     let mut stale: Vec<crate::cit::propagation::InputChange> = vec![];
     let mut invalidated = false;
@@ -48,17 +63,23 @@ fn handoff_freshness(p: &Project, task: &str) -> Result<(Value, Vec<String>)> {
             .get("invalidated")
             .map(|v| !v.is_null())
             .unwrap_or(false);
-        let delivered = prev["input_hashes"]
-            .as_object()
-            .cloned()
-            .unwrap_or_default();
+        let key = if normative {
+            "input_normative_hashes"
+        } else {
+            "input_hashes"
+        };
+        let delivered = prev[key].as_object().cloned().unwrap_or_default();
         for (id, cur) in &now {
             let d = delivered.get(id).and_then(|v| v.as_str()).map(String::from);
             if d.as_deref() != cur.as_deref() {
                 stale.push(crate::cit::propagation::InputChange {
                     id: id.clone(),
                     from: d,
-                    to: cur.clone(),
+                    to: m
+                        .entries
+                        .iter()
+                        .find(|e| &e.id == id)
+                        .and_then(|e| e.normative_hash.clone()),
                 });
             }
         }

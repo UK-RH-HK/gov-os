@@ -578,7 +578,7 @@ pub fn route_for_task(p: &Project, task_id: &str) -> Value {
                 let mm = crate::context::manifest::resolve_with(&p.root, &json!({}), &store, x);
                 con.members
                     .iter()
-                    .all(|id| mm.entries.iter().any(|e| &e.id == id))
+                    .any(|id| mm.entries.iter().any(|e| &e.id == id))
             })
             .map(|x| x.id())
             .collect();

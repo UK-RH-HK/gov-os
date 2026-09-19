@@ -644,7 +644,34 @@ fn classify_file(
             true,
         );
     }
-    if let Some(g) = any_glob(INFRA_PATHS, path) {
+    // executable acceptance criteria (Gherkin feature files)
+    if lower.ends_with(".feature") {
+        m.push(
+            "acceptance_criteria_change",
+            path,
+            "executable acceptance criteria",
+            format!("{path} {what} (Gherkin feature file)"),
+            true,
+        );
+    }
+    // infrastructure recognised by content wherever it lives (Terraform resources, Kubernetes/Helm manifests)
+    let infra_by_content = after
+        .or(before)
+        .map(|t| {
+            t.lines().any(|l| {
+                let l = l.trim_start();
+                l.starts_with("resource \"") || l.starts_with("module \"")
+            }) || (t.contains("apiVersion:") && t.contains("kind:"))
+        })
+        .unwrap_or(false);
+    let infra_glob = any_glob(INFRA_PATHS, path).or(if infra_by_content {
+        Some(
+            "infrastructure definition by content (Terraform resource/module, Kubernetes manifest)",
+        )
+    } else {
+        None
+    });
+    if let Some(g) = infra_glob {
         let sizing = match (before, after) {
             (Some(b), Some(a)) => {
                 let lb = lines_with(b, SIZING_TOKENS);
@@ -1093,6 +1120,30 @@ mod tests {
             (
                 file("governance/project/NOTES.md", None, Some("x\n")),
                 "governance_change",
+            ),
+            (
+                file(
+                    "tests/features/checkout.feature",
+                    Some("Then total is 398\n"),
+                    Some("Then total is 400\n"),
+                ),
+                "acceptance_criteria_change",
+            ),
+            (
+                file(
+                    "ops/cluster.yaml",
+                    None,
+                    Some("apiVersion: apps/v1\nkind: Deployment\nspec:\n  replicas: 40\n"),
+                ),
+                "infrastructure_cost",
+            ),
+            (
+                file(
+                    "platform/db.hcl",
+                    Some("resource \"aws_db_instance\" \"x\" { instance_class = \"small\" }\n"),
+                    Some("resource \"aws_db_instance\" \"x\" { instance_class = \"8xlarge\" }\n"),
+                ),
+                "infrastructure_cost",
             ),
         ];
         for (c, want) in cases {

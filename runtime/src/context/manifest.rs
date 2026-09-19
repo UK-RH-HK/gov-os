@@ -275,6 +275,10 @@ pub struct Entry {
     pub state_class: String,
     pub version: Option<String>,
     pub content_hash: Option<String>,
+    /// SHA-256 of the record's normative content: its data without the bookkeeping the OS writes into it
+    /// (`staleness`, retest/revalidation markers, `updated`, journals, seals) and its body. Upstream-change staleness is
+    /// judged on this, so marking an input stale never makes it look changed (`cit::propagation::normative_hash`).
+    pub normative_hash: Option<String>,
     pub superseded_by: Option<String>,
     pub duplicate_paths: Vec<String>,
     pub authority_flag: Option<String>,
@@ -297,6 +301,7 @@ impl Entry {
             state_class: String::new(),
             version: None,
             content_hash: None,
+            normative_hash: None,
             superseded_by: None,
             duplicate_paths: vec![],
             authority_flag: None,
@@ -330,7 +335,7 @@ impl Entry {
             "id": self.id, "slot": self.slot.name(), "required": self.required, "reason": self.reason(),
             "declared_in": self.sources, "resolution": self.resolution, "delivered": self.delivered(),
             "satisfied": self.satisfied(), "type": self.record_type, "path": self.path, "status": self.status,
-            "state_class": self.state_class, "version": self.version, "content_hash": self.content_hash,
+            "state_class": self.state_class, "version": self.version, "content_hash": self.content_hash, "normative_hash": self.normative_hash,
             "superseded_by": self.superseded_by, "authority_flag": self.authority_flag,
             "problems": self.problems_value(),
         });
@@ -683,6 +688,7 @@ fn resolve_entry(
     e.content_hash = crate::util::read_bytes(&root.join(&r.path))
         .ok()
         .map(|b| sha256_hex(&b));
+    e.normative_hash = Some(crate::cit::propagation::normative_hash(r));
     e.superseded_by = succ.get(&e.id).cloned();
     let expected = e.slot.expected_types();
     if !expected.is_empty() && !expected.contains(&e.record_type.as_str()) {
@@ -1008,7 +1014,14 @@ fn apply_contradictions(p: &Project, store: &RecordStore, m: &mut Manifest) {
         .filter(|e| e.delivered() && e.slot != Slot::Dependency)
         .map(|e| e.id.clone())
         .collect();
-    let found = detect_among(store, &ids);
+    // contradictions among the task's own inputs, and project-wide contradictions one of its inputs is a member of
+    // (a task that depends on one side of a contradiction receives contradicted authority)
+    let mut found = detect_among(store, &ids);
+    for c in crate::context::contradictions::detect_all(store) {
+        if c.members.iter().any(|x| ids.contains(x)) && !found.iter().any(|f| f.key == c.key) {
+            found.push(c);
+        }
+    }
     let mut out = vec![];
     for c in &found {
         let res = resolution(p, store, c);

@@ -138,16 +138,45 @@ impl Plan {
     }
 }
 
-/// Current SHA-256 of a governed record's bytes, or of a repository file named `file:<path>` (`None` when it does
-/// not exist).
-pub fn record_hash(root: &std::path::Path, store: &RecordStore, id: &str) -> Option<String> {
-    let rel = match id.strip_prefix("file:") {
-        Some(path) => path.to_string(),
-        None => store.get(id)?.path.clone(),
-    };
-    crate::util::read_bytes(&root.join(rel))
+/// Fields the OS writes into a record as bookkeeping: excluded from its normative content.
+pub const NON_NORMATIVE_FIELDS: &[&str] = &[
+    "updated",
+    "staleness",
+    "retest_required",
+    "retest_reason",
+    "revalidation",
+    "journal",
+    "os_state",
+    crate::t2::SEAL_FIELD,
+    "status_note",
+];
+
+/// **SHA-256 of a record's normative content**: its data without [`NON_NORMATIVE_FIELDS`] (as the product's YAML
+/// writer stores it) and its Markdown body. Marking a record stale, re-sealing it or journalling on it does not
+/// change it; changing anything a consumer reads does.
+pub fn normative_hash(r: &Record) -> String {
+    let mut d = r.data.clone();
+    if let Some(o) = d.as_object_mut() {
+        for k in NON_NORMATIVE_FIELDS {
+            o.remove(*k);
+        }
+    }
+    let norm = crate::util::to_yaml(&d)
         .ok()
-        .map(|b| sha256_hex(&b))
+        .and_then(|t| serde_yaml::from_str::<Value>(&t).ok())
+        .unwrap_or(d);
+    sha256_hex(format!("{}\n{}", crate::util::canonical_json(&norm), r.body).as_bytes())
+}
+
+/// Current normative hash of a governed record ([`normative_hash`]), or the SHA-256 of a repository file named
+/// `file:<path>` (`None` when it does not exist).
+pub fn record_hash(root: &std::path::Path, store: &RecordStore, id: &str) -> Option<String> {
+    match id.strip_prefix("file:") {
+        Some(path) => crate::util::read_bytes(&root.join(path))
+            .ok()
+            .map(|b| sha256_hex(&b)),
+        None => store.get(id).map(normative_hash),
+    }
 }
 
 fn packet_path(p: &Project, task: &str) -> std::path::PathBuf {
@@ -250,7 +279,7 @@ pub fn plan(
         }
         let m = manifest::resolve(p, store, t);
         for e in &m.entries {
-            if changed_set.contains(e.id.as_str()) {
+            if changed_set.contains(e.id.as_str()) && e.slot != manifest::Slot::Dependency {
                 affected.entry(t.id()).or_default().insert(format!(
                     "consumes {} ({}, declared in {})",
                     e.id,
@@ -765,10 +794,24 @@ pub fn apply(
                 let Ok(mut pk) = read_json(&abs) else {
                     continue;
                 };
-                let supplied = pk["input_hashes"].as_object().cloned().unwrap_or_default();
+                // changes are expressed on normative content: compare with what the packet delivered, normatively
+                // when it recorded that (a packet from before normative hashes counts every delivered change)
+                let normative = pk.get("input_normative_hashes").is_some();
+                let supplied = if normative {
+                    pk["input_normative_hashes"]
+                        .as_object()
+                        .cloned()
+                        .unwrap_or_default()
+                } else {
+                    pk["input_hashes"].as_object().cloned().unwrap_or_default()
+                };
                 let stale: Vec<Value> = ch
                     .iter()
-                    .filter(|c| supplied.get(&c.id).and_then(|v| v.as_str()) != c.to.as_deref())
+                    .filter(|c| {
+                        !normative
+                            || supplied.get(&c.id).and_then(|v| v.as_str()) != c.to.as_deref()
+                    })
+                    .filter(|c| supplied.contains_key(&c.id) || normative)
                     .map(|c| json!({"id": c.id, "delivered": supplied.get(&c.id), "current": c.to, "cause": reason}))
                     .collect();
                 if stale.is_empty() {
@@ -825,12 +868,15 @@ pub struct Baseline {
     pub source: String,
     pub reference: String,
     pub at: String,
+    /// `normative` (hashes of normative content, bookkeeping excluded) or `bytes` (raw file hashes: a consumption
+    /// receipt, or a packet/checkpoint written before normative hashes were recorded).
+    pub kind: &'static str,
     pub hashes: BTreeMap<String, String>,
 }
 
 impl Baseline {
     pub fn to_value(&self) -> Value {
-        json!({"source": self.source, "reference": self.reference, "at": self.at, "inputs": self.hashes})
+        json!({"source": self.source, "reference": self.reference, "at": self.at, "kind": self.kind, "inputs": self.hashes})
     }
 }
 
@@ -861,29 +907,37 @@ fn receipt_hashes(r: &Record) -> BTreeMap<String, String> {
     out
 }
 
-/// **What task `t`'s work consumed.** For a completed task: the consumption receipt of its closing report, else the
-/// inputs its closing checkpoint recorded (as delivered), else the last packet compiled before it closed. For open
-/// work: the latest of its delivered packet and its latest checkpoint's recorded inputs. `None` when nothing was
-/// ever delivered (no work consumed anything).
+/// `inputs_consumed` of a report or worker return (`ID@hash` or `{id, content_hash}`).
+fn receipt_hashes_of(v: &Value) -> BTreeMap<String, String> {
+    let r = Record {
+        path: String::new(),
+        data: json!({"inputs_consumed": v.get("inputs_consumed").cloned().unwrap_or(json!([]))}),
+        body: String::new(),
+        format: crate::records::RecordFormat::Yaml,
+        problems: vec![],
+    };
+    receipt_hashes(&r)
+}
+
+fn map_of(v: &Value) -> BTreeMap<String, String> {
+    v.as_object()
+        .map(|o| {
+            o.iter()
+                .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// **What task `t`'s work consumed.** For a completed task: the inputs its closing checkpoint recorded (as
+/// delivered), else the consumption receipt of its closing report, else the last packet compiled before it closed.
+/// For open work: the latest of its delivered packet and its latest checkpoint's recorded inputs. `None` when
+/// nothing was ever delivered (no work consumed anything).
 pub fn baseline_of(p: &Project, store: &RecordStore, t: &Record) -> Option<Baseline> {
     let tid = t.id();
     let done = FINISHED.contains(&t.get("task_status").as_str());
     let closed_at = t.get("closed_at");
     let mut cands: Vec<Baseline> = vec![];
-    if done {
-        let rid = t.get("closed_by_report");
-        if let Some(r) = store.get(&rid) {
-            let h = receipt_hashes(r);
-            if !h.is_empty() {
-                return Some(Baseline {
-                    source: "closing report consumption receipt".into(),
-                    reference: rid,
-                    at: closed_at,
-                    hashes: h,
-                });
-            }
-        }
-    }
     for c in store.of_type("checkpoint") {
         if c.get("task") != tid {
             continue;
@@ -899,13 +953,18 @@ pub fn baseline_of(p: &Project, store: &RecordStore, t: &Record) -> Option<Basel
         let Some(arr) = c.data["inputs"].as_array() else {
             continue;
         };
+        let normative = arr.iter().any(|x| x.get("normative_hash").is_some());
         let mut h = BTreeMap::new();
         for x in arr {
             let id = x["id"].as_str().unwrap_or("");
-            let hash = x["delivered_hash"]
-                .as_str()
-                .or(x["content_hash"].as_str())
-                .unwrap_or("");
+            let hash = if normative {
+                x["delivered_normative_hash"]
+                    .as_str()
+                    .or(x["normative_hash"].as_str())
+            } else {
+                x["delivered_hash"].as_str().or(x["content_hash"].as_str())
+            }
+            .unwrap_or("");
             if !id.is_empty() && !hash.is_empty() {
                 h.insert(id.to_string(), hash.to_string());
             }
@@ -915,26 +974,7 @@ pub fn baseline_of(p: &Project, store: &RecordStore, t: &Record) -> Option<Basel
                 source: format!("checkpoint {} ({})", c.id(), c.get("trigger")),
                 reference: c.id(),
                 at,
-                hashes: h,
-            });
-        }
-    }
-    if let Ok(pk) = read_json(&packet_path(p, &tid)) {
-        let at = pk["compiled_at"].as_str().unwrap_or("").to_string();
-        let h: BTreeMap<String, String> = pk["input_hashes"]
-            .as_object()
-            .map(|o| {
-                o.iter()
-                    .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
-                    .collect()
-            })
-            .unwrap_or_default();
-        let before_close = !done || closed_at.is_empty() || at.as_str() <= closed_at.as_str();
-        if !h.is_empty() && before_close {
-            cands.push(Baseline {
-                source: "delivered context packet".into(),
-                reference: pk["packet_hash"].as_str().unwrap_or("").to_string(),
-                at,
+                kind: if normative { "normative" } else { "bytes" },
                 hashes: h,
             });
         }
@@ -948,11 +988,43 @@ pub fn baseline_of(p: &Project, store: &RecordStore, t: &Record) -> Option<Basel
         {
             return Some(b.clone());
         }
+        let rid = t.get("closed_by_report");
+        if let Some(r) = store.get(&rid) {
+            let h = receipt_hashes(r);
+            if !h.is_empty() {
+                return Some(Baseline {
+                    source: "closing report consumption receipt".into(),
+                    reference: rid,
+                    at: closed_at,
+                    kind: "bytes",
+                    hashes: h,
+                });
+            }
+        }
+    }
+    if let Ok(pk) = read_json(&packet_path(p, &tid)) {
+        let at = pk["compiled_at"].as_str().unwrap_or("").to_string();
+        let (kind, h) = if pk.get("input_normative_hashes").is_some() {
+            ("normative", map_of(&pk["input_normative_hashes"]))
+        } else {
+            ("bytes", map_of(&pk["input_hashes"]))
+        };
+        let before_close = !done || closed_at.is_empty() || at.as_str() <= closed_at.as_str();
+        if !h.is_empty() && before_close {
+            cands.push(Baseline {
+                source: "delivered context packet".into(),
+                reference: pk["packet_hash"].as_str().unwrap_or("").to_string(),
+                at,
+                kind,
+                hashes: h,
+            });
+        }
     }
     cands.into_iter().max_by(|a, b| a.at.cmp(&b.at))
 }
 
-/// Inputs of task `t` whose bytes changed since its baseline, and whether each change is already propagated to it.
+/// Inputs of task `t` whose content changed since its baseline (normative content where the baseline recorded it),
+/// and whether each change is already propagated to it. Task dependencies are not content inputs.
 pub fn stale_inputs(
     p: &Project,
     store: &RecordStore,
@@ -967,18 +1039,40 @@ pub fn stale_inputs(
         .cloned()
         .unwrap_or_default();
     let mut out = vec![];
-    for e in &m.entries {
-        let Some(then) = b.hashes.get(&e.id) else {
-            continue;
+    for e in m
+        .entries
+        .iter()
+        .filter(|e| e.slot != manifest::Slot::Dependency)
+    {
+        let then = match b.hashes.get(&e.id) {
+            Some(h) => Some(h.clone()),
+            // a required input the work never received is an upstream change too (a new applicable decision, a
+            // newly declared requirement): the work predates it. A consumption receipt may omit optional inputs, so
+            // only a delivery baseline (packet or checkpoint, which lists everything delivered) counts absences.
+            None if e.required
+                && e.delivered()
+                && b.source != "closing report consumption receipt" =>
+            {
+                None
+            }
+            None => continue,
         };
-        let now = e.content_hash.clone();
-        if now.as_deref() == Some(then.as_str()) {
+        let now_cmp = if b.kind == "normative" {
+            e.normative_hash.clone()
+        } else {
+            e.content_hash.clone()
+        };
+        let unchanged = match (&then, &now_cmp) {
+            (Some(a), Some(c)) => c.starts_with(a.as_str()) && a.len() >= 12,
+            _ => false,
+        };
+        if unchanged {
             continue;
         }
         let c = InputChange {
             id: e.id.clone(),
-            from: Some(then.clone()),
-            to: now,
+            from: then,
+            to: e.normative_hash.clone(),
         };
         let propagated = recorded.iter().any(|x| {
             x["id"].as_str() == Some(c.id.as_str()) && x["to"].as_str() == c.to.as_deref()
@@ -1090,40 +1184,26 @@ pub fn require_current_inputs(
         .filter(|t| t.rtype() == "task")
         .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("task {task_id} not found")))?;
     let m = manifest::resolve(p, store, t);
-    let current: BTreeMap<String, Option<String>> = m
+    // a receipt may name an input by its byte hash or its normative hash (either, as a prefix of >= 12 hex chars)
+    let current: BTreeMap<String, (Option<String>, Option<String>)> = m
         .entries
         .iter()
-        .map(|e| (e.id.clone(), e.content_hash.clone()))
+        .map(|e| {
+            (
+                e.id.clone(),
+                (e.content_hash.clone(), e.normative_hash.clone()),
+            )
+        })
         .collect();
-    let receipt: BTreeMap<String, String> = {
-        let mut out = BTreeMap::new();
-        for x in report["inputs_consumed"]
-            .as_array()
-            .cloned()
-            .unwrap_or_default()
-        {
-            match &x {
-                Value::String(s) => {
-                    if let Some((id, h)) = s.split_once('@') {
-                        out.insert(id.trim().to_string(), h.trim().to_string());
-                    }
-                }
-                Value::Object(o) => {
-                    if let (Some(id), Some(h)) = (
-                        o.get("id").and_then(|v| v.as_str()),
-                        o.get("content_hash").and_then(|v| v.as_str()),
-                    ) {
-                        out.insert(id.to_string(), h.to_string());
-                    }
-                }
-                _ => {}
-            }
-        }
-        out
-    };
+    let receipt: BTreeMap<String, String> = receipt_hashes_of(report);
     let acknowledged = |id: &str| -> bool {
-        match (receipt.get(id), current.get(id).cloned().flatten()) {
-            (Some(h), Some(c)) => c.starts_with(h.as_str()) && h.len() >= 12,
+        match (receipt.get(id), current.get(id)) {
+            (Some(h), Some((bytes, norm))) => {
+                let h = h.trim().trim_start_matches("sha256:").to_ascii_lowercase();
+                h.len() >= 12
+                    && (bytes.as_deref().map(|b| b.starts_with(&h)).unwrap_or(false)
+                        || norm.as_deref().map(|n| n.starts_with(&h)).unwrap_or(false))
+            }
             _ => false,
         }
     };
@@ -1206,7 +1286,8 @@ pub fn acknowledge_on_redelivery(p: &Project, task_id: &str, packet: &Value) -> 
     {
         return Ok(false);
     }
-    let supplied = packet["input_hashes"]
+    // markers record normative hashes; a packet delivers them in `input_normative_hashes`
+    let supplied = packet["input_normative_hashes"]
         .as_object()
         .cloned()
         .unwrap_or_default();
@@ -1281,6 +1362,37 @@ mod tests {
         let s2 = merged_staleness(Some(&s1), &[c2], &direct, &why, json!({})).unwrap();
         assert_eq!(s2["inputs_changed"].as_array().unwrap().len(), 2);
         assert_eq!(s2["causes"].as_array().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn normative_content_ignores_bookkeeping_and_tracks_content() {
+        let a = crate::records::parse_record_text(
+            "id: SCN-0001\ntype: scenario\nstatus: ACTIVE\nthen: [total is 398]\n",
+            "spec/scenarios/SCN-0001.yaml",
+        )
+        .unwrap();
+        let mut marked = a.clone();
+        marked.set(
+            "staleness",
+            json!({"stale": true, "reason": "CIT CIT-0001"}),
+        );
+        marked.set("updated", json!("2026-09-19"));
+        marked.set("retest_required", json!(true));
+        assert_eq!(
+            normative_hash(&a),
+            normative_hash(&marked),
+            "a staleness marker is not a change"
+        );
+        let mut changed = a.clone();
+        changed.set("then", json!(["total is 400"]));
+        assert_ne!(normative_hash(&a), normative_hash(&changed));
+        let mut status = a.clone();
+        status.set("status", json!("SUPERSEDED"));
+        assert_ne!(
+            normative_hash(&a),
+            normative_hash(&status),
+            "a lifecycle change is a change"
+        );
     }
 
     #[test]
