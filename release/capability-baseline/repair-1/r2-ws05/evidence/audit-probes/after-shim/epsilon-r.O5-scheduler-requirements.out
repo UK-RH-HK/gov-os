@@ -1,0 +1,111 @@
+# P2-AR-0026 audit-of-record probe re-run (unedited): epsilon-r/O5-scheduler-requirements mode=after-shim
+# worktree HEAD 090eded736d1995e21bfe24fd73280f3b837dece; product files differing from HEAD: 0
+# probe sha256 1241dec5bf6008f3342834b95d60532d9b2a140ebab13fa4d3f6423d9ed9a24b; real gov 6d3db3c0fd51804da94091e261e3e4feb3ca10223da707de045528bd84708e9a via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap2/mirror-after-shim/target/release/gov
+# date 2026-09-19T05:55:20Z
+
+=== S1 impacted-test selection: a trivial (whitespace-only) mutation of one decision record
+D021 before: exit=0 green record "AUD-0002" current
+D021 after trivial mutation: exit=0 green record "AUD-0002" is obsolete (inputs changed: index_manifest, spec_decisions)
+# is there any product surface that selects checks from the changed path? (status / continue / doctor output after the mutation)
+exit=0 {"next_action": "no runnable tasks: run readiness planning or discovery"}
+# the remedy the product names is 'gov audit' — the whole suite:
+{"args": "audit --no-persist", "wall_ms": 194, "max_threads": 5, "max_child_processes": 1, "samples": 92, "exit": 0, "families_in_result": 25, "verdict": "HEALTHY"}
+# every family, one at a time (each invocation also runs the family twice for the reproducibility check):
+  schema_invariants 61ms
+  graph_integrity 63ms
+  index_freshness 67ms
+  memory_retrieval_regression 65ms
+  authority_role_limits 63ms
+  mutation_scope 63ms
+  path_map_compliance 63ms
+  context_reproducibility 67ms
+  concurrency_claims 67ms
+  adapter_portability 63ms
+  skill_regression 63ms
+  command_contract_consistency 65ms
+  secrets_sensitivity_indexing 65ms
+  recovery_rebuild 63ms
+  fresh_agent_reconstruction 118ms
+  product_traceability 65ms
+  audit_reproducibility 68ms
+  policy_enforcement_coverage 65ms
+  policy_precedence 65ms
+  plugin_governance 63ms
+  product_test_health 66ms
+  human_gate_integrity 65ms
+  change_control_integrity 63ms
+  continuity_checkpoint_handoff 65ms
+  model_routing_integrity 65ms
+sum of per-family invocations: 1666ms (includes 20 process start-ups)
+
+=== S2 parallel execution of independent checks: thread/child sampling during a full and a deep audit
+{"args": "audit --no-persist", "wall_ms": 403, "max_threads": 9, "max_child_processes": 4, "samples": 186, "exit": 0, "families_in_result": 25, "verdict": "HEALTHY"}
+{"args": "audit --no-persist --deep", "wall_ms": 356, "max_threads": 4, "max_child_processes": 1, "samples": 169, "exit": 0, "families_in_result": 25, "verdict": "HEALTHY"}
+{"args": "doctor", "wall_ms": 90, "max_threads": 5, "max_child_processes": 1, "samples": 43, "exit": 0, "families_in_result": 0, "verdict": "HEALTHY"}
+
+=== S3 isolation: where does the suite run and what does it touch? (deep audit rebuilds the LIVE index in place)
+state.db before: {'inode': 10730706, 'mtime': 1789797321015, 'sha': '8490214098a4cad5'}
+exit=0 {"audit": "AUD-0002", "recovery_rebuild": {"deep": true, "duration_ms": 292, "isolated_in_sandbox": true, "rebuild_1": "1f37734a8a81adc02f2531535b08a854d31c06b7a2d0f63436b5194893f3503f", "rebuild_2": "1f37734a8a81adc02f2531535b08a854d31c06b7a2d0f63436b5194893f3503f", "tracked_before": "1f37734a8a81adc02f2531535b08a854d31c06b7a2d0f63436b5194893f3503f"}, "verdict": "HEALTHY"}
+state.db after : {'inode': 10730706, 'mtime': 1789797327587, 'sha': '98fc18409fe18728'}
+AUD-0001.yaml
+AUD-0002.yaml
+# no worktree, copy or child process is used: see max_threads/max_child_processes in S2
+
+=== S4 cache keyed by content/policy/framework hashes: two identical runs, then one changed input
+{"args": "audit --no-persist", "wall_ms": 417, "max_threads": 9, "max_child_processes": 5, "samples": 194, "exit": 0, "families_in_result": 25, "verdict": "HEALTHY"}
+{"args": "audit --no-persist", "wall_ms": 113, "max_threads": 3, "max_child_processes": 1, "samples": 54, "exit": 0, "families_in_result": 25, "verdict": "HEALTHY"}
+.
+..
+claims.db
+health
+state.db
+telemetry
+# change one policy override (an inputs_hash input) and re-run: every family is recomputed, none is reused
+{"args": "audit --no-persist", "wall_ms": 486, "max_threads": 9, "max_child_processes": 5, "samples": 226, "exit": 0, "families_in_result": 25, "verdict": "DEGRADED"}
+# inputs_hash is used only to judge an existing green record current/obsolete (D021, task close), never to skip work:
+runtime/src/verification/mod.rs:6://! only while its `inputs_hash` equals the key over **every** Contract v3:97-109 input class ([`currency`]).
+runtime/src/verification/mod.rs:64:pub fn inputs_hash(p: &Project) -> String {
+runtime/src/verification/mod.rs:65:    currency::inputs_hash(p)
+runtime/src/verification/mod.rs:987:                    .map(|g| g["inputs_hash"].as_str() != Some(ih.as_str()))
+runtime/src/verification/mod.rs:1003:        let mut fields = json!({"scope": "governance-suite", "auditor_role": p.role, "session": p.session_id, "families": families, "findings": findings, "verdict": verdict, "suite_verdict": suite_verdict, "complete": complete, "inputs_hash": ih, "inputs": out.snapshot.classes_value(), "result_hash": h1, "reproducible": reproducible, "green": green, "state_class": "EVIDENCE", "run_at": now_iso(), "deep": o.deep});
+runtime/src/verification/mod.rs:1033:        "inputs_hash": ih, "inputs": out.snapshot.classes_value(), "result_hash": h1, "reproducible": reproducible, "counts": counts,
+
+=== S5 RED/YELLOW/GREEN machine state (HEALTHY / DEGRADED / UNHEALTHY) and aggregation by worst severity
+GREEN  doctor: exit=0 {"failed": [], "ok": true, "verdict": "HEALTHY"}
+GREEN  audit : exit=0 {"findings": [["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the expectation is the status an implementing agent reports for its own wo"], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requires a project database and an agent-authored destructive migration; e"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLIC"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualification: needs a brownfield repository with a failing post-batch test; ex"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installatio"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installatio"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared deferred: the executable form below (a research record without method fails"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the expectation concerns how a test-design agent records authorship and rea"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the expectation concerns the content of an agent-authored threat model; ex"], ["product_test_health", "low", "no recorded product-test evidence for family 'unit'; run `gov verify product`"], ["product_test_health", "low", "no recorded product-test evidence for family 'integration'; run `gov verify product`"]], "ok": true, "verdict": "HEALTHY"}
+YELLOW doctor: exit=0 {"failed": [["D010", "medium", "stale: 1 changed, 0 added, 0 removed"], ["D021", "medium", "green record \"AUD-0001\" is obsolete (inputs changed: spec_requirements)"]], "ok": true, "verdict": "DEGRADED"}
+YELLOW audit (family index_freshness): exit=0 {"findings": [["index_freshness", "medium", "index stale: 1 changed, 0 added, 0 removed"]], "ok": true, "verdict": "DEGRADED"}
+RED    doctor: exit=3 {"failed": [["D010", "medium", "stale: 0 changed, 1 added, 0 removed"], ["D011", "critical", "1 file(s) contain secret patterns but are not secret-class: src/creds.rs"], ["D021", "medium", "green record \"AUD-0001\" is obsolete (inputs changed: source)"]], "ok": false, "verdict": "UNHEALTHY"}
+RED    audit : exit=3 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["path_map_compliance", "critical", "secret content in a non-secret-class path (blocked from index; must be moved or classified secret)"], ["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the expectation is the status an implementing agent reports for its own wo"], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requires a project database and an agent-authored destructive migration; e"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLIC"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualification: needs a brownfield repository with a failing post-batch test; ex"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installatio"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installatio"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared deferred: the executable form below (a research record without method fails"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the expectation concerns how a test-design agent records authorship and rea"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the expectation concerns the content of an agent-authored threat model; ex"], ["product_test_health", "low", "no recorded product-test evidence for family 'unit'; run `gov verify product`"], ["product_test_health", "low", "no recorded product-test evidence for family 'integration'; run `gov verify product`"]], "ok": false, "verdict": "UNHEALTHY"}
+# doctor and audit are separate verdicts; no command aggregates tiers or both surfaces into one repository state (adopt a11 only, for adoption)
+
+=== S6 hard-block vs warning: does a RED (UNHEALTHY) repository block governed work?
+doctor: exit=3 {"failed": [["D010", "medium", "stale: 0 changed, 1 added, 0 removed"], ["D011", "critical", "1 file(s) contain secret patterns but are not secret-class: src/creds.rs"], ["D021", "medium", "green record \"AUD-0001\" is obsolete (inputs changed: source)"]], "ok": false, "verdict": "UNHEALTHY"}
+task create: ERR:{"code": "HEALTH_HARD_BLOCK", "message": "task.create is refused: 1 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: src/creds.rs. Repair the condition, then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it", "detail
+continue --claim: exit=1 {"err": "HEALTH_HARD_BLOCK", "ok": false, "status": null, "task": null}
+task close: exit=1 [false, "TASK_NOT_FOUND"]
+cit propose: exit=0 [true, "CIT-0001"]
+# a failed product suite is reported with exit 0 (warning-shaped), see O1-product-families.out G; a stale green is DEGRADED (exit 0)
+# per-check severity is explicit in output; which states block which commands is not declared anywhere (no block/warn field):
+exit=0 ["blocks", "currency", "enforcement", "id", "message", "name", "ok", "product_tests", "remediation", "severity", "stale_blocks"]
+
+=== S7 health-result provenance
+audit record keys: ['actor', 'auditor_role', 'cache_mode', 'checks', 'complete', 'created', 'deep', 'finished_at', 'green', 'health_result', 'id', 'inputs', 'inputs_hash', 'machine_trust', 'parallelism', 'repository', 'reproducible', 'result_hash', 'run_at', 'run_summary', 'runtime', 'scope', 'session', 'started_at', 'state_class', 'status', 'suite_verdict', 'tier', 'title', 'trigger', 'type', 'verdict']
+{'session': 'S-probe', 'auditor_role': 'orchestrator', 'inputs_hash': 'ba16db6af7baea98f29a5af58f299015f86850a255e791431f3c17147caa5c53', 'result_hash': 'e9685b9dea45255074e1f603ed9c25a988b0ae903c1b4f024e6907a418bdfff1', 'run_at': '2026-09-19T05:55:31Z'}
+# doctor: is anything persisted?
+governed tree hash before/after doctor: b2c91e873c9a6668 / b2c91e873c9a6668
+only trace of the doctor run: cli.doctor {'ok': True, 'duration_ms': 72, 'error': None}
+
+=== S8 remediation / task generation from a RED health result
+exit=3 {"remediation": ["gov rebuild-memory (full when pins changed; --incremental otherwise)", "move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile", "gov adapters generate", "gov health run (re-checks only the checks the changed inputs impact; gov audit runs the full suite)"], "verdict": "UNHEALTHY"}
+exit=0 {"status": "NO_RUNNABLE_WORK", "suggestion": "run `gov readiness plan <feature>` or create discovery tasks"}
+exit=0 {"blocked": 0, "changed": [], "cycles": [], "runnable": [], "waiting_human": 0}
+task records before/after doctor+audit+continue+replan: 0 / 0
+
+=== S9 stale evidence: an obsolete green is surfaced as a warning only (D021 medium → DEGRADED)
+exit=0 {"failed": [["D021", "medium", "green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, spec_decisions)"]], "ok": true, "verdict": "DEGRADED"}
+
+=== U<->O5 (AC-16): is any SLO/health breach observed without a human/agent invoking doctor or audit?
+audit records before/after task create+claim+checkpoint+status: 1 / 1
+telemetry event names in this project: ['cli.checkpoint', 'cli.doctor', 'cli.init', 'cli.status', 'cli.task', 'health.run']
+[exit=0]

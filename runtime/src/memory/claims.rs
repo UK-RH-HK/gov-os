@@ -16,6 +16,14 @@
 //! **One store per repository, not per checkout.** Linked git worktrees of one repository share the claims store
 //! of the main worktree (see [`ClaimsStore::path_for`]), so a claim made from one worktree is visible — and
 //! collides — in every other; the claim records which worktree it was made from (its unit of isolation).
+//!
+//! **A copy is not the store** (P2-AR-0026). A claim is a lock held in *one* table; a copy of that table (a disposable
+//! sandbox the health scheduler runs checks in, a restored backup, a copied runtime directory) could otherwise grant
+//! the same task a second time, and its stale rows would refuse work that has nothing to do with them (a sandboxed
+//! skill scenario was refused `CLAIM_SCOPE_CONFLICT` by the live project's claims). The store records the canonical
+//! location it was created at (`store_meta.location`); opened anywhere else it is a copy, so the claims it carries are
+//! not live there: they are cleared and the copy becomes a new, empty store at its new location (the event is
+//! recorded as `store_meta.relocated_from`).
 use crate::util::now_iso;
 use crate::{GovError, Project, Result};
 use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBehavior};
@@ -140,18 +148,75 @@ impl ClaimsStore {
                 |r| r.get::<_, i64>(0),
             )? > 0)
         };
-        if !exists(&conn, "claims")? || !exists(&conn, "claim_isolation")? {
+        if !exists(&conn, "claims")?
+            || !exists(&conn, "claim_isolation")?
+            || !exists(&conn, "store_meta")?
+        {
             // create under the write lock so concurrent first opens serialise
             let tx = Transaction::new_unchecked(&conn, TransactionBehavior::Immediate)
                 .map_err(|e| busy(e, "initialising the schema"))?;
             tx.execute_batch("CREATE TABLE IF NOT EXISTS claims (task_id TEXT PRIMARY KEY, session_id TEXT, role TEXT, claimed_at TEXT, expires_at TEXT);
-                CREATE TABLE IF NOT EXISTS claim_isolation (task_id TEXT PRIMARY KEY, session_id TEXT, claimed_at TEXT, worktree TEXT, git_dir TEXT, branch TEXT, head TEXT, scope TEXT);")?;
+                CREATE TABLE IF NOT EXISTS claim_isolation (task_id TEXT PRIMARY KEY, session_id TEXT, claimed_at TEXT, worktree TEXT, git_dir TEXT, branch TEXT, head TEXT, scope TEXT);
+                CREATE TABLE IF NOT EXISTS store_meta (key TEXT PRIMARY KEY, value TEXT);")?;
             tx.commit()?;
         }
+        Self::bind_location(&conn, path)?;
         Ok(ClaimsStore {
             conn,
             path: path.to_path_buf(),
         })
+    }
+
+    /// The canonical location of the store file (what `store_meta.location` records).
+    fn canonical_location(path: &Path) -> String {
+        std::fs::canonicalize(path)
+            .unwrap_or_else(|_| path.to_path_buf())
+            .display()
+            .to_string()
+    }
+
+    /// Bind the store to its location: adopt it on first sight (a store created before this rule), keep it when it is
+    /// where it was created, and treat it as a **copy** when it is anywhere else — its rows are claims of the store it
+    /// was copied from, not live claims here, so they are cleared (see the module documentation).
+    fn bind_location(conn: &Connection, path: &Path) -> Result<()> {
+        let here = Self::canonical_location(path);
+        let read = |c: &Connection| -> Result<Option<String>> {
+            Ok(c.query_row(
+                "SELECT value FROM store_meta WHERE key='location'",
+                [],
+                |r| r.get::<_, String>(0),
+            )
+            .optional()?)
+        };
+        if read(conn)?.as_deref() == Some(here.as_str()) {
+            return Ok(());
+        }
+        let tx = Transaction::new_unchecked(conn, TransactionBehavior::Immediate)
+            .map_err(|e| busy(e, "binding the store to its location"))?;
+        match read(&tx)? {
+            Some(l) if l == here => {}
+            None => {
+                tx.execute(
+                    "INSERT OR REPLACE INTO store_meta(key, value) VALUES ('location', ?1)",
+                    params![here],
+                )?;
+            }
+            Some(elsewhere) => {
+                tx.execute("DELETE FROM claims", [])?;
+                tx.execute("DELETE FROM claim_isolation", [])?;
+                tx.execute(
+                    "INSERT OR REPLACE INTO store_meta(key, value) VALUES ('location', ?1)",
+                    params![here],
+                )?;
+                tx.execute(
+                    "INSERT OR REPLACE INTO store_meta(key, value) VALUES ('relocated_from', ?1)",
+                    params![format!("{elsewhere} at {}", now_iso())],
+                )?;
+            }
+        }
+        tx.commit()
+            .map_err(|e| busy(e, "binding the store to its location"))?;
+        Ok(())
     }
     pub fn integrity_ok(&self) -> bool {
         self.conn
@@ -782,6 +847,39 @@ mod tests {
     }
 
     /// Linked worktrees resolve to the main worktree's store; the main worktree and plain directories keep their own.
+    #[test]
+    fn a_copied_store_is_not_the_store_its_claims_are_not_live_there() {
+        let d = tmp("copy");
+        let sc = vec!["src/**".to_string()];
+        let a = d.join("a").join("claims.db");
+        let b = d.join("b").join("claims.db");
+        {
+            let s = ClaimsStore::open_at(&a).unwrap();
+            s.claim_exclusive(&req("T1", "S1", &iso("wa"), &sc))
+                .unwrap();
+            assert_eq!(s.list().unwrap().len(), 1);
+        }
+        std::fs::create_dir_all(b.parent().unwrap()).unwrap();
+        std::fs::copy(&a, &b).unwrap();
+        // the copy (a sandbox, a restored runtime dir) carries rows the original store granted: not live there
+        let copy = ClaimsStore::open_at(&b).unwrap();
+        assert!(
+            copy.list().unwrap().is_empty(),
+            "a copied store must not carry live claims"
+        );
+        copy.claim_exclusive(&req("T2", "S2", &iso("wb"), &sc))
+            .expect("the copy's stale rows must not refuse unrelated work");
+        // ... and the original is untouched
+        let orig = ClaimsStore::open_at(&a).unwrap();
+        assert_eq!(orig.list().unwrap().len(), 1);
+        assert_eq!(
+            orig.claim_exclusive(&req("T1", "S9", &iso("wa"), &sc))
+                .unwrap_err()
+                .code,
+            "TASK_CLAIMED"
+        );
+    }
+
     #[test]
     fn linked_worktrees_share_the_main_worktree_store() {
         let d = tmp("git");

@@ -1,0 +1,147 @@
+# P2-AR-0026 audit-of-record probe re-run (unedited): zeta-r/W09-session-handoff-continuity mode=base-shim
+# worktree HEAD 1de472e08ea73462765ea8095ae154a791b55ce4; product files differing from HEAD: 0
+# probe sha256 fc3563afa0db7708a6156b402ed1272ec08545d9cb245278d017d8453fbb94b8; real gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/mirror-base-shim/target/release/gov
+# date 2026-09-19T05:06:02Z
+# project w9: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/ap-base-shim-zeta-r-W09-session-handoff-continuity-i2Qx4g/w9-794362470
+$ gov init --name w9 --alias z-w9    [session=S-zeta role=orchestrator exit=0 1.2s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 398"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.3s]
+$ gov context compile TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+$ gov checkpoint create --next-action "implement totals" --task TASK-0001 --trigger before_session_close    [session=S-one role=orchestrator exit=0 0.1s]
+checkpoint at session close: {"id": "CKPT-00001", "type": "checkpoint", "title": "Checkpoint 1 (before_session_close)", "status": "ACTIVE", "created": "2026-09-19", "next_action": "implement totals", "task": "TASK-0001", "trigger": "before_session_close", "session": "S-one", "role": "orchestrator", "sequence": 1, "mode": "RUNNING", "pending_decisions": [], "open_transactions": [], "open_questions": [], "files_changed": ["overnance/generated/index-manifest.json", "governance/generated/memory-manifest.json"], "tests_status": "unknown", "context_packet_hash": "a586a631a2eb4be6f29d11706d470dce83804d4a1c66c6fc6de2835fc9b2ac1f", "memory_snapshot": {"index_manifest_hash": "125d63ec7951bc55bb4cfce7a5c899934f987923172fadf4a2c0c7ce42a2d4c4", "index_version": "4.1.5-idx3"}, "state_class": "EVIDENCE", "created_at": "2026-09-19T05:06:04Z"}
+$ gov task show TASK-0001    [session=S-two-fresh role=orchestrator exit=0 0.1s]
+OBS W9-c1-manifest-persists: PASS -- fresh session reads TASK-0001 requirements=['REQ-0001'] scenarios=['SCN-0001'] from the governed task record
+OBS W9-c2-checkpoint-input-ids: FAIL -- checkpoint keys: ['context_packet_hash', 'created', 'created_at', 'files_changed', 'id', 'memory_snapshot', 'mode', 'next_action', 'open_questions', 'open_transactions', 'pending_decisions', 'role', 'sequence', 'session', 'state_class', 'status', 'task', 'tests_status', 'title', 'trigger', 'type']; mentions REQ-0001: False
+OBS W9-c2-checkpoint-state-reference: PASS -- context_packet_hash=a586a631a2eb (== packet a586a631a2eb); memory_snapshot={'index_manifest_hash': '125d63ec7951bc55bb4cfce7a5c899934f987923172fadf4a2c0c7ce42a2d4c4', 'index_version': '4.1.5-idx3'}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 398"], "statement": "Totals SHALL round to whole units."}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+$ gov checkpoint create --next-action "implement totals" --task TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+OBS W9-c2-packet-hash-tracks-input-content: PASS -- checkpoint context_packet_hash before/after REQ-0001 statement change: a586a631a2eb / e8604cc67dbe; deterministic_hash before/after: 8452d585b4dc / 57d4c7219af8 (packet_hash moved only because the RETRIEVED block's excerpts changed: False)
+OBS W9-c2-index-hash-tracks-input-content: PASS -- checkpoint memory_snapshot.index_manifest_hash before/after: 125d63ec7951 / ae69f537ce31
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 398", "negative quantities rejected"], "statement": "Totals SHALL round to whole units."}
+$ gov memory freshness    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov checkpoint create --next-action "implement totals" --task TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+OBS W9-c2-state-reference-current-at-checkpoint: FAIL -- live index_manifest_hash just before REQ-0001 changed=19fe5438127a; index freshness when the checkpoint was taken: fresh=False stale=['spec/requirements/REQ-0001.yaml']; checkpoint CKPT-00003 records 19fe5438127a (equal to the pre-change state: True); checkpoints::create records memory_snapshot before its own incremental rebuild
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-one role=orchestrator exit=0 0.1s]
+OBS W9-c2-checkpoint-files-changed-paths-exist: FAIL -- checkpoint files_changed as recorded: ['overnance/generated/index-manifest.json', 'governance/generated/memory-manifest.json']; paths that do not exist in the repository: ['overnance/generated/index-manifest.json']
+$ gov checkpoint create --next-action "resume on another provider" --task TASK-0001 --trigger before_model_switch    [session=S-one role=orchestrator exit=0 0.2s]
+OBS W9-c3-before-model-switch-checkpoint: PASS -- checkpoint trigger=before_model_switch id=CKPT-00004
+$ gov context compile TASK-0001    [session=S-model-0 role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-model-1 role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-model-2 role=orchestrator exit=0 0.1s]
+OBS W9-c3-provider-switch-same-inputs: PASS -- deterministic_hash under three provider/model environments and sessions: ['ef6e175ef547', 'ef6e175ef547', 'ef6e175ef547']
+$ gov context compile TASK-0001    [session=S-role role=backend-engineer exit=0 0.1s]
+OBS W9-c3-role-switch-same-inputs: PASS -- backend-engineer vs orchestrator: mandatory input lists identical=True (whole deterministic_hash differs by acting role: True)
+$ gov status    [session=S-fresh-agent role=orchestrator exit=0 0.1s]
+$ gov continue    [session=S-fresh-agent role=orchestrator exit=0 0.1s]
+OBS W9-c4-fresh-agent-reconstructs: PASS -- fresh session: status.next_action='gov continue → claim TASK-0001'; continue -> task TASK-0001; mandatory inputs identical to the prior session's packet: True
+$ gov checkpoint create --next-action "continue after compaction" --task TASK-0001 --trigger before_compaction    [session=S-one role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-post-compaction role=orchestrator exit=0 0.1s]
+OBS W9-c5-compaction-cannot-remove-state: PASS -- before_compaction checkpoint CKPT-00005; post-'compaction' session (no conversational state) rebuilds identical mandatory inputs: True
+$ gov task create --id TASK-0002 --class implementation --objective "Implement refunds" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-9999\"], \"decisions\": [\"D-9999\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov handoff create --to-role backend-engineer --task TASK-0002    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "authority": {
+  "allowed": [
+   "src/**"
+  ],
+  "prohibited": [
+   "governance/kernel/**"
+  ]
+ },
+ "created": "2026-09-19",
+ "expected_outputs": [
+  "implementation",
+  "evidence"
+ ],
+ "from_role": "orchestrator",
+ "handoff_status": "OPEN",
+ "id": "HND-0001",
+ "inputs": {
+  "context_packet": ".governance-runtime/context/TASK-0002.json",
+  "task": "TASK-0002"
+ },
+ "required_return": [
+  "changed_files",
+  "tests",
+  "discoveries",
+  "unresolved"
+ ],
+ "state_class": "DERIVED",
+ "status": "ACTIVE",
+ "task": "TASK-0002",
+ "title": "Handoff orchestrator \u2192 backend-engineer for TASK-0002",
+ "to_role": "backend-engineer",
+ "type": "handoff"
+}
+OBS W9-c6-handoff-missing-inputs-blocked-or-degraded: FAIL -- handoff for TASK-0002 (REQ-9999, D-9999 absent; no packet ever compiled) -> ok=True; inputs={'task': 'TASK-0002', 'context_packet': '.governance-runtime/context/TASK-0002.json'}; packet file exists: False
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "acceptance_criteria": ["2 x 199 = 400 (whole units)"], "statement": "Totals SHALL round to whole units."}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov handoff create --to-role backend-engineer --task TASK-0001    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "authority": {
+  "allowed": [
+   "src/**"
+  ],
+  "prohibited": [
+   "governance/kernel/**"
+  ]
+ },
+ "created": "2026-09-19",
+ "expected_outputs": [
+  "implementation",
+  "evidence"
+ ],
+ "from_role": "orchestrator",
+ "handoff_status": "OPEN",
+ "id": "HND-0002",
+ "inputs": {
+  "context_packet": ".governance-runtime/context/TASK-0001.json",
+  "task": "TASK-0001"
+ },
+ "required_return": [
+  "changed_files",
+  "tests",
+  "discoveries",
+  "unresolved"
+ ],
+ "state_class": "DERIVED",
+ "status": "ACTIVE",
+ "task": "TASK-0001",
+ "title": "Handoff orchestrator \u2192 backend-engineer for TASK-0001",
+ "to_role": "backend-engineer",
+ "type": "handoff"
+}
+OBS W9-c6-handoff-stale-inputs-blocked-or-degraded: FAIL -- handoff for TASK-0001 after its requirement changed -> ok=True; handed-off packet still carries pre-change criterion: True; packet unchanged: True
+$ gov checkpoint latest    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS AC16-NxW9-before-handoff-checkpoint-flags-stale-packet: FAIL -- before_handoff checkpoint CKPT-00007 trigger=before_handoff context_packet_hash=b7c9aa9aeb7a == stale packet hash b7c9aa9aeb7a: True; staleness marker: False
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS AC16-NxW9-doctor-checkpoint-freshness: FAIL -- doctor checks about checkpoints: []
+
+==== SUMMARY ====
+W9-c1-manifest-persists: PASS
+W9-c2-checkpoint-input-ids: FAIL
+W9-c2-checkpoint-state-reference: PASS
+W9-c2-packet-hash-tracks-input-content: PASS
+W9-c2-index-hash-tracks-input-content: PASS
+W9-c2-state-reference-current-at-checkpoint: FAIL
+W9-c2-checkpoint-files-changed-paths-exist: FAIL
+W9-c3-before-model-switch-checkpoint: PASS
+W9-c3-provider-switch-same-inputs: PASS
+W9-c3-role-switch-same-inputs: PASS
+W9-c4-fresh-agent-reconstructs: PASS
+W9-c5-compaction-cannot-remove-state: PASS
+W9-c6-handoff-missing-inputs-blocked-or-degraded: FAIL
+W9-c6-handoff-stale-inputs-blocked-or-degraded: FAIL
+AC16-NxW9-before-handoff-checkpoint-flags-stale-packet: FAIL
+AC16-NxW9-doctor-checkpoint-freshness: FAIL
+total=16 pass=9 fail=7
+[exit=0]

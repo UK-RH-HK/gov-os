@@ -108,6 +108,16 @@ fn injected_failures_are_detected_and_recovered() {
         "INDEX_STALE"
     );
     g.ok(&["rebuild-memory", "--incremental"]);
+    // BC-P2-20 (P2-AR-0026): the close that succeeds carries the worker's consumption receipt
+    let rep = crate::ws05::receipt(
+        &g,
+        &root,
+        &tid,
+        "t2",
+        "wrote docs",
+        &["README.md"],
+        "not_applicable_with_reason",
+    );
     g.ok(&["task", "close", &tid, "--report", &rep]);
     // 4. expired claim
     {

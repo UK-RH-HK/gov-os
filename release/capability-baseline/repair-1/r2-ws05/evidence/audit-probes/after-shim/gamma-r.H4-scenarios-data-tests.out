@@ -1,0 +1,59 @@
+# P2-AR-0026 audit-of-record probe re-run (unedited): gamma-r/H4-scenarios-data-tests mode=after-shim
+# worktree HEAD 090eded736d1995e21bfe24fd73280f3b837dece; product files differing from HEAD: 0
+# probe sha256 cd7a61ff1f94fbb276e967da02339dd761affd8ea0db085be369244fe21d3732; real gov 6d3db3c0fd51804da94091e261e3e4feb3ca10223da707de045528bd84708e9a via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap2/mirror-after-shim/target/release/gov
+# date 2026-09-19T05:49:47Z
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap2/ap-after-shim-gamma-r-H4-scenarios-data-tests-g1BoxA/h4
+records written
+
+==== H4.b1 FEATURE -> SCENARIOS -> DATA -> TEST DATA -> SUCCESS/FAILURE -> INDEPENDENT TESTS, traced with the product's own fields ====
+  F-0001    -> SCN-0001 TRACED via →VALIDATED_BY
+  SCN-0001  -> DATA-0001 NOT an edge (neighbours: ['F-0001', 'TST-0001'])
+  DATA-0001 -> TD-0001  NOT an edge (neighbours: [])
+  TD-0001   -> TST-0001 NOT an edge (neighbours: [])
+  SCN-0001  -> TST-0001 TRACED via ←TESTS
+  TST-0001  -> F-0001   TRACED via →REALISES
+$ the relation fields the graph derives edges from (records.rs RELATION_FIELDS) — is data_requirements / data_provenance among them?
+  35:    ("scenarios", "VALIDATED_BY"),
+  49:    ("scenario", "TESTS"),
+  177:    ("scenario", "spec/scenarios"),
+  202:    ("scenario", "SCN"),
+$ success/failure criteria reach the implementer's context packet (via the scenario)
+  scenario: SCN-0001 success: ['exact integer total'] failure: ['duplicate order ids accepted']
+  acceptance_criteria block: [{'criterion': 'exact integer total', 'scenario': 'SCN-0001'}, {'scenario': 'SCN-0001', 'then': 'total_cents is 399'}]
+$ the chain gates implementation: TEST_POLICY.implementation_task_requires + independent_test_author_required_for
+  complete chain -> TASK-0001 runnable: False
+  no scenarios   -> [['TEST_POLICY.implementation_task_requires: no scenarios declared on the task or its feature', "TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for), and its independence is not established from recorded authorship: no sealed close report produced its current content. `independent_of_implementer` / `author_role` are the artefact's own claims, not evidence; produce it through a test-design task closed by an independent role and session", "test data TD-0001 (used by TST-0001) declares itself authored by the implementer (author_role 'backend-engineer'): test-data authorship must be independent of the implementation (Contract v3 H4)"]]
+  no tests       -> [['TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature']]
+  non-independent acceptance obligation -> [["TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for), and its independence is not established from recorded authorship: no sealed close report produced its current content. `independent_of_implementer` / `author_role` are the artefact's own claims, not evidence; produce it through a test-design task closed by an independent role and session", "test data TD-0001 (used by TST-0001) declares itself authored by the implementer (author_role 'backend-engineer'): test-data authorship must be independent of the implementation (Contract v3 H4)"]]
+$ missing success or failure criteria on the scenario: is the chain refused anywhere?
+  scenario without success/failure criteria -> TASK-0001 runnable: False
+  suite findings mentioning SCN-0001: []
+$ (readiness still says success_criteria / failure_criteria PRESENT for F-0001: the cell is author-asserted)
+   [('representative_test_data', 'PRESENT'), ('success_criteria', 'PRESENT'), ('failure_criteria', 'PRESENT'), ('independent_acceptance_tests', 'PRESENT')]
+
+==== H4.b2 test-data author independence ====
+$ the kernel has a data-author role
+  data-author: data-author T1
+$ the test dataset TD-0001 was authored by the implementer role (author_role: backend-engineer, same as TASK-0001.role): anything refused or flagged?
+  TASK-0001 blocked reasons: [["TST-0001 (acceptance) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for), and its independence is not established from recorded authorship: no sealed close report produced its current content. `independent_of_implementer` / `author_role` are the artefact's own claims, not evidence; produce it through a test-design task closed by an independent role and session", "test data TD-0001 (used by TST-0001) declares itself authored by the implementer (author_role 'backend-engineer'): test-data authorship must be independent of the implementation (Contract v3 H4)"]] runnable: False
+  suite findings mentioning TD-0001/DATA-0001/author: ['SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-aut', 'SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design ag', 'SKL-THREAT-MODEL V1: not executed by the governance suite — declared agent: the expectation concerns the content of an a']
+$ source: where is a data author's independence recorded or compared? (search for data author / data_author / author_role consumers)
+  runtime/src/orchestration/tasks.rs:306:/// (`mutation_evidence.observed_hashes`) — never from a field an artefact states about itself (`author_role`,
+  runtime/src/orchestration/tasks.rs:407:            "independent-test-designer" | "data-author"
+  runtime/src/orchestration/tasks.rs:2007:            json!({"class": "data", "role": "data-author"})
+  runtime/src/orchestration/dag.rs:558:            return Some(format!("{} ({}) must be authored independently of the implementer (TEST_POLICY.independent_test_author_required_for), and its independence is not established from recorded authorship: no sealed close report produced its current content. `independent_of_implementer` / `author_role` are the artefact's own claims, not evidence; produce it through a test-design task closed by an independent role and session", o.id(), o.get("family")));
+  runtime/src/orchestration/dag.rs:586:    /// (`author_role`, `author_session`): a record that states it was authored by the implementer is believed.
+  runtime/src/orchestration/dag.rs:602:        let declared_role = d.get("author_role");
+  runtime/src/orchestration/dag.rs:607:            return Some(format!("test data {} (used by {}) declares itself authored by the implementer (author_role '{}'{}): test-data authorship must be independent of the implementation (Contract v3 H4)", d.id(), o.id(), declared_role, if declared_session.is_empty() { String::new() } else { format!(", session {declared_session}") }));
+  runtime/src/graph/identity.rs:40:    "author_role",
+
+==== H4.b3 data provenance is recorded ====
+$ TST-0001 carries data_provenance; a second obligation without it, and a readiness cell 'representative_test_data: PRESENT' with no dataset record at all
+  findings mentioning TST-0002 or provenance: []
+  TST-0001.data_provenance = TD-0001 (synthetic, generated)
+$ is data_provenance consumed anywhere (DAG, close, suite, context)?
+  runtime/src/orchestration/dag.rs:612:    /// The test datasets obligation `o` relies on: ids named in `test_data` / `datasets` / `data_provenance` that
+  runtime/src/orchestration/dag.rs:616:        for k in ["test_data", "datasets", "data_provenance", "dataset"] {
+  (no lines above = the field is stored when an author writes it, never required or read)
+END
+[exit=0]

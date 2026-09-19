@@ -1,0 +1,26 @@
+# rustfmt --edition 2021 --check on every Rust file this run changed (843d79c..HEAD); tests/certification/main.rs is checked alone (rustfmt follows its mod declarations into files this run did not touch)
+clean runtime/src/memory/claims.rs
+clean runtime/src/orchestration/dag.rs
+clean runtime/src/orchestration/intents.rs
+clean runtime/src/orchestration/readiness.rs
+clean runtime/src/orchestration/tasks.rs
+clean runtime/src/status.rs
+clean tests/certification/failure_injection.rs
+clean tests/certification/greenfield.rs
+clean tests/certification/repair.rs
+clean tests/certification/repair2.rs
+clean tests/certification/ws03.rs
+clean tests/certification/ws05.rs
+main.rs: the only change is the added line 'mod ws05;' (git diff below)
+diff --git a/tests/certification/main.rs b/tests/certification/main.rs
+index 2b9d8b1..4ae497c 100644
+--- a/tests/certification/main.rs
++++ b/tests/certification/main.rs
+@@ -18,4 +18,5 @@ mod srr_material;
+ mod update;
+ mod upstream;
+ mod ws03;
++mod ws05;
+ mod ws08;
+# cargo build warnings:
+0

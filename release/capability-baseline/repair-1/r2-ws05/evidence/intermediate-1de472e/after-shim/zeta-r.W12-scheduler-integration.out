@@ -1,0 +1,111 @@
+# P2-AR-0026 audit-of-record probe re-run (unedited): zeta-r/W12-scheduler-integration mode=after-shim
+# worktree HEAD 1de472e08ea73462765ea8095ae154a791b55ce4; product files differing from HEAD: 0
+# probe sha256 c7777f1d6b11afc118928be0f25a5922a352d3fc32367cb774e16d9c22e6f3b9; real gov 9bc29fd13a5bd2781d949b2fca4ca0e8da17aa18d3913fcbcfd272f7157b3130 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/mirror-after-shim/target/release/gov
+# date 2026-09-19T05:04:35Z
+[static supporting scan] tier/health-state identifiers in runtime/ and cli/: ['cli/src/main.rs:YELLOW', 'cli/src/main.rs:\\bG[0-6] ', 'runtime/src/contracts.rs:"G[0-6]"', 'runtime/src/contracts.rs:\\bG[0-6] ', 'runtime/src/contracts.rs:health_scheduler', 'runtime/src/doctor.rs:\\bG[0-6] ', 'runtime/src/orchestration/control.rs:\\bG[0-6] ', 'runtime/src/orchestration/tasks.rs:\\bG[0-6] ', 'runtime/src/qualification_oracle.rs:"G[0-6]"', 'runtime/src/qualification_oracle.rs:\\bG[0-6] ', 'runtime/src/scheduler/mod.rs:"G[0-6]"', 'runtime/src/scheduler/mod.rs:YELLOW', 'runtime/src/scheduler/mod.rs:\\bG[0-6] ', 'runtime/src/scheduler/store.rs:\\bG[0-6] ', 'runtime/src/skills.rs:\\bG[0-6] ', 'runtime/src/status.rs:YELLOW', 'runtime/src/status.rs:\\bG[0-6] ', 'runtime/src/t2.rs:\\bG[0-6] ', 'runtime/src/verification/mod.rs:\\bG[0-6] ']
+# project w12g0: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/ap-after-shim-zeta-r-W12-scheduler-integration-kFfEwE/w12g0-794275462
+$ gov init --name w12g0 --alias z-w12g0    [session=S-zeta role=orchestrator exit=0 3.2s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up", "status": "SUPERSEDED", "superseded_by": "REQ-0002", "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "supersedes": ["REQ-0001"], "feature": "F-0001", "acceptance_criteria": ["2.5 -> 2"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger crate owns totals", "status": "ACTIVE", "derived_from": ["D-0001"], "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals TASK-0001" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"decisions\": [], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.5s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=1 0.1s]
+  ok=false error={
+ "code": "TASK_NOT_RUNNABLE",
+ "details": {
+  "gates": [],
+  "manifest": {
+   "delivery_state": "BLOCKED",
+   "input_violations": [
+    {
+     "declared_in": [
+      "task.requirements"
+     ],
+     "id": "REQ-0001",
+     "problems": [
+      {
+       "blocking": true,
+       "code": "SUPERSEDED",
+       "message": "REQ-0001 is superseded by REQ-0002; a superseded input cannot satisfy a current requirement \u2014 depend on REQ-0002 (or resolve the supersession via CIT)"
+      },
+      {
+       "blocking": true,
+       "code": "LIFECYCLE_STATE",
+       "message": "REQ-0001 is SUPERSEDED but the input requires ACTIVE|PROVISIONAL; historical or non-current material cannot replace a current authoritative input"
+      }
+     ],
+     "reason": null,
+     "required": true,
+     "resolution": "RESOLVED",
+     "slot": "requirement",
+     "type": "requirement"
+    }
+   ],
+   "missing_inputs": []
+  },
+  "pending_gates": [],
+  "reasons": [
+   "mandatory inputs unsatisfied: REQ-0001 (requirement: SUPERSEDED,LIFECYCLE_STATE)"
+  ],
+  "state": "BLOCKED",
+  "task": "TASK-0001"
+ },
+ "message": "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: REQ-0001 (requirement: SUPERSEDED,LIFECYCLE_STATE). `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`"
+}
+OBS W12-G0-current-version-substitution-blocked(claim): PASS -- privileged claim of a task whose mandatory input is SUPERSEDED REQ-0001 -> ok=False
+$ gov cit propose --proposal "Revise the superseded requirement as if it were current" --trigger editorial --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/ap-after-shim-zeta-r-W12-scheduler-integration-kFfEwE/w12g0-794275462/.governance-runtime/m.json    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov cit simulate CIT-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov cit approve CIT-0001 --by agent --method auto    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov cit execute CIT-0001    [session=S-zeta role=orchestrator exit=0 0.6s]
+OBS W12-G0-superseded-target-substitution-blocked(cit): FAIL -- CIT editing SUPERSEDED REQ-0001: propose ok=True simulate ok=True approve ok=True execute ok=True None
+$ gov cit propose --proposal "Clarify REQ-0002 acceptance" --trigger acceptance_criteria_change --targets REQ-0002 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/ap-after-shim-zeta-r-W12-scheduler-integration-kFfEwE/w12g0-794275462/.governance-runtime/m2.json    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov gate present HDG-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov decide HDG-0001 --option A --by owner    [session=S-zeta role=human exit=0 0.6s]
+$ gov cit approve CIT-0002 --by owner --method human    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov cit execute CIT-0002    [session=S-zeta role=orchestrator exit=1 0.1s]
+OBS W12-G0-authority-substitution-blocked(cit execute): PASS -- approval decision D-0003 superseded after approval -> execute GATE_REVOKED
+# project w12g1: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/ap-after-shim-zeta-r-W12-scheduler-integration-kFfEwE/w12g1-794281474
+$ gov init --name w12g1 --alias z-w12g1    [session=S-zeta role=orchestrator exit=0 3.7s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up", "status": "SUPERSEDED", "superseded_by": "REQ-0002", "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "supersedes": ["REQ-0001"], "feature": "F-0001", "acceptance_criteria": ["2.5 -> 2"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger crate owns totals", "status": "ACTIVE", "derived_from": ["D-0001"], "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals TASK-0001" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"decisions\": [], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.5s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.2s]
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "supersedes": ["REQ-0001"], "feature": "F-0001", "acceptance_criteria": ["2.5 -> 3"]}
+$ gov memory freshness    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task list    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS W12-G1-mutation-detected(index): PASS -- index freshness after the mutation: stale=['spec/requirements/REQ-0002.yaml']
+OBS W12-G1-dependency-evidence-invalidated: FAIL -- top-level invalidation marker on the packet: False; after mutation + incremental rebuild: TASK-0001 retest_required=False; its packet still carries '2.5 -> 2': True
+# project w12g2: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/ap-after-shim-zeta-r-W12-scheduler-integration-kFfEwE/w12g2-794286748
+$ gov init --name w12g2 --alias z-w12g2    [session=S-zeta role=orchestrator exit=0 6.1s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up", "status": "SUPERSEDED", "superseded_by": "REQ-0002", "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "supersedes": ["REQ-0001"], "feature": "F-0001", "acceptance_criteria": ["2.5 -> 2"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger crate owns totals", "status": "ACTIVE", "derived_from": ["D-0001"], "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals TASK-0001" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-9999\"], \"decisions\": [], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.5s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=1 0.1s]
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/mirror-after-shim/release/capability-baseline/audit-0/zeta-r/evidence/W12-scheduler-integration.py", line 85, in <module>
+    g.ok("task", "claim", "TASK-0001", quiet=True)
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap/mirror-after-shim/release/capability-baseline/audit-0/zeta-r/evidence/lib/zprobe.py", line 97, in ok
+    raise RuntimeError(f"gov {' '.join(args)} failed: {e.get('error')}")
+RuntimeError: gov task claim TASK-0001 failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT). `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`', 'details': {'task': 'TASK-0001', 'state': 'BLOCKED', 'reasons': ['mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT)'], 'gates': [], 'pending_gates': [], 'manifest': {'delivery_state': 'BLOCKED', 'missing_inputs': [{'id': 'REQ-9999', 'slot': 'requirement', 'required': True, 'declared_in': ['task.requirements'], 'reason': None, 'resolution': 'ABSENT', 'type': '', 'problems': [{'code': 'ABSENT', 'message': 'REQ-9999 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration', 'blocking': True}]}], 'input_violations': []}}}
+[exit=1]

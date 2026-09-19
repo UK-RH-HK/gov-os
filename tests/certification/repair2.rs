@@ -391,6 +391,9 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         .unwrap()
         .iter()
         .all(|h| h["path"] != "product/data/customers.md"));
+    // visible in doctor, the governance suite and the context packet. P2-AR-0026: the task is created (and its
+    // packet compiled) before doctor records the CRITICAL D027 result, because task creation is guarded by the G0
+    // hard-block tier contract (IP-WS02-02) and D027 critical hard-blocks every governed operation.
     let t = g.ok(&[
         "task",
         "create",
@@ -402,6 +405,30 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         "READY",
     ]);
     let ctx = g.ok(&["context", "compile", t["id"].as_str().unwrap()]);
+    let (ok27, msg27) = doctor_check(&g, "D027");
+    assert!(!ok27, "{msg27}");
+    // ... and the refused weakening now refuses new governed work until it is repaired (G0 hard-block)
+    let hb = g.err(&[
+        "task",
+        "create",
+        "--class",
+        "documentation",
+        "--objective",
+        "while weakened",
+        "--status",
+        "READY",
+    ]);
+    assert_eq!(hb.error_code(), "HEALTH_HARD_BLOCK", "{}", hb.envelope);
+    assert!(hb.envelope.to_string().contains("D027"), "{}", hb.envelope);
+    let au = g.run(&["audit", "--no-persist"]);
+    let f = if au.ok() { au.result() } else { au.details() };
+    let crit: Vec<&Value> = f["findings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|x| x["family"] == "policy_precedence" && x["severity"] == "critical")
+        .collect();
+    assert!(crit.len() >= 10, "{}", f["findings"]);
     let layer3 = ctx["deterministic_authority"]["authority_layers"]
         .as_array()
         .unwrap()
@@ -413,29 +440,6 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         layer3["policy_overrides_refused"].as_array().unwrap().len() >= 10,
         "{layer3}"
     );
-    // visible in doctor, the governance suite and the context packet
-    let (ok27, msg27) = doctor_check(&g, "D027");
-    assert!(!ok27, "{msg27}");
-    let au = g.run(&["audit", "--no-persist"]);
-    let f = if au.ok() { au.result() } else { au.details() };
-    let crit: Vec<&Value> = f["findings"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|x| x["family"] == "policy_precedence" && x["severity"] == "critical")
-        .collect();
-    assert!(crit.len() >= 10, "{}", f["findings"]);
-    // round 2 (P2-AR-0024, IP-WS02-08): the CRITICAL precedence finding recorded above is a hard-block, so new
-    // governed work is refused at G0 until it is repaired (the context packet was compiled before the doctor run)
-    let e = g.err(&[
-        "task",
-        "create",
-        "--class",
-        "documentation",
-        "--objective",
-        "y",
-    ]);
-    assert_eq!(e.error_code(), "HEALTH_HARD_BLOCK", "{}", e.envelope);
     // exceptions follow the same rules and need a real governing decision (verifier V-M1). WS-3 / BC-P2-09: that
     // decision must be one a gov operation wrote — the human's owner-signed answer to a gate that asked for exactly
     // this scope — because a hand-written decision claiming human approval is a request, recorded and ignored.
@@ -1328,8 +1332,11 @@ fn task_close_uses_observed_mutations_not_self_attestation() {
     let e3 = g.err(&["task", "close", &tid, "--report", &rep]);
     assert_eq!(e3.error_code(), "MUTATION_SCOPE_VIOLATION");
     assert_eq!(e3.details()["undeclared"], json!(["docs/extra.md"]));
-    let rep3 = write_report(
+    // BC-P2-20 (P2-AR-0026): the successful close carries the full consumption receipt (the worker's return)
+    let rep3 = crate::ws05::receipt(
+        &g,
         &root,
+        &tid,
         "r3",
         "docs",
         &["docs/notes.md", "docs/extra.md"],
