@@ -408,6 +408,89 @@ fn a_red_result_made_stale_by_the_events_own_records_is_reevaluated_not_dropped(
     assert_eq!(generated(&root).len(), n);
 }
 
+/// BC-P2-24 CIT effects (Contract v3:578, :1134): a CIT that changes an input of completed work generates its
+/// revalidation work when it executes — one `validation` task that `revalidates` the completed task, linked to it,
+/// counted as the CIT-effect work of the engine (adopted, never duplicated: reconciling again creates nothing).
+#[test]
+fn a_cit_effect_on_completed_work_generates_one_linked_revalidation_task() {
+    let (root, g) = fresh("ws5r3-cit");
+    let inputs = traceable_inputs(&root, "0730");
+    git_commit_all(&root, "inputs");
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let done = create(&g, "refactor", "totals", "src/**", inputs);
+    g.ok(&["context", "compile", &done]);
+    g.ok(&["task", "claim", &done]);
+    write_file(&root, "src/totals.rs", "pub fn t() -> i64 { 398 }\n");
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let rep = receipt(
+        &g,
+        &root,
+        &done,
+        "done",
+        "totals",
+        &["src/totals.rs"],
+        "not_applicable_with_reason",
+    );
+    g.ok(&["task", "close", &done, "--report", &rep]);
+    git_commit_all(&root, "done");
+    let mf = root.join(".governance-runtime/mf-cit.json");
+    std::fs::write(
+        &mf,
+        json!([{"op": "set_field", "target": "REQ-0730", "field": "statement", "value": "totals are integer cents"}]).to_string(),
+    )
+    .unwrap();
+    let cit = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        "state the unit",
+        "--trigger",
+        "behaviour_change",
+        "--targets",
+        "REQ-0730",
+        "--manifest",
+        mf.to_str().unwrap(),
+    ])["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let sim = g.ok(&["cit", "simulate", &cit]);
+    crate::ws03::human_decide(&g, sim["human_gate"].as_str().unwrap(), "A");
+    g.ok(&["cit", "approve", &cit, "--by", "owner", "--method", "human"]);
+    g.ok(&["cit", "execute", &cit]);
+    let list = g.ok(&["task", "list"]);
+    let reval: Vec<&Value> = list
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["generated_from"]["source"] == "cit-effect")
+        .collect();
+    assert_eq!(reval.len(), 1, "{list}");
+    assert_eq!(reval[0]["generated_from"]["subject"], json!(done), "{list}");
+    let rid = reval[0]["id"].as_str().unwrap().to_string();
+    let rt = g.ok(&["task", "show", &rid]);
+    assert_eq!(rt["revalidates"], json!(done), "{rt}");
+    // the engine counts it as the CIT effect's work: reconciling again creates nothing, and lists it as adopted or
+    // generated for this source
+    let again = g.ok(&["task", "generate"]);
+    assert_eq!(again["created"], json!([]), "{again}");
+    let n = list
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["generated_from"]["source"] == "cit-effect")
+        .count();
+    assert_eq!(
+        g.ok(&["task", "list"])
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|t| t["generated_from"]["source"] == "cit-effect")
+            .count(),
+        n
+    );
+}
+
 /// BC-P2-24 failed tests: a recorded failing product-test family generates one repair task derived from the failing
 /// run; a second failing run of the same streak generates nothing new.
 #[test]
