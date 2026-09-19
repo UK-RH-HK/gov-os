@@ -2760,3 +2760,105 @@ pub fn glob_helper(pat: &str, path: &str) -> bool {
 pub fn read_json_helper(p: &Path) -> Result<Value> {
     read_json(p)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_approval_digest_ignores_os_bookkeeping_but_not_what_happens_to_an_artefact() {
+        let e = json!({"artifact_id": "ART-1", "current_path": "src/a.py", "action": "KEEP_IN_PLACE", "batch": 1, "requires_human_gate": false});
+        let f = json!({"artifact_id": "ART-2", "current_path": "src/b.py", "action": "MOVE", "target_path": "lib/b.py", "batch": 2});
+        let mut e_os = e.clone();
+        e_os["human_gate"] = json!("HDG-0001");
+        e_os["entry_version"] = json!(3);
+        e_os["producer"] = json!({"stage": "A3"});
+        let d = planner::catalogue_digest(&[e.clone(), f.clone()]);
+        assert_eq!(d, planner::catalogue_digest(&[f.clone(), e_os]));
+        let mut e_del = e.clone();
+        e_del["action"] = json!("DELETE_FROM_ACTIVE_TREE");
+        assert_ne!(d, planner::catalogue_digest(&[e_del, f.clone()]));
+        let mut e_gate = e.clone();
+        e_gate["requires_human_gate"] = json!(true);
+        assert_ne!(d, planner::catalogue_digest(&[e_gate, f]));
+    }
+
+    #[test]
+    fn a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound() {
+        let v = json!({"catalogue_sha256": "a", "plan_sha256": "b", "tests_sha256": "c"});
+        let same = json!({"catalogue_sha256": "a", "plan_sha256": "b", "tests_sha256": "c"});
+        assert!(binding_changes(&v, &same).is_empty());
+        let t = json!({"catalogue_sha256": "a", "plan_sha256": "b", "tests_sha256": "d"});
+        assert_eq!(binding_changes(&v, &t), vec!["tests".to_string()]);
+        assert_eq!(binding_changes(&json!({}), &same).len(), 3);
+    }
+
+    #[test]
+    fn plan_digest_ignores_regeneration_stamps_only() {
+        let p = json!({"id": PLAN_ID, "version": 1, "batches": [{"batch": 1}, {"batch": 2}]});
+        let mut q = p.clone();
+        q["last_regenerated_at"] = json!("2026-09-19T00:00:00Z");
+        q["last_regenerated_by"] = json!({"stage": "A4"});
+        assert_eq!(plan_digest(&p), plan_digest(&q));
+        q["batches"].as_array_mut().unwrap().pop();
+        assert_ne!(plan_digest(&p), plan_digest(&q));
+    }
+
+    #[test]
+    fn a_relabelled_heldout_query_keeps_its_identity() {
+        let q = json!({"id": "HQ-001", "category": "exact_path", "query": "src/a.py", "expected_refs": ["file:src/a.py"], "forbidden": [], "k": 8, "route": "path"});
+        let r = json!({"id": "VQ-9", "category": "verifier", "query": " src/a.py ", "expected_refs": ["file:src/a.py"], "forbidden": [], "k": 3, "route": "path", "note": "mine"});
+        assert_eq!(heldout_query_identity(&q), heldout_query_identity(&r));
+        let mut s = q.clone();
+        s["expected_refs"] = json!(["file:src/b.py"]);
+        assert_ne!(heldout_query_identity(&q), heldout_query_identity(&s));
+    }
+
+    #[test]
+    fn every_designated_independent_role_is_a_read_only_kernel_role() {
+        let roles: Value =
+            read_yaml(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../framework/roles/ROLES.yaml"))
+                .unwrap();
+        for (stage, role, _) in DESIGNATED_ROLES {
+            let r = roles["roles"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|r| r["id"].as_str() == Some(role))
+                .unwrap_or_else(|| panic!("{stage}: {role} is not a kernel role"));
+            assert_eq!(
+                r["level"], "L0",
+                "{stage}: an independent role authors no builder stage"
+            );
+            assert_eq!(designated_role(stage), Some(*role));
+        }
+        assert!(designated_role("A6").is_none());
+        // every adoption command is specified, and only the four independent stages are Independent
+        for c in [
+            "baseline",
+            "inventory",
+            "classify",
+            "map",
+            "plan",
+            "test-design",
+            "review",
+            "migrate",
+            "rollback",
+            "verify-migration",
+            "extract-legacy",
+            "build-memory",
+            "verify-memory",
+            "audit",
+        ] {
+            let s = spec(c);
+            assert_eq!(
+                s.group == Group::Independent,
+                designated_role(s.stage).is_some()
+                    && c != "test-design"
+                    && c != "rollback"
+                    && c != "migrate",
+                "{c}"
+            );
+        }
+    }
+}
