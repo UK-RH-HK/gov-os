@@ -38,7 +38,7 @@ reconciled without choosing a trade-off the sources leave open, stop that item a
 
 - `governance/registry/` into `tasks::OS_MANAGED_PREFIXES` (WS-7 IP-W7R3-1 — **required**: plugin registration inside a claimed
   task is otherwise refused at close; WS-3 IP-R3-WS03-3) unless WS-5 already did it.
-- `cit` into `t2::SEALED_RECORD_TYPES` once every CIT write is sealed (WS-3 IP-R3-WS03-2, WS-4's round-3 work).
+- **IP-R3-WS04-01 (integration-critical):** `gates::answer`/`revoke` write CIT records without re-sealing, so a CIT declined inside another task's claim window fails that task's close (`MUTATION_SCOPE_VIOLATION`). In order: apply WS-4's `release/capability-baseline/repair-1/r3-ws04/evidence/IP-R3-WS04-01.gates-reseal.patch` (or an equivalent re-seal of previously-verified CIT records in `gates.rs`), then add `cit` to `t2::SEALED_RECORD_TYPES` (WS-3 IP-R3-WS03-2), then un-ignore `ws04r3::a_cit_declined_during_another_tasks_claim_does_not_block_its_close`. WS-4 measured the end state at lib 215/0, certification 145/0.
 - WS-10's research write commands: declare `record_research_evidence: L1`, `lifecycle::RECORD_AUTHORITY` and the 12
   `COMMAND_GUARDS` entries together (WS-3 IP-R3-WS03-4).
 - Kernel version 4.1.6 (WS-8): every schema version bumped by any round-3 builder must be mirrored in `KERNEL.yaml`
