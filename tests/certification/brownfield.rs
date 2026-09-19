@@ -185,7 +185,7 @@ fn brownfield_adoption_end_to_end() {
     assert!(gates.len() >= 2, "{gates:?}");
     for gid in &gates {
         executor.ok(&["gate", "present", gid]);
-        executor.ok(&["decide", gid, "--option", "A", "--by", "owner"]);
+        crate::ws03::human_decide(&executor, gid, "A");
     }
     executor.ok(&["adopt", "migrate", "--batch", "7"]);
     assert!(
@@ -290,7 +290,7 @@ fn brownfield_adoption_end_to_end() {
     assert_eq!(sim["impact"]["human_gate_required"], true);
     let gate = sim["human_gate"].as_str().unwrap().to_string();
     executor.ok(&["gate", "present", &gate]);
-    executor.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&executor, &gate, "A");
     executor.ok(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     let ex2 = executor.ok(&["cit", "execute", &cid]);
     assert_eq!(ex2["cit_status"], "COMMITTED", "{ex2}");

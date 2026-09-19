@@ -89,6 +89,10 @@ pub struct PolicySet {
     /// Verified-kernel verdict for the source these policies were read from (verifier V-H2).
     pub kernel_trust: Value,
     pub problems: Vec<String>,
+    /// Project overlay documents as the product must read them (BC-P2-45): every key evaluated against
+    /// POLICY_PRECEDENCE, refused weakenings replaced by the kernel value and reported in `refused_overrides`.
+    /// Keys: `PROJECT_POLICY.yaml`, `MODEL_ROUTING_OVERRIDES.yaml`.
+    pub effective_overlays: BTreeMap<String, Value>,
 }
 
 impl PolicySet {
@@ -257,6 +261,18 @@ impl PolicySet {
                 ps.refused_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"), "reason": verdict_exc.reason}));
                 continue;
             }
+            // BC-P2-09: the governing decision is T2 state. Its approval fields count only when a gov operation
+            // (a Human Decision Gate answer) wrote the record as it stands; a hand-written or edited decision is a
+            // request, recorded and ignored (D-0007 rule 2).
+            if let Some(dp) = verdict_exc.decision_path.as_deref() {
+                let b = crate::t2::verify_file(root, dp);
+                if !b.is_verified() {
+                    ps.refused_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"),
+                        "reason": format!("decision {} ({dp}) is not a record a gov operation wrote as it stands (T2 binding {}); only a decision recorded by an answered Human Decision Gate can authorise a policy exception (D-0007 rule 2)", e.get("decision").and_then(|v| v.as_str()).unwrap_or("?"), b.code()),
+                        "t2": b.to_value()}));
+                    continue;
+                }
+            }
             let kernel_value = ps.raw.get(&pol).and_then(|k| deep_get(k, &key).cloned());
             let verdict = match &prec {
                 Some(pr) => crate::policy_precedence::evaluate(
@@ -277,6 +293,73 @@ impl PolicySet {
                 Err(reason) => ps.refused_overrides.push(json!({"policy": pol, "key": key, "value": value, "source": id, "decision": e.get("decision"), "kernel_value": kernel_value, "reason": reason})),
             }
         }
+        // ---- BC-P2-45: every project overlay input is subject to POLICY_PRECEDENCE, not only policy_overrides.
+        // Kernel values come from the verified kernel: the overlay templates it ships (PROJECT_POLICY), the
+        // routing policy's task-class floors and the roles' tier/reasoning defaults (MODEL_ROUTING_OVERRIDES).
+        let template_pp = read_yaml(
+            &kernel_dir
+                .join("overlay-templates")
+                .join("PROJECT_POLICY.yaml"),
+        )
+        .unwrap_or(json!({}));
+        let pp_kernel = |dotted: &str| deep_get(&template_pp, dotted).cloned();
+        let v = crate::policy_precedence::evaluate_overlay(
+            prec.as_ref(),
+            "PROJECT_POLICY",
+            "PROJECT_POLICY.yaml",
+            &pp,
+            &pp_kernel,
+            &["policy_overrides"],
+        );
+        ps.applied_overrides.extend(v.applied);
+        ps.refused_overrides.extend(v.refused);
+        ps.effective_overlays
+            .insert("PROJECT_POLICY.yaml".into(), v.effective);
+        let roles = read_yaml(&kernel_dir.join("roles").join("ROLES.yaml")).unwrap_or(json!({}));
+        let routing_kernel = ps
+            .raw
+            .get("MODEL_ROUTING_POLICY")
+            .cloned()
+            .unwrap_or(json!({}));
+        let mro_kernel = |dotted: &str| -> Option<Value> {
+            let parts: Vec<&str> = dotted.split('.').collect();
+            match parts.as_slice() {
+                ["task_class_overrides", class] => Some(
+                    deep_get(&routing_kernel, &format!("task_class_minimum_tier.{class}"))
+                        .cloned()
+                        .unwrap_or(json!(crate::routing::DEFAULT_CLASS_TIER)),
+                ),
+                ["role_overrides", role, field] => {
+                    let r = roles["roles"]
+                        .as_array()
+                        .and_then(|a| a.iter().find(|x| x["id"].as_str() == Some(role)))?;
+                    match *field {
+                        "minimum_tier" => Some(json!(r["minimum_tier"]
+                            .as_str()
+                            .filter(|t| t.starts_with('T'))
+                            .unwrap_or("T0"))),
+                        "default_reasoning" => Some(json!(r["default_reasoning"]
+                            .as_str()
+                            .filter(|x| ["low", "medium", "high", "extra_high"].contains(x))
+                            .unwrap_or("low"))),
+                        _ => None,
+                    }
+                }
+                _ => None,
+            }
+        };
+        let v = crate::policy_precedence::evaluate_overlay(
+            prec.as_ref(),
+            "MODEL_ROUTING_OVERRIDES",
+            "MODEL_ROUTING_OVERRIDES.yaml",
+            &overlay.get("MODEL_ROUTING_OVERRIDES.yaml"),
+            &mro_kernel,
+            &[],
+        );
+        ps.applied_overrides.extend(v.applied);
+        ps.refused_overrides.extend(v.refused);
+        ps.effective_overlays
+            .insert("MODEL_ROUTING_OVERRIDES.yaml".into(), v.effective);
         ps
     }
     pub fn policy(&self, name: &str) -> Result<&Value> {

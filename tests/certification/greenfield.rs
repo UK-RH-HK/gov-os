@@ -223,7 +223,7 @@ fn greenfield_end_to_end() {
         .as_str()
         .unwrap()
         .contains("HUMAN DECISION GATE"));
-    let dec = g.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    let dec = crate::ws03::human_decide(&g, &gate, "A");
     let decision = dec["decision"].as_str().unwrap().to_string();
     let ap = g.ok(&[
         "cit", "approve", &cit_id, "--by", "owner", "--method", "human",

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/human-gate.schema.json",
   "title": "human-gate",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -201,9 +201,14 @@
           },
           "impact": {
             "type": "string"
+          },
+          "authorises_blocked_work": {
+            "type": "boolean",
+            "description": "whether choosing this option authorises the work the gate blocks (default: only option A)"
           }
         }
-      }
+      },
+      "minItems": 1
     },
     "impact": {
       "type": "string"
@@ -249,6 +254,58 @@
     },
     "cit": {
       "type": "string"
+    },
+    "gate_instance": {
+      "type": "string",
+      "description": "OS-issued nonce of this gate instance; an owner-signed answer binds it"
+    },
+    "impact_radius": {
+      "type": "string",
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ]
+    },
+    "reversible": {
+      "type": "boolean"
+    },
+    "raised_by": {
+      "type": "object",
+      "description": "who raised the gate: kind agent|system, session, role"
+    },
+    "assessment": {
+      "type": "object",
+      "description": "the impact radius / reversibility / confidence assessment agent resolution is judged on, and its source (declared|os)"
+    },
+    "presentation": {
+      "type": "object",
+      "description": "the OS rendering of the package (rendered_at, rendered_by, package_sha256); not a human receipt"
+    },
+    "presented_by": {
+      "type": "object"
+    },
+    "presentation_receipt": {
+      "type": "object",
+      "description": "owner-signed evidence that the package reached the human (a receipt or a signed answer)"
+    },
+    "revoked": {
+      "type": "object"
+    },
+    "subject": {
+      "type": "object",
+      "description": "what the approval is bound to (kind, id, sha256)"
+    },
+    "decision_scope": {
+      "type": "object",
+      "description": "fields carried into the resulting decision (e.g. authorises_exceptions, permits_policy_keys)"
+    },
+    "os_binding": {
+      "type": "object",
+      "description": "T2 seal: the record was written by a gov operation (runtime t2)"
     }
   },
   "required": [

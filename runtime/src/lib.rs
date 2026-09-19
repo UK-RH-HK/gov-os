@@ -17,6 +17,8 @@ pub mod doctor;
 pub mod error;
 pub mod exceptions;
 pub mod graph;
+/// Authenticated human channel (BC-P2-10): owner-signed Human Decision Gate answers and presentation receipts.
+pub mod human_channel;
 pub mod init;
 pub mod kernel;
 pub mod kernel_trust;
@@ -43,6 +45,8 @@ pub mod skills;
 /// protected floors and break-glass recovery.
 pub mod srr;
 pub mod status;
+/// T2 binding primitive (BC-P2-09): a T2 fact is honoured only when it provably results from an OS operation.
+pub mod t2;
 pub mod tools;
 pub mod update;
 pub mod upstream;

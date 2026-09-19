@@ -208,7 +208,7 @@ fn path_migration_with_rollback_and_memory_rebuild() {
             .as_str()
             .expect("gate record for destructive entry");
         executor.ok(&["gate", "present", gid]);
-        executor.ok(&["decide", gid, "--option", "B", "--by", "owner"]);
+        crate::ws03::human_decide(&executor, gid, "B");
         assert!(exists(&root, e["current_path"].as_str().unwrap()));
     }
     // --- independent verification against reality ---
