@@ -1,0 +1,84 @@
+# P2-AR-0033: compare_probes.py (P2-AR-0023's tool, copied unchanged) over before/after, before-shim/after-shim, before-ws05/after-ws05
+# after = HEAD 2e7200728174a0fa27928b17a4d7c681cd46bfd9, release gov 94f9ed9805a2bd6e0026dfd619185c810a23aefc31c918b953e4745bf8978151; before = base 53897c1 export, gov 5ff6ce9c…
+
+== beta-r.FRESH-evidence-invalidation.out  (before -> after)
+  FRESH-manifest                                                         PASS -> PASS
+  FRESH-pathmap                                                          PASS -> PASS
+  FRESH-profile                                                          PASS -> PASS
+  FRESH-source                                                           PASS -> PASS
+  FRESH-spec                                                             PASS -> PASS
+
+== derived_FR-freshness-invalidation.h4-complete.P2-AR-0033.py.out  (before -> after)
+  FR-baseline-green-current                                              PASS -> PASS
+
+== derived_W11-quantitative-health.receipt.P2-AR-0033.py.out  (before -> after)
+  W11-m1-required-input-delivery-accuracy                                PASS -> PASS
+  W11-m2-current-version-selection-accuracy                              FAIL -> PASS   <== changed
+  W11-m3-proxy-retrieval-superseded-hit-rate                             PASS -> PASS
+  W11-m3-superseded-input-leakage-rate                                   FAIL -> PASS   <== changed
+  W11-m4-missing-required-input-detection                                FAIL -> PASS   <== changed
+  W11-m5-staleness-propagation-accuracy                                  FAIL -> PASS   <== changed
+  W11-m6-proxy-task-traceability                                         PASS -> PASS
+  W11-m6-requirement-to-code-traceability-coverage                       FAIL -> PASS   <== changed
+  W11-m7-requirement-to-test-traceability-coverage                       FAIL -> PASS   <== changed
+  W11-m8-orphan-detection-recall-fp                                      PASS -> PASS
+  W11-m8-proxy-orphan-count                                              PASS -> PASS
+  W11-m9-fresh-agent-reconstruction-correctness                          FAIL -> PASS   <== changed
+  W11-m9-proxy-fresh-agent-read-budget                                   PASS -> PASS
+
+== zeta-r.FR-freshness-invalidation.out  (before -> after)
+  FR-baseline-green-current                                              PASS -> FAIL   <== changed
+
+== zeta-r.W07-orphan-detection.out  (before -> after)
+  W7-o1-expected-consumer-missing                                        PASS -> PASS
+  W7-o1-expected-consumer-not-consuming                                  PASS -> PASS
+  W7-o2-requirement-without-impl-or-test                                 PASS -> PASS
+  W7-o2b-linked-requirement-without-impl-or-test                         PASS -> PASS
+  W7-o3-research-never-consumed                                          PASS -> PASS
+  W7-o3b-linked-research-never-consumed                                  PASS -> PASS
+  W7-o4-acceptance-test-without-requirement                              PASS -> PASS
+  W7-o4b-feature-only-acceptance-test                                    PASS -> PASS
+  W7-o5-unjustified-code                                                 PASS -> PASS
+  W7-o6-no-silent-deletion                                               PASS -> PASS
+  W7-o6-orphans-produce-governed-remediation                             PASS -> PASS
+  W7-orphan-count-surfaced                                               PASS -> PASS
+
+== delta-r.FRESH-invalidation.out  (before-shim -> after-shim)
+  F.CKPT-09999.inv                                                       PASS -> PASS
+  F.EXP-0500.inv                                                         PASS -> PASS
+  F.HDG-0500                                                             PASS -> PASS
+  F.HND-0500.inv                                                         PASS -> PASS
+  F.MODEL_ROUTING_OVERRIDES                                              PASS -> PASS
+  F.PROJECT_POLICY                                                       PASS -> PASS
+  F.RES-0500.inv                                                         PASS -> PASS
+  F.TASK-0500.inv                                                        PASS -> PASS
+  F.base.1                                                               PASS -> PASS
+  F.close.1                                                              FAIL -> FAIL
+  F.close.2                                                              FAIL -> FAIL
+  F.families.1                                                           PASS -> PASS
+  F.impl.1                                                               FAIL -> FAIL
+
+== zeta-r.W12-scheduler-integration.out  (before-shim -> after-shim)
+  W12-G0-current-version-substitution-blocked(claim)                     PASS -> PASS
+  W12-G0-superseded-target-substitution-blocked(cit)                     PASS -> PASS
+  W12-G1-dependency-evidence-invalidated                                 FAIL -> FAIL
+  W12-G1-mutation-detected(index)                                        PASS -> PASS
+
+== synthesis.AC16-X1-upstream-change-chain.out  (before-ws05 -> after-ws05)
+  X1-C9-cit-p-candidates-deduplicated                                    PASS -> PASS
+  X1-G1-D1-detects-direct-change                                         PASS -> PASS
+  X1-G1xW6-direct-change-cannot-be-licensed-by-rebuild                   FAIL -> FAIL
+  X1-K2-cit-committed                                                    PASS -> PASS
+  X1-K2xD1-index-fresh-after-cit                                         PASS -> PASS
+  X1-K2xW6-done-evidence-stale                                           PASS -> PASS
+  X1-K2xW6-done-task-revalidated                                         PASS -> PASS
+  X1-K2xW6-open-task-retest                                              PASS -> PASS
+  X1-K2xW6-packet-invalidated                                            PASS -> PASS
+  X1-K2xW6-rework-generated                                              PASS -> PASS
+  X1-NxW9-checkpoint-stale-marked                                        PASS -> PASS
+  X1-NxW9-handoff-blocked-or-degraded                                    PASS -> PASS
+  X1-O4-green-stale-after-direct-spec-change                             PASS -> FAIL   <== changed
+  X1-UxO5-health-reflects-invalid-completed-work                         FAIL -> PASS   <== changed
+  X1-W12-G4-wider-check-recorded                                         FAIL -> PASS   <== changed
+
+# TOTAL FAIL->PASS: 9, PASS->FAIL: 2, PASS->PASS: 48, FAIL->FAIL: 5, only-before: 0, only-after: 0

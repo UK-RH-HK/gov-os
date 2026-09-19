@@ -1,0 +1,1786 @@
+# P2-AR-0033 derived probe run: W11-quantitative-health.receipt.P2-AR-0033.py (sha256 c2e7e42411d798b3c9e53fc77dedfc1c62fc5e6123a067aac7a8e64b96c26e5c) label=before
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/base-tree (HEAD 53897c1a44157e5af81b176017bc7ded6a63b9cd); gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82
+# date 2026-09-19T11:29:18Z
+# project w11: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/../../p2ar0033/probes/dp-before-ynRYs4/w11-817358323
+$ gov init --name w11 --alias z-w11    [session=S-zeta role=orchestrator exit=0 1.2s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up", "status": "SUPERSEDED", "superseded_by": "REQ-0002", "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "supersedes": ["REQ-0001"], "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0003.yaml: {"id": "REQ-0003", "type": "requirement", "title": "Orphan requirement", "status": "ACTIVE"}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals TASK-0001" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task create --id TASK-0002 --class implementation --objective "Implement totals TASK-0002" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task create --id TASK-0003 --class implementation --objective "Implement totals TASK-0003" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-9999\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov memory heldout-starter    [session=S-zeta role=orchestrator exit=2 0.0s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote file] src/lib.rs (1103 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/../../p2ar0033/probes/dp-before-ynRYs4/w11-817358323/.governance-runtime/reports/TASK-0001.json: {"work_completed": "implemented TASK-0001", "files_changed": ["src/lib.rs"], "tests": {"status": "not_applicable_with_reason", "reason": "zeta probe"}, "outcome": "success", "evidence": [], "context_packet_hash": "6f9a0619852aa01a593713de1f7b82b99779aac82c710bb52e2f3ff7e3978730", "inputs_consumed": ["F-0001@5fe64eb070a1ff073682390a3229a0ddb447b56b4e21bdff085169538dc3ad4d", "REQ-0002@dffaab3c2cebac2b8e28b4af5479de725301eb2888baba7089f7a49747f236a2", "SCN-0001@a9e79a55c878a7cf1f4d87be8d2ea1f052931f9cc0fe8b284caa24434012c4fe", "TST-0001@9f3fc81ed1ae050168fba712c8e1e33fddf67bcf6ef799436a489d538bb5
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/../../p2ar0033/probes/dp-before-ynRYs4/w11-817358323/.governance-runtime/reports/TASK-0001.json    [session=S-zeta role=orchestrator exit=0 0.7s]
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov telemetry summary    [session=S-zeta role=orchestrator exit=0 0.0s]
+
+===== telemetry summary (ok=True) full output =====
+{
+ "budget": {
+  "active_sessions": [],
+  "max_network_calls_per_task": 200,
+  "max_parallel_agents": 4,
+  "network_calls_by_task": {},
+  "over_budget": []
+ },
+ "commands": [
+  {
+   "avg_ms": 53.0,
+   "count": 2,
+   "name": "cli.context",
+   "ok": 2
+  },
+  {
+   "avg_ms": 1227.0,
+   "count": 1,
+   "name": "cli.init",
+   "ok": 1
+  },
+  {
+   "avg_ms": 95.33333333333333,
+   "count": 3,
+   "name": "cli.memory",
+   "ok": 2
+  },
+  {
+   "avg_ms": 185.0,
+   "count": 1,
+   "name": "cli.rebuild-memory",
+   "ok": 1
+  },
+  {
+   "avg_ms": 147.4,
+   "count": 5,
+   "name": "cli.task",
+   "ok": 5
+  },
+  {
+   "avg_ms": 202.25,
+   "count": 4,
+   "name": "health.run",
+   "ok": 4
+  }
+ ],
+ "cost_by_task_class": {
+  "implementation": 0.0
+ },
+ "events": 16,
+ "first_pass_completion_rate": 1.0,
+ "human_gates_by_feature": {},
+ "model_routing": [],
+ "retrieval": {
+  "avg_hits": 0.0,
+  "avg_latency_ms": 0.0,
+  "queries": 0
+ },
+ "rework_by_role": [
+  {
+   "repairs": 0,
+   "repairs_per_report": 0.0,
+   "reports": 1,
+   "role": "orchestrator"
+  }
+ ]
+}
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=0 0.7s]
+
+===== audit (ok=True) full output =====
+{
+ "audit": "",
+ "blocks": [],
+ "cache_mode": "use",
+ "complete": true,
+ "counts": {
+  "critical": 0,
+  "high": 0,
+  "low": 12,
+  "medium": 3
+ },
+ "failure_memory": null,
+ "families": {
+  "adapter_portability": {
+   "cached_from": "HR-20260919T112918681Z-5b661ebd",
+   "detail": {
+    "adapters_checked": 5,
+    "invariants": 15,
+    "ok": true,
+    "problems": [],
+    "served_from_cache": "HR-20260919T112918681Z-5b661ebd"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "audit_reproducibility": {
+   "cached_from": null,
+   "detail": {
+    "compared": [
+     {
+      "check": "schema_invariants",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "graph_integrity",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "index_freshness",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "memory_retrieval_regression",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "authority_role_limits",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "mutation_scope",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "path_map_compliance",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "secrets_sensitivity_indexing",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "product_traceability",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "change_control_integrity",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "continuity_checkpoint_handoff",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "model_routing_integrity",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "lineage_orphans",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "index_content_coverage",
+      "equal": true,
+      "method": "double-run"
+     }
+    ],
+    "mismatches": 0,
+    "note": "every executed DoubleRun check runs twice concurrently; every refreshed check is compared with its cached result under an identical key"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "authority_role_limits": {
+   "cached_from": null,
+   "detail": null,
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "change_control_integrity": {
+   "cached_from": null,
+   "detail": {
+    "cits_by_status": {}
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "command_contract_consistency": {
+   "cached_from": "HR-20260919T112918681Z-5b661ebd",
+   "detail": null,
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "concurrency_claims": {
+   "cached_from": null,
+   "detail": {
+    "claims": 0,
+    "expired": 0
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "context_reproducibility": {
+   "cached_from": null,
+   "detail": {
+    "chars": 25338,
+    "delivery": [],
+    "deterministic_hash": "2c1044928542ca10d57e05f8292421521aa7a9a53413f116310b162cf3e39553",
+    "isolated_in_sandbox": true,
+    "task": "TASK-0001"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "continuity_checkpoint_handoff": {
+   "cached_from": null,
+   "detail": {
+    "checkpoints": 1,
+    "handoffs": 0,
+    "latest": "spec/reports/checkpoints/CKPT-00001.yaml"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "contract_binding": {
+   "cached_from": "HR-20260919T112918681Z-5b661ebd",
+   "detail": {
+    "applicable": true,
+    "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3",
+    "root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/base-tree",
+    "served_from_cache": "HR-20260919T112918681Z-5b661ebd",
+    "verdict": "CONTRACT_SOURCE_BOUND"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "fresh_agent_reconstruction": {
+   "cached_from": null,
+   "detail": {
+    "budget": 25,
+    "next_action": "no runnable tasks: run readiness planning or discovery",
+    "reads": 5,
+    "status_chars": 6325
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "graph_integrity": {
+   "cached_from": null,
+   "detail": {
+    "dangling": 2,
+    "dangling_edges": [
+     {
+      "dst": "REQ-9999",
+      "source_artifact": "TASK-0003",
+      "src": "TASK-0003",
+      "type": "CONSUMES"
+     },
+     {
+      "dst": "REQ-9999",
+      "source_artifact": "TASK-0003",
+      "src": "TASK-0003",
+      "type": "GOVERNED_BY"
+     }
+    ],
+    "edge_types": {
+     "CALLS": 1,
+     "CONSUMES": 13,
+     "GOVERNED_BY": 4,
+     "IMPLEMENTS": 3,
+     "IMPORTS": 1,
+     "PRODUCES": 5,
+     "REALISES": 7,
+     "SUPERSEDES": 2,
+     "TESTS": 2,
+     "VALIDATED_BY": 9
+    },
+    "lineage": {
+     "dangling_blocks": 0,
+     "misplaced_records": 0,
+     "stale_links": 2
+    },
+    "orphan_records": [
+     "AUD-0001",
+     "REQ-0003"
+    ],
+    "orphans": 2
+   },
+   "findings": 3,
+   "ok": false,
+   "status": "executed"
+  },
+  "human_gate_integrity": {
+   "cached_from": "HR-20260919T112920629Z-eabc73ff",
+   "detail": {
+    "answered": 0,
+    "pending": 0,
+    "served_from_cache": "HR-20260919T112920629Z-eabc73ff"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "index_content_coverage": {
+   "cached_from": null,
+   "detail": {
+    "check": "index_content_coverage",
+    "checked_artifacts": 172,
+    "complete": true,
+    "gaps": [],
+    "stale_skipped": 0,
+    "uncovered_lines": 0
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "index_freshness": {
+   "cached_from": null,
+   "detail": {
+    "added": [],
+    "checked": 172,
+    "removed": [],
+    "stale": []
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "installation_authenticity": {
+   "cached_from": null,
+   "detail": {
+    "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+    "authenticity": "UNKNOWN",
+    "authenticity_established": false,
+    "bootstrap": {
+     "authenticity": "UNKNOWN",
+     "binary": {
+      "cli_version": "4.1.5",
+      "embedded_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
+      "embedded_kernel_version": "4.1.5",
+      "embedded_payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df",
+      "executable_sha256": "5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82",
+      "gov_version": "4.1.5"
+     },
+     "decision": "OWNER-DECISION-P2-0002",
+     "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+     "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+     "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+    },
+    "bound_release": {
+     "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+     "at": "2026-09-19T11:29:18Z",
+     "authenticity": "UNKNOWN",
+     "bootstrap": {
+      "authenticity": "UNKNOWN",
+      "binary": {
+       "cli_version": "4.1.5",
+       "embedded_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
+       "embedded_kernel_version": "4.1.5",
+       "embedded_payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df",
+       "executable_sha256": "5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82",
+       "gov_version": "4.1.5"
+      },
+      "decision": "OWNER-DECISION-P2-0002",
+      "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+      "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+      "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+     },
+     "channel": "unspecified",
+     "ingress": "init",
+     "kernel_manifest_hash": "a831188b208e7dcb7047203942e6ded0db6f0f38780a9865125ead564dbc9b46",
+     "payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df",
+     "posture_at_install": "UNPROVISIONED",
+     "release_metadata_sha256": "",
+     "release_version": "4.1.5",
+     "sequence": 0
+    },
+    "disclosure": "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.5), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).",
+    "installed": true,
+    "integrity": {
+     "basis": "byte-identical to the payload embedded in the running gov binary: the bootstrap baseline a machine with no trust anchor may hold (OWNER-DECISION-P2-0002); its authenticity is UNKNOWN",
+     "intact": true,
+     "protected_record": "MATCHED"
+    },
+    "lock_version": "4.1.5",
+    "machine_posture": "UNPROVISIONED",
+    "project_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/dp-before-ynRYs4/w11-817358323"
+   },
+   "findings": 1,
+   "ok": true,
+   "status": "executed"
+  },
+  "lineage_orphans": {
+   "cached_from": null,
+   "detail": {
+    "baseline": {
+     "adoption_moves": 0,
+     "available": true,
+     "commits": [
+      "ed9bd18607ecee2156aa30da041cc32b3e5580c7"
+     ],
+     "note": "governance baseline: 1 commit(s), 174 path(s), 0 adoption move(s)",
+     "paths": 174
+    },
+    "by_kind": {
+     "spec-without-downstream-path": {
+      "contract": "Contract v3:1140",
+      "count": 1
+     },
+     "unconsumed-output": {
+      "contract": "Contract v3:1139",
+      "count": 0
+     },
+     "unconsumed-research": {
+      "contract": "Contract v3:1141",
+      "count": 0
+     },
+     "unjustified-acceptance-test": {
+      "contract": "Contract v3:1142",
+      "count": 0
+     },
+     "unjustified-code": {
+      "contract": "Contract v3:1143",
+      "count": 0
+     }
+    },
+    "code": {
+     "baseline_available": true,
+     "baseline_unlinked": [
+      "tests/ledger_test.rs"
+     ],
+     "code_graph_available": true,
+     "files_checked": 2,
+     "justifications": {
+      "src/lib.rs": {
+       "edge": "PRODUCES",
+       "how": "produced by governed work traced to an active specification",
+       "record": "RPT-0001",
+       "traces_to": "F-0001"
+      }
+     },
+     "justified": 1,
+     "unexplained": []
+    },
+    "orphans": 1,
+    "research": {
+     "consumed": [],
+     "incomplete": [],
+     "pending_decisions": []
+    },
+    "subjects": [
+     {
+      "key": "W7-d615c76b10562d94",
+      "kind": "spec-without-downstream-path",
+      "severity": "low",
+      "subject": "REQ-0003"
+     }
+    ],
+    "tests": {
+     "test_obligations_checked": 1
+    }
+   },
+   "findings": 2,
+   "ok": true,
+   "status": "executed"
+  },
+  "memory_retrieval_regression": {
+   "cached_from": null,
+   "detail": {
+    "failed": [],
+    "failed_results": [],
+    "isolated_in_sandbox": true,
+    "mrr": 1.0,
+    "pending": 2,
+    "precision_at_k": 0.980392156862745,
+    "queries": 17,
+    "recall_at_k": 1.0,
+    "status": "PASS"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "model_routing_integrity": {
+   "cached_from": null,
+   "detail": {
+    "task_classes": {
+     "implementation": {
+      "minimum": "T2",
+      "tier": "T2"
+     }
+    }
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "mutation_scope": {
+   "cached_from": null,
+   "detail": null,
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "os_binding_integrity": {
+   "cached_from": null,
+   "detail": {
+    "binding_key": "0156de73ae8b9e4d",
+    "gates_unverified": 0,
+    "unverified_by_binding": {}
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "path_map_compliance": {
+   "cached_from": null,
+   "detail": {
+    "hidden_oracle_material": [],
+    "secret_content_outside_secret_class": [
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.1s]
+
+===== doctor (ok=True) full output =====
+{
+ "checks": [
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D001",
+   "message": "present",
+   "name": "framework.lock present",
+   "ok": true,
+   "remediation": "gov init / gov adopt",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute",
+       "release.build",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D002",
+   "message": "valid",
+   "name": "framework.lock schema",
+   "ok": true,
+   "remediation": "gov update --apply (migration) or repair lock",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D003",
+   "message": "intact (4.1.5)",
+   "name": "kernel payload integrity",
+   "ok": true,
+   "remediation": "gov kernel reinstall --source <release> (kernel is immutable, INV-007)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D004",
+   "message": "match",
+   "name": "lock matches kernel manifest",
+   "ok": true,
+   "remediation": "gov update --apply or gov kernel reinstall",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D005",
+   "message": "match",
+   "name": "CLI/kernel compatibility",
+   "ok": true,
+   "remediation": "gov update --check",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute",
+       "release.build",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D006",
+   "message": "7 overlay files valid",
+   "name": "project overlay",
+   "ok": true,
+   "remediation": "repair governance/project/*.yaml against kernel schemas",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute",
+       "release.build",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D007",
+   "message": "14 policies loaded, 0 overrides",
+   "name": "policies",
+   "ok": true,
+   "remediation": "repair policy overrides/exceptions",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D029",
+   "message": "installed kernel 4.1.5 intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record",
+   "name": "constitutional policy read from a verified kernel",
+   "ok": true,
+   "remediation": "gov kernel verify; gov kernel reinstall (or `gov kernel override --reason ...` as an L4+ role, which raises a gate)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D027",
+   "message": "0 override(s) applied within POLICY_PRECEDENCE; rules from installed kernel (verified)",
+   "name": "policy precedence respected (no override weakens security/authority/gate floors)",
+   "ok": true,
+   "remediation": "remove the weakening override from governance/project/PROJECT_POLICY.yaml or PROJECT_EXCEPTIONS.yaml; only strengthening overrides are applied",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D028",
+   "message": "no plugin problems",
+   "name": "capability plugins governed (schema-valid, registered, pinned, authorised)",
+   "ok": true,
+   "remediation": "gov plugins list; fix or register the descriptor (gov plugins register --descriptor <file>)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D008",
+   "message": "in sync",
+   "name": "framework.json in sync with repository contract",
+   "ok": true,
+   "remediation": "gov adapters generate",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D009",
+   "message": "state.db ok (172 artefacts)",
+   "name": "derived runtime",
+   "ok": true,
+   "remediation": "gov rebuild-memory",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D010",
+   "message": "fresh (172 artefacts)",
+   "name": "index freshness",
+   "ok": true,
+   "remediation": "gov rebuild-memory (full when pins changed; --incremental otherwise)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D011",
+   "message": "none",
+   "name": "secrets outside secret class",
+   "ok": true,
+   "remediation": "move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D012",
+   "message": "clean",
+   "name": "no secrets in index",
+   "ok": true,
+   "remediation": "gov rebuild-memory (fail-closed re-index) and rotate the exposed secret",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D025",
+   "message": "consistent: hashed-ngram (421 vectors)",
+   "name": "semantic index consistent with pinned embedder/reranker",
+   "ok": true,
+   "remediation": "gov rebuild-memory (full rebuild re-embeds every chunk with the pinned implementation)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D026",
+   "message": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/dp-before-ynRYs4/w11-817358323/.governance-runtime/claims.db",
+   "name": "claims store present and intact",
+   "ok": true,
+   "remediation": "restore claims.db or gov claims sweep",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D013",
+   "message": "0 legacy mechanism(s), all marked LEGACY/archived",
+   "name": "legacy governance mechanisms retired",
+   "ok": true,
+   "remediation": "gov adopt (A2/A8) or register a LEGACY record / move to archive/",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute",
+       "release.build",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D014",
+   "message": "0 supersession conflict(s), 0 duplicate id(s)",
+   "name": "authority unambiguous (no supersession conflicts / duplicate ids)",
+   "ok": true,
+   "remediation": "resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D015",
+   "message": "2 dangling edge(s) [TASK-0003 CONSUMES REQ-9999, TASK-0003 GOVERNED_BY REQ-9999], 2 orphan record(s) [AUD-0001, REQ-0003], 2 stale lineage link(s) [TASK-0002 is linked (CONSUMES) to REQ-0001, which is SUPERSEDED and superseded by REQ-0002, TASK-0002 is linked (GOVERNED_BY) to REQ-0001, which is SUPERSEDED and superseded by REQ-0002]",
+   "name": "graph integrity",
+   "ok": false,
+   "orphan_records": [
+    "AUD-0001",
+    "REQ-0003"
+   ],
+   "remediation": "fix references in records or add missing records; move misplaced records to their canonical directory; re-point or revalidate work linked to superseded records (through a CIT)",
+   "severity": "medium"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "cit.propose",
+       "cit.execute",
+       "task.close"
+      ],
+      "scope": "global"
+     }
+    ]
+   },
+   "id": "D016",
+   "message": "none",
+   "name": "no interrupted transactions",
+   "ok": true,
+   "remediation": "gov recover (classifies and rolls back/finishes interrupted mutations)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D017",
+   "message": "0 claim(s), 0 expired (claims store: .governance-runtime/claims.db, survives rebuilds)",
+   "name": "session claims",
+   "ok": true,
+   "remediation": "gov claims sweep",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D018",
+   "message": "mode \"RUNNING\" writes_frozen false",
+   "name": "control state",
+   "ok": true,
+   "remediation": "gov resume (only after the reason for the pause/freeze is resolved)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D019",
+   "message": "0 pending gate(s): 0 presented (owner-signed receipt or answer)",
+   "name": "human gates surfaced to th
+$ gov status    [session=S-zeta role=orchestrator exit=0 0.2s]
+
+===== status (ok=True) full output =====
+{
+ "control": {
+  "agents_cancelled": false,
+  "mode": "RUNNING",
+  "reason": null,
+  "updated_at": null,
+  "writes_frozen": false
+ },
+ "features": [
+  {
+   "coverage": 1.0,
+   "gaps": 0,
+   "id": "F-0001",
+   "pre_implementation_ok": true,
+   "title": "Order totals"
+  }
+ ],
+ "framework": {
+  "cli_version": "4.1.5",
+  "installed_at": "2026-09-19T11:29:18Z",
+  "name": "agentic-engineering-os",
+  "release_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df",
+  "version": "4.1.5"
+ },
+ "fresh_agent_reads": [
+  "governance/framework.lock",
+  "governance/kernel/constitution/CONSTITUTION.md",
+  "governance/project/PROJECT_POLICY.yaml",
+  "governance/project/REPOSITORY_CONTRACT.yaml",
+  "spec/reports/checkpoints/CKPT-00001.yaml"
+ ],
+ "health": {
+  "blocks": [],
+  "failing_checks": [
+   {
+    "at": "2026-09-19T11:29:21Z",
+    "check": "D015",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T112921886Z-423e8682"
+   },
+   {
+    "at": "2026-09-19T11:29:21Z",
+    "check": "D021",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T112921886Z-423e8682"
+   },
+   {
+    "at": "2026-09-19T11:29:21Z",
+    "check": "D022",
+    "enforcement": "warning",
+    "max_severity": "low",
+    "result": "HR-20260919T112921886Z-423e8682"
+   },
+   {
+    "at": "2026-09-19T11:29:21Z",
+    "check": "D032",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T112921886Z-423e8682"
+   },
+   {
+    "at": "2026-09-19T11:29:21Z",
+    "check": "graph_integrity",
+    "enforcement": "hard-block",
+    "max_severity": "medium",
+    "result": "HR-20260919T112921121Z-d7b74694"
+   }
+  ],
+  "failure_memory": {
+   "by_kind": {},
+   "open": 0,
+   "records": []
+  },
+  "governance_suite_currency": {
+   "changed_classes": [
+    {
+     "class": "continuity_records",
+     "contract_class": "checkpoint/handoff records"
+    },
+    {
+     "class": "evidence_records",
+     "contract_class": "implementation/test evidence records"
+    },
+    {
+     "class": "index_manifest",
+     "contract_class": "relevant index manifest"
+    },
+    {
+     "class": "source",
+     "contract_class": "relevant source files"
+    },
+    {
+     "class": "spec_requirements",
+     "contract_class": "authoritative spec/decision"
+    },
+    {
+     "class": "spec_tasks",
+     "contract_class": "authoritative spec/decision (task manifests, test obligations)"
+    }
+   ],
+   "current": false,
+   "green": "AUD-0001",
+   "key": "26d22a42fbc8f61403fa3e0a540304a8816ab782e7834eb695fbc54fef6d3e2d",
+   "message": "green record \"AUD-0001\" is obsolete (inputs changed: continuity_records, evidence_records, index_manifest, source, spec_requirements, spec_tasks)",
+   "recorded_key": "681a5d3726435365071fe63d13930d14bb56da69c9667e84900f50f0cf6fcd9a",
+   "unhonoured_green": []
+  },
+  "last_result": "HR-20260919T112921886Z-423e8682",
+  "product_tests": {
+   "applicable": false,
+   "families": {},
+   "notes": [
+    "no product test command configured (PROJECT_POLICY.tests) or detectable with an available toolchain (capability gap)"
+   ]
+  },
+  "stale_checks": [],
+  "state": "YELLOW",
+  "updated_at": "2026-09-19T11:29:21Z"
+ },
+ "human_gates": [],
+ "latest_checkpoint": {
+  "id": "CKPT-00001",
+  "next_action": "gov continue",
+  "session": "S-zeta",
+  "task": "TASK-0001"
+ },
+ "memory": {
+  "added": 0,
+  "index_fresh": true,
+  "index_manifest_present": true,
+  "removed": 0,
+  "runtime_present": true,
+  "stale": 0
+ },
+ "next_action": "no runnable tasks: run readiness planning or discovery",
+ "next_task": null,
+ "open_transactions": [],
+ "project": {
+  "alias": "z-w11",
+  "branch": "main",
+  "commit": "c7957a90f883e0d37624a5643402c0711f7e3c4b",
+  "name": "w11",
+  "root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/dp-before-ynRYs4/w11-817358323"
+ },
+ "recent_reports": [
+  {
+   "id": "RPT-0001",
+   "outcome": "success",
+   "task": "TASK-0001"
+  }
+ ],
+ "records": 12,
+ "release_trust": {
+  "authenticity": "UNKNOWN",
+  "authenticity_established": false,
+  "below_floor": false,
+  "bound_release": {
+   "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+   "at": "2026-09-19T11:29:18Z",
+   "authenticity": "UNKNOWN",
+   "bootstrap": {
+    "authenticity": "UNKNOWN",
+    "binary": {
+     "cli_version": "4.1.5",
+     "embedded_commit": "25dac6efcc4a0d8149d12b619b1776788f34dcaf",
+     "embedded_kernel_version": "4.1.5",
+     "embedded_payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df",
+     "executable_sha256": "5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82",
+     "gov_version": "4.1.5"
+    },
+    "decision": "OWNER-DECISION-P2-0002",
+    "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+    "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+    "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+   },
+   "channel": "unspecified",
+   "ingress": "init",
+   "kernel_manifest_hash": "a831188b208e7dcb7047203942e6ded0db6f0f38780a9865125ead564dbc9b46",
+   "payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df",
+   "posture_at_install": "UNPROVISIONED",
+   "release_metadata_sha256": "",
+   "release_version": "4.1.5",
+   "sequence": 0
+  },
+  "currency": "UNKNOWN_BETWEEN_INGRESSES",
+  "detail": "gov trust status",
+  "disclosure": "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.5), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).",
+  "integrity": {
+   "basis": "byte-identical to the payload embedded in the running gov binary: the bootstrap baseline a machine with no trust anchor may hold (OWNER-DECISION-P2-0002); its authenticity is UNKNOWN",
+   "intact": true,
+   "protected_record": "MATCHED"
+  },
+  "marking": null,
+  "posture": "UNPROVISIONED",
+  "revocation_knowledge": "only revocations this machine has received; no claim about unseen or future revocations",
+  "scope": "this project's installation (machine-protected per-project record)",
+  "verified_payload_hash": null,
+  "verified_release": null
+ },
+ "role": "orchestrator",
+ "session": "S-zeta",
+ "tasks": {
+  "blocked": [
+   {
+    "reasons": [
+     "mandatory inputs unsatisfied: REQ-0001 (requirement: SUPERSEDED,LIFECYCLE_STATE)"
+    ],
+    "task": "TASK-0002"
+   },
+   {
+    "reasons": [
+     "mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT)"
+    ],
+    "task": "TASK-0003"
+   }
+  ],
+  "counts": {
+   "blocked": 2,
+   "done": 1,
+   "open": 2,
+   "runnable": 0,
+   "total": 3,
+   "waiting_human": 0
+  },
+  "cycles": [],
+  "longest_chain": [
+   "TASK-0002"
+  ],
+  "runnable": [],
+  "waiting_human": []
+ }
+}
+$ gov memory verify    [session=S-zeta role=orchestrator exit=0 0.1s]
+
+===== memory verify (ok=True) full output =====
+{
+ "avg_latency_ms": 0.6470588235294118,
+ "by_category": [
+  {
+   "category": "exact_path",
+   "queries": 6,
+   "recall": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "queries": 6,
+   "recall": 1.0
+  },
+  {
+   "category": "symbol",
+   "queries": 5,
+   "recall": 1.0
+  }
+ ],
+ "forbidden_violations": 0,
+ "index_fresh": true,
+ "measured": true,
+ "min_queries": 5,
+ "mrr": 1.0,
+ "pass": true,
+ "pending_queries": 2,
+ "precision_at_k": 0.980392156862745,
+ "queries": 17,
+ "recall_at_k": 1.0,
+ "results": [
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/framework.lock"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/framework.lock",
+    "file:governance/framework.lock"
+   ],
+   "id": "HQ-001",
+   "latency_ms": 3,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/framework.lock",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/KERNEL.yaml",
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "id": "HQ-002",
+   "latency_ms": 1,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/KERNEL.yaml",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/KERNEL_MANIFEST.json"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/KERNEL_MANIFEST.json",
+    "file:governance/kernel/KERNEL_MANIFEST.json"
+   ],
+   "id": "HQ-003",
+   "latency_ms": 1,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/KERNEL_MANIFEST.json",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/adapters/api/adapter.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/api/adapter.yaml",
+    "file:governance/kernel/adapters/api/adapter.yaml"
+   ],
+   "id": "HQ-004",
+   "latency_ms": 1,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/adapters/api/adapter.yaml",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/api/template.txt",
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "id": "HQ-005",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/adapters/api/template.txt",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/adapters/cli/adapter.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/cli/adapter.yaml",
+    "file:governance/kernel/adapters/cli/adapter.yaml"
+   ],
+   "id": "HQ-006",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/adapters/cli/adapter.yaml",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:src/lib.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:src/lib.rs"
+   ],
+   "id": "HQ-007",
+   "latency_ms": 3,
+   "pass": true,
+   "precision": 1.0,
+   "query": "append",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:tests/ledger_test.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:tests/ledger_test.rs"
+   ],
+   "id": "HQ-008",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "appends_and_totals",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:src/lib.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:src/lib.rs",
+    "file:src/lib.rs"
+   ],
+   "id": "HQ-009",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "is_empty",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:tests/ledger_test.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:tests/ledger_test.rs"
+   ],
+   "id": "HQ-010",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "rejects_duplicates_and_zero_quantity",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:src/lib.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:src/lib.rs",
+    "file:src/lib.rs",
+    "file:tests/ledger_test.rs"
+   ],
+   "id": "HQ-011",
+   "latency_ms": 1,
+   "pass": true,
+   "precision": 0.6666666666666666,
+   "query": "total_cents",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/framework.lock"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/framework.lock"
+   ],
+   "id": "HQ-012",
+   "latency_ms": 1,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"release_hash: measured digest of the installed payload (verified-byte binding at install)\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/KERNEL.yaml",
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "id": "HQ-013",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"# This file is part of the immutable kernel payload installed into <repo>/governance/kernel/.\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/api/template.txt",
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "id": "HQ-014",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"You operate inside a repository governed by {{framework}} {{version}} (project {{project_name}}).\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "id": "HQ-015",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"1. Run `gov status` to reconstruct the current governed state (no prior conversation needed).\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "id": "HQ-016",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"- Never edit governance/kernel/. Propose framework changes as FRAMEWORK-scoped lessons.\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/ide/adapter.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/ide/adapter.yaml",
+    "file:governance/kernel/adapters/ide/adapter.yaml"
+   ],
+   "id": "HQ-017",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"description: IDE rules projection (generic rules file consumed by IDE agents).\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  }
+ ],
+ "stale_hit_rate": 0.0,
+ "status": "PASS",
+ "superseded_hit_rate": 0.0,
+ "thresholds": {
+  "max_stale_hit_rate": 0.0,
+  "max_superseded_hit_rate": 0.0,
+  "min_mrr": 0.5,
+  "min_queries": 5,
+  "min_recall_at_k": 0.8
+ },
+ "thresholds_met": true
+}
+$ gov task dag    [session=S-zeta role=orchestrator exit=0 0.0s]
+
+===== task dag (ok=True) full output =====
+{
+ "blocked": [
+  {
+   "reasons": [
+    "mandatory inputs unsatisfied: REQ-0001 (requirement: SUPERSEDED,LIFECYCLE_STATE)"
+   ],
+   "task": "TASK-0002"
+  },
+  {
+   "reasons": [
+    "mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT)"
+   ],
+   "task": "TASK-0003"
+  }
+ ],
+ "counts": {
+  "blocked": 2,
+  "done": 1,
+  "open": 2,
+  "runnable": 0,
+  "total": 3,
+  "waiting_human": 0
+ },
+ "cycles": [],
+ "dangling_blocks": [],
+ "done": [
+  "TASK-0001"
+ ],
+ "human_gate_dependencies": [],
+ "longest_chain": [
+  "TASK-0002"
+ ],
+ "missing_dependencies": [],
+ "per_feature": {
+  "F-0001": [
+   "TASK-0001",
+   "TASK-0002",
+   "TASK-0003"
+  ]
+ },
+ "runnable": [],
+ "waiting_human": []
+}
+documented name-matching proxies: {
+ "audit.families.secrets_sensitivity_indexing.detail.leaked_chunks": "secret-pattern chunks in the index (security), not superseded-input leakage",
+ "memory verify.superseded_hit_rate": "held-out RETRIEVAL leakage of superseded artefacts (W11-m3-proxy line)",
+ "memory verify.thresholds.max_superseded_hit_rate": "threshold for the retrieval proxy above",
+ "audit.families.graph_integrity.detail.orphans": "count of records with no edge at all (W11-m8-proxy line)",
+ "audit.families.fresh_agent_reconstruction": "read-count vs read-budget family (W11-m9-proxy line)",
+ "status.fresh_agent_reads": "list of files a fresh agent should read (W11-m9-proxy line)"
+}
+m1-required-input-delivery-accuracy: keys matching ['delivery', 'required_input', 'input_accuracy']: ['audit.families.context_reproducibility.detail.delivery']
+OBS W11-m1-required-input-delivery-accuracy: PASS -- metric keys (excluding documented proxies): ['audit.families.context_reproducibility.detail.delivery']; proxies matched: []
+m2-current-version-selection-accuracy: keys matching ['current_version', 'version_selection']: []
+OBS W11-m2-current-version-selection-accuracy: FAIL -- metric keys (excluding documented proxies): []; proxies matched: []
+m3-superseded-input-leakage-rate: keys matching ['superseded.*(rate|leak)', 'leak']: ['audit.families.secrets_sensitivity_indexing.detail.leaked_chunks', 'memory verify.superseded_hit_rate', 'memory verify.thresholds.max_superseded_hit_rate']
+OBS W11-m3-superseded-input-leakage-rate: FAIL -- metric keys (excluding documented proxies): []; proxies matched: ['audit.families.secrets_sensitivity_indexing.detail.leaked_chunks', 'memory verify.superseded_hit_rate', 'memory verify.thresholds.max_superseded_hit_rate']
+m4-missing-required-input-detection: keys matching ['missing_(required_)?input', 'missing_inputs']: []
+OBS W11-m4-missing-required-input-detection: FAIL -- metric keys (excluding documented proxies): []; proxies matched: []
+m5-staleness-propagation-accuracy: keys matching ['staleness', 'propagation_accuracy', 'stale_propagation']: []
+OBS W11-m5-staleness-propagation-accuracy: FAIL -- metric keys (excluding documented proxies): []; proxies matched: []
+m6-requirement-to-code-traceability-coverage: keys matching ['requirement.*code', 'req.*code_cov', 'code_traceab']: []
+OBS W11-m6-requirement-to-code-traceability-coverage: FAIL -- metric keys (excluding documented proxies): []; proxies matched: []
+m7-requirement-to-test-traceability-coverage: keys matching ['requirement.*test', 'test_traceab']: []
+OBS W11-m7-requirement-to-test-traceability-coverage: FAIL -- metric keys (excluding documented proxies): []; proxies matched: []
+m8-orphan-detection-recall-fp: keys matching ['orphan.*(recall|precision|false)', 'orphan']: ['audit.families.graph_integrity.detail.orphan_records', 'audit.families.graph_integrity.detail.orphans', 'audit.families.lineage_orphans', 'audit.families.lineage_orphans.detail.orphans', 'audit.findings[].orphan', 'doctor.checks[].orphan_records']
+OBS W11-m8-orphan-detection-recall-fp: PASS -- metric keys (excluding documented proxies): ['audit.families.graph_integrity.detail.orphan_records', 'audit.families.lineage_orphans', 'audit.families.lineage_orphans.detail.orphans', 'audit.findings[].orphan', 'doctor.checks[].orphan_records']; proxies matched: ['audit.families.graph_integrity.detail.orphans']
+m9-fresh-agent-reconstruction-correctness: keys matching ['reconstruction', 'fresh_agent']: ['audit.families.fresh_agent_reconstruction', 'status.fresh_agent_reads']
+OBS W11-m9-fresh-agent-reconstruction-correctness: FAIL -- metric keys (excluding documented proxies): []; proxies matched: ['audit.families.fresh_agent_reconstruction', 'status.fresh_agent_reads']
+OBS W11-m3-proxy-retrieval-superseded-hit-rate: PASS -- memory verify superseded_hit_rate=0.0 (held-out RETRIEVAL leakage of superseded artefacts; not leakage into mandatory task inputs: TASK-0002 received SUPERSEDED REQ-0001 as a governing requirement and is DONE)
+OBS W11-m6-proxy-task-traceability: PASS -- audit product_traceability.detail={'tasks': 3, 'done': 1, 'task_traceability': 1.0, 'features': 1, 'untraceable_closed_tasks': []} (fraction of tasks naming a feature; not requirement->code coverage)
+OBS W11-m8-proxy-orphan-count: PASS -- audit graph_integrity.detail.orphans=2 (count only: no recall, no false-positive rate)
+OBS W11-m9-proxy-fresh-agent-read-budget: PASS -- audit fresh_agent_reconstruction.detail={'reads': 5, 'budget': 25, 'status_chars': 6325, 'next_action': 'no runnable tasks: run readiness planning or discovery'} (read-count vs budget; correctness of reconstructed inputs not measured)
+
+==== SUMMARY ====
+W11-m1-required-input-delivery-accuracy: PASS
+W11-m2-current-version-selection-accuracy: FAIL
+W11-m3-superseded-input-leakage-rate: FAIL
+W11-m4-missing-required-input-detection: FAIL
+W11-m5-staleness-propagation-accuracy: FAIL
+W11-m6-requirement-to-code-traceability-coverage: FAIL
+W11-m7-requirement-to-test-traceability-coverage: FAIL
+W11-m8-orphan-detection-recall-fp: PASS
+W11-m9-fresh-agent-reconstruction-correctness: FAIL
+W11-m3-proxy-retrieval-superseded-hit-rate: PASS
+W11-m6-proxy-task-traceability: PASS
+W11-m8-proxy-orphan-count: PASS
+W11-m9-proxy-fresh-agent-read-budget: PASS
+total=13 pass=6 fail=7
+[exit=0]

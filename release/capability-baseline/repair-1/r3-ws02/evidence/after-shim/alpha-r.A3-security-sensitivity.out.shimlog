@@ -1,0 +1,18 @@
+(a) role declared: orchestrator for init --name a3
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for policy effective MEMORY_POLICY
+(a) role declared: orchestrator for tools list
+(a) role declared: orchestrator for memory query AKIAABCDEFGHIJKLMNOP
+(a) role declared: orchestrator for memory query hunter2hunter2
+(a) role declared: orchestrator for memory query alice@example.invalid
+(a) role declared: orchestrator for memory query zebra-quartz-17
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for policy overrides
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for cit propose --proposal

@@ -1,0 +1,3895 @@
+{
+  "ok": true,
+  "command": "health",
+  "result": {
+    "tiers": [
+      {
+        "tier": "G0",
+        "duty": "Guard — every privileged/mutating command",
+        "checks": []
+      },
+      {
+        "tier": "G1",
+        "duty": "Mutation — changed paths/schema/secrets/index invalidation",
+        "checks": [
+          "schema_invariants",
+          "graph_integrity",
+          "index_freshness",
+          "path_map_compliance",
+          "secrets_sensitivity_indexing",
+          "os_binding_integrity",
+          "installation_authenticity",
+          "index_content_coverage",
+          "upstream_change_propagation",
+          "authority_unambiguous",
+          "legacy_authority",
+          "feature_readiness",
+          "unresolved_audit_findings",
+          "health_slos",
+          "D001",
+          "D002",
+          "D003",
+          "D004",
+          "D005",
+          "D006",
+          "D007",
+          "D008",
+          "D009",
+          "D010",
+          "D011",
+          "D012",
+          "D013",
+          "D014",
+          "D015",
+          "D016",
+          "D017",
+          "D018",
+          "D019",
+          "D020",
+          "D021",
+          "D022",
+          "D023",
+          "D024",
+          "D025",
+          "D026",
+          "D027",
+          "D028",
+          "D029",
+          "D030",
+          "D031",
+          "D032",
+          "D033",
+          "D034",
+          "D035"
+        ]
+      },
+      {
+        "tier": "G2",
+        "duty": "Task Close — mutation scope/readiness/tests/references/memory freshness",
+        "checks": [
+          "schema_invariants",
+          "graph_integrity",
+          "index_freshness",
+          "mutation_scope",
+          "product_traceability",
+          "product_test_health",
+          "os_binding_integrity",
+          "task_contract_integrity",
+          "upstream_change_propagation",
+          "feature_readiness",
+          "research_experiment_data_lifecycle"
+        ]
+      },
+      {
+        "tier": "G3",
+        "duty": "Checkpoint/Handoff — claims/decisions/gates/checkpoint freshness",
+        "checks": [
+          "authority_role_limits",
+          "concurrency_claims",
+          "human_gate_integrity",
+          "change_control_integrity",
+          "continuity_checkpoint_handoff",
+          "os_binding_integrity",
+          "upstream_change_propagation",
+          "authority_unambiguous",
+          "unresolved_audit_findings",
+          "health_slos"
+        ]
+      },
+      {
+        "tier": "G4",
+        "duty": "Milestone — CIT-E/migration/memory/architecture changes",
+        "checks": [
+          "schema_invariants",
+          "graph_integrity",
+          "index_freshness",
+          "memory_retrieval_regression",
+          "authority_role_limits",
+          "mutation_scope",
+          "path_map_compliance",
+          "context_reproducibility",
+          "concurrency_claims",
+          "adapter_portability",
+          "secrets_sensitivity_indexing",
+          "recovery_rebuild",
+          "fresh_agent_reconstruction",
+          "product_traceability",
+          "audit_reproducibility",
+          "policy_precedence",
+          "plugin_governance",
+          "product_test_health",
+          "human_gate_integrity",
+          "change_control_integrity",
+          "continuity_checkpoint_handoff",
+          "model_routing_integrity",
+          "lineage_orphans",
+          "os_binding_integrity",
+          "installation_authenticity",
+          "index_content_coverage",
+          "task_contract_integrity",
+          "upstream_change_propagation",
+          "authority_unambiguous",
+          "legacy_authority",
+          "feature_readiness",
+          "unresolved_audit_findings",
+          "research_experiment_data_lifecycle",
+          "artifact_flow_health",
+          "health_slos"
+        ]
+      },
+      {
+        "tier": "G5",
+        "duty": "Full Suite — adopt/update/release/full audit",
+        "checks": [
+          "schema_invariants",
+          "graph_integrity",
+          "index_freshness",
+          "memory_retrieval_regression",
+          "authority_role_limits",
+          "mutation_scope",
+          "path_map_compliance",
+          "context_reproducibility",
+          "concurrency_claims",
+          "adapter_portability",
+          "skill_regression",
+          "command_contract_consistency",
+          "secrets_sensitivity_indexing",
+          "recovery_rebuild",
+          "fresh_agent_reconstruction",
+          "product_traceability",
+          "audit_reproducibility",
+          "policy_enforcement_coverage",
+          "policy_precedence",
+          "plugin_governance",
+          "product_test_health",
+          "human_gate_integrity",
+          "change_control_integrity",
+          "continuity_checkpoint_handoff",
+          "model_routing_integrity",
+          "lineage_orphans",
+          "os_binding_integrity",
+          "installation_authenticity",
+          "contract_binding",
+          "index_content_coverage",
+          "task_contract_integrity",
+          "upstream_change_propagation",
+          "authority_unambiguous",
+          "legacy_authority",
+          "feature_readiness",
+          "unresolved_audit_findings",
+          "research_experiment_data_lifecycle",
+          "artifact_flow_health",
+          "health_slos",
+          "D001",
+          "D002",
+          "D003",
+          "D004",
+          "D005",
+          "D006",
+          "D007",
+          "D008",
+          "D009",
+          "D010",
+          "D011",
+          "D012",
+          "D013",
+          "D014",
+          "D015",
+          "D016",
+          "D017",
+          "D018",
+          "D019",
+          "D020",
+          "D021",
+          "D022",
+          "D023",
+          "D024",
+          "D025",
+          "D026",
+          "D027",
+          "D028",
+          "D029",
+          "D030",
+          "D031",
+          "D032",
+          "D033",
+          "D034",
+          "D035"
+        ]
+      },
+      {
+        "tier": "G6",
+        "duty": "Qualification — synthetic repos/chaos/soak/hidden tests",
+        "checks": [
+          "schema_invariants",
+          "graph_integrity",
+          "index_freshness",
+          "memory_retrieval_regression",
+          "authority_role_limits",
+          "mutation_scope",
+          "path_map_compliance",
+          "context_reproducibility",
+          "concurrency_claims",
+          "adapter_portability",
+          "skill_regression",
+          "command_contract_consistency",
+          "secrets_sensitivity_indexing",
+          "recovery_rebuild",
+          "fresh_agent_reconstruction",
+          "product_traceability",
+          "audit_reproducibility",
+          "policy_enforcement_coverage",
+          "policy_precedence",
+          "plugin_governance",
+          "product_test_health",
+          "human_gate_integrity",
+          "change_control_integrity",
+          "continuity_checkpoint_handoff",
+          "model_routing_integrity",
+          "lineage_orphans",
+          "os_binding_integrity",
+          "installation_authenticity",
+          "contract_binding",
+          "index_content_coverage",
+          "task_contract_integrity",
+          "upstream_change_propagation",
+          "authority_unambiguous",
+          "legacy_authority",
+          "feature_readiness",
+          "unresolved_audit_findings",
+          "research_experiment_data_lifecycle",
+          "artifact_flow_health",
+          "health_slos"
+        ]
+      }
+    ],
+    "operations": [
+      "task.create",
+      "task.claim",
+      "task.close",
+      "cit.propose",
+      "cit.approve",
+      "cit.execute",
+      "handoff.create",
+      "release.build",
+      "update.apply",
+      "adopt.migrate"
+    ],
+    "checks": [
+      {
+        "id": "schema_invariants",
+        "surface": "governance-family",
+        "duty": "records and overlay valid against kernel schemas; lifecycle/state classes; duplicate ids; superseded-but-ACTIVE authority; no hidden Qualification Oracle record in the governed repository",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "graph_integrity",
+        "surface": "governance-family",
+        "duty": "relationship graph (orphan, dangling, stale, reversed, ill-typed relationships and supersession cycles: memory::integrity), records outside their canonical location (W1), stale lineage links (W8), task DAG (cycles, missing dependencies, `blocks` naming no task)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "index_manifest",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "path_map",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [
+          "LiveIndex"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.claim",
+                "task.close"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "index_freshness",
+        "surface": "governance-family",
+        "duty": "tracked index manifest matches the working tree and the policy pins; the live retrieval profile is governed (memory::profile)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "memory_retrieval_regression",
+        "surface": "governance-family",
+        "duty": "held-out retrieval regression (recall@k, MRR, stale/superseded/forbidden hits) against the live index",
+        "depends_on": [
+          "framework_lock",
+          "governance_tests",
+          "index_manifest",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex"
+        ],
+        "isolation": "Sandbox",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "authority_role_limits",
+        "surface": "governance-family",
+        "duty": "tool permissions name kernel roles; no worker handed the orchestrator role; no task scoped into the kernel",
+        "depends_on": [
+          "continuity_records",
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "mutation_scope",
+        "surface": "governance-family",
+        "duty": "kernel payload unmodified (INV-007); returned handoffs carry no authority violations",
+        "depends_on": [
+          "continuity_records",
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "path_map_compliance",
+        "surface": "governance-family",
+        "duty": "every governed file matches a repository-contract rule; no secret content outside secret-class paths; no hidden Qualification Oracle material in any file",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "context_reproducibility",
+        "surface": "governance-family",
+        "duty": "deterministic authority block of a compiled context packet is reproducible and carries the policy fields; every dispatchable task's delivered inputs verify against its declared manifest (W4)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "index_manifest",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex"
+        ],
+        "isolation": "Sandbox",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "concurrency_claims",
+        "surface": "governance-family",
+        "duty": "session claims reference known tasks; expired claims swept",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_tasks"
+        ],
+        "extras": [
+          "Claims"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "adapter_portability",
+        "surface": "governance-family",
+        "duty": "generated provider adapters are current and carry the kernel invariants",
+        "depends_on": [
+          "framework_lock",
+          "generated_other",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "skill_regression",
+        "surface": "governance-family",
+        "duty": "skill schema; version identifies content (bindings and observations); validation scenarios executed in sandboxes",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [
+          "SkillObservations"
+        ],
+        "isolation": "OwnSandboxes",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "command_contract_consistency",
+        "surface": "governance-family",
+        "duty": "every command-contract operation maps to an implemented CLI command",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "secrets_sensitivity_indexing",
+        "surface": "governance-family",
+        "duty": "no secret-class artefact, secret pattern, never-index class or derived vector in the index",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "recovery_rebuild",
+        "surface": "governance-family",
+        "duty": "tracked manifest matches the live index; deep: two full rebuilds in a sandbox reproduce the manifest hash; non-rebuildable OS state kept outside the derived directories (paths::misplaced_os_state)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex",
+          "DeepMode"
+        ],
+        "isolation": "Sandbox",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "fresh_agent_reconstruction",
+        "surface": "governance-family",
+        "duty": "a fresh agent reconstructs state within the read budget",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "Claims"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "product_traceability",
+        "surface": "governance-family",
+        "duty": "test obligations within policy families and independence; DONE tasks closed by a report; features have scenarios/tests; DONE implementation traces to its requirements (W5/W8)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "audit_reproducibility",
+        "surface": "governance-family",
+        "duty": "every check executed in this run reproduced its result (double run, or cached result under an identical key)",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "policy_enforcement_coverage",
+        "surface": "governance-family",
+        "duty": "every kernel policy key is enforced or classified informational",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "policy_precedence",
+        "surface": "governance-family",
+        "duty": "no refused (weakening) override; precedence rules available; policy read from a verified kernel",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "plugin_governance",
+        "surface": "governance-family",
+        "duty": "plugin descriptors valid, registered, pinned and authorised (records first governed use on this machine)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "PluginObservations"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "product_test_health",
+        "surface": "governance-family",
+        "duty": "per-family product-test evidence: recorded, current for its inputs, passing (O1, U product-test health)",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "tools_plugins"
+        ],
+        "extras": [
+          "ProductEvidence"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close"
+              ],
+              "scope": "covered-paths",
+              "remedies": []
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "human_gate_integrity",
+        "surface": "governance-family",
+        "duty": "answers are offered options of presented gates; no work completed past an unanswered blocking gate",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_decisions",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "change_control_integrity",
+        "surface": "governance-family",
+        "duty": "no interrupted CIT; committed CITs carry an approval and, where required, an answered gate",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "cit.propose",
+                "cit.execute",
+                "task.close"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "continuity_checkpoint_handoff",
+        "surface": "governance-family",
+        "duty": "handoffs and checkpoints reference known tasks; the latest-checkpoint pointer resolves; the latest checkpoint still describes the material state it captured (checkpoints::freshness)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "model_routing_integrity",
+        "surface": "governance-family",
+        "duty": "every task class in use resolves to a routing tier; routing evidence names known task classes",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "project_policy",
+          "runtime_identity",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "lineage_orphans",
+        "surface": "governance-family",
+        "duty": "W7: every orphan by name — unconsumed outputs, specs without implementation/test path, research never consumed by a decision, acceptance tests without requirement/scenario, code without active spec justification; generates linked investigation work",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex",
+          "GovernanceBaseline"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "os_binding_integrity",
+        "surface": "governance-family",
+        "duty": "T2: gate/decision records, CIT state, plugin-registry entries, the adoption baseline and health evidence that no gov operation on this machine produced as they stand are reported and not honoured; tampering with sealed OS state is high",
+        "depends_on": [
+          "adoption_evidence",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_decisions",
+          "spec_tasks",
+          "t2_bindings",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G2",
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "installation_authenticity",
+        "surface": "governance-family",
+        "duty": "BC-P2-36: an installation whose release authenticity is not established is disclosed with its admission (low on an unprovisioned bootstrap machine, medium on a provisioned one)",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "contract_binding",
+        "surface": "governance-family",
+        "duty": "BC-P2-01: the compiled contract views, evidence map and generated view are semantically identical to the owner source (`gov contract verify`), where the contract chain is present",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [
+          "ContractSource"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "index_content_coverage",
+        "surface": "governance-family",
+        "duty": "BC-P2-25: every governed record's content and every non-empty line of indexed code is held by at least one chunk of the live index",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "task_contract_integrity",
+        "surface": "governance-family",
+        "duty": "task contracts hold in the tree: output of a task whose contract forbids production merge (every experiment) is not in the production tree",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "Claims"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "upstream_change_propagation",
+        "surface": "governance-family",
+        "duty": "G1/G4 dependency and lineage invalidation (W6, W12): authoritative inputs changed since dependent work consumed them and not yet propagated; completed work, evidence and packets invalidated by an upstream change and not yet revalidated",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [
+          "ContextPackets"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G2",
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "authority_unambiguous",
+        "surface": "governance-family",
+        "duty": "HEALTHY 1 / Gate U unresolved contradictions: contradictions between current authoritative records (context::contradictions) are reported by name until resolved",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "t2_bindings"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "legacy_authority",
+        "surface": "governance-family",
+        "duty": "HEALTHY 2: no legacy governance mechanism (provider rules files, legacy agent instructions) remains in the active tree without LEGACY registration",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "feature_readiness",
+        "surface": "governance-family",
+        "duty": "HEALTHY 7: every active feature states its readiness explicitly (orchestration::readiness); silent N/A and invalid cells reported",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "spec_requirements",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "unresolved_audit_findings",
+        "surface": "governance-family",
+        "duty": "HEALTHY 11: no unresolved critical finding in any current audit record other than the suite's own results (independent, adoption and imported audits)",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "research_experiment_data_lifecycle",
+        "surface": "governance-family",
+        "duty": "J1/J2/H4 (WS-10 lifecycle::suite_findings): research/experiment evidence complete before it is relied on or presented as evidence, influence backlinks, irreproducible experiments, scenario → data → test-data chain; experimental task output in the production tree",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "t2_bindings",
+          "tools_plugins"
+        ],
+        "extras": [
+          "Claims"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "DoubleRun",
+        "cache": "Cacheable",
+        "tiers": [
+          "G2",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "artifact_flow_health",
+        "surface": "governance-family",
+        "duty": "W11: the nine artifact-flow metrics — required-input delivery accuracy, current-version selection accuracy, superseded-input leakage rate, missing-required-input detection, staleness propagation accuracy, requirement→code and requirement→test traceability coverage, orphan-output detection recall/false positives, fresh-agent reconstruction correctness",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex",
+          "Claims",
+          "ContextPackets",
+          "Qualifications"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "health_slos",
+        "surface": "governance-family",
+        "duty": "Gate U: every framework-health SLO computed against its declared threshold (framework/health/HEALTH_SLOS.yaml); a crossed threshold is a finding unless the SLO's owning check already raises it",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [
+          "LiveIndex",
+          "Claims",
+          "Telemetry",
+          "ContextPackets",
+          "ClockHour"
+        ],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Cacheable",
+        "tiers": [
+          "G1",
+          "G3",
+          "G4",
+          "G5",
+          "G6"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D001",
+        "surface": "doctor",
+        "duty": "framework.lock present",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D002",
+        "surface": "doctor",
+        "duty": "framework.lock schema",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D003",
+        "surface": "doctor",
+        "duty": "kernel payload integrity",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D004",
+        "surface": "doctor",
+        "duty": "lock matches kernel manifest",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D005",
+        "surface": "doctor",
+        "duty": "CLI/kernel compatibility",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D006",
+        "surface": "doctor",
+        "duty": "project overlay",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D007",
+        "surface": "doctor",
+        "duty": "policies",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D008",
+        "surface": "doctor",
+        "duty": "framework.json in sync",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "path_map",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D009",
+        "surface": "doctor",
+        "duty": "derived runtime",
+        "depends_on": [
+          "framework_lock",
+          "index_manifest",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D010",
+        "surface": "doctor",
+        "duty": "index freshness",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D011",
+        "surface": "doctor",
+        "duty": "secrets outside secret class",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D012",
+        "surface": "doctor",
+        "duty": "no secrets in index",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D013",
+        "surface": "doctor",
+        "duty": "legacy governance mechanisms retired",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D014",
+        "surface": "doctor",
+        "duty": "authority unambiguous",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D015",
+        "surface": "doctor",
+        "duty": "graph integrity",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D016",
+        "surface": "doctor",
+        "duty": "no interrupted transactions",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_decisions"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "cit.propose",
+                "cit.execute"
+              ],
+              "scope": "global",
+              "remedies": []
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close"
+              ],
+              "scope": "subjects",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D017",
+        "surface": "doctor",
+        "duty": "session claims",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D018",
+        "surface": "doctor",
+        "duty": "control state",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D019",
+        "surface": "doctor",
+        "duty": "human gates presented",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_decisions"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D020",
+        "surface": "doctor",
+        "duty": "adapters current and conformant",
+        "depends_on": [
+          "framework_lock",
+          "generated_other",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D021",
+        "surface": "doctor",
+        "duty": "governance suite green and current",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D022",
+        "surface": "doctor",
+        "duty": "native toolchains",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "source"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D023",
+        "surface": "doctor",
+        "duty": "records parse",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "research_experiments",
+          "runtime_identity",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D024",
+        "surface": "doctor",
+        "duty": ".governance-runtime ignored by git",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "source"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D025",
+        "surface": "doctor",
+        "duty": "semantic index consistent with pins; retrieval profile governed; embedding runtime unchanged",
+        "depends_on": [
+          "framework_lock",
+          "index_manifest",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D026",
+        "surface": "doctor",
+        "duty": "claims store present and intact",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D027",
+        "surface": "doctor",
+        "duty": "policy precedence respected",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D028",
+        "surface": "doctor",
+        "duty": "capability plugins governed",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D029",
+        "surface": "doctor",
+        "duty": "constitutional policy read from a verified kernel",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D030",
+        "surface": "doctor",
+        "duty": "product tests pass (recorded evidence)",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close"
+              ],
+              "scope": "covered-paths",
+              "remedies": []
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D031",
+        "surface": "doctor",
+        "duty": "no active health hard-block",
+        "depends_on": [
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D032",
+        "surface": "doctor",
+        "duty": "installation authenticity established (else disclosed)",
+        "depends_on": [
+          "framework_lock",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D033",
+        "surface": "doctor",
+        "duty": "OS-written records bound to gov operations (T2)",
+        "depends_on": [
+          "adoption_evidence",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity",
+          "spec_decisions",
+          "t2_bindings",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D034",
+        "surface": "doctor",
+        "duty": "failure memory followed up",
+        "depends_on": [
+          "evidence_records",
+          "framework_lock",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "machine_trust",
+          "project_policy",
+          "runtime_identity"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D035",
+        "surface": "doctor",
+        "duty": "repository HEALTHY: the thirteen Gate U conditions and the framework-health SLOs",
+        "depends_on": [
+          "adoption_evidence",
+          "archive",
+          "continuity_records",
+          "evidence_records",
+          "framework_lock",
+          "generated_other",
+          "governance_tests",
+          "index_manifest",
+          "kernel_migration",
+          "kernel_other",
+          "kernel_policy",
+          "kernel_schema",
+          "kernel_skills",
+          "kernel_tools",
+          "machine_trust",
+          "model_profile",
+          "overlay_other",
+          "path_map",
+          "project_policy",
+          "project_skills",
+          "research_experiments",
+          "runtime_identity",
+          "sensitivity",
+          "source",
+          "spec_architecture",
+          "spec_decisions",
+          "spec_other",
+          "spec_requirements",
+          "spec_tasks",
+          "tools_plugins"
+        ],
+        "extras": [],
+        "isolation": "InProcess",
+        "reproducibility": "SelfChecked",
+        "cache": "Never",
+        "tiers": [
+          "G1",
+          "G5"
+        ],
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      }
+    ],
+    "input_classes": [
+      {
+        "class": "kernel_policy",
+        "contract_class": "governing contract/policy"
+      },
+      {
+        "class": "kernel_schema",
+        "contract_class": "schema"
+      },
+      {
+        "class": "kernel_migration",
+        "contract_class": "migration"
+      },
+      {
+        "class": "kernel_skills",
+        "contract_class": "skill (versioned method)"
+      },
+      {
+        "class": "kernel_tools",
+        "contract_class": "tool/plugin"
+      },
+      {
+        "class": "kernel_other",
+        "contract_class": "runtime/kernel implementation"
+      },
+      {
+        "class": "framework_lock",
+        "contract_class": "runtime/kernel implementation"
+      },
+      {
+        "class": "project_policy",
+        "contract_class": "governing contract/policy"
+      },
+      {
+        "class": "path_map",
+        "contract_class": "project path map"
+      },
+      {
+        "class": "sensitivity",
+        "contract_class": "security/sensitivity policy"
+      },
+      {
+        "class": "model_profile",
+        "contract_class": "model/retrieval profile"
+      },
+      {
+        "class": "tools_plugins",
+        "contract_class": "tool/plugin"
+      },
+      {
+        "class": "project_skills",
+        "contract_class": "skill (versioned method)"
+      },
+      {
+        "class": "overlay_other",
+        "contract_class": "governing contract/policy"
+      },
+      {
+        "class": "governance_tests",
+        "contract_class": "governing contract/policy (governance test inputs)"
+      },
+      {
+        "class": "index_manifest",
+        "contract_class": "relevant index manifest"
+      },
+      {
+        "class": "generated_other",
+        "contract_class": "generated adapters/registries"
+      },
+      {
+        "class": "spec_decisions",
+        "contract_class": "authoritative spec/decision"
+      },
+      {
+        "class": "spec_requirements",
+        "contract_class": "authoritative spec/decision"
+      },
+      {
+        "class": "spec_architecture",
+        "contract_class": "authoritative spec/decision"
+      },
+      {
+        "class": "spec_tasks",
+        "contract_class": "authoritative spec/decision (task manifests, test obligations)"
+      },
+      {
+        "class": "research_experiments",
+        "contract_class": "research/experiment records"
+      },
+      {
+        "class": "continuity_records",
+        "contract_class": "checkpoint/handoff records"
+      },
+      {
+        "class": "evidence_records",
+        "contract_class": "implementation/test evidence records"
+      },
+      {
+        "class": "adoption_evidence",
+        "contract_class": "adoption/audit evidence"
+      },
+      {
+        "class": "spec_other",
+        "contract_class": "authoritative spec/decision"
+      },
+      {
+        "class": "archive",
+        "contract_class": "legacy/historical records"
+      },
+      {
+        "class": "source",
+        "contract_class": "relevant source files"
+      },
+      {
+        "class": "runtime_identity",
+        "contract_class": "runtime/kernel implementation"
+      },
+      {
+        "class": "machine_trust",
+        "contract_class": "machine trust state"
+      },
+      {
+        "class": "t2_bindings",
+        "contract_class": "machine trust state (OS-operation binding of T2 records)"
+      }
+    ]
+  },
+  "session": "S-p2ar0033",
+  "release_trust": {
+    "surface": "health",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "UNAUTHENTICATED",
+    "section_6_bullet": 7,
+    "authenticity_established": false,
+    "disclosure": [
+      "BOOTSTRAP installation (OWNER-DECISION-P2-0002): the installed kernel is a gov binary's embedded payload, installed on a machine with no provisioned Signed Release Root trust anchor. Release authenticity UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+    ],
+    "detail": "gov kernel trust; gov trust status",
+    "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 §6 bullet 7 was also asked and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking."
+  }
+}
