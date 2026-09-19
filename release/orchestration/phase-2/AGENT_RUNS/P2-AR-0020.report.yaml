@@ -1,0 +1,96 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0020
+role: capability-repair
+objective: Repair iteration 1, round 1, WS-8 (part) — implement the repair-delta requirements for BC-P2-35, BC-P2-36 (presentation/disclosure part only), BC-P2-37 and BC-P2-38 without weakening any SRR control; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), a fresh capability-repair builder. This run
+  authored the product changes, builder tests and builder probes listed below; it authored none of the Phase-2 audits,
+  the synthesis, the R1 reviews or their held-out suites, and it grades none of its own work (every claim is
+  REPAIRED_CLAIMED; acceptance is for fresh independent verifiers). It did not read any session or agent transcript, any
+  task-output store (all long commands ran in the foreground with output redirected into its evidence directory), or
+  user auto-memory; it did not spawn sub-agents or contact the product owner. It edited only its owned files
+  (runtime/src/{kernel_trust,kernel,lock,update,release}.rs, runtime/src/srr/** except plugins.rs,
+  framework/schemas/framework-lock.schema.json) plus builder tests (tests/certification/repair2.rs two assertions,
+  tests/certification/ws08.rs new, one `mod` line in tests/certification/main.rs) and its own output directory. No file
+  under release/verification/, release/root-of-trust/, release/releases/, release/orchestration/phase-1/ or
+  release/capability-baseline/audit-0/ was modified; D-0007 and the Contract v3 source are untouched
+  (governed_state_digest unchanged).
+input:
+  base_commit: c6b60bc760a0bb42907f74210fd9e644a420851a
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0017-repair-1-ws08.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0017-repair-1-ws08.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.run.yaml
+  - release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml (frozen gate contract pin)
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md (§0, §1 root-of-trust classes, §2, §3, §4)
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml (BC-P2-35..38)
+  - release/capability-baseline/audit-0/synthesis/findings.yaml (A0-A2-01..04, A0-S5-01/02, A0-A2-05)
+  - release/capability-baseline/audit-0/synthesis/owner-decisions-required.md
+  - release/capability-baseline/audit-0/synthesis/evidence/AC16-X3-ingress-root-of-trust-chain.{py,out}
+  - release/capability-baseline/audit-0/alpha-r/00-AUDIT-REPORT.md (§1-§5)
+  - release/capability-baseline/audit-0/alpha-r/findings.yaml
+  - release/capability-baseline/audit-0/alpha-r/evidence/ (A2-01, A2-02, A2-03, A2-04, A2-05, A2-08, S5-update, S6-cross-machine probes and outputs, lib/env.sh, lib/srr_mint.py, 00-*regression* scripts)
+  - spec/architecture/ARCH-0003.yaml
+  - release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
+  - release/verification/4.1.6-r1*/evidence/REPRODUCTION.md and heldout-tests/ (all four suites; run unedited)
+  - release/verification/4.1.6-r1-4/evidence/derive.py (run from a scratch copy with only ROOT substituted)
+  - runtime/src/ (srr/*, kernel_trust, kernel, lock, init, update, release, recovery, doctor, status, adopt install path, policy, project, capabilities/governance acquisition channel, verification audit families, context packet)
+  - runtime/build.rs
+  - cli/src/main.rs
+  - tests/certification/ (common, srr, srr_material, section6, repair2, repair3, update, multi_machine, failure_injection)
+produced:
+  - runtime/src/srr/installation.rs
+  - runtime/src/srr/{mod,present,state,verifier}.rs
+  - runtime/src/{kernel,kernel_trust,lock,release,update}.rs
+  - framework/schemas/framework-lock.schema.json
+  - tests/certification/ws08.rs
+  - tests/certification/main.rs
+  - tests/certification/repair2.rs
+  - release/capability-baseline/repair-1/ws08/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/ws08/claims.yaml
+  - release/capability-baseline/repair-1/ws08/evidence/
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.report.yaml
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib, default and xdgcache modes (before 42/42)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/regression-after-63f82ba.out}
+  - {id: REG-CERT, description: "cargo test --test certification incl. section6.rs and srr.rs: 86/86 default and 86/86 xdgcache (before 79/79 and 78/79)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/regression-after-63f82ba.out}
+  - {id: R1-AR0027, description: "AR-0027 held-out suite unedited: 26 pass / 3 fail (b1, b2, d3) = recorded baseline, same failure messages", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/r1-heldout-after-63f82ba.out}
+  - {id: R1-AR0029, description: "AR-0029 held-out suite unedited: 26 / 2 (b3, b6), ho_f_preservation does not compile = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/r1-heldout-after-63f82ba.out}
+  - {id: R1-AR0031, description: "AR-0031 held-out suite unedited: 27 / 7 (a1, a5, a8, b6, c2, c3, d2) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/r1-heldout-after-63f82ba.out}
+  - {id: R1-AR0033, description: "AR-0033 held-out suite unedited: 30 / 1 vs recorded 31 / 0 — hv_a::a1 pins the product tree at 84 files / 740 functions (after 85 / 801); its §6 census substance re-measured by AR-0033's derive.py: 0 violations", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws08/evidence/r1-heldout-after-63f82ba.out}
+  - {id: A2-03-T2, description: "alpha-r consistent post-install rewrite: detected, kernel untrusted, mutations KERNEL_TAMPERED, doctor/audit UNHEALTHY (before: accepted as intact)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-03.out}
+  - {id: X3c-A2-146, description: "AC16-X3 consistent-rewrite-detected FAIL -> PASS", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/AC16-X3.out}
+  - {id: X3d, description: "AC16-X3 X3d cannot grade: its gate is created after the rewrite and gate creation is now refused (TypeError); property measured by WS08-P1 R1c", result: ERROR, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/AC16-X3.out}
+  - {id: X3a-A2-150, description: "AC16-X3 no-masquerade: presented_as UNAUTHENTICATED (was CURRENT); doctor still HEALTHY until WS-2 wires IP-1", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/AC16-X3.out}
+  - {id: A2-01-U2, description: "alpha-r unprovisioned posture presentation: envelope UNAUTHENTICATED, status verified_release null, doctor payload discloses (admission unchanged, OD-P2-02)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-01.out}
+  - {id: A2-04-L1-L4, description: "lock identity: forged unsigned commit not recorded; unsigned CERTIFIED no longer waives the gate; minting refused; authenticity basis recorded; embedded identity independent of XDG_CACHE_HOME", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-04.out}
+  - {id: S6-X3, description: "cross-machine identity with XDG_CACHE_HOME without .cache equals machine A", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/S6-cross-machine.out}
+  - {id: A2-08-V1-V3, description: "reinstall of another version refused before the swap; installation unchanged", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-08.out}
+  - {id: A2-05-K6a, description: "break-glass reinstall of an older release refused before the swap; kernel/lock/records unchanged; machine marked until IP-3", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-05.out}
+  - {id: A2-05-K6b, description: "probe's update now needs its gate (BC-P2-37) so nothing to roll back; re-established in WS08-P4 K1 (rollback from the ledger under the floor/break-glass rule)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/ws08-probes-after-63f82ba.out}
+  - {id: WS08-PROBES, description: "supplementary builder probes P1-P4: 45/45 PASS repaired; 9/45 PASS on the base binary (negative control)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws08/evidence/ws08-probes-after-63f82ba.out}
+findings: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-ws08
+  commit: 436dd5aa0255cbb70ec1b12950946fa1733088c1
+  evidence_path: release/capability-baseline/repair-1/ws08/
+  product_commit: 63f82bae91592418f1772d639fe9caa8d9a3f8af
+  product_code_digest: d34fbec033612eb497ee8b4052c6b9b41410433d0715b0f6c4ec02be7aa548e8
+unresolved:
+  - "IP-1 (WS-2 doctor.rs): add crate::srr::installation::doctor_check(&p.root, <id>) — needed for AC16-X3 X3a-A2:150xU-no-masquerade doctor half"
+  - "IP-2 (WS-2 verification/mod.rs): audit finding from crate::srr::installation::posture_of"
+  - "IP-3 (WS-3 cli/src/main.rs KernelCmd::Reinstall): pass .with_pinned_payload(lock release_hash) so a refused reinstall precedes break-glass entry"
+  - "IP-4 (WS-5 status.rs): per-project release_trust from posture_of"
+  - "IP-5 (WS-1 capability-evidence-map.yaml): evidence-owner rows for A2:146/149/150 and S5:944"
+  - "R1 AR-0033 hv_a::a1 size pin (84 files / 740 functions) fails on any candidate that adds a function; for the AC-14 R1-preservation verifier"
+  - "OD-P2-02 (with the owner): admission on unprovisioned machines unchanged; unprovisioned BC-P2-35 sub-case report-only"
+recommended_next_action: Integrate WS-8 with round-1 workstreams, wire IP-1..IP-5 in the owning workstreams, then run the AC-14 R1-preservation verification and fresh independent capability verification on the integrated candidate.
+completed_at: "2026-09-19T01:05:00Z"
