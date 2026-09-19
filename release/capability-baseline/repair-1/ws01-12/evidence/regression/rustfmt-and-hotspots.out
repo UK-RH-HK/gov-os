@@ -1,0 +1,9 @@
+# rustfmt evidence at 473c3fba12a64cc36144c192c02b07f5db63fa04
+## files this run owns / created (must be fmt-clean):
+runtime/src/contracts.rs runtime/src/qualification_oracle.rs: clean
+## cli/src/main.rs (shared hot spot, not fmt-clean at base c6b60bc): rustfmt --check hunk count here vs base
+here: 4
+base: 4
+## git diff --numstat c6b60bc HEAD -- cli/src/main.rs runtime/src/lib.rs (additions only):
+42	0	cli/src/main.rs
+1	0	runtime/src/lib.rs

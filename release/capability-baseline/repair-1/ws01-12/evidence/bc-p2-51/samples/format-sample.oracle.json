@@ -1,0 +1,260 @@
+{
+  "format": "governance-os.qualification-oracle",
+  "format_version": 1,
+  "format_sha256": "f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd",
+  "kind": "qualification-oracle",
+  "purpose": "FORMAT_SAMPLE",
+  "oracle_id": "FORMAT-SAMPLE-ORACLE-1",
+  "custody": {
+    "owner_role": "FRESH_INDEPENDENT_VERIFIER",
+    "owner_run_id": "FORMAT-SAMPLE",
+    "authored_independently_of_implementation": true,
+    "created_at": "2026-09-19T00:00:00Z"
+  },
+  "visibility": "HIDDEN",
+  "repository": {
+    "id": "format-sample-repository",
+    "adoption_mode": "BROWNFIELD",
+    "commit": "0000000000000000000000000000000000000000",
+    "label": "FORMAT SAMPLE placeholder"
+  },
+  "separation": {
+    "public_qualification_suite": "sample/public-suite",
+    "qualification_repository": "sample/repository",
+    "oracle_storage": "sample/verifier-custody/oracle.json"
+  },
+  "fault_manifest": {
+    "faults": [
+      {
+        "fault_id": "SAMPLE-F1",
+        "class": {
+          "id": "SAMPLE_CLASS_W",
+          "capabilities": [
+            "W3"
+          ],
+          "challenge_ids": [
+            "AQC-W12"
+          ]
+        },
+        "hidden_authoritative_truth": {
+          "statement": "FORMAT SAMPLE placeholder: the truth statement of sample fault one",
+          "authoritative_refs": [
+            "sample/a"
+          ]
+        },
+        "injected_repository_state": {
+          "description": "FORMAT SAMPLE placeholder: injected state",
+          "changes": [
+            {
+              "path": "sample/a",
+              "change": "MODIFIED"
+            },
+            {
+              "path": "sample/b",
+              "change": "RENAMED",
+              "from_path": "sample/b0"
+            }
+          ]
+        },
+        "expected_detection": {
+          "tiers": [
+            "G2"
+          ],
+          "signals": [
+            "SAMPLE_SIGNAL"
+          ],
+          "must_detect_before": "task close"
+        },
+        "expected_severity": "HIGH",
+        "expected_impacted": [
+          {
+            "ref": "sample/task",
+            "ref_kind": "TASK",
+            "relation": "DIRECT"
+          },
+          {
+            "ref": "sample/c",
+            "ref_kind": "PATH",
+            "relation": "TRANSITIVE"
+          }
+        ],
+        "expected_governed_action": [
+          {
+            "action": "BLOCK_CLOSE",
+            "target": "sample/task",
+            "description": "FORMAT SAMPLE placeholder: governed action"
+          }
+        ],
+        "forbidden_outcomes": [
+          {
+            "outcome": "FORMAT SAMPLE placeholder: forbidden outcome",
+            "observable": "FORMAT SAMPLE placeholder: how it is observed"
+          }
+        ],
+        "artifact_flow": {
+          "required_inputs": [
+            {
+              "artefact_id": "sample/a",
+              "version": "2"
+            }
+          ],
+          "expected_propagation": [
+            {
+              "ref": "sample/task",
+              "expected_state": "STALE"
+            }
+          ]
+        }
+      },
+      {
+        "fault_id": "SAMPLE-F2",
+        "class": {
+          "id": "SAMPLE_CLASS_A",
+          "capabilities": [
+            "A3"
+          ]
+        },
+        "hidden_authoritative_truth": {
+          "statement": "FORMAT SAMPLE placeholder: the truth statement of sample fault two",
+          "authoritative_refs": []
+        },
+        "injected_repository_state": {
+          "description": "FORMAT SAMPLE placeholder: injected state",
+          "changes": [
+            {
+              "path": "sample/secret",
+              "change": "ADDED"
+            }
+          ]
+        },
+        "expected_detection": {
+          "tiers": [
+            "G1"
+          ],
+          "signals": [
+            "SAMPLE_SIGNAL_2"
+          ],
+          "must_detect_before": "the next index build"
+        },
+        "expected_severity": "CRITICAL",
+        "expected_impacted": [
+          {
+            "ref": "sample/secret",
+            "ref_kind": "PATH",
+            "relation": "DIRECT"
+          }
+        ],
+        "expected_governed_action": [
+          {
+            "action": "QUARANTINE",
+            "description": "FORMAT SAMPLE placeholder: governed action"
+          }
+        ],
+        "forbidden_outcomes": [
+          {
+            "outcome": "FORMAT SAMPLE placeholder: forbidden outcome",
+            "observable": "FORMAT SAMPLE placeholder: how it is observed"
+          }
+        ]
+      }
+    ]
+  },
+  "path_map_oracle": {
+    "entries": [
+      {
+        "current_artefact": {
+          "path": "sample/a"
+        },
+        "correct_classification": "sample-class",
+        "authority": "sample-authority",
+        "expected_target_paths": [
+          "sample/a"
+        ],
+        "action": "KEEP",
+        "expected_references": [
+          "sample/c"
+        ],
+        "expected_consumers": [
+          "sample/task"
+        ],
+        "sensitivity": "sample-sensitivity",
+        "indexing_expectation": "INDEX_CURRENT"
+      },
+      {
+        "current_artefact": {
+          "path": "sample/old"
+        },
+        "correct_classification": "sample-class",
+        "authority": "sample-authority",
+        "expected_target_paths": [
+          "sample/archive/old"
+        ],
+        "action": "MOVE",
+        "expected_references": [],
+        "expected_consumers": [],
+        "sensitivity": "sample-sensitivity",
+        "indexing_expectation": "INDEX_HISTORICAL"
+      }
+    ]
+  },
+  "memory_oracle": {
+    "must_be_indexed": [
+      {
+        "ref": "sample/a",
+        "routes": [
+          "STRUCTURED"
+        ]
+      }
+    ],
+    "must_never_be_indexed": [
+      {
+        "ref": "sample/secret",
+        "reason": "FORMAT SAMPLE placeholder: reason"
+      }
+    ],
+    "expected_authority_namespaces": [
+      {
+        "ref": "sample/a",
+        "namespace": "sample-namespace"
+      }
+    ],
+    "expected_status": [
+      {
+        "ref": "sample/a",
+        "status": "CURRENT"
+      },
+      {
+        "ref": "sample/old",
+        "status": "SUPERSEDED",
+        "superseded_by": "sample/a"
+      }
+    ],
+    "expected_graph_relationships": [
+      {
+        "from": "sample/c",
+        "relation": "IMPLEMENTS",
+        "to": "sample/a"
+      }
+    ],
+    "expected_code_symbols": [
+      {
+        "path": "sample/c",
+        "symbol": "sample_symbol",
+        "symbol_kind": "function"
+      }
+    ],
+    "expected_retrieval_results": [
+      {
+        "query_id": "SQ1",
+        "query": "FORMAT SAMPLE placeholder: query",
+        "top_k": 5,
+        "must_include": [
+          "sample/a"
+        ],
+        "must_not_include": [
+          "sample/old"
+        ]
+      }
+    ]
+  }
+}

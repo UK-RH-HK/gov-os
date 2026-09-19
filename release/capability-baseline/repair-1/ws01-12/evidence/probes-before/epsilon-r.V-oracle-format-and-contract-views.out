@@ -1,0 +1,65 @@
+# P2-AR-0014 re-run of epsilon-r.V-oracle-format-and-contract-views (unedited) at worktree HEAD c6b60bc760a0bb42907f74210fd9e644a420851a dirty=1; gov sha256 3271ce0e4e095561911e0d03d8641aa92fbeda39ef3c8a2ecb2a9f21cacbe81d; 2026-09-18T23:17:56Z
+
+=== A. is there any machine-checkable oracle definition on the candidate? (whole tree, excluding this evidence dir)
+# V1-V4 field names searched as identifiers (snake/kebab/camel) in every tracked file:
+  fault[_-]?manifest|faultManifest                             <none>
+  hidden[_-]?truth|authoritative[_-]truth                      <none>
+  injected[_-]?(repository[_-]?)?state                         <none>
+  expected[_-]?detection                                       <none>
+  expected[_-]?severity                                        <none>
+  expected[_-]?(impacted|governed)                             <none>
+  forbidden[_-]?outcomes?                                      <none>
+  path[_-]?map[_-]?oracle                                      <none>
+  memory[_-]?oracle                                            <none>
+  expected[_-]?(target[_-]?path|classification|namespace)      <none>
+  must[_-]?never[_-]?be[_-]?indexed|never[_-]?indexed          fixtures/update/previous-release/4.1.1/constitution/HARD_INVARIANTS.yaml framework/constitution/HARD_INVARIANTS.yaml release/releases/4.1.2/kernel/constitution/HARD_INVARIANTS.yaml release/releases/4.1.3/kernel/constitution/HARD_INVARIANTS.yaml release/releases/4.1.4/kernel/constitution/HARD_INVARIANTS.yaml release/releases/4.1.5/kernel/constitution/HARD_INVARIANTS.yaml release/verification/4.1.2/heldout/harness.py 
+  detection[_-]?recall                                         <none>
+  severity[_-]?accuracy|impact[_-]?map[_-]?accuracy|path[_-]?map[_-]?accuracy <none>
+  wrong[_-]?indexing                                           Governance_OS_Capability_Acceptance_Contract_v3.md framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html 
+  human[_-]?gate[_-]?correctness|readiness[_-]?correctness     <none>
+# schemas shipped by the product (framework/schemas):
+adapter-manifest.schema.json adoption-baseline.schema.json audit.schema.json capability-profile.schema.json checkpoint.schema.json cit.schema.json command-contract.schema.json context-packet.schema.json data-sensitivity.schema.json decision.schema.json experiment.schema.json feature.schema.json framework-change-proposal.schema.json framework-lock.schema.json governance-capability-acceptance.schema.json handoff.schema.json hard-invariants.schema.json heldout-tests.schema.json human-gate.schema.json index-manifest.schema.json interface.schema.json kernel-manifest.schema.json lesson.schema.json mcp-registry.schema.json memory-manifest.schema.json migration-catalogue-entry.schema.json migration.schema.json model-routing-overrides.schema.json plugin-descriptor.schema.json plugin-registry.schema.json policy-ARCHIVE_POLICY.schema.json policy-AUTHORITY_POLICY.schema.json policy-BUDGET_POLICY.schema.json policy-CHANGE_POLICY.schema.json policy-CHECKPOINT_POLICY.schema.json policy-CONTEXT_POLICY.schema.json policy-HUMAN_GATE_POLICY.schema.json policy-LEARNING_POLICY.schema.json policy-MEMORY_POLICY.schema.json policy-MODEL_ROUTING_POLICY.schema.json policy-SECURITY_POLICY.schema.json policy-TEST_POLICY.schema.json policy-TOOL_POLICY.schema.json project-exceptions.schema.json project-policy.schema.json project.schema.json readiness-dimensions.schema.json record.schema.json release-manifest.schema.json report.schema.json repository-contract.schema.json requirement.schema.json research.schema.json roles.schema.json scenario.schema.json skill.schema.json task.schema.json test-obligation.schema.json tool-permissions.schema.json tool-registry.schema.json tool.schema.json upstream-packet.schema.json worker-return.schema.json 
+# files under release/orchestration/phase-2 (orchestration records of this phase):
+release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.report.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0014.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0015.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0016.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0017.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0018.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0019.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.run.yaml release/orchestration/phase-2/AGENT_RUNS/P2-AR-0021.run.yaml release/orchestration/phase-2/AGENT_RUNS/README.md release/orchestration/phase-2/CHECKPOINTS/P2-CP-0001.yaml release/orchestration/phase-2/CHECKPOINTS/P2-CP-0002.yaml release/orchestration/phase-2/CHECKPOINTS/P2-CP-0003.yaml release/orchestration/phase-2/GATES/GATE-REGISTER.yaml release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md release/orchestration/phase-2/HANDOFFS/P2-HO-0001-audit-0-alpha.md release/orchestration/phase-2/HANDOFFS/P2-HO-0002-audit-0-beta.md release/orchestration/phase-2/HANDOFFS/P2-HO-0003-audit-0-gamma.md release/orchestration/phase-2/HANDOFFS/P2-HO-0004-audit-0-delta.md release/orchestration/phase-2/HANDOFFS/P2-HO-0005-audit-0-epsilon.md release/orchestration/phase-2/HANDOFFS/P2-HO-0006-audit-0-zeta.md release/orchestration/phase-2/HANDOFFS/P2-HO-0007-audit-0-synthesis.md release/orchestration/phase-2/HANDOFFS/P2-HO-0008-audit-0-epsilon-reaudit.md release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md release/orchestration/phase-2/HANDOFFS/P2-HO-0011-repair-1-ws01-12.md release/orchestration/phase-2/HANDOFFS/P2-HO-0012-repair-1-ws02.md release/orchestration/phase-2/HANDOFFS/P2-HO-0013-repair-1-ws03.md release/orchestration/phase-2/HANDOFFS/P2-HO-0014-repair-1-ws04.md release/orchestration/phase-2/HANDOFFS/P2-HO-0015-repair-1-ws05.md release/orchestration/phase-2/HANDOFFS/P2-HO-0016-repair-1-ws06.md release/orchestration/phase-2/HANDOFFS/P2-HO-0017-repair-1-ws08.md release/orchestration/phase-2/HANDOFFS/P2-HO-0018-repair-1-ws09-11.md release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml release/orchestration/phase-2/PHASE_LEDGER.md release/orchestration/phase-2/README.md release/orchestration/phase-2/tools/check_state.py release/orchestration/phase-2/tools/product_identity.py 
+# gate register entry for the oracle format:
+44:  - id: GATE-P2-ORACLE-FORMAT
+45-    title: Qualification Oracle format (V1-V4) accepted by a fresh independent reviewer before any hidden fault exists
+46-    status: NOT_SATISFIED
+47-    satisfier: fresh independent reviewer (frozen contract AC-6, section 9.2)
+48-    preconditions: [GATE-P2-FROZEN-CONTRACT]
+--
+
+=== B. does the product validate an oracle document? (a V1 fault manifest missing every V1 field, as a governed record)
+exit=0 {"findings": [], "ok": true, "verdict": "HEALTHY"}
+# no command accepts an oracle / fault manifest / scoring input:
+gov qualify: error: unrecognized subcommand 'qualify'
+gov oracle: error: unrecognized subcommand 'oracle'
+gov score: error: unrecognized subcommand 'score'
+gov qualification: error: unrecognized subcommand 'qualification'
+
+=== C. V4 metrics the product can compute today (retrieval metrics only; nothing scores injected defects)
+exit=0 {"forbidden_violations": 0, "mrr": 1.0, "precision_at_k": 0.9705882352941176, "recall_at_k": 1.0, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0}
+
+=== D. contract derived views vs owner source (this family's scope)
+contract verify: True CONTRACT_SOURCE_BOUND | capability_count: 100
+scratch copy unchanged by verify: e757cc252b193453 == e757cc252b193453
+compiled capability ids in scope: ['O1', 'O2', 'O3', 'O4', 'O5', 'P1', 'P2', 'Q1', 'Q2', 'Q3', 'Q4', 'V1', 'V2', 'V3', 'V4']
+gate U present in compiled form: False | in evidence map: False
+  source 749: # GATE O — Verification and Continuous Governance Health
+  source 791: ## O5. Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**
+  source 976: # GATE U — Framework Health SLOs
+  source 1012: # GATE V — Qualification Oracle **[NEW TESTING REFINEMENT]**
+  source 1016: ## V1. Fault manifest
+  source 1028: ## V2. Hidden path-map oracle
+  source 1038: ## V3. Hidden memory oracle
+  source 1047: ## V4. Quantitative qualification scoring
+  compiled O5: requirement_class=ORIGINAL title='Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**'
+  compiled V1: requirement_class=ORIGINAL title='Fault manifest'
+  compiled V2: requirement_class=ORIGINAL title='Hidden path-map oracle'
+  compiled V3: requirement_class=ORIGINAL title='Hidden memory oracle'
+  compiled V4: requirement_class=ORIGINAL title='Quantitative qualification scoring'
+owner-source checklist bullets in scope (lines 749-866, 976-1062): 146
+compiled form fields per capability: ['family', 'id', 'requirement_class', 'source_reference', 'status', 'title'] | bullets carried: 0
+evidence-map rows in scope: 15 | evidence_class values: ['NOT_YET_MAPPED'] | rows with automated_checks: 0
+contract lines 53-73 per-capability fields absent from compiled form: ['severity if violated', 'applicability rule', 'evidence-freshness triggers', 'health-scheduler tier(s) G0–G6', 'advanced-qualification challenge IDs', 'adoption verification obligation', 'remediation/task-generation rule']
+# exit=0

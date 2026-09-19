@@ -1,0 +1,9 @@
+[beta-r scope] D3 L324 'document → section/record → child chunk': carried (ensure_ascii=False) but escaped by json.dumps default
+[beta-r scope] D3 L325 'code file → module/class → function/symbol': carried (ensure_ascii=False) but escaped by json.dumps default
+[beta-r scope] bullets=123 matched with json.dumps default=121 matched with ensure_ascii=False=123
+[zeta-r scope] W8 L1148 'outcome/feature → scenario → requirement → decision → architecture → task → code → test → evidence → release': carried (ensure_ascii=False) but escaped by json.dumps default
+[zeta-r scope] W11 L1180 'requirement→code traceability coverage': carried (ensure_ascii=False) but escaped by json.dumps default
+[zeta-r scope] W11 L1181 'requirement→test traceability coverage': carried (ensure_ascii=False) but escaped by json.dumps default
+[zeta-r scope] W bullets=86 matched with json.dumps default=83 matched with ensure_ascii=False=86
+[all] owner-source checklist lines=722 carried verbatim by the compiled form=722 differing=[]
+[alpha-r scope] bullets carried in compiled 'checklist' for 17 capabilities: 100 (alpha-r's C0 summary line prints a literal '0', it does not count)
