@@ -19,6 +19,7 @@ mod update;
 mod upstream;
 mod ws03;
 mod ws04r2;
+mod ws04r3;
 mod ws05;
 mod ws06;
 mod ws07;

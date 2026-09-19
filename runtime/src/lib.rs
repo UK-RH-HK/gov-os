@@ -61,7 +61,7 @@ pub const FRAMEWORK_NAME: &str = "agentic-engineering-os";
 pub const VERSION: &str = "4.1.5";
 pub const CLI_VERSION: &str = "4.1.5";
 pub const RUNTIME_VERSION: &str = "4.1.5";
-pub const INDEX_VERSION: &str = "4.1.5-idx4";
+pub const INDEX_VERSION: &str = "4.1.5-idx5";
 pub const RUNTIME_DIR: &str = ".governance-runtime";
 
 pub use error::{GovError, Result};

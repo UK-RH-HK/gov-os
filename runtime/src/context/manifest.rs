@@ -36,6 +36,14 @@
 //! silently satisfies a current requirement** (W3 line 1102): it is delivered flagged and the manifest is
 //! `BLOCKED`. A missing required input makes the manifest `BLOCKED` with the missing ids named (W4 line 1112).
 //!
+//! Two rules are applied to the resolution itself, so every consumer reads the same answer (repair iteration 1,
+//! round 3):
+//! * **the producer rule** (WS-5 IP-R3-4): a task that produces its feature's specification is not held to the
+//!   inputs it only inherits from the feature and that are not yet satisfied — they are what it is writing
+//!   ([`apply_producer_rule`]; advisory `INHERITED_INPUT_UNSATISFIED`);
+//! * **non-governed evidence is flagged** (WS-10 IP-WS10-10): a research or experiment input that is not governed
+//!   evidence (`lifecycle::evidence_status`) carries `EVIDENCE_NOT_GOVERNED`, so no packet presents it as evidence.
+//!
 //! ## Integration points (not wired here; see the WS-4 repair report)
 //!
 //! * READY derivation (`orchestration::{dag,tasks}`, WS-5): a task is not READY/claimable while
@@ -978,6 +986,7 @@ pub fn resolve_with(
     for e in entries.iter_mut() {
         resolve_entry(e, store, root, authority, &succ);
     }
+    apply_producer_rule(task, &mut entries);
     // supplementary context: declared separately, never authority, never blocking
     let mut supplementary = vec![];
     for (id, obj) in entry_ids(task.data.get("supplementary_context")) {
@@ -1098,6 +1107,86 @@ fn apply_contradictions(p: &Project, store: &RecordStore, m: &mut Manifest) {
     m.contradictions = out;
 }
 
+/// **The producer rule** (WS-5 round 2 §1.4, moved into the manifest itself: WS-5 IP-R3-4). A task that produces its
+/// feature's specification (`orchestration::dag::produces_feature_specification`: a readiness gap task, or a
+/// specification-producing class) does not consume the parts of that specification the feature still lacks: an input
+/// it only **inherits from its feature** (every place it is declared is the feature's own list) and that is not
+/// satisfied is not mandatory for it — it is delivered when it exists, flagged, and reported as an advisory
+/// (`INHERITED_INPUT_UNSATISFIED`), never blocking. What the task declares itself still binds, and implementation
+/// work of the feature stays blocked until the inputs exist. Because the rule lives here, the task DAG, packet
+/// dispatch (`gov continue`), `gov context manifest|receipt` and task close all read the same answer.
+fn apply_producer_rule(task: &Record, entries: &mut [Entry]) {
+    if !crate::orchestration::dag::produces_feature_specification(task) {
+        return;
+    }
+    let tid = task.id();
+    for e in entries.iter_mut() {
+        let inherited_only =
+            !e.sources.is_empty() && e.sources.iter().all(|s| s.starts_with("feature "));
+        if !(e.required && inherited_only && !e.satisfied()) {
+            continue;
+        }
+        e.required = false;
+        for pr in e.problems.iter_mut() {
+            pr.blocking = false;
+        }
+        let why = format!("{tid} produces its feature's specification; {} is inherited from the feature and not yet satisfied, so it is not a mandatory input of this task (the feature's implementation work stays blocked on it)", e.id);
+        e.problems.push(Problem {
+            code: "INHERITED_INPUT_UNSATISFIED",
+            message: why.clone(),
+            blocking: false,
+        });
+        if !e.reasons.contains(&why) {
+            e.reasons.push(why);
+        }
+    }
+}
+
+/// Research and experiment inputs that are not governed evidence (BC-P2-47/48; WS-10 IP-WS10-10): flagged
+/// `EVIDENCE_NOT_GOVERNED` with their standing, so a packet never presents unsupported research or an unreproduced
+/// experiment as evidence. Advisory: the input is still delivered, and blocking stays with the manifest's own rules.
+fn flag_ungoverned_evidence(p: &Project, store: &RecordStore, m: &mut Manifest) {
+    if !m
+        .entries
+        .iter()
+        .any(|e| e.delivered() && matches!(e.record_type.as_str(), "research" | "experiment"))
+    {
+        return;
+    }
+    let ctx = crate::lifecycle::Ctx::new(p, store);
+    for e in m.entries.iter_mut() {
+        if !e.delivered() || !matches!(e.record_type.as_str(), "research" | "experiment") {
+            continue;
+        }
+        let Some(r) = store.get(&e.id) else { continue };
+        let Some(st) = crate::lifecycle::evidence_status(&ctx, r) else {
+            continue;
+        };
+        if st.citable() {
+            continue;
+        }
+        let v = st.to_value();
+        e.authority_flag
+            .get_or_insert("EVIDENCE_NOT_GOVERNED".into());
+        e.problems.push(Problem {
+            code: "EVIDENCE_NOT_GOVERNED",
+            message: format!(
+                "{} ({}) is not governed evidence (standing {}{}): it is delivered for reference, never as evidence — complete it through `gov {} ...` before relying on it",
+                e.id,
+                e.record_type,
+                v["standing"].as_str().unwrap_or("?"),
+                v["reasons"]
+                    .as_array()
+                    .filter(|a| !a.is_empty())
+                    .map(|a| format!("; {}", a.iter().filter_map(|x| x.as_str()).collect::<Vec<_>>().join("; ")))
+                    .unwrap_or_default(),
+                e.record_type
+            ),
+            blocking: false,
+        });
+    }
+}
+
 /// Resolve the manifest of `task` in project `p`, contradictions among its inputs included.
 pub fn resolve(p: &Project, store: &RecordStore, task: &Record) -> Manifest {
     let authority = p
@@ -1108,6 +1197,9 @@ pub fn resolve(p: &Project, store: &RecordStore, task: &Record) -> Manifest {
         .unwrap_or(json!({}));
     let mut m = resolve_with(&p.root, &authority, store, task);
     apply_contradictions(p, store, &mut m);
+    // a contradiction can leave an inherited input unsatisfied only now: the producer rule sees the final state
+    apply_producer_rule(task, &mut m.entries);
+    flag_ungoverned_evidence(p, store, &mut m);
     m
 }
 
@@ -1379,6 +1471,46 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn a_specification_producer_is_not_held_to_what_its_feature_still_lacks() {
+        let fx = base();
+        // the feature lists a requirement nobody has written yet
+        fx.put("spec/features/F-0002.yaml", "id: F-0002\ntype: feature\nstatus: ACTIVE\nrequirements: [REQ-0999, REQ-0002]\nreadiness: {}\n");
+        fx.put(
+            "spec/tasks/TASK-0010.yaml",
+            "id: TASK-0010\ntype: task\nstatus: ACTIVE\nclass: specification\nfeature: F-0002\n",
+        );
+        fx.put(
+            "spec/tasks/TASK-0011.yaml",
+            "id: TASK-0011\ntype: task\nstatus: ACTIVE\nclass: implementation\nfeature: F-0002\n",
+        );
+        // a producer that declares the absent requirement itself is still held to it
+        fx.put("spec/tasks/TASK-0012.yaml", "id: TASK-0012\ntype: task\nstatus: ACTIVE\nreadiness_cell: requirements\nfeature: F-0002\nrequirements: [REQ-0999]\n");
+        let producer = fx.manifest("TASK-0010");
+        assert!(producer.satisfied(), "{}", producer.to_value());
+        let e = producer
+            .entries
+            .iter()
+            .find(|e| e.id == "REQ-0999")
+            .unwrap();
+        assert!(!e.required && e.problems.iter().all(|p| !p.blocking));
+        assert!(e
+            .problems
+            .iter()
+            .any(|p| p.code == "INHERITED_INPUT_UNSATISFIED"));
+        assert!(producer.advisories().iter().any(|a| a["id"] == "REQ-0999"));
+        // what exists is still a mandatory input of the producer
+        assert!(producer
+            .entries
+            .iter()
+            .any(|e| e.id == "REQ-0002" && e.required && e.satisfied()));
+        // implementation work of the feature stays blocked until the input exists
+        let implementer = fx.manifest("TASK-0011");
+        assert_eq!(implementer.delivery_state(), "BLOCKED");
+        assert!(implementer.blocking_reason().unwrap().contains("REQ-0999"));
+        assert_eq!(fx.manifest("TASK-0012").delivery_state(), "BLOCKED");
     }
 
     #[test]

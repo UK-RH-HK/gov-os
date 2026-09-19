@@ -67,6 +67,15 @@ pub const RELATION_FIELDS: &[(&str, &str)] = &[
     // BC-P2-18): each constrains the other until the contradiction is resolved
     ("conflicts_with", "CONSTRAINS"),
     ("contradicts", "CONSTRAINS"),
+    // the evidence a decision cites (gate answers record `evidence_refs`; retrieval-profile decisions cite their
+    // benchmark and regression): research consumption is a graph fact, not only a field W7 reads (WS-2 R3-3)
+    ("evidence_refs", "DERIVED_FROM"),
+    // FEATURE -> SCENARIO -> DATA -> TEST DATA -> TESTS (Contract v3 H4:524-527, BC-P2-46; WS-10 IP-WS10-08): a
+    // scenario consumes the data requirements it declares, a test obligation consumes the test data it runs on, and a
+    // test dataset realises (implements) the data requirement it satisfies
+    ("data_requirements", "CONSUMES"),
+    ("test_data", "CONSUMES"),
+    ("realises", "IMPLEMENTS"),
 ];
 
 /// Fields naming records that point at THIS record: each id yields the canonical edge `id -TYPE-> self`.
@@ -204,6 +213,10 @@ pub const TYPE_DIR: &[(&str, &str)] = &[
     ("failure", "spec/reports/failures"),
     // the adoption/migration plan (WS-9 `adopt`, BC-P2-21 plan identity)
     ("migration-plan", "spec/audits/GOVERNANCE-ADOPTION"),
+    // a release of the governed product (Contract v3 W8:1147 "... -> evidence -> release"; WS-8 IP-R2-WS08-7): a
+    // governed record whose `derived_from` names the work (tasks, close reports) it ships and whose `validated_by` names
+    // the evidence (audits, test evidence) that validated it. Not a Governance OS kernel release (`release.rs`).
+    ("release", "spec/releases"),
 ];
 pub const TYPE_PREFIX: &[(&str, &str)] = &[
     ("project", "PRJ"),
@@ -228,6 +241,7 @@ pub const TYPE_PREFIX: &[(&str, &str)] = &[
     ("legacy", "LEG"),
     ("failure", "FAIL"),
     ("migration-plan", "MPLAN"),
+    ("release", "REL"),
 ];
 
 pub fn id_regex() -> &'static Regex {

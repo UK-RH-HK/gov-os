@@ -22,6 +22,9 @@
 //!   explicitly degraded when the session's work has stale, missing or contradictory mandatory inputs.
 //! * **Tier contract.** A checkpoint runs the G3 tier (`scheduler::tier_run`, IP-WS02-07) and records the result; a
 //!   checkpoint is a remedy and is never refused for health.
+//! * **Sealed** (round 3, O-7): a checkpoint record is T2-sealed as written by `checkpoint create` (best effort — a
+//!   checkpoint is never refused); propagation's staleness mark re-seals it only when the seal verified before, and a
+//!   hand-edited checkpoint is not believed as the baseline of what the work consumed (`cit::propagation`).
 use crate::memory::db::RuntimeDb;
 use crate::orchestration::{claims, control};
 use crate::records::{new_record, save_record, Record, RecordStore};
@@ -552,6 +555,16 @@ pub fn create(p: &Project, db: &RuntimeDb, mut fields: Value) -> Result<Value> {
         "{}/{id}.yaml",
         pol.get_str("CHECKPOINT_POLICY", "location", "spec/reports/checkpoints")
     );
+    // T2 (round 3, O-7): a checkpoint is OS-written continuity evidence — what the work consumed, at which state —
+    // so it is sealed as written by this operation; a later edit breaks the seal (task close observes it as a
+    // lower-trust write of OS state, and upstream-change detection no longer takes it as the work's baseline). A
+    // checkpoint is a remedy and is never refused: without a usable binding key it is written unsealed, and says so.
+    let binding = match crate::t2::seal_record(&mut rec, "checkpoint create") {
+        Ok(()) => json!({"sealed": true}),
+        Err(e) => {
+            json!({"sealed": false, "code": e.code, "message": e.message, "consequence": "written unsealed: its edits cannot be told apart from the OS's writes on this machine"})
+        }
+    };
     save_record(&p.root, &rec)?;
     write_yaml(
         &dir(p).join("LATEST.yaml"),
@@ -566,7 +579,9 @@ pub fn create(p: &Project, db: &RuntimeDb, mut fields: Value) -> Result<Value> {
             },
         );
     }
-    Ok(rec.data)
+    let mut out = rec.data;
+    out["record_binding"] = binding;
+    Ok(out)
 }
 
 fn latest_record(p: &Project, store: &RecordStore) -> Option<Record> {
