@@ -22,6 +22,18 @@ pub fn update_references_opts(
     relativise_moved: bool,
     skip: &[String],
 ) -> Result<Vec<String>> {
+    update_references_in(root, moves, relativise_moved, skip, &|_| true)
+}
+
+/// As [`update_references_opts`], rewriting references only in files for which `scope(rel)` holds. Retirement moves
+/// use a scope limited to the archive so that no active reference is re-pointed at archived legacy material.
+pub fn update_references_in(
+    root: &Path,
+    moves: &[(String, String)],
+    relativise_moved: bool,
+    skip: &[String],
+    scope: &dyn Fn(&str) -> bool,
+) -> Result<Vec<String>> {
     let mut changed = vec![];
     if moves.is_empty() {
         return Ok(changed);
@@ -75,6 +87,7 @@ pub fn update_references_opts(
             || rel.starts_with("governance/kernel/")
             || rel.starts_with("governance/generated/")
             || skip.contains(&rel)
+            || !scope(&rel)
         {
             continue;
         }
