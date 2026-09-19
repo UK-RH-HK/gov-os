@@ -284,43 +284,61 @@ fn quantise(v: f64) -> i64 {
     (v * 10_000.0).round() as i64
 }
 
-/// 4-grams of quantised floats with at least two non-zero members (sparse embeddings share zero runs with anything).
-fn grams(v: &[f64]) -> std::collections::HashSet<[i64; 4]> {
-    let q: Vec<i64> = v.iter().map(|x| quantise(*x)).collect();
-    q.windows(4)
-        .filter(|w| w.iter().filter(|x| **x != 0).count() >= 2)
-        .map(|w| [w[0], w[1], w[2], w[3]])
+/// Fingerprints of a number sequence: every run of three consecutive non-zero values (quantised to 1e-4) with the gaps
+/// between them. Stored embeddings may be sparse (hashed n-grams) or dense; either way three consecutive non-zero
+/// components at the stored precision, in order and at their spacing, only occur in a copy of the vector.
+fn grams(v: &[f64]) -> std::collections::HashSet<[i64; 5]> {
+    let nz: Vec<(usize, i64)> = v
+        .iter()
+        .enumerate()
+        .map(|(i, x)| (i, quantise(*x)))
+        .filter(|(_, q)| *q != 0)
+        .collect();
+    nz.windows(3)
+        .map(|w| {
+            [
+                w[0].1,
+                (w[1].0 - w[0].0) as i64,
+                w[1].1,
+                (w[2].0 - w[1].0) as i64,
+                w[2].1,
+            ]
+        })
         .collect()
 }
 
-/// The chunk of the derived index whose stored vector shares a run with `fixture_grams`, if any.
-fn vector_hit(db: &Path, fixture_grams: &std::collections::HashSet<[i64; 4]>) -> Option<String> {
-    if fixture_grams.is_empty() {
-        return None;
+/// One pass over the stored vectors: for every fingerprint in `wanted`, the first index chunk whose vector carries it.
+fn vector_hits(
+    db: &Path,
+    wanted: &std::collections::HashSet<[i64; 5]>,
+) -> std::collections::HashMap<[i64; 5], String> {
+    let mut out = std::collections::HashMap::new();
+    if wanted.is_empty() {
+        return out;
     }
-    let conn =
+    let Ok(conn) =
         rusqlite::Connection::open_with_flags(db, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
-            .ok()?;
-    let mut st = conn
-        .prepare("SELECT chunk_id, vec FROM vectors LIMIT 200000")
-        .ok()?;
-    let rows = st
-        .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))
-        .ok()?;
+    else {
+        return out;
+    };
+    let Ok(mut st) = conn.prepare("SELECT chunk_id, vec FROM vectors LIMIT 200000") else {
+        return out;
+    };
+    let Ok(rows) = st.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))
+    else {
+        return out;
+    };
     for (id, vec) in rows.flatten() {
         let Ok(v) = serde_json::from_str::<Vec<f64>>(&vec) else {
             continue;
         };
-        let q: Vec<i64> = v.iter().map(|x| quantise(*x)).collect();
-        for w in q.windows(4) {
-            if w.iter().filter(|x| **x != 0).count() >= 2
-                && fixture_grams.contains(&[w[0], w[1], w[2], w[3]])
-            {
-                return Some(id);
+        for g in grams(&v) {
+            if wanted.contains(&g) {
+                out.entry(g).or_insert_with(|| id.clone());
             }
         }
     }
-    None
+    out
 }
 
 fn fenced_blocks(text: &str) -> String {
@@ -352,7 +370,16 @@ pub fn content_gate(p: &Project, items: &[(String, String, bool)]) -> (Vec<Strin
     let chunk_tok = Regex::new(r"[A-Za-z0-9_:./@\-]+#\d+").unwrap();
     let mut reasons = vec![];
     let mut report = vec![];
-    for (label, text, strict) in items {
+    // stored-vector fingerprints of every item, matched in a single pass over the index
+    let item_grams: Vec<std::collections::HashSet<[i64; 5]>> = items
+        .iter()
+        .map(|(_, text, _)| grams(&float_runs(text).1))
+        .collect();
+    let vec_hits = match &prints.db {
+        Some(db) => vector_hits(db, &item_grams.iter().flatten().copied().collect()),
+        None => Default::default(),
+    };
+    for (n, (label, text, strict)) in items.iter().enumerate() {
         if text.trim().is_empty() {
             continue;
         }
@@ -450,16 +477,14 @@ pub fn content_gate(p: &Project, items: &[(String, String, bool)]) -> (Vec<Strin
                 m.as_str()
             ));
         }
-        let (longest, floats) = float_runs(text);
+        let (longest, _floats) = float_runs(text);
         if longest > ctl.max_numeric_array {
             item_reasons.push(format!("{label} contains a run of {longest} numbers (embedding/vector-shaped data; limit {})", ctl.max_numeric_array));
         }
-        if let Some(db) = &prints.db {
-            if let Some(id) = vector_hit(db, &grams(&floats)) {
-                item_reasons.push(format!(
-                    "{label} reproduces the stored embedding vector of index chunk {id}"
-                ));
-            }
+        if let Some(id) = item_grams[n].iter().find_map(|g| vec_hits.get(g)) {
+            item_reasons.push(format!(
+                "{label} reproduces the stored embedding vector of index chunk {id}"
+            ));
         }
         if let Some(m) = blob_rx.find(text) {
             item_reasons.push(format!("{label} contains an opaque {}-character hex/base64 run (encoded or binary content cannot be reviewed)", m.as_str().len()));

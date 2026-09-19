@@ -503,35 +503,62 @@ impl ReferenceIndex {
 
     /// Edges whose endpoints involve `path`, for the path-map representation of one artefact.
     pub fn path_map_fields(&self, path: &str) -> Value {
-        let mut imports = BTreeSet::new();
-        let mut citations = BTreeSet::new();
-        let mut path_references = BTreeSet::new();
-        let mut consumers = BTreeSet::new();
-        let mut cited_by = BTreeSet::new();
-        let mut detail = vec![];
-        for e in &self.edges {
-            if e.from == path {
-                match e.kind.as_str() {
-                    "import" => imports.insert(e.to.clone()),
-                    "citation" | "provenance" => citations.insert(e.to.clone()),
-                    _ => path_references.insert(e.to.clone()),
-                };
-                detail.push(json!({"path": e.to, "direction": "out", "kind": e.kind, "resolution": e.resolution, "line": e.line}));
-            } else if e.to == path {
-                consumers.insert(e.from.clone());
-                if e.kind == "citation" {
-                    cited_by.insert(e.from.clone());
-                }
-                detail.push(json!({"path": e.from, "direction": "in", "kind": e.kind, "resolution": e.resolution, "line": e.line}));
-            }
-        }
-        let mut references: BTreeSet<String> = BTreeSet::new();
-        for s in [&imports, &citations, &path_references, &consumers] {
-            references.extend(s.iter().cloned());
-        }
-        json!({"imports": imports, "citations": citations, "path_references": path_references, "consumers": consumers,
-            "cited_by": cited_by, "references": references, "reference_edges": detail})
+        let out: Vec<&RefEdge> = self.edges.iter().filter(|e| e.from == path).collect();
+        let inc: Vec<&RefEdge> = self.edges.iter().filter(|e| e.to == path).collect();
+        path_map_value(&out, &inc)
     }
+
+    /// [`Self::path_map_fields`] for every path at once (one pass over the edges).
+    pub fn path_map_all(&self) -> HashMap<String, Value> {
+        let mut out: HashMap<&str, Vec<&RefEdge>> = HashMap::new();
+        let mut inc: HashMap<&str, Vec<&RefEdge>> = HashMap::new();
+        for e in &self.edges {
+            out.entry(e.from.as_str()).or_default().push(e);
+            inc.entry(e.to.as_str()).or_default().push(e);
+        }
+        let keys: BTreeSet<&str> = out.keys().chain(inc.keys()).copied().collect();
+        keys.into_iter()
+            .map(|k| {
+                (
+                    k.to_string(),
+                    path_map_value(
+                        out.get(k).map(|v| v.as_slice()).unwrap_or(&[]),
+                        inc.get(k).map(|v| v.as_slice()).unwrap_or(&[]),
+                    ),
+                )
+            })
+            .collect()
+    }
+}
+
+fn path_map_value(out: &[&RefEdge], inc: &[&RefEdge]) -> Value {
+    let mut imports = BTreeSet::new();
+    let mut citations = BTreeSet::new();
+    let mut path_references = BTreeSet::new();
+    let mut consumers = BTreeSet::new();
+    let mut cited_by = BTreeSet::new();
+    let mut detail = vec![];
+    for e in out {
+        match e.kind.as_str() {
+            "import" => imports.insert(e.to.clone()),
+            "citation" | "provenance" => citations.insert(e.to.clone()),
+            _ => path_references.insert(e.to.clone()),
+        };
+        detail.push(json!({"path": e.to, "direction": "out", "kind": e.kind, "resolution": e.resolution, "line": e.line}));
+    }
+    for e in inc {
+        consumers.insert(e.from.clone());
+        if e.kind == "citation" {
+            cited_by.insert(e.from.clone());
+        }
+        detail.push(json!({"path": e.from, "direction": "in", "kind": e.kind, "resolution": e.resolution, "line": e.line}));
+    }
+    let mut references: BTreeSet<String> = BTreeSet::new();
+    for s in [&imports, &citations, &path_references, &consumers] {
+        references.extend(s.iter().cloned());
+    }
+    json!({"imports": imports, "citations": citations, "path_references": path_references, "consumers": consumers,
+        "cited_by": cited_by, "references": references, "reference_edges": detail})
 }
 
 /// The dependency proof for retiring `subject` (and, when given, its archive `target`, so that nothing active was

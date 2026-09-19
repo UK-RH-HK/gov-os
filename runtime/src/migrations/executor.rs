@@ -167,18 +167,6 @@ pub struct BatchContext {
     pub scanner: crate::security::secrets::SecretScanner,
 }
 
-impl BatchContext {
-    pub fn simple(root: &Path) -> BatchContext {
-        let _ = root;
-        BatchContext {
-            archive_root: "archive".into(),
-            catalogue_version: Value::Null,
-            plan_version: Value::Null,
-            scanner: crate::security::secrets::SecretScanner::default_scanner(),
-        }
-    }
-}
-
 /// Dependants (file, kind) of a proof.
 fn dependants(proof: &Value) -> std::collections::BTreeSet<(String, String)> {
     proof["active_references"]

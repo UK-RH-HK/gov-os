@@ -61,9 +61,34 @@ fn kinds(item: &Value) -> Vec<String> {
 
 /// Build a reverse import graph over source files to detect dead/unused modules (heuristic, low confidence).
 /// Import graph over the inventory: (importer path, imported path) edges resolved loosely by module stem.
+///
+/// Resolution is unchanged from the original linear scan (a file whose stem is the import's last segment, or a package
+/// `__init__`/`mod.rs`/`index.ts|js` named by it); the candidates are indexed by stem so the dependency proofs that
+/// now rescan the tree at every retirement stay linear in the number of imports.
 pub(crate) fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)> {
     let mut edges: Vec<(String, String)> = vec![];
+    let mut seen: HashSet<(String, String)> = HashSet::new();
     let plugins: Vec<crate::capabilities::protocol::PluginDescriptor> = vec![];
+    let mut by_stem: HashMap<String, Vec<String>> = HashMap::new();
+    let mut packages: Vec<String> = vec![];
+    for other in items {
+        let op = other["path"].as_str().unwrap_or("").to_string();
+        let stem = Path::new(&op)
+            .file_stem()
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_default();
+        if stem == "__init__"
+            || op.ends_with("/mod.rs")
+            || op.ends_with("/index.ts")
+            || op.ends_with("/index.js")
+            || op == "mod.rs"
+            || op == "index.ts"
+            || op == "index.js"
+        {
+            packages.push(op.clone());
+        }
+        by_stem.entry(stem).or_default().push(op);
+    }
     for it in items {
         let rel = it["path"].as_str().unwrap_or("");
         let k = kinds(it);
@@ -94,21 +119,29 @@ pub(crate) fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)
             if last.is_empty() {
                 continue;
             }
-            for other in items {
-                let op = other["path"].as_str().unwrap_or("");
-                let stem = Path::new(op)
-                    .file_stem()
-                    .map(|s| s.to_string_lossy().to_string())
-                    .unwrap_or_default();
-                if op != rel
-                    && (stem == last
-                        || (stem == "__init__" && op.contains(&format!("/{last}/"))
-                            || op.ends_with(&format!("{last}/mod.rs"))
-                            || op.ends_with(&format!("{last}/index.ts"))
-                            || op.ends_with(&format!("{last}/index.js"))))
+            let mut targets: Vec<&String> = by_stem
+                .get(&last)
+                .map(|v| v.iter().collect())
+                .unwrap_or_default();
+            for op in &packages {
+                let stem_init = op.ends_with("__init__.py")
+                    || op
+                        .rsplit('/')
+                        .next()
+                        .map(|n| n.starts_with("__init__."))
+                        .unwrap_or(false);
+                if (stem_init && op.contains(&format!("/{last}/")))
+                    || op.ends_with(&format!("{last}/mod.rs"))
+                    || op.ends_with(&format!("{last}/index.ts"))
+                    || op.ends_with(&format!("{last}/index.js"))
                 {
+                    targets.push(op);
+                }
+            }
+            for op in targets {
+                if op != rel {
                     let e = (rel.to_string(), op.to_string());
-                    if !edges.contains(&e) {
+                    if seen.insert(e.clone()) {
                         edges.push(e);
                     }
                 }
@@ -134,6 +167,7 @@ pub fn reference_index(root: &Path, items: &[Value]) -> super::references::Refer
 pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
     let os = super::ownership::OsState::load(root);
     let index = reference_index(root, items);
+    let path_maps = index.path_map_all();
     let role_of_path: HashMap<String, String> = items
         .iter()
         .map(|it| {
@@ -414,7 +448,10 @@ pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
         if secret && legacy_kind && ownership.is_none() {
             reasons.push("legacy mechanism that also carries secret material: sensitivity secret (never indexed or exported; moved only under an answered Human Decision Gate with the destination classified secret)".into());
         }
-        let pm = index.path_map_fields(&rel);
+        let pm = path_maps
+            .get(&rel)
+            .cloned()
+            .unwrap_or_else(|| index.path_map_fields(&rel));
         let mut entry = json!({"artifact_id": super::identity::artefact_id(&rel), "path": rel, "class": class, "authority": authority, "confidence": confidence, "reasons": reasons, "kinds": k, "git_tracked": it["git_tracked"], "size": it["size"], "hash": it["hash"],
             "sensitivity": if secret { "secret" } else { "internal" }, "os_owned": ownership.map(|o| o.label())});
         for f in [

@@ -205,11 +205,12 @@ fn export_gate_fails_closed_on_content_whatever_the_name() {
             .unwrap(),
     )
     .unwrap();
-    // the 12-value window of the stored vector with the most non-zero components (short of the length rule)
-    let best = (0..vec.len().saturating_sub(12))
-        .max_by_key(|i| vec[*i..*i + 12].iter().filter(|x| **x != 0.0).count())
+    // the 40-value window of the stored vector with the most non-zero components (short of the 64-number length rule)
+    let best = (0..vec.len().saturating_sub(40))
+        .max_by_key(|i| vec[*i..*i + 40].iter().filter(|x| **x != 0.0).count())
         .unwrap();
-    let window: Vec<String> = vec[best..best + 12]
+    assert!(vec[best..best + 40].iter().filter(|x| **x != 0.0).count() >= 3);
+    let window: Vec<String> = vec[best..best + 40]
         .iter()
         .map(|x| format!("{x}"))
         .collect(); // zeros print as `0`
