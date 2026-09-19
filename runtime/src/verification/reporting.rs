@@ -365,8 +365,11 @@ pub fn os_binding_integrity(p: &Project, store: &RecordStore, f: &mut Family) {
             ))
             .or_insert(0) += 1;
         let in_force = matches!(st.as_str(), "APPROVED" | "EXECUTING");
+        // state sealed on another machine (P2-ADJ-0002) is not honoured here and is reported low, as `t2_severity`
+        // reports every other FOREIGN T2 record; modified, hand-written or copied state in force is high
+        let elsewhere = crate::cit::binding::sealed_elsewhere(&c["state"]);
         let mut x = finding(
-            if in_force { "high" } else { "low" },
+            if in_force && !elsewhere { "high" } else { "low" },
             &fam,
             format!(
                 "{id} ({st}): its change-control state is not the state gov sealed ({}): {}; the OS does not honour it{}",

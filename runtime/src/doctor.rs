@@ -1107,10 +1107,13 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
             continue;
         }
         let id = c["id"].as_str().unwrap_or("?").to_string();
+        // state sealed on another machine is not honoured here and is disclosed, as for every other T2 record
+        // (P2-ADJ-0002; `t2_severity` FOREIGN); modified, hand-written or copied state in force fails
         if matches!(
             c["cit_status"].as_str(),
             Some("APPROVED") | Some("EXECUTING")
-        ) {
+        ) && !crate::cit::binding::sealed_elsewhere(&c["state"])
+        {
             failing.push((
                 id,
                 "high",

@@ -354,8 +354,23 @@ pub fn verified_state(rec: &Record) -> Result<CitState> {
 pub fn binding_of(rec: &Record) -> Value {
     match verified_state(rec) {
         Ok(s) => json!({"binding": "VERIFIED", "cit_status": s.cit_status, "op": s.op, "at": s.at}),
-        Err(e) => json!({"binding": "UNBOUND", "code": e.code, "message": e.message}),
+        // `t2`: the underlying T2 binding (BROKEN, UNSEALED, FOREIGN, UNAUTHORISED, …), so a consumer can tell state
+        // sealed on another machine (P2-ADJ-0002: not honoured here) from state modified after gov sealed it
+        Err(e) => {
+            json!({"binding": "UNBOUND", "code": e.code, "message": e.message, "t2": e.details.get("t2").cloned().unwrap_or(Value::Null)})
+        }
     }
+}
+
+/// Is an unbound CIT state (from [`binding_of`]) **sealed elsewhere** — by another machine's key or under a binding
+/// key this machine does not honour now — rather than modified, hand-written or copied from another transaction? Such
+/// state is simply not honoured here (P2-ADJ-0002, as `verification::reporting::t2_severity` treats every other T2
+/// record), never evidence of tampering.
+pub fn sealed_elsewhere(state: &Value) -> bool {
+    matches!(
+        state["t2"]["binding"].as_str(),
+        Some("FOREIGN") | Some("UNAUTHORISED") | Some("KEY_UNAVAILABLE")
+    )
 }
 
 /// One file a CIT execution wrote, with the content it left (`sha256: None` = the execution deleted it).
