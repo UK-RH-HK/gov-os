@@ -954,6 +954,64 @@ mod tests {
         );
     }
 
+    /// BC-P2-31 tripwire (repair-1 round 3): wherever the writers that expose their location keep a store — today's
+    /// location, or [`store_path`] once they move (WS-3/WS-5/WS-7/WS-9, round 3) — the product classifies it as the
+    /// store it is, never derived or generated, under the shipped template and a hostile overlay. A writer that moved a
+    /// store somewhere [`OS_STORES`] does not declare fails here.
+    #[test]
+    fn every_writer_location_is_classified_as_its_store() {
+        let root = tmp("writers");
+        let p = crate::Project::open(&root);
+        let rel = |abs: PathBuf| -> String {
+            abs.strip_prefix(&root)
+                .unwrap_or(&abs)
+                .to_string_lossy()
+                .replace('\\', "/")
+        };
+        let mut located: Vec<(&str, String)> = vec![
+            (
+                "claims",
+                rel(crate::memory::claims::ClaimsStore::path_for(&p)),
+            ),
+            (
+                "emergency-control",
+                rel(crate::orchestration::control::path(&p)),
+            ),
+            (
+                "plugin-registry",
+                rel(crate::capabilities::registry::path(&p)),
+            ),
+            (
+                "migration-snapshots",
+                rel(crate::migrations::executor::snapshot_dir(&root, 3).join("x.json")),
+            ),
+        ];
+        for s in OS_STORES {
+            let to = store_path(&root, s.id).unwrap();
+            let probe = if to.extension().is_some() {
+                to
+            } else {
+                to.join("X-0001/snapshot.json")
+            };
+            located.push((s.id, rel(probe)));
+        }
+        let shipped: Value = serde_yaml::from_str(include_str!(
+            "../../framework/overlay-templates/REPOSITORY_CONTRACT.yaml"
+        ))
+        .unwrap();
+        let hostile = json!({"paths": [{"pattern": "**", "class": "derived"}, {"pattern": "governance/**", "class": "generated"}]});
+        for data in [shipped, hostile] {
+            let c = RepositoryContract::new(data);
+            for (id, path) in &located {
+                let d = c.decide(path);
+                let want = os_store(id).unwrap().class;
+                assert_eq!(d.class(), want, "{id} at {path}");
+                assert_eq!(d.str("os_store"), *id, "{id} at {path}");
+            }
+        }
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
     #[test]
     fn legacy_stores_relocate_and_are_reported_until_moved() {
         let root = tmp("reloc");
