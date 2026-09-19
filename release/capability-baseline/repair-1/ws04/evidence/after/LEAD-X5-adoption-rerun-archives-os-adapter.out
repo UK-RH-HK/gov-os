@@ -1,0 +1,32 @@
+# project x5: fixture=brownfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/synth-final2-LEAD-X5-adoption-rerun-archives-os-adapter/x5-074b5c/proj
+$ gov adopt baseline   [role=orchestrator session=S-planner exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-planner exit=0]
+$ gov adopt classify   [role=orchestrator session=S-planner exit=0]
+$ gov adopt map   [role=orchestrator session=S-planner exit=0]
+$ gov adopt plan   [role=orchestrator session=S-planner exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-planner exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-reviewer exit=0]
+$ gov adopt migrate --name shipping-quotes --alias fx-1   [role=migration-executor session=S-executor exit=0]
+$ gov gate present HDG-0001   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0001 --option A --by owner   [role=human session=S-owner exit=0]
+$ gov gate present HDG-0002   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0002 --option A --by owner   [role=human session=S-owner exit=0]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-executor exit=0]
+$ gov adopt verify-migration   [role=migration-verifier session=S-verifier exit=0]
+NOTE pass 1: migrate ok=True gates=['HDG-0001', 'HDG-0002'] A7 verdict=MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+NOTE after pass 1: OS IDE adapter present at governance/generated/adapters/ide/RULES.md: True
+$ gov adopt baseline   [role=orchestrator session=S-planner exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-planner exit=0]
+$ gov adopt classify   [role=orchestrator session=S-planner exit=0]
+$ gov adopt map   [role=orchestrator session=S-planner exit=0]
+$ gov adopt plan   [role=orchestrator session=S-planner exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-planner exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-reviewer exit=0]
+$ gov adopt migrate --name shipping-quotes --alias fx-2   [role=migration-executor session=S-executor exit=0]
+$ gov adopt verify-migration   [role=migration-verifier session=S-verifier exit=0]
+NOTE pass 2: migrate ok=True gates=[] A7 verdict=MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+X X5-W1-catalogue-ids-stable-across-passes FAIL W1:1070 a path keeps its catalogue artefact id when adoption stages are re-run -- {"examples": {".env": ["ART-00003", "ART-00002"], ".gitignore": ["ART-00005", "ART-00003"], "README.md": ["ART-00009", "ART-00004"], "config/secrets.yaml": ["ART-00010", "ART-00014"], "config/settings.yaml": ["ART-00011", "ART-00015"]}, "paths_whose_id_changed": 21}
+X X5-S4xB2-os-generated-adapter-not-legacy FAIL S4 A2/A3 on re-run: the Governance OS's own generated IDE adapter is not classified as legacy provider rules or moved to the legacy archive -- {"archived_copies": ["archive/governance/legacy-rules/AGENT_RULES_v2.md", "archive/governance/legacy-rules/governance__generated__adapters__ide__RULES.md"], "classification": {"authority": "LEGACY", "class": "GOVERNANCE_LEGACY", "id": null, "kinds": ["provider_rules", "doc"]}, "map": {"action": "MOVE", "artifact_id": "ART-00022", "target_path": "archive/governance/legacy-rules/governance__generated__adapters__ide__RULES.md"}, "still_at_original_path": false}
+NOTE ledger files: ["spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl"]
+X X5-T3-ledger-ids-match-catalogue FAIL T3:972 / S5:945 the migration ledger identifies each moved artefact by the id the catalogue gives that path -- {"count": 13, "mismatches": [{"catalogue_path_for_that_id": ".env", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00002", "ledger_path": ".cursorrules"}, {"catalogue_path_for_that_id": "README.md", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00004", "ledger_path": ".github/copilot-instructions.md"}, {"catalogue_path_for_that_id": "archive/governance/legacy-rules/.github__copilot-instructions.md", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00008", "ledger_path": "AGENT_RULES_v2.md"}, {"catalogue_path_for_that_id": "archive/spec/legacy-docs/docs__DECISIONS.md", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00012", "ledger_path": "docs/DECISIONS.md"}, {"catalogue_path_for_that_id": "archive/spec/legacy-docs/docs__decisions__ADR-001-retries.md", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00013", "ledger_path": "docs/decisions/ADR-001-retries.md"}, {"catalogue_path_for_that_id": "config/settings.yaml", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00015", "ledger_path": "docs/old/decision-2-copy.yaml"}, {"catalogue_path_for_that_id": "governance/generated/adapters/ide/RULES.md", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00022", "ledger_path": "specs/requirements.md"}, {"catalogue_path_for_that_id": "governance/kernel/adapters/api/adapter.yaml", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00029", "ledger_path": "src/specs/feature-login.md"}, {"catalogue_path_for_that_id": "framework.json", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00016", "ledger_path": "docs/test_utils.py"}, {"catalogue_path_for_that_id": "archive/governance/.gitkeep", "ledger": "migration-ledger.jsonl", "ledger_id": "ART-00006", "ledger_path": ".index/manifest.json"}]}
+SUMMARY total=3 pass=0 fail=3 failed=['X5-W1-catalogue-ids-stable-across-passes', 'X5-S4xB2-os-generated-adapter-not-legacy', 'X5-T3-ledger-ids-match-catalogue']

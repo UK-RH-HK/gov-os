@@ -6,6 +6,16 @@ use serde_json::{json, Value};
 use std::path::Path;
 use std::sync::OnceLock;
 
+// ------------------------------------------------------------------------------------------------------------------
+// Relation fields and edges (Contract v3 W1/W2 lines 1069-1090, W6 line 1133; BC-P2-21).
+//
+// Every relation field yields an edge whose direction matches its meaning. A field declared on the record the
+// edge points FROM is in [`RELATION_FIELDS`]; a field declared on the record the edge points TO is in
+// [`INVERSE_RELATION_FIELDS`] and is stored under the inverse name `crate::graph::INVERSE_EDGE_TYPES` gives it,
+// which every graph query reads back canonically. [`Record::edges`] is the canonical view of one record.
+// ------------------------------------------------------------------------------------------------------------------
+
+/// Fields naming records this record points AT: each id yields `self -TYPE-> id`.
 pub const RELATION_FIELDS: &[(&str, &str)] = &[
     ("depends_on", "DEPENDS_ON"),
     ("blocks", "BLOCKS"),
@@ -15,28 +25,149 @@ pub const RELATION_FIELDS: &[(&str, &str)] = &[
     ("tests", "TESTS"),
     ("derived_from", "DERIVED_FROM"),
     ("affects", "AFFECTS"),
+    // research/experiment output that influences a decision or task: a change to it affects them (W2, W7)
+    ("influences", "AFFECTS"),
     ("supersedes", "SUPERSEDES"),
     ("requirements", "GOVERNED_BY"),
     ("decisions", "GOVERNED_BY"),
+    // a task's declared architecture constraints (context::manifest)
+    ("architecture", "GOVERNED_BY"),
     ("scenarios", "VALIDATED_BY"),
     ("acceptance_tests", "VALIDATED_BY"),
     ("dependencies", "DEPENDS_ON"),
     ("feature", "REALISES"),
-    ("task", "PRODUCES"),
-    ("consumers", "CONSUMES"),
-    ("producers", "PRODUCES"),
     ("required_skills", "USES"),
     ("required_tools", "USES"),
     ("interfaces", "USES"),
+    // declared datasets and the explicit task-input manifest are consumed inputs (W3, context::manifest)
+    ("required_data", "CONSUMES"),
+    ("required_inputs", "CONSUMES"),
+    ("optional_inputs", "CONSUMES"),
     ("lessons", "LEARNED_FROM"),
     ("sources", "DERIVED_FROM"),
     ("cit", "GENERATED_FROM"),
     ("scenario", "TESTS"),
-    ("human_gate", "BLOCKS"),
     ("decision", "GOVERNED_BY"),
     ("targets", "AFFECTS"),
     ("blocks_tasks", "BLOCKS"),
+    // a closed task produced its closing report
+    ("closed_by_report", "PRODUCES"),
+    // the consumption receipt persisted on an execution report (context::receipt, W5 lines 1115-1126)
+    ("inputs_consumed", "CONSUMES"),
+    ("requirements_implemented", "IMPLEMENTS"),
+    ("scenarios_implemented", "IMPLEMENTS"),
+    ("features_implemented", "IMPLEMENTS"),
+    ("decisions_applied", "GOVERNED_BY"),
+    ("constraints_applied", "GOVERNED_BY"),
+    ("acceptance_evidence", "VALIDATED_BY"),
 ];
+
+/// Fields naming records that point at THIS record: each id yields the canonical edge `id -TYPE-> self`.
+/// `X.consumers: [T]` means T consumes X; `X.producers: [P]` means P produces X; `report.task: T` means T produced
+/// the report; `task.human_gate: G` means G blocks the task; `X.superseded_by: Y` means Y supersedes X.
+pub const INVERSE_RELATION_FIELDS: &[(&str, &str)] = &[
+    ("consumers", "CONSUMES"),
+    ("producers", "PRODUCES"),
+    ("task", "PRODUCES"),
+    ("human_gate", "BLOCKS"),
+    ("superseded_by", "SUPERSEDES"),
+];
+
+/// Output fields of execution records (paths or ids): each yields `self -PRODUCES-> file:<path>` (or `-> <id>`).
+/// Only the record types in [`OUTPUT_RECORD_TYPES`] produce outputs; a checkpoint's `files_changed` is a snapshot of
+/// the working tree, not something the checkpoint produced.
+pub const OUTPUT_FIELDS: &[&str] = &[
+    "outputs_produced",
+    "files_changed",
+    "observed_files_changed",
+];
+pub const OUTPUT_RECORD_TYPES: &[&str] = &["report", "task"];
+
+/// Task fields that declare an upstream input of the task (Contract v3 W3 lines 1093-1098, `context::manifest`).
+/// Besides the typed edge of its own field, each declared input also yields `task CONSUMES input`, so impact
+/// traversal reaches the declaring task from every input it declared (W6 line 1133), and "who consumes X" is one
+/// uniform query (W7).
+pub const TASK_INPUT_FIELDS: &[&str] = &[
+    "requirements",
+    "decisions",
+    "scenarios",
+    "acceptance_tests",
+    "interfaces",
+    "required_data",
+    "derived_from",
+    "architecture",
+    "required_inputs",
+    "optional_inputs",
+];
+
+/// `relations[].type` values that declare an upstream input of the declaring task (mirrored as `CONSUMES`).
+pub const INPUT_RELATION_TYPES: &[&str] = &[
+    "GOVERNED_BY",
+    "IMPLEMENTS",
+    "USES",
+    "CONSUMES",
+    "DERIVED_FROM",
+    "VALIDATED_BY",
+    "GENERATED_FROM",
+];
+
+/// The id named by one relation-field value: a bare id, `ID@version-or-hash`, or an object carrying `id` (or
+/// `test`/`target` for acceptance evidence entries).
+pub fn relation_target(v: &Value) -> Option<String> {
+    let s = match v {
+        Value::String(s) => s.clone(),
+        Value::Object(o) => ["id", "test", "target"]
+            .iter()
+            .find_map(|k| o.get(*k).and_then(|x| x.as_str()).map(|x| x.to_string()))?,
+        _ => return None,
+    };
+    let s = s.split('@').next().unwrap_or("").trim().to_string();
+    if id_regex().is_match(&s) {
+        Some(s)
+    } else {
+        None
+    }
+}
+
+fn field_targets(v: Option<&Value>) -> Vec<String> {
+    match v {
+        Some(Value::Array(a)) => a.iter().filter_map(relation_target).collect(),
+        Some(x @ Value::String(_)) => relation_target(x).into_iter().collect(),
+        _ => vec![],
+    }
+}
+
+/// Output entries of an execution record: repository paths become `file:<path>` nodes, ids stay ids.
+fn output_targets(v: Option<&Value>) -> Vec<String> {
+    let mut out = vec![];
+    if let Some(Value::Array(a)) = v {
+        for x in a {
+            let s = match x {
+                Value::String(s) => s.clone(),
+                Value::Object(o) => o
+                    .get("path")
+                    .or_else(|| o.get("id"))
+                    .and_then(|p| p.as_str())
+                    .unwrap_or("")
+                    .to_string(),
+                _ => continue,
+            };
+            let s = s.trim().trim_start_matches("./").to_string();
+            if s.is_empty() || s.starts_with('/') || s.contains("..") {
+                continue;
+            }
+            if id_regex().is_match(&s) {
+                out.push(s);
+            } else if let Some(rest) = s.strip_prefix("file:") {
+                out.push(format!("file:{rest}"));
+            } else {
+                out.push(format!("file:{s}"));
+            }
+        }
+    }
+    out
+}
+
 pub const TYPE_DIR: &[(&str, &str)] = &[
     ("project", "spec/product"),
     ("feature", "spec/features"),
@@ -224,8 +355,13 @@ impl Record {
         }
         out
     }
+    /// The edges this record declares, in **storage form** `(type, target)` with this record as the stored source —
+    /// the form the indexer writes. A field whose meaning points at this record (see [`INVERSE_RELATION_FIELDS`])
+    /// comes back under its inverse storage type (`CONSUMED_BY`, `PRODUCED_BY`, `BLOCKED_BY`, `SUPERSEDED_BY`);
+    /// [`Record::edges`] and every `crate::graph` query read it canonically.
     pub fn relations(&self) -> Vec<(String, String)> {
         let mut out: Vec<(String, String)> = vec![];
+        let is_task = self.rtype() == "task";
         if let Some(rels) = self.data.get("relations").and_then(|v| v.as_array()) {
             for r in rels {
                 if let (Some(t), Some(tg)) = (
@@ -233,34 +369,58 @@ impl Record {
                     r.get("target").and_then(|v| v.as_str()),
                 ) {
                     out.push((t.to_string(), tg.to_string()));
+                    if is_task && INPUT_RELATION_TYPES.contains(&t) {
+                        if let Some(id) = relation_target(&Value::String(tg.to_string())) {
+                            out.push(("CONSUMES".into(), id));
+                        }
+                    }
                 }
             }
         }
         for (fld, etype) in RELATION_FIELDS {
-            match self.data.get(*fld) {
-                Some(Value::String(s)) if id_regex().is_match(s) => {
-                    out.push((etype.to_string(), s.clone()))
-                }
-                Some(Value::Array(a)) => {
-                    for x in a {
-                        match x {
-                            Value::String(s) if id_regex().is_match(s) => {
-                                out.push((etype.to_string(), s.clone()))
-                            }
-                            Value::Object(o) => {
-                                if let Some(Value::String(s)) = o.get("id") {
-                                    if id_regex().is_match(s) {
-                                        out.push((etype.to_string(), s.clone()));
-                                    }
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                }
-                _ => {}
+            for id in field_targets(self.data.get(*fld)) {
+                out.push((etype.to_string(), id));
             }
         }
+        for (fld, canonical) in INVERSE_RELATION_FIELDS {
+            let stored = crate::graph::inverse_of(canonical).unwrap_or(canonical);
+            for id in field_targets(self.data.get(*fld)) {
+                out.push((stored.to_string(), id));
+            }
+        }
+        if is_task {
+            for fld in TASK_INPUT_FIELDS {
+                for id in field_targets(self.data.get(*fld)) {
+                    out.push(("CONSUMES".into(), id));
+                }
+            }
+        }
+        if OUTPUT_RECORD_TYPES.contains(&self.rtype().as_str()) {
+            for fld in OUTPUT_FIELDS {
+                for t in output_targets(self.data.get(*fld)) {
+                    out.push(("PRODUCES".into(), t));
+                }
+            }
+        }
+        let me = self.id();
+        out.retain(|(_, t)| *t != me);
+        out.sort();
+        out.dedup();
+        out
+    }
+
+    /// The edges this record declares, **canonically**: `(source, type, destination)` in the direction of the
+    /// relation's meaning (a stored `X CONSUMED_BY T` is returned as `T CONSUMES X`).
+    pub fn edges(&self) -> Vec<(String, String, String)> {
+        let me = self.id();
+        let mut out: Vec<(String, String, String)> = self
+            .relations()
+            .into_iter()
+            .map(|(t, target)| match crate::graph::canonical_of(&t) {
+                Some(c) => (target, c.to_string(), me.clone()),
+                None => (me.clone(), t, target),
+            })
+            .collect();
         out.sort();
         out.dedup();
         out

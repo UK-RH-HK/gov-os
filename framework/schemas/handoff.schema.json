@@ -227,6 +227,13 @@
         "RETURNED",
         "CANCELLED"
       ]
+    },
+    "receipt_validation": {
+      "type": "object",
+      "description": "Verdict of validating the worker's return as the task's consumption receipt against its input manifest (context::receipt::validate; Contract v3 W5). Recorded at return; task close refuses an invalid receipt."
+    },
+    "returned_at": {
+      "type": "string"
     }
   },
   "required": [

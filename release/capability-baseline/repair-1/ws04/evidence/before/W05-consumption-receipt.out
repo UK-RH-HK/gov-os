@@ -1,0 +1,271 @@
+# project w5s1: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s1-773475885
+$ gov init --name w5s1 --alias z-w5s1    [session=S-zeta role=orchestrator exit=0 0.7s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1115 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s1-773475885/.governance-runtime/reports/r.json: {"work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s1-773475885/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "checkpoint": "CKPT-00001",
+ "degraded": [],
+ "report": "RPT-0001",
+ "task": "TASK-0001",
+ "task_status": "DONE"
+}
+OBS W5-c1-refuses-missing-traceability: FAIL -- close with a report naming no consumed inputs, implemented requirements or applied decisions -> ok=True
+persisted report RPT-0001: {"id": "RPT-0001", "type": "report", "title": "Report for TASK-0001: Implement totals", "status": "ACTIVE", "created": "2026-09-18", "work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": [], "task": "TASK-0001", "session": "S-zeta", "role": "orchestrator", "state_class": "EVIDENCE", "observed_files_changed": ["src/lib.rs"], "mutation_evidence": {"baseline": "claim baseline 2026-09-18 (commit 25321e2698aa9c1f38ed52e4983b8b914038d2b3)", "reported_but_unchanged": []}}
+task-close checkpoint CKPT-00001: {"id": "CKPT-00001", "type": "checkpoint", "title": "Checkpoint 1 (task_transition)", "status": "ACTIVE", "created": "2026-09-18", "task": "TASK-0001", "trigger": "task_transition", "last_completed_step": "closed TASK-0001", "next_action": "gov continue", "tests_status": "passed", "files_changed": ["src/lib.rs"], "observed_files_changed": ["src/lib.rs"], "session": "S-zeta", "role": "orchestrator", "sequence": 1, "mode": "RUNNING", "pending_decisions": [], "open_transactions": [], "open_questions": [], "context_packet_hash": "72b4cb9b3c72e4d1862ac456b7fbea82c95b4bdb8d9e83d4fe6c1c9164151a31", "memory_snapshot": {"index_manifest_hash": "932eca45decd7a7323fc6c29ee11c950e274a47664a09b78874d2597d638ee43", "index_version": "4.1.5-idx3"}, "state_class": "EVIDENCE", "created_at": "2026-09-18T23:17:57Z"}
+OBS W5-r1-inputs-supplied-in-receipt: FAIL -- report keys recording supplied/consumed inputs: []
+OBS W5-r1-packet-hash-on-close-checkpoint: PASS -- close checkpoint context_packet_hash=72b4cb9b3c72e4d1 == packet compiled before work 72b4cb9b3c72e4d1
+OBS W5-r2-outputs-produced: PASS -- report files_changed=['src/lib.rs'] observed_files_changed=['src/lib.rs']
+OBS W5-r3-requirements-implemented-recorded: FAIL -- persisted report keys: ['created', 'evidence', 'files_changed', 'id', 'mutation_evidence', 'observed_files_changed', 'outcome', 'role', 'session', 'state_class', 'status', 'task', 'tests', 'title', 'type', 'work_completed']
+OBS W5-r4-decisions-applied-recorded: FAIL -- persisted report keys: ['created', 'evidence', 'files_changed', 'id', 'mutation_evidence', 'observed_files_changed', 'outcome', 'role', 'session', 'state_class', 'status', 'task', 'tests', 'title', 'type', 'work_completed']
+OBS W5-r5-acceptance-evidence-bound-to-declared-tests: FAIL -- TASK-0001 declares acceptance_tests [TST-0001]; report tests.status=passed, evidence=[] and no reference to TST-0001 -> close ok=True
+OBS W5-r6-task-close-requires-unknowns: FAIL -- report carries no deviations/unknowns (unresolved/risks/discoveries) field at all -> close ok=True
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov memory impact REQ-0001 --depth 4    [session=S-zeta role=orchestrator exit=0 0.0s]
+impact(REQ-0001, depth 4): [["F-0001", "GOVERNED_BY \u2192 REQ-0001"], ["SCN-0001", "REALISES \u2192 F-0001"], ["TASK-0001", "GOVERNED_BY \u2192 REQ-0001"], ["TST-0001", "REALISES \u2192 F-0001"]]
+OBS W5-c3-code-linked-to-requirement: FAIL -- code changed under TASK-0001 reachable from REQ-0001: False
+OBS W5-c3-report-linked-to-requirement: FAIL -- closing report RPT-0001 reachable from REQ-0001: False
+$ gov memory graph RPT-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS W5-c3-report-task-edge-direction: FAIL -- indexed edge between report and task: [('TASK-0001', '→PRODUCES')] (report.task maps to 'RPT-0001 PRODUCES TASK-0001')
+$ gov memory graph TASK-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS W5-c3-task-to-code-edge: FAIL -- TASK-0001 neighbours: [('CKPT-00001', '←PRODUCES'), ('D-0001', '→GOVERNED_BY'), ('F-0001', '→REALISES'), ('REQ-0001', '→GOVERNED_BY'), ('RPT-0001', '←PRODUCES'), ('SCN-0001', '→VALIDATED_BY'), ('TST-0001', '→VALIDATED_BY')]
+# project w5s2: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s2-773477310
+$ gov init --name w5s2 --alias z-w5s2    [session=S-zeta role=orchestrator exit=0 0.7s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1115 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s2-773477310/.governance-runtime/reports/r.json: {"work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": [], "requirements_implemented": ["REQ-9999"], "decisions_applied": ["D-4242"], "inputs_consumed": ["REQ-0001@deadbeef"], "unresolved": [], "risks": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s2-773477310/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "checkpoint": "CKPT-00001",
+ "degraded": [],
+ "report": "RPT-0001",
+ "task": "TASK-0001",
+ "task_status": "DONE"
+}
+OBS W5-r3r4-fabricated-trace-refused: FAIL -- report claims implementation of nonexistent REQ-9999 / application of nonexistent D-4242 / consumption of REQ-0001@deadbeef -> ok=True
+# project w5s3: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s3-773478692
+$ gov init --name w5s3 --alias z-w5s3    [session=S-zeta role=orchestrator exit=0 0.7s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1115 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s3-773478692/.governance-runtime/reports/r.json: {"work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "failed", "reason": "zeta probe"}, "outcome": "success", "evidence": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s3-773478692/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=1 0.0s]
+  ok=false error={
+ "code": "EVIDENCE_REQUIRED",
+ "details": null,
+ "message": "report.tests.status must be one of [\"passed\", \"not_applicable_with_reason\"] (got 'failed')"
+}
+OBS W5-r5-tests-status-enforced: PASS -- close with tests.status=failed -> EVIDENCE_REQUIRED
+# project w5s4: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s4-773479802
+$ gov init --name w5s4 --alias z-w5s4    [session=S-zeta role=orchestrator exit=0 0.7s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1115 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s4-773479802/.governance-runtime/reports/r.json: {"work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": [], "unresolved": ["rounding of negative totals undecided"], "risks": ["overflow at i64::MAX"], "discoveries": ["cents are i64"]}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s4-773479802/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "checkpoint": "CKPT-00001",
+ "degraded": [],
+ "report": "RPT-0001",
+ "task": "TASK-0001",
+ "task_status": "DONE"
+}
+OBS W5-r6-deviations-persisted-when-given: PASS -- persisted report unresolved=['rounding of negative totals undecided'] risks=['overflow at i64::MAX']
+# project w5s4b: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s4b-773481031
+$ gov init --name w5s4b --alias z-w5s4b    [session=S-zeta role=orchestrator exit=0 0.6s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov handoff create --to-role backend-engineer --task TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov handoff return HND-0001 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s4b-773481031/.governance-runtime/ret-bad.json    [session=S-zeta role=orchestrator exit=3 0.0s]
+  ok=false error={
+ "code": "SCHEMA_INVALID",
+ "details": {
+  "errors": [
+   "<root>: \"discoveries\" is a required property",
+   "<root>: \"lessons\" is a required property",
+   "<root>: \"proposed_decisions\" is a required property",
+   "<root>: \"recommended_next_action\" is a required property",
+   "<root>: \"risks\" is a required property",
+   "<root>: \"unresolved\" is a required property"
+  ]
+ },
+ "message": "schema validation failed for worker-return (worker return contract): <root>: \"discoveries\" is a required property; <root>: \"lessons\" is a required property; <root>: \"proposed_decisions\" is a required property; <root>: \"recommended_next_action\" is a required property; <root>: \"risks\" is a required property; <root>: \"unresolved\" is a required property"
+}
+OBS W5-r6-handoff-return-requires-unknowns: PASS -- handoff return without discoveries/risks/unresolved -> ok=False SCHEMA_INVALID
+# project w5s5: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s5-773482004
+$ gov init --name w5s5 --alias z-w5s5    [session=S-zeta role=orchestrator exit=0 0.6s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1107 chars)
+  [probe wrote file] tests/zeta_extra.rs (18 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s5-773482004/.governance-runtime/reports/r.json: {"work_completed": "declared only tests", "files_changed": ["tests/zeta_extra.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s5-773482004/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=1 0.0s]
+  ok=false error={
+ "code": "MUTATION_SCOPE_VIOLATION",
+ "details": {
+  "evidence": {
+   "baseline": "claim baseline 2026-09-18 (commit bed4d93608108a879c534379ad32ca03220aebc8)",
+   "observed": [
+    "src/lib.rs",
+    "tests/zeta_extra.rs"
+   ]
+  },
+  "observed": [
+   "src/lib.rs",
+   "tests/zeta_extra.rs"
+  ],
+  "out_of_scope": [],
+  "reported": [
+   "tests/zeta_extra.rs"
+  ],
+  "undeclared": [
+   "src/lib.rs"
+  ]
+ },
+ "message": "task TASK-0001: the repository shows mutations the report does not declare or the contract does not allow (undeclared: [\"src/lib.rs\"]; out of scope: []); declare every change in files_changed, route out-of-scope changes through a CIT, or amend the task contract"
+}
+OBS W5-c2-undocumented-change-detected: PASS -- undeclared src/lib.rs change -> MUTATION_SCOPE_VIOLATION undeclared=['src/lib.rs']
+# project w5s6: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s6-773482938
+$ gov init --name w5s6 --alias z-w5s6    [session=S-zeta role=orchestrator exit=0 0.6s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/** --fields {}    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1115 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s6-773482938/.governance-runtime/reports/r.json: {"work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s6-773482938/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=0 0.2s]
+  ok=true result={
+ "checkpoint": "CKPT-00001",
+ "degraded": [],
+ "report": "RPT-0001",
+ "task": "TASK-0001",
+ "task_status": "DONE"
+}
+OBS W5-c2-untraceable-implementation-detected: FAIL -- implementation task with no feature/requirements/decisions/scenarios; code change declared and in scope -> close ok=True None
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=0 0.3s]
+product_traceability detail: {"ok": true, "findings": 0, "detail": {"tasks": 1, "done": 1, "task_traceability": 0.0, "features": 1}}
+OBS W5-c2-untraceable-implementation-reported-by-audit: FAIL -- gov audit product_traceability findings: []
+# project w5s7: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s7-773484263
+$ gov init --name w5s7 --alias z-w5s7    [session=S-zeta role=orchestrator exit=0 0.6s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --status READY --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"decisions\": [\"D-0001\"], \"acceptance_tests\": [\"TST-0001\"]}" --feature F-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote file] src/lib.rs (1104 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s7-773484263/.governance-runtime/reports/r.json: {"work_completed": "declared exactly the one change", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w5s7-773484263/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=1 0.0s]
+  ok=false error={
+ "code": "MUTATION_SCOPE_VIOLATION",
+ "details": {
+  "evidence": {
+   "baseline": "none (git status --porcelain)",
+   "observed": [
+    "overnance/generated/index-manifest.json",
+    "src/lib.rs"
+   ]
+  },
+  "observed": [
+   "overnance/generated/index-manifest.json",
+   "src/lib.rs"
+  ],
+  "out_of_scope": [
+   "overnance/generated/index-manifest.json: outside allowed_paths [\"src/**\", \"tests/**\"] and not governed by a committed CIT"
+  ],
+  "reported": [
+   "src/lib.rs"
+  ],
+  "undeclared": [
+   "overnance/generated/index-manifest.json"
+  ]
+ },
+ "message": "task TASK-0001: the repository shows mutations the report does not declare or the contract does not allow (undeclared: [\"overnance/generated/index-manifest.json\"]; out of scope: [\"overnance/generated/index-manifest.json: outside allowed_paths [\\\"src/**\\\", \\\"tests/**\\\"] and not governed by a committed CIT\"]); declare every change in files_changed, route out-of-scope changes through a CIT, or amend the task contract"
+}
+OBS W5-c2-no-claim-observed-paths-correct: FAIL -- non-existent paths attributed to the worker: ['overnance/generated/index-manifest.json']; honest report declaring exactly src/lib.rs, no claim -> ok=False code=MUTATION_SCOPE_VIOLATION observed=['overnance/generated/index-manifest.json', 'src/lib.rs'] undeclared=['overnance/generated/index-manifest.json']
+
+==== SUMMARY ====
+W5-c1-refuses-missing-traceability: FAIL
+W5-r1-inputs-supplied-in-receipt: FAIL
+W5-r1-packet-hash-on-close-checkpoint: PASS
+W5-r2-outputs-produced: PASS
+W5-r3-requirements-implemented-recorded: FAIL
+W5-r4-decisions-applied-recorded: FAIL
+W5-r5-acceptance-evidence-bound-to-declared-tests: FAIL
+W5-r6-task-close-requires-unknowns: FAIL
+W5-c3-code-linked-to-requirement: FAIL
+W5-c3-report-linked-to-requirement: FAIL
+W5-c3-report-task-edge-direction: FAIL
+W5-c3-task-to-code-edge: FAIL
+W5-r3r4-fabricated-trace-refused: FAIL
+W5-r5-tests-status-enforced: PASS
+W5-r6-deviations-persisted-when-given: PASS
+W5-r6-handoff-return-requires-unknowns: PASS
+W5-c2-undocumented-change-detected: PASS
+W5-c2-untraceable-implementation-detected: FAIL
+W5-c2-untraceable-implementation-reported-by-audit: FAIL
+W5-c2-no-claim-observed-paths-correct: FAIL
+total=20 pass=6 fail=14

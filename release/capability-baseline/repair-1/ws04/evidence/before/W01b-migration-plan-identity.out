@@ -1,0 +1,181 @@
+# project w1b: fixture=brownfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zprobe-before/w1b-773465887
+$ gov adopt baseline    [session=S-planner role=orchestrator exit=0 0.4s]
+  ok=true result={
+ "baseline_tests": "failed",
+ "commit": "0b1569dc50b4bba6b5eff8ec81abce31409cfa22",
+ "dirty_files": 0,
+ "evidence": "spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml",
+ "freeze_advice": "clean baseline",
+ "interrupted": false,
+ "stage": "A0"
+}
+$ gov adopt inventory    [session=S-planner role=orchestrator exit=0 0.0s]
+  ok=true result={
+ "evidence": [
+  "spec/audits/GOVERNANCE-ADOPTION/01-COLD-INVENTORY.md",
+  "spec/audits/GOVERNANCE-ADOPTION/01-COLD-INVENTORY.jsonl"
+ ],
+ "stage": "A1",
+ "summary": {
+  "by_kind": {
+   "binary": 1,
+   "chat_store": 2,
+   "config": 9,
+   "data": 1,
+   "database": 1,
+   "doc": 7,
+   "entrypoint": 1,
+   "index_store": 2,
+   "old_governance": 2,
+   "package_manifest": 2,
+   "provider_rules": 3,
+   "report": 1,
+   "secret": 3,
+   "source": 9,
+   "spec_doc": 5,
+   "test": 4,
+   "unknown": 1
+  },
+  "bytes": 15897,
+  "files": 35,
+  "tracked": 34
+ }
+}
+$ gov adopt classify    [session=S-planner role=orchestrator exit=0 0.0s]
+  ok=true result={
+ "by_authority": {
+  "ACTIVE": 20,
+  "LEGACY": 8,
+  "PROVISIONAL": 3,
+  "SUPERSEDED": 1,
+  "UNKNOWN_OR_CONFLICTING": 3
+ },
+ "by_class": {
+  "DEAD_OR_UNUSED": 2,
+  "DECISION": 5,
+  "GENERATED": 2,
+  "GOVERNANCE_LEGACY": 3,
+  "HISTORICAL": 2,
+  "PRODUCT_SOURCE": 6,
+  "PRODUCT_TEST": 4,
+  "SECRET": 3,
+  "SPEC_AUTHORITATIVE": 3,
+  "SPEC_DERIVED": 1,
+  "TOOLING": 4
+ },
+ "classified": 35,
+ "conflicting": 3,
+ "evidence": [
+  "spec/audits/GOVERNANCE-ADOPTION/02-CLASSIFICATION.jsonl",
+  "spec/audits/GOVERNANCE-ADOPTION/03-LEGACY-GOVERNANCE-MAP.md"
+ ],
+ "stage": "A2",
+ "unknown": 0
+}
+$ gov adopt map    [session=S-planner role=orchestrator exit=0 0.0s]
+  ok=true result={
+ "actions": {
+  "DELETE_FROM_ACTIVE_TREE": 4,
+  "EXTRACT": 4,
+  "KEEP_IN_PLACE": 20,
+  "MOVE": 7
+ },
+ "entries": 35,
+ "evidence": "spec/audits/GOVERNANCE-ADOPTION/04-TARGET-PATH-MAP.jsonl",
+ "schema_problems": [],
+ "stage": "A3",
+ "unknown_blocking_destructive": 0
+}
+$ gov adopt plan    [session=S-planner role=orchestrator exit=0 0.0s]
+  ok=true result={
+ "batches": [
+  {
+   "batch": 0,
+   "entries": 0,
+   "human_gate": false
+  },
+  {
+   "batch": 1,
+   "entries": 3,
+   "human_gate": false
+  },
+  {
+   "batch": 2,
+   "entries": 5,
+   "human_gate": false
+  },
+  {
+   "batch": 3,
+   "entries": 0,
+   "human_gate": false
+  },
+  {
+   "batch": 4,
+   "entries": 1,
+   "human_gate": false
+  },
+  {
+   "batch": 5,
+   "entries": 0,
+   "human_gate": false
+  },
+  {
+   "batch": 6,
+   "entries": 4,
+   "human_gate": false
+  },
+  {
+   "batch": 7,
+   "entries": 2,
+   "human_gate": true
+  }
+ ],
+ "evidence": [
+  "spec/audits/GOVERNANCE-ADOPTION/05-ADOPTION-MIGRATION-PLAN.md",
+  "spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml"
+ ],
+ "human_gates_created": [],
+ "stage": "A4"
+}
+OBS W1-migplan-persisted: PASS -- product persisted spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml and 05-ADOPTION-MIGRATION-PLAN.md
+05-plan.yaml top-level keys: ['batches', 'created_at', 'unknown_blocking']
+05-plan.yaml (excerpt): {"batches": [{"batch": 0, "description": "Install/pin kernel + establish overlay (no destructive migration)", "entries": 0, "actions": [], "requires_human_gate": false, "rollback_point": "snapshot batch-0", "pre_tests": ["independent path/link/import tests", "affected product tests"], "post_tests": ["independent path/link/import tests", "affected product tests", "checkpoint"]}, {"batch": 1, "description": "Governance authority: retire legacy provider rules and governance docs to archive", "entries": 3, "actions": ["ART-00002", "ART-00004", "ART-00008"], "requires_human_gate": false, "rollback_point": "snapshot batch-1", "pre_tests": ["independent path/link/import tests", "affected product tests"], "post_tests": ["independent path/link/import tests", "affected product tests", "checkpoint"]}, {"batch": 2, "description": "Spec normalisation: move/extract non-code records into spec/; update citations", "entries": 5, "actions": ["ART-00012", "ART-00013", "ART-00015", "ART-00022", "ART-00029"], "requires_human_gate": false, "rollback_point": "snapshot batch-2", "pre_tests": ["independent path/link/import tests", "affected product tests"], "post_tests": ["independent path/link/import tests", "affected product tests", "checkpoint"]}, {"batch": 3, "description": "Product source relocation (only where justified; human gate)", "entries": 0, "actions": [], "requires_human_gate": false, "rollback_point": "snapshot batch-3", "pre_tests": ["independent path/link/import tests", "affected pro
+05-ADOPTION-MIGRATION-PLAN.md head:
+# 05 — Adoption/migration plan
+
+Order follows protocol §9: kernel first, governance authority, spec normalisation, links, product source only where justified, tests/devops, legacy retirement, memory rebuild only after path stability.
+
+Unknown artefacts blocking destructive batches: **0**
+
+## Batches
+
+| # | Description | Entries | Human gate |
+|---|---|---|---|
+| 0 | Install/pin kernel + establish overlay (no destructive migration) | 0 | false |
+| 1 | Governance authority: retire legacy provider rules and governance docs to archive | 3 | false |
+| 2 | Spec normalisation: move/extract non-code records into spec/; update citations | 5 | false |
+| 3 | Product source relocation (only where justified; human gate) | 0 | false |
+| 4 | Tests/devops relocation and import updates | 1 | false |
+| 5 | 
+OBS W1-b1-migplan-stable-id: FAIL -- 05-plan.yaml carries a stable artefact id: keys=['batches', 'created_at', 'unknown_blocking']
+OBS W1-b2-migplan-type: FAIL -- 05-plan.yaml carries an artefact type
+OBS W1-b4-migplan-authority: FAIL -- 05-plan.yaml carries authoritative status / lifecycle
+OBS W1-b6-migplan-version-hash: FAIL -- 05-plan.yaml carries version/content hash
+OBS W1-b7-migplan-provenance: FAIL -- 05-plan.yaml carries producer/provenance (created_at only is a timestamp, not a producer)
+OBS W1-b8-migplan-lineage: FAIL -- 05-plan.yaml carries supersedes lineage (re-running A4 overwrites the file in place)
+OBS W1-b9-migplan-consumers: FAIL -- 05-plan.yaml declares expected downstream consumers
+$ gov adopt plan    [session=S-planner role=orchestrator exit=0 0.0s]
+adoption evidence dir after re-plan: ['00-BASELINE.yaml', '01-COLD-INVENTORY.jsonl', '01-COLD-INVENTORY.md', '02-CLASSIFICATION.jsonl', '03-LEGACY-GOVERNANCE-MAP.md', '04-TARGET-PATH-MAP.jsonl', '05-ADOPTION-MIGRATION-PLAN.md', '05-plan.yaml']
+OBS W1-b8-migplan-replan-keeps-history: FAIL -- re-running A4 keeps a superseded plan version (file rewritten in place: True; created_at before=2026-09-18T23:17:46Z after=2026-09-18T23:17:47Z); files=['05-ADOPTION-MIGRATION-PLAN.md', '05-plan.yaml']
+
+==== SUMMARY ====
+W1-migplan-persisted: PASS
+W1-b1-migplan-stable-id: FAIL
+W1-b2-migplan-type: FAIL
+W1-b4-migplan-authority: FAIL
+W1-b6-migplan-version-hash: FAIL
+W1-b7-migplan-provenance: FAIL
+W1-b8-migplan-lineage: FAIL
+W1-b9-migplan-consumers: FAIL
+W1-b8-migplan-replan-keeps-history: FAIL
+total=9 pass=1 fail=8

@@ -285,6 +285,11 @@ enum Cmd {
         #[command(subcommand)]
         op: PolicyCmd,
     },
+    /// Artefact identity and lineage (Gate W W1/W8)
+    Artefact {
+        #[command(subcommand)]
+        op: ArtefactCmd,
+    },
 }
 #[derive(Subcommand)]
 enum PluginsCmd {
@@ -495,6 +500,46 @@ enum CitCmd {
 #[derive(Subcommand)]
 enum ContextCmd {
     Compile { task: String },
+    // ---- WS-4 (P2-AR-0017, BC-P2-17/19/20): input manifest, delivery verification, receipt validation
+    /// Resolve the task's mandatory input manifest (W3): what is required, what each id resolved to, what blocks
+    Manifest { task: String },
+    /// Verify a compiled packet still delivers the task's declared inputs at their current versions (W4/W10)
+    Verify {
+        task: String,
+        /// packet_hash (or a prefix of >= 12 hex chars); default: the packet last compiled
+        #[arg(long)]
+        hash: Option<String>,
+    },
+    /// Show a compiled packet from the packet history
+    Show {
+        task: String,
+        #[arg(long)]
+        hash: Option<String>,
+    },
+    /// Validate a consumption receipt / worker return against the task's manifest (W5; dry run, writes nothing)
+    Receipt {
+        task: String,
+        #[arg(long)]
+        file: String,
+    },
+}
+// ---- WS-4 (P2-AR-0017, BC-P2-21): artefact identity and record-level lineage
+#[derive(Subcommand)]
+enum ArtefactCmd {
+    /// The W1 identity of a governed artefact (id, type, canonical path, authority, lifecycle, version/hash,
+    /// provenance, supersession lineage, expected and actual consumers)
+    Show { id: String },
+    /// Identity and lineage problems: misplaced records, duplicate ids, stale links, unconsumed outputs
+    Check,
+    /// Forward (impact) or reverse (upstream) lineage of an artefact over canonical edges
+    Lineage {
+        id: String,
+        /// `down` (what depends on it) or `up` (what it traces back to)
+        #[arg(long, default_value = "down")]
+        direction: String,
+        #[arg(long, default_value_t = 6)]
+        depth: usize,
+    },
 }
 #[derive(Subcommand)]
 enum CheckpointCmd {
@@ -1236,7 +1281,33 @@ fn run(cli: &Cli) -> Result<Value> {
                 CitCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found"))) }
             }
         }
-        Cmd::Context { op } => { let p = open_project(cli, true)?; let d = db(&p)?; match op { ContextCmd::Compile { task } => gov_runtime::context::compile(&p, &d, task) } }
+        // WS-4 (P2-AR-0017): the context commands do not require the derived index — mandatory inputs are resolved
+        // from governed records, and an absent or damaged index degrades only the supplementary block (W10).
+        Cmd::Context { op } => {
+            let p = open_project(cli, true)?;
+            use gov_runtime::context as ctx;
+            match op {
+                ContextCmd::Compile { task } => ctx::compile_tolerant(&p, task),
+                ContextCmd::Manifest { task } => { let s = gov_runtime::records::RecordStore::load(&p.root); Ok(ctx::manifest::resolve_task(&p, &s, task)?.to_value()) }
+                ContextCmd::Verify { task, hash } => { let pk = ctx::load_packet(&p, task, hash.as_deref())?; ctx::verify_delivery(&p, &pk) }
+                ContextCmd::Show { task, hash } => ctx::load_packet(&p, task, hash.as_deref()),
+                ContextCmd::Receipt { task, file } => { let s = gov_runtime::records::RecordStore::load(&p.root); Ok(ctx::receipt::validate(&p, &s, task, &load_file_value(file)?)?.to_value()) }
+            }
+        }
+        Cmd::Artefact { op } => {
+            let p = open_project(cli, true)?;
+            let s = gov_runtime::records::RecordStore::load(&p.root);
+            match op {
+                ArtefactCmd::Show { id } => gov_runtime::graph::identity::identity(&p, &s, id),
+                ArtefactCmd::Check => Ok(gov_runtime::graph::identity::check(&p, &s)),
+                ArtefactCmd::Lineage { id, direction, depth } => {
+                    let d = db(&p)?;
+                    let seeds = vec![id.clone()];
+                    let reach = match direction.as_str() { "up" | "upstream" | "reverse" => gov_runtime::graph::upstream_set(&d, &seeds, *depth)?, "down" | "downstream" | "forward" | "impact" => gov_runtime::graph::impact_set(&d, &seeds, *depth)?, other => return Err(GovError::new("USAGE", format!("--direction must be up or down (got '{other}')"))) };
+                    Ok(json!({"id": id, "direction": direction, "depth": depth, "reach": reach, "edges": gov_runtime::graph::canonical_edges(&d, id)?}))
+                }
+            }
+        }
         Cmd::Checkpoint { op } => {
             let p = open_project(cli, true)?; let d = db(&p)?;
             match op {
@@ -1409,6 +1480,7 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Lessons { .. } => "lessons",
         Cmd::Plugins { .. } => "plugins",
         Cmd::Policy { .. } => "policy",
+        Cmd::Artefact { .. } => "artefact",
     }
 }
 
