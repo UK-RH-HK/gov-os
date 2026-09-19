@@ -1,0 +1,143 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0031
+role: capability-repair
+objective: 'Repair iteration 1, round 2, WS-10: implement the repair-delta requirements for BC-P2-46 (scenario → data → test-data lineage, provenance, test-data author independence), BC-P2-47 (research completeness) and BC-P2-48 (experiment lifecycle) as governed records and state machines; claims only, never acceptance.'
+agent_model: claude-opus-5[1m]
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context. This run authored none of the
+  iteration-0 audits, the synthesis, any round-1 repair or the round-1 integration; before this run it had authored
+  nothing in the repository. It read the handoffs P2-HO-0029, P2-HO-0020 and P2-HO-0010; repair-delta §0-§4 and the
+  BC-P2-14/21/34/46/47/48 entries; blocker-classes.yaml and findings.yaml (A0-H4-01/02/03, A0-J1-01, A0-J2-01) and the
+  gamma-r / delta-r family findings; the delta-r J1-J2 and gamma-r H4 probes and outputs of record (and the other
+  audit-of-record probes it re-ran); Contract v3 Gates H4 and J; framework §39 and §45-46; the round-1 integration report
+  and the WS-2, WS-4 and WS-5 round-1 repair reports; the owner decisions and adjudication named in P2-HO-0020; and the
+  product source it used or changed. It did not read session or agent transcripts, task-output stores or user
+  auto-memory, spawned no sub-agent and did not contact the owner. Builder tests and the builder probe are regression
+  evidence only (Contract v3 O3). Audit-of-record probes ran unedited (from a clean export of the base or from this
+  worktree, through private mirror roots); no file under release/capability-baseline/audit-0/ changed.
+input:
+  base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+  candidate: "none (round-2 repair branch of repair iteration 1; no candidate minted)"
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0029-repair-1-r2-ws10.md
+  common_protocol:
+    - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+    - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0029-repair-1-r2-ws10.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  - release/capability-baseline/audit-0/synthesis/findings.yaml
+  - release/capability-baseline/audit-0/gamma-r/findings.yaml
+  - release/capability-baseline/audit-0/delta-r/findings.yaml
+  - release/capability-baseline/audit-0/delta-r/evidence/ (J1-J2-research-experiments, harness.py, FRESH-invalidation, K1-K3)
+  - release/capability-baseline/audit-0/gamma-r/evidence/ (H4-scenarios-data-tests, lib.sh, H1, H2H3, I1I2)
+  - release/capability-baseline/audit-0/{alpha-r,beta-r,epsilon-r,zeta-r}/evidence/ (the probes re-run in §6 of the report)
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md and evidence (run-audit-probe.sh, gov-owner-channel-shim.py, normdiff.py, compare_audit_probes.py, run-r1-heldout.sh)
+  - release/capability-baseline/repair-1/{ws02,ws04,ws05}/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/ws03/evidence/hc_owner.py
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (H4, J1-J2)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (§39, §45-46)
+  - framework/schemas/{research,experiment,scenario,test-obligation,record,task,decision,human-gate,report}.schema.json
+  - framework/policies/{AUTHORITY_POLICY,TEST_POLICY,CHANGE_POLICY}.yaml, framework/roles/ROLES.yaml, framework/skills/SKL-RESEARCH-BENCHMARK.yaml, framework/health/SKILL_SCENARIO_CHECKS.yaml
+  - runtime/src/{records,t2,schemas,authority,project,error,util,lib}.rs, runtime/src/orchestration/{gates,control,tasks}.rs, runtime/src/graph/{mod,identity,lineage}.rs, runtime/src/cit/mod.rs, runtime/src/verification/mod.rs, runtime/src/scheduler/catalogue.rs, runtime/src/memory/benchmark.rs, runtime/src/update.rs, runtime/src/srr/breakglass.rs (§6 signatures), cli/src/main.rs
+  - tests/certification/{common,section6,ws03}.rs
+  - release/orchestration/phase-2/AGENT_RUNS/README.md, P2-AR-0031.run.yaml, P2-AR-0018.report.yaml
+produced:
+  - runtime/src/lifecycle/mod.rs
+  - runtime/src/lifecycle/research.rs
+  - runtime/src/lifecycle/experiment.rs
+  - runtime/src/lifecycle/scenario.rs
+  - framework/schemas/research.schema.json
+  - framework/schemas/experiment.schema.json
+  - framework/schemas/scenario.schema.json
+  - cli/src/main.rs (additive WS-10 block)
+  - runtime/src/orchestration/control.rs (additive COMMAND_GUARDS entries)
+  - runtime/src/lib.rs (pub mod lifecycle)
+  - release/capability-baseline/repair-1/r2-ws10/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r2-ws10/claims.yaml
+  - release/capability-baseline/repair-1/r2-ws10/evidence/
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0031.report.yaml
+class_claims:
+  BC-P2-47: REPAIRED_CLAIMED (WS-10 side)
+  BC-P2-48: REPAIRED_CLAIMED (WS-10 side)
+  BC-P2-46: REPAIRED_CLAIMED (WS-10 side; includes the data-authorship part of BC-P2-34)
+product_code_digest_after: 9456fb927f528f2e8d4d4fe52f32d07d854cb3fd84442e08a40cbf0169d0fe40
+work_commits:
+  - 25edc5a67bd725c5fe0420540879a3ef02d0f673
+  - 8c4e63488768a088f4bddad65785a708eaf6ffda
+tests_or_attacks:
+  - id: delta-r/J1-J2 J1.b.accepted
+    description: a CIT appends a research record with only question + conclusion presented as evidence
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/after/delta-r.J1-J2-research-experiments.shim.out
+  - id: delta-r/J1-J2 J1.b.audit
+    description: the governance suite flags hand-written incomplete research
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/after/delta-r.J1-J2-research-experiments.shim.out
+  - id: delta-r/J1-J2 J2.empty
+    description: a CIT appends an experiment with no hypothesis/method/data/results
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/after/delta-r.J1-J2-research-experiments.shim.out
+  - id: delta-r/J1-J2 J1.a.influences, J1.a.influence_backlink, J2.merge.detected
+    description: benchmark/select backlinks and the suite finding for merged experimental output — call sites of WS-6 and WS-2
+    result: FAIL
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/after/delta-r.J1-J2-research-experiments.shim.out
+    note: integration points IP-WS10-03/04/06; the same behaviours hold through gov research sync (WS10-J1-8) and gov experiment check (WS10-J2-9)
+  - id: delta-r/J1-J2 J2.incomplete.audit
+    description: the suite flags the empty experiment EXP-0001
+    result: FAIL
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/after/delta-r.J1-J2-research-experiments.shim.out
+    note: vacuous after the repair — J2.empty refuses EXP-0001, so it never exists; a directly written incomplete experiment is flagged (report §2.4)
+  - id: gamma-r/H4-scenarios-data-tests
+    description: chain edges (memory graph), DAG, readiness and suite lines of H4.b1-b3 (observation probe, re-run unedited)
+    result: FAIL
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/after/gamma-r.H4-scenarios-data-tests.integrated.out
+    note: the Accept lines H4.b1/H4.b3 as written read surfaces owned by WS-4 (memory graph), WS-5 (task dag, readiness) and WS-2 (audit), which are unchanged (IP-WS10-06/08/12); the fixture's missing links are named by gov scenario trace (WS10-H4-1)
+  - id: ws10_supplementary.py
+    description: builder probe, 35 checks over J1, J2, H4 and G0 on disposable projects; negative control on the base binary
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/probes/
+    note: 35/35 after; 1/35 on the base binary (the control only)
+  - id: cross-family re-run
+    description: 25 audit-of-record probes whose fixtures write research/experiment/scenario records, before vs after, unedited
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/probe-reruns/COMPARE.out
+    note: 'no capability regression: PASS→FAIL only beta-r C8-b5 and the D2 abort, both a fixture effect (the synthetic project''s RES-0101/EXP-0001 are incomplete evidence) shown by a labelled derived fixture to leave both probes identical; W07-o3/o3b FAIL→PASS is spurious (report §6)'
+  - id: cargo test --lib
+    description: product unit tests
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/regression/cargo-test-lib.out
+    note: 160 passed, 0 failed
+  - id: cargo test --test certification
+    description: certification suite incl. section6 and ws03 G0 classification
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/regression/cargo-test-certification.out
+    note: 100 passed, 0 failed
+  - id: R1 held-out suites (AR-0027/0029/0031/0033)
+    description: every prior R1 held-out suite, unedited, built against this worktree through a private scratch root
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws10/evidence/r1-heldout/r1-heldout-final.out
+    note: 'at the recorded baselines — AR-0027 26/3, AR-0029 26/2 (ho_f does not compile, as recorded), AR-0031 27/7, AR-0033 30/1 (hv_a::a1 scale pin only); derived unpinned census 109 files / 1581 functions, 0 violations in every section-6 activity; derive.py agrees'
+integration_points_new: [IP-WS10-01, IP-WS10-02, IP-WS10-03, IP-WS10-04, IP-WS10-05, IP-WS10-06, IP-WS10-07, IP-WS10-08, IP-WS10-09, IP-WS10-10, IP-WS10-11, IP-WS10-12, IP-WS10-13, IP-WS10-14, IP-WS10-15, IP-WS10-16, IP-WS10-17]
+integration_points_routed: [IP-WS02-21 (precondition met; WS-2 flips the mode — IP-WS10-07)]
+owner_decision_required: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-ws10
+  commit: 8c4e63488768a088f4bddad65785a708eaf6ffda
+  evidence_path: release/capability-baseline/repair-1/r2-ws10/
+unresolved:
+  - 'Accept lines at other workstreams'' call sites (round 3): J1.a.influences (IP-WS10-04), J1.a.influence_backlink (IP-WS10-03), J2.merge.detected and the H4 suite lines (IP-WS10-06), H4.b1 graph edges (IP-WS10-08), H4 DAG/readiness (IP-WS10-12), retrieval standing (IP-WS10-05), refusal of decisions citing non-governed evidence (IP-WS10-02)'
+  - 'L1 research-agent/data-author cannot run the write commands until an L1 authority class exists (IP-WS10-01, WS-3)'
+  - 'Design consequence to weigh: incomplete research/experiment evidence is a schema HIGH, which WS-2''s scheduler turns into a hard-block on state-relying operations (report §6.1)'
+recommended_next_action: >-
+  Integrate this branch with the other round-2 branches, then route IP-WS10-01..17 to their owners in round 3 (WS-2 family
+  and IP-WS02-21 flip, WS-3 gates and authority class, WS-4 relation fields and CIT promotion check, WS-5 close/DAG/readiness
+  and test-obligation schema, WS-6 select/benchmark/indexer, WS-1 evidence map) before the candidate is minted.
+completed_at: '2026-09-19T05:12:09Z'
