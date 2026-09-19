@@ -10,7 +10,7 @@
 //!   that owns one (the latest suite results in the health state, the latest — or current — doctor run) and the
 //!   currency of the green governance evidence. [`repository_verdict`] is the **one** repository verdict: `HEALTHY`
 //!   only when all thirteen hold (`gov health status`, `gov status` → `health.repository`, doctor D035).
-use super::currency::{self, Currency, Snapshot};
+use super::currency::{Currency, Snapshot};
 use super::Family;
 use crate::memory::db::RuntimeDb;
 use crate::records::RecordStore;
@@ -56,17 +56,30 @@ fn number(p: &Project, v: &Value, default: f64) -> (f64, Value) {
     (default, json!({"value": default, "source": "default"}))
 }
 
-/// Record types counted by the orphan-graph SLO (see [`evaluate`], SLO 5).
+/// Record types counted by the orphan-graph SLO (see [`evaluate`], SLO 5). Tasks are not among them: whether work
+/// traces to the authority it serves is what the task-traceability SLO (SLO 8) measures, under its own population rule;
+/// counting an untraced task here as well would judge the same fact twice and bypass that rule.
 pub const ORPHAN_SLO_TYPES: &[&str] = &[
     "feature",
     "requirement",
     "scenario",
     "test-obligation",
     "interface",
-    "task",
     "research",
     "experiment",
 ];
+
+/// Task classes that produce the evidence decisions rest on (outside the task-traceability population, SLO 8).
+pub const EVIDENCE_TASK_CLASSES: &[&str] = &["discovery", "research", "experiment"];
+
+/// Whether a task class is outside the task-traceability population (SLO 8): work that creates or maintains the
+/// authority (`currency::GOVERNANCE_AFFECTING_TASK_CLASSES`) or produces the evidence decisions rest on
+/// ([`EVIDENCE_TASK_CLASSES`]). Their own grounding is judged elsewhere (governance-affecting closes by the currency
+/// gate; research and experiment by their lifecycle).
+pub fn authority_upstream_class(class: &str) -> bool {
+    super::currency::GOVERNANCE_AFFECTING_TASK_CLASSES.contains(&class)
+        || EVIDENCE_TASK_CLASSES.contains(&class)
+}
 
 /// What an SLO evaluation needs.
 pub struct SloCtx<'a> {
@@ -240,9 +253,9 @@ pub fn evaluate(c: &SloCtx) -> Vec<Value> {
         match c.db {
             Some(db) => {
                 // a node counts when it is current (ACTIVE) and of a type whose purpose is to be implemented,
-                // validated, consumed or worked on (ORPHAN_SLO_TYPES): a requirement, scenario, test obligation,
-                // interface, feature or task no relationship reaches, or research/experiment evidence no decision
-                // consumes. Decisions and architecture records govern the project as a whole and may stand alone; the
+                // validated or consumed (ORPHAN_SLO_TYPES): a requirement, scenario, test obligation, interface or
+                // feature no relationship reaches, or research/experiment evidence no decision consumes (untraced
+                // work is SLO 8's). Decisions and architecture records govern the project as a whole and may stand alone; the
                 // project record is the chain's root; audits are evidence; PROVISIONAL candidates awaiting review
                 // (e.g. decisions extracted from retired legacy stores) are not orphan authority.
                 let orphans: Vec<String> = crate::graph::orphan_nodes(db)
@@ -330,7 +343,10 @@ pub fn evaluate(c: &SloCtx) -> Vec<Value> {
             json!({"open": open.iter().map(|g| json!({"id": g.id(), "gate_status": g.get("gate_status"), "age_hours": age_of(g)})).collect::<Vec<_>>()}),
         ));
     }
-    // 8 task traceability % (owner health_slos)
+    // 8 task traceability % (owner health_slos). The population is the work that realises authority: a task of a
+    // class whose work creates or maintains the authority itself (the governance-affecting classes: governance,
+    // specification, decision preparation, architecture, release, memory, migration) or produces the evidence a
+    // decision is taken on (discovery, research, experiment) is upstream of what it would trace to.
     {
         let t = &decl("task_traceability")["threshold"];
         let (min, _) = number(p, &t["min"], 0.8);
@@ -348,6 +364,7 @@ pub fn evaluate(c: &SloCtx) -> Vec<Value> {
                 || tk.get("task_status") == "CANCELLED"
                 || super::lineage::is_generated(tk)
                 || !tk.get("generated_by").is_empty()
+                || authority_upstream_class(&tk.get("class"))
             {
                 continue;
             }
@@ -640,7 +657,20 @@ pub fn family(c: &SloCtx, f: &mut Family) {
                 "path": Value::Null}));
         }
     }
-    f.detail = json!({"slos": slos, "crossed": crossed, "declarations": "framework/health/HEALTH_SLOS.yaml"});
+    // compact: the measures and titles are declarations (`framework/health/HEALTH_SLOS.yaml`, `gov health status`);
+    // each SLO carries its value, threshold, owner and verdict, and the detail that names what crosses it
+    let compact: Vec<Value> = slos
+        .iter()
+        .map(|s| {
+            let mut c = json!({"id": s["id"], "value": s["value"], "threshold": s["threshold"], "owner": s["owner"],
+                               "applicable": s["applicable"], "crossed": s["crossed"]});
+            if s["crossed"] == true && s["owner"] == FAMILY {
+                c["detail"] = s["detail"].clone();
+            }
+            c
+        })
+        .collect();
+    f.detail = json!({"slos": compact, "crossed": crossed, "declarations": "framework/health/HEALTH_SLOS.yaml"});
 }
 
 fn slo_subjects(s: &Value) -> Vec<String> {

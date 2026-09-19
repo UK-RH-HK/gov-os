@@ -41,7 +41,7 @@ slos:
   - id: orphan_graph_count
     contract: "Contract v3:984"
     title: orphan-graph count
-    measure: current (ACTIVE) records whose purpose is to be implemented, validated, consumed or worked on (feature, requirement, scenario, test obligation, interface, task) and research/experiment evidence expected to feed a decision, that the relationship graph neither reaches nor leaves (graph::orphan_nodes). Decisions and architecture records govern the project as a whole and may stand alone; the project record, audit evidence and PROVISIONAL candidates awaiting review are not counted
+    measure: current (ACTIVE) records whose purpose is to be implemented, validated or consumed (feature, requirement, scenario, test obligation, interface) and research/experiment evidence expected to feed a decision, that the relationship graph neither reaches nor leaves (graph::orphan_nodes). Decisions and architecture records govern the project as a whole and may stand alone; the project record, audit evidence and PROVISIONAL candidates awaiting review are not counted; untraced work (tasks) is measured by task_traceability
     threshold: {max: 0}
     owner: health_slos
     severity: medium
@@ -64,7 +64,7 @@ slos:
   - id: task_traceability
     contract: "Contract v3:987"
     title: task traceability %
-    measure: live tasks (generated remediation excluded) that declare the upstream authority they serve (feature, requirement, scenario, decision, interface, architecture or explicit input) and, when DONE under a traceability-required class, whose closing report traces what they implemented
+    measure: live tasks that realise authority (generated remediation excluded, and so are the classes that create or maintain the authority or the evidence it rests on — governance, specification, decision-preparation, architecture, release, memory, migration, discovery, research, experiment) that declare the upstream authority they serve (feature, requirement, scenario, decision, interface, architecture or explicit input) and, when DONE under a traceability-required class, whose closing report traces what they implemented
     threshold: {min: 0.8, min_population: 3}
     owner: health_slos
     severity: medium

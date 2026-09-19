@@ -103,7 +103,42 @@ pub fn human_gate_integrity(store: &RecordStore, f: &mut Family) {
             _ => {}
         }
     }
-    f.detail = json!({"pending": pending, "answered": answered});
+    // G3 (Contract v3:796 "claims/decisions/gates"): work claimed or in progress on a task an unanswered gate blocks
+    // (the gate lists it in `blocks_tasks`, or the task names the gate) — handing it off or checkpointing it carries
+    // work the human has not authorised yet (medium; closing it is refused by the gate itself)
+    let mut held = vec![];
+    for g in store.of_type("human-gate") {
+        if !matches!(g.get("gate_status").as_str(), "PENDING" | "PRESENTED") {
+            continue;
+        }
+        let mut tasks: BTreeSet<String> = g.list("blocks_tasks").into_iter().collect();
+        for t in store.of_type("task") {
+            if t.get("human_gate") == g.id() {
+                tasks.insert(t.id());
+            }
+        }
+        for t in tasks {
+            if let Some(task) = store.get(&t) {
+                let st = task.get("task_status");
+                if matches!(st.as_str(), "CLAIMED" | "IN_PROGRESS" | "REVIEW") {
+                    held.push(t.clone());
+                    let mut x = finding(
+                        "medium",
+                        &fam,
+                        format!(
+                            "{t} is {st} while {} (which blocks it) is still {}: work is in progress, and may be handed off or checkpointed, without the human decision it waits on",
+                            g.id(),
+                            g.get("gate_status")
+                        ),
+                        Some(task.path.clone()),
+                    );
+                    x["subjects"] = json!([t, g.id()]);
+                    f.findings.push(x);
+                }
+            }
+        }
+    }
+    f.detail = json!({"pending": pending, "answered": answered, "work_in_progress_on_unanswered_gates": held});
 }
 
 /// K: no CIT left EXECUTING; a COMMITTED CIT carries its approval and, where a human gate was required, that gate is

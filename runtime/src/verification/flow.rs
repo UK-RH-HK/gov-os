@@ -136,14 +136,14 @@ pub fn metrics(p: &Project, store: &RecordStore) -> Value {
         "Contract v3:1175",
         delivered_ok,
         declared,
-        json!({"misses": delivery_misses.iter().take(20).collect::<Vec<_>>(), "over": "mandatory inputs of live tasks whose context packet was delivered"}),
+        json!({"misses": delivery_misses.iter().take(5).collect::<Vec<_>>(), "over": "mandatory inputs of live tasks whose context packet was delivered"}),
     );
     let m2 = metric(
         "current_version_selection_accuracy",
         "Contract v3:1176",
         supplied_current,
         supplied_total,
-        json!({"misses": version_misses.iter().take(20).collect::<Vec<_>>(), "over": "inputs delivered in stored context packets"}),
+        json!({"misses": version_misses.iter().take(5).collect::<Vec<_>>(), "over": "inputs delivered in stored context packets"}),
     );
     // ---- m3: superseded-input leakage (governing inputs of live and DONE work that are no longer current, unflagged)
     let mut pairs = 0usize;
@@ -189,7 +189,7 @@ pub fn metrics(p: &Project, store: &RecordStore) -> Value {
     }
     let m3 = json!({"metric": "superseded_input_leakage_rate", "contract": "Contract v3:1177", "value": ratio(leaks.len(), pairs),
                     "numerator": leaks.len(), "denominator": pairs, "applicable": pairs > 0,
-                    "detail": {"leaks": leaks.iter().take(20).collect::<Vec<_>>(), "over": "governing inputs (declared, delivered or consumed per receipt) of live and DONE tasks; a flagged (stale/retest) task is not a leak"}});
+                    "detail": {"leaks": leaks.iter().take(5).collect::<Vec<_>>(), "over": "governing inputs (declared, delivered or consumed per receipt) of live and DONE tasks; a flagged (stale/retest) task is not a leak"}});
     // ---- m4: missing required inputs, and whether the product detects them (not offered as runnable)
     let dag = crate::orchestration::dag::compute(p).ok();
     let runnable: BTreeSet<String> = dag
@@ -242,7 +242,7 @@ pub fn metrics(p: &Project, store: &RecordStore) -> Value {
         "Contract v3:1179",
         propagated,
         changed_pairs,
-        json!({"unpropagated": unpropagated.iter().take(20).collect::<Vec<_>>(), "over": "(task, input) pairs whose input changed since the work consumed it"}),
+        json!({"unpropagated": unpropagated.iter().take(5).collect::<Vec<_>>(), "over": "(task, input) pairs whose input changed since the work consumed it"}),
     );
     // ---- m6 / m7: requirement → code and requirement → test traceability
     let reqs = super::lineage::requirement_paths(p, store);

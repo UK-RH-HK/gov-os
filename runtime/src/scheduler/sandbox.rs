@@ -15,6 +15,18 @@ pub fn inside_sandbox() -> bool {
         .unwrap_or(false)
 }
 
+/// Copy `src` to `dst` unless `src` is gone. Checks run concurrently: a file listed a moment ago may be removed before
+/// it is copied (SQLite drops `-wal`/`-shm` when the last connection closes; an atomic writer renames its temporary
+/// file). A file that no longer exists is not part of the state being isolated, so it is skipped instead of failing the
+/// check that asked for the sandbox; every other I/O error is returned.
+fn copy_if_present(src: &Path, dst: &Path) -> Result<()> {
+    match std::fs::copy(src, dst) {
+        Ok(_) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(e.into()),
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SandboxOptions {
     /// Copy the derived runtime stores (`state.db`, its WAL, `claims.db`).
@@ -53,7 +65,7 @@ impl Sandbox {
             if let Some(d) = dst.parent() {
                 std::fs::create_dir_all(d)?;
             }
-            std::fs::copy(&abs, &dst)?;
+            copy_if_present(&abs, &dst)?;
         }
         if opts.runtime {
             let rt = root.join(crate::RUNTIME_DIR);
@@ -66,10 +78,7 @@ impl Sandbox {
                 "claims.db-wal",
                 "claims.db-shm",
             ] {
-                let src = p.runtime_dir().join(name);
-                if src.is_file() {
-                    std::fs::copy(&src, rt.join(name))?;
-                }
+                copy_if_present(&p.runtime_dir().join(name), &rt.join(name))?;
             }
         }
         if opts.git {

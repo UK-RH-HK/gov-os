@@ -1566,10 +1566,12 @@ fn save_observed(p: &Project, snap: &Snapshot, by: &str) -> Result<()> {
     Ok(())
 }
 
-/// The digest of the index manifest's core (what the index is built from and with, not its per-artefact entries):
-/// a change is a memory-profile change (embedder, reranker, chunking, pins).
+/// The digest of the memory profile: the index manifest's core (what the index was built from and with, not its
+/// per-artefact entries) and the pins the effective policy asks for (embedder, reranker, chunking, lexical, index
+/// format). A change of either is a memory change (a pin changed in the policy overlay, or the index rebuilt under
+/// another profile).
 fn memory_profile_digest(p: &Project) -> String {
-    match crate::memory::manifest::read_index_manifest(p) {
+    let core = match crate::memory::manifest::read_index_manifest(p) {
         Some(mut m) => {
             if let Some(o) = m.as_object_mut() {
                 for k in [
@@ -1583,10 +1585,21 @@ fn memory_profile_digest(p: &Project) -> String {
                     o.remove(k);
                 }
             }
-            hash_value(&m)
+            m
         }
-        None => "absent".into(),
-    }
+        None => json!("absent"),
+    };
+    // the pins as the effective policy states them (not the plugin set a role may use: the digest must not depend on
+    // who observes)
+    let mem = p
+        .policies()
+        .effective
+        .get("MEMORY_POLICY")
+        .cloned()
+        .unwrap_or(Value::Null);
+    let pins = json!({"embedding": mem["embedding"], "reranker": mem["reranker"], "chunking": mem["chunking"],
+                      "lexical": mem["lexical"], "index_version": crate::INDEX_VERSION});
+    hash_value(&json!({"index": core, "pins": pins}))
 }
 
 /// **G1 at every material mutation, however made** (Contract v3:794, W12 :1187; BC-P2-07). The product is not a

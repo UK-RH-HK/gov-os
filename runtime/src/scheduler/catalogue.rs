@@ -763,6 +763,9 @@ pub const CHECKS: &[CheckDef] = &[
         repro: Repro::DoubleRun,
         cache: Cache::Cacheable,
         tiers: &[G1, G2, G3, G4, G5, G6],
+        // no hard-block: the close of work whose inputs changed underneath it is refused by the close host itself
+        // (`cit::propagation::require_current_inputs`, INPUTS_STALE / RETEST_EVIDENCE_REQUIRED, which also accepts a
+        // report acknowledging the current versions); a second, report-blind refusal here would duplicate it
         blocks: &[],
     },
     CheckDef {

@@ -751,9 +751,10 @@ pub fn upstream_change_propagation(p: &Project, store: &RecordStore, f: &mut Fam
             ),
             store.get(task).map(|t| t.path.clone()),
         );
-        let mut subj = vec![task.clone()];
-        subj.extend(ids);
-        x["subjects"] = json!(subj);
+        // the work that relied on the changed inputs is what this governs (its close); work consuming the inputs at
+        // their current version is not affected
+        x["subjects"] = json!([task]);
+        x["changed_inputs"] = json!(ids);
         f.findings.push(x);
     }
     let mut invalidated_done = vec![];
@@ -788,9 +789,9 @@ pub fn upstream_change_propagation(p: &Project, store: &RecordStore, f: &mut Fam
                 Some(t.path.clone()),
             );
             let mut subj = vec![t.id(), t.get("closed_by_report")];
-            subj.extend(changed);
             subj.retain(|s| !s.is_empty());
             x["subjects"] = json!(subj);
+            x["changed_inputs"] = json!(changed);
             f.findings.push(x);
         } else {
             retest_open.push(t.id());
