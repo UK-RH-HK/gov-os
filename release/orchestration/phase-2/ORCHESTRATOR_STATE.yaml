@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-19T13:30:35Z'
-state_hash: 7f56ea38916dd7810d5e3121143c9dd951e6c1234ea54633acd9e9abc91a21ef
+updated_at: '2026-09-19T13:50:17Z'
+state_hash: 4d988f2f9a88d04f202ce62b7e8cd57d236fcc1260e9f1ae74b43b822ac3a355
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_REPAIR_1_ROUND_3_RUNNING
 
@@ -237,7 +237,7 @@ agent_runs:
   - {run_id: P2-AR-0030, role: capability-repair, workstream: WS-9+WS-11, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0030.run.yaml}
   - {run_id: P2-AR-0031, role: capability-repair, workstream: WS-10, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws10, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0031.run.yaml}
   - {run_id: P2-AR-0032, role: capability-repair (integration), iteration: 1, round: 2, status: COMPLETED, merge_commit: e8e1ff2, branch: phase2/repair-1-r2-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0032.run.yaml}
-  - {run_id: P2-AR-0033, role: capability-repair, workstream: WS-2, iteration: 1, round: 3, status: RUNNING, branch: phase2/repair-1-r3-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0033.run.yaml}
+  - {run_id: P2-AR-0033, role: capability-repair, workstream: WS-2, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0033.run.yaml}
   - {run_id: P2-AR-0034, role: capability-repair, workstream: WS-3 (+docs/spec/adapters), iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws03, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0034.run.yaml}
   - {run_id: P2-AR-0035, role: capability-repair, workstream: WS-4, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws04, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0035.run.yaml}
   - {run_id: P2-AR-0036, role: capability-repair, workstream: WS-5, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0036.run.yaml}
@@ -246,8 +246,7 @@ agent_runs:
   - {run_id: P2-AR-0039, role: capability-repair, workstream: WS-8, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0039.run.yaml}
   - {run_id: P2-AR-0040, role: capability-repair, workstream: WS-9+WS-11, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0040.run.yaml}
 
-running_work:
-  - {run_id: P2-AR-0033, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0033.run.yaml}
+running_work: []
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -300,12 +299,12 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0001-orchestrator-continuity.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0006.yaml
 next_deterministic_action: >-
-  AWAIT_REPAIR_1_ROUND_3 — eight round-3 builders P2-AR-0033..0040 run on branches phase2/repair-1-r3-* from the merged
-  round-2 tree (handoffs P2-HO-0031..0039). On each completion: verify report, scope, declared test edits, regression and
-  R1 census on its own tree; record. When all eight are done: fresh integration builder (round 3), merge, reproduce
-  regression; then round 4 (WS-1 BC-P2-02 evidence map over the integrated tree), merge; then mint cap2-candidate-1 (tag,
-  product_code_digest) and dispatch independent verification: AC-14 R1-preservation verifier, AC-6 oracle-format reviewer,
-  independent test authors/capability verifiers per family, and a fresh synthesis verifier issuing the iteration-1 verdict.
+  DISPATCH_INTEGRATION_3 — all eight round-3 builders P2-AR-0033..0040 are recorded COMPLETED_AWAITING_INTEGRATION. Create
+  worktree/branch phase2/repair-1-r3-integration from the release-branch HEAD, claim P2-AR-0041 and dispatch one fresh
+  integration builder (model opus) with HANDOFFS/P2-HO-0040-integration-3.md: unify the two P2-ADJ-0002 mechanisms, converge
+  the availability host API, the ordered CIT/task re-sealing items, and every routed IP. On completion: verify, merge --no-ff,
+  reproduce lib/certification regression, record, checkpoint; then round 4 (BC-P2-02 evidence map), mint cap2-candidate-1 and
+  dispatch verification iteration 1.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}

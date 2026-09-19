@@ -223,3 +223,13 @@ integration builder. Regression reproduction only — not a verdict.
 | Durable tooling | `tools/record_builder_round.py` (JSON-quoted outcome recorder), `tools/telemetry_context_extract.py`, `tools/telemetry_usage_table.py`; per-agent data in `telemetry/P2-CONTEXT-TELEMETRY.json`. |
 | Pre-compaction | The orchestrator context is at 943,882 tokens. Checkpoint **P2-CP-0006** and continuity handoff **P2-HO-ORCH-0001** record the exact next actions: await P2-AR-0033/0035/0036 → integration-3 (P2-HO-0040, unify the two P2-ADJ-0002 mechanisms) → round 4 (BC-P2-02) → mint `cap2-candidate-1` → verification iteration 1. |
 | Routing | Unchanged. |
+
+## P2-L-0022 — 2026-09-19 — Round 3: all eight builders complete; P2-ADJ-0003 (H4 gaps and green-baseline probes)
+
+| Field | Value |
+|---|---|
+| Recorded | P2-AR-0035 WS-4 (`2324548`), P2-AR-0036 WS-5 (`d7db8dc`), P2-AR-0033 WS-2 (this entry). All eight round-3 runs are `COMPLETED_AWAITING_INTEGRATION` with verdict `READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION`; every branch sits on base `53897c1`; scope checked against each handoff (WS-5 declared three additive exceptions — CLI, `COMMAND_GUARDS`, `mod.rs`; WS-2 none). Builder-reported regression on their own trees: WS-2 lib 213/0, certification 136/0; WS-5 lib 215/0, certification 146/0; R1 held-out at baselines with census on each tree. These are builder claims, not acceptance. |
+| Adjudication | **P2-ADJ-0003** (`GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md`). WS-2 asked whether WS-10's `medium` H4 scenario-chain findings should degrade suite health (they turn two audit-of-record probe preconditions, zeta-r FR baseline and AC16-X1 X1-O4, from PASS to FAIL). Ruled **determined**: Contract v3 H2/H3/H4 and HEALTHY ("tests/traceability satisfy policy") make an incomplete scenario chain not green; no availability trade-off, since no hard-block fires below `high` and the close gate accepts a complete, current non-green suite result. Probe preconditions are read against the contract: green baselines use contract-valid fixtures; X1-O4's precondition contradicts Contract v3:1136. Not an owner decision; owner-overridable. |
+| Routed | WS-5 R3-WS5-1..11 (incl. deferred task-record sealing, ordered after WS-3/WS-4 re-sealing) and WS-2 IP-R3-WS02-01..11 (incl. one availability host API across scheduler and task hosts) into `HANDOFFS/P2-HO-0040-integration-3.md`. |
+| Disclosed | WS-2 left one superseded R1 run output in its evidence (`rm` denied in this environment; its report says so). Harmless; not deleted. |
+| Next | Integration-3: P2-AR-0041 on `phase2/repair-1-r3-integration`. |

@@ -50,7 +50,7 @@ reconciled without choosing a trade-off the sources leave open, stop that item a
     The post-command hook must respect the availability rule and must not run for commands the guard refused.
   - CLI `task show` calls `orchestration::tasks::show` (R3-WS5-4).
   - The claims store moved to `paths::store_path(root, "claims")`: the scheduler sandbox, currency input and doctor D017/D026
-    must read it there (R3-WS5-5; WS-6 IP-R2-12). Emergency-control state to `store_path(root, "emergency-control")` with
+    must read it there (R3-WS5-5; WS-6 IP-R2-12) — WS-2's `2e72007` already moved the sandbox copy; check the rest. Emergency-control state to `store_path(root, "emergency-control")` with
     `relocate_legacy` (R3-WS5-6; WS-6 IP-R2-8) unless WS-3/WS-6 already did it — D6-b2-B must pass.
   - `recovery::recover` writes report `evidence`/`discoveries`/`unresolved` items as strings per the report schema (R3-WS5-7,
     HIGH, pre-existing): a recovery report must pass `schema_invariants` with remediation work closed, not only while it is open.
@@ -64,6 +64,32 @@ reconciled without choosing a trade-off the sources leave open, stop that item a
   - Integration regression check: WS-5 changed existing tests in greenfield, repair, repair2, ws03, ws04r2, ws05 and ws06
     (report §8); re-check every other builder's tests that create, claim or close tasks, because generation now runs after
     every governed write and new generated tasks take the next sequential id.
+- **WS-2 round 3 (P2-AR-0033, report `r3-ws02/00-REPAIR-REPORT.md` §6), in addition:**
+  - **One availability host API (integration-critical).** WS-2 replaced the scheduler host surface (`scheduler::{Request,
+    admit, confirm_remedy, guard, subjects_reach}`, catalogue `BlockRule{min_severity, operations, scope, remedies}`,
+    `BlockScope::{Global, CoveredPaths, Subjects}`, `WORK_REMEDIES`/`ALL_REMEDIES`, `ops::COMMITTING`/`UPDATE_SUBJECTS`) while
+    WS-5 wired the availability rule into `tasks::create`/`claim`/`close` (`guard_work`) against the round-2 API. Converge
+    every host on WS-2's API, passing the task id and its declared inputs as subjects at create and claim (IP-R3-WS02-03), so
+    that subject-scoped blocks leave independent claims available at the host as well as in the decision.
+  - Drop `cit propose` from `control::GOVERNED_WORK_OPS`; the CIT host already guards it with its paths (IP-R3-WS02-01, WS-3
+    file) — this is the one failing WS-2 supplementary line, AV.2b-e2e.
+  - `update::apply_update_opts`: `admit(UPDATE_APPLY, UPDATE_SUBJECTS)` after `authority::require`, then `confirm_remedy` before
+    committing, rolling back on `HEALTH_REMEDY_INCOMPLETE` (IP-R3-WS02-02, WS-8 file). Check it against WS-8's own round-3
+    update/G5 changes.
+  - CIT `guard_paths` include the manifest's file targets, so a CIT repairing a file-level block reaches its subjects
+    (IP-R3-WS02-04, WS-4 file). Optional: CIT-E repair refuses at entry when `details.remedy_admissible` is not true (-11).
+  - WS-4 R2-1 `require_current_inputs` at close and R2-3 `detect_and_propagate` at claim were done by WS-5 this round
+    (IP-R3-WS02-05/-06): after merging, re-run zeta-r `W12-G1-dependency-evidence-invalidated` and AC16-X1 `X1-G1xW6` and
+    report both (they close BC-P2-07's remaining line).
+  - `records.rs` maps `revalidates`→`TESTS` (task → task), which `memory::integrity` TESTS signatures refuse, so every
+    generated revalidation task raises a false `ill_typed` finding (IP-R3-WS02-07). Fix the mapping or the signature, one
+    way, and prove a CIT that invalidates DONE work leaves `graph_integrity`/D015 clean.
+  - The recovery report writer (IP-R3-WS02-08) is the same defect as R3-WS5-7 above; fix once.
+  - Once the BC-P2-31 stores have moved, raise `misplaced_os_state` to `medium` (IP-R3-WS02-09); WS-6's R3-4 heading markers
+    in `memory::coverage` let WS-2's confirmation step go (-10).
+  - Orchestrator adjudication **P2-ADJ-0003** (`GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md`): H4 gaps keep degrading
+    suite health and refuse nothing; do not lower their severity. Probe preconditions that need a green baseline use a
+    contract-valid (H4-complete) fixture.
 - WS-10's research write commands: declare `record_research_evidence: L1`, `lifecycle::RECORD_AUTHORITY` and the 12
   `COMMAND_GUARDS` entries together (WS-3 IP-R3-WS03-4).
 - Kernel version 4.1.6 (WS-8): every schema version bumped by any round-3 builder must be mirrored in `KERNEL.yaml`
