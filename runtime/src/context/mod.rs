@@ -132,7 +132,7 @@ fn degradation(stage: &str, e: &GovError) -> Value {
 fn retrieved_block(p: &Project, db: IndexHandle, query: &str, k: usize) -> (Value, Vec<Value>) {
     let mut degr = vec![];
     let mut ret = json!({"query": query, "retrieval_strategy": Value::Null, "routes": [], "index_snapshot": {"index_version": Value::Null, "manifest_hash": Value::Null},
-        "ranked_evidence": [], "lessons_failures": [], "code_references": []});
+        "ranked_evidence": [], "semantic_candidates": [], "lessons_failures": [], "code_references": []});
     let db = match db {
         IndexHandle::Open(d) => d,
         IndexHandle::Unavailable(e) => {
@@ -155,6 +155,9 @@ fn retrieved_block(p: &Project, db: IndexHandle, query: &str, k: usize) -> (Valu
             ret["routes"] = json!(res.routes);
             ret["index_snapshot"] = json!({"index_version": res.index_version, "manifest_hash": res.index_manifest_hash});
             ret["ranked_evidence"] = json!(res.hits.iter().map(|h| json!({"artifact_id": h.artifact_id, "path": h.path, "section": h.section, "score": h.score, "routes": h.routes, "status": h.status, "state_class": h.state_class, "excerpt": h.excerpt, "parent_excerpt": h.parent_excerpt, "neighbours": h.neighbours, "flags": h.flags})).collect::<Vec<_>>());
+            // framework §15.2 "semantic candidates" (CONTEXT_POLICY.retrieved_fields): the admitted candidates the
+            // semantic route contributed, as references into ranked_evidence (same order; content is not repeated)
+            ret["semantic_candidates"] = json!(res.hits.iter().filter(|h| h.routes.iter().any(|r| r == "semantic")).map(|h| json!({"artifact_id": h.artifact_id, "path": h.path, "section": h.section, "score": h.score})).collect::<Vec<_>>());
         }
         Err(e) => degr.push(degradation("retrieve", &e)),
     }
@@ -381,6 +384,7 @@ pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -
         }
         let mut dropped = false;
         for key in [
+            "semantic_candidates",
             "code_references",
             "lessons_failures",
             "ranked_evidence",
