@@ -1344,19 +1344,12 @@ enum TrustCmd {
         #[arg(long)]
         provision: Option<String>,
     },
-    /// T2 binding (P2-ADJ-0002): whether OS-written facts sealed here are honoured on the owner's other provisioned
-    /// machines — the sealing scope, the installed binding authorities and whether this machine's root authorises them
-    T2Binding {
-        /// Administrator: install the owner's T2 binding authority (a `t2-binding-provisioning` bundle from the
-        /// administrator domain: the owner-signed authorisation and the binding key) on this provisioned machine
-        #[arg(long, conflicts_with = "reseal")]
-        provision: Option<String>,
-        /// Re-seal, under the binding authority, the records this machine sealed while provisioned (continuity for
-        /// records written before the authority was installed)
+    /// P2-ADJ-0002 continuity: re-seal, under the owner's T2 binding authority (`gov trust bind`), the records this
+    /// machine sealed with its own key while it was provisioned (records sealed while unprovisioned, and records whose
+    /// seal does not verify, are never re-sealed). The binding status is part of `gov trust status` (`t2_binding`).
+    Reseal {
+        /// Report what would be resealed and write nothing
         #[arg(long)]
-        reseal: bool,
-        /// With --reseal: report what would be resealed and write nothing
-        #[arg(long, requires = "reseal")]
         dry_run: bool,
     },
 }
@@ -1566,19 +1559,11 @@ fn g0_label(cmd: &Cmd) -> String {
                     "trust human-channel"
                 }
             }
-            TrustCmd::T2Binding {
-                provision,
-                reseal,
-                dry_run,
-            } => {
-                if provision.is_some() {
-                    "trust t2-binding --provision"
-                } else if *reseal && *dry_run {
-                    "trust t2-binding --reseal --dry-run"
-                } else if *reseal {
-                    "trust t2-binding --reseal"
+            TrustCmd::Reseal { dry_run } => {
+                if *dry_run {
+                    "trust reseal --dry-run"
                 } else {
-                    "trust t2-binding"
+                    "trust reseal"
                 }
             }
         }),
@@ -1989,12 +1974,8 @@ fn run(cli: &Cli) -> Result<Value> {
                         None => gov_runtime::human_channel::status(allowed),
                     }
                 }
-                // P2-ADJ-0002: the owner's T2 binding authority on this machine
-                TrustCmd::T2Binding { provision, reseal, dry_run } => match (provision, reseal) {
-                    (Some(f), _) => gov_runtime::t2::provision_authority(Path::new(f), project_root.as_deref()),
-                    (None, true) => { let p = open_project(cli, true)?; gov_runtime::t2::reseal(&p, *dry_run) }
-                    (None, false) => Ok(gov_runtime::t2::binding_status()),
-                },
+                // P2-ADJ-0002 continuity under the owner's T2 binding authority (installed by `trust bind`)
+                TrustCmd::Reseal { dry_run } => { let p = open_project(cli, true)?; gov_runtime::t2::reseal(&p, *dry_run) }
             }
         }
         Cmd::Contract { op } => {

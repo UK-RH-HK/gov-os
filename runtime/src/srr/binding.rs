@@ -38,25 +38,34 @@
 //! the seal (`BROKEN`) exactly as before. Nothing secret is ever written to a repository: the document carries only
 //! commitments, and the key file and the installed key live in protected machine state.
 //!
-//! ## Where the key goes, and the API for `crate::t2` (WS-3)
+//! ## One mechanism (round-3 integration, P2-AR-0041)
 //!
-//! `crate::t2` keeps its sealing key at `<state_root>/t2-binding/key.json` (`key_hex`). Binding installs the
-//! authority's active key **there**, so every T2 writer and consumer uses it without any change to `t2.rs`; a key
-//! that was already there (a machine that sealed records before it was bound) is kept in the keyring, never
-//! destroyed. [`keyring`] is the richer interface for WS-3's round-3 work: the authority re-verified against the
-//! current trusted root at the moment of use, with every key this machine holds and its standing (`ACTIVE`,
-//! `RETIRED`, or not authorised), so a consumer can honour seals made under a retired key and refuse a revoked one.
+//! This module is the **only** provisioning path and the **only** keyring of P2-ADJ-0002: one delegated role
+//! ([`ROLE`]), one authority document format ([`AUTHORITY_TYPE`], versioned, keys by id and commitment, exactly one
+//! active key), one provisioning command (`gov trust bind`, [`bind`]) and one use-time API ([`keyring`]).
+//! `crate::t2` seals and verifies through it:
+//!
+//! * the binding keys live in `<state_root>/t2-binding/keyring/<key_id>.json` (mode 0600, directory 0700); the
+//!   machine's own key (`<state_root>/t2-binding/key.json`, `crate::t2`'s machine scope) is a different key and is
+//!   never replaced or destroyed by binding;
+//! * while [`keyring`] verifies **now** (the authority re-verified against the current trusted root, unexpired, this
+//!   machine authorised) and the machine holds the authority's active key, `crate::t2` seals in the provisioned scope
+//!   with that key and honours seals made under every key the current authority authorises (`ACTIVE` or `RETIRED`)
+//!   that this machine holds; a key the current authority no longer lists is revoked (`UNAUTHORISED`), and so is
+//!   every key while the authority does not verify (root succession dropped the delegation, expired, altered);
+//! * a bound machine honours only the owner's facts: its own machine-scope seals are not owner facts (`crate::t2`
+//!   reports them `UNAUTHORISED`); `gov trust reseal` re-seals under the active key what it sealed while provisioned
+//!   (`crate::t2::reseal`), and an administrator may instead authorise the machine's existing key.
 //!
 //! ## What this does not do (stated, not overclaimed)
 //!
-//! * Within one machine the binding key is exactly as protected as the machine-local key it replaces: a process
-//!   with the operator's full OS privileges can read it (see `crate::t2`, "What it proves"). Across machines, a key
+//! * Within one machine the binding key is exactly as protected as the machine-local key: a process with the
+//!   operator's full OS privileges can read it (see `crate::t2`, "What it proves"). Across machines, a key
 //!   exfiltrated from an owner machine lets its holder seal as the owner's machines — the administrator boundary
 //!   (ARCH-0003 §1) is assumed, as it is for the root metadata and the break-glass inbox.
 //! * Revoking one machine means rotating the authority's active key on every other owner machine; a machine the
-//!   administrator never re-binds keeps sealing with the old key, which re-bound machines then refuse (fail closed).
-//! * `crate::t2` still verifies against the single installed key; honouring retired keys and refusing a key whose
-//!   authority no longer verifies is the consumer side (WS-3), through [`keyring`].
+//!   administrator never re-binds keeps sealing with the old key, which re-bound machines then refuse (fail closed),
+//!   and its own authority stops being honoured when it expires.
 use crate::srr::breakglass::{self, Effect};
 use crate::srr::metadata::{self, Envelope, Root};
 use crate::srr::state::{fsync_dir, write_durable, MachineState};
@@ -72,10 +81,10 @@ pub const AUTHORITY_TYPE: &str = "t2-binding-authority";
 /// `_type` of a binding-key file handed over from the administrator domain (optional in the file; a `crate::t2`
 /// `key.json` carrying only `key_hex` is accepted as well, so an existing machine key can become the authority's).
 pub const KEY_FILE_TYPE: &str = "t2-binding-key";
-/// The directory of protected machine state `crate::t2` keeps its sealing key in.
+/// The directory of protected machine state the binding state lives in (beside `crate::t2`'s machine key).
 const DIR: &str = "t2-binding";
-/// The file `crate::t2` seals with and verifies against.
-const CURRENT_KEY_FILE: &str = "key.json";
+/// `crate::t2`'s machine-scope key (read here only to report it; binding never writes it).
+const MACHINE_KEY_FILE: &str = "key.json";
 /// The exact bytes of the accepted binding-authority document.
 const AUTHORITY_FILE: &str = "authority.json";
 /// What this machine accepted, and the highest authority version it has seen (never lowered).
@@ -325,9 +334,14 @@ fn dir_of(ms: &MachineState) -> PathBuf {
 /// domain (ARCH-0003 §5, §8), never from repository content.
 fn refuse_repository_sourced(file: &Path, what: &str, project_root: Option<&Path>) -> Result<()> {
     let abs = file.canonicalize().unwrap_or_else(|_| file.to_path_buf());
+    // inside the working directory's project, or inside the governed project that encloses it (a command run from a
+    // subdirectory of a repository still refuses a file anywhere in that repository)
     let inside_project = project_root
         .map(|pr| pr.canonicalize().unwrap_or_else(|_| pr.to_path_buf()))
-        .map(|pabs| abs.starts_with(&pabs))
+        .map(|pabs| {
+            abs.starts_with(&pabs)
+                || crate::project::find_root(&pabs).is_some_and(|r| abs.starts_with(&r))
+        })
         .unwrap_or(false);
     let repository_component = abs.components().any(|c| {
         let s = c.as_os_str().to_string_lossy();
@@ -391,6 +405,12 @@ fn write_private(path: &Path, bytes: &[u8]) -> Result<()> {
     })?;
     std::fs::create_dir_all(parent)
         .map_err(|e| GovError::io(&format!("mkdir {}", parent.display()), e))?;
+    #[cfg(unix)]
+    {
+        // the binding state is readable by the owning account only (the directory as well as the files)
+        use std::os::unix::fs::PermissionsExt;
+        let _ = std::fs::set_permissions(parent, std::fs::Permissions::from_mode(0o700));
+    }
     let tmp = parent.join(format!(
         ".{}.tmp-{}-{}",
         path.file_name()
@@ -510,6 +530,10 @@ pub fn bind(authority_file: &Path, key_file: &Path, project_root: Option<&Path>)
 }
 
 /// The one writer of the binding state. Refuses the effect below floor at the instant of the write.
+///
+/// It writes the presented key into the keyring (whatever its standing), the exact authority bytes and the binding
+/// record. It never writes or removes `crate::t2`'s machine key: a machine that sealed records before it was bound
+/// keeps that key, and binding reports it (`machine_local_key_kept`) when the authority does not authorise it.
 fn install_binding(
     ms: &MachineState,
     root: &Root,
@@ -526,72 +550,95 @@ fn install_binding(
     )?;
     let dir = dir_of(ms);
     let key_id = key_id_of(key);
+    let prior = read_binding(ms);
+    let key_path = dir.join(KEYRING_DIR).join(format!("{key_id}.json"));
+    let key_held = read_key_hex(&key_path).as_deref() == Some(key);
+    let action = if prior.is_null() {
+        "installed".to_string()
+    } else if prior["authority_sha256"].as_str() == Some(authority.sha256.as_str()) && key_held {
+        "unchanged".to_string()
+    } else if prior["authority_sha256"].as_str() == Some(authority.sha256.as_str()) {
+        format!(
+            "key {key_id} added under authority version {}",
+            authority.version
+        )
+    } else {
+        format!(
+            "authority updated to version {} (from version {})",
+            authority.version,
+            prior["authority_version"].as_u64().unwrap_or(0)
+        )
+    };
     // 1. the key joins the keyring (verification material, whatever its status)
-    write_private(
-        &dir.join(KEYRING_DIR).join(format!("{key_id}.json")),
-        (serde_json::to_string_pretty(&key_doc(
-            key,
-            status.as_str(),
-            Some(authority),
-            "binding key authorised by the owner's t2-binding authority (P2-ADJ-0002)",
-        ))? + "\n")
-            .as_bytes(),
-    )?;
-    // 2. the accepted authority, as its exact bytes
-    write_private(&dir.join(AUTHORITY_FILE), authority_bytes)?;
-    // 3. an active key becomes the key `crate::t2` seals with; a machine-local key it replaces is kept
-    let current_path = dir.join(CURRENT_KEY_FILE);
-    let previous = crate::util::read_json(&current_path).ok();
-    let previous_id = previous
-        .as_ref()
-        .and_then(|v| v["key_hex"].as_str())
-        .and_then(|h| hex::decode(h).ok())
-        .map(|k| key_id_of(&k));
-    let mut retired_local: Option<String> = None;
-    if status == KeyStatus::Active && previous_id.as_deref() != Some(key_id.as_str()) {
-        if let (Some(prev), Some(pid)) = (previous.as_ref(), previous_id.as_ref()) {
-            let kept = dir.join(KEYRING_DIR).join(format!("{pid}.json"));
-            if !kept.exists() {
-                let mut doc = prev.clone();
-                doc["status"] = json!("MACHINE_LOCAL");
-                doc["kept_at"] = json!(now_iso());
-                doc["note"] = json!("the machine-local key this machine sealed with before it was bound; kept so records sealed under it stay verifiable (by the T2 consumer, through srr::binding::keyring)");
-                write_private(
-                    &kept,
-                    (serde_json::to_string_pretty(&doc)? + "\n").as_bytes(),
-                )?;
-            }
-            if authority.standing(pid).is_none() {
-                retired_local = Some(pid.clone());
-            }
-        }
+    if !key_held {
         write_private(
-            &current_path,
-            (serde_json::to_string_pretty(&key_doc(key, "ACTIVE", Some(authority), "T2 binding key (BC-P2-09) delegated by the owner's t2-binding authority (P2-ADJ-0002): every owner machine seals with it. Keep it out of every repository; anyone who can read it can seal records as the owner's machines."))? + "\n").as_bytes(),
+            &key_path,
+            (serde_json::to_string_pretty(&key_doc(
+                key,
+                status.as_str(),
+                Some(authority),
+                "binding key authorised by the owner's t2-binding authority (P2-ADJ-0002). Keep it out of every repository; anyone who can read it can seal records as the owner's machines.",
+            ))? + "\n")
+                .as_bytes(),
         )?;
     }
-    let sealing_key = crate::util::read_json(&current_path)
-        .ok()
-        .and_then(|v| v["key_hex"].as_str().and_then(|h| hex::decode(h).ok()))
-        .map(|k| key_id_of(&k));
-    // 4. what was accepted (the version floor never goes down)
+    // 2. the accepted authority, as its exact bytes
+    write_private(&dir.join(AUTHORITY_FILE), authority_bytes)?;
+    // 3. what was accepted (the version floor never goes down)
+    let machine_key = machine_key_id(ms);
+    let machine_local_key_kept = machine_key
+        .clone()
+        .filter(|id| authority.standing(id).is_none());
+    let active = authority.active().map(|k| k.key_id.clone());
+    let holds_active = active
+        .as_ref()
+        .map(|a| *a == key_id || dir.join(KEYRING_DIR).join(format!("{a}.json")).exists())
+        .unwrap_or(false);
+    let sealing_key = if holds_active {
+        active.clone()
+    } else {
+        machine_key.clone()
+    };
     let record = json!({
         "authority_id": authority.authority_id, "authority_version": authority.version,
         "highest_version": authority.version, "authority_sha256": authority.sha256,
         "authority_expires": authority.expires, "root_version": root.version, "product": root.product,
-        "machine_id": ms.machine_id, "bound_at": now_iso(), "active_key_id": authority.active().map(|k| k.key_id.clone()),
-        "sealing_key_id": sealing_key, "machine_local_key_kept": retired_local,
+        "machine_id": ms.machine_id, "bound_at": now_iso(), "active_key_id": active,
+        "holds_active_key": holds_active, "machine_local_key_kept": machine_local_key_kept,
     });
     write_durable(&dir.join(BINDING_FILE), &record)?;
+    let t2 = crate::t2::binding_status();
     Ok(json!({
-        "bound": true, "machine_id": ms.machine_id, "authority": authority.to_value(), "root_version": root.version,
+        "bound": true, "action": action, "machine_id": ms.machine_id, "authority": authority.to_value(), "root_version": root.version,
         "installed_key": {"key_id": key_id, "status": status.as_str()},
         "sealing_key_id": sealing_key,
-        "sealing_key_is_authority_active_key": sealing_key.is_some() && sealing_key == authority.active().map(|k| k.key_id.clone()),
-        "machine_local_key_kept": retired_local,
+        "sealing_key_is_authority_active_key": holds_active,
+        "machine_local_key_kept": machine_local_key_kept,
+        "sealing": t2["sealing"],
         "state": dir.display().to_string(),
-        "note": "T2 facts this machine's gov operations write from now on are sealed with the owner's binding key, and verify on every other machine bound to the same authority (P2-ADJ-0002). Records sealed by an unbound, unprovisioned or foreign machine stay FOREIGN here and are refused.",
+        "note": if holds_active {
+            "T2 facts this machine's gov operations write from now on are sealed under the owner's binding authority, and verify on every other machine bound to the same authority (P2-ADJ-0002). Records sealed by an unbound, unprovisioned or foreign machine stay FOREIGN here and are refused; records this machine sealed with its own key are not owner facts (`gov trust reseal` re-seals what it sealed while provisioned)."
+        } else {
+            "the key installed is not the authority's active key: this machine verifies owner facts sealed under it, and seals in its own (machine) scope until the administrator binds the active key"
+        },
     }))
+}
+
+/// The key id of `crate::t2`'s machine-scope key on this machine, if one exists (read-only).
+fn machine_key_id(ms: &MachineState) -> Option<String> {
+    read_key_hex(&dir_of(ms).join(MACHINE_KEY_FILE)).map(|k| key_id_of(&k))
+}
+
+/// The 32-byte key a key file (`key_hex`) carries, if it is readable and well formed.
+fn read_key_hex(path: &Path) -> Option<Vec<u8>> {
+    crate::util::read_json(path)
+        .ok()
+        .and_then(|v| {
+            v["key_hex"]
+                .as_str()
+                .and_then(|h| hex::decode(h.trim()).ok())
+        })
+        .filter(|k| k.len() == 32)
 }
 
 fn read_binding(ms: &MachineState) -> Value {
@@ -637,13 +684,72 @@ impl Keyring {
     }
 }
 
-/// **The API for the T2 consumer (WS-3).** `Ok(None)` on a machine that holds no binding authority (unprovisioned,
-/// or provisioned but never bound): its seals are machine-local. `Err` when an authority is installed but does not
-/// verify now (root succession dropped the delegation, the document expired or was altered): the consumer refuses
-/// rather than trusting a stale authority. Read-only: nothing is created or written.
+/// Every binding key installed on this machine (`keyring/`), without judging its standing: the verification
+/// material the T2 consumer checks a seal's MAC against before it asks [`keyring`] whether the key is authorised.
+/// Read-only.
+pub fn held_keys(state_root: &Path) -> Vec<HeldKey> {
+    let dir = state_root.join(DIR).join(KEYRING_DIR);
+    let mut out: Vec<HeldKey> = vec![];
+    if let Ok(rd) = std::fs::read_dir(&dir) {
+        let mut paths: Vec<PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+        paths.sort();
+        for p in paths {
+            if p.extension().and_then(|e| e.to_str()) != Some("json") {
+                continue;
+            }
+            let Some(k) = read_key_hex(&p) else { continue };
+            let key_id = key_id_of(&k);
+            if out.iter().any(|h| h.key_id == key_id) {
+                continue;
+            }
+            out.push(HeldKey {
+                key_id,
+                status: None,
+                key: k,
+            });
+        }
+    }
+    out
+}
+
+/// A digest of every file the binding state is derived from (the authority, the binding record and the keyring),
+/// for a consumer's per-process cache. The trust anchor is not read here; the provisioning record, which
+/// `MachineState` rewrites on every provisioning and root succession, stands for it at the caller.
+pub fn state_fingerprint(state_root: &Path) -> String {
+    let dir = state_root.join(DIR);
+    let digest = |p: &Path| {
+        std::fs::read(p)
+            .map(|b| sha256_hex(&b))
+            .unwrap_or_else(|_| "-".into())
+    };
+    let mut parts = vec![
+        digest(&dir.join(AUTHORITY_FILE)),
+        digest(&dir.join(BINDING_FILE)),
+    ];
+    if let Ok(rd) = std::fs::read_dir(dir.join(KEYRING_DIR)) {
+        let mut paths: Vec<PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+        paths.sort();
+        for p in paths {
+            parts.push(format!("{}={}", p.display(), digest(&p)));
+        }
+    }
+    sha256_hex(parts.join("\n").as_bytes())
+}
+
+/// **The one use-time API (P2-ADJ-0002), consumed by `crate::t2` sealing and verification.** `Ok(None)` on a machine
+/// that holds no binding authority (unprovisioned, or provisioned but never bound): its seals are machine-local.
+/// `Err` when an authority is installed but does not verify **now** — root succession dropped the delegation or its
+/// keys, the document expired or was altered, the binding record does not match it, or the authority lists machines
+/// and this is not one of them: the consumer refuses every seal made under it rather than trusting a stale authority.
+/// Read-only: nothing is created or written.
 pub fn keyring() -> Result<Option<Keyring>> {
     let root_dir = crate::srr::state::resolve_state_root()?;
-    let ms = MachineState::read_only(&root_dir);
+    keyring_at(&root_dir)
+}
+
+/// [`keyring`] for an explicit state root.
+pub fn keyring_at(root_dir: &Path) -> Result<Option<Keyring>> {
+    let ms = MachineState::read_only(root_dir);
     let dir = dir_of(&ms);
     let path = dir.join(AUTHORITY_FILE);
     if !path.exists() {
@@ -663,63 +769,48 @@ pub fn keyring() -> Result<Option<Keyring>> {
             json!({"recorded": recorded["authority_sha256"], "installed": authority.sha256}),
         ));
     }
-    let mut keys: Vec<HeldKey> = vec![];
-    if let Ok(rd) = std::fs::read_dir(dir.join(KEYRING_DIR)) {
-        let mut paths: Vec<PathBuf> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
-        paths.sort();
-        for p in paths {
-            let Some(k) = crate::util::read_json(&p)
-                .ok()
-                .and_then(|v| v["key_hex"].as_str().and_then(|h| hex::decode(h).ok()))
-                .filter(|k| k.len() == 32)
-            else {
-                continue;
-            };
-            let key_id = key_id_of(&k);
-            let status = authority
+    if !authority.authorises_machine(&ms.machine_id) {
+        return Err(refusal(
+            "T2_BINDING_MACHINE_NOT_AUTHORISED",
+            format!("the installed binding authority '{}' (version {}) lists the machines it authorises, and this machine ({}) is not one of them", authority.authority_id, authority.version, ms.machine_id),
+            json!({"machine_id": ms.machine_id}),
+        ));
+    }
+    let keys = held_keys(root_dir)
+        .into_iter()
+        .map(|mut h| {
+            h.status = authority
                 .keys
                 .iter()
-                .find(|a| a.key_id == key_id && a.commitment == commitment_of(&k))
+                .find(|a| a.key_id == h.key_id && a.commitment == commitment_of(&h.key))
                 .map(|a| a.status);
-            keys.push(HeldKey {
-                key_id,
-                status,
-                key: k,
-            });
-        }
-    }
+            h
+        })
+        .collect();
     Ok(Some(Keyring { authority, keys }))
 }
 
-/// `gov trust status` → `t2_binding`: whether this machine is bound, to which authority, and whether the key
-/// `crate::t2` seals with is the authority's active key. Read-only; never prints key material.
-pub fn status() -> Value {
-    let sealing = crate::t2::binding_key_id();
-    match keyring() {
-        Ok(None) => json!({
-            "bound": false,
-            "sealing_key_id": sealing,
-            "meaning": "no owner binding authority is installed: T2 facts this machine writes are sealed with a machine-local key and are FOREIGN (not honoured) on every other machine",
-            "remediation": "administrator: gov trust bind --authority <owner-signed t2-binding-authority> --key <binding key>, both from the administrator domain (P2-ADJ-0002)",
-        }),
-        Ok(Some(k)) => {
-            let active = k.authority.active().map(|a| a.key_id.clone());
-            json!({
-                "bound": true,
-                "authority": k.authority.to_value(),
-                "sealing_key_id": sealing,
-                "sealing_key_is_authority_active_key": sealing.is_some() && sealing == active,
-                "held_keys": k.keys.iter().map(|h| json!({"key_id": h.key_id, "standing": h.status.map(|s| s.as_str()).unwrap_or("NOT_AUTHORISED")})).collect::<Vec<_>>(),
-                "meaning": "T2 facts sealed with an ACTIVE or RETIRED key of this authority were written by an owner machine; any other seal is FOREIGN here",
-            })
-        }
-        Err(e) => json!({
-            "bound": false,
-            "sealing_key_id": sealing,
-            "authority_error": {"code": e.code, "message": e.message},
-            "meaning": "a binding authority is installed but does not verify against this machine's trusted root now; it must not be honoured",
-        }),
-    }
+/// Does this machine's trusted root delegate the [`ROLE`] role now? `None` when the machine holds no trusted root
+/// (unprovisioned) or it cannot be loaded. Read-only.
+pub fn root_delegates_role() -> Option<bool> {
+    let root_dir = crate::srr::state::resolve_state_root().ok()?;
+    let ms = MachineState::read_only(&root_dir);
+    let now = metadata::local_clock_now();
+    super::verifier::trusted_root(&ms, &now)
+        .ok()
+        .flatten()
+        .map(|r| r.has_role(ROLE))
+}
+
+/// The authority document installed on this machine, parsed but **not** verified (for status reports of an authority
+/// that no longer verifies). `None` when none is installed or it cannot be parsed.
+pub fn installed_authority_unverified(state_root: &Path) -> Option<Value> {
+    let path = state_root.join(DIR).join(AUTHORITY_FILE);
+    let env = Envelope::read(&path).ok()?;
+    Some(json!({
+        "authority_id": env.signed["authority_id"], "version": env.version(), "expires": env.expires(),
+        "owner": env.signed["owner"], "sha256": env.file_sha256,
+    }))
 }
 
 #[cfg(test)]

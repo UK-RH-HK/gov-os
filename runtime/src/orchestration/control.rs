@@ -318,10 +318,10 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     // state that asks OWNER-DECISION-0006 §6 bullet 4 inside the write, refuses an unprovisioned machine, a
     // repository-sourced bundle and any authorisation this machine's trusted root does not verify; the reseal
     // rewrites governed records (their seals), so it is a project write of its own class (L4), and its dry run reads
-    outside("trust t2-binding", "machine trust domain: read-only report of the T2 binding authorities and the sealing scope"),
-    outside("trust t2-binding --provision", "machine trust domain (administrator): the T2 binding authority write asks OWNER-DECISION-0006 §6 bullet 4 inside the write and admits only an authorisation this machine's trusted root verifies"),
-    g("trust t2-binding --reseal", "reseal_t2_bindings", Write),
-    g("trust t2-binding --reseal --dry-run", "read", Read),
+    // P2-ADJ-0002 (one mechanism, round-3 integration): `trust bind` above is the one provisioning command and
+    // `trust status` the one report; the continuity re-seal rewrites governed records' seals (a project write, L4)
+    g("trust reseal", "reseal_t2_bindings", Write),
+    g("trust reseal --dry-run", "read", Read),
     outside("contract verify", "canonical-repository tooling: read-only"),
     outside("contract compile", "canonical-repository release tooling (regenerates the compiled contract views of the canonical repository, not a governed project)"),
     g("upstream prepare", "upstream_prepare", Write),

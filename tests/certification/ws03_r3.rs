@@ -3,10 +3,15 @@
 //! BC-P2-31 control-state move and the routed integration points.
 //!
 //! Builder regression evidence (Contract v3 O3), not acceptance evidence. Every scenario drives the `gov` binary.
-//! The owner's material is TEST MATERIAL ONLY: published seeds (`srr_material::key`) and a published 32-byte binding
-//! key. Machines are the harness's simulated machines (one per repository root, `XDG_STATE_HOME`), each provisioned
-//! explicitly here with the root the scenario needs — the suite root (`common::suite_root_file`) delegates no
-//! `t2-binding` role in this tree (integration point for WS-8's harness helper).
+//!
+//! **Round-3 integration (P2-AR-0041).** WS-3 (`gov trust t2-binding --provision <bundle>`, per-key authorisations,
+//! `t2-v2` seals) and WS-8 (`gov trust bind`, a versioned authority document, `srr::binding::keyring`) each built the
+//! P2-ADJ-0002 mechanism; the integration keeps **one**: one role, WS-8's authority document and `gov trust bind`, the
+//! keyring as the use-time API, and WS-3's portable `t2-v2` seal and `reseal` (now `gov trust reseal`) on top of it.
+//! These tests therefore provision through the one harness (WS-8's `common.rs`: the suite root, the suite owner's
+//! binding authority, `clone_to_machine`, `foreign_owner`) and use the unified command and document format; every
+//! property they asserted is kept (the seal is still re-derived here from its documentation, independently of the
+//! product). The owner's material is TEST MATERIAL ONLY, drawn at run time by the harness.
 #![allow(dead_code)]
 use crate::common::*;
 use crate::srr_material::{envelope, far_future, key, key_entry, past, root_doc, TestKey};
@@ -15,15 +20,18 @@ use std::path::{Path, PathBuf};
 
 // ============================================================================================ owner material
 
-/// The owner's `t2-binding` role key. NOT A PRODUCTION KEY: derived from a published seed.
-pub fn t2_role_key() -> TestKey {
-    key(0x6b)
+/// The owner's `t2-binding` role key (the suite root delegates the role to it; TEST MATERIAL, drawn at run time).
+pub fn t2_role_key() -> &'static TestKey {
+    binding_role_key()
 }
 
-/// The owner's T2 binding key. NOT A PRODUCTION KEY: a published 32-byte value.
+/// The owner's T2 binding key (the suite owner's authority's active key; TEST MATERIAL, drawn at run time).
 pub fn binding_key() -> Vec<u8> {
-    vec![0x3c; 32]
+    suite_binding().key.to_vec()
 }
+
+/// The suite owner's binding authority id (`common::suite_binding`).
+pub const OWNER_AUTHORITY: &str = "suite-owner";
 
 /// A directory in the simulated administrator domain (outside every project, no `.git`/`governance` component).
 pub fn admin_dir(tag: &str) -> PathBuf {
@@ -70,7 +78,9 @@ pub fn root_of(version: u64, root_keys: [&TestKey; 3], human: &TestKey, t2: &[&T
     doc
 }
 
-/// The owner's root (the suite publisher's root keys; `human-gate` → `ws03::owner`; `t2-binding` → `t2`).
+/// The owner's root at `version` (the suite publisher's root keys; `human-gate` → `ws03::owner`; `t2-binding` →
+/// `t2`). Version 1 with the suite's `t2-binding` key is what `common::suite_root_file` provisions; a later version
+/// is a succession of it.
 pub fn owner_root(version: u64, t2: &[&TestKey]) -> String {
     let p = suite_publisher();
     envelope(
@@ -84,46 +94,35 @@ pub fn owner_root(version: u64, t2: &[&TestKey]) -> String {
     )
 }
 
-/// Another owner's root: other root keys, another human-gate key, another `t2-binding` key (same release keys, so the
-/// suite's releases install on its machines).
-pub fn foreign_root() -> String {
-    let (a, b, c) = (key(0x81), key(0x82), key(0x83));
-    envelope(
-        &root_of(1, [&a, &b, &c], &key(0x8a), &[&key(0x8b)]),
-        &[&a, &b],
-    )
+/// A `t2-binding-authority` document (the one format, `srr::binding::AUTHORITY_TYPE`) authorising `keys` under
+/// `authority_id` at `version`, signed by `signers`.
+pub fn authority_doc(
+    authority_id: &str,
+    version: u64,
+    expires: &str,
+    keys: &[(&[u8], &str)],
+    signers: &[&TestKey],
+) -> String {
+    binding_authority_doc(authority_id, version, expires, keys, None, signers)
 }
 
-/// A `t2-binding-provisioning` bundle: the binding key and the owner-signed `t2-binding-authority` document.
-pub fn bundle(binding: &[u8], signers: &[&TestKey], expires: &str) -> String {
-    let signed = json!({"_type": "t2-binding-authority", "spec_version": "srr/1", "product": gov_runtime::FRAMEWORK_NAME,
-        "version": 1, "authority_id": gov_runtime::t2::authority_id_of(binding),
-        "key_commitment": gov_runtime::t2::key_commitment_of(binding), "issued": "2026-09-19T00:00:00Z",
-        "expires": expires, "owner": "certification owner (published test seed)"});
-    format!(
-        "{{\"_type\":\"t2-binding-provisioning\",\"key_hex\":\"{}\",\"authority\":{}}}",
-        hex::encode(binding),
-        envelope(&signed, signers)
-    )
-}
-
-/// The owner's administrator material for one scenario: the owner root (with the `t2-binding` delegation) and the
-/// owner's binding bundle, in an administrator-domain directory.
+/// The owner's administrator material for one scenario: the suite root (with the `t2-binding` delegation), the
+/// suite owner's binding authority and its key file.
 pub struct OwnerMaterial {
     pub dir: PathBuf,
     pub root: PathBuf,
-    pub bundle: PathBuf,
+    pub authority: PathBuf,
+    pub key_file: PathBuf,
 }
 
 pub fn owner_material(tag: &str) -> OwnerMaterial {
-    let dir = admin_dir(tag);
-    let root = write_admin(&dir, "owner-root-1.json", &owner_root(1, &[&t2_role_key()]));
-    let bundle = write_admin(
-        &dir,
-        "owner-t2-binding.json",
-        &bundle(&binding_key(), &[&t2_role_key()], &far_future()),
-    );
-    OwnerMaterial { dir, root, bundle }
+    let b = suite_binding();
+    OwnerMaterial {
+        dir: admin_dir(tag),
+        root: suite_root_file(),
+        authority: b.authority.clone(),
+        key_file: b.key_file.clone(),
+    }
 }
 
 /// Provision `g`'s machine with `root_file` (administrator step).
@@ -136,29 +135,33 @@ pub fn provision_root(g: &Gov, root_file: &Path) {
     ]);
 }
 
-/// Install the T2 binding bundle on `g`'s machine (administrator step).
-pub fn install_binding(g: &Gov, bundle_file: &Path) -> Value {
-    g.ok(&[
+/// Bind `g`'s machine to an owner's T2 binding authority (administrator step; the one provisioning command).
+pub fn bind_with(g: &Gov, authority: &Path, key_file: &Path) -> Out {
+    g.run(&[
         "trust",
-        "t2-binding",
-        "--provision",
-        bundle_file.to_str().unwrap(),
+        "bind",
+        "--authority",
+        authority.to_str().unwrap(),
+        "--key",
+        key_file.to_str().unwrap(),
     ])
 }
 
-/// A clone of `src` at a new path — another simulated machine.
+/// Install the owner's binding authority on `g`'s machine (administrator step).
+pub fn install_binding(g: &Gov, m: &OwnerMaterial) -> Value {
+    let o = bind_with(g, &m.authority, &m.key_file);
+    assert!(o.ok(), "{}", o.envelope);
+    o.result()
+}
+
+/// The T2 binding status (`gov trust status` → `t2_binding`, the one report).
+pub fn t2_status(g: &Gov) -> Value {
+    g.ok(&["trust", "status"])["t2_binding"].clone()
+}
+
+/// A clone of `src` onto a new simulated machine that is not yet provisioned (the harness's two-machine helper).
 pub fn clone_of(src: &Path, tag: &str) -> (PathBuf, Gov) {
-    let dir = tmp(tag);
-    let dst = dir.join("repo");
-    let (code, out) = git(
-        src,
-        &["clone", "-q", src.to_str().unwrap(), dst.to_str().unwrap()],
-    );
-    assert_eq!(code, 0, "{out}");
-    git(&dst, &["config", "user.email", "cert@example.invalid"]);
-    git(&dst, &["config", "user.name", "cert"]);
-    let g = Gov::new(&dst, &format!("S-{tag}"));
-    (dst, g)
+    clone_to_machine(src, tag, &format!("S-{tag}"), MachineKind::Unprovisioned)
 }
 
 /// Pull `from`'s commits into `into` (another machine's work arriving through Git).
@@ -195,11 +198,13 @@ fn canonical_content(data: &Value, body: &str) -> String {
     format!("{}\n{}", gov_runtime::util::canonical_json(&rt), body)
 }
 
+/// The documented portable MAC: `hmac-sha256/t2-v2 \n authority \n key_id \n machine \n operation \n at \n content`.
 fn portable_mac(binding: &[u8], seal: &Value, content: &str) -> String {
     let s = |k: &str| seal[k].as_str().unwrap_or("").to_string();
     let msg = format!(
-        "hmac-sha256/t2-v2\n{}\n{}\n{}\n{}\n{content}",
+        "hmac-sha256/t2-v2\n{}\n{}\n{}\n{}\n{}\n{content}",
         s("authority"),
+        s("key_id"),
         s("machine"),
         s("operation"),
         s("at")
@@ -219,12 +224,11 @@ pub fn owner_verifies(data: &Value) -> Option<String> {
         .then(|| seal["operation"].as_str().unwrap_or("").to_string())
 }
 
-/// Seal `data` as an OS writer holding the owner's binding authority would (the documented format), as `operation`.
+/// Seal `data` as an OS writer holding the owner's binding key would (the documented format), as `operation`.
 pub fn owner_seal(data: &mut Value, operation: &str) {
     data.as_object_mut().unwrap().remove("os_binding");
-    let aid = gov_runtime::t2::authority_id_of(&binding_key());
-    let mut seal = json!({"alg": "hmac-sha256/t2-v2", "scope": "provisioned", "key_id": aid, "authority": aid,
-        "machine": "certification-writer", "operation": operation, "at": "2026-09-19T00:00:00Z"});
+    let mut seal = json!({"alg": "hmac-sha256/t2-v2", "scope": "provisioned", "authority": OWNER_AUTHORITY,
+        "key_id": suite_binding().key_id, "machine": "certification-writer", "operation": operation, "at": "2026-09-19T00:00:00Z"});
     let mac = portable_mac(&binding_key(), &seal, &canonical_content(data, ""));
     seal["mac"] = json!(mac);
     data["os_binding"] = seal;
@@ -297,7 +301,7 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
     // ---------------------------------------------------------------- machine A: provision, authority, install
     let (a, ga) = setup_fixture_unprovisioned("greenfield", "t2x-a", "S-A");
     provision_root(&ga, &m.root);
-    let st = ga.ok(&["trust", "t2-binding"]);
+    let st = t2_status(&ga);
     assert_eq!(st["portable"], false, "{st}");
     assert!(
         st["sealing"]["reason"]
@@ -306,26 +310,29 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
             .contains("no T2 binding authority is installed"),
         "{st}"
     );
-    let inst = install_binding(&ga, &m.bundle);
-    let aid = gov_runtime::t2::authority_id_of(&binding_key());
-    assert_eq!(inst["authority_id"], json!(aid), "{inst}");
+    let inst = install_binding(&ga, &m);
+    assert_eq!(inst["authority"]["authority_id"], OWNER_AUTHORITY, "{inst}");
     assert_eq!(inst["action"], "installed");
     assert_eq!(inst["sealing"]["scope"], "provisioned", "{inst}");
     assert!(
         !inst.to_string().contains(&hex::encode(binding_key())),
         "the key is never printed"
     );
-    // the authority id and commitment are derived as documented
-    assert_eq!(
-        aid,
-        format!(
-            "t2a-{}",
-            &gov_runtime::util::sha256_hex(
-                &[b"t2-binding-authority-id:".as_slice(), &binding_key()].concat()
-            )[..16]
-        )
+    // the key id and commitment are derived as documented
+    let kid = format!(
+        "{}",
+        &gov_runtime::util::sha256_hex(
+            &[b"t2-binding-key-id:".as_slice(), &binding_key()].concat()
+        )[..16]
     );
-    assert_eq!(install_binding(&ga, &m.bundle)["action"], "unchanged");
+    assert_eq!(inst["sealing_key_id"], json!(kid), "{inst}");
+    assert_eq!(
+        inst["authority"]["keys"][0]["commitment"],
+        json!(gov_runtime::util::sha256_hex(
+            &[b"t2-binding-key-commitment:".as_slice(), &binding_key()].concat()
+        ))
+    );
+    assert_eq!(install_binding(&ga, &m)["action"], "unchanged");
     ga.ok(&[
         "init",
         "--source",
@@ -414,7 +421,8 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
         "{}",
         cit_rec["os_state"]
     );
-    let reg = json(&a, "governance/generated/plugin-registry.json");
+    // round 3 (WS-7, BC-P2-31): the registry lives at `paths::PLUGIN_REGISTRY_PATH`
+    let reg = json(&a, gov_runtime::paths::PLUGIN_REGISTRY_PATH);
     assert_eq!(
         owner_verifies(&reg["plugins"]["t2p"]).as_deref(),
         Some("plugins register")
@@ -425,7 +433,7 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
     // ---------------------------------------------------------------- machine B: the owner's second machine
     let (b, gb) = clone_of(&a, "t2x-b");
     provision_root(&gb, &m.root);
-    install_binding(&gb, &m.bundle);
+    install_binding(&gb, &m);
     gb.with_role("orchestrator")
         .ok(&["kernel", "reinstall", "--source", signed_source()]);
     gb.ok(&["rebuild-memory"]);
@@ -487,7 +495,7 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
     provision_root(&gd, &m.root);
     gd.with_role("orchestrator")
         .ok(&["kernel", "reinstall", "--source", signed_source()]);
-    let std_ = gd.ok(&["trust", "t2-binding"]);
+    let std_ = t2_status(&gd);
     assert_eq!(std_["portable"], false);
     assert_eq!(std_["sealing"]["scope"], "machine");
     let t = t2_of(&gd, &g1);
@@ -535,7 +543,7 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
 
     // ---------------------------------------------------------------- machine U: unprovisioned
     let (_u, gu) = clone_of(&a, "t2x-u");
-    let su = gu.ok(&["trust", "t2-binding"]);
+    let su = t2_status(&gu);
     assert_eq!(su["provisioned"], false);
     assert!(
         su["sealing"]["reason"]
@@ -544,18 +552,8 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
             .contains("unprovisioned"),
         "{su}"
     );
-    let e = gu.err(&[
-        "trust",
-        "t2-binding",
-        "--provision",
-        m.bundle.to_str().unwrap(),
-    ]);
-    assert_eq!(
-        e.error_code(),
-        "T2_AUTHORITY_UNPROVISIONED",
-        "{}",
-        e.envelope
-    );
+    let e = bind_with(&gu, &m.authority, &m.key_file);
+    assert_eq!(e.error_code(), "T2_BINDING_UNPROVISIONED", "{}", e.envelope);
     assert_eq!(t2_of(&gu, &g1)["binding"], "FOREIGN");
     // a record an unprovisioned machine wrote (bootstrap installation of the embedded payload) is refused on B
     let (u2, gu2) = setup_fixture_unprovisioned("greenfield", "t2x-u2", "S-U2");
@@ -574,33 +572,19 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
     assert_eq!(t2_of(&gb, &ugate)["binding"], "FOREIGN");
 
     // ---------------------------------------------------------------- machine F: another owner's machine
-    let fdir = admin_dir("foreign");
-    let froot = write_admin(&fdir, "foreign-root-1.json", &foreign_root());
-    let fbundle = write_admin(
-        &fdir,
-        "foreign-t2.json",
-        &bundle(&[0x5eu8; 32], &[&key(0x8b)], &far_future()),
-    );
+    let fo = foreign_owner();
     let (f, gf) = setup_fixture_unprovisioned("greenfield", "t2x-f", "S-F");
-    provision_root(&gf, &froot);
-    // the owner's bundle is not authorised by another owner's root
-    let e = gf.err(&[
-        "trust",
-        "t2-binding",
-        "--provision",
-        m.bundle.to_str().unwrap(),
-    ]);
-    assert_eq!(
-        e.error_code(),
-        "T2_AUTHORITY_UNAUTHORISED",
-        "{}",
-        e.envelope
-    );
-    install_binding(&gf, &fbundle);
+    provision_root(&gf, &fo.root_file);
+    // the owner's authority is not authorised by another owner's root (below the role's threshold: another signer)
+    let e = bind_with(&gf, &m.authority, &m.key_file);
+    assert!(!e.ok(), "{}", e.envelope);
+    assert_eq!(e.error_code(), "SRR_THRESHOLD_NOT_MET", "{}", e.envelope);
+    let fb = bind_with(&gf, &fo.authority, &fo.key_file);
+    assert!(fb.ok(), "{}", fb.envelope);
     gf.ok(&[
         "init",
         "--source",
-        signed_source(),
+        &fo.signed_source,
         "--name",
         "f",
         "--alias",
@@ -634,7 +618,7 @@ fn os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_no
 
 /// P2-ADJ-0002 (provisioning side): the binding authority is admitted only from the administrator domain, only on a
 /// provisioned machine, only when this machine's trusted root delegates `t2-binding` and the owner's authorisation
-/// verifies at threshold, is unexpired, binds this product and commits to exactly the supplied key; and only while
+/// verifies at threshold, is unexpired, binds this product and authorises exactly the supplied key; and only while
 /// the machine is not below floor. Each refusal is typed and writes nothing.
 #[test]
 fn a_t2_binding_authority_is_admitted_only_from_the_administrator_domain_under_this_machines_root()
@@ -642,116 +626,143 @@ fn a_t2_binding_authority_is_admitted_only_from_the_administrator_domain_under_t
     let m = owner_material("adm");
     let (root, g) = setup_fixture_unprovisioned("greenfield", "t2-adm", "S-adm");
     let dir = m.dir.clone();
-    let authorities = machine_state_dir(&root)
-        .join("t2-binding")
-        .join("authorities");
+    let keyring = machine_state_dir(&root).join("t2-binding").join("keyring");
     // unprovisioned
     assert_eq!(
-        g.err(&[
-            "trust",
-            "t2-binding",
-            "--provision",
-            m.bundle.to_str().unwrap()
-        ])
-        .error_code(),
-        "T2_AUTHORITY_UNPROVISIONED"
+        bind_with(&g, &m.authority, &m.key_file).error_code(),
+        "T2_BINDING_UNPROVISIONED"
     );
     // a root that delegates no `t2-binding` role
     let bare = write_admin(&dir, "bare-root.json", &owner_root(1, &[]));
     provision_root(&g, &bare);
-    let e = g.err(&[
-        "trust",
-        "t2-binding",
-        "--provision",
-        m.bundle.to_str().unwrap(),
-    ]);
-    assert_eq!(
-        e.error_code(),
-        "T2_AUTHORITY_ROLE_NOT_DELEGATED",
-        "{}",
-        e.envelope
-    );
-    let st = g.ok(&["trust", "t2-binding"]);
-    assert_eq!(st["root_delegates_role"], false);
-    assert!(!authorities.exists() || std::fs::read_dir(&authorities).unwrap().count() == 0);
+    let e = bind_with(&g, &m.authority, &m.key_file);
+    assert_eq!(e.error_code(), "T2_BINDING_NOT_DELEGATED", "{}", e.envelope);
+    let st = t2_status(&g);
+    assert_eq!(st["root_delegates_role"], false, "{st}");
+    assert!(!keyring.exists() || std::fs::read_dir(&keyring).unwrap().count() == 0);
 
     // a machine whose root delegates the role
     let (root2, g2) = setup_fixture_unprovisioned("greenfield", "t2-adm2", "S-adm2");
     provision_root(&g2, &m.root);
-    let authorities2 = machine_state_dir(&root2)
-        .join("t2-binding")
-        .join("authorities");
+    // a governed project on this machine (installed before the authority arrives)
+    g2.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "adm2",
+        "--alias",
+        "adm2",
+        "--skip-index",
+    ]);
+    let keyring2 = machine_state_dir(&root2).join("t2-binding").join("keyring");
+    let k = binding_key();
     let refuse = |name: &str, text: String, code: &str| {
         let f = write_admin(&dir, name, &text);
-        let e = g2.err(&["trust", "t2-binding", "--provision", f.to_str().unwrap()]);
+        let e = bind_with(&g2, &f, &m.key_file);
         assert_eq!(e.error_code(), code, "{name}: {}", e.envelope);
         assert!(
-            !authorities2.exists() || std::fs::read_dir(&authorities2).unwrap().count() == 0,
+            !keyring2.exists() || std::fs::read_dir(&keyring2).unwrap().count() == 0,
             "{name}: nothing installed"
         );
     };
     // signed by a key the root does not delegate for `t2-binding` (e.g. the human-gate key, or an agent's own key)
     refuse(
         "wrong-signer.json",
-        bundle(&binding_key(), &[&crate::ws03::owner()], &far_future()),
-        "T2_AUTHORITY_UNAUTHORISED",
+        authority_doc(
+            OWNER_AUTHORITY,
+            1,
+            &far_future(),
+            &[(&k, "active")],
+            &[&crate::ws03::owner()],
+        ),
+        "SRR_THRESHOLD_NOT_MET",
     );
     refuse(
         "self-signed.json",
-        bundle(&binding_key(), &[&key(0x99)], &far_future()),
-        "T2_AUTHORITY_UNAUTHORISED",
+        authority_doc(
+            OWNER_AUTHORITY,
+            1,
+            &far_future(),
+            &[(&k, "active")],
+            &[&key(0x99)],
+        ),
+        "SRR_THRESHOLD_NOT_MET",
     );
     // expired
     refuse(
         "expired.json",
-        bundle(&binding_key(), &[&t2_role_key()], &past()),
-        "T2_AUTHORITY_EXPIRED",
+        authority_doc(
+            OWNER_AUTHORITY,
+            1,
+            &past(),
+            &[(&k, "active")],
+            &[t2_role_key()],
+        ),
+        "T2_BINDING_AUTHORITY_EXPIRED",
     );
     // the key is not the key the owner authorised
-    let mut swapped: Value =
-        serde_json::from_str(&bundle(&binding_key(), &[&t2_role_key()], &far_future())).unwrap();
-    swapped["key_hex"] = json!(hex::encode([0x11u8; 32]));
     refuse(
-        "swapped-key.json",
-        swapped.to_string(),
-        "T2_AUTHORITY_KEY_MISMATCH",
+        "other-key.json",
+        authority_doc(
+            OWNER_AUTHORITY,
+            1,
+            &far_future(),
+            &[(&[0x11u8; 32], "active")],
+            &[t2_role_key()],
+        ),
+        "T2_BINDING_KEY_NOT_AUTHORISED",
     );
     // a signature over other bytes than the document parsed
     let signed = json!({"_type": "t2-binding-authority", "spec_version": "srr/1", "product": gov_runtime::FRAMEWORK_NAME,
-        "authority_id": gov_runtime::t2::authority_id_of(&binding_key()), "key_commitment": gov_runtime::t2::key_commitment_of(&binding_key()),
-        "issued": "2026-09-19T00:00:00Z", "expires": far_future()});
+        "authority_id": OWNER_AUTHORITY, "version": 1, "expires": far_future(),
+        "keys": [{"key_id": gov_runtime::srr::binding::key_id_of(&k), "commitment": gov_runtime::srr::binding::commitment_of(&k), "status": "active"}]});
     let other = json!({"_type": "t2-binding-authority", "note": "something else"});
     let env =
-        crate::srr_material::envelope_with_foreign_signature(&signed, &other, &[&t2_role_key()]);
+        crate::srr_material::envelope_with_foreign_signature(&signed, &other, &[t2_role_key()]);
+    let f = write_admin(&dir, "foreign-signature.json", &env);
+    let e = bind_with(&g2, &f, &m.key_file);
+    assert!(
+        e.error_code().starts_with("SRR_") || e.error_code().starts_with("T2_BINDING"),
+        "{}",
+        e.envelope
+    );
+    assert!(!keyring2.exists() || std::fs::read_dir(&keyring2).unwrap().count() == 0);
+    // not an authority document
     refuse(
-        "foreign-signature.json",
-        format!(
-            "{{\"_type\":\"t2-binding-provisioning\",\"key_hex\":\"{}\",\"authority\":{env}}}",
-            hex::encode(binding_key())
+        "not-an-authority.json",
+        crate::srr_material::envelope(
+            &json!({"_type": "something", "spec_version": "srr/1", "product": gov_runtime::FRAMEWORK_NAME}),
+            &[t2_role_key()],
         ),
-        "T2_AUTHORITY_UNAUTHORISED",
+        "T2_BINDING_AUTHORITY_INVALID",
     );
-    // not a bundle
-    refuse(
-        "not-a-bundle.json",
-        json!({"_type": "something", "key_hex": "00"}).to_string(),
-        "T2_AUTHORITY_INVALID",
+    // an authority inside the governed project (repository content) is refused before it is read
+    let inrepo = root2.join("t2-authority.json");
+    std::fs::copy(&m.authority, &inrepo).unwrap();
+    let e = bind_with(&g2, &inrepo, &m.key_file);
+    assert_eq!(e.error_code(), "T2_BINDING_FROM_REPOSITORY_REFUSED");
+    // ... also when the command runs from a subdirectory of the project and the file is elsewhere in it (same
+    // machine: the same protected state)
+    std::fs::create_dir_all(root2.join("docs")).unwrap();
+    std::fs::create_dir_all(root2.join("admin-notes")).unwrap();
+    let elsewhere = root2.join("admin-notes/t2-authority.json");
+    std::fs::copy(&m.authority, &elsewhere).unwrap();
+    let gsub = Gov::new(&root2.join("docs"), "S-adm2").with_env(
+        "XDG_STATE_HOME",
+        machine_state_home(&root2).to_str().unwrap(),
     );
-    // a bundle inside the governed project (repository content) is refused before it is read
-    let inrepo = root2.join("t2-bundle.json");
-    std::fs::copy(&m.bundle, &inrepo).unwrap();
-    let e = g2.err(&[
-        "trust",
-        "t2-binding",
-        "--provision",
-        inrepo.to_str().unwrap(),
-    ]);
-    assert_eq!(e.error_code(), "T2_AUTHORITY_FROM_REPOSITORY_REFUSED");
-    // the administrator's genuine bundle
-    let ok = install_binding(&g2, &m.bundle);
+    let e = bind_with(&gsub, &elsewhere, &m.key_file);
+    assert_eq!(
+        e.error_code(),
+        "T2_BINDING_FROM_REPOSITORY_REFUSED",
+        "{}",
+        e.envelope
+    );
+    // the administrator's genuine material
+    let ok = install_binding(&g2, &m);
     assert_eq!(ok["action"], "installed");
-    let aid = gov_runtime::t2::authority_id_of(&binding_key());
-    let kf = authorities2.join(&aid).join("key.json");
+    let kf = keyring2.join(format!("{}.json", suite_binding().key_id));
     assert!(kf.exists());
     {
         use std::os::unix::fs::PermissionsExt;
@@ -759,30 +770,58 @@ fn a_t2_binding_authority_is_admitted_only_from_the_administrator_domain_under_t
             std::fs::metadata(&kf).unwrap().permissions().mode() & 0o777,
             0o600
         );
+        assert_eq!(
+            std::fs::metadata(&keyring2).unwrap().permissions().mode() & 0o777,
+            0o700
+        );
     }
-    let st = g2.ok(&["trust", "t2-binding"]);
+    let st = t2_status(&g2);
     assert_eq!(st["portable"], true, "{st}");
-    assert_eq!(st["authorities"][0]["authorised_by_trusted_root"], true);
-    assert_eq!(st["authorities"][0]["seals_new_records"], true);
-    // the owner re-signs the same key (e.g. the role's key rotated): the stored authorisation is replaced
+    assert_eq!(st["authority"]["authorised_by_trusted_root"], true);
+    assert_eq!(st["sealing"]["scope"], "provisioned");
+    // the owner re-signs the authorisation of the same key (e.g. the role's key rotated): a newer version replaces it
     let resigned = write_admin(
         &dir,
         "resigned.json",
-        &bundle(&binding_key(), &[&t2_role_key()], "2098-01-01T00:00:00Z"),
+        &authority_doc(
+            OWNER_AUTHORITY,
+            2,
+            "2098-01-01T00:00:00Z",
+            &[(&k, "active")],
+            &[t2_role_key()],
+        ),
     );
-    assert_eq!(
-        install_binding(&g2, &resigned)["action"],
-        "authorisation replaced (the same key, newly authorised)"
+    let r = bind_with(&g2, &resigned, &m.key_file);
+    assert!(r.ok(), "{}", r.envelope);
+    assert!(
+        r.result()["action"]
+            .as_str()
+            .unwrap()
+            .starts_with("authority updated to version 2"),
+        "{}",
+        r.envelope
     );
-    // G0: the report and the administrator write are machine-trust commands; the reseal is a project write (L4)
+    assert_eq!(t2_status(&g2)["authority"]["version"], 2);
+    // G0: the administrator write and the status are machine-trust commands; the reseal is a project write (L4)
+    for label in [
+        "trust bind",
+        "trust status",
+        "trust reseal",
+        "trust reseal --dry-run",
+    ] {
+        assert!(
+            gov_runtime::orchestration::control::command_guard(label).is_some(),
+            "{label}"
+        );
+    }
+    // the one mechanism: WS-3's second provisioning path and status command are gone
     for label in [
         "trust t2-binding",
         "trust t2-binding --provision",
         "trust t2-binding --reseal",
-        "trust t2-binding --reseal --dry-run",
     ] {
         assert!(
-            gov_runtime::orchestration::control::command_guard(label).is_some(),
+            gov_runtime::orchestration::control::command_guard(label).is_none(),
             "{label}"
         );
     }
@@ -796,7 +835,7 @@ fn root_succession_that_drops_the_binding_role_revokes_its_records_and_sealing_f
     let m = owner_material("rev");
     let (root, g) = setup_fixture_unprovisioned("greenfield", "t2-rev", "S-rev");
     provision_root(&g, &m.root);
-    install_binding(&g, &m.bundle);
+    install_binding(&g, &m);
     g.ok(&[
         "init",
         "--source",
@@ -814,9 +853,9 @@ fn root_succession_that_drops_the_binding_role_revokes_its_records_and_sealing_f
     let t = t2_of(&g, &g1);
     assert_eq!(t["binding"], "UNAUTHORISED", "{t}");
     assert!(t["reason"].as_str().unwrap().contains("t2-binding"), "{t}");
-    let st = g.ok(&["trust", "t2-binding"]);
+    let st = t2_status(&g);
     assert_eq!(st["portable"], false);
-    assert_eq!(st["authorities"][0]["authorised_by_trusted_root"], false);
+    assert_eq!(st["authority"]["authorised_by_trusted_root"], false, "{st}");
     assert_eq!(st["sealing"]["scope"], "machine");
     // new work keeps going on this machine, sealed in the machine scope
     let g2 = gate_with(&g, "HDG-0302", "After revocation?", json!({}));
@@ -828,10 +867,11 @@ fn root_succession_that_drops_the_binding_role_revokes_its_records_and_sealing_f
     let _ = root;
 }
 
-/// P2-ADJ-0002 continuity: `gov trust t2-binding --reseal` re-seals under the owner's authority exactly the records
-/// this machine sealed while it was provisioned (keeping the recorded operation and time), so they are honoured on the
-/// owner's other machines; a record sealed while the machine was unprovisioned, and a record whose seal does not
-/// verify, are left as they are.
+/// P2-ADJ-0002 continuity: `gov trust reseal` re-seals under the owner's authority exactly the records this machine
+/// sealed while it was provisioned (keeping the recorded operation and time), so they are honoured on the owner's
+/// other machines; a record sealed while the machine was unprovisioned, and a record whose seal does not verify, are
+/// left as they are. Once bound, the machine does not honour its own machine-scope records (they are not owner facts)
+/// until they are re-sealed.
 #[test]
 fn reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_else() {
     let m = owner_material("rs");
@@ -856,12 +896,14 @@ fn reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_
     let mut fv = yaml(&a, forged_rel);
     fv["question"] = json!("edited by hand");
     write_yaml(&a, forged_rel, &fv);
-    // the authority arrives; nothing changed yet
-    install_binding(&ga, &m.bundle);
-    assert_eq!(t2_of(&ga, &mid)["scope"], "machine");
+    // the authority arrives; nothing changed yet — and the machine's own records are not owner facts
+    install_binding(&ga, &m);
+    let before = t2_of(&ga, &mid);
+    assert_eq!(before["scope"], "machine");
+    assert_eq!(before["binding"], "UNAUTHORISED", "{before}");
     let dry = ga
         .with_role("orchestrator")
-        .ok(&["trust", "t2-binding", "--reseal", "--dry-run"]);
+        .ok(&["trust", "reseal", "--dry-run"]);
     let files: Vec<String> = dry["resealed_files"]
         .as_array()
         .unwrap()
@@ -876,17 +918,15 @@ fn reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_
         "machine",
         "a dry run writes nothing"
     );
-    // an L2 role may not reseal; FREEZE_WRITES refuses it
+    // an L2 role may not reseal
     assert_eq!(
         ga.with_role("product-spec-agent")
-            .err(&["trust", "t2-binding", "--reseal"])
+            .err(&["trust", "reseal"])
             .error_code(),
         "AUTHORITY_DENIED"
     );
     let before_op = yaml(&a, "spec/decisions/HDG-0402.yaml")["os_binding"].clone();
-    let r = ga
-        .with_role("orchestrator")
-        .ok(&["trust", "t2-binding", "--reseal"]);
+    let r = ga.with_role("orchestrator").ok(&["trust", "reseal"]);
     assert!(r["resealed_seals"].as_u64().unwrap() >= 1, "{r}");
     let after = yaml(&a, "spec/decisions/HDG-0402.yaml");
     assert_eq!(after["os_binding"]["scope"], "provisioned");
@@ -895,12 +935,13 @@ fn reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_
     assert!(owner_verifies(&after).is_some());
     assert_eq!(t2_of(&ga, &mid)["binding"], "VERIFIED");
     assert_eq!(t2_of(&ga, &early)["scope"], "machine");
+    assert_ne!(t2_of(&ga, &early)["binding"], "VERIFIED");
     assert_eq!(t2_of(&ga, &forged_id)["binding"], "BROKEN");
     git_commit_all(&a, "resealed");
     // on the owner's second machine: the resealed gate is honoured; the unprovisioned-era one is not
     let (_b, gb) = clone_of(&a, "t2-rs-b");
     provision_root(&gb, &m.root);
-    install_binding(&gb, &m.bundle);
+    install_binding(&gb, &m);
     assert_eq!(t2_of(&gb, &mid)["binding"], "VERIFIED");
     assert_eq!(t2_of(&gb, &early)["binding"], "FOREIGN");
 }
@@ -915,7 +956,7 @@ fn gate_operations_keep_os_sealed_task_records_verifiable_and_never_bless_others
     let m = owner_material("tk");
     let (root, g) = setup_fixture_unprovisioned("greenfield", "t2-tk", "S-tk");
     provision_root(&g, &m.root);
-    install_binding(&g, &m.bundle);
+    install_binding(&g, &m);
     g.ok(&[
         "init",
         "--source",
@@ -1017,7 +1058,8 @@ fn the_t2_audit_covers_the_plugin_registry() {
         .as_object()
         .map(|o| o.is_empty())
         .unwrap_or(true));
-    let reg_path = "governance/generated/plugin-registry.json";
+    // round 3 (WS-7, BC-P2-31): the registry lives at `paths::PLUGIN_REGISTRY_PATH`
+    let reg_path = gov_runtime::paths::PLUGIN_REGISTRY_PATH;
     let mut reg = json(&root, reg_path);
     reg["plugins"]["rp"]["approved_roles"] = json!(["all", "backend-engineer"]);
     gov_runtime::util::write_json(&root.join(reg_path), &reg).unwrap();

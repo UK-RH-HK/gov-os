@@ -92,8 +92,9 @@ pub fn status() -> Result<Value> {
         },
         "installations": installations_recorded(&ms, product),
         // P2-ADJ-0002: whether T2 facts this machine writes are sealed under the owner's binding authority (and so
-        // honoured on the owner's other provisioned machines) or with a machine-local key
-        "t2_binding": binding::status(),
+        // honoured on the owner's other provisioned machines) or with a machine-local key — the one T2 binding status
+        // (`crate::t2::binding_status`, over the one keyring `binding::keyring`)
+        "t2_binding": crate::t2::binding_status(),
         "degraded": degraded.map(|d| json!({"marking": d.marking, "entered_at": d.entered_at, "record": d.record})),
         "break_glass": {
             "marking": breakglass::DEGRADED_TOKEN,

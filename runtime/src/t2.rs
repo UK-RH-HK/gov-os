@@ -16,22 +16,22 @@
 //!
 //! | scope | key | alg | honoured on |
 //! |---|---|---|---|
-//! | **provisioned** (P2-ADJ-0002) | an owner-authorised **T2 binding authority**: a 32-byte HMAC key the administrator installs on each of the owner's provisioned machines, together with the owner's signed authorisation of that key under the trusted root's `t2-binding` role | [`SEAL_ALG_PORTABLE`] | every machine that holds the same authority **and** whose trusted Signed Release Root authorises it — i.e. every machine provisioned for the owner/project, after a Git clone or pull |
-//! | **machine** (round 1) | this machine's own binding key (`<state_root>/t2-binding/key.json`, created on first use, mode 0600) | [`SEAL_ALG`] | this machine only |
+//! | **provisioned** (P2-ADJ-0002) | the active key of the owner's **T2 binding authority** (`crate::srr::binding`): an owner-signed, versioned `t2-binding-authority` document under the trusted root's `t2-binding` role authorises binding keys by id and commitment; the administrator installs the document and a key with `gov trust bind` | [`SEAL_ALG_PORTABLE`] | every machine that holds that key and whose trusted root authorises it under the current authority — i.e. every machine provisioned and bound for the owner/project, after a Git clone or pull |
+//! | **machine** (round 1) | this machine's own binding key (`<state_root>/t2-binding/key.json`, created on first use, mode 0600) | [`SEAL_ALG`] | this machine only, and only while it is not bound to the owner's authority |
 //!
-//! A new seal uses the provisioned scope whenever this machine holds a binding authority that its trusted root
-//! currently authorises and that has not expired ([`binding_status`] says which, and why); otherwise the machine
-//! scope, exactly as before (an unprovisioned machine, or a provisioned one whose administrator has not installed an
-//! authority, keeps working locally and its records are simply not portable). [`verify_record`] recomputes the
-//! seal:
+//! A new seal uses the provisioned scope whenever this machine's binding authority verifies now
+//! (`crate::srr::binding::keyring`: re-verified against the current trusted root, unexpired, this machine
+//! authorised) and the machine holds the authority's active key; otherwise the machine scope, exactly as before (an
+//! unprovisioned machine, or a provisioned one whose administrator has not bound it, keeps working locally and its
+//! records are simply not portable). [`verify_record`] recomputes the seal:
 //!
 //! | [`Binding`] | meaning | honoured? |
 //! |---|---|---|
-//! | `Verified` | written by a `gov` operation (on this machine, or under a binding authority this machine holds and its root authorises) and unmodified since; `scope` says which | yes |
+//! | `Verified` | written by a `gov` operation and unmodified since: under a key the owner's current authority authorises (`ACTIVE` or `RETIRED`) that this machine holds, or — on a machine not bound to the owner's authority — with this machine's own key; `scope` says which | yes |
 //! | `Unsealed` | no seal: hand-written, legacy, or written by code that has not adopted the primitive | **no** |
 //! | `Broken` | sealed, then modified (any field, including a single flag), or a malformed seal | **no** |
-//! | `Foreign` | sealed with a key this machine does not hold: another machine's own key (an unprovisioned or unauthorised machine, a clone of a machine-scope record) or a binding authority this machine was not provisioned with (a foreign owner's machine) | **no** |
-//! | `Unauthorised` | sealed under a binding authority this machine holds, but this machine's trusted root does not authorise it now (unprovisioned, the `t2-binding` role not delegated, the signing key revoked by root succession) | **no** |
+//! | `Foreign` | sealed with a key this machine does not hold: another machine's own key (an unprovisioned or unauthorised machine, a clone of a machine-scope record) or a binding key this machine was not given (another owner's authority) | **no** |
+//! | `Unauthorised` | sealed with a key this machine holds but does not honour now: a binding key the current authority no longer lists (revoked), any binding key while the authority does not verify (root succession dropped the `t2-binding` delegation, expired, altered), or this machine's own key once the machine is bound (its own machine-scope records are not owner facts) | **no** |
 //! | `KeyUnavailable` | this machine has no binding key / its state root cannot be resolved | **no** |
 //!
 //! Consumers never read a T2 field for a decision without first asking this module; everything that is not
@@ -41,43 +41,50 @@
 //!
 //! ARCH-0003 §8: additional machines are provisioned outside the project repository with the verifier, public root
 //! metadata and protected machine/workload policy. The authority for a portable seal is delegated through that same
-//! provisioned root, and nothing about it is in any repository:
+//! provisioned root, and nothing about it is in any repository. **There is one mechanism** (round-3 integration,
+//! P2-AR-0041): one delegated role, one authority document format, one provisioning command and one keyring, all in
+//! `crate::srr::binding`; this module only seals and verifies through `crate::srr::binding::keyring`.
 //!
 //! 1. **Delegation.** The owner's root delegates the role [`AUTHORITY_ROLE`] (`t2-binding`) to the owner's key(s)
 //!    (root metadata; public).
-//! 2. **Authorisation.** The owner, off the agents' machines, generates a 32-byte binding key and signs a
-//!    [`AUTHORITY_TYPE`] document with the `t2-binding` key(s) at threshold, binding the product, the authority id
-//!    ([`authority_id_of`]) and a commitment to the key ([`key_commitment_of`]), with `issued`/`expires`. `gov`
-//!    verifies; it never signs (`SRR-R0-L4`).
-//! 3. **Provisioning.** The administrator installs the [`BUNDLE_TYPE`] bundle (the signed authorisation and the key)
-//!    on each of the owner's provisioned machines from the administrator domain: `gov trust t2-binding --provision
-//!    <bundle>` ([`provision_authority`]). Refused unless the machine is provisioned, the authorisation verifies
-//!    against *its* trusted root's `t2-binding` role at threshold, is unexpired, and the key matches the commitment;
-//!    refused for a file inside a repository; refused below floor (`OWNER-DECISION-0006` §6 bullet 4). The key is
-//!    kept in protected machine state (mode 0600), never in a repository.
-//! 4. **Use.** A portable seal binds the authority id, the sealing machine's id, the operation, the time and the
-//!    content. A verifying machine honours it only when it holds that authority's key (the MAC verifies) **and** its
-//!    own trusted root authorises the authority at use time (the signature is re-verified against the current root,
-//!    so a root successor that drops the `t2-binding` key revokes it). Expiry bounds when an authority may *seal*;
-//!    records sealed while it was valid stay honoured, as owner-signed human answers do.
+//! 2. **Authorisation.** The owner, off the agents' machines, generates 32-byte binding keys and signs a versioned
+//!    `t2-binding-authority` document with the `t2-binding` key(s) at threshold: the authority id, a version (never
+//!    lowered on a machine), an expiry, optionally the machine ids it authorises, and its keys — each by key id
+//!    (`crate::srr::binding::key_id_of`) and commitment (`crate::srr::binding::commitment_of`), exactly one `active`,
+//!    any number `retired`. `gov` verifies; it never signs (`SRR-R0-L4`).
+//! 3. **Provisioning.** The administrator installs the document and a key it authorises on each of the owner's
+//!    provisioned machines from the administrator domain: [`PROVISION_COMMAND`]. Refused below floor, from a
+//!    repository, via the environment, on an unprovisioned machine, under a root that does not delegate the role,
+//!    below threshold or by another signer, expired, older than (or conflicting with) the version this machine
+//!    accepted, for an unlisted machine, and for a key the document does not authorise by id and commitment.
+//! 4. **Use.** A portable seal binds the authority id, the key id, the sealing machine's id, the operation, the time
+//!    and the content. A verifying machine honours it only when it holds that key (the MAC verifies) **and** its own
+//!    binding authority verifies now and authorises the key (`ACTIVE` or `RETIRED`). Rotation keeps the retired
+//!    key's seals honoured; a key the current version no longer lists is revoked; root succession that drops the
+//!    delegation, and expiry, stop every seal of the authority being honoured until the administrator binds a valid
+//!    one (and new seals fall back to the machine scope).
+//! 5. **Continuity.** A bound machine honours only owner facts. Records it sealed with its own key while it was
+//!    provisioned are re-sealed under the active key by [`reseal`] (`gov trust reseal`), keeping the recorded
+//!    operation and time; nothing sealed while it was unprovisioned, and nothing whose seal does not verify, is ever
+//!    re-sealed.
 //!
 //! ## What it proves, and what it does not (stated, not overclaimed)
 //!
 //! * A process that can write the repository but cannot read the machine's protected state cannot produce a
 //!   `Verified` record — on any machine: hand-written gate answers, decisions and registry entries are detected
 //!   (A0-E1-02's lower-role worker, A0-L3-02's record forgery). This is the attack in the findings.
-//! * A record written by an unprovisioned machine, by a machine the owner's provisioning did not give the authority,
-//!   or by a machine of another owner (another root, another authority) is `Foreign`/`Unauthorised` on the owner's
-//!   machines: refused, typed and observable (P2-ADJ-0002).
+//! * A record written by an unprovisioned machine, by a machine the owner's provisioning did not bind, or by a
+//!   machine of another owner (another root, another authority) is `Foreign`/`Unauthorised` on the owner's machines:
+//!   refused, typed and observable (P2-ADJ-0002).
 //! * A process running with the **operator's full OS privileges** on a provisioned machine can read the binding key
 //!   (same account) and could compute a seal. Against that attacker the primitive is detection-grade, not proof —
 //!   and, because the requirement is that a record written on one provisioned machine is honoured on the others,
-//!   what such a process forges on one of the owner's machines is honoured on the others holding the same authority
+//!   what such a process forges on one of the owner's machines is honoured on the others holding the same key
 //!   (any mechanism meeting the requirement has that property). The facts that must hold against it — human answers
 //!   and human-approval assertions — are additionally bound to an **owner signature** the machines do not hold
 //!   ([`crate::human_channel`]). The key is symmetric and shared by the machines that hold it (`gov` never signs, so
-//!   no per-machine signature is available): revocation is per authority (root succession, or a new authority and
-//!   [`reseal`]), not per machine, unless the owner issues one authority per machine.
+//!   no per-machine signature is available): revocation is per key (a new authority version), not per machine,
+//!   unless the owner issues machine-listed authorities.
 //! * A process can always *run `gov`* under a declared role; what it writes that way is an OS operation performed
 //!   under that role's authority and is recorded as such (the agent-identity question is OD-P2-01, out of scope).
 //!
@@ -91,11 +98,11 @@
 //!   when it is `Verified`; otherwise it is a worker mutation to be refused, not exempted ([`OS_MANAGED_PREFIXES`]
 //!   names the OS-written locations this module knows of);
 //! * suite / doctor: [`audit`] lists every open T2 record (and plugin-registry entry) that no OS operation produced;
-//!   [`binding_status`] reports the sealing scope and the installed authorities.
+//!   [`binding_status`] is the one report of the sealing scope and the owner's binding authority.
 use crate::records::{Record, RecordFormat, RecordStore};
-use crate::srr::metadata::{Envelope, Root};
+use crate::srr::binding::{HeldKey, Keyring};
 use crate::util::{canonical_json, now_iso, sha256_hex};
-use crate::{GovError, Project, Result, FRAMEWORK_NAME};
+use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -104,24 +111,18 @@ use std::sync::{Arc, Mutex};
 pub const SEAL_FIELD: &str = "os_binding";
 /// Seal algorithm identifier of a **machine-scope** seal (bound into the MAC).
 pub const SEAL_ALG: &str = "hmac-sha256/t2-v1";
-/// Seal algorithm identifier of a **provisioned-scope** (portable) seal under a binding authority (P2-ADJ-0002).
+/// Seal algorithm identifier of a **provisioned-scope** (portable) seal under the owner's binding authority
+/// (P2-ADJ-0002).
 pub const SEAL_ALG_PORTABLE: &str = "hmac-sha256/t2-v2";
-/// The root-delegated role whose keys authorise a T2 binding authority.
-pub const AUTHORITY_ROLE: &str = "t2-binding";
-/// `_type` of the owner-signed authorisation of one binding key.
-pub const AUTHORITY_TYPE: &str = "t2-binding-authority";
-/// `_type` of the provisioning bundle the administrator installs (the signed authorisation and the key).
-pub const BUNDLE_TYPE: &str = "t2-binding-provisioning";
-/// Every binding-authority id starts with this prefix (a machine key id never does).
-pub const AUTHORITY_ID_PREFIX: &str = "t2a-";
-/// The administrator command that installs a binding authority on a provisioned machine.
+/// The root-delegated role whose keys authorise the owner's T2 binding authority (`crate::srr::binding::ROLE`).
+pub const AUTHORITY_ROLE: &str = crate::srr::binding::ROLE;
+/// The one administrator command that installs (or rotates) the owner's binding authority on a provisioned machine.
 pub const PROVISION_COMMAND: &str =
-    "gov trust t2-binding --provision <bundle.json supplied from the administrator domain>";
+    "gov trust bind --authority <owner-signed t2-binding-authority> --key <binding key>, both from the administrator domain";
+/// The continuity command: re-seal what this machine sealed while provisioned under the owner's active key.
+pub const RESEAL_COMMAND: &str = "gov trust reseal [--dry-run]";
 const KEY_DIR: &str = "t2-binding";
 const KEY_FILE: &str = "key.json";
-const AUTHORITIES_DIR: &str = "authorities";
-const AUTHORITY_FILE: &str = "authority.json";
-const AUTHORITY_KEY_FILE: &str = "key.json";
 
 /// Record types every instance of which is T2 state written only by OS operations (checked by [`audit`]).
 ///
@@ -146,6 +147,9 @@ pub const OS_MANAGED_PREFIXES: &[&str] = &[
 ];
 
 /// Outcome of verifying a T2 binding.
+///
+/// `key_id` names the key a seal was made with: a machine key's id (16 hex) for a machine-scope seal, and
+/// `<authority_id>/<key_id>` for a seal under the owner's binding authority ([`scope_of_key`]).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Binding {
     Verified {
@@ -160,7 +164,7 @@ pub enum Binding {
     Foreign {
         key_id: String,
     },
-    /// Sealed under a binding authority this machine holds but its trusted root does not authorise now.
+    /// Sealed with a key this machine holds but does not honour now (see the module table).
     Unauthorised {
         key_id: String,
         reason: String,
@@ -170,20 +174,26 @@ pub enum Binding {
     },
 }
 
-/// `provisioned` for a key id of a binding authority, `machine` for a machine's own key.
+/// `provisioned` for a key named under the owner's binding authority (`<authority_id>/<key_id>`), `machine` for a
+/// machine's own key (16 hex, never containing `/`).
 pub fn scope_of_key(key_id: &str) -> &'static str {
-    if key_id.starts_with(AUTHORITY_ID_PREFIX) {
+    if key_id.contains('/') {
         "provisioned"
     } else {
         "machine"
     }
 }
 
+/// The name a [`Binding`] gives a key of the owner's binding authority.
+pub fn owner_key_name(authority_id: &str, key_id: &str) -> String {
+    format!("{authority_id}/{key_id}")
+}
+
 impl Binding {
     pub fn is_verified(&self) -> bool {
         matches!(self, Binding::Verified { .. })
     }
-    /// A verified binding that other provisioned machines holding the same authority also honour.
+    /// A verified binding that other provisioned machines bound to the same authority also honour.
     pub fn is_portable(&self) -> bool {
         matches!(self, Binding::Verified { key_id, .. } if scope_of_key(key_id) == "provisioned")
     }
@@ -211,13 +221,16 @@ impl Binding {
             }
             Binding::Broken { reason } => json!({"binding": "BROKEN", "reason": reason}),
             Binding::Foreign { key_id } if scope_of_key(key_id) == "provisioned" => {
-                json!({"binding": "FOREIGN", "key_id": key_id, "scope": "provisioned", "reason": format!("sealed under T2 binding authority {key_id}, which this machine was not provisioned with (a machine of another owner or project, or a machine whose administrator has not installed that authority here); not verifiable on this machine")})
+                json!({"binding": "FOREIGN", "key_id": key_id, "scope": "provisioned", "reason": format!("sealed under binding key {key_id}, which this machine does not hold (a machine of another owner or project, or a machine whose administrator has not bound it to that authority); not verifiable on this machine")})
             }
             Binding::Foreign { key_id } => {
-                json!({"binding": "FOREIGN", "key_id": key_id, "scope": "machine", "reason": "sealed with another machine's own binding key (a machine-scope seal: an unprovisioned machine, a machine without the owner's T2 binding authority, or a record sealed before the authority existed); not verifiable on this machine"})
+                json!({"binding": "FOREIGN", "key_id": key_id, "scope": "machine", "reason": "sealed with another machine's own binding key (a machine-scope seal: an unprovisioned machine, a machine the owner's provisioning did not bind, or a record sealed before its machine was bound); not verifiable on this machine"})
+            }
+            Binding::Unauthorised { key_id, reason } if scope_of_key(key_id) == "provisioned" => {
+                json!({"binding": "UNAUTHORISED", "key_id": key_id, "scope": "provisioned", "reason": format!("sealed under binding key {key_id}, which this machine holds but its owner's binding authority does not authorise now: {reason}")})
             }
             Binding::Unauthorised { key_id, reason } => {
-                json!({"binding": "UNAUTHORISED", "key_id": key_id, "scope": "provisioned", "reason": format!("sealed under T2 binding authority {key_id}, which this machine holds but its trusted root does not authorise now: {reason}")})
+                json!({"binding": "UNAUTHORISED", "key_id": key_id, "scope": "machine", "reason": reason})
             }
             Binding::KeyUnavailable { reason } => {
                 json!({"binding": "KEY_UNAVAILABLE", "reason": reason})
@@ -368,161 +381,78 @@ fn mac_message(key_id: &str, operation: &str, at: &str, content: &str) -> Vec<u8
     format!("{SEAL_ALG}\n{key_id}\n{operation}\n{at}\n{content}").into_bytes()
 }
 
-/// The MAC input of a portable seal: the authority, the sealing machine, the operation, the time and the content.
+/// The MAC input of a portable seal: the authority, the key, the sealing machine, the operation, the time and the
+/// content.
 fn mac_message_portable(
     authority: &str,
+    key_id: &str,
     machine: &str,
     operation: &str,
     at: &str,
     content: &str,
 ) -> Vec<u8> {
-    format!("{SEAL_ALG_PORTABLE}\n{authority}\n{machine}\n{operation}\n{at}\n{content}")
+    format!("{SEAL_ALG_PORTABLE}\n{authority}\n{key_id}\n{machine}\n{operation}\n{at}\n{content}")
         .into_bytes()
 }
 
-// ------------------------------------------------------------------------------- binding authorities (P2-ADJ-0002)
+// ------------------------------------------------------------------ the owner's binding authority (P2-ADJ-0002)
 
-/// The id of the binding authority whose key is `key` (derived from the key, never taken from a document).
-pub fn authority_id_of(key: &[u8]) -> String {
-    format!(
-        "{AUTHORITY_ID_PREFIX}{}",
-        &sha256_hex(&[b"t2-binding-authority-id:".as_slice(), key].concat())[..16]
-    )
-}
-
-/// The commitment to a binding key that the owner's authorisation binds (SHA-256 over a domain-separated key).
-pub fn key_commitment_of(key: &[u8]) -> String {
-    sha256_hex(&[b"t2-binding-key-commitment:".as_slice(), key].concat())
-}
-
-/// What an owner-signed authorisation established.
+/// This machine's standing under the owner's T2 binding authority, as `crate::srr::binding::keyring` establishes it
+/// (the one keyring API), plus the key material installed by `gov trust bind`.
 #[derive(Debug, Clone)]
-struct AuthorityDoc {
-    issued: String,
-    expires: String,
-    owner: String,
-    signed_by: Vec<String>,
-    envelope_sha256: String,
-}
-
-fn str_of(v: &Value, k: &str) -> String {
-    v.get(k).and_then(|x| x.as_str()).unwrap_or("").to_string()
-}
-
-/// Verify an owner-signed authorisation of `key` against `root`'s `t2-binding` role. `now = Some(clock)` also
-/// refuses an expired authorisation (provisioning and sealing); `None` is use-time verification of an authority
-/// that sealed while it was valid.
-fn authorise(
-    root: &Root,
-    env_bytes: &[u8],
-    key: &[u8],
-    source: &str,
-    now: Option<&str>,
-) -> Result<AuthorityDoc> {
-    let bad = |code: &str, m: String| GovError::new(code, format!("{source}: {m}"));
-    let env = Envelope::parse(env_bytes, source)
-        .map_err(|e| bad("T2_AUTHORITY_INVALID", format!("{}: {}", e.code, e.message)))?;
-    if env.typ() != AUTHORITY_TYPE {
-        return Err(bad(
-            "T2_AUTHORITY_INVALID",
-            format!("expected _type '{AUTHORITY_TYPE}', found '{}'", env.typ()),
-        ));
-    }
-    if env.spec_version() != crate::srr::metadata::SPEC_VERSION {
-        return Err(bad(
-            "T2_AUTHORITY_INVALID",
-            format!("unsupported spec_version '{}'", env.spec_version()),
-        ));
-    }
-    if env.product() != FRAMEWORK_NAME {
-        return Err(bad(
-            "T2_AUTHORITY_INVALID",
-            format!("binds product '{}', not '{FRAMEWORK_NAME}'", env.product()),
-        ));
-    }
-    if !root.has_role(AUTHORITY_ROLE) {
-        return Err(bad(
-            "T2_AUTHORITY_ROLE_NOT_DELEGATED",
-            format!("this machine's trusted Signed Release Root (version {}) delegates no `{AUTHORITY_ROLE}` role, so no T2 binding authority is authorised here", root.version),
-        ));
-    }
-    let signed_by = root.verify_role(AUTHORITY_ROLE, &env).map_err(|e| {
-        bad(
-            "T2_AUTHORITY_UNAUTHORISED",
-            format!(
-                "not authorised by the `{AUTHORITY_ROLE}` role of this machine's trusted root (version {}): {}",
-                root.version, e.message
-            ),
-        )
-    })?;
-    let s = &env.signed;
-    if str_of(s, "authority_id") != authority_id_of(key)
-        || str_of(s, "key_commitment") != key_commitment_of(key)
-    {
-        return Err(bad(
-            "T2_AUTHORITY_KEY_MISMATCH",
-            format!("the binding key does not match the key the owner authorised (authority_id '{}', key_commitment '{}'; this key derives {})", str_of(s, "authority_id"), str_of(s, "key_commitment"), authority_id_of(key)),
-        ));
-    }
-    if let Some(now) = now {
-        if let Some(f) = env.expiry_fault(now) {
-            return Err(bad("T2_AUTHORITY_EXPIRED", f));
-        }
-    }
-    Ok(AuthorityDoc {
-        issued: str_of(s, "issued"),
-        expires: env.expires().to_string(),
-        owner: str_of(s, "owner"),
-        signed_by,
-        envelope_sha256: env.file_sha256.clone(),
-    })
-}
-
-/// One binding authority installed in this machine's protected state.
-#[derive(Debug, Clone)]
-struct HeldAuthority {
-    id: String,
-    /// `None` when the key file is missing, unreadable, or does not derive the authority id.
-    key: Option<Vec<u8>>,
-    /// The owner's authorisation, verified against this machine's trusted root now (expiry not applied).
-    doc: std::result::Result<AuthorityDoc, String>,
-}
-
-/// This machine's T2 binding authorities and the trust state they are judged against.
-#[derive(Debug, Clone, Default)]
-struct MachineAuthorities {
+struct MachineView {
     state_root: Option<PathBuf>,
     unresolved: Option<String>,
     machine_id: String,
     provisioned: bool,
     provisioned_at: Option<String>,
-    root_version: Option<u64>,
-    root_problem: Option<String>,
-    role_delegated: bool,
-    held: Vec<HeldAuthority>,
+    /// `Ok(None)`: no authority installed; `Ok(Some)`: it verified against the current trusted root when loaded;
+    /// `Err((code, message))`: installed but not honoured.
+    keyring: std::result::Result<Option<Keyring>, (String, String)>,
+    /// Every binding key installed here, whatever its standing (for the MAC check before the standing check).
+    held: Vec<HeldKey>,
 }
 
-impl MachineAuthorities {
-    fn find(&self, id: &str) -> Option<&HeldAuthority> {
-        self.held.iter().find(|h| h.id == id)
+impl Default for MachineView {
+    fn default() -> Self {
+        MachineView {
+            state_root: None,
+            unresolved: None,
+            machine_id: String::new(),
+            provisioned: false,
+            provisioned_at: None,
+            keyring: Ok(None),
+            held: vec![],
+        }
     }
-    /// The authority new seals use: installed, key usable, authorised by the trusted root now, unexpired; the most
-    /// recently issued one (then the smallest id) when several qualify.
-    fn sealing(&self, now: &str) -> Option<(&HeldAuthority, &Vec<u8>)> {
-        self.held
-            .iter()
-            .filter_map(|h| match (&h.key, &h.doc) {
-                (Some(k), Ok(d))
-                    if crate::srr::metadata::expiry_fault(&d.expires, now).is_none() =>
-                {
-                    Some((h, k, d.issued.clone()))
-                }
-                _ => None,
-            })
-            .max_by(|a, b| (a.2.as_str(), b.0.id.as_str()).cmp(&(b.2.as_str(), a.0.id.as_str())))
-            .map(|(h, k, _)| (h, k))
+}
+
+impl MachineView {
+    /// The authority, when it verifies **now** (the load verified it; expiry is re-checked at `now` because the view
+    /// is cached per process).
+    fn valid(&self, now: &str) -> std::result::Result<Option<&Keyring>, String> {
+        match &self.keyring {
+            Ok(None) => Ok(None),
+            Ok(Some(k)) => match crate::srr::metadata::expiry_fault(&k.authority.expires, now) {
+                Some(f) => Err(format!(
+                    "T2_BINDING_AUTHORITY_EXPIRED: binding authority '{}' version {} is not current: {f}",
+                    k.authority.authority_id, k.authority.version
+                )),
+                None => Ok(Some(k)),
+            },
+            Err((code, msg)) => Err(format!("{code}: {msg}")),
+        }
     }
-    /// Why no authority seals (for the status report).
+    /// Owner mode: the authority verifies now and this machine holds its active key — new seals are portable and
+    /// only owner facts are honoured.
+    fn sealing(&self, now: &str) -> Option<(&Keyring, &HeldKey)> {
+        let k = self.valid(now).ok().flatten()?;
+        k.active().map(|a| (k, a))
+    }
+    fn held(&self, key_id: &str) -> Option<&HeldKey> {
+        self.held.iter().find(|h| h.key_id == key_id)
+    }
+    /// Why new seals are machine-scope (for the status report).
     fn why_machine_scope(&self, now: &str) -> String {
         if let Some(u) = &self.unresolved {
             return format!("the protected machine state cannot be resolved ({u})");
@@ -530,158 +460,81 @@ impl MachineAuthorities {
         if !self.provisioned {
             return "this machine is unprovisioned (no Signed Release Root): its seals are machine-scope and are not honoured on any other machine (P2-ADJ-0002; OWNER-DECISION-P2-0002)".into();
         }
-        if let Some(r) = &self.root_problem {
-            return format!("this machine's trusted root cannot be loaded ({r})");
+        match self.valid(now) {
+            Ok(None) => format!(
+                "no T2 binding authority is installed here: administrator: {PROVISION_COMMAND}"
+            ),
+            Err(e) => format!("the installed T2 binding authority is not honoured now ({e})"),
+            Ok(Some(k)) => format!(
+                "this machine does not hold the active key {} of binding authority '{}' version {}: administrator: {PROVISION_COMMAND}",
+                k.authority.active().map(|a| a.key_id.as_str()).unwrap_or("?"),
+                k.authority.authority_id,
+                k.authority.version
+            ),
         }
-        if !self.role_delegated {
-            return format!("this machine's trusted root delegates no `{AUTHORITY_ROLE}` role");
-        }
-        if self.held.is_empty() {
-            return format!("no T2 binding authority is installed here ({PROVISION_COMMAND})");
-        }
-        let reasons: Vec<String> = self
-            .held
-            .iter()
-            .map(|h| match (&h.key, &h.doc) {
-                (None, _) => format!("{}: its key is unusable", h.id),
-                (_, Err(e)) => format!("{}: {e}", h.id),
-                (_, Ok(d)) => match crate::srr::metadata::expiry_fault(&d.expires, now) {
-                    Some(f) => format!("{}: expired ({f})", h.id),
-                    None => format!("{}: usable", h.id),
-                },
-            })
-            .collect();
-        format!(
-            "no installed T2 binding authority may seal now: {}",
-            reasons.join("; ")
-        )
     }
 }
 
-fn authorities_dir(state_root: &Path) -> PathBuf {
-    state_root.join(KEY_DIR).join(AUTHORITIES_DIR)
-}
-
-fn file_digest(p: &Path) -> String {
-    std::fs::read(p)
-        .map(|b| sha256_hex(&b))
-        .unwrap_or_else(|_| "-".into())
-}
-
-fn authority_dirs(state_root: &Path) -> Vec<PathBuf> {
-    let mut v: Vec<PathBuf> = std::fs::read_dir(authorities_dir(state_root))
-        .map(|rd| {
-            rd.filter_map(|e| e.ok())
-                .map(|e| e.path())
-                .filter(|p| p.is_dir())
-                .collect()
-        })
-        .unwrap_or_default();
-    v.sort();
-    v
-}
-
-/// A digest of everything the authority set is derived from, so the per-process cache never serves a stale view.
+/// A digest of everything the view is derived from, so the per-process cache never serves a stale view.
 ///
 /// The trust anchor itself is not read here (only `srr::state` composes its path and `srr::verifier` reads it — the R1
 /// census holds that): the provisioning record, which `MachineState::set_root_metadata` rewrites with the anchor's
 /// digest and version on every provisioning and root succession, stands for it.
 fn fingerprint(state_root: &Path) -> String {
     let ms = crate::srr::state::MachineState::read_only(state_root);
-    let mut parts = vec![
-        state_root.display().to_string(),
-        canonical_json(&ms.provisioned_record()),
-        ms.machine_id.clone(),
-    ];
-    for d in authority_dirs(state_root) {
-        parts.push(d.display().to_string());
-        parts.push(file_digest(&d.join(AUTHORITY_FILE)));
-        parts.push(file_digest(&d.join(AUTHORITY_KEY_FILE)));
-    }
-    sha256_hex(parts.join("\n").as_bytes())
+    sha256_hex(
+        [
+            state_root.display().to_string(),
+            canonical_json(&ms.provisioned_record()),
+            ms.machine_id.clone(),
+            crate::srr::binding::state_fingerprint(state_root),
+        ]
+        .join("\n")
+        .as_bytes(),
+    )
 }
 
-fn load_machine_authorities(state_root: &Path) -> MachineAuthorities {
+fn load_view(state_root: &Path) -> MachineView {
     let ms = crate::srr::state::MachineState::read_only(state_root);
-    let mut m = MachineAuthorities {
+    MachineView {
         state_root: Some(state_root.to_path_buf()),
+        unresolved: None,
         machine_id: ms.machine_id.clone(),
         provisioned: ms.is_provisioned(),
-        ..Default::default()
-    };
-    m.provisioned_at = ms
-        .provisioned_record()
-        .get("provisioned_at")
-        .and_then(|v| v.as_str())
-        .map(String::from);
-    let now = crate::srr::metadata::local_clock_now();
-    let trusted: Option<Root> = if m.provisioned {
-        match crate::srr::verifier::trusted_root(&ms, &now) {
-            Ok(r) => r,
-            Err(e) => {
-                m.root_problem = Some(format!("{}: {}", e.code, e.message));
-                None
-            }
-        }
-    } else {
-        None
-    };
-    if let Some(r) = &trusted {
-        m.root_version = Some(r.version);
-        m.role_delegated = r.has_role(AUTHORITY_ROLE);
+        provisioned_at: ms
+            .provisioned_record()
+            .get("provisioned_at")
+            .and_then(|v| v.as_str())
+            .map(String::from),
+        keyring: crate::srr::binding::keyring_at(state_root).map_err(|e| (e.code, e.message)),
+        held: crate::srr::binding::held_keys(state_root),
     }
-    for d in authority_dirs(state_root) {
-        let id = d
-            .file_name()
-            .map(|f| f.to_string_lossy().to_string())
-            .unwrap_or_default();
-        let key = crate::util::read_json(&d.join(AUTHORITY_KEY_FILE))
-            .ok()
-            .and_then(|v| {
-                v["key_hex"]
-                    .as_str()
-                    .and_then(|h| hex::decode(h.trim()).ok())
-            })
-            .filter(|k| k.len() == 32 && authority_id_of(k) == id);
-        let doc = match (&key, std::fs::read(d.join(AUTHORITY_FILE))) {
-            (None, _) => Err("the binding key file of this authority is missing, unreadable or does not derive its id".to_string()),
-            (_, Err(e)) => Err(format!("the authority document is unreadable: {e}")),
-            (Some(k), Ok(bytes)) => match &trusted {
-                None if !m.provisioned => Err("this machine holds no Signed Release Root (unprovisioned), so no T2 binding authority is authorised here".to_string()),
-                None => Err(format!("this machine's trusted root cannot be loaded ({})", m.root_problem.clone().unwrap_or_default())),
-                Some(r) => authorise(r, &bytes, k, &d.join(AUTHORITY_FILE).display().to_string(), None)
-                    .map_err(|e| format!("{}: {}", e.code, e.message)),
-            },
-        };
-        m.held.push(HeldAuthority { id, key, doc });
-    }
-    m
 }
 
-static AUTHORITY_CACHE: Mutex<Option<(String, Arc<MachineAuthorities>)>> = Mutex::new(None);
+static VIEW_CACHE: Mutex<Option<(String, Arc<MachineView>)>> = Mutex::new(None);
 
-/// This machine's binding authorities, read-only (nothing is created by asking), cached per process by a digest of
-/// every input.
-fn machine_authorities() -> Arc<MachineAuthorities> {
+/// This machine's view of the owner's binding authority, read-only (nothing is created by asking), cached per
+/// process by a digest of every input.
+fn machine_view() -> Arc<MachineView> {
     let root = match crate::srr::state::resolve_state_root() {
         Ok(r) => r,
         Err(e) => {
-            return Arc::new(MachineAuthorities {
+            return Arc::new(MachineView {
                 unresolved: Some(format!("{}: {}", e.code, e.message)),
                 ..Default::default()
             })
         }
     };
     let fp = fingerprint(&root);
-    if let Ok(g) = AUTHORITY_CACHE.lock() {
+    if let Ok(g) = VIEW_CACHE.lock() {
         if let Some((f, m)) = g.as_ref() {
             if *f == fp {
                 return m.clone();
             }
         }
     }
-    let m = Arc::new(load_machine_authorities(&root));
-    if let Ok(mut g) = AUTHORITY_CACHE.lock() {
+    let m = Arc::new(load_view(&root));
+    if let Ok(mut g) = VIEW_CACHE.lock() {
         *g = Some((fp, m.clone()));
     }
     m
@@ -691,12 +544,22 @@ fn machine_authorities() -> Arc<MachineAuthorities> {
 
 /// Seal `data` (a record's data or a JSON document) as written by the OS operation `operation`. Call it
 /// immediately before persisting; any later modification of any field breaks the seal. The seal is portable
-/// (provisioned scope) when this machine holds a usable binding authority, machine-scope otherwise.
+/// (provisioned scope) when this machine is bound to the owner's authority and holds its active key, machine-scope
+/// otherwise.
 pub fn seal_value(data: &mut Value, body: &str, operation: &str) -> Result<()> {
-    let m = machine_authorities();
+    let v = machine_view();
     let at = now_iso();
-    if let Some((h, key)) = m.sealing(&at) {
-        return seal_portable_at(&h.id, key, &m.machine_id, data, body, operation, &at);
+    if let Some((k, active)) = v.sealing(&at) {
+        return seal_portable_at(
+            &k.authority.authority_id,
+            &active.key_id,
+            &active.key,
+            &v.machine_id,
+            data,
+            body,
+            operation,
+            &at,
+        );
     }
     let key = load_or_create_key()?;
     seal_local_at(&key, data, body, operation, &at)
@@ -730,8 +593,10 @@ fn seal_local_at(
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 fn seal_portable_at(
     authority: &str,
+    key_id: &str,
     key: &[u8],
     machine: &str,
     data: &mut Value,
@@ -743,10 +608,10 @@ fn seal_portable_at(
     let content = canonical_content(data, body)?;
     let mac = hex::encode(hmac_sha256(
         key,
-        &mac_message_portable(authority, machine, operation, at, &content),
+        &mac_message_portable(authority, key_id, machine, operation, at, &content),
     ));
-    data[SEAL_FIELD] = json!({"alg": SEAL_ALG_PORTABLE, "scope": "provisioned", "key_id": authority,
-        "authority": authority, "machine": machine, "operation": operation, "at": at, "mac": mac});
+    data[SEAL_FIELD] = json!({"alg": SEAL_ALG_PORTABLE, "scope": "provisioned", "authority": authority,
+        "key_id": key_id, "machine": machine, "operation": operation, "at": at, "mac": mac});
     Ok(())
 }
 
@@ -780,24 +645,165 @@ pub fn verify_value(data: &Value, body: &str) -> Binding {
     let Some(seal) = data.get(SEAL_FIELD).filter(|v| !v.is_null()) else {
         return Binding::Unsealed;
     };
-    if seal.get("alg").and_then(|v| v.as_str()) == Some(SEAL_ALG_PORTABLE) {
-        return verify_portable(&machine_authorities(), data, body);
+    let v = machine_view();
+    if let Some(u) = &v.unresolved {
+        return Binding::KeyUnavailable {
+            reason: format!("the protected machine state cannot be resolved ({u})"),
+        };
     }
-    match load_key() {
-        Ok(Some(k)) => verify_with(&k, data, body),
-        // this machine never sealed anything in the machine scope, so a machine-scope seal is another machine's
-        Ok(None) => match seal.get("key_id").and_then(|v| v.as_str()) {
-            Some(k)
-                if !k.is_empty() && seal.get("alg").and_then(|v| v.as_str()) == Some(SEAL_ALG) =>
-            {
-                Binding::Foreign {
-                    key_id: k.to_string(),
-                }
-            }
-            _ => Binding::Broken {
-                reason: "malformed seal".into(),
+    if seal.get("alg").and_then(|a| a.as_str()) == Some(SEAL_ALG_PORTABLE) {
+        return verify_portable(&v, data, body);
+    }
+    verify_machine_scope(&v, data, body)
+}
+
+/// The standing of an authentic seal made with the held binding key `key_id`, under this machine's authority now.
+fn owner_standing(
+    v: &MachineView,
+    key_id: &str,
+    name: String,
+    operation: String,
+    at: String,
+) -> Binding {
+    let now = now_iso();
+    match v.valid(&now) {
+        Ok(Some(k)) => match k.standing(key_id) {
+            Some(_) => Binding::Verified {
+                key_id: name,
+                operation,
+                at,
+            },
+            None => Binding::Unauthorised {
+                key_id: name,
+                reason: format!(
+                    "binding authority '{}' version {} does not list key {key_id} (revoked by the owner)",
+                    k.authority.authority_id, k.authority.version
+                ),
             },
         },
+        Ok(None) => Binding::Unauthorised {
+            key_id: name,
+            reason: "no binding authority is installed on this machine to authorise the key".into(),
+        },
+        Err(reason) => Binding::Unauthorised {
+            key_id: name,
+            reason,
+        },
+    }
+}
+
+/// Verify a portable (provisioned-scope) seal against the binding keys this machine holds and its authority now.
+fn verify_portable(v: &MachineView, data: &Value, body: &str) -> Binding {
+    let seal = &data[SEAL_FIELD];
+    let field = |k: &str| {
+        seal.get(k)
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string()
+    };
+    let (authority, key_id, scope, machine, operation, at, mac) = (
+        field("authority"),
+        field("key_id"),
+        field("scope"),
+        field("machine"),
+        field("operation"),
+        field("at"),
+        field("mac"),
+    );
+    if authority.is_empty()
+        || key_id.is_empty()
+        || key_id.contains('/')
+        || mac.is_empty()
+        || scope != "provisioned"
+    {
+        return Binding::Broken {
+            reason: format!("malformed portable seal (authority '{authority}', key_id '{key_id}', scope '{scope}')"),
+        };
+    }
+    let name = owner_key_name(&authority, &key_id);
+    let Some(h) = v.held(&key_id) else {
+        return Binding::Foreign { key_id: name };
+    };
+    let content = match canonical_content(data, body) {
+        Ok(c) => c,
+        Err(e) => {
+            return Binding::Broken {
+                reason: format!("canonical form: {}", e.message),
+            }
+        }
+    };
+    let want = hmac_sha256(
+        &h.key,
+        &mac_message_portable(&authority, &key_id, &machine, &operation, &at, &content),
+    );
+    let got = hex::decode(&mac).unwrap_or_default();
+    if !ct_eq(&want, &got) {
+        return Binding::Broken {
+            reason: format!(
+                "the record was modified after the OS operation '{operation}' sealed it at {at} (machine {machine}, authority {authority}, key {key_id})"
+            ),
+        };
+    }
+    owner_standing(v, &key_id, name, operation, at)
+}
+
+/// Verify a machine-scope seal: under a binding key the owner's authority adopted, or this machine's own key.
+fn verify_machine_scope(v: &MachineView, data: &Value, body: &str) -> Binding {
+    let seal = &data[SEAL_FIELD];
+    let field = |k: &str| {
+        seal.get(k)
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string()
+    };
+    let (alg, key_id) = (field("alg"), field("key_id"));
+    if alg != SEAL_ALG || key_id.is_empty() || field("mac").is_empty() {
+        return Binding::Broken {
+            reason: format!("malformed seal (alg '{alg}')"),
+        };
+    }
+    // a machine key the owner's authority authorises (an administrator may authorise a machine's existing key): its
+    // seals are owner facts under the authority's standing
+    if let Some(h) = v.held(&key_id) {
+        let k = BindingKey {
+            key: h.key.clone(),
+            id: h.key_id.clone(),
+        };
+        return match verify_with(&k, data, body) {
+            Binding::Verified { operation, at, .. } => {
+                let authority = match &v.keyring {
+                    Ok(Some(k)) => k.authority.authority_id.clone(),
+                    _ => crate::srr::binding::installed_authority_unverified(
+                        v.state_root.as_deref().unwrap_or(Path::new("")),
+                    )
+                    .and_then(|a| a["authority_id"].as_str().map(String::from))
+                    .unwrap_or_else(|| "t2-binding".into()),
+                };
+                owner_standing(
+                    v,
+                    &key_id,
+                    owner_key_name(&authority, &key_id),
+                    operation,
+                    at,
+                )
+            }
+            other => other,
+        };
+    }
+    match load_key() {
+        Ok(Some(local)) => match verify_with(&local, data, body) {
+            Binding::Verified { key_id, operation, at } if v.sealing(&now_iso()).is_some() => {
+                Binding::Unauthorised {
+                    key_id,
+                    reason: format!(
+                        "sealed at {at} by '{operation}' with this machine's own key; this machine is bound to the owner's T2 binding authority and honours only facts sealed under it (P2-ADJ-0002). Records this machine sealed while it was provisioned are re-sealed with `{RESEAL_COMMAND}`"
+                    ),
+                }
+            }
+            other => other,
+        },
+        // this machine never sealed anything in the machine scope, so a machine-scope seal is another machine's
+        Ok(None) => Binding::Foreign { key_id },
         Err(e) => Binding::KeyUnavailable {
             reason: format!("{}: {}", e.code, e.message),
         },
@@ -851,80 +857,6 @@ fn verify_with(key: &BindingKey, data: &Value, body: &str) -> Binding {
                 "the record was modified after the OS operation '{operation}' sealed it at {at}"
             ),
         }
-    }
-}
-
-/// Verify a portable (provisioned-scope) seal against the authorities this machine holds.
-fn verify_portable(m: &MachineAuthorities, data: &Value, body: &str) -> Binding {
-    let seal = &data[SEAL_FIELD];
-    let field = |k: &str| {
-        seal.get(k)
-            .and_then(|v| v.as_str())
-            .unwrap_or("")
-            .to_string()
-    };
-    let (authority, key_id, scope, machine, operation, at, mac) = (
-        field("authority"),
-        field("key_id"),
-        field("scope"),
-        field("machine"),
-        field("operation"),
-        field("at"),
-        field("mac"),
-    );
-    if authority.is_empty()
-        || mac.is_empty()
-        || key_id != authority
-        || scope != "provisioned"
-        || !authority.starts_with(AUTHORITY_ID_PREFIX)
-    {
-        return Binding::Broken {
-            reason: format!("malformed portable seal (authority '{authority}', key_id '{key_id}', scope '{scope}')"),
-        };
-    }
-    if let Some(u) = &m.unresolved {
-        return Binding::KeyUnavailable {
-            reason: format!("the protected machine state cannot be resolved ({u})"),
-        };
-    }
-    let Some(h) = m.find(&authority) else {
-        return Binding::Foreign { key_id: authority };
-    };
-    let Some(key) = &h.key else {
-        return Binding::KeyUnavailable {
-            reason: format!("T2 binding authority {authority} is installed on this machine but its key is unusable; re-provision it ({PROVISION_COMMAND})"),
-        };
-    };
-    let content = match canonical_content(data, body) {
-        Ok(c) => c,
-        Err(e) => {
-            return Binding::Broken {
-                reason: format!("canonical form: {}", e.message),
-            }
-        }
-    };
-    let want = hmac_sha256(
-        key,
-        &mac_message_portable(&authority, &machine, &operation, &at, &content),
-    );
-    let got = hex::decode(&mac).unwrap_or_default();
-    if !ct_eq(&want, &got) {
-        return Binding::Broken {
-            reason: format!(
-                "the record was modified after the OS operation '{operation}' sealed it at {at} (machine {machine}, authority {authority})"
-            ),
-        };
-    }
-    match &h.doc {
-        Ok(_) => Binding::Verified {
-            key_id: authority,
-            operation,
-            at,
-        },
-        Err(reason) => Binding::Unauthorised {
-            key_id: authority,
-            reason: reason.clone(),
-        },
     }
 }
 
@@ -1043,255 +975,102 @@ pub fn audit(p: &Project) -> Vec<Value> {
 
 // ------------------------------------------------------------------------------------------------ status
 
-/// `gov trust t2-binding`: which scope new seals take on this machine and why, the installed binding authorities
-/// and whether this machine's trusted root authorises each now, and what a bundle must contain.
+/// **The one T2 binding status** (`gov trust status` → `t2_binding`): whether this machine is bound to the owner's
+/// T2 binding authority and whether that authority verifies now, which scope new seals take and why, the key new
+/// seals use, and every key this machine holds with its standing. Read-only; never prints key material.
 pub fn binding_status() -> Value {
-    let m = machine_authorities();
+    let v = machine_view();
     let now = now_iso();
-    let sealing = m.sealing(&now);
-    let authorities: Vec<Value> = m
+    let sealing = v.sealing(&now);
+    let machine_key = binding_key_id();
+    let valid = v.valid(&now);
+    let (bound, authority, authority_error) = match (&valid, &v.keyring) {
+        (Ok(Some(k)), _) => {
+            let mut a = k.authority.to_value();
+            a["authorised_by_trusted_root"] = json!(true);
+            (true, a, Value::Null)
+        }
+        (Ok(None), _) => (false, Value::Null, Value::Null),
+        (Err(e), _) => {
+            let mut a = v
+                .state_root
+                .as_deref()
+                .and_then(crate::srr::binding::installed_authority_unverified)
+                .unwrap_or(Value::Null);
+            if a.is_object() {
+                a["authorised_by_trusted_root"] = json!(false);
+                a["unauthorised_reason"] = json!(e);
+            }
+            let (code, message) = e.split_once(": ").unwrap_or(("T2_BINDING_INVALID", e));
+            (false, a, json!({"code": code, "message": message}))
+        }
+    };
+    let standing_of = |id: &str| -> &'static str {
+        match &valid {
+            Ok(Some(k)) => k
+                .standing(id)
+                .map(|s| s.as_str())
+                .unwrap_or("NOT_AUTHORISED"),
+            _ => "NOT_AUTHORISED",
+        }
+    };
+    let mut held: Vec<Value> = v
         .held
         .iter()
-        .map(|h| {
-            let (authorised, reason, doc) = match &h.doc {
-                Ok(d) => (true, Value::Null, Some(d)),
-                Err(e) => (false, json!(e), None),
-            };
-            let expiry = doc.and_then(|d| crate::srr::metadata::expiry_fault(&d.expires, &now));
-            json!({
-                "authority_id": h.id,
-                "key_usable": h.key.is_some(),
-                "authorised_by_trusted_root": authorised,
-                "unauthorised_reason": reason,
-                "issued": doc.map(|d| d.issued.clone()),
-                "expires": doc.map(|d| d.expires.clone()),
-                "expired": expiry.is_some(),
-                "owner": doc.map(|d| d.owner.clone()),
-                "signed_by_key_ids": doc.map(|d| d.signed_by.clone()),
-                "authority_sha256": doc.map(|d| d.envelope_sha256.clone()),
-                "seals_new_records": sealing.map(|(s, _)| s.id == h.id).unwrap_or(false),
-            })
-        })
+        .map(|h| json!({"key_id": h.key_id, "standing": standing_of(&h.key_id), "kind": "binding key"}))
         .collect();
+    if let Some(m) = &machine_key {
+        if !v.held.iter().any(|h| &h.key_id == m) {
+            held.push(
+                json!({"key_id": m, "standing": standing_of(m), "kind": "this machine's own key"}),
+            );
+        }
+    }
+    let (sealing_key_id, sealing_json) = match sealing {
+        Some((k, a)) => (
+            json!(a.key_id),
+            json!({"scope": "provisioned", "authority_id": k.authority.authority_id, "key_id": a.key_id, "alg": SEAL_ALG_PORTABLE,
+                "honoured_on": "every machine bound to this authority that holds this key and whose trusted root authorises it (the owner's provisioned machines), after a Git clone or pull"}),
+        ),
+        None => (
+            json!(machine_key),
+            json!({"scope": "machine", "machine_key_id": machine_key, "alg": SEAL_ALG,
+                "honoured_on": "this machine only", "reason": v.why_machine_scope(&now)}),
+        ),
+    };
+    let active = match &valid {
+        Ok(Some(k)) => k.authority.active().map(|a| a.key_id.clone()),
+        _ => None,
+    };
     json!({
-        "state_root": m.state_root.as_ref().map(|p| p.display().to_string()),
-        "machine_id": m.machine_id,
-        "provisioned": m.provisioned,
-        "trusted_root_version": m.root_version,
+        "bound": bound,
+        "state_root": v.state_root.as_ref().map(|p| p.display().to_string()),
+        "machine_id": v.machine_id,
+        "provisioned": v.provisioned,
         "role": AUTHORITY_ROLE,
-        "root_delegates_role": m.role_delegated,
+        "root_delegates_role": match (&valid, &v.keyring) {
+            (Ok(Some(_)), _) => json!(true),
+            (Err(e), _) if e.starts_with("T2_BINDING_NOT_DELEGATED") => json!(false),
+            _ => json!(crate::srr::binding::root_delegates_role()),
+        },
+        "authority": authority,
+        "authority_error": authority_error,
         "portable": sealing.is_some(),
-        "sealing": match sealing {
-            Some((h, _)) => json!({"scope": "provisioned", "authority_id": h.id, "alg": SEAL_ALG_PORTABLE,
-                "honoured_on": "every machine that holds this authority and whose trusted root authorises it (the owner's provisioned machines), after a Git clone or pull"}),
-            None => json!({"scope": "machine", "machine_key_id": binding_key_id(), "alg": SEAL_ALG,
-                "honoured_on": "this machine only", "reason": m.why_machine_scope(&now)}),
-        },
-        "authorities": authorities,
-        "machine_key_id": binding_key_id(),
+        "sealing": sealing_json,
+        "sealing_key_id": sealing_key_id,
+        "sealing_key_is_authority_active_key": sealing.is_some() && active.is_some() && sealing_key_id == json!(active),
+        "machine_key_id": machine_key,
+        "held_keys": held,
         "provision_command": PROVISION_COMMAND,
-        "bundle_document": {
-            "_type": BUNDLE_TYPE,
-            "members": {"key_hex": "the 32-byte binding key, hex (secret: kept only in protected machine state, never in a repository)",
-                        "authority": format!("the owner-signed `{AUTHORITY_TYPE}` envelope, verbatim")},
-            "authority_binds": ["_type", "spec_version", "product", "authority_id", "key_commitment", "issued", "expires", "owner"],
-            "authority_id": "t2a- + the first 16 hex of SHA-256(\"t2-binding-authority-id:\" || key)",
-            "key_commitment": "SHA-256(\"t2-binding-key-commitment:\" || key), hex",
-            "signature": format!("ed25519 over the exact bytes of the `signed` member, by the trusted root's `{AUTHORITY_ROLE}` role at threshold"),
+        "reseal_command": RESEAL_COMMAND,
+        "meaning": if bound {
+            "T2 facts sealed under an ACTIVE or RETIRED key of this authority were written by an owner machine; any other seal is not honoured here (FOREIGN, or UNAUTHORISED for a key this machine holds but the authority does not authorise now, including this machine's own key)"
+        } else {
+            "no owner binding authority is honoured here: T2 facts this machine writes are sealed with its own key and are FOREIGN (not honoured) on every other machine"
         },
-        "cannot_provide_authority": ["repository content (a bundle file inside a repository is refused)", "environment variables", "CLI flags", "a key the owner did not authorise under this machine's root", "another owner's root"],
+        "cannot_provide_authority": ["repository content (an authority or key file inside a repository is refused)", "environment variables", "CLI flags", "a key the owner did not authorise under this machine's root", "another owner's root"],
         "premise": "ARCH-0003 §1/§8: the administrator boundary is uncompromised; the binding key is protected machine material installed from the administrator domain. A process with the operator's OS privileges can read it (detection-grade against that attacker; human answers stay owner-signed).",
     })
-}
-
-// ------------------------------------------------------------------------------------------------ provisioning
-
-/// ARCH-0003 §5 / OWNER-DIRECTIVE-0004: trust material comes from the administrator installation boundary, never from
-/// repository content (the rule `gov trust provision` applies to a Signed Release Root).
-fn refuse_repository_sourced(file: &Path, project_root: Option<&Path>) -> Result<()> {
-    let abs = file.canonicalize().unwrap_or_else(|_| file.to_path_buf());
-    let refuse = |why: String| {
-        GovError::new(
-            "T2_AUTHORITY_FROM_REPOSITORY_REFUSED",
-            format!("{} {why}. A T2 binding authority is protected machine material installed from the administrator domain, never repository content (ARCH-0003 §5/§8, OWNER-DIRECTIVE-0004); it carries a secret key that must never be committed.", abs.display()),
-        )
-        .with_details(json!({"bundle_file": abs.display().to_string()}))
-    };
-    if let Some(pr) = project_root {
-        let pabs = pr.canonicalize().unwrap_or_else(|_| pr.to_path_buf());
-        if crate::project::find_root(&pabs).is_some_and(|r| abs.starts_with(&r))
-            || abs.starts_with(&pabs)
-        {
-            return Err(refuse(format!(
-                "is inside the governed project at {}",
-                pabs.display()
-            )));
-        }
-    }
-    for part in abs.components() {
-        let s = part.as_os_str().to_string_lossy();
-        if s == ".git" || s == "governance" {
-            return Err(refuse("is repository-controlled content".into()));
-        }
-    }
-    Ok(())
-}
-
-/// Write `bytes` to `path` atomically (temporary file, fsync, rename), with `mode` on unix.
-fn write_private(path: &Path, bytes: &[u8], mode: u32) -> Result<()> {
-    let dir = path.parent().expect("a file path has a parent");
-    let tmp = dir.join(format!(
-        ".{}.{}.{}.tmp",
-        path.file_name()
-            .map(|f| f.to_string_lossy().to_string())
-            .unwrap_or_default(),
-        std::process::id(),
-        crate::util::short_uuid()
-    ));
-    {
-        use std::io::Write;
-        let mut f = std::fs::File::create(&tmp)
-            .map_err(|e| GovError::io(&format!("create {}", tmp.display()), e))?;
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let _ = std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(mode));
-        }
-        f.write_all(bytes)
-            .map_err(|e| GovError::io(&format!("write {}", tmp.display()), e))?;
-        f.sync_all()
-            .map_err(|e| GovError::io(&format!("fsync {}", tmp.display()), e))?;
-    }
-    let _ = mode;
-    std::fs::rename(&tmp, path)
-        .map_err(|e| GovError::io(&format!("install {}", path.display()), e))?;
-    crate::srr::state::fsync_dir(dir);
-    Ok(())
-}
-
-/// **Administrator action (P2-ADJ-0002)**: install the owner's T2 binding authority on this provisioned machine from
-/// a [`BUNDLE_TYPE`] bundle supplied from the administrator domain.
-///
-/// Refused below floor (a trust-policy mutation: `OWNER-DECISION-0006` §6 bullet 4), for a bundle that is repository
-/// content, on an unprovisioned machine (`T2_AUTHORITY_UNPROVISIONED`: provision first), and unless the owner's
-/// authorisation verifies against **this machine's** trusted root's `t2-binding` role at threshold, is unexpired,
-/// binds this product, and commits to exactly the supplied key. Installing the same bundle again changes nothing; a
-/// newly signed authorisation of the same key (e.g. after the owner rotated the role's keys) replaces the stored
-/// authorisation. The key is written with mode 0600 and is never printed.
-pub fn provision_authority(bundle: &Path, project_root: Option<&Path>) -> Result<Value> {
-    crate::srr::breakglass::guard_effect(
-        crate::srr::breakglass::Effect::TrustPolicyMutation,
-        "trust t2-binding provision",
-    )?;
-    refuse_repository_sourced(bundle, project_root)?;
-    let ms = crate::srr::state::MachineState::open()?;
-    let now = crate::srr::metadata::local_clock_now();
-    let root = crate::srr::verifier::trusted_root(&ms, &now)?.ok_or_else(|| {
-        GovError::new(
-            "T2_AUTHORITY_UNPROVISIONED",
-            "this machine holds no Signed Release Root, so no T2 binding authority can be authorised here (P2-ADJ-0002: only machines provisioned for the owner/project honour and write portable T2 facts). Remediation: provision the machine first (`gov trust provision --anchor <root.json>` from the administrator domain), with a root whose `t2-binding` role delegates the owner's key(s).",
-        )
-        .with_details(json!({"cause": "UNPROVISIONED", "provision_command": crate::human_channel::PROVISION_COMMAND}))
-    })?;
-    let bytes = std::fs::read(bundle)
-        .map_err(|e| GovError::io(&format!("read {}", bundle.display()), e))?;
-    #[derive(serde::Deserialize)]
-    struct Bundle<'a> {
-        #[serde(rename = "_type")]
-        typ: String,
-        key_hex: String,
-        #[serde(borrow)]
-        authority: &'a serde_json::value::RawValue,
-    }
-    let b: Bundle = serde_json::from_slice(&bytes).map_err(|e| {
-        GovError::new(
-            "T2_AUTHORITY_INVALID",
-            format!(
-                "{}: not a `{BUNDLE_TYPE}` bundle ({{_type, key_hex, authority}}): {e}",
-                bundle.display()
-            ),
-        )
-    })?;
-    if b.typ != BUNDLE_TYPE {
-        return Err(GovError::new(
-            "T2_AUTHORITY_INVALID",
-            format!(
-                "{}: expected _type '{BUNDLE_TYPE}', found '{}'",
-                bundle.display(),
-                b.typ
-            ),
-        ));
-    }
-    let key = hex::decode(b.key_hex.trim())
-        .ok()
-        .filter(|k| k.len() == 32)
-        .ok_or_else(|| {
-            GovError::new(
-                "T2_AUTHORITY_INVALID",
-                format!(
-                    "{}: key_hex must be 32 bytes, hex-encoded",
-                    bundle.display()
-                ),
-            )
-        })?;
-    let env_bytes = b.authority.get().as_bytes().to_vec();
-    let doc = authorise(
-        &root,
-        &env_bytes,
-        &key,
-        &bundle.display().to_string(),
-        Some(&now),
-    )?;
-    let id = authority_id_of(&key);
-    let dir = authorities_dir(&ms.root).join(&id);
-    let existing = std::fs::read(dir.join(AUTHORITY_FILE)).ok();
-    let action = match &existing {
-        Some(e) if *e == env_bytes => "unchanged",
-        Some(_) => "authorisation replaced (the same key, newly authorised)",
-        None => "installed",
-    };
-    std::fs::create_dir_all(&dir)
-        .map_err(|e| GovError::io(&format!("mkdir {}", dir.display()), e))?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        let _ = std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700));
-    }
-    let key_doc = json!({"authority_id": id, "key_hex": hex::encode(&key), "installed_at": now_iso(),
-        "purpose": "T2 binding authority key (P2-ADJ-0002): seals records portable across the owner's provisioned machines. Protected machine material: keep it out of every repository."});
-    let key_file = dir.join(AUTHORITY_KEY_FILE);
-    let key_ok = crate::util::read_json(&key_file)
-        .ok()
-        .and_then(|v| v["key_hex"].as_str().map(|h| h.trim().to_lowercase()))
-        == Some(hex::encode(&key));
-    if !key_ok {
-        write_private(
-            &key_file,
-            (serde_json::to_string_pretty(&key_doc)? + "\n").as_bytes(),
-            0o600,
-        )?;
-    }
-    if action != "unchanged" {
-        write_private(&dir.join(AUTHORITY_FILE), &env_bytes, 0o644)?;
-    }
-    if let Ok(mut g) = AUTHORITY_CACHE.lock() {
-        *g = None;
-    }
-    let status = binding_status();
-    Ok(json!({
-        "provisioned": true,
-        "action": action,
-        "authority_id": id,
-        "issued": doc.issued,
-        "expires": doc.expires,
-        "owner": doc.owner,
-        "signed_by_key_ids": doc.signed_by,
-        "trusted_root_version": root.version,
-        "role": AUTHORITY_ROLE,
-        "machine_id": ms.machine_id,
-        "sealing": status["sealing"],
-        "note": "Records sealed under this authority are honoured on every machine provisioned with it and authorised by its trusted root (P2-ADJ-0002). The key never leaves protected machine state; nothing was written to any repository.",
-    }))
 }
 
 // ------------------------------------------------------------------------------------------------ reseal
@@ -1305,11 +1084,10 @@ fn local_seal_at(data: &Value) -> Option<String> {
     s.get("at").and_then(|v| v.as_str()).map(String::from)
 }
 
-/// Re-seal, inside `v` (bottom-up), every object whose machine-scope seal verifies here and was made at or after
-/// `since` under the portable authority, keeping its recorded operation and time; an enclosing sealed object whose
-/// content changed is re-sealed in the scope it already had. Returns the number of seals rewritten.
-/// A seal's standing judged against exactly this machine's keys (the machine key and the held authorities).
-fn verify_in(m: &MachineAuthorities, local: &BindingKey, v: &Value, body: &str) -> Binding {
+/// A seal's standing judged against exactly this machine's keys: a portable seal against the owner's authority, a
+/// machine-scope seal against this machine's own key (whatever the machine's standing: reseal asks whether this
+/// machine made it).
+fn verify_in(m: &MachineView, local: &BindingKey, v: &Value, body: &str) -> Binding {
     if v[SEAL_FIELD].get("alg").and_then(|a| a.as_str()) == Some(SEAL_ALG_PORTABLE) {
         verify_portable(m, v, body)
     } else {
@@ -1317,13 +1095,18 @@ fn verify_in(m: &MachineAuthorities, local: &BindingKey, v: &Value, body: &str) 
     }
 }
 
-#[allow(clippy::too_many_arguments)]
+/// The owner's key new seals use: (authority id, key id, key).
+type OwnerKey<'a> = (&'a str, &'a str, &'a [u8]);
+
+/// Re-seal, inside `v` (bottom-up), every object whose machine-scope seal verifies under this machine's own key and
+/// was made at or after `since`, under the owner's active key, keeping its recorded operation and time; an enclosing
+/// sealed object whose content changed is re-sealed in the scope it already had. Returns the number of seals rewritten.
 fn reseal_tree(
     v: &mut Value,
     body: &str,
-    m: &MachineAuthorities,
+    m: &MachineView,
     local: &BindingKey,
-    authority: (&str, &[u8]),
+    owner: OwnerKey,
     machine: &str,
     since: &str,
 ) -> Result<usize> {
@@ -1331,7 +1114,7 @@ fn reseal_tree(
         if let Some(a) = v.as_array_mut() {
             let mut n = 0;
             for x in a.iter_mut() {
-                n += reseal_tree(x, "", m, local, authority, machine, since)?;
+                n += reseal_tree(x, "", m, local, owner, machine, since)?;
             }
             return Ok(n);
         }
@@ -1347,7 +1130,7 @@ fn reseal_tree(
     if let Some(o) = v.as_object_mut() {
         for (k, x) in o.iter_mut() {
             if k != SEAL_FIELD {
-                n += reseal_tree(x, "", m, local, authority, machine, since)?;
+                n += reseal_tree(x, "", m, local, owner, machine, since)?;
             }
         }
     }
@@ -1359,7 +1142,7 @@ fn reseal_tree(
     let at = str_of(&v[SEAL_FIELD], "at");
     let eligible = local_at.as_deref().is_some_and(|a| a >= since);
     if eligible {
-        seal_portable_at(authority.0, authority.1, machine, v, body, &op, &at)?;
+        seal_portable_at(owner.0, owner.1, owner.2, machine, v, body, &op, &at)?;
         return Ok(n + 1);
     }
     if n > 0 {
@@ -1367,8 +1150,9 @@ fn reseal_tree(
         if b.is_portable() {
             let original_machine = str_of(&v[SEAL_FIELD], "machine");
             seal_portable_at(
-                authority.0,
-                authority.1,
+                owner.0,
+                owner.1,
+                owner.2,
                 &original_machine,
                 v,
                 body,
@@ -1383,24 +1167,28 @@ fn reseal_tree(
     Ok(n)
 }
 
-/// `gov trust t2-binding --reseal [--dry-run]` — continuity for records sealed on this machine before it held the
-/// owner's binding authority (P2-ADJ-0002). Every tracked governed record or document under `spec/` and
-/// `governance/` (the kernel excluded) whose **machine-scope** seal verifies here and was made **while this machine
-/// was provisioned** is re-sealed under the portable authority, keeping the operation and time the OS recorded; a
-/// record sealed while the machine was unprovisioned, or one whose seal does not verify, is left as it is (the OS
-/// never blesses content it did not write, and an unprovisioned machine's records stay machine-scope).
+fn str_of(v: &Value, k: &str) -> String {
+    v.get(k).and_then(|x| x.as_str()).unwrap_or("").to_string()
+}
+
+/// `gov trust reseal [--dry-run]` — continuity for records sealed on this machine before it was bound to the owner's
+/// binding authority (P2-ADJ-0002). Every tracked governed record or document under `spec/` and `governance/` (the
+/// kernel excluded) whose **machine-scope** seal verifies under this machine's own key and was made **while this
+/// machine was provisioned** is re-sealed under the owner's active key, keeping the operation and time the OS
+/// recorded; a record sealed while the machine was unprovisioned, or one whose seal does not verify, is left as it is
+/// (the OS never blesses content it did not write, and an unprovisioned machine's records stay machine-scope).
 pub fn reseal(p: &Project, dry_run: bool) -> Result<Value> {
     if !dry_run {
-        crate::orchestration::control::guard_write(p, "trust t2-binding --reseal")?;
+        crate::orchestration::control::guard_write(p, "trust reseal")?;
         crate::authority::require(p, "reseal_t2_bindings")?;
     }
-    let m = machine_authorities();
+    let m = machine_view();
     let at = now_iso();
-    let Some((h, key)) = m.sealing(&at) else {
+    let Some((k, active)) = m.sealing(&at) else {
         return Err(GovError::new(
-            "T2_AUTHORITY_UNAVAILABLE",
+            "T2_BINDING_UNAVAILABLE",
             format!(
-                "no T2 binding authority may seal on this machine: {}",
+                "this machine does not seal under the owner's T2 binding authority: {}",
                 m.why_machine_scope(&at)
             ),
         )
@@ -1408,15 +1196,20 @@ pub fn reseal(p: &Project, dry_run: bool) -> Result<Value> {
     };
     let since = m.provisioned_at.clone().ok_or_else(|| {
         GovError::new(
-            "T2_AUTHORITY_UNAVAILABLE",
+            "T2_BINDING_UNAVAILABLE",
             "this machine's provisioning time is not recorded, so records sealed while it was unprovisioned cannot be told apart; nothing was resealed",
         )
     })?;
     let Some(local) = load_key()? else {
         return Ok(
-            json!({"resealed_files": [], "resealed_seals": 0, "note": "this machine holds no machine-scope key: nothing was sealed here before the authority"}),
+            json!({"resealed_files": [], "resealed_seals": 0, "note": "this machine holds no machine-scope key: nothing was sealed here before it was bound"}),
         );
     };
+    let owner: OwnerKey = (
+        k.authority.authority_id.as_str(),
+        active.key_id.as_str(),
+        active.key.as_slice(),
+    );
     let mut files: Vec<Value> = vec![];
     let mut total = 0usize;
     for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) {
@@ -1435,12 +1228,11 @@ pub fn reseal(p: &Project, dry_run: bool) -> Result<Value> {
         if !text.contains(SEAL_FIELD) {
             continue;
         }
-        let auth = (h.id.as_str(), key.as_slice());
         if rel.ends_with(".json") {
             let Ok(mut v) = serde_json::from_str::<Value>(&text) else {
                 continue;
             };
-            let n = reseal_tree(&mut v, "", &m, &local, auth, &m.machine_id, &since)?;
+            let n = reseal_tree(&mut v, "", &m, &local, owner, &m.machine_id, &since)?;
             if n > 0 {
                 if !dry_run {
                     crate::util::write_json(&abs, &v)?;
@@ -1454,7 +1246,7 @@ pub fn reseal(p: &Project, dry_run: bool) -> Result<Value> {
             .filter(|r| r.problems.is_empty() && !r.id().is_empty())
         {
             let body = record_body(&r).to_string();
-            let n = reseal_tree(&mut r.data, &body, &m, &local, auth, &m.machine_id, &since)?;
+            let n = reseal_tree(&mut r.data, &body, &m, &local, owner, &m.machine_id, &since)?;
             if n > 0 {
                 if !dry_run {
                     crate::records::save_record(&p.root, &r)?;
@@ -1470,7 +1262,7 @@ pub fn reseal(p: &Project, dry_run: bool) -> Result<Value> {
         let Ok(mut v) = serde_yaml::from_str::<Value>(&text) else {
             continue;
         };
-        let n = reseal_tree(&mut v, "", &m, &local, auth, &m.machine_id, &since)?;
+        let n = reseal_tree(&mut v, "", &m, &local, owner, &m.machine_id, &since)?;
         if n > 0 {
             if !dry_run {
                 crate::util::write_yaml(&abs, &v)?;
@@ -1481,18 +1273,20 @@ pub fn reseal(p: &Project, dry_run: bool) -> Result<Value> {
     }
     Ok(json!({
         "dry_run": dry_run,
-        "authority_id": h.id,
+        "authority_id": k.authority.authority_id,
+        "key_id": active.key_id,
         "machine_id": m.machine_id,
         "provisioned_at": since,
         "resealed_seals": total,
         "resealed_files": files,
-        "rule": "only machine-scope seals that verify on this machine and were made while it was provisioned are resealed, keeping the operation and time the OS recorded; records sealed while unprovisioned, and records whose seal does not verify, are left as they are",
+        "rule": "only machine-scope seals that verify under this machine's own key and were made while it was provisioned are resealed, keeping the operation and time the OS recorded; records sealed while unprovisioned, and records whose seal does not verify, are left as they are",
     }))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::srr::binding::{AuthorisedKey, Authority, KeyStatus};
 
     #[test]
     fn hmac_matches_rfc4231_test_cases() {
@@ -1573,39 +1367,67 @@ mod tests {
         let _ = std::fs::remove_dir_all(&root);
     }
 
-    fn held(id_key: &[u8], authorised: bool) -> HeldAuthority {
-        HeldAuthority {
-            id: authority_id_of(id_key),
-            key: Some(id_key.to_vec()),
-            doc: if authorised {
-                Ok(AuthorityDoc {
-                    issued: "2026-09-19T00:00:00Z".into(),
-                    expires: "2099-01-01T00:00:00Z".into(),
-                    owner: "test".into(),
-                    signed_by: vec![],
-                    envelope_sha256: String::new(),
+    /// An owner authority (as `srr::binding::keyring` hands it back after verifying it) authorising `keys`.
+    fn authority(id: &str, version: u64, expires: &str, keys: &[(&[u8], KeyStatus)]) -> Authority {
+        Authority {
+            authority_id: id.into(),
+            owner: "test".into(),
+            version,
+            expires: expires.into(),
+            keys: keys
+                .iter()
+                .map(|(k, st)| AuthorisedKey {
+                    key_id: crate::srr::binding::key_id_of(k),
+                    commitment: crate::srr::binding::commitment_of(k),
+                    status: *st,
                 })
-            } else {
-                Err("T2_AUTHORITY_UNAUTHORISED: revoked (test)".into())
-            },
+                .collect(),
+            machines: None,
+            sha256: String::new(),
+            signed_by: vec![],
         }
     }
 
-    /// P2-ADJ-0002: a portable seal verifies on any machine holding the same authorised binding authority, binds the
-    /// sealing machine, the operation, the time and the content, and is refused (typed) everywhere else.
+    fn held(k: &[u8], status: Option<KeyStatus>) -> HeldKey {
+        HeldKey {
+            key_id: crate::srr::binding::key_id_of(k),
+            status,
+            key: k.to_vec(),
+        }
+    }
+
+    /// A machine bound to `auth`, holding `keys`.
+    fn bound(auth: Authority, keys: &[&[u8]]) -> MachineView {
+        let held_keys: Vec<HeldKey> = keys
+            .iter()
+            .map(|k| held(k, auth.standing(&crate::srr::binding::key_id_of(k))))
+            .collect();
+        MachineView {
+            provisioned: true,
+            machine_id: "machine-B".into(),
+            keyring: Ok(Some(Keyring {
+                authority: auth,
+                keys: held_keys.clone(),
+            })),
+            held: held_keys,
+            ..Default::default()
+        }
+    }
+
+    const FAR: &str = "2099-01-01T00:00:00Z";
+
+    /// P2-ADJ-0002: a portable seal verifies on any machine bound to the owner's authority that holds the key and
+    /// whose authority authorises it now; it binds the authority, the key, the sealing machine, the operation, the time
+    /// and the content, and it is refused (typed) everywhere else.
     #[test]
-    fn a_portable_seal_is_honoured_where_the_authority_is_held_and_authorised_and_nowhere_else() {
-        let owner_key = [0x42u8; 32];
-        let aid = authority_id_of(&owner_key);
-        assert!(
-            aid.starts_with(AUTHORITY_ID_PREFIX) && aid.len() == AUTHORITY_ID_PREFIX.len() + 16
-        );
-        assert_eq!(key_commitment_of(&owner_key).len(), 64);
-        assert_ne!(authority_id_of(&[0x43u8; 32]), aid);
+    fn a_portable_seal_is_honoured_where_the_key_is_held_and_authorised_and_nowhere_else() {
+        let k1 = [0x42u8; 32];
+        let k1_id = crate::srr::binding::key_id_of(&k1);
         let mut data = json!({"id": "HDG-0001", "type": "human-gate", "gate_status": "ANSWERED", "question": "q?"});
         seal_portable_at(
-            &aid,
-            &owner_key,
+            "owner",
+            &k1_id,
+            &k1,
             "machine-A",
             &mut data,
             "",
@@ -1613,38 +1435,70 @@ mod tests {
             "2026-09-19T01:02:03Z",
         )
         .unwrap();
-        let machine_b = MachineAuthorities {
-            provisioned: true,
-            held: vec![held(&owner_key, true)],
-            ..Default::default()
-        };
+        let machine_b = bound(
+            authority("owner", 1, FAR, &[(&k1, KeyStatus::Active)]),
+            &[&k1],
+        );
         let b = verify_portable(&machine_b, &data, "");
         assert!(b.is_verified() && b.is_portable(), "{b:?}");
         assert_eq!(b.to_value()["scope"], "provisioned");
-        // a machine that was not given the authority (unprovisioned, unauthorised by the provisioning, another owner)
-        let other = MachineAuthorities {
-            provisioned: true,
-            held: vec![held(&[0x43u8; 32], true)],
-            ..Default::default()
-        };
-        assert!(matches!(
-            verify_portable(&other, &data, ""),
-            Binding::Foreign { .. }
+        assert_eq!(b.to_value()["key_id"], format!("owner/{k1_id}"));
+        // a machine that does not hold the key (unprovisioned, not bound, another owner)
+        let other = bound(
+            authority("other", 1, FAR, &[(&[0x43u8; 32], KeyStatus::Active)]),
+            &[&[0x43u8; 32]],
+        );
+        assert_eq!(verify_portable(&other, &data, "").code(), "FOREIGN");
+        assert_eq!(
+            verify_portable(&MachineView::default(), &data, "").code(),
+            "FOREIGN"
+        );
+        // rotation: k2 active, k1 retired — k1's seals stay honoured
+        let k2 = [0x44u8; 32];
+        let rotated = bound(
+            authority(
+                "owner",
+                2,
+                FAR,
+                &[(&k2, KeyStatus::Active), (&k1, KeyStatus::Retired)],
+            ),
+            &[&k1, &k2],
+        );
+        assert!(verify_portable(&rotated, &data, "").is_verified());
+        // revocation: a version that no longer lists k1
+        let revoked = bound(
+            authority("owner", 3, FAR, &[(&k2, KeyStatus::Active)]),
+            &[&k1, &k2],
+        );
+        let r = verify_portable(&revoked, &data, "");
+        assert_eq!(r.code(), "UNAUTHORISED", "{r:?}");
+        assert!(r.to_value()["reason"].as_str().unwrap().contains("revoked"));
+        // an authority that does not verify now (root succession dropped the delegation) or has expired
+        let mut dropped = bound(
+            authority("owner", 1, FAR, &[(&k1, KeyStatus::Active)]),
+            &[&k1],
+        );
+        dropped.keyring = Err((
+            "T2_BINDING_NOT_DELEGATED".into(),
+            "the root delegates no `t2-binding` role".into(),
         ));
-        assert!(matches!(
-            verify_portable(&MachineAuthorities::default(), &data, ""),
-            Binding::Foreign { .. }
-        ));
-        // the authority is held but no longer authorised by this machine's trusted root (revoked by succession)
-        let revoked = MachineAuthorities {
-            provisioned: true,
-            held: vec![held(&owner_key, false)],
-            ..Default::default()
-        };
-        let u = verify_portable(&revoked, &data, "");
+        let u = verify_portable(&dropped, &data, "");
         assert_eq!(u.code(), "UNAUTHORISED", "{u:?}");
-        assert!(!u.is_verified());
-        // any edit — a field, the sealing machine, the operation, the time, the authority name — breaks it
+        assert!(u.to_value()["reason"]
+            .as_str()
+            .unwrap()
+            .contains("t2-binding"));
+        let expired = bound(
+            authority(
+                "owner",
+                1,
+                "2020-01-01T00:00:00Z",
+                &[(&k1, KeyStatus::Active)],
+            ),
+            &[&k1],
+        );
+        assert_eq!(verify_portable(&expired, &data, "").code(), "UNAUTHORISED");
+        // any edit — a field, the sealing machine, the operation, the time, the authority, the key — breaks it
         for (path, val) in [
             ("gate_status", json!("PENDING")),
             ("question", json!("q2?")),
@@ -1657,77 +1511,84 @@ mod tests {
             ("machine", "machine-X"),
             ("operation", "gate create"),
             ("at", "2026-09-19T01:02:04Z"),
+            ("authority", "someone-else"),
         ] {
             let mut e = data.clone();
             e[SEAL_FIELD][k] = json!(val);
             assert_eq!(verify_portable(&machine_b, &e, "").code(), "BROKEN", "{k}");
         }
         let mut e = data.clone();
-        e[SEAL_FIELD]["key_id"] = json!("t2a-0000000000000000");
-        assert_eq!(verify_portable(&machine_b, &e, "").code(), "BROKEN");
-        let mut e = data.clone();
         e[SEAL_FIELD]["scope"] = json!("machine");
         assert_eq!(verify_portable(&machine_b, &e, "").code(), "BROKEN");
-        // a key the authority id is not derived from is never used (the key file is refused at load)
-        let mut forged_key = held(&owner_key, true);
-        forged_key.key = None;
-        let bad = MachineAuthorities {
-            provisioned: true,
-            held: vec![forged_key],
-            ..Default::default()
-        };
-        assert_eq!(verify_portable(&bad, &data, "").code(), "KEY_UNAVAILABLE");
+        let mut e = data.clone();
+        e[SEAL_FIELD]["key_id"] = json!(crate::srr::binding::key_id_of(&k2));
+        assert_ne!(verify_portable(&rotated, &e, "").code(), "VERIFIED");
     }
 
     #[test]
-    fn the_sealing_authority_is_authorised_unexpired_and_the_latest_issued() {
+    fn new_seals_are_portable_only_under_an_authority_that_verifies_now_with_its_active_key_held() {
         let now = "2026-09-19T12:00:00Z";
-        let mut a = held(&[1u8; 32], true);
-        let mut b = held(&[2u8; 32], true);
-        if let Ok(d) = &mut b.doc {
-            d.issued = "2026-09-19T06:00:00Z".into();
-        }
-        let m = MachineAuthorities {
-            provisioned: true,
-            role_delegated: true,
-            held: vec![a.clone(), b.clone()],
-            ..Default::default()
-        };
-        assert_eq!(m.sealing(now).unwrap().0.id, b.id);
-        if let Ok(d) = &mut b.doc {
-            d.expires = "2026-09-19T11:00:00Z".into();
-        }
-        let m = MachineAuthorities {
-            provisioned: true,
-            role_delegated: true,
-            held: vec![a.clone(), b.clone()],
-            ..Default::default()
-        };
-        assert_eq!(m.sealing(now).unwrap().0.id, a.id);
-        a.doc = Err("revoked".into());
-        let m = MachineAuthorities {
-            provisioned: true,
-            role_delegated: true,
-            held: vec![a, b],
-            ..Default::default()
-        };
-        assert!(m.sealing(now).is_none());
-        assert!(
-            m.why_machine_scope(now).contains("expired"),
-            "{}",
-            m.why_machine_scope(now)
+        let k1 = [1u8; 32];
+        let k2 = [2u8; 32];
+        let a = bound(
+            authority("owner", 1, FAR, &[(&k1, KeyStatus::Active)]),
+            &[&k1],
         );
-        let unprov = MachineAuthorities::default();
+        assert_eq!(
+            a.sealing(now).unwrap().1.key_id,
+            crate::srr::binding::key_id_of(&k1)
+        );
+        // the active key is not held here (only a retired one was installed): machine scope, and why
+        let b = bound(
+            authority(
+                "owner",
+                2,
+                FAR,
+                &[(&k2, KeyStatus::Active), (&k1, KeyStatus::Retired)],
+            ),
+            &[&k1],
+        );
+        assert!(b.sealing(now).is_none());
+        assert!(b.why_machine_scope(now).contains("active key"));
+        // expired
+        let c = bound(
+            authority(
+                "owner",
+                1,
+                "2026-09-19T11:00:00Z",
+                &[(&k1, KeyStatus::Active)],
+            ),
+            &[&k1],
+        );
+        assert!(c.sealing(now).is_none());
+        assert!(
+            c.why_machine_scope(now).contains("EXPIRED"),
+            "{}",
+            c.why_machine_scope(now)
+        );
+        let unprov = MachineView::default();
         assert!(unprov.why_machine_scope(now).contains("unprovisioned"));
+        let unbound = MachineView {
+            provisioned: true,
+            ..Default::default()
+        };
+        assert!(unbound
+            .why_machine_scope(now)
+            .contains("no T2 binding authority is installed"));
     }
 
-    /// Reseal moves only seals this machine made while provisioned, keeps their operation and time, and keeps an
-    /// enclosing seal valid when content inside it changed.
+    /// Reseal moves only seals this machine made with its own key while provisioned, keeps their operation and time,
+    /// and keeps an enclosing seal valid when content inside it changed.
     #[test]
     fn reseal_moves_only_post_provisioning_local_seals_and_keeps_enclosing_seals_valid() {
         let local = test_key(5);
         let akey = [0x77u8; 32];
-        let aid = authority_id_of(&akey);
+        let akey_id = crate::srr::binding::key_id_of(&akey);
+        let m = bound(
+            authority("owner", 1, FAR, &[(&akey, KeyStatus::Active)]),
+            &[&akey],
+        );
+        let owner: OwnerKey = ("owner", akey_id.as_str(), &akey);
         let mut early = json!({"id": "D-0001", "v": 1});
         seal_local_at(
             &local,
@@ -1755,17 +1616,12 @@ mod tests {
             "2026-09-19T00:00:01Z",
         )
         .unwrap();
-        let m = MachineAuthorities {
-            provisioned: true,
-            held: vec![held(&akey, true)],
-            ..Default::default()
-        };
         let n = reseal_tree(
             &mut doc,
             "",
             &m,
             &local,
-            (&aid, &akey),
+            owner,
             "m1",
             "2026-09-10T00:00:00Z",
         )
@@ -1777,7 +1633,7 @@ mod tests {
         assert_eq!(inner[SEAL_FIELD]["operation"], "plugins register");
         assert_eq!(inner[SEAL_FIELD]["at"], "2026-09-19T00:00:00Z");
         assert!(verify_portable(&m, &doc, "").is_portable());
-        // sealed before provisioning: left machine-scope, still verifying locally
+        // sealed before provisioning: left machine-scope, still verifying under the machine's own key
         assert_eq!(doc["early"][SEAL_FIELD]["alg"], SEAL_ALG);
         assert!(verify_with(&local, &doc["early"], "").is_verified());
         // an edited (unverified) object is never blessed
@@ -1797,7 +1653,7 @@ mod tests {
                 "",
                 &m,
                 &local,
-                (&aid, &akey),
+                owner,
                 "m1",
                 "2026-09-10T00:00:00Z"
             )
