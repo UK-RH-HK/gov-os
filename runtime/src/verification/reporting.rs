@@ -651,6 +651,24 @@ mod tests {
     }
 
     #[test]
+    fn a_coverage_gap_is_confirmed_unless_the_line_is_held_with_its_heading_markers() {
+        let db = RuntimeDb::open_memory().unwrap();
+        db.init_schema().unwrap();
+        db.exec(
+            "INSERT INTO chunks(chunk_id, artifact_id, text) VALUES ('a#1', 'file:a.md', ?1)",
+            &[&"a.md\n# no input change\n# second heading"],
+        )
+        .unwrap();
+        let held = json!({"artifact_id": "file:a.md", "count": 1, "lines": [{"line": 1, "text": "no input change"}]});
+        assert!(gap_is_heading_marker_artefact(&db, &held));
+        let missing = json!({"artifact_id": "file:a.md", "count": 1, "lines": [{"line": 3, "text": "a line no chunk holds"}]});
+        assert!(!gap_is_heading_marker_artefact(&db, &missing));
+        // a row that lists fewer lines than it counts cannot be confirmed as an artefact
+        let partial = json!({"artifact_id": "file:a.md", "count": 7, "lines": [{"line": 1, "text": "no input change"}]});
+        assert!(!gap_is_heading_marker_artefact(&db, &partial));
+    }
+
+    #[test]
     fn a_completed_change_transaction_is_not_a_stale_link_to_what_it_changed() {
         let s = store(&[
             ("id: REQ-0001\ntype: requirement\nstatus: SUPERSEDED\nsuperseded_by: REQ-0002\n", "spec/requirements/REQ-0001.yaml"),
