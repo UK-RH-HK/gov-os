@@ -7,6 +7,12 @@
 //! claim?") and the insert can never interleave with another claimant's. A concurrent claimant waits on the lock
 //! (busy timeout) and then sees the committed winner, receiving `TASK_CLAIMED`.
 //!
+//! **Layout.** The `claims` table keeps its original five columns (task, session, role, claimed_at, expires_at), so
+//! tools and fault-injection harnesses that write it positionally keep working. What a claim adds — its unit of
+//! isolation and its mutation scope — lives in `claim_isolation`, bound to the exact claim instance
+//! (task, session, claimed_at): a row written into `claims` by anything else carries no isolation record and is read
+//! as an unknown worktree with an unrestricted scope (the conservative reading).
+//!
 //! **One store per repository, not per checkout.** Linked git worktrees of one repository share the claims store
 //! of the main worktree (see [`ClaimsStore::path_for`]), so a claim made from one worktree is visible — and
 //! collides — in every other; the claim records which worktree it was made from (its unit of isolation).
@@ -64,8 +70,8 @@ pub struct ClaimsStore {
     pub path: PathBuf,
 }
 
-const COLUMNS: &str =
-    "task_id, session_id, role, claimed_at, expires_at, worktree, git_dir, branch, head, scope";
+/// The claim with its isolation record (joined on the exact claim instance).
+const SELECT_CLAIMS: &str = "SELECT c.task_id, c.session_id, c.role, c.claimed_at, c.expires_at, i.worktree, i.git_dir, i.branch, i.head, i.scope FROM claims c LEFT JOIN claim_isolation i ON i.task_id = c.task_id AND i.session_id IS c.session_id AND i.claimed_at IS c.claimed_at";
 
 fn row_to_value(r: &rusqlite::Row) -> rusqlite::Result<Value> {
     let opt = |i: usize| -> rusqlite::Result<Option<String>> { r.get::<_, Option<String>>(i) };
@@ -127,24 +133,19 @@ impl ClaimsStore {
                 Err(_) => std::thread::sleep(Duration::from_millis(50)),
             }
         }
-        let columns = |c: &Connection| -> Result<Vec<String>> {
-            let mut st = c.prepare("PRAGMA table_info(claims)")?;
-            let rows = st.query_map([], |r| r.get::<_, String>(1))?;
-            Ok(rows.filter_map(|x| x.ok()).collect())
+        let exists = |c: &Connection, t: &str| -> Result<bool> {
+            Ok(c.query_row(
+                "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?1",
+                params![t],
+                |r| r.get::<_, i64>(0),
+            )? > 0)
         };
-        const EXTRA: [&str; 5] = ["worktree", "git_dir", "branch", "head", "scope"];
-        let have = columns(&conn)?;
-        if have.is_empty() || EXTRA.iter().any(|c| !have.iter().any(|h| h == c)) {
-            // create / migrate under the write lock so concurrent first opens cannot both add a column
+        if !exists(&conn, "claims")? || !exists(&conn, "claim_isolation")? {
+            // create under the write lock so concurrent first opens serialise
             let tx = Transaction::new_unchecked(&conn, TransactionBehavior::Immediate)
                 .map_err(|e| busy(e, "initialising the schema"))?;
-            tx.execute_batch("CREATE TABLE IF NOT EXISTS claims (task_id TEXT PRIMARY KEY, session_id TEXT, role TEXT, claimed_at TEXT, expires_at TEXT);")?;
-            let have = columns(&tx)?;
-            for col in EXTRA {
-                if !have.iter().any(|h| h == col) {
-                    tx.execute_batch(&format!("ALTER TABLE claims ADD COLUMN {col} TEXT;"))?;
-                }
-            }
+            tx.execute_batch("CREATE TABLE IF NOT EXISTS claims (task_id TEXT PRIMARY KEY, session_id TEXT, role TEXT, claimed_at TEXT, expires_at TEXT);
+                CREATE TABLE IF NOT EXISTS claim_isolation (task_id TEXT PRIMARY KEY, session_id TEXT, claimed_at TEXT, worktree TEXT, git_dir TEXT, branch TEXT, head TEXT, scope TEXT);")?;
             tx.commit()?;
         }
         Ok(ClaimsStore {
@@ -159,7 +160,7 @@ impl ClaimsStore {
             .unwrap_or(false)
     }
     fn all_rows(conn: &Connection) -> Result<Vec<Value>> {
-        let mut stmt = conn.prepare(&format!("SELECT {COLUMNS} FROM claims ORDER BY task_id"))?;
+        let mut stmt = conn.prepare(&format!("{SELECT_CLAIMS} ORDER BY c.task_id"))?;
         let rows = stmt.query_map([], row_to_value)?;
         let mut out = vec![];
         for r in rows {
@@ -282,15 +283,15 @@ impl ClaimsStore {
         let expires_at = to_iso(now + lease);
         let scope_text = serde_json::to_string(req.scope)?;
         tx.execute(
-            &format!(
-                "INSERT OR REPLACE INTO claims({COLUMNS}) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)"
-            ),
+            "INSERT OR REPLACE INTO claims(task_id, session_id, role, claimed_at, expires_at) VALUES (?1,?2,?3,?4,?5)",
+            params![req.task_id, req.session, req.role, claimed_at, expires_at],
+        )?;
+        tx.execute(
+            "INSERT OR REPLACE INTO claim_isolation(task_id, session_id, claimed_at, worktree, git_dir, branch, head, scope) VALUES (?1,?2,?3,?4,?5,?6,?7,?8)",
             params![
                 req.task_id,
                 req.session,
-                req.role,
                 claimed_at,
-                expires_at,
                 req.isolation.worktree,
                 req.isolation.git_dir,
                 req.isolation.branch,
@@ -309,7 +310,7 @@ impl ClaimsStore {
         Ok(self
             .conn
             .query_row(
-                &format!("SELECT {COLUMNS} FROM claims WHERE task_id=?1"),
+                &format!("{SELECT_CLAIMS} WHERE c.task_id=?1"),
                 params![task_id],
                 row_to_value,
             )
@@ -328,7 +329,7 @@ impl ClaimsStore {
             .map_err(|e| busy(e, &format!("releasing {task_id}")))?;
         let existing = tx
             .query_row(
-                &format!("SELECT {COLUMNS} FROM claims WHERE task_id=?1"),
+                &format!("{SELECT_CLAIMS} WHERE c.task_id=?1"),
                 params![task_id],
                 row_to_value,
             )
@@ -343,6 +344,10 @@ impl ClaimsStore {
         tx.execute(
             "DELETE FROM claims WHERE task_id=?1 AND session_id IS ?2 AND claimed_at IS ?3",
             params![task_id, holder, existing["claimed_at"].as_str()],
+        )?;
+        tx.execute(
+            "DELETE FROM claim_isolation WHERE task_id=?1",
+            params![task_id],
         )?;
         tx.commit()?;
         Ok(Some(existing))
@@ -378,10 +383,17 @@ impl ClaimsStore {
             .collect();
         let mut n = 0;
         for c in &expired {
-            n += tx.execute(
+            let d = tx.execute(
                 "DELETE FROM claims WHERE task_id=?1 AND expires_at IS ?2",
                 params![c["task_id"].as_str(), c["expires_at"].as_str()],
             )?;
+            if d > 0 {
+                tx.execute(
+                    "DELETE FROM claim_isolation WHERE task_id=?1",
+                    params![c["task_id"].as_str()],
+                )?;
+            }
+            n += d;
         }
         tx.commit()?;
         Ok(n)
@@ -726,8 +738,9 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    /// A database written by the previous schema (five columns) is migrated in place; old rows read as an
-    /// unrestricted scope with an unknown worktree.
+    /// A database written by the previous schema gains the isolation table; old rows (and rows any other writer
+    /// inserts positionally into the unchanged five-column `claims` table) read as an unrestricted scope with an
+    /// unknown worktree.
     #[test]
     fn legacy_store_is_migrated() {
         let dir = tmp("legacy");
@@ -751,6 +764,20 @@ mod tests {
                 .code,
             "CLAIM_SCOPE_CONFLICT"
         );
+        // the five-column layout still accepts positional writers; an isolation record never leaks onto a claim
+        // instance it was not written for
+        s.conn
+            .execute("DELETE FROM claims WHERE task_id='T0'", [])
+            .unwrap();
+        s.claim_exclusive(&req("T2", "S-a", &w, &sc)).unwrap();
+        assert_eq!(s.get("T2").unwrap().unwrap()["worktree"], "/w");
+        s.conn
+            .execute("INSERT OR REPLACE INTO claims VALUES ('T2','S-ghost','r','2026-01-01T00:00:00Z','2999-01-01T00:00:00Z')", [])
+            .unwrap();
+        let ghost = s.get("T2").unwrap().unwrap();
+        assert_eq!(ghost["session_id"], "S-ghost");
+        assert_eq!(ghost["worktree"], Value::Null);
+        assert_eq!(ghost["scope"], Value::Null);
         let _ = std::fs::remove_dir_all(&dir);
     }
 

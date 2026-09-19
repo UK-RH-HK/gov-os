@@ -839,10 +839,44 @@ pub fn close(
     if t.get("task_status") == "DONE" {
         return Err(GovError::new("USAGE", format!("{id} already DONE")));
     }
+    // another session's live claim is refused first (as before); the rest of the claim binding follows the
+    // evidence checks so a malformed report keeps its own refusal
+    let live_holder = claims::holder(p, id)?;
+    if let Some(h) = &live_holder {
+        if h["session_id"].as_str() != Some(p.session_id.as_str()) && !force {
+            return Err(GovError::new(
+                "TASK_CLAIMED",
+                format!("{id} is claimed by another session; --force requires L3+"),
+            ));
+        }
+    }
+    let tests_status = report
+        .get("tests")
+        .and_then(|x| x.get("status"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    let allowed = pol.get_list("TEST_POLICY", "task_close_requires_tests_status");
+    if !allowed.contains(&tests_status) {
+        return Err(GovError::new(
+            "EVIDENCE_REQUIRED",
+            format!("report.tests.status must be one of {allowed:?} (got '{tests_status}')"),
+        ));
+    }
+    if report
+        .get("work_completed")
+        .and_then(|v| v.as_str())
+        .map(|s| s.is_empty())
+        .unwrap_or(true)
+    {
+        return Err(GovError::new(
+            "EVIDENCE_REQUIRED",
+            "report.work_completed is required",
+        ));
+    }
     // --- the claim (BC-P2-15): work is closed by the session that holds it, from the working tree it was claimed in
     let wt = claims::worktree_id(p);
     let claim = claims::get(p, id)?;
-    let live_holder = claims::holder(p, id)?;
     let mut overrides: Vec<Value> = vec![];
     match &claim {
         Some(c) if c["session_id"].as_str() == Some(p.session_id.as_str()) => {
@@ -876,30 +910,6 @@ pub fn close(
             return Err(e);
         }
         overrides.push(json!({"override": "designated_role", "designated_role": t.get("role"), "acting_role": p.role}));
-    }
-    let tests_status = report
-        .get("tests")
-        .and_then(|x| x.get("status"))
-        .and_then(|v| v.as_str())
-        .unwrap_or("")
-        .to_string();
-    let allowed = pol.get_list("TEST_POLICY", "task_close_requires_tests_status");
-    if !allowed.contains(&tests_status) {
-        return Err(GovError::new(
-            "EVIDENCE_REQUIRED",
-            format!("report.tests.status must be one of {allowed:?} (got '{tests_status}')"),
-        ));
-    }
-    if report
-        .get("work_completed")
-        .and_then(|v| v.as_str())
-        .map(|s| s.is_empty())
-        .unwrap_or(true)
-    {
-        return Err(GovError::new(
-            "EVIDENCE_REQUIRED",
-            "report.work_completed is required",
-        ));
     }
     let files_changed: Vec<String> = report
         .get("files_changed")
