@@ -351,3 +351,6 @@ absolute scratch paths of this run.
   branch or worktree was touched.
 - Shell commands deleting scratch or evidence files (`rm`, `rm -rf`) were denied by the permission system; they were not
   retried — fresh directories were used, and two superseded evidence files were replaced by one-line notes.
+- The certification suite's `arch.rs` cross-implementation check (`python3` importing
+  `capabilities/python/govos_capabilities`) leaves a git-ignored `__pycache__/` in the worktree; it is not committed and
+  is not product code (pre-existing behaviour of that test).
