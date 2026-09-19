@@ -195,10 +195,23 @@ pub fn continue_work<'a>(
     // dispatch (W4 line 1112): a packet whose mandatory inputs are not all satisfied is never dispatched; the next
     // candidate is tried and the refused one is reported
     let mut chosen: Option<(String, Value)> = None;
+    let mut producer_note: Option<Value> = None;
     for next in &candidates {
         match crate::context::compile(p, handle(), next) {
             Ok(pk) => match crate::context::ensure_dispatchable(&pk) {
                 Ok(()) => {
+                    chosen = Some((next.clone(), pk));
+                    break;
+                }
+                // a task producing its feature's specification is not blocked by what the feature still lacks
+                // (the same rule the DAG and close apply: orchestration::dag::packet_blocked_only_by_inherited)
+                Err(_)
+                    if store
+                        .get(next)
+                        .is_some_and(|t| dag::packet_blocked_only_by_inherited(t, &pk)) =>
+                {
+                    producer_note = Some(json!({"kind": "inherited_inputs_absent", "missing_inputs": pk["input_manifest"]["missing_inputs"], "input_violations": pk["input_manifest"]["input_violations"],
+                        "effect": "the packet lacks inputs the task's feature declares but does not have yet; this task produces the feature's specification, so it is dispatched"}));
                     chosen = Some((next.clone(), pk));
                     break;
                 }
@@ -213,7 +226,7 @@ pub fn continue_work<'a>(
         );
     };
     // governed degradations of the dispatch, reported rather than silent
-    let mut degraded: Vec<Value> = vec![];
+    let mut degraded: Vec<Value> = producer_note.into_iter().collect();
     if let Some(e) = &db_unavailable {
         degraded.push(json!({"kind": "index_unavailable", "code": e.code, "message": e.message, "effect": "the supplementary (retrieved) block of the packet is empty; the mandatory inputs are delivered in full"}));
     }

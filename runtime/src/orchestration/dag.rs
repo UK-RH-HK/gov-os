@@ -15,7 +15,9 @@
 //! 1. **ordering** — every `dependencies` entry is DONE and every task whose `blocks` names it is DONE;
 //! 2. **required data / tools / skills** resolve ([`InputResolver`]);
 //! 3. **mandatory inputs** — the task-input manifest (`context::manifest`, Contract v3 W3) is satisfied: an absent,
-//!    superseded, conflicting, non-current or constraint-violating mandatory input blocks;
+//!    superseded, conflicting, non-current or constraint-violating mandatory input blocks. A task that produces its
+//!    feature's specification ([`produces_feature_specification`]) is not blocked by inputs it only inherits from the
+//!    feature — those are what it is writing;
 //! 4. **Human Decision Gates** — every gate governing the task authorises the work
 //!    (`gates::task_gate_authorisation_in`, the single gate decision): the gate the task record names in
 //!    `human_gate`, and the latest OS-written (T2-verified) gate whose `blocks_tasks` names the task, so removing the
@@ -332,6 +334,50 @@ pub fn explicit_hold(t: &Record) -> Option<String> {
 /// Task classes whose work is implementation for the independence rules (the implementer side of BC-P2-34).
 pub const IMPLEMENTATION_CLASSES: &[&str] =
     &["implementation", "integration", "refactor", "repair"];
+
+/// Task classes that produce a feature's specification (the readiness planner's gap classes and discovery): they do
+/// not consume the inputs a feature still lacks.
+pub const SPECIFICATION_PRODUCING_CLASSES: &[&str] = &[
+    "discovery",
+    "research",
+    "specification",
+    "decision-preparation",
+    "data",
+    "architecture",
+    "test-design",
+    "security",
+    "performance",
+];
+
+/// Does `t` produce its feature's specification (a readiness gap task, or a specification-producing class)? For such a
+/// task the inputs it only inherits from its feature are not mandatory inputs (see [`evaluate`], step 3); what it
+/// declares itself still binds.
+pub fn produces_feature_specification(t: &Record) -> bool {
+    !t.get("readiness_cell").is_empty()
+        || SPECIFICATION_PRODUCING_CLASSES.contains(&t.get("class").as_str())
+}
+
+/// Is `packet` (a compiled context packet of task `t`) BLOCKED **only** by inputs `t` inherits from its feature, while
+/// `t` produces that feature's specification ([`produces_feature_specification`])? Then the packet is dispatchable
+/// and completable for `t` (the same rule as [`evaluate`] step 3); anything the task declares itself still blocks.
+pub fn packet_blocked_only_by_inherited(t: &Record, packet: &Value) -> bool {
+    if packet["delivery_state"] == "COMPLETE" || !produces_feature_specification(t) {
+        return false;
+    }
+    let im = &packet["input_manifest"];
+    let blocking: Vec<&Value> = ["missing_inputs", "input_violations"]
+        .iter()
+        .flat_map(|k| im[*k].as_array().into_iter().flatten())
+        .collect();
+    !blocking.is_empty()
+        && blocking.iter().all(|e| {
+            e["declared_in"].as_array().map_or(false, |a| {
+                !a.is_empty()
+                    && a.iter()
+                        .all(|s| s.as_str().is_some_and(|s| s.starts_with("feature ")))
+            })
+        })
+}
 
 /// One gate's authorisation, cached per computation.
 #[derive(Clone)]
@@ -672,12 +718,41 @@ pub fn evaluate(ctx: &DagCtx, t: &Record, as_status: Option<&str>) -> TaskEval {
     }
     // 2. required data / tools / skills
     reasons.extend(ctx.inputs.gaps(t));
-    // 3. mandatory task-input manifest (W3)
+    // 3. mandatory task-input manifest (W3). A task that produces its feature's specification does not consume the
+    //    parts of it the feature still lacks: inputs it only inherits from the feature bind consumers of that
+    //    specification (implementation work), not the work that writes it — otherwise readiness planning would
+    //    generate work that can never start
     let m = crate::context::manifest::resolve(ctx.p, ctx.store, t);
-    if let Some(r) = m.blocking_reason() {
-        reasons.push(r);
+    let producer = produces_feature_specification(t);
+    let unsatisfied: Vec<&crate::context::manifest::Entry> = m
+        .entries
+        .iter()
+        .filter(|e| e.required && !e.satisfied())
+        .filter(|e| !(producer && e.sources.iter().all(|s| s.starts_with("feature "))))
+        .collect();
+    if !unsatisfied.is_empty() {
+        let items: Vec<String> = unsatisfied
+            .iter()
+            .map(|e| {
+                let codes: Vec<&str> = if e.delivered() {
+                    e.problems
+                        .iter()
+                        .filter(|p| p.blocking)
+                        .map(|p| p.code)
+                        .collect()
+                } else {
+                    vec![e.resolution]
+                };
+                format!("{} ({}: {})", e.id, e.slot.name(), codes.join(","))
+            })
+            .collect();
+        reasons.push(format!(
+            "mandatory inputs unsatisfied: {}",
+            items.join("; ")
+        ));
         ev.manifest = Some(
-            json!({"delivery_state": m.delivery_state(), "missing_inputs": m.missing(), "input_violations": m.violations()}),
+            json!({"delivery_state": m.delivery_state(), "missing_inputs": m.missing(), "input_violations": m.violations(),
+                   "blocking": unsatisfied.iter().map(|e| e.id.clone()).collect::<Vec<_>>()}),
         );
     }
     // 4. Human Decision Gates (BC-P2-12)
@@ -956,4 +1031,65 @@ pub fn replan(p: &Project) -> Result<Value> {
     Ok(
         json!({"changed": changed, "runnable": view.runnable, "blocked": view.blocked.len(), "waiting_human": view.waiting_human.len(), "cycles": view.cycles}),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::records::new_record;
+
+    fn task(status: &str, source: Value) -> Record {
+        let mut f = json!({"class": "documentation", "task_status": status, "objective": "o"});
+        if !source.is_null() {
+            f["status_source"] = source;
+        }
+        new_record("task", "TASK-0001", "t", f)
+    }
+
+    /// Only a BLOCKED / WAITING_HUMAN set by `gov task status` — and still the stored status — is an explicit hold;
+    /// derived statuses (replan, create, the planner, gate transitions) are recomputed from the DAG.
+    #[test]
+    fn explicit_hold_is_only_a_status_set_by_task_status_and_still_in_force() {
+        let by_status =
+            |s: &str| json!({"operation": "task status", "status": s, "session": "S", "role": "r"});
+        assert!(explicit_hold(&task("BLOCKED", by_status("BLOCKED"))).is_some());
+        assert!(explicit_hold(&task("WAITING_HUMAN", by_status("WAITING_HUMAN"))).is_some());
+        // derived by replan or create: recomputed
+        assert!(explicit_hold(&task(
+            "BLOCKED",
+            json!({"operation": "replan", "status": "BLOCKED"})
+        ))
+        .is_none());
+        assert!(explicit_hold(&task("BLOCKED", Value::Null)).is_none());
+        // the status moved on since the hold (e.g. a gate transition rewrote it): no longer a hold
+        assert!(explicit_hold(&task("BLOCKED", by_status("READY"))).is_none());
+        // READY / DRAFT set by `task status` are not holds
+        assert!(explicit_hold(&task("READY", by_status("READY"))).is_none());
+        assert!(explicit_hold(&task("DRAFT", by_status("DRAFT"))).is_none());
+    }
+
+    #[test]
+    fn task_state_names_are_stable() {
+        for (s, n) in [
+            (TaskState::Done, "DONE"),
+            (TaskState::Runnable, "RUNNABLE"),
+            (TaskState::WaitingHuman, "WAITING_HUMAN"),
+            (TaskState::Blocked, "BLOCKED"),
+        ] {
+            assert_eq!(s.as_str(), n);
+        }
+        let ev = TaskEval {
+            task: "TASK-0001".into(),
+            state: TaskState::Blocked,
+            reasons: vec!["dependency TASK-0002 is READY".into()],
+            gates: vec![],
+            pending_gates: vec![],
+            manifest: None,
+            missing_dependencies: vec![],
+        };
+        let e = ev.refusal("claimed");
+        assert_eq!(e.code, "TASK_NOT_RUNNABLE");
+        assert!(e.message.contains("TASK-0002"));
+        assert_eq!(e.details["state"], "BLOCKED");
+    }
 }

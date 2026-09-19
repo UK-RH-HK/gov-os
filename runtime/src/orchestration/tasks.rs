@@ -1733,7 +1733,7 @@ pub fn close(
         degraded.push(json!(format!("index stale ({stale_count})")));
     }
     // --- 12. the consumption receipt (BC-P2-20, W5): validated against the manifest and the packet it names
-    report = crate::context::receipt::require_valid(p, &store, id, &report)?;
+    report = require_receipt(p, &store, t, &report)?;
     // --- 13. the health close gate (G0 hard-block, G2 re-check, O4 currency, O1 product tests from evidence)
     // what this task touched: what it declares and what it was observed to change — not the paths an in-window CIT
     // changed, which are that CIT's governed mutations (its own G4 tier covers them)
@@ -1825,6 +1825,85 @@ pub fn close(
     )
 }
 
+/// **The consumption receipt at close** (BC-P2-20 close side): `context::receipt::validate` against the task's
+/// manifest and the packet the receipt names, refused as `RECEIPT_INVALID` with every error — exactly
+/// `receipt::require_valid`, with one rule the task DAG applies too ([`dag::produces_feature_specification`]): a task
+/// that produces its feature's specification does not complete *on* the inputs it only inherits from the feature,
+/// so an unsatisfied inherited-only input is advisory for it rather than `MANIFEST_UNSATISFIED` (what the task
+/// declares itself still binds). Returns the report fields to persist: the canonical receipt merged over the report,
+/// plus `receipt_validation`.
+fn require_receipt(p: &Project, store: &RecordStore, t: &Record, report: &Value) -> Result<Value> {
+    let id = t.id();
+    let mut chk = crate::context::receipt::validate(p, store, &id, report)?;
+    let mut advisory: Vec<Value> = vec![];
+    if dag::produces_feature_specification(t) {
+        let m = crate::context::manifest::resolve(p, store, t);
+        let inherited_only: BTreeSet<String> = m
+            .entries
+            .iter()
+            .filter(|e| e.required && !e.satisfied())
+            .filter(|e| e.sources.iter().all(|s| s.starts_with("feature ")))
+            .map(|e| e.id.clone())
+            .collect();
+        chk.errors.retain(|e| {
+            let ids: Vec<String> = e["ids"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let only_inherited = (e["code"] == "MANIFEST_UNSATISFIED"
+                && !ids.is_empty()
+                && ids.iter().all(|i| inherited_only.contains(i)))
+                || (e["code"] == "PACKET_BLOCKED"
+                    && ids.first().is_some_and(|h| {
+                        crate::context::load_packet(p, &id, Some(h))
+                            .map(|pk| dag::packet_blocked_only_by_inherited(t, &pk))
+                            .unwrap_or(false)
+                    }));
+            if only_inherited {
+                advisory.push(json!({"code": "INHERITED_INPUT_UNSATISFIED", "message": format!("{id} produces its feature's specification; the inputs it only inherits from the feature are not yet satisfied ({}: {})", e["code"].as_str().unwrap_or(""), ids.join(", ")), "ids": ids}));
+            }
+            !only_inherited
+        });
+    }
+    if !chk.ok() {
+        let codes: Vec<String> = chk
+            .errors
+            .iter()
+            .filter_map(|e| e["code"].as_str().map(|s| s.to_string()))
+            .collect();
+        return Err(GovError::new(
+            "RECEIPT_INVALID",
+            format!(
+                "{id}: the consumption receipt does not trace this completion to its inputs ({}). Remediation: return the fields in the packet's receipt_contract — {}",
+                codes.join(", "),
+                chk.errors.iter().filter_map(|e| e["message"].as_str()).collect::<Vec<_>>().join(" | ")
+            ),
+        )
+        .with_details(chk.to_value()));
+    }
+    chk.warnings.extend(advisory);
+    let mut out = crate::context::receipt::report_from_worker_return(report);
+    if let (Some(o), Some(c)) = (out.as_object_mut(), chk.receipt.as_object()) {
+        for (k, v) in c {
+            if !v.is_null() {
+                o.insert(k.clone(), v.clone());
+            }
+        }
+        let mut summary = chk.summary();
+        summary["warnings"] = json!(chk
+            .warnings
+            .iter()
+            .map(|w| w["code"].clone())
+            .collect::<Vec<_>>());
+        o.insert("receipt_validation".into(), summary);
+    }
+    Ok(out)
+}
+
 /// The enforcement state of a task's contract fields, for consumers that present the contract (the context packet,
 /// `gov task show`): resolution of `required_data`, `required_tools` and `required_skills`, the tasks that `blocks`
 /// it, the designated role, the production-merge permission, the governing gates and the task's DAG state.
@@ -1890,4 +1969,48 @@ pub fn production_merge_findings(p: &Project, store: &RecordStore) -> Vec<Value>
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// DONE, CLAIMED and IN_PROGRESS are reached only through close / claim: `task create` and `task status` refuse
+    /// them with the route to take; every other status is settable.
+    #[test]
+    fn operation_only_statuses_name_their_route() {
+        for s in ["DONE", "CLAIMED", "IN_PROGRESS"] {
+            let e = operation_only(s).expect(s);
+            assert_eq!(e.code, "TASK_STATUS_REQUIRES_OPERATION");
+            assert!(e.details["route"]
+                .as_str()
+                .unwrap()
+                .starts_with("gov task "));
+        }
+        for s in [
+            "DRAFT",
+            "READY",
+            "BLOCKED",
+            "REVIEW",
+            "CANCELLED",
+            "WAITING_HUMAN",
+        ] {
+            assert!(operation_only(s).is_none(), "{s}");
+        }
+    }
+
+    #[test]
+    fn independent_work_is_recognised_by_class_role_or_readiness_cell() {
+        let t = |f: Value| crate::records::new_record("task", "TASK-0001", "t", f);
+        assert!(independent_work(&t(json!({"class": "test-design"}))));
+        assert!(independent_work(&t(
+            json!({"class": "data", "role": "data-author"})
+        )));
+        assert!(independent_work(&t(
+            json!({"class": "specification", "readiness_cell": "independent_acceptance_tests"})
+        )));
+        assert!(!independent_work(&t(
+            json!({"class": "implementation", "role": "backend-engineer"})
+        )));
+    }
 }
