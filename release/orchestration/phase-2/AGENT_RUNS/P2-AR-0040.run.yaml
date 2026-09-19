@@ -18,4 +18,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/r3-ws09-11/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0040.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 2160c8dee611f0ce10106b0e04b5f2aa33b69dbd
+  branch_tip_commit: 2ec465648365fe238c29ce1443bee2da26690fc3
+  branch_product_code_digest: 4dedf0279de64c5b070103a1efdb219e790e2dd96e60be968161131372ff7225
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'WS-6 r2 IP-R2-10 (migration snapshots to the BC-P2-31 store path)': 'REPAIRED_CLAIMED', 'WS-6 r2 IP-R2-11 (overlay template rules delivered to installed projects through a migration operation; framework.json projection)': 'REPAIRED_CLAIMED', "WS-9 r2 observation — reviewer-written command test runs an arbitrary command at A6/A7 with the executor's privileges": 'REPAIRED_CLAIMED', 'WS-2 r2 R3-9 — A11 states the posture as the reason when D032 is its only doctor failure': 'REPAIRED_CLAIMED', "migrations/M-4.1.5-4.1.6.yaml with WS-8's version/payload decision": 'DONE_THIS_SIDE'}
+  orchestrator_checks: scope conforms (adopt.rs, migrations/{executor,framework,verify,planner}.rs, migration + adoption-baseline schemas, migrations/M-4.1.5-4.1.6.yaml + README, migration.rs test extended/added; no main.rs/lib.rs/R1-listed file); lib 217/0, certification 137/0; R1 held-out via private path at baselines, census 118/2017, 0 violations; incidental hardening: migration rollback writes only recorded batch paths, never kernel/lock/trust/.git (closes the RoT review's RV-M1 planted-snapshot note); command tests bounded to governed product-test commands + RUN_TESTS permission (TEST_COMMAND_NOT_PERMITTED). IPs for WS-8 version decision (IP-R3-WS09-2) and WS-6 template (IP-R3-WS09-1)
