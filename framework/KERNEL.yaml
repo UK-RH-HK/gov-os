@@ -7,33 +7,33 @@ kernel_contract_version: 1
 schema_versions:
   framework-lock: 1.1.0
   kernel-manifest: 1.0.0
-  repository-contract: 1.0.0
+  repository-contract: 1.1.0
   project-policy: 1.0.0
   capability-profile: 1.0.0
   tool-permissions: 1.0.0
   model-routing-overrides: 1.1.0
   data-sensitivity: 1.0.0
   project-exceptions: 1.0.0
-  record: 1.0.0
-  task: 1.1.0
+  record: 1.1.0
+  task: 1.2.0
   decision: 1.2.0
   feature: 1.0.0
-  cit: 1.0.0
+  cit: 1.1.0
   checkpoint: 1.0.0
   handoff: 1.0.0
   lesson: 1.0.0
   upstream-packet: 1.2.0
-  migration: 1.1.0
+  migration: 1.2.0
   context-packet: 1.1.0
-  index-manifest: 1.1.0
+  index-manifest: 1.2.0
   skill: 1.0.0
   tool: 1.3.0
   release-manifest: 1.2.0
   framework-change-proposal: 1.0.0
-  plugin-descriptor: 1.3.0
+  plugin-descriptor: 1.4.0
   plugin-registry: 1.1.0
   adapter-manifest: 1.0.0
-  adoption-baseline: 1.1.0
+  adoption-baseline: 1.2.0
   audit: 1.2.0
   command-contract: 1.0.0
   experiment: 1.1.0
@@ -64,7 +64,7 @@ schema_versions:
   research: 1.1.0
   roles: 1.0.0
   scenario: 1.1.0
-  test-obligation: 1.0.0
+  test-obligation: 1.1.0
   tool-registry: 1.0.0
   worker-return: 1.1.0
 cli_version: 4.1.6
@@ -88,3 +88,4 @@ payload_dirs:
   - overlay-templates
   - migrations
   - tools
+  - health

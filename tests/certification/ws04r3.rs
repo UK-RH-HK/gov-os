@@ -309,6 +309,11 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
     );
     git_commit_all(&root, "obligation");
     g.ok(&["rebuild-memory", "--incremental"]);
+    // round-3 integration (P2-AR-0041): the work writes product source (`src/**`), so it is a source-changing class
+    // (`refactor`), not `discovery` — WS-5's in-task material-change hook (BC-P2-13, `tasks::material_changes`) refuses
+    // a behaviour change of product source by a class not contracted to change it, exactly as WS-5 updated
+    // `ws04r2::upstream_change_reaches_completed_work`. What this test asserts (the system transaction and its
+    // coverage) is unchanged.
     let task = |objective: &str, reqs: &[&str]| -> String {
         let f = json!({"requirements": reqs}).to_string();
         id(&g.ok(&[
@@ -317,7 +322,7 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
             "--objective",
             objective,
             "--class",
-            "discovery",
+            "refactor",
             "--status",
             "READY",
             "--allowed",
