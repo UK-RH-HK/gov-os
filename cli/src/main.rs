@@ -1210,7 +1210,13 @@ fn g0_label(cmd: &Cmd) -> String {
             CitCmd::List => "cit list",
             CitCmd::Show { .. } => "cit show",
         }),
-        Cmd::Context { .. } => s("context compile"),
+        Cmd::Context { op } => s(match op {
+            ContextCmd::Compile { .. } => "context compile",
+            ContextCmd::Manifest { .. } => "context manifest",
+            ContextCmd::Verify { .. } => "context verify",
+            ContextCmd::Show { .. } => "context show",
+            ContextCmd::Receipt { .. } => "context receipt",
+        }),
         Cmd::Checkpoint { op } => s(match op {
             CheckpointCmd::Create { .. } | CheckpointCmd::Watchdog { .. } => "checkpoint",
             CheckpointCmd::Latest => "checkpoint latest",
@@ -1312,6 +1318,39 @@ fn g0_label(cmd: &Cmd) -> String {
         Cmd::Policy { op } => s(match op {
             PolicyCmd::Overrides => "policy overrides",
             PolicyCmd::Effective { .. } => "policy effective",
+        }),
+        Cmd::Artefact { op } => s(match op {
+            ArtefactCmd::Show { .. } => "artefact show",
+            ArtefactCmd::Check => "artefact check",
+            ArtefactCmd::Lineage { .. } => "artefact lineage",
+        }),
+        Cmd::Health { op } => s(match op {
+            HealthCmd::Run { no_persist, .. } => {
+                if *no_persist {
+                    "health run --no-persist"
+                } else {
+                    "health run"
+                }
+            }
+            HealthCmd::Status => "health status",
+            HealthCmd::Checks => "health checks",
+            HealthCmd::History { .. } => "health history",
+            HealthCmd::Show { .. } => "health show",
+            HealthCmd::Guard { .. } => "health guard",
+            HealthCmd::Currency => "health currency",
+            HealthCmd::Product { .. } => "health product",
+            HealthCmd::Skills { record, .. } => {
+                if *record {
+                    "health skills --record"
+                } else {
+                    "health skills"
+                }
+            }
+            HealthCmd::CloseCheck { .. } => "health close-check",
+        }),
+        Cmd::Oracle { op } => s(match op {
+            OracleCmd::Format => "oracle format",
+            OracleCmd::Validate { .. } => "oracle validate",
         }),
     }
 }

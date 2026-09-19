@@ -173,7 +173,9 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("audit", "record_audit", Write),
     g("audit --no-persist", "read", Read),
     g("verify governance", "record_audit", Write),
-    g("verify product", "read", Read),
+    // integration P2-AR-0022: with WS-2 (BC-P2-43) `verify product` records its per-family results as a governed
+    // EVIDENCE audit record (`scope: product-tests`), so it is a write of the `record_audit` class like `audit`
+    g("verify product", "record_audit", Write),
     g("pause", "emergency_control", Write),
     g("freeze writes", "emergency_control", Write),
     g("cancel agents", "emergency_control", Write),
@@ -231,6 +233,12 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("cit list", "read", Read),
     g("cit show", "read", Read),
     g("context compile", "compile_context", Write),
+    // integration P2-AR-0022 (WS-4, BC-P2-17/19/20): resolution, verification and display of the manifest and of the
+    // packet history, and a dry-run receipt validation — none of them writes
+    g("context manifest", "read", Read),
+    g("context verify", "read", Read),
+    g("context show", "read", Read),
+    g("context receipt", "read", Read),
     g("checkpoint", "checkpoint", Write),
     g("checkpoint latest", "read", Read),
     g("skills list", "read", Read),
@@ -289,6 +297,33 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("plugins health --ping", "execute_plugin", Write),
     g("policy overrides", "read", Read),
     g("policy effective", "read", Read),
+    // ---- integration P2-AR-0022: subcommands added by round-1 workstreams other than WS-3
+    // WS-4 (BC-P2-21): artefact identity and lineage read governed records, VCS history and the index
+    g("artefact show", "read", Read),
+    g("artefact check", "read", Read),
+    g("artefact lineage", "read", Read),
+    // WS-2 (BC-P2-03/06/42/43): the health scheduler. A run persists a governance-suite EVIDENCE audit record when
+    // it re-establishes currency (as `audit` does); `--no-persist` never does (as `audit --no-persist`). The
+    // product-test run records a product-tests EVIDENCE audit record; the close check runs the G2 tier with the
+    // same record policy as a run. `skills --record` binds skill versions in the tracked, OS-written
+    // governance/generated/skill-bindings.json (`skills::record` requires `record_skill_binding`). The rest read
+    // (their runtime-local cache, ledger and observation files are derived, machine-local state).
+    g("health run", "record_audit", Write),
+    g("health run --no-persist", "read", Read),
+    g("health status", "read", Read),
+    g("health checks", "read", Read),
+    g("health history", "read", Read),
+    g("health show", "read", Read),
+    g("health guard", "read", Read),
+    g("health currency", "read", Read),
+    g("health product", "record_audit", Write),
+    g("health skills", "read", Read),
+    g("health skills --record", "record_skill_binding", Write),
+    g("health close-check", "record_audit", Write),
+    // WS-1/12 (BC-P2-51): the Qualification Oracle format tool reads documents held in verifier custody and the
+    // format compiled into this binary; it opens no project
+    outside("oracle format", "qualification tooling: prints the Qualification Oracle format compiled into this binary; opens no project"),
+    outside("oracle validate", "qualification tooling: read-only validation of verifier-custody oracle / score-report documents; opens no governed project"),
 ];
 
 /// **The FREEZE_WRITES recovery allow-list** — the only writes permitted while writes are frozen, with the reason.
