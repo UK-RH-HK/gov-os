@@ -1509,8 +1509,9 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         db.set_meta("graph_integrity", &gi.summary(200))?;
         report.graph_integrity = gi.summary(20);
         // BC-P2-30: is the profile this build used governed (kernel pin or a profile decision)?
-        report.retrieval_profile = crate::memory::profile::governance(
+        report.retrieval_profile = crate::memory::profile::governance_in(
             p,
+            &store,
             &crate::memory::profile::Profile::of(emb_pin.clone(), rr_pin.clone()),
         );
         db.set_meta("retrieval_profile", &report.retrieval_profile)?;

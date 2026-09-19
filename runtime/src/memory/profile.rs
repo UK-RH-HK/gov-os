@@ -206,10 +206,28 @@ impl ComponentIdentity {
             return out;
         }
         if recorded["adapter"] != self.adapter {
+            let fields: Vec<String> = [
+                ("kind", "kind"),
+                ("plugin_id", "plugin id"),
+                ("version", "revision"),
+                (
+                    "descriptor_exec_sha256",
+                    "descriptor (command, cwd, languages, permissions)",
+                ),
+                ("implementation_sha256", "implementation files"),
+            ]
+            .iter()
+            .filter(|(k, _)| recorded["adapter"][*k] != self.adapter[*k])
+            .map(|(_, label)| label.to_string())
+            .collect();
             out.push(format!(
-                "adapter (recorded {}, now {})",
-                short(&recorded["adapter"]),
-                short(&self.adapter)
+                "adapter {} ({} changed)",
+                short(&self.adapter),
+                if fields.is_empty() {
+                    "identity".to_string()
+                } else {
+                    fields.join(", ")
+                }
             ));
         }
         if recorded["model"]["sha256"] != self.model["sha256"]
@@ -523,8 +541,22 @@ fn plugin_identity(
             files.push(fid);
         }
     }
+    // the descriptor fields that decide what executes and how (not its provenance, registration or status notes)
+    let exec: serde_json::Map<String, Value> = [
+        "plugin_id",
+        "capability",
+        "command",
+        "cwd",
+        "version",
+        "languages",
+        "timeout_seconds",
+        "permissions",
+    ]
+    .iter()
+    .filter_map(|k| desc.raw.get(*k).map(|v| (k.to_string(), v.clone())))
+    .collect();
     let adapter = json!({"kind": "plugin", "plugin_id": desc.plugin_id, "version": desc.version,
-        "descriptor_sha256": crate::capabilities::registry::descriptor_hash(desc),
+        "descriptor_exec_sha256": h(&Value::Object(exec)),
         "implementation": implementation, "implementation_sha256": h(&json!(implementation))});
     // --- model artefact: everything shipped beside the implementation (its own directory or module package),
     // other plugins' implementations and this plugin's own implementation files excluded
@@ -805,12 +837,16 @@ fn profile_decisions(store: &RecordStore) -> Vec<&Record> {
 /// revision swapped under the pin — is `UNGOVERNED` (no decision at all) or `UNGOVERNED_CHANGE` (differs from the
 /// latest decision). A decision that pins it but is not T2-verifiable on this machine is `GOVERNED_UNVERIFIED`.
 pub fn governance(p: &Project, prof: &Profile) -> Value {
+    governance_in(p, &RecordStore::load(&p.root), prof)
+}
+
+/// [`governance`] over a record store the caller already loaded.
+pub fn governance_in(p: &Project, store: &RecordStore, prof: &Profile) -> Value {
     if is_kernel_default(p, prof) {
         return json!({"state": "KERNEL_DEFAULT", "governed": true, "digest": prof.digest, "profile": prof.describe(),
                       "message": format!("the live retrieval profile {} is the kernel's own pin", prof.describe())});
     }
-    let store = RecordStore::load(&p.root);
-    let decisions = profile_decisions(&store);
+    let decisions = profile_decisions(store);
     if let Some(d) = decisions
         .iter()
         .rev()
@@ -1035,12 +1071,23 @@ pub fn select(
             let gid = match existing {
                 Some(g) => {
                     let st = g.get("gate_status");
+                    let declined = st == "ANSWERED"
+                        && crate::orchestration::gates::verified_answer_in(p, &store, &g.id())
+                            .map(|a| !a.authorises_blocked_work)
+                            .unwrap_or(false);
+                    let status = if declined {
+                        "GATE_DECLINED"
+                    } else if st == "ANSWERED" {
+                        "GATE_ANSWERED"
+                    } else {
+                        "WAITING_HUMAN"
+                    };
                     return Ok(
-                        json!({"applied": false, "status": if st == "ANSWERED" { "GATE_ANSWERED" } else { "WAITING_HUMAN" }, "human_gate": g.id(), "gate_status": st,
+                        json!({"applied": false, "status": status, "human_gate": g.id(), "gate_status": st,
                         "subject_sha256": subject_sha, "impact_radius": radius, "human_answer_required": needs_human, "candidate": candidate,
                         "target": target.to_value(), "evidence": res_id,
-                        "reason": format!("gate {} was raised for this exact change; the change is applied only with --gate {} once an answer authorises it", g.id(), g.id()),
-                        "next_actions": [format!("gov gate present {}", g.id()), format!("gov memory select {candidate} --research {res_id} --gate {}", g.id())]}),
+                        "reason": if declined { format!("gate {} was raised for this exact change and the answer declined it; withdraw it (gov gate revoke {}) to ask again", g.id(), g.id()) } else { format!("gate {} was raised for this exact change; the change is applied only with --gate {} once an answer authorises it", g.id(), g.id()) },
+                        "next_actions": if declined { vec![format!("gov gate revoke {}", g.id())] } else { vec![format!("gov gate present {}", g.id()), format!("gov memory select {candidate} --research {res_id} --gate {}", g.id())] }}),
                     );
                 }
                 None => {
@@ -1076,6 +1123,13 @@ pub fn select(
                 "next_actions": [format!("gov gate present {gid}"), format!("the owner answers {gid} through the human channel (gov decide {gid} --option A --answer-file <signed>)"), format!("gov memory select {candidate} --research {res_id} --gate {gid}")]}),
             );
         };
+        // an answer authorises one application of the change it approved, not a replay after a revert
+        if let Some(d) = store.of_type("decision").into_iter().find(|d| {
+            d.data.get("retrieval_profile").is_some()
+                && d.data["approval"]["gate"].as_str() == Some(gid)
+        }) {
+            return Err(GovError::new("GATE_ALREADY_APPLIED", format!("gate {gid} already authorised the change recorded by decision {}; a new change needs a new gate (run select without --gate)", d.id())));
+        }
         let a = if needs_human {
             // WS-3 IP-8: human approval only from a verified, owner-signed answer bound to this exact change
             crate::orchestration::gates::human_approval_for(p, gid, &subject_sha)?

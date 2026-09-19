@@ -4,11 +4,13 @@
 //! [`check`] **raises** — as findings with a kind, a severity, the edge and a remediation, not as a count —
 //!
 //! * `orphan`: a governed traceability record (feature, requirement, scenario, test obligation, interface,
-//!   architecture, decision, task) that no relationship reaches or leaves;
+//!   architecture, decision, task) that no relationship reaches or leaves (an architecture record every task consumes
+//!   implicitly — `graph::IMPLICIT_CONSUMERS` — is not an orphan while a current task exists);
 //! * `dangling`: an edge whose target does not exist (index edges, code included; record edges without an index);
-//! * `stale`: a *current* record whose in-force relationship (depends on, implements, realises, governed by,
-//!   constrains, validated by, tests, uses, consumes, blocks, owns, calls, imports) points at a target that is no
-//!   longer current — superseded (by status or by a successor), retired, deprecated, rejected, legacy, historical, or
+//! * `stale`: a record that still asserts its relationships — current, not evidence, not closed work (a DONE task,
+//!   a committed CIT, an answered gate, a checkpoint or handoff are history) — whose in-force relationship (depends
+//!   on, implements, realises, governed by, constrains, validated by, tests, uses, consumes, blocks, owns, calls,
+//!   imports) points at a target that is no longer current — superseded (by status or by a successor), retired, deprecated, rejected, legacy, historical, or
 //!   archived / under a path the repository contract classifies `historical`. Provenance relationships
 //!   (derived from, learned from, failed because, generated from, produces, affects, supersedes) record history and
 //!   are never stale;
@@ -427,12 +429,24 @@ pub fn check(p: &Project, store: &RecordStore, db: Option<&RuntimeDb>) -> Result
             }
         }
     }
-    // --- orphans: traceability records no relationship reaches or leaves
+    // --- orphans: traceability records no relationship reaches or leaves (an implicit input the context compiler
+    // delivers to every consumer of a type — graph::IMPLICIT_CONSUMERS — is consumed when such a consumer exists)
+    let implicitly_consumed = |r: &Record| {
+        crate::graph::IMPLICIT_CONSUMERS
+            .iter()
+            .any(|(input, consumer, _)| {
+                *input == r.rtype()
+                    && crate::graph::IMPLICIT_INPUT_STATUSES.contains(&r.status().as_str())
+                    && records
+                        .iter()
+                        .any(|c| c.rtype() == *consumer && is_current(c, &succ))
+            })
+    };
     for r in &records {
         if !CONNECTED_TYPES.contains(&r.rtype().as_str()) || !is_current(r, &succ) {
             continue;
         }
-        if !touched.contains(&r.id()) {
+        if !touched.contains(&r.id()) && !implicitly_consumed(r) {
             findings.push(finding("orphan", "low", format!("orphan {} {}: no relationship reaches or leaves it (it traces to no feature, requirement, decision, test or work)", r.rtype(), r.id()),
                 json!({"record": r.id(), "path": r.path, "remediation": "relate it to what it realises, implements, tests or governs, or retire it"})));
         }

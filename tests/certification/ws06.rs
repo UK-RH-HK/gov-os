@@ -308,17 +308,22 @@ fn a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression() {
     assert_eq!(prof["state"], "GOVERNED", "{prof}");
     assert_eq!(prof["decision"], json!(did));
     assert_eq!(g.ok(&["memory", "freshness"])["fresh"], true);
-    // the same gate cannot authorise another change
-    let b2 = g.ok(&[
-        "memory",
-        "benchmark",
-        "--candidate",
-        "current",
-        "--candidate",
-        "builtin:32",
-        "--record",
-    ]);
-    let res2 = b2["research_record"].as_str().unwrap().to_string();
+    // an applied gate authorises nothing more, and an answer binds exactly the change it approved
+    let bench = |cand: &str| -> String {
+        g.ok(&[
+            "memory",
+            "benchmark",
+            "--candidate",
+            "current",
+            "--candidate",
+            cand,
+            "--record",
+        ])["research_record"]
+            .as_str()
+            .unwrap()
+            .to_string()
+    };
+    let res2 = bench("builtin:32");
     assert_eq!(
         g.err(&[
             "memory",
@@ -328,6 +333,25 @@ fn a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression() {
             &res2,
             "--gate",
             &gid
+        ])
+        .error_code(),
+        "GATE_ALREADY_APPLIED"
+    );
+    let gid2 = g.ok(&["memory", "select", "builtin:32", "--research", &res2])["human_gate"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    crate::ws03::human_decide(&g, &gid2, "A");
+    let res3 = bench("builtin:32");
+    assert_eq!(
+        g.err(&[
+            "memory",
+            "select",
+            "builtin:32",
+            "--research",
+            &res3,
+            "--gate",
+            &gid2
         ])
         .error_code(),
         "APPROVAL_STALE"
