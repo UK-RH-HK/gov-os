@@ -23,6 +23,7 @@
 //! | any other content of a requirement, scenario, feature or decision (not its planning attributes `priority`, `owner_role`, `legacy_source`); product source (repository-contract class `source`) | behaviour_change |
 //! | a `security` record; security-named paths (auth, crypto, permission, secrets, TLS, …); a removed or weakened line carrying a security check (verify/signature/authenticate/authorise/permission/…) | security_change |
 //! | `governance/**` (except `governance/generated/**`), `framework/**`, any policy/overlay configuration file | governance_change |
+//! | a capability plugin's registration: its descriptor (`governance/project/plugins/**`) or the plugin registry (either location) — which program the OS executes with the invoking account's authority (Contract v3 F4, K3; INT3-O1) | security_change |
 //! | infrastructure definitions (`infra/**`, Terraform, Kubernetes/Helm, Docker/Compose, CloudFormation, Bicep, serverless) | infrastructure_cost |
 //! | migrations (`migrations/**`, `db/migrate/**`, Alembic/Flyway), SQL carrying DDL/DML, dataset schema fields | data_migration |
 //!
@@ -644,6 +645,27 @@ fn lines_with<'a>(text: &'a str, toks: &[&str]) -> BTreeSet<&'a str> {
         .collect()
 }
 
+/// A capability plugin's registration: its descriptor or the plugin registry, at its location or the legacy one.
+pub fn is_plugin_registration_path(path: &str) -> bool {
+    glob_match("governance/project/plugins/**", path)
+        || path == crate::paths::PLUGIN_REGISTRY_PATH
+        || path == crate::capabilities::registry::LEGACY_REGISTRY_PATH
+}
+
+/// INT3-O1 (Contract v3 K3 "security", F4): a plugin registration decides which program the OS executes with the
+/// invoking account's authority, so it is a security change as well as a governance change.
+fn push_plugin_registration(m: &mut Materiality, path: &str, what: &str) {
+    if is_plugin_registration_path(path) {
+        m.push(
+            "security_change",
+            path,
+            "capability plugin registration",
+            format!("{path} {what}: a capability plugin's registration decides which program the OS executes with the invoking account's authority (Contract v3 F4)"),
+            true,
+        );
+    }
+}
+
 fn classify_file(
     p: Option<&Project>,
     m: &mut Materiality,
@@ -672,6 +694,7 @@ fn classify_file(
         _ => "modified",
     };
     let lower = path.to_lowercase();
+    push_plugin_registration(m, path, what);
     if (glob_match("governance/**", path) && !glob_match("governance/generated/**", path))
         || glob_match("framework/**", path)
         || any_glob(GOVERNANCE_FILES, path).is_some()
@@ -881,6 +904,7 @@ fn classify_path_only(
         (true, false) => "removed",
         _ => "modified",
     };
+    push_plugin_registration(m, path, what);
     if (glob_match("governance/**", path) && !glob_match("governance/generated/**", path))
         || any_glob(GOVERNANCE_FILES, path).is_some()
     {
@@ -1013,6 +1037,33 @@ pub fn changes_of_manifest(p: &Project, store: &RecordStore, cit: &Value) -> Vec
                     fields: vec![],
                     before,
                     after: Some(rec),
+                });
+            }
+            // INT3-O1: a plugin registration writes its normalised descriptor and the registry
+            "register_plugin" => {
+                let path = op["path"].as_str().unwrap_or("").to_string();
+                if !path.is_empty() {
+                    out.push(Change::File {
+                        before: read_opt(p, &path),
+                        after: crate::util::to_yaml(&op["descriptor"]).ok(),
+                        path,
+                    });
+                }
+                let reg = op["registry"]
+                    .as_str()
+                    .unwrap_or(crate::paths::PLUGIN_REGISTRY_PATH)
+                    .to_string();
+                let before = read_opt(p, &reg);
+                // the entry's content is the OS's (sealed at execution); what is classified is that the file changes
+                let after = Some(format!(
+                    "{}\n# registration of {}\n",
+                    before.clone().unwrap_or_default(),
+                    op["plugin_id"].as_str().unwrap_or("")
+                ));
+                out.push(Change::File {
+                    path: reg,
+                    before,
+                    after,
                 });
             }
             "set_lock_field" => out.push(Change::File {

@@ -354,18 +354,21 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
         d["statement"] = json!("totals are integer cents, rounded half-even")
     });
     git_commit_all(&root, "direct edit");
-    g.ok(&["rebuild-memory", "--incremental"]);
-    // round-3 integration (P2-AR-0041): WS-5 wired WS-4 R2-3 — `task claim` propagates a change made outside change
-    // control before it establishes the claim (`tasks::claim` -> `detect_and_propagate`) — so the direct propagation
-    // this test observes is the one the next claim runs, recorded exactly as `gov cit propagate` records it: one
-    // sealed system transaction. The pending change is visible beforehand (dry run), the claim reports it, every
-    // property below is asserted on that transaction, and a later `gov cit propagate` finds nothing left.
+    // round 4 (P2-AR-0043, INT3-O2): a direct change observed by a host-run index rebuild is propagated by that
+    // rebuild (G1), when it is observed. The round-3 integration observed the next claim's propagation here, because
+    // the rebuild did not propagate; now the rebuild does, recorded exactly as `gov cit propagate` records it: one
+    // sealed system transaction. The pending change is visible beforehand (dry run), the rebuild reports it, every
+    // property below is asserted on that transaction, the next claim finds nothing left to propagate (the claim-time
+    // path is kept: `ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence`), and a
+    // later `gov cit propagate` finds nothing either.
     let pending = g.ok(&["cit", "propagate", "--dry-run"]);
     assert!(pending["changes"].as_u64().unwrap_or(0) > 0, "{pending}");
+    let rb = g.ok(&["rebuild-memory", "--incremental"]);
+    assert_eq!(rb["upstream_changes"]["propagated"], true, "{rb}");
     let b = task("refund log", &["REQ-0002"]);
     g.ok(&["context", "compile", &b]);
     let cl = g.ok(&["task", "claim", &b]);
-    assert_eq!(cl["upstream_changes"]["propagated"], true, "{cl}");
+    assert_ne!(cl["upstream_changes"]["propagated"], true, "{cl}");
     let sys = g
         .ok(&["cit", "list"])
         .as_array()
@@ -373,7 +376,8 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
         .iter()
         .find(|c| c["origin"] == "system")
         .map(|c| c["id"].as_str().unwrap().to_string())
-        .expect("the claim's propagation is recorded as a sealed system transaction");
+        .expect("the rebuild's propagation is recorded as a sealed system transaction");
+    assert_eq!(rb["upstream_changes"]["cit"], json!(sys), "{rb}");
     let rec = g.ok(&["cit", "show", &sys]);
     assert_eq!(rec["origin"], "system", "{rec}");
     assert_eq!(rec["cit_status"], "COMMITTED");
@@ -421,7 +425,7 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
         true
     );
     assert_ne!(seal(&g, "TST-0001").0, "VERIFIED");
-    // the task whose claim propagated closes with its own work only: the OS's marks are not its mutations
+    // the task claimed after the propagation closes with its own work only: the OS's marks are not its mutations
     write(&root, "src/refunds.rs", "pub fn log() {}\n");
     g.ok(&["rebuild-memory", "--incremental"]);
     let rep_b = crate::ws05::receipt(

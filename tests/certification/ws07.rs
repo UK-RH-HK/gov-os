@@ -103,34 +103,63 @@ fn unrelated_answered_gate(g: &Gov) -> String {
 /// **Register a plugin the governed way**: `gov plugins register` (as `g`'s role) raises a gate for exactly this
 /// registration; the OS renders it and the product owner answers A through the owner-signed channel; the same
 /// registration is run again and succeeds. Returns the final `plugins register` result.
+///
+/// INT3-O1 (round 4): a registration is also a material governance/security change, so the first request also
+/// returns the change transaction the OS proposed for it (`change_transaction`, CIT-P simulated automatically) with
+/// its own gate. The owner answers both — the execution approval (`human_gate`, subject `plugin-registration`) and
+/// the change approval (the transaction's gate) — and the repeated registration executes the transaction (CIT-E).
+/// For an OS-provided plugin there is no execution approval, so the only gate is the transaction's.
 pub fn register_approved(g: &Gov, descriptor: &Path) -> Value {
-    let r = g.ok(&[
+    let mut r = g.ok(&[
         "plugins",
         "register",
         "--descriptor",
         descriptor.to_str().unwrap(),
     ]);
-    if r["registered"] == true {
-        return r;
+    let mut execution_gate: Option<String> = None;
+    let mut answered: Vec<String> = vec![];
+    for _ in 0..3 {
+        if r["registered"] == true {
+            break;
+        }
+        let mut gates: Vec<String> = vec![];
+        if let Some(gid) = r["human_gate"].as_str() {
+            gates.push(gid.to_string());
+        }
+        if let Some(gid) = r["change_transaction"]["human_gate"].as_str() {
+            gates.push(gid.to_string());
+        }
+        gates.retain(|x| !answered.contains(x));
+        assert!(
+            !gates.is_empty(),
+            "registration neither succeeded nor raised a gate: {r}"
+        );
+        for gid in gates {
+            if execution_gate.is_none()
+                && yaml(&g.root, &format!("spec/decisions/{gid}.yaml"))["subject"]["kind"]
+                    == "plugin-registration"
+            {
+                execution_gate = Some(gid.clone());
+            }
+            crate::ws03::human_decide(&g.with_role("orchestrator"), &gid, "A");
+            answered.push(gid);
+        }
+        r = g.ok(&[
+            "plugins",
+            "register",
+            "--descriptor",
+            descriptor.to_str().unwrap(),
+        ]);
     }
-    let gate = r["human_gate"]
-        .as_str()
-        .unwrap_or_else(|| panic!("registration neither succeeded nor raised a gate: {r}"))
-        .to_string();
-    crate::ws03::human_decide(&g.with_role("orchestrator"), &gate, "A");
-    let r2 = g.ok(&[
-        "plugins",
-        "register",
-        "--descriptor",
-        descriptor.to_str().unwrap(),
-    ]);
-    assert_eq!(r2["registered"], true, "{r2}");
-    assert_eq!(
-        r2["registry_entry"]["registration_gate"],
-        json!(gate),
-        "{r2}"
-    );
-    r2
+    assert_eq!(r["registered"], true, "{r}");
+    if let Some(gate) = execution_gate {
+        assert_eq!(r["registry_entry"]["registration_gate"], json!(gate), "{r}");
+    }
+    // the registration was written by its change transaction, which committed
+    if r["unchanged"] != true {
+        assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
+    }
+    r
 }
 
 // ============================================================================================ BC-P2-39
@@ -302,9 +331,22 @@ fn a_registration_is_approved_only_by_a_gate_raised_for_exactly_it() {
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     let g2 = r["human_gate"].as_str().unwrap().to_string();
     assert_ne!(g2, g1);
+    // INT3-O1 (round 4): the registration is also a material governance/security change; the OS proposed its change
+    // transaction (CIT-P simulated automatically) with its own gate, and the execution approval does not stand in
+    // for it — the registration stays unwritten until the change is approved too
+    let ct_gate = r["change_transaction"]["human_gate"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    assert_ne!(ct_gate, g2, "{r}");
     crate::ws03::human_decide(&g, &g2, "A");
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
+    assert_eq!(r["registered"], false, "{r}");
+    assert_eq!(r["human_gate"], json!(ct_gate), "{r}");
+    crate::ws03::human_decide(&g, &ct_gate, "A");
+    let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     assert_eq!(r["registered"], true, "{r}");
+    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
     let e = &json(&root, REGISTRY)["plugins"]["p1"];
     assert_eq!(e["registration_gate"], json!(g2));
     assert_eq!(
@@ -1095,6 +1137,12 @@ fn declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves() {
         "{impact}"
     );
     crate::ws03::human_decide(&g, &gate, "A");
+    // INT3-O1 (round 4): the change transaction the OS proposed for the registration is approved through its own gate
+    crate::ws03::human_decide(
+        &g,
+        r["change_transaction"]["human_gate"].as_str().unwrap(),
+        "A",
+    );
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     assert_eq!(r["registered"], true, "{r}");
     let bound = r["registry_entry"]["implementation"].to_string();

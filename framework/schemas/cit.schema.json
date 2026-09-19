@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/cit.schema.json",
   "title": "cit",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "id": {
@@ -213,7 +213,8 @@
               "append_record",
               "mark_stale",
               "set_lock_field",
-              "regenerate_views"
+              "regenerate_views",
+              "register_plugin"
             ]
           },
           "target": {
@@ -236,6 +237,27 @@
             "type": "object"
           },
           "reason": {
+            "type": "string"
+          },
+          "plugin_id": {
+            "type": "string",
+            "description": "`register_plugin`: the plugin a registration transaction registers"
+          },
+          "descriptor": {
+            "type": "object",
+            "description": "`register_plugin`: the OS-normalised descriptor the registration writes (part of the content the approval binds)"
+          },
+          "subject_sha256": {
+            "type": "string",
+            "description": "`register_plugin`: the registration subject; CIT-E writes only when the plugin's bytes still give exactly this subject and its execution approval (a gate raised for exactly this subject) is honoured"
+          },
+          "registry": {
+            "type": "string"
+          },
+          "implementation_sha256": {
+            "type": "string"
+          },
+          "execution_class": {
             "type": "string"
           }
         },
@@ -271,7 +293,7 @@
         "proposer",
         "system"
       ],
-      "description": "`system`: a transaction the OS itself recorded — the propagation of an upstream change detected outside change control (`trigger: propagation`, no mutation manifest, bookkeeping writes only), whose touched list and sealed per-path writes cover what it marked. Absent: proposed through `gov cit propose`."
+      "description": "`system`: a transaction the OS itself recorded or proposed — the propagation of an upstream change detected outside change control (`system.kind: direct-change propagation`, `trigger: propagation`, no mutation manifest, bookkeeping writes only), whose touched list and sealed per-path writes cover what it marked; or a plugin registration requested with `gov plugins register` (`system.kind: plugin-registration`, one `register_plugin` operation, simulated, gated and executed like any transaction). Absent: proposed through `gov cit propose` (which strips this field from proposer input)."
     },
     "system": {
       "type": "object",

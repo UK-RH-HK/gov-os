@@ -165,6 +165,10 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     // registration completes once the product owner answers A through the owner-signed channel
     let r = crate::ws07::register_approved(&l4, &df);
     assert_eq!(r["registered"], true, "{r}");
+    // INT3-O1 (round 4): the registration is written by its change transaction, whose CIT-E refreshes the index
+    // under the registering role (L4) once the owner approved execution — which may run this approved plugin. What
+    // this test measures below is whether the L0/L1 roles can execute it, so the marker is measured from here.
+    let _ = std::fs::remove_file(&marker);
     // BC-P2-31 (repair iteration 1, WS-7 round 3): the OS writes the registry outside the regenerable views
     let reg = json(&root, "governance/registry/plugin-registry.json");
     let e = &reg["plugins"]["p-reg"];
@@ -249,6 +253,13 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     );
     l4.ok(&["gate", "present", &gate]);
     crate::ws03::human_decide(&l4, &gate, "A");
+    // INT3-O1 (round 4): the registration's change transaction (proposed and simulated by the OS) is approved
+    // through its own gate; the execution approval above does not stand in for it
+    crate::ws03::human_decide(
+        &l4,
+        r["change_transaction"]["human_gate"].as_str().unwrap(),
+        "A",
+    );
     let mut d = yaml(&root, "governance/project/plugins/p-elev.yaml");
     d["registration_gate"] = json!(gate);
     write_yaml(&root, "governance/project/plugins/p-elev.yaml", &d);

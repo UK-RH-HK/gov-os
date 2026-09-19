@@ -778,6 +778,13 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
     assert!(!exists(&root, "governance/project/plugins/netembed.yaml"));
     g.ok(&["gate", "present", &gate]);
     crate::ws03::human_decide(&g, &gate, "A");
+    // INT3-O1 (round 4): the registration's change transaction (proposed and simulated by the OS) is approved
+    // through its own gate; the execution approval above does not stand in for it
+    crate::ws03::human_decide(
+        &g,
+        r["change_transaction"]["human_gate"].as_str().unwrap(),
+        "A",
+    );
     let mut net2 = net.clone();
     net2["registration_gate"] = json!(gate);
     std::fs::write(&df, net2.to_string()).unwrap();
