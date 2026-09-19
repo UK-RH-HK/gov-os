@@ -997,7 +997,7 @@ mod tests {
         let p = Project::open(&dir);
         let mut out = MigrationOutcome::default();
         apply(&p, &m, &root.join("framework"), false, &mut out).unwrap();
-        assert!(out.index_rebuild && out.regenerate_adapters && out.notes.len() == 2);
+        assert!(out.index_rebuild && out.regenerate_adapters && out.notes.len() == 3);
         assert!(
             out.template_conflicts.is_empty(),
             "{:?}",
