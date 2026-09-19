@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-19T18:02:26Z'
-state_hash: 7e56656d6cdcfa36cee36c9d787e3cd1e7db7597f5c633aa327d146af79b19a8
+updated_at: '2026-09-19T18:23:07Z'
+state_hash: 69bf407af2f6a656c5282e0b13110db41b39c797ffbf88d9a900612d41c41201
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: SAFE_HOLD_USAGE_LIMIT
 
@@ -246,11 +246,10 @@ agent_runs:
   - {run_id: P2-AR-0039, role: capability-repair, workstream: WS-8, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0039.run.yaml}
   - {run_id: P2-AR-0040, role: capability-repair, workstream: WS-9+WS-11, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0040.run.yaml}
   - {run_id: P2-AR-0041, role: capability-repair (integration builder), iteration: 1, round: 3, status: COMPLETED, branch: phase2/repair-1-r3-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.run.yaml}
-  - {run_id: P2-AR-0042, role: capability-repair, workstream: WS-1, iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-ws01, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
+  - {run_id: P2-AR-0042, role: capability-repair, workstream: WS-1, iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-ws01, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
   - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0042, role: capability-repair, status: RUNNING, at_safe_hold: 'branch tip 9bafcb3; uncommitted work in refs/safe-hold/P2-AR-0042 7d94516; no report', run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
   - {run_id: P2-AR-0043, role: capability-repair, status: RUNNING, at_safe_hold: 'branch tip cae2f67 (no commits); uncommitted work in refs/safe-hold/P2-AR-0043 b7e1e55; no report', run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
 
 unresolved_findings:
@@ -307,7 +306,7 @@ next_deterministic_action: >-
   SAFE_HOLD — owner-ordered usage-preservation hold (2026-09-19). Do NOT start any builder, integration, candidate minting,
   independent verification or repair round, and launch no replacement or follow-on agent, until the owner explicitly says
   the usage limit has reset. Then RESUME_ROUND_4 per HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md "Resume procedure":
-  determine P2-AR-0042 / P2-AR-0043 state from their branches (report present = completed -> record; no report and no live
+  P2-AR-0042 is COMPLETED_AWAITING_INTEGRATION (recorded during the hold); determine P2-AR-0043 state from its branch (report present = completed -> record; no report and no live
   agent = INCOMPLETE -> preserve worktree to refs/safe-hold, re-dispatch fresh from the same handoff on a new branch); when
   both are complete, merge (or fresh integration builder), reproduce regression and gov contract verify, mint
   cap2-candidate-1, dispatch verification iteration 1 (P2-HO-0043..0047). Model routing and acceptance criteria unchanged.

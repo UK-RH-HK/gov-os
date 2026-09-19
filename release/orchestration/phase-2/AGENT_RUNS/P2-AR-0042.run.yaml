@@ -17,7 +17,15 @@ branch: phase2/repair-1-r4-ws01
 expected_output_path: release/capability-baseline/repair-1/r4-ws01/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 2ed8ab1158f69b966c1cc7bb799c910d262bec15
+  branch_tip_commit: d1487e8dcec37aa6903f01d28a41326b28430453
+  branch_product_code_digest: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-02': 'REPAIRED_CLAIMED', 'AC-13 preservation (ws01-12 BC-P2-01 controls)': 'REPAIRED_CLAIMED', 'AC-10 second sentence — invalidation owner per freshness trigger': 'REPAIRED_CLAIMED', 'ws01-12 IP-3': 'REPAIRED_CLAIMED', 'ws02 IP-WS02-19': 'REPAIRED_CLAIMED', 'ws04 IP-11': 'REPAIRED_CLAIMED', 'ws05 IP-6': 'PARTIAL', 'ws06 IP-1': 'REPAIRED_CLAIMED', 'ws08 IP-5': 'REPAIRED_CLAIMED', 'ws09-11 item 6': 'REPAIRED_CLAIMED', 'r2-ws02 R3-6': 'PARTIAL', 'r2-ws04 R2-14': 'REPAIRED_CLAIMED', 'r2-ws05 IP-R3-8': 'REPAIRED_CLAIMED', 'r2-ws06 IP-R2-4': 'REPAIRED_CLAIMED', 'r2-ws08 IP-R2-WS08-11': 'REPAIRED_CLAIMED', 'r2-ws09-11 IP-R2-6': 'REPAIRED_CLAIMED', 'r2-ws10 IP-WS10-14': 'REPAIRED_CLAIMED', 'r3-ws04 IP-R3-WS04-10': 'REPAIRED_CLAIMED', 'r3-ws06 IP-R3-WS06-6': 'REPAIRED_CLAIMED', 'r3-ws08 IP-R3-WS08-10': 'REPAIRED_CLAIMED', 'r3-ws09-11 IP-R3-WS09-5': 'REPAIRED_CLAIMED', 'integration-3 §8 evidence-map rows': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: "Recorded during SAFE HOLD (collection only; no merge). Scope checked against P2-HO-0041: product files within owned set (contracts.rs, acceptance schema, capability-evidence-map.yaml, contract-source.lock, docs/generated) plus declared additive exception (cli/src/main.rs contract matrix arm, control.rs COMMAND_GUARDS entry) and new ws01r4 tests. Product tip 9bafcb3, product_code_digest d0c6a0d4...a4c9. Builder-reported lib 271/0, certification 193/0; R1 AR-0027 26/3, AR-0029 26/2 (ho_f n/c), AR-0031 27/7, AR-0033 30/1 (size pin; census 123 files/2340 fns, 0 violations). 101/101 capabilities name >=1 running owner; disclosed gaps: 16 capabilities owned only by builder tests, 9 without G-tier owner, no G6 owner, 127 checklist items unowned. Remaining IPs IP-R4-WS01-1..6 (incl. -3: re-run gov contract verify after merging P2-AR-0043). Claims only, not acceptance."
 at_safe_hold:
   date: '2026-09-19'
   agent: still running when the owner ordered SAFE_HOLD; not stopped by the orchestrator

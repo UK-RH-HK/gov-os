@@ -251,3 +251,12 @@ integration builder. Regression reproduction only — not a verdict.
 | Order | Owner: usage at ~99% of the model limit, resetting next day. Enter USAGE-PRESERVATION / SAFE-HOLD: no new builders, integrations, candidate minting, independent verification or repair round, and no replacement or follow-on agents, until the owner explicitly confirms the reset. Do not rush to acceptance; do not change model routing or acceptance criteria. |
 | State at hold | Round 3 merged (`e4cb662`, digest `1d3e9f59…85df7`). Round 4 running: P2-AR-0042 (BC-P2-02 evidence map) at branch tip `9bafcb3`, 9 uncommitted files; P2-AR-0043 (residual IPs) with no commits, 26 uncommitted files. Neither has reported. Both agents were left running (not stopped); their uncommitted work was snapshotted, without touching their worktrees, to `refs/safe-hold/P2-AR-0042` (`7d94516`) and `refs/safe-hold/P2-AR-0043` (`b7e1e55`). `cap2-candidate-1` not minted; verification iteration 1 prepared (P2-HO-0043…0047, `d267f97`), not dispatched. 52 classes open; convergence counter 0 of 3; no owner gate pending. |
 | Durable records | Checkpoint `CHECKPOINTS/P2-CP-0008.yaml`; continuity handoff `HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md` (supersedes P2-HO-ORCH-0001) with the exact resume procedure; `next_deterministic_action` = SAFE_HOLD → RESUME_ROUND_4; a hold prohibition added to `current_prohibitions`. |
+
+## P2-L-0025 — 2026-09-19 — During SAFE HOLD: P2-AR-0042 (BC-P2-02 evidence map) completed and recorded; nothing merged
+
+P2-AR-0042 reported `READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION` on `phase2/repair-1-r4-ws01` (product tip `9bafcb3`,
+work `2ed8ab1`, report `d1487e8`; `product_code_digest` `d0c6a0d4…a4c9`). Scope checked against P2-HO-0041; recorded
+`COMPLETED_AWAITING_INTEGRATION` (collection only, as the hold allows). Builder-reported lib 271/0, certification 193/0, R1 at
+baselines. Disclosed gaps for the verifier: 16 capabilities owned only by builder tests, 9 without a G-tier owner, no G6
+owner, 127 checklist items unowned. Remaining IPs IP-R4-WS01-1…6 — at merge, run `gov contract verify` after P2-AR-0043
+merges (IP-R4-WS01-3). P2-AR-0043 still running. Hold unchanged.

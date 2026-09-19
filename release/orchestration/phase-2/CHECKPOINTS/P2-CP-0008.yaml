@@ -34,6 +34,7 @@ repair_iteration_1:
         uncommitted_at_hold: 9 files, preserved in refs/safe-hold/P2-AR-0042 = 7d94516f6b63a4da91454de211dc0e82e194be7e
         report_present_at_hold: false
         worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01
+        completed_during_hold: {status: COMPLETED_AWAITING_INTEGRATION, verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, product_tip: 9bafcb3, work_commit: 2ed8ab1, report_commit: d1487e8, product_code_digest: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9, remaining_ips: IP-R4-WS01-1..6, note: refs/safe-hold/P2-AR-0042 is superseded by the committed branch}
       - run_id: P2-AR-0043
         scope: residual integration points incl. INT3-O1/INT3-O2
         handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0042-repair-1-r4-residual-integration-points.md
