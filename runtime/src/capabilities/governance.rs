@@ -251,7 +251,7 @@ pub fn approval_for_subject(
         match store.get(c).filter(|r| r.rtype() == "human-gate") {
             None => not_honoured.push(json!({"gate": c, "code": "GATE_NOT_FOUND", "reason": "cited gate does not exist"})),
             Some(r) if !for_subject(r) => not_honoured.push(json!({"gate": c, "code": "GATE_MISMATCH",
-                "reason": format!("gate {c} was raised for {} , not for this {kind} ({sha}); a gate answer approves exactly what it was raised for",
+                "reason": format!("gate {c} was raised for {}, not for this {kind} ({sha}); a gate answer approves exactly what it was raised for",
                     if r.data["subject"].is_object() { r.data["subject"].to_string() } else { format!("'{}'", r.get("question")) })})),
             Some(_) => candidates.push(c.clone()),
         }

@@ -248,27 +248,53 @@ pub fn resolve_program(program: &str, cwd: &Path) -> Option<PathBuf> {
     Some(found.canonicalize().unwrap_or(found))
 }
 
-fn current_exe() -> &'static Option<PathBuf> {
-    static EXE: OnceLock<Option<PathBuf>> = OnceLock::new();
-    EXE.get_or_init(|| {
-        let exe = std::env::current_exe().ok()?;
-        Some(exe.canonicalize().unwrap_or(exe))
-    })
+/// The file of the RUNNING `gov` binary: `/proc/self/exe` on Linux names the running inode even if the path was
+/// replaced or deleted since start; elsewhere `current_exe`.
+fn running_exe() -> PathBuf {
+    #[cfg(target_os = "linux")]
+    {
+        PathBuf::from("/proc/self/exe")
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        std::env::current_exe().unwrap_or_default()
+    }
 }
 
-/// Whether `program` is this very `gov` binary (the same file, or a byte-identical copy).
-fn is_this_binary(program: &Path, program_sha: &str) -> bool {
-    let Some(exe) = current_exe() else {
-        return false;
-    };
-    if exe == program {
-        return true;
+fn file_identity(p: &Path) -> Option<(u64, u64, u64)> {
+    let m = std::fs::metadata(p).ok()?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        Some((m.dev(), m.ino(), m.len()))
     }
-    let same_size = match (std::fs::metadata(exe), std::fs::metadata(program)) {
-        (Ok(a), Ok(b)) => a.len() == b.len(),
-        _ => false,
-    };
-    same_size && hash_file(exe).as_deref() == Some(program_sha)
+    #[cfg(not(unix))]
+    {
+        Some((0, 0, m.len()))
+    }
+}
+
+/// The content hash of the running binary, read once per process from the running file itself.
+fn running_exe_sha() -> Option<&'static str> {
+    static SHA: OnceLock<Option<String>> = OnceLock::new();
+    SHA.get_or_init(|| crate::util::sha256_file(&running_exe()).ok())
+        .as_deref()
+}
+
+/// `Some(sha)` when `program` is the running `gov` binary — the very same file (device and inode), or a byte-identical
+/// copy — with its content hash; `None` otherwise. The same-file case needs no re-hash: an executable cannot be
+/// rewritten in place while it runs (ETXTBSY), and a replaced path is a different inode.
+fn this_binary(program: &Path) -> Option<String> {
+    let run = file_identity(&running_exe())?;
+    let prog = file_identity(program)?;
+    if cfg!(unix) && run.0 == prog.0 && run.1 == prog.1 {
+        return running_exe_sha().map(String::from);
+    }
+    if run.2 != prog.2 {
+        return None;
+    }
+    let h = hash_file(program)?;
+    (Some(h.as_str()) == running_exe_sha()).then_some(h)
 }
 
 /// Whether `args` (after the program) invoke exactly one OS capability server with only its own flags.
@@ -299,14 +325,9 @@ fn os_capability_server(args: &[String]) -> bool {
     })
 }
 
-type FileStamp = (u64, i128, u64);
-
-/// Content hash of one file (a symlink is identified by its target). Hashes are memoised for the life of the process
-/// by (path, size, modification time, inode), so one command that authorises the same plugin several times (the
-/// plugin set, doctor, the registry view) reads a large interpreter or binary once; any change to the file changes
-/// the stamp and is hashed afresh.
+/// Content hash of one file (a symlink is identified by its target). Never memoised: every authorisation reads the
+/// bytes it is about to approve.
 fn hash_file(p: &Path) -> Option<String> {
-    static CACHE: OnceLock<Mutex<BTreeMap<PathBuf, (FileStamp, String)>>> = OnceLock::new();
     let meta = std::fs::symlink_metadata(p).ok()?;
     if meta.file_type().is_symlink() {
         let t = std::fs::read_link(p).ok()?;
@@ -314,31 +335,7 @@ fn hash_file(p: &Path) -> Option<String> {
             format!("symlink:{}", t.to_string_lossy()).as_bytes(),
         ));
     }
-    let mtime = meta
-        .modified()
-        .ok()
-        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-        .map(|d| d.as_nanos() as i128)
-        .unwrap_or(-1);
-    #[cfg(unix)]
-    let ino = {
-        use std::os::unix::fs::MetadataExt;
-        meta.ino()
-    };
-    #[cfg(not(unix))]
-    let ino = 0u64;
-    let stamp: FileStamp = (meta.len(), mtime, ino);
-    let cache = CACHE.get_or_init(|| Mutex::new(BTreeMap::new()));
-    if let Some((st, h)) = cache.lock().ok().and_then(|c| c.get(p).cloned()) {
-        if st == stamp {
-            return Some(h);
-        }
-    }
-    let h = crate::util::sha256_file(p).ok()?;
-    if let Ok(mut c) = cache.lock() {
-        c.insert(p.to_path_buf(), (stamp, h.clone()));
-    }
-    Some(h)
+    crate::util::sha256_file(p).ok()
 }
 
 /// Every file under `dir` (recursively, symlinked directories not followed), sorted.
@@ -503,12 +500,16 @@ pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
             format!("its program '{first}' does not resolve to a file (relative to its working directory, or on PATH)"),
         )
     })?;
-    let program_sha = hash_file(&program).ok_or_else(|| {
-        unresolved(
-            desc,
-            format!("its program {} is unreadable", program.display()),
-        )
-    })?;
+    let os_binary = this_binary(&program);
+    let program_sha = match &os_binary {
+        Some(h) => h.clone(),
+        None => hash_file(&program).ok_or_else(|| {
+            unresolved(
+                desc,
+                format!("its program {} is unreadable", program.display()),
+            )
+        })?,
+    };
     let args: Vec<String> = cmd[1..].to_vec();
     let mut bound: BTreeMap<String, BoundFile> = BTreeMap::new();
     let mut add = |role: &str, p: &Path, sha: String| {
@@ -520,7 +521,7 @@ pub fn resolve(desc: &PluginDescriptor, root: &Path) -> Result<Implementation> {
         });
     };
     add("program", &program, program_sha.clone());
-    let class = if is_this_binary(&program, &program_sha) && os_capability_server(&args) {
+    let class = if os_binary.is_some() && os_capability_server(&args) {
         ExecutionClass::OsProvided
     } else {
         ExecutionClass::Executable
