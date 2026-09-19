@@ -1,0 +1,162 @@
+
+=== base -> after ===
+synthesis.AC16-X1-upstream-change-chain: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 0, 'not-reached-after': 1, 'not-reached-before': 0}
+    X1-C9-cit-p-candidates-deduplicated                                    PASS         -> NOT_REACHED
+synthesis.AC16-X2-authority-gate-chain: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 1, 'not-reached-after': 4, 'not-reached-before': 0}
+    X2-E1xG2-worker-forgery-invisible-at-close                             FAIL         -> NOT_REACHED
+    X2-L3xE1-forged-human-approval-refused                                 PASS         -> NOT_REACHED
+    X2-L3xK2-forged-approval-cannot-execute                                PASS         -> NOT_REACHED
+    X2-L3xU-suite-detects-forged-approval                                  FAIL         -> NOT_REACHED
+zeta-r.W03-task-input-manifest: {'FAIL->PASS': 8, 'PASS->FAIL': 0, 'same': 12, 'not-reached-after': 0, 'not-reached-before': 0}
+    W3-m2-required-state-enforced                                          FAIL         -> PASS
+    W3-m3-hash-pin-enforced                                                FAIL         -> PASS
+    W3-r1-create-READY-with-missing-input                                  FAIL         -> PASS
+    W3-r1-replan-READY-with-missing-input                                  FAIL         -> PASS
+    W3-r1-status-READY-with-missing-input                                  FAIL         -> PASS
+    W3-r1-claim-with-missing-input                                         FAIL         -> PASS
+    W3-r1-missing-task-dependency-bypass-via-status                        FAIL         -> PASS
+    W3-r3-conflict-triggers-handling                                       FAIL         -> PASS
+zeta-r.W04-context-delivery: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 13, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W05-consumption-receipt: {'FAIL->PASS': 3, 'PASS->FAIL': 4, 'same': 3, 'not-reached-after': 10, 'not-reached-before': 0}
+    W5-c1-refuses-missing-traceability                                     FAIL         -> PASS
+    W5-r1-packet-hash-on-close-checkpoint                                  PASS         -> FAIL
+    W5-r2-outputs-produced                                                 PASS         -> FAIL
+    W5-r5-acceptance-evidence-bound-to-declared-tests                      FAIL         -> PASS
+    W5-r6-task-close-requires-unknowns                                     FAIL         -> PASS
+    W5-c3-code-linked-to-requirement                                       PASS         -> FAIL
+    W5-c3-report-linked-to-requirement                                     PASS         -> FAIL
+    W5-c3-report-task-edge-direction                                       PASS         -> NOT_REACHED
+    W5-c3-task-to-code-edge                                                FAIL         -> NOT_REACHED
+    W5-r3r4-fabricated-trace-refused                                       FAIL         -> NOT_REACHED
+    W5-r5-tests-status-enforced                                            PASS         -> NOT_REACHED
+    W5-r6-deviations-persisted-when-given                                  PASS         -> NOT_REACHED
+    W5-r6-handoff-return-requires-unknowns                                 PASS         -> NOT_REACHED
+    W5-c2-undocumented-change-detected                                     PASS         -> NOT_REACHED
+    W5-c2-untraceable-implementation-detected                              FAIL         -> NOT_REACHED
+    W5-c2-untraceable-implementation-reported-by-audit                     FAIL         -> NOT_REACHED
+    W5-c2-no-claim-observed-paths-correct                                  PASS         -> NOT_REACHED
+zeta-r.W08-lineage: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 0, 'not-reached-after': 24, 'not-reached-before': 0}
+    W8-l1-forward-reaches:SCN-0001                                         PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:REQ-0001                                         PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:D-0001                                           PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:ARCH-0001                                        PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:TASK-0001                                        PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:file:src/lib.rs                                  PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:file:tests/ledger_test.rs                        PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:RPT-0001                                         PASS         -> NOT_REACHED
+    W8-l1-forward-reaches:release                                          FAIL         -> NOT_REACHED
+    W8-l2-reverse-impact(REQ-0001)->task                                   PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(REQ-0001)->implementation                         PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(REQ-0001)->tests                                  PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(REQ-0001)->evidence                               PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(D-0001)->task                                     PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(D-0001)->implementation                           PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(D-0001)->tests                                    PASS         -> NOT_REACHED
+    W8-l2-reverse-impact(D-0001)->evidence                                 PASS         -> NOT_REACHED
+    W8-l3-missing-target-link-detected                                     PASS         -> NOT_REACHED
+    W8-l3-missing-feature-scenario-link-detected                           PASS         -> NOT_REACHED
+    W8-l3-missing-task-to-code-link-detected                               FAIL         -> NOT_REACHED
+    W8-l4-stale-link-to-superseded-detected                                FAIL         -> NOT_REACHED
+    W8-l5-intra-language-edges(ts)                                         PASS         -> NOT_REACHED
+    W8-l5-intra-language-edges(py)                                         PASS         -> NOT_REACHED
+    W8-l5-cross-language-through-interface                                 PASS         -> NOT_REACHED
+
+=== base-shim -> after-shim ===
+beta-r.C7-episodic-memory: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 0, 'not-reached-after': 7, 'not-reached-before': 0}
+    C7-b1:                                                                 PASS         -> NOT_REACHED
+    C7-b2:                                                                 PASS         -> NOT_REACHED
+    C7-b3:                                                                 PASS         -> NOT_REACHED
+    C7-b4:                                                                 PASS         -> NOT_REACHED
+    C7-b5:                                                                 FAIL         -> NOT_REACHED
+    C7-b6-discovery-indexed:                                               PASS         -> NOT_REACHED
+    C7-b6:                                                                 PASS         -> NOT_REACHED
+beta-r.C9-context-packet: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 10, 'not-reached-after': 0, 'not-reached-before': 0}
+delta-r.J1-J2-research-experiments: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 20, 'not-reached-after': 0, 'not-reached-before': 0}
+delta-r.L3-gate-presentation-attacks: {'FAIL->PASS': 4, 'PASS->FAIL': 0, 'same': 35, 'not-reached-after': 0, 'not-reached-before': 0}
+    L3.b4.t2                                                               FAIL         -> PASS
+    L3.b4.t3                                                               FAIL         -> PASS
+    L3.b4.t4                                                               FAIL         -> PASS
+    L3.b4.t5                                                               FAIL         -> PASS
+delta-r.L3-supplement: {'FAIL->PASS': 2, 'PASS->FAIL': 0, 'same': 0, 'not-reached-after': 0, 'not-reached-before': 0}
+    L3s.1                                                                  FAIL         -> PASS
+    L3s.2                                                                  FAIL         -> PASS
+synthesis.AC16-X1-upstream-change-chain: {'FAIL->PASS': 1, 'PASS->FAIL': 0, 'same': 14, 'not-reached-after': 0, 'not-reached-before': 0}
+    X1-G1xW6-direct-change-cannot-be-licensed-by-rebuild                   FAIL         -> PASS
+synthesis.AC16-X2-authority-gate-chain: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 1, 'not-reached-after': 14, 'not-reached-before': 0}
+    X2-E1xG2-worker-forgery-invisible-at-close                             FAIL         -> NOT_REACHED
+    X2-L3xE1-forged-human-approval-refused                                 PASS         -> NOT_REACHED
+    X2-L3xK2-forged-approval-cannot-execute                                PASS         -> NOT_REACHED
+    X2-L3xU-suite-detects-forged-approval                                  FAIL         -> NOT_REACHED
+    X2-L3-fabrication-default                                              FAIL         -> NOT_REACHED
+    X2-L3-fabrication-role-human                                           FAIL         -> NOT_REACHED
+    X2-L3-fabrication-env-GOV_ROLE                                         FAIL         -> NOT_REACHED
+    X2-E1-undeclared-role-is-not-orchestrator                              FAIL         -> NOT_REACHED
+    X2-E1-init-honours-declared-role                                       PASS         -> NOT_REACHED
+    X2-E3-return-bound-to-recipient                                        FAIL         -> NOT_REACHED
+    X2-N4xW5-worker-return-usable-at-close                                 FAIL         -> NOT_REACHED
+    X2-I4-blocked-not-runnable                                             FAIL         -> NOT_REACHED
+    X2-I4-continue-does-not-offer-blocked                                  FAIL         -> NOT_REACHED
+    X2-B1B3-nonrebuildable-state-not-classified-derived                    FAIL         -> NOT_REACHED
+zeta-r.W01-artefact-identity: {'FAIL->PASS': 1, 'PASS->FAIL': 0, 'same': 69, 'not-reached-after': 0, 'not-reached-before': 0}
+    W1-b7-task                                                             FAIL         -> PASS
+zeta-r.W02-typed-contracts: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 16, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W03-task-input-manifest: {'FAIL->PASS': 8, 'PASS->FAIL': 0, 'same': 12, 'not-reached-after': 0, 'not-reached-before': 0}
+    W3-m2-required-state-enforced                                          FAIL         -> PASS
+    W3-m3-hash-pin-enforced                                                FAIL         -> PASS
+    W3-r1-create-READY-with-missing-input                                  FAIL         -> PASS
+    W3-r1-replan-READY-with-missing-input                                  FAIL         -> PASS
+    W3-r1-status-READY-with-missing-input                                  FAIL         -> PASS
+    W3-r1-claim-with-missing-input                                         FAIL         -> PASS
+    W3-r1-missing-task-dependency-bypass-via-status                        FAIL         -> PASS
+    W3-r3-conflict-triggers-handling                                       FAIL         -> PASS
+zeta-r.W04-context-delivery: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 13, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W04b-input-class-delivery: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 13, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W05-consumption-receipt: {'FAIL->PASS': 2, 'PASS->FAIL': 0, 'same': 15, 'not-reached-after': 3, 'not-reached-before': 0}
+    W5-c3-task-to-code-edge                                                FAIL         -> PASS
+    W5-r3r4-fabricated-trace-refused                                       FAIL         -> PASS
+    W5-c2-untraceable-implementation-detected                              FAIL         -> NOT_REACHED
+    W5-c2-untraceable-implementation-reported-by-audit                     FAIL         -> NOT_REACHED
+    W5-c2-no-claim-observed-paths-correct                                  PASS         -> NOT_REACHED
+zeta-r.W06-staleness-propagation: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 26, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W07-orphan-detection: {'FAIL->PASS': 1, 'PASS->FAIL': 0, 'same': 11, 'not-reached-after': 0, 'not-reached-before': 0}
+    W7-o4b-feature-only-acceptance-test                                    FAIL         -> PASS
+zeta-r.W08-lineage: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 24, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W09-session-handoff-continuity: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 16, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W10-hard-invariant-attacks: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 23, 'not-reached-after': 0, 'not-reached-before': 0}
+zeta-r.W11-quantitative-health: {'FAIL->PASS': 0, 'PASS->FAIL': 0, 'same': 0, 'not-reached-after': 13, 'not-reached-before': 0}
+    W11-m1-required-input-delivery-accuracy                                FAIL         -> NOT_REACHED
+    W11-m2-current-version-selection-accuracy                              FAIL         -> NOT_REACHED
+    W11-m3-superseded-input-leakage-rate                                   FAIL         -> NOT_REACHED
+    W11-m4-missing-required-input-detection                                FAIL         -> NOT_REACHED
+    W11-m5-staleness-propagation-accuracy                                  FAIL         -> NOT_REACHED
+    W11-m6-requirement-to-code-traceability-coverage                       FAIL         -> NOT_REACHED
+    W11-m7-requirement-to-test-traceability-coverage                       FAIL         -> NOT_REACHED
+    W11-m8-orphan-detection-recall-fp                                      FAIL         -> NOT_REACHED
+    W11-m9-fresh-agent-reconstruction-correctness                          FAIL         -> NOT_REACHED
+    W11-m3-proxy-retrieval-superseded-hit-rate                             PASS         -> NOT_REACHED
+    W11-m6-proxy-task-traceability                                         PASS         -> NOT_REACHED
+    W11-m8-proxy-orphan-count                                              PASS         -> NOT_REACHED
+    W11-m9-proxy-fresh-agent-read-budget                                   PASS         -> NOT_REACHED
+zeta-r.W12-scheduler-integration: {'FAIL->PASS': 1, 'PASS->FAIL': 0, 'same': 3, 'not-reached-after': 10, 'not-reached-before': 0}
+    W12-G0-current-version-substitution-blocked(claim)                     FAIL         -> PASS
+    W12-G2-input-consumption-traceability-verified-at-close                FAIL         -> NOT_REACHED
+    W12-G3-continuity-verified(checkpoint)                                 FAIL         -> NOT_REACHED
+    W12-G4-cit-wider-propagation                                           PASS         -> NOT_REACHED
+    W12-G4-propagation-after-noncit-architecture-change                    FAIL         -> NOT_REACHED
+    W12-G5-audits-superseded-consumption                                   FAIL         -> NOT_REACHED
+    AC16-W12xO5-health-state-reflects-superseded-consumption               FAIL         -> NOT_REACHED
+    W12-G5-audits-missing-input                                            PASS         -> NOT_REACHED
+    AC16-W12xO5-health-state-reflects-missing-input                        PASS         -> NOT_REACHED
+    W12-G5-audits-end-to-end-lineage                                       FAIL         -> NOT_REACHED
+    AC16-W12xO5-tier-scheduler-present                                     PASS         -> NOT_REACHED
+
+=== derived X2 copy: base -> after ===
+AC16-X2-authority-gate-chain.derived.P2-AR-0026: {'FAIL->PASS': 1, 'PASS->FAIL': 0, 'same': 4, 'not-reached-after': 0, 'not-reached-before': 0}
+    X2-E1xG2-worker-forgery-invisible-at-close                             FAIL         -> PASS
+
+=== derived X2 copy: base-shim -> after-shim ===
+AC16-X2-authority-gate-chain.derived.P2-AR-0026: {'FAIL->PASS': 4, 'PASS->FAIL': 0, 'same': 11, 'not-reached-after': 0, 'not-reached-before': 0}
+    X2-E1xG2-worker-forgery-invisible-at-close                             FAIL         -> PASS
+    X2-N4xW5-worker-return-usable-at-close                                 FAIL         -> PASS
+    X2-I4-blocked-not-runnable                                             FAIL         -> PASS
+    X2-I4-continue-does-not-offer-blocked                                  FAIL         -> PASS

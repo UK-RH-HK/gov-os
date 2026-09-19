@@ -1,0 +1,241 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0026
+workstream: WS-5 (repair iteration 1, round 2)
+base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+work_commits: [1de472e08ea73462765ea8095ae154a791b55ce4, a60b8676dbe93f54312aed1d05c8d6da61a1bbac, 090eded736d1995e21bfe24fd73280f3b837dece]
+product_code_digest_before: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+product_code_digest_after: 7679602a12e887a2ea210fd50f253ca14e63daa431aaf03ee08c67235dcbd728
+governed_state_digest: 4981437f0dca482b0d7d2aba2d48378260a93eaace20f1ea15bb5761ec4c227d
+note: >-
+  Builder claims only (Contract v3 O3: builder evidence is regression evidence). Nothing here is acceptance.
+  REPAIRED_CLAIMED means the WS-5 side of the class is implemented and exercised; lines of audit probes that stop at a
+  claim or close the repaired requirements now refuse (fixture effects) are listed, not counted as passing.
+  "adapter" = the probe run through evidence/audit-probes/gov-adapter.py on both binaries (00-REPAIR-REPORT.md §9).
+claims:
+  - class: BC-P2-16
+    title: Runnable / claimable / READY derived from the task DAG
+    status: REPAIRED_CLAIMED
+    requirement: >-
+      A task is claimable, stored READY or offered as runnable only when the DAG allows it: dependencies and blocks,
+      readiness policy, TEST_POLICY, gates, mandatory task inputs present and valid, not held (Contract v3:392, :522,
+      :587, :1101; repair-delta BC-P2-16; A0-I1/I2, A0-W3, A0-E4 findings).
+    files:
+      - runtime/src/orchestration/dag.rs
+      - runtime/src/orchestration/tasks.rs
+      - runtime/src/orchestration/readiness.rs
+      - runtime/src/status.rs
+      - framework/schemas/task.schema.json
+    product_checks:
+      - "dag::evaluate / DagCtx / TaskEval — the single runnability decision (manifest via context::manifest::resolve, gates, readiness, TEST_POLICY, retest, explicit holds); used by dag::compute, dag::replan, tasks::claim, tasks::create, tasks::set_status, status::continue_work"
+      - "tasks::claim — TASK_NOT_RUNNABLE with every reason (runs on every `gov task claim` / `gov continue --claim`)"
+      - "tasks::create — `--status READY` stores the derived status and returns ready_check; refuses DONE/CLAIMED/IN_PROGRESS"
+      - "tasks::set_status — READY only if runnable (TASK_NOT_READY); DONE/CLAIMED/IN_PROGRESS refused TASK_STATUS_REQUIRES_OPERATION; BLOCKED/WAITING_HUMAN become explicit holds (status_source)"
+      - "dag::replan — promotes only runnable tasks, never an explicit hold"
+      - "dag::produces_feature_specification / packet_blocked_only_by_inherited — producers of a feature's specification are not blocked by inputs they only inherit from the feature (00-REPAIR-REPORT.md §1.4)"
+      - "certification test ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag"
+      - "unit tests orchestration::dag::tests::{explicit_hold_is_only_a_status_set_by_task_status_and_still_in_force, task_state_names_are_stable}; orchestration::tasks::tests::operation_only_statuses_name_their_route"
+    probes_rerun:
+      - probe: zeta-r W03-task-input-manifest.py (unedited and adapter)
+        before: "8 FAIL: W3-m2-required-state-enforced, W3-m3-hash-pin-enforced, W3-r1-{create,replan,status}-READY-with-missing-input, W3-r1-claim-with-missing-input, W3-r1-missing-task-dependency-bypass-via-status, W3-r3-conflict-triggers-handling"
+        after: "all 8 PASS; 12 other lines unchanged; 0 PASS->FAIL"
+        evidence: [evidence/audit-probes/base/zeta-r.W03-task-input-manifest.out, evidence/audit-probes/after/zeta-r.W03-task-input-manifest.out, evidence/audit-probes/COMPARE.out]
+      - probe: zeta-r W12-scheduler-integration.py (adapter)
+        before: "W12-G0-current-version-substitution-blocked(claim) FAIL"
+        after: "PASS; later sections not reached (their claims of tasks with absent mandatory inputs are refused)"
+        evidence: [evidence/audit-probes/after-shim/zeta-r.W12-scheduler-integration.out]
+      - probe: synthesis AC16-X2 derived copy (fixture-only, labelled; adapter)
+        before: "X2-I4-blocked-not-runnable FAIL, X2-I4-continue-does-not-offer-blocked FAIL"
+        after: "both PASS"
+        evidence: [evidence/derived/AC16-X2-authority-gate-chain.derived.P2-AR-0026.py, evidence/derived/base-shim/, evidence/derived/after-shim/]
+      - probe: gamma-r E4-claims.sh E4.b5 (adapter)
+        before: "claim of TASK-DEP-B (dependency open) ok, then closed DONE"
+        after: "claim TASK_NOT_RUNNABLE; close CLAIM_REQUIRED; TASK-DEP-B stays BLOCKED"
+        evidence: [evidence/audit-probes/after-shim/gamma-r.E4-claims.out]
+      - probe: gamma-r H2H3-readiness.sh H3.b5 (adapter)
+        before: "L2 `task status READY` on a readiness-blocked implementation task ok; implementer claim ok"
+        after: "TASK_NOT_READY; claim TASK_NOT_RUNNABLE"
+        evidence: [evidence/audit-probes/after-shim/gamma-r.H2H3-readiness.out]
+      - probe: evidence/probes/ws05_r2_supplementary.py section A
+        before: "A1-A4, A6-A8 FAIL (A5 control PASS)"
+        after: "A1-A8 PASS"
+        evidence: [evidence/supplementary/ws05-r2-supplementary.base-843d79c.out, evidence/supplementary/ws05-r2-supplementary.after-090eded.out]
+    integration_points:
+      - "WS-4 IP-R3-4: apply the producer rule inside context::manifest::resolve so `gov context manifest|receipt` agree with the DAG"
+      - "WS-2 O-R2-1: governance-affecting closes need a green suite; a suite DEGRADED by the incomplete specification the work completes refuses them (GOVERNANCE_SUITE_STALE)"
+      - "WS-2 O-R2-2: graph_integrity HIGH hard-blocks task.claim globally"
+      - "WS-1 IP-R3-8: evidence-map entries for the tests above"
+    residuals_and_limits:
+      - "Dependency completion reads the stored DONE status; task records are not yet sealed (IP-R3-1)."
+      - "Explicit holds come from `gov task status`; `task create --status BLOCKED` is a requested initial status, derived like any other."
+      - "Fixture effect: implementation tasks declaring no scenario/test and tasks with absent mandatory inputs are no longer claimable (AC16-X2 unedited, W05 S6, W11, W12 G2-G5 not reached)."
+    owner_decision_required: []
+
+  - class: BC-P2-12
+    title: Task-blocking Human Decision Gate semantics (DAG side)
+    status: REPAIRED_CLAIMED
+    scope: DAG, claim and close side; answer semantics are WS-3's
+    requirement: >-
+      Work blocked by a gate becomes runnable only on an authorising answer, returns to blocked when it is revoked or
+      withdrawn, cannot be completed while the gate is unanswered, and a reference to a missing gate blocks (Contract
+      v3:678; framework §53; repair-delta BC-P2-12).
+    files:
+      - runtime/src/orchestration/dag.rs
+      - runtime/src/orchestration/tasks.rs
+      - runtime/src/orchestration/intents.rs
+      - runtime/src/status.rs
+    product_checks:
+      - "dag::DagCtx::governing_gates — the task's human_gate plus the latest T2-verified gate whose blocks_tasks names it; each checked by gates::task_gate_authorisation_in (PENDING waits; DECLINED/WITHDRAWN/MISSING/UNVERIFIED block)"
+      - "tasks::close step 8 — GATE_NOT_AUTHORISED for every governing gate including the one recorded in the sealed claim baseline; not overridable by --force"
+      - "intents / status next_action — propose gate present, trust human-channel, decide, cit approve; never `--by human`"
+      - "certification test ws05::gates_decide_runnability_and_completion"
+    probes_rerun:
+      - probe: delta-r L3-gate-presentation-attacks.py (adapter)
+        before: "L3.b4.t2, L3.b4.t3, L3.b4.t4, L3.b4.t5 FAIL"
+        after: "all 4 PASS; 35 other lines unchanged"
+        evidence: [evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out, evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out]
+      - probe: delta-r L3-supplement.py (adapter)
+        before: "L3s.1 (close while the blocking gate is pending) FAIL, L3s.2 (intents propose --by human) FAIL"
+        after: "both PASS"
+        evidence: [evidence/audit-probes/after-shim/delta-r.L3-supplement.out]
+      - probe: evidence/probes/ws05_r2_supplementary.py section B
+        before: "B2-B6 FAIL (B1 control PASS; B7 control FAIL with USAGE on the base)"
+        after: "B1-B7 PASS (B6: GATE_NOT_AUTHORISED also with --force; B5: removing human_gate from the task record does not release it)"
+        evidence: [evidence/supplementary/ws05-r2-supplementary.after-090eded.out]
+    integration_points:
+      - "WS-2 IP-R3-7: map GATE_NOT_AUTHORISED (and TASK_NOT_READY, CLAIM_BASELINE_UNBOUND) to exit 4"
+      - "WS-3 IP-R3-9: document the new codes"
+    residuals_and_limits:
+      - "Hand-written (unverified) gates block the tasks they name, by design (T2); delta-r probes still stop at setup unedited (undeclared roles, WS-3 round 1)."
+    owner_decision_required: []
+
+  - class: BC-P2-20
+    title: Consumption receipt validated at close
+    status: REPAIRED_CLAIMED
+    scope: close side; the receipt contract and validator are WS-4's
+    requirement: >-
+      The worker's structured return is the consumption receipt, validated against the manifest at close; close refuses
+      missing mandatory traceability; code/test/output evidence links back to the authoritative inputs (Contract v3:1115-1126,
+      :1147-1152; repair-delta BC-P2-20).
+    files:
+      - runtime/src/orchestration/tasks.rs
+      - runtime/src/status.rs
+      - framework/schemas/report.schema.json
+      - framework/schemas/worker-return.schema.json
+      - framework/schemas/task.schema.json
+    product_checks:
+      - "tasks::close step 1 — context::receipt::report_from_worker_return (lossless status -> outcome)"
+      - "tasks::close step 12 / tasks::require_receipt — context::receipt::validate, RECEIPT_INVALID with every error (require_valid semantics plus the producer rule); canonical receipt and receipt_validation persisted on the sealed report"
+      - "tasks::close — task.outputs_produced = observed changes minus in-window CIT paths (task -> output lineage edge)"
+      - "tasks::close step 13 — verification::close_gate (product-test outcome from recorded evidence; no class exemption)"
+      - "status::continue_work — packets compiled through IndexHandle, BLOCKED packets deferred (ensure_dispatchable), receipt_contract delivered"
+      - "certification test ws05::close_requires_and_persists_the_consumption_receipt"
+    probes_rerun:
+      - probe: zeta-r W05-consumption-receipt.py (unedited)
+        before: "W5-c1-refuses-missing-traceability, W5-r5-acceptance-evidence-bound-to-declared-tests, W5-r6-task-close-requires-unknowns FAIL"
+        after: "all 3 PASS; 4 lines reading the never-written report PASS->FAIL and 10 not reached (the bare report is refused, then the probe aborts) — fixture effect, see 00-REPAIR-REPORT.md §3.2"
+        evidence: [evidence/audit-probes/base/zeta-r.W05-consumption-receipt.out, evidence/audit-probes/after/zeta-r.W05-consumption-receipt.out]
+      - probe: zeta-r W05-consumption-receipt.py (adapter)
+        before: "W5-r3r4-fabricated-trace-refused FAIL, W5-c3-task-to-code-edge FAIL"
+        after: "both PASS; 15 lines unchanged; S6 (3 lines) not reached (unscoped implementation task not runnable)"
+        evidence: [evidence/audit-probes/after-shim/zeta-r.W05-consumption-receipt.out]
+      - probe: zeta-r W08-lineage.py (adapter)
+        before: "42 PASS / 6 FAIL"
+        after: "identical"
+        evidence: [evidence/audit-probes/after-shim/zeta-r.W08-lineage.out]
+      - probe: synthesis AC16-X2 derived copy (adapter)
+        before: "X2-N4xW5-worker-return-usable-at-close FAIL (SCHEMA_INVALID)"
+        after: "PASS"
+        evidence: [evidence/derived/after-shim/AC16-X2-authority-gate-chain.derived.P2-AR-0026.out]
+      - probe: epsilon-r O1-product-families.sh §H (unedited)
+        before: "close with a self-attested tests.status=passed while the product suite fails -> DONE"
+        after: "RECEIPT_INVALID (under the adapter, which replaces `passed`, the close is accepted — line read unedited only)"
+        evidence: [evidence/audit-probes/after/epsilon-r.O1-product-families.out]
+      - probe: evidence/probes/ws05_r2_supplementary.py sections D and I
+        before: "D1-D3, I1 FAIL (D4 not reached on the base)"
+        after: "D1-D4, I1 PASS"
+        evidence: [evidence/supplementary/ws05-r2-supplementary.after-090eded.out]
+    integration_points:
+      - "WS-4 IP-R3-4 (producer rule in manifest::resolve), IP-R3-5 (UNTRACEABLE_IMPLEMENTATION when implementation is produced, not by class alone)"
+      - "WS-3 (from round 1, WS-4 IP-6): the CLI `continue` arm passes an IndexHandle; continue_work already accepts impl Into<IndexHandle>"
+    residuals_and_limits:
+      - "Every existing probe/fixture closing with a bare report is refused; the adapter shows the other lines."
+      - "No separate evidence line for UNTRACEABLE_IMPLEMENTATION in this run (the close refuses every validator error through RECEIPT_INVALID)."
+    owner_decision_required: []
+
+  - class: BC-P2-34
+    title: Independence from recorded authorship; designated task roles
+    status: REPAIRED_CLAIMED
+    scope: task-role side; adoption-stage independence, held-out protection and data records are WS-9/WS-2/WS-10
+    requirement: >-
+      Independence is established from recorded authorship (role and session of the author versus the implementer),
+      bound to the evidence; a task's designated role binds who may claim and close it (Contract v3:366, :521, :526,
+      :783-785; A0-E1-05, A0-H4-02). Agent roles stay adapter-declared (OWNER-DECISION-P2-0001 Option A).
+    files:
+      - runtime/src/orchestration/tasks.rs
+      - runtime/src/orchestration/dag.rs
+      - runtime/src/orchestration/readiness.rs
+      - runtime/src/status.rs
+      - framework/taxonomy/READINESS_DIMENSIONS.yaml
+    product_checks:
+      - "tasks::AuthorshipIndex — authorship from T2-sealed close reports and the exact content each accepted (content changed since only by an honoured COMMITTED CIT keeps the author)"
+      - "dag::DagCtx::obligation_dependence / data_dependence — TEST_POLICY-family obligations and their test data must have a recorded author independent of the implementation task, its designated role and its claim session; self-declared independence is ignored"
+      - "tasks::independence_conflicts — INDEPENDENCE_VIOLATION at claim and close; continue does not offer such work"
+      - "tasks::designated_role_refusal — role as recorded and as claimed (claim baseline contract)"
+      - "readiness::plan + READINESS_DIMENSIONS.yaml gap_task_role — independent-test-designer / data-author"
+      - "certification test ws05::independence_is_established_from_recorded_authorship; unit test orchestration::tasks::tests::independent_work_is_recognised_by_class_role_or_readiness_cell"
+    probes_rerun:
+      - probe: gamma-r E1-authority.sh E1.b4.b (adapter)
+        before: "implementer-authored obligation declaring independent_of_implementer:true -> TASK-IM2 runnable"
+        after: "TASK-IM2 blocked: independence not established from recorded authorship (the claim lines now hit HEALTH_HARD_BLOCK from the fixture's dangling TASK-NOPE, O-R2-2)"
+        evidence: [evidence/audit-probes/base-shim/gamma-r.E1-authority.out, evidence/audit-probes/after-shim/gamma-r.E1-authority.out]
+      - probe: gamma-r H4-scenarios-data-tests.sh H4.b2 (adapter)
+        before: "TD-0001 authored by the implementer role; TASK-0001 blocked reasons [] and runnable"
+        after: "TASK-0001 blocked, naming TD-0001's implementer authorship"
+        evidence: [evidence/audit-probes/after-shim/gamma-r.H4-scenarios-data-tests.out]
+      - probe: evidence/probes/ws05_r2_supplementary.py section E
+        before: "E1, E3, E4, E5 FAIL (E2, E6 controls PASS)"
+        after: "E1-E6 PASS"
+        evidence: [evidence/supplementary/ws05-r2-supplementary.after-090eded.out]
+    integration_points:
+      - "WS-4 IP-R3-3: OS writes into sealed reports / authored test obligations re-seal or are recorded in a CIT touched list (keeps recorded authorship)"
+      - "WS-4 IP-R3-6: content-hash CIT coverage, consumed by WS-5 in round 3"
+    residuals_and_limits:
+      - "Session and role are caller-declared (OWNER-DECISION-P2-0001 Option A, recorded residual risk)."
+      - "Hand-written independent obligations in fixtures (beta-r C7, gamma-r H4.b1/E1) now block the implementation tasks relying on them, by design."
+    owner_decision_required: []
+
+integration_points_implemented:
+  - {ip: IP-WS02-01, owner_side: WS-5, status: implemented, where: "tasks::close step 13 (verification::close_gate; touched excludes in-window CIT paths)"}
+  - {ip: IP-WS02-02, owner_side: WS-5, status: implemented, where: "tasks::create (scheduler::guard task.create)"}
+  - {ip: IP-WS02-03, owner_side: WS-5, status: implemented, where: "tasks::claim; status::continue_work with --claim, before any side effect"}
+  - {ip: IP-WS02-04, owner_side: WS-5, status: implemented, where: "status::status health = scheduler::status"}
+  - {ip: WS-3 IP-1, owner_side: WS-5, status: implemented, where: "tasks::classify_os_path / observe_against (T2 classification) and close step 8 (GATE_NOT_AUTHORISED)", limit: "unsealed records of kinds not yet sealed by every writer are reported (os_managed_unbound), not refused — 00-REPAIR-REPORT.md §5.4"}
+  - {ip: WS-3 IP-2, owner_side: WS-5, status: implemented, where: "dag::DagCtx::governing_gates via gates::task_gate_authorisation_in"}
+  - {ip: WS-3 IP-3, owner_side: WS-5, status: implemented, where: "intents.rs, status next_action"}
+  - {ip: WS-4 IP-1, owner_side: WS-5, status: implemented, where: "dag::evaluate (manifest), create/status/replan/claim"}
+  - {ip: WS-4 IP-2, owner_side: WS-5, status: implemented, where: "tasks::close steps 1 and 12, outputs_produced"}
+  - {ip: WS-4 IP-3, owner_side: WS-5, status: implemented, where: "status::continue_work"}
+  - {ip: WS-4 IP-4, owner_side: WS-5, status: implemented, where: "tasks::create provenance / provenance_requested; readiness::plan"}
+  - {ip: WS-4 IP-5, owner_side: WS-5, status: implemented, where: "framework/schemas/task.schema.json 1.1.0"}
+  - {ip: WS-4 IP-6, owner_side: WS-5, status: implemented_ws5_side, where: "status::continue_work accepts impl Into<IndexHandle>; the CLI arm is WS-3's"}
+  - {ip: WS-5 IP-4, owner_side: WS-5, status: implemented, where: "tasks::release control::guard_write; not a §5 allow-list activity; R1 unchanged"}
+  - {ip: WS-5 IP-5, owner_side: WS-5, status: implemented, where: "closed_states and authorship read sealed reports only; claim baselines and carried sets sealed; cit_window_paths honours verified CIT records", limit: "unsealed CIT records honoured only while t2::SEALED_RECORD_TYPES lacks 'cit' (IP-R3-2)"}
+  - {ip: WS-5 IP-9, owner_side: WS-5, status: implemented, where: "tasks::claim consults dag::evaluate"}
+  - {ip: WS-8 IP-4, owner_side: WS-5, status: implemented, where: "status::status release_trust from srr::installation::posture_of; marking/below_floor still from Degraded::load"}
+
+new_integration_points: [IP-R3-1, IP-R3-2, IP-R3-3, IP-R3-4, IP-R3-5, IP-R3-6, IP-R3-7, IP-R3-8, IP-R3-9, IP-R3-10]
+new_integration_points_detail: 00-REPAIR-REPORT.md §6.2
+observations_routed: [O-R2-1, O-R2-2, O-R2-3, O-R2-4]
+
+regression:
+  cargo_test_lib: {passed: 151, failed: 0, evidence: evidence/regression/cargo-test-lib.out}
+  cargo_test_certification: {passed: 107, failed: 0, evidence: evidence/regression/cargo-test-certification.out}
+  rustfmt_and_warnings: {result: clean, warnings: 0, evidence: evidence/regression/rustfmt-and-warnings.out}
+r1_heldout:
+  evidence: evidence/r1-heldout/r1-heldout-090eded.out
+  AR-0027: {passed: 26, failed: 3, at_baseline: true}
+  AR-0029: {passed: 26, failed: 2, ho_f_compiles: false, at_baseline: true}
+  AR-0031: {passed: 27, failed: 7, at_baseline: true}
+  AR-0033: {passed: 30, failed: 1, failing: [hv_a_derivation::a1 size pin], census: "105 files / 1499 functions, 0 violations in every §6 activity"}
+owner_decision_required: []
