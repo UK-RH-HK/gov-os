@@ -1,0 +1,150 @@
+# P2-AR-0019: PASS/FAIL summary lines of every beta-r audit-of-record probe — audit of record (cap2-candidate-0) vs this
+# worktree before repair (base c6b60bc, named probes only) vs after repair (work commit 2f4ee57). Probes run unedited from release/capability-baseline/audit-0/beta-r/evidence.
+
+## C3-semantic-memory  record 11P/3F | before 11P/3F | after 14P/0F
+  before PASS -> after PASS  C3-b1
+  before PASS -> after PASS  C3-b2
+  before PASS -> after PASS  C3-b3
+  before PASS -> after PASS  C3-b3r
+  before PASS -> after PASS  C3-b4
+  before PASS -> after PASS  C3-b5
+  before PASS -> after PASS  C3-b5s
+  before FAIL -> after PASS  C3-b5-lists   <-- changed
+  before PASS -> after PASS  C3-b6
+  before PASS -> after PASS  C3-b6-selected
+  before PASS -> after PASS  C3-b7-role-filter
+  before PASS -> after PASS  C3-b7-authority-filter
+  before FAIL -> after PASS  C3-b7-filter-before-truncation   <-- changed
+  before FAIL -> after PASS  C3-b7-no-excluded-text-to-plugin   <-- changed
+
+## C4-lexical-memory  record 21P/13F | before 21P/13F | after 33P/1F
+  before PASS -> after PASS  C4-b1-router
+  before PASS -> after PASS  C4-b1-lexical
+  before PASS -> after PASS  C4-b2-router
+  before PASS -> after PASS  C4-b2-lexical
+  before PASS -> after PASS  C4-b2c-router
+  before PASS -> after PASS  C4-b2c-lexical
+  before FAIL -> after PASS  C4-b3-router   <-- changed
+  before PASS -> after PASS  C4-b3-lexical
+  before FAIL -> after PASS  C4-b3b-router   <-- changed
+  before PASS -> after PASS  C4-b3b-lexical
+  before PASS -> after PASS  C4-b3p-router
+  before PASS -> after PASS  C4-b3p-lexical
+  before PASS -> after PASS  C4-b4-router
+  before PASS -> after PASS  C4-b4-lexical
+  before PASS -> after PASS  C4-b4m-router
+  before PASS -> after PASS  C4-b4m-lexical
+  before PASS -> after PASS  C4-b5k-router
+  before PASS -> after PASS  C4-b5k-lexical
+  before FAIL -> after PASS  C4-b5a-router   <-- changed
+  before FAIL -> after PASS  C4-b5a-lexical   <-- changed
+  before PASS -> after PASS  C4-b5n-router
+  before PASS -> after PASS  C4-b5n-lexical
+  before PASS -> after PASS  C4-b6-router
+  before PASS -> after PASS  C4-b6-lexical
+  before FAIL -> after PASS  C4-b6l-router   <-- changed
+  before FAIL -> after PASS  C4-b6l-lexical   <-- changed
+  before PASS -> after PASS  C4-b6s-router
+  before FAIL -> after PASS  C4-b6s-lexical   <-- changed
+  before FAIL -> after PASS  C4-cov-q1-router   <-- changed
+  before FAIL -> after PASS  C4-cov-q1-lexical   <-- changed
+  before FAIL -> after PASS  C4-cov-q2-router   <-- changed
+  before FAIL -> after PASS  C4-cov-q2-lexical   <-- changed
+  before FAIL -> after PASS  C4-coverage   <-- changed
+  before FAIL -> after FAIL  C4-exactness
+
+## C5-code-structural-memory  record 7P/4F | before 7P/4F | after 10P/1F
+  before PASS -> after FAIL  C5-b1   <-- changed
+  before PASS -> after PASS  C5-b8
+  before PASS -> after PASS  C5-b8-degrade
+  before PASS -> after PASS  C5-b2
+  before PASS -> after PASS  C5-b3-interfaces
+  before FAIL -> after PASS  C5-b3-inheritance   <-- changed
+  before PASS -> after PASS  C5-b4
+  before FAIL -> after PASS  C5-b5   <-- changed
+  before FAIL -> after PASS  C5-b6   <-- changed
+  before FAIL -> after PASS  C5-b7-tests-dir   <-- changed
+  before PASS -> after PASS  C5-b7-relative
+
+## C7-episodic-memory  record 6P/1F | before 6P/1F | after 7P/0F
+  before PASS -> after PASS  C7-b1
+  before PASS -> after PASS  C7-b2
+  before PASS -> after PASS  C7-b3
+  before PASS -> after PASS  C7-b4
+  before PASS -> after PASS  C7-b5
+  before FAIL -> after PASS  C7-b6-discovery-indexed   <-- changed
+  before PASS -> after PASS  C7-b6
+
+## C8-failure-memory  record 6P/2F | before 6P/2F | after 8P/0F
+  before PASS -> after PASS  C8-b1
+  before PASS -> after PASS  C8-b2
+  before PASS -> after PASS  C8-b3
+  before PASS -> after PASS  C8-b4-heldout
+  before FAIL -> after PASS  C8-b4-adhoc   <-- changed
+  before PASS -> after PASS  C8-b5
+  before PASS -> after PASS  C8-b6
+  before FAIL -> after PASS  C8-b7   <-- changed
+
+## C9-context-packet  record 8P/2F | before 8P/2F | after 9P/1F
+  before PASS -> after PASS  C9-b1
+  before PASS -> after PASS  C9-b2
+  before PASS -> after PASS  C9-b3
+  before FAIL -> after FAIL  C9-b3-policy-fields
+  before PASS -> after PASS  C9-b4
+  before PASS -> after PASS  C9-b4-overbudget
+  before PASS -> after PASS  C9-b5
+  before PASS -> after PASS  C9-b6-per-artifact-cap
+  before FAIL -> after PASS  C9-b6-content-dups   <-- changed
+  before PASS -> after PASS  C9-b7
+
+## D1-incremental-freshness  record 8P/3F | before 8P/3F | after 11P/0F
+  before PASS -> after PASS  D1-b1
+  before PASS -> after PASS  D1-b2-own
+  before FAIL -> after PASS  D1-b2-dependants   <-- changed
+  before PASS -> after PASS  D1-b3
+  before PASS -> after PASS  D1-b4
+  before PASS -> after PASS  D1-b5
+  before PASS -> after PASS  D1-b6
+  before FAIL -> after PASS  D1-pathmap-freshness   <-- changed
+  before FAIL -> after PASS  D1-pathmap-incremental   <-- changed
+  before PASS -> after PASS  D1-sensitivity-freshness
+  before PASS -> after PASS  D1-sensitivity-incremental
+
+## D2-retrieval-router  record 5P/4F | before 5P/4F | after 9P/0F
+  before PASS -> after PASS  D2-b1
+  before FAIL -> after PASS  D2-b1-rank1   <-- changed
+  before PASS -> after PASS  D2-b2
+  before PASS -> after PASS  D2-b3
+  before FAIL -> after PASS  D2-b3-filename   <-- changed
+  before FAIL -> after PASS  D2-b4   <-- changed
+  before FAIL -> after PASS  D2-b4-code   <-- changed
+  before PASS -> after PASS  D2-b5
+  before PASS -> after PASS  D2-b6
+
+## D3-hierarchical-retrieval  record 4P/1F | before 4P/1F | after 5P/0F
+  before PASS -> after PASS  D3-b1
+  before PASS -> after PASS  D3-b2-symbols
+  before FAIL -> after PASS  D3-b2-chunks   <-- changed
+  before PASS -> after PASS  D3-b3
+  before PASS -> after PASS  D3-b4
+
+## X-K2-D1-W6-interactions  record 3P/2F | before 3P/2F | after 5P/0F
+  before PASS -> after PASS  K2-D1-1
+  before FAIL -> after PASS  K2-D1-2   <-- changed
+  before FAIL -> after PASS  K2-D1-3   <-- changed
+  before PASS -> after PASS  D1-W6-1
+  before PASS -> after PASS  D1-W6-3
+
+## other beta-r probes (regression check: identical PASS/FAIL lines to the audit of record)
+  C1-deterministic-structured-memory: record 18P/0F  after 18P/0F  IDENTICAL
+  C2-relationship-graph: record 7P/3F  after 7P/3F  IDENTICAL
+  C6-temporal-memory: record 5P/1F  after 5P/1F  IDENTICAL
+  C10-capability-memory: record 6P/4F  after 6P/4F  IDENTICAL
+  D4-component-separation: record 9P/2F  after 9P/2F  IDENTICAL
+  D5-model-selection: record 7P/4F  after 7P/4F  IDENTICAL
+  D6-rebuild-guarantee: record 6P/2F  after 6P/2F  IDENTICAL
+  R1-R2-legacy-and-chat-retirement: record 8P/5F  after 8P/5F  IDENTICAL
+  R3-archive-policy: record 3P/1F  after 3P/1F  IDENTICAL
+  FRESH-evidence-invalidation: record 2P/3F  after 2P/3F  IDENTICAL
+  DERIVED-views-reconciliation: record 0P/2F  after 0P/2F  IDENTICAL
+  SCALE-retrieval-latency: record 0P/0F  after 0P/0F  IDENTICAL

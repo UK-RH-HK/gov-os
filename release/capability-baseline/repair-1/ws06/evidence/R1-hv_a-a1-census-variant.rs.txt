@@ -1,0 +1,47 @@
+//! P2-AR-0019 DERIVED VARIANT (not the unedited suite): AR-0033 hv_a_derivation::a1 with only its two pinned-scale
+//! assertions (84 files / 740 functions) removed, so its independent section-6 census runs on a grown product tree.
+mod common;
+use common::*;
+use gov_runtime::srr::breakglass as bg;
+
+#[test]
+fn a1_census_without_the_scale_pin() {
+    let files = product_files();
+    let funcs = product_functions(true);
+    println!("independent walk: {} files, {} functions", files.len(), funcs.len());
+
+    let mut report = vec![];
+    let mut total_violations = vec![];
+    for (activity, sig, acc) in bg::SECTION_6_SIGNATURES {
+        if *activity == "normal_privileged_operation" {
+            continue;
+        }
+        let derived: Vec<&Fun> = funcs.iter().filter(|f| any(&f.body, sig)).collect();
+        let writers: Vec<&&Fun> = derived.iter().filter(|f| is_write(&f.body)).collect();
+        let (mut viol, mut exempt) = (vec![], vec![]);
+        for f in &writers {
+            if any(&f.body, acc) {
+                continue;
+            }
+            let s = f.site();
+            if bg::derivation_exemption(activity, &s).is_some() {
+                exempt.push(s);
+            } else {
+                viol.push(s);
+            }
+        }
+        report.push(format!(
+            "{activity}: derived {} / writers {} / exempt {} / violations {}",
+            derived.len(),
+            writers.len(),
+            exempt.len(),
+            viol.len()
+        ));
+        total_violations.extend(viol);
+    }
+    println!("AR-0033 independent §6 census:\n  {}", report.join("\n  "));
+    assert!(
+        total_violations.is_empty(),
+        "independently derived §6 violations in the candidate: {total_violations:?}"
+    );
+}

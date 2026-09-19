@@ -1,0 +1,65 @@
+# command: PROBE_TMP=<scratch> python3 D3-hierarchical-retrieval.py   (before, HEAD c6b60bc, run 2026-09-18T23:16:36Z)
+$ gov --role orchestrator init --name orders-ledger --alias d3 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+D3-b1 document -> section/record -> child chunk
+====================================================================================================
+   ('file:docs/settlement-design.md#0', 'document', 'docs/settlement-design.md', None, 25)
+   ('file:docs/settlement-design.md#1', 'section', 'Settlement design', 'file:docs/settlement-design.md#0', 54)
+   ('file:docs/settlement-design.md#2', 'section', 'Ingestion', 'file:docs/settlement-design.md#0', 1210)
+   ('file:docs/settlement-design.md#3', 'child', 'Ingestion', 'file:docs/settlement-design.md#2', 933)
+   ('file:docs/settlement-design.md#4', 'child', 'Ingestion', 'file:docs/settlement-design.md#2', 959)
+   ('file:docs/settlement-design.md#5', 'section', 'Matching', 'file:docs/settlement-design.md#0', 848)
+record D-0102 chunk tree: [('D-0102#0', 'document', 'Store money as integer cents', None), ('D-0102#1', 'section', 'rationale', 'D-0102#0')]
+[PASS] D3-b1: documents and records are indexed as document -> section/field -> child chunks with parent pointers
+
+====================================================================================================
+D3-b2 code file -> module/class -> function/symbol
+====================================================================================================
+   ('file:src/app/pipeline.py#0', 'document', 'src/app/pipeline.py', None, 376)
+   ('file:src/app/pipeline.py#1', 'section', '__module__', 'file:src/app/pipeline.py#0', 28)
+   ('file:src/app/pipeline.py#2', 'section', 'SettlementPipeline', 'file:src/app/pipeline.py#0', 1219)
+   ('file:src/app/pipeline.py#3', 'child', 'SettlementPipeline', 'file:src/app/pipeline.py#2', 1168)
+   ('file:src/app/pipeline.py#4', 'child', 'SettlementPipeline', 'file:src/app/pipeline.py#2', 950)
+symbols: [('pipeline', 'module', None, 1, 68), ('SettlementPipeline', 'class', None, 4, 68), ('SettlementPipeline.step_1', 'method', 'SettlementPipeline', 7, 10), ('SettlementPipeline.step_2', 'method', 'SettlementPipeline', 11, 14), ('SettlementPipeline.step_3', 'method', 'SettlementPipeline', 15, 18), ('SettlementPipeline.step_4', 'method', 'SettlementPipeline', 19, 22), ('SettlementPipeline.step_5', 'method', 'SettlementPipeline', 23, 26), ('SettlementPipeline.step_6', 'method', 'SettlementPipeline', 27, 30), ('SettlementPipeline.step_7', 'method', 'SettlementPipeline', 31, 34), ('SettlementPipeline.step_8', 'method', 'SettlementPipeline', 35, 38), ('SettlementPipeline.step_9', 'method', 'SettlementPipeline', 39, 42), ('SettlementPipeline.step_10', 'method', 'SettlementPipeline', 43, 46), ('SettlementPipeline.step_11', 'method', 'SettlementPipeline', 47, 50), ('SettlementPipeline.step_12', 'method', 'SettlementPipeline', 51, 54), ('SettlementPipeline.step_13', 'method', 'SettlementPipeline', 55, 58), ('SettlementPipeline.step_14', 'method', 'SettlementPipeline', 59, 62), ('SettlementPipeline.step_15', 'method', 'SettlementPipeline', 63, 66), ('SettlementPipeline.reconcile_quarantine', 'method', 'SettlementPipeline', 67, 68)]
+chunks whose section is a method (Class.method): []
+$ gov --role orchestrator memory query SettlementPipeline.reconcile_quarantine --k 5  -> exit 0 ok=True
+symbol query SettlementPipeline.reconcile_quarantine -> [('file:src/app/pipeline.py', 'file:src/app/pipeline.py#0', 'document', 'src/app/pipeline.py')]
+[PASS] D3-b2-symbols: the class -> method hierarchy is held in the symbol store
+excerpt returned for the method lookup (first 160 chars): 'src/app/pipeline.py\n"""Settlement pipeline."""\n\n\nclass SettlementPipeline:\n    """Runs settlement steps."""\n\n    def step_1(self, rows):\n        """Pipeline ste'
+[FAIL] D3-b2-chunks: a function/method inside a class is retrievable as its own unit (chunk hierarchy file -> class -> method)
+
+====================================================================================================
+D3-b3 child-first retrieval
+====================================================================================================
+$ gov --role orchestrator memory query 'how long does the quarantine bucket keep malformed rows' --k 5  -> exit 0 ok=True
+hits: [('file:docs/settlement-design.md', 'file:docs/settlement-design.md#3', 'child', 'Ingestion'), ('file:docs/settlement-design.md', 'file:docs/settlement-design.md#4', 'child', 'Ingestion'), ('file:src/app/pipeline.py', 'file:src/app/pipeline.py#4', 'child', 'SettlementPipeline'), ('SCN-0001', 'SCN-0001#0', 'document', 'Two orders totalled'), ('file:src/app/pipeline.py', 'file:src/app/pipeline.py#3', 'child', 'SettlementPipeline')]
+top hit level: child | contains the answer: True | parent_excerpt present: True
+[PASS] D3-b3: the precise child chunk holding the answer is retrieved first (not the whole section/document)
+
+====================================================================================================
+D3-b4 selective parent / graph-neighbour expansion
+====================================================================================================
+$ gov --role orchestrator policy effective MEMORY_POLICY  -> exit 0 ok=True
+MEMORY_POLICY.retrieval parent_expansion_top_n / graph_neighbour_depth: 3 1
+$ gov --role orchestrator memory query 'settlement batch streamed in pages validated before commit quarantine matching' --k 8  -> exit 0 ok=True
+  #1 file:docs/settlement-design.md     level=child    parent_excerpt=yes neighbours=0
+  #2 file:docs/settlement-design.md     level=section  parent_excerpt=no  neighbours=0
+  #3 file:src/app/pipeline.py           level=section  parent_excerpt=no  neighbours=0
+  #4 RES-0101                           level=section  parent_excerpt=no  neighbours=0
+  #5 file:governance/kernel/skills/SKL-LIVE-MIGRATION.yaml level=section  parent_excerpt=no  neighbours=0
+  #6 file:docs/runbook.md               level=section  parent_excerpt=no  neighbours=0
+  #7 file:config/settings.yaml          level=section  parent_excerpt=no  neighbours=0
+  #8 file:governance/kernel/skills/SKL-LIVE-MIGRATION.yaml level=document parent_excerpt=no  neighbours=0
+$ gov --role orchestrator memory query 'REQ-0001 exact integer cents' --k 5  -> exit 0 ok=True
+neighbour expansion for a record hit: [('REQ-0001', ['→REALISES F-0001', '←TESTS TST-0001']), ('REQ-0001', ['→REALISES F-0001', '←TESTS TST-0001'])]
+[PASS] D3-b4: only the top-N hits are expanded: child hits get their parent section, record hits their graph neighbours
+
+=== SUMMARY ===
+PASS  D3-b1  documents and records are indexed as document -> section/field -> child chunks with parent pointers
+PASS  D3-b2-symbols  the class -> method hierarchy is held in the symbol store
+FAIL  D3-b2-chunks  a function/method inside a class is retrievable as its own unit (chunk hierarchy file -> class -> method)
+PASS  D3-b3  the precise child chunk holding the answer is retrieved first (not the whole section/document)
+PASS  D3-b4  only the top-N hits are expanded: child hits get their parent section, record hits their graph neighbours
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes-before-1789773388/D3-hierarchical-retrieval
