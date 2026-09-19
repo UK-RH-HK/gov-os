@@ -247,23 +247,43 @@ pub const DECISION_DERIVATION_FIELDS: &[&str] = &[
     STATE_FIELD,
 ];
 
+/// Fields of a task record its lifecycle operations establish — a claim, a close, a status transition, the
+/// planner's provenance (WS-5). A governed change may revise the task's contract (objective, inputs, scope), and that
+/// is re-sealed; a CIT writing one of these is not, so a transaction cannot pass for a close or a claim.
+pub const TASK_OPERATION_FIELDS: &[&str] = &[
+    "task_status",
+    "status_source",
+    "closed_by_report",
+    "closed_at",
+    "outputs_produced",
+    "claimed_by",
+    "claim",
+    "provenance",
+    "revalidation",
+    "retest_required",
+    crate::t2::SEAL_FIELD,
+];
+
 /// Is a content write of `field` (`None`: a whole-record rewrite) into a record of type `rtype`, made by a governed
 /// change (a CIT manifest op), one the OS may seal as its own? Not for [`OPERATION_OWNED_TYPES`], not for a
-/// decision's [`DECISION_DERIVATION_FIELDS`] (nor a whole-record rewrite of a decision); yes otherwise.
+/// decision's [`DECISION_DERIVATION_FIELDS`] or a task's [`TASK_OPERATION_FIELDS`] (nor a whole-record rewrite of
+/// either); yes otherwise.
 pub fn content_write_entitled(rtype: &str, field: Option<&str>) -> bool {
     if OPERATION_OWNED_TYPES.contains(&rtype) {
         return false;
     }
-    if rtype == "decision" {
-        return match field {
-            Some(f) => {
-                let top = f.split('.').next().unwrap_or(f);
-                !DECISION_DERIVATION_FIELDS.contains(&top)
-            }
-            None => false,
-        };
+    let protected: &[&str] = match rtype {
+        "decision" => DECISION_DERIVATION_FIELDS,
+        "task" => TASK_OPERATION_FIELDS,
+        _ => return true,
+    };
+    match field {
+        Some(f) => {
+            let top = f.split('.').next().unwrap_or(f);
+            !protected.contains(&top)
+        }
+        None => false,
     }
-    true
 }
 
 /// Does `rec` carry a T2 seal that verifies on this machine? Call it **before** modifying the record, and pass the
@@ -519,6 +539,13 @@ mod tests {
             assert!(!content_write_entitled("decision", Some(f)), "{f}");
         }
         assert!(!content_write_entitled("decision", None));
+        // a task's contract may be revised through change control; its claim, close and status may not
+        assert!(content_write_entitled("task", Some("objective")));
+        assert!(content_write_entitled("task", Some("allowed_paths")));
+        for f in ["task_status", "closed_by_report", "outputs_produced"] {
+            assert!(!content_write_entitled("task", Some(f)), "{f}");
+        }
+        assert!(!content_write_entitled("task", None));
     }
 
     #[test]

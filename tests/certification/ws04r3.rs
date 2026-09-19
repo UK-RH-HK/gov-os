@@ -711,3 +711,71 @@ fn untraceable_implementation_is_judged_on_what_was_produced() {
         "{produced}"
     );
 }
+
+/// **Pending integration point IP-R3-WS04-01 (WS-3, `gates.rs`)** — ignored until it lands, then run at integration.
+/// A gate operation that writes a CIT record (`gates::answer` records the decision and marks a declined transaction
+/// REJECTED; `gates::revoke` returns it to SIMULATED) must re-seal the record when its seal verified before the write
+/// (`cit::binding::reseal_if_verified(c, was_verified, true, "gate answer")`), as every other OS writer does (O-7).
+/// Until then a CIT declined inside another task's claim window leaves a broken seal on an OS-managed path, and that
+/// task's close is refused as a T2 violation it did not commit.
+#[test]
+#[ignore = "IP-R3-WS04-01: gates::answer/revoke must re-seal the CIT records they write (WS-3); un-ignore at integration"]
+fn a_cit_declined_during_another_tasks_claim_does_not_block_its_close() {
+    let (root, g) = fresh("ws4r3-decline");
+    let f = json!({"requirements": ["REQ-0002"]}).to_string();
+    let t = id(&g.ok(&[
+        "task",
+        "create",
+        "--objective",
+        "refund log",
+        "--class",
+        "discovery",
+        "--status",
+        "READY",
+        "--allowed",
+        "src/**",
+        "--fields",
+        &f,
+    ]));
+    g.ok(&["context", "compile", &t]);
+    g.ok(&["task", "claim", &t]);
+    let mf = manifest(
+        &root,
+        "decline",
+        json!([{"op": "set_field", "target": "REQ-0001", "field": "statement", "value": "totals are floats"}]),
+    );
+    let c = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        "floats",
+        "--trigger",
+        "behaviour_change",
+        "--manifest",
+        &mf,
+    ]);
+    let cid = id(&c);
+    let gate = c["simulation"]["human_gate"].as_str().unwrap().to_string();
+    g.ok(&["gate", "present", &gate]);
+    crate::ws03::human_decide(&g, &gate, "B");
+    assert_eq!(
+        cit_seal(&g, &cid),
+        "VERIFIED",
+        "the gate's write re-sealed the CIT"
+    );
+    write(&root, "src/refunds.rs", "pub fn log() {}\n");
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let rep = crate::ws05::receipt(
+        &g,
+        &root,
+        &t,
+        "t",
+        "refund log",
+        &["src/refunds.rs"],
+        "not_applicable_with_reason",
+    );
+    assert_eq!(
+        g.ok(&["task", "close", &t, "--report", &rep])["task_status"],
+        "DONE"
+    );
+}
