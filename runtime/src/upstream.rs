@@ -508,16 +508,87 @@ pub struct ExportApprovalRequest<'a> {
     pub destination: &'a str,
 }
 
-/// **The export-approval hook.** Every upstream submission obtains its approval here and nowhere else.
+/// The Human Decision Gate trigger of an upstream export approval.
+pub const EXPORT_TRIGGER: &str = "upstream_export";
+
+/// What an export approval is bound to (`human-gate.subject`): the packet id, the lesson it was prepared from and the
+/// payload hash of exactly the content that would leave (problem statement, failure mode, impact, suggested change,
+/// synthetic fixture, metrics). Its `sha256` is the subject a human answer must approve.
+pub fn export_subject(packet_id: &str, lesson_id: &str, payload_hash: &str) -> Value {
+    let body = json!({"kind": "upstream-export", "packet_id": packet_id, "lesson_id": lesson_id, "payload_hash": payload_hash});
+    let sha = crate::util::sha256_text(&crate::util::canonical_json(&body));
+    json!({"kind": "upstream-export", "id": packet_id, "lesson_id": lesson_id, "payload_hash": payload_hash, "sha256": sha})
+}
+
+/// The export-approval gates raised for `packet_id`, newest first.
+fn export_gates(p: &Project, packet_id: &str) -> Vec<crate::records::Record> {
+    let mut v: Vec<crate::records::Record> = RecordStore::load(&p.root)
+        .of_type("human-gate")
+        .into_iter()
+        .filter(|g| {
+            g.get("trigger") == EXPORT_TRIGGER
+                && g.data["subject"]["kind"] == "upstream-export"
+                && g.data["subject"]["id"].as_str() == Some(packet_id)
+        })
+        .cloned()
+        .collect();
+    v.sort_by_key(|g| std::cmp::Reverse(g.id()));
+    v
+}
+
+/// Raise the export-approval Human Decision Gate for a prepared packet (a system gate: the OS asks the human whether
+/// exactly this content may leave the project). The package shows what would leave; the subject binds its hash.
+pub fn raise_export_gate(p: &Project, packet: &Value) -> Result<Value> {
+    let packet_id = packet["packet_id"].as_str().unwrap_or("");
+    let lesson_id = packet["lesson_id"].as_str().unwrap_or("");
+    let payload_hash = packet["payload_hash"].as_str().unwrap_or("");
+    let clip = |f: &str| -> String {
+        let t = packet[f].as_str().unwrap_or("").replace('\n', " ");
+        if t.chars().count() > 240 {
+            format!("{}…", t.chars().take(240).collect::<String>())
+        } else {
+            t
+        }
+    };
+    let fixture_files: Vec<String> = packet["synthetic_fixture"]["files"]
+        .as_object()
+        .map(|o| o.keys().cloned().collect())
+        .unwrap_or_default();
+    crate::orchestration::gates::create_system(
+        p,
+        json!({
+            "question": format!("Export framework-lesson packet {packet_id} (from lesson {lesson_id}) to the canonical Governance OS repository?"),
+            "why_now": "LEARNING_POLICY.upstream.approval = human: a sanitised packet passed every export scan and waits for the product owner's approval before anything leaves the project (framework §75G step 7; release protocol §14)",
+            "current_state": format!("packet {packet_id} is prepared in the project's outbound area and has not left it. Category: {}. Problem: {}. Failure mode: {}. Impact: {}. Suggested framework change: {}. Synthetic fixture files: {}. Payload sha256 {payload_hash}.",
+                clip("category"), clip("problem_statement"), clip("generic_failure_mode"), clip("impact"), clip("suggested_framework_change"), if fixture_files.is_empty() { "none".to_string() } else { fixture_files.join(", ") }),
+            "options": [
+                {"id": "A", "description": format!("approve exporting exactly packet {packet_id} (payload sha256 {payload_hash}) and its synthetic fixture to the canonical lessons inbox"), "authorises_blocked_work": true},
+                {"id": "B", "description": "do not export: the packet stays local and is never submitted", "authorises_blocked_work": false}
+            ],
+            "impact": "the packet's text and synthetic fixture become visible in the canonical Governance OS repository and may shape framework change proposals for every project",
+            "reversibility": "irreversible: once written to the canonical lessons inbox the packet cannot be recalled from this project",
+            "cost_rework": "none for this project; a rejected export only keeps the lesson local",
+            "recommendation": "read the packet (outbound area) and its scan report; approve only if nothing in it identifies the project, its customers or its code",
+            "confidence": 0.5,
+            "impact_radius": "R3",
+            "trigger": EXPORT_TRIGGER,
+            "subject": export_subject(packet_id, lesson_id, payload_hash),
+            "packet_id": packet_id,
+            "lesson_id": lesson_id,
+        }),
+    )
+}
+
+/// **The export-approval hook (BC-P2-10 export use).** Every upstream submission obtains its approval here and nowhere
+/// else.
 ///
-/// Today the only approval input is the caller-supplied `--approved-by` string, which is *not* an authenticated
-/// human channel: it is recorded as such (`channel: "cli-argument"`, `authenticated: false`) and bound to the exact
-/// packet and payload hash it approved, so it cannot be replayed onto another packet.
-///
-/// **Integration point (BC-P2-10, WS-3):** when the authenticated human channel lands, this function obtains the
-/// approval from it — e.g. a Human Decision Gate raised for `(packet_id, payload_hash, destination)` and answered
-/// through the channel the acting agent cannot operate — and returns its evidence here (`authenticated: true`);
-/// `submit` needs no other change. `LEARNING_POLICY.upstream.approval = human` must then refuse a CLI-string approval.
+/// With `LEARNING_POLICY.upstream.approval = human` the approval is an owner-signed human answer — through the
+/// authenticated human channel the acting agent cannot operate — authorising the packet's export gate, whose subject
+/// binds the packet id, lesson and payload hash (`gates::human_approval_for`). `--approved-by`, the acting role, the
+/// environment and repository files are not approval: `approved_by` is recorded as the caller's claim and ignored.
+/// A packet without an export gate gets one raised here (typed refusal `HUMAN_GATE_REQUIRED` naming it); a pending,
+/// declined, agent-resolved or stale gate refuses with its own typed reason. `approval = policy` asserts no human
+/// approval: the export relies on the automated gate alone, and the evidence says so.
 pub fn resolve_export_approval(
     p: &Project,
     req: &ExportApprovalRequest,
@@ -526,20 +597,75 @@ pub fn resolve_export_approval(
     let policy = p
         .policies()
         .get_str("LEARNING_POLICY", "upstream.approval", "human");
-    if policy == "human" && approved_by.map(|s| s.trim().is_empty()).unwrap_or(true) {
-        return Err(GovError::new(
-            "HUMAN_GATE_REQUIRED",
-            "LEARNING_POLICY.upstream.approval=human: --approved-by <human> is required",
-        ));
+    let claim = approved_by
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(String::from);
+    let binds = json!({"packet_id": req.packet_id, "lesson_id": req.lesson_id, "payload_hash": req.payload_hash, "destination": req.destination});
+    if policy != "human" {
+        return Ok(
+            json!({"required": policy, "channel": "policy", "human_approval": false, "authenticated": false, "approved_by": Value::Null, "approved_by_claim": claim, "binds": binds, "approved_at": now_iso(),
+                "note": "LEARNING_POLICY.upstream.approval is not `human`: no human approval is asserted; the export relies on the automated export gate only"}),
+        );
     }
-    Ok(
-        json!({"required": policy, "approved_by": approved_by, "approved_at": now_iso(), "channel": "cli-argument", "authenticated": false,
-            "binds": {"packet_id": req.packet_id, "lesson_id": req.lesson_id, "payload_hash": req.payload_hash, "destination": req.destination},
-            "note": "unauthenticated approval string; the authenticated human channel (BC-P2-10) replaces it at this hook"}),
+    let subject = export_subject(req.packet_id, req.lesson_id, req.payload_hash);
+    let sha = subject["sha256"].as_str().unwrap_or("").to_string();
+    let gates = export_gates(p, req.packet_id);
+    let mut refusals: Vec<Value> = vec![];
+    for g in &gates {
+        match crate::orchestration::gates::human_approval_for(p, &g.id(), &sha) {
+            Ok(a) => {
+                return Ok(
+                    json!({"required": "human", "channel": "human-gate", "human_approval": true, "authenticated": true, "gate": a.gate, "decision": a.decision, "option": a.option,
+                        "approved_by": a.answered_by, "approved_by_claim": claim, "human_evidence": a.to_value()["human_evidence"], "subject": subject, "binds": binds, "approved_at": now_iso()}),
+                )
+            }
+            Err(e) => refusals.push(
+                json!({"gate": g.id(), "gate_status": g.get("gate_status"), "code": e.code, "message": e.message}),
+            ),
+        }
+    }
+    let mut raised = Value::Null;
+    if gates.is_empty() {
+        let dir = outbound_dir(p).join(req.packet_id);
+        if let Ok(pk) = crate::util::read_yaml(&dir.join("packet.yaml")) {
+            if let Ok(g) = raise_export_gate(p, &pk) {
+                raised = g["id"].clone();
+            }
+        }
+    }
+    let gate_ids: Vec<Value> = if raised.is_null() {
+        gates.iter().map(|g| json!(g.id())).collect()
+    } else {
+        vec![raised.clone()]
+    };
+    // the most specific typed reason: a declined/stale/agent-resolved/unverifiable gate says so; else it is pending
+    let code = refusals
+        .iter()
+        .filter_map(|r| r["code"].as_str())
+        .find(|c| !matches!(*c, "GATE_NOT_ANSWERED"))
+        .unwrap_or("HUMAN_GATE_REQUIRED")
+        .to_string();
+    let first = gate_ids
+        .first()
+        .and_then(|g| g.as_str())
+        .unwrap_or("")
+        .to_string();
+    Err(GovError::new(
+        &code,
+        format!(
+            "LEARNING_POLICY.upstream.approval=human: exporting {} requires the product owner's owner-signed answer authorising its export gate{}; --approved-by{} is a claim, not an approval",
+            req.packet_id,
+            if first.is_empty() { String::new() } else { format!(" {first}") },
+            claim.as_deref().map(|c| format!(" ('{c}')")).unwrap_or_default()
+        ),
     )
+    .with_details(json!({"packet_id": req.packet_id, "gates": gate_ids, "raised": raised, "refusals": refusals, "subject": subject, "approved_by_claim": claim,
+        "next_actions": if first.is_empty() { json!(["gov upstream prepare <lesson> again: no export gate could be raised for this packet"]) } else { json!([format!("gov gate present {first}"), format!("the product owner signs a human-gate-answer for {first} choosing A (see `gov trust human-channel`); relay it with gov decide {first} --option A --answer-file <document>"), format!("gov upstream submit {} --destination <canonical lessons/inbox>", req.packet_id)]) }})))
 }
 
-fn payload_hash_of(packet: &Value) -> String {
+/// The payload hash of a packet: exactly the content that would leave (what an export approval binds).
+pub fn payload_hash_of(packet: &Value) -> String {
     hash_value(
         &json!({"p": packet["problem_statement"], "f": packet["generic_failure_mode"], "i": packet["impact"], "c": packet["suggested_framework_change"], "x": packet["synthetic_fixture"], "m": packet["metrics"]}),
     )
@@ -761,10 +887,31 @@ pub fn prepare(p: &Project, lesson_id: &str) -> Result<Value> {
     }
     let payload_hash = payload_hash_of(&packet);
     packet["payload_hash"] = json!(payload_hash);
+    // human approval (LEARNING_POLICY.upstream.approval = human) is asked for exactly this packet: the OS raises its
+    // export gate now, bound to the payload hash; `submit` honours only an owner-signed answer to it
+    let mut approval_gate = Value::Null;
+    let mut approval_error = Value::Null;
+    if packet["approval"]["required"] == "human" {
+        match raise_export_gate(p, &packet) {
+            Ok(g) => approval_gate = g["id"].clone(),
+            Err(e) => {
+                approval_error = json!({"code": e.code, "message": e.message});
+            }
+        }
+        packet["approval"]["gate"] = approval_gate.clone();
+        packet["approval"]["subject_sha256"] = export_subject(
+            packet["packet_id"].as_str().unwrap_or(""),
+            lesson_id,
+            &payload_hash,
+        )["sha256"]
+            .clone();
+    }
     write_yaml(&dir.join("packet.yaml"), &packet)?;
     write_json(&dir.join("scans.json"), &scans)?;
     Ok(
-        json!({"packet_id": packet["packet_id"], "path": dir.join("packet.yaml").display().to_string(), "payload_hash": payload_hash, "scans": scans, "export_allowed": true, "approval_required": packet["approval"]["required"]}),
+        json!({"packet_id": packet["packet_id"], "path": dir.join("packet.yaml").display().to_string(), "payload_hash": payload_hash, "scans": scans, "export_allowed": true, "approval_required": packet["approval"]["required"],
+            "approval_gate": approval_gate, "approval_gate_error": approval_error,
+            "next": if approval_gate.is_null() { Value::Null } else { json!(format!("gov gate present {} — the product owner answers it through the human channel; then gov upstream submit {} --destination <canonical lessons/inbox>", approval_gate.as_str().unwrap_or(""), packet["packet_id"].as_str().unwrap_or(""))) }}),
     )
 }
 
@@ -884,16 +1031,6 @@ pub fn submit(
             ));
         }
     }
-    let approval_evidence = resolve_export_approval(
-        p,
-        &ExportApprovalRequest {
-            packet_id,
-            lesson_id: packet["lesson_id"].as_str().unwrap_or(""),
-            payload_hash: packet["payload_hash"].as_str().unwrap_or(""),
-            destination,
-        },
-        approved_by,
-    )?;
     if destination.starts_with("http://")
         || destination.starts_with("https://")
         || destination.starts_with("git@")
@@ -907,6 +1044,16 @@ pub fn submit(
             format!("destination must be an existing lessons/inbox directory (got {destination})"),
         ));
     }
+    let approval_evidence = resolve_export_approval(
+        p,
+        &ExportApprovalRequest {
+            packet_id,
+            lesson_id: packet["lesson_id"].as_str().unwrap_or(""),
+            payload_hash: packet["payload_hash"].as_str().unwrap_or(""),
+            destination,
+        },
+        approved_by,
+    )?;
     // outbound allowlist: exactly packet.yaml (+ fixture files embedded in the packet). Nothing else leaves.
     let allowed = pol.get_list("LEARNING_POLICY", "upstream.allowed_payload");
     if !allowed.iter().any(|a| a == "packet") {
@@ -938,7 +1085,8 @@ pub fn submit(
             }
         }
     }
-    let entry = json!({"at": now_iso(), "packet_id": packet_id, "lesson_id": packet["lesson_id"], "payload_hash": packet["payload_hash"], "destination": target_dir.display().to_string(), "approved_by": approved_by, "approval": approval_evidence, "session": p.session_id, "files": sent});
+    let entry = json!({"at": now_iso(), "packet_id": packet_id, "lesson_id": packet["lesson_id"], "payload_hash": packet["payload_hash"], "destination": target_dir.display().to_string(),
+        "approved_by": approval_evidence["approved_by"], "approved_by_claim": approval_evidence["approved_by_claim"], "approval": approval_evidence, "session": p.session_id, "role": p.role, "files": sent});
     let ledger = p.root.join(pol.get_str(
         "LEARNING_POLICY",
         "upstream.ledger",
@@ -951,7 +1099,7 @@ pub fn submit(
     let mut store = RecordStore::load(&p.root);
     if let Some(l) = store.get_mut(packet["lesson_id"].as_str().unwrap_or("")) {
         l.set("lifecycle", json!("promoted"));
-        l.set("upstream", json!({"packet_id": packet_id, "payload_hash": packet["payload_hash"], "at": now_iso()}));
+        l.set("upstream", json!({"packet_id": packet_id, "payload_hash": packet["payload_hash"], "approval_gate": approval_evidence["gate"], "approval_decision": approval_evidence["decision"], "human_approval": approval_evidence["human_approval"], "at": now_iso()}));
         save_record(&p.root, l)?;
     }
     Ok(entry)

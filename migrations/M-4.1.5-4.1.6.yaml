@@ -1,0 +1,24 @@
+id: M-4.1.5-4.1.6
+from_version: 4.1.5
+to_version: 4.1.6
+description: >
+  Prepared during Phase-2 repair iteration 1 for the next release (4.1.6); the release owner completes this record
+  when 4.1.6 is cut (every further overlay-template delta between the 4.1.5 payload and the 4.1.6 payload must carry an
+  operation here or an overlay_template_changes entry — `gov release build` refuses the release otherwise). This
+  migration delivers one repository-contract rule to already-installed projects: retrieval-miss failure records
+  (framework §18 failure memory, `failure_kind: retrieval-miss`) live in spec/reports/memory-quality/ as evidence that is
+  never indexed for retrieval, so the path map states what the product enforces. New installations receive the rule
+  from the REPOSITORY_CONTRACT overlay template.
+breaking: false
+human_gate: none
+affected_indexes: [lexical, semantic, graph, code]
+overlay_template_changes:
+  - {file: REPOSITORY_CONTRACT.yaml, handled_by: "op:set_overlay_rule", reason: "spec/reports/memory-quality/** is the canonical location of retrieval-miss failure records (evidence, all four index flags false); delivered explicitly so installed 4.1.5 projects converge with the template"}
+operations:
+  - {op: note, text: "Retrieval-miss failure records (spec/reports/memory-quality/**) are evidence that is never indexed: a record of what retrieval failed to find must not itself be served as retrieval evidence."}
+  - {op: set_overlay_rule, file: REPOSITORY_CONTRACT.yaml, list_key: paths, match: {pattern: "spec/reports/memory-quality/**"}, set: {class: evidence, semantic_index: false, lexical_index: false, graph_index: false, code_index: false, namespace: spec}, add_if_missing: true}
+  - {op: require_index_rebuild, index: all}
+  - {op: regenerate_adapters}
+rollback: >
+  `gov update --rollback [--reason ...]` restores the previous kernel, overlay snapshot and framework.lock, rebuilds
+  indexes, appends a rollback entry to spec/reports/framework-updates.jsonl and consumes the snapshot.

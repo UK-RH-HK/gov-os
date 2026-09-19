@@ -1,5 +1,28 @@
 //! `gov adopt`: staged, path-first, memory-safe brownfield adoption (framework §79, protocol A0-A11) with an
 //! immutable evidence tree and independence enforced by session/role separation and verdict gates.
+//!
+//! ## Authorship and independence (BC-P2-34; Contract v3 T1/T2/O3; adoption protocol §3, §10-§16)
+//!
+//! Agent roles are adapter-declared (OWNER-DECISION-P2-0001): the OS does not issue agent credentials, so it binds
+//! every adoption stage to **what the caller declared** and applies it consistently:
+//!
+//! * **Actor.** Every stage runs as the process's declared acting role (the one authority is evaluated against,
+//!   `authority::installed_acting_role`) and a **declared session** (`--session`, `GOV_SESSION`, or
+//!   `adopt review --reviewer-session`; [`identity::resolve_actor`]). A stage with no declared session refuses
+//!   (`ADOPTION_SESSION_UNDECLARED`): authorship that is not recorded cannot establish independence.
+//! * **Authorship log.** Each stage records its author (group, role, session, where each came from) in the adoption
+//!   baseline. Within one adoption a session keeps the role it first acted under (`ADOPTION_ROLE_INCONSISTENT`).
+//! * **Designated independent roles.** A5, A7, A10 and A11 are performed only by the kernel role designated for them
+//!   ([`DESIGNATED_ROLES`]) in a session and role that authored no planner, executor or memory-builder stage
+//!   (`INDEPENDENCE`, `details.cause`).
+//! * **Verdicts bound to what was approved.** The A5 approval records digests of the catalogue, plan and tests it
+//!   approved, and which tests the reviewer authored (the planner's scaffold is regression evidence, never the
+//!   reviewer's); A6 refuses to execute anything once one of them changed (`APPROVAL_STALE`); A7 never accepts with
+//!   zero executed tests or tests that are not the approved ones; A10 accepts only on held-out queries the memory
+//!   verifier authored (the builder's starter set is regression evidence); A11 runs the G5 full suite.
+//! * **T2.** The baseline that carries the log, the stage order and every verdict is OS-written state: it is sealed
+//!   ([`crate::t2`]) whenever a stage writes it and honoured only when the seal verifies (`T2_UNBOUND`), so a verdict,
+//!   an author entry or a bound digest edited by hand is never honoured.
 use crate::kernel::{install_kernel, resolve_kernel_source};
 use crate::lock::write_lock;
 use crate::memory::db::RuntimeDb;
@@ -18,6 +41,8 @@ pub const EVIDENCE: &str = "spec/audits/GOVERNANCE-ADOPTION";
 pub const STAGES: &[&str] = &[
     "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11",
 ];
+/// The id under which T2 refusals name the adoption record.
+pub const BASELINE_ID: &str = "ADOPTION-BASELINE";
 
 fn ev(root: &Path) -> PathBuf {
     root.join(EVIDENCE)
@@ -25,7 +50,7 @@ fn ev(root: &Path) -> PathBuf {
 fn baseline_path(root: &Path) -> PathBuf {
     ev(root).join("00-BASELINE.yaml")
 }
-fn load_baseline(root: &Path) -> Result<Value> {
+fn load_baseline_raw(root: &Path) -> Result<Value> {
     read_yaml(&baseline_path(root)).map_err(|_| {
         GovError::new(
             "ADOPTION_NOT_STARTED",
@@ -33,8 +58,32 @@ fn load_baseline(root: &Path) -> Result<Value> {
         )
     })
 }
-fn save_baseline(root: &Path, b: &Value) -> Result<()> {
-    write_yaml(&baseline_path(root), b)
+/// The adoption record, honoured only as the OS wrote it (T2): stage order, authorship and every independent verdict
+/// live here, so a hand-edited record decides nothing.
+fn load_baseline(root: &Path) -> Result<Value> {
+    let b = load_baseline_raw(root)?;
+    let binding = crate::t2::verify_value(&b, "");
+    if !binding.is_verified() {
+        return Err(GovError::new(
+            "T2_UNBOUND",
+            format!(
+                "{EVIDENCE}/00-BASELINE.yaml is not the adoption record gov wrote (binding {}): its stage order, authorship and verdicts are not honoured. Restore it from version control, or restart the adoption with `gov adopt baseline` (A0).",
+                binding.code()
+            ),
+        )
+        .with_details(json!({"record": BASELINE_ID, "path": format!("{EVIDENCE}/00-BASELINE.yaml"), "fact": "adoption stage order, authorship and independent verdicts", "t2": binding.to_value(),
+            "remediation": "restore 00-BASELINE.yaml from version control, or run `gov adopt baseline` to start a new adoption pass"})));
+    }
+    Ok(b)
+}
+/// Persist the adoption record sealed as written by `adopt <op>` (T2).
+fn save_baseline(root: &Path, b: &Value, op: &str) -> Result<()> {
+    let mut v = b.clone();
+    if let Some(o) = v.as_object_mut() {
+        o.remove(crate::t2::SEAL_FIELD);
+    }
+    crate::t2::seal_value(&mut v, "", &format!("adopt {op}"))?;
+    write_yaml(&baseline_path(root), &v)
 }
 fn set_stage(
     root: &Path,
@@ -48,7 +97,7 @@ fn set_stage(
     if let Some((k, v)) = extra {
         b[k] = v;
     }
-    save_baseline(root, &b)?;
+    save_baseline(root, &b, stage)?;
     Ok(b)
 }
 fn require_stage(b: &Value, stage: &str) -> Result<()> {
@@ -70,6 +119,423 @@ fn require_verdict(b: &Value, key: &str, accepted: &[&str]) -> Result<()> {
     }
     Ok(())
 }
+
+// ---------------------------------------------------------------- authorship and independence (BC-P2-34)
+
+/// The kernel role designated for each independent adoption stage (adoption protocol §3 roles B, D, F, G). These are
+/// kernel role ids (`framework/roles/ROLES.yaml`); the stage is performed only by an invocation that declared exactly
+/// that role.
+pub const DESIGNATED_ROLES: &[(&str, &str, &str)] = &[
+    (
+        "A5",
+        "migration-reviewer",
+        "Role B — independent migration reviewer & test author",
+    ),
+    (
+        "A7",
+        "migration-verifier",
+        "Role D — independent migration verifier",
+    ),
+    (
+        "A10",
+        "memory-verifier",
+        "Role F — independent memory verifier / test author",
+    ),
+    (
+        "A11",
+        "independent-auditor",
+        "Role G — comprehensive independent auditor",
+    ),
+];
+
+/// The kernel role designated for independent stage `stage`, if it is one.
+pub fn designated_role(stage: &str) -> Option<&'static str> {
+    DESIGNATED_ROLES
+        .iter()
+        .find(|(s, _, _)| *s == stage)
+        .map(|(_, r, _)| *r)
+}
+
+/// Authorship groups of the adoption protocol: the builders whose context an independent stage must not continue,
+/// and the independent roles themselves.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Group {
+    /// Role A: A0-A4 and the test scaffold.
+    Planner,
+    /// Role C: A6 batches, rollback, A8 extraction/retirement.
+    Executor,
+    /// Role E: A9.
+    MemoryBuilder,
+    /// Roles B, D, F, G: A5, A7, A10, A11.
+    Independent,
+}
+
+impl Group {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Group::Planner => "planner",
+            Group::Executor => "executor",
+            Group::MemoryBuilder => "memory_builder",
+            Group::Independent => "independent",
+        }
+    }
+    fn is_builder(s: &str) -> bool {
+        matches!(s, "planner" | "executor" | "memory_builder")
+    }
+}
+
+struct StageSpec {
+    stage: &'static str,
+    command: &'static str,
+    group: Group,
+    /// AUTHORITY_POLICY class (the same one G0 evaluates for the command).
+    class: &'static str,
+}
+
+const STAGE_SPECS: &[StageSpec] = &[
+    StageSpec {
+        stage: "A0",
+        command: "baseline",
+        group: Group::Planner,
+        class: "adoption_plan",
+    },
+    StageSpec {
+        stage: "A1",
+        command: "inventory",
+        group: Group::Planner,
+        class: "adoption_plan",
+    },
+    StageSpec {
+        stage: "A2",
+        command: "classify",
+        group: Group::Planner,
+        class: "adoption_plan",
+    },
+    StageSpec {
+        stage: "A3",
+        command: "map",
+        group: Group::Planner,
+        class: "adoption_plan",
+    },
+    StageSpec {
+        stage: "A4",
+        command: "plan",
+        group: Group::Planner,
+        class: "adoption_plan",
+    },
+    StageSpec {
+        stage: "A5",
+        command: "test-design",
+        group: Group::Planner,
+        class: "adoption_plan",
+    },
+    StageSpec {
+        stage: "A5",
+        command: "review",
+        group: Group::Independent,
+        class: "adoption_review",
+    },
+    StageSpec {
+        stage: "A6",
+        command: "migrate",
+        group: Group::Executor,
+        class: "migrate_execute",
+    },
+    StageSpec {
+        stage: "A6",
+        command: "rollback",
+        group: Group::Executor,
+        class: "migrate_execute",
+    },
+    StageSpec {
+        stage: "A7",
+        command: "verify-migration",
+        group: Group::Independent,
+        class: "adoption_review",
+    },
+    StageSpec {
+        stage: "A8",
+        command: "extract-legacy",
+        group: Group::Executor,
+        class: "migrate_execute",
+    },
+    StageSpec {
+        stage: "A9",
+        command: "build-memory",
+        group: Group::MemoryBuilder,
+        class: "build_memory",
+    },
+    StageSpec {
+        stage: "A10",
+        command: "verify-memory",
+        group: Group::Independent,
+        class: "adoption_review",
+    },
+    StageSpec {
+        stage: "A11",
+        command: "audit",
+        group: Group::Independent,
+        class: "adoption_review",
+    },
+];
+
+fn spec(command: &str) -> &'static StageSpec {
+    STAGE_SPECS
+        .iter()
+        .find(|s| s.command == command)
+        .expect("every adoption command has a stage spec")
+}
+
+/// The author of one adoption stage invocation, as the OS established it.
+#[derive(Debug, Clone)]
+pub struct StageActor {
+    pub stage: &'static str,
+    pub command: &'static str,
+    pub group: Group,
+    pub actor: identity::ResolvedActor,
+    /// For an independent stage: the evidence that independence was established (designated role, builders judged).
+    pub independence: Value,
+}
+
+impl StageActor {
+    pub fn session(&self) -> String {
+        self.actor.session_id()
+    }
+    pub fn role(&self) -> String {
+        self.actor.role_id()
+    }
+}
+
+/// Authority for a stage, evaluated for the declared role against the installed kernel's policy, or against the kernel
+/// embedded in this binary when nothing is installed yet (BC-P2-08: every adopt stage, first install batch
+/// included). The CLI's G0 guard makes the same decision; this keeps it for every caller of the runtime.
+fn stage_authority(root: &Path, role: &str, class: &str) -> Result<()> {
+    let p = Project::open(root);
+    if p.is_installed() {
+        let p = p.with_session(None, Some(role.to_string()));
+        crate::authority::require(&p, class)?;
+    } else {
+        crate::authority::require_with_embedded_kernel(role, class)?;
+    }
+    Ok(())
+}
+
+fn independence_refusal(stage: &str, cause: &str, message: String, details: Value) -> GovError {
+    let mut d = details;
+    d["stage"] = json!(stage);
+    d["cause"] = json!(cause);
+    d["designated_role"] = json!(designated_role(stage));
+    d["remediation"] = json!(format!(
+        "run {stage} as the designated role '{}' in a fresh session that authored no planner, executor or memory-builder stage of this adoption (declare both: --role, --session / GOV_SESSION)",
+        designated_role(stage).unwrap_or("-")
+    ));
+    GovError::new("INDEPENDENCE", message).with_details(d)
+}
+
+/// Resolve and check the actor of a stage against the adoption record `b` (None for A0, which starts one).
+fn check_actor(
+    root: &Path,
+    s: &'static StageSpec,
+    actor: &identity::Actor,
+    stage_flag: Option<&str>,
+    b: Option<&Value>,
+) -> Result<StageActor> {
+    let who = identity::resolve_actor(actor, stage_flag)?;
+    let role = who.role_id();
+    // independent stages: the designated role, declared (an undeclared invocation carries no role at all)
+    if s.group == Group::Independent {
+        let want = designated_role(s.stage).unwrap_or("");
+        if !who.role_declared() {
+            return Err(independence_refusal(s.stage, "ROLE_UNDECLARED", format!("{} ({}) is performed by the designated independent role '{want}'; this invocation declared no role", s.stage, s.command), json!({"actor": who.to_value()})));
+        }
+        if role != want {
+            return Err(independence_refusal(s.stage, "ROLE_NOT_DESIGNATED", format!("{} ({}) is performed only by the role designated for it, '{want}'; this invocation declared '{role}'", s.stage, s.command), json!({"actor": who.to_value()})));
+        }
+    }
+    stage_authority(root, &role, s.class)?;
+    if !who.session_declared() {
+        return Err(GovError::new(
+            "ADOPTION_SESSION_UNDECLARED",
+            format!(
+                "adoption stage {} ({}) records its author, and this invocation declared no session{}; an undeclared (generated) session cannot establish or be judged for independence",
+                s.stage,
+                s.command,
+                who.session.as_deref().map(|x| format!(" (the id '{x}' was not declared by the caller)")).unwrap_or_default()
+            ),
+        )
+        .with_details(json!({"stage": s.stage, "actor": who.to_value(), "remediation": "declare the session you act in: the global --session <id> flag or GOV_SESSION (review: --reviewer-session)"})));
+    }
+    let session = who.session_id();
+    let authors: Vec<Value> = b
+        .and_then(|b| b["authors"].as_array().cloned())
+        .unwrap_or_default();
+    let mut independence = Value::Null;
+    if s.group == Group::Independent {
+        let builders: Vec<&Value> = authors
+            .iter()
+            .filter(|a| Group::is_builder(a["group"].as_str().unwrap_or("")))
+            .collect();
+        if let Some(a) = builders
+            .iter()
+            .find(|a| a["session"].as_str() == Some(session.as_str()))
+        {
+            return Err(independence_refusal(s.stage, "SAME_SESSION_AS_BUILDER", format!("{} must be performed in a fresh session: session '{session}' authored {} stage(s) {} of this adoption (protocol §3: independent roles do not continue builder/executor context)", s.stage, a["group"].as_str().unwrap_or(""), a["stages"]), json!({"actor": who.to_value(), "builder": a})));
+        }
+        if let Some(a) = builders
+            .iter()
+            .find(|a| a["role"].as_str() == Some(role.as_str()))
+        {
+            return Err(independence_refusal(
+                s.stage,
+                "SAME_ROLE_AS_BUILDER",
+                format!(
+                    "{}: role '{role}' authored {} stage(s) {} of this adoption",
+                    s.stage,
+                    a["group"].as_str().unwrap_or(""),
+                    a["stages"]
+                ),
+                json!({"actor": who.to_value(), "builder": a}),
+            ));
+        }
+        independence = json!({"established": true, "designated_role": designated_role(s.stage), "role": role, "session": session,
+            "session_source": who.session_source.as_str(), "role_source": who.role_source,
+            "judged_builders": builders.iter().map(|a| json!({"group": a["group"], "role": a["role"], "session": a["session"], "stages": a["stages"]})).collect::<Vec<_>>(),
+            "basis": "declared role and session (adapter-declared identity, OWNER-DECISION-P2-0001) recorded against every builder author of this adoption"});
+    }
+    if let Some(a) = authors.iter().find(|a| {
+        a["session"].as_str() == Some(session.as_str()) && a["role"].as_str() != Some(role.as_str())
+    }) {
+        return Err(GovError::new(
+            "ADOPTION_ROLE_INCONSISTENT",
+            format!(
+                "session '{session}' authored {:?} of this adoption as '{}' and now declares '{role}'; within one adoption a session keeps the role it acts under (roles are adapter-declared: one agent session, one role)",
+                a["stages"], a["role"].as_str().unwrap_or("")
+            ),
+        )
+        .with_details(json!({"stage": s.stage, "actor": who.to_value(), "earlier": a, "remediation": "act in the session the role was assigned, or start a new session for the other role"})));
+    }
+    Ok(StageActor {
+        stage: s.stage,
+        command: s.command,
+        group: s.group,
+        actor: who,
+        independence,
+    })
+}
+
+/// Resolve the actor of a stage of an existing adoption and load the (verified) record.
+fn begin_stage(
+    root: &Path,
+    command: &str,
+    actor: &identity::Actor,
+    stage_flag: Option<&str>,
+) -> Result<(Value, StageActor)> {
+    let s = spec(command);
+    let b = load_baseline(root)?;
+    let who = check_actor(root, s, actor, stage_flag, Some(&b))?;
+    Ok((b, who))
+}
+
+/// Record `who` in the authorship log of `b` (one entry per group, session and role; the stages it performed).
+fn record_author(b: &mut Value, who: &StageActor) {
+    if !b["authors"].is_array() {
+        b["authors"] = json!([]);
+    }
+    let now = now_iso();
+    let arr = b["authors"].as_array_mut().unwrap();
+    let key = (who.group.as_str(), who.session(), who.role());
+    if let Some(a) = arr.iter_mut().find(|a| {
+        a["group"].as_str() == Some(key.0)
+            && a["session"].as_str() == Some(key.1.as_str())
+            && a["role"].as_str() == Some(key.2.as_str())
+    }) {
+        let label = format!("{} {}", who.stage, who.command);
+        if !a["stages"]
+            .as_array()
+            .map(|x| x.iter().any(|y| y == &json!(label)))
+            .unwrap_or(false)
+        {
+            a["stages"].as_array_mut().map(|x| x.push(json!(label)));
+        }
+        a["last_at"] = json!(now);
+        return;
+    }
+    arr.push(json!({"group": key.0, "role": key.2, "session": key.1, "session_source": who.actor.session_source.as_str(),
+        "role_source": who.actor.role_source, "stages": [format!("{} {}", who.stage, who.command)], "first_at": now, "last_at": now}));
+}
+
+fn verdict_actor(who: &StageActor) -> Value {
+    json!({"session": who.session(), "role": who.role(), "session_source": who.actor.session_source.as_str(), "role_source": who.actor.role_source})
+}
+
+/// Digest of the migration plan as approved (volatile regeneration stamps excluded).
+fn plan_digest(plan: &Value) -> String {
+    let mut m = plan.clone();
+    if let Some(o) = m.as_object_mut() {
+        for k in [
+            "last_regenerated_at",
+            "last_regenerated_by",
+            crate::t2::SEAL_FIELD,
+        ] {
+            o.remove(k);
+        }
+    }
+    identity::content_hash(&m)
+}
+
+/// The catalogue, plan and tests exactly as they stand now, digested the way an approval binds them.
+fn current_bindings(root: &Path) -> Result<Value> {
+    let catalogue = read_jsonl(&ev(root).join(format!("{CATALOGUE_STEM}.jsonl")))?;
+    let plan = read_yaml(&ev(root).join(format!("{PLAN_STEM}.yaml"))).unwrap_or(Value::Null);
+    let tests = read_yaml(&ev(root).join("06-migration-tests.yaml")).unwrap_or(Value::Null);
+    Ok(
+        json!({"catalogue_sha256": planner::catalogue_digest(&catalogue), "plan_sha256": plan_digest(&plan), "tests_sha256": verify::tests_digest(&tests),
+        "catalogue_entries": catalogue.len(), "plan_version": plan["version"], "tests": tests["tests"].as_array().map(|a| a.len()).unwrap_or(0)}),
+    )
+}
+
+/// Which of the artefacts `verdict` bound differ from what stands now.
+fn binding_changes(verdict: &Value, now: &Value) -> Vec<String> {
+    ["catalogue_sha256", "plan_sha256", "tests_sha256"]
+        .iter()
+        .filter(|k| verdict[**k].as_str().is_some() && verdict[**k] != now[**k])
+        .map(|k| k.trim_end_matches("_sha256").to_string())
+        .chain(
+            ["catalogue_sha256", "plan_sha256", "tests_sha256"]
+                .iter()
+                .filter(|k| verdict[**k].as_str().is_none())
+                .map(|k| {
+                    format!(
+                        "{} (not bound by the verdict)",
+                        k.trim_end_matches("_sha256")
+                    )
+                }),
+        )
+        .collect()
+}
+
+/// **Execution bound to the approval (BC-P2-34).** Refuse unless the catalogue, plan and independent tests are exactly
+/// those the A5 approval bound.
+fn require_approved_artefacts(root: &Path, b: &Value, what: &str) -> Result<Value> {
+    let a5 = &b["verdicts"]["A5"];
+    let now = current_bindings(root)?;
+    let changed = binding_changes(a5, &now);
+    if !changed.is_empty() {
+        return Err(GovError::new(
+            "APPROVAL_STALE",
+            format!(
+                "{what} refused: the {} changed after the independent reviewer approved them (A5 by '{}', session '{}'); execution is bound to exactly the approved plan, catalogue and tests (protocol §3 Role C, §11 \"do not weaken tests\")",
+                changed.join(", "),
+                a5["role"].as_str().unwrap_or(""),
+                a5["session"].as_str().unwrap_or("")
+            ),
+        )
+        .with_details(json!({"changed": changed, "approved": {"catalogue_sha256": a5["catalogue_sha256"], "plan_sha256": a5["plan_sha256"], "tests_sha256": a5["tests_sha256"]}, "current": now,
+            "remediation": "restore the approved artefacts, or have the independent reviewer review the changed plan/tests again (`gov adopt review`)"})));
+    }
+    Ok(now)
+}
+
 fn write_md(root: &Path, name: &str, text: &str) -> Result<String> {
     let p = ev(root).join(name);
     write_text(&p, text)?;
@@ -99,6 +565,14 @@ fn scanner_for(root: &Path) -> crate::security::secrets::SecretScanner {
 
 // ---------------------------------------------------------------- A0
 pub fn a0_baseline(root: &Path, session: &str) -> Result<Value> {
+    a0_baseline_by(root, &identity::Actor::supplied(session, None))
+}
+
+/// A0 as `actor` (Role A, planner). Starts a new adoption record: its authorship log begins with the planner.
+pub fn a0_baseline_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
+    let who = check_actor(root, spec("baseline"), actor, None, None)?;
+    let session = who.session();
+    let session = session.as_str();
     std::fs::create_dir_all(ev(root))?;
     let p = Project::open(root);
     let git = p.git_available();
@@ -149,9 +623,10 @@ pub fn a0_baseline(root: &Path, session: &str) -> Result<Value> {
             baseline_tests = json!({"ran": true, "ecosystem": e["id"], "command": cmd, "exit": code, "status": if code == 0 { "passed" } else { "failed" }, "stdout_tail": out.lines().rev().take(5).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n"), "stderr_tail": err.lines().rev().take(5).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n")});
         }
     }
-    let b = json!({"adoption_id": format!("ADOPT-{}", crate::util::today()), "started_at": now_iso(), "session": session, "planner_session": session, "commit": if git { p.git_commit() } else { "no-git".into() }, "branch": if git { p.git_branch() } else { "no-git".into() },
-        "dirty_files": dirty, "untracked_files": [], "baseline_tests": baseline_tests, "interrupted_work": interrupted, "ecosystems": eco, "stage_status": {"A0": "done"}, "stage_times": {"A0": now_iso()}, "verdicts": {}});
-    save_baseline(root, &b)?;
+    let mut b = json!({"adoption_id": format!("ADOPT-{}", crate::util::today()), "started_at": now_iso(), "session": session, "planner_session": session, "commit": if git { p.git_commit() } else { "no-git".into() }, "branch": if git { p.git_branch() } else { "no-git".into() },
+        "dirty_files": dirty, "untracked_files": [], "baseline_tests": baseline_tests, "interrupted_work": interrupted, "ecosystems": eco, "stage_status": {"A0": "done"}, "stage_times": {"A0": now_iso()}, "verdicts": {}, "authors": []});
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A0")?;
     Ok(
         json!({"stage": "A0", "evidence": format!("{EVIDENCE}/00-BASELINE.yaml"), "commit": b["commit"], "dirty_files": b["dirty_files"].as_array().map(|a| a.len()).unwrap_or(0), "interrupted": b["interrupted_work"]["detected"], "baseline_tests": b["baseline_tests"]["status"], "freeze_advice": if b["interrupted_work"]["detected"].as_bool().unwrap_or(false) { "interrupted work detected: review items before A1; broad edits are frozen by protocol" } else { "clean baseline" }}),
     )
@@ -159,8 +634,14 @@ pub fn a0_baseline(root: &Path, session: &str) -> Result<Value> {
 
 // ---------------------------------------------------------------- A1
 pub fn a1_inventory(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a1_inventory_by(root, &identity::Actor::process())
+}
+
+pub fn a1_inventory_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
+    let (mut b, who) = begin_stage(root, "inventory", actor, None)?;
     require_stage(&b, "A0")?;
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A1")?;
     set_stage(root, "A1", "in_progress", None)?;
     let items = inventory::inventory(root, &scanner_for(root));
     let summary = inventory::summary(&items);
@@ -221,8 +702,14 @@ fn read_jsonl(p: &Path) -> Result<Vec<Value>> {
 
 // ---------------------------------------------------------------- A2
 pub fn a2_classify(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a2_classify_by(root, &identity::Actor::process())
+}
+
+pub fn a2_classify_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
+    let (mut b, who) = begin_stage(root, "classify", actor, None)?;
     require_stage(&b, "A1")?;
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A2")?;
     set_stage(root, "A2", "in_progress", None)?;
     let items = read_jsonl(&ev(root).join("01-COLD-INVENTORY.jsonl"))?;
     let classified = classify::classify_all(root, &items);
@@ -295,14 +782,17 @@ fn write_catalogue(root: &Path, catalogue: &[Value]) -> Result<()> {
 }
 
 pub fn a3_map(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
-    a3_map_by(root, &identity::Actor::from_env_or_baseline(&b))
+    a3_map_by(root, &identity::Actor::process())
 }
 
-/// A3 with the producing actor recorded in every catalogue entry (W1 producer/provenance).
+/// A3 with the producing actor recorded in every catalogue entry (W1 producer/provenance). The actor is the one the
+/// caller declared ([`identity::resolve_actor`]); a supplied session nobody declared is refused.
 pub fn a3_map_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
-    let b = load_baseline(root)?;
+    let (mut b, who) = begin_stage(root, "map", actor, None)?;
     require_stage(&b, "A2")?;
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A3")?;
+    let actor = &who.actor.as_actor();
     set_stage(root, "A3", "in_progress", None)?;
     let classified = read_jsonl(&ev(root).join("02-CLASSIFICATION.jsonl"))?;
     // ARCHIVE_POLICY.unused_code_action of the kernel being adopted decides how dead code is treated
@@ -506,7 +996,8 @@ pub fn ensure_destructive_gates(root: &Path, catalogue: &mut [Value]) -> Result<
             &p,
             json!({"question": question, "why_now": format!("migration action needing a human decision ({})", if reasons.is_empty() { "destructive or structural".to_string() } else { reasons.join(", ") }), "current_state": format!("present at {path}"),
                 "options": [{"id": "A", "description": option_a}, {"id": "B", "description": option_b}], "impact": format!("target: {}; dependency proof: {} (dependants digest {})", e["target_path"].as_str().unwrap_or("removed from active tree"), e["dependency_proof"]["result"].as_str().unwrap_or("n/a"), e["dependency_proof"]["dependants_digest"].as_str().unwrap_or("-")),
-                "reversibility": "batch snapshot + git history", "recommendation": if refs_gate { "B until the references are removed" } else { "A if no reference or unique data exists" }, "confidence": e["confidence"].as_f64().unwrap_or(0.5), "trigger": "destructive_migration", "impact_radius": "R2", "artifact_id": aid}),
+                "reversibility": "batch snapshot + git history", "recommendation": if refs_gate { "B until the references are removed" } else { "A if no reference or unique data exists" }, "confidence": e["confidence"].as_f64().unwrap_or(0.5), "trigger": "destructive_migration", "impact_radius": "R2", "artifact_id": aid,
+                "subject": {"kind": "adoption-catalogue-entry", "id": aid, "sha256": planner::gate_subject_sha256(e)}}),
         )?;
         let gid = g["id"].as_str().unwrap_or("").to_string();
         e["human_gate"] = json!(gid);
@@ -518,6 +1009,26 @@ pub fn ensure_destructive_gates(root: &Path, catalogue: &mut [Value]) -> Result<
     Ok(created)
 }
 
+/// The verified answer (`gates::verified_answer`) of the Human Decision Gate raised for catalogue entry `e` — only
+/// when that gate was raised for this entry and its recorded subject is still exactly this entry's question
+/// (artefact, path, action, target, reasons, dependants: [`planner::gate_subject_sha256`]). A gate id pointed at
+/// another entry's answered gate, or an entry changed after its gate was answered, authorises nothing (BC-P2-11 for
+/// adoption gates).
+pub fn entry_gate_answer(p: &Project, e: &Value) -> Option<String> {
+    let g = e["human_gate"].as_str().filter(|g| !g.is_empty())?;
+    let a = crate::orchestration::gates::verified_answer(p, g).ok()?;
+    let d = &a.record.data;
+    if d["artifact_id"] != e["artifact_id"] || d["trigger"] != "destructive_migration" {
+        return None;
+    }
+    if let Some(sha) = d["subject"]["sha256"].as_str() {
+        if sha != planner::gate_subject_sha256(e) {
+            return None;
+        }
+    }
+    Some(a.option)
+}
+
 /// Artefact ids whose destructive gate has been presented and answered with option A.
 pub fn answered_destructive(root: &Path, catalogue: &[Value]) -> Vec<String> {
     let p = Project::open(root);
@@ -527,20 +1038,14 @@ pub fn answered_destructive(root: &Path, catalogue: &[Value]) -> Vec<String> {
     catalogue
         .iter()
         .filter(|e| e["requires_human_gate"].as_bool().unwrap_or(false))
-        .filter(|e| {
-            e.get("human_gate")
-                .and_then(|g| g.as_str())
-                .map(|g| crate::orchestration::gates::is_answered_yes(&p, g))
-                .unwrap_or(false)
-        })
+        .filter(|e| entry_gate_answer(&p, e).as_deref() == Some("A"))
         .filter_map(|e| e["artifact_id"].as_str().map(|s| s.to_string()))
         .collect()
 }
 
 // ---------------------------------------------------------------- A4
 pub fn a4_plan(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
-    a4_plan_by(root, &identity::Actor::from_env_or_baseline(&b))
+    a4_plan_by(root, &identity::Actor::process())
 }
 
 /// The downstream consumers the migration plan declares (W1 "expected consumers", Contract v3:1076-1078). They are
@@ -560,8 +1065,11 @@ fn plan_consumers() -> Value {
 /// version, producer, declared consumers and supersession lineage; every version is kept in `05-plan.versions/`, so
 /// re-planning never overwrites the plan a reviewer approved (BC-P2-21; Contract v3:1069-1080).
 pub fn a4_plan_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
-    let b = load_baseline(root)?;
+    let (mut b, who) = begin_stage(root, "plan", actor, None)?;
     require_stage(&b, "A3")?;
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A4")?;
+    let actor = &who.actor.as_actor();
     set_stage(root, "A4", "in_progress", None)?;
     let mut catalogue = read_jsonl(&ev(root).join(format!("{CATALOGUE_STEM}.jsonl")))?;
     let gates_created = ensure_destructive_gates(root, &mut catalogue)?;
@@ -641,10 +1149,8 @@ pub fn a4_plan_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
 }
 
 // ---------------------------------------------------------------- A5
-pub fn a5_test_design(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
-    require_stage(&b, "A4")?;
-    let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
+/// The planner's scaffold for the current catalogue (deterministic: the same catalogue yields the same tests).
+fn scaffold_for(root: &Path, b: &Value, catalogue: &[Value]) -> Value {
     let legacy: Vec<String> = classify::legacy_mechanisms(root)
         .into_iter()
         .map(|l| l.path)
@@ -657,7 +1163,28 @@ pub fn a5_test_design(root: &Path) -> Result<Value> {
                 .collect::<Vec<_>>()
         })
         .filter(|c| !c.is_empty() && b["baseline_tests"]["status"] == "passed");
-    let tests = verify::scaffold_tests(&catalogue, &legacy, cmd);
+    verify::scaffold_tests(catalogue, &legacy, cmd)
+}
+
+fn test_identities(tests: &Value) -> Vec<String> {
+    tests["tests"]
+        .as_array()
+        .map(|a| a.iter().map(verify::test_identity).collect())
+        .unwrap_or_default()
+}
+
+pub fn a5_test_design(root: &Path) -> Result<Value> {
+    a5_test_design_by(root, &identity::Actor::process())
+}
+
+/// A5 scaffold (Role A): the planner derives tests from the plan for the independent reviewer to review and extend.
+/// Every scaffold this adoption generated is recorded (by test identity), so the scaffold is never counted as the
+/// reviewer's own tests (O3: builder tests are regression evidence).
+pub fn a5_test_design_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
+    let (mut b, who) = begin_stage(root, "test-design", actor, None)?;
+    require_stage(&b, "A4")?;
+    let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
+    let tests = scaffold_for(root, &b, &catalogue);
     let path = ev(root).join("06-migration-tests.yaml");
     if !path.exists() {
         write_yaml(&path, &tests)?;
@@ -665,13 +1192,30 @@ pub fn a5_test_design(root: &Path) -> Result<Value> {
     // the plan and the independent tests must agree on every artefact's disposition (Contract v3:928-929)
     let current = read_yaml(&path).unwrap_or(tests.clone());
     let conflicts = verify::plan_test_agreement(&catalogue, &current);
-    let md = format!("# 06 — Independent migration test design\n\nAuthored by a fresh independent session (Role B). Scaffold generated by the planner; the reviewer must review classification, target map, destructive moves, unknown items, references/imports, authority changes, archive/delete decisions and old memory stores, then extend `06-migration-tests.yaml` and record a verdict with `gov adopt review`.\n\nTest families: path integrity · code integrity · governance integrity · behaviour preservation · rollback/recovery.\n\nScaffolded tests: {}\n\n## Verdicts\n\n", tests["tests"].as_array().map(|a| a.len()).unwrap_or(0));
+    let md = format!("# 06 — Independent migration test design\n\nAuthored by a fresh independent session (Role B). Scaffold generated by the planner; the reviewer must review classification, target map, destructive moves, unknown items, references/imports, authority changes, archive/delete decisions and old memory stores, then extend `06-migration-tests.yaml` with tests of their own and record a verdict with `gov adopt review` (as `migration-reviewer`, in a fresh session). Scaffolded tests are the planner's regression evidence; an approval requires at least one reviewer-authored test.\n\nTest families: path integrity · code integrity · governance integrity · behaviour preservation · rollback/recovery.\n\nScaffolded tests: {}\n\n## Verdicts\n\n", tests["tests"].as_array().map(|a| a.len()).unwrap_or(0));
     let p = ev(root).join("06-INDEPENDENT-MIGRATION-TEST-DESIGN.md");
     if !p.exists() {
         write_text(&p, &md)?;
     }
+    let mut known: Vec<String> = b["test_design"]["scaffold_identities"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    for i in test_identities(&tests) {
+        if !known.contains(&i) {
+            known.push(i);
+        }
+    }
+    b["test_design"] = json!({"scaffold_identities": known, "scaffold_sha256": verify::tests_digest(&tests), "scaffold_tests": tests["tests"].as_array().map(|a| a.len()).unwrap_or(0),
+        "by": verdict_actor(&who), "at": now_iso()});
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A5 test-design")?;
     Ok(
-        json!({"stage": "A5", "tests_file": format!("{EVIDENCE}/06-migration-tests.yaml"), "scaffolded_tests": tests["tests"].as_array().map(|a| a.len()).unwrap_or(0), "plan_test_disagreements": conflicts, "next": "independent reviewer extends tests and runs `gov adopt review --verdict MIGRATION_PLAN_APPROVED --session <fresh-session>`"}),
+        json!({"stage": "A5", "tests_file": format!("{EVIDENCE}/06-migration-tests.yaml"), "scaffolded_tests": tests["tests"].as_array().map(|a| a.len()).unwrap_or(0), "plan_test_disagreements": conflicts, "next": "the independent reviewer (role migration-reviewer, fresh session) reviews the plan, adds tests of their own to 06-migration-tests.yaml and runs `gov adopt review --verdict MIGRATION_PLAN_APPROVED`"}),
     )
 }
 
@@ -682,8 +1226,24 @@ pub fn a5_review(
     reviewer_role: &str,
     notes: Option<&str>,
 ) -> Result<Value> {
-    let b = load_baseline(root)?;
-    require_stage(&b, "A4")?;
+    a5_review_by(
+        root,
+        verdict,
+        &identity::Actor::supplied(reviewer_session, Some(reviewer_role)),
+        notes,
+    )
+}
+
+/// **A5 independent review (Role B).** Performed only by `migration-reviewer` in a fresh declared session. An
+/// approval requires tests the reviewer authored (tests whose identity is not in any planner scaffold of this
+/// adoption), all of an executable kind, agreeing with the plan; it binds the digests of the catalogue, plan and test
+/// file it approved, which A6 and A7 enforce.
+pub fn a5_review_by(
+    root: &Path,
+    verdict: &str,
+    actor: &identity::Actor,
+    notes: Option<&str>,
+) -> Result<Value> {
     if ![
         "MIGRATION_PLAN_APPROVED",
         "MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS",
@@ -693,16 +1253,33 @@ pub fn a5_review(
     {
         return Err(GovError::new("USAGE", "verdict must be MIGRATION_PLAN_APPROVED | MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS | MIGRATION_PLAN_REJECTED"));
     }
-    if b["planner_session"].as_str() == Some(reviewer_session) {
-        return Err(GovError::new("INDEPENDENCE", "reviewer session must differ from the planner session (fresh independent context, protocol Role B)"));
-    }
-    if !ev(root).join("06-migration-tests.yaml").exists() {
-        return Err(GovError::new("VERDICT_REQUIRED", "independent tests file 06-migration-tests.yaml missing; run `gov adopt test-design` and author tests before a verdict"));
+    let (b, who) = begin_stage(root, "review", actor, Some("--reviewer-session"))?;
+    require_stage(&b, "A4")?;
+    if !ev(root).join("06-migration-tests.yaml").exists() || !b["test_design"].is_object() {
+        return Err(GovError::new("VERDICT_REQUIRED", "independent tests file 06-migration-tests.yaml or its recorded scaffold missing; run `gov adopt test-design` (planner) and author tests before a verdict"));
     }
     let tests = read_yaml(&ev(root).join("06-migration-tests.yaml"))?;
     let n = tests["tests"].as_array().map(|a| a.len()).unwrap_or(0);
-    if verdict.starts_with("MIGRATION_PLAN_APPROVED") {
-        let catalogue = read_jsonl(&ev(root).join(format!("{CATALOGUE_STEM}.jsonl")))?;
+    let catalogue = read_jsonl(&ev(root).join(format!("{CATALOGUE_STEM}.jsonl")))?;
+    // what the planner generated (every scaffold of this adoption, and the scaffold of the catalogue as it is now)
+    let mut scaffold: Vec<String> = b["test_design"]["scaffold_identities"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    let latest = scaffold_for(root, &b, &catalogue);
+    scaffold.extend(test_identities(&latest));
+    let all: Vec<Value> = tests["tests"].as_array().cloned().unwrap_or_default();
+    let reviewer_tests: Vec<&Value> = all
+        .iter()
+        .filter(|t| !scaffold.contains(&verify::test_identity(t)))
+        .collect();
+    let scaffold_kept = all.len() - reviewer_tests.len();
+    let approved = verdict.starts_with("MIGRATION_PLAN_APPROVED");
+    if approved {
         let conflicts = verify::plan_test_agreement(&catalogue, &tests);
         if !conflicts.is_empty() {
             return Err(GovError::new(
@@ -711,11 +1288,59 @@ pub fn a5_review(
             )
             .with_details(json!({"conflicts": conflicts})));
         }
+        if reviewer_tests.is_empty() {
+            return Err(GovError::new(
+                "INDEPENDENT_TESTS_REQUIRED",
+                format!("an approval records the independent reviewer's own acceptance tests (adoption protocol §10: the reviewer authors tests before execution; Contract v3 O3: builder tests are regression evidence), but all {n} test(s) in 06-migration-tests.yaml are the planner's scaffold"),
+            )
+            .with_details(json!({"tests": n, "scaffold_tests": scaffold_kept, "remediation": "add tests of your own to spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml (path/code/governance integrity, behaviour preservation, rollback), then record the verdict", "test_kinds": verify::TEST_KINDS})));
+        }
+        let invalid: Vec<Value> = reviewer_tests
+            .iter()
+            .filter(|t| {
+                !verify::TEST_KINDS.contains(&t["kind"].as_str().unwrap_or(""))
+                    || t["id"]
+                        .as_str()
+                        .map(|x| x.trim().is_empty())
+                        .unwrap_or(true)
+            })
+            .map(|t| json!({"id": t["id"], "kind": t["kind"]}))
+            .collect();
+        if !invalid.is_empty() {
+            return Err(GovError::new(
+                "INDEPENDENT_TESTS_INVALID",
+                format!("{} reviewer-authored test(s) have no id or a kind the executor cannot run; a test that cannot run cannot pass", invalid.len()),
+            )
+            .with_details(json!({"invalid": invalid, "test_kinds": verify::TEST_KINDS})));
+        }
     }
-    let entry = json!({"verdict": verdict, "session": reviewer_session, "role": reviewer_role, "at": now_iso(), "tests": n, "notes": notes});
+    let bound = current_bindings(root)?;
+    let plan = read_yaml(&ev(root).join(format!("{PLAN_STEM}.yaml"))).unwrap_or(Value::Null);
+    let reviewer_ids: Vec<Value> = reviewer_tests.iter().map(|t| t["id"].clone()).collect();
+    // scaffold tests the reviewer removed are recorded (visible to A7/A11), never silently dropped
+    let present: Vec<String> = all.iter().map(verify::test_identity).collect();
+    let removed: Vec<Value> = latest["tests"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+        .iter()
+        .filter(|t| !present.contains(&verify::test_identity(t)))
+        .map(|t| t["id"].clone())
+        .collect();
+    let mut entry = verdict_actor(&who);
+    for (k, v) in json!({"verdict": verdict, "at": now_iso(), "tests": n, "notes": notes, "reviewer_tests": reviewer_ids, "reviewer_tests_count": reviewer_tests.len(),
+        "scaffold_tests": scaffold_kept, "scaffold_tests_removed": removed,
+        "catalogue_sha256": bound["catalogue_sha256"], "catalogue_version": read_json(&catalogue_meta_path(root)).map(|m| m["version"].clone()).unwrap_or(Value::Null),
+        "plan_id": plan["id"], "plan_version": plan["version"], "plan_sha256": bound["plan_sha256"], "tests_sha256": bound["tests_sha256"],
+        "independence": who.independence}).as_object().unwrap() {
+        entry[k] = v.clone();
+    }
     let mut md =
         read_text(&ev(root).join("06-INDEPENDENT-MIGRATION-TEST-DESIGN.md")).unwrap_or_default();
-    md.push_str(&format!("- {} — **{verdict}** by {reviewer_role} (session {reviewer_session}), {n} held-out tests. {}\n", now_iso(), notes.unwrap_or("")));
+    md.push_str(&format!("- {} — **{verdict}** by {} (session {}), {n} tests of which {} authored by the reviewer; bound to catalogue `{}`, plan `{}`, tests `{}`. {}\n", now_iso(), who.role(), who.session(), reviewer_tests.len(),
+        &bound["catalogue_sha256"].as_str().unwrap_or("")[..12.min(bound["catalogue_sha256"].as_str().unwrap_or("").len())],
+        &bound["plan_sha256"].as_str().unwrap_or("")[..12.min(bound["plan_sha256"].as_str().unwrap_or("").len())],
+        &bound["tests_sha256"].as_str().unwrap_or("")[..12.min(bound["tests_sha256"].as_str().unwrap_or("").len())], notes.unwrap_or("")));
     write_text(
         &ev(root).join("06-INDEPENDENT-MIGRATION-TEST-DESIGN.md"),
         &md,
@@ -728,7 +1353,8 @@ pub fn a5_review(
         "done"
     });
     b2["stage_times"]["A5"] = json!(now_iso());
-    save_baseline(root, &b2)?;
+    record_author(&mut b2, &who);
+    save_baseline(root, &b2, "A5 review")?;
     Ok(json!({"stage": "A5", "verdict": entry}))
 }
 
@@ -830,7 +1456,32 @@ pub fn a6_migrate(
     alias: &str,
     session: &str,
 ) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a6_migrate_by(
+        root,
+        batch,
+        source,
+        gate_answers,
+        project_name,
+        alias,
+        &identity::Actor::supplied(session, None),
+    )
+}
+
+/// **A6 controlled migration (Role C).** Executes only the plan the independent reviewer approved: the catalogue,
+/// plan and tests must be exactly those the A5 approval bound (`APPROVAL_STALE` otherwise). Health tiers: the G0
+/// guard (`scheduler::guard`, operation `adopt.migrate`) before any batch of an installed project, and G4 (wider
+/// staleness after migration changes) once the migration is complete.
+pub fn a6_migrate_by(
+    root: &Path,
+    batch: Option<i64>,
+    source: Option<&str>,
+    gate_answers: &[String],
+    project_name: &str,
+    alias: &str,
+    actor: &identity::Actor,
+) -> Result<Value> {
+    let (b, who) = begin_stage(root, "migrate", actor, None)?;
+    let session = who.session();
     require_stage(&b, "A4")?;
     require_verdict(
         &b,
@@ -840,6 +1491,7 @@ pub fn a6_migrate(
             "MIGRATION_PLAN_APPROVED_WITH_AMENDMENTS",
         ],
     )?;
+    let approved = require_approved_artefacts(root, &b, "adopt migrate")?;
     {
         let p0 = Project::open(root);
         if p0.is_installed() {
@@ -874,6 +1526,35 @@ pub fn a6_migrate(
             .map(|a| a.iter().filter_map(|x| x["batch"].as_i64()).collect())
             .unwrap_or_default(),
     };
+    // G0 (tier contract): an active hard-block governing `adopt.migrate` refuses before anything moves
+    let touched: Vec<String> = catalogue
+        .iter()
+        .filter(|e| {
+            e["batch"]
+                .as_i64()
+                .map(|n| batches.contains(&n))
+                .unwrap_or(false)
+                && e["action"] != "KEEP_IN_PLACE"
+        })
+        .flat_map(|e| {
+            [e["current_path"].as_str(), e["target_path"].as_str()]
+                .into_iter()
+                .flatten()
+                .filter(|x| !x.is_empty())
+                .map(String::from)
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    {
+        let p0 = Project::open(root);
+        if p0.is_installed() {
+            crate::scheduler::guard(
+                &p0,
+                crate::scheduler::catalogue::ops::ADOPT_MIGRATE,
+                &touched,
+            )?;
+        }
+    }
     let ledger = ev(root).join("migration-ledger.jsonl");
     let tests_file = ev(root).join("06-migration-tests.yaml");
     let mut report = read_text(&ev(root).join("07-MIGRATION-EXECUTION-REPORT.md")).unwrap_or_else(|_| "# 07 — Migration execution report\n\nExecutor: Role C. Each batch: checkpoint → execute → update references → independent-authored tests + affected product tests → evidence → ledger.\n\n".into());
@@ -881,7 +1562,8 @@ pub fn a6_migrate(
     let mut b2 = b.clone();
     b2["executor_session"] = json!(session);
     b2["stage_status"]["A6"] = json!("in_progress");
-    save_baseline(root, &b2)?;
+    record_author(&mut b2, &who);
+    save_baseline(root, &b2, "A6")?;
     let unknown = catalogue
         .iter()
         .filter(|e| e["finding_state"] == "UNKNOWN")
@@ -984,7 +1666,7 @@ pub fn a6_migrate(
                         .find(|e| e["artifact_id"].as_str() == Some(&aid))
                     {
                         if let Some(g) = e["human_gate"].as_str() {
-                            match crate::orchestration::gates::answered_option(&pj, g).as_deref() {
+                            match entry_gate_answer(&pj, e).as_deref() {
                                 Some("A") => {}
                                 Some(o) => {
                                     sk["reason"] = json!(format!(
@@ -1018,7 +1700,7 @@ pub fn a6_migrate(
                 let rb = executor::rollback_batch(root, n)?;
                 entry["rolled_back"] = json!(rb);
                 b2["stage_status"]["A6"] = json!("failed");
-                save_baseline(root, &b2)?;
+                save_baseline(root, &b2, "A6")?;
                 report.push_str(&format!(
                     "## Batch {n} — FAILED tests, rolled back\n\n```json\n{}\n```\n\n",
                     serde_json::to_string_pretty(&t)?
@@ -1058,14 +1740,74 @@ pub fn a6_migrate(
             .unwrap_or(true);
     b2["stage_status"]["A6"] = json!(if all_done { "done" } else { "in_progress" });
     b2["stage_times"]["A6"] = json!(now_iso());
-    save_baseline(root, &b2)?;
+    b2["migration_execution"] = json!({"approved_catalogue_sha256": approved["catalogue_sha256"], "approved_plan_sha256": approved["plan_sha256"], "approved_tests_sha256": approved["tests_sha256"], "by": verdict_actor(&who), "at": now_iso()});
+    save_baseline(root, &b2, "A6")?;
+    // G4 (Contract v3:797): wider staleness/impact propagation after the migration changed the tree
+    let health = if all_done {
+        let p = Project::open(root);
+        if p.is_installed() {
+            let moved: Vec<String> = results
+                .iter()
+                .flat_map(|r| {
+                    r["moves"]
+                        .as_array()
+                        .cloned()
+                        .unwrap_or_default()
+                        .into_iter()
+                        .flat_map(|m| {
+                            m.as_array()
+                                .cloned()
+                                .unwrap_or_default()
+                                .into_iter()
+                                .filter_map(|x| x.as_str().map(String::from))
+                        })
+                })
+                .collect();
+            tier_health(
+                &p,
+                crate::scheduler::Tier::G4,
+                crate::scheduler::Trigger::new(crate::scheduler::catalogue::ops::ADOPT_MIGRATE)
+                    .with_subject(b["adoption_id"].as_str().unwrap_or("adoption"))
+                    .with_paths(&moved),
+            )
+        } else {
+            Value::Null
+        }
+    } else {
+        Value::Null
+    };
     Ok(
-        json!({"stage": "A6", "batches": results, "complete": all_done, "evidence": format!("{EVIDENCE}/07-MIGRATION-EXECUTION-REPORT.md")}),
+        json!({"stage": "A6", "batches": results, "complete": all_done, "approval": {"verdict": b["verdicts"]["A5"]["verdict"], "reviewer": b["verdicts"]["A5"]["role"], "catalogue_sha256": approved["catalogue_sha256"], "plan_sha256": approved["plan_sha256"], "tests_sha256": approved["tests_sha256"]},
+            "health": health, "evidence": format!("{EVIDENCE}/07-MIGRATION-EXECUTION-REPORT.md")}),
     )
 }
 
+/// Run health tier `tier` for an adoption event and summarise it. A tier run that cannot complete is reported (the
+/// stage's own changes are already recorded); the independent verification of the next stage judges the tree.
+fn tier_health(
+    p: &Project,
+    tier: crate::scheduler::Tier,
+    trigger: crate::scheduler::Trigger,
+) -> Value {
+    match crate::scheduler::tier_run(p, tier, trigger) {
+        Ok(r) => {
+            json!({"tier": tier.as_str(), "verdict": r["verdict"], "health_result": r["health_result"], "state": r["state"], "findings": r["counts"], "blocks": r["blocks"]})
+        }
+        Err(e) => json!({"tier": tier.as_str(), "error": {"code": e.code, "message": e.message}}),
+    }
+}
+
 pub fn rollback_batch(root: &Path, batch: i64) -> Result<Value> {
-    executor::rollback_batch(root, batch)
+    rollback_batch_by(root, batch, &identity::Actor::process())
+}
+
+/// Roll back an executed batch (Role C). Recorded as executor authorship.
+pub fn rollback_batch_by(root: &Path, batch: i64, actor: &identity::Actor) -> Result<Value> {
+    let (mut b, who) = begin_stage(root, "rollback", actor, None)?;
+    let r = executor::rollback_batch(root, batch)?;
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A6 rollback")?;
+    Ok(r)
 }
 
 // ---------------------------------------------------------------- A7
@@ -1075,22 +1817,58 @@ pub fn a7_verify_migration(
     session: &str,
     role: &str,
 ) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a7_verify_migration_by(
+        root,
+        verdict,
+        &identity::Actor::supplied(session, Some(role)),
+    )
+}
+
+/// **A7 independent migration verification (Role D).** Performed only by `migration-verifier` in a fresh declared
+/// session. It verifies the tree against exactly what was approved: an acceptance needs the approved independent tests
+/// (the digest A5 bound, reviewer-authored tests present), at least one executed test and no failure — an accept
+/// with zero executed tests, or over tests emptied or changed after approval, is not computed and a claimed accept is
+/// refused (`VERDICT_CONFLICT`).
+pub fn a7_verify_migration_by(
+    root: &Path,
+    verdict: Option<&str>,
+    actor: &identity::Actor,
+) -> Result<Value> {
+    let (b, who) = begin_stage(root, "verify-migration", actor, None)?;
+    let (session, role) = (who.session(), who.role());
     require_stage(&b, "A6")?;
-    if b["executor_session"].as_str() == Some(session) {
-        return Err(GovError::new(
-            "INDEPENDENCE",
-            "migration verifier session must differ from the executor session (Role D)",
-        ));
-    }
     let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
     let vc = verify::verify_catalogue(root, &catalogue);
     let tests_file = ev(root).join("06-migration-tests.yaml");
     let tests = if tests_file.exists() {
         verify::run_tests_file(root, &tests_file)?
     } else {
-        json!({"ok": false, "reason": "no independent tests"})
+        json!({"ok": false, "reason": "no independent tests", "tests": 0, "pass": 0, "fail": 0})
     };
+    // bound to the approval: the tests run are the approved ones, over the approved plan and catalogue
+    let now = current_bindings(root)?;
+    let a5 = &b["verdicts"]["A5"];
+    let mut approval_problems: Vec<String> = binding_changes(a5, &now)
+        .into_iter()
+        .map(|c| format!("{c} differs from what the independent reviewer approved"))
+        .collect();
+    if !a5["verdict"]
+        .as_str()
+        .map(|v| v.starts_with("MIGRATION_PLAN_APPROVED"))
+        .unwrap_or(false)
+    {
+        approval_problems.push("no independent approval (A5) of the plan".into());
+    }
+    if a5["reviewer_tests_count"].as_u64().unwrap_or(0) == 0 {
+        approval_problems.push("the approval records no reviewer-authored test".into());
+    }
+    let executed = tests["tests"].as_u64().unwrap_or(0);
+    if executed == 0 {
+        approval_problems.push(
+            "no independent test was executed: an acceptance is never computed from zero tests"
+                .into(),
+        );
+    }
     let p = Project::open(root);
     let secrets_ok = p.is_installed() && {
         let sc = p.secret_scanner();
@@ -1109,6 +1887,7 @@ pub fn a7_verify_migration(
             .unwrap_or(false);
     let computed = if vc["ok"].as_bool().unwrap_or(false)
         && tests["ok"].as_bool().unwrap_or(false)
+        && approval_problems.is_empty()
         && secrets_ok
         && kernel_ok
     {
@@ -1125,25 +1904,33 @@ pub fn a7_verify_migration(
             "VERDICT_CONFLICT",
             format!("verifier claims acceptance but evidence computes {computed}; repair first"),
         )
-        .with_details(json!({"catalogue": vc, "tests": tests})));
+        .with_details(
+            json!({"catalogue": vc, "tests": tests, "approval_problems": approval_problems}),
+        ));
     }
     let n_of = |k: &str| vc[k].as_array().map(|a| a.len()).unwrap_or(0);
-    let md = format!("# 08 — Independent migration verification\n\nVerifier: {role} (session {session}) at {}. Executor confidence statements ignored; actual paths inspected; dependency references re-derived from a fresh scan.\n\n- Catalogue vs reality: {} problem(s), {} broken link(s), {} legacy mechanism(s) still active\n- Legacy retirements awaiting a Human Decision Gate: {} · kept by decision: {}\n- Retired with active references accepted at a gate: {} · active citations of archived material: {}\n- Independent tests: {} pass / {} fail\n- Secrets isolated: {secrets_ok}\n- Kernel intact: {kernel_ok}\n\n**Verdict: {final_verdict}**\n\n```json\n{}\n```\n", now_iso(), n_of("problems"), n_of("broken_links"), n_of("legacy_in_active_tree"), n_of("legacy_retirement_pending_gate"), n_of("legacy_kept_by_decision"), n_of("retired_with_accepted_active_references"), n_of("active_citations_of_archived_material"), tests["pass"], tests["fail"], serde_json::to_string_pretty(&json!({"catalogue": vc, "tests": tests}))?);
+    let md = format!("# 08 — Independent migration verification\n\nVerifier: {role} (session {session}) at {}. Executor confidence statements ignored; actual paths inspected; dependency references re-derived from a fresh scan.\n\n- Catalogue vs reality: {} problem(s), {} broken link(s), {} legacy mechanism(s) still active\n- Legacy retirements awaiting a Human Decision Gate: {} · kept by decision: {}\n- Retired with active references accepted at a gate: {} · active citations of archived material: {}\n- Independent tests: {} executed, {} pass / {} fail ({} reviewer-authored in the approval)\n- Bound to the approval: {}\n- Secrets isolated: {secrets_ok}\n- Kernel intact: {kernel_ok}\n\n**Verdict: {final_verdict}**\n\n```json\n{}\n```\n", now_iso(), n_of("problems"), n_of("broken_links"), n_of("legacy_in_active_tree"), n_of("legacy_retirement_pending_gate"), n_of("legacy_kept_by_decision"), n_of("retired_with_accepted_active_references"), n_of("active_citations_of_archived_material"), executed, tests["pass"], tests["fail"], a5["reviewer_tests_count"], if approval_problems.is_empty() { "yes".to_string() } else { approval_problems.join("; ") }, serde_json::to_string_pretty(&json!({"catalogue": vc, "tests": tests, "approval_problems": approval_problems}))?);
     write_md(root, "08-INDEPENDENT-MIGRATION-VERIFICATION.md", &md)?;
     let mut b2 = b.clone();
-    b2["verdicts"]["A7"] =
-        json!({"verdict": final_verdict, "session": session, "role": role, "at": now_iso()});
+    let mut entry = verdict_actor(&who);
+    for (k, v) in json!({"verdict": final_verdict, "at": now_iso(), "tests": {"executed": executed, "pass": tests["pass"], "fail": tests["fail"], "deferred": tests["deferred"]},
+        "catalogue_sha256": now["catalogue_sha256"], "plan_sha256": now["plan_sha256"], "tests_sha256": now["tests_sha256"], "approval_bound": approval_problems.is_empty(), "approval_problems": approval_problems,
+        "independence": who.independence}).as_object().unwrap() {
+        entry[k] = v.clone();
+    }
+    b2["verdicts"]["A7"] = entry;
     b2["stage_status"]["A7"] = json!(if final_verdict.starts_with("MIGRATION_ACCEPTED") {
         "done"
     } else {
         "rejected"
     });
     b2["stage_times"]["A7"] = json!(now_iso());
-    save_baseline(root, &b2)?;
+    record_author(&mut b2, &who);
+    save_baseline(root, &b2, "A7")?;
     Ok(
         json!({"stage": "A7", "verdict": final_verdict, "catalogue_problems": vc["problems"], "broken_links": vc["broken_links"], "legacy_in_active_tree": vc["legacy_in_active_tree"],
             "legacy_retirement_pending_gate": vc["legacy_retirement_pending_gate"], "legacy_kept_by_decision": vc["legacy_kept_by_decision"], "retired_with_accepted_active_references": vc["retired_with_accepted_active_references"],
-            "active_citations_of_archived_material": vc["active_citations_of_archived_material"], "tests": {"pass": tests["pass"], "fail": tests["fail"]}, "secrets_isolated": secrets_ok, "kernel_intact": kernel_ok}),
+            "active_citations_of_archived_material": vc["active_citations_of_archived_material"], "tests": {"executed": executed, "pass": tests["pass"], "fail": tests["fail"]}, "approval_problems": approval_problems, "secrets_isolated": secrets_ok, "kernel_intact": kernel_ok}),
     )
 }
 
@@ -1153,7 +1940,13 @@ pub fn a7_verify_migration(
 /// fresh dependency proof shows no active code, configuration or document depends on it — or under a Human Decision
 /// Gate answered A for exactly the dependants found, leaving them as they are (framework §69-70; BC-P2-33).
 pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a8_extract_legacy_by(root, &identity::Actor::process())
+}
+
+/// A8 as `actor` (Role C). It acts on the catalogue the independent verifier accepted: a catalogue changed since A7
+/// is refused (`APPROVAL_STALE`), and the G0 guard (`adopt.migrate`) applies to its retirements.
+pub fn a8_extract_legacy_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
+    let (mut b, who) = begin_stage(root, "extract-legacy", actor, None)?;
     require_stage(&b, "A7")?;
     require_verdict(&b, "A7", &["MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"])?;
     {
@@ -1161,6 +1954,23 @@ pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
         crate::orchestration::control::guard_write(&p0, "adopt extract-legacy")?;
         crate::authority::require(&p0, "migrate_execute")?;
     }
+    {
+        let now = current_bindings(root)?;
+        let a7 = &b["verdicts"]["A7"];
+        if a7["catalogue_sha256"].as_str().is_none()
+            || a7["catalogue_sha256"] != now["catalogue_sha256"]
+        {
+            return Err(GovError::new(
+                "APPROVAL_STALE",
+                "adopt extract-legacy refused: the migration catalogue changed after the independent migration verifier accepted the migration (A7); A8 acts only on the accepted catalogue",
+            )
+            .with_details(json!({"accepted_catalogue_sha256": a7["catalogue_sha256"], "current_catalogue_sha256": now["catalogue_sha256"], "remediation": "restore the accepted catalogue, or re-run the migration verification (`gov adopt verify-migration` as migration-verifier)"})));
+        }
+        let p0 = Project::open(root);
+        crate::scheduler::guard(&p0, crate::scheduler::catalogue::ops::ADOPT_MIGRATE, &[])?;
+    }
+    record_author(&mut b, &who);
+    save_baseline(root, &b, "A8")?;
     set_stage(root, "A8", "in_progress", None)?;
     let catalogue = read_jsonl(&ev(root).join(format!("{CATALOGUE_STEM}.jsonl")))?;
     let scanner = scanner_for(root);
@@ -1231,10 +2041,7 @@ pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
             "RETIRE".to_string()
         } else if !is_store {
             // a legacy rule file its migration batch did not retire (gated or blocked): registered, not moved here
-            let why = match e["human_gate"]
-                .as_str()
-                .and_then(|g| crate::orchestration::gates::answered_option(&Project::open(root), g))
-            {
+            let why = match entry_gate_answer(&Project::open(root), e) {
                 Some(o) if o != "A" => "KEPT_BY_DECISION",
                 _ => "RETIREMENT_PENDING_GATE",
             };
@@ -1257,9 +2064,7 @@ pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
             {
                 "RETIREMENT_BLOCKED_ACTIVE_REFERENCES"
             } else if gated && !authorised {
-                match e["human_gate"].as_str().and_then(|g| {
-                    crate::orchestration::gates::answered_option(&Project::open(root), g)
-                }) {
+                match entry_gate_answer(&Project::open(root), e) {
                     Some(_) => "KEPT_BY_DECISION",
                     None => "RETIREMENT_PENDING_GATE",
                 }
@@ -1346,7 +2151,15 @@ pub fn a8_extract_legacy(root: &Path) -> Result<Value> {
 
 // ---------------------------------------------------------------- A9
 pub fn a9_build_memory(root: &Path, session: &str) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a9_build_memory_by(root, &identity::Actor::supplied(session, None))
+}
+
+/// A9 as `actor` (Role E, memory builder). Every held-out query present after the build — the generated starter set
+/// and anything that pre-existed — is recorded as the builder's regression set, so A10 can only accept on queries
+/// the independent memory verifier authored afterwards.
+pub fn a9_build_memory_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
+    let (b, who) = begin_stage(root, "build-memory", actor, None)?;
+    let session = who.session();
     require_stage(&b, "A8")?;
     require_verdict(&b, "A7", &["MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"])?;
     {
@@ -1357,7 +2170,8 @@ pub fn a9_build_memory(root: &Path, session: &str) -> Result<Value> {
     let mut b2 = b.clone();
     b2["memory_builder_session"] = json!(session);
     b2["stage_status"]["A9"] = json!("in_progress");
-    save_baseline(root, &b2)?;
+    record_author(&mut b2, &who);
+    save_baseline(root, &b2, "A9")?;
     let mut p = Project::open(root);
     p.invalidate();
     p.require_installed()?;
@@ -1393,11 +2207,70 @@ pub fn a9_build_memory(root: &Path, session: &str) -> Result<Value> {
             },
         );
     }
-    let md = format!("# 10 — Memory implementation report\n\nBuilt after path stabilisation (A7 accepted) on canonical paths.\n\n- artefacts: {} · chunks: {} · vectors: {} · edges: {} · symbols: {}\n- excluded (secret/binary/large): {}\n- secret-content blocked: {}\n- embedder: {}\n- manifest hash: {}\n- degradations: {:?}\n- held-out queries generated: {generated}\n", r.counts["artifacts"], r.counts["chunks"], r.counts["vectors"], r.counts["edges"], r.counts["symbols"], r.excluded.len(), r.secret_blocked.len(), r.embedder, r.manifest_hash, r.degradations);
+    // the builder's held-out set (regression evidence): every query present now, except those an earlier verified
+    // A10 recorded as the memory verifier's own
+    let verifier_owned: Vec<String> = b["verdicts"]["A10"]["verifier_query_identities"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    let held = read_yaml(&held_path).unwrap_or(json!({"queries": []}));
+    let builder_queries: Vec<String> = held["queries"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .map(heldout_query_identity)
+                .filter(|i| !verifier_owned.contains(i))
+                .collect()
+        })
+        .unwrap_or_default();
+    let heldout_rel = held_path
+        .strip_prefix(root)
+        .map(|x| x.to_string_lossy().replace('\\', "/"))
+        .unwrap_or_default();
+    let md = format!("# 10 — Memory implementation report\n\nBuilt after path stabilisation (A7 accepted) on canonical paths.\n\n- artefacts: {} · chunks: {} · vectors: {} · edges: {} · symbols: {}\n- excluded (secret/binary/large): {}\n- secret-content blocked: {}\n- embedder: {}\n- manifest hash: {}\n- degradations: {:?}\n- held-out queries generated: {generated}\n- builder held-out set (regression evidence, not independent): {} quer(ies) in `{heldout_rel}`; the independent memory verifier (A10) authors its own held-out queries\n", r.counts["artifacts"], r.counts["chunks"], r.counts["vectors"], r.counts["edges"], r.counts["symbols"], r.excluded.len(), r.secret_blocked.len(), r.embedder, r.manifest_hash, r.degradations, builder_queries.len());
     write_md(root, "10-MEMORY-IMPLEMENTATION-REPORT.md", &md)?;
-    set_stage(root, "A9", "done", None)?;
+    set_stage(
+        root,
+        "A9",
+        "done",
+        Some((
+            "memory_build",
+            json!({"heldout_file": heldout_rel, "builder_query_identities": builder_queries, "generated": generated, "manifest_hash": r.manifest_hash, "by": verdict_actor(&who), "at": now_iso()}),
+        )),
+    )?;
+    // G4 (Contract v3:797): wider staleness/impact propagation after the memory change
+    let health = tier_health(
+        &p,
+        crate::scheduler::Tier::G4,
+        crate::scheduler::Trigger::new("adopt.build-memory")
+            .with_subject(b["adoption_id"].as_str().unwrap_or("adoption")),
+    );
     Ok(
-        json!({"stage": "A9", "counts": r.counts, "manifest_hash": r.manifest_hash, "excluded": r.excluded.len(), "secret_blocked": r.secret_blocked, "heldout_generated": generated}),
+        json!({"stage": "A9", "counts": r.counts, "manifest_hash": r.manifest_hash, "excluded": r.excluded.len(), "secret_blocked": r.secret_blocked, "heldout_generated": generated, "builder_heldout_queries": builder_queries.len(), "health": health}),
+    )
+}
+
+/// What a held-out query asks and expects, independent of its label (`id`, `k`, `category`, notes): a starter query
+/// relabelled is still the builder's.
+pub fn heldout_query_identity(q: &Value) -> String {
+    let norm = |v: &Value| -> Value {
+        let mut a: Vec<String> = v
+            .as_array()
+            .map(|x| {
+                x.iter()
+                    .filter_map(|y| y.as_str().map(|s| s.trim().to_string()))
+                    .collect()
+            })
+            .unwrap_or_default();
+        a.sort();
+        json!(a)
+    };
+    identity::content_hash(
+        &json!({"query": q["query"].as_str().map(|s| s.trim()), "expected_refs": norm(&q["expected_refs"]), "forbidden": norm(&q["forbidden"]), "route": q["route"]}),
     )
 }
 
@@ -1408,16 +2281,40 @@ pub fn a10_verify_memory(
     session: &str,
     role: &str,
 ) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a10_verify_memory_by(
+        root,
+        verdict,
+        &identity::Actor::supplied(session, Some(role)),
+    )
+}
+
+/// **A10 independent memory verification (Role F).** Performed only by `memory-verifier` in a fresh declared session.
+/// The held-out tests are the verifier's own (adoption protocol §15; Contract v3 O3, T2): queries in the governed
+/// held-out file that are neither in the builder's recorded set (A9) nor produced by the product's own starter
+/// generator from this index. Without any, the stage refuses (`INDEPENDENT_HELDOUT_REQUIRED`); an acceptance needs
+/// the verifier's set to pass on its own (a measured set: `MEMORY_POLICY.regression.min_queries`) as well as the
+/// whole set, a reproducible rebuild and no secret in the index.
+pub fn a10_verify_memory_by(
+    root: &Path,
+    verdict: Option<&str>,
+    actor: &identity::Actor,
+) -> Result<Value> {
+    let (b, who) = begin_stage(root, "verify-memory", actor, None)?;
+    let (session, role) = (who.session(), who.role());
     require_stage(&b, "A9")?;
-    if b["memory_builder_session"].as_str() == Some(session) {
-        return Err(GovError::new(
-            "INDEPENDENCE",
-            "memory verifier session must differ from the memory builder session (Role F)",
-        ));
-    }
     let mut p = Project::open(root);
     p.invalidate();
+    let held_rel = p.policies().get_str(
+        "MEMORY_POLICY",
+        "regression.heldout_file",
+        "governance/tests/memory/heldout.yaml",
+    );
+    let held = read_yaml(&root.join(&held_rel)).map_err(|_| {
+        GovError::new(
+            "INDEPENDENT_HELDOUT_REQUIRED",
+            format!("the held-out set {held_rel} is missing; the independent memory verifier authors held-out queries there before A10"),
+        )
+    })?;
     // delete/rebuild guarantee (§19): two full rebuilds from Git + records at the same tree state must be identical
     let first = crate::memory::indexer::rebuild(
         &p,
@@ -1435,14 +2332,43 @@ pub fn a10_verify_memory(
         },
     )?;
     let reproducible = before.as_deref() == Some(rebuilt.manifest_hash.as_str());
-    // held-out retrieval regression on the fresh index
     let db = RuntimeDb::open(&p.db_path())?;
-    let held = read_yaml(&root.join(p.policies().get_str(
-        "MEMORY_POLICY",
-        "regression.heldout_file",
-        "governance/tests/memory/heldout.yaml",
-    )))?;
+    // what the builder produced: its recorded set (A9) and whatever the product's own generator makes of this index
+    let mut builder: Vec<String> = b["memory_build"]["builder_query_identities"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    if let Ok(gen) = crate::memory::heldout::generate_starter(&p, &db, "A10 builder-set check") {
+        builder.extend(
+            gen["queries"]
+                .as_array()
+                .map(|a| a.iter().map(heldout_query_identity).collect::<Vec<_>>())
+                .unwrap_or_default(),
+        );
+    }
+    let all_queries: Vec<Value> = held["queries"].as_array().cloned().unwrap_or_default();
+    let verifier_queries: Vec<Value> = all_queries
+        .iter()
+        .filter(|q| !q.get("pending").and_then(|v| v.as_bool()).unwrap_or(false))
+        .filter(|q| !builder.contains(&heldout_query_identity(q)))
+        .cloned()
+        .collect();
+    if verifier_queries.is_empty() {
+        return Err(GovError::new(
+            "INDEPENDENT_HELDOUT_REQUIRED",
+            format!("A10 evaluates held-out queries the independent memory verifier authored (adoption protocol §15: \"fresh test author creates held-out tests independently\"); every query in {held_rel} is the builder's starter or pre-existing set (regression evidence only)"),
+        )
+        .with_details(json!({"heldout_file": held_rel, "queries": all_queries.len(), "builder_queries": all_queries.len(), "min_queries": p.policies().get_i64("MEMORY_POLICY", "regression.min_queries", 5),
+            "remediation": "add held-out queries of your own (exact id/path, lexical, semantic paraphrase, graph, superseded-vs-active, symbol) with their expected references, then run A10"})));
+    }
     let h = crate::retrieval::run_heldout(&p, &db, &held)?;
+    let mut indep_set = held.clone();
+    indep_set["queries"] = json!(verifier_queries);
+    let hi = crate::retrieval::run_heldout(&p, &db, &indep_set)?;
     let secret_leak = db.count_where("artifacts", "path_class='secret'") > 0
         || db.query("SELECT text FROM chunks", &[])?.iter().any(|r| {
             !p.secret_scanner()
@@ -1450,7 +2376,11 @@ pub fn a10_verify_memory(
                 .is_empty()
         });
     let status = crate::status::status(&p)?;
-    let computed = if h["pass"].as_bool().unwrap_or(false) && reproducible && !secret_leak {
+    let computed = if h["pass"].as_bool().unwrap_or(false)
+        && hi["pass"].as_bool().unwrap_or(false)
+        && reproducible
+        && !secret_leak
+    {
         "MEMORY_ACCEPTED_FOR_V4_AUDIT"
     } else {
         "MEMORY_REJECTED_NEEDS_REPAIR"
@@ -1460,21 +2390,29 @@ pub fn a10_verify_memory(
         return Err(
             GovError::new("VERDICT_CONFLICT", format!("evidence computes {computed}"))
                 .with_details(
-                    json!({"heldout": h, "reproducible": reproducible, "secret_leak": secret_leak}),
+                    json!({"heldout": h, "independent_heldout": hi, "reproducible": reproducible, "secret_leak": secret_leak}),
                 ),
         );
     }
-    let md = format!("# 11 — Independent memory verification\n\nVerifier: {role} (session {session}) at {}.\n\n- held-out: recall@k {:.2}, MRR {:.2}, stale-hit {:.2}, superseded-hit {:.2}, forbidden {} → pass={}\n- delete/rebuild reproducibility: {reproducible} (before {:?}, after {})\n- secret exclusion: leak={secret_leak}\n- fresh-agent reconstruction: status packet ok, next action: {}\n\n**Verdict: {final_verdict}**\n", now_iso(), h["recall_at_k"].as_f64().unwrap_or(0.0), h["mrr"].as_f64().unwrap_or(0.0), h["stale_hit_rate"].as_f64().unwrap_or(0.0), h["superseded_hit_rate"].as_f64().unwrap_or(0.0), h["forbidden_violations"], h["pass"], before, rebuilt.manifest_hash, status["next_action"]);
+    let md = format!("# 11 — Independent memory verification\n\nVerifier: {role} (session {session}) at {}.\n\n- independent held-out (authored by the verifier): {} quer(ies), recall@k {:.2}, MRR {:.2}, measured={} → pass={}\n- whole held-out set (verifier + builder regression): recall@k {:.2}, MRR {:.2}, stale-hit {:.2}, superseded-hit {:.2}, forbidden {} → pass={}\n- delete/rebuild reproducibility: {reproducible} (before {:?}, after {})\n- secret exclusion: leak={secret_leak}\n- fresh-agent reconstruction: status packet ok, next action: {}\n\n**Verdict: {final_verdict}**\n", now_iso(), verifier_queries.len(), hi["recall_at_k"].as_f64().unwrap_or(0.0), hi["mrr"].as_f64().unwrap_or(0.0), hi["measured"], hi["pass"], h["recall_at_k"].as_f64().unwrap_or(0.0), h["mrr"].as_f64().unwrap_or(0.0), h["stale_hit_rate"].as_f64().unwrap_or(0.0), h["superseded_hit_rate"].as_f64().unwrap_or(0.0), h["forbidden_violations"], h["pass"], before, rebuilt.manifest_hash, status["next_action"]);
     write_md(root, "11-INDEPENDENT-MEMORY-VERIFICATION.md", &md)?;
     let mut b2 = b.clone();
-    b2["verdicts"]["A10"] = json!({"verdict": final_verdict, "session": session, "role": role, "at": now_iso(), "reproducible": reproducible});
+    let mut entry = verdict_actor(&who);
+    for (k, v) in json!({"verdict": final_verdict, "at": now_iso(), "reproducible": reproducible, "heldout_file": held_rel, "heldout_sha256": identity::content_hash(&held),
+        "verifier_queries": verifier_queries.iter().map(|q| q["id"].clone()).collect::<Vec<_>>(), "verifier_query_identities": verifier_queries.iter().map(heldout_query_identity).collect::<Vec<_>>(),
+        "builder_queries": all_queries.len() - verifier_queries.len(), "independent_heldout": {"queries": hi["queries"], "measured": hi["measured"], "recall_at_k": hi["recall_at_k"], "mrr": hi["mrr"], "pass": hi["pass"]},
+        "manifest_hash": rebuilt.manifest_hash, "independence": who.independence}).as_object().unwrap() {
+        entry[k] = v.clone();
+    }
+    b2["verdicts"]["A10"] = entry;
     b2["stage_status"]["A10"] = json!(if final_verdict.starts_with("MEMORY_ACCEPTED") {
         "done"
     } else {
         "rejected"
     });
     b2["stage_times"]["A10"] = json!(now_iso());
-    save_baseline(root, &b2)?;
+    record_author(&mut b2, &who);
+    save_baseline(root, &b2, "A10")?;
     let failed: Vec<Value> = h["results"]
         .as_array()
         .map(|a| {
@@ -1485,13 +2423,28 @@ pub fn a10_verify_memory(
         })
         .unwrap_or_default();
     Ok(
-        json!({"stage": "A10", "verdict": final_verdict, "heldout": {"recall_at_k": h["recall_at_k"], "mrr": h["mrr"], "pass": h["pass"], "queries": h["queries"], "stale_hit_rate": h["stale_hit_rate"], "superseded_hit_rate": h["superseded_hit_rate"], "forbidden_violations": h["forbidden_violations"], "failed": failed}, "reproducible": reproducible, "secret_leak": secret_leak}),
+        json!({"stage": "A10", "verdict": final_verdict, "heldout": {"recall_at_k": h["recall_at_k"], "mrr": h["mrr"], "pass": h["pass"], "queries": h["queries"], "stale_hit_rate": h["stale_hit_rate"], "superseded_hit_rate": h["superseded_hit_rate"], "forbidden_violations": h["forbidden_violations"], "failed": failed},
+            "independent_heldout": {"queries": hi["queries"], "measured": hi["measured"], "recall_at_k": hi["recall_at_k"], "mrr": hi["mrr"], "pass": hi["pass"], "min_queries": hi["min_queries"]},
+            "builder_queries": all_queries.len() - verifier_queries.len(), "reproducible": reproducible, "secret_leak": secret_leak}),
     )
 }
 
 // ---------------------------------------------------------------- A11
 pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
-    let b = load_baseline(root)?;
+    a11_audit_by(root, accept_exceptions, &identity::Actor::process())
+}
+
+/// **A11 comprehensive independent audit (Role G).** Performed only by `independent-auditor` in a fresh declared
+/// session that authored no planner, executor or memory-builder stage. The audit is the G5 full suite of the health
+/// scheduler's tier contract (every check, fresh, deep, recorded as a governance-suite audit record), plus the
+/// adoption's own re-derived findings and the adoption acceptance criteria — which now include that every
+/// independent verdict was given by its designated role in a fresh session and bound to what it judged.
+pub fn a11_audit_by(
+    root: &Path,
+    accept_exceptions: bool,
+    actor: &identity::Actor,
+) -> Result<Value> {
+    let (b, who) = begin_stage(root, "audit", actor, None)?;
     require_stage(&b, "A10")?;
     require_verdict(&b, "A10", &["MEMORY_ACCEPTED_FOR_V4_AUDIT"])?;
     let mut p = Project::open(root);
@@ -1503,14 +2456,17 @@ pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
             ..Default::default()
         },
     )?; // audit a fresh index
-    let audit = crate::verification::audit(
-        &p,
-        &crate::verification::SuiteOptions {
-            deep: true,
-            families: vec![],
-        },
-        true,
-    )?;
+        // G5 at adopt (Contract v3:798; tier contract `scheduler`): every check, executed fresh and compared with the
+        // cache, deep, persisted as the adoption's audit record
+    let mut g5 = crate::scheduler::RunOptions::new(
+        crate::scheduler::Tier::G5,
+        crate::scheduler::Trigger::new("adopt.audit")
+            .with_subject(b["adoption_id"].as_str().unwrap_or("adoption")),
+    );
+    g5.deep = true;
+    g5.surface = "adopt".into();
+    g5.record = crate::scheduler::RecordPolicy::Always;
+    let audit = crate::verification::audit_with(&p, &g5)?;
     let _ = crate::memory::indexer::rebuild(
         &p,
         crate::memory::indexer::IndexOptions {
@@ -1637,11 +2593,19 @@ pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
                 .as_str()
                 .map(|v| v.starts_with("MIGRATION_PLAN_APPROVED"))
                 .unwrap_or(false)
-                && b["verdicts"]["A5"]["session"] != b["planner_session"],
+                && independent_verdict(&b, "A5"),
         ),
         (
             "independent migration tests exist",
-            ev(root).join("06-migration-tests.yaml").exists(),
+            ev(root).join("06-migration-tests.yaml").exists()
+                && b["verdicts"]["A5"]["reviewer_tests_count"]
+                    .as_u64()
+                    .unwrap_or(0)
+                    > 0,
+        ),
+        (
+            "migration executed and verified against the approved plan and tests",
+            b["verdicts"]["A7"]["approval_bound"] == true && independent_verdict(&b, "A7"),
         ),
         (
             "migrated paths/imports/links pass",
@@ -1666,11 +2630,20 @@ pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
         ),
         (
             "independent memory verifier passed",
-            b["verdicts"]["A10"]["verdict"] == "MEMORY_ACCEPTED_FOR_V4_AUDIT",
+            b["verdicts"]["A10"]["verdict"] == "MEMORY_ACCEPTED_FOR_V4_AUDIT"
+                && independent_verdict(&b, "A10")
+                && b["verdicts"]["A10"]["verifier_queries"]
+                    .as_array()
+                    .map(|a| !a.is_empty())
+                    .unwrap_or(false),
         ),
         (
             "comprehensive v4 audit completed",
-            !audit["audit"].as_str().unwrap_or("").is_empty(),
+            !audit["audit"].as_str().unwrap_or("").is_empty() && audit["tier"] == "G5",
+        ),
+        (
+            "comprehensive audit by a fresh independent auditor",
+            who.independence["established"] == true,
         ),
         (
             "installed release pinned in framework.lock",
@@ -1710,15 +2683,20 @@ pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
     } else {
         "NOT_ADOPTED_HEALTHY"
     };
-    let md = format!("# 12 — Adoption final report\n\nAudit: {} (verdict {}), doctor: {}\n\n| Acceptance criterion | OK |\n|---|---|\n{}\n\nOpen findings: critical {} · high {} · medium {} · low {}\n\n## Adoption findings (stable ids)\n\n| Id | Severity | Finding |\n|---|---|---|\n{}\n\n**Final verdict: {verdict}**\n", audit["audit"], audit["verdict"], doctor.verdict, checks.iter().map(|(n, ok)| format!("| {n} | {} |", if *ok { "✅" } else { "❌" })).collect::<Vec<_>>().join("\n"), audit["counts"]["critical"], audit["counts"]["high"], audit["counts"]["medium"], audit["counts"]["low"],
+    let md = format!("# 12 — Adoption final report\n\nAuditor: {} (session {}). Audit: {} (tier {}, verdict {}), doctor: {}\n\n| Acceptance criterion | OK |\n|---|---|\n{}\n\nOpen findings: critical {} · high {} · medium {} · low {}\n\n## Adoption findings (stable ids)\n\n| Id | Severity | Finding |\n|---|---|---|\n{}\n\n**Final verdict: {verdict}**\n", who.role(), who.session(), audit["audit"], audit["tier"], audit["verdict"], doctor.verdict, checks.iter().map(|(n, ok)| format!("| {n} | {} |", if *ok { "✅" } else { "❌" })).collect::<Vec<_>>().join("\n"), audit["counts"]["critical"], audit["counts"]["high"], audit["counts"]["medium"], audit["counts"]["low"],
         adoption_findings.iter().map(|f| format!("| {} | {} | {} |", f["id"].as_str().unwrap_or(""), f["severity"].as_str().unwrap_or(""), f["message"].as_str().unwrap_or("").replace('|', "/"))).collect::<Vec<_>>().join("\n"));
     write_md(root, "12-ADOPTION-FINAL-REPORT.md", &md)?;
     let mut b2 = b.clone();
-    b2["verdicts"]["A11"] = json!({"verdict": verdict, "audit": audit["audit"], "at": now_iso()});
+    let mut entry = verdict_actor(&who);
+    for (k, v) in json!({"verdict": verdict, "audit": audit["audit"], "tier": audit["tier"], "health_result": audit["health_result"], "inputs_hash": audit["inputs_hash"], "at": now_iso(), "independence": who.independence}).as_object().unwrap() {
+        entry[k] = v.clone();
+    }
+    b2["verdicts"]["A11"] = entry;
     b2["stage_status"]["A11"] = json!("done");
     b2["stage_times"]["A11"] = json!(now_iso());
     b2["final_verdict"] = json!(verdict);
-    save_baseline(root, &b2)?;
+    record_author(&mut b2, &who);
+    save_baseline(root, &b2, "A11")?;
     let mut messages: Vec<Value> = adoption_findings
         .iter()
         .map(|f| json!({"id": f["id"], "severity": f["severity"], "family": f["family"], "message": f["message"]}))
@@ -1731,22 +2709,34 @@ pub fn a11_audit(root: &Path, accept_exceptions: bool) -> Result<Value> {
         .map(|c| json!({"id": c["id"], "message": c["message"]}))
         .collect();
     Ok(
-        json!({"stage": "A11", "verdict": verdict, "audit": audit["audit"], "audit_verdict": audit["verdict"], "doctor": doctor.verdict, "checks": checks.iter().map(|(n, ok)| json!({"criterion": n, "ok": ok})).collect::<Vec<_>>(), "findings": audit["counts"], "adoption_findings": adoption_findings, "legacy_authority_retired": legacy_retired, "finding_messages": messages, "doctor_failed": doctor_failed, "evidence": format!("{EVIDENCE}/12-ADOPTION-FINAL-REPORT.md")}),
+        json!({"stage": "A11", "verdict": verdict, "audit": audit["audit"], "audit_verdict": audit["verdict"], "tier": audit["tier"], "health_result": audit["health_result"], "doctor": doctor.verdict, "checks": checks.iter().map(|(n, ok)| json!({"criterion": n, "ok": ok})).collect::<Vec<_>>(), "findings": audit["counts"], "adoption_findings": adoption_findings, "legacy_authority_retired": legacy_retired, "finding_messages": messages, "doctor_failed": doctor_failed, "evidence": format!("{EVIDENCE}/12-ADOPTION-FINAL-REPORT.md")}),
     )
 }
 
+/// Whether the recorded verdict of independent stage `stage` was given by its designated role with independence
+/// established (the record is the verified baseline, so this is what the OS recorded).
+fn independent_verdict(b: &Value, stage: &str) -> bool {
+    let v = &b["verdicts"][stage];
+    v["independence"]["established"] == true
+        && v["role"].as_str().is_some()
+        && v["role"].as_str() == designated_role(stage)
+}
+
 pub fn status(root: &Path) -> Result<Value> {
-    let b = load_baseline(root)?;
+    let b = load_baseline_raw(root)?;
+    let binding = crate::t2::verify_value(&b, "");
     let mut stages = vec![];
     for s in STAGES {
-        stages.push(json!({"stage": s, "status": b["stage_status"][s].as_str().unwrap_or("pending"), "verdict": b["verdicts"][s]["verdict"]}));
+        stages.push(json!({"stage": s, "status": b["stage_status"][s].as_str().unwrap_or("pending"), "verdict": b["verdicts"][s]["verdict"],
+            "by": if b["verdicts"][s].is_object() { json!({"role": b["verdicts"][s]["role"], "session": b["verdicts"][s]["session"], "designated_role": designated_role(s), "independence_established": b["verdicts"][s]["independence"]["established"]}) } else { Value::Null }}));
     }
     let next = STAGES
         .iter()
         .find(|s| b["stage_status"][s].as_str().unwrap_or("pending") != "done")
         .map(|s| s.to_string());
     Ok(
-        json!({"adoption_id": b["adoption_id"], "commit": b["commit"], "stages": stages, "next_stage": next, "final_verdict": b["final_verdict"], "evidence_dir": EVIDENCE}),
+        json!({"adoption_id": b["adoption_id"], "commit": b["commit"], "stages": stages, "next_stage": next, "final_verdict": b["final_verdict"], "evidence_dir": EVIDENCE,
+            "record_binding": binding.to_value(), "honoured": binding.is_verified(), "authors": b["authors"]}),
     )
 }
 

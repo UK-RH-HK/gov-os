@@ -320,6 +320,7 @@ pub fn run_brownfield_to_a6(tag: &str) -> (PathBuf, Gov, Gov) {
     ] {
         planner.ok(&["adopt", s]);
     }
+    crate::migration::reviewer_authors_tests(&root); // BC-P2-34: the reviewer approves with tests of its own
     planner
         .with_session("S-reviewer")
         .with_role("migration-reviewer")
