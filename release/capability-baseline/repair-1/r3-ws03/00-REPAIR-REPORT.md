@@ -376,6 +376,12 @@ final run is at baseline.
   directory.
 * Audit-of-record probes ran unedited. The two labelled copies (`derived/`) list every change in their headers.
 * The standalone human-gate anchor stays off, and no default role or unauthenticated answer path was introduced.
+* No new hard-block (availability rule, P2-HO-0031):
+  * The new refusals are typed and scoped to the one operation whose reliance they protect: `T2_AUTHORITY_*`,
+    `EVIDENCE_NOT_CITABLE` on the citing gate or answer, and the two human-only triggers on their own gates.
+  * `trust t2-binding --reseal` is not a governed-work operation, so `control::guard_health` never refuses it.
+  * The control-state move keeps FREEZE_WRITES/PAUSE as the policy-required global stop (Contract v3 L4), with the
+    round-2 recovery allow-lists unchanged.
 
 ## 10. Owner-decision questions
 
