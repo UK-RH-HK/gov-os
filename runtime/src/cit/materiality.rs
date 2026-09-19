@@ -20,7 +20,7 @@
 //! | an `architecture` record; `docs/architecture/**`, ADRs, `spec/architecture/**` | architecture_change |
 //! | an `interface` record; API contracts (`*.proto`, `*.graphql`, OpenAPI/Swagger, `*.avsc`, `*.wsdl`) | interface_change |
 //! | acceptance/success/failure criteria of requirements and scenarios; test obligations; a feature's requirement/scenario/acceptance-test lists | acceptance_criteria_change |
-//! | any other content of a requirement, scenario, feature or decision; product source (repository-contract class `source`) | behaviour_change |
+//! | any other content of a requirement, scenario, feature or decision (not its planning attributes `priority`, `owner_role`, `legacy_source`); product source (repository-contract class `source`) | behaviour_change |
 //! | a `security` record; security-named paths (auth, crypto, permission, secrets, TLS, …); a removed or weakened line carrying a security check (verify/signature/authenticate/authorise/permission/…) | security_change |
 //! | `governance/**` (except `governance/generated/**`), `framework/**`, any policy/overlay configuration file | governance_change |
 //! | infrastructure definitions (`infra/**`, Terraform, Kubernetes/Helm, Docker/Compose, CloudFormation, Bicep, serverless) | infrastructure_cost |
@@ -66,6 +66,11 @@ pub const BOOKKEEPING_FIELDS: &[&str] = &[
     "status_note",
     "human_gate",
 ];
+
+/// Planning attributes of a specification record (requirement, scenario, feature): in which order it is worked, who
+/// owns it and where it came from. They do not specify what the product does, so a change confined to them is not a
+/// behaviour change (framework §49 "R1 local semantic change" at most); every other field of such a record is.
+pub const PLANNING_FIELDS: &[&str] = &["priority", "owner_role", "legacy_source"];
 
 const CRITERIA_FIELDS: &[&str] = &[
     "acceptance_criteria",
@@ -436,7 +441,11 @@ fn classify_record(
         .copied()
         .filter(|f| CRITERIA_FIELDS.contains(&f.as_str()))
         .collect();
-    let non_crit = content.len() > crit.len() || before.is_none() || after.is_none();
+    let non_crit = content
+        .iter()
+        .any(|f| !CRITERIA_FIELDS.contains(&f.as_str()) && !PLANNING_FIELDS.contains(&f.as_str()))
+        || before.is_none()
+        || after.is_none();
     match rtype {
         "architecture" => m.push(
             "architecture_change",
@@ -1196,6 +1205,30 @@ mod tests {
             )],
         );
         assert!(!m.material(), "{:?}", m.findings);
+        // planning attributes of a requirement (order, owner, provenance) do not specify behaviour ...
+        let m = classify(
+            None,
+            &[rec(
+                "REQ-0001",
+                "requirement",
+                &["priority"],
+                json!({"priority": "low"}),
+                json!({"priority": "high"}),
+            )],
+        );
+        assert!(!m.material(), "{:?}", m.findings);
+        // ... but the same change together with the statement does
+        let m = classify(
+            None,
+            &[rec(
+                "REQ-0001",
+                "requirement",
+                &["priority", "statement"],
+                json!({"priority": "low", "statement": "a"}),
+                json!({"priority": "high", "statement": "b"}),
+            )],
+        );
+        assert_eq!(m.classes(), vec!["behaviour_change"]);
         let m = classify(None, &[file("docs/guide.md", Some("a"), Some("b"))]);
         assert!(!m.material(), "{:?}", m.findings);
         let m = classify(None, &[file("infra/main.tf", Some("x"), Some("y"))]);
