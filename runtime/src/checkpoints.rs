@@ -214,7 +214,9 @@ fn files_changed_since(p: &Project, since: &str) -> usize {
         .count()
 }
 
-/// gov commands (excluding pure inspection) executed after `since`, from the product's own telemetry.
+/// gov commands (excluding pure inspection) executed since `since`, from the product's own telemetry. Telemetry and
+/// checkpoint times have one-second resolution, so a command in the checkpoint's own second counts: the watchdog may
+/// over-count by the commands of that one second (it then checkpoints slightly early), never under-count.
 fn commands_since(p: &Project, since: &str) -> usize {
     crate::observability::events(p)
         .iter()
@@ -222,7 +224,7 @@ fn commands_since(p: &Project, since: &str) -> usize {
             let n = e["name"].as_str().unwrap_or("");
             n.starts_with("cli.")
                 && !INSPECTION_COMMANDS.contains(&n)
-                && e["timestamp"].as_str().unwrap_or("") > since
+                && e["timestamp"].as_str().unwrap_or("") >= since
         })
         .count()
 }
