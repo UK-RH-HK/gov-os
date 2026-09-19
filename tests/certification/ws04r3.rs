@@ -355,13 +355,25 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
     });
     git_commit_all(&root, "direct edit");
     g.ok(&["rebuild-memory", "--incremental"]);
-    // unrelated work claimed before the change is propagated
+    // round-3 integration (P2-AR-0041): WS-5 wired WS-4 R2-3 — `task claim` propagates a change made outside change
+    // control before it establishes the claim (`tasks::claim` -> `detect_and_propagate`) — so the direct propagation
+    // this test observes is the one the next claim runs, recorded exactly as `gov cit propagate` records it: one
+    // sealed system transaction. The pending change is visible beforehand (dry run), the claim reports it, every
+    // property below is asserted on that transaction, and a later `gov cit propagate` finds nothing left.
+    let pending = g.ok(&["cit", "propagate", "--dry-run"]);
+    assert!(pending["changes"].as_u64().unwrap_or(0) > 0, "{pending}");
     let b = task("refund log", &["REQ-0002"]);
     g.ok(&["context", "compile", &b]);
-    g.ok(&["task", "claim", &b]);
-    let pr = g.ok(&["cit", "propagate"]);
-    assert_eq!(pr["propagated"], true, "{pr}");
-    let sys = pr["cit"].as_str().unwrap().to_string();
+    let cl = g.ok(&["task", "claim", &b]);
+    assert_eq!(cl["upstream_changes"]["propagated"], true, "{cl}");
+    let sys = g
+        .ok(&["cit", "list"])
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["origin"] == "system")
+        .map(|c| c["id"].as_str().unwrap().to_string())
+        .expect("the claim's propagation is recorded as a sealed system transaction");
     let rec = g.ok(&["cit", "show", &sys]);
     assert_eq!(rec["origin"], "system", "{rec}");
     assert_eq!(rec["cit_status"], "COMMITTED");
@@ -409,7 +421,7 @@ fn direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks() {
         true
     );
     assert_ne!(seal(&g, "TST-0001").0, "VERIFIED");
-    // the task claimed before the propagation closes with its own work only: the OS's marks are not its mutations
+    // the task whose claim propagated closes with its own work only: the OS's marks are not its mutations
     write(&root, "src/refunds.rs", "pub fn log() {}\n");
     g.ok(&["rebuild-memory", "--incremental"]);
     let rep_b = crate::ws05::receipt(
