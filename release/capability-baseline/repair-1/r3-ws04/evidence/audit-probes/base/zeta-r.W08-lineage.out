@@ -1,0 +1,117 @@
+# P2-AR-0035 audit-of-record probe re-run (unedited, through the P2-AR-0032 root-channel adapter): zeta-r/W08-lineage mode=base
+# worktree HEAD bda16a23dbcc316b69c7efc782d4181ec18faf60; product files differing from HEAD: 0
+# probe sha256 bed90445cd031d48e5ebff156483f7aa9a3918e2c4d168d2f51e6da37ea30b88; real gov 418bf48a2ab451177b90b5efa589c4d18d4106f632f0fd0cbdca05f5d0e16a81 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/bin/gov-base-53897c1)
+# adapter sha256 bf5fd618c2f90dd973da4a79b1233f20420f3000e5e50cb5c3c904db654fed6c
+# date 2026-09-19T11:28:04Z
+# project w8: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-base-zeta-r-W08-lineage-BNJmSI/w8-817284090
+$ gov init --name w8 --alias z-w8    [session=S-zeta role=orchestrator exit=0 21.7s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "decisions": ["D-0001"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Store money as i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001", "ARCH-0001"]}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger crate owns totals", "status": "ACTIVE", "derived_from": ["D-0001"]}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Totals HTTP API", "status": "ACTIVE", "contract": {"path": "/totals"}, "producers": ["TASK-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --feature F-0001 --status READY --allowed src/**,tests/**,web/**,py/** --fields "{\"requirements\": [\"REQ-0001\"], \"decisions\": [\"D-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"], \"interfaces\": [\"API-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.3s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 1.3s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.4s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.3s]
+  [probe wrote file] src/lib.rs (1148 chars)
+  [probe wrote file] src/web/client.ts (148 chars)
+  [probe wrote file] src/web/fmt.ts (42 chars)
+  [probe wrote file] src/py/server.py (101 chars)
+  [probe wrote file] src/py/util.py (26 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.9s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-base-zeta-r-W08-lineage-BNJmSI/w8-817284090/.governance-runtime/reports/r.json: {"work_completed": "implemented totals across rust/ts/python", "files_changed": ["src/lib.rs", "src/web/client.ts", "src/web/fmt.ts", "src/py/server.py", "src/py/util.py"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome": "success", "evidence": []}
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/pr-base-zeta-r-W08-lineage-BNJmSI/w8-817284090/.governance-runtime/reports/r.json    [session=S-zeta role=orchestrator exit=0 7.2s]
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.7s]
+$ gov memory graph F-0001 --depth 10    [session=S-zeta role=orchestrator exit=0 0.2s]
+graph(F-0001, depth 10) reaches: ["API-0001", "ARCH-0001", "CKPT-00001", "D-0001", "REQ-0001", "RPT-0001", "SCN-0001", "TASK-0001", "TST-0001", "file:src/lib.rs", "file:src/py/server.py", "file:src/py/util.py", "file:src/web/client.ts", "file:src/web/fmt.ts", "file:tests/ledger_test.rs"]
+OBS W8-l1-forward-reaches:SCN-0001: PASS -- SCN-0001 reachable from F-0001: True via →VALIDATED_BY
+OBS W8-l1-forward-reaches:REQ-0001: PASS -- REQ-0001 reachable from F-0001: True via →GOVERNED_BY
+OBS W8-l1-forward-reaches:D-0001: PASS -- D-0001 reachable from F-0001: True via ←AFFECTS
+OBS W8-l1-forward-reaches:ARCH-0001: PASS -- ARCH-0001 reachable from F-0001: True via →AFFECTS
+OBS W8-l1-forward-reaches:TASK-0001: PASS -- TASK-0001 reachable from F-0001: True via ←REALISES
+OBS W8-l1-forward-reaches:file:src/lib.rs: PASS -- file:src/lib.rs reachable from F-0001: True via →PRODUCES
+OBS W8-l1-forward-reaches:file:tests/ledger_test.rs: PASS -- file:tests/ledger_test.rs reachable from F-0001: True via ←CALLS
+OBS W8-l1-forward-reaches:RPT-0001: PASS -- RPT-0001 reachable from F-0001: True via ←CONSUMES
+OBS W8-l1-forward-reaches:release: FAIL -- any release artefact in the lineage from F-0001
+$ gov memory impact REQ-0001 --depth 6    [session=S-zeta role=orchestrator exit=0 0.2s]
+impact(REQ-0001, depth 6): ["API-0001", "CKPT-00001", "F-0001", "RPT-0001", "SCN-0001", "TASK-0001", "TST-0001", "file:src/lib.rs", "file:src/py/server.py", "file:src/py/util.py", "file:src/web/client.ts", "file:src/web/fmt.ts", "file:tests/ledger_test.rs"]
+OBS W8-l2-reverse-impact(REQ-0001)->task: PASS -- TASK-0001 in impact(REQ-0001): True
+OBS W8-l2-reverse-impact(REQ-0001)->implementation: PASS -- file:src/lib.rs in impact(REQ-0001): True
+OBS W8-l2-reverse-impact(REQ-0001)->tests: PASS -- test artefacts in impact(REQ-0001): ['file:tests/ledger_test.rs', 'TST-0001']
+OBS W8-l2-reverse-impact(REQ-0001)->evidence: PASS -- closing report RPT-0001 in impact(REQ-0001): True
+$ gov memory impact D-0001 --depth 6    [session=S-zeta role=orchestrator exit=0 0.2s]
+impact(D-0001, depth 6): ["API-0001", "ARCH-0001", "CKPT-00001", "F-0001", "REQ-0001", "RPT-0001", "SCN-0001", "TASK-0001", "TST-0001", "file:src/lib.rs", "file:src/py/server.py", "file:src/py/util.py", "file:src/web/client.ts", "file:src/web/fmt.ts", "file:tests/ledger_test.rs"]
+OBS W8-l2-reverse-impact(D-0001)->task: PASS -- TASK-0001 in impact(D-0001): True
+OBS W8-l2-reverse-impact(D-0001)->implementation: PASS -- file:src/lib.rs in impact(D-0001): True
+OBS W8-l2-reverse-impact(D-0001)->tests: PASS -- test artefacts in impact(D-0001): ['TST-0001', 'file:tests/ledger_test.rs']
+OBS W8-l2-reverse-impact(D-0001)->evidence: PASS -- closing report RPT-0001 in impact(D-0001): True
+  [probe wrote record] spec/features/F-0002.yaml: {"id": "F-0002", "type": "feature", "title": "Refunds (no scenarios, no tests)", "status": "ACTIVE", "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "backend_service_behaviour": "PRESENT", "database_state_requirements": "PRESENT", "interface_api_event_contr
+  [probe wrote record] spec/tasks/TASK-0002.yaml: {"id": "TASK-0002", "type": "task", "title": "Implement refunds", "status": "ACTIVE", "class": "implementation", "task_status": "READY", "objective": "refunds", "feature": "F-0002", "requirements": ["REQ-4040"]}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.7s]
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=0 9.9s]
+audit findings: [
+ "medium graph_integrity: 2 dangling edge(s) reference unknown artefacts (e.g. \"TASK-0002\" \"CONSUMES\" \"REQ-4040\")",
+ "medium context_reproducibility: TASK-0002 is READY but its context packet is BLOCKED: declared mandatory input(s) not delivered: missing input REQ-4040 (W4 missing required input; `gov context manifest TASK-0002`)",
+ "low skill_regression: SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family",
+ "low skill_regression: SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness",
+ "low skill_regression: SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands.",
+ "low skill_regression: SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run",
+ "low skill_regression: SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run",
+ "low skill_regression: SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run",
+ "low skill_regression: SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared deferred: the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands.",
+ "low skill_regression: SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34",
+ "low skill_regression: SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness",
+ "low product_traceability: feature F-0002 has no scenarios",
+ "low product_traceability: feature F-0002 has no test obligations/acceptance tests",
+ "low lineage_orphans: 1 source/test file(s) predate governance (governance baseline) and are not yet linked to an active requirement/decision/spec: tests/ledger_test.rs (W7 baseline code; adopted as it was, not produced by governed work)",
+ "low installation_authenticity: installation authenticity not established (UNPROVISIONED machine): this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.5), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+]
+OBS W8-l3-missing-target-link-detected: PASS -- TASK-0002 -> REQ-4040 (absent) reported: ['medium graph_integrity: 2 dangling edge(s) reference unknown artefacts (e.g. "TASK-0002" "CONSUMES" "REQ-4040")', 'medium context_reproducibility: TASK-0002 is READY but its context packet is BLOCKED: declared mandatory input(s) not delivered: missing input REQ-4040 (W4 missing required input; `gov context manifest TASK-0002`)']
+OBS W8-l3-missing-feature-scenario-link-detected: PASS -- F-0002 without scenarios reported: ['low product_traceability: feature F-0002 has no scenarios', 'low product_traceability: feature F-0002 has no test obligations/acceptance tests']
+OBS W8-l3-missing-task-to-code-link-detected: FAIL -- DONE TASK-0001 has no task->code lineage edge (files_changed is not a relation); reported by audit
+  [probe wrote record] spec/requirements/REQ-0009.yaml: {"id": "REQ-0009", "type": "requirement", "title": "Old refund rule", "status": "SUPERSEDED", "superseded_by": "REQ-0001", "feature": "F-0002"}
+  [probe wrote record] spec/tasks/TASK-0003.yaml: {"id": "TASK-0003", "type": "task", "title": "Implement old refund rule", "status": "ACTIVE", "class": "implementation", "task_status": "READY", "objective": "refunds", "feature": "F-0002", "requirements": ["REQ-0009"], "scenarios": ["SCN-0001"]}
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.6s]
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=0 3.6s]
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.9s]
+OBS W8-l4-stale-link-to-superseded-detected: PASS -- TASK-0003 -> SUPERSEDED REQ-0009: audit/doctor mentions: ['medium graph_integrity: stale lineage link: TASK-0003 is linked (CONSUMES) to REQ-0009, which is SUPERSEDED and superseded by REQ-0001 (W8 stale lineage link)', 'medium graph_integrity: stale lineage link: TASK-0003 is linked (GOVERNED_BY) to REQ-0009, which is SUPERSEDED and superseded by REQ-0001 (W8 stale lineage link)', 'medium context_reproducibility: TASK-0003 is READY but its context packet is BLOCKED: declared mandatory input(s) not delivered; violations {"id":"REQ-0009","slot":"requirement","required":true,"declared_in":["task.requirements"],"reason":null,"resolution":"RESOLVED","type":"requirement","problems":[{"code":"SUPERSEDED","message":"REQ-0009 is superseded by REQ-0001; a superseded input cannot satisfy a current requirement — depend on REQ-0001 (or resolve the supersession via CIT)","blocking":true},{"code":"LIFECYCLE_STATE","message":"REQ-0009 is SUPERSEDED but the input requires ACTIVE|PROVISIONAL; historical or non-current material cannot replace a current authoritative input","blocking":true}]} (W4 missing required input; `gov context manifest TASK-0003`)', 'D015: 2 dangling edge(s) [TASK-0002 CONSUMES REQ-4040, TASK-0002 GOVERNED_BY REQ-4040], 1 orphan record(s) [AUD-0001], 2 stale lineage link(s) [TASK-0003 is linked (CONSUMES) to REQ-0009, which is SUPERSEDED and superseded by REQ-0001, TASK-0003 is linked (GOVERNED_BY) to REQ-0009, which is SUPERSEDED and superseded by REQ-0001]']
+$ gov memory graph file:src/web/client.ts --depth 1    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov memory graph file:src/py/server.py --depth 1    [session=S-zeta role=orchestrator exit=0 0.1s]
+graph(web/client.ts): [["RPT-0001", "\u2190PRODUCES"], ["TASK-0001", "\u2190PRODUCES"], ["file:src/web/fmt.ts", "\u2192IMPORTS"]]
+graph(py/server.py): [["RPT-0001", "\u2190PRODUCES"], ["TASK-0001", "\u2190PRODUCES"], ["file:src/py/util.py", "\u2192CALLS"]]
+OBS W8-l5-intra-language-edges(ts): PASS -- src/web/client.ts -> src/web/fmt.ts edge(s): ['→IMPORTS']
+OBS W8-l5-intra-language-edges(py): PASS -- src/py/server.py -> src/py/util.py edge(s): ['→CALLS']
+$ gov memory graph API-0001 --depth 3    [session=S-zeta role=orchestrator exit=0 0.2s]
+OBS W8-l5-cross-language-through-interface: PASS -- API-0001 neighbourhood (depth 3) contains TS consumer / Python producer: ts=True py=True
+
+==== SUMMARY ====
+W8-l1-forward-reaches:SCN-0001: PASS
+W8-l1-forward-reaches:REQ-0001: PASS
+W8-l1-forward-reaches:D-0001: PASS
+W8-l1-forward-reaches:ARCH-0001: PASS
+W8-l1-forward-reaches:TASK-0001: PASS
+W8-l1-forward-reaches:file:src/lib.rs: PASS
+W8-l1-forward-reaches:file:tests/ledger_test.rs: PASS
+W8-l1-forward-reaches:RPT-0001: PASS
+W8-l1-forward-reaches:release: FAIL
+W8-l2-reverse-impact(REQ-0001)->task: PASS
+W8-l2-reverse-impact(REQ-0001)->implementation: PASS
+W8-l2-reverse-impact(REQ-0001)->tests: PASS
+W8-l2-reverse-impact(REQ-0001)->evidence: PASS
+W8-l2-reverse-impact(D-0001)->task: PASS
+W8-l2-reverse-impact(D-0001)->implementation: PASS
+W8-l2-reverse-impact(D-0001)->tests: PASS
+W8-l2-reverse-impact(D-0001)->evidence: PASS
+W8-l3-missing-target-link-detected: PASS
+W8-l3-missing-feature-scenario-link-detected: PASS
+W8-l3-missing-task-to-code-link-detected: FAIL
+W8-l4-stale-link-to-superseded-detected: PASS
+W8-l5-intra-language-edges(ts): PASS
+W8-l5-intra-language-edges(py): PASS
+W8-l5-cross-language-through-interface: PASS
+total=24 pass=22 fail=2
+[exit=0]

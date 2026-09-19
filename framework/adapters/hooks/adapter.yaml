@@ -1,0 +1,10 @@
+id: hooks
+version: 1.0.0
+description: >-
+  Provider lifecycle hooks (Contract v3 N2/N3; WS-4 r2 R2-12). A harness that can run a command on its own lifecycle
+  events wires these so the mandatory checkpoint triggers it owns fire without relying on the agent: before a known
+  context compaction, at session end and before a model/provider switch. Each hook is a gov command the harness runs
+  in the agent's environment (the declared GOV_ROLE/GOV_SESSION apply; both commands need an L1+ role).
+output: governance/generated/adapters/hooks/provider-hooks.json
+format: json
+template: template.json

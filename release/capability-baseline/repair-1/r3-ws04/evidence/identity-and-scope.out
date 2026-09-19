@@ -1,0 +1,23 @@
+# P2-AR-0035 product identity (release/orchestration/phase-2/tools/product_identity.py)
+commit: 53897c1a44157e5af81b176017bc7ded6a63b9cd
+product_code_digest: 797da37c8532528e1b8f3d924e2b7b7a304bb567bd928ce80126e8e120161fe1
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+
+commit: 958b2b294a50851ecd0c584b953a16e101376aba
+product_code_digest: a53dabc6a57fab633b27122ce233e1ab70f4435ac067604ef4ae2317792617e0
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+
+commit: ff529e9048ff54eb082c678048938bff3fde8bce
+product_code_digest: 31ac399d98db909179c2c4401d18ca73ea7da5c7f3ccf1b95e3b616c21c406e8
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+
+commit: bda16a23dbcc316b69c7efc782d4181ec18faf60
+product_code_digest: 67d7f7b87e62893cb4dcbc375d0b8232599907475c623736e3200a4c16b14b41
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+
+# Contract v3 source sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+# protected paths changed 53897c1..HEAD (release/verification, release/root-of-trust, release/releases, release/orchestration/phase-1, release/capability-baseline/audit-0, other repair-1 dirs) — expect none:
+  (end)
+# R1-listed files touched: records.rs (relation fields + TYPE_DIR/TYPE_PREFIX only; save_record unchanged):
+ runtime/src/records.rs | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)

@@ -25,6 +25,23 @@ pub struct PluginDescriptor {
 }
 
 impl PluginDescriptor {
+    /// The paths the descriptor declares under `field`, as written: `implementation` (a list), or `model` /
+    /// `runtime` (`{artefacts: [...]}`, IP-R2-13). Resolution and binding: `capabilities::binding::declared_paths`.
+    pub fn declared_paths(&self, field: &str) -> Vec<String> {
+        let v = self.raw.get(field);
+        let list = match field {
+            "implementation" => v,
+            _ => v.and_then(|m| m.get("artefacts")),
+        };
+        list.and_then(|a| a.as_array())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|s| s.as_str().map(|t| t.to_string()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
     pub fn from_value(v: &Value, source: &str) -> Option<Self> {
         let plugin_id = v.get("plugin_id")?.as_str()?.to_string();
         let capability = v.get("capability")?.as_str()?.to_string();

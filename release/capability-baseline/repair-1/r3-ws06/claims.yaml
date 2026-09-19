@@ -1,0 +1,160 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0037
+workstream: WS-6
+iteration: 1
+round: 3
+base_commit: 53897c1a44157e5af81b176017bc7ded6a63b9cd
+work_commit: 7cd1fbbe60d4afd67ed98b7e19d76b24f0f01f22
+product_code_digest: d01dca822266aa146bbb2e5d4862610cbcbf3f5244d9430af62cbd0df94acaf7
+note: Builder claims only (Contract v3 O3). Nothing here claims acceptance, verification or closure.
+claims:
+  - item: "WS-4 r2 R2-10 (index freshness vs what the indexer skips; pre-existing)"
+    class: BC-P2-29 (incremental equals full) / Contract v3 D1
+    status: REPAIRED_CLAIMED
+    requirement: "A file the indexer skips (too large, not UTF-8, unreadable, duplicate record id, secret content) never reads as unindexed to freshness, and no recorded exclusion hides a file the index should hold; incremental equals full for the occurrence of a duplicated id"
+    files:
+      - runtime/src/memory/indexer.rs
+      - runtime/src/memory/manifest.rs
+      - runtime/src/security/secrets.rs
+      - framework/schemas/index-manifest.schema.json
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "memory::indexer::admit shared by the indexer and memory::manifest::freshness", tier: "every build; task close G2, CIT-E index_freshness verification, status, doctor D010/D025"}
+      - {check: "content-level exclusions bound to content hash + derivation key (incl. secret-scanning rules)", tier: every build / freshness}
+      - {check: "duplicate-id holder ranked over the tree by the record store's rule", tier: every build}
+    probes_rerun:
+      - {probe: "SUPP-ws06-r3 S1-S3", before: "1/5 (only S3.incremental-equals-full, which passes on both)", after: "5/5"}
+      - {probe: "beta-r D1-incremental-freshness (unedited)", before: "5/5 PASS lines (stops at D1-b5, WS-7 registration)", after: "identical"}
+      - {probe: "zeta-r FR-freshness-invalidation (unedited)", before: "2/2", after: "2/2"}
+    tests: [ws06r3::freshness_judges_exactly_what_the_indexer_indexes, ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips, memory::indexer::tests::admission_decides_every_skip_reason_from_the_file, memory::indexer::tests::record_rank_follows_the_record_store_and_changes_count_content_only]
+    integration_points: [IP-R3-WS06-6]
+    owner_decision_required: null
+  - item: "WS-4 r2 R2-11 (observe checkpoint boundaries at index rebuild)"
+    class: BC-P2-05 (host side) / Contract v3 N2 "significant mutation"
+    status: REPAIRED_CLAIMED
+    requirement: "An index rebuild that observes at least CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints added/changed/removed artefacts writes a checkpoint without relying on the agent"
+    files:
+      - runtime/src/memory/indexer.rs (IndexOptions::observe_boundaries, content_changes, observe_significant_mutation)
+      - "cli/src/main.rs (declared exception: rebuild-memory and memory rebuild pass observe_boundaries: true)"
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "significant mutation measured at the operator's rebuild; checkpoints::observe_boundaries, else a significant_mutation checkpoint; typed report when it cannot be written", tier: "rebuild-memory / memory rebuild"}
+    probes_rerun:
+      - {probe: "delta-r N1-N2 (unedited, shim and shim5)", before: "14/14, stops before N2.b4 (WS-5 task close)", after: identical}
+      - {probe: "derived N2-b4-significant-mutation.P2-AR-0037", before: "N2.b4 FAIL", after: "N2.b4 PASS"}
+      - {probe: "SUPP-ws06-r3 S4", before: FAIL, after: PASS}
+    tests: [ws06r3::a_significant_mutation_observed_at_rebuild_is_a_checkpoint_boundary]
+    integration_points: [IP-R3-WS06-3]
+    owner_decision_required: null
+  - item: "WS-2 r2 R3-4 (coverage checker reports held Markdown headings as gaps)"
+    class: BC-P2-25
+    status: REPAIRED_CLAIMED
+    requirement: "Every Markdown heading is held by a chunk; the verifier compares headings the same way on both sides and lists every uncovered line"
+    files:
+      - runtime/src/memory/chunking.rs (atx_heading, chunk_markdown, uncovered_lines_with; CHUNKER_VERSION 3)
+      - runtime/src/memory/coverage.rs
+      - runtime/src/memory/indexer.rs (coverage tally)
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "build coverage tally (IndexReport.coverage, meta index_coverage)", tier: every build}
+      - {check: "memory::coverage::verify (WS-2 family index_content_coverage)", tier: G1/G4-G6}
+    probes_rerun:
+      - {probe: "SUPP-ws06-r3 S5", before: "FAIL (3 headings held by no chunk; confirmed medium finding)", after: PASS}
+      - {probe: "WS-2 derived supplementary SUITE.coverage", before: PASS, after: PASS}
+    tests: [memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides, ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap]
+    integration_points: [IP-R3-WS06-4]
+    owner_decision_required: null
+  - item: "WS-7 r2 IP-W7-2 (a refused code_intel adapter falls back silently)"
+    class: "D-0005 / BC-P2-27 support (C5-b8-degrade)"
+    status: REPAIRED_CLAIMED
+    requirement: "A declared code_intel adapter the product refuses is a recorded degradation (per file, per build) and a failure-memory record; adapters stay resolved through the capability registry"
+    files:
+      - runtime/src/memory/indexer.rs (refused_code_intel, degradations, adapter failures)
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "refused adapters from PluginSet::denied/rejected; degradation + tool-failure record", tier: every build}
+    probes_rerun:
+      - {probe: "beta-r C5-code-structural-memory (unedited)", before: "8/11", after: "9/11", turned: [C5-b8-degrade]}
+      - {probe: "WS-6 round-1 SUPP-ws06-behaviours (unedited)", before: "16/19", after: "17/19", turned: [S4-recall]}
+      - {probe: "SUPP-ws06-r3 S6", before: "0/2", after: "2/2"}
+    tests: [ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation]
+    integration_points: []
+    owner_decision_required: null
+  - item: "WS-10 r2 IP-WS10-04 (benchmark --task; concluded, sealed research)"
+    class: BC-P2-47 (J1, WS-6 call site)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/memory/benchmark.rs (run_for)
+      - "cli/src/main.rs (declared exception: memory benchmark --task)"
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "memory benchmark --record writes research_state CONCLUDED, lifecycle stamps/history, schema-validated, T2-sealed; --task recorded in influences", tier: memory benchmark --record}
+    probes_rerun:
+      - {probe: "SUPP-ws06-r3 S8", before: "FAIL (--task unknown)", after: PASS}
+      - {probe: "delta-r J1-J2 J1.a.influences (unedited wording: non-empty at creation without a task)", before: FAIL, after: FAIL, note: "nothing was influenced at creation; the commissioning task is recorded when given (WS-10 r2 §1.4)"}
+    tests: [ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence]
+    integration_points: []
+    owner_decision_required: null
+  - item: "WS-10 r2 IP-WS10-03 (memory select: require_citable + record_influence)"
+    class: BC-P2-47 (J1, WS-6 call site)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/memory/profile.rs (select)
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "select refuses non-citable evidence (EVIDENCE_NOT_CITABLE) and records the decision on the research", tier: memory select}
+    probes_rerun:
+      - {probe: "derived J1-J2-research-experiments.select-gate.P2-AR-0037", before: "J1.a.influence_backlink FAIL", after: "J1.a.influence_backlink PASS"}
+      - {probe: "SUPP-ws06-r3 S9", before: FAIL, after: PASS}
+      - {probe: "WS-10 derived supplementary", before: "35/35", after: "35/35"}
+    tests: [ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence]
+    integration_points: []
+    owner_decision_required: null
+  - item: "WS-10 r2 IP-WS10-05 (non-governed evidence held reference-only in the index)"
+    class: BC-P2-47/48 (J1/J2, WS-6 call site)
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/memory/indexer.rs (record_state_class, recorded_state_class_holds)
+      - runtime/src/memory/manifest.rs (freshness re-evaluates standing)
+      - tests/certification/ws06r3.rs
+    product_checks:
+      - {check: "research/experiment state class from lifecycle::indexed_state_class; re-evaluated for unchanged artefacts by incremental builds and freshness", tier: every build / freshness}
+    probes_rerun:
+      - {probe: "SUPP-ws06-r3 S7 (delta-r OBSERVE J1.b.retrieval's scenario)", before: "FAIL (EVIDENCE)", after: "PASS (NARRATIVE)"}
+    tests: [ws06r3::the_index_holds_research_and_experiments_at_their_evidence_standing]
+    integration_points: []
+    owner_decision_required: null
+  - item: "BC-P2-31 classification + template rules (WS-6 side); WS-9 r2 IP-R2-2; WS-6 r2 O-1 and IP-R2-11 (WS-6 side)"
+    class: BC-P2-31
+    status: REPAIRED_CLAIMED
+    scope_note: "WS-6's side of the class: the product's and the template's classification, the framework.json projection, the shadowed-rule check and the tripwire against the writer moves. The writer moves are WS-3/4/5/7/8/9's this round; delivery of the template rules to installed projects is WS-9's migration (IP-R3-WS06-1); KERNEL.yaml schema versions are WS-8's (IP-R3-WS06-2)."
+    requirement: "The repository contract and documentation classify the storage of claims, emergency-control state and plugin registration truthfully; they survive deletion of every path classified derived or generated (Contract v3 B1:188, B3:202, D6:352; D-0007 T2; S0-B1B3-01)"
+    files:
+      - framework/overlay-templates/REPOSITORY_CONTRACT.yaml
+      - framework/schemas/repository-contract.schema.json
+      - runtime/src/paths.rs (to_framework_json kernel_paths, shadowed_rules, tests)
+      - tests/certification/ws06r3.rs
+      - tests/certification/repair2.rs (migration-substance assertion extended to the next version's migration)
+    product_checks:
+      - {check: "RepositoryContract::decide (kernel OS_STORES rules after the overlay's)", tier: every decision}
+      - {check: "framework.json kernel_paths (doctor D008 in sync)", tier: adapters generate / doctor}
+      - {check: "RepositoryContract::shadowed_rules", tier: "API; doctor/audit wiring IP-R3-WS06-4"}
+      - {check: "paths::misplaced_os_state at every build", tier: G1-equivalent}
+    probes_rerun:
+      - {probe: "derived AC16-X2-B1B3.P2-AR-0037 (the X2-B1B3 block verbatim)", before: FAIL, after: PASS}
+      - {probe: "synthesis AC16-X2 (unedited)", before: "stops at task claim TASK-W (WS-5)", after: identical}
+      - {probe: "beta-r D6-rebuild-guarantee (unedited)", before: "stops at task claim (WS-5)", after: identical, note: "D6-B also needs the writer moves of other workstreams"}
+      - {probe: "SUPP-ws06-r3 S10", before: "0/3", after: "3/3"}
+    tests: [paths::tests::the_shipped_template_states_the_store_classification_under_any_reading, paths::tests::every_writer_location_is_classified_as_its_store, ws06r3::the_repository_contract_states_where_the_os_keeps_its_state, repair2::interface_contract_kernel_yaml_and_migration_substance_are_consistent]
+    integration_points: [IP-R3-WS06-1, IP-R3-WS06-2, IP-R3-WS06-3, IP-R3-WS06-5, IP-R3-WS06-7]
+    owner_decision_required: null
+regression:
+  cargo_test_lib: "212 passed, 0 failed"
+  cargo_test_certification: "144 passed, 0 failed (59 + 23 + 10 + 52)"
+  rustfmt: clean on every touched Rust file
+  probes: "4 FAIL->PASS, 0 PASS->FAIL, 319 same (29 runs + 3 labelled derived copies, base vs branch)"
+  supplementary: "SUPP-ws06-r3: base 1/16, branch 16/16"
+  r1_heldout: "AR-0027 26/3, AR-0029 26/2 (+ho_f not compiling), AR-0031 27/7, AR-0033 30/1 (hv_a::a1 size pin); census 118 files / 2009 functions, 0 violations"
+new_integration_points: [IP-R3-WS06-1, IP-R3-WS06-2, IP-R3-WS06-3, IP-R3-WS06-4, IP-R3-WS06-5, IP-R3-WS06-6, IP-R3-WS06-7]
+owner_decision_required: []

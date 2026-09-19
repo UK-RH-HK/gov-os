@@ -1,0 +1,167 @@
+
+######## mode=direct  base=base-53897c1  final=final-0393bca
+## round-2 WS-7 lines (regression check: both trees carry the round-2 repair)
+- F4.b1 UNDER-declaration (BC-P2-39)
+    base  [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'sneaky' is declared but not usable: plugin 'sneaky' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+    final [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'sneaky' is declared but not usable: plugin 'sneaky' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+- F4.b1 side effect of the under-declared plugin (absent line = no side effect)
+    base  [PASS] (no line)
+    final [PASS] (no line)
+- F4.b3/b4 TOFU reset re-baselines drifted bytes (BC-P2-40)
+    base  [PASS] after reset: ok=False PLUGIN_NOT_APPROVED plugin 'tofu' is declared but not usable: plugin 'tofu' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+    final [PASS] after reset: ok=False PLUGIN_NOT_APPROVED plugin 'tofu' is declared but not usable: plugin 'tofu' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+- F4.b3/b4 interpreter-only command runs unpinned (BC-P2-40)
+    base  [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'inline' is declared but not usable: plugin 'inline' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+    final [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'inline' is declared but not usable: plugin 'inline' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+- F4.b5 re-registering while the gate is PENDING returns the SAME gate (BC-P2-11)
+    base  [PASS] registered= False gate= HDG-0002
+    final [PASS] registered= False gate= HDG-0002
+- F4.b5.x unrelated answered gate registers a plugin (BC-P2-11)
+    base  [PASS] ok= True registered= False registry gate= None new gate raised= HDG-0003
+    final [PASS] ok= True registered= False registry gate= None new gate raised= HDG-0003
+- F4.b5.x the plugin then runs
+    base  [PASS] run it: ok=False PLUGIN_NOT_APPROVED plugin 'exfil' is declared but not usable: plugin 'exfil' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process 
+    final [PASS] run it: ok=False PLUGIN_NOT_APPROVED plugin 'exfil' is declared but not usable: plugin 'exfil' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process 
+- F4.b2.x forged registry entry runs (BC-P2-09)
+    base  [PASS] after: ok=False PLUGIN_NOT_APPROVED plugin 'netplug' is declared but not usable: plugin 'netplug' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+    final [PASS] after: ok=False PLUGIN_NOT_APPROVED plugin 'netplug' is declared but not usable: plugin 'netplug' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+- F4.b2.x suite plugin_governance reports the forged entry
+    base  [PASS] suite plugin_governance usable: []  findings mentioning netplug: ['plugin netplug is an executable plugin with no registration: it never runs (whatever it declares) until
+    final [PASS] suite plugin_governance usable: []  findings mentioning netplug: ['plugin netplug is an executable plugin with no registration: it never runs (whatever it declares) until
+- F4.b6 any existing record as security review (BC-P2-41)
+    base  [PASS] installed= False ['license MIT (approved); security review: not evidenced: the descriptor names no security_review_record (its own `security_review: passed` is a claim, n
+    final [PASS] installed= False ['license MIT (approved); security review: not evidenced: the descriptor names no security_review_record (its own `security_review: passed` is a claim, n
+- F3 (b) approved install gate proceeds (BC-P2-41)
+    base  [FAIL] after approval: installed= False new gate= HDG-0001
+    final [FAIL] after approval: installed= False new gate= HDG-0001
+- F3 (b) citing the answered gate
+    base  [FAIL] citing the answered gate in the descriptor: installed= False new gate= HDG-0001
+    final [FAIL] citing the answered gate in the descriptor: installed= False new gate= HDG-0001
+- F2.b8.x hand-declared plugin shown registered/approved
+    base  [PASS] generated tool-registry entry: status=unregistered approved_roles=[] provenance=None denied_for_acting_role=plugin 'claimsreg' is an executable plugin (it runs `/usr/bi
+    final [PASS] generated tool-registry entry: status=unregistered approved_roles=[] provenance=None denied_for_acting_role=plugin 'claimsreg' is an executable plugin (it runs `/usr/bi
+- synthesis.LEAD-X4-registered-module-plugin-unpinned base-53897c1: X lines []; stop: RuntimeError: gov decide HDG-0001 --option A --by owner failed: {'code': 'AUTHORITY_DENIED', 'message': "role 'human' is the human/product-owner role; human authority is never conferred by a role declaration and is exercised only 
+- synthesis.LEAD-X4-registered-module-plugin-unpinned final-0393bca: X lines []; stop: RuntimeError: gov decide HDG-0001 --option A --by owner failed: {'code': 'AUTHORITY_DENIED', 'message': "role 'human' is the human/product-owner role; human authority is never conferred by a role declaration and is exercised only 
+- synthesis.AC16-X2-authority-gate-chain base-53897c1: X lines [('X2-L3-approve-refused-before-answer', 'PASS')]; stop: RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed: the task DAG does not allow it (BLOCKED): TEST_POLICY.implementation_task_requires: no scenarios declared on the task 
+- synthesis.AC16-X2-authority-gate-chain final-0393bca: X lines [('X2-L3-approve-refused-before-answer', 'PASS')]; stop: RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed: the task DAG does not allow it (BLOCKED): TEST_POLICY.implementation_task_requires: no scenarios declared on the task 
+- beta-r.D6-rebuild-guarantee base-53897c1: X lines []; stop: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): TST-0001 (acceptance) must be authored independently of the implem
+- beta-r.D6-rebuild-guarantee final-0393bca: X lines []; stop: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): TST-0001 (acceptance) must be authored independently of the implem
+
+######## mode=shim  base=base-53897c1  final=final-0393bca
+## round-2 WS-7 lines (regression check: both trees carry the round-2 repair)
+- F4.b1 UNDER-declaration (BC-P2-39)
+    base  [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'sneaky' is declared but not usable: plugin 'sneaky' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+    final [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'sneaky' is declared but not usable: plugin 'sneaky' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+- F4.b1 side effect of the under-declared plugin (absent line = no side effect)
+    base  [PASS] (no line)
+    final [PASS] (no line)
+- F4.b3/b4 TOFU reset re-baselines drifted bytes (BC-P2-40)
+    base  [PASS] after reset: ok=False PLUGIN_NOT_APPROVED plugin 'tofu' is declared but not usable: plugin 'tofu' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+    final [PASS] after reset: ok=False PLUGIN_NOT_APPROVED plugin 'tofu' is declared but not usable: plugin 'tofu' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+- F4.b3/b4 interpreter-only command runs unpinned (BC-P2-40)
+    base  [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'inline' is declared but not usable: plugin 'inline' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+    final [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'inline' is declared but not usable: plugin 'inline' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+- F4.b5 re-registering while the gate is PENDING returns the SAME gate (BC-P2-11)
+    base  [PASS] registered= False gate= HDG-0002
+    final [PASS] registered= False gate= HDG-0002
+- F4.b5.x unrelated answered gate registers a plugin (BC-P2-11)
+    base  [PASS] ok= True registered= False registry gate= None new gate raised= HDG-0004
+    final [PASS] ok= True registered= False registry gate= None new gate raised= HDG-0004
+- F4.b5.x the plugin then runs
+    base  [PASS] run it: ok=False PLUGIN_NOT_APPROVED plugin 'exfil' is declared but not usable: plugin 'exfil' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process 
+    final [PASS] run it: ok=False PLUGIN_NOT_APPROVED plugin 'exfil' is declared but not usable: plugin 'exfil' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process 
+- F4.b2.x forged registry entry runs (BC-P2-09)
+    base  [PASS] after: ok=False PLUGIN_REGISTRATION_UNBOUND plugin 'netplug' is declared but not usable: plugin 'netplug' has a registry entry in governance/generated/plugin-registry.jso
+    final [PASS] after: ok=False PLUGIN_NOT_APPROVED plugin 'netplug' is declared but not usable: plugin 'netplug' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+- F4.b2.x suite plugin_governance reports the forged entry
+    base  [PASS] suite plugin_governance usable: []  findings mentioning netplug: ['plugin netplug: its entry in governance/generated/plugin-registry.json is not what `gov plugins registe
+    final [PASS] suite plugin_governance usable: []  findings mentioning netplug: ['plugin netplug is an executable plugin with no registration: it never runs (whatever it declares) until
+- F4.b6 any existing record as security review (BC-P2-41)
+    base  [PASS] installed= False ['license MIT (approved); security review: not evidenced: HDG-0003 is a human-gate record, not a security review report']
+    final [PASS] installed= False ['license MIT (approved); security review: not evidenced: HDG-0003 is a human-gate record, not a security review report']
+- F3 (b) approved install gate proceeds (BC-P2-41)
+    base  [PASS] after approval: installed= True new gate= None
+    final [PASS] after approval: installed= True new gate= None
+- F3 (b) citing the answered gate
+    base  [PASS] citing the answered gate in the descriptor: installed= True new gate= None
+    final [PASS] citing the answered gate in the descriptor: installed= True new gate= None
+- F2.b8.x hand-declared plugin shown registered/approved
+    base  [PASS] generated tool-registry entry: status=unregistered approved_roles=[] provenance=None denied_for_acting_role=plugin 'claimsreg' is an executable plugin (it runs `/usr/bi
+    final [PASS] generated tool-registry entry: status=unregistered approved_roles=[] provenance=None denied_for_acting_role=plugin 'claimsreg' is an executable plugin (it runs `/usr/bi
+- synthesis.LEAD-X4-registered-module-plugin-unpinned base-53897c1: X lines [('X4-F4-registered', 'PASS'), ('X4-F4:428-implementation-pinned', 'PASS'), ('X4-F4:429-drift-fails-closed', 'PASS'), ('X4-F4-doctor-sees-drift', 'PASS')]; stop: SUMMARY total=4 pass=4 fail=0 failed=[]
+- synthesis.LEAD-X4-registered-module-plugin-unpinned final-0393bca: X lines [('X4-F4-registered', 'PASS'), ('X4-F4:428-implementation-pinned', 'PASS'), ('X4-F4:429-drift-fails-closed', 'PASS'), ('X4-F4-doctor-sees-drift', 'PASS')]; stop: SUMMARY total=4 pass=4 fail=0 failed=[]
+- synthesis.AC16-X2-authority-gate-chain base-53897c1: X lines [('X2-L3-approve-refused-before-answer', 'PASS')]; stop: RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed: the task DAG does not allow it (BLOCKED): TEST_POLICY.implementation_task_requires: no scenarios declared on the task 
+- synthesis.AC16-X2-authority-gate-chain final-0393bca: X lines [('X2-L3-approve-refused-before-answer', 'PASS')]; stop: RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed: the task DAG does not allow it (BLOCKED): TEST_POLICY.implementation_task_requires: no scenarios declared on the task 
+- beta-r.D6-rebuild-guarantee base-53897c1: X lines []; stop: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): TST-0001 (acceptance) must be authored independently of the implem
+- beta-r.D6-rebuild-guarantee final-0393bca: X lines []; stop: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot be claimed: the task DAG does not allow it (BLOCKED): TST-0001 (acceptance) must be authored independently of the implem
+
+Note: in mode=direct the probes cannot produce a human answer on either tree (WS-3 refuses `decide --by owner`),
+so lines that need one are measured in mode=shim. beta-r D6 and synthesis AC16-X2 stop at their task-claim setup on
+both trees (WS-5's DAG rules, BC-P2-16/BC-P2-34), before any registry line: they are not discriminating here; the
+round-3 named checks cover the registry move through legitimate paths.
+
+######## WS-7 round-3 named checks (legitimate paths; base is the negative control)
+- base-53897c1: # SUMMARY: 0 of 11 discriminating checks PASS
+    C W7R3-31.setup HOLDS p1 registered the governed way (gate answered A by the owner channel) -- 
+    X W7R3-31.a FAIL the OS writes the plugin registry outside the regenerable views (governance/registry/plugin-registry.json) -- {"at_location": false, 
+    X W7R3-31.b FAIL deleting the whole governance/generated/ directory keeps the registration: the plugin still runs -- {"ok": false, "code": "PLUGIN_NOT
+    C W7R3-31.c BROKEN a registry kept at the legacy location is honoured as it stands, and reading it (invoke, list, registry, doctor) never moves it -- 
+    X W7R3-31.d FAIL the next registry write moves the legacy registry unchanged: the sealed entry still runs, the forged entry stays refused, and the OS 
+    X W7R3-31.e FAIL after the move, a registry planted at the legacy location (one that would unregister everything) is ignored and reported by D028 -- {
+    C W7R3-31.f HOLDS the forged n1 never ran -- {"n1_runs": 0, "p1_q1_runs": 0}
+    X W7R3-13.a FAIL the kernel plugin-descriptor schema admits declared model/runtime artefacts -- [{"plugin_id": "m1", "source": "/tmp/claude-1000/-home
+    X W7R3-13.b FAIL the registration gate shows the declared model/runtime artefacts and the registration binds their bytes -- {"roles": [], "gate_impact
+    X W7R3-13.c FAIL a changed model byte stops the registered plugin (PLUGIN_PIN_MISMATCH naming the file) -- {"ran_before": false, "code": "PLUGIN_DESCR
+    X W7R3-13.d FAIL a changed runtime byte stops it as well -- {"code": "PLUGIN_DESCRIPTOR_INVALID"}
+    X W7R3-13.e FAIL a declared model artefact that does not exist is refused before any gate is raised -- {"code": "SCHEMA_INVALID", "gates_raised": 0}
+    X W7R3-PC.a FAIL the digest labelling the running gov binary is kept in the machine's protected state; no bound plugin file's digest leaves the proces
+    C W7R3-PC.b HOLDS no pin cache is ever written inside the repository -- []
+    C W7R3-PC.c HOLDS a same-size rewrite with the modification time put back is refused -- {"code": "PLUGIN_PIN_MISMATCH"}
+    C W7R3-PC.g HOLDS a forged machine-store entry naming the approved digest for the tampered file does not make it run -- {"code": "PLUGIN_PIN_MISMATCH"
+    X W7R3-PC.d FAIL a change to the file a bound symlink points at (outside the repository) is refused -- {"restored_ran": true, "code": null}
+    C W7R3-PC.f BROKEN changed bytes never ran (2 approved executions only) -- {"runs": 3}
+    C W7R3-41.a HOLDS IP-W7-1 confirmed: the OS-sealed report closing a security task by another session and role is the governed review; the install proc
+    C W7R3-41.b HOLDS the reviewing role's own review does not approve its own installation -- [{"condition": "licence_and_security_satisfied", "ok": fals
+- final-0393bca: # SUMMARY: 11 of 11 discriminating checks PASS
+    C W7R3-31.setup HOLDS p1 registered the governed way (gate answered A by the owner channel) -- 
+    X W7R3-31.a PASS the OS writes the plugin registry outside the regenerable views (governance/registry/plugin-registry.json) -- {"at_location": true, "
+    X W7R3-31.b PASS deleting the whole governance/generated/ directory keeps the registration: the plugin still runs -- {"ok": true, "code": null, "runs"
+    C W7R3-31.c HOLDS a registry kept at the legacy location is honoured as it stands, and reading it (invoke, list, registry, doctor) never moves it -- {
+    X W7R3-31.d PASS the next registry write moves the legacy registry unchanged: the sealed entry still runs, the forged entry stays refused, and the OS 
+    X W7R3-31.e PASS after the move, a registry planted at the legacy location (one that would unregister everything) is ignored and reported by D028 -- {
+    C W7R3-31.f HOLDS the forged n1 never ran -- {"n1_runs": 0, "p1_q1_runs": 4}
+    X W7R3-13.a PASS the kernel plugin-descriptor schema admits declared model/runtime artefacts -- []
+    X W7R3-13.b PASS the registration gate shows the declared model/runtime artefacts and the registration binds their bytes -- {"roles": [["model", "toke
+    X W7R3-13.c PASS a changed model byte stops the registered plugin (PLUGIN_PIN_MISMATCH naming the file) -- {"ran_before": true, "code": "PLUGIN_PIN_MI
+    X W7R3-13.d PASS a changed runtime byte stops it as well -- {"code": "PLUGIN_PIN_MISMATCH"}
+    X W7R3-13.e PASS a declared model artefact that does not exist is refused before any gate is raised -- {"code": "PLUGIN_IMPLEMENTATION_UNRESOLVED", "g
+    X W7R3-PC.a PASS the digest labelling the running gov binary is kept in the machine's protected state; no bound plugin file's digest leaves the proces
+    C W7R3-PC.b HOLDS no pin cache is ever written inside the repository -- []
+    C W7R3-PC.c HOLDS a same-size rewrite with the modification time put back is refused -- {"code": "PLUGIN_PIN_MISMATCH"}
+    C W7R3-PC.g HOLDS a forged machine-store entry naming the approved digest for the tampered file does not make it run -- {"code": "PLUGIN_PIN_MISMATCH"
+    X W7R3-PC.d PASS a change to the file a bound symlink points at (outside the repository) is refused -- {"restored_ran": true, "code": "PLUGIN_PIN_MISM
+    C W7R3-PC.f HOLDS changed bytes never ran (2 approved executions only) -- {"runs": 2}
+    C W7R3-41.a HOLDS IP-W7-1 confirmed: the OS-sealed report closing a security task by another session and role is the governed review; the install proc
+    C W7R3-41.b HOLDS the reviewing role's own review does not approve its own installation -- [{"condition": "licence_and_security_satisfied", "ok": fals
+
+######## gamma-r F4 through the labelled derived copy (registry path only; derived/F4-plugins.registry-path.P2-AR-0038.sh), shim
+- F4.b1 UNDER-declaration (BC-P2-39)
+    final [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'sneaky' is declared but not usable: plugin 'sneaky' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+- F4.b1 side effect of the under-declared plugin (absent line = no side effect)
+    final [PASS] (no line)
+- F4.b3/b4 TOFU reset re-baselines drifted bytes (BC-P2-40)
+    final [PASS] after reset: ok=False PLUGIN_NOT_APPROVED plugin 'tofu' is declared but not usable: plugin 'tofu' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed proce
+- F4.b3/b4 interpreter-only command runs unpinned (BC-P2-40)
+    final [PASS] ok=False PLUGIN_NOT_APPROVED plugin 'inline' is declared but not usable: plugin 'inline' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process with t
+- F4.b5 re-registering while the gate is PENDING returns the SAME gate (BC-P2-11)
+    final [PASS] registered= False gate= HDG-0002
+- F4.b5.x unrelated answered gate registers a plugin (BC-P2-11)
+    final [PASS] ok= True registered= False registry gate= None new gate raised= HDG-0004
+- F4.b5.x the plugin then runs
+    final [PASS] run it: ok=False PLUGIN_NOT_APPROVED plugin 'exfil' is declared but not usable: plugin 'exfil' is an executable plugin (it runs `/usr/bin/dash` as an unsandboxed process 
+- F4.b2.x forged registry entry runs (BC-P2-09)
+    final [PASS] after: ok=False PLUGIN_REGISTRATION_UNBOUND plugin 'netplug' is declared but not usable: plugin 'netplug' has a registry entry in governance/registry/plugin-registry.json
+- F4.b2.x suite plugin_governance reports the forged entry
+    final [PASS] suite plugin_governance usable: []  findings mentioning netplug: ['plugin netplug: its entry in governance/registry/plugin-registry.json is not what `gov plugins register
+- F4.b6 any existing record as security review (BC-P2-41)
+    final [PASS] installed= False ['license MIT (approved); security review: not evidenced: HDG-0003 is a human-gate record, not a security review report']

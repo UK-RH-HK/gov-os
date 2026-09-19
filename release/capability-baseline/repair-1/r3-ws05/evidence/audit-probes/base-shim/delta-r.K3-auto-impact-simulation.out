@@ -1,0 +1,166 @@
+# P2-AR-0036 audit-of-record probe re-run (unedited): delta-r/K3-auto-impact-simulation mode=base-shim
+# worktree HEAD 25f935ca5a035840102b4ec9d8e30a8b39598cbf; product files differing from HEAD: 0
+# probe sha256 9fb09750c2b4c941c50f7e3347a57c2a5d2f6c6d0db8eddebcbcdcfb3315dd27; real gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/mirror-base-shim/target/release/gov
+# date 2026-09-19T11:29:30Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+# RECORD WRITE (direct file write, no gov command): spec/architecture/ARCH-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/interfaces/API-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+$ gov --json --session probe-43e02e1d rebuild-memory
+  -> ok
+
+## each material class, when declared as the CIT trigger, simulates automatically at propose time
+$ gov --json --session probe-43e02e1d cit propose --proposal 'architecture change' --trigger architecture_change --targets ARCH-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b1.json
+  -> ok
+CHECK K3.b1.label PASS architecture: declared trigger 'architecture_change' auto-simulates (radius R3, gate HDG-0001)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'behaviour change' --trigger behaviour_change --targets SCN-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b2.json
+  -> ok
+CHECK K3.b2.label PASS behaviour: declared trigger 'behaviour_change' auto-simulates (radius R2, gate HDG-0002)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'interfaces change' --trigger interface_change --targets API-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b3.json
+  -> ok
+CHECK K3.b3.label PASS interfaces: declared trigger 'interface_change' auto-simulates (radius R2, gate HDG-0003)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'security change' --trigger security_change --targets API-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b4.json
+  -> ok
+CHECK K3.b4.label PASS security: declared trigger 'security_change' auto-simulates (radius R2, gate HDG-0004)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'governance/policy change' --trigger governance_change --targets ARCH-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b5.json
+  -> ok
+CHECK K3.b5.label PASS governance/policy: declared trigger 'governance_change' auto-simulates (radius R5, gate HDG-0005)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'infrastructure cost change' --trigger infrastructure_cost --targets ARCH-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b6.json
+  -> ok
+CHECK K3.b6.label PASS infrastructure cost: declared trigger 'infrastructure_cost' auto-simulates (radius R3, gate HDG-0006)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'acceptance criteria change' --trigger acceptance_criteria_change --targets SCN-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b7.json
+  -> ok
+CHECK K3.b7.label PASS acceptance criteria: declared trigger 'acceptance_criteria_change' auto-simulates (radius R2, gate HDG-0007)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'data migration change' --trigger data_migration --targets ARCH-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-b8.json
+  -> ok
+CHECK K3.b8.label PASS data migration: declared trigger 'data_migration' auto-simulates (radius R3, gate HDG-0008)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'unlabelled change' --targets ARCH-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-nolabel.json
+  -> ok
+OBSERVE K3.default a proposal with no trigger defaults to behaviour_change and auto-simulates: {"auto_simulated": true, "trigger": "behaviour_change"}
+
+## materiality is taken from the proposer's label, not from what the change touches
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in ARCH-0001' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b1.json --targets ARCH-0001
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0010
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0010 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0010 was never presented to the human (INV-008); run `gov gate present HDG-0010` and obtain the owner's answer
+OBSERVE K3.b1.mislabel.detail architecture record ARCH-0001 changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0010 was never presented to the human (INV-008); run `gov gate present HDG-0010` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0010 was never presented to the human (INV-008); run `gov gate present HDG-0010` and obtain the owner's answer"}, "human_gate": "HDG-0010", "radius": "R3"}
+CHECK K3.b1.mislabel PASS a material change to the architecture record ARCH-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in API-0001' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b3.json --targets API-0001
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0011
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0011 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0011 was never presented to the human (INV-008); run `gov gate present HDG-0011` and obtain the owner's answer
+OBSERVE K3.b3.mislabel.detail interface record API-0001 changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0011 was never presented to the human (INV-008); run `gov gate present HDG-0011` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0011 was never presented to the human (INV-008); run `gov gate present HDG-0011` and obtain the owner's answer"}, "human_gate": "HDG-0011", "radius": "R2"}
+CHECK K3.b3.mislabel PASS a material change to the interface record API-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in SCN-0001' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b7.json --targets SCN-0001
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0012
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0012 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0012 was never presented to the human (INV-008); run `gov gate present HDG-0012` and obtain the owner's answer
+OBSERVE K3.b7.mislabel.detail acceptance criterion of SCN-0001 changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0012 was never presented to the human (INV-008); run `gov gate present HDG-0012` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0012 was never presented to the human (INV-008); run `gov gate present HDG-0012` and obtain the owner's answer"}, "human_gate": "HDG-0012", "radius": "R1"}
+CHECK K3.b7.mislabel PASS a material change to the acceptance criterion of SCN-0001, declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in product/retry.py' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b2.json
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0013
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0013 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0013 was never presented to the human (INV-008); run `gov gate present HDG-0013` and obtain the owner's answer
+OBSERVE K3.b2.mislabel.detail product behaviour (retry bound 5 -> 50) changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0013 was never presented to the human (INV-008); run `gov gate present HDG-0013` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0013 was never presented to the human (INV-008); run `gov gate present HDG-0013` and obtain the owner's answer"}, "human_gate": "HDG-0013", "radius": "R2"}
+CHECK K3.b2.mislabel PASS a material change to the product behaviour (retry bound 5 -> 50), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in product/auth.py' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b4.json
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0014
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0014 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0014 was never presented to the human (INV-008); run `gov gate present HDG-0014` and obtain the owner's answer
+OBSERVE K3.b4.mislabel.detail security control (signature check removed) changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0014 was never presented to the human (INV-008); run `gov gate present HDG-0014` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0014 was never presented to the human (INV-008); run `gov gate present HDG-0014` and obtain the owner's answer"}, "human_gate": "HDG-0014", "radius": "R2"}
+CHECK K3.b4.mislabel PASS a material change to the security control (signature check removed), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in infra/main.tf' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b6.json
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0015
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0015 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0015 was never presented to the human (INV-008); run `gov gate present HDG-0015` and obtain the owner's answer
+OBSERVE K3.b6.mislabel.detail infrastructure cost (db small -> 8xlarge) changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0015 was never presented to the human (INV-008); run `gov gate present HDG-0015` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0015 was never presented to the human (INV-008); run `gov gate present HDG-0015` and obtain the owner's answer"}, "human_gate": "HDG-0015", "radius": "R1"}
+CHECK K3.b6.mislabel PASS a material change to the infrastructure cost (db small -> 8xlarge), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'tidy wording in product/migrations/002_drop_legacy.sql' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b8.json
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0016
+  -> ok
+$ gov --json --session probe-43e02e1d cit approve CIT-0016 --method auto
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0016 was never presented to the human (INV-008); run `gov gate present HDG-0016` and obtain the owner's answer
+OBSERVE K3.b8.mislabel.detail data migration (drop a column) changed under trigger 'editorial': {"approve": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0016 was never presented to the human (INV-008); run `gov gate present HDG-0016` and obtain the owner's answer"}, "auto_simulated_at_propose": true, "execute": {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0016 was never presented to the human (INV-008); run `gov gate present HDG-0016` and obtain the owner's answer"}, "human_gate": "HDG-0016", "radius": "R2"}
+CHECK K3.b8.mislabel PASS a material change to the data migration (drop a column), declared 'editorial', is still treated as material (auto-simulated and not auto-approved without a human gate)
+$ gov --json --session probe-43e02e1d cit propose --proposal 'reformat project policy' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/m-mis-b5.json
+  -> ok
+$ gov --json --session probe-43e02e1d cit simulate CIT-0017
+  -> ok
+CHECK K3.b5.path PASS a change under governance/** is R5 and human-gated whatever its declared trigger (path rule)
+      detail: {"auto_simulated_at_propose": true, "gate": "HDG-0017", "radius": "R5"}
+
+## material changes made outside change control (inside an ordinary task) never reach CIT-P
+$ gov --json --session probe-43e02e1d task create --objective 'update docs and specs' --class documentation --status READY --allowed spec/**,product/**
+  -> ok
+$ gov --json --session probe-43e02e1d task claim TASK-0001
+  -> ok
+$ gov --json --session probe-43e02e1d rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-43e02e1d cit list
+  -> ok
+$ gov --json --session probe-43e02e1d task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/rep-k3.json
+  -> ERROR [GOVERNANCE_SUITE_STALE] governance-affecting work cannot close on stale green evidence: green record "AUD-0001" is obsolete (inputs changed: index_manifest, source, spec_architecture, spec_decisions, spec_requirements, spec_tasks); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`
+$ gov --json --session probe-43e02e1d cit list
+  -> ok
+CHECK K3.outside.1 PASS an architecture + interface + acceptance-criterion change closed through an ordinary task either is refused or triggers CIT-P
+      detail: {"cits_after": 17, "cits_before": 17, "close": {"code": "GOVERNANCE_SUITE_STALE", "details": {"currency": {"changed_classes": [{"class": "index_manifest", "contract_class": "relevant index manifest"}, {"class": "source", "contract_class": "relevant source files"}, {"class": "spec_architecture", "contract_class": "authoritative spec/decision"}, {"class": "spec_decisions", "contract_class": "authoritative spec/decision"}, {"class": "spec_requirements", "contract_class": "authoritative spec/decision"}, {"class": "spec_tasks", "contract_class": "authoritative spec/decision (task manifests, test obligations)"}], "current": false, "green": "AUD-0001", "key": "9f3aeb9f5c6309d407b33e2a26b4fc3199a4e1404d5484f83f53cf984ffed995", "message": "green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, source, spec_architecture, spec_decisions, spec_requirements, spec_tasks)", "recorded_key": "af800164c1bafdd79a507a05490ee0c27fbbbcd425cb99b9b1dc683a4383c520", "unhonoured_green": []}, "governance_affecting_because": ["touches governed inputs: spec/architecture/ARCH-0001.yaml (spec_architecture), spec/interfaces/API-0001.yaml (spec_architecture), spec/scenarios/SCN-0001.yaml (spec_requirements)"], "remediation": "gov health run"}, "message": "governance-affecting work cannot close on stale green evidence: green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, source, spec_architecture, spec_decisions, spec_requirements, spec_tasks); run `gov health run` (re-checks
+$ gov --json --session probe-43e02e1d task create --objective 'small code and infra edits' --class implementation --status READY --allowed product/**,infra/** --fields '{"scenarios": ["SCN-0001"], "acceptance_tests": ["TST-X"]}'
+  -> ok
+$ gov --json --session probe-43e02e1d task claim TASK-0002
+  -> ERROR [TASK_NOT_RUNNABLE] TASK-0002 cannot be claimed: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: TST-X (test_design: ABSENT). `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`
+OBSERVE K3.outside.3a claim refused (readiness prerequisites) - use a discovery task instead: {"code": "TASK_NOT_RUNNABLE", "details": {"gates": [], "manifest": {"blocking": ["TST-X"], "delivery_state": "BLOCKED", "input_violations": [], "missing_inputs": [{"declared_in": ["task.acceptance_tests"], "id": "TST-X", "problems": [{"blocking": true, "code": "ABSENT", "message": "TST-X is declared as a test_design input but no governed record with that id exists; create it, correct the id, or remove the declaration"}], "reason": null, "required": true, "resolution": "ABSENT", "slot": "test_design", "type": ""}]}, "pending_gates": [], "reasons": ["mandatory inputs unsatisfied: TST-X (test_design: ABSENT)"], "state": "BLOCKED", "task": "TASK-0002"}, "message": "TASK-0002 cannot be claimed: the task DAG does not allow it (BLOCKED): mandatory inputs unsatisfied: TST-X (test_design: ABSENT). `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`"}
+$ gov --json --session probe-43e02e1d task create --objective 'small code and infra edits' --class discovery --status READY --allowed product/**,infra/**
+  -> ok
+$ gov --json --session probe-43e02e1d task claim TASK-0003
+  -> ok
+$ gov --json --session probe-43e02e1d rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-43e02e1d cit list
+  -> ok
+$ gov --json --session probe-43e02e1d task close TASK-0003 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3-1789817370-ac11e4/rep-k3c.json
+  -> ERROR [RECEIPT_INVALID] TASK-0003: the consumption receipt does not trace this completion to its inputs (UNTRACEABLE_IMPLEMENTATION). Remediation: return the fields in the packet's receipt_contract — TASK-0003 (discovery) produces implementation (product/auth.py, product/migrations/003_truncate.sql, product/retry.py) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification
+CHECK K3.outside.3 PASS behaviour + security + infrastructure-cost + data-migration changes closed through an ordinary task are refused or trigger CIT-P
+      detail: {"close": {"code": "RECEIPT_INVALID", "details": {"errors": [{"code": "UNTRACEABLE_IMPLEMENTATION", "ids": ["product/auth.py", "product/migrations/003_truncate.sql", "product/retry.py"], "message": "TASK-0003 (discovery) produces implementation (product/auth.py, product/migrations/003_truncate.sql, product/retry.py) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification"}], "manifest_hash": "64421315e654a4bb37dfb0c80e93e7794cbfaa611b7ffe380e321cbaf5b60c31", "ok": false, "packet_hash": "84310683d7a3ad904e0ee873518d1d684fa993a3656c1a8a3a8b0ed56dae25e4", "receipt": {"acceptance_evidence": [], "constraints_applied": [], "context_packet_hash": "84310683d7a3ad904e0ee873518d1d684fa993a3656c1a8a3a8b0ed56dae25e4", "decisions_applied": [], "deviations": [], "features_implemented": [], "inputs_consumed": [], "outputs_produced": ["infra/main.tf", "product/auth.py", "product/migrations/003_truncate.sql", "product/retry.py"], "requirements_implemented": [], "scenarios_implemented": [], "unresolved": []}, "task": "TASK-0003", "traceability_required": true, "warnings": []}, "message": "TASK-0003: the consumption receipt does not trace this completion to its inputs (UNTRACEABLE_IMPLEMENTATION). Remediation: return the fields in the packet's receipt_contract \u2014 TASK-0003 (discovery) produces implementation (product/auth.py, product/migrations/003_truncate.sql, product/retry.py) but declares no feature, requirement, scenar
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3gov-1789817388-af1c19/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+$ gov --json --session probe-3ce4118c task create --objective 'tune governance' --class governance --status READY --allowed governance/project/**
+  -> ok
+$ gov --json --session probe-3ce4118c task claim TASK-0001
+  -> ok
+$ gov --json --session probe-3ce4118c rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-3ce4118c task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3gov-1789817388-af1c19/rep-k3b.json
+  -> ERROR [GOVERNANCE_SUITE_STALE] governance-affecting work cannot close on stale green evidence: green record "AUD-0001" is obsolete (inputs changed: index_manifest, project_policy, spec_tasks); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`
+OBSERVE K3.outside.2a governance policy change closed through a task (first attempt): {"code": "GOVERNANCE_SUITE_STALE", "details": {"currency": {"changed_classes": [{"class": "index_manifest", "contract_class": "relevant index manifest"}, {"class": "project_policy", "contract_class": "governing contract/policy"}, {"class": "spec_tasks", "contract_class": "authoritative spec/decision (task manifests, test obligations)"}], "current": false, "green": "AUD-0001", "key": "7fb1567e8fa073a0ad7a359a46be0ea78c5636911a95a343223647bd5ac6172c", "message": "green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, project_policy, spec_tasks)", "recorded_key": "bee4266feca95f7e79bc70a46b3e6a381d1fa11bdc236bfc44f55cd4bbca7e30", "unhonoured_green": []}, "governance_affecting_because": ["task class 'governance' is governance-affecting", "touches governed inputs: governance/project/PROJECT_POLICY.yaml (project_policy)"], "remediation": "gov health run"}, "message": "governance-affecting work cannot close on stale green evidence: green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, project_policy, spec_tasks); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`"}
+$ gov --json --session probe-3ce4118c adapters generate
+  -> ok
+$ gov --json --session probe-3ce4118c audit
+  -> ok
+OBSERVE K3.outside.2b gov audit after the policy edit: {"ok": true, "verdict": "HEALTHY"}
+$ gov --json --session probe-3ce4118c rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-3ce4118c task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-delta-r-K3-auto-impact-simulation-DTiUQu/k3gov-1789817388-af1c19/rep-k3b.json
+  -> ok
+$ gov --json --session probe-3ce4118c cit list
+  -> ok
+CHECK K3.outside.2 FAIL a governance/policy change closed through an ordinary task is refused or triggers CIT-P (not only a green-audit check)
+      detail: {"cits": 0, "close": {"checkpoint": "CKPT-00001", "close_gate": {"g2": {"health_result": "HR-20260919T112954283Z-ab992a66", "record": "", "summary": {"complete": true, "executed": 13, "executed_checks": ["graph_integrity", "memory_retrieval_regression", "context_reproducibility", "concurrency_claims", "secrets_sensitivity_indexing", "recovery_rebuild", "fresh_agent_reconstruction", "audit_reproducibility", "lineage_orphans", "os_binding_integrity", "installation_authenticity", "index_content_coverage", "task_contract_integrity"], "not_evaluated": 0, "not_evaluated_checks": [], "reused": 18, "reused_checks": ["schema_invariants", "index_freshness", "authority_role_limits", "mutation_scope", "path_map_compliance", "adapter_portability", "skill_regression", "command_contract_consistency", "product_traceability", "policy_enforcement_coverage", "policy_precedence", "plugin_governance", "product_test_health", "human_gate_integrity", "change_control_integrity", "continuity_checkpoint_handoff", "model_routing_integrity", "contract_binding"]}, "verdict": "HEALTHY"}, "governance_affecting": true}, "degraded": [], "overrides": [], "receipt_validation": {"error_count": 0, "errors": [], "manifest_hash": "38a71485e5b48e0b0a4904e8066e6b2658ca41d3d8ac50712891bdbde3bc0b1a", "ok": true, "packet_hash": "e1125e3c40f606f3f1db9c7b152b047b7d21cb68bb3fddb2f9b17ad8e2c2a4dc", "traceability_required": false, "warning_count": 0, "warnings": []}, "report": "RPT-0001", "task": "TASK-0001", "task_status": 
+$ gov --json --session probe-3ce4118c policy effective HUMAN_GATE_POLICY
+  -> ok
+OBSERVE K3.outside.2c the policy change is in effect without any change-impact transaction: {"batch_low_priority": false}
+SUMMARY checks=19 pass=18 fail=1 failed=['K3.outside.2']
+[exit=0]

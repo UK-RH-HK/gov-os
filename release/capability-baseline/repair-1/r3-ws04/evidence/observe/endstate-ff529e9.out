@@ -1,0 +1,20 @@
+# P2-AR-0035 end-state measurement: commit=ff529e9048ff54eb082c678048938bff3fde8bce + IP-R3-WS04-01 + cit in SEALED_RECORD_TYPES
+# scratch /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/endstate-clone-ff529e9
+# date 2026-09-19T10:03:24Z
+patching file runtime/src/orchestration/gates.rs
+--- /dev/fd/63	2026-09-19 11:03:24.792032008 +0100
++++ /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0035/endstate-clone-ff529e9/tree/runtime/src/t2.rs	2026-09-19 11:03:24.792032008 +0100
+@@ -62,7 +62,7 @@
+ const KEY_FILE: &str = "key.json";
+ 
+ /// Record types every instance of which is T2 state written only by OS operations (checked by [`audit`]).
+-pub const SEALED_RECORD_TYPES: &[&str] = &["human-gate"];
++pub const SEALED_RECORD_TYPES: &[&str] = &["human-gate", "cit"];
+ 
+ /// Outcome of verifying a T2 binding.
+ #[derive(Debug, Clone, PartialEq, Eq)]
+## cargo test --lib
+test result: ok. 215 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.84s
+## cargo test --test certification -- --include-ignored (the IP-R3-WS04-01 test included)
+test result: ok. 145 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 567.78s
+[endstate cert exit=0]

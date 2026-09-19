@@ -1,0 +1,39 @@
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-rot-yrs902pj/s0/kernel
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-rot-yrs902pj/s2-old/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-rot-yrs902pj/s2-new/kernel
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-rot-yrs902pj/s5-min/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-rot-yrs902pj/s5-old/kernel
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-rot-min-fb1ilh1i/m1/kernel
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-bg-djct1nck/new/kernel
+(a) role declared: orchestrator for kernel reinstall --source
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for kernel reinstall --source
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for init --force --break-glass
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-05-rotation-revocation-recovery-75ExEl/alpha-r-a2-bg-rb-x_kx71jr/r15/kernel
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for update --rollback --break-glass

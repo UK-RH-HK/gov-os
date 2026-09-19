@@ -421,10 +421,10 @@ fn sha_opt(p: &Path) -> Value {
 /// through the SRR verifier's reader (`srr::verifier::trusted_root`: the digest of the anchor file when it verifies,
 /// the refusal code when it does not) — the R1 census basis is that nothing outside `srr/state.rs` and
 /// `srr/verifier.rs` reaches the anchor path (AR-0031 `hx_a::a4`; integration P2-AR-0022).
-/// Not covered: `floors/` and `installed/` — they are advanced by the lifecycle transaction itself *after* its
-/// verification (init/update step 9) and the kernel content they bind is already keyed through `governance/kernel`
-/// and `framework.lock`. If kernel trust starts consulting the installed record (BC-P2-35), that record must be added
-/// here and the lifecycle conformance run moved after `srr::record_installed` (integration point, WS-8).
+/// Also covered (WS-8 IP-R2-WS08-4, now that `init` writes them before its conformance run, IP-WS02-14): the release
+/// floors (`floors/<product>.json`), the machine's installed-release record (`installed/<product>.json`) and its
+/// verified-release ledger (`installed/<product>/verified/*`) — kernel trust (BC-P2-35) consults them, so evidence
+/// computed under another floor or installation record is stale. Read-only, through `srr::state` paths.
 pub fn machine_trust_state() -> Value {
     match crate::srr::state::resolve_state_root() {
         Ok(root) => {
@@ -436,11 +436,30 @@ pub fn machine_trust_state() -> Value {
                 Ok(None) => Value::Null,
                 Err(e) => json!(format!("UNVERIFIABLE:{}", e.code)),
             };
+            let product = crate::FRAMEWORK_NAME;
+            let mut verified: Vec<Value> = vec![];
+            if let Ok(rd) = std::fs::read_dir(ms.installed_dir(product).join("verified")) {
+                let mut files: Vec<std::path::PathBuf> = rd
+                    .flatten()
+                    .map(|e| e.path())
+                    .filter(|x| x.is_file())
+                    .collect();
+                files.sort();
+                for f in files {
+                    verified.push(json!([
+                        f.file_name().map(|n| n.to_string_lossy().to_string()),
+                        sha_opt(&f)
+                    ]));
+                }
+            }
             json!({
                 "posture": if provisioned.exists() { "PROVISIONED" } else { "UNPROVISIONED" },
                 "trust_anchor_sha256": anchor,
                 "provisioning_latch_sha256": sha_opt(&provisioned),
-                "break_glass_marking_sha256": sha_opt(&crate::srr::state::degraded_path_at(&root, crate::FRAMEWORK_NAME)),
+                "break_glass_marking_sha256": sha_opt(&crate::srr::state::degraded_path_at(&root, product)),
+                "floors_sha256": sha_opt(&ms.floors_path(product)),
+                "installed_record_sha256": sha_opt(&ms.installed_path(product)),
+                "verified_releases": verified,
             })
         }
         Err(e) => json!({"posture": "UNRESOLVED", "error": e.code}),
@@ -458,11 +477,30 @@ pub fn t2_binding_state(p: &Project) -> Value {
             json!({"id": r["id"], "path": r["path"], "binding": r["t2"]["binding"], "key_id": r["t2"]["key_id"]})
         })
         .collect();
+    // plugin-registry entries (WS-7 seals them; WS-2 R3-11), change-control state (WS-4 `cit::binding`) and the
+    // adoption record (WS-9): the same "not produced by a gov operation on this machine as it stands" verdicts
+    for (id, b) in super::reporting::plugin_registry_unbound(p) {
+        rows.push(json!({"id": id, "path": "plugin-registry", "binding": b["binding"], "key_id": b["key_id"]}));
+    }
+    for c in crate::cit::bindings(p) {
+        if c["state"]["binding"] != "VERIFIED" && c["cit_status"] != "PROPOSED" {
+            rows.push(json!({"id": c["id"], "path": "cit", "binding": c["state"]["code"], "key_id": Value::Null}));
+        }
+    }
+    if let Some((b, rel)) = super::reporting::adoption_baseline_binding(p) {
+        if !b.is_verified() {
+            rows.push(json!({"id": crate::adopt::BASELINE_ID, "path": rel, "binding": b.code(), "key_id": b.to_value()["key_id"]}));
+        }
+    }
     rows.sort_by(|a, b| {
-        a["path"]
-            .as_str()
-            .unwrap_or("")
-            .cmp(b["path"].as_str().unwrap_or(""))
+        (
+            a["path"].as_str().unwrap_or(""),
+            a["id"].as_str().unwrap_or(""),
+        )
+            .cmp(&(
+                b["path"].as_str().unwrap_or(""),
+                b["id"].as_str().unwrap_or(""),
+            ))
     });
     json!({"unverified": rows})
 }
@@ -840,16 +878,33 @@ pub fn close_currency(p: &Project, task: &Value, touched: &[String]) -> Result<V
 }
 
 /// **Close gate (integration point for `orchestration::tasks::close`, WS-5).** Refuses the close of every
-/// governance-affecting task (by class or by the governed inputs it touches) while the green governance evidence is
-/// stale or absent. With `force` (an L3+ decision the caller has already authorised) the close proceeds and the
-/// returned notes must be recorded as `degraded` on the report. The host is expected to have run
-/// `crate::scheduler::tier_run(p, Tier::G2, ..)` first, so staleness that a re-check can clear is cleared before this
-/// gate is asked.
+/// governance-affecting task (by class or by the governed inputs it touches) while the governance evidence is stale
+/// or absent. With `force` (an L3+ decision the caller has already authorised) the close proceeds and the returned
+/// notes must be recorded as `degraded` on the report. The host is expected to have run the G2 re-check first
+/// (`verification::close_gate`), so staleness that a re-check can clear is cleared before this gate is asked.
 pub fn enforce_close(
     p: &Project,
     task: &Value,
     touched: &[String],
     force: bool,
+) -> Result<Vec<String>> {
+    enforce_close_with(p, task, touched, force, None)
+}
+
+/// [`enforce_close`] given the G2 re-check the close just ran (`checked`: the `verification::audit_with` result).
+///
+/// **Currency is not health gating** (the availability rule; WS-5 O-R2-1). O4 forbids closing governance-affecting
+/// work on *stale* evidence. The re-check's result is **current evidence** when it is complete (every suite check
+/// evaluated) and was computed for exactly the inputs the repository has now; it then satisfies O4 whatever its
+/// verdict — its warnings refuse nothing (O5 :807: warnings are warnings), and the hard-blocks that govern this close
+/// were decided by the G0 guard within their scope. So a close is never refused by the incomplete specification it
+/// is completing. Without such a result, the latest honoured green record must be current.
+pub fn enforce_close_with(
+    p: &Project,
+    task: &Value,
+    touched: &[String],
+    force: bool,
+    checked: Option<&Value>,
 ) -> Result<Vec<String>> {
     let (affecting, reasons) = governance_affecting(task, touched);
     if !affecting {
@@ -860,16 +915,23 @@ pub fn enforce_close(
     if cur.current {
         return Ok(vec![]);
     }
+    if let Some(c) = checked {
+        if c["complete"].as_bool() == Some(true)
+            && c["inputs_hash"].as_str() == Some(snap.key().as_str())
+        {
+            return Ok(vec![]);
+        }
+    }
     if force {
         return Ok(vec![format!("governance suite stale: {}", cur.message())]);
     }
     let (code, msg) = if cur.green.is_some() {
         ("GOVERNANCE_SUITE_STALE", format!("governance-affecting work cannot close on stale green evidence: {}; run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`", cur.message()))
     } else {
-        ("GOVERNANCE_SUITE_MISSING", "governance-affecting work cannot close: no green governance record exists; run `gov health run` or `gov audit`".to_string())
+        ("GOVERNANCE_SUITE_MISSING", "governance-affecting work cannot close: no current governance evidence exists (no green record, and no complete suite result for the current inputs); run `gov health run` or `gov audit`".to_string())
     };
     Err(GovError::new(code, msg).with_details(
-        json!({"governance_affecting_because": reasons, "currency": cur.to_value(), "remediation": "gov health run"}),
+        json!({"governance_affecting_because": reasons, "currency": cur.to_value(), "checked": checked.map(|c| json!({"complete": c["complete"], "inputs_hash": c["inputs_hash"], "verdict": c["verdict"], "health_result": c["health_result"]})), "current_key": snap.key(), "remediation": "gov health run"}),
     ))
 }
 

@@ -21,6 +21,26 @@
 //!   after commit and records the result.
 //! * **What an execution wrote is recorded per path** (`execution.writes`, sealed): [`binding::verified_writes`] is the
 //!   API task close uses to accept an out-of-scope path only when its content is what an in-window CIT wrote.
+//!
+//! ## Repair iteration 1, round 3 (WS-4)
+//!
+//! * **Every CIT write is sealed** (WS-5 IP-R3-2): each operation seals the sealed-state block *and* the whole record
+//!   ([`binding::seal`]); the secret-material flag is bound into the block. Another OS writer of a CIT record re-seals
+//!   it only when its seal verified before the write (IP for WS-3's gate writers).
+//! * **Every OS write into a sealed record either re-seals a previously verified record or is recorded in the CIT's
+//!   touched list, and a hand edit still breaks the seal** (integration O-7): manifest ops re-seal a record they
+//!   modify when its seal verified before and the write is one the OS is entitled to seal
+//!   ([`binding::content_write_entitled`]), and always record the path; rollback re-seals the approval decision it
+//!   marks REJECTED (WS-2 R3-1); propagation re-seals the markers it writes; **a change propagated outside CIT-E**
+//!   (detected direct change, handoff re-delivery) is recorded as a sealed system transaction whose touched list and
+//!   per-path writes cover what it marked ([`propagate_as_transaction`], WS-5 IP-R3-3).
+//! * **CIT-E verification judges graph integrity** with `memory::integrity::check` before and after the manifest: a
+//!   new reversed, ill-typed or stale relationship declared by a record the transaction wrote, or a new supersession
+//!   cycle, fails the verification and rolls back (WS-6 IP-R2-2).
+//! * **Experimental output reaches production only through a promotion** the approved CIT names
+//!   (`lifecycle::experiment::promotion_refusal` at approve and at execute; WS-10 IP-WS10-09).
+//! * **Rollback snapshots are non-rebuildable state** kept where `paths::store_path(root, "cit-snapshots")` says
+//!   (BC-P2-31, WS-6 IP-R2-10), relocated once from the legacy runtime directory.
 pub mod binding;
 pub mod materiality;
 pub mod propagation;
@@ -85,9 +105,15 @@ fn guard_paths(store: &RecordStore, cit: &Value) -> Vec<String> {
             None => v.push(x),
         }
     }
+    // the transaction's targets: a record by its path (the guard aliases ids and paths), and a file target as the
+    // path it is (WS-2 IP-R3-WS02-04, round-3 integration: a CIT repairing a file-level block — a secret in `src/…` —
+    // reaches that block's subjects and is admitted as its remedy)
     for t in cit["targets"].as_array().cloned().unwrap_or_default() {
-        if let Some(r) = t.as_str().and_then(|id| store.get(id)) {
-            v.push(r.path.clone());
+        if let Some(x) = t.as_str().filter(|x| !x.is_empty()) {
+            match store.get(x) {
+                Some(r) => v.push(r.path.clone()),
+                None => v.push(x.to_string()),
+            }
         }
     }
     v.sort();
@@ -209,6 +235,7 @@ pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
         CitState {
             cit_status: "PROPOSED".into(),
             content_sha256: content,
+            secret_flagged: !secret_hits.is_empty(),
             ..Default::default()
         },
         "cit propose",
@@ -588,6 +615,7 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
             impact_sha256: Some(impact_sha),
             binding_sha256: Some(bind),
             human_gate: gate_id.clone(),
+            secret_flagged: st.secret_flagged,
             ..Default::default()
         },
         "cit simulate",
@@ -620,6 +648,7 @@ fn reject_sealed(p: &Project, id: &str, why: &str) -> Result<()> {
                 impact_sha256: prev.as_ref().and_then(|s| s.impact_sha256.clone()),
                 binding_sha256: prev.as_ref().and_then(|s| s.binding_sha256.clone()),
                 human_gate: prev.as_ref().and_then(|s| s.human_gate.clone()),
+                secret_flagged: prev.as_ref().map(|s| s.secret_flagged).unwrap_or(false),
                 ..Default::default()
             },
             "cit reject",
@@ -686,6 +715,19 @@ fn gate_answer_for(
     Ok(a)
 }
 
+/// **Experimental output enters production only through a governed promotion** (Contract v3:607-614 J2; WS-10
+/// IP-WS10-09): a transaction that names an experiment, moves a file out of an experiment's outputs or writes bytes
+/// equal to an experimental output into the production tree is refused (`EXPERIMENT_NOT_PROMOTED`) unless an
+/// approved, still-honoured promotion of that experiment covers each such path. Asked at approve and again at
+/// execute (a promotion revoked in between stops the execution).
+fn promotion_check(p: &Project, store: &RecordStore, cit: &Record) -> Result<()> {
+    let ctx = crate::lifecycle::Ctx::new(p, store);
+    match crate::lifecycle::experiment::promotion_refusal(&ctx, cit) {
+        Some(e) => Err(e),
+        None => Ok(()),
+    }
+}
+
 /// Approve a simulated transaction. Human approval is never supplied by the caller: it is DERIVED from the gate's
 /// verified answer (`gates::verified_answer`: T2-bound, owner-signed for a human answer) for exactly this transaction
 /// and simulated impact. Without a gate only the automatic path within CHANGE_POLICY.auto_approve_max_radius exists,
@@ -731,6 +773,9 @@ pub fn approve(p: &Project, id: &str, by: &str, method: &str) -> Result<Value> {
     if st.impact_sha256.as_deref() != Some(impact_sha.as_str()) {
         return Err(GovError::new("APPROVAL_STALE", format!("{id}: the recorded impact is not the impact gov simulated; approval binds the simulated impact — re-simulate {id}")).with_details(json!({"sealed_impact_sha256": st.impact_sha256, "impact_sha256": impact_sha})));
     }
+    // J2 (WS-10 IP-WS10-09): a transaction that carries experimental output into production is approvable only for
+    // paths an approved promotion of that experiment covers
+    promotion_check(p, &store, &r)?;
     let record_gate = Some(r.get("human_gate")).filter(|g| !g.is_empty());
     if record_gate != st.human_gate {
         return Err(GovError::new("GATE_MISMATCH", format!("{id} names gate {:?} but gov raised {:?} for it; a gate answer approves exactly the transaction it was raised for", record_gate, st.human_gate)));
@@ -824,6 +869,7 @@ pub fn approve(p: &Project, id: &str, by: &str, method: &str) -> Result<Value> {
             human_gate: st.human_gate.clone(),
             approval_sha256: Some(binding::approval_digest(&approval)),
             decision: Some(decision_id.clone()),
+            secret_flagged: st.secret_flagged,
             ..Default::default()
         },
         "cit approve",
@@ -906,8 +952,52 @@ fn changed_record_ids(p: &Project, store: &RecordStore, cit: &Value) -> Vec<Stri
     v
 }
 
+/// **Where rollback snapshots live** (BC-P2-31; Contract v3 B3:202 "deleting derived state cannot delete project
+/// truth"; WS-6 IP-R2-10): the non-rebuildable OS store `paths::store_path(root, "cit-snapshots")`, never the derived
+/// runtime directory a rebuild may delete. A snapshot tree an earlier release kept in the runtime directory is moved
+/// here first ([`relocate_snapshots`]).
+fn snapshot_base(p: &Project) -> PathBuf {
+    relocate_snapshots(p);
+    crate::paths::store_path(&p.root, "cit-snapshots")
+        .unwrap_or_else(|| p.runtime_dir().join("cit"))
+}
+
 fn snapshot_dir(p: &Project, id: &str) -> PathBuf {
-    p.runtime_dir().join("cit").join(id)
+    snapshot_base(p).join(id)
+}
+
+/// Move the legacy snapshot tree (`paths::relocate_legacy`); when both locations hold snapshots (an older binary
+/// wrote after the move), move each transaction's snapshot that is not already at the store location, keep the
+/// others where they are, and report both. Never overwrites a snapshot.
+fn relocate_snapshots(p: &Project) -> Vec<Value> {
+    match crate::paths::relocate_legacy(&p.root, "cit-snapshots") {
+        Ok(v) => v,
+        Err(e) if e.code == "STATE_LOCATION_CONFLICT" => {
+            let Some(store) = crate::paths::os_store("cit-snapshots") else {
+                return vec![];
+            };
+            let Some((from, to)) = store.moves.first() else {
+                return vec![];
+            };
+            let (legacy, dest) = (p.root.join(from), p.root.join(to));
+            let mut out = vec![];
+            for e in std::fs::read_dir(&legacy)
+                .map(|rd| rd.filter_map(|e| e.ok()).collect::<Vec<_>>())
+                .unwrap_or_default()
+            {
+                let name = e.file_name();
+                let target = dest.join(&name);
+                if target.exists() {
+                    out.push(json!({"store": "cit-snapshots", "kept": crate::util::rel_posix(&e.path(), &p.root), "reason": "a snapshot of the same transaction exists at the store location"}));
+                } else if std::fs::rename(e.path(), &target).is_ok() {
+                    out.push(json!({"store": "cit-snapshots", "from": crate::util::rel_posix(&e.path(), &p.root), "to": crate::util::rel_posix(&target, &p.root), "action": "moved"}));
+                }
+            }
+            let _ = std::fs::remove_dir(&legacy);
+            out
+        }
+        Err(_) => vec![],
+    }
 }
 
 fn take_snapshot(
@@ -917,6 +1007,8 @@ fn take_snapshot(
     store: &RecordStore,
     extra: &[String],
 ) -> Result<Value> {
+    // the store location is self-ignored by Git, so a snapshot is never observed as a worker's mutation
+    crate::paths::ensure_state_dir(&p.root)?;
     let dir = snapshot_dir(p, id);
     let snap = dir.join("snapshot");
     crate::util::remove_dir_if_exists(&dir)?;
@@ -1012,7 +1104,58 @@ fn register_created(p: &Project, id: &str, created: &[String]) -> Result<()> {
     write_json(&path, &m)
 }
 
-fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
+/// What the manifest ops of one execution did to OS-sealed records (integration O-7): the records re-sealed after a
+/// write the OS verified and was entitled to seal, and the sealed records written but left unsealed (a content
+/// rewrite of operation-owned facts, or a record whose seal did not verify before the write). Every one of them is
+/// also in the execution's touched list.
+#[derive(Debug, Default)]
+struct SealLog {
+    cit: String,
+    resealed: Vec<String>,
+    left_unsealed: Vec<Value>,
+}
+
+impl SealLog {
+    fn op_name(&self, kind: &str) -> String {
+        format!("cit execute {}: {kind}", self.cit)
+    }
+    fn record(&mut self, path: &str, was_verified: bool, sealed: bool, why: &str) {
+        if sealed {
+            self.resealed.push(path.to_string());
+        } else if was_verified {
+            self.left_unsealed
+                .push(json!({"path": path, "reason": why}));
+        }
+    }
+    fn to_value(&self) -> Value {
+        json!({"resealed": self.resealed, "left_unsealed": self.left_unsealed,
+            "rule": "a record whose T2 seal verified before the write is re-sealed when the write is one the OS may seal as its own (bookkeeping, or a governed content change outside operation-owned facts); otherwise it stays unsealed and the path is in the touched list (cit::binding::reseal_if_verified)"})
+    }
+}
+
+/// After a `write_file` op replaced a record wholesale: re-seal it as the transaction's write when the record at that
+/// path was sealed and verified before, and a whole-record rewrite of its type is one the OS may seal
+/// ([`binding::content_write_entitled`]). Returns whether it sealed.
+fn reseal_rewritten_file(p: &Project, path: &str, was_verified: bool, op: &str) -> Result<bool> {
+    if !was_verified {
+        return Ok(false);
+    }
+    let Some(mut r) = std::fs::read_to_string(p.root.join(path))
+        .ok()
+        .and_then(|t| parse_record_text(&t, path))
+        .filter(|r| r.problems.is_empty() && !r.id().is_empty())
+    else {
+        return Ok(false);
+    };
+    if !binding::content_write_entitled(&r.rtype(), None) {
+        return Ok(false);
+    }
+    binding::reseal_if_verified(&mut r, was_verified, true, op)?;
+    save_record(&p.root, &r)?;
+    Ok(true)
+}
+
+fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>, seals: &mut SealLog) -> Result<()> {
     let kind = op["op"].as_str().unwrap_or("");
     match kind {
         "set_status" | "set_field" | "mark_stale" => {
@@ -1023,6 +1166,13 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
             let r = store
                 .get_mut(target)
                 .ok_or_else(|| GovError::new("RECORD_NOT_FOUND", format!("{target} not found")))?;
+            // O-7: was this record OS state the OS can vouch for before the transaction wrote into it?
+            let was_verified = binding::verified_before(r);
+            let entitled = match kind {
+                "mark_stale" => true,
+                "set_status" => binding::content_write_entitled(&r.rtype(), Some("status")),
+                _ => binding::content_write_entitled(&r.rtype(), op["field"].as_str()),
+            };
             match kind {
                 "set_status" => {
                     r.set("status", op["value"].clone());
@@ -1047,6 +1197,9 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
                 }
             }
             r.set("updated", json!(today()));
+            let sealed =
+                binding::reseal_if_verified(r, was_verified, entitled, &seals.op_name(kind))?;
+            seals.record(&r.path, was_verified, sealed, if entitled { "" } else { "a governed content change of facts only the record's own operation establishes is not sealed as the OS's own" });
             touched.push(r.path.clone());
             save_record(&p.root, r)?;
         }
@@ -1073,7 +1226,27 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
                     crate::srr::breakglass::guard_effect(effect, "cit write_file")?;
                 }
             }
+            // O-7: a sealed record the transaction replaces wholesale
+            let was_verified =
+                p.root.join(path).is_file() && crate::t2::verify_file(&p.root, path).is_verified();
+            let old_type = std::fs::read_to_string(p.root.join(path))
+                .ok()
+                .and_then(|t| parse_record_text(&t, path))
+                .map(|r| r.rtype())
+                .unwrap_or_default();
             write_text(&p.root.join(path), content)?;
+            let sealed = reseal_rewritten_file(
+                p,
+                path,
+                was_verified && binding::content_write_entitled(&old_type, None),
+                &seals.op_name(kind),
+            )?;
+            seals.record(
+                path,
+                was_verified,
+                sealed,
+                "a wholesale rewrite of a record whose facts only its own operation establishes is not sealed as the OS's own",
+            );
             touched.push(path.to_string());
         }
         "move_file" => {
@@ -1133,6 +1306,12 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>) -> Result<()> {
             let mut r = parse_record_text(&crate::util::to_yaml(&rec)?, &path)
                 .ok_or_else(|| GovError::new("USAGE", "invalid record"))?;
             r.path = path.clone();
+            // an appended record is the transaction's content, never replayed OS state: a seal or sealed CIT state
+            // carried in the manifest (copied from another record) is not written
+            if let Some(o) = r.data.as_object_mut() {
+                o.remove(crate::t2::SEAL_FIELD);
+                o.remove(binding::STATE_FIELD);
+            }
             if p.schemas().has(&t) {
                 p.schemas().validate(&t, &r.data, &format!("({id})"))?;
             } else {
@@ -1202,6 +1381,9 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     }
     // ---- the approval is re-derived at execution time and must still bind exactly this transaction (BC-P2-11)
     let st = binding::verified_state(&rec)?;
+    if st.secret_flagged {
+        return Err(GovError::new("SECRET_IN_MANIFEST", format!("{id} was flagged at proposal time because its proposal/manifest contained secret material (redacted); gov sealed that flag, so it cannot be executed whatever the record now says. Re-propose without secrets (store them in a secret-class path).")).with_details(json!({"sealed_state": "secret_flagged"})));
+    }
     let content = binding::content_digest(&rec.data);
     if content != st.content_sha256 {
         return Err(GovError::new("APPROVAL_STALE", format!("{id}: the transaction content (mutation manifest, targets, proposal or trigger) changed after it was approved; the approval binds the exact content that was answered — nothing was executed. Re-simulate {id} and obtain a decision for the transaction as it stands")).with_details(json!({"approved_content_sha256": st.content_sha256, "content_sha256": content})));
@@ -1293,6 +1475,8 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     if st.approval_sha256.as_deref() != Some(binding::approval_digest(&approval).as_str()) {
         return Err(GovError::new("APPROVAL_STALE", format!("{id}: the approval record is not the one gov derived when it approved; nothing was executed — approve again through gov")));
     }
+    // J2 (WS-10 IP-WS10-09): a promotion revoked, or experimental bytes produced, after approval stop execution
+    promotion_check(p, &store, &rec)?;
     // ---- propagation is planned before anything is applied, so the snapshot covers every record it will touch
     let changed = changed_record_ids(p, &store, &rec.data);
     let before_hashes: Vec<(String, Option<String>)> = changed
@@ -1316,6 +1500,8 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
         .iter()
         .map(|e| e.to_string())
         .collect();
+    // relationship integrity before the manifest (WS-6 IP-R2-2): what the transaction may not make worse
+    let integrity_before = integrity_keys(p);
     let mut s = RecordStore::load(&p.root);
     {
         let r = s.get_mut(id).unwrap();
@@ -1325,31 +1511,30 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
             r,
             json!({"at": now_iso(), "event": "executing", "gate": approval["gate"], "decision": approval["decision"], "session": p.session_id}),
         );
-        binding::seal(
-            r,
-            CitState {
-                cit_status: "EXECUTING".into(),
-                content_sha256: content.clone(),
-                impact_sha256: Some(impact_sha.clone()),
-                binding_sha256: st.binding_sha256.clone(),
-                human_gate: st.human_gate.clone(),
-                approval_sha256: st.approval_sha256.clone(),
-                decision: st.decision.clone(),
-                ..Default::default()
-            },
-            "cit execute",
-        )?;
+        binding::seal(r, st.carried("EXECUTING"), "cit execute")?;
         save_record(&p.root, r)?;
     }
     let mut touched = vec![];
     let mut created: Vec<String> = vec![];
+    let mut seals = SealLog {
+        cit: id.to_string(),
+        ..Default::default()
+    };
     let result: Result<Value> = (|| {
+        // paths the manifest's content ops wrote (not its staleness marks or deletions): the records whose declared
+        // relationships the transaction answers for
+        let mut content_written: Vec<String> = vec![];
+        let mut integrity_report = Value::Null;
         for op in rec.data["mutation_manifest"]
             .as_array()
             .cloned()
             .unwrap_or_default()
         {
-            apply_op(p, &op, &mut touched)?;
+            let from = touched.len();
+            apply_op(p, &op, &mut touched, &mut seals)?;
+            if !matches!(op["op"].as_str(), Some("mark_stale") | Some("delete_file")) {
+                content_written.extend(touched[from..].iter().cloned());
+            }
         }
         // propagation (framework §47.2; BC-P2-04): open AND completed dependents, their evidence, validation evidence,
         // checkpoints, handoffs and packets; revalidation tasks for completed work
@@ -1430,6 +1615,23 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
                         .join(", ")
                 ));
             }
+            // WS-6 IP-R2-2: relationships the transaction itself declared must be well-typed, in the direction of
+            // their meaning and not point at non-current records; it must not create a supersession cycle
+            let (introduced, consequences) =
+                integrity_introduced(p, &integrity_before, &content_written, &changed);
+            integrity_report = json!({"introduced": introduced, "consequences": consequences,
+                "rule": "memory::integrity::check before and after the manifest: a new reversed, ill-typed or stale relationship declared by a record this transaction's content ops wrote (stale: to a target it did not itself change), or a new supersession cycle, fails the verification; new stale relationships of other records to a target this transaction retired are its propagation's consequences"});
+            if !introduced.is_empty() {
+                problems.push(format!(
+                    "{} relationship integrity finding(s) introduced by records this transaction wrote: {}",
+                    introduced.len(),
+                    introduced
+                        .iter()
+                        .map(|f| f["message"].as_str().unwrap_or("").to_string())
+                        .collect::<Vec<_>>()
+                        .join(" | ")
+                ));
+            }
         }
         if required.iter().any(|r| r == "index_freshness") {
             let f = freshness(p);
@@ -1451,6 +1653,8 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
         }
         let mut v = prop;
         v["touched"] = json!(touched.clone());
+        v["relationship_integrity"] = integrity_report;
+        v["t2_seals"] = seals.to_value();
         Ok(v)
     })();
     match result {
@@ -1477,15 +1681,8 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
             binding::seal(
                 r,
                 CitState {
-                    cit_status: "COMMITTED".into(),
-                    content_sha256: content.clone(),
-                    impact_sha256: Some(impact_sha.clone()),
-                    binding_sha256: st.binding_sha256.clone(),
-                    human_gate: st.human_gate.clone(),
-                    approval_sha256: st.approval_sha256.clone(),
-                    decision: st.decision.clone(),
                     writes_sha256: Some(binding::writes_digest(&writes_v)),
-                    ..Default::default()
+                    ..st.carried("COMMITTED")
                 },
                 "cit execute",
             )?;
@@ -1548,12 +1745,15 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
                 }
             };
             // recorded with the execution (outside the sealed state, which binds status, digests and writes only); the
-            // index is refreshed again so the committed transaction leaves it current
+            // whole-record seal is renewed only when the committed record still verifies (O-7: a hand edit made after
+            // the commit stays broken). The index is refreshed again so the committed transaction leaves it current.
             let mut s3 = RecordStore::load(&p.root);
             if let Some(r) = s3.get_mut(id) {
+                let was_verified = binding::verified_before(r);
                 let mut ex = r.data["execution"].clone();
                 ex["health"] = health.clone();
                 r.set("execution", ex);
+                binding::reseal_if_verified(r, was_verified, true, "cit execute (G4 health)")?;
                 save_record(&p.root, r)?;
             }
             let _ = crate::memory::indexer::rebuild(
@@ -1586,20 +1786,7 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
                     r,
                     json!({"at": now_iso(), "event": "rolled_back", "error": e.to_string()}),
                 );
-                binding::seal(
-                    r,
-                    CitState {
-                        cit_status: "ROLLED_BACK".into(),
-                        content_sha256: content.clone(),
-                        impact_sha256: Some(impact_sha.clone()),
-                        binding_sha256: st.binding_sha256.clone(),
-                        human_gate: st.human_gate.clone(),
-                        approval_sha256: st.approval_sha256.clone(),
-                        decision: st.decision.clone(),
-                        ..Default::default()
-                    },
-                    "cit execute",
-                )?;
+                binding::seal(r, st.carried("ROLLED_BACK"), "cit execute")?;
                 save_record(&p.root, r)?;
             }
             let _ = crate::memory::indexer::rebuild(
@@ -1621,6 +1808,225 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
                 ),
             )
             .with_details(json!({"rollback": rb, "details": e.details})))
+        }
+    }
+}
+
+/// Relationship-integrity findings (`memory::integrity::check`, WS-6 BC-P2-28) that are not `low`, keyed for a
+/// before/after comparison by kind, declaring record and edge. Dangling edges are left to the index-based check CIT-E
+/// already runs beside it.
+fn integrity_keys(p: &Project) -> std::collections::BTreeMap<String, Value> {
+    let store = RecordStore::load(&p.root);
+    match crate::memory::integrity::check(p, &store, None) {
+        Ok(i) => i
+            .findings
+            .into_iter()
+            .filter(|f| f["severity"] != "low" && f["kind"] != "dangling")
+            .map(|f| {
+                let key = format!(
+                    "{}|{}|{}|{}",
+                    f["kind"], f["record"], f["edge"], f["records"]
+                );
+                (key, f)
+            })
+            .collect(),
+        Err(_) => Default::default(),
+    }
+}
+
+/// The relationship-integrity findings a transaction introduced and answers for (WS-6 IP-R2-2), and the new findings
+/// that are consequences of it:
+/// * **introduced** — a new `reversed` or `ill_typed` relationship declared by a record the manifest's content ops
+///   wrote; a new `stale` relationship declared by such a record to a target the transaction did not itself change
+///   (it pointed new content at a record that was already not current); a new `supersession_cycle`;
+/// * **consequences** — every other new finding, e.g. current records still pointing at a record this transaction
+///   superseded: propagation marks their work for retest, and the suite reports the links.
+fn integrity_introduced(
+    p: &Project,
+    before: &std::collections::BTreeMap<String, Value>,
+    content_written: &[String],
+    changed: &[String],
+) -> (Vec<Value>, Vec<Value>) {
+    let after = integrity_keys(p);
+    let store = RecordStore::load(&p.root);
+    let written: std::collections::BTreeSet<String> = content_written
+        .iter()
+        .filter_map(|pth| {
+            store
+                .records
+                .iter()
+                .find(|r| r.path == *pth)
+                .map(|r| r.id())
+        })
+        .collect();
+    let (mut introduced, mut consequences) = (vec![], vec![]);
+    for (k, f) in after {
+        if before.contains_key(&k) {
+            continue;
+        }
+        let kind = f["kind"].as_str().unwrap_or("");
+        let declarer = f["record"].as_str().unwrap_or("");
+        let own = written.contains(declarer);
+        let target = {
+            let (s, d) = (
+                f["edge"]["src"].as_str().unwrap_or(""),
+                f["edge"]["dst"].as_str().unwrap_or(""),
+            );
+            if s == declarer {
+                d.to_string()
+            } else {
+                s.to_string()
+            }
+        };
+        let answerable = match kind {
+            "supersession_cycle" => true,
+            "reversed" | "ill_typed" => own,
+            "stale" => own && !changed.iter().any(|c| *c == target),
+            _ => false,
+        };
+        if answerable {
+            introduced.push(f);
+        } else {
+            consequences.push(f);
+        }
+    }
+    (introduced, consequences)
+}
+
+/// **Propagate a change made outside CIT-E as a sealed system transaction** (BC-P2-04 direct path; WS-5 IP-R3-3;
+/// integration O-7). Propagation writes OS markers into records it does not own — close reports, authored test
+/// obligations, scenarios, tasks, checkpoints, handoffs — and a concurrent task close must be able to tell those
+/// writes apart from a worker's (a changed authored obligation would otherwise be an undeclared mutation; an unsealed
+/// or legacy report a T2 violation) and recorded authorship must survive them. Re-sealing covers records whose seal
+/// verified; for the rest, the OS records the paths in a transaction's touched list: this function writes a
+/// `COMMITTED` CIT record of `origin: system`, `trigger: propagation`, with no mutation manifest (it changes no
+/// authoritative content), whose `execution.propagation.touched` and sealed per-path `execution.writes` are exactly
+/// what the propagation wrote. It is taken with a rollback snapshot and journalled like CIT-E (an interruption is
+/// recovered by `gov recover`); when the propagation writes nothing, no record is kept. Returns the propagation
+/// summary with `cit` naming the transaction (or `null`).
+pub fn propagate_as_transaction(
+    p: &Project,
+    plan: &propagation::Plan,
+    changes: &[propagation::InputChange],
+    detected_by: &str,
+    opts: &propagation::ApplyOptions,
+) -> Result<Value> {
+    let store = RecordStore::load(&p.root);
+    let id = store.next_id("cit");
+    let cause = propagation::Cause::Direct {
+        detected_by: detected_by.to_string(),
+    };
+    let ids: Vec<String> = changes.iter().map(|c| c.id.clone()).collect();
+    let targets: Vec<String> = ids
+        .iter()
+        .filter(|i| store.get(i).is_some())
+        .cloned()
+        .collect();
+    let approval = json!({"method": "policy", "policy": "CHANGE_POLICY.propagation", "human_approved": false, "answered_by_kind": "system",
+        "basis": "propagation of a detected upstream change writes OS bookkeeping only (staleness, retest and revalidation marks, packet invalidation); it changes no authoritative content, so CHANGE_POLICY.propagation authorises it without a gate",
+        "recorded_by_session": p.session_id, "recorded_by_role": p.role, "at": now_iso()});
+    let impact = json!({"radius": "R0", "human_gate_required": false, "seeds": ids, "affected": [], "affected_tasks": plan.open_tasks.keys().chain(plan.done_tasks.keys()).cloned().collect::<Vec<_>>(),
+        "tests_required": plan.tests.keys().cloned().collect::<Vec<_>>(), "features": [], "material_classes": [], "effective_triggers": [],
+        "consequences": ["bookkeeping only: dependents of the changed input(s) are marked stale / for retest or revalidation"]});
+    let mut rec = new_record(
+        "cit",
+        &id,
+        &format!("Propagation of a direct change to {}", ids.join(", ")),
+        json!({"cit_status": "EXECUTING", "origin": "system", "trigger": "propagation", "proposed_by": p.role,
+            "proposal": format!("propagate upstream change(s) to {} detected by {detected_by} (made outside change control) to the work that consumed the previous content", ids.join(", ")),
+            "targets": targets, "mutation_manifest": [], "impact": impact, "approval": approval, "state_class": "AUTHORITATIVE",
+            "system": {"kind": "direct-change propagation", "detected_by": detected_by, "cause": cause.to_value(),
+                "inputs_changed": changes.iter().map(|c| c.to_value(&cause)).collect::<Vec<_>>()},
+            "journal": [{"at": now_iso(), "event": "system_propagation", "detected_by": detected_by, "session": p.session_id}]}),
+    );
+    p.schemas().validate("cit", &rec.data, &format!("({id})"))?;
+    let snapshot = take_snapshot(p, &id, &rec.data, &store, &plan.paths(p, &store))?;
+    rec.set("execution", json!({"started": now_iso(), "snapshot": snapshot, "session": p.session_id, "role": p.role, "cause": cause.to_value()}));
+    let content = binding::content_digest(&rec.data);
+    let state = CitState {
+        content_sha256: content,
+        impact_sha256: Some(binding::impact_digest(&rec.data["impact"])),
+        approval_sha256: Some(binding::approval_digest(&rec.data["approval"])),
+        ..Default::default()
+    };
+    binding::seal(
+        &mut rec,
+        state.carried("EXECUTING"),
+        "cit propagate (system)",
+    )?;
+    save_record(&p.root, &rec)?;
+    let mut touched = vec![];
+    let mut created = vec![];
+    let applied = propagation::apply(p, plan, changes, &cause, opts, &mut touched, &mut created);
+    let _ = register_created(p, &id, &created);
+    let mut s2 = RecordStore::load(&p.root);
+    let Some(r) = s2.get_mut(&id) else {
+        return Err(GovError::new(
+            "CIT_NOT_FOUND",
+            format!("the propagation transaction {id} vanished while it executed"),
+        ));
+    };
+    match applied {
+        Ok(mut v) if touched.is_empty() && created.is_empty() => {
+            // nothing was written (every change was already recorded): no transaction to keep
+            let _ = std::fs::remove_file(p.root.join(&r.path));
+            let _ = crate::util::remove_dir_if_exists(&snapshot_dir(p, &id));
+            v["cit"] = Value::Null;
+            v["touched"] = json!([]);
+            Ok(v)
+        }
+        Ok(mut v) => {
+            v["touched"] = json!(touched.clone());
+            let mut all = touched.clone();
+            all.extend(created.iter().cloned());
+            let writes_v = json!(binding::capture_writes(&p.root, &all)
+                .iter()
+                .map(|w| w.to_value())
+                .collect::<Vec<_>>());
+            let mut ex = r.data["execution"].clone();
+            ex["finished"] = json!(now_iso());
+            ex["result"] = json!("committed");
+            ex["verification"] =
+                json!({"ok": true, "note": "bookkeeping only: no authoritative content changed"});
+            ex["propagation"] = v.clone();
+            ex["writes"] = writes_v.clone();
+            r.set("execution", ex);
+            r.set("cit_status", json!("COMMITTED"));
+            journal(r, json!({"at": now_iso(), "event": "committed"}));
+            binding::seal(
+                r,
+                CitState {
+                    writes_sha256: Some(binding::writes_digest(&writes_v)),
+                    ..state.carried("COMMITTED")
+                },
+                "cit propagate (system)",
+            )?;
+            save_record(&p.root, r)?;
+            v["cit"] = json!(id);
+            Ok(v)
+        }
+        Err(e) => {
+            let rb = restore_snapshot(p, &id)?;
+            let mut ex = r.data["execution"].clone();
+            ex["finished"] = json!(now_iso());
+            ex["result"] = json!("rolled_back");
+            ex["error"] = json!(e.to_string());
+            r.set("execution", ex);
+            r.set("cit_status", json!("ROLLED_BACK"));
+            journal(
+                r,
+                json!({"at": now_iso(), "event": "rolled_back", "error": e.to_string()}),
+            );
+            binding::seal(r, state.carried("ROLLED_BACK"), "cit propagate (system)")?;
+            save_record(&p.root, r)?;
+            Err(GovError::new(
+                &e.code,
+                format!(
+                    "{} — the propagation transaction {id} was rolled back",
+                    e.message
+                ),
+            )
+            .with_details(json!({"cit": id, "rollback": rb, "details": e.details})))
         }
     }
 }
@@ -1683,14 +2089,14 @@ pub fn bindings(p: &Project) -> Vec<Value> {
     RecordStore::load(&p.root)
         .of_type("cit")
         .into_iter()
-        .map(|c| json!({"id": c.id(), "cit_status": c.get("cit_status"), "state": binding::binding_of(c)}))
+        .map(|c| json!({"id": c.id(), "cit_status": c.get("cit_status"), "state": binding::binding_of(c), "record_seal": crate::t2::verify_record(c).code()}))
         .collect()
 }
 
 /// CHANGE_POLICY.rollback.keep_snapshots: keep only the newest N CIT snapshot directories (older transactions cannot be
 /// rolled back automatically afterwards; git history remains).
 pub fn prune_snapshots(p: &Project, keep: usize) {
-    let base = p.runtime_dir().join("cit");
+    let base = snapshot_base(p);
     let Ok(rd) = std::fs::read_dir(&base) else {
         return;
     };
@@ -1807,7 +2213,8 @@ pub fn rollback(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
             r,
             json!({"at": now_iso(), "event": "rolled_back", "reason": reason, "by": p.session_id}),
         );
-        // rolling back is the fail-safe direction: sealed whatever the record's prior binding was
+        // rolling back is the fail-safe direction: sealed whatever the record's prior binding was (a ROLLED_BACK
+        // transaction covers nothing and authorises nothing)
         let content = binding::content_digest(&r.data);
         binding::seal(
             r,
@@ -1820,20 +2227,29 @@ pub fn rollback(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
                 approval_sha256: prev.as_ref().and_then(|s| s.approval_sha256.clone()),
                 decision: prev.as_ref().and_then(|s| s.decision.clone()),
                 writes_sha256: prev.as_ref().and_then(|s| s.writes_sha256.clone()),
+                secret_flagged: prev.as_ref().map(|s| s.secret_flagged).unwrap_or(false),
                 ..Default::default()
             },
             "cit rollback",
         )?;
         save_record(&p.root, r)?;
     }
-    // the approval decision no longer describes the project (verifier L7): mark it REJECTED with provenance
+    // the approval decision no longer describes the project (verifier L7): mark it REJECTED with provenance. The
+    // rollback is the decision's own lifecycle operation, so a decision whose seal verified before is re-sealed as
+    // written by it (WS-2 R3-1): the OS's rollback never makes its own decision look tampered with, and a decision
+    // edited by hand before the rollback stays unsealed
+    let mut decision_resealed = Value::Null;
     if !decision_id.is_empty() {
         let mut s3 = RecordStore::load(&p.root);
         if let Some(d) = s3.get_mut(&decision_id) {
+            let was_verified = binding::verified_before(d);
             d.set("status", json!("REJECTED"));
             d.set("state_class", json!("HISTORICAL"));
             d.set("rollback_of", json!(id));
             d.set("updated", json!(crate::util::today()));
+            let sealed = binding::reseal_if_verified(d, was_verified, true, "cit rollback")?;
+            decision_resealed =
+                json!({"decision": decision_id, "resealed": sealed, "sealed_before": was_verified});
             save_record(&p.root, d)?;
         }
     }
@@ -1846,7 +2262,9 @@ pub fn rollback(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
             ..Default::default()
         },
     );
-    Ok(json!({"cit": id, "cit_status": "ROLLED_BACK", "rollback": rb}))
+    Ok(
+        json!({"cit": id, "cit_status": "ROLLED_BACK", "rollback": rb, "approval_decision": decision_resealed}),
+    )
 }
 
 pub fn interrupted(p: &Project) -> Vec<Value> {
@@ -1854,7 +2272,7 @@ pub fn interrupted(p: &Project) -> Vec<Value> {
 }
 
 pub fn list(p: &Project) -> Vec<Value> {
-    RecordStore::load(&p.root).of_type("cit").into_iter().map(|c| json!({"id": c.id(), "title": c.title(), "cit_status": c.get("cit_status"), "trigger": c.get("trigger"), "effective_trigger": c.data["materiality"]["effective_trigger"], "radius": c.data["impact"]["radius"], "human_gate": c.get("human_gate"), "decision": c.get("decision"), "state": binding::binding_of(c)})).collect()
+    RecordStore::load(&p.root).of_type("cit").into_iter().map(|c| json!({"id": c.id(), "title": c.title(), "cit_status": c.get("cit_status"), "trigger": c.get("trigger"), "effective_trigger": c.data["materiality"]["effective_trigger"], "radius": c.data["impact"]["radius"], "human_gate": c.get("human_gate"), "decision": c.get("decision"), "state": binding::binding_of(c), "origin": c.data.get("origin").cloned().unwrap_or(json!("proposer")), "record_seal": crate::t2::verify_record(c).code()})).collect()
 }
 
 pub fn read_text_opt(p: &Path) -> Option<String> {

@@ -371,6 +371,47 @@ fn changed_fields(before: Option<&Value>, after: Option<&Value>) -> Vec<String> 
     keys.into_iter().filter(|k| b.get(k) != a.get(k)).collect()
 }
 
+/// Tags (and their fragments) that mark a record as part of the retrieval profile: `memory::profile` tags every
+/// retrieval-profile decision `retrieval-profile` and `embedder-selection`.
+const RETRIEVAL_PROFILE_TAGS: &[&str] = &["retrieval-profile", "embedder", "reranker"];
+
+/// Overlay keys that pin the retrieval profile (`memory::profile::select` writes them into the project policy
+/// overlay's `policy_overrides`).
+const RETRIEVAL_PROFILE_KEYS: &[&str] = &["MEMORY_POLICY.embedding.", "MEMORY_POLICY.reranker."];
+
+/// The retrieval-profile pins a policy/overlay file change touches: every `MEMORY_POLICY.embedding.*` /
+/// `MEMORY_POLICY.reranker.*` override key, and in a `MEMORY_POLICY` file itself the `embedding` / `reranker`
+/// blocks, whose value differs between `before` and `after`.
+fn retrieval_profile_keys(path: &str, before: Option<&str>, after: Option<&str>) -> Vec<String> {
+    let parse = |t: Option<&str>| -> Value {
+        t.and_then(|t| serde_yaml::from_str::<Value>(t).ok())
+            .unwrap_or(Value::Null)
+    };
+    let (b, a) = (parse(before), parse(after));
+    let mut keys: BTreeSet<String> = BTreeSet::new();
+    for doc in [&b, &a] {
+        if let Some(o) = doc["policy_overrides"].as_object() {
+            for k in o.keys() {
+                if RETRIEVAL_PROFILE_KEYS.iter().any(|p| k.starts_with(p)) {
+                    keys.insert(k.clone());
+                }
+            }
+        }
+    }
+    let mut out: Vec<String> = keys
+        .into_iter()
+        .filter(|k| b["policy_overrides"].get(k) != a["policy_overrides"].get(k))
+        .collect();
+    if path.ends_with("MEMORY_POLICY.yaml") {
+        for block in ["embedding", "reranker"] {
+            if b.get(block) != a.get(block) && (b.get(block).is_some() || a.get(block).is_some()) {
+                out.push(format!("MEMORY_POLICY.{block}"));
+            }
+        }
+    }
+    out
+}
+
 fn tag_classes(data: &Value) -> Vec<&'static str> {
     let mut out = vec![];
     let tags: Vec<String> = data["tags"]
@@ -382,7 +423,11 @@ fn tag_classes(data: &Value) -> Vec<&'static str> {
         })
         .unwrap_or_default();
     for t in &tags {
-        let c = if t.contains("architect") {
+        // the retrieval profile (embedder, reranker) decides every semantic answer and context packet: a change to
+        // it is a governance change (WS-6 IP-R2-6; BC-P2-30 linked to BC-P2-13)
+        let c = if RETRIEVAL_PROFILE_TAGS.iter().any(|x| t.contains(x)) {
+            "governance_change"
+        } else if t.contains("architect") {
             "architecture_change"
         } else if t.contains("secur") || t.contains("privacy") || t.contains("auth") {
             "security_change"
@@ -525,7 +570,11 @@ fn classify_record(
         }
         "decision" => {
             let data = after.or(before).cloned().unwrap_or(Value::Null);
-            let tagged = tag_classes(&data);
+            let mut tagged = tag_classes(&data);
+            // a decision that pins a retrieval profile (`memory::profile::select`) is one whatever its tags
+            if data.get("retrieval_profile").is_some() && !tagged.contains(&"governance_change") {
+                tagged.push("governance_change");
+            }
             if tagged.is_empty() {
                 m.push(
                     "behaviour_change",
@@ -634,6 +683,18 @@ fn classify_file(
             format!("{path} {what}"),
             true,
         );
+        // the retrieval-profile pins in particular (WS-6 IP-R2-6): named, so the simulation and the gate say what
+        // changes — every semantic answer and context packet
+        let keys = retrieval_profile_keys(path, before, after);
+        if !keys.is_empty() {
+            m.push(
+                "governance_change",
+                path,
+                "retrieval profile pins",
+                format!("{path}: retrieval-profile pins changed ({}): every semantic answer and context packet is produced differently; a governed profile change needs benchmark evidence and a held-out regression (`gov memory select`)", keys.join(", ")),
+                true,
+            );
+        }
     }
     if let Some(g) = any_glob(ARCHITECTURE_PATHS, path) {
         m.push(
@@ -1275,5 +1336,64 @@ mod tests {
             .count();
         assert_eq!(n, 1);
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_retrieval_profile_change_is_material_for_cit_p() {
+        // re-pinning the embedder in the project overlay: governance, with the pins named
+        let before = "policy_overrides:\n  MEMORY_POLICY.embedding.provider: builtin:hash-384\n  TEST_POLICY.x: 1\n";
+        let after = "policy_overrides:\n  MEMORY_POLICY.embedding.provider: plugin:local-embed\n  TEST_POLICY.x: 1\n";
+        let m = classify(
+            None,
+            &[file(
+                "governance/project/PROJECT_POLICY.yaml",
+                Some(before),
+                Some(after),
+            )],
+        );
+        let pins: Vec<&Finding> = m
+            .findings
+            .iter()
+            .filter(|f| f.rule == "retrieval profile pins")
+            .collect();
+        assert_eq!(pins.len(), 1, "{:?}", m.findings);
+        assert!(pins[0]
+            .evidence
+            .contains("MEMORY_POLICY.embedding.provider"));
+        // an overlay change that leaves the pins alone names none
+        let other = classify(
+            None,
+            &[file(
+                "governance/project/PROJECT_POLICY.yaml",
+                Some(before),
+                Some(&before.replace("TEST_POLICY.x: 1", "TEST_POLICY.x: 2")),
+            )],
+        );
+        assert!(other
+            .findings
+            .iter()
+            .all(|f| f.rule != "retrieval profile pins"));
+        // a new retrieval-profile decision is a governance change, by its tag or by the pin it records
+        for data in [
+            json!({"tags": ["memory", "embedder-selection", "retrieval-profile"]}),
+            json!({"retrieval_profile": {"digest": "abc"}}),
+        ] {
+            let d = classify(
+                None,
+                &[Change::Record {
+                    id: "D-0009".into(),
+                    rtype: "decision".into(),
+                    path: "spec/decisions/D-0009.yaml".into(),
+                    fields: vec![],
+                    before: None,
+                    after: Some(data.clone()),
+                }],
+            );
+            assert!(
+                d.classes().contains(&"governance_change"),
+                "{data}: {:?}",
+                d.findings
+            );
+        }
     }
 }

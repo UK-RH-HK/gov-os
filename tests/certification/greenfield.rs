@@ -38,7 +38,19 @@ fn greenfield_end_to_end() {
         assert!(exists(&root, f), "{f} missing after init");
     }
     assert!(read(&root, ".gitignore").contains(".governance-runtime/"));
-    assert_eq!(r["adapters"], 5);
+    // round 3 (P2-AR-0034, WS-4 r2 R2-12): the kernel's adapters now include the provider lifecycle hooks, so init
+    // generates one output per kernel adapter directory (generic, cli, api, ide, mcp, hooks)
+    let kernel_adapters = std::fs::read_dir(canonical_root().join("framework/adapters"))
+        .unwrap()
+        .flatten()
+        .filter(|e| e.path().join("adapter.yaml").exists())
+        .count();
+    assert_eq!(kernel_adapters, 6);
+    assert_eq!(r["adapters"], kernel_adapters);
+    assert!(exists(
+        &root,
+        "governance/generated/adapters/hooks/provider-hooks.json"
+    ));
     assert!(
         r["index"]["ecosystems"].as_u64().unwrap() >= 1,
         "Cargo ecosystem must be detected"
@@ -69,7 +81,10 @@ fn greenfield_end_to_end() {
     write_yaml(
         &root,
         "spec/scenarios/SCN-0001.yaml",
-        &json!({"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}),
+        &json!({"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"],
+            // round 3 (P2-AR-0036, WS-10 IP-WS10-12): the scenario -> data link of the H4 chain is explicit; a silent N/A
+            // would be a gap that keeps implementation from becoming READY
+            "data_requirements_not_applicable": "the scenario's order lines are literal values constructed inside the acceptance test; no external or generated dataset is involved"}),
     );
     let t = g.ok(&[
         "task",

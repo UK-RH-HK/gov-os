@@ -1,0 +1,48 @@
+# chunk start=0 count=16 HEAD=a0cb4e3497080bf5a7499405ca813653796f6d23 2026-09-19T11:21:47Z
+#  arch::builtin_embedder_matches_python_reference_plugin
+#  arch::core_crates_have_no_python_or_node_bindings
+#  arch::core_runs_without_any_governed_toolchain_on_path
+#  arch::ecosystem_resolution_follows_the_governed_project_not_the_os
+#  arch::kernel_data_contains_no_language_or_toolchain_assumptions
+#  arch::plugin_protocol_is_language_neutral_bash_embedder
+#  arch::rust_sources_never_hardcode_external_language_runtimes
+#  arch::schemas_policies_and_registries_validate_against_kernel_schemas
+#  brownfield::brownfield_adoption_end_to_end
+#  failure_injection::injected_failures_are_detected_and_recovered
+#  greenfield::greenfield_end_to_end
+#  migration::adoption_dependency_proof_citations_and_rerun_identity
+#  migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts
+#  migration::path_migration_with_rollback_and_memory_rebuild
+#  multi_machine::clone_rebuilds_identical_derived_state
+#  repair2::cit_approval_derives_only_from_an_answered_gate
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws03/runtime)
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws03/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.01s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-15a10c09d13f7815)
+
+running 16 tests
+test arch::core_crates_have_no_python_or_node_bindings ... ok
+test arch::kernel_data_contains_no_language_or_toolchain_assumptions ... ok
+test arch::rust_sources_never_hardcode_external_language_runtimes ... ok
+test arch::builtin_embedder_matches_python_reference_plugin ... ok
+test arch::schemas_policies_and_registries_validate_against_kernel_schemas ... ok
+test arch::ecosystem_resolution_follows_the_governed_project_not_the_os ... ok
+test arch::plugin_protocol_is_language_neutral_bash_embedder ... ok
+test arch::core_runs_without_any_governed_toolchain_on_path ... ok
+test multi_machine::clone_rebuilds_identical_derived_state ... ok
+test repair2::cit_approval_derives_only_from_an_answered_gate ... ok
+test migration::adoption_dependency_proof_citations_and_rerun_identity ... ok
+test brownfield::brownfield_adoption_end_to_end has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered has been running for over 60 seconds
+test greenfield::greenfield_end_to_end has been running for over 60 seconds
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts has been running for over 60 seconds
+test migration::path_migration_with_rollback_and_memory_rebuild has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered ... ok
+test greenfield::greenfield_end_to_end ... ok
+test migration::path_migration_with_rollback_and_memory_rebuild ... ok
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts ... ok
+test brownfield::brownfield_adoption_end_to_end ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 130 filtered out; finished in 117.18s
+
+# exit=0

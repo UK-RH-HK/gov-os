@@ -416,11 +416,18 @@ fn refused_lifecycle_commands_leave_the_installation_as_they_found_it() {
     .unwrap();
     let up = update_through_gate(&g, &unsigned.join("kernel"));
     assert_eq!(up.error_code(), "SRR_RELEASE_UNVERIFIED", "{}", up.envelope);
-    let snaps = proj.join(".governance-runtime/update");
-    assert!(
-        !snaps.exists() || std::fs::read_dir(&snaps).unwrap().next().is_none(),
-        "a refused update left a snapshot behind"
-    );
+    // P2-AR-0039 (BC-P2-31): update snapshots live in `.governance-state/update/`; neither there nor at the legacy
+    // location may a refused update leave one
+    for snaps in [
+        proj.join(".governance-state/update"),
+        proj.join(".governance-runtime/update"),
+    ] {
+        assert!(
+            !snaps.exists() || std::fs::read_dir(&snaps).unwrap().next().is_none(),
+            "a refused update left a snapshot behind in {}",
+            snaps.display()
+        );
+    }
     assert_eq!(
         g.err(&["update", "--rollback"]).error_code(),
         "SNAPSHOT_MISSING"

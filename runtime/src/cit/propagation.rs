@@ -14,7 +14,19 @@
 //!   dependent work recorded it consumed, and [`detect_and_propagate`] runs the same [`plan`]/[`apply`]. Detection is
 //!   content-based: it compares the SHA-256 each consumer recorded (the task's delivered context packet, the inputs a
 //!   checkpoint recorded, the consumption receipt of a closing report) with the input's bytes now. It never reads the
-//!   derived index, so an index rebuild cannot substitute for dependency staleness (W6 line 1132, AC-16 W6×D1).
+//!   derived index, so an index rebuild cannot substitute for dependency staleness (W6 line 1132, AC-16 W6×D1). A
+//!   baseline the OS sealed and someone then edited (a checkpoint or closing report whose seal is broken) is not
+//!   believed.
+//!
+//! ## The markers are OS writes, and are recognisable as such (repair iteration 1, round 3; O-7, WS-5 IP-R3-1/-3)
+//!
+//! Propagation writes markers into records other operations wrote — close reports, authored test obligations,
+//! scenarios, tasks, checkpoints, handoffs. Each write either **re-seals** a record whose T2 seal verified before the
+//! write (`cit::binding::reseal_if_verified`; a hand-edited record is marked but never sealed) or is **recorded in a
+//! transaction's touched list**: inside CIT-E the executing CIT's; for a change detected outside change control, a
+//! sealed **system transaction** `cit::propagate_as_transaction` records (`origin: system`, `trigger: propagation`,
+//! touched list and per-path writes). A concurrent task close therefore sees OS writes, not an undeclared change or a
+//! T2 violation, and recorded authorship of an authored test obligation survives its staleness mark.
 //!
 //! ## What a change reaches (the dependency closure, independent of the CIT radius)
 //!
@@ -570,17 +582,17 @@ fn save_set(
     let Some(r) = st.get_mut(id) else {
         return Ok(false);
     };
-    // Round-2 integration (P2-AR-0032; WS-5 IP-R3-3): a record whose T2 seal verifies (a close report, sealed by
-    // `tasks::close`) is OS state. Propagation's marker is itself an OS write, so the record is re-sealed after it,
-    // keeping the report honoured as recorded authorship and as T2 evidence. A record whose seal does not verify
-    // (unsealed, edited, foreign) is marked but never sealed: the OS does not bless content it did not write.
-    let was_sealed = crate::t2::verify_record(r).is_verified();
+    // Round-2 integration (P2-AR-0032; WS-5 IP-R3-1/-3; O-7): a record whose T2 seal verifies (a close report sealed
+    // by `tasks::close`, a sealed task, checkpoint or handoff) is OS state. Propagation's marker is bookkeeping the
+    // OS is entitled to write into any record, so the record is re-sealed after it, keeping a report honoured as
+    // recorded authorship and T2 evidence. A record whose seal does not verify (unsealed, edited, foreign) is marked
+    // but never sealed: the OS does not bless content it did not write. Either way the path is in `touched` (the
+    // CIT's touched list, or the system propagation transaction's).
+    let was_verified = crate::cit::binding::verified_before(r);
     if !f(r) {
         return Ok(false);
     }
-    if was_sealed {
-        crate::t2::seal_record(r, "cit propagation")?;
-    }
+    crate::cit::binding::reseal_if_verified(r, was_verified, true, "cit propagation")?;
     touched.push(r.path.clone());
     save_record(&p.root, r)?;
     Ok(true)
@@ -937,6 +949,15 @@ fn map_of(v: &Value) -> BTreeMap<String, String> {
         .unwrap_or_default()
 }
 
+/// Was `r` sealed by an OS operation on this machine and modified since? (Unsealed and foreign records are not
+/// judged here: legacy records and records sealed on another machine still describe what the work consumed.)
+fn tampered(r: &Record) -> bool {
+    matches!(
+        crate::t2::verify_record(r),
+        crate::t2::Binding::Broken { .. }
+    )
+}
+
 /// **What task `t`'s work consumed.** For a completed task: the inputs its closing checkpoint recorded (as
 /// delivered), else the consumption receipt of its closing report, else the last packet compiled before it closed.
 /// For open work: the latest of its delivered packet and its latest checkpoint's recorded inputs. `None` when
@@ -948,6 +969,11 @@ pub fn baseline_of(p: &Project, store: &RecordStore, t: &Record) -> Option<Basel
     let mut cands: Vec<Baseline> = vec![];
     for c in store.of_type("checkpoint") {
         if c.get("task") != tid {
+            continue;
+        }
+        // a checkpoint the OS sealed and someone then edited is not what the work was checked against: rewriting
+        // its recorded input hashes must not hide an upstream change (round 3, O-7)
+        if tampered(c) {
             continue;
         }
         let at = c.get("created_at");
@@ -997,7 +1023,7 @@ pub fn baseline_of(p: &Project, store: &RecordStore, t: &Record) -> Option<Basel
             return Some(b.clone());
         }
         let rid = t.get("closed_by_report");
-        if let Some(r) = store.get(&rid) {
+        if let Some(r) = store.get(&rid).filter(|r| !tampered(r)) {
             let h = receipt_hashes(r);
             if !h.is_empty() {
                 return Some(Baseline {
@@ -1154,17 +1180,15 @@ pub fn detect_and_propagate(p: &Project, detected_by: &str, dry_run: bool) -> Re
             json!({"detected": detected, "changes": changes.len(), "dry_run": dry_run, "plan": pl.to_value(), "propagated": false}),
         );
     }
-    let cause = Cause::Direct {
-        detected_by: detected_by.to_string(),
-    };
     let opts = ApplyOptions {
         generate_rework: crate::authority::require(p, "create_task").is_ok(),
     };
-    let mut touched = vec![];
-    let mut created = vec![];
-    let r = apply(p, &pl, &changes, &cause, &opts, &mut touched, &mut created)?;
+    // the markers are recorded as a sealed system transaction (touched list + per-path writes), so a concurrent task
+    // close sees the OS's writes, not an undeclared change, and recorded authorship survives them (WS-5 IP-R3-3)
+    let r = crate::cit::propagate_as_transaction(p, &pl, &changes, detected_by, &opts)?;
+    let touched = r["touched"].clone();
     Ok(
-        json!({"detected": detected, "changes": changes.len(), "dry_run": false, "propagated": true, "propagation": r, "touched": touched}),
+        json!({"detected": detected, "changes": changes.len(), "dry_run": false, "propagated": true, "propagation": r, "touched": touched, "cit": r["cit"]}),
     )
 }
 

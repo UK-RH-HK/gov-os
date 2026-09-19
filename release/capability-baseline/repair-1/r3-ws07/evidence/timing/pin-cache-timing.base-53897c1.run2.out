@@ -1,0 +1,11 @@
+# back-to-back run 2: 2026-09-19T10:27:49Z load: 55.10 67.31 64.83; binary sha256 166c5695421dee7e88dd6cc5be27666236ec2d3e794c90b53a5d24d701e19e7e
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/base-tree/target/debug/gov (170443920 bytes)
+run 1 gov plugins list     4.12 s  peak RSS  193468 KB  ok=True
+run 1 gov plugins health   4.85 s  peak RSS  193636 KB  ok=True
+run 2 gov plugins list     4.62 s  peak RSS  193792 KB  ok=True
+run 2 gov plugins health   4.45 s  peak RSS  193628 KB  ok=True
+run 3 gov plugins list     4.13 s  peak RSS  193624 KB  ok=True
+run 3 gov plugins health   4.94 s  peak RSS  193956 KB  ok=True
+run 4 gov plugins list     6.84 s  peak RSS  193316 KB  ok=True
+run 4 gov plugins health   3.35 s  peak RSS  193464 KB  ok=True
+# machine pin cache: absent (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0038/timing3-base-53897c1/timing-5742df/home/.local/state/governance-os/machine/plugin-pin-cache/cache.json)

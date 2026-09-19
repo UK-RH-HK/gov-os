@@ -441,16 +441,30 @@ pub fn validate(
 
     // --- traceability where it is required
     let class = task.get("class");
-    let source_outputs: Vec<String> = outputs
+    // implementation produced = production source among the outputs (declared, or observed by the close that
+    // persisted the receipt)
+    let mut output_paths: Vec<String> = outputs
         .clone()
         .unwrap_or_default()
         .iter()
-        .filter_map(|x| x.as_str())
-        .filter(|path| p.contract().decide(path).class() == "source")
-        .map(|s| s.to_string())
+        .filter_map(|x| x.as_str().map(|s| s.to_string()))
         .collect();
+    output_paths.extend(
+        list_of(&o, &["observed_files_changed"])
+            .unwrap_or_default()
+            .iter()
+            .filter_map(|x| x.as_str().map(|s| s.to_string())),
+    );
+    output_paths.sort();
+    output_paths.dedup();
+    let source_outputs: Vec<String> = output_paths
+        .iter()
+        .filter(|path| p.contract().decide(path).class() == "source")
+        .cloned()
+        .collect();
+    let implementation_produced = !source_outputs.is_empty();
     let trace_required =
-        TRACEABILITY_REQUIRED_CLASSES.contains(&class.as_str()) || !source_outputs.is_empty();
+        TRACEABILITY_REQUIRED_CLASSES.contains(&class.as_str()) || implementation_produced;
     let deviation_text =
         serde_json::to_string(&deviations.clone().unwrap_or_default()).unwrap_or_default();
     if trace_required {
@@ -465,10 +479,21 @@ pub fn validate(
                     )
             })
             .collect();
+        // W5 line 1125 "untraceable implementation is reported": it is judged on implementation that was produced,
+        // not on the task's class alone (WS-5 IP-R3-5) — a traceability-class task that produced no production
+        // source has nothing untraceable; it must still account for every declared input (TRACE_INCOMPLETE below)
         if upstream.is_empty() {
-            errors.push(err("UNTRACEABLE_IMPLEMENTATION", format!("{task_id} ({class}) produces implementation{} but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification", if source_outputs.is_empty() { String::new() } else { format!(" ({})", source_outputs.join(", ")) }), source_outputs.clone()));
-        } else if req_impl.is_empty() && scn_impl.is_empty() && feat_impl.is_empty() {
-            errors.push(err("TRACEABILITY_MISSING", format!("{task_id} ({class}) closes without naming the requirements/scenarios/features it implemented (requirements_implemented / scenarios_implemented / features_implemented)"), vec![]));
+            if implementation_produced {
+                errors.push(err("UNTRACEABLE_IMPLEMENTATION", format!("{task_id} ({class}) produced implementation ({}) but declares no feature, requirement, scenario or decision it realises; implementation needs an authoritative justification", source_outputs.join(", ")), source_outputs.clone()));
+            } else {
+                warnings.push(json!({"code": "NO_IMPLEMENTATION_PRODUCED", "message": format!("{task_id} ({class}) is held to traceability but produced no production source and declares no upstream it realises; nothing it produced is untraceable"), "ids": []}));
+            }
+        } else if implementation_produced
+            && req_impl.is_empty()
+            && scn_impl.is_empty()
+            && feat_impl.is_empty()
+        {
+            errors.push(err("TRACEABILITY_MISSING", format!("{task_id} ({class}) produced implementation ({}) but does not name the requirements/scenarios/features it implemented (requirements_implemented / scenarios_implemented / features_implemented)", source_outputs.join(", ")), vec![]));
         }
         let mut unaccounted = vec![];
         for e in &upstream {
@@ -613,10 +638,12 @@ pub fn require_valid(
     Ok(out)
 }
 
-/// Closed tasks whose completion does not trace to upstream authority: a DONE task that is held to traceability
-/// (by class, or because its closing report records production-source outputs) whose closing report names no
-/// implemented requirement/scenario/feature, or whose manifest declares none (W5 line 1125, W7 line 1143).
-/// Integration point for the full-audit `product_traceability` family (WS-2).
+/// Closed tasks whose completion does not trace to upstream authority: a DONE task whose recorded outputs include
+/// production source (implementation it produced) and whose closing report names no implemented
+/// requirement/scenario/feature, or whose manifest declares none (W5 line 1125, W7 line 1143). A task held to
+/// traceability by class whose close recorded its outputs and produced no production source has nothing untraceable
+/// (WS-5 IP-R3-5); one whose close recorded no outputs at all (a legacy close) is judged by its class, since what it
+/// produced cannot be told. Integration point for the full-audit `product_traceability` family (WS-2).
 pub fn untraceable_closed_tasks(p: &Project, store: &RecordStore) -> Vec<Value> {
     let mut out = vec![];
     for t in store.of_type("task") {
@@ -624,19 +651,32 @@ pub fn untraceable_closed_tasks(p: &Project, store: &RecordStore) -> Vec<Value> 
             continue;
         }
         let rpt = store.get(&t.get("closed_by_report"));
-        let outputs: Vec<String> = rpt
-            .map(|r| {
-                let mut v = r.list("outputs_produced");
-                v.extend(r.list("files_changed"));
-                v
-            })
-            .unwrap_or_default();
+        const OUTPUT_KEYS: &[&str] = &[
+            "outputs_produced",
+            "files_changed",
+            "observed_files_changed",
+        ];
+        let recorded = OUTPUT_KEYS.iter().any(|k| {
+            rpt.map(|r| r.data.get(*k).is_some()).unwrap_or(false) || t.data.get(*k).is_some()
+        });
+        let mut outputs: Vec<String> = vec![];
+        for k in OUTPUT_KEYS {
+            if let Some(r) = rpt {
+                outputs.extend(r.list(k));
+            }
+            outputs.extend(t.list(k));
+        }
         let source: Vec<&String> = outputs
             .iter()
             .filter(|path| p.contract().decide(path).class() == "source")
             .collect();
         let class = t.get("class");
-        if !(TRACEABILITY_REQUIRED_CLASSES.contains(&class.as_str()) || !source.is_empty()) {
+        let held = if recorded {
+            !source.is_empty()
+        } else {
+            TRACEABILITY_REQUIRED_CLASSES.contains(&class.as_str())
+        };
+        if !held {
             continue;
         }
         let m = manifest::resolve(p, store, t);

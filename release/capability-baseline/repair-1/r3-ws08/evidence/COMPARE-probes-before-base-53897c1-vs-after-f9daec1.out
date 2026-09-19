@@ -1,0 +1,342 @@
+======== derived A2-03-post-install-tamper
+# 28 lines before, 28 after, 0 differing
+
+======== derived A2-04-lock-identity-and-masquerade
+# 43 lines before, 43 after, 16 differing
+--- derived-probes/derived-before-base-53897c1/A2-04-lock-identity-and-masquerade.out
++++ derived-probes/derived-after-f9daec1/A2-04-lock-identity-and-masquerade.out
+@@ -4 +4 @@
+-[L1] framework.lock.release_commit = <HEX> | source = release:agentic-engineering-os@4.1.5
++[L1] framework.lock.release_commit = unverified | source = release:agentic-engineering-os@4.1.5
+@@ -21 +21 @@
+-[L3]   cli_version            authentic-install=4.1.5                                                unknown-install=4.1.5
++[L3]   cli_version            authentic-install=4.1.6                                                unknown-install=4.1.6
+@@ -28 +28 @@
+-[L3]   release_commit         authentic-install=<HEX>             unknown-install=<HEX>
++[L3]   release_commit         authentic-install=unverified                                           unknown-install=<HEX>
+@@ -32,2 +32,2 @@
+-[L3]   source                 authentic-install=release:agentic-engineering-os@4.1.5                 unknown-install=embedded:agentic-engineering-os@4.1.5
+-[L3]   version                authentic-install=4.1.5                                                unknown-install=4.1.5
++[L3]   source                 authentic-install=release:agentic-engineering-os@4.1.5                 unknown-install=embedded:agentic-engineering-os@4.1.6
++[L3]   version                authentic-install=4.1.5                                                unknown-install=4.1.6
+@@ -37,3 +37,3 @@
+-[L4a] default cache ($HOME/.cache): source = embedded:agentic-engineering-os@4.1.5 | release_commit = <HEX>
+-[L4b] XDG_CACHE_HOME=<dir without '.cache'>: source = embedded:agentic-engineering-os@4.1.5 | release_commit = <HEX>
+-[L4c] XDG_CACHE_HOME inside the consumer repo: source = embedded:agentic-engineering-os@4.1.5 | release_commit = <HEX> | consumer HEAD = <HEX> | release_commit == consumer HEAD: False | installed_at_commit = <HEX>
++[L4a] default cache ($HOME/.cache): source = embedded:agentic-engineering-os@4.1.6 | release_commit = <HEX>
++[L4b] XDG_CACHE_HOME=<dir without '.cache'>: source = embedded:agentic-engineering-os@4.1.6 | release_commit = <HEX>
++[L4c] XDG_CACHE_HOME inside the consumer repo: source = embedded:agentic-engineering-os@4.1.6 | release_commit = <HEX> | consumer HEAD = <HEX> | release_commit == consumer HEAD: False | installed_at_commit = <HEX>
+======== derived A2-05-rotation-revocation-recovery
+# 69 lines before, 69 after, 4 differing
+--- derived-probes/derived-before-base-53897c1/A2-05-rotation-revocation-recovery.out
++++ derived-probes/derived-after-f9daec1/A2-05-rotation-revocation-recovery.out
+@@ -57 +57 @@
+-  -> ok (exit 0) {"root": "<PATH>", "version": "4.1.5", "release_hash": "<HEX>", "source": "release:agentic-engineering-os@4.1.5", "kernel_files": 123, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EX…
++  -> ok (exit 0) {"root": "<PATH>", "version": "4.1.5", "release_hash": "<HEX>", "source": "release:agentic-engineering-os@4.1.5", "kernel_files": 123, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIO…
+@@ -65 +65 @@
+-  -> REFUSED (exit 1) code=SNAPSHOT_MISSING msg=no unconsumed update snapshot under .governance-runtime/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)
++  -> REFUSED (exit 1) code=SNAPSHOT_MISSING msg=no unconsumed update snapshot under .governance-state/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)
+======== derived A2-01-unprovisioned-posture
+# 23 lines before, 23 after, 2 differing
+--- derived-probes/derived-before-base-53897c1/A2-01-unprovisioned-posture.out
++++ derived-probes/derived-after-f9daec1/A2-01-unprovisioned-posture.out
+@@ -15 +15 @@
+-[U3] ok = True | authenticity = UNKNOWN | source = embedded:agentic-engineering-os@4.1.5
++[U3] ok = True | authenticity = UNKNOWN | source = embedded:agentic-engineering-os@4.1.6
+======== derived AC16-X3-ingress-root-of-trust-chain
+# 33 lines before, 33 after, 8 differing
+--- derived-probes/derived-before-base-53897c1/AC16-X3-ingress-root-of-trust-chain.out
++++ derived-probes/derived-after-f9daec1/AC16-X3-ingress-root-of-trust-chain.out
+@@ -5 +5 @@
+-[X3c-before-tamper] {"effective_never_index_classes": ["secret", "restricted"], "rebuild_ok": true, "secret_retrieved_by": [], "status.release_trust": {"authenticity": "AUTHENTIC", "posture": "PROVISIONED", "verified_release": "4.1.5", "verified_payload_hash": "<HEX>"}, "envelope.presented_as": "CURRENT", "doctor": "DEGRADED", "doctor_failing": [["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records)"]], "audit": "HEALTHY", "audit_findings": [["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the "], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requ"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualifica"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared defer"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the e"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the "], ["lineage_orphans", "low", "1 source/test file(s) predate governance (governance baseline) and are not yet l"]]}
++[X3c-before-tamper] {"effective_never_index_classes": ["secret", "restricted"], "rebuild_ok": true, "secret_retrieved_by": [], "status.release_trust": {"authenticity": "AUTHENTIC", "posture": "PROVISIONED", "verified_release": "4.1.5", "verified_payload_hash": "<HEX>"}, "envelope.presented_as": "CURRENT", "doctor": "DEGRADED", "doctor_failing": [["D005", "installed kernel 4.1.5 differs from CLI 4.1.6; run gov update --check"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records)"]], "audit": "HEALTHY", "audit_findings": [["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the "], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requ"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualifica"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared defer"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the e"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the "], ["lineage_orphans", "low", "1 source/test file(s) predate governance (governance baseline) and are not yet l"]]}
+@@ -8,2 +8,2 @@
+-[X3c-after-consistent-rewrite] {"effective_never_index_classes": ["secret", "restricted"], "rebuild_ok": false, "secret_retrieved_by": [], "status.release_trust": {"authenticity": "NOT_ESTABLISHED", "posture": "PROVISIONED", "verified_release": null, "verified_payload_hash": null}, "envelope.presented_as": "UNAUTHENTICATED", "doctor": "UNHEALTHY", "doctor_failing": [["D003", "modified=[\"policies/SECURITY_POLICY.yaml\"] missing=[] added=[]"], ["D007", "installed kernel failed verification: kernel payload is not the payload this mac"], ["D029", "installed kernel FAILED verification (kernel payload is not the payload this mac"], ["D010", "stale: 3 changed, 0 added, 0 removed"], ["D020", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records, framework"], ["D032", "release authenticity of this installation is NOT ESTABLISHED on this machine (DI"]], "audit": "UNHEALTHY", "audit_findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload is not the payload this mac"], ["index_freshness", "medium", "index stale: 3 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.23 supersed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/SECURITY_POLICY."], ["adapter_portability", "medium", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["skill_regression", "medium", "SKL-API-CONTRACT-REVIEW V1: validation scenario FAILED \u2014 given 'breaking field r"], ["skill_regression", "medium", "SKL-BACKEND-IMPL V1: validation scenario FAILED \u2014 given 'task with forbidden pat"], ["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the "], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requ"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualifica"], ["skill_regression", "medium", "SKL-MEMORY-RECONSTRUCTION V1: validation scenario FAILED \u2014 given 'secret file in"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared defer"], ["skill_regression", "medium", "SKL-TASK-CLOSE V1: validation scenario FAILED \u2014 given 'stale index and on_stale_"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the e"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not
+-X X3c-A2:146-consistent-rewrite-detected PASS A2:146 installed-kernel verification detects a mutually consistent post-install rewrite -- {"installed": true, "verified": false, "source": "embedded baseline 4.1.5 substituted for the untrusted installed kernel 4.1.5", "substituted_embedded_baseline": true, "manifest_matches_lock": true, "modified": ["policies/SECURITY_POLICY.yaml"], "missing": [], "added": [], "installed_version": "4.1.5", "trusted_version": "4.1.5", "problems": ["kernel payload is not the payload this machine committed into this project (<HEX>), whatever KERNEL_MANIFEST.json and framework.lock say: modified [\"policies/SECURITY_POLICY.yaml\"] missing [] added []. A post-install rewrite, or a change made without an ingress on this machine: verify the release framework.lock pins with `gov kernel reinstall --source <signed release>`"], "fingerprint": "<HEX>", "measured_payload_hash": "<HEX>", "manifest_hash": "<HEX>", "protected_record": {"state": "DIVERGED", "basis": "the installed payload <HEX> is not the payload <HEX> this machine committed into this project \u2014 a post-install rewrite, or a change made without an ingress on this machine; KERNEL_MANIFEST.json and framework.lock agreeing with it does not make it intact. Verify the release framewor
++[X3c-after-consistent-rewrite] {"effective_never_index_classes": ["secret", "restricted"], "rebuild_ok": false, "secret_retrieved_by": [], "status.release_trust": {"authenticity": "NOT_ESTABLISHED", "posture": "PROVISIONED", "verified_release": null, "verified_payload_hash": null}, "envelope.presented_as": "UNAUTHENTICATED", "doctor": "UNHEALTHY", "doctor_failing": [["D003", "modified=[\"policies/SECURITY_POLICY.yaml\"] missing=[] added=[]"], ["D005", "installed kernel 4.1.5 differs from CLI 4.1.6; run gov update --check"], ["D007", "installed kernel failed verification: kernel payload is not the payload this mac"], ["D029", "installed kernel FAILED verification (kernel payload is not the payload this mac"], ["D010", "stale: 3 changed, 0 added, 0 removed"], ["D020", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records, framework"], ["D032", "release authenticity of this installation is NOT ESTABLISHED on this machine (DI"]], "audit": "UNHEALTHY", "audit_findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload is not the payload this mac"], ["index_freshness", "medium", "index stale: 3 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.23 supersed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/SECURITY_POLICY."], ["adapter_portability", "medium", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["skill_regression", "medium", "SKL-API-CONTRACT-REVIEW V1: validation scenario FAILED \u2014 given 'breaking field r"], ["skill_regression", "medium", "SKL-BACKEND-IMPL V1: validation scenario FAILED \u2014 given 'task with forbidden pat"], ["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the "], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requ"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualifica"], ["skill_regression", "medium", "SKL-MEMORY-RECONSTRUCTION V1: validation scenario FAILED \u2014 given 'secret file in"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared defer"], ["skill_regression", "medium", "SKL-TASK-CLOSE V1: validation scenario FAILED \u2014 given 'stale index and on_stale_"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u
++X X3c-A2:146-consistent-rewrite-detected PASS A2:146 installed-kernel verification detects a mutually consistent post-install rewrite -- {"installed": true, "verified": false, "source": "embedded baseline 4.1.6 substituted for the untrusted installed kernel 4.1.5", "substituted_embedded_baseline": true, "manifest_matches_lock": true, "modified": ["policies/SECURITY_POLICY.yaml"], "missing": [], "added": [], "installed_version": "4.1.5", "trusted_version": "4.1.6", "problems": ["kernel payload is not the payload this machine committed into this project (<HEX>), whatever KERNEL_MANIFEST.json and framework.lock say: modified [\"policies/SECURITY_POLICY.yaml\"] missing [] added []. A post-install rewrite, or a change made without an ingress on this machine: verify the release framework.lock pins with `gov kernel reinstall --source <signed release>`"], "fingerprint": "<HEX>", "measured_payload_hash": "<HEX>", "manifest_hash": "<HEX>", "protected_record": {"state": "DIVERGED", "basis": "the installed payload <HEX> is not the payload <HEX> this machine committed into this project \u2014 a post-install rewrite, or a change made without an ingress on this machine; KERNEL_MANIFEST.json and framework.lock agreeing with it does not make it intact. Verify the release framewor
+@@ -11 +11 @@
+-X X3c-A2xU-health-reflects-tamper PASS A2<->U: health does not report HEALTHY while the installed kernel's security policy has been rewritten to expose secrets -- {"doctor": "UNHEALTHY", "doctor_failing": [["D003", "modified=[\"policies/SECURITY_POLICY.yaml\"] missing=[] added=[]"], ["D007", "installed kernel failed verification: kernel payload is not the payload this mac"], ["D029", "installed kernel FAILED verification (kernel payload is not the payload this mac"], ["D010", "stale: 3 changed, 0 added, 0 removed"], ["D020", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records, framework"], ["D032", "release authenticity of this installation is NOT ESTABLISHED on this machine (DI"]], "audit": "UNHEALTHY", "audit_findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload is not the payload this mac"], ["index_freshness", "medium", "index stale: 3 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.23 supersed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/SECURITY_POLICY."], ["adapter_portability", "medium", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["skill_regression", "medium", "SKL-API-CONTRACT-REVIEW V1: validation scenario FAILED \u2014 given 'breaking field r"], ["skill_regression", "medium", "SKL-BACKEND-IMPL V1: validation scenario FAILED \u2014 given 'task with forbidden pat"], ["skill_regression", "low", "SKL-B
++X X3c-A2xU-health-reflects-tamper PASS A2<->U: health does not report HEALTHY while the installed kernel's security policy has been rewritten to expose secrets -- {"doctor": "UNHEALTHY", "doctor_failing": [["D003", "modified=[\"policies/SECURITY_POLICY.yaml\"] missing=[] added=[]"], ["D005", "installed kernel 4.1.5 differs from CLI 4.1.6; run gov update --check"], ["D007", "installed kernel failed verification: kernel payload is not the payload this mac"], ["D029", "installed kernel FAILED verification (kernel payload is not the payload this mac"], ["D010", "stale: 3 changed, 0 added, 0 removed"], ["D020", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records, framework"], ["D032", "release authenticity of this installation is NOT ESTABLISHED on this machine (DI"]], "audit": "UNHEALTHY", "audit_findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload is not the payload this mac"], ["index_freshness", "medium", "index stale: 3 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.23 supersed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/SECURITY_POLICY."], ["adapter_portability", "medium", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["skill_regression", "medium", "SKL-API-CONTRACT-REVIEW V1: validation scenario FAILED \u2014 given 'breaking field r"], ["skill_regression", "medium", "SKL-BACKEND-IMPL V1: validation scenario
+======== derived S5-update
+# 6 lines before, 6 after, 0 differing
+
+======== derived S5-update.provisioned.P2-AR-0039
+# 59 lines before, 59 after, 2 differing
+--- derived-probes/derived-before-base-53897c1/S5-update.provisioned.P2-AR-0039.out
++++ derived-probes/derived-after-f9daec1/S5-update.provisioned.P2-AR-0039.out
+@@ -16 +16 @@
+-[U2] rollback snapshot at the BC-P2-31 location: [] | at the legacy location: ['4.1.5']
++[U2] rollback snapshot at the BC-P2-31 location: ['4.1.5'] | at the legacy location: []
+======== unedited A2-08
+# 25 lines before, 25 after, 0 differing
+
+======== unedited S6-cross-machine
+# 19 lines before, 19 after, 8 differing
+--- probes-before-base-53897c1/S6-cross-machine.out
++++ probes-after-f9daec1/S6-cross-machine.out
+@@ -3 +3 @@
+-[X1] gov status on B: records = 4 | tasks = 1 | framework = 4.1.5 | memory = {'runtime_present': False, 'index_fresh': True, 'index_manifest_present': True, 'stale': 0, 'added': 0, 'removed': 0}
++[X1] gov status on B: records = 4 | tasks = 1 | framework = 4.1.6 | memory = {'runtime_present': False, 'index_fresh': True, 'index_manifest_present': True, 'stale': 0, 'added': 0, 'removed': 0}
+@@ -13 +13 @@
+-[X3] lock on B is A's tracked lock (identical): True | lock identity: {'version': '4.1.5', 'release_hash': '<HEX>', 'release_commit': '<HEX>', 'source': 'embedded:agentic-engineering-os@4.1.5'}
++[X3] lock on B is A's tracked lock (identical): True | lock identity: {'version': '4.1.6', 'release_hash': '<HEX>', 'release_commit': '<HEX>', 'source': 'embedded:agentic-engineering-os@4.1.6'}
+@@ -15,2 +15,2 @@
+-[X3] same binary, fresh init on B (default cache): identity = {'version': '4.1.5', 'release_hash': '<HEX>', 'release_commit': '<HEX>', 'source': 'embedded:agentic-engineering-os@4.1.5'} | equal to A: True
+-[X3] same binary, init on B with XDG_CACHE_HOME=<path without '.cache'>: identity = {'version': '4.1.5', 'release_hash': '<HEX>', 'release_commit': '<HEX>', 'source': 'embedded:agentic-engineering-os@4.1.5'} | equal to A: True
++[X3] same binary, fresh init on B (default cache): identity = {'version': '4.1.6', 'release_hash': '<HEX>', 'release_commit': '<HEX>', 'source': 'embedded:agentic-engineering-os@4.1.6'} | equal to A: True
++[X3] same binary, init on B with XDG_CACHE_HOME=<path without '.cache'>: identity = {'version': '4.1.6', 'release_hash': '<HEX>', 'release_commit': '<HEX>', 'source': 'embedded:agentic-engineering-os@4.1.6'} | equal to A: True
+======== unedited A2-01
+# 23 lines before, 11 after, 22 differing
+--- probes-before-base-53897c1/A2-01.out
++++ probes-after-f9daec1/A2-01.out
+@@ -3 +3 @@
+-  -> ok (exit 0) {"machine_id": "<HEX>", "state_root": "<PATH>", "posture": "UNPROVISIONED", "admission_policy": {"policy": "refuse_external_source_until_provisioned__embedded_payload_as_marked_bootstrap_only", "decision": "OWNER-DECISION-P2-0002", "admits": "only the payload embedded in this gov binary (<HEX>…
++  -> ok (exit 0) {"machine_id": "<HEX>", "state_root": "<PATH>", "posture": "UNPROVISIONED", "admission_policy": {"policy": "refuse_external_source_until_provisioned__embedded_payload_as_marked_bootstrap_only", "decision": "OWNER-DECISION-P2-0002", "admits": "only the payload embedded in this gov binary (<HEX>)…
+@@ -6,12 +5,0 @@
+-tampered file: <PATH> -> never_index_classes: []
+-$ gov release verify <PATH>
+-  -> ok (exit 0) {"version": "4.1.5", "ok": false, "modified": ["policies/SECURITY_POLICY.yaml"], "missing": [], "added": [], "release_hash_matches_kernel": true, "certification": {"effective_status": "UNCERTIFIED", "authenticated": false, "basis": "this machine holds no Signed Release Root trust anchor, so no certification claim can be authenticated; the candidate is treated as uncertified", "unsigned_manifest_claim": {"certified_at": "", "implementer_evidence": "", "independent_verifier": "", "status": "READY_FOR_INDEPENDENT_OS_VERIFICATION"}}}
+-
+-## [U2] gov init --source <tampered release> on the UNPROVISIONED machine
+-$ gov init --source <PATH> --name pu --alias pu-a --skip-index
+-  -> REFUSED (exit 1) code=SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED msg=ingress `init` refused: this machine holds no administrator-provisioned Signed Release Root trust anchor, so the authenticity of kernel material from an external source cannot be established, and such material is not staged for installation (OWNER-DECISION-P2-0002; Contract v3 A2:143). The candidate (4.1.5 <HEX>) is not the payload embedde
+-
+-## [U3] gov init with the EMBEDDED payload (the README path) on the unprovisioned machine
+-[U3] ok = True | authenticity = UNKNOWN | source = embedded:agentic-engineering-os@4.1.5
+-
+-## [U4] a source directory that regenerates its OWN identity (consistent manifest + manifest.json claiming CERTIFIED)
+@@ -19,4 +7,4 @@
+-  File "<PATH>", line 65, in <module>
+-    print("[U4] attacker built a release with certification.status =", b2["result"]["certification"]["status"])
+-                                                                       ~~^^^^^^^^^^
+-KeyError: 'result'
++  File "<PATH>", line 22, in <module>
++    before = open(sp).read()
++             ^^^^^^^^
++FileNotFoundError: [Errno 2] No such file or directory: '<PATH>'
+======== unedited A2-02
+# 97 lines before, 97 after, 4 differing
+--- probes-before-base-53897c1/A2-02.out
++++ probes-after-f9daec1/A2-02.out
+@@ -6 +6 @@
+-  -> ok (exit 0) {"provisioned": true, "machine_id": "<HEX>", "state_root": "<PATH>", "product": "agentic-engineering-os", "root_version": 1, "root_expires": "<TS>", "root_sha256": "<HEX>", "roles": {"recovery": {"threshold": 1, "keys": 1}, "release": {"threshold": 1, "keys": 1}, "root": {"t…
++  -> ok (exit 0) {"provisioned": true, "machine_id": "<HEX>", "state_root": "<PATH>", "product": "agentic-engineering-os", "root_version": 1, "root_expires": "<TS>", "root_sha256": "<HEX>", "roles": {"recovery": {"threshold": 1, "keys": 1}, "release": {"threshold": 1, "keys": 1}, "root": {"thresho…
+@@ -69 +69 @@
+-  -> ok (exit 0) {"root": "<PATH>", "version": "4.1.5", "release_hash": "<HEX>", "source": "release:agentic-engineering-os@4.1.5", "kernel_files": 123, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIONS.yaml"], "tools": 16…
++  -> ok (exit 0) {"root": "<PATH>", "version": "4.1.5", "release_hash": "<HEX>", "source": "release:agentic-engineering-os@4.1.5", "kernel_files": 123, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIONS.yaml"], "tools": 16, "ada…
+======== unedited A2-03
+# 28 lines before, 12 after, 40 differing
+--- probes-before-base-53897c1/A2-03.out
++++ probes-after-f9daec1/A2-03.out
+@@ -1,28 +1,12 @@
+-## [T1] naive post-install tamper: one installed kernel file edited
+-[T1] gov kernel verify: ok=False modified=['policies/SECURITY_POLICY.yaml'] trust.verified=False substituted=True
+-[T1] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted']
+-[T1] mutating op `gov task create`: REFUSED KERNEL_TAMPERED
+-[T1] doctor verdict=UNHEALTHY D003=[(False, 'modified=["policies/SECURITY_POLICY.yaml"] missing=[] added=[]'), (True, 'match'), (False, 'installed kernel FAILED verification (kernel payload does not match KERNEL_MANIFEST.json: ')]
+-[T1] status.framework.release_hash=<HEX>… status.release_trust.verified_payload_hash=None… authenticity=NOT_ESTABLISHED
+-[T1] audit mutation_scope verdict=UNHEALTHY findings=['kernel payload modified in place (INV-007): modified ["policies/SECURITY_POLICY.yaml"] missing [] ad']
+-[T1] remedy: gov kernel reinstall --source <authentic release>
+-[T1] reinstall ok = True | authenticity = AUTHENTIC
+-[T1-after-reinstall] gov kernel verify: ok=True modified=[] trust.verified=True substituted=False
+-[T1-after-reinstall] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted']
+-[T1-after-reinstall] mutating op `gov task create`: ok
+-[T1-after-reinstall] doctor verdict=DEGRADED D003=[(True, 'intact (4.1.5)'), (True, 'match'), (True, 'installed kernel 4.1.5 intact: matches KERNEL_MANIFEST.json, framework.lock and this machi')]
+-[T1-after-reinstall] status.framework.release_hash=<HEX>… status.release_trust.verified_payload_hash=<HEX>… authenticity=AUTHENTIC
+-[T1-after-reinstall] audit mutation_scope verdict=HEALTHY findings=[]
+-
+-## [T2] consistent post-install tamper: kernel file + KERNEL_MANIFEST.json + framework.lock rewritten to agree
+-[T2] rewrote KERNEL_MANIFEST.json payload_hash -> <HEX> … and framework.lock release_hash/kernel_manifest_hash
+-[T2] gov kernel verify: ok=False modified=['policies/SECURITY_POLICY.yaml'] trust.verified=False substituted=True
+-[T2] effective SECURITY_POLICY.never_index_classes = ['secret', 'restricted']
+-[T2] mutating op `gov task create`: REFUSED KERNEL_TAMPERED
+-[T2] doctor verdict=UNHEALTHY D003=[(False, 'modified=["policies/SECURITY_POLICY.yaml"] missing=[] added=[]'), (True, 'match'), (False, 'installed kernel FAILED verification (kernel payload is not the payload this machine commi')]
+-[T2] status.framework.release_hash=<HEX>… status.release_trust.verified_payload_hash=None… authenticity=NOT_ESTABLISHED
+-[T2] audit mutation_scope verdict=UNHEALTHY findings=['kernel payload modified in place (INV-007): modified ["policies/SECURITY_POLICY.yaml"] missing [] ad']
+-[T2] protected machine record (authenticated at install): payload_hash = <HEX> … ; installed payload now = <HEX> …; equal = False
+-
+-DONE
+-[A2-03 exit=0]
++Traceback (most recent call last):
++  File "<PATH>", line 25, in <module>
++    publish(os.path.join(reldir, "metadata"), release_doc(kern, sequence=10, version=1), [REL1], [SNAP], [TS])
++                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++  File "<PATH>", line 124, in release_doc
++    st = stage_files(candidate)
++         ^^^^^^^^^^^^^^^^^^^^^^
++  File "<PATH>", line 80, in stage_files
++    meta = yaml.safe_load(open(os.path.join(candidate, "KERNEL.yaml")))
++                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++FileNotFoundError: [Errno 2] No such file or directory: '<PATH>'
++[A2-03 exit=1]
+======== unedited A2-04
+# 43 lines before, 22 after, 35 differing
+--- probes-before-base-53897c1/A2-04.out
++++ probes-after-f9daec1/A2-04.out
+@@ -4 +4 @@
+-[L1] framework.lock.release_commit = <HEX> | source = release:agentic-engineering-os@4.1.5
++[L1] framework.lock.release_commit = unverified | source = release:agentic-engineering-os@4.1.5
+@@ -17,27 +17,6 @@
+-[L3] unprovisioned authenticity = UNKNOWN
+-[L3]   admission              authentic-install=SIGNED_RELEASE_METADATA                              unknown-install=BOOTSTRAP_EMBEDDED_PAYLOAD
+-[L3]   authenticity           authentic-install=AUTHENTIC                                            unknown-install=UNKNOWN
+-[L3]   channel                authentic-install=stable                                               unknown-install=None
+-[L3]   cli_version            authentic-install=4.1.5                                                unknown-install=4.1.5
+-[L3]   framework              authentic-install=agentic-engineering-os                               unknown-install=agentic-engineering-os
+-[L3]   identity_basis         authentic-install={'established_by': "this machine's protected insta   unknown-install={'established_by': 'not established: a BOOTSTRAP i
+-[L3]   installed_at           authentic-install=<TS>                                 unknown-install=<TS>
+-[L3]   installed_at_commit    authentic-install=<HEX>             unknown-install=<HEX>
+-[L3]   kernel_manifest_hash   authentic-install=<HEX>   unknown-install=<HEX>
+-[L3]   lock_schema_version    authentic-install=1.1.0                                                unknown-install=1.1.0
+-[L3]   release_commit         authentic-install=<HEX>             unknown-install=<HEX>
+-[L3]   release_hash           authentic-install=<HEX>   unknown-install=<HEX>
+-[L3]   release_metadata_sha256 authentic-install=<HEX>   unknown-install=None
+-[L3]   sequence               authentic-install=10                                                   unknown-install=None
+-[L3]   source                 authentic-install=release:agentic-engineering-os@4.1.5                 unknown-install=embedded:agentic-engineering-os@4.1.5
+-[L3]   version                authentic-install=4.1.5                                                unknown-install=4.1.5
+-[L3] lock carries authenticity/sequence/channel/metadata digest: True
+-
+-## [L4] embedded payload + XDG_CACHE_HOME location (machine-specific path) -> recorded release identity
+-[L4a] default cache ($HOME/.cache): source = embedded:agentic-engineering-os@4.1.5 | release_commit = <HEX>
+-[L4b] XDG_CACHE_HOME=<dir without '.cache'>: source = embedded:agentic-engineering-os@4.1.5 | release_commit = <HEX>
+-[L4c] XDG_CACHE_HOME inside the consumer repo: source = embedded:agentic-engineering-os@4.1.5 | release_commit = <HEX> | consumer HEAD = <HEX> | release_commit == consumer HEAD: False | installed_at_commit = <HEX>
+-[L4] same binary, same embedded payload, same release_hash: True
+-
+-DONE
+-[A2-04 exit=0]
++Traceback (most recent call last):
++  File "<PATH>", line 72, in <module>
++    lk3 = yaml.safe_load(open(os.path.join(p3, "governance/framework.lock")))
++                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++FileNotFoundError: [Errno 2] No such file or directory: '<PATH>'
++[A2-04 exit=1]
+======== unedited A2-05
+# 69 lines before, 13 after, 80 differing
+--- probes-before-base-53897c1/A2-05.out
++++ probes-after-f9daec1/A2-05.out
+@@ -2,68 +2,12 @@
+-[K0] ok = True | authenticity = AUTHENTIC
+-
+-## [K1] root succession v1 -> v2 (rotate root-c -> root-d, rotate release-1 -> release-2)
+-$ gov trust root-update --anchor <PATH>
+-  -> REFUSED (exit 1) code=SRR_ROOT_VERSION_NOT_SUCCESSOR msg=candidate root version 3 is not the immediate successor of the trusted root version 1 (succession must be applied one version at a time so that every intermediate revocation takes effect)
+-$ gov trust root-update --anchor <PATH>
+-  -> REFUSED (exit 1) code=SRR_ROOT_SUCCESSION_UNAUTHORISED msg=the trusted root's quorum did not authorise this successor: <PATH>: role 'root' requires 2 valid signature(s) from its authorised keys, found 0
+-$ gov trust root-update --anchor <PATH>
+-  -> REFUSED (exit 1) code=SRR_ROOT_SUCCESSION_UNAUTHORISED msg=the candidate root is not self-signed by its own quorum: <PATH>: role 'root' requires 2 valid signature(s) from its authorised keys, found 0
+-$ gov trust root-update --anchor <PATH>
+-  -> REFUSED (exit 1) code=SRR_METADATA_EXPIRED msg=candidate root version 2: expired at <TS> against the declared local clock <TS>
+-$ gov trust root-update --anchor <PATH>
+-  -> ok (exit 0) {"root_updated": true, "from_version": 1, "to_version": 2, "product": "agentic-engineering-os", "expires": "<TS>", "revoked_keyids": ["<HEX>", "<HEX>"], "note": "Keys and delegations absent from the accepted successor are revoked from this moment. Succession is applied one version at a time so that no intermediate revocation is skipped (SRR-R0-L1)."}
+-[K1] accepted v2; revoked_keyids = ['<HEX>', '<HEX>'] | release-1 keyid = <HEX> … root-c keyid = <HEX> …
+-
+-## [K2] revocation by omission: release-1 no longer authorises releases; release-2 does
+-$ gov init --source <PATH> --name p2 --alias p2-a --skip-index
+-  -> REFUSED (exit 1) code=SRR_THRESHOLD_NOT_MET msg=<PATH>: role 'release' requires 1 valid signature(s) from its authorised keys, found 0
+-[K2] release-2 signed release: ok = True | authenticity = AUTHENTIC
+-
+-## [K3] replay of the old root v1 through root-update
+-$ gov trust root-update --anchor <PATH>
+-  -> REFUSED (exit 1) code=SRR_ROOT_VERSION_NOT_SUCCESSOR msg=candidate root version 1 is not the immediate successor of the trusted root version 2 (succession must be applied one version at a time so that every intermediate revocation takes effect)
+-
+-## [K4] recovery from loss of one root key: root-b is lost; v3 is authorised by root-a + root-d (2-of-3 of v2)
+-$ gov trust root-update --anchor <PATH>
+-  -> ok (exit 0) {"root_updated": true, "from_version": 2, "to_version": 3, "product": "agentic-engineering-os", "expires": "<TS>", "revoked_keyids": ["<HEX>"], "note": "Keys and delegations absent from the accepted successor are revoked from this moment. Succession is applied one version at a time so that no intermediate revocation is skipped (SRR-R0-L1)."}
+-[K4] a v4 attempted with the LOST key root-b + root-c (no longer trusted) is refused:
+-$ gov trust root-update --anchor <PATH>
+-  -> REFUSED (exit 1) code=SRR_ROOT_SUCCESSION_UNAUTHORISED msg=the trusted root's quorum did not authorise this successor: <PATH>: role 'root' requires 2 valid signature(s) from its authorised keys, found 0
+-[K4] trust anchor now: version = 3 | roles = {"recovery": {"threshold": 1, "keys": 1}, "release": {"threshold": 1, "keys": 1}, "root": {"threshold": 2, "keys": 3}, "snapshot": {"threshold": 1, "keys": 1}, "timestamp": {"threshold": 1, "keys": 1}} | metadata_high_water.root = 3
+-
+-## [K5] revocation of old releases by a signed minimum secure release
+-[K5] authentic release seq 30 carrying minimum_secure_sequence 30: ok = True | floors.minimum_secure = {"release": "4.1.5", "sequence": 30, "source_metadata_sha256": "<HEX>"}
+-$ gov init --source <PATH> --name p5b --alias p5b-a --skip-index
+-  -> REFUSED (exit 1) code=SRR_BELOW_FLOOR msg=ingress `init` would place this machine on release 4.1.5, below its floor (4.1.5). The floors are a property of the machine and bind every privileged lifecycle ingress. Below-floor recovery is refused by default and is admissible only as an explicit owner-authorised emergency recovery mode (OWNER-DECISION-0006).
+-[K5b] a minimum_secure_release published WITHOUT minimum_secure_sequence (AR27-N5):
+-[K5b] floors after a release declaring minimum_secure_release 9.9.9 with no sequence: {"release": "", "sequence": 0, "source_metadata_sha256": ""}
+-
+-## [K6] break-glass recovery below floor (owner-signed recovery-role token)
+-[K6] installed authentic seq 20: ok = True | floor = {"version": "4.1.5", "sequence": 20}
+-[K6a] kernel reinstall --source <authentic older release, seq 10> --break-glass (token present)
+-$ gov kernel reinstall --source <PATH> --break-glass
+-  -> REFUSED (exit 1) code=KERNEL_MISMATCH msg=ingress `reinstall` restores the pinned release: the candidate's payload <HEX> is not the payload framework.lock pins (<HEX>); use `gov update` for a version change or `gov update --rollback` to return to the previous release
+-[K6a] after: kernel verify ok = True | trust.verified = True | problems = []
+-[K6a] installed KERNEL_MANIFEST payload_hash = <HEX> … | lock.release_hash = <HEX> … | older payload = <HEX> …
+-[K6a] trust status: degraded = null | installed_release.payload_hash = <HEX> …
+-[K6a] normal privileged operation (task create) while below floor: ok
+-[K6a] exit: reinstall the authentic at-floor release (seq 20)
+-$ gov kernel reinstall --source <PATH>
+-  -> ok (exit 0) {"reinstalled": true, "version": "4.1.5", "payload_hash": "<HEX>", "release_authenticity": {"ingress": "reinstall", "product": "agentic-engineering-os", "release_version": "4.1.5", "sequence": 20, "channel": "stable", "repository": "private/agentic-engineering-os", "authenticity": "AUTHENTIC", "currency": "CURRENT", "posture": "PROVISIONED", "payload_hash": "<HEX>", "kernel_manifest_hash": "<HEX>", "below_floor": false,…
+-[K6a] after exit attempt: degraded = null | kernel verify ok = True | trust.verified = True
+-
+-[K6c] alternative restoration path: gov init --force --break-glass --source <authentic older release> (fresh token)
+-$ gov init --force --break-glass --source <PATH> --name pg --alias pga --skip-index
+-  -> ok (exit 0) {"root": "<PATH>", "version": "4.1.5", "release_hash": "<HEX>", "source": "release:agentic-engineering-os@4.1.5", "kernel_files": 123, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIONS.yaml"], "tools": 16, "…
+-[K6c] after: kernel verify ok = True | trust.verified = True | lock.release_hash = <HEX> … | degraded marking = DEGRADED — RECOVERY ONLY | floors.release_high_water = {"version": "4.1.5", "sequence": 20}
+-[K6c] normal privileged operation (task create) while marked: REFUSED SRR_BELOW_FLOOR_REFUSED
+-[K6c] gov status envelope release_trust.presented_as = BELOW_FLOOR_RECOVERY_ONLY | marking = DEGRADED — RECOVERY ONLY
+-
+-[K6b] update --rollback --break-glass after an authenticated update (the rollback ingress)
+-[K6b] update 4.1.5 -> 4.1.6 applied = None
+-$ gov update --rollback --break-glass
+-  -> REFUSED (exit 1) code=SNAPSHOT_MISSING msg=no unconsumed update snapshot under .governance-runtime/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)
+-[K6b] after rollback attempt: lock.version = 4.1.5
+-
+-DONE
+-[A2-05 exit=0]
++Traceback (most recent call last):
++  File "<PATH>", line 42, in <module>
++    p0, o = init(signed("s0", 10, REL1), "p0", quiet=True); print("[K0] ok =", o["ok"], "| authenticity =", o["result"]["release_authenticity"]["authenticity"])
++                 ^^^^^^^^^^^^^^^^^^^^^^
++  File "<PATH>", line 34, in signed
++    d = sb.path(name); shutil.copytree(base, d)
++                       ^^^^^^^^^^^^^^^^^^^^^^^^
++  File "/usr/lib/python3.12/shutil.py", line 598, in copytree
++    with os.scandir(src) as itr:
++         ^^^^^^^^^^^^^^^
++FileNotFoundError: [Errno 2] No such file or directory: '<PATH>'
++[A2-05 exit=1]
+======== unedited AC16-X3
+# 33 lines before, 6 after, 35 differing
+--- probes-before-base-53897c1/AC16-X3.out
++++ probes-after-f9daec1/AC16-X3.out
+@@ -1,14 +0,0 @@
+-X X3a-S3xA2-unprovisioned-refuses-unauthenticated PASS S3<->A2:143 on the default (unprovisioned) posture, privileged kernel material whose authenticity cannot be established is not installed -- {"init_ok": false, "authenticity": null, "posture": null}
+-[X3b] trust provision ok = True
+-X X3b-S3xA2-provisioned-refuses-tampered PASS S3<->A2 on a provisioned machine the release tampered after signing is refused at init -- {"ok": false, "code": "SRR_PAYLOAD_DIGEST_MISMATCH"}
+-[X3c] authentic install ok = True authenticity = AUTHENTIC
+-[X3c-before-tamper] {"effective_never_index_classes": ["secret", "restricted"], "rebuild_ok": true, "secret_retrieved_by": [], "status.release_trust": {"authenticity": "AUTHENTIC", "posture": "PROVISIONED", "verified_release": "4.1.5", "verified_payload_hash": "<HEX>"}, "envelope.presented_as": "CURRENT", "doctor": "DEGRADED", "doctor_failing": [["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records)"]], "audit": "HEALTHY", "audit_findings": [["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the "], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requ"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualifica"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared defer"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the e"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not executed by the governance suite \u2014 declared agent: the "], ["lineage_orphans", "low", "1 source/test file(s) predate governance (governance baseline) and are not yet l"]]}
+-X X3c-baseline-secret-excluded PASS baseline: on an authentic install the path-classified secret is not retrievable -- []
+-[X3c] kernel verify after consistent rewrite: {"ok": false, "modified": ["policies/SECURITY_POLICY.yaml"]} trust.verified= False
+-[X3c-after-consistent-rewrite] {"effective_never_index_classes": ["secret", "restricted"], "rebuild_ok": false, "secret_retrieved_by": [], "status.release_trust": {"authenticity": "NOT_ESTABLISHED", "posture": "PROVISIONED", "verified_release": null, "verified_payload_hash": null}, "envelope.presented_as": "UNAUTHENTICATED", "doctor": "UNHEALTHY", "doctor_failing": [["D003", "modified=[\"policies/SECURITY_POLICY.yaml\"] missing=[] added=[]"], ["D007", "installed kernel failed verification: kernel payload is not the payload this mac"], ["D029", "installed kernel FAILED verification (kernel payload is not the payload this mac"], ["D010", "stale: 3 changed, 0 added, 0 removed"], ["D020", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records, framework"], ["D032", "release authenticity of this installation is NOT ESTABLISHED on this machine (DI"]], "audit": "UNHEALTHY", "audit_findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload is not the payload this mac"], ["index_freshness", "medium", "index stale: 3 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.23 supersed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/SECURITY_POLICY."], ["adapter_portability", "medium", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["skill_regression", "medium", "SKL-API-CONTRACT-REVIEW V1: validation scenario FAILED \u2014 given 'breaking field r"], ["skill_regression", "medium", "SKL-BACKEND-IMPL V1: validation scenario FAILED \u2014 given 'task with forbidden pat"], ["skill_regression", "low", "SKL-BACKEND-IMPL V2: not executed by the governance suite \u2014 declared agent: the "], ["skill_regression", "low", "SKL-DB-MIGRATION V1: not executed by the governance suite \u2014 declared agent: requ"], ["skill_regression", "low", "SKL-IMPACT-ANALYSIS V1: not executed by the governance suite \u2014 declared deferred"], ["skill_regression", "low", "SKL-LIVE-MIGRATION V1: not executed by the governance suite \u2014 declared qualifica"], ["skill_regression", "medium", "SKL-MEMORY-RECONSTRUCTION V1: validation scenario FAILED \u2014 given 'secret file in"], ["skill_regression", "low", "SKL-REPO-ADOPTION V1: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-REPO-ADOPTION V2: not executed by the governance suite \u2014 declared qualificat"], ["skill_regression", "low", "SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite \u2014 declared defer"], ["skill_regression", "medium", "SKL-TASK-CLOSE V1: validation scenario FAILED \u2014 given 'stale index and on_stale_"], ["skill_regression", "low", "SKL-TEST-DESIGN V1: not executed by the governance suite \u2014 declared agent: the e"], ["skill_regression", "low", "SKL-THREAT-MODEL V1: not
+-X X3c-A2:146-consistent-rewrite-detected PASS A2:146 installed-kernel verification detects a mutually consistent post-install rewrite -- {"installed": true, "verified": false, "source": "embedded baseline 4.1.5 substituted for the untrusted installed kernel 4.1.5", "substituted_embedded_baseline": true, "manifest_matches_lock": true, "modified": ["policies/SECURITY_POLICY.yaml"], "missing": [], "added": [], "installed_version": "4.1.5", "trusted_version": "4.1.5", "problems": ["kernel payload is not the payload this machine committed into this project (<HEX>), whatever KERNEL_MANIFEST.json and framework.lock say: modified [\"policies/SECURITY_POLICY.yaml\"] missing [] added []. A post-install rewrite, or a change made without an ingress on this machine: verify the release framework.lock pins with `gov kernel reinstall --source <signed release>`"], "fingerprint": "<HEX>", "measured_payload_hash": "<HEX>", "manifest_hash": "<HEX>", "protected_record": {"state": "DIVERGED", "basis": "the installed payload <HEX> is not the payload <HEX> this machine committed into this project \u2014 a post-install rewrite, or a change made without an ingress on this machine; KERNEL_MANIFEST.json and framework.lock agreeing with it does not make it intact. Verify the release framewor
+-X X3c-A2xA3xC4-secret-not-exposed PASS A2->A3->C4/D1: after the undetected rewrite, the path-classified secret is still excluded from the index and retrieval -- []
+-X X3c-A2xU-health-reflects-tamper PASS A2<->U: health does not report HEALTHY while the installed kernel's security policy has been rewritten to expose secrets -- {"doctor": "UNHEALTHY", "doctor_failing": [["D003", "modified=[\"policies/SECURITY_POLICY.yaml\"] missing=[] added=[]"], ["D007", "installed kernel failed verification: kernel payload is not the payload this mac"], ["D029", "installed kernel FAILED verification (kernel payload is not the payload this mac"], ["D010", "stale: 3 changed, 0 added, 0 removed"], ["D020", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["D021", "green record \"AUD-<N>\" is obsolete (inputs changed: evidence_records, framework"], ["D032", "release authenticity of this installation is NOT ESTABLISHED on this machine (DI"]], "audit": "UNHEALTHY", "audit_findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload is not the payload this mac"], ["index_freshness", "medium", "index stale: 3 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.23 supersed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/SECURITY_POLICY."], ["adapter_portability", "medium", "adapter manifest kernel_hash differs from framework.lock (stale adapters)"], ["skill_regression", "medium", "SKL-API-CONTRACT-REVIEW V1: validation scenario FAILED \u2014 given 'breaking field r"], ["skill_regression", "medium", "SKL-BACKEND-IMPL V1: validation scenario FAILED \u2014 given 'task with forbidden pat"], ["skill_regression", "low", "SKL-B
+-[X3c] index after rewrite: .env artifact rows = 0 | chunks containing the token = 0 | excluded rows for .env = [('.env', 'secret_class', '**/.env*')]
+-X X3c-note-secret-exclusion-independent-of-never_index_classes PASS observation: a path-classified secret stays excluded even with never_index_classes emptied (a second exclusion layer holds); the A2 consequence is carried by other policies, see X3d -- {"env_artifact_rows": 0, "excluded": [[".env", "secret_class", "**/.env*"]]}
+-[X3d-control] authentic untampered kernel: L1 backend-engineer decide -> False AUTHORITY_DENIED
+@@ -16,17 +2,4 @@
+-  File "<PATH>", line 194, in <module>
+-    gid1, d1 = l1_answers_gate(pd, "after-rewrite")
+-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-  File "<PATH>", line 181, in l1_answers_gate
+-    sbp.gov("gate", "present", gid, cwd=proj, role="orchestrator", quiet=True)
+-  File "<PATH>", line 199, in gov
+-    r = subprocess.run(cmd, cwd=cwd or self.dir, env=e, capture_output=True, text=True)
+-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-  File "/usr/lib/python3.12/subprocess.py", line 548, in run
+-    with Popen(*popenargs, **kwargs) as process:
+-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-  File "/usr/lib/python3.12/subprocess.py", line 1026, in __init__
+-    self._execute_child(args, executable, preexec_fn, close_fds,
+-  File "/usr/lib/python3.12/subprocess.py", line 1885, in _execute_child
+-    self.pid = _fork_exec(
+-               ^^^^^^^^^^^
+-TypeError: expected str, bytes or os.PathLike object, not NoneType
++  File "<PATH>", line 75, in <module>
++    assert b.get("ok"), b
++           ^^^^^^^^^^^
++AssertionError: {'ok': False, 'command': 'release', 'error': {'code': 'VERSION_MISMATCH', 'message': 'framework/KERNEL.yaml version "4.1.6" != requested 4.1.5', 'details': None}, 'session': '', 'release_trust': {'surface': 'release', 'below_floor': False, 'marking': None, 'presented_as': 'CURRENT', 'section_6_bullet': 7, 'basis': "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}, '_exit': 1}
+======== unedited S5-update
+# 6 lines before, 6 after, 0 differing
+

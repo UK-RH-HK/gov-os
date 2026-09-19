@@ -352,17 +352,256 @@ pub fn verify_catalogue(root: &Path, catalogue: &[Value]) -> Value {
         "deferred_memory_stores": deferred, "ok": problems.is_empty() && legacy.is_empty()})
 }
 
-/// Execute independent-authored migration tests (YAML). Kinds: path_present, path_absent, link_resolves, text_absent,
-/// text_present, command (exit 0), legacy_not_active, no_secret_in_index.
-pub fn run_tests_file(root: &Path, tests_path: &Path) -> Result<Value> {
-    run_tests_file_upto(root, tests_path, None)
+// ------------------------------------------------------------------ command tests (Contract v3 A3)
+//
+// **A `command` test executes only what policy and the executing role permit (Contract v3 A3: "Tool execution
+// respects role/authority/permission boundaries").** A migration test is authored by the reviewer (or scaffolded by
+// the planner) and executed later by someone else — the executor after each A6 batch, the verifier at A7 — with that
+// process's privileges. So what a `command` test may run is decided by the OS at execution, never by the test file:
+//
+// * **What.** The command, and the directory it runs in, must be exactly one of the project's governed product-test
+//   commands: the ones the OS itself runs as product tests (`verification::product::plan`: `PROJECT_POLICY.tests`
+//   families or command, else the kernel's ecosystem convention) or the behaviour baseline recorded at A0. Argument
+//   extensions are not accepted — a runner's own flags can hand execution to another program (`go test -exec`,
+//   `make -f`, `cargo --config`), so a narrower command is declared as a test family in `PROJECT_POLICY`, a governed
+//   overlay change. The directory is repository-relative, with no `..` and no absolute path.
+// * **Who.** The executing role must hold `RUN_TESTS`: its `TOOL_PERMISSIONS.roles` entry when the policy lists the
+//   role; for a role the policy does not list, the duty the adoption protocol designates it (Role D, the A7
+//   `migration-verifier`, "independently runs/extends tests"), and nothing otherwise.
+// * **How.** The command runs without the stage actor's declared identity in its environment (`GOV_ROLE`,
+//   `GOV_SESSION`), stdin closed.
+//
+// Anything else is refused, typed (`TEST_COMMAND_NOT_PERMITTED`, naming the test, the command, the role and what is
+// permitted): an approval (A5) that would bind such a test, and a stage (A6, A7) that would execute it, refuse before
+// anything runs; inside the runner a refused command test does not run and fails.
+
+/// The permission class a `command` test needs from the role executing it.
+pub const COMMAND_TEST_PERMISSION: &str = "RUN_TESTS";
+
+/// A governed product-test command: what it runs, where, and which policy governs it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GovernedCommand {
+    pub command: Vec<String>,
+    /// repository-relative directory, normalised ("" = repository root)
+    pub cwd: String,
+    pub source: String,
 }
 
-/// Run tests whose `after_batch` is <= `upto_batch` (tests without `after_batch` always run).
+/// Who executes an adoption's migration tests, and what policy lets them run commands.
+#[derive(Debug, Clone)]
+pub struct CommandPolicy {
+    pub stage: String,
+    pub role: String,
+    /// the permission classes the executing role holds, and where that came from
+    pub permissions: Vec<String>,
+    pub permission_basis: String,
+    pub governed: Vec<GovernedCommand>,
+}
+
+impl CommandPolicy {
+    /// A policy under which no command test runs (no executing role is known).
+    pub fn none() -> Self {
+        CommandPolicy {
+            stage: String::new(),
+            role: String::new(),
+            permissions: vec![],
+            permission_basis:
+                "no executing role: a command test runs only for a declared stage actor".into(),
+            governed: vec![],
+        }
+    }
+    pub fn to_value(&self) -> Value {
+        json!({"stage": self.stage, "role": self.role, "permissions": self.permissions, "permission_basis": self.permission_basis,
+               "governed_commands": self.governed.iter().map(|g| json!({"command": g.command, "cwd": g.cwd, "source": g.source})).collect::<Vec<_>>()})
+    }
+}
+
+fn str_list(v: &Value) -> Vec<String> {
+    v.as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// A command test's working directory, repository-relative and normalised; None when it leaves the repository.
+fn test_cwd(raw: &str) -> Option<String> {
+    if raw.starts_with('/') || raw.contains('\\') || raw.split('/').any(|c| c == "..") {
+        return None;
+    }
+    Some(super::references::normalize_rel(raw))
+}
+
+/// The project's governed product-test commands at `root`, plus the A0 behaviour baseline recorded in `baseline`
+/// (the T2-verified adoption record).
+pub fn governed_test_commands(root: &Path, baseline: &Value) -> Vec<GovernedCommand> {
+    let mut out: Vec<GovernedCommand> = vec![];
+    let mut push = |command: Vec<String>, cwd: &str, source: String| {
+        if command.is_empty() {
+            return;
+        }
+        let g = GovernedCommand {
+            command,
+            cwd: super::references::normalize_rel(cwd),
+            source,
+        };
+        if !out.iter().any(|x| x.command == g.command && x.cwd == g.cwd) {
+            out.push(g);
+        }
+    };
+    let p = crate::project::Project::open(root);
+    if p.is_installed() {
+        for f in crate::verification::product::plan(&p).0 {
+            push(f.command, &f.cwd, f.source);
+        }
+    } else {
+        let eco = crate::capabilities::ecosystems::detect(root, &["product/".into()]);
+        if let Some(e) = eco["ecosystems"].as_array().and_then(|a| {
+            a.iter()
+                .find(|e| e["test"].is_object() && e["available"].as_bool().unwrap_or(false))
+        }) {
+            push(
+                str_list(&e["test"]["command"]),
+                e["dir"].as_str().unwrap_or(""),
+                format!("ecosystem:{}", e["id"].as_str().unwrap_or("")),
+            );
+        }
+    }
+    let bt = &baseline["baseline_tests"];
+    push(
+        str_list(&bt["command"]),
+        bt["dir"].as_str().unwrap_or(""),
+        "adoption A0 behaviour baseline".into(),
+    );
+    out
+}
+
+/// Why `test` (a `command` test) may not run under `policy`, or None when it may.
+pub fn command_test_refusal(test: &Value, policy: &CommandPolicy) -> Option<Value> {
+    let command = str_list(&test["command"]);
+    let raw_cwd = test["cwd"].as_str().unwrap_or("");
+    let mut why = vec![];
+    if !policy
+        .permissions
+        .iter()
+        .any(|x| x == COMMAND_TEST_PERMISSION)
+    {
+        why.push(format!(
+            "role '{}' does not hold {COMMAND_TEST_PERMISSION} ({})",
+            if policy.role.is_empty() {
+                "-"
+            } else {
+                &policy.role
+            },
+            policy.permission_basis
+        ));
+    }
+    match test_cwd(raw_cwd) {
+        None => why.push(format!(
+            "working directory '{raw_cwd}' is outside the repository"
+        )),
+        Some(cwd) => {
+            if !policy
+                .governed
+                .iter()
+                .any(|g| g.command == command && g.cwd == cwd)
+            {
+                why.push(format!(
+                    "{:?} in '{}' is not one of the project's governed test commands",
+                    command,
+                    if cwd.is_empty() { "." } else { &cwd }
+                ));
+            }
+        }
+    }
+    if why.is_empty() {
+        return None;
+    }
+    Some(
+        json!({"test": test["id"], "command": command, "cwd": raw_cwd, "stage": policy.stage, "role": policy.role,
+        "reasons": why, "permission_basis": policy.permission_basis,
+        "governed_commands": policy.governed.iter().map(|g| json!({"command": g.command, "cwd": g.cwd, "source": g.source})).collect::<Vec<_>>()}),
+    )
+}
+
+/// Every `command` test in `tests` that may not run under `policy`.
+pub fn unpermitted_command_tests(tests: &Value, policy: &CommandPolicy) -> Vec<Value> {
+    tests["tests"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter(|t| t["kind"] == "command")
+                .filter_map(|t| command_test_refusal(t, policy))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// The typed refusal of a stage that would bind or execute command tests `policy` does not permit.
+pub fn refuse_unpermitted_command_tests(
+    tests: &Value,
+    policy: &CommandPolicy,
+    what: &str,
+) -> Result<()> {
+    let refused = unpermitted_command_tests(tests, policy);
+    if refused.is_empty() {
+        return Ok(());
+    }
+    Err(crate::GovError::new(
+        "TEST_COMMAND_NOT_PERMITTED",
+        format!(
+            "{what} refused: {} command test(s) would execute something the policy does not let role '{}' run at {} (Contract v3 A3: tool execution respects role/authority/permission boundaries); nothing was executed",
+            refused.len(),
+            policy.role,
+            policy.stage
+        ),
+    )
+    .with_details(json!({"refused": refused, "policy": policy.to_value(),
+        "remediation": "a command test runs exactly one of the project's governed test commands in its directory (see governed_commands): replace the test and have the independent reviewer approve again (`gov adopt review`), or declare the command as a product test family (PROJECT_POLICY.tests.families.<family>.command, a governed overlay change); the executing role needs RUN_TESTS (TOOL_PERMISSIONS)"})))
+}
+
+/// Run one permitted command test: no stage-actor identity in its environment, stdin closed.
+fn run_command(cmd: &[String], cwd: &Path) -> i32 {
+    if cmd.is_empty() {
+        return -1;
+    }
+    std::process::Command::new(&cmd[0])
+        .args(&cmd[1..])
+        .current_dir(cwd)
+        .env_remove("GOV_ROLE")
+        .env_remove("GOV_SESSION")
+        .stdin(std::process::Stdio::null())
+        .output()
+        .map(|o| o.status.code().unwrap_or(-1))
+        .unwrap_or(-1)
+}
+
+/// Execute independent-authored migration tests (YAML). Kinds: path_present, path_absent, link_resolves, text_absent,
+/// text_present, command (exit 0), legacy_not_active, no_secret_in_index. No executing role is given, so no
+/// `command` test runs (each is refused and fails); stages use [`run_tests_file_as`].
+pub fn run_tests_file(root: &Path, tests_path: &Path) -> Result<Value> {
+    run_tests_file_as(root, tests_path, None, &CommandPolicy::none())
+}
+
+/// Run tests whose `after_batch` is <= `upto_batch` (tests without `after_batch` always run); no `command` test runs
+/// (see [`run_tests_file`]).
 pub fn run_tests_file_upto(
     root: &Path,
     tests_path: &Path,
     upto_batch: Option<i64>,
+) -> Result<Value> {
+    run_tests_file_as(root, tests_path, upto_batch, &CommandPolicy::none())
+}
+
+/// Run the migration tests as the stage actor `policy` describes: a `command` test runs only when `policy` permits
+/// it (otherwise it does not run, fails and carries its refusal).
+pub fn run_tests_file_as(
+    root: &Path,
+    tests_path: &Path,
+    upto_batch: Option<i64>,
+    policy: &CommandPolicy,
 ) -> Result<Value> {
     let tests = read_yaml(tests_path)?;
     let mut results = vec![];
@@ -370,6 +609,7 @@ pub fn run_tests_file_upto(
     let mut fail = 0;
     let mut deferred = 0;
     let mut deferred_reasons = vec![];
+    let mut refused: Vec<Value> = vec![];
     let catalogue_path = root
         .join(crate::adopt::EVIDENCE)
         .join("04-TARGET-PATH-MAP.jsonl");
@@ -443,6 +683,7 @@ pub fn run_tests_file_upto(
         }
         let kind = t["kind"].as_str().unwrap_or("");
         let target = t["path"].as_str().unwrap_or("").to_string();
+        let mut refusal: Option<Value> = None;
         let ok = match kind {
             "path_present" => root.join(&target).exists(),
             "path_absent" => !root.join(&target).exists(),
@@ -461,20 +702,19 @@ pub fn run_tests_file_upto(
             "legacy_not_active" => !super::classify::legacy_mechanisms(root)
                 .iter()
                 .any(|l| glob_match(t["pattern"].as_str().unwrap_or(&target), &l.path)),
-            "command" => {
-                let cmd: Vec<String> = t["command"]
-                    .as_array()
-                    .map(|a| {
-                        a.iter()
-                            .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                            .collect()
-                    })
-                    .unwrap_or_default();
-                let cwd = root.join(t["cwd"].as_str().unwrap_or(""));
-                crate::util::run_cmd(&cmd, &cwd)
-                    .map(|(c, _, _)| c == t["expect_exit"].as_i64().unwrap_or(0) as i32)
-                    .unwrap_or(false)
-            }
+            // Contract v3 A3: only a governed test command, only for a role that may run tests
+            "command" => match command_test_refusal(&t, policy) {
+                Some(r) => {
+                    refusal = Some(r);
+                    false
+                }
+                None => {
+                    let cmd = str_list(&t["command"]);
+                    let cwd =
+                        root.join(test_cwd(t["cwd"].as_str().unwrap_or("")).unwrap_or_default());
+                    run_command(&cmd, &cwd) == t["expect_exit"].as_i64().unwrap_or(0) as i32
+                }
+            },
             // after a retirement: nothing active refers to the archived copy (no re-pointing into the archive), and
             // nothing active refers to the retired path except the dependants the retirement's gate accepted
             "retirement_references" => {
@@ -537,10 +777,25 @@ pub fn run_tests_file_upto(
         } else {
             fail += 1;
         }
-        results.push(json!({"id": t["id"], "kind": kind, "ok": ok, "path": target, "description": t["description"]}));
+        let mut row = json!({"id": t["id"], "kind": kind, "ok": ok, "path": target, "description": t["description"]});
+        if kind == "command" {
+            row["command"] = t["command"].clone();
+            match refusal {
+                Some(r) => {
+                    row["refused"] =
+                        json!({"code": "TEST_COMMAND_NOT_PERMITTED", "reasons": r["reasons"]});
+                    refused.push(r);
+                }
+                None => {
+                    row["authorised"] = json!({"role": policy.role, "stage": policy.stage, "permission_basis": policy.permission_basis});
+                }
+            }
+        }
+        results.push(row);
     }
     Ok(
-        json!({"tests": results.len(), "pass": pass, "fail": fail, "deferred": deferred, "deferred_reasons": deferred_reasons, "ok": fail == 0, "results": results}),
+        json!({"tests": results.len(), "pass": pass, "fail": fail, "deferred": deferred, "deferred_reasons": deferred_reasons, "ok": fail == 0, "results": results,
+            "commands_refused": refused, "run_as": {"stage": policy.stage, "role": policy.role}}),
     )
 }
 
@@ -553,7 +808,7 @@ pub fn run_tests_file_upto(
 pub fn scaffold_tests(
     catalogue: &[Value],
     legacy_paths: &[String],
-    product_test_cmd: Option<Vec<String>>,
+    product_test_cmd: Option<(Vec<String>, String)>,
 ) -> Value {
     let mut tests = vec![];
     let mut n = 0;
@@ -699,12 +954,18 @@ pub fn scaffold_tests(
             format!("legacy mechanism {l} not active (INV-004){}", suffix(e)),
         );
     }
-    if let Some(cmd) = product_test_cmd {
+    if let Some((cmd, dir)) = product_test_cmd {
+        let mut x = json!({"command": cmd, "expect_exit": 0});
+        let dir = super::references::normalize_rel(&dir);
+        if !dir.is_empty() {
+            x["cwd"] = json!(dir);
+        }
         push(
             "command",
             ".",
-            json!({"command": cmd, "expect_exit": 0}),
-            "behaviour baseline: product tests pass".into(),
+            x,
+            "behaviour baseline: product tests pass (the A0 baseline command, where A0 ran it)"
+                .into(),
         );
     }
     push(
@@ -782,4 +1043,100 @@ pub fn plan_test_agreement(catalogue: &[Value], tests: &Value) -> Vec<Value> {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn policy(governed: &[(&[&str], &str)], perms: &[&str]) -> CommandPolicy {
+        CommandPolicy {
+            stage: "A6".into(),
+            role: "migration-executor".into(),
+            permissions: perms.iter().map(|x| x.to_string()).collect(),
+            permission_basis: "test".into(),
+            governed: governed
+                .iter()
+                .map(|(c, d)| GovernedCommand {
+                    command: c.iter().map(|x| x.to_string()).collect(),
+                    cwd: d.to_string(),
+                    source: "test".into(),
+                })
+                .collect(),
+        }
+    }
+
+    /// Contract v3 A3: a command test runs exactly a governed test command, where it is governed, for a role holding
+    /// RUN_TESTS — never an arbitrary program, an argument-extended runner (a runner's flags can hand execution to
+    /// another program), a directory outside the repository, or a role without the permission.
+    #[test]
+    fn a_command_test_runs_only_a_governed_command_for_a_permitted_role() {
+        let pol = policy(
+            &[(&["go", "test", "./..."], ""), (&["npm", "test"], "web")],
+            &["READ_REPO", "RUN_TESTS"],
+        );
+        let t = |cmd: &[&str], cwd: &str| json!({"id": "RT", "kind": "command", "command": cmd, "cwd": cwd});
+        assert!(command_test_refusal(&t(&["go", "test", "./..."], ""), &pol).is_none());
+        assert!(command_test_refusal(&t(&["go", "test", "./..."], "."), &pol).is_none());
+        assert!(command_test_refusal(&t(&["npm", "test"], "web/"), &pol).is_none());
+        for (cmd, cwd) in [
+            (&["sh", "-c", "touch pwned"][..], ""),
+            (&["go", "test", "-exec", "/tmp/evil", "./..."][..], ""),
+            (&["go", "test", "./...", "-exec=/tmp/evil"][..], ""),
+            (&["npm", "test"][..], ""),
+            (&["npm", "test"][..], "../web"),
+            (&["go", "test", "./..."][..], "/"),
+            (&["gov", "trust", "provision"][..], ""),
+        ] {
+            let r = command_test_refusal(&t(cmd, cwd), &pol);
+            assert!(r.is_some(), "{cmd:?} in {cwd:?} must be refused");
+        }
+        let nobody = policy(&[(&["go", "test", "./..."], "")], &["READ_REPO"]);
+        let r = command_test_refusal(&t(&["go", "test", "./..."], ""), &nobody).unwrap();
+        assert!(r["reasons"][0]
+            .as_str()
+            .unwrap()
+            .contains("does not hold RUN_TESTS"));
+        let tests = json!({"tests": [t(&["sh", "-c", "x"], ""), {"id": "P", "kind": "path_present", "path": "a"}]});
+        let e = refuse_unpermitted_command_tests(&tests, &pol, "adopt migrate").unwrap_err();
+        assert_eq!(e.code, "TEST_COMMAND_NOT_PERMITTED");
+        assert_eq!(e.details["refused"].as_array().unwrap().len(), 1);
+        assert!(refuse_unpermitted_command_tests(
+            &json!({"tests": [t(&["go", "test", "./..."], "")]}),
+            &pol,
+            "x"
+        )
+        .is_ok());
+    }
+
+    /// Inside the runner a refused command test does not run and fails with its refusal; a permitted one runs (here a
+    /// governed `true`), and with no executing role (`run_tests_file`) no command test runs at all.
+    #[test]
+    fn the_runner_executes_only_permitted_command_tests() {
+        let root =
+            std::env::temp_dir().join(format!("gov-verify-cmd-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&root).unwrap();
+        let tf = root.join("tests.yaml");
+        let marker = root.join("PWNED");
+        crate::util::write_yaml(&tf, &json!({"tests": [
+            {"id": "OK", "kind": "command", "path": ".", "command": ["true"]},
+            {"id": "BAD", "kind": "command", "path": ".", "command": ["touch", marker.to_string_lossy()]}]})).unwrap();
+        let pol = policy(&[(&["true"], "")], &["RUN_TESTS"]);
+        let r = run_tests_file_as(&root, &tf, None, &pol).unwrap();
+        assert_eq!(
+            (r["pass"].as_u64(), r["fail"].as_u64()),
+            (Some(1), Some(1)),
+            "{r}"
+        );
+        assert!(!marker.exists(), "a refused command never runs");
+        assert_eq!(r["results"][0]["authorised"]["role"], "migration-executor");
+        assert_eq!(
+            r["results"][1]["refused"]["code"],
+            "TEST_COMMAND_NOT_PERMITTED"
+        );
+        let r = run_tests_file(&root, &tf).unwrap();
+        assert_eq!(r["fail"].as_u64(), Some(2));
+        assert!(!marker.exists());
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

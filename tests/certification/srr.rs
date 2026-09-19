@@ -721,7 +721,12 @@ fn environment_repository_and_caller_inputs_cannot_create_trust_or_approval() {
     lock["version"] = json!("9.9.9");
     write_yaml(&proj, "governance/framework.lock", &lock);
     let st = g.ok(&["trust", "status"]);
-    assert_eq!(st["installed_release"]["release_version"], "4.1.5");
+    // the release this machine verified is the current framework payload (P2-AR-0039: its version follows
+    // framework/KERNEL.yaml, 4.1.6, rather than a literal)
+    assert_eq!(
+        st["installed_release"]["release_version"],
+        gov_runtime::VERSION
+    );
     assert_ne!(
         st["installed_release"]["payload_hash"],
         json!("0".repeat(64))

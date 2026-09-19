@@ -15,9 +15,21 @@ pub fn inside_sandbox() -> bool {
         .unwrap_or(false)
 }
 
+/// Copy `src` to `dst` unless `src` is gone. Checks run concurrently: a file listed a moment ago may be removed before
+/// it is copied (SQLite drops `-wal`/`-shm` when the last connection closes; an atomic writer renames its temporary
+/// file). A file that no longer exists is not part of the state being isolated, so it is skipped instead of failing the
+/// check that asked for the sandbox; every other I/O error is returned.
+fn copy_if_present(src: &Path, dst: &Path) -> Result<()> {
+    match std::fs::copy(src, dst) {
+        Ok(_) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(e.into()),
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SandboxOptions {
-    /// Copy the derived runtime stores (`state.db`, its WAL, `claims.db`).
+    /// Copy the derived runtime store (`state.db`, its WAL) and the claims store (where `ClaimsStore::path_for` keeps it).
     pub runtime: bool,
     /// Initialise a fresh Git repository with the copied tree committed (for scenarios that observe mutations).
     pub git: bool,
@@ -53,23 +65,28 @@ impl Sandbox {
             if let Some(d) = dst.parent() {
                 std::fs::create_dir_all(d)?;
             }
-            std::fs::copy(&abs, &dst)?;
+            copy_if_present(&abs, &dst)?;
         }
         if opts.runtime {
             let rt = root.join(crate::RUNTIME_DIR);
             std::fs::create_dir_all(&rt)?;
-            for name in [
-                "state.db",
-                "state.db-wal",
-                "state.db-shm",
-                "claims.db",
-                "claims.db-wal",
-                "claims.db-shm",
-            ] {
-                let src = p.runtime_dir().join(name);
-                if src.is_file() {
-                    std::fs::copy(&src, rt.join(name))?;
-                }
+            for name in ["state.db", "state.db-wal", "state.db-shm"] {
+                copy_if_present(&p.runtime_dir().join(name), &rt.join(name))?;
+            }
+            // the claims store from where the claims module keeps it (`ClaimsStore::path_for`: the runtime directory,
+            // a linked worktree's shared directory, or its BC-P2-31 location), to the same place relative to the
+            // sandbox root (the runtime directory when it lives outside the project) — WS-6 IP-R2-12
+            let live_claims = crate::memory::claims::ClaimsStore::path_for(p);
+            let dst_claims = match live_claims.strip_prefix(&p.root) {
+                Ok(rel) => root.join(rel),
+                Err(_) => rt.join("claims.db"),
+            };
+            if let Some(d) = dst_claims.parent() {
+                std::fs::create_dir_all(d)?;
+            }
+            for suffix in ["", "-wal", "-shm"] {
+                let with = |x: &Path| PathBuf::from(format!("{}{suffix}", x.display()));
+                copy_if_present(&with(&live_claims), &with(&dst_claims))?;
             }
         }
         if opts.git {

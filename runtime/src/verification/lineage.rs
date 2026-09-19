@@ -321,6 +321,7 @@ pub fn detect(p: &Project, store: &RecordStore, db: Option<&RuntimeDb>) -> Repor
         "tests": tests,
         "code": code,
         "baseline": baseline.to_value(),
+        "resolved_investigations": resolved_investigations(p, store),
     });
     Report {
         orphans,
@@ -420,21 +421,188 @@ fn unconsumed_outputs(store: &RecordStore, g: &Graph, out: &mut Vec<Orphan>) {
 
 /// Nodes downstream of `id`: what depends on it (in-edges of impact-in types) and what it is validated by / affects.
 fn downstream(g: &Graph, id: &str) -> Vec<String> {
-    let mut v: Vec<String> = g
+    let mut v: Vec<String> = downstream_typed(g, id)
+        .into_iter()
+        .map(|(_, n)| n)
+        .collect();
+    v.sort();
+    v.dedup();
+    v
+}
+
+/// [`downstream`] with the edge type each node is reached by.
+fn downstream_typed(g: &Graph, id: &str) -> Vec<(String, String)> {
+    let mut v: Vec<(String, String)> = g
         .in_of(id)
         .iter()
         .filter(|(t, _, _)| IMPACT_IN.contains(&t.as_str()) || t == "VALIDATED_BY" || t == "TESTS")
-        .map(|(_, s, _)| s.clone())
+        .map(|(t, s, _)| (t.clone(), s.clone()))
         .collect();
     v.extend(
         g.out_of(id)
             .iter()
             .filter(|(t, _, _)| t == "VALIDATED_BY" || t == "AFFECTS")
-            .map(|(_, d, _)| d.clone()),
+            .map(|(t, d, _)| (t.clone(), d.clone())),
     );
     v.sort();
     v.dedup();
     v
+}
+
+/// Report fields that make a closing report a **consumption receipt** (`context::receipt`, W5): the receipt states
+/// what the work implemented, separately from what it consumed.
+pub const RECEIPT_FIELDS: &[&str] = &[
+    "receipt_validation",
+    "requirements_implemented",
+    "scenarios_implemented",
+    "features_implemented",
+    "inputs_consumed",
+];
+
+/// Was `task` closed under the consumption-receipt contract? Then its receipt — not its declarations — says what it
+/// implemented.
+pub fn closed_under_receipt(store: &RecordStore, task: &Record) -> bool {
+    store
+        .get(&task.get("closed_by_report"))
+        .map(|r| RECEIPT_FIELDS.iter().any(|k| r.data.get(*k).is_some()))
+        .unwrap_or(false)
+}
+
+/// Edge types by which planned (open) work declares the specification it will implement or verify.
+const PLANNED_PATH_TYPES: &[&str] = &[
+    "IMPLEMENTS",
+    "GOVERNED_BY",
+    "VALIDATED_BY",
+    "TESTS",
+    "AFFECTS",
+];
+
+/// **What counts as a downstream implementation path (W7 line 1140; W5 lines 1115-1119: consumption ≠
+/// implementation; IF-1).** A node reached from a spec record through edge `t` is an implementation path when:
+/// * a **report** (a closing receipt) `IMPLEMENTS` it — consuming it (`inputs_consumed` → `CONSUMES`) or applying it
+///   is not implementing it;
+/// * an **open task** plans it (`requirements`/`scenarios` → `GOVERNED_BY`/`VALIDATED_BY`, `implements`, `tests`);
+///   a task that only consumes it (`required_inputs`) does not;
+/// * a **DONE task** closed under the receipt contract never does by its own declarations (its receipt is the
+///   statement of what it implemented); a DONE task closed before that contract (no receipt fields) is judged by its
+///   declarations, as before;
+/// * a **change transaction** `IMPLEMENTS` it.
+fn work_implements(store: &RecordStore, r: &Record, t: &str) -> bool {
+    match r.rtype().as_str() {
+        "report" => t == "IMPLEMENTS",
+        "cit" => t == "IMPLEMENTS",
+        "task" => {
+            if !PLANNED_PATH_TYPES.contains(&t) {
+                return false;
+            }
+            r.get("task_status") != "DONE" || !closed_under_receipt(store, r)
+        }
+        _ => false,
+    }
+}
+
+/// The implementation, test and code paths of one spec record (one hop through the scenarios that validate it).
+#[derive(Debug, Clone, Default)]
+pub struct SpecPaths {
+    pub implementation: bool,
+    pub test: bool,
+    /// Production code (repository-contract class `source`) produced by the work that implements it, or code that
+    /// names it.
+    pub code: bool,
+    pub via_scenarios: Vec<String>,
+    pub implemented_by: Vec<String>,
+}
+
+fn spec_paths_of(
+    file_class: &dyn Fn(&str) -> String,
+    store: &RecordStore,
+    g: &Graph,
+    id: &str,
+) -> SpecPaths {
+    let direct = |id: &str| -> SpecPaths {
+        let mut sp = SpecPaths::default();
+        for (t, n) in downstream_typed(g, id) {
+            if let Some(file) = n.strip_prefix("file:") {
+                if file_class(file) == "test" {
+                    sp.test = true;
+                } else {
+                    sp.implementation = true;
+                    sp.code = true;
+                }
+                continue;
+            }
+            let Some(r) = store.get(&n) else { continue };
+            if !live(r) || is_generated(r) {
+                continue;
+            }
+            let rt = r.rtype();
+            if WORK_TYPES.contains(&rt.as_str()) {
+                if work_implements(store, r, &t) {
+                    sp.implementation = true;
+                    sp.implemented_by.push(n.clone());
+                }
+            } else if rt == "test-obligation" {
+                sp.test = true;
+            } else if rt == "scenario" && n != id {
+                sp.via_scenarios.push(n.clone());
+            }
+        }
+        sp
+    };
+    let mut sp = direct(id);
+    for s in sp.via_scenarios.clone() {
+        let s2 = direct(&s);
+        sp.implementation |= s2.implementation;
+        sp.test |= s2.test;
+        sp.code |= s2.code;
+        sp.implemented_by.extend(s2.implemented_by);
+    }
+    // code: what the implementing work produced (the report, or the task and its closing report)
+    if !sp.code {
+        for w in &sp.implemented_by {
+            let mut producers = vec![w.clone()];
+            if let Some(r) = store.get(w) {
+                if r.rtype() == "task" {
+                    let rep = r.get("closed_by_report");
+                    if !rep.is_empty() {
+                        producers.push(rep);
+                    }
+                }
+            }
+            let produced_code = producers.iter().any(|x| {
+                g.out_of(x).iter().any(|(t, d, _)| {
+                    t == "PRODUCES"
+                        && d.strip_prefix("file:")
+                            .map(|f| file_class(f) == "source")
+                            .unwrap_or(false)
+                })
+            });
+            if produced_code {
+                sp.code = true;
+                break;
+            }
+        }
+    }
+    sp.implemented_by.sort();
+    sp.implemented_by.dedup();
+    sp
+}
+
+/// W11 requirement→code and requirement→test traceability (Contract v3:1180-1181): every live, ACTIVE requirement with
+/// its implementation, code and test paths (same path semantics as W7 detection).
+pub fn requirement_paths(p: &Project, store: &RecordStore) -> Vec<Value> {
+    let g = Graph::build(store);
+    let contract = p.contract();
+    let fc = |f: &str| contract.decide(f).class();
+    store
+        .of_type("requirement")
+        .into_iter()
+        .filter(|r| live(r) && !is_generated(r) && r.status() == "ACTIVE")
+        .map(|r| {
+            let sp = spec_paths_of(&fc, store, &g, &r.id());
+            json!({"requirement": r.id(), "implementation": sp.implementation, "code": sp.code, "test": sp.test, "implemented_by": sp.implemented_by, "via_scenarios": sp.via_scenarios})
+        })
+        .collect()
 }
 
 /// W7 line 1140: current requirements/scenarios that nothing implements or tests.
@@ -444,50 +612,17 @@ fn specs_without_path(
     g: &Graph,
     out: &mut Vec<Orphan>,
 ) {
-    // (implementation path, test path) per spec record, with one hop through validating scenarios
-    let direct = |id: &str| -> (bool, bool, Vec<String>) {
-        let mut imp = false;
-        let mut test = false;
-        let mut via_scn = vec![];
-        for n in downstream(g, id) {
-            if let Some(file) = n.strip_prefix("file:") {
-                if file_class(file) == "test" {
-                    test = true;
-                } else {
-                    imp = true;
-                }
-                continue;
-            }
-            let Some(r) = store.get(&n) else { continue };
-            if !live(r) || is_generated(r) {
-                continue;
-            }
-            let t = r.rtype();
-            if WORK_TYPES.contains(&t.as_str()) {
-                imp = true;
-            } else if t == "test-obligation" {
-                test = true;
-            } else if t == "scenario" && n != id {
-                via_scn.push(n.clone());
-            }
-        }
-        (imp, test, via_scn)
-    };
     for r in &store.records {
         let t = r.rtype();
         if !SPEC_TYPES.contains(&t.as_str()) || !live(r) || is_generated(r) {
             continue;
         }
         let id = r.id();
-        let (mut imp, mut test, via) = direct(&id);
-        for s in &via {
-            let (i2, t2, _) = direct(s);
-            imp |= i2;
-            test |= t2;
-        }
-        if imp || test {
+        let sp = spec_paths_of(file_class, store, g, &id);
+        if sp.implementation || sp.test {
             continue;
         }
+        let via = sp.via_scenarios.clone();
         // Severity: a current spec of a feature whose implementation work is already DONE was skipped by delivered
         // work — a delivery gap (medium). A spec no work has reached yet is visible, generates its investigation, and
         // does not degrade health on its own (low): an unplanned requirement is backlog, not a defect.
@@ -500,15 +635,28 @@ fn specs_without_path(
         } else {
             "low"
         };
+        // consumption is not implementation: name the closing receipts that consumed it without implementing it
+        let consumed_only: Vec<String> = g
+            .in_of(&id)
+            .iter()
+            .filter(|(et, s, _)| {
+                et == "CONSUMES"
+                    && store
+                        .get(s)
+                        .map(|x| x.rtype() == "report" && live(x))
+                        .unwrap_or(false)
+            })
+            .map(|(_, s, _)| s.clone())
+            .collect();
         out.push(Orphan {
             kind: KIND_SPEC_WITHOUT_PATH,
             subject: id.clone(),
             subject_type: t.clone(),
             path: Some(r.path.clone()),
             severity,
-            message: format!("orphan {t}: {id} ({}) has no downstream implementation or test path — no task, report, change or code implements it and no test obligation or test validates it{} (W7 requirement/spec without downstream path)", r.status(), if delivered.is_empty() { String::new() } else { format!(", although implementation work of its feature {} is DONE", delivered.join(", ")) }),
+            message: format!("orphan {t}: {id} ({}) has no downstream implementation or test path — no task, report, change or code implements it and no test obligation or test validates it{}{} (W7 requirement/spec without downstream path)", r.status(), if delivered.is_empty() { String::new() } else { format!(", although implementation work of its feature {} is DONE", delivered.join(", ")) }, if consumed_only.is_empty() { String::new() } else { format!("; closing receipt(s) {} consumed it without implementing it (consumption is not implementation, Contract v3:1115-1119)", consumed_only.join(", ")) }),
             remediation: format!("plan work for {id} (a task declaring it in `requirements`/`scenarios`), link the test that validates it, or retire it through a CIT"),
-            detail: json!({"downstream": downstream(g, &id), "via_scenarios": via, "features_with_done_work": delivered}),
+            detail: json!({"downstream": downstream(g, &id), "via_scenarios": via, "features_with_done_work": delivered, "consumed_without_implementation_by": consumed_only}),
         });
     }
 }
@@ -976,6 +1124,53 @@ pub fn investigations(store: &RecordStore) -> BTreeMap<String, (String, String)>
     m
 }
 
+/// Does the subject of an investigation still exist (a governed record, or a repository file)?
+fn subject_exists(p: &Project, store: &RecordStore, subject: &str) -> bool {
+    match subject.strip_prefix("file:") {
+        Some(f) => p.root.join(f).exists(),
+        None => store.get(subject).is_some(),
+    }
+}
+
+/// **Investigations whose subject is gone** (integration observation O-1). Deleting or retiring an orphan's subject
+/// is how many investigations end; the generated task's `AFFECTS` link to it then names nothing. That link is the
+/// record of what was investigated, not a defect of the graph: it is never reported as a dangling edge
+/// ([`is_resolved_investigation_edge`]), so it can neither degrade health nor refuse a governance close, and the
+/// investigation task stays closable or withdrawable like any task. Returned for reporting.
+pub fn resolved_investigations(p: &Project, store: &RecordStore) -> Vec<Value> {
+    store
+        .of_type("task")
+        .into_iter()
+        .filter(|t| is_generated(t))
+        .filter_map(|t| {
+            let subject = t.data["investigates"]["subject"].as_str()?.to_string();
+            (!subject_exists(p, store, &subject)).then(|| {
+                json!({"task": t.id(), "task_status": t.get("task_status"), "subject": subject, "kind": t.data["investigates"]["kind"],
+                       "note": "the orphan's subject no longer exists: the investigation is complete; close it with its receipt or withdraw it (task status CANCELLED)"})
+            })
+        })
+        .collect()
+}
+
+/// Is `src -type-> dst` the `AFFECTS` link of a generated investigation to its subject, and is that subject gone?
+pub fn is_resolved_investigation_edge(
+    p: &Project,
+    store: &RecordStore,
+    src: &str,
+    etype: &str,
+    dst: &str,
+) -> bool {
+    if etype != "AFFECTS" {
+        return false;
+    }
+    let Some(t) = store.get(src) else {
+        return false;
+    };
+    is_generated(t)
+        && t.data["investigates"]["subject"].as_str() == Some(dst)
+        && !subject_exists(p, store, dst)
+}
+
 fn remediate(
     p: &Project,
     store: &RecordStore,
@@ -1005,7 +1200,7 @@ fn remediate(
         let id = crate::util::next_id(crate::records::prefix_for("task"), &ids, 4);
         ids.push(id.clone());
         let title = format!("Investigate orphan {}: {}", o.kind, o.subject);
-        let rec = crate::records::new_record(
+        let mut rec = crate::records::new_record(
             "task",
             &id,
             &title,
@@ -1027,6 +1222,8 @@ fn remediate(
         );
         p.schemas()
             .validate("task", &rec.data, &format!("({id})"))?;
+        // task records are T2 state the OS writes (IP-R3-WS04-05, round-3 integration): sealed as this operation's
+        crate::t2::seal_record(&mut rec, "health (lineage remediation)")?;
         crate::records::save_record(&p.root, &rec)?;
         created.push(json!({"task": id, "kind": o.kind, "subject": o.subject, "key": o.key()}));
     }
@@ -1129,6 +1326,32 @@ mod tests {
                 "{not} is linked: {names:?}"
             );
         }
+        // IF-1: consumption is not implementation. A closing receipt that consumed REQ-0005 (inputs_consumed) and
+        // declares it not implemented leaves it an orphan; the one that implemented REQ-0006 does not; a DONE task
+        // closed under a receipt is judged by the receipt, not by its own declaration
+        let s2 = store(&[
+            ("id: F-0002\ntype: feature\nstatus: ACTIVE\nrequirements: [REQ-0005, REQ-0006]\n", "spec/features/F-0002.yaml"),
+            ("id: REQ-0005\ntype: requirement\nstatus: ACTIVE\nfeature: F-0002\n", "spec/requirements/REQ-0005.yaml"),
+            ("id: REQ-0006\ntype: requirement\nstatus: ACTIVE\nfeature: F-0002\n", "spec/requirements/REQ-0006.yaml"),
+            ("id: TASK-0005\ntype: task\nstatus: ACTIVE\ntask_status: DONE\nclass: implementation\nfeature: F-0002\nrequirements: [REQ-0005, REQ-0006]\nclosed_by_report: RPT-0005\n", "spec/tasks/TASK-0005.yaml"),
+            ("id: RPT-0005\ntype: report\nstatus: ACTIVE\ntask: TASK-0005\ninputs_consumed: [REQ-0005, REQ-0006]\nrequirements_implemented: [REQ-0006]\ndeviations: ['REQ-0005: not implemented by this task']\n", "spec/reports/RPT-0005.yaml"),
+            ("id: TASK-0006\ntype: task\nstatus: ACTIVE\ntask_status: READY\nrequired_inputs: [{id: REQ-0007, reason: context}]\n", "spec/tasks/TASK-0006.yaml"),
+            ("id: REQ-0007\ntype: requirement\nstatus: ACTIVE\n", "spec/requirements/REQ-0007.yaml"),
+        ]);
+        let g2 = Graph::build(&s2);
+        let mut out2 = vec![];
+        specs_without_path(&|_f: &str| "source".to_string(), &s2, &g2, &mut out2);
+        let orphaned: Vec<&str> = out2.iter().map(|o| o.subject.as_str()).collect();
+        assert!(orphaned.contains(&"REQ-0005"), "{orphaned:?}");
+        assert!(!orphaned.contains(&"REQ-0006"), "{orphaned:?}");
+        // an open task that only consumes a requirement does not plan its implementation
+        assert!(orphaned.contains(&"REQ-0007"), "{orphaned:?}");
+        let r5 = out2.iter().find(|o| o.subject == "REQ-0005").unwrap();
+        assert_eq!(
+            r5.severity, "medium",
+            "a delivery gap of a feature with DONE work"
+        );
+        assert!(r5.message.contains("RPT-0005"), "{}", r5.message);
         // every orphan has a stable key and a named finding
         let f = out[0].finding(FAMILY);
         assert_eq!(f["orphan"]["key"], json!(out[0].key()));

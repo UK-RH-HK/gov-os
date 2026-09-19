@@ -1,0 +1,40 @@
+# P2-AR-0041 rustfmt (edition 2021) --check on every Rust file changed after the last merge (8972c16..HEAD), at 22d43cec7ab7bf87122158e9196464814e94ea2e
+rustfmt --check cli/src/main.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/cit/binding.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/cit/mod.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/doctor.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/lifecycle/mod.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/memory/integrity.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/migrations/references.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/orchestration/control.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/orchestration/dag.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/orchestration/generation.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/orchestration/readiness.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/orchestration/tasks.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/project.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/recovery.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/release.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/scheduler/catalogue.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/scheduler/mod.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/srr/binding.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/srr/mod.rs: rc=1 (0 = no hunk)
+rustfmt --check runtime/src/t2.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/update.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/verification/lineage.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/verification/mod.rs: rc=0 (0 = no hunk)
+rustfmt --check runtime/src/verification/reporting.rs: rc=0 (0 = no hunk)
+rustfmt --check tests/certification/common.rs: rc=0 (0 = no hunk)
+rustfmt --check tests/certification/integration_r3.rs: rc=0 (0 = no hunk)
+rustfmt --check tests/certification/main.rs: rc=1 (0 = no hunk)
+rustfmt --check tests/certification/ws03_r3.rs: rc=0 (0 = no hunk)
+rustfmt --check tests/certification/ws04r3.rs: rc=0 (0 = no hunk)
+# The two rc=1 lines are hunks in CHILD modules rustfmt follows from those files, not in the files themselves:
+#   runtime/src/srr/mod.rs -> srr/breakglass.rs (12 hunks), srr/metadata.rs (2 hunks)
+#   tests/certification/main.rs -> section6.rs (22 hunks), srr.rs (15 hunks)
+# None of those four files is changed by this integration (git diff 8972c16..HEAD); they carry the same hunks at the
+# merged tip and are left untouched (breakglass.rs / metadata.rs are R1-reviewed code; reformatting would move their
+# byte identity for no behavioural reason).
+runtime/src/srr/breakglass.rs changed since 8972c16: 0; since 53897c1: 0
+runtime/src/srr/metadata.rs changed since 8972c16: 0; since 53897c1: 0
+tests/certification/section6.rs changed since 8972c16: 0; since 53897c1: 0
+tests/certification/srr.rs changed since 8972c16: 0; since 53897c1: 1

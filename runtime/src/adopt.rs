@@ -620,7 +620,7 @@ pub fn a0_baseline_by(root: &Path, actor: &identity::Actor) -> Result<Value> {
             .collect();
         let cwd = root.join(e["dir"].as_str().unwrap_or(""));
         if let Ok((code, out, err)) = crate::util::run_cmd(&cmd, &cwd) {
-            baseline_tests = json!({"ran": true, "ecosystem": e["id"], "command": cmd, "exit": code, "status": if code == 0 { "passed" } else { "failed" }, "stdout_tail": out.lines().rev().take(5).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n"), "stderr_tail": err.lines().rev().take(5).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n")});
+            baseline_tests = json!({"ran": true, "ecosystem": e["id"], "command": cmd, "dir": e["dir"].as_str().unwrap_or(""), "exit": code, "status": if code == 0 { "passed" } else { "failed" }, "stdout_tail": out.lines().rev().take(5).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n"), "stderr_tail": err.lines().rev().take(5).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n")});
         }
     }
     let mut b = json!({"adoption_id": format!("ADOPT-{}", crate::util::today()), "started_at": now_iso(), "session": session, "planner_session": session, "commit": if git { p.git_commit() } else { "no-git".into() }, "branch": if git { p.git_branch() } else { "no-git".into() },
@@ -1162,8 +1162,88 @@ fn scaffold_for(root: &Path, b: &Value, catalogue: &[Value]) -> Value {
                 .filter_map(|x| x.as_str().map(|s| s.to_string()))
                 .collect::<Vec<_>>()
         })
-        .filter(|c| !c.is_empty() && b["baseline_tests"]["status"] == "passed");
+        .filter(|c| !c.is_empty() && b["baseline_tests"]["status"] == "passed")
+        .map(|c| {
+            (
+                c,
+                b["baseline_tests"]["dir"]
+                    .as_str()
+                    .unwrap_or("")
+                    .to_string(),
+            )
+        });
     verify::scaffold_tests(catalogue, &legacy, cmd)
+}
+
+/// Adoption stages whose designated role's protocol duty is to execute the approved independent tests (adoption
+/// protocol §3, Role D: "verifies the actual migrated repo and independently runs/extends tests").
+const TEST_EXECUTION_DUTY: &[&str] = &["A7"];
+
+/// The permission classes `role` holds for running tests at `stage`: its TOOL_PERMISSIONS entry (`listed`, read from
+/// `source`) when the policy lists the role — an explicit entry decides, even an empty one; otherwise the classes the
+/// adoption protocol's designated duty of `stage` needs, for its designated role only; otherwise none.
+fn test_permissions(
+    listed: Option<Vec<String>>,
+    stage: &str,
+    role: &str,
+    source: &str,
+) -> (Vec<String>, String) {
+    match listed {
+        Some(v) => (v, format!("TOOL_PERMISSIONS.roles.{role} ({source})")),
+        None if TEST_EXECUTION_DUTY.contains(&stage) && designated_role(stage) == Some(role) => (
+            vec!["READ_REPO".to_string(), verify::COMMAND_TEST_PERMISSION.to_string()],
+            format!("adoption protocol: {stage} is performed by its designated role '{role}', whose duty is to run the approved independent tests (TOOL_PERMISSIONS does not list the role)"),
+        ),
+        None => (
+            vec![],
+            format!("TOOL_PERMISSIONS lists no permission classes for role '{role}'"),
+        ),
+    }
+}
+
+/// What a `command` migration test may execute when `role` runs the tests at `stage` (Contract v3 A3; see
+/// `verify::CommandPolicy`): the project's governed test commands, and the permission classes of the executing role —
+/// its `TOOL_PERMISSIONS.roles` entry (the installed overlay, or the template the first install writes) when the policy
+/// lists it; for an unlisted role, the classes its designated adoption duty needs (A7: `READ_REPO`, `RUN_TESTS`).
+fn command_policy(root: &Path, b: &Value, stage: &str, role: &str) -> verify::CommandPolicy {
+    let p = Project::open(root);
+    let listed: Option<Vec<String>> = {
+        let doc = if p.is_installed() {
+            p.overlay().get("TOOL_PERMISSIONS.yaml")
+        } else {
+            crate::kernel::embedded::files()
+                .iter()
+                .find(|(r, _)| *r == "overlay-templates/TOOL_PERMISSIONS.yaml")
+                .and_then(|(_, bytes)| serde_yaml::from_slice::<Value>(bytes).ok())
+                .unwrap_or(Value::Null)
+        };
+        doc["roles"].get(role).map(|v| {
+            v.as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(String::from))
+                        .collect()
+                })
+                .unwrap_or_default()
+        })
+    };
+    let (permissions, basis) = test_permissions(
+        listed,
+        stage,
+        role,
+        if p.is_installed() {
+            "governance/project/TOOL_PERMISSIONS.yaml"
+        } else {
+            "the kernel template the first install writes"
+        },
+    );
+    verify::CommandPolicy {
+        stage: stage.to_string(),
+        role: role.to_string(),
+        permissions,
+        permission_basis: basis,
+        governed: verify::governed_test_commands(root, b),
+    }
 }
 
 fn test_identities(tests: &Value) -> Vec<String> {
@@ -1319,6 +1399,13 @@ pub fn a5_review_by(
             })
             .map(|t| json!({"id": t["id"], "kind": t["kind"]}))
             .collect();
+        // Contract v3 A3: an approval never binds a command test the executing stages may not run. A7's designated
+        // verifier executes every approved test; A6 re-checks against its own executor before anything moves.
+        verify::refuse_unpermitted_command_tests(
+            &tests,
+            &command_policy(root, &b, "A7", designated_role("A7").unwrap_or("")),
+            "adopt review (approval)",
+        )?;
         if !invalid.is_empty() {
             return Err(GovError::new(
                 "INDEPENDENT_TESTS_INVALID",
@@ -1524,6 +1611,12 @@ pub fn a6_migrate_by(
             )
             .with_details(json!({"conflicts": conflicts})));
         }
+        // Contract v3 A3: every command test the batches will run must be one this executor may run
+        verify::refuse_unpermitted_command_tests(
+            &t,
+            &command_policy(root, &b, "A6", &who.role()),
+            "adopt migrate",
+        )?;
     }
     let deprecated_flag_note = if gate_answers.is_empty() {
         Value::Null
@@ -1708,7 +1801,12 @@ pub fn a6_migrate_by(
         // post-batch tests
         let mut tests = json!({"ran": false});
         if tests_file.exists() {
-            let t = verify::run_tests_file_upto(root, &tests_file, Some(n))?;
+            let t = verify::run_tests_file_as(
+                root,
+                &tests_file,
+                Some(n),
+                &command_policy(root, &b, "A6", &who.role()),
+            )?;
             tests = t.clone();
             if !t["ok"].as_bool().unwrap_or(false) && n > 0 {
                 let rb = executor::rollback_batch(root, n)?;
@@ -1854,8 +1952,13 @@ pub fn a7_verify_migration_by(
     let catalogue = read_jsonl(&ev(root).join("04-TARGET-PATH-MAP.jsonl"))?;
     let vc = verify::verify_catalogue(root, &catalogue);
     let tests_file = ev(root).join("06-migration-tests.yaml");
+    let run_as = command_policy(root, &b, "A7", &role);
+    if let Ok(t) = read_yaml(&tests_file) {
+        // Contract v3 A3: refused before any test runs when a command test is one this verifier may not run
+        verify::refuse_unpermitted_command_tests(&t, &run_as, "adopt verify-migration")?;
+    }
     let tests = if tests_file.exists() {
-        verify::run_tests_file(root, &tests_file)?
+        verify::run_tests_file_as(root, &tests_file, None, &run_as)?
     } else {
         json!({"ok": false, "reason": "no independent tests", "tests": 0, "pass": 0, "fail": 0})
     };
@@ -2697,12 +2800,35 @@ pub fn a11_audit_by(
     } else {
         "NOT_ADOPTED_HEALTHY"
     };
-    let md = format!("# 12 — Adoption final report\n\nAuditor: {} (session {}). Audit: {} (tier {}, verdict {}), doctor: {}\n\n| Acceptance criterion | OK |\n|---|---|\n{}\n\nOpen findings: critical {} · high {} · medium {} · low {}\n\n## Adoption findings (stable ids)\n\n| Id | Severity | Finding |\n|---|---|---|\n{}\n\n**Final verdict: {verdict}**\n", who.role(), who.session(), audit["audit"], audit["tier"], audit["verdict"], doctor.verdict, checks.iter().map(|(n, ok)| format!("| {n} | {} |", if *ok { "✅" } else { "❌" })).collect::<Vec<_>>().join("\n"), audit["counts"]["critical"], audit["counts"]["high"], audit["counts"]["medium"], audit["counts"]["low"],
+    // WS-2 R3-9: the verdict states why it is not ADOPTED_HEALTHY — and, on a machine whose installation authenticity
+    // is not established (D032 its only doctor failure), names that posture as the reason
+    let (reasons, posture_reason) = verdict_reasons(
+        verdict,
+        &checks,
+        adoption_high,
+        &audit,
+        &doctor.verdict,
+        &doctor.checks,
+    );
+    let why = if reasons.is_empty() {
+        String::new()
+    } else {
+        format!(
+            "\n## Why the verdict is {verdict}\n\n{}\n",
+            reasons
+                .iter()
+                .map(|r| format!("- {}", r["message"].as_str().unwrap_or("")))
+                .collect::<Vec<_>>()
+                .join("\n")
+        )
+    };
+    let md = format!("# 12 — Adoption final report\n\nAuditor: {} (session {}). Audit: {} (tier {}, verdict {}), doctor: {}\n\n| Acceptance criterion | OK |\n|---|---|\n{}\n\nOpen findings: critical {} · high {} · medium {} · low {}\n\n## Adoption findings (stable ids)\n\n| Id | Severity | Finding |\n|---|---|---|\n{}\n\n**Final verdict: {verdict}**\n{why}", who.role(), who.session(), audit["audit"], audit["tier"], audit["verdict"], doctor.verdict, checks.iter().map(|(n, ok)| format!("| {n} | {} |", if *ok { "✅" } else { "❌" })).collect::<Vec<_>>().join("\n"), audit["counts"]["critical"], audit["counts"]["high"], audit["counts"]["medium"], audit["counts"]["low"],
         adoption_findings.iter().map(|f| format!("| {} | {} | {} |", f["id"].as_str().unwrap_or(""), f["severity"].as_str().unwrap_or(""), f["message"].as_str().unwrap_or("").replace('|', "/"))).collect::<Vec<_>>().join("\n"));
     write_md(root, "12-ADOPTION-FINAL-REPORT.md", &md)?;
     let mut b2 = b.clone();
     let mut entry = verdict_actor(&who);
-    for (k, v) in json!({"verdict": verdict, "audit": audit["audit"], "tier": audit["tier"], "health_result": audit["health_result"], "inputs_hash": audit["inputs_hash"], "at": now_iso(), "independence": who.independence}).as_object().unwrap() {
+    for (k, v) in json!({"verdict": verdict, "audit": audit["audit"], "tier": audit["tier"], "health_result": audit["health_result"], "inputs_hash": audit["inputs_hash"], "at": now_iso(), "independence": who.independence,
+        "reasons": reasons, "reason": posture_reason}).as_object().unwrap() {
         entry[k] = v.clone();
     }
     b2["verdicts"]["A11"] = entry;
@@ -2723,8 +2849,75 @@ pub fn a11_audit_by(
         .map(|c| json!({"id": c["id"], "message": c["message"]}))
         .collect();
     Ok(
-        json!({"stage": "A11", "verdict": verdict, "audit": audit["audit"], "audit_verdict": audit["verdict"], "tier": audit["tier"], "health_result": audit["health_result"], "doctor": doctor.verdict, "checks": checks.iter().map(|(n, ok)| json!({"criterion": n, "ok": ok})).collect::<Vec<_>>(), "findings": audit["counts"], "adoption_findings": adoption_findings, "legacy_authority_retired": legacy_retired, "finding_messages": messages, "doctor_failed": doctor_failed, "evidence": format!("{EVIDENCE}/12-ADOPTION-FINAL-REPORT.md")}),
+        json!({"stage": "A11", "verdict": verdict, "verdict_reasons": reasons, "verdict_reason": posture_reason, "audit": audit["audit"], "audit_verdict": audit["verdict"], "tier": audit["tier"], "health_result": audit["health_result"], "doctor": doctor.verdict, "checks": checks.iter().map(|(n, ok)| json!({"criterion": n, "ok": ok})).collect::<Vec<_>>(), "findings": audit["counts"], "adoption_findings": adoption_findings, "legacy_authority_retired": legacy_retired, "finding_messages": messages, "doctor_failed": doctor_failed, "evidence": format!("{EVIDENCE}/12-ADOPTION-FINAL-REPORT.md")}),
     )
+}
+
+/// **Why A11's verdict is not `ADOPTED_HEALTHY`** (WS-2 round-2 R3-9): every acceptance criterion that failed, the
+/// adoption's own high/critical findings, a governance-suite or doctor verdict other than HEALTHY (naming the failing
+/// checks). When the doctor's only failing check is D032 — the installation's release authenticity is not established
+/// on this machine (an unprovisioned or bootstrap installation, OWNER-DECISION-P2-0002) — and nothing else stands
+/// between the adoption and a healthy verdict (every criterion holds, no high adoption finding, and the audit is
+/// HEALTHY or finds nothing above `low` outside its own installation-authenticity disclosure), that posture is **the**
+/// reason: returned separately, with D032's disclosure and remediation. Empty for `ADOPTED_HEALTHY`.
+fn verdict_reasons(
+    verdict: &str,
+    checks: &[(&str, bool)],
+    adoption_high: usize,
+    audit: &Value,
+    doctor_verdict: &str,
+    doctor_checks: &[Value],
+) -> (Vec<Value>, Value) {
+    if verdict == "ADOPTED_HEALTHY" {
+        return (vec![], Value::Null);
+    }
+    let mut reasons = vec![];
+    for (n, ok) in checks {
+        if !*ok {
+            reasons.push(json!({"kind": "acceptance_criterion", "criterion": n, "message": format!("acceptance criterion not met: {n}")}));
+        }
+    }
+    if adoption_high > 0 {
+        reasons.push(json!({"kind": "adoption_findings", "high_or_critical": adoption_high, "message": format!("{adoption_high} high/critical adoption finding(s) open (see Adoption findings)")}));
+    }
+    let serious =
+        |f: &&Value| matches!(f["severity"].as_str(), Some("medium" | "high" | "critical"));
+    let audit_findings: Vec<&Value> = audit["findings"]
+        .as_array()
+        .map(|a| a.iter().filter(serious).collect())
+        .unwrap_or_default();
+    if audit["verdict"] != "HEALTHY" {
+        reasons.push(json!({"kind": "audit", "verdict": audit["verdict"], "counts": audit["counts"], "message": format!("the G5 governance suite's verdict is {} (critical {}, high {}, medium {})", audit["verdict"].as_str().unwrap_or("?"), audit["counts"]["critical"], audit["counts"]["high"], audit["counts"]["medium"])}));
+    }
+    let failed: Vec<&Value> = doctor_checks
+        .iter()
+        .filter(|c| !c["ok"].as_bool().unwrap_or(true))
+        .collect();
+    if doctor_verdict != "HEALTHY" || !failed.is_empty() {
+        reasons.push(json!({"kind": "doctor", "verdict": doctor_verdict, "failed": failed.iter().map(|c| json!({"id": c["id"], "severity": c["severity"], "message": c["message"]})).collect::<Vec<_>>(),
+            "message": format!("doctor verdict {doctor_verdict}: failing {}", failed.iter().map(|c| c["id"].as_str().unwrap_or("?").to_string()).collect::<Vec<_>>().join(", "))}));
+    }
+    let only_d032 = failed.len() == 1 && failed[0]["id"] == "D032";
+    let rest_ok = checks.iter().all(|(_, ok)| *ok)
+        && adoption_high == 0
+        && (audit["verdict"] == "HEALTHY"
+            || audit_findings
+                .iter()
+                .all(|f| f["family"] == "installation_authenticity"));
+    if !(only_d032 && rest_ok) {
+        return (reasons, Value::Null);
+    }
+    let d = failed[0];
+    let posture = &d["posture"];
+    let why = json!({"kind": "installation_authenticity", "check": "D032",
+        "machine_posture": posture["machine_posture"], "authenticity": posture["authenticity"], "admission": posture["admission"],
+        "disclosure": d["message"], "remediation": d["remediation"],
+        "message": format!("every adoption acceptance criterion holds and the governance suite accepts the repository; the verdict is {verdict} only because this installation's release authenticity is not established on this machine (doctor D032: machine {}, authenticity {}, admission {}). {}",
+            posture["machine_posture"].as_str().unwrap_or("?"), posture["authenticity"].as_str().unwrap_or("?"), posture["admission"].as_str().unwrap_or("?"),
+            d["remediation"].as_str().map(|r| format!("Remedy: {r}; then run the audit again.")).unwrap_or_default())});
+    // the posture is the reason: it leads, the doctor summary it explains stays listed
+    reasons.insert(0, why.clone());
+    (reasons, why)
 }
 
 /// Whether the recorded verdict of independent stage `stage` was given by its designated role with independence
@@ -2812,6 +3005,136 @@ mod tests {
         let mut s = q.clone();
         s["expected_refs"] = json!(["file:src/b.py"]);
         assert_ne!(heldout_query_identity(&q), heldout_query_identity(&s));
+    }
+
+    /// WS-2 R3-9: A11 states why its verdict is not ADOPTED_HEALTHY, and when the only thing between the adoption and
+    /// a healthy verdict is D032 (installation authenticity not established on this machine), that posture is the
+    /// reason, with D032's own disclosure and remediation. The D032 check is the real one for an unestablished
+    /// installation (`srr::installation::doctor_check`).
+    #[test]
+    fn a11_names_the_installation_posture_when_it_is_the_only_reason() {
+        let dir = std::env::temp_dir().join(format!("gov-a11-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let mut d032 = crate::srr::installation::doctor_check(&dir, "D032");
+        assert_eq!(d032["ok"], false);
+        d032["posture"]["machine_posture"] = json!("UNPROVISIONED");
+        d032["posture"]["admission"] = json!("BOOTSTRAP_EMBEDDED_PAYLOAD");
+        let ok = |id: &str| json!({"id": id, "ok": true, "severity": "info", "message": "ok"});
+        let checks: Vec<(&str, bool)> = vec![
+            ("migration baseline pinned", true),
+            ("independent memory verifier passed", true),
+        ];
+        let healthy = json!({"verdict": "HEALTHY", "counts": {"critical": 0, "high": 0, "medium": 0}, "findings": [
+            {"family": "installation_authenticity", "severity": "low", "message": "bootstrap"}]});
+        // healthy: nothing to explain
+        let (r, why) = verdict_reasons(
+            "ADOPTED_HEALTHY",
+            &checks,
+            0,
+            &healthy,
+            "HEALTHY",
+            &[ok("D001")],
+        );
+        assert!(r.is_empty() && why.is_null());
+        // D032 alone: the posture is the reason
+        let (r, why) = verdict_reasons(
+            "NOT_ADOPTED_HEALTHY",
+            &checks,
+            0,
+            &healthy,
+            "DEGRADED",
+            &[ok("D001"), d032.clone()],
+        );
+        assert_eq!(why["kind"], "installation_authenticity");
+        assert_eq!(why["machine_posture"], "UNPROVISIONED");
+        assert_eq!(why["admission"], "BOOTSTRAP_EMBEDDED_PAYLOAD");
+        assert_eq!(why["disclosure"], d032["message"]);
+        assert_eq!(why["remediation"], d032["remediation"]);
+        assert!(why["message"]
+            .as_str()
+            .unwrap()
+            .contains("only because this installation's release authenticity is not established"));
+        assert_eq!(r[0], why, "the posture leads the reasons");
+        // the suite's own disclosure of the same posture (a medium installation_authenticity finding) does not hide it
+        let disclosed = json!({"verdict": "DEGRADED", "counts": {"critical": 0, "high": 0, "medium": 1}, "findings": [
+            {"family": "installation_authenticity", "severity": "medium", "message": "not established"}]});
+        let (_, why) = verdict_reasons(
+            "NOT_ADOPTED_HEALTHY",
+            &checks,
+            0,
+            &disclosed,
+            "DEGRADED",
+            &[d032.clone()],
+        );
+        assert_eq!(why["kind"], "installation_authenticity");
+        // anything else failing too: every reason is listed and the posture is not singled out
+        let mut other = ok("D021");
+        other["ok"] = json!(false);
+        let (r, why) = verdict_reasons(
+            "NOT_ADOPTED_HEALTHY",
+            &checks,
+            0,
+            &healthy,
+            "DEGRADED",
+            &[d032.clone(), other],
+        );
+        assert!(why.is_null());
+        assert_eq!(r.len(), 1);
+        assert!(r[0]["message"].as_str().unwrap().contains("D032, D021"));
+        let failing: Vec<(&str, bool)> = vec![("migrated paths/imports/links pass", false)];
+        let (r, why) = verdict_reasons(
+            "NOT_ADOPTED_HEALTHY",
+            &failing,
+            2,
+            &healthy,
+            "DEGRADED",
+            &[d032],
+        );
+        assert!(why.is_null());
+        let kinds: Vec<&str> = r.iter().map(|x| x["kind"].as_str().unwrap()).collect();
+        assert_eq!(
+            kinds,
+            vec!["acceptance_criterion", "adoption_findings", "doctor"]
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Contract v3 A3: who may run a command test is decided by policy for the executing role — its TOOL_PERMISSIONS
+    /// entry when listed (an explicit entry is authoritative, even an empty one), the A7 designated verifier's
+    /// protocol duty when it is not listed, and nothing for anyone else.
+    #[test]
+    fn command_test_permissions_come_from_policy_and_the_designated_duty() {
+        let dir = std::env::temp_dir().join(format!("gov-cmdpol-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let b = json!({"baseline_tests": {"command": ["python3", "-m", "pytest", "-q"], "dir": "", "status": "passed"}});
+        let ex = command_policy(&dir, &b, "A6", "migration-executor");
+        assert!(
+            ex.permissions.contains(&"RUN_TESTS".to_string()),
+            "{:?}",
+            ex.permissions
+        );
+        assert!(ex
+            .permission_basis
+            .starts_with("TOOL_PERMISSIONS.roles.migration-executor"));
+        assert_eq!(
+            ex.governed.last().unwrap().command,
+            vec!["python3", "-m", "pytest", "-q"]
+        );
+        let v = command_policy(&dir, &b, "A7", "migration-verifier");
+        assert!(v.permissions.contains(&"RUN_TESTS".to_string()));
+        assert!(v.permission_basis.contains("designated role"));
+        let r = command_policy(&dir, &b, "A7", "migration-reviewer");
+        assert!(r.permissions.is_empty(), "{:?}", r.permissions);
+        let t =
+            json!({"id": "RT-1", "kind": "command", "command": ["python3", "-m", "pytest", "-q"]});
+        assert!(verify::command_test_refusal(&t, &v).is_none());
+        assert!(verify::command_test_refusal(&t, &r).is_some());
+        // an explicit TOOL_PERMISSIONS entry decides, even an empty one for the designated verifier
+        let (p, basis) = test_permissions(Some(vec![]), "A7", "migration-verifier", "overlay");
+        assert!(p.is_empty() && basis.starts_with("TOOL_PERMISSIONS.roles.migration-verifier"));
+        let (p, _) = test_permissions(None, "A6", "migration-executor", "overlay");
+        assert!(p.is_empty(), "no designated duty at A6");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

@@ -1,0 +1,42 @@
+# P2-AR-0034 audit-of-record re-runs: base 53897c1 vs this tree, through the round-2 integration builder's root-channel adapters (run-audit-probe.P2-AR-0034.sh)
+
+== alpha-r.A5-emergency-controls
+   after: gov-after-a0cb4e3; 0 PASS, 0 FAIL, 1 traceback(s), [exit=1]; first stop: TypeError: 'NoneType' object is not subscriptable
+   base : gov-base-53897c1; 0 PASS, 0 FAIL, 0 traceback(s), [exit=0]; first stop: 
+   verdict lines: identical
+
+== alpha-r.A5-emergency-controls.store-path.P2-AR-0034
+   after: gov-after-a0cb4e3; 0 PASS, 0 FAIL, 0 traceback(s), [exit=0]; first stop: 
+   base : none (a labelled derived copy for this tree; see the pairing below)
+
+== beta-r.D6-rebuild-guarantee.claimable.P2-AR-0034
+   after: gov-after-a0cb4e3; 12 PASS, 4 FAIL, 0 traceback(s), [exit=0]; first stop: 
+   base : gov-base-53897c1; 12 PASS, 4 FAIL, 0 traceback(s), [exit=0]; first stop: 
+   verdict lines: identical
+
+== beta-r.D6-rebuild-guarantee
+   after: gov-after-a0cb4e3; 0 PASS, 0 FAIL, 0 traceback(s), [exit=1]; first stop: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot 
+   base : gov-base-53897c1; 0 PASS, 0 FAIL, 0 traceback(s), [exit=1]; first stop: required command failed: gov task claim TASK-0001: {'code': 'TASK_NOT_RUNNABLE', 'message': "TASK-0001 cannot 
+   verdict lines: identical
+
+== delta-r.L3-gate-presentation-attacks
+   after: gov-after-a0cb4e3; 33 PASS, 6 FAIL, 0 traceback(s), [exit=1]; first stop: unexpected failure: gov gate present HDG-0023: {'code': 'T2_UNBOUND', 'message': "HDG-0023 (spec/decisions/HDG
+   base : gov-base-53897c1; 33 PASS, 6 FAIL, 0 traceback(s), [exit=1]; first stop: unexpected failure: gov gate present HDG-0023: {'code': 'T2_UNBOUND', 'message': 'HDG-0023 (spec/decisions/HDG
+   verdict lines: identical
+
+== delta-r.N1-N2-checkpoints
+   after: gov-after-a0cb4e3; 14 PASS, 0 FAIL, 0 traceback(s), [exit=1]; first stop: unexpected failure: gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering
+   base : gov-base-53897c1; 14 PASS, 0 FAIL, 0 traceback(s), [exit=1]; first stop: unexpected failure: gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering
+   verdict lines: identical
+
+== synthesis.AC16-X2-authority-gate-chain
+   after: gov-after-a0cb4e3; 1 PASS, 0 FAIL, 1 traceback(s), [exit=1]; first stop: RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed
+   base : gov-base-53897c1; 1 PASS, 0 FAIL, 1 traceback(s), [exit=1]; first stop: RuntimeError: gov task claim TASK-W failed: {'code': 'TASK_NOT_RUNNABLE', 'message': 'TASK-W cannot be claimed
+   verdict lines: identical
+
+== D6 (derived copy, both binaries): snapshot differences after deleting the whole runtime directory
+   base : [B] differences vs pre-deletion snapshot: {"claims": [[["TASK-0001", "S-probe"]], []], "control": [{"mode": "RUNNING", "writes_frozen": true}, {"mode": "RUNNING", "writes_frozen": false}]}
+   after: [B] differences vs pre-deletion snapshot: {"claims": [[["TASK-0001", "S-probe"]], []]}
+
+== A5: the unedited base run vs the derived (store-path) after run, normalised (volatile ids/timestamps removed)
+   identical after normalisation

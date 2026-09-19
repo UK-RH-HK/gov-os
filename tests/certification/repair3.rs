@@ -165,7 +165,8 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     // registration completes once the product owner answers A through the owner-signed channel
     let r = crate::ws07::register_approved(&l4, &df);
     assert_eq!(r["registered"], true, "{r}");
-    let reg = json(&root, "governance/generated/plugin-registry.json");
+    // BC-P2-31 (repair iteration 1, WS-7 round 3): the OS writes the registry outside the regenerable views
+    let reg = json(&root, "governance/registry/plugin-registry.json");
     let e = &reg["plugins"]["p-reg"];
     assert_eq!(e["version"], "1");
     assert!(e["descriptor_sha256"].as_str().unwrap().len() == 64);
@@ -242,8 +243,8 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     assert_eq!(r["registered"], false);
     let gate = r["human_gate"].as_str().unwrap().to_string();
     assert!(
-        !exists(&root, "governance/generated/plugin-registry.json")
-            || json(&root, "governance/generated/plugin-registry.json")["plugins"]["p-elev"]
+        !exists(&root, "governance/registry/plugin-registry.json")
+            || json(&root, "governance/registry/plugin-registry.json")["plugins"]["p-elev"]
                 .is_null()
     );
     l4.ok(&["gate", "present", &gate]);
@@ -255,7 +256,7 @@ fn plugin_descriptors_can_never_authorise_themselves() {
     let r2 = l4.ok(&["plugins", "register", "--descriptor", df2.to_str().unwrap()]);
     assert_eq!(r2["registered"], true, "{r2}");
     assert_eq!(
-        json(&root, "governance/generated/plugin-registry.json")["plugins"]["p-elev"]
+        json(&root, "governance/registry/plugin-registry.json")["plugins"]["p-elev"]
             ["registration_gate"],
         gate
     );
@@ -844,6 +845,20 @@ fn lower_trust_inputs_cannot_manufacture_higher_trust_facts() {
 /// (its `KERNEL.yaml` equalling the working tree, and HEAD carrying the `v4.1.4-rc1` tag) and therefore cannot pass
 /// for a later candidate. Asserted here against the CURRENT release: kernel-data hygiene, manifest agreement,
 /// payload identity, reproduction from the recorded commit, immutability and branch/tag provenance.
+///
+/// P2-AR-0039 (WS-8 round 3, kernel payload/version consistency): the working tree is now the NEXT release, 4.1.6,
+/// whose payload differs from the immutable shipped 4.1.5 (Phase-2 schema and policy changes). The test used to look
+/// for `release/releases/<VERSION>` and, not finding 4.1.6, would silently skip every identity assertion. It now
+/// asserts both halves, so neither can pass vacuously:
+/// * the LAST SHIPPED release (the highest version under `release/releases/`) is intact and immutable: manifests
+///   agree, its `KERNEL.yaml` is exactly `framework/KERNEL.yaml` at its recorded release commit (an ancestor of HEAD),
+///   it verifies, it reproduces byte-identically from that commit, and building over it is refused;
+/// * the working tree's payload is a distinct, self-consistent next version: its `KERNEL.yaml` versions equal the
+///   binary's, it is newer than the shipped release and supports updating from it through a migration whose substance
+///   check is clean, and a release built from it verifies, carries exactly this `KERNEL.yaml`, declares the schema
+///   versions of the schema files it ships and passes the kernel's own secret scan.
+/// When the current version itself has been cut into `release/releases/`, the shipped half covers it and the
+/// working tree's `KERNEL.yaml` must equal the released one, as before.
 #[test]
 fn current_release_payload_identity_and_hygiene() {
     let croot = canonical_root();
@@ -904,17 +919,16 @@ fn current_release_payload_identity_and_hygiene() {
         let d = dup_keys(&std::fs::read_to_string(&abs).unwrap());
         assert!(d.is_empty(), "duplicate keys {d:?} in framework/{rel}");
     }
-    let dir = croot.join("release/releases").join(version);
-    if !dir.join("manifest.json").exists() {
-        eprintln!("release/releases/{version} not built yet; payload identity asserted after `gov release build`");
-        return;
-    }
-    // the released payload is exactly the kernel data of this working tree
-    assert_eq!(
-        std::fs::read_to_string(dir.join("kernel/KERNEL.yaml")).unwrap(),
-        std::fs::read_to_string(croot.join("framework/KERNEL.yaml")).unwrap(),
-        "the released KERNEL.yaml must equal framework/KERNEL.yaml at this commit"
-    );
+    // ---- (1) the last SHIPPED release: intact, immutable, reproducible from its recorded commit
+    let releases = croot.join("release/releases");
+    let shipped = std::fs::read_dir(&releases)
+        .unwrap()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().join("manifest.json").exists())
+        .map(|e| e.file_name().to_string_lossy().to_string())
+        .max_by(|a, b| gov_runtime::lock::compare_versions(a, b))
+        .expect("no shipped release under release/releases");
+    let dir = releases.join(&shipped);
     let m = json(&dir, "manifest.json");
     let my: Value = gov_runtime::util::read_yaml(&dir.join("manifest.yaml")).unwrap();
     assert_eq!(my, m, "manifest.yaml and manifest.json must agree");
@@ -922,8 +936,9 @@ fn current_release_payload_identity_and_hygiene() {
     let ky: Value = gov_runtime::util::read_yaml(&dir.join("kernel/KERNEL.yaml")).unwrap();
     assert_eq!(ky["schema_versions"], km["schema_versions"]);
     assert_eq!(km["schema_versions"], m["schema_versions"]);
-    assert_eq!(m["version"], version);
-    assert_eq!(m["provenance"]["release_tag"], format!("v{version}-rc1"));
+    assert_eq!(m["version"], shipped.as_str());
+    assert_eq!(ky["version"], shipped.as_str());
+    assert_eq!(m["provenance"]["release_tag"], format!("v{shipped}-rc1"));
     // provenance records where the release was BUILT; a verifier clones at the tag (detached HEAD), so the checkout
     // shape is never asserted — only that a branch was recorded and the release commit is in this history
     assert!(
@@ -938,24 +953,32 @@ fn current_release_payload_identity_and_hygiene() {
         .as_array()
         .unwrap()
         .is_empty());
-    // the payload verifies and reproduces from its recorded commit
-    let g = Gov::new(&croot, "S-rel3");
-    assert_eq!(
-        g.ok(&["release", "verify", dir.to_str().unwrap()])["ok"],
-        true
-    );
     let rc = m["release_commit"].as_str().unwrap();
     assert_eq!(
         git(&croot, &["merge-base", "--is-ancestor", rc, "HEAD"]).0,
         0,
         "release_commit must be an ancestor of HEAD"
     );
+    // the released payload is exactly the kernel data of the commit it records
+    assert_eq!(
+        git(&croot, &["show", &format!("{rc}:framework/KERNEL.yaml")]).1,
+        std::fs::read_to_string(dir.join("kernel/KERNEL.yaml"))
+            .unwrap()
+            .trim_end(),
+        "the released KERNEL.yaml must equal framework/KERNEL.yaml at its release commit"
+    );
+    // the payload verifies and reproduces from its recorded commit
+    let g = Gov::new(&croot, "S-rel3");
+    assert_eq!(
+        g.ok(&["release", "verify", dir.to_str().unwrap()])["ok"],
+        true
+    );
     let out = tmp("rep3-release-out");
     let b = g.ok(&[
         "release",
         "build",
         "--version",
-        version,
+        &shipped,
         "--canonical",
         croot.to_str().unwrap(),
         "--out",
@@ -969,12 +992,13 @@ fn current_release_payload_identity_and_hygiene() {
         b["provenance"]["reproduced_from_commit"],
         m["release_commit"]
     );
+    let status_before = git(&croot, &["status", "--porcelain", "--", "release/releases"]).1;
     assert_eq!(
         g.err(&[
             "release",
             "build",
             "--version",
-            version,
+            &shipped,
             "--canonical",
             croot.to_str().unwrap(),
             "--out",
@@ -982,5 +1006,92 @@ fn current_release_payload_identity_and_hygiene() {
         ])
         .error_code(),
         "RELEASE_IMMUTABLE"
+    );
+    assert_eq!(
+        git(&croot, &["status", "--porcelain", "--", "release/releases"]).1,
+        status_before,
+        "the shipped releases are immutable"
+    );
+    // ---- (2) the working tree's payload
+    let wk: Value = gov_runtime::util::read_yaml(&croot.join("framework/KERNEL.yaml")).unwrap();
+    assert_eq!(
+        wk["version"], version,
+        "framework/KERNEL.yaml version must be the binary's VERSION"
+    );
+    assert_eq!(wk["cli_version"], gov_runtime::CLI_VERSION);
+    assert_eq!(wk["runtime_version"], gov_runtime::RUNTIME_VERSION);
+    let problems = gov_runtime::kernel::schema_version_problems(&croot.join("framework"));
+    assert!(problems.is_empty(), "{problems:?}");
+    if shipped == version {
+        // the current version has been cut: the working tree's kernel data is exactly the released kernel data
+        assert_eq!(
+            std::fs::read_to_string(dir.join("kernel/KERNEL.yaml")).unwrap(),
+            std::fs::read_to_string(croot.join("framework/KERNEL.yaml")).unwrap(),
+            "the released KERNEL.yaml must equal framework/KERNEL.yaml at this commit"
+        );
+        return;
+    }
+    assert_eq!(
+        gov_runtime::lock::compare_versions(&shipped, version),
+        std::cmp::Ordering::Less,
+        "the working tree ({version}) must be newer than the last shipped release ({shipped}): a payload that differs from a shipped release must not carry its version"
+    );
+    assert!(
+        wk["supported_from_versions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v == shipped.as_str()),
+        "{version} must support updating from the shipped {shipped}"
+    );
+    let migs = gov_runtime::migrations::framework::load_migrations(&croot.join("migrations"));
+    assert!(
+        migs.iter()
+            .any(|m| m["from_version"] == shipped.as_str() && m["to_version"] == version),
+        "no migration from the shipped {shipped} to {version}"
+    );
+    let next = g.ok(&[
+        "release",
+        "build",
+        "--version",
+        version,
+        "--canonical",
+        croot.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--certification",
+        "READY_FOR_INDEPENDENT_REVERIFICATION",
+    ]);
+    let ndir = out.join("releases").join(version);
+    assert_eq!(
+        std::fs::read_to_string(ndir.join("kernel/KERNEL.yaml")).unwrap(),
+        std::fs::read_to_string(croot.join("framework/KERNEL.yaml")).unwrap(),
+        "the next release's KERNEL.yaml must equal framework/KERNEL.yaml at this commit"
+    );
+    let nm = json(&ndir, "manifest.json");
+    let nmy: Value = gov_runtime::util::read_yaml(&ndir.join("manifest.yaml")).unwrap();
+    assert_eq!(nmy, nm, "manifest.yaml and manifest.json must agree");
+    let nkm = json(&ndir, "kernel/KERNEL_MANIFEST.json");
+    assert_eq!(nkm["schema_versions"], wk["schema_versions"]);
+    assert_eq!(nm["schema_versions"], wk["schema_versions"]);
+    assert_ne!(
+        nm["release_hash"], m["release_hash"],
+        "a payload that differs from the shipped release must have a different identity"
+    );
+    assert!(nm["provenance"]["migration_substance_problems"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    let kp = &next["pre_release_checks"]["kernel_payload"];
+    assert_eq!(kp["schema_versions_consistent"], true, "{kp}");
+    assert_eq!(kp["secret_scan_hits"], json!([]), "{kp}");
+    assert_eq!(
+        g.ok(&["release", "verify", ndir.to_str().unwrap()])["ok"],
+        true
+    );
+    assert_eq!(
+        git(&croot, &["status", "--porcelain", "--", "release/releases"]).1,
+        status_before,
+        "building the next release must not touch the shipped releases"
     );
 }

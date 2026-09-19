@@ -1,0 +1,46 @@
+# P2-AR-0041 builder-probe re-run: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration/release/capability-baseline/repair-1/r3-ws08/evidence/r1-invariants.sh
+# probe sha256 f49d3489843a75c227c03f74d8cbeed7aeecefe96b56c17ca25e5d54b39694f0
+# integrated tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration HEAD 22d43cec7ab7bf87122158e9196464814e94ea2e; product files differing: 0
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration/target/release/gov sha256 81a9b9ee33303347099a9d53630e532ea108a5230a8b0c9bad182de54de56570
+# date 2026-09-19T15:41:15Z
+# HEAD 22d43cec7ab7bf87122158e9196464814e94ea2e; base 53897c1a44157e5af81b176017bc7ded6a63b9cd
+## P1 every privileged ingress calls the one verifier; only admit constructs the typed value
+srr::admit( call sites (expect 5): 5
+      1 cli/src/main.rs
+      1 runtime/src/adopt.rs
+      1 runtime/src/init.rs
+      2 runtime/src/update.rs
+install_kernel( call sites (expect 5): 5
+by_admit( call sites (expect 1 + the fn): 2
+AuthenticatedRelease { literals outside verifier.rs (expect 0): 0
+## P2 the floor check binds every ingress (is_backward_capable / floor code unchanged)
+verifier::is_backward_capable byte-identical to base: yes
+verifier::may_use_protected_installed_record byte-identical to base: yes
+admit_inner floor-check + break-glass block (step 9-10) byte-identical to base: yes
+effective_floor_sequence() occurrences (expect <= 4): 3
+## P3 break-glass relaxes the floor only, never authenticity
+SRR_BREAK_GLASS_REQUIRES_AUTHENTIC_RELEASE present in admit_inner: 1
+## P4 floors monotonic, raised only from authenticated observations; no new floor writer
+files changed vs base under srr/ that hold Floors/breakglass/state code: 0 (expect 0)
+floors_path( / join("floors") outside state.rs, excluding breakglass::SECTION_6_SIGNATURES (a marker table, not a writer) (expect 0): 1
+## §5 allow-list (OWNER-DECISION-0006 §5) — breakglass.rs PERMITTED_OPERATIONS
+(empty line above = breakglass.rs byte-identical to base)
+pub const PERMITTED_OPERATIONS: &[(&str, &str)] = &[
+    ("checkpoint", "backup_export"),
+    ("kernel reinstall", "uninstall_reinstall"),
+    ("update --apply", "restore_authenticated_release"),
+    ("update --rollback", "restore_authenticated_release"),
+];
+## D-0007 separation: kernel_trust.rs free of SRR verdict vocabulary
+  srr::admit: 0
+  AuthenticatedRelease: 0
+  Authenticity: 0
+  breakglass: 0
+  below_floor: 0
+  Floors: 0
+## no signing capability
+SigningKey / ed25519_dalek::Signer in product source (expect 0): 0
+## OWNER-DECISION-0007 §1 / SRR2-R1-C1 owner-closed functions byte-identical
+state::resolve_state_root identical: yes
+state::default_state_root identical: yes
+[exit=0]

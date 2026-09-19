@@ -30,6 +30,7 @@
 //! Private, locally hosted, owner-operated, private repositories. No public SaaS, multi-tenant or cloud assumption
 //! is made anywhere in this module. R2 ceremonies (production signing, key custody) and R3 high-assurance controls
 //! are deliberately absent: `gov` verifies signatures and never creates them.
+pub mod binding;
 pub mod breakglass;
 pub mod crypto;
 pub mod installation;
@@ -90,6 +91,10 @@ pub fn status() -> Result<Value> {
             "clock_assumption": "ARCH-0003 §1: the local time source is inside the trusted local boundary. No signed, attested or monotonic time is assumed, required or provided. If the clock is materially wrong, expiry/staleness/currency are wrong in the corresponding direction; no floor is lowered, no unauthorised release is admitted and the verified-byte binding is unaffected.",
         },
         "installations": installations_recorded(&ms, product),
+        // P2-ADJ-0002: whether T2 facts this machine writes are sealed under the owner's binding authority (and so
+        // honoured on the owner's other provisioned machines) or with a machine-local key — the one T2 binding status
+        // (`crate::t2::binding_status`, over the one keyring `binding::keyring`)
+        "t2_binding": crate::t2::binding_status(),
         "degraded": degraded.map(|d| json!({"marking": d.marking, "entered_at": d.entered_at, "record": d.record})),
         "break_glass": {
             "marking": breakglass::DEGRADED_TOKEN,

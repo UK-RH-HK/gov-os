@@ -1,0 +1,589 @@
+//! **AR-0033 held-out verification — the attack on the derivation.**
+//!
+//! `OWNER-DECISION-0008` mandate parts 3 and 4 are the substance of this candidate. The claim is that §6 coverage
+//! is now *derived from the product* rather than asserted beside it, and that a "no primitive exists" claim is
+//! refutable by the product's own suite. This file attacks both, with my own census machinery so that the thing
+//! under test is not also the thing doing the testing.
+//!
+//! Run single-threaded: several tests set process-wide environment.
+mod common;
+use common::*;
+use gov_runtime::srr::breakglass as bg;
+
+/// **a1 — I re-derive the census independently and get the candidate's numbers.**
+///
+/// If my splitter and the candidate's disagree, one of them is wrong and the coverage claim is not measurable.
+/// This also pins the claimed scale (84 files / 740 functions) rather than taking it from the repair report.
+#[test]
+fn a1_the_derived_census_reproduces_independently_at_the_claimed_scale() {
+    let files = product_files();
+    let funcs = product_functions(true);
+    println!("independent walk: {} files, {} functions", files.len(), funcs.len());
+    println!("DERIVED COPY (P2-AR-0027, WS-6 round 2): scale pin 84 files not asserted; measured {}", files.len());
+    println!("DERIVED COPY (P2-AR-0027, WS-6 round 2): scale pin 740 functions not asserted; measured {}", funcs.len());
+
+    let mut report = vec![];
+    let mut total_violations = vec![];
+    for (activity, sig, acc) in bg::SECTION_6_SIGNATURES {
+        if *activity == "normal_privileged_operation" {
+            continue;
+        }
+        let derived: Vec<&Fun> = funcs.iter().filter(|f| any(&f.body, sig)).collect();
+        let writers: Vec<&&Fun> = derived.iter().filter(|f| is_write(&f.body)).collect();
+        let (mut viol, mut exempt) = (vec![], vec![]);
+        for f in &writers {
+            if any(&f.body, acc) {
+                continue;
+            }
+            let s = f.site();
+            if bg::derivation_exemption(activity, &s).is_some() {
+                exempt.push(s);
+            } else {
+                viol.push(s);
+            }
+        }
+        report.push(format!(
+            "{activity}: derived {} / writers {} / exempt {} / violations {}",
+            derived.len(),
+            writers.len(),
+            exempt.len(),
+            viol.len()
+        ));
+        total_violations.extend(viol);
+    }
+    println!("AR-0033 independent §6 census:\n  {}", report.join("\n  "));
+    assert!(
+        total_violations.is_empty(),
+        "independently derived §6 violations in the candidate: {total_violations:?}"
+    );
+}
+
+/// **a2 — the census is not vacuous: run the candidate's OWN signatures against the PRE-REPAIR source.**
+///
+/// This is the strongest available evidence for or against "the derivation works". If the signatures flag
+/// nothing in the code the repair replaced, the mechanism proves nothing; if they independently rediscover the
+/// findings, it is doing real work. The base tree is supplied by the runner as `AR0033_BASE_SRC`.
+#[test]
+fn a2_the_same_signatures_flag_the_pre_repair_source() {
+    let Ok(base) = std::env::var("AR0033_BASE_SRC") else {
+        panic!("AR0033_BASE_SRC must point at an export of runtime/src + cli/src at the base commit");
+    };
+    let base = std::path::PathBuf::from(base);
+    let mut funcs: Vec<Fun> = vec![];
+    fn walk(d: &std::path::Path, root: &std::path::Path, out: &mut Vec<Fun>) {
+        let Ok(rd) = std::fs::read_dir(d) else { return };
+        let mut es: Vec<_> = rd.filter_map(|e| e.ok()).map(|e| e.path()).collect();
+        es.sort();
+        for p in es {
+            if p.is_dir() {
+                walk(&p, root, out);
+            } else if p.extension().map(|x| x == "rs").unwrap_or(false) {
+                let t = std::fs::read_to_string(&p).unwrap_or_default();
+                let rel = p.strip_prefix(root).unwrap_or(&p).display().to_string();
+                out.extend(split(&rel, &cut_tests(&t)));
+            }
+        }
+    }
+    walk(&base, &base, &mut funcs);
+    assert!(funcs.len() > 300, "base export looks wrong: {} functions", funcs.len());
+
+    let mut found: Vec<(String, String)> = vec![];
+    for (activity, sig, acc) in bg::SECTION_6_SIGNATURES {
+        if *activity == "normal_privileged_operation" {
+            continue;
+        }
+        for f in funcs.iter().filter(|f| any(&f.body, sig) && is_write(&f.body)) {
+            if any(&f.body, acc) {
+                continue;
+            }
+            if bg::derivation_exemption(activity, &f.site()).is_some() {
+                continue;
+            }
+            found.push((activity.to_string(), f.site()));
+        }
+    }
+    found.sort();
+    println!("the candidate's signatures, applied to the PRE-REPAIR product: {found:#?}");
+    // Each of these is a finding the repair reports having closed. The census must be able to see all three.
+    for want in [
+        ("privileged_plugin_acquisition", "tools.rs::install"),
+        ("floor_lower_or_reset", "srr/state.rs::save"),
+        ("present_below_floor_release_as_current", "main.rs::main"),
+    ] {
+        assert!(
+            found.iter().any(|(a, s)| a == want.0 && s.ends_with(want.1)),
+            "the derivation does NOT flag {want:?} in the pre-repair source, so its claim to have found that \
+             item by construction is unsupported. Found: {found:?}"
+        );
+    }
+}
+
+/// **a3 — THE CENTRAL QUESTION: can `SECTION_6_SIGNATURES` be made to miss a primitive a plausible future
+/// author would write?**
+///
+/// I write that author's code. Each probe is an implementation of a forbidden effect written the way somebody
+/// who knows this product — but not this table — would plausibly write it, using the product's own types and
+/// helpers. A probe is DETECTED when the signature matches it, the write census sees it, and no acceptance
+/// marker waves it through.
+#[test]
+fn a3_plausible_future_primitives_against_the_signatures() {
+    // (bullet, what a future author writes, one-line description)
+    let probes: &[(&str, &str, &str)] = &[
+        ("human_gate_approve", r#"
+fn a_future_approver(p: &Project, g: &mut Record) -> Result<()> {
+    g.set("gate_status", Value::String("ANSWERED".into()));
+    crate::util::write_yaml(&p.root.join(&g.path), &g.data)
+}
+"#, "approve using Value::String instead of the json! macro"),
+        ("human_gate_approve", r#"
+const ANSWERED: &str = "ANSWERED";
+fn a_future_approver(p: &Project, g: &mut Record) -> Result<()> {
+    g.set("gate_status", json!(ANSWERED));
+    crate::util::write_yaml(&p.root.join(&g.path), &g.data)
+}
+"#, "approve through a named constant"),
+        ("human_gate_create", r#"
+fn a_future_gate_writer(p: &Project, id: &str, fields: &Value) -> Result<()> {
+    crate::util::write_yaml(&p.root.join("spec/decisions").join(format!("{id}.yaml")), fields)
+}
+"#, "write the gate file at a hand-built path (the repair's own uncertainty 4)"),
+        ("release_certification", r#"
+fn a_future_certifier(out: &Path, version: &str) -> Result<()> {
+    crate::util::write_json(&out.join("releases").join(version).join("release.json"),
+        &json!({"version": version, "certified": true, "status": "CERTIFIED"}))
+}
+"#, "certify with a differently spelled status field"),
+        ("trust_policy_mutation", r#"
+fn a_future_role_writer(ms: &MachineState, role: &str, bytes: &[u8]) -> Result<()> {
+    std::fs::write(ms.root.join("trust").join(format!("{role}.json")), bytes)?;
+    Ok(())
+}
+"#, "write a trust role file with a computed filename"),
+        ("privileged_plugin_acquisition", r#"
+fn a_future_capability_installer(p: &Project, kind: &str, d: &Value) -> Result<()> {
+    crate::util::write_yaml(&p.overlay_dir().join(format!("{kind}s")).join("new.yaml"), d)
+}
+"#, "write a capability registry with a computed directory name"),
+        ("floor_lower_or_reset", r#"
+fn a_future_floor_reset(ms: &MachineState, product: &str) -> Result<()> {
+    let mut f = crate::srr::state::Floors::load(ms, product);
+    f.release_high_water_sequence = 0;
+    f.minimum_secure_sequence = 0;
+    f.save(ms)
+}
+"#, "lower a floor by public-field assignment then save — THE REPAIR'S OWN EXAMPLE of the latent primitive"),
+        ("present_below_floor_release_as_current", r#"
+fn a_future_release_report(p: &Project) -> Result<()> {
+    println!("{}", json!({"framework": crate::FRAMEWORK_NAME, "installed": p.framework_version(), "state": "current"}));
+    Ok(())
+}
+"#, "a new reporting surface that prints the installed release"),
+        ("present_below_floor_release_as_current", r#"
+fn a_future_serve_mode(id: &str) -> ! {
+    println!("{}", serde_json::to_string(&json!({"ok": true, "provider": id, "release": crate::FRAMEWORK_VERSION})).unwrap());
+    std::process::exit(0);
+}
+"#, "a new serve mode that prints and exits before the CLI envelope"),
+    ];
+
+    let mut missed = vec![];
+    println!("{:<44}{:<7}{:<8}{:<7}{}", "bullet", "sig", "write", "acc", "probe");
+    for (activity, code, what) in probes {
+        let (sig, acc) = bg::section_6_signature(activity).expect("signature");
+        let (m, w, a) = (any(code, sig), is_write(code), any(code, acc));
+        let detected = m && w && !a;
+        println!(
+            "{:<44}{:<7}{:<8}{:<7}{} {}",
+            activity, m, w, a,
+            if detected { "DETECTED" } else { "**MISSED**" },
+            what
+        );
+        if !detected {
+            missed.push((*activity, *what));
+        }
+    }
+    println!("\nMISSED: {} of {}", missed.len(), probes.len());
+    for (a, w) in &missed {
+        println!("  - [{a}] {w}");
+    }
+
+    // The candidate makes no universal claim, and this test does not assert one. What it DOES assert is that
+    // the gap is real and material, so the disposition is recorded as measurement rather than opinion.
+    assert!(
+        missed.len() >= 6,
+        "if the signatures caught almost everything, this finding should be downgraded; measured misses: {}",
+        missed.len()
+    );
+}
+
+/// **a4 — the thing the census misses for bullet 6 is nevertheless refused by the SINK.**
+///
+/// `a3` shows the census cannot see `f.release_high_water_sequence = 0; f.save(&ms)`. That would be a live §6
+/// bullet 6 defect if nothing else stopped it. This is the check that the defence in depth is real, because the
+/// repair's answer to bullet 6 is the sink, not the census.
+#[test]
+fn a4_the_bullet_6_primitive_the_census_cannot_see_is_refused_by_the_sink() {
+    use gov_runtime::srr::state::{Floors, MachineState};
+    let m = machine("a4-floors");
+    let ms: MachineState = m.ms();
+
+    let mut high = Floors { product: PRODUCT.into(), ..Default::default() };
+    high.raise_metadata("root", 9);
+    high.raise_release("4.1.9", 42, true);
+    high.raise_minimum_secure("4.1.7", 33, "abc");
+    high.save(&ms).unwrap();
+
+    // The exact code `a3` proves the census cannot see.
+    let mut low = Floors::load(&ms, PRODUCT);
+    low.release_high_water_sequence = 0;
+    low.release_high_water_version = "0.0.1".into();
+    low.minimum_secure_sequence = 0;
+    low.minimum_secure_release = String::new();
+    low.minimum_secure_source_sha256 = String::new();
+    low.metadata_high_water.insert("root".into(), 0);
+    low.save(&ms).unwrap();
+
+    let after = Floors::load(&ms, PRODUCT);
+    assert_eq!(after.release_high_water_sequence, 42, "the release high-water was lowered");
+    assert_eq!(after.release_high_water_version, "4.1.9");
+    assert_eq!(after.minimum_secure_sequence, 33, "the signed minimum secure release was lowered");
+    assert_eq!(after.minimum_secure_release, "4.1.7");
+    assert_eq!(after.minimum_secure_source_sha256, "abc", "the floor's provenance was forgotten");
+    assert_eq!(after.metadata_floor("root"), 9, "a metadata high-water was reset");
+    // the in-memory value must agree, or a caller keeps acting on a floor that is not the floor
+    assert_eq!(low.release_high_water_sequence, 42);
+    assert_eq!(low.minimum_secure_sequence, 33);
+
+    // A brand-new `Floors` that has never seen the persisted value must not erase it either — this is the
+    // "reset" half of §6 bullet 6 and §8, and it is the shape a future author is most likely to reach for.
+    let mut fresh = Floors { product: PRODUCT.into(), ..Default::default() };
+    fresh.save(&ms).unwrap();
+    let after2 = Floors::load(&ms, PRODUCT);
+    assert_eq!(after2.release_high_water_sequence, 42, "a default-constructed Floors reset the floor");
+    assert_eq!(after2.minimum_secure_sequence, 33);
+    assert_eq!(after2.metadata_floor("root"), 9);
+
+    // and it is still monotonic upward, so this is a floor and not a freeze
+    let mut up = Floors::load(&ms, PRODUCT);
+    up.raise_release("4.2.0", 50, true);
+    up.save(&ms).unwrap();
+    assert_eq!(Floors::load(&ms, PRODUCT).release_high_water_sequence, 50);
+}
+
+/// **a5 — do the acceptance markers accept something unenforced?**
+///
+/// The repair names this as the least-defended part of the mechanism and says it found no cheap fix. I test it
+/// two ways: by construction, and by showing the product itself contained the shape one commit ago.
+#[test]
+fn a5_an_acceptance_marker_accepts_an_unenforced_implementation() {
+    let (sig, acc) = bg::section_6_signature("human_gate_create").unwrap();
+
+    // By construction: a function that calls the sink on one branch and writes a record path by hand on another
+    // is accepted, because acceptance is by marker and not by reachability.
+    let two_branches = r#"
+fn a_future_mixed_writer(p: &Project, rec: &Record, raw: &str, id: &str) -> Result<()> {
+    if rec.rtype() == "task" {
+        return crate::records::save_record(&p.root, rec);
+    }
+    let at = crate::records::record_path_for("human-gate", id)?;
+    crate::util::write_text(&p.root.join(at), raw)
+}
+"#;
+    assert!(any(two_branches, sig) && is_write(two_branches));
+    assert!(
+        any(two_branches, acc),
+        "if this no longer matches an acceptance marker the finding is closed; re-derive it"
+    );
+    println!(
+        "CONSTRUCTED: a function whose `human-gate` branch writes the record path by hand is ACCEPTED, because \
+         its `task` branch calls `save_record`. Acceptance is by marker, not by reachability."
+    );
+
+    // And the same shape was live in the product at the base commit: `cit::apply_op`'s `write_file` branch wrote
+    // a governed record path with `write_text` while its `append_record` branch called `save_record`. The
+    // derivation accepted it; the repair closed it by reading the code, not by the census firing.
+    if let Ok(base) = std::env::var("AR0033_BASE_SRC") {
+        let t = std::fs::read_to_string(std::path::PathBuf::from(base).join("runtime/src/cit/mod.rs")).unwrap();
+        let apply = split("runtime/src/cit/mod.rs", &cut_tests(&t))
+            .into_iter()
+            .find(|f| f.name == "apply_op")
+            .expect("cit::apply_op not found at the base commit");
+        assert!(any(&apply.body, sig) && is_write(&apply.body));
+        assert!(
+            any(&apply.body, acc),
+            "the base-commit `apply_op` should be ACCEPTED by a marker despite its unguarded write_file branch"
+        );
+        assert!(
+            !apply.body.contains("guarded_record_effect("),
+            "the base-commit `apply_op` should carry no bullet-2 enforcement of its own"
+        );
+        println!(
+            "MEASURED IN THE PRODUCT: at the base commit `cit::apply_op` was accepted for bullet 2 purely by the \
+             `save_record(` marker while its `write_file` branch wrote a record path with `write_text`. The \
+             census passed it. The repair closed it by reading, not by the mechanism firing."
+        );
+    }
+
+    // At the candidate commit the instance is closed — the enforcement is now inside the branch.
+    let now = product_functions(true);
+    let apply = now.iter().find(|f| f.file.ends_with("cit/mod.rs") && f.name == "apply_op").unwrap();
+    assert!(
+        apply.body.contains("guarded_record_effect(") && apply.body.matches("guard_effect(").count() >= 2,
+        "the CIT write_file/move_file closure is not present at the candidate commit"
+    );
+}
+
+/// **a6 — are the positive controls genuine, or is each detector tuned to its own control?**
+///
+/// A control that only proves "this literal matches this literal" proves nothing. I classify each control by
+/// whether the signature marker it satisfies is a *behavioural* spelling (a product API a new author must call)
+/// or a *cosmetic* one (a literal the control was written around).
+#[test]
+fn a6_the_positive_controls_are_classified_by_what_they_actually_prove() {
+    // For each bullet, the marker its own positive control matches, and my independent judgement of whether an
+    // implementation of the same effect can trivially avoid that marker. `a3` supplies the evidence.
+    let cosmetic = [
+        ("human_gate_approve", "json!(\"ANSWERED\")", "a status string has many spellings; a3 evades it twice"),
+        ("release_certification", "certification_status", "a manifest field name; a3 evades it"),
+        (
+            "present_below_floor_release_as_current",
+            "\"ok\": true, \"command\"",
+            "the control is a verbatim copy of the ONE existing envelope, so it proves only that the detector \
+             recognises the implementation it was derived from",
+        ),
+    ];
+    let behavioural = [
+        ("human_gate_create", "record_path_for(", "the product's own record-path builder"),
+        ("trust_policy_mutation", "join(\"root.json\")", "the anchor's real filename, but a3 evades it when computed"),
+        ("privileged_plugin_acquisition", "join(\"plugins\")", "the registry directory, evadable when computed"),
+        ("floor_lower_or_reset", "floors_path(", "the product's own path builder — but NOT the primitive the repair itself identified"),
+    ];
+    for (a, m, _) in cosmetic.iter().chain(behavioural.iter()) {
+        let (sig, _) = bg::section_6_signature(a).unwrap();
+        assert!(sig.contains(m), "signature for {a} no longer names {m}; re-derive this classification");
+    }
+    println!("positive controls judged COSMETIC (detector recognises its own spelling):");
+    for (a, m, why) in cosmetic {
+        println!("  {a}: matches on {m:?} — {why}");
+    }
+    println!("positive controls judged BEHAVIOURAL (a real product primitive):");
+    for (a, m, why) in behavioural {
+        println!("  {a}: matches on {m:?} — {why}");
+    }
+
+    // The mechanism's own guarantee — a control must be flagged, must write, and must NOT be accepted — is real
+    // and worth stating: it is what stops a detector from being silently switched off. Verified directly.
+    for (activity, sig, acc) in bg::SECTION_6_SIGNATURES {
+        if *activity == "normal_privileged_operation" {
+            continue;
+        }
+        assert!(!sig.is_empty() && !acc.is_empty(), "{activity}: empty signature or acceptance set");
+    }
+}
+
+/// **a7 — the "no primitive exists" mechanism (mandate part 4).**
+#[test]
+fn a7_no_sink_entry_claims_an_absence_and_bullet_7_has_real_call_sites() {
+    for (activity, sink) in bg::SECTION_6_SINKS {
+        assert!(
+            !sink.starts_with("no primitive"),
+            "§6 '{activity}' still claims no primitive exists"
+        );
+        assert!(sink.len() > 10, "§6 '{activity}' sink entry is not a usable name");
+    }
+    assert_eq!(
+        bg::SECTION_6_SIGNATURES.len(),
+        bg::REFUSED_ACTIVITIES.len(),
+        "a §6 bullet has no signature"
+    );
+
+    // AR31-B1's concrete measurement was that `Effect::PresentBelowFloorReleaseAsCurrent` had NO call site
+    // outside `breakglass.rs`. Re-measure it from the tree.
+    let sites: Vec<String> = product_functions(true)
+        .into_iter()
+        .filter(|f| {
+            !f.file.ends_with("srr/breakglass.rs")
+                && (f.body.contains("Effect::PresentBelowFloorReleaseAsCurrent")
+                    || f.body.contains("present::attach(")
+                    || f.body.contains("present::presentation("))
+        })
+        .map(|f| f.site())
+        .collect();
+    println!("§6 bullet 7 enforcement sites outside breakglass.rs: {sites:#?}");
+    assert!(sites.len() >= 4, "bullet 7 is reached from only {} places: {sites:?}", sites.len());
+    for want in ["cli/src/main.rs::main", "runtime/src/doctor.rs::run", "runtime/src/update.rs::check"] {
+        assert!(sites.iter().any(|s| s == want), "bullet 7 is not reached from {want}");
+    }
+}
+
+/// **a8 — `DERIVATION.md` §4 limit 5 claims the tree is rustfmt-canonical. It is not.**
+///
+/// The function splitter closes a function at the first line equal to its opening indent plus `}`, which is only
+/// sound on canonically formatted code. The candidate states this and offers "the tree is rustfmt-canonical at
+/// this commit" as the mitigation. That statement is false, so the mitigation is absent. Measured here, together
+/// with the consequence: my brace-counting splitter and the candidate's indentation splitter are compared
+/// function by function, because if they agree the unsound assumption has not actually cost anything.
+#[test]
+fn a8_the_rustfmt_assumption_behind_the_splitter_is_untrue_but_costs_nothing_here() {
+    // The candidate's splitter, reimplemented exactly as `tests/certification/section6.rs` writes it.
+    fn theirs(file: &str, text: &str) -> Vec<Fun> {
+        let lines: Vec<&str> = text.split('\n').collect();
+        let mut out = vec![];
+        for (i, l) in lines.iter().enumerate() {
+            let t = l.trim_start();
+            let indent = &l[..l.len() - t.len()];
+            if !["fn ", "pub fn ", "pub(crate) fn ", "pub(super) fn ", "async fn ", "pub async fn "]
+                .iter()
+                .any(|p| t.starts_with(p))
+            {
+                continue;
+            }
+            let name: String = t
+                .split("fn ")
+                .nth(1)
+                .unwrap_or("")
+                .chars()
+                .take_while(|c| c.is_alphanumeric() || *c == '_')
+                .collect();
+            if name.is_empty() {
+                continue;
+            }
+            let close = format!("{indent}}}");
+            let mut end = lines.len() - 1;
+            for (j, line) in lines.iter().enumerate().skip(i + 1) {
+                if *line == close {
+                    end = j;
+                    break;
+                }
+            }
+            out.push(Fun { file: file.into(), name, body: lines[i..=end].join("\n") });
+        }
+        out
+    }
+
+    let mut mine = vec![];
+    let mut their = vec![];
+    for (p, t) in product_files() {
+        let t = cut_tests(&t);
+        mine.extend(split(&p, &t));
+        their.extend(theirs(&p, &t));
+    }
+    assert_eq!(mine.len(), their.len(), "the two splitters find different numbers of functions");
+
+    // Where they disagree on a BODY, the candidate's census could be looking at the wrong text.
+    let differing: Vec<String> = mine
+        .iter()
+        .zip(their.iter())
+        .filter(|(a, b)| a.body != b.body)
+        .map(|(a, _)| a.site())
+        .collect();
+    println!("functions where the two splitters disagree on the body: {}", differing.len());
+    if !differing.is_empty() {
+        println!("  {:#?}", &differing[..differing.len().min(20)]);
+    }
+
+    // The consequence that matters: does any disagreement change a §6 verdict for any bullet?
+    let mut verdict_changes = vec![];
+    for (activity, sig, acc) in bg::SECTION_6_SIGNATURES {
+        if *activity == "normal_privileged_operation" {
+            continue;
+        }
+        for (a, b) in mine.iter().zip(their.iter()) {
+            let va = any(&a.body, sig) && is_write(&a.body) && !any(&a.body, acc);
+            let vb = any(&b.body, sig) && is_write(&b.body) && !any(&b.body, acc);
+            if va != vb {
+                verdict_changes.push(format!("{} [{}] mine={va} theirs={vb}", a.site(), activity));
+            }
+        }
+    }
+    println!("§6 verdicts that differ between the splitters: {verdict_changes:?}");
+    assert!(
+        verdict_changes.is_empty(),
+        "the splitter's formatting assumption changes a §6 verdict: {verdict_changes:?}"
+    );
+}
+
+/// **a9 — the `#[cfg(test)]` cut (limit 4) hides nothing §6-relevant at this commit.**
+#[test]
+fn a9_the_cfg_test_cut_hides_no_section_6_primitive() {
+    let mut hidden = vec![];
+    for (p, full) in product_files() {
+        let cut = cut_tests(&full);
+        if cut.len() == full.len() {
+            continue;
+        }
+        for f in split(&p, &full[cut.len()..]) {
+            for (activity, sig, acc) in bg::SECTION_6_SIGNATURES {
+                if *activity == "normal_privileged_operation" {
+                    continue;
+                }
+                if any(&f.body, sig) && is_write(&f.body) && !any(&f.body, acc) {
+                    hidden.push(format!("{}::{} [{activity}]", p, f.name));
+                }
+            }
+        }
+    }
+    println!("§6-signature-matching writers hidden by the #[cfg(test)] cut: {hidden:?}");
+    assert!(hidden.is_empty(), "the cut hides a §6 primitive: {hidden:?}");
+}
+
+/// **a10 — the single exemption, read.**
+///
+/// The repair says this is "the one place a wrong judgement passes quietly". The recorded reason is that
+/// `take_snapshot` computes a record's canonical path only in order to COPY it into a rollback snapshot, and
+/// that every byte it writes goes to the snapshot directory. I check that claim against the code rather than
+/// against the reason.
+#[test]
+fn a10_the_single_exemption_writes_only_into_the_snapshot_directory() {
+    assert_eq!(bg::SECTION_6_DERIVATION_EXEMPTIONS.len(), 1, "the exemption list grew");
+    let (activity, site, why) = bg::SECTION_6_DERIVATION_EXEMPTIONS[0];
+    assert_eq!(activity, "human_gate_create");
+    assert_eq!(site, "runtime/src/cit/mod.rs::take_snapshot");
+    assert!(why.len() > 60);
+
+    let f = product_functions(true)
+        .into_iter()
+        .find(|f| f.site() == site)
+        .expect("the exempted function no longer exists");
+
+    // 1. It really is found by the derivation (an exemption that excuses nothing is a blanket).
+    let (sig, acc) = bg::section_6_signature(activity).unwrap();
+    assert!(any(&f.body, sig) && is_write(&f.body), "the exemption is stale");
+    assert!(!any(&f.body, acc), "the exemption is unnecessary — it now carries the enforcement");
+
+    // 2. Its use of `record_path_for` is a READ: the computed path is only tested for existence.
+    assert!(
+        f.body.contains("record_path_for(") && f.body.contains("if !p.root.join(&pth).exists()"),
+        "`take_snapshot` no longer uses the record path merely to test existence; re-read the exemption"
+    );
+
+    // 3. Every write destination is derived from the snapshot directory, and none from a record path.
+    let writes: Vec<&str> = f
+        .body
+        .lines()
+        .filter(|l| {
+            let t = l.trim_start();
+            !t.starts_with("//")
+                && (t.contains("std::fs::copy(")
+                    || t.contains("write_json(")
+                    || t.contains("write_yaml(")
+                    || t.contains("write_text(")
+                    || t.contains("write_durable(")
+                    || t.contains("copy_dir("))
+        })
+        .collect();
+    println!("`take_snapshot` write sites:\n{}", writes.join("\n"));
+    assert!(!writes.is_empty(), "no write sites found; re-derive this check");
+    for w in &writes {
+        assert!(
+            w.contains("&dst") || w.contains("snap.join") || w.contains("dir.join") || w.contains("&snap.join"),
+            "a `take_snapshot` write does not target the snapshot directory: {w}"
+        );
+    }
+    // and the snapshot directory is not a record directory
+    assert!(
+        f.body.contains("let dir = snapshot_dir(p, id);") && f.body.contains("let snap = dir.join(\"snapshot\");"),
+        "the snapshot root is no longer `runtime/cit/<id>/snapshot`; the exemption's reasoning does not carry"
+    );
+    println!("EXEMPTION ACCEPTED: the record path is read for existence only; every write targets the snapshot tree.");
+}

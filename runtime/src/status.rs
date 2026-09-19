@@ -40,7 +40,8 @@ pub fn status(p: &Project) -> Result<Value> {
         })
         .map(|c| json!({"id": c.id(), "cit_status": c.get("cit_status"), "title": c.title()}))
         .collect();
-    let features: Vec<Value> = store.of_type("feature").into_iter().map(|f| { let r = crate::orchestration::readiness::evaluate(p, f); json!({"id": f.id(), "title": f.title(), "coverage": r.coverage, "pre_implementation_ok": r.pre_implementation_ok, "gaps": r.gaps.len()}) }).collect();
+    let lctx = crate::lifecycle::Ctx::new(p, &store);
+    let features: Vec<Value> = store.of_type("feature").into_iter().map(|f| { let r = crate::orchestration::readiness::evaluate_in(p, &lctx, f); json!({"id": f.id(), "title": f.title(), "coverage": r.coverage, "pre_implementation_ok": r.pre_implementation_ok, "gaps": r.gaps.len()}) }).collect();
     let next_task = d.runnable.first().cloned();
     let mut reads = vec![
         "governance/framework.lock".to_string(),
@@ -161,6 +162,14 @@ pub fn continue_work<'a>(
             }
         }
     };
+    // the work the events since the last governed operation call for is in the DAG before the next work is chosen
+    // (BC-P2-24): failed tests, findings, discoveries, decisions, lessons, capability gaps, failures
+    let generated = crate::orchestration::generation::reconcile(
+        p,
+        &crate::orchestration::generation::Options::triggered_by("continue"),
+    )
+    .map(|r| crate::orchestration::generation::summary(&r))
+    .unwrap_or_else(|e| json!({"error": {"code": e.code, "message": e.message}}));
     let st = status(p)?;
     let ctl = control::state(p);
     let mut gate_text = None;
@@ -189,7 +198,7 @@ pub fn continue_work<'a>(
             .get_bool("HUMAN_GATE_POLICY", "continue_independent_work", true)
     {
         return Ok(
-            json!({"status": "WAITING_HUMAN", "gate": gate_text, "message": "HUMAN_GATE_POLICY.continue_independent_work=false: work halts while a gate is pending"}),
+            json!({"status": "WAITING_HUMAN", "gate": gate_text, "message": "HUMAN_GATE_POLICY.continue_independent_work=false: work halts while a gate is pending", "generated_work": generated}),
         );
     }
     // dispatch (W4 line 1112): a packet whose mandatory inputs are not all satisfied is never dispatched; the next
@@ -222,7 +231,7 @@ pub fn continue_work<'a>(
     }
     let Some((next, packet)) = chosen else {
         return Ok(
-            json!({"status": "NO_RUNNABLE_WORK", "gate": gate_text, "waiting_human": d.waiting_human, "blocked": d.blocked, "deferred": deferred, "suggestion": if deferred.is_empty() { "run `gov readiness plan <feature>` or create discovery tasks" } else { "runnable work exists but this session cannot take it now (see `deferred`): act in the designated role from an independent session, wait for the overlapping claims to close, or satisfy the mandatory inputs the packet names" }}),
+            json!({"status": "NO_RUNNABLE_WORK", "gate": gate_text, "waiting_human": d.waiting_human, "blocked": d.blocked, "deferred": deferred, "generated_work": generated, "suggestion": if deferred.is_empty() { "run `gov readiness plan <feature>` or create discovery tasks" } else { "runnable work exists but this session cannot take it now (see `deferred`): act in the designated role from an independent session, wait for the overlapping claims to close, or satisfy the mandatory inputs the packet names" }}),
         );
     };
     // governed degradations of the dispatch, reported rather than silent
@@ -251,7 +260,7 @@ pub fn continue_work<'a>(
     }
     Ok(
         json!({"status": "NEXT_WORK", "task": next, "task_contract": task, "context_packet": {"path": format!(".governance-runtime/context/{next}.json"), "deterministic_hash": packet["deterministic_hash"], "packet_hash": packet["packet_hash"], "chars": packet["chars"], "delivery_state": packet["delivery_state"], "receipt_contract": packet["receipt_contract"]},
-        "skills": skills, "routing": {"minimum_tier": routing["minimum_tier"], "reasoning": routing["reasoning"], "chosen": routing["chosen"]}, "claimed": claimed, "parallel_runnable": candidates.iter().filter(|t| **t != next).take(5).cloned().collect::<Vec<_>>(), "deferred": deferred, "degraded": degraded, "gate": gate_text, "status_summary": st["next_action"]}),
+        "skills": skills, "routing": {"minimum_tier": routing["minimum_tier"], "reasoning": routing["reasoning"], "chosen": routing["chosen"]}, "claimed": claimed, "parallel_runnable": candidates.iter().filter(|t| **t != next).take(5).cloned().collect::<Vec<_>>(), "deferred": deferred, "degraded": degraded, "gate": gate_text, "status_summary": st["next_action"], "generated_work": generated}),
     )
 }
 

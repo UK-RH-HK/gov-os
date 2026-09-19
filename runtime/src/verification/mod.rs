@@ -14,9 +14,11 @@ use serde_json::{json, Value};
 
 pub mod currency;
 pub mod families_ext;
+pub mod flow;
 pub mod lineage;
 pub mod product;
 pub mod reporting;
+pub mod slo;
 
 pub const KNOWN_CLI: &[&str] = &[
     "status",
@@ -120,10 +122,18 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
         match fam.as_str() {
             "schema_invariants" => {
                 for pr in &p.overlay().problems {
-                    f.findings.push(finding("high", &fam, pr.clone(), None));
+                    let mut x = finding("high", &fam, pr.clone(), None);
+                    x["subjects"] = json!(["governance/project/**"]);
+                    f.findings.push(x);
                 }
                 for pr in &pol.problems {
-                    f.findings.push(finding("high", &fam, pr.clone(), None));
+                    let mut x = finding("high", &fam, pr.clone(), None);
+                    x["subjects"] = json!([
+                        "governance/project/PROJECT_POLICY.yaml",
+                        "governance/project/PROJECT_EXCEPTIONS.yaml",
+                        "governance/kernel/policies/**"
+                    ]);
+                    f.findings.push(x);
                 }
                 if let Ok(inv) = read_yaml(
                     &p.kernel_dir()
@@ -207,12 +217,16 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                     }
                 }
                 for (id, paths) in &store.duplicates {
-                    f.findings.push(finding(
+                    let mut x = finding(
                         "high",
                         &fam,
                         format!("duplicate record id {id} at {}", paths.join(", ")),
                         None,
-                    ));
+                    );
+                    let mut subj = vec![id.clone()];
+                    subj.extend(paths.iter().cloned());
+                    x["subjects"] = json!(subj);
+                    f.findings.push(x);
                 }
                 // authority must be unambiguous: a superseded record that is still ACTIVE is a contradiction
                 let mut by_id: std::collections::BTreeMap<String, &crate::records::Record> =
@@ -226,7 +240,9 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                     for s in r.list("supersedes") {
                         if let Some(t) = by_id.get(&s) {
                             if t.status() == "ACTIVE" {
-                                f.findings.push(finding("high", &fam, format!("{} is superseded by {} but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)", s, r.id()), Some(t.path.clone())));
+                                let mut x = finding("high", &fam, format!("{} is superseded by {} but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)", s, r.id()), Some(t.path.clone()));
+                                x["subjects"] = json!([s, r.id(), t.path.clone(), r.path.clone()]);
+                                f.findings.push(x);
                             }
                         }
                     }
@@ -234,24 +250,72 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                 f.detail = json!({"records_checked": checked});
             }
             "graph_integrity" => {
-                if let Some(db) = &db {
-                    let d = graph::dangling_edges(db)?;
-                    if !d.is_empty() {
-                        f.findings.push(finding(
-                            "medium",
-                            &fam,
-                            format!(
-                                "{} dangling edge(s) reference unknown artefacts (e.g. {} {} {})",
-                                d.len(),
-                                d[0]["src"],
-                                d[0]["type"],
-                                d[0]["dst"]
-                            ),
-                            None,
-                        ));
+                // the relationship graph through memory::integrity (WS-6 IP-R2-1): orphan, dangling, stale, reversed
+                // and ill-typed relationships and supersession cycles, each named with its edge. The AFFECTS link of a
+                // generated investigation whose subject was deleted or retired records what was investigated and is
+                // not a defect (O-1): it is listed, never reported as dangling.
+                let mut resolved_links = vec![];
+                let mut integrity = Value::Null;
+                match crate::memory::integrity::check(p, store, db) {
+                    Ok(gi) => {
+                        for x in &gi.findings {
+                            let (src, et, dst) = (
+                                x["edge"]["src"].as_str().unwrap_or(""),
+                                x["edge"]["type"].as_str().unwrap_or(""),
+                                x["edge"]["dst"].as_str().unwrap_or(""),
+                            );
+                            if x["kind"] == "dangling"
+                                && lineage::is_resolved_investigation_edge(p, store, src, et, dst)
+                            {
+                                resolved_links.push(x["edge"].clone());
+                                continue;
+                            }
+                            let mut y = finding(
+                                x["severity"].as_str().unwrap_or("medium"),
+                                &fam,
+                                format!(
+                                    "{} ({} relationship)",
+                                    x["message"].as_str().unwrap_or(""),
+                                    x["kind"].as_str().unwrap_or("?")
+                                ),
+                                x["path"].as_str().map(|s| s.to_string()),
+                            );
+                            let mut subj: Vec<String> = vec![];
+                            for k in ["src", "dst"] {
+                                if let Some(v) = x["edge"][k].as_str() {
+                                    subj.push(v.trim_start_matches("file:").to_string());
+                                }
+                            }
+                            for k in ["record"] {
+                                if let Some(v) = x[k].as_str() {
+                                    subj.push(v.to_string());
+                                }
+                            }
+                            if let Some(a) = x["records"].as_array() {
+                                subj.extend(
+                                    a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())),
+                                );
+                            }
+                            y["subjects"] = json!(subj);
+                            y["integrity_kind"] = x["kind"].clone();
+                            f.findings.push(y);
+                        }
+                        integrity = json!({"ok": gi.ok, "checked_records": gi.checked_records, "checked_edges": gi.checked_edges, "counts": gi.counts});
                     }
+                    Err(e) => f.findings.push(finding(
+                        "medium",
+                        &fam,
+                        format!(
+                            "graph integrity could not be checked: [{}] {}",
+                            e.code, e.message
+                        ),
+                        None,
+                    )),
+                }
+                if let Some(db) = &db {
                     let o = graph::orphan_nodes(db)?;
-                    f.detail = json!({"dangling": d.len(), "orphans": o.len(), "orphan_records": o, "dangling_edges": d.iter().take(20).collect::<Vec<_>>(), "edge_types": graph::edge_type_counts(db)?});
+                    let d = graph::dangling_edges(db)?;
+                    f.detail = json!({"dangling": d.len() - resolved_links.len().min(d.len()), "orphans": o.len(), "orphan_records": o, "edge_types": graph::edge_type_counts(db)?});
                 } else {
                     f.findings.push(finding(
                         "medium",
@@ -260,30 +324,63 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                         None,
                     ));
                 }
+                if let Some(o) = f.detail.as_object_mut() {
+                    o.insert("integrity".into(), integrity);
+                    o.insert("resolved_investigation_links".into(), json!(resolved_links));
+                } else {
+                    f.detail = json!({"integrity": integrity, "resolved_investigation_links": resolved_links});
+                }
                 let dag = crate::orchestration::dag::compute(p)?;
-                // W1 canonical path, W8 stale lineage links, `blocks` naming no task (ws04 IP-7, ws05 IP-2)
+                // W1 canonical path, W8 stale lineage links, `blocks` naming no task (ws04 IP-7, ws05 IP-2); a stale
+                // lineage link memory::integrity already names is not reported twice
                 let (lf, ld) = reporting::graph_lineage_findings(p, store, &dag, &fam);
-                f.findings.extend(lf);
+                for x in lf {
+                    let dup = f.findings.iter().any(|y| {
+                        y["integrity_kind"] == "stale"
+                            && x["path"] == y["path"]
+                            && x["message"]
+                                .as_str()
+                                .map(|m| {
+                                    y["subjects"].as_array().map(|a| {
+                                        a.iter().all(|s| {
+                                            s.as_str().map(|s| m.contains(s)).unwrap_or(false)
+                                        })
+                                    }) == Some(true)
+                                })
+                                .unwrap_or(false)
+                    });
+                    if !dup {
+                        f.findings.push(x);
+                    }
+                }
                 if let Some(o) = f.detail.as_object_mut() {
                     o.insert("lineage".into(), ld);
-                } else {
-                    f.detail = json!({"lineage": ld});
                 }
                 if !dag.cycles.is_empty() {
-                    f.findings.push(finding(
-                        "high",
-                        &fam,
-                        format!("task DAG has cycles: {:?}", dag.cycles),
-                        None,
-                    ));
+                    for c in &dag.cycles {
+                        let mut y = finding(
+                            "high",
+                            &fam,
+                            format!("task DAG has a cycle: {}", c.join(" -> ")),
+                            None,
+                        );
+                        y["subjects"] = json!(c);
+                        f.findings.push(y);
+                    }
                 }
                 for m in &dag.missing_dependencies {
-                    f.findings.push(finding(
+                    let mut y = finding(
                         "high",
                         &fam,
-                        format!("task {} depends on missing {}", m["task"], m["dependency"]),
+                        format!(
+                            "task {} depends on missing {}",
+                            m["task"].as_str().unwrap_or("?"),
+                            m["dependency"].as_str().unwrap_or("?")
+                        ),
                         None,
-                    ));
+                    );
+                    y["subjects"] = json!([m["task"], m["dependency"]]);
+                    f.findings.push(y);
                 }
             }
             "index_freshness" => {
@@ -308,7 +405,22 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                         None,
                     ));
                 }
-                f.detail = json!({"checked": fr.checked, "stale": fr.stale, "added": fr.added, "removed": fr.removed});
+                // the live retrieval profile is governed (WS-6 IP-R2-3: memory::profile::status)
+                let prof = crate::memory::profile::status(p);
+                if prof["governed"] != true {
+                    f.findings.push(finding(
+                        prof["severity"].as_str().unwrap_or("medium"),
+                        &fam,
+                        format!(
+                            "retrieval profile {}: {}",
+                            prof["state"].as_str().unwrap_or("?"),
+                            prof["message"].as_str().unwrap_or("")
+                        ),
+                        Some("governance/project/PROJECT_POLICY.yaml".into()),
+                    ));
+                }
+                f.detail = json!({"checked": fr.checked, "stale": fr.stale, "added": fr.added, "removed": fr.removed,
+                                  "retrieval_profile": {"state": prof["state"], "governed": prof["governed"], "decision": prof["decision"], "digest": prof["digest"]}});
             }
             "memory_retrieval_regression" => {
                 let hp = p.root.join(pol.get_str(
@@ -713,6 +825,23 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                         None,
                     ));
                 }
+                // non-rebuildable OS state kept inside the derived/generated directories is lost when those are
+                // deleted and rebuilt (BC-P2-31; WS-6 IP-R2-12). Every writer now keeps its store at
+                // `paths::store_path` (round 3: claims and claim trees WS-5, emergency control WS-3, plugin registry
+                // WS-7, CIT/update/migration snapshots WS-4/WS-8/WS-9), so a store still found in a derived location
+                // is a project defect (medium; WS-2 IP-R3-WS02-09, round-3 integration) until its writer relocates it.
+                let misplaced = crate::paths::misplaced_os_state(&p.root);
+                for m in &misplaced {
+                    f.findings.push(finding(
+                        "medium",
+                        &fam,
+                        m["message"].as_str().unwrap_or("").to_string(),
+                        m["found_at"].as_str().map(|s| s.to_string()),
+                    ));
+                }
+                if let Some(o) = f.detail.as_object_mut() {
+                    o.insert("misplaced_os_state".into(), json!(misplaced));
+                }
             }
             "fresh_agent_reconstruction" => {
                 let st = crate::status::status(p)?;
@@ -914,6 +1043,31 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
             "contract_binding" => reporting::contract_binding(p, &mut f),
             "index_content_coverage" => reporting::index_content_coverage(p, db, &mut f),
             "task_contract_integrity" => reporting::task_contract_integrity(p, store, &mut f),
+            // ---- round 3: tier duties (BC-P2-07), W11 (BC-P2-23), Gate U (BC-P2-44), WS-10 lifecycle at a G-tier
+            "upstream_change_propagation" => {
+                reporting::upstream_change_propagation(p, store, &mut f)
+            }
+            "authority_unambiguous" => reporting::authority_unambiguous(p, store, &mut f),
+            "legacy_authority" => reporting::legacy_authority(p, store, &mut f),
+            "feature_readiness" => reporting::feature_readiness(p, store, &mut f),
+            "unresolved_audit_findings" => reporting::unresolved_audit_findings(store, &mut f),
+            "research_experiment_data_lifecycle" => {
+                reporting::research_experiment_data_lifecycle(p, store, &mut f)
+            }
+            "artifact_flow_health" => flow::family(p, store, &mut f),
+            "health_slos" => {
+                let st = crate::scheduler::store::load_state(p);
+                slo::family(
+                    &slo::SloCtx {
+                        p,
+                        store,
+                        db,
+                        snapshot: ctx.snapshot,
+                        state: &st,
+                    },
+                    &mut f,
+                )
+            }
             other => {
                 f.findings.push(finding(
                     "low",
@@ -1169,16 +1323,85 @@ pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
     }))
 }
 
+/// The subjects of a task close (the availability rule's scope, `scheduler::Request`): the task and its record, every
+/// path it touched, and every upstream input it declares (its feature, requirements, scenarios, decisions,
+/// interfaces, architecture, data, tests and explicit inputs) and depends on. A block about any of them governs the
+/// close; a block about anything else does not.
+pub fn close_subjects(task: &Value, touched: &[String]) -> Vec<String> {
+    let mut v: Vec<String> = vec![];
+    let id = task["id"].as_str().unwrap_or("").to_string();
+    if !id.is_empty() {
+        v.push(format!("spec/tasks/{id}.yaml"));
+        v.push(id);
+    }
+    v.extend(touched.iter().cloned());
+    let mut fields: Vec<&str> = crate::records::TASK_INPUT_FIELDS.to_vec();
+    fields.extend(["feature", "dependencies", "depends_on"]);
+    for f in fields {
+        match &task[f] {
+            Value::String(x) if !x.is_empty() => v.push(x.clone()),
+            Value::Array(a) => {
+                for x in a {
+                    if let Some(id) = crate::records::relation_target(x) {
+                        v.push(id.split('@').next().unwrap_or("").to_string());
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    v.retain(|x| !x.is_empty());
+    v.sort();
+    v.dedup();
+    v
+}
+
+/// **G2 readiness at close** (Contract v3:795 "G2 Task Close — mutation scope/readiness/tests/references/memory
+/// freshness"): an implementation task of a feature may only close while its feature's pre-implementation readiness
+/// still holds — the same rule the DAG applies at READY/claim (`orchestration::dag`), re-checked because readiness can
+/// regress after the claim. Returns the reason when it does not hold.
+pub fn close_readiness(p: &Project, task: &Value) -> Option<Value> {
+    if task["class"].as_str() != Some("implementation") {
+        return None;
+    }
+    let feature = task["feature"].as_str().filter(|f| !f.is_empty())?;
+    let enforce = p
+        .project_policy()
+        .get("readiness")
+        .and_then(|r| r.get("enforce_pre_implementation_cells"))
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    if !enforce {
+        return None;
+    }
+    let store = RecordStore::load(&p.root);
+    let f = store.get(feature).filter(|f| f.rtype() == "feature")?;
+    let r = crate::orchestration::readiness::evaluate(p, f);
+    if r.pre_implementation_ok {
+        return None;
+    }
+    Some(
+        json!({"feature": feature, "pre_implementation_gaps": r.pre_implementation_gaps, "invalid": r.invalid, "coverage": r.coverage}),
+    )
+}
+
 /// **The task-close health gate (integration point for `orchestration::tasks::close`, WS-5).** One call covering
 /// the health duties of a close, in order:
 ///
-/// 1. **G0** — `scheduler::guard("task.close", touched)`: an active hard-block governing the touched paths refuses;
-/// 2. **G2 re-check** — stale evidence is re-checked before the close may rely on it (Contract v3:111). For a
+/// 1. **G0** — `scheduler::guard("task.close", subjects)`: the close names its subjects (the task, its declared
+///    inputs, every touched path: [`close_subjects`]); an active hard-block refuses only when its scope reaches them
+///    (the availability rule: a block about other records leaves this close available);
+/// 2. **G2 readiness** — [`close_readiness`]: `TASK_READINESS_REGRESSED` when the feature's pre-implementation
+///    readiness no longer holds (`force` records it as degraded);
+/// 3. **G2 re-check** — stale evidence is re-checked before the close may rely on it (Contract v3:111). For a
 ///    governance-affecting task every stale suite check is re-executed (the rest are served from the cache) and a
-///    governance-suite record is written when that re-establishes currency; otherwise the G2 checks run;
-/// 3. **O4** — `currency::enforce_close`: governance-affecting work (by class or by governed inputs touched) cannot
-///    close on stale or absent green evidence (`force` records the degradation instead);
-/// 4. **O1/U** — `product::enforce_close`: the test outcome comes from recorded per-family evidence, not the report.
+///    governance-suite record is written when that re-establishes green currency; otherwise the G2 checks run;
+/// 4. **O4** — `currency::enforce_close_with`: governance-affecting work (by class or by governed inputs touched)
+///    cannot close on stale evidence. The complete suite result of step 3, computed for exactly the current inputs, is
+///    current evidence even when it is not green: its warnings do not refuse the close (hard-blocks were decided at
+///    step 1 within their scope) — the gaps a close is completing never refuse it (O-R2-1). Without it, the latest
+///    honoured green record must be current (`force` records the degradation instead);
+/// 5. **O1/U** — `product::enforce_close`: the test outcome comes from recorded per-family evidence, not the report.
 ///
 /// `touched` must be the union of the report's `files_changed` and the mutations observed since the claim.
 /// Returns the notes to record as `degraded` on the report, and the G2 health result id.
@@ -1189,19 +1412,51 @@ pub fn close_gate(
     touched: &[String],
     force: bool,
 ) -> Result<Value> {
-    scheduler::guard(p, scheduler::catalogue::ops::TASK_CLOSE, touched)?;
-    let (affecting, reasons) = currency::governance_affecting(task, touched);
+    let subjects = close_subjects(task, touched);
+    scheduler::guard(p, scheduler::catalogue::ops::TASK_CLOSE, &subjects)?;
     let id = task["id"].as_str().unwrap_or("?");
+    let mut degraded: Vec<String> = vec![];
+    if let Some(r) = close_readiness(p, task) {
+        let why = format!(
+            "feature {} pre-implementation readiness no longer holds (gaps: {})",
+            r["feature"].as_str().unwrap_or("?"),
+            r["pre_implementation_gaps"]
+                .as_array()
+                .map(|a| a
+                    .iter()
+                    .filter_map(|x| x.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", "))
+                .unwrap_or_default()
+        );
+        if !force {
+            return Err(crate::GovError::new(
+                "TASK_READINESS_REGRESSED",
+                format!("{id} cannot close: {why}; the implementation was claimed under readiness that has since regressed (G2 readiness, Contract v3:795). Restore the feature's readiness cells (`gov readiness check {}`), then close", r["feature"].as_str().unwrap_or("?")),
+            )
+            .with_details(json!({"task": id, "readiness": r, "remediation": "restore the missing pre-implementation readiness cells of the feature, or close with --force as an L3+ role (recorded as degraded)"})));
+        }
+        degraded.push(format!("G2 readiness: {why}"));
+    }
+    let (affecting, reasons) = currency::governance_affecting(task, touched);
     let mut o = RunOptions::new(Tier::G2, scheduler::Trigger::task_close(id, touched));
     o.surface = "task.close".into();
     if affecting {
         o.selection = Selection::All;
     }
     let g2 = audit_with(p, &o)?;
-    let mut degraded = currency::enforce_close(p, task, touched, force)?;
+    degraded.extend(currency::enforce_close_with(
+        p,
+        task,
+        touched,
+        force,
+        Some(&g2),
+    )?);
     degraded.extend(product::enforce_close(p, task, report, touched)?);
     Ok(
-        json!({"allowed": true, "governance_affecting": affecting, "reasons": reasons, "g2": {"health_result": g2["health_result"], "verdict": g2["verdict"], "record": g2["audit"], "summary": g2["summary"]}, "degraded": degraded}),
+        json!({"allowed": true, "governance_affecting": affecting, "reasons": reasons, "subjects": subjects,
+               "g2": {"health_result": g2["health_result"], "verdict": g2["verdict"], "complete": g2["complete"], "inputs_hash": g2["inputs_hash"], "record": g2["audit"], "summary": g2["summary"]},
+               "degraded": degraded}),
     )
 }
 

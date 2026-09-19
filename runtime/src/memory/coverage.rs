@@ -6,26 +6,31 @@
 //! spots. `memory::indexer::rebuild` checks it for every artefact it (re)indexes and reports the result
 //! (`IndexReport.coverage`, runtime meta `index_coverage`); [`verify`] checks the whole live index against the tree
 //! and is the entry point for a health-scheduler/governance-suite check.
-use crate::memory::chunking::{uncovered_lines, Chunk};
+//!
+//! **Markdown headings (repair-1 round 3, WS-2 R3-4).** A heading is one definition shared with the chunker
+//! ([`crate::memory::chunking::atx_heading`]); the chunker holds every heading as a section title without its `#`
+//! markers (chunker version 3), and the comparison reads headings the same way on both sides
+//! ([`crate::memory::chunking::uncovered_lines_with`]), so a heading a chunk holds — with or without markers — is
+//! never reported as a gap. Every uncovered line of a listed artefact is reported.
+use crate::memory::chunking::{atx_heading, uncovered_lines_with, Chunk};
 use crate::memory::db::RuntimeDb;
 use crate::records::parse_record_text;
 use crate::util::{read_text, sha256_hex};
 use crate::{Project, Result};
-use regex::Regex;
 use serde_json::{json, Value};
-use std::sync::OnceLock;
 
 /// Markdown headings are held as section titles (without their `#` markers); compare body lines the same way.
 pub fn without_heading_markers(text: &str) -> String {
-    static RX: OnceLock<Regex> = OnceLock::new();
-    let rx = RX.get_or_init(|| Regex::new(r"^#{1,6}\s+(.*)$").unwrap());
     text.lines()
-        .map(|l| match rx.captures(l) {
-            Some(c) => c[1].trim().to_string(),
-            None => l.to_string(),
-        })
+        .map(|l| atx_heading(l).unwrap_or(l).to_string())
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+/// True when an artefact's content is compared as Markdown (records — their body is Markdown — and documents).
+pub fn is_markdown_content(rel: &str, is_record: bool) -> bool {
+    let ext = rel.rsplit('.').next().unwrap_or("").to_lowercase();
+    is_record || matches!(ext.as_str(), "md" | "txt" | "rst")
 }
 
 /// The content an artefact's chunks must hold: for a record, its content sections and body; for a document,
@@ -47,12 +52,37 @@ pub fn expected_content(rel: &str, text: &str, is_record: bool) -> String {
                 .join("\n");
         }
     }
-    let ext = rel.rsplit('.').next().unwrap_or("").to_lowercase();
-    if matches!(ext.as_str(), "md" | "txt" | "rst") {
+    if is_markdown_content(rel, false) {
         without_heading_markers(text)
     } else {
         text.to_string()
     }
+}
+
+/// The non-empty lines of `expected` that none of `chunks` holds, compared as Markdown for records and documents.
+pub fn uncovered(
+    rel: &str,
+    expected: &str,
+    chunks: &[Chunk],
+    max_chars: usize,
+    is_record: bool,
+) -> Vec<(usize, String)> {
+    uncovered_lines_with(
+        expected,
+        chunks,
+        max_chars,
+        is_markdown_content(rel, is_record),
+    )
+}
+
+/// A gap row: the artefact and **every** uncovered line (each line's text truncated for the report).
+pub fn gap_row(artifact_id: Option<&str>, rel: &str, miss: &[(usize, String)]) -> Value {
+    let mut v = json!({"path": rel, "count": miss.len(),
+        "lines": miss.iter().map(|(n, l)| json!({"line": n, "text": l.chars().take(120).collect::<String>()})).collect::<Vec<_>>()});
+    if let Some(a) = artifact_id {
+        v["artifact_id"] = json!(a);
+    }
+    v
 }
 
 /// Check the live index: for each artefact whose file is unchanged since indexing, the non-empty lines of its
@@ -65,8 +95,9 @@ pub fn verify(p: &Project, db: &RuntimeDb) -> Result<Value> {
         .unwrap_or(1200) as usize;
     let mut checked = 0usize;
     let mut stale = 0usize;
-    let mut uncovered = 0usize;
+    let mut uncovered_total = 0usize;
     let mut gaps = vec![];
+    let mut unlisted_artefacts = 0usize;
     for a in db.query(
         "SELECT artifact_id, path, record_type, content_hash, lexical, semantic FROM artifacts ORDER BY path",
         &[],
@@ -98,17 +129,19 @@ pub fn verify(p: &Project, db: &RuntimeDb) -> Result<Value> {
             })
             .collect();
         checked += 1;
-        let miss = uncovered_lines(&expected, &chunks, max_chars);
+        let miss = uncovered(&rel, &expected, &chunks, max_chars, is_record);
         if !miss.is_empty() {
-            uncovered += miss.len();
+            uncovered_total += miss.len();
             if gaps.len() < 50 {
-                gaps.push(json!({"artifact_id": aid, "path": rel, "count": miss.len(),
-                    "lines": miss.iter().take(5).map(|(n, l)| json!({"line": n, "text": l.chars().take(120).collect::<String>()})).collect::<Vec<_>>()}));
+                gaps.push(gap_row(Some(&aid), &rel, &miss));
+            } else {
+                unlisted_artefacts += 1;
             }
         }
     }
     Ok(
         json!({"check": "index_content_coverage", "checked_artifacts": checked, "stale_skipped": stale,
-        "uncovered_lines": uncovered, "complete": uncovered == 0, "gaps": gaps}),
+        "uncovered_lines": uncovered_total, "complete": uncovered_total == 0, "gaps": gaps,
+        "unlisted_artefacts": unlisted_artefacts, "comparison": "markdown headings by text on both sides (chunker 3)"}),
     )
 }

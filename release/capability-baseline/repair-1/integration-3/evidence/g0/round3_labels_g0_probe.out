@@ -1,0 +1,25 @@
+# P2-AR-0041 round-3 G0 label probe at e3b6cfbcaefafa4f538f604be52dcde41c581e85 (product files differing: 0); gov sha256 81a9b9ee33303347099a9d53630e532ea108a5230a8b0c9bad182de54de56570; 2026-09-19T16:08:39Z
+# freeze-writes: ok=True code=None
+CHECK R1.FROZEN.control PASS `freeze-writes` in force -- null
+CHECK R1.FROZEN.trust reseal PASS `trust reseal` (Write) is refused FROZEN under freeze-writes and changes no tracked file -- "FROZEN"
+CHECK R1.FROZEN.task generate PASS `task generate` (Write) is refused FROZEN under freeze-writes and changes no tracked file -- "FROZEN"
+CHECK R1.FROZEN.release record PASS `release record` (Write) is refused FROZEN under freeze-writes and changes no tracked file -- "FROZEN"
+CHECK R1.FROZEN.research record PASS `research record` (Write) is refused FROZEN under freeze-writes and changes no tracked file -- "FROZEN"
+CHECK R1.FROZEN.trust reseal --dry-run PASS `trust reseal --dry-run` (Read) is not refused by freeze-writes and changes no tracked file -- {"ok": false, "code": "T2_BINDING_UNAVAILABLE"}
+CHECK R1.FROZEN.task generate --dry-run PASS `task generate --dry-run` (Read) is not refused by freeze-writes and changes no tracked file -- {"ok": true, "code": null}
+CHECK R3.FROZEN PASS no work generated after the commands refused under freeze-writes -- []
+# pause: ok=True code=None
+CHECK R1.PAUSED.control PASS `pause` in force -- null
+CHECK R1.PAUSED.trust reseal PASS `trust reseal` (Write) is refused PAUSED under pause and changes no tracked file -- "PAUSED"
+CHECK R1.PAUSED.task generate PASS `task generate` (Write) is refused PAUSED under pause and changes no tracked file -- "PAUSED"
+CHECK R1.PAUSED.release record PASS `release record` (Write) is refused PAUSED under pause and changes no tracked file -- "PAUSED"
+CHECK R1.PAUSED.research record PASS `research record` (Write) is refused PAUSED under pause and changes no tracked file -- "PAUSED"
+CHECK R1.PAUSED.trust reseal --dry-run PASS `trust reseal --dry-run` (Read) is not refused by pause and changes no tracked file -- {"ok": false, "code": "T2_BINDING_UNAVAILABLE"}
+CHECK R1.PAUSED.task generate --dry-run PASS `task generate --dry-run` (Read) is not refused by pause and changes no tracked file -- {"ok": true, "code": null}
+CHECK R3.PAUSED PASS no work generated after the commands refused under pause -- []
+CHECK R2.trust reseal PASS `trust reseal` without a declared role is refused AUTHORITY_DENIED (no default role) -- "AUTHORITY_DENIED"
+CHECK R2.task generate PASS `task generate` without a declared role is refused AUTHORITY_DENIED (no default role) -- "AUTHORITY_DENIED"
+CHECK R2.release record PASS `release record` without a declared role is refused AUTHORITY_DENIED (no default role) -- "AUTHORITY_DENIED"
+CHECK R2.research record PASS `research record` without a declared role is refused AUTHORITY_DENIED (no default role) -- "AUTHORITY_DENIED"
+SUMMARY total=20 pass=20 fail=0 failed=[]
+[exit=0]

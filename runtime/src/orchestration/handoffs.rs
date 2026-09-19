@@ -12,6 +12,16 @@
 //! * the result and the record state the freshness the handoff was created under (`freshness`), and the
 //!   `before_handoff` checkpoint records it and the checkpoint it supersedes.
 //! The G0 guard (`scheduler::guard(handoff.create)`) and the G3 tier (IP-WS02-05/07) run at creation.
+//!
+//! ## Round 3 (WS-4)
+//!
+//! * **The G0 guard is scoped to what the handoff relies on** (availability rule, P2-HO-0031): it is asked for the
+//!   task record and every input the task's manifest delivers, so a path-scoped hard-block refuses the handoff only
+//!   when it governs something the receiving worker would rely on.
+//! * **Handoff records are T2-sealed** as written by `handoff create`, and re-sealed by `handoff return` only when the
+//!   seal verified before (O-7): a later hand edit is observable.
+//! * **The targeted propagation of a stale packet** is recorded as a sealed system transaction
+//!   (`cit::propagate_as_transaction`), like every propagation outside CIT-E.
 use crate::orchestration::control;
 use crate::records::{new_record, save_record, RecordStore};
 use crate::util::{now_iso, read_json, read_yaml};
@@ -111,20 +121,15 @@ fn handoff_freshness(p: &Project, task: &str) -> Result<(Value, Vec<String>)> {
         let ids: Vec<String> = stale.iter().map(|c| c.id.clone()).collect();
         let only: std::collections::BTreeSet<String> = [task.to_string()].into_iter().collect();
         let pl = crate::cit::propagation::plan(p, &store, &ids, None, Some(&only));
-        let mut touched = vec![];
-        let mut created = vec![];
-        propagated = crate::cit::propagation::apply(
+        // recorded as a sealed system transaction, like every propagation outside CIT-E (WS-5 IP-R3-3)
+        propagated = crate::cit::propagate_as_transaction(
             p,
             &pl,
             &stale,
-            &crate::cit::propagation::Cause::Direct {
-                detected_by: "gov handoff create".into(),
-            },
+            "gov handoff create",
             &crate::cit::propagation::ApplyOptions {
                 generate_rework: false,
             },
-            &mut touched,
-            &mut created,
         )
         .unwrap_or_else(|e| json!({"error": {"code": e.code, "message": e.message}}));
     }
@@ -142,12 +147,35 @@ fn handoff_freshness(p: &Project, task: &str) -> Result<(Value, Vec<String>)> {
     Ok((fresh, degraded))
 }
 
+/// What a handoff of `task` relies on, as repository paths: the task record and every input its manifest delivers.
+/// The G0 guard is asked for exactly these (availability rule, P2-HO-0031): a hard-block scoped to paths refuses the
+/// handoff only when it governs something the receiving worker would rely on; work outside the block stays available.
+fn reliance_paths(p: &Project, store: &RecordStore, task: &str) -> Vec<String> {
+    let Some(t) = store.get(task) else {
+        return vec![];
+    };
+    let mut v = vec![t.path.clone()];
+    for e in crate::context::manifest::resolve(p, store, t).entries {
+        if e.delivered() && !e.path.is_empty() {
+            v.push(e.path.clone());
+        }
+    }
+    v.sort();
+    v.dedup();
+    v
+}
+
 pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     control::guard_write(p, "handoff create")?;
     crate::authority::require(p, "create_handoff")?;
-    // G0 (tier contract, IP-WS02-05/07): an active hard-block refuses the handoff
-    crate::scheduler::guard(p, crate::scheduler::catalogue::ops::HANDOFF_CREATE, &[])?;
     let store = RecordStore::load(&p.root);
+    // G0 (tier contract, IP-WS02-05/07): an active hard-block governing what the handoff relies on refuses it
+    let task_named = fields["task"].as_str().unwrap_or("").to_string();
+    crate::scheduler::guard(
+        p,
+        crate::scheduler::catalogue::ops::HANDOFF_CREATE,
+        &reliance_paths(p, &store, &task_named),
+    )?;
     let id = store.next_id("handoff");
     let o = fields
         .as_object_mut()
@@ -241,7 +269,7 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     ]));
     o.insert("handoff_status".into(), json!("OPEN"));
     o.insert("state_class".into(), json!("DERIVED"));
-    let rec = new_record(
+    let mut rec = new_record(
         "handoff",
         &id,
         &format!(
@@ -268,9 +296,18 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
                 "handoff_freshness": {"handoff": id, "state": freshness["state"], "stale_inputs_redelivered": freshness["stale_inputs"], "previous_packet_hash": freshness["previous_packet_hash"], "packet_hash": freshness["packet_hash"], "degraded": degraded}}),
         )?;
     }
+    // T2 (round 3, O-7): the handoff record is OS-written continuity state (what was handed over, under which
+    // freshness and authority); it is sealed as written by this operation, so a later edit is observable
+    let binding = match crate::t2::seal_record(&mut rec, "handoff create") {
+        Ok(()) => json!({"sealed": true}),
+        Err(e) => {
+            json!({"sealed": false, "code": e.code, "message": e.message, "consequence": "written unsealed: its edits cannot be told apart from the OS's writes on this machine"})
+        }
+    };
     save_record(&p.root, &rec)?;
     let mut out = rec.data.clone();
     out["stale_inputs"] = freshness["stale_inputs"].clone();
+    out["record_binding"] = binding;
     Ok(out)
 }
 
@@ -296,6 +333,14 @@ pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
     let h = store
         .get_mut(id)
         .ok_or_else(|| GovError::new("HANDOFF_NOT_FOUND", format!("{id} not found")))?;
+    if h.rtype() != "handoff" {
+        return Err(GovError::new(
+            "HANDOFF_NOT_FOUND",
+            format!("{id} is not a handoff"),
+        ));
+    }
+    // O-7: the return is the handoff's own operation; it re-seals the record only when the seal verified before
+    let was_verified = crate::cit::binding::verified_before(h);
     let allowed = h.data["authority"]["allowed"]
         .as_array()
         .cloned()
@@ -330,6 +375,7 @@ pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
         h.set("authority_violations", json!(violations));
     }
     let task_id = h.get("task");
+    crate::cit::binding::reseal_if_verified(h, was_verified, true, "handoff return")?;
     save_record(&p.root, h)?;
     if !violations.is_empty() {
         return Err(GovError::new(

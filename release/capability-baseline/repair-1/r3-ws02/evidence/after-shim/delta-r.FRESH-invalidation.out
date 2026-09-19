@@ -1,0 +1,74 @@
+# P2-AR-0033 audit-of-record probe re-run (unedited): delta-r/FRESH-invalidation label=after-shim mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02 (HEAD 2e7200728174a0fa27928b17a4d7c681cd46bfd9)
+# probe sha256 2c5ebbfcc1bedf6bfb4aa3d89cd09aaeee1e07a305aec40fa06aa1a9e247d94d; gov 94f9ed9805a2bd6e0026dfd619185c810a23aefc31c918b953e4745bf8978151 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/mirror-shim-48ceba011a5a/target/release/gov
+# date 2026-09-19T13:30:01Z
+# evidence adapter /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/gov-owner-channel-shim.root-channel.P2-AR-0032.py (sha256 0dcb65734ae4964bc476fd7ab0935e9ef40075fe6259b853285b59ea34d59f3b)
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/ap-after-shim-delta-r-FRESH-invalidation-flWyPl/fresh-1789824601-9a3561/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+OBSERVE F.base green audit written by gov init: {"green": true, "id": "AUD-0001", "inputs_hash": "8aa91941c948991cd870a456e1e33394bd66126415bec49de2933297a4286521", "record_keys": ["actor", "auditor_role", "cache_mode", "checks", "complete", "created", "deep", "families", "findings", "finished_at", "green", "health_result", "id", "inputs", "inputs_hash", "machine_trust", "os_binding", "parallelism", "remediation", "repository", "reproducible", "result_hash", "run_at", "run_summary", "runtime", "scope", "session", "started_at", "state_class", "status", "suite_verdict", "tier", "title", "trigger", "type", "verdict"], "verdict": "HEALTHY"}
+CHECK F.base.1 PASS immediately after init the green audit is current (inputs_hash equal)
+      detail: {"green": "8aa91941c948991cd870a456e1e33394bd66126415bec49de2933297a4286521", "now": "8aa91941c948991cd870a456e1e33394bd66126415bec49de2933297a4286521"}
+CHECK F.PROJECT_POLICY PASS changing HUMAN_GATE_POLICY override (L family) (governance/project/PROJECT_POLICY.yaml) invalidates the prior green governance evidence (inputs_hash changes)
+      detail: {"inputs_hash_changed": true}
+CHECK F.MODEL_ROUTING_OVERRIDES PASS changing MODEL_ROUTING_OVERRIDES provider map (M family) (governance/project/MODEL_ROUTING_OVERRIDES.yaml) invalidates the prior green governance evidence (inputs_hash changes)
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/decisions/HDG-0500.yaml
+CHECK F.HDG-0500 PASS changing a Human Decision Gate record (L3) (spec/decisions/HDG-0500.yaml) invalidates the prior green governance evidence (inputs_hash changes)
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/research/RES-0500.yaml
+OBSERVE F.RES-0500 changing a research record (J1) (spec/research/RES-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.RES-0500.inv PASS a change to a research record (J1) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/experiments/EXP-0500.yaml
+OBSERVE F.EXP-0500 changing an experiment record (J2) (spec/experiments/EXP-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.EXP-0500.inv PASS a change to an experiment record (J2) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/reports/checkpoints/CKPT-09999.yaml
+OBSERVE F.CKPT-09999 changing a checkpoint record (N1) (spec/reports/checkpoints/CKPT-09999.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.CKPT-09999.inv PASS a change to a checkpoint record (N1) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/planning/HND-0500.yaml
+OBSERVE F.HND-0500 changing a handoff record (N4) (spec/planning/HND-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.HND-0500.inv PASS a change to a handoff record (N4) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TASK-0500.yaml
+OBSERVE F.TASK-0500 changing a task record (K2 retest flags live here) (spec/tasks/TASK-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.TASK-0500.inv PASS a change to a task record (K2 retest flags live here) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+
+## consequence of staleness at task close (governance-touching work)
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/ap-after-shim-delta-r-FRESH-invalidation-flWyPl/fresh2-1789824606-06d33a/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+$ gov --json --session probe-9e78214c task create --objective 'touch governance' --class governance --status READY --allowed governance/project/**
+  -> ok
+$ gov --json --session probe-9e78214c task claim TASK-0001
+  -> ok
+$ gov --json --session probe-9e78214c rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-9e78214c task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/ap-after-shim-delta-r-FRESH-invalidation-flWyPl/fresh2-1789824606-06d33a/rep.json
+  -> ERROR [RECEIPT_INVALID] TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING). Remediation: return the fields in the packet's receipt_contract — the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')
+CHECK F.close.1 FAIL after an input change the stale green record blocks governance-touching task close
+      detail: {"code": "RECEIPT_INVALID", "details": {"errors": [{"code": "RECEIPT_FIELDS_MISSING", "ids": ["context_packet_hash", "inputs_consumed", "deviations", "unresolved (or unknowns)"], "message": "the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')"}], "manifest_hash": "38a71485e5b48e0b0a4904e8066e6b2658ca41d3d8ac50712891bdbde3bc0b1a", "ok": false, "packet_hash": null, "receipt": {"acceptance_evidence": [], "constraints_applied": [], "context_packet_hash": null, "decisions_applied": [], "deviations": [], "features_implemented": [], "inputs_consumed": [], "outputs_produced": ["governance/project/NOTE.md"], "requirements_implemented": [], "scenarios_implemented": [], "unresolved": []}, "task": "TASK-0001", "traceability_required": false, "warnings": []}, "message": "TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING). Remediation: return the fields in the packet's receipt_contract \u2014 the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')"}
+$ gov --json --session probe-9e78214c adapters generate
+  -> ok
+$ gov --json --session probe-9e78214c audit
+  -> ok
+$ gov --json --session probe-9e78214c task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/ap-after-shim-delta-r-FRESH-invalidation-flWyPl/fresh2-1789824606-06d33a/rep.json
+  -> ERROR [RECEIPT_INVALID] TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING). Remediation: return the fields in the packet's receipt_contract — the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')
+CHECK F.close.2 FAIL after a fresh green audit the close succeeds (re-check before reliance)
+      detail: {"code": "RECEIPT_INVALID", "details": {"errors": [{"code": "RECEIPT_FIELDS_MISSING", "ids": ["context_packet_hash", "inputs_consumed", "deviations", "unresolved (or unknowns)"], "message": "the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')"}], "manifest_hash": "38a71485e5b48e0b0a4904e8066e6b2658ca41d3d8ac50712891bdbde3bc0b1a", "ok": false, "packet_hash": null, "receipt": {"acceptance_evidence": [], "constraints_applied": [], "context_packet_hash": null, "decisions_applied": [], "deviations": [], "features_implemented": [], "inputs_consumed": [], "outputs_produced": ["governance/project/NOTE.md"], "requirements_implemented": [], "scenarios_implemented": [], "unresolved": []}, "task": "TASK-0001", "traceability_required": false, "warnings": []}, "message": "TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING). Remediation: return the fields in the packet's receipt_contract \u2014 the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')"}
+
+## runtime/kernel implementation change: a different gov binary with the same kernel payload
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/ap-after-shim-delta-r-FRESH-invalidation-flWyPl/fresh3-1789824609-104957/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+OBSERVE F.impl.bins binaries: {"modified_sha256": "83ad105537a3886e", "original_sha256": "0f55e5bdceebda1b"}
+$ <modified gov binary> --json audit --no-persist  -> inputs_hash 520385c79a6da798de88a1e8360ce55ee712fd95633c03fc1e54ff9a46aa7893
+CHECK F.impl.1 FAIL running a different runtime/CLI implementation invalidates the green record produced by the previous implementation
+      detail: {"audit_record_has_binary_identity": false, "green_inputs_hash": "520385c79a6da798de88a1e8360ce55ee712fd95633c03fc1e54ff9a46aa7893", "under_modified_binary": "520385c79a6da798de88a1e8360ce55ee712fd95633c03fc1e54ff9a46aa7893"}
+
+## which governance-suite families would re-check family-delta behaviour after invalidation?
+OBSERVE F.families governance-suite families (TEST_POLICY.governance_families): ["adapter_portability", "artifact_flow_health", "audit_reproducibility", "authority_role_limits", "authority_unambiguous", "change_control_integrity", "command_contract_consistency", "concurrency_claims", "context_reproducibility", "continuity_checkpoint_handoff", "contract_binding", "feature_readiness", "fresh_agent_reconstruction", "graph_integrity", "health_slos", "human_gate_integrity", "index_content_coverage", "index_freshness", "installation_authenticity", "legacy_authority", "lineage_orphans", "memory_retrieval_regression", "model_routing_integrity", "mutation_scope", "os_binding_integrity", "path_map_compliance", "plugin_governance", "policy_enforcement_coverage", "policy_precedence", "product_test_health", "product_traceability", "recovery_rebuild", "research_experiment_data_lifecycle", "schema_invariants", "secrets_sensitivity_indexing", "skill_regression", "task_contract_integrity", "unresolved_audit_findings", "upstream_change_propagation"]
+CHECK F.families.1 PASS the re-check the product runs on stale evidence includes a family that exercises J/K/L/M/N behaviour
+      detail: ["adapter_portability", "artifact_flow_health", "audit_reproducibility", "authority_role_limits", "authority_unambiguous", "change_control_integrity", "command_contract_consistency", "concurrency_claims", "context_reproducibility", "continuity_checkpoint_handoff", "contract_binding", "feature_readiness", "fresh_agent_reconstruction", "graph_integrity", "health_slos", "human_gate_integrity", "index_content_coverage", "index_freshness", "installation_authenticity", "legacy_authority", "lineage_orphans", "memory_retrieval_regression", "model_routing_integrity", "mutation_scope", "os_binding_integrity", "path_map_compliance", "plugin_governance", "policy_enforcement_coverage", "policy_precedence", "product_test_health", "product_traceability", "recovery_rebuild", "research_experiment_data_lifecycle", "schema_invariants", "secrets_sensitivity_indexing", "skill_regression", "task_contract_integrity", "unresolved_audit_findings", "upstream_change_propagation"]
+SUMMARY checks=13 pass=10 fail=3 failed=['F.close.1', 'F.close.2', 'F.impl.1']
+[exit=0]

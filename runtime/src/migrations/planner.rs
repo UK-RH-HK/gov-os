@@ -194,7 +194,7 @@ pub fn plan(
             "path_references": c.get("path_references").cloned().unwrap_or(json!([])), "consumers": c.get("consumers").cloned().unwrap_or(json!([])), "cited_by": c.get("cited_by").cloned().unwrap_or(json!([])),
             "reference_edges": c.get("reference_edges").cloned().unwrap_or(json!([])),
             "index_policy": index_policy, "sensitivity": if secret { "secret" } else { "internal" },
-            "rollback": "batch snapshot under .governance-runtime/migration/batch-<n>/ restored by `gov adopt rollback --batch <n>`; git history preserves deletions", "verification": verification, "batch": batch, "requires_human_gate": gate, "gate_reasons": gate_reasons, "confidence": c["confidence"], "finding_state": finding_state});
+            "rollback": "batch snapshot under .governance-state/migration/batch-<n>/ (non-rebuildable OS state, BC-P2-31) restored by `gov adopt rollback --batch <n>`; git history preserves deletions", "verification": verification, "batch": batch, "requires_human_gate": gate, "gate_reasons": gate_reasons, "confidence": c["confidence"], "finding_state": finding_state});
         if c["os_owned"].is_string() {
             e["os_owned"] = c["os_owned"].clone();
         }

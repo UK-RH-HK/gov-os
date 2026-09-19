@@ -942,6 +942,12 @@ enum TaskCmd {
     },
     Dag,
     Replan,
+    /// WS-5 (P2-AR-0036, BC-P2-24) additive: generate the governed, linked work the recorded events call for
+    /// (`--dry-run` reports it and writes nothing)
+    Generate {
+        #[arg(long)]
+        dry_run: bool,
+    },
 }
 #[derive(Subcommand)]
 enum CitCmd {
@@ -1167,6 +1173,9 @@ enum MemoryCmd {
         heldout: Option<PathBuf>,
         #[arg(long)]
         record: bool,
+        /// With --record: the task that commissioned the benchmark (recorded among the work the research influenced)
+        #[arg(long)]
+        task: Option<String>,
     },
     /// Change the retrieval profile through the governed path (BC-P2-30): benchmark evidence (--research), the
     /// change-control gate for its radius (raised on the first call; --gate once an answer authorises it), a full
@@ -1271,6 +1280,22 @@ enum ReleaseCmd {
     Verify {
         dir: PathBuf,
     },
+    /// Record this project's own product release (`REL-<version>` under spec/releases): derived from the work that
+    /// produced it, validated by the evidence that accepted it (W8 forward lineage; WS-8 IP-R2-WS08-7)
+    Record {
+        #[arg(long)]
+        version: String,
+        #[arg(long)]
+        title: String,
+        /// Comma-separated task / report / feature / requirement / decision ids
+        #[arg(long, value_delimiter = ',')]
+        derived_from: Vec<String>,
+        /// Comma-separated audit / report / test-obligation / scenario ids
+        #[arg(long, value_delimiter = ',')]
+        validated_by: Vec<String>,
+        #[arg(long)]
+        notes: Option<String>,
+    },
 }
 #[derive(Subcommand)]
 enum KernelCmd {
@@ -1317,12 +1342,31 @@ enum TrustCmd {
     BreakGlass,
     /// Replay any interrupted install transaction and report what was done
     RecoverTransactions,
+    /// Administrator (P2-ADJ-0002): install the owner's T2 binding authority on this provisioned machine, so T2 facts
+    /// it writes are honoured on the owner's other provisioned machines
+    Bind {
+        /// Owner-signed `t2-binding-authority` document (signed by the root-delegated `t2-binding` role), from the
+        /// administrator domain
+        #[arg(long)]
+        authority: String,
+        /// A binding key the authority authorises (`key_hex`), from the administrator domain — never a repository
+        #[arg(long)]
+        key: String,
+    },
     /// The authenticated human channel for Human Decision Gate answers: anchor, inbox, what a signed answer binds
     HumanChannel {
         /// Administrator: install the owner's public `human-gate` keys (a self-signed `human-channel-anchor`
         /// document from the administrator domain) on a machine without a Signed Release Root
         #[arg(long)]
         provision: Option<String>,
+    },
+    /// P2-ADJ-0002 continuity: re-seal, under the owner's T2 binding authority (`gov trust bind`), the records this
+    /// machine sealed with its own key while it was provisioned (records sealed while unprovisioned, and records whose
+    /// seal does not verify, are never re-sealed). The binding status is part of `gov trust status` (`t2_binding`).
+    Reseal {
+        /// Report what would be resealed and write nothing
+        #[arg(long)]
+        dry_run: bool,
     },
 }
 
@@ -1523,11 +1567,19 @@ fn g0_label(cmd: &Cmd) -> String {
             TrustCmd::RootUpdate { .. } => "trust root-update",
             TrustCmd::BreakGlass => "trust break-glass",
             TrustCmd::RecoverTransactions => "trust recover-transactions",
+            TrustCmd::Bind { .. } => "trust bind",
             TrustCmd::HumanChannel { provision } => {
                 if provision.is_some() {
                     "trust human-channel --provision"
                 } else {
                     "trust human-channel"
+                }
+            }
+            TrustCmd::Reseal { dry_run } => {
+                if *dry_run {
+                    "trust reseal --dry-run"
+                } else {
+                    "trust reseal"
                 }
             }
         }),
@@ -1561,6 +1613,14 @@ fn g0_label(cmd: &Cmd) -> String {
             }
             TaskCmd::Dag => "task dag",
             TaskCmd::Replan => "replan",
+            // WS-5 (P2-AR-0036) additive arm
+            TaskCmd::Generate { dry_run } => {
+                if *dry_run {
+                    "task generate --dry-run"
+                } else {
+                    "task generate"
+                }
+            }
         }),
         Cmd::Cit { op } => s(match op {
             CitCmd::Propose { .. } => "cit propose",
@@ -1659,6 +1719,7 @@ fn g0_label(cmd: &Cmd) -> String {
         Cmd::Release { op } => s(match op {
             ReleaseCmd::Build { .. } => "release build",
             ReleaseCmd::Verify { .. } => "release verify",
+            ReleaseCmd::Record { .. } => "release record",
         }),
         Cmd::Kernel { op } => s(match op {
             KernelCmd::Verify => "kernel verify",
@@ -1838,6 +1899,14 @@ fn run(cli: &Cli) -> Result<Value> {
     // BC-P2-08: resolve the acting role once and make it the role of every Project this process opens — including
     // those `init` and every `adopt`/`migrate` stage open internally — then pass the G0 guard.
     gov_runtime::authority::install_acting_role(declared_role(cli)?)?;
+    // WS-9/11 r2 IP-R2-1 (BC-P2-08): the session this invocation declared (the global `--session`, else
+    // GOV_SESSION) is installed once, as parsed here, so the runtime's adoption authorship reads the same declaration
+    // the CLI resolved instead of re-parsing the process arguments
+    gov_runtime::migrations::identity::install_declared_session(
+        cli.session
+            .clone()
+            .or_else(|| std::env::var("GOV_SESSION").ok()),
+    )?;
     g0(cli)?;
     let acting = gov_runtime::authority::default_role_id();
     match &cli.cmd {
@@ -1866,7 +1935,7 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::CancelAgents { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "CANCEL_AGENTS", reason.as_deref()) }
         Cmd::Resume => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "RESUME", None) }
         Cmd::Doctor => { let p = open_project(cli, false)?; let r = gov_runtime::doctor::run(&p)?; let v = serde_json::to_value(&r)?; if r.verdict == "UNHEALTHY" { return Err(GovError::new("UNHEALTHY", format!("doctor: UNHEALTHY ({} failed checks)", r.failed)).with_details(v)); } Ok(v) }
-        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
+        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
         Cmd::Recover { dry_run } => { let p = open_project(cli, true)?; if !*dry_run { gov_runtime::authority::require(&p, "recover")?; } gov_runtime::recovery::recover(&p, *dry_run) }
         Cmd::Adopt { stage } | Cmd::Migrate { stage } => {
             let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
@@ -1901,6 +1970,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 TrustCmd::Provision { anchor } => gov_runtime::srr::provision::provision(Path::new(anchor), project_root.as_deref()),
                 TrustCmd::RootUpdate { anchor } => gov_runtime::srr::provision::root_update(Path::new(anchor), project_root.as_deref()),
                 TrustCmd::BreakGlass => gov_runtime::srr::provision::break_glass_status(),
+                TrustCmd::Bind { authority, key } => gov_runtime::srr::binding::bind(Path::new(authority), Path::new(key), project_root.as_deref()),
                 TrustCmd::RecoverTransactions => {
                     let ms = gov_runtime::srr::state::MachineState::open()?;
                     let r = gov_runtime::srr::staging::recover(&ms)?;
@@ -1921,6 +1991,8 @@ fn run(cli: &Cli) -> Result<Value> {
                         None => gov_runtime::human_channel::status(allowed),
                     }
                 }
+                // P2-ADJ-0002 continuity under the owner's T2 binding authority (installed by `trust bind`)
+                TrustCmd::Reseal { dry_run } => { let p = open_project(cli, true)?; gov_runtime::t2::reseal(&p, *dry_run) }
             }
         }
         Cmd::Contract { op } => {
@@ -1948,13 +2020,16 @@ fn run(cli: &Cli) -> Result<Value> {
                     if let Some(s) = status { o.insert("task_status".into(), json!(s)); }
                     if let Some(i) = id { o.insert("id".into(), json!(i)); } t::create(&p, f) }
                 TaskCmd::List { status } => Ok(json!(t::list(&p, status.as_deref()))),
-                TaskCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found"))) }
+                // R3-WS5-4: the record with its DAG evaluation, staleness and generation source (`tasks::show`)
+                TaskCmd::Show { id } => t::show(&p, id),
                 TaskCmd::Status { id, status, note } => t::set_status(&p, id, status, note.as_deref()),
                 TaskCmd::Claim { id } => t::claim(&p, id),
                 TaskCmd::Release { id, force } => Ok(json!({"released": t::release(&p, id, *force)?})),
                 TaskCmd::Close { id, report, force } => { let d = db(&p)?; let r = load_file_value(report)?; t::close(&p, &d, id, r, *force) }
                 TaskCmd::Dag => Ok(serde_json::to_value(gov_runtime::orchestration::dag::compute(&p)?)?),
                 TaskCmd::Replan => gov_runtime::orchestration::dag::replan(&p),
+                // WS-5 (P2-AR-0036, BC-P2-24) additive arm
+                TaskCmd::Generate { dry_run } => gov_runtime::orchestration::generation::reconcile(&p, &gov_runtime::orchestration::generation::Options { trigger: "task generate".into(), dry_run: *dry_run }),
             }
         }
         Cmd::Cit { op } => {
@@ -2041,7 +2116,7 @@ fn run(cli: &Cli) -> Result<Value> {
             match op {
                 MemoryCmd::Query { query, k, route, include_historical } => { let d = db(&p)?; let r = gov_runtime::retrieval::retrieve(&p, &d, query, gov_runtime::retrieval::RetrieveOptions { k: *k, route: route.clone(), include_historical: *include_historical, log: true, ..Default::default() })?; gov_runtime::observability::emit(&p, "retrieval", json!({"routes": r.routes, "hits": r.hits.len(), "latency_ms": r.latency_ms}))?; Ok(serde_json::to_value(&r)?) }
                 MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if r["measured"].as_bool().unwrap_or(false) && !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
-                MemoryCmd::Benchmark { candidates, heldout, record } => gov_runtime::memory::benchmark::run(&p, candidates, heldout.clone(), *record),
+                MemoryCmd::Benchmark { candidates, heldout, record, task } => gov_runtime::memory::benchmark::run_for(&p, candidates, heldout.clone(), *record, task.as_deref()),
                 MemoryCmd::Select { candidate, research, by, gate } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), gate.as_deref(), by.as_deref().unwrap_or(&acting)),
                 MemoryCmd::Integrity => { let d = db(&p).ok(); let store = gov_runtime::records::RecordStore::load(&p.root); Ok(serde_json::to_value(gov_runtime::memory::integrity::check(&p, &store, d.as_ref())?)?) }
                 MemoryCmd::Profile => { let mut v = gov_runtime::memory::profile::status(&p); v["live_index"] = db(&p).ok().map(|d| json!({"embedder": d.get_meta("embedder"), "reranker": d.get_meta("reranker"), "components": {"embedder": d.get_meta("embedder_identity"), "reranker": d.get_meta("reranker_identity")}})).unwrap_or(Value::Null); Ok(v) }
@@ -2058,7 +2133,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 }
                 MemoryCmd::Failures => Ok(json!({"open": gov_runtime::memory::failures::open_failures(&p)})),
                 MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
-                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?)?),
+                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, ..Default::default() })?)?),
                 MemoryCmd::Graph { node, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::neighbours(&d, node, *depth)?)) }
                 MemoryCmd::Impact { seeds, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::impact_set(&d, &csv(&Some(seeds.clone())), *depth)?)) }
             }
@@ -2073,6 +2148,12 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::Release { op } => match op {
             ReleaseCmd::Build { version, out, certification, evidence, canonical } => { let croot = canonical.clone().or_else(gov_runtime::kernel::canonical_root).ok_or_else(|| GovError::new("KERNEL_SOURCE_NOT_FOUND", "canonical repository root not found (pass --canonical)"))?; let out = out.clone().unwrap_or(croot.join("release")); gov_runtime::release::build(&croot, version, &out, certification, evidence.as_deref()) }
             ReleaseCmd::Verify { dir } => gov_runtime::release::verify(dir),
+            // product-release records (IP-R3-WS03-5 / IP-R3-WS08-8 / IP-R3-WS04-07): WS-8's writer, WS-4's record type,
+            // WS-3's G0 class (`release record`: Write / `record_release`)
+            ReleaseCmd::Record { version, title, derived_from, validated_by, notes } => {
+                let p = open_project(cli, true)?;
+                gov_runtime::release::record_product_release(&p, &gov_runtime::release::ProductRelease { version: version.clone(), title: title.clone(), derived_from: derived_from.clone(), validated_by: validated_by.clone(), notes: notes.clone() })
+            }
         },
         Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => { let v = serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?; let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"ok": v["ok"], "modified": v["modified"], "missing": v["missing"], "added": v["added"], "payload_hash": v["payload_hash"], "version": v["version"], "trust": t.to_value()})) }
             KernelCmd::Trust => { let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"verified": t.verified, "summary": t.summary(), "trust": t.to_value()})) }
@@ -2132,7 +2213,8 @@ fn run(cli: &Cli) -> Result<Value> {
             PluginsCmd::Register { descriptor } => gov_runtime::capabilities::governance::register(&p, load_file_value(descriptor)?),
             PluginsCmd::List => { let set = gov_runtime::capabilities::governance::plugin_set(&p); Ok(json!({"role": p.role, "usable": set.usable, "denied": set.denied, "rejected": set.rejected})) }
             PluginsCmd::Unregister { plugin_id } => gov_runtime::capabilities::governance::unregister(&p, plugin_id),
-            PluginsCmd::Registry => Ok(gov_runtime::capabilities::registry::load(&p)),
+            // WS-7 r2 IP-W7-4: every entry with its T2 binding and whether it is honoured, and the document's binding
+            PluginsCmd::Registry => Ok(gov_runtime::capabilities::registry::report(&p)),
             PluginsCmd::Health { ping } => Ok(json!(gov_runtime::capabilities::governance::health(&p, *ping))) } }
         Cmd::Policy { op } => { let p = open_project(cli, true)?; let pol = p.policies(); match op {
             PolicyCmd::Overrides => Ok(json!({"applied": pol.applied_overrides, "refused": pol.refused_overrides, "precedence": pol.precedence, "kernel_trust": pol.kernel_trust, "problems": pol.problems})),
@@ -2257,6 +2339,35 @@ fn main() {
         .unwrap_or_default();
     let started = std::time::Instant::now();
     let result = run(&cli);
+    // WS-5 (P2-AR-0036, BC-P2-24) additive block — **governed work generated when the event occurs.** After a
+    // governed write command (its G0 class), the work its recorded events call for (failed tests, findings, health
+    // failures, discoveries, human decisions, CIT effects, lessons, missing tools/skills, failures, performance
+    // regressions) is generated into the task DAG, linked and idempotent (`orchestration::generation::after_command`).
+    // It runs whether the command succeeded or failed (a failing run may have recorded its event) but not after a
+    // refusal before dispatch, and not after any refusal of the guard (round-3 integration review, R3-WS5-1: the
+    // write guard's kernel-trust, below-floor and emergency-control refusals and the availability rule's
+    // `HEALTH_HARD_BLOCK` — a refused command recorded no event, and its refusal is not work to generate); it never
+    // changes the command's result.
+    if !matches!(
+        result.as_ref().err().map(|e| e.code.as_str()),
+        Some(
+            "G0_UNCLASSIFIED"
+                | "AUTHORITY_DENIED"
+                | "FROZEN"
+                | "PAUSED"
+                | "USAGE"
+                | "ROLE_UNDECLARED"
+                | "HEALTH_HARD_BLOCK"
+                | "KERNEL_TAMPERED"
+                | "KERNEL_UNANCHORED"
+                | "SRR_BELOW_FLOOR_REFUSED"
+                | "SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED"
+        )
+    ) {
+        if let Ok(p) = open_project(&cli, true) {
+            let _ = gov_runtime::orchestration::generation::after_command(&p, &g0_label(&cli.cmd));
+        }
+    }
     // telemetry span for every command when a project is available
     if let Ok(p) = open_project(&cli, true) {
         let _ = gov_runtime::observability::emit(

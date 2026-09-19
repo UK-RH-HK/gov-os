@@ -138,12 +138,14 @@ fn path_migration_with_rollback_and_memory_rebuild() {
         contract["capability_roots"]
     );
     executor.ok(&["adopt", "migrate", "--batch", "1"]);
+    // `.governance-state/**` is the OS's operational state (BC-P2-31): the batch snapshots live there
     let before = tree_hash(
         &root,
         &[
             "spec/audits/**",
             "spec/reports/**",
             "governance/generated/**",
+            ".governance-state/**",
         ],
     );
     let b2 = executor.ok(&["adopt", "migrate", "--batch", "2"]);
@@ -228,15 +230,25 @@ fn path_migration_with_rollback_and_memory_rebuild() {
     assert!(legacy_entry["dependency_proof"]["active_references"]
         .to_string()
         .contains("docs/architecture.md"));
+    // BC-P2-31 (IP-R2-10): the batch snapshot is non-rebuildable OS state in `.governance-state/`, so deleting the
+    // whole derived runtime directory (framework §19) does not take the rollback with it
+    assert!(exists(
+        &root,
+        ".governance-state/migration/batch-2/batch.json"
+    ));
+    assert!(!exists(&root, ".governance-runtime/migration"));
+    std::fs::remove_dir_all(root.join(".governance-runtime")).unwrap();
     let rb = executor.ok(&["adopt", "rollback", "--batch", "2"]);
     assert!(rb["restored"].as_array().unwrap().len() >= 2);
+    assert_eq!(rb["refused"], serde_json::json!([]), "{rb}");
     assert_eq!(
         tree_hash(
             &root,
             &[
                 "spec/audits/**",
                 "spec/reports/**",
-                "governance/generated/**"
+                "governance/generated/**",
+                ".governance-state/**"
             ]
         ),
         before,
@@ -1008,5 +1020,157 @@ fn adoption_independence_is_bound_to_declared_roles_and_approved_artefacts() {
             .clone();
         assert_eq!(s["by"]["role"], role, "{s}");
         assert_eq!(s["by"]["independence_established"], true, "{s}");
+    }
+}
+
+/// Repair-1 r3 WS-9 regression (builder evidence, not acceptance) — Contract v3 A3 "Tool execution respects
+/// role/authority/permission boundaries": a reviewer-authored `command` test executes only one of the project's
+/// governed test commands, where it is governed, for a role that may run tests. An approval that would bind anything
+/// else is refused before anything runs (an arbitrary program, a runner with extra arguments, a directory outside the
+/// repository); the governed baseline command still runs at A6 (the executor, TOOL_PERMISSIONS) and at A7 (the
+/// designated verifier's duty), recorded with who was authorised and why; when policy takes RUN_TESTS from the
+/// executor, the next batch is refused before anything moves.
+#[test]
+fn command_tests_execute_only_governed_commands_for_permitted_roles() {
+    use serde_json::json;
+    let (root, planner) = setup_fixture("migration", "adopt-cmd", "S-planner");
+    for s in [
+        "baseline",
+        "inventory",
+        "classify",
+        "map",
+        "plan",
+        "test-design",
+    ] {
+        planner.ok(&["adopt", s]);
+    }
+    let tf = "spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml";
+    let baseline = yaml(&root, "spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml");
+    let governed_cmd: Vec<String> = baseline["baseline_tests"]["command"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default();
+    reviewer_authors_tests(&root);
+    let reviewer = planner
+        .with_session("S-reviewer")
+        .with_role("migration-reviewer");
+    let approved_tests = yaml(&root, tf);
+    let with_test = |extra: serde_json::Value| {
+        let mut t = approved_tests.clone();
+        t["tests"].as_array_mut().unwrap().push(extra);
+        write_yaml(&root, tf, &t);
+    };
+    // an arbitrary program, a governed runner with extra arguments, a directory outside the repository
+    let mut attempts = vec![
+        json!({"id": "RT-CMD", "kind": "command", "path": ".", "command": ["sh", "-c", "touch PWNED"], "expect_exit": 0}),
+        json!({"id": "RT-CMD", "kind": "command", "path": ".", "command": ["git", "-c", "alias.x=!touch PWNED", "x"], "expect_exit": 0}),
+    ];
+    if !governed_cmd.is_empty() {
+        let mut extended = governed_cmd.clone();
+        extended.extend(["-p".to_string(), "no:cacheprovider".to_string()]);
+        attempts.push(json!({"id": "RT-CMD", "kind": "command", "path": ".", "command": extended, "expect_exit": 0}));
+        attempts.push(json!({"id": "RT-CMD", "kind": "command", "path": ".", "command": governed_cmd, "cwd": "../", "expect_exit": 0}));
+    }
+    for a in attempts {
+        with_test(a.clone());
+        let e = reviewer.err(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"]);
+        assert_eq!(
+            e.error_code(),
+            "TEST_COMMAND_NOT_PERMITTED",
+            "{a}: {}",
+            e.envelope
+        );
+        assert_eq!(e.details()["refused"][0]["test"], "RT-CMD");
+        assert_eq!(e.details()["policy"]["role"], "migration-verifier");
+        assert!(!exists(&root, "PWNED"), "nothing was executed");
+    }
+    write_yaml(&root, tf, &approved_tests);
+    reviewer.ok(&["adopt", "review", "--verdict", "MIGRATION_PLAN_APPROVED"]);
+    let executor = planner
+        .with_session("S-executor")
+        .with_role("migration-executor");
+    let b0 = executor.ok(&[
+        "adopt",
+        "migrate",
+        "--batch",
+        "0",
+        "--source",
+        signed_source(),
+        "--name",
+        "libcore",
+        "--alias",
+        "fx-cmd",
+    ]);
+    let cmd_rows = |r: &serde_json::Value| -> Vec<serde_json::Value> {
+        r["batches"][0]["tests"]["results"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter(|x| x["kind"] == "command")
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let has_command_test = baseline["baseline_tests"]["status"] == "passed";
+    if has_command_test {
+        // the scaffolded behaviour baseline is the governed command: it ran, authorised for the executor by policy
+        let rows = cmd_rows(&b0);
+        assert_eq!(rows.len(), 1, "{b0}");
+        assert_eq!(rows[0]["authorised"]["role"], "migration-executor", "{b0}");
+        assert!(rows[0]["authorised"]["permission_basis"]
+            .as_str()
+            .unwrap()
+            .starts_with("TOOL_PERMISSIONS.roles.migration-executor"));
+        // policy takes RUN_TESTS from the executor: the next batch is refused before anything moves
+        let tp = "governance/project/TOOL_PERMISSIONS.yaml";
+        let original = read(&root, tp);
+        let mut perms = yaml(&root, tp);
+        perms["roles"]["migration-executor"] = json!(["READ_REPO", "WRITE_REPO_SCOPED"]);
+        write_yaml(&root, tp, &perms);
+        let ledger = root.join("spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl");
+        let ledger_before = std::fs::read_to_string(&ledger).ok();
+        let e = executor.err(&["adopt", "migrate", "--batch", "1"]);
+        assert_eq!(
+            e.error_code(),
+            "TEST_COMMAND_NOT_PERMITTED",
+            "{}",
+            e.envelope
+        );
+        assert!(e.details()["refused"][0]["reasons"][0]
+            .as_str()
+            .unwrap()
+            .contains("does not hold RUN_TESTS"));
+        assert_eq!(
+            std::fs::read_to_string(&ledger).ok(),
+            ledger_before,
+            "nothing executed"
+        );
+        assert!(!exists(&root, ".governance-state/migration/batch-1"));
+        write(&root, tp, &original);
+    }
+    for b in ["1", "2", "3", "4", "5", "6", "7"] {
+        executor.ok(&["adopt", "migrate", "--batch", b]);
+    }
+    // A7: the designated verifier runs the approved command test by its protocol duty (TOOL_PERMISSIONS does not
+    // list migration-verifier), and the verification report records it
+    planner
+        .with_session("S-verifier")
+        .with_role("migration-verifier")
+        .ok(&["adopt", "verify-migration"]);
+    if has_command_test {
+        let report = read(
+            &root,
+            "spec/audits/GOVERNANCE-ADOPTION/08-INDEPENDENT-MIGRATION-VERIFICATION.md",
+        );
+        assert!(
+            report.contains("\"role\": \"migration-verifier\"")
+                && report.contains("whose duty is to run the approved independent tests"),
+            "{report}"
+        );
     }
 }

@@ -9,21 +9,31 @@
 //!
 //! | Tier | Duty (Contract v3:793-799) | Host trigger (owner) | Default selection / cache |
 //! |---|---|---|---|
-//! | G0 | guard every privileged/mutating command | every governed operation (`control::guard_write`, WS-3; task/CIT hosts) | [`guard`]: active hard-blocks, targeted re-evaluation |
-//! | G1 | changed paths / schema / secrets / index invalidation | any material mutation (WS-4/WS-5/WS-6) | tier checks, cache |
-//! | G2 | mutation scope / tests / references / memory freshness | task close (`tasks::close`, WS-5) | tier checks, cache |
-//! | G3 | claims / decisions / gates / checkpoint freshness | checkpoint & handoff (WS-4) | tier checks, cache |
-//! | G4 | wider staleness after CIT-E / migration / memory / architecture | CIT execute (WS-4), migration (WS-9) | tier checks, cache |
+//! | G0 | guard every privileged/mutating command | every governed operation (`control::guard_write`, WS-3; task/CIT/update hosts) | [`admit`] / [`guard`]: active hard-blocks within their scope, remedies admitted, targeted re-evaluation |
+//! | G1 | changed paths / schema / secrets / index and dependency/lineage invalidation | **every material mutation, however made**: [`observe`] compares the tree with the last observed state before any operation commits a change the repository relies on (close, CIT-E, release, update, migration) and at `gov status`/`continue`/`gov health status`, and runs G1 on what changed | G1 checks the changed inputs impact, cache |
+//! | G2 | mutation scope / readiness / tests / references / memory freshness / input consumption | task close (`tasks::close` → `verification::close_gate`, WS-5) | tier checks (all for governance-affecting work), cache |
+//! | G3 | claims / decisions / gates / checkpoint freshness / mandatory-input continuity | checkpoint & handoff (WS-4) | tier checks, cache |
+//! | G4 | wider staleness/impact propagation after CIT-E / migration / memory / architecture | CIT execute (WS-4), migration (WS-9), and [`observe`] when an architecture, migration or memory-profile input changed however made | tier checks, cache; a governance-suite record is written |
 //! | G5 | full suite | adopt (WS-9), update/release (WS-8), `gov audit` | all checks, fresh (hosts) / cache (`gov audit`) |
-//! | G6 | qualification (synthetic repos, chaos, soak, hidden tests) | qualification harness (Phase 4) | all checks, fresh, qualification subject recorded |
+//! | G6 | qualification (synthetic repos, chaos, soak, hidden tests) | `gov health qualify` (Phase 4 harness), provisioned machines only | all checks, fresh, qualification subject and machine posture recorded |
+//!
+//! **Availability rule (P2-HO-0031; Contract v3 L4, O5 :807).** A hard-block refuses the operations whose reliance
+//! it protects, **scoped** to what the failing check governs ([`catalogue::BlockScope`]); work that remedies a block
+//! and independent work outside its scope stay available; a remedy that does not clear its block does not commit; every
+//! refusal is typed (`HEALTH_HARD_BLOCK`, `HEALTH_REMEDY_INCOMPLETE`) and names each block, its check, its scope and
+//! its subjects. Hosts use one API: [`admit`] a [`Request`] naming the operation and its subjects; when the
+//! [`Admission`] is a remedy of a committing operation, call [`confirm_remedy`] after applying the change and before
+//! committing (roll back on error). [`guard`] is the same decision for hosts that pass paths and cannot carry an
+//! obligation: it refuses a committing operation that would only be admitted as a remedy.
 use crate::records::RecordStore;
 use crate::util::{glob_match, hash_value, now_iso};
 use crate::verification::currency::{self, Snapshot};
 use crate::verification::Family;
 use crate::{GovError, Project, Result};
-use catalogue::{BlockScope, Cache, CheckDef, Extra, Isolation, Repro, Surface};
+use catalogue::{Cache, CheckDef, Extra, Isolation, Repro, Surface};
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, VecDeque};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
 
 pub mod catalogue;
@@ -186,6 +196,11 @@ pub struct RunOptions {
     /// G6 only: the validated qualification run this health result observes ([`qualification_run`]), recorded with
     /// the result and the governance-suite record.
     pub qualification: Option<Value>,
+    /// Execute every check once (no concurrent double run): mutation observation ([`observe`]) re-evaluates impacted
+    /// checks cheaply; reproducibility is established by the G4-G6 runs.
+    pub single_run: bool,
+    /// The input snapshot the run evaluates, when the caller already took it (`None`: taken by the run).
+    pub snapshot: Option<Snapshot>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -213,6 +228,8 @@ impl RunOptions {
             workers: None,
             ledger: true,
             qualification: None,
+            single_run: false,
+            snapshot: None,
         }
     }
 }
@@ -394,9 +411,40 @@ impl<'a> Extras<'a> {
         }
         let v = match e {
             Extra::LiveIndex => live_index_digest(self.p),
+            // the store actually in use (a linked worktree shares its main worktree's; WS-6 IP-R2-12: wherever its
+            // writer keeps it)
             Extra::Claims => {
-                let rt = self.p.runtime_dir();
-                sha_of_files(&[rt.join("claims.db"), rt.join("claims.db-wal")])
+                let db = crate::memory::claims::ClaimsStore::path_for(self.p);
+                let wal = db.with_file_name(format!(
+                    "{}-wal",
+                    db.file_name()
+                        .map(|n| n.to_string_lossy().to_string())
+                        .unwrap_or_else(|| "claims.db".into())
+                ));
+                sha_of_files(&[db, wal])
+            }
+            Extra::Telemetry => sha_of_files(&[
+                crate::observability::path(self.p),
+                crate::routing::evidence_path(self.p),
+            ]),
+            Extra::Qualifications => hash_value(&json!(store::history(self.p, store::RETAIN)
+                .into_iter()
+                .filter(|h| h["tier"] == "G6")
+                .map(|h| h["id"].clone())
+                .collect::<Vec<_>>())),
+            Extra::ClockHour => chrono::Utc::now().format("%Y-%m-%dT%H").to_string(),
+            Extra::ContextPackets => {
+                let mut files: Vec<std::path::PathBuf> =
+                    std::fs::read_dir(self.p.runtime_dir().join("context"))
+                        .map(|rd| {
+                            rd.flatten()
+                                .map(|e| e.path())
+                                .filter(|x| x.extension().map(|e| e == "json").unwrap_or(false))
+                                .collect()
+                        })
+                        .unwrap_or_default();
+                files.sort();
+                sha_of_files(&files)
             }
             Extra::ProductEvidence => product_evidence_digest(self.p),
             Extra::SkillObservations => sha_of_files(&[crate::skills::observations_path(self.p)]),
@@ -566,11 +614,28 @@ pub fn suite_families(p: &Project) -> Vec<String> {
 /// Run the governance suite under the scheduler. The caller receives every check run; the ledger result (with
 /// provenance) is persisted and the hard-block state updated unless `opts.ledger` is false.
 pub fn run_suite(p: &Project, opts: &RunOptions) -> Result<SuiteOutcome> {
+    let _depth = SuiteDepth::enter();
     let started = std::time::Instant::now();
     let started_at = now_iso();
     let run_id = store::new_result_id();
-    let snap = Snapshot::take(p)?;
-    let families = suite_families(p);
+    let snap = match &opts.snapshot {
+        Some(s) => s.clone(),
+        None => Snapshot::take(p)?,
+    };
+    let mut families = suite_families(p);
+    // a check named explicitly runs even when the effective suite list does not name it: a block recorded under an
+    // earlier effective policy (another kernel became the verified one, an update changed the list) is re-evaluated —
+    // and cleared — only by the check that recorded it (`reevaluate`)
+    if let Selection::Explicit(ids) = &opts.selection {
+        for id in ids {
+            let family = catalogue::get(id)
+                .map(|d| d.surface == Surface::Family)
+                .unwrap_or(false);
+            if family && !families.contains(id) {
+                families.push(id.clone());
+            }
+        }
+    }
     let mut extras = Extras {
         p,
         deep: opts.deep,
@@ -639,7 +704,7 @@ pub fn run_suite(p: &Project, opts: &RunOptions) -> Result<SuiteOutcome> {
     let mut queue: VecDeque<Task> = VecDeque::new();
     for &i in &to_execute {
         queue.push_back(Task { idx: i, replica: 0 });
-        if def_for(&runs[i].id).repro == Repro::DoubleRun {
+        if def_for(&runs[i].id).repro == Repro::DoubleRun && !opts.single_run {
             queue.push_back(Task { idx: i, replica: 1 });
         }
     }
@@ -811,6 +876,14 @@ pub fn run_suite(p: &Project, opts: &RunOptions) -> Result<SuiteOutcome> {
         out.result["blocks"] = store::load_state(p)["blocks"].clone();
         out.result["state"] = json!(health_state(&store::load_state(p)));
         store::save_result(p, &out.result)?;
+        // every G1 duty evaluated against this snapshot: the mutations up to it are observed (see `observe`)
+        let g1_done = out
+            .runs
+            .iter()
+            .all(|r| !def_for(&r.id).tiers.contains(&Tier::G1) || r.status != Status::NotEvaluated);
+        if g1_done {
+            let _ = save_observed(p, &out.snapshot, &run_id);
+        }
         let _ = crate::observability::emit(
             p,
             "health.run",
@@ -899,6 +972,31 @@ pub fn repository_state(p: &Project, snap: &Snapshot) -> Value {
 
 // ------------------------------------------------------------------------------------------------ state & blocks
 
+/// The subjects a finding names: its explicit `subjects`, else the records and paths it carries (`path`, `record`,
+/// `records`, an orphan's subject). Empty when it names none.
+fn finding_subjects(f: &Value) -> Vec<String> {
+    let mut v: Vec<String> = vec![];
+    let mut push = |x: &Value| {
+        if let Some(s) = x.as_str() {
+            if !s.is_empty() {
+                v.push(s.to_string());
+            }
+        }
+    };
+    for x in f["subjects"].as_array().cloned().unwrap_or_default() {
+        push(&x);
+    }
+    push(&f["path"]);
+    push(&f["record"]);
+    for x in f["records"].as_array().cloned().unwrap_or_default() {
+        push(&x);
+    }
+    push(&f["orphan"]["subject"]);
+    v.sort();
+    v.dedup();
+    v
+}
+
 fn blocking_findings(def: &CheckDef, findings: &[Value]) -> Vec<Value> {
     let lowest = def
         .blocks
@@ -911,7 +1009,16 @@ fn blocking_findings(def: &CheckDef, findings: &[Value]) -> Vec<Value> {
     findings
         .iter()
         .filter(|f| catalogue::rank(f["severity"].as_str().unwrap_or("low")) >= lowest)
-        .map(|f| json!({"severity": f["severity"], "message": f["message"], "covers": f.get("covers").cloned().unwrap_or(Value::Null), "path": f.get("path").cloned().unwrap_or(Value::Null)}))
+        .map(|f| {
+            let named = finding_subjects(f);
+            let (subjects, implicit) = if named.is_empty() {
+                (catalogue::governed_paths(def), true)
+            } else {
+                (named, false)
+            };
+            json!({"severity": f["severity"], "message": f["message"], "covers": f.get("covers").cloned().unwrap_or(Value::Null),
+                   "path": f.get("path").cloned().unwrap_or(Value::Null), "subjects": subjects, "subjects_implicit": implicit})
+        })
         .collect()
 }
 
@@ -932,7 +1039,8 @@ fn derive_blocks(checks: &Map<String, Value>) -> Vec<Value> {
                 }
                 out.push(json!({
                     "check": id, "surface": e["surface"], "severity": sev, "operations": rule.operations,
-                    "scope": match rule.scope { BlockScope::Global => "global", BlockScope::CoveredPaths => "covered-paths" },
+                    "scope": rule.scope.as_str(), "remedies": rule.remedies,
+                    "subjects": f.get("subjects").cloned().unwrap_or(json!([])), "subjects_implicit": f["subjects_implicit"],
                     "covers": f["covers"], "message": f["message"], "result": e["result"], "at": e["at"], "key": e["key"],
                 }));
             }
@@ -1002,7 +1110,7 @@ pub fn record_doctor(p: &Project, report: &Value, snap: Option<&Snapshot>) -> Re
             vec![]
         } else {
             vec![
-                json!({"severity": sev, "message": c["message"], "covers": c.get("covers").cloned().unwrap_or(Value::Null)}),
+                json!({"severity": sev, "message": c["message"], "covers": c.get("covers").cloned().unwrap_or(Value::Null), "subjects": c.get("subjects").cloned().unwrap_or(json!([]))}),
             ]
         };
         entries.push((
@@ -1057,18 +1165,109 @@ pub fn health_state(st: &Value) -> &'static str {
     }
 }
 
-fn block_applies(b: &Value, operation: &str, paths: &[String]) -> bool {
-    let ops_ok = b["operations"]
-        .as_array()
-        .map(|a| a.iter().any(|o| o.as_str() == Some(operation)))
-        .unwrap_or(false);
-    if !ops_ok {
-        return false;
+// -------------------------------------------------------------------------- G0: one host API (availability rule)
+
+/// A governed operation presented to the G0 guard: the operation ([`catalogue::ops`]) and its **subjects** — the
+/// record ids and repository paths (globs allowed) it starts, hands off, completes or changes. Examples: a task close
+/// names the task, its declared inputs and every touched path (`verification::close_gate`); a change transaction names
+/// its targets and manifest paths; `update --apply` names [`catalogue::ops::UPDATE_SUBJECTS`]. An empty subject list
+/// means "the operation as a whole": only blocks that are not subject-scoped can be decided for it.
+#[derive(Debug, Clone, Default)]
+pub struct Request {
+    pub operation: String,
+    pub subjects: Vec<String>,
+    /// The health checks the work this request starts says it repairs (a task's `remedies`): required for a
+    /// [`catalogue::DECLARED_REMEDY_OPS`] operation to be admitted as a block's remedy.
+    pub remedies: Vec<String>,
+}
+
+impl Request {
+    pub fn new(operation: &str) -> Self {
+        Request {
+            operation: operation.to_string(),
+            subjects: vec![],
+            remedies: vec![],
+        }
     }
-    if b["scope"].as_str() != Some("covered-paths") {
-        return true;
+    pub fn with_subjects<S: AsRef<str>>(mut self, subjects: &[S]) -> Self {
+        self.subjects
+            .extend(subjects.iter().map(|s| s.as_ref().to_string()));
+        self
     }
-    let covers: Vec<String> = b["covers"]
+    /// Declare the checks the work repairs (see [`catalogue::DECLARED_REMEDY_OPS`]).
+    pub fn with_remedies<S: AsRef<str>>(mut self, checks: &[S]) -> Self {
+        self.remedies
+            .extend(checks.iter().map(|s| s.as_ref().to_string()));
+        self
+    }
+    pub fn to_value(&self) -> Value {
+        json!({"operation": self.operation, "subjects": self.subjects, "remedies": self.remedies})
+    }
+}
+
+/// The G0 decision for a [`Request`] that is not refused.
+#[derive(Debug, Clone)]
+pub struct Admission {
+    pub operation: String,
+    pub subjects: Vec<String>,
+    /// The checks the request declared it remedies ([`Request::remedies`]).
+    pub remedies: Vec<String>,
+    /// Active blocks this operation is admitted under **as their remedy** (empty: no block governs it). When the
+    /// operation commits ([`Admission::obligation`]), it may commit only after [`confirm_remedy`] shows every one of
+    /// them cleared.
+    pub remedy_for: Vec<Value>,
+    /// Checks re-evaluated because their inputs changed since the block was recorded.
+    pub reevaluated: Vec<String>,
+    /// The mutation observation (G1) this decision was taken after.
+    pub observed: Value,
+}
+
+impl Admission {
+    pub fn is_remedy(&self) -> bool {
+        !self.remedy_for.is_empty()
+    }
+    /// Does the host owe a [`confirm_remedy`] before committing?
+    pub fn obligation(&self) -> bool {
+        self.is_remedy() && catalogue::ops::COMMITTING.contains(&self.operation.as_str())
+    }
+    pub fn to_value(&self) -> Value {
+        json!({"operation": self.operation, "allowed": true, "subjects": self.subjects, "remedy_for": self.remedy_for,
+               "remedy": self.is_remedy(), "obligation": if self.obligation() { json!("confirm_remedy before commit: the blocks listed in remedy_for must be cleared by this change, else roll back") } else { Value::Null },
+               "blocks": [], "reevaluated": self.reevaluated, "observed": self.observed})
+    }
+}
+
+fn subject_matches(a: &str, b: &str) -> bool {
+    a == b || glob_match(a, b) || glob_match(b, a)
+}
+
+/// Does any requested subject reach any block subject?
+pub fn subjects_reach(block_subjects: &[String], request: &[String]) -> bool {
+    request
+        .iter()
+        .any(|r| block_subjects.iter().any(|b| subject_matches(b, r)))
+}
+
+/// Add each named record's path and each record path's id, so ids and paths match either way. An empty id or path
+/// is never a subject (round-3 integration: a record that does not parse is loaded with an empty id, and an empty
+/// subject glob-matches every path — it made a block about that record "reach" every request).
+fn with_record_aliases(store: &RecordStore, subjects: &[String]) -> Vec<String> {
+    let mut out: Vec<String> = subjects.to_vec();
+    for s in subjects {
+        if let Some(r) = store.get(s) {
+            out.push(r.path.clone());
+        } else if let Some(r) = store.records.iter().find(|r| &r.path == s) {
+            out.push(r.id());
+        }
+    }
+    out.retain(|x| !x.trim().is_empty());
+    out.sort();
+    out.dedup();
+    out
+}
+
+fn block_subjects(b: &Value, store: &RecordStore) -> Vec<String> {
+    let v: Vec<String> = b["subjects"]
         .as_array()
         .map(|a| {
             a.iter()
@@ -1076,34 +1275,95 @@ fn block_applies(b: &Value, operation: &str, paths: &[String]) -> bool {
                 .collect()
         })
         .unwrap_or_default();
-    if covers.is_empty() {
-        return true;
-    }
-    paths
-        .iter()
-        .any(|pth| covers.iter().any(|c| glob_match(c, pth)))
+    with_record_aliases(store, &v)
 }
 
-/// **G0 guard (tier contract).** Refuses `operation` (see [`catalogue::ops`]) while an active hard-block governs it.
-/// A block whose check's declared inputs have changed since it was recorded is re-evaluated first (only that check),
-/// so a repaired condition never keeps refusing work and an unrepaired one never stops refusing it.
-///
-/// Integration points: `orchestration::control::guard_write` (WS-3) for every governed operation; `tasks::create`,
-/// `tasks::claim`, `status::continue_work(claim)`, `tasks::close` (WS-5); `cit::propose`/`approve`/`execute`,
-/// `handoffs::create` (WS-4); `release::build`, `update::apply_update_opts` (WS-8); `adopt::a6_migrate` (WS-9).
-pub fn guard(p: &Project, operation: &str, paths: &[String]) -> Result<Value> {
-    let st = store::load_state(p);
-    let active: Vec<Value> = st["blocks"]
-        .as_array()
-        .cloned()
-        .unwrap_or_default()
-        .into_iter()
-        .filter(|b| block_applies(b, operation, paths))
-        .collect();
-    if active.is_empty() {
-        return Ok(json!({"operation": operation, "allowed": true, "blocks": []}));
+/// How an active block bears on a request: it does not apply, it refuses the request, or it admits the request as
+/// its remedy.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Bearing {
+    None,
+    Refuses,
+    Remedy,
+}
+
+fn bearing(b: &Value, req: &Request, req_subjects: &[String], store: &RecordStore) -> Bearing {
+    let op = req.operation.as_str();
+    let listed = |k: &str| {
+        b[k].as_array()
+            .map(|a| a.iter().any(|o| o.as_str() == Some(op)))
+            .unwrap_or(false)
+    };
+    let refused_op = listed("operations");
+    let remedy_op = listed("remedies");
+    if !refused_op && !remedy_op {
+        return Bearing::None;
     }
-    // targeted re-evaluation of blocking checks whose inputs changed
+    let bsub = block_subjects(b, store);
+    let reaches = !req_subjects.is_empty() && subjects_reach(&bsub, req_subjects);
+    // starting work is the remedy only of the conditions it declares it repairs (catalogue::DECLARED_REMEDY_OPS)
+    let declared = !catalogue::DECLARED_REMEDY_OPS.contains(&op)
+        || b["check"]
+            .as_str()
+            .is_some_and(|c| req.remedies.iter().any(|r| r == c));
+    if remedy_op && reaches && declared {
+        return Bearing::Remedy;
+    }
+    if !refused_op {
+        return Bearing::None;
+    }
+    let applies = match b["scope"].as_str() {
+        Some("covered-paths") => {
+            let covers: Vec<String> = b["covers"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_default();
+            covers.is_empty()
+                || req
+                    .subjects
+                    .iter()
+                    .any(|pth| covers.iter().any(|c| glob_match(c, pth)))
+        }
+        Some("subjects") => reaches,
+        _ => true,
+    };
+    if applies {
+        Bearing::Refuses
+    } else {
+        Bearing::None
+    }
+}
+
+/// Split the active blocks of `st` by their bearing on `req`: (refusing, remedial).
+fn classify_blocks(st: &Value, req: &Request, store: &RecordStore) -> (Vec<Value>, Vec<Value>) {
+    let req_subjects = with_record_aliases(store, &req.subjects);
+    let (mut refusing, mut remedial) = (vec![], vec![]);
+    for b in st["blocks"].as_array().cloned().unwrap_or_default() {
+        match bearing(&b, req, &req_subjects, store) {
+            Bearing::Refuses => refusing.push(b),
+            Bearing::Remedy => remedial.push(b),
+            Bearing::None => {}
+        }
+    }
+    (refusing, remedial)
+}
+
+/// Re-evaluate the checks behind `blocks` whose declared inputs changed since the block was recorded (or that are
+/// never cached), so a repaired condition never keeps refusing work and an unrepaired one never stops refusing it.
+fn reevaluate(
+    p: &Project,
+    blocks: &[Value],
+    operation: &str,
+    subjects: &[String],
+    force: bool,
+) -> Result<Vec<String>> {
+    if blocks.is_empty() {
+        return Ok(vec![]);
+    }
     let snap = Snapshot::take(p)?;
     let mut extras = Extras {
         p,
@@ -1112,14 +1372,14 @@ pub fn guard(p: &Project, operation: &str, paths: &[String]) -> Result<Value> {
     };
     let mut fam_rerun: Vec<String> = vec![];
     let mut doctor_rerun = false;
-    for b in &active {
+    for b in blocks {
         let id = b["check"].as_str().unwrap_or("");
         let def = def_for(id);
         let now_key = match def.surface {
             Surface::Family => check_key(&snap, def, id, &mut extras).0,
             Surface::Doctor => snap.key_for(&catalogue::expand_deps(def)),
         };
-        if b["key"].as_str() != Some(now_key.as_str()) || def.cache == Cache::Never {
+        if force || b["key"].as_str() != Some(now_key.as_str()) || def.cache == Cache::Never {
             match def.surface {
                 Surface::Family => fam_rerun.push(id.to_string()),
                 Surface::Doctor => doctor_rerun = true,
@@ -1130,10 +1390,16 @@ pub fn guard(p: &Project, operation: &str, paths: &[String]) -> Result<Value> {
     fam_rerun.dedup();
     let mut reevaluated = vec![];
     if !fam_rerun.is_empty() {
-        let mut o = RunOptions::new(Tier::G0, Trigger::new(operation).with_paths(paths));
+        let mut o = RunOptions::new(Tier::G0, Trigger::new(operation).with_paths(subjects));
         o.selection = Selection::Explicit(fam_rerun.clone());
         o.surface = "guard".into();
         o.record = RecordPolicy::Never;
+        o.cache = if force {
+            CacheMode::Refresh
+        } else {
+            CacheMode::Use
+        };
+        o.snapshot = Some(snap);
         run_suite(p, &o)?;
         reevaluated.extend(fam_rerun);
     }
@@ -1141,31 +1407,356 @@ pub fn guard(p: &Project, operation: &str, paths: &[String]) -> Result<Value> {
         crate::doctor::run(p)?;
         reevaluated.push("doctor".into());
     }
-    let st = store::load_state(p);
-    let still: Vec<Value> = st["blocks"]
+    Ok(reevaluated)
+}
+
+fn describe_block(b: &Value) -> String {
+    let subj: Vec<String> = b["subjects"]
         .as_array()
-        .cloned()
-        .unwrap_or_default()
-        .into_iter()
-        .filter(|b| block_applies(b, operation, paths))
-        .collect();
-    if still.is_empty() {
-        return Ok(
-            json!({"operation": operation, "allowed": true, "blocks": [], "reevaluated": reevaluated}),
-        );
-    }
-    let first = &still[0];
-    Err(GovError::new(
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .take(4)
+                .collect()
+        })
+        .unwrap_or_default();
+    format!(
+        "check {} ({}, scope {}{}): {}",
+        b["check"].as_str().unwrap_or("?"),
+        b["severity"].as_str().unwrap_or("?"),
+        b["scope"].as_str().unwrap_or("global"),
+        if subj.is_empty() || b["scope"] == "global" {
+            String::new()
+        } else {
+            format!(" [{}]", subj.join(", "))
+        },
+        b["message"].as_str().unwrap_or("")
+    )
+}
+
+fn hard_block_error(req: &Request, refusing: &[Value], reevaluated: &[String]) -> GovError {
+    GovError::new(
         "HEALTH_HARD_BLOCK",
         format!(
-            "{operation} is refused: {} active hard-block(s), e.g. check {} ({}): {}. Repair the condition, then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it",
-            still.len(),
-            first["check"].as_str().unwrap_or("?"),
-            first["severity"].as_str().unwrap_or("?"),
-            first["message"].as_str().unwrap_or("")
+            "{} is refused: {} active hard-block(s) govern it, e.g. {}. Repair the condition (or run the work that remedies it: an operation listed as a block's remedy that names the blocked subjects stays available), then re-run `gov health run` (or `gov doctor` for doctor checks) to clear it",
+            req.operation,
+            refusing.len(),
+            describe_block(&refusing[0])
         ),
     )
-    .with_details(json!({"operation": operation, "paths": paths, "blocks": still, "reevaluated": reevaluated, "remediation": "repair the failing condition; `gov health status` lists every active block and its check; `gov health run` re-evaluates"})))
+    .with_details(json!({"operation": req.operation, "subjects": req.subjects, "paths": req.subjects, "blocks": refusing, "reevaluated": reevaluated,
+        "remediation": "repair the failing condition; `gov health status` lists every active block with its check, scope and subjects; `gov health run` re-evaluates"}))
+}
+
+/// **G0 (tier contract; the one host API).** Decide `req` against the active hard-blocks after observing the
+/// mutations made since the last observation (G1, [`observe`]):
+///
+/// * a block **refuses** the request when the operation is one it protects and its scope applies (global;
+///   covered paths; or subjects the request reaches) — unless the request is that block's remedy;
+/// * a block **admits** the request as its **remedy** when the operation is listed among the block's remedies and the
+///   request's subjects reach the block's subjects — the work that repairs the condition stays available;
+/// * every other block does not bear on the request: independent work stays available.
+///
+/// Blocks whose check inputs changed since they were recorded are re-evaluated first. The refusal is
+/// `HEALTH_HARD_BLOCK` (exit 4) naming every refusing block, its check, scope and subjects. On admission the host
+/// that commits a change must honour [`Admission::obligation`] with [`confirm_remedy`].
+pub fn admit(p: &Project, req: &Request) -> Result<Admission> {
+    // an operation that commits a change the repository then relies on first observes every mutation made since the
+    // last observation (G1 before reliance); operations that only start, hand off or propose work are decided on the
+    // recorded state
+    let observed = if catalogue::ops::COMMITTING.contains(&req.operation.as_str()) {
+        observe(p).unwrap_or_else(|e| json!({"error": e.code, "message": e.message}))
+    } else {
+        Value::Null
+    };
+    let store = RecordStore::load(&p.root);
+    let (refusing, remedial) = classify_blocks(&store::load_state(p), req, &store);
+    let mut all: Vec<Value> = refusing.clone();
+    all.extend(remedial.iter().cloned());
+    if all.is_empty() {
+        return Ok(Admission {
+            operation: req.operation.clone(),
+            subjects: req.subjects.clone(),
+            remedies: req.remedies.clone(),
+            remedy_for: vec![],
+            reevaluated: vec![],
+            observed,
+        });
+    }
+    let reevaluated = reevaluate(p, &all, &req.operation, &req.subjects, false)?;
+    let store = RecordStore::load(&p.root);
+    let (refusing, remedial) = classify_blocks(&store::load_state(p), req, &store);
+    if !refusing.is_empty() {
+        return Err(hard_block_error(req, &refusing, &reevaluated));
+    }
+    Ok(Admission {
+        operation: req.operation.clone(),
+        subjects: req.subjects.clone(),
+        remedies: req.remedies.clone(),
+        remedy_for: remedial,
+        reevaluated,
+        observed,
+    })
+}
+
+/// **The remedy obligation.** After a host admitted as a remedy ([`Admission::obligation`]) has applied its change
+/// and before it commits: re-evaluate every block the admission was granted under, fresh, against the changed state.
+/// `Ok` when none remains (the change repaired what it was admitted for); `HEALTH_REMEDY_INCOMPLETE` (exit 4) naming
+/// every block left otherwise — the host rolls back: nothing commits under a block it does not clear. A block that
+/// still admits or refuses the operation counts as left.
+pub fn confirm_remedy(p: &Project, adm: &Admission) -> Result<Value> {
+    if !adm.is_remedy() {
+        return Ok(json!({"remedy": false, "cleared": []}));
+    }
+    let reevaluated = reevaluate(p, &adm.remedy_for, &adm.operation, &adm.subjects, true)?;
+    let req = Request {
+        operation: adm.operation.clone(),
+        subjects: adm.subjects.clone(),
+        remedies: adm.remedies.clone(),
+    };
+    let store = RecordStore::load(&p.root);
+    let (refusing, remedial) = classify_blocks(&store::load_state(p), &req, &store);
+    let checks: Vec<&str> = adm
+        .remedy_for
+        .iter()
+        .filter_map(|b| b["check"].as_str())
+        .collect();
+    let left: Vec<Value> = refusing
+        .into_iter()
+        .chain(remedial)
+        .filter(|b| checks.contains(&b["check"].as_str().unwrap_or("")))
+        .collect();
+    if !left.is_empty() {
+        return Err(GovError::new(
+            "HEALTH_REMEDY_INCOMPLETE",
+            format!(
+                "{} was admitted under {} hard-block(s) as their remedy, but after its change {} still hold(s), e.g. {} — a remedy that does not clear its block does not commit; roll the change back",
+                adm.operation,
+                adm.remedy_for.len(),
+                left.len(),
+                describe_block(&left[0])
+            ),
+        )
+        .with_details(json!({"operation": adm.operation, "subjects": adm.subjects, "admitted_under": adm.remedy_for, "left": left, "reevaluated": reevaluated})));
+    }
+    Ok(json!({"remedy": true, "cleared": adm.remedy_for, "reevaluated": reevaluated}))
+}
+
+/// **G0 guard for hosts that pass the paths they touch** (`control::guard_write`, WS-3; task, CIT, handoff, release
+/// and adopt hosts). The same decision as [`admit`] with the paths as subjects. It cannot hand back a remedy
+/// obligation, so a **committing** operation (`ops::COMMITTING`) that would be admitted only as a remedy is refused
+/// here (`HEALTH_HARD_BLOCK`, `details.remedy_admissible: true`): its host either applies-then-verifies (e.g. CIT-E's
+/// repair mode re-guards the committed state and rolls back) or uses [`admit`] + [`confirm_remedy`]. A non-committing
+/// operation admitted as a remedy (proposing or approving the change that repairs a block, creating, claiming or
+/// handing off the task that repairs it) is allowed.
+pub fn guard(p: &Project, operation: &str, paths: &[String]) -> Result<Value> {
+    let req = Request::new(operation).with_subjects(paths);
+    let adm = admit(p, &req)?;
+    if adm.obligation() {
+        return Err(GovError::new(
+            "HEALTH_HARD_BLOCK",
+            format!(
+                "{operation} is refused here: {} active hard-block(s) govern it and it is admissible only as their remedy, e.g. {} — a remedy commits only once it has cleared them (apply, then confirm: `scheduler::admit` + `scheduler::confirm_remedy`; CIT-E re-guards the applied state)",
+                adm.remedy_for.len(),
+                describe_block(&adm.remedy_for[0])
+            ),
+        )
+        .with_details(json!({"operation": operation, "subjects": paths, "paths": paths, "blocks": adm.remedy_for, "remedy_admissible": true, "reevaluated": adm.reevaluated,
+            "remediation": "apply the change and confirm that it clears the listed blocks before committing"})));
+    }
+    Ok(adm.to_value())
+}
+
+// ------------------------------------------------------------------------------------ G1: mutation observation
+
+fn observed_path(p: &Project) -> std::path::PathBuf {
+    store::dir(p).join("observed.json")
+}
+
+/// Input classes whose change is a **milestone** (Contract v3:797 "CIT-E/migration/memory/architecture changes"):
+/// architecture and interface specifications, kernel migrations and the lock, the model/retrieval profile. A
+/// mutation of one of them, however made, is observed at G4 (wider staleness/impact propagation) instead of G1.
+pub const MILESTONE_CLASSES: &[&str] = &[
+    "spec_architecture",
+    "kernel_migration",
+    "framework_lock",
+    "model_profile",
+];
+
+fn save_observed(p: &Project, snap: &Snapshot, by: &str) -> Result<()> {
+    let files: Map<String, Value> = snap
+        .files
+        .iter()
+        .map(|(k, (c, d))| (k.clone(), json!([c, d])))
+        .collect();
+    let path = observed_path(p);
+    if let Some(d) = path.parent() {
+        std::fs::create_dir_all(d)?;
+    }
+    let tmp = path.with_extension(format!("tmp-{}", crate::util::short_uuid()));
+    crate::util::write_json(
+        &tmp,
+        &json!({"key": snap.key(), "by": by, "at": now_iso(), "memory_profile": memory_profile_digest(p), "files": files}),
+    )?;
+    std::fs::rename(&tmp, &path)?;
+    Ok(())
+}
+
+/// The digest of the memory profile: the index manifest's core (what the index was built from and with, not its
+/// per-artefact entries) and the pins the effective policy asks for (embedder, reranker, chunking, lexical, index
+/// format). A change of either is a memory change (a pin changed in the policy overlay, or the index rebuilt under
+/// another profile).
+fn memory_profile_digest(p: &Project) -> String {
+    let core = match crate::memory::manifest::read_index_manifest(p) {
+        Some(mut m) => {
+            if let Some(o) = m.as_object_mut() {
+                for k in [
+                    "artifacts",
+                    "excluded",
+                    "built_at",
+                    "repo_commit",
+                    "counts",
+                    "manifest_hash",
+                ] {
+                    o.remove(k);
+                }
+            }
+            m
+        }
+        None => json!("absent"),
+    };
+    // the pins as the effective policy states them (not the plugin set a role may use: the digest must not depend on
+    // who observes)
+    let mem = p
+        .policies()
+        .effective
+        .get("MEMORY_POLICY")
+        .cloned()
+        .unwrap_or(Value::Null);
+    let pins = json!({"embedding": mem["embedding"], "reranker": mem["reranker"], "chunking": mem["chunking"],
+                      "lexical": mem["lexical"], "index_version": crate::INDEX_VERSION});
+    hash_value(&json!({"index": core, "pins": pins}))
+}
+
+/// **G1 at every material mutation, however made** (Contract v3:794, W12 :1187; BC-P2-07). The product is not a
+/// daemon: a mutation made by an editor, a worker, a script or a gov command is observed at the next gov invocation
+/// that commits a change the repository then relies on ([`admit`] of a committing operation: task close, CIT-E,
+/// release, update, migration) or that reports state (`gov status`, `gov continue`, `gov health status`) — so no
+/// mutation is relied on before G1 has checked it. The
+/// tree is compared with the state the last observation (or any run that evaluated every G1 check) saw; when paths
+/// changed, the G1 tier runs on them — the checks whose declared inputs the change impacts are re-executed, the others
+/// are served from the cache — and the result is recorded with trigger `mutation.observed` and the changed paths. A
+/// change to a milestone input ([`MILESTONE_CLASSES`], or the memory profile of the index manifest) is observed at
+/// G4. Nothing governed is written: no governance-suite record, no remediation (the hard-blocks it derives take effect
+/// at once for the admission that observed it). Skipped inside health sandboxes and before installation.
+pub fn observe(p: &Project) -> Result<Value> {
+    if sandbox::inside_sandbox()
+        || !p.lock_path().exists()
+        || SUITE_DEPTH.load(Ordering::SeqCst) > 0
+    {
+        return Ok(Value::Null);
+    }
+    // one observation at a time per process: a check that reports state (fresh-agent reconstruction reads
+    // `gov status`) must not observe again from inside the observation's own run
+    if OBSERVING
+        .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+        .is_err()
+    {
+        return Ok(json!({"skipped": "an observation is already running in this process"}));
+    }
+    let r = observe_inner(p);
+    OBSERVING.store(false, Ordering::SeqCst);
+    r
+}
+
+static OBSERVING: AtomicBool = AtomicBool::new(false);
+/// Suite runs in progress in this process (a check that reports state must not start a run of its own).
+pub(crate) static SUITE_DEPTH: AtomicUsize = AtomicUsize::new(0);
+
+struct SuiteDepth;
+impl SuiteDepth {
+    fn enter() -> Self {
+        SUITE_DEPTH.fetch_add(1, Ordering::SeqCst);
+        SuiteDepth
+    }
+}
+impl Drop for SuiteDepth {
+    fn drop(&mut self) {
+        SUITE_DEPTH.fetch_sub(1, Ordering::SeqCst);
+    }
+}
+
+fn observe_inner(p: &Project) -> Result<Value> {
+    let prev = crate::util::read_json(&observed_path(p)).unwrap_or(json!({}));
+    let snap = Snapshot::take(p)?;
+    if prev["key"].as_str() == Some(snap.key().as_str()) {
+        return Ok(json!({"changed": 0}));
+    }
+    let prev_files: BTreeMap<String, (String, String)> = prev["files"]
+        .as_object()
+        .map(|m| {
+            m.iter()
+                .map(|(k, v)| {
+                    (
+                        k.clone(),
+                        (
+                            v[0].as_str().unwrap_or("").to_string(),
+                            v[1].as_str().unwrap_or("").to_string(),
+                        ),
+                    )
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let changed = snap.changed_paths(&prev_files);
+    let mut classes: Vec<String> = changed
+        .iter()
+        .map(|c| {
+            snap.files
+                .get(c)
+                .map(|(k, _)| k.clone())
+                .or_else(|| prev_files.get(c).map(|(k, _)| k.clone()))
+                .unwrap_or_else(|| currency::classify_path(c).to_string())
+        })
+        .collect();
+    classes.sort();
+    classes.dedup();
+    let profile = memory_profile_digest(p);
+    let memory_change = prev["memory_profile"]
+        .as_str()
+        .map(|d| d != profile)
+        .unwrap_or(false);
+    let milestone = memory_change
+        || classes
+            .iter()
+            .any(|c| MILESTONE_CLASSES.contains(&c.as_str()));
+    if changed.is_empty() && !milestone {
+        // only non-file classes changed (runtime, machine trust, T2 state): the next run re-keys; nothing to observe
+        let _ = save_observed(p, &snap, "observe");
+        return Ok(json!({"changed": 0, "non_file_classes_changed": true}));
+    }
+    let tier = if milestone { Tier::G4 } else { Tier::G1 };
+    let shown: Vec<String> = changed.iter().take(200).cloned().collect();
+    let mut o = RunOptions::new(tier, Trigger::new("mutation.observed").with_paths(&shown));
+    o.surface = format!("observe:{}", tier.as_str());
+    // exactly the tier's checks (the cache serves those whose declared inputs the change did not touch)
+    o.selection = Selection::Explicit(
+        suite_families(p)
+            .into_iter()
+            .filter(|id| def_for(id).tiers.contains(&tier))
+            .collect(),
+    );
+    o.record = RecordPolicy::Never;
+    o.single_run = true;
+    o.snapshot = Some(snap.clone());
+    let out = run_suite(p, &o)?;
+    let _ = save_observed(p, &snap, out.result["id"].as_str().unwrap_or("observe"));
+    Ok(json!({
+        "tier": tier.as_str(), "changed": changed.len(), "changed_paths": shown, "changed_classes": classes,
+        "milestone": milestone, "memory_profile_changed": memory_change,
+        "health_result": out.result["id"], "verdict": out.result["verdict"], "state": out.result["state"],
+        "executed": out.result["summary"]["executed_checks"],
+    }))
 }
 
 /// Blocks recorded by governance-suite checks, split into those whose check inputs are unchanged since the blocking
@@ -1194,8 +1785,16 @@ pub fn suite_blocks(p: &Project, snap: &Snapshot) -> (Vec<Value>, Vec<Value>) {
     (current, stale)
 }
 
-/// The repository health state: RED/YELLOW/GREEN, active blocks, latest check outcomes, stale checks and currency.
+/// The repository health state: RED/YELLOW/GREEN, active blocks, latest check outcomes, stale checks and currency;
+/// the **repository verdict** (the thirteen HEALTHY conditions, `verification::slo`), every Gate U SLO and the W11
+/// artifact-flow metrics of the latest suite result. Mutations made since the last observation are observed first
+/// (G1, [`observe`]), so the state reflects every material mutation however made.
 pub fn status(p: &Project) -> Result<Value> {
+    let observed = if SUITE_DEPTH.load(Ordering::SeqCst) > 0 {
+        Value::Null
+    } else {
+        observe(p).unwrap_or_else(|e| json!({"error": e.code, "message": e.message}))
+    };
     let st = store::load_state(p);
     let snap = Snapshot::take(p)?;
     let cur = currency::Currency::evaluate(p, &snap);
@@ -1226,16 +1825,43 @@ pub fn status(p: &Project) -> Result<Value> {
                 .collect()
         })
         .unwrap_or_default();
+    // the repository verdict and the SLOs (skipped when asked from inside a suite run: a check reading `gov status`
+    // must not evaluate the checks that are running)
+    let repository = if SUITE_DEPTH.load(Ordering::SeqCst) > 0 {
+        json!({"verdict": "NOT_EVALUATED", "reason": "requested from inside a health run"})
+    } else {
+        let store = RecordStore::load(&p.root);
+        let db = if p.db_path().exists() {
+            crate::memory::db::RuntimeDb::open(&p.db_path()).ok()
+        } else {
+            None
+        };
+        let slos = crate::verification::slo::evaluate(&crate::verification::slo::SloCtx {
+            p,
+            store: &store,
+            db: db.as_ref(),
+            snapshot: Some(&snap),
+            state: &st,
+        });
+        let conds = crate::verification::slo::conditions(&st, None, Some(cur.current));
+        crate::verification::slo::repository_verdict(&conds, &slos)
+    };
+    let w11 = store::cache_peek(p, crate::verification::flow::FAMILY)
+        .map(|c| json!({"metrics": c["result"]["detail"]["w11_metrics"], "computed_by": c["produced_by"], "at": c["produced_at"], "current": st["checks"][crate::verification::flow::FAMILY]["key"] == c["key"]}))
+        .unwrap_or(json!({"metrics": null, "reason": "no artifact_flow_health result recorded yet (G4-G6: gov health run --tier G4, gov audit)"}));
     Ok(json!({
         "state": health_state(&st),
+        "repository": repository,
         "blocks": st["blocks"],
         "failing_checks": failing,
         "stale_checks": stale,
         "governance_suite_currency": cur.to_value(),
         "last_result": st["last_result"],
         "updated_at": st["updated_at"],
+        "observed": observed,
         "product_tests": crate::verification::product::status(p, Some(&snap)),
         "failure_memory": failure_memory_summary(p),
+        "artifact_flow": w11,
     }))
 }
 
@@ -1261,6 +1887,12 @@ pub fn tier_run(p: &Project, tier: Tier, trigger: Trigger) -> Result<Value> {
     }
     let mut o = RunOptions::new(tier, trigger);
     o.surface = format!("tier:{}", tier.as_str());
+    // a milestone, full-suite or qualification result is governed evidence whatever its verdict (W12 :1190-1192;
+    // WS-4 R2-7): it is recorded as a governance-suite record; G1-G3 results persist a record only when they
+    // re-establish green currency
+    if matches!(tier, Tier::G4 | Tier::G5 | Tier::G6) {
+        o.record = RecordPolicy::Always;
+    }
     crate::verification::audit_with(p, &o)
 }
 
@@ -1358,6 +1990,22 @@ pub fn qualification_run(p: &Project, q: &QualificationRun) -> Result<Value> {
         })
         .unwrap_or_else(|| format!("QR-{}", crate::util::short_uuid()));
     let purpose = oracle["purpose"].as_str().unwrap_or("").to_string();
+    // OWNER-DECISION-P2-0002 requirement 4 (WS-8 IP-R2-WS08-8): Phase-4 qualification evidence runs on provisioned
+    // machines. A qualification run on a machine with no trust anchor is refused; a format-sample run is recorded
+    // with the posture and never counts as qualification.
+    let trust = currency::machine_trust_state();
+    let provisioned = trust["posture"] == "PROVISIONED";
+    if !provisioned && purpose == "QUALIFICATION" {
+        return Err(GovError::new(
+            "QUALIFICATION_MACHINE_UNPROVISIONED",
+            format!(
+                "a {} qualification run cannot be recorded on this machine: it has no provisioned Signed Release Root trust anchor (posture {}), and Phase-4 qualification evidence runs only on provisioned machines (OWNER-DECISION-P2-0002 requirement 4). Provision the machine (`gov trust provision --anchor <administrator root>`) and re-run",
+                q.kind,
+                trust["posture"].as_str().unwrap_or("?")
+            ),
+        )
+        .with_details(json!({"machine_posture": trust["posture"], "remediation": "gov trust provision --anchor <root metadata from the administrator domain>"})));
+    }
     // What is recorded lives in the qualification repository, so it must not carry the hidden oracle: no oracle id,
     // no oracle digest, no fault identities or truths (Contract v3:1062; the separation scan would — rightly — find
     // them). The oracle is referred to by a one-way commitment its custodian can recompute from the oracle digest;
@@ -1397,7 +2045,9 @@ pub fn qualification_run(p: &Project, q: &QualificationRun) -> Result<Value> {
         "kind": q.kind, "run_id": run_id,
         "oracle": {"commitment_sha256": commitment(&oracle["canonical_sha256"]), "purpose": purpose, "format_sha256": oracle["format_sha256"], "separation_checked": oracle["separation"]["scanned"]},
         "score_report": {"canonical_sha256": report["canonical_sha256"], "binding_verified": report["binding_verified"].is_object(), "metrics": metrics},
-        "counts_as_qualification": purpose == "QUALIFICATION",
+        "counts_as_qualification": purpose == "QUALIFICATION" && provisioned,
+        "machine_posture": trust["posture"],
+        "machine_trust_anchor_sha256": trust["trust_anchor_sha256"],
     });
     let mut o = RunOptions::new(Tier::G6, Trigger::qualification(&q.kind, &run_id));
     o.surface = "qualification".into();
@@ -1433,32 +2083,151 @@ mod tests {
         assert_eq!(o.cache, CacheMode::Use);
     }
 
+    fn st_with(checks: &Map<String, Value>) -> Value {
+        json!({"checks": checks, "blocks": derive_blocks(checks)})
+    }
+
+    fn empty_store() -> RecordStore {
+        RecordStore {
+            records: vec![],
+            by_id: Default::default(),
+            duplicates: vec![],
+            problems: vec![],
+        }
+    }
+
     #[test]
     fn blocks_are_derived_from_declared_rules_and_scoped() {
         let mut checks = Map::new();
-        checks.insert("D011".into(), json!({"surface": "doctor", "blocking_findings": [{"severity": "critical", "message": "secret"}], "result": "HR-1", "at": "t", "key": "k"}));
-        checks.insert("product_test_health".into(), json!({"surface": "family", "blocking_findings": [{"severity": "high", "message": "unit failed", "covers": ["src/**"]}], "result": "HR-2", "at": "t", "key": "k2"}));
+        checks.insert("D011".into(), json!({"surface": "doctor", "blocking_findings": blocking_findings(catalogue::get("D011").unwrap(), &[json!({"severity": "critical", "message": "secret", "subjects": ["src/creds.rs"]})]), "result": "HR-1", "at": "t", "key": "k"}));
+        checks.insert("product_test_health".into(), json!({"surface": "family", "blocking_findings": [{"severity": "high", "message": "unit failed", "covers": ["src/**"], "subjects": ["**"]}], "result": "HR-2", "at": "t", "key": "k2"}));
         checks.insert("index_freshness".into(), json!({"surface": "family", "blocking_findings": [], "result": "HR-2", "at": "t", "key": "k3"}));
-        let blocks = derive_blocks(&checks);
-        assert!(blocks
+        let st = st_with(&checks);
+        let store = empty_store();
+        let refuses = |op: &str, subj: &[&str]| {
+            let r = Request::new(op).with_subjects(subj);
+            classify_blocks(&st, &r, &store)
+        };
+        // a critical global block refuses every governed operation...
+        assert_eq!(refuses("task.create", &[]).0.len(), 1);
+        assert_eq!(refuses("cit.propose", &["docs/n.md"]).0.len(), 1);
+        // ...except the work that repairs exactly what it names (non-committing: allowed; committing: obligation)
+        let (refusing, remedial) = refuses("cit.propose", &["src/creds.rs"]);
+        assert!(refusing.is_empty() && remedial.len() == 1);
+        // covered paths: only a close touching the covered code
+        assert!(refuses("task.close", &["src/lib.rs"])
+            .0
             .iter()
-            .any(|b| b["check"] == "D011" && block_applies(b, "task.create", &[])));
-        let close_block = blocks
+            .any(|b| b["check"] == "product_test_health"));
+        assert!(!refuses("task.close", &["docs/x.md"])
+            .0
             .iter()
-            .find(|b| b["check"] == "product_test_health" && b["scope"] == "covered-paths")
-            .unwrap();
-        assert!(block_applies(
-            close_block,
-            "task.close",
-            &["src/lib.rs".into()]
-        ));
-        assert!(!block_applies(
-            close_block,
-            "task.close",
-            &["docs/x.md".into()]
-        ));
-        assert!(!blocks.iter().any(|b| b["check"] == "index_freshness"));
-        let st = json!({"checks": checks, "blocks": blocks});
+            .any(|b| b["check"] == "product_test_health"));
+        // a kernel update does not rely on product behaviour
+        assert!(!refuses("update.apply", &["governance/kernel/**"])
+            .0
+            .iter()
+            .any(|b| b["check"] == "product_test_health"));
+        assert!(!st["blocks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|b| b["check"] == "index_freshness"));
         assert_eq!(health_state(&st), "RED");
+    }
+
+    #[test]
+    fn subject_scoped_blocks_leave_independent_work_available() {
+        let mut checks = Map::new();
+        let gi = catalogue::get("graph_integrity").unwrap();
+        checks.insert("graph_integrity".into(), json!({"surface": "family", "blocking_findings": blocking_findings(gi, &[json!({"severity": "high", "message": "task TASK-0001 depends on missing TASK-0099", "subjects": ["TASK-0001", "TASK-0099"]})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let store = empty_store();
+        let r = |op: &str, subj: &[&str]| {
+            classify_blocks(&st, &Request::new(op).with_subjects(subj), &store)
+        };
+        // the task it names cannot be claimed or closed ...
+        assert_eq!(r("task.claim", &["TASK-0001"]).0.len(), 1);
+        assert_eq!(r("task.close", &["TASK-0001", "src/lib.rs"]).0.len(), 1);
+        // ... every other task stays available (O-R2-2), and so does an operation judged as a whole
+        assert!(r("task.claim", &["TASK-0002"]).0.is_empty());
+        assert!(r("task.close", &["TASK-0002", "docs/a.md"]).0.is_empty());
+        assert!(r("task.claim", &[]).0.is_empty());
+        // a release relies on the whole graph
+        assert_eq!(r("release.build", &[]).0.len(), 1);
+        // creating work is not refused by it; a change transaction on it is not refused either
+        assert!(r("task.create", &["TASK-0099"]).0.is_empty());
+        assert!(r("cit.execute", &["spec/tasks/TASK-0001.yaml"])
+            .0
+            .is_empty());
+    }
+
+    /// Round-3 integration: a record that does not parse is loaded with an empty id; its block (D023, schema) must
+    /// still name only its path, so an update — whose subjects are the kernel, lock, overlay and views — is refused by
+    /// it, and is never admitted as its "remedy" through an empty alias that matches every path.
+    #[test]
+    fn a_block_about_an_unparseable_record_is_not_reached_by_every_request() {
+        let root =
+            std::env::temp_dir().join(format!("gov-sched-alias-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(root.join("spec/decisions")).unwrap();
+        std::fs::write(
+            root.join("spec/decisions/D-0777.yaml"),
+            "id: D-0777\ntype: decision\n  bad: [indent\n",
+        )
+        .unwrap();
+        let store = RecordStore::load(&root);
+        let d023 = catalogue::get("D023").unwrap();
+        let mut checks = Map::new();
+        checks.insert("D023".into(), json!({"surface": "doctor", "blocking_findings": blocking_findings(d023, &[json!({"severity": "high", "message": "record does not parse", "subjects": ["spec/decisions/D-0777.yaml"]})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let upd = Request::new(catalogue::ops::UPDATE_APPLY)
+            .with_subjects(catalogue::ops::UPDATE_SUBJECTS);
+        let (refusing, remedial) = classify_blocks(&st, &upd, &store);
+        assert!(remedial.is_empty(), "{remedial:?}");
+        assert!(
+            refusing.iter().any(|b| b["check"] == "D023"),
+            "{refusing:?}"
+        );
+        assert!(
+            with_record_aliases(&store, &["spec/decisions/D-0777.yaml".to_string()])
+                .iter()
+                .all(|x| !x.is_empty())
+        );
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn an_update_is_the_remedy_of_an_overlay_block_but_not_of_a_record_block() {
+        let mut checks = Map::new();
+        let d006 = catalogue::get("D006").unwrap();
+        // D006 names no file of its own: its subjects are the paths it governs (the overlay)
+        checks.insert("D006".into(), json!({"surface": "doctor", "blocking_findings": blocking_findings(d006, &[json!({"severity": "high", "message": "overlay file missing: PROJECT_EXCEPTIONS.yaml"})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let store = empty_store();
+        let upd = Request::new(catalogue::ops::UPDATE_APPLY)
+            .with_subjects(catalogue::ops::UPDATE_SUBJECTS);
+        let (refusing, remedial) = classify_blocks(&st, &upd, &store);
+        assert!(refusing.is_empty(), "{refusing:?}");
+        assert_eq!(remedial.len(), 1);
+        let si = catalogue::get("schema_invariants").unwrap();
+        let mut checks = Map::new();
+        checks.insert("schema_invariants".into(), json!({"surface": "family", "blocking_findings": blocking_findings(si, &[json!({"severity": "high", "message": "REQ-0102 invalid", "path": "spec/requirements/REQ-0102.yaml"})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let (refusing, _) = classify_blocks(&st, &upd, &store);
+        assert_eq!(refusing.len(), 1, "an update does not repair a record");
+        // a close elsewhere is not refused; a close that relies on the record is
+        let (r1, _) = classify_blocks(
+            &st,
+            &Request::new("task.close").with_subjects(&["TASK-0001", "src/lib.rs"]),
+            &store,
+        );
+        assert!(r1.is_empty());
+        let (r2, _) = classify_blocks(
+            &st,
+            &Request::new("task.close")
+                .with_subjects(&["TASK-0001", "spec/requirements/REQ-0102.yaml"]),
+            &store,
+        );
+        assert_eq!(r2.len(), 1);
     }
 }

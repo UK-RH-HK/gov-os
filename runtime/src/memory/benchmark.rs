@@ -9,7 +9,7 @@
 use crate::memory::db::RuntimeDb;
 use crate::memory::embedder::EmbedSpec;
 use crate::memory::indexer::{rebuild, IndexOptions};
-use crate::records::{new_record, save_record, RecordStore};
+use crate::records::{new_record, RecordStore};
 use crate::retrieval::run_heldout_with;
 use crate::util::read_yaml;
 use crate::{GovError, Project, Result};
@@ -55,6 +55,18 @@ pub fn run(
     heldout: Option<PathBuf>,
     record: bool,
 ) -> Result<Value> {
+    run_for(p, candidates, heldout, record, None)
+}
+
+/// [`run`] for the task that commissioned the benchmark (`gov memory benchmark --record --task <TASK>`): the research
+/// record names it among the work it influenced (J1 "influenced decisions/tasks", WS-10 IP-WS10-04).
+pub fn run_for(
+    p: &Project,
+    candidates: &[String],
+    heldout: Option<PathBuf>,
+    record: bool,
+    task: Option<&str>,
+) -> Result<Value> {
     p.require_installed()?;
     crate::authority::require(p, "memory_benchmark")?;
     if candidates.len() < 2 {
@@ -63,6 +75,27 @@ pub fn run(
             "a benchmark needs at least two candidates (e.g. current builtin:64 plugin:<id>)",
         ));
     }
+    if task.is_some() && !record {
+        return Err(GovError::new(
+            "USAGE",
+            "--task names the task a recorded benchmark was commissioned for; add --record",
+        ));
+    }
+    let commissioning = match task {
+        Some(t) => {
+            let store = RecordStore::load(&p.root);
+            match store.get(t) {
+                Some(r) if r.rtype() == "task" => Some(t.to_string()),
+                _ => {
+                    return Err(GovError::new(
+                        "TASK_NOT_FOUND",
+                        format!("--task {t} is not a task"),
+                    ))
+                }
+            }
+        }
+        None => None,
+    };
     let held_path = heldout.unwrap_or(p.root.join(p.policies().get_str(
         "MEMORY_POLICY",
         "regression.heldout_file",
@@ -97,6 +130,7 @@ pub fn run(
                 db_path: Some(db_path.clone()),
                 embed_override: Some(cand.embed.clone()),
                 record_failures: Some(false),
+                observe_boundaries: false,
             },
         ) {
             Ok(r) => r,
@@ -149,6 +183,7 @@ pub fn run(
         .unwrap_or(Value::Null);
     let mut out = json!({"heldout": held_path.display().to_string(), "queries": held["queries"].as_array().map(|a| a.len()).unwrap_or(0), "rows": rows, "recommended": best, "note": "recall@k, MRR, precision@k, stale/superseded rates, symbol recall, latency and index cost per candidate on the held-out set; selection is a governed decision (gov memory benchmark --select <candidate>)"});
     if record {
+        crate::orchestration::control::guard_write(p, "memory benchmark --record")?;
         let store = RecordStore::load(&p.root);
         let id = store.next_id("research");
         let heldout_sha = crate::util::sha256_file(&held_path).unwrap_or_default();
@@ -161,17 +196,29 @@ pub fn run(
                 "Embedding/reranker benchmark ({} candidates)",
                 candidates.len()
             ),
-            json!({"question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?", "reason": "framework §14.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration", "method": format!("For each candidate: full re-index into an isolated database, then the held-out set ({} queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.", out["queries"]), "sources": [held_path.strip_prefix(&p.root).unwrap_or(&held_path).to_string_lossy()], "measurements": {"rows": out["rows"].clone()}, "uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending", "conclusion": format!("recommended: {}", out["recommended"]), "confidence": if out["queries"].as_u64().unwrap_or(0) >= 10 { 0.7 } else { 0.4 }, "influences": [], "state_class": "EVIDENCE",
+            json!({"question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?", "reason": "framework §14.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration", "method": format!("For each candidate: full re-index into an isolated database, then the held-out set ({} queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.", out["queries"]), "sources": [held_path.strip_prefix(&p.root).unwrap_or(&held_path).to_string_lossy()], "measurements": {"rows": out["rows"].clone()}, "uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending", "conclusion": format!("recommended: {}", out["recommended"]), "confidence": if out["queries"].as_u64().unwrap_or(0) >= 10 { 0.7 } else { 0.4 }, "influences": commissioning.iter().collect::<Vec<_>>(), "state_class": "EVIDENCE",
                 // IP-13: the version and content hash of the benchmark result this record carries
                 "version": "1", "content_hash": content_hash,
                 "benchmark": {"format": crate::memory::profile::BENCHMARK_FORMAT, "heldout_sha256": heldout_sha, "candidates": candidates, "recommended": out["recommended"], "result_sha256": content_hash},
                 "tags": ["memory", "retrieval-benchmark"]}),
         );
-        // T2: the evidence a profile change rests on must be what the OS measured (memory::profile::select)
-        crate::t2::seal_record(&mut rec, "memory benchmark")?;
-        save_record(&p.root, &rec)?;
+        // a measured benchmark is concluded research (J1: every field above is recorded by the OS), written through
+        // the research lifecycle's own stamps; schema-validated and T2-sealed: the evidence a profile change rests
+        // on must be what the OS measured (memory::profile::select, WS-10 IP-WS10-04)
+        rec.set("research_state", json!("CONCLUDED"));
+        rec.set(
+            "recorded_by",
+            crate::lifecycle::stamp(p, "memory benchmark --record"),
+        );
+        rec.set(
+            "concluded_by",
+            crate::lifecycle::stamp(p, "memory benchmark --record"),
+        );
+        crate::lifecycle::push_history(&mut rec, p, "CONCLUDED", "memory benchmark --record");
+        crate::lifecycle::validate_seal_save(p, &mut rec, "memory benchmark")?;
         out["research_record"] = json!(id);
         out["content_hash"] = json!(content_hash);
+        out["influences"] = json!(commissioning.iter().collect::<Vec<_>>());
     }
     Ok(out)
 }

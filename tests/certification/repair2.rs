@@ -1199,10 +1199,29 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         &root,
         "governance/kernel/policies/POLICY_PRECEDENCE.yaml"
     ));
+    // round 3 (P2-AR-0036, BC-P2-24): governed work the OS generates from events inside this window (the held-out
+    // marker queries' retrieval misses, a health failure of the installed older kernel) is OS-written work, like the
+    // audits/reports/decisions excluded above — not something an update wrote. Those task records are excluded by
+    // exact path; every other spec/ file must be untouched.
+    let generated: Vec<String> = std::fs::read_dir(root.join("spec/tasks"))
+        .map(|rd| {
+            rd.filter_map(|e| e.ok())
+                .map(|e| e.file_name().to_string_lossy().to_string())
+                .filter(|n| {
+                    n.ends_with(".yaml")
+                        && yaml(&root, &format!("spec/tasks/{n}"))["generated_by"]
+                            == "gov work generation"
+                })
+                .map(|n| format!("tasks/{n}"))
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut after_excl: Vec<&str> = spec_excl.to_vec();
+    after_excl.extend(generated.iter().map(|s| s.as_str()));
     assert_eq!(
-        tree_hash(&root.join("spec"), spec_excl),
+        tree_hash(&root.join("spec"), &after_excl),
         spec_before,
-        "spec/ untouched by updates (INV-013)"
+        "spec/ untouched by updates (INV-013); generated work excluded: {generated:?}"
     );
     assert_eq!(
         yaml(&root, "spec/decisions/D-0001.yaml")["title"],
@@ -1230,18 +1249,45 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     // Round-2 integration (P2-AR-0032): this machine is provisioned (WS-8 harness), so D032 (installation release
     // authenticity, P2-AR-0023) must pass here like every other structural check — its temporary unprovisioned-machine
     // allowance is removed
+    // BC-P2-44 (P2-AR-0033): D035 is not a structural check — it carries the repository verdict (the thirteen HEALTHY
+    // conditions from the governance-suite outcomes, and the Gate U SLOs). After the chain the only conditions it may
+    // name are H10 (the same currency prompt as D021) and H5 (retrieval: this fixture's held-out set has too few
+    // queries to measure recall, which the suite reports as UNMEASURED); every structural check must pass.
     let doc = g.ok(&["doctor"]);
     let failed: Vec<String> = doc["checks"]
         .as_array()
         .unwrap()
         .iter()
-        .filter(|c| c["ok"] == false)
+        .filter(|c| c["ok"] == false && c["id"] != "D035")
         .map(|c| c["id"].as_str().unwrap().to_string())
         .collect();
     assert!(
         failed.iter().all(|c| c == "D021"),
         "unexpected doctor failures after the 4.1.2 -> 4.1.3 -> 4.1.4 chain: {failed:?}"
     );
+    let d35 = doc["checks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["id"] == "D035")
+        .unwrap();
+    if d35["ok"] == false {
+        let conds: Vec<&str> = d35["repository"]["failing_conditions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|c| c.as_str())
+            .collect();
+        assert!(
+            conds.iter().all(|c| *c == "H5" || *c == "H10")
+                && d35["repository"]["crossed_slos"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|x| x["owner"] != "health_slos"),
+            "D035 after the chain: {d35}"
+        );
+    }
     // rollback 4.1.4 -> 4.1.3 leaves a ledger entry and consumes its snapshot; then 4.1.3 -> 4.1.2; then nothing left.
     // On a provisioned machine each rollback is below the protected release high-water, so it is refused without,
     // and admitted with, an owner-signed break-glass authorisation (ARCH-0003 §7; OWNER-DECISION-0006).
@@ -1602,9 +1648,19 @@ fn interface_contract_kernel_yaml_and_migration_substance_are_consistent() {
         let d = dup_keys(&std::fs::read_to_string(&abs).unwrap());
         assert!(d.is_empty(), "duplicate keys {d:?} in framework/{rel}");
     }
-    // migration substance: every migration into the current version accounts for the template changes it spans
+    // migration substance: every migration into the current version accounts for the template changes it spans.
+    // Once the current version is released (its payload under release/releases/<VERSION> is immutable), a change to
+    // the working tree's templates belongs to the NEXT version: the migrations into VERSION are checked against the
+    // payload they shipped with, and every migration from VERSION must account for the working tree's changes since
+    // that payload (repair-1 round 3, WS-6: a template change reaches installed projects only through the next
+    // migration's operations). Before the version is released the working tree is its payload, as before.
     let migs = gov_runtime::migrations::framework::load_migrations(&croot.join("migrations"));
     let cur = gov_runtime::VERSION;
+    let working = croot.join("framework/overlay-templates");
+    let released = croot
+        .join("release/releases")
+        .join(cur)
+        .join("kernel/overlay-templates");
     let into: Vec<&Value> = migs.iter().filter(|m| m["to_version"] == cur).collect();
     assert!(!into.is_empty(), "no migration into {cur}");
     for m in into {
@@ -1614,12 +1670,31 @@ fn interface_contract_kernel_yaml_and_migration_substance_are_consistent() {
             .join(from)
             .join("kernel/overlay-templates");
         assert!(old.is_dir(), "previous release {from} payload missing");
-        let problems = gov_runtime::migrations::framework::check_substance(
-            m,
-            &old,
-            &croot.join("framework/overlay-templates"),
-        );
+        let new = if released.is_dir() {
+            released.clone()
+        } else {
+            working.clone()
+        };
+        let problems = gov_runtime::migrations::framework::check_substance(m, &old, &new);
         assert!(problems.is_empty(), "{problems:?}");
+    }
+    if released.is_dir() {
+        let differs = std::fs::read_dir(&working)
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .any(|e| {
+                std::fs::read(e.path()).ok() != std::fs::read(released.join(e.file_name())).ok()
+            });
+        let next: Vec<&Value> = migs.iter().filter(|m| m["from_version"] == cur).collect();
+        assert!(
+            !differs || !next.is_empty(),
+            "overlay templates changed since the released {cur} payload, and no migration from {cur} delivers them"
+        );
+        for m in next {
+            let problems =
+                gov_runtime::migrations::framework::check_substance(m, &released, &working);
+            assert!(problems.is_empty(), "{problems:?}");
+        }
     }
     let bad = json!({"id": "M-x", "from_version": "4.1.3", "to_version": cur, "description": "tightens the contract", "operations": [{"op": "note", "text": "nothing"}]});
     let problems = gov_runtime::migrations::framework::check_substance(

@@ -1,0 +1,2029 @@
+# P2-AR-0033 derived probe run: W11-quantitative-health.receipt.P2-AR-0033.py (sha256 c2e7e42411d798b3c9e53fc77dedfc1c62fc5e6123a067aac7a8e64b96c26e5c) label=after
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02 (HEAD 2e7200728174a0fa27928b17a4d7c681cd46bfd9); gov 94f9ed9805a2bd6e0026dfd619185c810a23aefc31c918b953e4745bf8978151
+# date 2026-09-19T13:28:18Z
+# project w11: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/dp-after-YceBRr/w11-824498301
+$ gov init --name w11 --alias z-w11    [session=S-zeta role=orchestrator exit=0 1.1s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up", "status": "SUPERSEDED", "superseded_by": "REQ-0002", "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "supersedes": ["REQ-0001"], "feature": "F-0001"}
+  [probe wrote record] spec/requirements/REQ-0003.yaml: {"id": "REQ-0003", "type": "requirement", "title": "Orphan requirement", "status": "ACTIVE"}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals TASK-0001" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0002\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task create --id TASK-0002 --class implementation --objective "Implement totals TASK-0002" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov task create --id TASK-0003 --class implementation --objective "Implement totals TASK-0003" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-9999\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.2s]
+$ gov memory heldout-starter    [session=S-zeta role=orchestrator exit=2 0.0s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task claim TASK-0001    [session=S-zeta role=orchestrator exit=0 0.0s]
+  [probe wrote file] src/lib.rs (1103 chars)
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+  [probe wrote worker report] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/dp-after-YceBRr/w11-824498301/.governance-runtime/reports/TASK-0001.json: {"work_completed": "implemented TASK-0001", "files_changed": ["src/lib.rs"], "tests": {"status": "not_applicable_with_reason", "reason": "zeta probe"}, "outcome": "success", "evidence": [], "context_packet_hash": "e2d999d9c31f659cba6082bf23f23cd71c372893140c836bf9ffbcf6daa01511", "inputs_consumed": ["F-0001@5fe64eb070a1ff073682390a3229a0ddb447b56b4e21bdff085169538dc3ad4d", "REQ-0002@dffaab3c2cebac2b8e28b4af5479de725301eb2888baba7089f7a49747f236a2", "SCN-0001@a9e79a55c878a7cf1f4d87be8d2ea1f052931f9cc0fe8b284caa24434012c4fe", "TST-0001@9f3fc81ed1ae050168fba712c8e1e33fddf67bcf6ef799436a489d538bb5
+$ gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/dp-after-YceBRr/w11-824498301/.governance-runtime/reports/TASK-0001.json    [session=S-zeta role=orchestrator exit=0 0.7s]
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov telemetry summary    [session=S-zeta role=orchestrator exit=0 0.0s]
+
+===== telemetry summary (ok=True) full output =====
+{
+ "budget": {
+  "active_sessions": [],
+  "max_network_calls_per_task": 200,
+  "max_parallel_agents": 4,
+  "network_calls_by_task": {},
+  "over_budget": []
+ },
+ "commands": [
+  {
+   "avg_ms": 43.5,
+   "count": 2,
+   "name": "cli.context",
+   "ok": 2
+  },
+  {
+   "avg_ms": 1105.0,
+   "count": 1,
+   "name": "cli.init",
+   "ok": 1
+  },
+  {
+   "avg_ms": 58.666666666666664,
+   "count": 3,
+   "name": "cli.memory",
+   "ok": 2
+  },
+  {
+   "avg_ms": 153.0,
+   "count": 1,
+   "name": "cli.rebuild-memory",
+   "ok": 1
+  },
+  {
+   "avg_ms": 159.4,
+   "count": 5,
+   "name": "cli.task",
+   "ok": 5
+  },
+  {
+   "avg_ms": 174.8,
+   "count": 5,
+   "name": "health.run",
+   "ok": 5
+  }
+ ],
+ "cost_by_task_class": {
+  "implementation": 0.0
+ },
+ "events": 17,
+ "first_pass_completion_rate": 1.0,
+ "human_gates_by_feature": {},
+ "model_routing": [],
+ "retrieval": {
+  "avg_hits": 0.0,
+  "avg_latency_ms": 0.0,
+  "queries": 0
+ },
+ "rework_by_role": [
+  {
+   "repairs": 0,
+   "repairs_per_report": 0.0,
+   "reports": 1,
+   "role": "orchestrator"
+  }
+ ]
+}
+$ gov audit --no-persist    [session=S-zeta role=orchestrator exit=0 0.6s]
+
+===== audit (ok=True) full output =====
+{
+ "audit": "",
+ "blocks": [],
+ "cache_mode": "use",
+ "complete": true,
+ "counts": {
+  "critical": 0,
+  "high": 0,
+  "low": 16,
+  "medium": 7
+ },
+ "failure_memory": null,
+ "families": {
+  "adapter_portability": {
+   "cached_from": "HR-20260919T132818621Z-9a3381e3",
+   "detail": {
+    "adapters_checked": 5,
+    "invariants": 15,
+    "ok": true,
+    "problems": [],
+    "served_from_cache": "HR-20260919T132818621Z-9a3381e3"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "artifact_flow_health": {
+   "cached_from": null,
+   "detail": {
+    "max_superseded_input_leakage_rate": 0.0,
+    "targets": [
+     {
+      "metric": "required_input_delivery_accuracy",
+      "min": 1.0
+     },
+     {
+      "metric": "current_version_selection_accuracy",
+      "min": 1.0
+     },
+     {
+      "metric": "missing_required_input_detection",
+      "min": 1.0
+     },
+     {
+      "metric": "staleness_propagation_accuracy",
+      "min": 1.0
+     },
+     {
+      "metric": "requirement_to_code_traceability_coverage",
+      "min": 1.0
+     },
+     {
+      "metric": "requirement_to_test_traceability_coverage",
+      "min": 1.0
+     },
+     {
+      "metric": "orphan_detection_precision",
+      "min": 1.0
+     },
+     {
+      "metric": "fresh_agent_reconstruction_correctness",
+      "min": 1.0
+     }
+    ],
+    "w11_metrics": {
+     "current_version_selection_accuracy": {
+      "applicable": false,
+      "contract": "Contract v3:1176",
+      "denominator": 0,
+      "detail": {
+       "misses": [],
+       "over": "inputs delivered in stored context packets"
+      },
+      "metric": "current_version_selection_accuracy",
+      "numerator": 0,
+      "value": null
+     },
+     "fresh_agent_reconstruction_correctness": {
+      "applicable": true,
+      "contract": "Contract v3:1183",
+      "denominator": 2,
+      "metric": "fresh_agent_reconstruction_correctness",
+      "numerator": 2,
+      "probes": [
+       {
+        "budget": 25,
+        "ok": true,
+        "probe": "status packet within the read budget",
+        "reads": 5
+       },
+       {
+        "checkpoint": "CKPT-00001",
+        "ok": true,
+        "probe": "latest checkpoint current",
+        "reasons": []
+       }
+      ],
+      "value": 1.0
+     },
+     "missing_required_input_detection": {
+      "applicable": true,
+      "contract": "Contract v3:1178",
+      "denominator": 1,
+      "detail": {
+       "tasks": [
+        {
+         "missing_inputs": [
+          {
+           "declared_in": [
+            "task.requirements"
+           ],
+           "id": "REQ-9999",
+           "problems": [
+            {
+             "blocking": true,
+             "code": "ABSENT",
+             "message": "REQ-9999 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+            }
+           ],
+           "reason": null,
+           "required": true,
+           "resolution": "ABSENT",
+           "slot": "requirement",
+           "type": ""
+          }
+         ],
+         "offered_as_runnable": false,
+         "task": "TASK-0003",
+         "task_status": "BLOCKED"
+        }
+       ]
+      },
+      "metric": "missing_required_input_detection",
+      "missing_required_inputs": 1,
+      "numerator": 1,
+      "value": 1.0
+     },
+     "orphan_detection": {
+      "applicable": true,
+      "by_kind": {
+       "spec-without-downstream-path": {
+        "contract": "Contract v3:1140",
+        "count": 1
+       },
+       "unconsumed-output": {
+        "contract": "Contract v3:1139",
+        "count": 0
+       },
+       "unconsumed-research": {
+        "contract": "Contract v3:1141",
+        "count": 0
+       },
+       "unjustified-acceptance-test": {
+        "contract": "Contract v3:1142",
+        "count": 0
+       },
+       "unjustified-code": {
+        "contract": "Contract v3:1143",
+        "count": 0
+       }
+      },
+      "contract": "Contract v3:1182",
+      "investigations": {
+       "false_positives": [],
+       "open": 0,
+       "resolved_false_positive": 0,
+       "resolved_true_positive": 0
+      },
+      "metric": "orphan_detection",
+      "orphan_detection_false_positive_rate": null,
+      "orphan_detection_precision": null,
+      "orphan_detection_recall": null,
+      "orphans_detected": 1,
+      "recall_source": "not measurable in the governed repository: the true orphan set is known only to a qualification oracle (G6)"
+     },
+     "required_input_delivery_accuracy": {
+      "applicable": false,
+      "contract": "Contract v3:1175",
+      "denominator": 0,
+      "detail": {
+       "misses": [],
+       "over": "mandatory inputs of live tasks whose context packet was delivered"
+      },
+      "metric": "required_input_delivery_accuracy",
+      "numerator": 0,
+      "value": null
+     },
+     "requirement_to_code_traceability_coverage": {
+      "applicable": true,
+      "contract": "Contract v3:1180",
+      "denominator": 2,
+      "detail": {
+       "uncovered": [
+        "REQ-0003"
+       ]
+      },
+      "metric": "requirement_to_code_traceability_coverage",
+      "numerator": 1,
+      "value": 0.5
+     },
+     "requirement_to_test_traceability_coverage": {
+      "applicable": true,
+      "contract": "Contract v3:1181",
+      "denominator": 2,
+      "detail": {
+       "uncovered": [
+        "REQ-0002",
+        "REQ-0003"
+       ]
+      },
+      "metric": "requirement_to_test_traceability_coverage",
+      "numerator": 0,
+      "value": 0.0
+     },
+     "staleness_propagation_accuracy": {
+      "applicable": false,
+      "contract": "Contract v3:1179",
+      "denominator": 0,
+      "detail": {
+       "over": "(task, input) pairs whose input changed since the work consumed it",
+       "unpropagated": []
+      },
+      "metric": "staleness_propagation_accuracy",
+      "numerator": 0,
+      "value": null
+     },
+     "superseded_input_leakage_rate": {
+      "applicable": true,
+      "contract": "Contract v3:1177",
+      "denominator": 5,
+      "detail": {
+       "leaks": [
+        {
+         "input": "REQ-0001",
+         "input_status": "SUPERSEDED",
+         "superseded_by": "REQ-0002",
+         "task": "TASK-0002",
+         "task_status": "BLOCKED"
+        }
+       ],
+       "over": "governing inputs (declared, delivered or consumed per receipt) of live and DONE tasks; a flagged (stale/retest) task is not a leak"
+      },
+      "metric": "superseded_input_leakage_rate",
+      "numerator": 1,
+      "value": 0.2
+     }
+    }
+   },
+   "findings": 3,
+   "ok": true,
+   "status": "executed"
+  },
+  "audit_reproducibility": {
+   "cached_from": null,
+   "detail": {
+    "compared": [
+     {
+      "check": "schema_invariants",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "graph_integrity",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "index_freshness",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "memory_retrieval_regression",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "authority_role_limits",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "mutation_scope",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "path_map_compliance",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "secrets_sensitivity_indexing",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "product_traceability",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "change_control_integrity",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "continuity_checkpoint_handoff",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "model_routing_integrity",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "lineage_orphans",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "index_content_coverage",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "upstream_change_propagation",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "authority_unambiguous",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "legacy_authority",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "unresolved_audit_findings",
+      "equal": true,
+      "method": "double-run"
+     },
+     {
+      "check": "research_experiment_data_lifecycle",
+      "equal": true,
+      "method": "double-run"
+     }
+    ],
+    "mismatches": 0,
+    "note": "every executed DoubleRun check runs twice concurrently; every refreshed check is compared with its cached result under an identical key"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "authority_role_limits": {
+   "cached_from": null,
+   "detail": null,
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "authority_unambiguous": {
+   "cached_from": null,
+   "detail": {
+    "contradictions": 0,
+    "detail": [],
+    "unresolved": 0
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "change_control_integrity": {
+   "cached_from": null,
+   "detail": {
+    "cits_by_status": {}
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "command_contract_consistency": {
+   "cached_from": "HR-20260919T132818621Z-9a3381e3",
+   "detail": null,
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "concurrency_claims": {
+   "cached_from": null,
+   "detail": {
+    "claims": 0,
+    "expired": 0
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "context_reproducibility": {
+   "cached_from": null,
+   "detail": {
+    "chars": 25286,
+    "delivery": [],
+    "deterministic_hash": "83e41546c1812bf4cd6be564cd645e00a00eaa39fb6603586b0e38eee6618b5c",
+    "isolated_in_sandbox": true,
+    "task": "TASK-0001"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "continuity_checkpoint_handoff": {
+   "cached_from": null,
+   "detail": {
+    "checkpoints": 1,
+    "handoffs": 0,
+    "latest": "spec/reports/checkpoints/CKPT-00001.yaml",
+    "latest_freshness": {
+     "checkpoint": "CKPT-00001",
+     "reasons": [],
+     "stale_checkpoints": [],
+     "state": "CURRENT"
+    }
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "contract_binding": {
+   "cached_from": "HR-20260919T132818621Z-9a3381e3",
+   "detail": {
+    "applicable": true,
+    "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3",
+    "root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02",
+    "served_from_cache": "HR-20260919T132818621Z-9a3381e3",
+    "verdict": "CONTRACT_SOURCE_BOUND"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "feature_readiness": {
+   "cached_from": "HR-20260919T132820027Z-bab69d0e",
+   "detail": {
+    "active_features": 1,
+    "features": [
+     {
+      "coverage": 1.0,
+      "explicit": true,
+      "feature": "F-0001",
+      "gaps": 0,
+      "pre_implementation_ok": true,
+      "stated_cells": 26
+     }
+    ],
+    "served_from_cache": "HR-20260919T132820027Z-bab69d0e"
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "reused"
+  },
+  "fresh_agent_reconstruction": {
+   "cached_from": null,
+   "detail": {
+    "budget": 25,
+    "next_action": "no runnable tasks: run readiness planning or discovery",
+    "reads": 5,
+    "status_chars": 9901
+   },
+   "findings": 0,
+   "ok": true,
+   "status": "executed"
+  },
+  "graph_integrity": {
+   "cached_from": null,
+   "detail": {
+    "dangling": 2,
+    "edge_types": {
+     "CALLS": 1,
+     "CONSUMES": 13,
+     "GOVERNED_BY": 4,
+     "IMPLEMENTS": 3,
+     "IMPORTS": 1,
+     "PRODUCES": 5,
+     "REALISES": 7,
+     "SUPERSEDES": 2,
+     "TESTS": 2,
+     "VALIDATED_BY": 9
+    },
+    "integrity": {
+     "checked_edges": 44,
+     "ch
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.2s]
+
+===== doctor (ok=True) full output =====
+{
+ "checks": [
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D001",
+   "message": "present",
+   "name": "framework.lock present",
+   "ok": true,
+   "remediation": "gov init / gov adopt",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute"
+      ],
+      "scope": "subjects"
+     },
+     {
+      "at_or_above": "high",
+      "operations": [
+       "release.build",
+       "update.apply"
+      ],
+      "remedies": [
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D002",
+   "message": "valid",
+   "name": "framework.lock schema",
+   "ok": true,
+   "remediation": "gov update --apply (migration) or repair lock",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D003",
+   "message": "intact (4.1.5)",
+   "name": "kernel payload integrity",
+   "ok": true,
+   "remediation": "gov kernel reinstall --source <release> (kernel is immutable, INV-007)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D004",
+   "message": "match",
+   "name": "lock matches kernel manifest",
+   "ok": true,
+   "remediation": "gov update --apply or gov kernel reinstall",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D005",
+   "message": "match",
+   "name": "CLI/kernel compatibility",
+   "ok": true,
+   "remediation": "gov update --check",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute"
+      ],
+      "scope": "subjects"
+     },
+     {
+      "at_or_above": "high",
+      "operations": [
+       "release.build",
+       "update.apply"
+      ],
+      "remedies": [
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D006",
+   "message": "7 overlay files valid",
+   "name": "project overlay",
+   "ok": true,
+   "remediation": "repair governance/project/*.yaml against kernel schemas",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "high",
+      "operations": [
+       "task.close",
+       "cit.execute"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute"
+      ],
+      "scope": "subjects"
+     },
+     {
+      "at_or_above": "high",
+      "operations": [
+       "release.build",
+       "update.apply"
+      ],
+      "remedies": [
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D007",
+   "message": "14 policies loaded, 0 overrides",
+   "name": "policies",
+   "ok": true,
+   "remediation": "repair policy overrides/exceptions",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D029",
+   "message": "installed kernel 4.1.5 intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record",
+   "name": "constitutional policy read from a verified kernel",
+   "ok": true,
+   "remediation": "gov kernel verify; gov kernel reinstall (or `gov kernel override --reason ...` as an L4+ role, which raises a gate)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D027",
+   "message": "0 override(s) applied within POLICY_PRECEDENCE; rules from installed kernel (verified)",
+   "name": "policy precedence respected (no override weakens security/authority/gate floors)",
+   "ok": true,
+   "remediation": "remove the weakening override from governance/project/PROJECT_POLICY.yaml or PROJECT_EXCEPTIONS.yaml; only strengthening overrides are applied",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D028",
+   "message": "no plugin problems",
+   "name": "capability plugins governed (schema-valid, registered, pinned, authorised)",
+   "ok": true,
+   "remediation": "gov plugins list; fix or register the descriptor (gov plugins register --descriptor <file>)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D008",
+   "message": "in sync",
+   "name": "framework.json in sync with repository contract",
+   "ok": true,
+   "remediation": "gov adapters generate",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D009",
+   "message": "state.db ok (172 artefacts)",
+   "name": "derived runtime",
+   "ok": true,
+   "remediation": "gov rebuild-memory",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "mode": "warning",
+    "refuses": []
+   },
+   "id": "D010",
+   "message": "fresh (172 artefacts)",
+   "name": "index freshness",
+   "ok": true,
+   "remediation": "gov rebuild-memory (full when pins changed; --incremental otherwise)",
+   "severity": "info"
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+   },
+   "id": "D011",
+   "message": "none",
+   "name": "secrets outside secret class",
+   "ok": true,
+   "remediation": "move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile",
+   "severity": "info",
+   "subjects": []
+  },
+  {
+   "enforcement": {
+    "below_threshold": "warning",
+    "mode": "hard-block",
+    "refuses": [
+     {
+      "at_or_above": "critical",
+      "operations": [
+       "task.create",
+       "task.claim",
+       "task.close",
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "handoff.create",
+       "release.build",
+       "update.apply",
+       "adopt.migrate"
+      ],
+      "remedies": [
+       "cit.propose",
+       "cit.approve",
+       "cit.execute",
+       "update.apply"
+      ],
+      "scope": "global"
+     }
+    ],
+    "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only i
+$ gov status    [session=S-zeta role=orchestrator exit=0 0.2s]
+
+===== status (ok=True) full output =====
+{
+ "control": {
+  "agents_cancelled": false,
+  "mode": "RUNNING",
+  "reason": null,
+  "updated_at": null,
+  "writes_frozen": false
+ },
+ "features": [
+  {
+   "coverage": 1.0,
+   "gaps": 0,
+   "id": "F-0001",
+   "pre_implementation_ok": true,
+   "title": "Order totals"
+  }
+ ],
+ "framework": {
+  "cli_version": "4.1.5",
+  "installed_at": "2026-09-19T13:28:18Z",
+  "name": "agentic-engineering-os",
+  "release_hash": "0ae670605542eb79950a8ca90927ec3272a045e19f53d844a5dce82a01efdf9f",
+  "version": "4.1.5"
+ },
+ "fresh_agent_reads": [
+  "governance/framework.lock",
+  "governance/kernel/constitution/CONSTITUTION.md",
+  "governance/project/PROJECT_POLICY.yaml",
+  "governance/project/REPOSITORY_CONTRACT.yaml",
+  "spec/reports/checkpoints/CKPT-00001.yaml"
+ ],
+ "health": {
+  "artifact_flow": {
+   "at": "2026-09-19T13:28:21Z",
+   "computed_by": "HR-20260919T132820828Z-d2092411",
+   "current": true,
+   "metrics": {
+    "current_version_selection_accuracy": {
+     "applicable": false,
+     "contract": "Contract v3:1176",
+     "denominator": 0,
+     "detail": {
+      "misses": [],
+      "over": "inputs delivered in stored context packets"
+     },
+     "metric": "current_version_selection_accuracy",
+     "numerator": 0,
+     "value": null
+    },
+    "fresh_agent_reconstruction_correctness": {
+     "applicable": true,
+     "contract": "Contract v3:1183",
+     "denominator": 2,
+     "metric": "fresh_agent_reconstruction_correctness",
+     "numerator": 2,
+     "probes": [
+      {
+       "budget": 25,
+       "ok": true,
+       "probe": "status packet within the read budget",
+       "reads": 5
+      },
+      {
+       "checkpoint": "CKPT-00001",
+       "ok": true,
+       "probe": "latest checkpoint current",
+       "reasons": []
+      }
+     ],
+     "value": 1.0
+    },
+    "missing_required_input_detection": {
+     "applicable": true,
+     "contract": "Contract v3:1178",
+     "denominator": 1,
+     "detail": {
+      "tasks": [
+       {
+        "missing_inputs": [
+         {
+          "declared_in": [
+           "task.requirements"
+          ],
+          "id": "REQ-9999",
+          "problems": [
+           {
+            "blocking": true,
+            "code": "ABSENT",
+            "message": "REQ-9999 is declared as a requirement input but no governed record with that id exists; create it, correct the id, or remove the declaration"
+           }
+          ],
+          "reason": null,
+          "required": true,
+          "resolution": "ABSENT",
+          "slot": "requirement",
+          "type": ""
+         }
+        ],
+        "offered_as_runnable": false,
+        "task": "TASK-0003",
+        "task_status": "BLOCKED"
+       }
+      ]
+     },
+     "metric": "missing_required_input_detection",
+     "missing_required_inputs": 1,
+     "numerator": 1,
+     "value": 1.0
+    },
+    "orphan_detection": {
+     "applicable": true,
+     "by_kind": {
+      "spec-without-downstream-path": {
+       "contract": "Contract v3:1140",
+       "count": 1
+      },
+      "unconsumed-output": {
+       "contract": "Contract v3:1139",
+       "count": 0
+      },
+      "unconsumed-research": {
+       "contract": "Contract v3:1141",
+       "count": 0
+      },
+      "unjustified-acceptance-test": {
+       "contract": "Contract v3:1142",
+       "count": 0
+      },
+      "unjustified-code": {
+       "contract": "Contract v3:1143",
+       "count": 0
+      }
+     },
+     "contract": "Contract v3:1182",
+     "investigations": {
+      "false_positives": [],
+      "open": 0,
+      "resolved_false_positive": 0,
+      "resolved_true_positive": 0
+     },
+     "metric": "orphan_detection",
+     "orphan_detection_false_positive_rate": null,
+     "orphan_detection_precision": null,
+     "orphan_detection_recall": null,
+     "orphans_detected": 1,
+     "recall_source": "not measurable in the governed repository: the true orphan set is known only to a qualification oracle (G6)"
+    },
+    "required_input_delivery_accuracy": {
+     "applicable": false,
+     "contract": "Contract v3:1175",
+     "denominator": 0,
+     "detail": {
+      "misses": [],
+      "over": "mandatory inputs of live tasks whose context packet was delivered"
+     },
+     "metric": "required_input_delivery_accuracy",
+     "numerator": 0,
+     "value": null
+    },
+    "requirement_to_code_traceability_coverage": {
+     "applicable": true,
+     "contract": "Contract v3:1180",
+     "denominator": 2,
+     "detail": {
+      "uncovered": [
+       "REQ-0003"
+      ]
+     },
+     "metric": "requirement_to_code_traceability_coverage",
+     "numerator": 1,
+     "value": 0.5
+    },
+    "requirement_to_test_traceability_coverage": {
+     "applicable": true,
+     "contract": "Contract v3:1181",
+     "denominator": 2,
+     "detail": {
+      "uncovered": [
+       "REQ-0002",
+       "REQ-0003"
+      ]
+     },
+     "metric": "requirement_to_test_traceability_coverage",
+     "numerator": 0,
+     "value": 0.0
+    },
+    "staleness_propagation_accuracy": {
+     "applicable": false,
+     "contract": "Contract v3:1179",
+     "denominator": 0,
+     "detail": {
+      "over": "(task, input) pairs whose input changed since the work consumed it",
+      "unpropagated": []
+     },
+     "metric": "staleness_propagation_accuracy",
+     "numerator": 0,
+     "value": null
+    },
+    "superseded_input_leakage_rate": {
+     "applicable": true,
+     "contract": "Contract v3:1177",
+     "denominator": 5,
+     "detail": {
+      "leaks": [
+       {
+        "input": "REQ-0001",
+        "input_status": "SUPERSEDED",
+        "superseded_by": "REQ-0002",
+        "task": "TASK-0002",
+        "task_status": "BLOCKED"
+       }
+      ],
+      "over": "governing inputs (declared, delivered or consumed per receipt) of live and DONE tasks; a flagged (stale/retest) task is not a leak"
+     },
+     "metric": "superseded_input_leakage_rate",
+     "numerator": 1,
+     "value": 0.2
+    }
+   }
+  },
+  "blocks": [],
+  "failing_checks": [
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "D015",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T132821585Z-bb93499f"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "D021",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T132821585Z-bb93499f"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "D022",
+    "enforcement": "warning",
+    "max_severity": "low",
+    "result": "HR-20260919T132821585Z-bb93499f"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "D032",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T132821585Z-bb93499f"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "D035",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T132821585Z-bb93499f"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "graph_integrity",
+    "enforcement": "hard-block",
+    "max_severity": "medium",
+    "result": "HR-20260919T132820828Z-d2092411"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "health_slos",
+    "enforcement": "warning",
+    "max_severity": "medium",
+    "result": "HR-20260919T132820828Z-d2092411"
+   },
+   {
+    "at": "2026-09-19T13:28:21Z",
+    "check": "research_experiment_data_lifecycle",
+    "enforcement": "hard-block",
+    "max_severity": "medium",
+    "result": "HR-20260919T132820828Z-d2092411"
+   }
+  ],
+  "failure_memory": {
+   "by_kind": {},
+   "open": 0,
+   "records": []
+  },
+  "governance_suite_currency": {
+   "changed_classes": [
+    {
+     "class": "continuity_records",
+     "contract_class": "checkpoint/handoff records"
+    },
+    {
+     "class": "evidence_records",
+     "contract_class": "implementation/test evidence records"
+    },
+    {
+     "class": "index_manifest",
+     "contract_class": "relevant index manifest"
+    },
+    {
+     "class": "source",
+     "contract_class": "relevant source files"
+    },
+    {
+     "class": "spec_requirements",
+     "contract_class": "authoritative spec/decision"
+    },
+    {
+     "class": "spec_tasks",
+     "contract_class": "authoritative spec/decision (task manifests, test obligations)"
+    }
+   ],
+   "current": false,
+   "green": "AUD-0001",
+   "key": "c564a3669f9ba6de4b999f52411f1270a890ce3dde4f174656c4e6b4e6d181ea",
+   "message": "green record \"AUD-0001\" is obsolete (inputs changed: continuity_records, evidence_records, index_manifest, source, spec_requirements, spec_tasks)",
+   "recorded_key": "408d25d750e2d43da38ced03648770d84784d70a54a7c6981b1e7f5ca8495e73",
+   "unhonoured_green": []
+  },
+  "last_result": "HR-20260919T132821585Z-bb93499f",
+  "observed": {
+   "changed": 0
+  },
+  "product_tests": {
+   "applicable": false,
+   "families": {},
+   "notes": [
+    "no product test command configured (PROJECT_POLICY.tests) or detectable with an available toolchain (capability gap)"
+   ]
+  },
+  "repository": {
+   "conditions": [
+    {
+     "contract": "Contract v3:996",
+     "evaluated_owners": 9,
+     "failing": [],
+     "id": "H1",
+     "owners": [
+      "D014",
+      "D027",
+      "D029",
+      "D003",
+      "schema_invariants",
+      "authority_unambiguous",
+      "authority_role_limits",
+      "policy_precedence",
+      "mutation_scope"
+     ],
+     "severity": "none",
+     "status": "HOLDS",
+     "title": "authority unambiguous"
+    },
+    {
+     "contract": "Contract v3:997",
+     "evaluated_owners": 2,
+     "failing": [],
+     "id": "H2",
+     "owners": [
+      "D013",
+      "legacy_authority"
+     ],
+     "severity": "none",
+     "status": "HOLDS",
+     "title": "no accidental legacy authority"
+    },
+    {
+     "contract": "Contract v3:998",
+     "evaluated_owners": 9,
+     "failing": [],
+     "id": "H3",
+     "owners": [
+      "D002",
+      "D004",
+      "D016",
+      "D023",
+      "D026",
+      "change_control_integrity",
+      "concurrency_claims",
+      "os_binding_integrity",
+      "task_contract_integrity"
+     ],
+     "severity": "none",
+     "status": "HOLDS",
+     "title": "deterministic state consistent"
+    },
+    {
+     "contract": "Contract v3:999",
+     "evaluated_owners": 8,
+     "failing": [
+      {
+       "check": "D015",
+       "severity": "medium"
+      },
+      {
+       "check": "graph_integrity",
+       "severity": "medium"
+      }
+     ],
+     "id": "H4",
+     "owners": [
+      "D009",
+      "D010",
+      "D015",
+      "D025",
+      "graph_integrity",
+      "index_freshness",
+      "index_content_coverage",
+      "upstream_change_propagation"
+     ],
+     "severity": "medium",
+     "status": "FAILS",
+     "title": "graph/index freshness passes"
+    },
+    {
+     "contract": "Contract v3:1000",
+     "evaluated_owners": 1,
+     "failing": [],
+     "id": "H5",
+     "owners": [
+      "memory_retrieval_regression"
+     ],
+     "severity": "none",
+     "status": "HOLDS",
+     "title": "retrieval meets thresholds"
+    },
+    {
+     "contract": "Contract v3:1001",
+     "evaluated_owners": 4,
+     "failing": [],
+     "id": "H6",
+     "owners": [
+      "D011",
+      "D012",
+      "path_map_compliance",
+      "secrets_sensitivity_indexing"
+     ],
+     "severity": "none",
+     "status": "HOLDS",
+     "title": "sensitive material isolated"
+    },
+    {
+     "contract": "Contract v3:1002",
+     "evaluated_owners": 1,
+     "failing": [],
+     "id": "H7",
+     "owners": [
+      "feature_readiness"
+     ],
+     "severity": "none",
+     "status": "HOLDS",
+     "title": "feature readiness explicit"
+    },
+    {
+     "contract": "Contract v3:1003",
+     "evaluated_owners": 3,
+     "failing": [
+      {
+       "check": "graph_integrity",
+       "severity": "medium"
+      }
+     ],
+     "id": "H8",
+     "owners": [
+      "graph_integrity",
+      "human_gate_integrity",
+      "concurrency_claims"
+     ],
+     "severity": "medium",
+     "status": "FAILS",
+     "title": "task runnable/blocked state correct"
+    },
+    {
+     "contract": "Contract v3:1004",
+     "evaluated_owners": 5,
+     "failing": [
+      {
+       "check": "research_experiment_data_lifecycle",
+       "severity": "medium"
+      }
+     ],
+     "id": "H9",
+     "
+$ gov memory verify    [session=S-zeta role=orchestrator exit=0 0.1s]
+
+===== memory verify (ok=True) full output =====
+{
+ "avg_latency_ms": 0.17647058823529413,
+ "by_category": [
+  {
+   "category": "lexical_literal",
+   "queries": 6,
+   "recall": 1.0
+  },
+  {
+   "category": "exact_path",
+   "queries": 6,
+   "recall": 1.0
+  },
+  {
+   "category": "symbol",
+   "queries": 5,
+   "recall": 1.0
+  }
+ ],
+ "forbidden_violations": 0,
+ "index_fresh": true,
+ "measured": true,
+ "min_queries": 5,
+ "mrr": 1.0,
+ "pass": true,
+ "pending_queries": 2,
+ "precision_at_k": 0.980392156862745,
+ "queries": 17,
+ "recall_at_k": 1.0,
+ "results": [
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/framework.lock"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/framework.lock",
+    "file:governance/framework.lock"
+   ],
+   "id": "HQ-001",
+   "latency_ms": 1,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/framework.lock",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/KERNEL.yaml",
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "id": "HQ-002",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/KERNEL.yaml",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/KERNEL_MANIFEST.json"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/KERNEL_MANIFEST.json",
+    "file:governance/kernel/KERNEL_MANIFEST.json"
+   ],
+   "id": "HQ-003",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/KERNEL_MANIFEST.json",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/adapters/api/adapter.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/api/adapter.yaml",
+    "file:governance/kernel/adapters/api/adapter.yaml"
+   ],
+   "id": "HQ-004",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/adapters/api/adapter.yaml",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/api/template.txt",
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "id": "HQ-005",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/adapters/api/template.txt",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "exact_path",
+   "expected": [
+    "file:governance/kernel/adapters/cli/adapter.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/cli/adapter.yaml",
+    "file:governance/kernel/adapters/cli/adapter.yaml"
+   ],
+   "id": "HQ-006",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "governance/kernel/adapters/cli/adapter.yaml",
+   "recall": 1.0,
+   "routes": [
+    "path"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:src/lib.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:src/lib.rs"
+   ],
+   "id": "HQ-007",
+   "latency_ms": 2,
+   "pass": true,
+   "precision": 1.0,
+   "query": "append",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:tests/ledger_test.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:tests/ledger_test.rs"
+   ],
+   "id": "HQ-008",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "appends_and_totals",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:src/lib.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:src/lib.rs",
+    "file:src/lib.rs"
+   ],
+   "id": "HQ-009",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "is_empty",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:tests/ledger_test.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:tests/ledger_test.rs"
+   ],
+   "id": "HQ-010",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "rejects_duplicates_and_zero_quantity",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "symbol",
+   "expected": [
+    "file:src/lib.rs"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:src/lib.rs",
+    "file:src/lib.rs",
+    "file:tests/ledger_test.rs"
+   ],
+   "id": "HQ-011",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 0.6666666666666666,
+   "query": "total_cents",
+   "recall": 1.0,
+   "routes": [
+    "symbol"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/framework.lock"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/framework.lock"
+   ],
+   "id": "HQ-012",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"release_hash: measured digest of the installed payload (verified-byte binding at install)\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/KERNEL.yaml",
+    "file:governance/kernel/KERNEL.yaml"
+   ],
+   "id": "HQ-013",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"# This file is part of the immutable kernel payload installed into <repo>/governance/kernel/.\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/api/template.txt",
+    "file:governance/kernel/adapters/api/template.txt"
+   ],
+   "id": "HQ-014",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"You operate inside a repository governed by {{framework}} {{version}} (project {{project_name}}).\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "id": "HQ-015",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"1. Run `gov status` to reconstruct the current governed state (no prior conversation needed).\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/generic/template.md"
+   ],
+   "id": "HQ-016",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"- Never edit governance/kernel/. Propose framework changes as FRAMEWORK-scoped lessons.\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  },
+  {
+   "category": "lexical_literal",
+   "expected": [
+    "file:governance/kernel/adapters/ide/adapter.yaml"
+   ],
+   "forbidden_hits": [],
+   "got": [
+    "file:governance/kernel/adapters/ide/adapter.yaml",
+    "file:governance/kernel/adapters/ide/adapter.yaml"
+   ],
+   "id": "HQ-017",
+   "latency_ms": 0,
+   "pass": true,
+   "precision": 1.0,
+   "query": "\"description: IDE rules projection (generic rules file consumed by IDE agents).\"",
+   "recall": 1.0,
+   "routes": [
+    "lexical_exact"
+   ],
+   "rr": 1.0
+  }
+ ],
+ "stale_hit_rate": 0.0,
+ "status": "PASS",
+ "superseded_hit_rate": 0.0,
+ "thresholds": {
+  "max_stale_hit_rate": 0.0,
+  "max_superseded_hit_rate": 0.0,
+  "min_mrr": 0.5,
+  "min_queries": 5,
+  "min_recall_at_k": 0.8
+ },
+ "thresholds_met": true
+}
+$ gov task dag    [session=S-zeta role=orchestrator exit=0 0.0s]
+
+===== task dag (ok=True) full output =====
+{
+ "blocked": [
+  {
+   "reasons": [
+    "mandatory inputs unsatisfied: REQ-0001 (requirement: SUPERSEDED,LIFECYCLE_STATE)"
+   ],
+   "task": "TASK-0002"
+  },
+  {
+   "reasons": [
+    "mandatory inputs unsatisfied: REQ-9999 (requirement: ABSENT)"
+   ],
+   "task": "TASK-0003"
+  }
+ ],
+ "counts": {
+  "blocked": 2,
+  "done": 1,
+  "open": 2,
+  "runnable": 0,
+  "total": 3,
+  "waiting_human": 0
+ },
+ "cycles": [],
+ "dangling_blocks": [],
+ "done": [
+  "TASK-0001"
+ ],
+ "human_gate_dependencies": [],
+ "longest_chain": [
+  "TASK-0002"
+ ],
+ "missing_dependencies": [],
+ "per_feature": {
+  "F-0001": [
+   "TASK-0001",
+   "TASK-0002",
+   "TASK-0003"
+  ]
+ },
+ "runnable": [],
+ "waiting_human": []
+}
+documented name-matching proxies: {
+ "audit.families.secrets_sensitivity_indexing.detail.leaked_chunks": "secret-pattern chunks in the index (security), not superseded-input leakage",
+ "memory verify.superseded_hit_rate": "held-out RETRIEVAL leakage of superseded artefacts (W11-m3-proxy line)",
+ "memory verify.thresholds.max_superseded_hit_rate": "threshold for the retrieval proxy above",
+ "audit.families.graph_integrity.detail.orphans": "count of records with no edge at all (W11-m8-proxy line)",
+ "audit.families.fresh_agent_reconstruction": "read-count vs read-budget family (W11-m9-proxy line)",
+ "status.fresh_agent_reads": "list of files a fresh agent should read (W11-m9-proxy line)"
+}
+m1-required-input-delivery-accuracy: keys matching ['delivery', 'required_input', 'input_accuracy']: ['audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection', 'audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection.missing_required_inputs', 'audit.families.artifact_flow_health.detail.w11_metrics.required_input_delivery_accuracy', 'audit.families.context_reproducibility.detail.delivery', 'status.health.artifact_flow.metrics.missing_required_input_detection', 'status.health.artifact_flow.metrics.missing_required_input_detection.missing_required_inputs', 'status.health.artifact_flow.metrics.required_input_delivery_accuracy']
+OBS W11-m1-required-input-delivery-accuracy: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection', 'audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection.missing_required_inputs', 'audit.families.artifact_flow_health.detail.w11_metrics.required_input_delivery_accuracy', 'audit.families.context_reproducibility.detail.delivery', 'status.health.artifact_flow.metrics.missing_required_input_detection', 'status.health.artifact_flow.metrics.missing_required_input_detection.missing_required_inputs', 'status.health.artifact_flow.metrics.required_input_delivery_accuracy']; proxies matched: []
+m2-current-version-selection-accuracy: keys matching ['current_version', 'version_selection']: ['audit.families.artifact_flow_health.detail.w11_metrics.current_version_selection_accuracy', 'status.health.artifact_flow.metrics.current_version_selection_accuracy']
+OBS W11-m2-current-version-selection-accuracy: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.current_version_selection_accuracy', 'status.health.artifact_flow.metrics.current_version_selection_accuracy']; proxies matched: []
+m3-superseded-input-leakage-rate: keys matching ['superseded.*(rate|leak)', 'leak']: ['audit.families.artifact_flow_health.detail.max_superseded_input_leakage_rate', 'audit.families.artifact_flow_health.detail.w11_metrics.superseded_input_leakage_rate', 'audit.families.artifact_flow_health.detail.w11_metrics.superseded_input_leakage_rate.detail.leaks', 'audit.families.secrets_sensitivity_indexing.detail.leaked_chunks', 'memory verify.superseded_hit_rate', 'memory verify.thresholds.max_superseded_hit_rate', 'status.health.artifact_flow.metrics.superseded_input_leakage_rate', 'status.health.artifact_flow.metrics.superseded_input_leakage_rate.detail.leaks']
+OBS W11-m3-superseded-input-leakage-rate: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.max_superseded_input_leakage_rate', 'audit.families.artifact_flow_health.detail.w11_metrics.superseded_input_leakage_rate', 'audit.families.artifact_flow_health.detail.w11_metrics.superseded_input_leakage_rate.detail.leaks', 'status.health.artifact_flow.metrics.superseded_input_leakage_rate', 'status.health.artifact_flow.metrics.superseded_input_leakage_rate.detail.leaks']; proxies matched: ['audit.families.secrets_sensitivity_indexing.detail.leaked_chunks', 'memory verify.superseded_hit_rate', 'memory verify.thresholds.max_superseded_hit_rate']
+m4-missing-required-input-detection: keys matching ['missing_(required_)?input', 'missing_inputs']: ['audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection', 'audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection.detail.tasks[].missing_inputs', 'audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection.missing_required_inputs', 'status.health.artifact_flow.metrics.missing_required_input_detection', 'status.health.artifact_flow.metrics.missing_required_input_detection.detail.tasks[].missing_inputs', 'status.health.artifact_flow.metrics.missing_required_input_detection.missing_required_inputs']
+OBS W11-m4-missing-required-input-detection: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection', 'audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection.detail.tasks[].missing_inputs', 'audit.families.artifact_flow_health.detail.w11_metrics.missing_required_input_detection.missing_required_inputs', 'status.health.artifact_flow.metrics.missing_required_input_detection', 'status.health.artifact_flow.metrics.missing_required_input_detection.detail.tasks[].missing_inputs', 'status.health.artifact_flow.metrics.missing_required_input_detection.missing_required_inputs']; proxies matched: []
+m5-staleness-propagation-accuracy: keys matching ['staleness', 'propagation_accuracy', 'stale_propagation']: ['audit.families.artifact_flow_health.detail.w11_metrics.staleness_propagation_accuracy', 'status.health.artifact_flow.metrics.staleness_propagation_accuracy']
+OBS W11-m5-staleness-propagation-accuracy: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.staleness_propagation_accuracy', 'status.health.artifact_flow.metrics.staleness_propagation_accuracy']; proxies matched: []
+m6-requirement-to-code-traceability-coverage: keys matching ['requirement.*code', 'req.*code_cov', 'code_traceab']: ['audit.families.artifact_flow_health.detail.w11_metrics.requirement_to_code_traceability_coverage', 'status.health.artifact_flow.metrics.requirement_to_code_traceability_coverage']
+OBS W11-m6-requirement-to-code-traceability-coverage: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.requirement_to_code_traceability_coverage', 'status.health.artifact_flow.metrics.requirement_to_code_traceability_coverage']; proxies matched: []
+m7-requirement-to-test-traceability-coverage: keys matching ['requirement.*test', 'test_traceab']: ['audit.families.artifact_flow_health.detail.w11_metrics.requirement_to_test_traceability_coverage', 'status.health.artifact_flow.metrics.requirement_to_test_traceability_coverage']
+OBS W11-m7-requirement-to-test-traceability-coverage: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.requirement_to_test_traceability_coverage', 'status.health.artifact_flow.metrics.requirement_to_test_traceability_coverage']; proxies matched: []
+m8-orphan-detection-recall-fp: keys matching ['orphan.*(recall|precision|false)', 'orphan']: ['audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphan_detection_false_positive_rate', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphan_detection_precision', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphan_detection_recall', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphans_detected', 'audit.families.graph_integrity.detail.integrity.counts.orphan', 'audit.families.graph_integrity.detail.orphan_records', 'audit.families.graph_integrity.detail.orphans', 'audit.families.health_slos.detail.slos[].detail.orphans', 'audit.families.health_slos.detail.slos[].value.orphan_graph_nodes', 'audit.families.lineage_orphans', 'audit.families.lineage_orphans.detail.orphans', 'audit.findings[].orphan', 'doctor.checks[].orphan_records', 'doctor.checks[].repository.crossed_slos[].value.orphan_graph_nodes', 'status.health.artifact_flow.metrics.orphan_detection', 'status.health.artifact_flow.metrics.orphan_detection.orphan_detection_false_positive_rate', 'status.health.artifact_flow.metrics.orphan_detection.orphan_detection_precision', 'status.health.artifact_flow.metrics.orphan_detection.orphan_detection_recall', 'status.health.artifact_flow.metrics.orphan_detection.orphans_detected', 'status.health.repository.crossed_slos[].value.orphan_graph_nodes', 'status.health.repository.slos[].detail.orphans', 'status.health.repository.slos[].value.orphan_graph_nodes']
+OBS W11-m8-orphan-detection-recall-fp: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphan_detection_false_positive_rate', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphan_detection_precision', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphan_detection_recall', 'audit.families.artifact_flow_health.detail.w11_metrics.orphan_detection.orphans_detected', 'audit.families.graph_integrity.detail.integrity.counts.orphan', 'audit.families.graph_integrity.detail.orphan_records', 'audit.families.health_slos.detail.slos[].detail.orphans', 'audit.families.health_slos.detail.slos[].value.orphan_graph_nodes', 'audit.families.lineage_orphans', 'audit.families.lineage_orphans.detail.orphans', 'audit.findings[].orphan', 'doctor.checks[].orphan_records', 'doctor.checks[].repository.crossed_slos[].value.orphan_graph_nodes', 'status.health.artifact_flow.metrics.orphan_detection', 'status.health.artifact_flow.metrics.orphan_detection.orphan_detection_false_positive_rate', 'status.health.artifact_flow.metrics.orphan_detection.orphan_detection_precision', 'status.health.artifact_flow.metrics.orphan_detection.orphan_detection_recall', 'status.health.artifact_flow.metrics.orphan_detection.orphans_detected', 'status.health.repository.crossed_slos[].value.orphan_graph_nodes', 'status.health.repository.slos[].detail.orphans', 'status.health.repository.slos[].value.orphan_graph_nodes']; proxies matched: ['audit.families.graph_integrity.detail.orphans']
+m9-fresh-agent-reconstruction-correctness: keys matching ['reconstruction', 'fresh_agent']: ['audit.families.artifact_flow_health.detail.w11_metrics.fresh_agent_reconstruction_correctness', 'audit.families.fresh_agent_reconstruction', 'status.fresh_agent_reads', 'status.health.artifact_flow.metrics.fresh_agent_reconstruction_correctness']
+OBS W11-m9-fresh-agent-reconstruction-correctness: PASS -- metric keys (excluding documented proxies): ['audit.families.artifact_flow_health.detail.w11_metrics.fresh_agent_reconstruction_correctness', 'status.health.artifact_flow.metrics.fresh_agent_reconstruction_correctness']; proxies matched: ['audit.families.fresh_agent_reconstruction', 'status.fresh_agent_reads']
+OBS W11-m3-proxy-retrieval-superseded-hit-rate: PASS -- memory verify superseded_hit_rate=0.0 (held-out RETRIEVAL leakage of superseded artefacts; not leakage into mandatory task inputs: TASK-0002 received SUPERSEDED REQ-0001 as a governing requirement and is DONE)
+OBS W11-m6-proxy-task-traceability: PASS -- audit product_traceability.detail={'tasks': 3, 'done': 1, 'task_traceability': 1.0, 'features': 1, 'untraceable_closed_tasks': []} (fraction of tasks naming a feature; not requirement->code coverage)
+OBS W11-m8-proxy-orphan-count: PASS -- audit graph_integrity.detail.orphans=2 (count only: no recall, no false-positive rate)
+OBS W11-m9-proxy-fresh-agent-read-budget: PASS -- audit fresh_agent_reconstruction.detail={'reads': 5, 'budget': 25, 'status_chars': 9901, 'next_action': 'no runnable tasks: run readiness planning or discovery'} (read-count vs budget; correctness of reconstructed inputs not measured)
+
+==== SUMMARY ====
+W11-m1-required-input-delivery-accuracy: PASS
+W11-m2-current-version-selection-accuracy: PASS
+W11-m3-superseded-input-leakage-rate: PASS
+W11-m4-missing-required-input-detection: PASS
+W11-m5-staleness-propagation-accuracy: PASS
+W11-m6-requirement-to-code-traceability-coverage: PASS
+W11-m7-requirement-to-test-traceability-coverage: PASS
+W11-m8-orphan-detection-recall-fp: PASS
+W11-m9-fresh-agent-reconstruction-correctness: PASS
+W11-m3-proxy-retrieval-superseded-hit-rate: PASS
+W11-m6-proxy-task-traceability: PASS
+W11-m8-proxy-orphan-count: PASS
+W11-m9-proxy-fresh-agent-read-budget: PASS
+total=13 pass=13 fail=0
+[exit=0]

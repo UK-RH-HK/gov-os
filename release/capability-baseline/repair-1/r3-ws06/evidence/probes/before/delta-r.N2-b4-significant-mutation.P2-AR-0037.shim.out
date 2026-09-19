@@ -1,0 +1,14 @@
+# P2-AR-0037 audit-of-record probe re-run (unedited): delta-r/derived:N2-b4-significant-mutation.P2-AR-0037.py mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/base-tree HEAD (git archive export of 53897c1)
+# probe /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws06/release/capability-baseline/repair-1/r3-ws06/evidence/derived/N2-b4-significant-mutation.P2-AR-0037.py sha256 8a54e30744d1050dfafafcf4b0e9b52bac37be18f82d2dbc706f9cc178b5a709; gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/mirror-1CsYfn/target/release/gov
+# date 2026-09-19T10:07:28Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r3ws06-P2-AR-0037/probe-scratch/run-shim-delta-r-N2-b4-significant-mutation.P2-AR-0037-rnFgWU/n2-1789812448-4bedf1/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+$ gov --json --session probe-8f21fc73 checkpoint create --next-action 'continue the n2 probe' --step 'set-up (derived copy)'
+  -> ok
+$ gov --json --session probe-8f21fc73 rebuild-memory --incremental
+  -> ok
+CHECK N2.b4 FAIL a significant mutation (30 new product files indexed) writes a checkpoint
+      detail: {"after": 1, "before": 1}
+SUMMARY checks=1 pass=0 fail=1 failed=['N2.b4']
+[exit=0]

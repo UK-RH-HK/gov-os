@@ -1,0 +1,49 @@
+# P2-AR-0036 audit-of-record probe re-run (unedited): gamma-r/FRESH-invalidation mode=base-shim
+# worktree HEAD 25f935ca5a035840102b4ec9d8e30a8b39598cbf; product files differing from HEAD: 2
+# probe sha256 7fc2fbe724a4d7d17054eb56cd5c7d1cd1f86bab5b0b8b81e17c1d37f7a1c14a; real gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/mirror-base-shim/target/release/gov
+# date 2026-09-19T11:37:37Z
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0036/probes2/ap-base-shim-gamma-r-FRESH-invalidation-C0HNgE/fresh
+
+==== FRESH.0 control: green record taken after the task's own change, no other input change -> close succeeds ====
+  audit: HEALTHY green= True record= AUD-0002 inputs_hash= 20d666d35d870fc9 []
+  close TASK-GOV1 (declares governance/project/NOTES.md): exit=0 ok=true
+
+==== FRESH.1 project overlay input (E1/F2/F3/F4: TOOL_PERMISSIONS.yaml) changed after the green record ====
+  audit: HEALTHY green= True record= AUD-0003 inputs_hash= ee62eba9c2be5319 []
+  input change applied after the green record: TOOL_PERMISSIONS.yaml edited
+  close TASK-GOV2 (declares governance/project/NOTES.md,governance/project/TOOL_PERMISSIONS.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0003" is obsolete (inputs changed: index_manifest, tools_plugins); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`
+
+==== FRESH.2 project skill (F1 input) added after the green record ====
+  audit: HEALTHY green= True record= AUD-0004 inputs_hash= 11ce825564621d9e []
+  input change applied after the green record: project skill added
+  close TASK-GOV3 (declares governance/project/NOTES.md,governance/project/skills/SKL-P.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: index_manifest, project_skills); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`
+
+==== FRESH.3 decision record (spec/decisions input) added after the green record ====
+  audit: DEGRADED green= False record= AUD-0005 inputs_hash= 96a2c4bf5d465ae6 ['SKL-P V1: validation scenario cannot be executed, so skill regression cannot pas']
+  input change applied after the green record: decision D-0500 added
+  close TASK-GOV4 (declares governance/project/NOTES.md): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: generated_other, index_manifest, overlay_other, project_skills, spec_decisions, spec_tasks); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`
+
+==== FRESH.4 plugin registry (F4 registration input, governance/generated) changed after the green record ====
+  audit: DEGRADED green= False record= AUD-0006 inputs_hash= 1824fe7b67931fec ['SKL-P V1: validation scenario cannot be executed, so skill regression cannot pas']
+  input change applied after the green record: plugin-registry.json edited
+  close TASK-GOV5 (declares governance/project/NOTES.md): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: generated_other, index_manifest, overlay_other, project_skills, spec_decisions, spec_tasks, tools_plugins); run `gov health run` (re-checks only the checks the changed inputs impact) 
+
+==== FRESH.5 feature record (H2/H3/I input; not a suite input — readiness and the DAG are computed live) added after the green record ====
+  audit: DEGRADED green= False record= AUD-0007 inputs_hash= 8dee631cd465a478 ['SKL-P V1: validation scenario cannot be executed, so skill regression cannot pas']
+  input change applied after the green record: feature F-9 added
+  close TASK-GOV6 (declares governance/project/NOTES.md,spec/features/F-9.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=governance-affecting work cannot close on stale green evidence: green record "AUD-0004" is obsolete (inputs changed: generated_other, index_manifest, overlay_other, project_skills, spec_decisions, spec_requirements, spec_tasks, tools_plugins); run `gov health run` (re-checks only the checks the chan
+  live readiness of F-9 right after the change: ['security_privacy'] pre_implementation_ok= False
+
+==== FRESH.6 kernel policy/taxonomy/roles/command-contract edits (E1/G/H inputs) fail closed immediately ====
+  roles/ROLES.yaml                     edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  policies/AUTHORITY_POLICY.yaml       edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  taxonomy/READINESS_DIMENSIONS.yaml   edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  commands/COMMAND_CONTRACT.yaml       edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  policies/TOOL_POLICY.yaml            edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  kernel trust verified= False | installed kernel FAILED verification (kernel payload does not match KERNEL_MANIFEST.json: modified ["roles/ROLES.yaml"] missing [] added []; kernel payload is not the payload this machine committed in
+
+==== FRESH.7 plugin implementation / skill method changes ====
+  plugin implementation change -> PLUGIN_PIN_MISMATCH: F4-plugins.out section F4.b3/b4
+  project skill method change without version bump -> nothing marked stale at skill level: F1-skills.out section F1.b3
+END
+[exit=0]

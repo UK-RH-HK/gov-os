@@ -403,6 +403,8 @@ pub struct DagCtx<'a> {
     gate_views: RefCell<BTreeMap<String, GateView>>,
     authorship: OnceCell<tasks::AuthorshipIndex>,
     live_claims: OnceCell<Vec<Value>>,
+    /// The research/experiment/test-data lifecycle context (WS-10), built once per computation.
+    lifecycle: OnceCell<crate::lifecycle::Ctx<'a>>,
 }
 
 impl<'a> DagCtx<'a> {
@@ -466,7 +468,41 @@ impl<'a> DagCtx<'a> {
             gate_views: RefCell::new(BTreeMap::new()),
             authorship: OnceCell::new(),
             live_claims: OnceCell::new(),
+            lifecycle: OnceCell::new(),
         }
+    }
+
+    /// The lifecycle context of the scenario → data → test-data chain (`lifecycle::scenario`).
+    pub fn lifecycle(&self) -> &crate::lifecycle::Ctx<'a> {
+        self.lifecycle
+            .get_or_init(|| crate::lifecycle::Ctx::new(self.p, self.store))
+    }
+
+    /// Why implementation task `t` may not start on its feature's scenario chain (WS-10 IP-WS10-12; Contract v3 H3
+    /// "Production implementation does not become READY before required prerequisite cells satisfy policy", H4
+    /// FEATURE → SCENARIOS → DATA → TEST DATA → SUCCESS/FAILURE → INDEPENDENT TESTS): each pre-implementation gap of
+    /// the chain (`lifecycle::scenario::implementation_blockers`), except gaps of a readiness cell the feature states
+    /// not applicable with a reason (`N/A_WITH_REASON` is explicit, never silent).
+    pub fn chain_blockers(&self, t: &Record) -> Vec<String> {
+        if !IMPLEMENTATION_CLASSES.contains(&t.get("class").as_str()) || t.get("feature").is_empty()
+        {
+            return vec![];
+        }
+        let not_applicable: Vec<String> = self
+            .store
+            .get(&t.get("feature"))
+            .filter(|f| f.rtype() == "feature")
+            .map(|f| readiness::not_applicable_cells(f))
+            .unwrap_or_default();
+        crate::lifecycle::scenario::implementation_blockers(self.lifecycle(), t)
+            .into_iter()
+            .filter(|g| {
+                let code = g.split(':').next().unwrap_or("");
+                !readiness::chain_cell_of(code)
+                    .map(|c| not_applicable.iter().any(|n| n == c))
+                    .unwrap_or(false)
+            })
+            .collect()
     }
 
     fn gate_view(&self, gate: &str) -> GateView {
@@ -769,10 +805,11 @@ pub fn evaluate(ctx: &DagCtx, t: &Record, as_status: Option<&str>) -> TaskEval {
         }
         ev.gates.push(v.value);
     }
-    // 5. readiness policy
+    // 5. readiness policy: the pre-implementation cells — those the scenario chain determines computed from it, not
+    //    asserted (IP-WS10-12) — and the chain's own pre-implementation gaps for the scenarios this work implements
     if ctx.enforce_readiness && t.get("class") == "implementation" && !t.get("feature").is_empty() {
         if let Some(f) = ctx.store.get(&t.get("feature")) {
-            let r = readiness::evaluate(ctx.p, f);
+            let r = readiness::evaluate_in(ctx.p, ctx.lifecycle(), f);
             if !r.pre_implementation_ok {
                 reasons.push(format!(
                     "feature {} pre-implementation readiness cells missing: {}",
@@ -780,6 +817,15 @@ pub fn evaluate(ctx: &DagCtx, t: &Record, as_status: Option<&str>) -> TaskEval {
                     r.pre_implementation_gaps.join(", ")
                 ));
             }
+        }
+    }
+    if ctx.enforce_readiness {
+        let chain = ctx.chain_blockers(t);
+        if !chain.is_empty() {
+            reasons.push(format!(
+                "scenario chain not ready for implementation (Contract v3 H3/H4; `gov scenario trace`): {}",
+                chain.join("; ")
+            ));
         }
     }
     // 6. TEST_POLICY
@@ -806,13 +852,34 @@ pub fn evaluate(ctx: &DagCtx, t: &Record, as_status: Option<&str>) -> TaskEval {
         }
     }
     reasons.extend(ctx.independence_reasons(t, None));
-    // 7. re-test after CIT propagation
+    // 7. re-test after an upstream change (CIT propagation, or a direct change propagated when detected)
     if t.data
         .get("retest_required")
         .and_then(|v| v.as_bool())
         .unwrap_or(false)
     {
-        reasons.push("retest required after CIT propagation".into());
+        let why = t.get("retest_reason");
+        reasons.push(format!(
+            "retest required after upstream change propagation{}: work that has not started re-delivers its context at the current inputs (`gov context compile {id}`); started work closes only with re-test evidence against the changed inputs",
+            if why.is_empty() { String::new() } else { format!(" ({why})") }
+        ));
+    }
+    // 7a. inputs changed since this task's work consumed them and not yet propagated (BC-P2-04; WS-4 R2-2): content
+    //     against what the delivered packet / checkpoint recorded — never index freshness
+    if !matches!(st.as_str(), "DONE" | "CANCELLED") {
+        let (baseline, stale) = crate::cit::propagation::stale_inputs(ctx.p, ctx.store, t);
+        let fresh: Vec<String> = stale
+            .iter()
+            .filter(|(_, propagated)| !propagated)
+            .map(|(c, _)| c.id.clone())
+            .collect();
+        if !fresh.is_empty() {
+            reasons.push(format!(
+                "input(s) {} changed since this task's work consumed them ({}), outside change control: an upstream change reaches its dependents (`gov cit propagate`), and a context compiled now (`gov context compile {id}`) delivers the current versions",
+                fresh.join(", "),
+                baseline.map(|b| b.source).unwrap_or_default()
+            ));
+        }
     }
     // 8. DRAFT and explicit holds (not when asked "as READY")
     if as_status.is_none() {
@@ -984,6 +1051,13 @@ pub fn compute(p: &Project) -> Result<DagView> {
 /// when [`evaluate`] finds it runnable (mandatory inputs, gates and every other reason included).
 pub fn replan(p: &Project) -> Result<Value> {
     crate::orchestration::control::guard_write(p, "replan")?;
+    // work the recorded events call for joins the DAG before it is replanned (BC-P2-24)
+    let generated = crate::orchestration::generation::reconcile(
+        p,
+        &crate::orchestration::generation::Options::triggered_by("replan"),
+    )
+    .map(|r| crate::orchestration::generation::summary(&r))
+    .unwrap_or_else(|e| json!({"error": {"code": e.code, "message": e.message}}));
     let view = compute(p)?;
     let mut store = RecordStore::load(&p.root);
     let mut changed = vec![];
@@ -1018,18 +1092,21 @@ pub fn replan(p: &Project) -> Result<Value> {
             continue;
         }
         if st != target {
+            let was_verified = crate::t2::verify_record(rec).is_verified();
             rec.set("task_status", json!(target));
             rec.set("updated", json!(today()));
             rec.set(
                 "status_source",
                 json!({"operation": "replan", "status": target, "session": p.session_id, "role": p.role, "at": now_iso()}),
             );
+            // the OS re-seal rule (task records are T2 state): re-sealed when it verified before, never blessed
+            crate::t2::seal_if_verified(rec, was_verified, "replan")?;
             save_record(&p.root, rec)?;
             changed.push(json!({"task": id, "from": st, "to": target}));
         }
     }
     Ok(
-        json!({"changed": changed, "runnable": view.runnable, "blocked": view.blocked.len(), "waiting_human": view.waiting_human.len(), "cycles": view.cycles}),
+        json!({"changed": changed, "runnable": view.runnable, "blocked": view.blocked.len(), "waiting_human": view.waiting_human.len(), "cycles": view.cycles, "generated_work": generated}),
     )
 }
 

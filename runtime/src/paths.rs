@@ -606,6 +606,54 @@ impl RepositoryContract {
             attrs,
         }
     }
+    /// **Rules that never decide anything** (the class of WS-6 r2 O-1): under last-match semantics a rule is dead
+    /// when a LATER rule matches every path it matches and says something else — `spec/reports/**: evidence` listed
+    /// before `spec/**: authoritative` makes every report authoritative, and the path map states a classification
+    /// the product never applies. Judged for the area form rule lists use (`prefix/**`, and `**`); a `secret` rule is
+    /// never shadowed (a secret classification always wins). Each finding names the dead rule, the rule that
+    /// overrides it and what the product applies instead — the input for a doctor/audit finding (WS-2) and for a
+    /// migration that reorders an installed contract (WS-9).
+    pub fn shadowed_rules(&self) -> Vec<Value> {
+        let literal = |p: &str| -> String {
+            p.chars()
+                .take_while(|c| !matches!(c, '*' | '?' | '['))
+                .collect()
+        };
+        let covers = |general: &str, specific: &str| -> bool {
+            if general == "**" {
+                return true;
+            }
+            match general.strip_suffix("/**") {
+                Some(gp) if !gp.contains(['*', '?', '[']) => {
+                    literal(specific).starts_with(&format!("{gp}/"))
+                }
+                _ => false,
+            }
+        };
+        let attrs = |r: &Value| -> Value {
+            let mut o = r.as_object().cloned().unwrap_or_default();
+            o.shift_remove("pattern");
+            o.shift_remove("owner_role");
+            Value::Object(o)
+        };
+        let mut out = vec![];
+        for (i, a) in self.rules.iter().enumerate() {
+            let pa = a.get("pattern").and_then(|v| v.as_str()).unwrap_or("");
+            if pa.is_empty() || a.get("class").and_then(|v| v.as_str()) == Some(SECRET_CLASS) {
+                continue;
+            }
+            if let Some(b) = self.rules[i + 1..].iter().rev().find(|b| {
+                let pb = b.get("pattern").and_then(|v| v.as_str()).unwrap_or("");
+                covers(pb, pa) && attrs(b) != attrs(a)
+            }) {
+                let pb = b.get("pattern").and_then(|v| v.as_str()).unwrap_or("");
+                out.push(json!({"rule": pa, "class": a.get("class"), "overridden_by": pb, "applied_class": b.get("class"),
+                    "message": format!("repository-contract rule `{pa}` ({}) never decides a path: the later rule `{pb}` matches every path it matches and applies {} (rules are last-match: list a specific rule after the general rule it refines)",
+                        a.get("class").and_then(|v| v.as_str()).unwrap_or("?"), b.get("class").and_then(|v| v.as_str()).unwrap_or("?"))}));
+            }
+        }
+        out
+    }
     pub fn to_framework_json(&self, framework: &str, version: &str) -> Value {
         let mut paths = Map::new();
         for r in &self.rules {
@@ -621,8 +669,21 @@ impl RepositoryContract {
         for (k, v) in &self.roots {
             roots.insert(k.clone(), Value::String(v.clone()));
         }
+        // BC-P2-31 (WS-6 IP-R2-11): the projection states the classification the product applies, including the
+        // kernel's classification of its own non-rebuildable stores, which no overlay rule can override
+        let mut kernel_paths = Map::new();
+        for r in os_rules() {
+            if let (Some(pat), Some(obj)) =
+                (r.get("pattern").and_then(|v| v.as_str()), r.as_object())
+            {
+                let mut o = obj.clone();
+                o.shift_remove("pattern");
+                kernel_paths.insert(pat.to_string(), Value::Object(o));
+            }
+        }
         json!({"framework": framework, "version": version, "generated": true, "source": "governance/project/REPOSITORY_CONTRACT.yaml",
-               "governance_dir": "governance", "roots": roots, "paths": paths})
+               "governance_dir": "governance", "roots": roots, "paths": paths, "kernel_paths": kernel_paths,
+               "precedence": "for each path the last matching rule of `paths` decides; the rules of `kernel_paths` (paths::OS_STORES, the OS's own non-rebuildable stores) apply after them; a `secret` classification always wins"})
     }
 }
 
@@ -786,6 +847,169 @@ mod tests {
             json!({"paths": [{"pattern": ".governance-state/**", "class": "secret"}]}),
         );
         assert!(s.decide(".governance-state/control.json").is_secret());
+    }
+
+    /// BC-P2-31 (repair-1 round 3, WS-6 IP-R2-11 / WS-9 IP-R2-2): the shipped repository-contract template states the
+    /// classification the product applies — under ANY reading of its rules (every matching rule, not only the last)
+    /// no location of an OS store is derived or generated; the specific rules that refine a general one come after it
+    /// and so take effect (the evidence areas of spec/, product tests); retrieval-miss records are never indexed; the
+    /// template is valid against the repository-contract schema; framework.json projects the kernel store rules.
+    #[test]
+    fn the_shipped_template_states_the_store_classification_under_any_reading() {
+        let tpl: Value = serde_yaml::from_str(include_str!(
+            "../../framework/overlay-templates/REPOSITORY_CONTRACT.yaml"
+        ))
+        .unwrap();
+        let rules = tpl["paths"].as_array().unwrap();
+        for s in OS_STORES {
+            for (legacy, target) in s.moves {
+                for rel in [legacy, target] {
+                    let probe = if rel.rsplit('/').next().unwrap_or("").contains('.') {
+                        rel.to_string()
+                    } else {
+                        format!("{rel}/x.json")
+                    };
+                    let classes: Vec<&str> = rules
+                        .iter()
+                        .filter(|r| glob_match(r["pattern"].as_str().unwrap_or(""), &probe))
+                        .map(|r| r["class"].as_str().unwrap_or(""))
+                        .collect();
+                    assert!(
+                        !classes.is_empty()
+                            && classes
+                                .iter()
+                                .all(|c| !matches!(*c, "derived" | "generated")),
+                        "{} at {probe}: {classes:?}",
+                        s.id
+                    );
+                }
+            }
+        }
+        let c = RepositoryContract::new(tpl.clone());
+        for (path, class) in [
+            ("spec/reports/checkpoints/CKPT-00001.yaml", "evidence"),
+            ("spec/lessons/L-0001.yaml", "evidence"),
+            ("spec/research/RES-0001.yaml", "evidence"),
+            ("spec/experiments/EXP-0001.yaml", "evidence"),
+            ("spec/audits/AUD-0001.yaml", "evidence"),
+            ("spec/requirements/REQ-0001.yaml", "authoritative"),
+            ("product/tests/test_a.py", "test"),
+            ("product/a.py", "source"),
+            (".governance-runtime/state.db-wal", "derived"),
+            (".governance-runtime/telemetry/events.jsonl", "runtime-data"),
+            ("governance/generated/adapter-manifest.json", "generated"),
+            ("governance/generated/adapters/ide/RULES.md", "generated"),
+        ] {
+            assert_eq!(c.decide(path).class(), class, "{path}");
+        }
+        let mq = c.decide("spec/reports/memory-quality/FAIL-0001.yaml");
+        assert_eq!(mq.class(), "evidence");
+        for f in [
+            "semantic_index",
+            "lexical_index",
+            "graph_index",
+            "code_index",
+        ] {
+            assert!(!mq.flag(f), "{f}");
+        }
+        let reg = crate::schemas::SchemaRegistry::new(
+            &Path::new(env!("CARGO_MANIFEST_DIR")).join("../framework/schemas"),
+        );
+        let errs = reg.errors("repository-contract", &tpl).unwrap();
+        assert!(errs.is_empty(), "{errs:?}");
+        let fj = c.to_framework_json("fw", "1");
+        assert_eq!(
+            fj["kernel_paths"][".governance-runtime/control.json"]["class"],
+            OPERATIONAL_CLASS
+        );
+        assert_eq!(
+            fj["kernel_paths"][PLUGIN_REGISTRY_PATH]["class"],
+            "authoritative"
+        );
+        assert!(fj["paths"].get("spec/**").is_some());
+        // no rule of the shipped template is dead; the template before this repair had shadowed rules (O-1)
+        assert!(c.shadowed_rules().is_empty(), "{:?}", c.shadowed_rules());
+        let old = RepositoryContract::new(json!({"paths": [
+            {"pattern": "spec/reports/**", "class": "evidence"}, {"pattern": "spec/research/**", "class": "evidence"},
+            {"pattern": "spec/**", "class": "authoritative"}, {"pattern": "product/tests/**", "class": "test"},
+            {"pattern": "product/**", "class": "source"}, {"pattern": "**/.env*", "class": "secret"}]}));
+        let dead: Vec<String> = old
+            .shadowed_rules()
+            .iter()
+            .map(|f| {
+                format!(
+                    "{}<{}",
+                    f["rule"].as_str().unwrap(),
+                    f["overridden_by"].as_str().unwrap()
+                )
+            })
+            .collect();
+        assert_eq!(
+            dead,
+            vec![
+                "spec/reports/**<spec/**",
+                "spec/research/**<spec/**",
+                "product/tests/**<product/**"
+            ]
+        );
+    }
+
+    /// BC-P2-31 tripwire (repair-1 round 3): wherever the writers that expose their location keep a store — today's
+    /// location, or [`store_path`] once they move (WS-3/WS-5/WS-7/WS-9, round 3) — the product classifies it as the
+    /// store it is, never derived or generated, under the shipped template and a hostile overlay. A writer that moved a
+    /// store somewhere [`OS_STORES`] does not declare fails here.
+    #[test]
+    fn every_writer_location_is_classified_as_its_store() {
+        let root = tmp("writers");
+        let p = crate::Project::open(&root);
+        let rel = |abs: PathBuf| -> String {
+            abs.strip_prefix(&root)
+                .unwrap_or(&abs)
+                .to_string_lossy()
+                .replace('\\', "/")
+        };
+        let mut located: Vec<(&str, String)> = vec![
+            (
+                "claims",
+                rel(crate::memory::claims::ClaimsStore::path_for(&p)),
+            ),
+            (
+                "emergency-control",
+                rel(crate::orchestration::control::path(&p)),
+            ),
+            (
+                "plugin-registry",
+                rel(crate::capabilities::registry::path(&p)),
+            ),
+            (
+                "migration-snapshots",
+                rel(crate::migrations::executor::snapshot_dir(&root, 3).join("x.json")),
+            ),
+        ];
+        for s in OS_STORES {
+            let to = store_path(&root, s.id).unwrap();
+            let probe = if to.extension().is_some() {
+                to
+            } else {
+                to.join("X-0001/snapshot.json")
+            };
+            located.push((s.id, rel(probe)));
+        }
+        let shipped: Value = serde_yaml::from_str(include_str!(
+            "../../framework/overlay-templates/REPOSITORY_CONTRACT.yaml"
+        ))
+        .unwrap();
+        let hostile = json!({"paths": [{"pattern": "**", "class": "derived"}, {"pattern": "governance/**", "class": "generated"}]});
+        for data in [shipped, hostile] {
+            let c = RepositoryContract::new(data);
+            for (id, path) in &located {
+                let d = c.decide(path);
+                let want = os_store(id).unwrap().class;
+                assert_eq!(d.class(), want, "{id} at {path}");
+                assert_eq!(d.str("os_store"), *id, "{id} at {path}");
+            }
+        }
+        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]

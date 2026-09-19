@@ -137,8 +137,68 @@ pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
     Ok(out)
 }
 
-fn snapshot_dir(p: &Project, target: &str) -> std::path::PathBuf {
-    p.runtime_dir().join("update").join(target)
+/// The OS store id of the framework-update rollback snapshots (`crate::paths::OS_STORES`).
+const SNAPSHOT_STORE: &str = "update-snapshots";
+
+/// Where the framework-update rollback snapshots live: **non-rebuildable operational state** (BC-P2-31, WS-6 r2
+/// IP-R2-10), `.governance-state/update/`, never the derived runtime directory `.governance-runtime/` that framework
+/// §19 deletes and rebuilds — a snapshot is the only copy of the pre-update kernel, overlay and lock, so deleting what
+/// the product classifies derived must not delete the way back. A snapshot an older `gov` left at the legacy
+/// location is moved once, by the store API ([`crate::paths::relocate_legacy`]), before any snapshot is read or
+/// written; a conflicting copy at both places is refused (`STATE_LOCATION_CONFLICT`), never overwritten.
+fn snapshot_base(p: &Project) -> Result<std::path::PathBuf> {
+    crate::paths::relocate_legacy(&p.root, SNAPSHOT_STORE)?;
+    crate::paths::store_path(&p.root, SNAPSHOT_STORE).ok_or_else(|| {
+        GovError::new(
+            "STATE_LOCATION_UNKNOWN",
+            format!("the OS store '{SNAPSHOT_STORE}' is not declared in paths::OS_STORES"),
+        )
+    })
+}
+
+fn snapshot_dir(p: &Project, target: &str) -> Result<std::path::PathBuf> {
+    let base = snapshot_base(p)?;
+    crate::paths::ensure_state_dir(&p.root)?;
+    Ok(base.join(target))
+}
+
+/// Can `update --apply` be the remedy for a hard-block of `check`? — **the catalogue's declaration** (WS-8 r3
+/// IP-R3-WS08-4, round-3 integration): a block rule of the check lists `update.apply` among its remedies
+/// (`scheduler::catalogue`: `CRIT_ALL`, `HIGH_RELY_SHIP`). Whether an update *is* the remedy of a given block is then
+/// decided by the one availability host API ([`entry_guard`], `scheduler::admit`): the block's subjects must lie in
+/// what an update changes (`catalogue::ops::UPDATE_SUBJECTS`: kernel, lock, overlay, generated views) — an older
+/// kernel's overlay deficit (D006, `schema_invariants` "overlay file missing") is; a record that does not parse (D023)
+/// is not, and refuses the update at entry.
+pub fn update_can_remedy(check: &str) -> bool {
+    crate::scheduler::catalogue::get(check)
+        .map(|def| {
+            def.blocks.iter().any(|r| {
+                r.remedies
+                    .contains(&crate::scheduler::catalogue::ops::UPDATE_APPLY)
+            })
+        })
+        .unwrap_or(false)
+}
+
+/// **The G0 entry guard of `update --apply`** (IP-WS02-12 at entry; WS-8 r2 IP-R2-WS08-5; WS-2 r3 IP-R3-WS02-02),
+/// on the one availability host API: `scheduler::admit` with the update's subjects
+/// (`catalogue::ops::UPDATE_SUBJECTS`), re-evaluating stale blocks first. Of the active hard-blocks that govern
+/// `update.apply`:
+/// * a block the update is the remedy for (the catalogue declares it, and its subjects lie in what the update changes)
+///   does not refuse the update; the admission carries it, and the update commits only if `scheduler::confirm_remedy`
+///   finds it cleared once the update is installed (`HEALTH_REMEDY_INCOMPLETE`, rolled back otherwise) — a remedy that
+///   does not clear its block does not commit;
+/// * any other block refuses the update here, before a Human Decision Gate is raised or a byte is staged, typed
+///   (`HEALTH_HARD_BLOCK`), naming each block, its check, its scope, its subjects and the operations it governs.
+fn entry_guard(p: &Project) -> Result<crate::scheduler::Admission> {
+    use crate::scheduler::catalogue::ops;
+    let req = crate::scheduler::Request::new(ops::UPDATE_APPLY).with_subjects(ops::UPDATE_SUBJECTS);
+    crate::scheduler::admit(p, &req).map_err(|mut e| {
+        if e.code == "HEALTH_HARD_BLOCK" && e.details.is_object() {
+            e.details["rule"] = json!("a hard-block refuses the operations whose reliance it protects, scoped to what the failing check governs; a block whose subjects lie in what the update changes (kernel, lock, overlay, generated views) may be remedied by it and does not refuse it at entry, but the update commits only if that block is gone afterwards (P2-HO-0031 availability rule)");
+        }
+        e
+    })
 }
 
 /// The gate raised for updating to `target`, if any.
@@ -171,13 +231,6 @@ pub fn apply_update_opts(
 ) -> Result<Value> {
     control::guard_write(p, "update --apply")?;
     crate::authority::require(p, "update_apply")?;
-    // IP-WS02-12 asked also for the G0 hard-block guard (`scheduler::guard("update.apply")`) here, at entry. It is
-    // deliberately not taken at entry: the blocks that govern `update.apply` include findings the update itself is
-    // the remedy for — an older kernel's overlay deficit (D006 on a 4.1.1 installation, whose migration adds the
-    // missing file) would refuse the only operation that repairs it. The purpose the IP states — no update applies
-    // over a defect the full suite detects — is met after the install instead: the G5 run below re-executes every
-    // check, fresh, against the updated installation, and an active hard-block (RED) or an UNHEALTHY verdict there
-    // refuses the update and rolls it back.
     let chk = check(p, source)?;
     if chk["up_to_date"].as_bool().unwrap_or(false) {
         return Ok(json!({"applied": false, "reason": "already up to date", "check": chk}));
@@ -198,6 +251,11 @@ pub fn apply_update_opts(
         crate::srr::Ingress::Update,
         Path::new(chk["source"].as_str().unwrap_or("")),
     )?;
+    // G0 at entry (IP-WS02-12, IP-R2-WS08-5): an active hard-block that governs `update.apply` and that the update
+    // does not repair refuses it here, before a gate is raised for it or anything is staged; blocks the update is the
+    // remedy for are carried and must be cleared by it (checked after the install, below).
+    let admission = entry_guard(p)?;
+    let remedies: Vec<Value> = admission.remedy_for.clone();
     if chk["human_gate_required"].as_bool().unwrap_or(true) {
         // INV-008: approval means a presented, answered gate record — never a CLI flag alone (verifier M3 / HV-11)
         let gate = match update_gate(p, &target_v) {
@@ -254,7 +312,7 @@ pub fn apply_update_opts(
     db.init_schema()?;
     let ck = crate::checkpoints::create(p, &db, json!({"trigger": "before_model_switch", "next_action": format!("gov update --apply to {target}"), "last_completed_step": "pre-update checkpoint"})).ok();
     // snapshot kernel + overlay + lock + generated
-    let snap = snapshot_dir(p, &target);
+    let snap = snapshot_dir(p, &target)?;
     remove_dir_if_exists(&snap)?;
     for sub in ["kernel", "project", "generated"] {
         let s = p.governance_dir().join(sub);
@@ -398,6 +456,13 @@ pub fn apply_update_opts(
             .as_str()
             .or_else(|| audit["health_state"].as_str())
             .unwrap_or("");
+        // A remedy that does not clear its block does not commit (P2-HO-0031; WS-2 IP-R3-WS02-02): every block the
+        // entry guard admitted this update as the remedy for is re-evaluated, fresh, against the updated installation
+        // (`scheduler::confirm_remedy`); `HEALTH_REMEDY_INCOMPLETE` names the blocks left, and the transaction rolls
+        // back.
+        if admission.obligation() {
+            crate::scheduler::confirm_remedy(p, &admission)?;
+        }
         if suite_verdict == "UNHEALTHY"
             || health_state == "RED"
             || audit["counts"]["critical"].as_u64().unwrap_or(0) > 0
@@ -412,7 +477,7 @@ pub fn apply_update_opts(
         // and only after the post-install governance suite has accepted the result.
         let protected = crate::srr::record_installed(&auth)?;
         Ok(
-            json!({"migrations": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "operations": out.applied, "overlay_keys_changed": out.overlay_keys_changed, "overlay_reconciled": reconciled, "index_manifest": rebuilt, "doctor": doc.verdict, "audit": audit["verdict"], "lock": lock_identity_summary(p), "release_authenticity": auth.to_value(), "protected_state": protected}),
+            json!({"migrations": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "remedied_blocks": remedies, "operations": out.applied, "overlay_keys_changed": out.overlay_keys_changed, "overlay_reconciled": reconciled, "index_manifest": rebuilt, "doctor": doc.verdict, "audit": audit["verdict"], "lock": lock_identity_summary(p), "release_authenticity": auth.to_value(), "protected_state": protected}),
         )
     })();
     match result {
@@ -503,7 +568,7 @@ fn rollback_internal(
             "update --rollback",
         )?;
     }
-    let base = p.runtime_dir().join("update");
+    let base = snapshot_base(p)?;
     let dir = match target {
         Some(t) => base.join(t),
         None => {
@@ -522,7 +587,7 @@ fn rollback_internal(
                     .and_then(|m| m.modified())
                     .ok()
             });
-            dirs.pop().ok_or_else(|| GovError::new("SNAPSHOT_MISSING", "no unconsumed update snapshot under .governance-runtime/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)"))?
+            dirs.pop().ok_or_else(|| GovError::new("SNAPSHOT_MISSING", "no unconsumed update snapshot under .governance-state/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)"))?
         }
     };
     if dir.join("consumed.json").exists() {

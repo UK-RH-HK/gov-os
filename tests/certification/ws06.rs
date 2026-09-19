@@ -638,12 +638,38 @@ fn deleting_everything_classified_derived_keeps_claims_control_and_registration(
         .iter()
         .map(|m| m["store"].as_str().unwrap().to_string())
         .collect();
-    for s in ["claims", "emergency-control", "plugin-registry"] {
-        assert!(
-            misplaced.iter().any(|m| m == s),
-            "{s} is reported while its writer keeps it in the legacy location: {misplaced:?}"
+    // round 3 (WS-3, BC-P2-31 / WS-6 IP-R2-8): the emergency-control writer now keeps its state where it belongs
+    // (`paths::store_path(root, "emergency-control")`), so it is no longer misplaced; a store whose writer still keeps
+    // it in the legacy location is reported, and exactly then
+    assert!(
+        exists(&root, ".governance-state/control.json")
+            && !exists(&root, ".governance-runtime/control.json"),
+        "the freeze is recorded in the operational store"
+    );
+    for s in gov_runtime::paths::OS_STORES {
+        let legacy_present = s.moves.iter().any(|(from, _)| root.join(from).exists());
+        assert_eq!(
+            misplaced.iter().any(|m| m == s.id),
+            legacy_present,
+            "{} is reported exactly while its writer keeps it in the legacy location: {misplaced:?}",
+            s.id
         );
     }
+    // round 3 (P2-AR-0036, BC-P2-31): the claims store's writer (WS-5) keeps it where it belongs,
+    // `paths::store_path(root, "claims")`, so it is no longer misplaced — and it lives outside every directory the
+    // product classifies derived or generated
+    assert!(
+        !misplaced.iter().any(|m| m == "claims"),
+        "the claims store is at its BC-P2-31 location: {misplaced:?}"
+    );
+    assert!(exists(&root, ".governance-state/claims.db"));
+    // WS-7 round 3 (IP-R2-9): the registry's writer resolves its location through `paths::store_path`, so a new
+    // registration is written where it belongs and is not misplaced
+    assert!(
+        !misplaced.iter().any(|m| m == "plugin-registry"),
+        "{misplaced:?}"
+    );
+    assert!(exists(&root, gov_runtime::paths::PLUGIN_REGISTRY_PATH));
     for f in &del {
         std::fs::remove_file(root.join(f)).unwrap();
     }
@@ -660,7 +686,7 @@ fn deleting_everything_classified_derived_keeps_claims_control_and_registration(
         "{claims}"
     );
     assert!(
-        json(&root, "governance/generated/plugin-registry.json")["plugins"]["shell-rerank"]
+        json(&root, gov_runtime::paths::PLUGIN_REGISTRY_PATH)["plugins"]["shell-rerank"]
             .is_object()
     );
     g.ok(&["resume"]);

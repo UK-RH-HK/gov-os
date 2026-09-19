@@ -105,6 +105,11 @@ fn package_fields(p: &Project) -> Vec<String> {
 /// agent answers ([`answer`]) **and** refused when a consumer reads the answer ([`verified_answer_in`]), so a record
 /// that claims an agent resolution of such a gate is not honoured even when its T2 seal verifies. This is the kernel
 /// floor; `HUMAN_GATE_POLICY.human_only_triggers` may add to it (POLICY_PRECEDENCE `additive`), never remove from it.
+///
+/// Round 3: `upstream_export` (WS-9/11 r2 IP-R2-5 — an export of lessons out of the project is irreversible and is
+/// already approved only by an owner-signed answer bound to the packet, `upstream::resolve_export_approval`) and
+/// `experiment_promotion` (WS-10 r2 IP-WS10-15 — experimental output entering production; promotion already honours
+/// only `human_approval_for`) join the floor, so an agent resolution of either is refused at answer time as well.
 pub const HUMAN_ONLY_TRIGGERS: &[&str] = &[
     "framework_update",
     "destructive_migration",
@@ -112,6 +117,8 @@ pub const HUMAN_ONLY_TRIGGERS: &[&str] = &[
     "kernel_integrity_override",
     "tool_install",
     "budget_threshold",
+    "upstream_export",
+    "experiment_promotion",
 ];
 
 /// Whether gates raised for `trigger` may only be answered by the human (see [`HUMAN_ONLY_TRIGGERS`]).
@@ -569,6 +576,9 @@ fn build(
     Ok(rec)
 }
 
+/// Point the tasks a new gate blocks at it. A task record whose T2 seal verified before this write is re-sealed after
+/// it (WS-5 r2 IP-R3-1, gates side): the OS keeps its own sealed records verifiable, and never blesses a record whose
+/// seal did not verify ([`crate::t2::seal_if_verified`]).
 fn block_tasks(p: &Project, rec: &crate::records::Record) -> Result<()> {
     let mut store2 = RecordStore::load(&p.root);
     for t in rec.data["blocks_tasks"]
@@ -577,14 +587,56 @@ fn block_tasks(p: &Project, rec: &crate::records::Record) -> Result<()> {
         .unwrap_or_default()
     {
         if let Some(tr) = t.as_str().and_then(|s| store2.get_mut(s)) {
+            let was_verified = crate::t2::verify_record(tr).is_verified();
             tr.set("human_gate", json!(rec.id()));
             if tr.get("task_status") != "DONE" {
                 tr.set("task_status", json!("WAITING_HUMAN"));
             }
+            crate::t2::seal_if_verified(tr, was_verified, "gate create (blocks task)")?;
             save_record(&p.root, tr)?;
         }
     }
     Ok(())
+}
+
+/// The research / experiment evidence a gate or an answer cites: `derived_from` and `evidence_refs` of `v`, plus
+/// `extra` (an answer's `--evidence`), deduplicated in order.
+fn cited_evidence_ids(v: &Value, extra: &[String]) -> Vec<String> {
+    let mut out: Vec<String> = vec![];
+    for k in ["derived_from", "evidence_refs"] {
+        let items: Vec<String> = match v.get(k) {
+            Some(Value::Array(a)) => a
+                .iter()
+                .filter_map(|x| x.as_str().map(String::from))
+                .collect(),
+            Some(Value::String(s)) if !s.is_empty() => vec![s.clone()],
+            _ => vec![],
+        };
+        for i in items {
+            if !out.contains(&i) {
+                out.push(i);
+            }
+        }
+    }
+    for e in extra {
+        if !out.contains(e) {
+            out.push(e.clone());
+        }
+    }
+    out
+}
+
+/// J1/J2 influence backlink (WS-10 r2 IP-WS10-02): the cited research/experiment records name `influenced`. The
+/// record that cites them is already persisted, so a failure here is reported beside the result rather than
+/// undoing it.
+fn record_influence_reported(p: &Project, cited: &[String], influenced: &str) -> Value {
+    if cited.is_empty() {
+        return Value::Null;
+    }
+    match crate::lifecycle::record_influence(p, cited, influenced) {
+        Ok(updated) => json!({"recorded": updated}),
+        Err(e) => json!({"error": {"code": e.code, "message": e.message}}),
+    }
 }
 
 /// Create a gate on behalf of an acting role (authority-checked). Its assessment is the acting session's
@@ -596,11 +648,21 @@ pub fn create(p: &Project, fields: Value) -> Result<Value> {
         crate::srr::breakglass::Effect::HumanGateCreate,
         "gate create",
     )?;
+    // J1 (WS-10 r2 IP-WS10-02): a gate may rest only on governed research/experiment evidence
+    let cited = cited_evidence_ids(&fields, &[]);
+    if !cited.is_empty() {
+        crate::lifecycle::require_citable(p, &RecordStore::load(&p.root), &cited)?;
+    }
     let mut rec = build(p, &clearance, fields, Origin::Agent)?;
     crate::t2::seal_record(&mut rec, "gate create")?;
     save_record(&p.root, &rec)?;
     block_tasks(p, &rec)?;
-    Ok(rec.data)
+    let influence = record_influence_reported(p, &cited, &rec.id());
+    let mut out = rec.data;
+    if !influence.is_null() {
+        out["evidence_influence"] = influence;
+    }
+    Ok(out)
 }
 
 /// Create a gate raised by the system itself (budget/threshold/update/migration triggers) — not subject to the
@@ -1262,6 +1324,7 @@ fn move_tasks(
     from: &[&str],
     to: &str,
     note: &str,
+    operation: &str,
 ) -> Result<Vec<String>> {
     let mut moved = vec![];
     let mut store = RecordStore::load(&p.root);
@@ -1274,9 +1337,12 @@ fn move_tasks(
     for tid in ids {
         if let Some(tr) = store.get_mut(&tid) {
             if from.contains(&tr.get("task_status").as_str()) {
+                // WS-5 r2 IP-R3-1 (gates side): keep an OS-sealed task record verifiable; never bless an unverified one
+                let was_verified = crate::t2::verify_record(tr).is_verified();
                 tr.set("task_status", json!(to));
                 tr.set("status_note", json!(note));
                 tr.set("updated", json!(today()));
+                crate::t2::seal_if_verified(tr, was_verified, operation)?;
                 save_record(&p.root, tr)?;
                 moved.push(tid);
             }
@@ -1351,6 +1417,12 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
                 format!("evidence reference {e} does not resolve to a governed record"),
             ));
         }
+    }
+    // J1 (WS-10 r2 IP-WS10-02): the decision an answer mints may rest only on governed research/experiment evidence —
+    // what the answer cites and what the gate itself was derived from
+    let cited = cited_evidence_ids(&store.get(id).unwrap().data, &req.evidence);
+    if !cited.is_empty() {
+        crate::lifecycle::require_citable(p, &store, &cited)?;
     }
     let g = store.get_mut(id).unwrap();
     let by_is_agent = req
@@ -1559,6 +1631,7 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
     }
     crate::t2::seal_record(&mut dec, "gate answer")?;
     save_record(&p.root, &dec)?;
+    let influence = record_influence_reported(p, &cited, &did);
     if let Some(cit_id) = gdata
         .get("cit")
         .and_then(|v| v.as_str())
@@ -1566,6 +1639,8 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
     {
         let mut sc = RecordStore::load(&p.root);
         if let Some(c) = sc.get_mut(cit_id) {
+            // a CIT record the OS sealed stays verifiable after this write; an unverified one is not blessed
+            let was_verified = crate::t2::verify_record(c).is_verified();
             if option == "A" {
                 if c.get("decision").is_empty() {
                     c.set("decision", json!(did));
@@ -1584,6 +1659,7 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
                     j.push(json!({"at": now_iso(), "event": "rejected_by_gate", "gate": id, "option": option, "by": by, "by_kind": kind}));
                 }
             }
+            crate::t2::seal_if_verified(c, was_verified, "gate answer (cit)")?;
             save_record(&p.root, c)?;
         }
     }
@@ -1596,6 +1672,7 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
                 &["WAITING_HUMAN"],
                 "READY",
                 &format!("released by {id} (option {option})"),
+                "gate answer (releases task)",
             )?,
             vec![],
         )
@@ -1608,12 +1685,15 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
                 &["WAITING_HUMAN", "READY"],
                 "BLOCKED",
                 &format!("{id} was answered '{option}', which does not authorise this work"),
+                "gate answer (blocks task)",
             )?,
         )
     };
-    Ok(
-        json!({"gate": id, "decision": did, "option": option, "answered_by_kind": kind, "answered_by": by, "authorises_blocked_work": authorises, "unblocked_tasks": unblocked, "blocked_tasks": blocked, "cit": gdata.get("cit")}),
-    )
+    let mut out = json!({"gate": id, "decision": did, "option": option, "answered_by_kind": kind, "answered_by": by, "authorises_blocked_work": authorises, "unblocked_tasks": unblocked, "blocked_tasks": blocked, "cit": gdata.get("cit")});
+    if !influence.is_null() {
+        out["evidence_influence"] = influence;
+    }
+    Ok(out)
 }
 
 /// Withdraw a gate (and any approval derived from it). The linked CIT returns to SIMULATED; the derived decision is
@@ -1669,6 +1749,7 @@ pub fn revoke(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
     {
         let mut s3 = RecordStore::load(&p.root);
         if let Some(c) = s3.get_mut(cit_id) {
+            let was_verified = crate::t2::verify_record(c).is_verified();
             if c.get("cit_status") == "APPROVED" {
                 c.set("cit_status", json!("SIMULATED"));
             }
@@ -1678,6 +1759,7 @@ pub fn revoke(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
             if let Some(j) = c.data["journal"].as_array_mut() {
                 j.push(json!({"at": now_iso(), "event": "approval_revoked", "gate": id, "reason": reason, "by_session": p.session_id}));
             }
+            crate::t2::seal_if_verified(c, was_verified, "gate revoke (cit)")?;
             save_record(&p.root, c)?;
             touched["cit"] = json!({"id": cit_id, "cit_status": c.get("cit_status")});
         }
@@ -1689,6 +1771,7 @@ pub fn revoke(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
         &["WAITING_HUMAN", "READY", "IN_PROGRESS", "CLAIMED"],
         "BLOCKED",
         &format!("human gate {id} was withdrawn: the work it blocked is not authorised"),
+        "gate revoke (blocks task)",
     )?;
     touched["blocked_tasks"] = json!(blocked);
     Ok(json!({"gate": id, "gate_status": "WITHDRAWN", "touched": touched}))

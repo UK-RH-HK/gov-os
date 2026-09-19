@@ -2,7 +2,10 @@
 
 All fixtures are synthetic; none contain real customer, product or credential material (the "secrets" are the
 well-known AWS documentation example key and obviously fake tokens). Each fixture directory has a README with the
-hazards it contains and the scenario that exercises it; the harness is `tests/certification/`.
+hazards it contains and the scenario that exercises it; the harness is `tests/certification/`. The documented first
+run is "provision, then install": every scenario machine is provisioned with the suite's throw-away test root
+(`tests/certification/common.rs::provision`) and installs releases signed under it; a scenario about the unprovisioned
+posture itself says so and uses `setup_fixture_unprovisioned`.
 
 | # | Fixture | Governed language(s) | Scenario file | Proves |
 |---|---|---|---|---|
@@ -11,7 +14,7 @@ hazards it contains and the scenario that exercises it; the harness is `tests/ce
 | 3 | `fixtures/migration` | Python + TypeScript | `migration.rs` | inventory/classification/map/plan, review independence, batched moves with link and import rewrites, byte-identical batch rollback, independent verification, legacy extraction, memory built after path stabilisation on canonical paths |
 | 4 | `fixtures/update` | none (governance only) | `update.rs` | synthetic 4.1.1 → current release (stored synthetic payload): CIT-P check, human gate, migration ops, overlay preserved, `spec/` untouched (INV-013), adapters regenerated, rollback byte-for-byte |
 | 5 | `fixtures/upstream-learning` | none | `upstream.rs` | export gate: scope, secrets, raw code, identifiers, forbidden paths, approval, remote transport refusal, outbound allowlist, ledger, inbox never leaks |
-| 6 | `fixtures/multi-machine` | Rust | `multi_machine.rs` | clone without runtime → doctor → rebuild → identical manifest hash, status and deterministic context hash |
+| 6 | `fixtures/multi-machine` | Rust | `multi_machine.rs` | clone without runtime → the second machine is provisioned and verifies the pinned release → doctor → rebuild → identical manifest hash, status and deterministic context hash. `ws03_r3.rs` adds the T2 continuity scenario (P2-ADJ-0002): gates, decisions, CIT state, plugin registrations and governed evidence written on one of the owner's provisioned machines are honoured on another after a clone/pull, and refused from an unprovisioned machine, a machine without the owner's binding authority, another owner's machine and a hand edit |
 | 7 | `fixtures/failure-injection` | Rust | `failure_injection.rs` | 13 injected faults detected by doctor/suite and repaired by recovery primitives (see fixture README table) |
 | — | architectural | Rust + Python | `arch.rs` | no toolchain coupling (core runs with only `git` on PATH), language-neutral kernel data, bash plugin satisfies API-0001, Rust/Python embedder bit-identical, ecosystem resolution per project, all kernel data + canonical records validate against schemas |
 
@@ -49,3 +52,12 @@ policy exceptions require a real governing decision (nonexistent, wrong type, ou
 revoked, expired, insufficient authority, wrong project, and constitutional floors that no exception can reach); and a
 trust-boundary sweep (self-certified tool security review, forged approval decision, self-attested mutation report,
 hand-written plugin registry entry).
+
+## Repair iteration 1 (Phase 2) builder scenarios
+`tests/certification/ws03.rs`, `ws03_r3.rs`, `ws04r2.rs`, `ws05.rs`, `ws06.rs`, `ws07.rs`, `ws08.rs`, `ws08_r2.rs` hold one
+test per repaired class: acting-role resolution and the G0 guard, the owner-signed human channel, T2 binding and its
+cross-machine continuity, policy precedence on older kernels, CIT approval bound to content and impact, materiality,
+change propagation and continuity, runnable derivation and the ordered close, recorded authorship, graph integrity and
+retrieval-profile governance, executable-plugin registration and byte binding, tool approval bound to the installation,
+admission on unprovisioned machines and the bootstrap marking, the operational store of the emergency controls and the
+generated provider lifecycle hooks. They are builder regression evidence (Contract v3 O3), not acceptance evidence.

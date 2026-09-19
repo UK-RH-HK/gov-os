@@ -158,12 +158,23 @@ pub fn recover(p: &Project, dry_run: bool) -> Result<Value> {
         }
         let store = RecordStore::load(&p.root);
         let id = store.next_id("report");
-        let rec = new_record(
+        // the report schema's evidence/discoveries/unresolved items are strings (R3-WS5-7 / IP-R3-WS02-08, round-3
+        // integration): each classified item and applied action is recorded as its exact JSON text, so a recovery
+        // report stays schema-valid (and never raises a HIGH `schema_invariants` block) after its work is closed
+        let as_text = |v: &Value| -> String {
+            v.as_str()
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| v.to_string())
+        };
+        let mut rec = new_record(
             "report",
             &id,
             &format!("Recovery report {id}"),
-            json!({"task": "recovery", "role": p.role, "outcome": if unknown > 0 { "blocked" } else { "success" }, "work_completed": format!("classified {} interrupted item(s); {} action(s) applied", items.len(), actions.len()), "files_changed": [], "evidence": items.clone(), "tests": {"status": "not_applicable_with_reason", "reason": "recovery"}, "discoveries": actions.clone(), "risks": [], "lessons": [], "proposed_decisions": [], "unresolved": items.iter().filter(|i| i["classification"] == "UNKNOWN").cloned().collect::<Vec<_>>(), "recommended_next_action": if frozen { "review UNKNOWN items, then gov resume" } else { "gov status" }, "state_class": "EVIDENCE", "recovered_at": now_iso()}),
+            json!({"task": "recovery", "role": p.role, "outcome": if unknown > 0 { "blocked" } else { "success" }, "work_completed": format!("classified {} interrupted item(s); {} action(s) applied", items.len(), actions.len()), "files_changed": [], "evidence": items.iter().map(as_text).collect::<Vec<_>>(), "tests": {"status": "not_applicable_with_reason", "reason": "recovery"}, "discoveries": actions.iter().map(as_text).collect::<Vec<_>>(), "risks": [], "lessons": [], "proposed_decisions": [], "unresolved": items.iter().filter(|i| i["classification"] == "UNKNOWN").map(as_text).collect::<Vec<_>>(), "recommended_next_action": if frozen { "review UNKNOWN items, then gov resume" } else { "gov status" }, "state_class": "EVIDENCE", "recovered_at": now_iso()}),
         );
+        // a report is T2 state the OS writes (WS-4 IP-R3-WS04-04): sealed as written by this operation, so a recovery
+        // run inside another task's claim window is recognised at that close as the OS's write
+        crate::t2::seal_record(&mut rec, "recover")?;
         save_record(&p.root, &rec)?;
     }
     Ok(

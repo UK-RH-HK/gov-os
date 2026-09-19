@@ -1,0 +1,99 @@
+# P2-AR-0033 supplementary, base binary: tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/base-tree (export of 53897c1a44157e5af81b176017bc7ded6a63b9cd) gov 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82 date 2026-09-19T13:37:36Z
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/base-tree/target/release/gov (5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82)  tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/base-tree  scratch /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/supp/final3-before
+
+## AV subject scope (O-R2-2)
+CHECK AV.1a FAIL a missing task dependency (graph_integrity high) holds a hard-block scoped to the tasks it names -- [{"scope": "global", "operations": ["task.claim", "task.close", "release.build"], "subjects": null}]
+CHECK AV.1b FAIL an independent task stays claimable (O-R2-2: the block is not global) -- "HEALTH_HARD_BLOCK"
+CHECK AV.1c FAIL closing the task it names is refused (typed, exit 4), naming the block, its scope and its subjects -- {"code": "HEALTH_HARD_BLOCK", "blocks": [{"check": "graph_integrity", "scope": "global", "subjects": null}]}
+CHECK AV.1d PASS a release still relies on the whole graph (global) -- "HEALTH_HARD_BLOCK"
+
+## AV remedy admission (WS-4 R2-8)
+CHECK AV.2a PASS under a critical block, a change transaction unrelated to it is refused (BC-P2-06 S6 holds) -- "HEALTH_HARD_BLOCK"
+CHECK AV.2b FAIL the G0 decision admits proposing the change transaction that repairs exactly what the block names (WS-4 R2-8: a remedy, not refused) -- "HEALTH_HARD_BLOCK"
+CHECK AV.2b-e2e FAIL end to end through `gov cit propose` (needs WS-3's generic G0 site to leave `cit propose` to its host, which guards it with its paths: IP-R3-WS02-01) -- "HEALTH_HARD_BLOCK"
+CHECK AV.2c PASS a critical block still refuses starting unrelated work (global) -- "HEALTH_HARD_BLOCK"
+CHECK AV.2d FAIL executing the repairing change is admissible only as a remedy that must clear the block before it commits (committing operation) -- {"code": "HEALTH_HARD_BLOCK", "remedy_admissible": null}
+
+## AV update entry decision (IP-R2-WS08-5)
+CHECK AV.3a FAIL an overlay block (D006) admits `update --apply` as its remedy (it must clear it before commit): the update entry guard does not deadlock the upgrade (WS-8 IP-R2-WS08-5) -- {"code": "HEALTH_HARD_BLOCK", "remedy_admissible": null, "checks": ["D006"]}
+CHECK AV.3b PASS a record block (schema_invariants on REQ-0102) is not one an update repairs: the update is refused at entry -- {"code": "HEALTH_HARD_BLOCK", "remedy_admissible": null}
+CHECK AV.3c FAIL the same record block leaves a close that does not rely on REQ-0102 available -- "HEALTH_HARD_BLOCK"
+
+## AV governance close on current evidence (O-R2-1)
+CHECK AV.4a FAIL a governance-affecting close relies on the current complete suite result even when it is not green (its warnings are the gaps it is completing): no GOVERNANCE_SUITE_STALE deadlock (O-R2-1) -- "GOVERNANCE_SUITE_STALE"
+CHECK AV.4b FAIL …and the close records the G2 result it relied on -- {}
+
+## AV retired investigation subject (O-1)
+CHECK AV.5a FAIL the investigation's link to a retired subject is not reported as a dangling edge (O-1) -- {"generated": ["TASK-0001.yaml"], "dangling": ["1 dangling edge(s) reference unknown artefacts (e.g. \"TASK-0001\" \"AFFECTS\" \"TST-0909\")"]}
+CHECK AV.5b FAIL the investigation is listed as complete (subject retired), closable or withdrawable -- []
+CHECK AV.5c FAIL doctor D015 does not count it as a defect -- "1 dangling edge(s) [TASK-0001 AFFECTS TST-0909], 2 orphan record(s) [AUD-0001, AUD-0002]"
+
+## IF1 consumption is not implementation
+CHECK IF1.a FAIL a requirement the closing receipt consumed but declares not implemented is a W7 delivery gap (consumption is not implementation) -- {"close": "DONE", "consumed": [{"id": "F-0001", "content_hash": "e8543c98fe1f828203217de0159e2827752204fe505f2bc6fccb769ef5483004"}, {"id": "REQ-0001", "content_hash": "9eb9b1b79a9782eb7c481f822b20f869df47fe318b912566cb8a8c684d03ae4e"}, {"id": "REQ-0002", "content_hash": "1184b8811e6972a868755e50161b5fabdcccc381872966e91bac33f4686f20e1"}, {"id": "SCN-0001", "content_hash": "833b72629ed04d5730aead235238eddcbb0bd5e99b563ed9c0b8b952ff64a67a"}, {"id": "TST-0001", "content_hash": "a1f27f3cf62f8e4ab2b26b5a15bd292b2303cebef568bae1a945ebb3930b55f2"}], "finding": ""}
+CHECK IF1.b PASS control: the requirement the receipt implemented is not an orphan
+
+## G1 observation of mutations however made
+CHECK G1.a FAIL `gov status` right after direct edits observes them and runs G1 on what changed (no operator command) -- {"tier": null, "changed_paths": null, "executed": null}
+CHECK G1.b FAIL the secret (critical block) and the schema-invalid record (schema_invariants) are health facts at once -- {"state": "YELLOW", "critical": [], "schema": []}
+CHECK G1.c FAIL …so the next governed operation is refused by the observed critical block
+CHECK G1.d PASS repairing the files releases the block at the next observation (no manual re-run) -- "YELLOW"
+CHECK G1.e FAIL an architecture change made directly is observed at G4 (wider staleness/impact propagation) -- {"tier": null, "milestone": null, "changed_classes": null}
+CHECK G1.f FAIL the observation is a recorded health result (trigger mutation.observed, tier G4) -- [["G1", "gov doctor"], ["G5", "gov audit"]]
+
+## G2 readiness at close
+CHECK G2.a FAIL a close after the feature's pre-implementation readiness regressed is refused (G2 readiness) -- "GOVERNANCE_SUITE_STALE"
+
+## G3 claims and gates at handoff
+CHECK G3.0 PASS control: the product parks claimed work on the gate that blocks it -- "WAITING_HUMAN"
+CHECK G3.a FAIL a handoff of work carried on (IN_PROGRESS) under an unanswered gate that blocks it records a G3 result that is not HEALTHY: human_gate_integrity names the gate-held work (claims/gates at handoff) -- {"health": {"tier": "G3", "verdict": "HEALTHY", "health_result": "HR-20260919T133752888Z-b792830a", "counts": {"critical": 0, "high": 0, "medium": 0, "low": 2}}, "g3_check": {"status": "executed", "max_severity": "low", "findings": 1}, "findings": []}
+CHECK G3.b PASS control: work the gate does not block is not named
+
+## G4/G6
+CHECK G6.a FAIL a qualification run records the machine posture; on an unprovisioned machine it never counts as qualification (OWNER-DECISION-P2-0002 item 4) -- {"machine_posture": null, "counts_as_qualification": false}
+CHECK G4.a PASS a G4 run is available as a host tier (recorded) -- {"before": 2, "after": 3}
+
+## W11 artifact-flow metrics
+CHECK W11.0 FAIL all nine W11 metrics are reported by the suite (audit family detail) -- {"keys": [], "close": "DONE"}
+CHECK W11.m1 FAIL required-input delivery accuracy moves when a delivered mandatory input changes -- [null, null]
+CHECK W11.m2 FAIL current-version selection accuracy moves when a delivered input is no longer current -- [null, null]
+CHECK W11.m5a FAIL staleness propagation accuracy drops after a direct upstream edit
+CHECK W11.m9 FAIL fresh-agent reconstruction correctness drops when the resume checkpoint and packet no longer describe the inputs -- [null, null]
+CHECK W11.m5b FAIL …and returns to 1.0 once the change is propagated -- {"value": null, "propagate": "ok"}
+CHECK W11.m3 FAIL superseded-input leakage rate rises when work is governed by a superseded requirement -- [null, null]
+CHECK W11.m4 FAIL missing-required-input detection counts the missing input and whether the product detects it (not offered as runnable) -- {"value": null, "numerator": null, "denominator": null, "missing_required_inputs": null}
+CHECK W11.m6 FAIL requirement→code coverage: 1.0 when the implementing receipt produced source, falls to 0.5 with a requirement nothing implements -- [null, null]
+CHECK W11.m7 FAIL requirement→test coverage: 1.0 through its validating scenario's test, falls to 0.5 with an untested requirement -- [null, null]
+CHECK W11.m8 FAIL orphan-output detection reports detections (rising with an injected orphan), false-positive rate and recall (with its source) -- {"orphans_detected": null, "orphan_detection_precision": null, "orphan_detection_false_positive_rate": null, "orphan_detection_recall": null, "recall_source": null}
+
+## U Gate U SLOs
+CHECK U.0 FAIL all fifteen Gate U SLOs are computed with a declared threshold -- []
+CHECK U.5 FAIL three orphan research records cross the orphan-graph SLO and change the verdict
+CHECK U.7 FAIL five open gates cross the unresolved-human-gates SLO (more than BUDGET_POLICY.max_parallel_agents)
+CHECK U.8 FAIL three untraced tasks cross the task-traceability SLO
+CHECK U.9 FAIL a feature with 1 of the readiness cells stated crosses the readiness-coverage SLO
+CHECK U.H7 FAIL an active feature with an empty readiness block is not explicit (HEALTHY 7) -- []
+CHECK U.first_pass_completion FAIL the first_pass_completion SLO crosses its threshold on the injected records
+CHECK U.handoff_failure FAIL the handoff_failure SLO crosses its threshold on the injected records
+CHECK U.tokens_per_completed_task FAIL the tokens_per_completed_task SLO crosses its threshold on the injected records
+CHECK U.10 FAIL a packet larger than CONTEXT_POLICY.max_packet_chars crosses the packet-size SLO
+CHECK U.verdict FAIL `gov health status` carries the one repository verdict: thirteen conditions, fifteen SLOs, crossed SLOs named -- {"verdict": null, "failing": null, "crossed": []}
+CHECK U.D035 FAIL doctor D035 carries the repository verdict and fails on crossed SLOs -- ""
+
+## U HEALTHY conditions
+CHECK U.H2 FAIL a legacy provider rules file in the active tree makes the audit verdict UNHEALTHY (HEALTHY 2) -- []
+CHECK U.H11a FAIL an unresolved critical finding of an independent audit record makes the audit UNHEALTHY (HEALTHY 11) -- []
+CHECK U.H11b FAIL …and so does the doctor, through D035 (one verdict) -- ""
+CHECK U.H11c PASS a resolved finding no longer counts
+
+## T2 registry and adoption record
+CHECK T2.reg FAIL a plugin-registry entry no gov operation wrote is reported as T2 state (R3-11) -- []
+CHECK T2.adopt FAIL an adoption record gov adopt did not write is reported (WS-9 IP-R2-4) -- []
+CHECK T2.cur FAIL both are T2 binding facts of the currency key (t2_bindings) -- []
+
+## SKL skills and literal
+CHECK SKL.SKL-IMPACT-ANALYSIS FAIL SKL-IMPACT-ANALYSIS V1 executes as an executable scenario and passes -- [["V1", "declared-deferred"]]
+CHECK SKL.SKL-RESEARCH-BENCHMARK FAIL SKL-RESEARCH-BENCHMARK V1 executes as an executable scenario and passes -- [["V1", "declared-deferred"]]
+CHECK SKL.SKL-MEMORY-RECONSTRUCTION PASS SKL-MEMORY-RECONSTRUCTION V1 executes as an executable scenario and passes -- [["V1", "passed"]]
+CHECK SKL.literal FAIL the kernel's scenario checks file carries no scannable secret literal (IP-R2-WS08-6) -- "1 file(s) contain secret patterns but are not secret-class: docs-skill-checks.yaml"
+
+SUMMARY pass=11 fail=54 total=65 failed=['AV.1a', 'AV.1b', 'AV.1c', 'AV.2b', 'AV.2b-e2e', 'AV.2d', 'AV.3a', 'AV.3c', 'AV.4a', 'AV.4b', 'AV.5a', 'AV.5b', 'AV.5c', 'IF1.a', 'G1.a', 'G1.b', 'G1.c', 'G1.e', 'G1.f', 'G2.a', 'G3.a', 'G6.a', 'W11.0', 'W11.m1', 'W11.m2', 'W11.m5a', 'W11.m9', 'W11.m5b', 'W11.m3', 'W11.m4', 'W11.m6', 'W11.m7', 'W11.m8', 'U.0', 'U.5', 'U.7', 'U.8', 'U.9', 'U.H7', 'U.first_pass_completion', 'U.handoff_failure', 'U.tokens_per_completed_task', 'U.10', 'U.verdict', 'U.D035', 'U.H2', 'U.H11a', 'U.H11b', 'T2.reg', 'T2.adopt', 'T2.cur', 'SKL.SKL-IMPACT-ANALYSIS', 'SKL.SKL-RESEARCH-BENCHMARK', 'SKL.literal']

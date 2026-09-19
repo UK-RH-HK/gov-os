@@ -1,0 +1,60 @@
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/a15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/t15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/x15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/m15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/g15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/h15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/att15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/att15b/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/fd15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/rk15/kernel
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/self/releases/4.1.5/kernel
+(a) role declared: orchestrator for init --name p6b
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/exp15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/hi15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/a15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/down15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/wp15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/ch15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/ch15/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-02-eUVO2U/alpha-r-a2-prov-81gibwoj/pl15/kernel
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for update --apply --source

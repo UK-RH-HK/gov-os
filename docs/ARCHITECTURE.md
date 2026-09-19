@@ -59,16 +59,30 @@ separate, individually pinned concerns.
 │   ├── kernel/                    # immutable installed payload + KERNEL_MANIFEST.json (file hashes)
 │   ├── project/                   # project-owned overlay (7 files) + optional plugins/, tools/, skills/, mcp/
 │   ├── generated/                 # index-manifest.json, memory-manifest.json, tool-registry.json,
-│   │                              # adapter-manifest.json, adapters/<id>/…
+│   │                              # adapter-manifest.json, adapters/<id>/… (incl. adapters/hooks/provider-hooks.json)
+│   ├── registry/plugin-registry.json  # where the OS-written plugin registry belongs (tracked T2; BC-P2-31)
 │   ├── tests/memory/heldout.yaml  # held-out retrieval regression queries
 │   └── framework.lock             # version, release_hash, kernel_manifest_hash, source, schema versions
 ├── spec/{now,product,features,requirements,architecture,workflows,interfaces,scenarios,data,security,
 │         performance,research,experiments,decisions,planning,tasks,reports(/checkpoints),lessons,audits}
 ├── product/ (or any native layout mapped by the contract)
 ├── archive/{governance,spec,research,code-reference}
-└── .governance-runtime/           # derived, gitignored: state.db (SQLite+FTS5), context/, cit/<id>/snapshot,
-                                   # migration/batch-n, update/<version>, telemetry/, routing/, outbound/, control.json
+├── .governance-state/             # OS operational state that cannot be rebuilt (self-ignored by Git, never indexed,
+│                                  # never deleted by a rebuild): control.json (emergency controls), claims, claim-tree
+│                                  # snapshots, CIT/update/migration rollback snapshots (paths::OS_STORES)
+└── .governance-runtime/           # derived, gitignored: state.db (SQLite+FTS5), context/, telemetry/, routing/,
+                                   # outbound/ … — and, until each writer has moved (§4.3), legacy copies of the stores above
 ```
+
+**Classification of the OS's own stores (BC-P2-31).** The kernel declares the stores the OS keeps and cannot rebuild
+(`paths::OS_STORES`: claims, emergency control, claim-time tree snapshots, CIT/update/migration rollback snapshots —
+class `operational`, machine-local — and the plugin registry — class `authoritative`, tracked, OS-written T2) and
+applies that classification after the overlay's rules, so no overlay rule (the template's blanket
+`.governance-runtime/**: derived`, a hostile `**: derived`) can make the product call them derived or generated: they
+are never indexed, retrieved or exported and are `mutation: os-only`, wherever they currently are. Writers resolve
+their location with `paths::store_path` and move a legacy copy once with `paths::relocate_legacy` (identical copies are
+removed; differing copies are `STATE_LOCATION_CONFLICT`, nothing overwritten); `paths::misplaced_os_state` lists every
+store still kept inside the derived runtime directory or `governance/generated/`.
 
 ## 4. Development Knowledge Fabric
 
@@ -116,9 +130,16 @@ into `state.db.building` and swapped in atomically, so a failed build never leav
 (HIGH); `task close` refuses with `INDEX_PIN_MISMATCH`.
 
 ### 4.3 State that survives rebuilds
-Session claims live in `.governance-runtime/claims.db` (`ClaimsStore`), control state in `control.json`; neither is
-touched by `gov rebuild-memory` (doctor D026 checks the claims store). Everything in `state.db` is derived. Because a
-rebuild changes only derived state, it stays available under FREEZE_WRITES and PAUSE (§4.6).
+Everything in `state.db` is derived; `gov rebuild-memory` never touches the OS stores of §3, wherever they are.
+**Emergency-control state** lives in `.governance-state/control.json` (`paths::store_path(root, "emergency-control")`),
+so deleting the whole derived runtime directory never lifts a freeze or a pause. A `control.json` an older binary left in
+the runtime directory is still honoured — while both exist the stricter state is in force (frozen if either is frozen,
+paused if either is paused) — and the next control command (`pause`, `freeze-writes`, `cancel-agents`, `resume`) moves
+the state where it belongs and removes the legacy copy. The other writers (claims and claim trees, the CIT/update/
+migration snapshots, the plugin registry) resolve their locations through the same API as each moves; until then
+`paths::misplaced_os_state` reports them, and the classification above already keeps them out of every derived
+deletion set (doctor D026 checks the claims store). Because a rebuild changes only derived state, it stays available
+under FREEZE_WRITES and PAUSE (§4.6).
 
 Failure memory (BC-P2-32, framework §18) is durable: tool failures observed while indexing or retrieving are governed
 evidence records under `spec/reports/failures/`; retrieval misses — an agent's logged query whose best evidence covers
@@ -145,6 +166,21 @@ D029, and every mutating operation (including `gov rebuild-memory`) fails closed
 `gov kernel reinstall`; an L4+ role may instead answer a presented gate raised by `gov kernel override`, bound to a
 fingerprint of that exact kernel state so it cannot outlive it. Presenting and answering gates stay available while
 untrusted, because that is the channel the remedy is recorded through.
+
+**Admission on a machine with no trust anchor (OWNER-DECISION-P2-0002, Option A).** The one verification policy
+(`srr::verifier::admit`) decides it for every ingress (`init --source`, `update`, `adopt migrate`, `kernel reinstall`,
+rollback, recovery): on a machine with no administrator-provisioned Signed Release Root, kernel material from any
+external source is refused `SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED` (typed, remediation: provision), decided by the
+digest of the privately staged bytes, never by path; the only payload such a machine admits is the one embedded in the
+running `gov` binary, and only as a marked **bootstrap** installation (`admission: BOOTSTRAP_EMBEDDED_PAYLOAD`, tied to
+the binary's identity) that is never presented as current, verified or certified — every command envelope says
+`presented_as: UNAUTHENTICATED` with the BOOTSTRAP disclosure, `framework.lock` and `gov trust status` carry the
+marking, and doctor D032 fails on it. A bootstrap installation rewritten after install, or kernel material the machine
+never admitted (e.g. arriving with a clone), is `KERNEL_TAMPERED` / `KERNEL_UNANCHORED` (remediation: provision, then
+verify the pinned signed release). The documented first run is therefore **provision, then install**:
+`gov trust provision --anchor <root metadata from the administrator domain>`, then `gov init --source <release signed
+under it>`; a dev/test machine provisions a throw-away root, as the certification harness does. On a provisioned
+machine the embedded payload without signed metadata is refused `SRR_RELEASE_UNVERIFIED` (R1 behaviour unchanged).
 
 ## 4.5 Constitutional policy precedence
 `framework/policies/POLICY_PRECEDENCE.yaml` is kernel data: an ordered list of layers (hard invariants →
@@ -214,22 +250,36 @@ verifies the map against the core and the `policy_enforcement_coverage` suite fa
 (decision D-0003).
 
 ## 4.7 Governed capability plugins
-A plugin descriptor is discovery, not authorisation (D-0005, D-0007). `TOOL_POLICY.plugins.min_authority` comes from
-verified kernel policy and gates **every** plugin execution, registered or not; nothing inside a descriptor can widen
-it. `approved_roles` in a descriptor may only narrow, and for a registered plugin the authoritative list is the
-registry's; `provenance` and `status` in a descriptor prove nothing. Registration is an OS-written record in
-`governance/generated/plugin-registry.json` (`gov plugins register|unregister|registry`) binding plugin id, version,
-descriptor bytes and implementation bytes to the acting session, role and approving gate; an edited, re-versioned or
-id-spoofing descriptor is `PLUGIN_REGISTRY_MISMATCH` for every role. Elevated permissions are approved only by the gate
-recorded in that registry entry. `capabilities::governance::plugin_set` classifies every
-descriptor for the acting role: **rejected** (fails the kernel `plugin-descriptor` schema — identity, version pin and
-capability required — never executable), **denied** (valid but the role may not trigger it) or **usable**. Execution
-requires: the role at/above `TOOL_POLICY.plugins.min_authority` for hand-declared descriptors or in `approved_roles`
-for registered ones; every `required_permission_classes` entry held by the role (TOOL_PERMISSIONS); a presented,
-answered registration gate for elevated permissions (`gov plugins register`); a resolvable executable; and a content
-pin — a declared `pin.sha256` must match, and an implementation that changes without a version change is refused
-(`PLUGIN_PIN_MISMATCH`). Plugins appear in the generated Tool/Capability Registry as `type: plugin`; doctor D028 and
-the suite family `plugin_governance` report invalid, denied or drifting plugins.
+A plugin descriptor is discovery, never authorisation (D-0005 as amended by
+[D-0010](../spec/decisions/D-0010.yaml); D-0007; Contract v3 F4; ARCH-0003 §9; API-0001 1.2). The OS classifies a
+plugin by **what its command executes**, never by what its descriptor declares (`capabilities::binding`):
+
+* **OS-provided** — the command runs this very `gov` binary (same inode, or byte-identical) as its own capability server
+  (`capabilities serve-embed [--id X] [--reverse]`). Its effects are the release's own, so it keeps the hand-declared
+  allowance: roles at/above `TOOL_POLICY.plugins.min_authority` may run it.
+* **Executable** — anything else (a script, an interpreter running a module or inline code, a binary). It runs only
+  with a registration `gov plugins register` wrote (T2-sealed, §4.8) **and** an owner-answered Human Decision Gate raised
+  for exactly that plugin identity, version, implementation and permission set (trigger `privilege_elevation`,
+  human-only), both re-verified at every execution; unregistered it is refused `PLUGIN_NOT_APPROVED` (`cause:
+  UNREGISTERED_EXECUTABLE`) for every role.
+
+The registration binds every byte the command executes as the OS derives it — the program resolved on `PATH`, every
+script argument, the whole top-level package of a `python3 -m` command (with `__pycache__`), inline code (inside the
+descriptor), and any path listed under `implementation:` — plus the descriptor bytes, the registration subject digest
+the gate's answer is bound to, and the authoritative `approved_roles`, permission classes and permissions. Any changed,
+added or removed byte, an edited descriptor, a version drift or a widened permission set fails closed
+(`PLUGIN_PIN_MISMATCH`, `PLUGIN_REGISTRY_MISMATCH`); an implementation the OS cannot locate never runs
+(`PLUGIN_IMPLEMENTATION_UNRESOLVED`); a registry entry that does not verify is `PLUGIN_REGISTRATION_UNBOUND`. There is no
+trust-on-first-use: nothing machine-local re-baselines a plugin. Plugins run without the caller's loader variables
+(`PYTHONPATH`, `LD_PRELOAD`, `NODE_OPTIONS`, …). Declared `permissions` / `required_permission_classes` only narrow (the
+acting role must hold them) and are shown in the gate package, raising its impact radius; they never decide whether
+approval is needed. `gov plugins registry` shows every entry with its T2 binding and whether it is honoured. Plugins
+appear in the generated Tool/Capability Registry as `type: plugin` (an unregistered executable as `unregistered`, with
+no approved roles); doctor D028 and the suite family `plugin_governance` report unregistered executables, drift,
+unbound entries and unapproved registrations. A tool installation's approval is likewise bound to that installation
+(`gates::create_system` trigger `tool_install`, subject = the installation digest), and a security review is evidence
+only as a T2-verified close report of a `security`-class task naming exactly that tool and version, written by another
+session and role.
 
 ## 4.8 Human Decision Gates, the authenticated human channel and CIT approval
 **Decision package (BC-P2-49).** A gate is created only with substantive content for every
@@ -262,17 +312,76 @@ anchor is refused `HUMAN_CHANNEL_STANDALONE_DISABLED`; an anchor file placed in 
 is strengthen-only: a project may keep it false, never set it true; a kernel that predates the key reads as false. A
 dev/test machine provisions a throw-away root (OWNER-DECISION-P2-0002: provision, then work).
 
-**T2 binding (BC-P2-09).** Gate and decision records (and other OS-written state as their owners adopt it) carry an
-`os_binding` seal (HMAC-SHA256 under a machine binding key kept in protected machine state). A hand-written or edited
-record is `Unsealed`/`Broken`/`Foreign` and never honoured (`T2_UNBOUND`); `gov gate list` reports unverified records
-separately and `gov gate show <HDG>` reports the binding, the answer's verification and what the gate authorises.
+**T2 binding (BC-P2-09).** OS-written state — gate and decision records, CIT state (`os_state`), close reports and
+claim baselines, the plugin registry (every entry and the document), the adoption record, health evidence, research/
+experiment/data records, retrieval-profile decisions — carries an `os_binding` seal: HMAC-SHA256 over the record's
+canonical content, the operation and the time, under a key kept in protected machine state, never in a repository
+(`t2`). A consumer honours a T2 fact only when the seal verifies; a hand-written or edited record is `UNSEALED` /
+`BROKEN` and never honoured (`T2_UNBOUND`). An OS writer that rewrites a record the OS sealed re-seals it only when its
+seal verified immediately before the write — the OS never blesses content it did not write (gate writes to task and CIT
+records, CIT propagation markers, lifecycle backlinks). `gov gate list` reports unverified gates separately, `gov gate
+show <HDG>` reports the binding and scope, the answer's verification and what the gate authorises, and `t2::audit`
+(suite family `os_binding_integrity`, doctor D033) lists every T2 record and plugin-registry entry no OS operation
+produced, with the severity of what it is (tampering in force is high).
+
+**T2 facts across the owner's machines (P2-ADJ-0002).** A seal has a scope. *Machine scope* (`hmac-sha256/t2-v1`,
+the machine's own key) is honoured only on the machine that wrote it, and only while that machine is not bound to the
+owner's authority. *Provisioned scope* (`hmac-sha256/t2-v2`) is made under the owner's **T2 binding authority** and is
+honoured on every machine bound to that authority, so gates, decisions, CIT state, plugin registrations, task records
+and governed evidence written on one of the owner's machines are honoured on the others after a Git clone or pull.
+There is **one mechanism** (`runtime/src/srr/binding.rs` provisions and keeps the keyring; `runtime/src/t2.rs` seals
+and verifies through it), delegated through the provisioned root, and nothing about it is in any repository:
+
+1. the owner's Signed Release Root delegates the role `t2-binding` to the owner's key(s);
+2. the owner generates 32-byte binding keys and signs a versioned `t2-binding-authority` document with the
+   `t2-binding` key(s) at threshold: the authority id, a version, an expiry, optionally the machine ids it authorises,
+   and its keys — each by key id and commitment only, exactly one `active` (owner machines seal with it) and any
+   number `retired` (still honoured) — `gov` verifies and never signs;
+3. the administrator installs the document and a key it authorises on each of the owner's provisioned machines from
+   the administrator domain: `gov trust bind --authority <doc> --key <file>`. It is refused below floor
+   (`SRR_BELOW_FLOOR_REFUSED`), when the environment carries authority, for a file inside a repository or the governed
+   project (`T2_BINDING_FROM_REPOSITORY_REFUSED`), on an unprovisioned machine (`T2_BINDING_UNPROVISIONED`), when
+   this machine's root delegates no `t2-binding` role (`T2_BINDING_NOT_DELEGATED`) or the role's signatures do not
+   verify at threshold (another owner's root, an agent's own key: the root verifier's `SRR_*` code), expired
+   (`T2_BINDING_AUTHORITY_EXPIRED`), older than or conflicting with the version this machine accepted
+   (`T2_BINDING_AUTHORITY_ROLLBACK`, `…_CONFLICT`), for a machine the document does not list
+   (`T2_BINDING_MACHINE_NOT_AUTHORISED`), and for a key it does not authorise by id and commitment
+   (`T2_BINDING_KEY_NOT_AUTHORISED`, `T2_BINDING_KEY_MISMATCH`). Keys are kept in the machine's keyring (mode 0600,
+   directory 0700) and never printed; the machine's own key is never replaced;
+4. a portable seal binds the authority, the key, the sealing machine's id, the operation, the time and the content. A
+   machine honours it only when it holds that key (the MAC verifies) **and** its own authority verifies **now**
+   (re-verified against the current trusted root, unexpired, this machine authorised) and lists the key as `ACTIVE`
+   or `RETIRED`. A key the current version no longer lists is revoked, and root succession that drops the delegation,
+   or expiry, stops every seal of the authority being honoured (`UNAUTHORISED`) until the administrator binds a valid
+   authority; new seals then fall back to the machine scope.
+
+Anything else is refused, typed and observable: a record written by an unprovisioned machine, by a machine the owner's
+provisioning did not bind, or by another owner's machine is `FOREIGN`; a record a bound machine sealed with its own key
+before it was bound is not an owner fact (`UNAUTHORISED` there, `FOREIGN` elsewhere) until `gov trust reseal
+[--dry-run]` (L4) re-seals under the active key exactly the records the machine sealed while it was provisioned,
+keeping their recorded operation and time; records sealed while it was unprovisioned, and records whose seal does not
+verify, are left as they are. `gov trust status` (`t2_binding`) reports whether the machine is bound, the authority and
+whether it verifies now, the scope new seals take and why, and every key held with its standing.
+*What it proves:* a process that can write the repository but cannot read protected machine state cannot produce a
+honoured record on any machine. A process with the operator's OS privileges on one of the owner's machines can read the
+binding key; against it the seal is detection-grade, and what it forges there is honoured on the owner's other machines
+holding the same key (inherent in the requirement that one machine's facts are honoured on the others). The facts that
+must hold against it — human answers and human-approval assertions — stay bound to the owner's signature. The key is
+shared by the machines that hold it (`gov` never signs, so no per-machine signature exists): revocation is per key (a
+new authority version), or per machine when the owner issues machine-listed authorities.
 
 **Agent resolution (BC-P2-18).** An agent answer (`gov decide <HDG> --option X --by <acting role>`) is accepted only
 for an L3+ role resolving as itself, on a complete assessment (radius ≤ R1, confidence ≥ 0.8, reversible) made by
 another session or the OS, with a recorded rationale; it records `by_kind: agent` and is never a human approval. Gates
 raised for `HUMAN_GATE_POLICY.human_only_triggers` (`framework_update`, `destructive_migration`, `privilege_elevation`,
-`kernel_integrity_override`, `tool_install`, `budget_threshold` — a kernel floor a project may extend, never shrink)
-are never agent-resolvable, at answer time or at use.
+`kernel_integrity_override`, `tool_install`, `budget_threshold`, `upstream_export`, `experiment_promotion` — a kernel
+floor a project may extend, never shrink) are never agent-resolvable, at answer time or at use.
+
+**Evidence a gate rests on (J1).** A gate created with `derived_from` / `evidence_refs`, and an answer citing
+`--evidence` (or answering a gate so derived), may rest only on governed research and experiment evidence: research
+that is not complete governed evidence (J1 fields, CONCLUDED) is refused `EVIDENCE_NOT_CITABLE` before anything is
+written, and the cited records gain the gate and the decision in their `influences` backlink (re-sealed only when their
+seal verified).
 
 **Blocking and CIT approval.** An authorising answer moves the tasks the gate blocks from WAITING_HUMAN to READY, a
 declining answer to BLOCKED, and `gov gate revoke` withdraws the gate (derived decisions REJECTED, the linked CIT back
@@ -303,12 +412,73 @@ sandboxes — and the rest are served from a cache keyed by those inputs; each r
 RED/YELLOW/GREEN and the active hard-blocks; `gov health guard <op>` shows whether a governed operation would be
 refused (§4.6). Product-test results are recorded per family as governed evidence (`gov health product`,
 `gov verify product`); skill regression executes the kernel's skill scenarios (`gov health skills [--record]`).
+**Only T2-honoured evidence counts:** governance-suite and product-test records are sealed when written, and currency
+(`currency::latest_green`, the product-evidence cache) honours only records whose seal verifies on this machine —
+under the owner's binding authority that includes records written on the owner's other provisioned machines (§4.8);
+doctor D021 names green records that are not honoured. The currency key includes the class `t2_bindings` (a digest of
+`t2::audit`), so a forged or edited T2 record, or a changed binding, stales green evidence. The suite families added in
+repair iteration 1 are `lineage_orphans` (W7: unconsumed outputs, requirements without an implementation/test path,
+unconsumed research, unjustified acceptance tests and code — each turned into one idempotent investigation task at a
+persisted G4-G6 run, never a deletion), `os_binding_integrity` (T2 records no OS operation produced), `installation_
+authenticity` (an installation whose release authenticity is not established), `contract_binding` (the canonical
+contract chain, G5/G6), `index_content_coverage` (indexed chunks cover the artefact's current content),
+`task_contract_integrity` (production-merge violations), plus the W8 stale-link, W1 misplaced-record and W5
+untraceable-work findings of `graph_integrity` / `product_traceability` and W4 delivery verification in
+`context_reproducibility`. Doctor adds D032 (installation authenticity / admission: fails on a bootstrap or not-admitted
+installation), D033 (T2 binding: tampering and an unsealed gate in force fail; legacy, hand-written and other-machine
+records are disclosed) and D034 (failure memory: an open tool failure degrades). `gov health qualify --kind K --oracle
+f --report f [--public-suite d]… [--repository d]… [--run-id id]` is the G6 entry: it refuses unless the oracle conforms
+and is separate from the public suites, the given repositories and this repository, and the score report conforms and
+is bound to it; the record keeps only a one-way commitment to the oracle, the report digest and numeric metrics.
 
 **Context delivery (BC-P2-17/19/20).** A task's mandatory inputs form a manifest resolved deterministically from the
 task record (`gov context manifest <TASK>`); the packet delivers each input's full content with its version and hash,
 marks an index outage explicitly (the supplementary block alone depends on the derived index) and is kept by hash
 (`gov context show <TASK> [--hash]`); `gov context verify <TASK>` re-resolves the manifest against a compiled packet;
 `gov context receipt <TASK> --file f` validates a worker's consumption receipt (a dry run).
+
+**Change propagation and continuity (BC-P2-04/05, WS-4).** An upstream change — through CIT-E or made directly —
+reaches open and completed consumers: open work is marked `retest_required`, completed work `revalidation` with a
+generated revalidation task, and closing reports, test obligations, scenarios, checkpoints, handoffs and stored packets
+are marked stale or `invalidated` (idempotently; normative-content hashing keeps bookkeeping edits from looking like
+upstream changes). `gov cit propagate [--dry-run]` detects direct changes from what each task consumed; `gov context
+staleness <TASK>` shows a task's stale inputs; a close is refused `INPUTS_STALE` / `RETEST_EVIDENCE_REQUIRED` until
+retested (the close-side call is the host's). A checkpoint records the task's mandatory inputs (ids, versions,
+content/normative hashes, what was delivered), a state reference taken after the index is current and the triggers
+observed since the previous one; it is stale when what it captured changed (`gov checkpoint freshness`). Handoffs refuse
+unsatisfied mandatory inputs (`HANDOFF_INPUTS_UNSATISFIED`) and re-deliver a stale packet as an explicitly degraded
+handoff; `gov session close` is never refused for staleness but states its degradation; the watchdog counts commands
+and changed files itself and checkpoints every unobserved trigger at the next boundary. The generated
+**provider hooks** (`governance/generated/adapters/hooks/provider-hooks.json`) let a harness wire the triggers it owns —
+`gov checkpoint create --trigger before_compaction` before a known compaction, `gov session close` at session end,
+`gov checkpoint create --trigger before_model_switch` before a model switch — so they fire without relying on the
+agent (the hooks run with the session's declared `GOV_ROLE`/`GOV_SESSION`; like every write they are refused under
+FREEZE_WRITES/PAUSE, and a refusal is typed). Contradictions precedence cannot resolve among current authoritative
+records (declared conflicts, supersession forks, decisions answering one question differently) are detected, every
+member is flagged `CONTRADICTORY` in any manifest that includes it (the packet is `BLOCKED`, never delivered as
+authority) and each is routed to a system gate (`trigger: contradiction`) whose verified answer resolves it.
+
+**Knowledge-fabric integrity and retrieval profile (BC-P2-28/30, WS-6).** Every index build runs the graph-integrity
+check (`gov memory integrity`): orphan (low), dangling and stale (medium: an in-force relation to a superseded,
+retired or historical target), reversed / ill-typed (medium, per relation-type endpoint signatures) and supersession
+cycles (high). The embedder and reranker are identified by adapter, model artefact and inference runtime; pins bind the
+revision actually executed and fail closed on any component change (`EMBEDDER_MISMATCH` naming the component,
+`EMBEDDER_REVISION_MISMATCH`, `RERANKER_REVISION_MISMATCH`; an incremental build escalates to a full re-embed). A
+profile change is governed (`gov memory select <candidate> --research RES-x [--gate HDG-x]`): T2-verified benchmark
+evidence measuring exactly the candidate (`PROFILE_EVIDENCE_REQUIRED|_UNBOUND|_STALE`), the change gate for its radius
+(R5: an owner-signed answer bound to the exact change), a full re-index, a recorded held-out regression — a regressed or
+unmeasured result rolls back (`PROFILE_REGRESSION_FAILED|_UNMEASURED`) — and a sealed decision. `gov memory profile`
+reports whether the pinned profile is governed (`UNGOVERNED_CHANGE` names a hand edit).
+
+**Research, experiments and test data (BC-P2-46/47/48, WS-10).** Research is governed evidence only when complete (J1:
+question, reason, method, sources or data, measurements, uncertainty, conclusion, confidence) and CONCLUDED
+(`gov research record|update|conclude|withdraw|sync|show|check`; incomplete → `RESEARCH_INCOMPLETE`, a draft is held
+reference-only); experiments run a DESIGNED → RUN → reproduced → CONCLUDED lifecycle with frozen design, recorded runs
+and reproducibility, and enter production only through a promotion gate answered by the owner
+(`gov experiment design|update|run|reproduce|conclude|promote|abandon|show|check`; `EXPERIMENT_*`); test data carries
+provenance and independent authorship (`gov data register|show`; `DATA_*`) and scenarios trace to data and tests
+(`gov scenario trace|check`; `SCENARIO_*`). Every lifecycle write is T2-sealed and records the decisions and tasks it
+influenced.
 
 **Artefact identity (BC-P2-21).** `gov artefact show <id>` reports the W1 identity of a governed artefact (type,
 canonical location, authority, lifecycle, content hash, provenance, supersession, expected and actual consumers);
@@ -321,9 +491,18 @@ validates an oracle or a score report held in verifier custody, fail-closed. Nei
 
 ## 5. Change control
 
-`gov cit propose|simulate|approve|reject|execute|rollback`. Simulation = deterministic impact traversal (depth by
-radius from CHANGE_POLICY) + bounded retrieval → radius R0–R5, consequences, tests required, human-gate requirement
-(radius above `auto_approve_max_radius` or trigger in `human_gate_triggers`) → gate record. Approval requires a
+`gov cit propose|simulate|approve|reject|execute|rollback|classify|propagate`. **Materiality is derived** (BC-P2-13):
+`cit::materiality` classifies what a change touches (record types and fields, paths, file content, declared path
+targets) into the eight Contract v3 classes — architecture, interface, acceptance criteria, behaviour, security,
+governance, infrastructure, data migration — and the effective triggers are the declared label ∪ the derived classes, so
+a mislabelled material change is still simulated and gated (`gov cit classify [--id] [--paths] [--base]`). Simulation =
+deterministic impact traversal (depth by radius from CHANGE_POLICY) + bounded retrieval → radius R0–R5 (at least the
+floor of every derived class), consequences, tests required, human-gate requirement (radius above
+`auto_approve_max_radius` or an effective trigger in `human_gate_triggers`) → a system gate whose subject digest binds
+the transaction content and its simulated impact (BC-P2-11). CIT state is T2-sealed (`os_state`); approve and execute
+re-derive the content, impact and binding digests and refuse `APPROVAL_STALE` (changed after the answer),
+`GATE_MISMATCH`, `T2_UNBOUND` / `CIT_STATE_MISMATCH` (hand-written, copied or unsealed state), and a re-simulation that
+changes the content or impact raises a new gate. Approval requires a
 presented, answered gate (INV-008); triggers in `CHANGE_POLICY.auto_simulate_triggers` simulate automatically at propose
 time. The proposal and mutation manifest are secret-scanned at propose: matches are redacted, the record is
 `secret_flagged`, and execution refuses with `SECRET_IN_MANIFEST`. Execution: snapshot → mutation manifest ops → propagation (retest flags, stale
@@ -334,8 +513,19 @@ classified and rolled back by `gov recover`.
 ## 6. Adoption (brownfield)
 
 Stages A0–A11 map 1:1 to `gov adopt` subcommands with an evidence tree under `spec/audits/GOVERNANCE-ADOPTION/`
-(files 00–12 per protocol §5). Independence is enforced mechanically: the reviewer (A5), migration verifier (A7)
-and memory verifier (A10) must use a session id different from the planner/executor/builder that they check; A6 refuses
+(files 00–12 per protocol §5). **Independence from recorded authorship (BC-P2-34, WS-9).** Every stage resolves its
+actor — the invocation's declared role and declared session (the global `--session`, else `GOV_SESSION`, installed once
+by the CLI; `adopt review --reviewer-session` as the stage's own declaration) — and records it in the T2-sealed adoption
+record `00-BASELINE.yaml` (a hand-edited record decides nothing: `T2_UNBOUND`). An undeclared session cannot author a
+stage (`ADOPTION_SESSION_UNDECLARED`); two declarations conflict (`SESSION_CONFLICT`, `ROLE_CONFLICT`); a session keeps
+the role it first acted under (`ADOPTION_ROLE_INCONSISTENT`). Each independent stage is performed by its designated
+kernel role — A5 `migration-reviewer`, A7 `migration-verifier`, A10 `memory-verifier`, A11 `independent-auditor` — in a
+session and role that authored no planner, executor or builder stage (`INDEPENDENCE`, `details.cause`). The A5 approval
+needs at least one reviewer-authored test (`INDEPENDENT_TESTS_REQUIRED`, `INDEPENDENT_TESTS_INVALID`) and binds the
+catalogue, plan and tests by digest: A6/A8 refuse `APPROVAL_STALE` when any changed after approval; A7 accepts only a
+computed verdict with at least one executed test against exactly the approved artefacts (a contradicting claim is
+`VERDICT_CONFLICT`); A10 needs verifier-authored held-out queries (`INDEPENDENT_HELDOUT_REQUIRED`); A11 runs the G5
+tier. Destructive-migration gates are bound to the catalogue entry they were raised for. Mechanically, A6 refuses
 to run without an approved plan verdict; A8/A9 refuse without `MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD`; A11 refuses
 without `MEMORY_ACCEPTED_FOR_V4_AUDIT`; unknown artefacts block destructive batches; every destructive entry gets a Human Decision Gate record at A4 and A6
 executes it only when that gate was presented and answered A (a CLI flag is never an answer; a gate answered B withdraws
@@ -345,7 +535,10 @@ dead code. Catalogue entries carry `imports`/`references`/`consumers` from the i
 
 ### 6.1 Claims and observed mutation scope
 `task claim` is decided in one store transaction (`ClaimsStore::claim_exclusive`): another session's live claim is
-`TASK_CLAIMED`; the same session holding it from another worktree `CLAIM_WORKTREE_MISMATCH`; a new session beyond
+`TASK_CLAIMED`; the same session holding it from another worktree `CLAIM_WORKTREE_MISMATCH`; a task the DAG does not
+find runnable `TASK_NOT_RUNNABLE` (every reason listed — dependencies, `blocks`, required data/tools/skills, the
+mandatory input manifest, every governing gate, readiness and test policy, recorded-authorship independence, explicit
+holds); a new session beyond
 `BUDGET_POLICY.defaults.max_parallel_agents` `BUDGET_EXCEEDED` (with a budget gate); a live claim of another session
 whose mutation scope (`allowed_paths`, unrestricted when empty) may share a path `CLAIM_SCOPE_CONFLICT`; a store kept
 busy beyond its timeout `CLAIMS_BUSY`. Linked git worktrees of one repository claim against one store. A task's `role`
@@ -358,6 +551,23 @@ this task's claim baseline** covers them (the permanent "any committed CIT" exem
 forbids production merge, and every experiment task, cannot close with production-tree changes
 (`PRODUCTION_MERGE_NOT_ALLOWED`). An L3+ `--force` close records every override it used. The report and checkpoint
 record `observed_files_changed` and the baseline used.
+
+**Runnable is derived (BC-P2-16/12, WS-5).** One DAG evaluation decides every route: `task create --status READY`
+stores the status the DAG derives, `task status X READY` is refused `TASK_NOT_READY` unless runnable, `DONE`/`CLAIMED`/
+`IN_PROGRESS` are reached only through close/claim (`TASK_STATUS_REQUIRES_OPERATION`), a `BLOCKED`/`WAITING_HUMAN` set
+by `task status` is an explicit hold that replan never lifts, and `gov continue` offers only runnable work this session
+may take. **The close, in order:** worker-return normalisation → another session's live claim → evidence payload → the
+claim (session, worktree) → the sealed claim baseline (`CLAIM_BASELINE_UNBOUND`) → designated role → independence from
+recorded authorship (`INDEPENDENCE_VIOLATION`) → every governing gate authorises the work (`GATE_NOT_AUTHORISED`; never
+overridden by `--force`) → observed mutations, including OS-written state no OS operation produced
+(`MUTATION_SCOPE_VIOLATION`, `details.t2_violations`) → production merge → index pins/freshness → the consumption
+receipt (`RECEIPT_INVALID`) → the health close gate (`HEALTH_HARD_BLOCK`, `GOVERNANCE_SUITE_STALE|_MISSING`,
+`PRODUCT_TEST_EVIDENCE_REQUIRED|_STALE`, `PRODUCT_TESTS_FAILED`). The report is sealed and the task records
+`outputs_produced`. **Recorded authorship:** the author of a path is the latest sealed close report that accepted a
+change to it; test and test-data independence is established from it, never from `independent_of_implementer` or
+`author_role`. **The producer rule:** a task that produces its feature's specification (a readiness gap task or a
+specification-class task) is not blocked by inputs it only inherits from its feature and is itself writing; what it
+declares itself still binds.
 
 ## 7. Releases, updates, upstream learning
 
@@ -380,9 +590,14 @@ It then runs declarative migrations (overlay/lock/generated only — never `spec
 preservation, regenerates adapters, rebuilds indexes, runs doctor + suite, and rolls back on failure.
 `gov upstream prepare` builds a sanitised FRAMEWORK lesson packet (identifier redaction incl. hyphen/underscore
 variants over every emitted field, path stripping, secret and code-line scans, `never_export_classes`,
-`corroboration_min_sources`, lesson lifecycle, synthetic fixture only) and fails closed; `gov lessons cluster` groups
-lessons into Framework Change Proposal records (D-0004); `submit` re-validates, requires approval, enforces the
-outbound allowlist (packet + declared synthetic fixture files) and records the payload hash in a ledger.
+`corroboration_min_sources`, lesson lifecycle, synthetic fixture only) and fails closed, and raises the packet's
+export-approval gate (`trigger: upstream_export`, a human-only trigger; its subject binds the packet id, the lesson and
+the payload hash); `gov lessons cluster` groups lessons into Framework Change Proposal records (D-0004); `submit`
+re-validates, enforces the outbound allowlist (packet + declared synthetic fixture files) and honours only an
+owner-signed answer to that gate bound to exactly this packet (`gates::human_approval_for`: `HUMAN_GATE_REQUIRED` while
+pending, `GATE_DECLINED`, `APPROVAL_STALE` after the content changed, `HUMAN_APPROVAL_REQUIRED` for an agent
+resolution, `T2_UNBOUND` for a hand-edited gate); `--approved-by` is recorded as a claim and ignored; the ledger records
+the payload hash and the signed answer's `answered_by`.
 
 ## 8. Capability plugin host
 `capabilities/host.rs` runs a plugin with a stdin writer thread, concurrent stdout/stderr drain threads (stderr tail

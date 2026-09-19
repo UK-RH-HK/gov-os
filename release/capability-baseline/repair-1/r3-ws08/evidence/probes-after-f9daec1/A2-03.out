@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws08/release/capability-baseline/audit-0/alpha-r/evidence/A2-03-post-install-tamper.py", line 25, in <module>
+    publish(os.path.join(reldir, "metadata"), release_doc(kern, sequence=10, version=1), [REL1], [SNAP], [TS])
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws08/release/capability-baseline/audit-0/alpha-r/evidence/lib/srr_mint.py", line 124, in release_doc
+    st = stage_files(candidate)
+         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws08/release/capability-baseline/audit-0/alpha-r/evidence/lib/srr_mint.py", line 80, in stage_files
+    meta = yaml.safe_load(open(os.path.join(candidate, "KERNEL.yaml")))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-after-f9daec1-A2-03-3sWYUw/alpha-r-a2-tamper-u98qmhao/rel/releases/4.1.5/kernel/KERNEL.yaml'
+[A2-03 exit=1]

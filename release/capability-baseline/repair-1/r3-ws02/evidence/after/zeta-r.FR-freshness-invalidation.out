@@ -1,0 +1,67 @@
+# P2-AR-0033 audit-of-record probe re-run (unedited): zeta-r/FR-freshness-invalidation label=after mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02 (HEAD 2e7200728174a0fa27928b17a4d7c681cd46bfd9)
+# probe sha256 110b10e11d926f0bb155c54e2d258b21833a1b0ffab4cc39c9d557b1ea17d971; gov 94f9ed9805a2bd6e0026dfd619185c810a23aefc31c918b953e4745bf8978151 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/target/release/gov
+# date 2026-09-19T13:28:08Z
+# project fr: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0033/probes/ap-after-zeta-r-FR-freshness-invalidation-J5xYJ6/fr-824488396
+$ gov init --name fr --alias z-fr    [session=S-zeta role=orchestrator exit=0 1.1s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals are exact integer cents", "status": "ACTIVE", "feature": "F-0001", "acceptance_criteria": ["2 x 199 = 398"]}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Ledger API", "status": "ACTIVE", "contract": {"sig": "total()"}}
+  [probe wrote record] spec/architecture/ARCH-0001.yaml: {"id": "ARCH-0001", "type": "architecture", "title": "Ledger crate owns totals", "status": "ACTIVE"}
+$ gov task create --id TASK-0001 --class implementation --objective "Implement totals" --feature F-0001 --status READY --allowed src/** --fields "{\"requirements\": [\"REQ-0001\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"], \"decisions\": [\"D-0001\"], \"interfaces\": [\"API-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 3.1s]
+$ gov audit    [session=S-zeta role=orchestrator exit=0 0.8s]
+baseline audit AUD-0002: verdict=DEGRADED green=False findings=['SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family', 'SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness', 'SKL-LIVE-MIGRATION V1: not executed by the governance suite — declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run', 'SKL-REPO-ADOPTION V1: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run', 'SKL-REPO-ADOPTION V2: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run', 'SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34', 'SKL-THREAT-MODEL V1: not executed by the governance suite — declared agent: the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness', "claims (session claims (Contract v3 C1 'claims' current truth; E4)) is kept at .governance-runtime/claims.db, inside the derived runtime directory (framework §81; deleted and rebuilt under §19); it is non-rebuildable operational state and belongs at .governance-state/claims.db (BC-P2-31)", '2 source/test file(s) predate governance (governance baseline) and are not yet linked to an active requirement/decision/spec: src/lib.rs, tests/ledger_test.rs (W7 baseline code; adopted as it was, not produced by governed work)', 'installation authenticity not established (UNPROVISIONED machine; admission BOOTSTRAP_EMBEDDED_PAYLOAD): this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.5), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).', '[SCENARIO_DATA_UNDECLARED] scenario SCN-0001 declares no data requirements and no reasoned `data_requirements_not_applicable` (a silent N/A is a gap)', '[SCENARIO_WITHOUT_INDEPENDENT_TEST] scenario SCN-0001 has no independent test (a test obligation of a family in ["acceptance", "scenario", "system"] with independent_of_implementer: true)', 'W11 requirement_to_code_traceability_coverage is 0.000, below its target 1.000 (Contract v3:1173-1183; the defects behind it are reported by their owning checks)', 'W11 requirement_to_test_traceability_coverage is 0.000, below its target 1.000 (Contract v3:1173-1183; the defects behind it are reported by their owning checks)']
+$ gov memory rebuild --incremental    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.2s]
+OBS FR-baseline-green-current: FAIL -- D021 at baseline: green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[governing policy (PROJECT_POLICY override)]: PASS -- (gate-W relevant: CONTEXT_POLICY drives delivery) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, project_policy, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+  [probe wrote file] governance/kernel/schemas/context-packet.schema.json (15116 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=3 0.3s]
+OBS FR-invalidates[schema (installed kernel schema)]: PASS -- (context-packet schema) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, kernel_schema, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[model/retrieval profile (MEMORY_POLICY pin)]: PASS -- (retrieval profile) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, project_policy, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[project path map (REPOSITORY_CONTRACT)]: PASS -- (path map) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, path_map, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+  [probe wrote file] governance/project/DATA_SENSITIVITY.yaml (336 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[security/sensitivity policy (DATA_SENSITIVITY)]: PASS -- (sensitivity) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, sensitivity, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[authoritative decision (spec/decisions)]: PASS -- (mandatory input of TASK-0001) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[authoritative requirement (spec/requirements)]: PASS -- (mandatory input of TASK-0001) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.5s]
+OBS FR-invalidates[authoritative interface (spec/interfaces)]: PASS -- (mandatory input of TASK-0001) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.5s]
+OBS FR-invalidates[authoritative architecture (spec/architecture)]: PASS -- (delivered to every task) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.5s]
+OBS FR-invalidates[task input manifest (spec/tasks)]: PASS -- (TASK-0001 declared inputs) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+  [probe wrote file] src/lib.rs (1094 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.3s]
+OBS FR-invalidates[relevant source file (src/)]: PASS -- (traced implementation) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, source, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+  [probe wrote file] governance/generated/index-manifest.json (77378 chars)
+$ gov doctor    [session=S-zeta role=orchestrator exit=0 0.5s]
+OBS FR-invalidates[relevant index manifest (governance/generated)]: PASS -- (retrieval supplement) D021 after change: ok=False message='green record "AUD-0001" is obsolete (inputs changed: index_manifest, spec_architecture, spec_decisions, spec_requirements, spec_tasks)'
+runtime/kernel implementation (the gov binary itself): not attempted - the audited binary is the pinned candidate; inputs_hash() (runtime/src/verification/mod.rs:54-71) hashes governance/kernel, governance/project, governance/tests, spec/decisions and governance/framework.lock only
+
+==== SUMMARY ====
+FR-baseline-green-current: FAIL
+FR-invalidates[governing policy (PROJECT_POLICY override)]: PASS
+FR-invalidates[schema (installed kernel schema)]: PASS
+FR-invalidates[model/retrieval profile (MEMORY_POLICY pin)]: PASS
+FR-invalidates[project path map (REPOSITORY_CONTRACT)]: PASS
+FR-invalidates[security/sensitivity policy (DATA_SENSITIVITY)]: PASS
+FR-invalidates[authoritative decision (spec/decisions)]: PASS
+FR-invalidates[authoritative requirement (spec/requirements)]: PASS
+FR-invalidates[authoritative interface (spec/interfaces)]: PASS
+FR-invalidates[authoritative architecture (spec/architecture)]: PASS
+FR-invalidates[task input manifest (spec/tasks)]: PASS
+FR-invalidates[relevant source file (src/)]: PASS
+FR-invalidates[relevant index manifest (governance/generated)]: PASS
+total=13 pass=12 fail=1
+[exit=0]

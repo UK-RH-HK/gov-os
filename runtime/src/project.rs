@@ -250,6 +250,10 @@ impl Project {
     /// Drop cached state after mutations to governance/.
     pub fn invalidate(&mut self) {
         crate::kernel_trust::clear();
+        // the schema registry is read from the installed kernel: after an install/update it is the new kernel's (the
+        // overlay a migration just delivered is validated against the schemas that ship with it, not the previous
+        // kernel's)
+        self.schemas = OnceCell::new();
         self.lock = OnceCell::new();
         self.manifest = OnceCell::new();
         self.overlay = OnceCell::new();

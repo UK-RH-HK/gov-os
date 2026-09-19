@@ -1,0 +1,12 @@
+# P2-AR-0041 R3-WS5-11 reproduction at 22d43cec7ab7bf87122158e9196464814e94ea2e (product files differing: 0); gov sha256 81a9b9ee33303347099a9d53630e532ea108a5230a8b0c9bad182de54de56570; 2026-09-19T16:03:35Z
+== minimal: held-out queries by category {"exact_path": 6, "lexical_literal": 6, "semantic_paraphrase": 2, "symbol": 2}; pending 2
+   run ok=True status=executed cached_from=None findings=0
+   detail: isolated_in_sandbox=True status=PASS recall_at_k=1.0 mrr=1.0 queries=14 pending=2 failed=[]
+   symbol queries: ['HQ-007', 'HQ-008']; any failing: []
+RESULT minimal R3-WS5-11 NOT_REPRODUCED (executed in sandbox: True)
+== greenfield: held-out queries by category {"exact_path": 6, "lexical_literal": 6, "semantic_paraphrase": 2, "symbol": 5}; pending 2
+   run ok=True status=executed cached_from=None findings=0
+   detail: isolated_in_sandbox=True status=PASS recall_at_k=1.0 mrr=1.0 queries=17 pending=2 failed=[]
+   symbol queries: ['HQ-007', 'HQ-008', 'HQ-009', 'HQ-010', 'HQ-011']; any failing: []
+RESULT greenfield R3-WS5-11 NOT_REPRODUCED (executed in sandbox: True)
+[exit=0]

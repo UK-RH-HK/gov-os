@@ -46,11 +46,11 @@ pub mod scenario;
 
 /// Name of the governance-suite family these checks are written for (the family itself is WS-2's to register).
 pub const FAMILY: &str = "research_experiment_data_lifecycle";
-/// The `AUTHORITY_POLICY` class every lifecycle write requires (research, experiment and data records are governed
-/// spec records other than decisions). The L1 roles that author this material — `research-agent`, `data-author` —
-/// are below it (L2): integration point IP-WS10-01 asks WS-3 to declare an L1 class for recording research and test
-/// data; this constant and the matching `COMMAND_GUARDS` entries (kept equal by a unit test) are what then changes.
-pub const RECORD_AUTHORITY: &str = "mutate_spec_other";
+/// The `AUTHORITY_POLICY` class every lifecycle write requires: `record_research_evidence` (L1), the class of
+/// recording research, experiments and test data, so the L1 roles that author this material — `research-agent`,
+/// `data-author` — can (IP-WS10-01; declared at the round-3 integration, IP-R3-WS03-4). The matching
+/// `COMMAND_GUARDS` entries are kept equal by a unit test.
+pub const RECORD_AUTHORITY: &str = "record_research_evidence";
 /// The `AUTHORITY_POLICY` class of an experiment promotion (applying a human-answered gate to a production change).
 pub const PROMOTE_AUTHORITY: &str = "approve_cit_human";
 /// Record types whose outputs are evidence with a lifecycle here.

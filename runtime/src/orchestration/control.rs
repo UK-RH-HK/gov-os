@@ -1,5 +1,9 @@
-//! Emergency controls (framework §74): PAUSE, FREEZE_WRITES, CANCEL_AGENTS, RESUME. Authority-checked; state lives in
-//! the runtime directory (never inside the rebuild-deleted index) and is honoured by every mutating operation.
+//! Emergency controls (framework §74): PAUSE, FREEZE_WRITES, CANCEL_AGENTS, RESUME. Authority-checked and honoured by
+//! every mutating operation. **Where the state lives (BC-P2-31):** in the OS's non-rebuildable operational store,
+//! `paths::store_path(root, "emergency-control")` (`.governance-state/control.json`), never in the derived runtime
+//! directory that `rebuild-memory` and framework §19's disaster recovery may delete. A control file an older writer
+//! left at the legacy location (`<runtime dir>/control.json`) is still honoured — the stricter of the two states is
+//! in force — and the next control command moves it (`paths::relocate_legacy`) and removes the legacy copy.
 //!
 //! ## G0 — the guard every command passes (Contract v3 O5 "G0 Guard — every privileged/mutating command"; BC-P2-08)
 //!
@@ -27,12 +31,48 @@ use crate::util::{now_iso, read_json, write_json};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 
+/// Where the emergency-control state belongs (BC-P2-31; `paths::OS_STORES` "emergency-control").
 pub fn path(p: &Project) -> std::path::PathBuf {
+    crate::paths::store_path(&p.root, "emergency-control")
+        .unwrap_or_else(|| p.root.join(crate::paths::STATE_DIR).join("control.json"))
+}
+
+/// Where writers before BC-P2-31 kept it: inside the derived runtime directory.
+fn legacy_path(p: &Project) -> std::path::PathBuf {
     p.runtime_dir().join("control.json")
 }
 
+fn running() -> Value {
+    json!({"mode": "RUNNING", "writes_frozen": false, "agents_cancelled": false, "updated_at": null, "reason": null})
+}
+
+/// The control state in force. Reading never moves or writes anything. When both the store and a legacy copy exist
+/// (an older binary wrote the legacy one), the stricter state is in force: frozen if either is frozen, paused if
+/// either is paused, agents cancelled if either says so.
 pub fn state(p: &Project) -> Value {
-    read_json(&path(p)).unwrap_or(json!({"mode": "RUNNING", "writes_frozen": false, "agents_cancelled": false, "updated_at": null, "reason": null}))
+    let cur = read_json(&path(p)).ok();
+    let legacy = read_json(&legacy_path(p)).ok();
+    match (cur, legacy) {
+        (Some(c), None) => c,
+        (None, Some(l)) => l,
+        (None, None) => running(),
+        (Some(c), Some(l)) => {
+            let mut s = c;
+            if l["writes_frozen"].as_bool().unwrap_or(false) {
+                s["writes_frozen"] = json!(true);
+            }
+            if l["agents_cancelled"].as_bool().unwrap_or(false) {
+                s["agents_cancelled"] = json!(true);
+            }
+            if l["mode"].as_str() == Some("PAUSED") {
+                s["mode"] = json!("PAUSED");
+            }
+            if s != l {
+                s["legacy_state"] = l;
+            }
+            s
+        }
+    }
 }
 
 pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
@@ -44,7 +84,15 @@ pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
             "emergency_control"
         },
     )?;
+    // BC-P2-31: the state belongs in the operational store; a legacy file is moved there first (an identical copy is
+    // simply removed). If both locations hold different states, `state` already applies the stricter one, and this
+    // explicit control command's result replaces both.
+    crate::paths::ensure_state_dir(&p.root)?;
+    let _ = crate::paths::relocate_legacy(&p.root, "emergency-control");
     let mut s = state(p);
+    if let Some(o) = s.as_object_mut() {
+        o.remove("legacy_state");
+    }
     match mode {
         "PAUSE" => {
             s["mode"] = json!("PAUSED");
@@ -73,6 +121,11 @@ pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
     s["session"] = json!(p.session_id);
     s["role"] = json!(p.role);
     write_json(&path(p), &s)?;
+    let legacy = legacy_path(p);
+    if legacy.exists() {
+        std::fs::remove_file(&legacy)
+            .map_err(|e| GovError::io(&format!("remove {}", legacy.display()), e))?;
+    }
     Ok(s)
 }
 
@@ -87,6 +140,17 @@ pub fn guard_write(p: &Project, operation: &str) -> Result<()> {
     crate::srr::breakglass::guard_light(crate::FRAMEWORK_NAME, operation)?;
     guard_emergency_state(p, operation)?;
     guard_health(p, operation)
+}
+
+/// [`guard_write`] for a **host that decides the health half itself** with the operation's subjects and declared
+/// remedies in hand (the one availability host API, `scheduler::admit`; round-3 integration, WS-2 IP-R3-WS02-03):
+/// kernel trust, break-glass and the emergency controls, exactly as [`guard_write`], without the generic
+/// whole-operation health guard — which cannot see the subjects, and so would refuse the remedy and independent work
+/// a subject-scoped decision leaves available.
+pub fn guard_write_host(p: &Project, operation: &str) -> Result<()> {
+    crate::kernel_trust::guard(p, operation)?;
+    crate::srr::breakglass::guard_light(crate::FRAMEWORK_NAME, operation)?;
+    guard_emergency_state(p, operation)
 }
 
 /// **The G0 hard-block site (Contract v3 O5 "G0 Guard — every privileged/mutating command", :807 "hard-block vs
@@ -114,11 +178,15 @@ pub fn guard_health(p: &Project, operation: &str) -> Result<()> {
 /// Operation labels (as passed to [`guard_write`] and classified in [`COMMAND_GUARDS`]) that start, hand off or
 /// complete governed work, with their scheduler vocabulary operation (`scheduler::catalogue::ops`). `continue --claim`
 /// claims through `tasks::claim` ("task claim") and a forced close passes "task close", so both are covered.
+///
+/// `cit propose` is not here (WS-2 IP-R3-WS02-01, round-3 integration): its host guards it with the transaction's
+/// targets and manifest paths (`cit::propose` → `scheduler::guard(CIT_PROPOSE, guard_paths)`), so a proposal that
+/// repairs a block is admitted as its remedy; guarded here as a whole it was refused first. Task create and claim
+/// decide at their host as well (`tasks::guard_work`, [`guard_write_host`]); the labels stay for other callers.
 pub const GOVERNED_WORK_OPS: &[(&str, &str)] = &[
     ("task create", crate::scheduler::catalogue::ops::TASK_CREATE),
     ("task claim", crate::scheduler::catalogue::ops::TASK_CLAIM),
     ("task close", crate::scheduler::catalogue::ops::TASK_CLOSE),
-    ("cit propose", crate::scheduler::catalogue::ops::CIT_PROPOSE),
     (
         "handoff create",
         crate::scheduler::catalogue::ops::HANDOFF_CREATE,
@@ -256,8 +324,19 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     outside("trust root-update", "machine trust domain (administrator): succession requires the outgoing and incoming root quorums; §6 bullet 4 enforced inside the trust-anchor write"),
     outside("trust break-glass", "machine trust domain: read-only report of where an owner-signed authorisation must be placed"),
     outside("trust recover-transactions", "machine trust domain: replays interrupted install transactions (crash recovery of the verifier's own journal)"),
+    // P2-AR-0039 (WS-8, P2-ADJ-0002): additive
+    outside("trust bind", "machine trust domain (administrator): installs the owner's T2 binding authority, verified against the provisioned root's `t2-binding` delegation; OWNER-DECISION-0006 §6 bullet 4 is enforced inside the binding-authority write"),
     outside("trust human-channel", "machine trust domain: read-only report of the authenticated human channel"),
     outside("trust human-channel --provision", "machine trust domain (administrator): the human-channel anchor write asks OWNER-DECISION-0006 §6 bullet 4 inside the write and refuses a provisioned or already-anchored machine"),
+    // round 3 (P2-ADJ-0002): the T2 binding authority that makes OS-written facts portable across the owner's
+    // provisioned machines. The report reads machine state only; provisioning is an administrator write into machine
+    // state that asks OWNER-DECISION-0006 §6 bullet 4 inside the write, refuses an unprovisioned machine, a
+    // repository-sourced bundle and any authorisation this machine's trusted root does not verify; the reseal
+    // rewrites governed records (their seals), so it is a project write of its own class (L4), and its dry run reads
+    // P2-ADJ-0002 (one mechanism, round-3 integration): `trust bind` above is the one provisioning command and
+    // `trust status` the one report; the continuity re-seal rewrites governed records' seals (a project write, L4)
+    g("trust reseal", "reseal_t2_bindings", Write),
+    g("trust reseal --dry-run", "read", Read),
     outside("contract verify", "canonical-repository tooling: read-only"),
     outside("contract compile", "canonical-repository release tooling (regenerates the compiled contract views of the canonical repository, not a governed project)"),
     g("upstream prepare", "upstream_prepare", Write),
@@ -273,6 +352,10 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("task close --force", "force_close_task", Write),
     g("task dag", "read", Read),
     g("replan", "replan_tasks", Write),
+    // WS-5 (P2-AR-0036, BC-P2-24) additive: governed work generated from recorded events — an OS recomputation of
+    // the DAG like `replan` (the dry run reads only)
+    g("task generate", "replan_tasks", Write),
+    g("task generate --dry-run", "read", Read),
     g("cit propose", "propose_cit", Write),
     g("cit simulate", "simulate_cit", Write),
     g("cit approve", "approve_cit_auto", Write),
@@ -344,6 +427,10 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("adapters generate", "generate_adapters", Write),
     g("adapters verify", "read", Read),
     outside("release build", "canonical-repository release tooling: certification is refused below floor inside `release::build` (§6 bullet 3); it writes no governed project"),
+    // round 3 (WS-8 r2 IP-R2-WS08-7): a governed project's own product-release record (`spec/releases/REL-*`, record
+    // type and relations WS-4, writer `release::record` WS-8) is authoritative project state: a Write of its own
+    // class. Classified here ahead of the CLI arm so the command can never run unguarded once it lands.
+    g("release record", "record_release", Write),
     outside("release verify", "canonical-repository release tooling: read-only"),
     g("kernel verify", "read", Read),
     g("kernel trust", "read", Read),
@@ -397,28 +484,28 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     outside("oracle validate", "qualification tooling: read-only validation of verifier-custody oracle / score-report documents; opens no governed project"),
     // ---- WS-10 (P2-AR-0031, BC-P2-46/47/48): research, experiment and test-data lifecycles (runtime/src/lifecycle).
     // Every transition writes a governed spec record (spec/research, spec/experiments, spec/data) and T2-seals it:
-    // `mutate_spec_other`, the class of governed spec records other than decisions (= `lifecycle::RECORD_AUTHORITY`;
-    // an L1 class for research-agent/data-author is WS-3's to declare, IP-WS10-01). A promotion records an
+    // `record_research_evidence` (L1, = `lifecycle::RECORD_AUTHORITY`; the class research-agent/data-author author
+    // under, IP-WS10-01 / IP-R3-WS03-4, declared at the round-3 integration). A promotion records an
     // owner-signed human approval of experimental output entering production (and may raise the gate for it):
     // `approve_cit_human`, the class that applies a human-answered gate to a production change
     // (= `lifecycle::PROMOTE_AUTHORITY`). show/check/trace read records, VCS history and the working tree only.
-    g("research record", "mutate_spec_other", Write),
-    g("research update", "mutate_spec_other", Write),
-    g("research conclude", "mutate_spec_other", Write),
-    g("research withdraw", "mutate_spec_other", Write),
-    g("research sync", "mutate_spec_other", Write),
+    g("research record", "record_research_evidence", Write),
+    g("research update", "record_research_evidence", Write),
+    g("research conclude", "record_research_evidence", Write),
+    g("research withdraw", "record_research_evidence", Write),
+    g("research sync", "record_research_evidence", Write),
     g("research show", "read", Read),
     g("research check", "read", Read),
-    g("experiment design", "mutate_spec_other", Write),
-    g("experiment update", "mutate_spec_other", Write),
-    g("experiment run", "mutate_spec_other", Write),
-    g("experiment reproduce", "mutate_spec_other", Write),
-    g("experiment conclude", "mutate_spec_other", Write),
-    g("experiment abandon", "mutate_spec_other", Write),
+    g("experiment design", "record_research_evidence", Write),
+    g("experiment update", "record_research_evidence", Write),
+    g("experiment run", "record_research_evidence", Write),
+    g("experiment reproduce", "record_research_evidence", Write),
+    g("experiment conclude", "record_research_evidence", Write),
+    g("experiment abandon", "record_research_evidence", Write),
     g("experiment promote", "approve_cit_human", Write),
     g("experiment show", "read", Read),
     g("experiment check", "read", Read),
-    g("data register", "mutate_spec_other", Write),
+    g("data register", "record_research_evidence", Write),
     g("data show", "read", Read),
     g("scenario trace", "read", Read),
     g("scenario check", "read", Read),
