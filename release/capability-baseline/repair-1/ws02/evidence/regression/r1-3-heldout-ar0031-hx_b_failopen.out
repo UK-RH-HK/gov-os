@@ -1,0 +1,30 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-3/runtime)
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s
+     Running tests/hx_b_failopen.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho31/debug/deps/hx_b_failopen-19da7a9e6fdc1843)
+
+running 6 tests
+test b1_resolve_state_root_errors_only_on_the_hostile_case_never_on_the_unprovisioned_one ... ok
+test b2_an_environment_variable_suppresses_every_effect_level_section_6_check ... ok
+test b3_the_operation_level_guard_fails_open_on_the_same_input ... ok
+test b4_gate_creation_loses_its_only_enforcement_point ... ok
+test b5_the_state_carrying_guard_is_immune_because_it_resolves_nothing ... ok
+test b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution ... FAILED
+
+failures:
+
+---- b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution stdout ----
+
+thread 'b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution' (540090) panicked at tests/hx_b_failopen.rs:263:5:
+assertion `left == right` failed: expected the fail-open in exactly `guard_light` and `guard_effect`; found 0
+  left: 0
+ right: 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--test hx_b_failopen`

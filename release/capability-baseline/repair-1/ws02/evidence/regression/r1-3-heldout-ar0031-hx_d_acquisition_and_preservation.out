@@ -1,0 +1,34 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-3/runtime)
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.37s
+     Running tests/hx_d_acquisition_and_preservation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho31/debug/deps/hx_d_acquisition_and_preservation-fd4008978447d017)
+
+running 12 tests
+test d10_the_exit_policy_point_is_single_and_unchanged ... ok
+test d11_floors_are_monotonic_and_advance_only_from_verified_facts ... ok
+test d12_break_glass_is_purely_local ... ok
+test d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor ... ok
+test d2_the_descriptor_decides_whether_section_6_is_consulted_at_all ... FAILED
+test d3_tools_install_reaches_the_bullet_5_effect_without_the_sink ... ok
+test d4_the_clearance_witness_is_not_a_capability_and_its_guarantee_stops_at_the_module_boundary ... ok
+test d5_the_allow_list_is_four_entries_and_matches_exactly ... ok
+test d6_five_admit_sites_and_five_install_kernel_sites ... ok
+test d7_no_signing_capability_in_product_source ... ok
+test d8_d0007_stays_independent_of_the_srr_verdicts ... ok
+test d9_contract_v3_canonical_import_is_byte_identical_and_fails_closed ... ok
+
+failures:
+
+---- d2_the_descriptor_decides_whether_section_6_is_consulted_at_all stdout ----
+
+thread 'd2_the_descriptor_decides_whether_section_6_is_consulted_at_all' (540933) panicked at tests/hx_d_acquisition_and_preservation.rs:47:5:
+baseline: an unprivileged remote capability is not a §6 bullet 5 effect
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    d2_the_descriptor_decides_whether_section_6_is_consulted_at_all
+
+test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `--test hx_d_acquisition_and_preservation`

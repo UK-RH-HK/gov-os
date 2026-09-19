@@ -1,0 +1,46 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-3/runtime)
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.13s
+     Running tests/hx_a_census.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho31/debug/deps/hx_a_census-350b581ae405c9bc)
+
+running 8 tests
+test a1_the_census_is_a_total_function_over_the_section_6_activities ... FAILED
+test a2_every_effect_guard_refuses_at_the_instant_of_the_effect ... ok
+test a3_an_allow_listed_operation_does_not_suspend_bullets_2_to_7 ... ok
+test a4_the_trust_anchor_sink_refuses_and_is_the_only_writer ... ok
+test a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module ... FAILED
+test a6_no_second_primitive_realises_a_named_section_6_effect ... ok
+test a7_bullet_6_has_no_primitive_because_every_floor_mutator_is_a_monotonic_raise ... ok
+test a8_bullet_7_claims_every_reporting_surface_carries_the_marking ... FAILED
+
+failures:
+
+---- a1_the_census_is_a_total_function_over_the_section_6_activities stdout ----
+
+thread 'a1_the_census_is_a_total_function_over_the_section_6_activities' (539705) panicked at tests/hx_a_census.rs:40:5:
+assertion `left == right` failed: the set of bullets claiming no primitive changed
+  left: []
+ right: ["floor_lower_or_reset", "present_below_floor_release_as_current"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module stdout ----
+
+thread 'a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module' (539709) panicked at tests/hx_a_census.rs:222:5:
+OBSERVED: `section_6_effects_are_enforced_inside_their_sinks` A6 polices the bullet-2 census with one source grep for the literal `new_record("human-gate"`. Three constructions demonstrated above reach the same durable artefact without spelling it: `new_record` through a non-literal type argument, `Record::set("type", ...)` on any existing record, and a `Record` struct literal (all fields `pub`). None needs a `Clearance`, because the compile-time guarantee binds only functions inside `gates.rs` where `build` is private. No such path exists in the product today (measured: the literal occurs once), so this is the census clause being weaker than its stated form, not a live bypass.
+
+---- a8_bullet_7_claims_every_reporting_surface_carries_the_marking stdout ----
+
+thread 'a8_bullet_7_claims_every_reporting_surface_carries_the_marking' (539712) panicked at tests/hx_a_census.rs:346:5:
+assertion `left == right` failed
+  left: "crate::srr::present::presentation — reached by every command result the CLI emits, and by doctor, update --check and the agent context packet directly"
+ right: "no primitive: every reporting surface carries the marking"
+
+
+failures:
+    a1_the_census_is_a_total_function_over_the_section_6_activities
+    a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module
+    a8_bullet_7_claims_every_reporting_surface_carries_the_marking
+
+test result: FAILED. 5 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `--test hx_a_census`

@@ -290,7 +290,190 @@ enum Cmd {
         #[command(subcommand)]
         op: ArtefactCmd,
     },
+    // ---- WS-2 (P2-AR-0015) additive block: Governance Health Scheduler (Gate O5), product tests, skill regression
+    /// Governance Health Scheduler: tiered runs, health state, checks, history, G0 guard, currency, product tests, skills
+    Health {
+        #[command(subcommand)]
+        op: HealthCmd,
+    },
 }
+// ---- WS-2 (P2-AR-0015) additive block
+#[derive(Subcommand)]
+enum HealthCmd {
+    /// Run the scheduler: checks whose declared inputs changed execute (concurrently; state-writing ones in sandboxes), the rest are served from the cache
+    Run {
+        /// Tier G1..G6 (default: every suite check, cache reused)
+        #[arg(long)]
+        tier: Option<String>,
+        /// Run only these checks
+        #[arg(long)]
+        check: Vec<String>,
+        /// Paths the triggering change touched (recorded as provenance)
+        #[arg(long)]
+        changed: Vec<String>,
+        /// Triggering event label (recorded as provenance)
+        #[arg(long)]
+        event: Option<String>,
+        /// Re-execute every selected check (reproducibility compared against the cache)
+        #[arg(long)]
+        no_cache: bool,
+        #[arg(long)]
+        deep: bool,
+        /// Do not persist a governance-suite record even when the run re-establishes currency
+        #[arg(long)]
+        no_persist: bool,
+    },
+    /// RED/YELLOW/GREEN health state, active hard-blocks, failing and stale checks, suite currency, product tests
+    Status,
+    /// The check catalogue: tiers, declared inputs, isolation, cache, hard-block vs warning
+    Checks,
+    /// Recorded health results (newest first)
+    History {
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
+    },
+    /// One recorded health result with its provenance
+    Show { id: String },
+    /// G0: would this governed operation be refused by an active hard-block?
+    Guard {
+        operation: String,
+        #[arg(long)]
+        paths: Vec<String>,
+    },
+    /// The evidence currency key: per input class digests and what changed since the latest green record
+    Currency,
+    /// Run product test families and record per-family governed evidence
+    Product {
+        #[arg(long)]
+        family: Vec<String>,
+    },
+    /// Skill regression: version/content binding and executed validation scenarios (--record binds passing versions)
+    Skills {
+        #[arg(long)]
+        skill: Option<String>,
+        #[arg(long)]
+        record: bool,
+        /// Also execute the executable form of deferred scenarios (reported only)
+        #[arg(long)]
+        include_deferred: bool,
+    },
+    /// The task-close health gate for a task and report, without closing it (G0 guard, G2 re-check, currency, product evidence)
+    CloseCheck {
+        task: String,
+        #[arg(long)]
+        report: String,
+    },
+}
+fn health_cmd(cli: &Cli, op: &HealthCmd) -> Result<Value> {
+    use gov_runtime::scheduler as sch;
+    let p = open_project(cli, true)?;
+    match op {
+        HealthCmd::Run {
+            tier,
+            check,
+            changed,
+            event,
+            no_cache,
+            deep,
+            no_persist,
+        } => {
+            let t = match tier {
+                Some(t) => sch::Tier::parse(t)?,
+                None => sch::Tier::G5,
+            };
+            let trig =
+                sch::Trigger::new(event.as_deref().unwrap_or("gov health run")).with_paths(changed);
+            let mut o = sch::RunOptions::new(t, trig);
+            if tier.is_none() {
+                o.selection = sch::Selection::All;
+                o.cache = sch::CacheMode::Use;
+            }
+            if !check.is_empty() {
+                o.selection = sch::Selection::Explicit(check.clone());
+            }
+            if *no_cache {
+                o.cache = sch::CacheMode::Refresh;
+            }
+            o.deep = *deep;
+            o.surface = "health-run".into();
+            o.record = if *no_persist {
+                sch::RecordPolicy::Never
+            } else {
+                sch::RecordPolicy::WhenCompleteAndStale
+            };
+            let r = gov_runtime::verification::audit_with(&p, &o)?;
+            if r["verdict"] == "UNHEALTHY" {
+                return Err(GovError::new(
+                    "UNHEALTHY",
+                    format!(
+                        "health run UNHEALTHY: {} critical, {} high",
+                        r["counts"]["critical"], r["counts"]["high"]
+                    ),
+                )
+                .with_details(r));
+            }
+            Ok(r)
+        }
+        HealthCmd::Status => sch::status(&p),
+        HealthCmd::Checks => Ok(sch::describe_catalogue()),
+        HealthCmd::History { limit } => Ok(json!(sch::store::history(&p, *limit))),
+        HealthCmd::Show { id } => sch::store::load_result(&p, id)
+            .ok_or_else(|| GovError::new("NOT_FOUND", format!("no health result {id}"))),
+        HealthCmd::Guard { operation, paths } => sch::guard(&p, operation, paths),
+        HealthCmd::Currency => {
+            let snap = gov_runtime::verification::currency::Snapshot::take(&p)?;
+            let cur = gov_runtime::verification::currency::Currency::evaluate(&p, &snap);
+            Ok(json!({"currency": cur.to_value(), "snapshot": snap.describe()}))
+        }
+        HealthCmd::Product { family } => gov_runtime::verification::product::run(&p, family),
+        HealthCmd::CloseCheck { task, report } => {
+            let s = gov_runtime::records::RecordStore::load(&p.root);
+            let t = s
+                .get(task)
+                .map(|r| r.data.clone())
+                .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{task} not found")))?;
+            let rep = load_file_value(report)?;
+            let mut touched: Vec<String> = rep["files_changed"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let (observed, _) = gov_runtime::orchestration::tasks::observed_mutations(&p, task);
+            for f in observed {
+                if !touched.contains(&f) {
+                    touched.push(f);
+                }
+            }
+            gov_runtime::verification::close_gate(&p, &t, &rep, &touched, false)
+        }
+        HealthCmd::Skills {
+            skill,
+            record,
+            include_deferred,
+        } => {
+            if *record {
+                gov_runtime::skills::record(&p, skill.as_deref())
+            } else {
+                let (findings, detail) = gov_runtime::skills::regression(
+                    &p,
+                    &gov_runtime::skills::RegressionOptions {
+                        execute: true,
+                        only: skill.clone(),
+                        observe: true,
+                        include_deferred: *include_deferred,
+                    },
+                );
+                Ok(
+                    json!({"findings": findings, "detail": detail, "ok": !findings.iter().any(|f| matches!(f["severity"].as_str(), Some("critical") | Some("high") | Some("medium")))}),
+                )
+            }
+        }
+    }
+}
+// ---- end WS-2 additive block
 #[derive(Subcommand)]
 enum PluginsCmd {
     Register {
@@ -1408,6 +1591,7 @@ fn run(cli: &Cli) -> Result<Value> {
             let policy = gov_runtime::util::read_yaml(&root.join("framework/policies/LEARNING_POLICY.yaml")).or_else(|_| gov_runtime::util::read_yaml(&root.join("governance/kernel/policies/LEARNING_POLICY.yaml")))?;
             gov_runtime::lessons::cluster(&inbox, &proposals, &policy, *write)
         } },
+        Cmd::Health { op } => health_cmd(cli, op), // WS-2 additive arm
         Cmd::Mcp { .. } => Err(GovError::new("MCP_NOT_IMPLEMENTED", "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)")),
     }.inspect(|_v| { let _ = name; })
 }
@@ -1481,6 +1665,7 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Plugins { .. } => "plugins",
         Cmd::Policy { .. } => "policy",
         Cmd::Artefact { .. } => "artefact",
+        Cmd::Health { .. } => "health", // WS-2 additive arm
     }
 }
 

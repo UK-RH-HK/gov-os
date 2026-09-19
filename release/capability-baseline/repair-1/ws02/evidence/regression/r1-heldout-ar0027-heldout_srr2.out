@@ -1,0 +1,40 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify/runtime)
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho27)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.30s
+     Running tests/heldout_srr2.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho27/debug/deps/heldout_srr2-771774b78d3c2def)
+
+running 8 tests
+test b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms ... FAILED
+test b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison ... FAILED
+test c1_floor_binds_a_non_rollback_ingress_after_a_verified_install ... ok
+test c2_identity_and_payload_binding_fail_closed ... ok
+test c3_provisioned_machine_refuses_unsigned_input_and_anchor_removal_fails_closed ... ok
+test c4_returning_a_machine_to_the_unprovisioned_posture ... ok
+test c5_environment_cannot_carry_authority ... ok
+test c6_floors_survive_project_deletion ... ok
+
+failures:
+
+---- b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms stdout ----
+AR-0027 B1 expiry findings:
+  offset form  '2026-09-17T13:00:00+14:00' (13h in the past) -> expired = true
+  lowercase    '2026-09-17t11:59:59z'      (1s in the past)  -> expired = true
+  absent `expires` member                                    -> expired = true
+
+thread 'b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms' (535705) panicked at tests/heldout_srr2.rs:119:5:
+OBSERVED: a non-UTC RFC-3339 expiry that is genuinely in the past is NOT treated as expired
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison stdout ----
+
+thread 'b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison' (535706) panicked at tests/heldout_srr2.rs:138:5:
+a non-emitted-format expiry is accepted without complaint: Err(GovError { code: "SRR_METADATA_EXPIRED", message: "root version 1: `expires` is '2099-01-01T00:00:00+00:00', which is not the canonical UTC form YYYY-MM-DDTHH:MM:SSZ that this profile emits and compares; a non-canonical expiry is treated as expired (fail closed)", details: Null })
+
+
+failures:
+    b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms
+    b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison
+
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.48s
+
+error: test failed, to rerun pass `--test heldout_srr2`

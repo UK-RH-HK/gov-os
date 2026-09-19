@@ -38,6 +38,7 @@ pub mod recovery;
 pub mod release;
 pub mod retrieval;
 pub mod routing;
+pub mod scheduler;
 pub mod schemas;
 pub mod security;
 pub mod skills;

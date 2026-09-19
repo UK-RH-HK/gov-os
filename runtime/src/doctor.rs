@@ -36,6 +36,9 @@ pub struct Report {
     /// A machine can be HEALTHY on every check and still be below floor; before this field it reported exactly
     /// that, with nothing to say so.
     pub release_trust: Value,
+    /// The persisted health result of this run (`.governance-runtime/health/results/<id>.json`): tier, checks,
+    /// inputs, runtime identity, repository state, actor and time (Contract v3:808), and the resulting health state.
+    pub health_result: Value,
 }
 
 fn chk(
@@ -46,23 +49,29 @@ fn chk(
     message: String,
     remediation: Option<&str>,
 ) -> Value {
-    json!({"id": id, "name": name, "ok": ok, "severity": if ok { "info" } else { severity }, "message": message, "remediation": remediation})
+    let enforcement = crate::scheduler::catalogue::get(id)
+        .map(crate::scheduler::catalogue::enforcement)
+        .unwrap_or(json!({"mode": "warning", "refuses": []}));
+    json!({"id": id, "name": name, "ok": ok, "severity": if ok { "info" } else { severity }, "message": message, "remediation": remediation, "enforcement": enforcement})
+}
+
+/// Canonical report order (the historical order, then the checks added later).
+const ORDER: &[&str] = &[
+    "D001", "D002", "D003", "D004", "D005", "D006", "D007", "D029", "D027", "D028", "D008", "D009",
+    "D010", "D011", "D012", "D025", "D026", "D013", "D014", "D015", "D016", "D017", "D018", "D019",
+    "D020", "D021", "D030", "D031", "D022", "D023", "D024",
+];
+
+fn order_of(c: &Value) -> usize {
+    let id = c["id"].as_str().unwrap_or("");
+    ORDER.iter().position(|x| *x == id).unwrap_or(ORDER.len())
 }
 
 pub fn run(p: &Project) -> Result<Report> {
     let mut checks = vec![];
-    let mut rem: Vec<String> = vec![];
-    let mut add = |c: Value| {
-        if !c["ok"].as_bool().unwrap_or(true) {
-            if let Some(r) = c["remediation"].as_str() {
-                rem.push(r.to_string());
-            }
-        }
-        checks.push(c);
-    };
     // D001 lock
     let lock_ok = p.lock_path().exists();
-    add(chk(
+    checks.push(chk(
         "D001",
         "framework.lock present",
         lock_ok,
@@ -79,13 +88,129 @@ pub fn run(p: &Project) -> Result<Report> {
             verdict: "UNHEALTHY".into(),
             checks,
             failed: 1,
-            remediation: rem,
+            remediation: vec!["gov init / gov adopt".into()],
             framework_version: String::new(),
             cli_version: CLI_VERSION.into(),
             root: p.root.display().to_string(),
             release_trust: crate::srr::present::presentation("doctor"),
+            health_result: Value::Null,
         });
     }
+    // Independent check groups run concurrently, each on its own project handle and database connection
+    // (Contract v3:803). Every group is a pure reader of the live repository. Kernel trust is resolved once here, before
+    // the groups start, so an embedded-baseline substitution is never materialised by two threads at once (see
+    // `scheduler::run_suite`).
+    let _ = crate::kernel_trust::trust(&p.root);
+    let root = p.root.clone();
+    let (session, role) = (p.session_id.clone(), p.role.clone());
+    type Group = fn(&Project) -> Result<Vec<Value>>;
+    let groups: [(&str, Group); 4] = [
+        ("kernel-policy", group_kernel_policy),
+        ("derived-runtime", group_runtime),
+        ("tree-scan", group_tree),
+        ("records-state", group_records_state),
+    ];
+    let (results, snap): (
+        Vec<Result<Vec<Value>>>,
+        Result<crate::verification::currency::Snapshot>,
+    ) = std::thread::scope(|s| {
+        let handles: Vec<_> = groups
+            .iter()
+            .map(|(name, f)| {
+                let (root, session, role, f) = (&root, &session, &role, *f);
+                std::thread::Builder::new()
+                    .name(format!("gov-doctor-{name}"))
+                    .spawn_scoped(s, move || {
+                        let gp = Project::open(root)
+                            .with_session(Some(session.clone()), Some(role.clone()));
+                        f(&gp)
+                    })
+            })
+            .collect();
+        // the currency/health group runs here, on this thread, with the one input snapshot of this run
+        let snap = crate::verification::currency::Snapshot::take(p);
+        let own = match &snap {
+            Ok(sn) => group_currency_health(p, sn),
+            Err(e) => Err(e.clone()),
+        };
+        let mut out: Vec<Result<Vec<Value>>> = handles
+            .into_iter()
+            .map(|h| match h {
+                Ok(h) => h.join().unwrap_or_else(|_| {
+                    Err(crate::GovError::new(
+                        "DOCTOR_GROUP_PANIC",
+                        "a doctor check group panicked",
+                    ))
+                }),
+                Err(e) => Err(crate::GovError::io("spawn doctor group", e)),
+            })
+            .collect();
+        out.push(own);
+        (out, snap)
+    });
+    for r in results {
+        checks.extend(r?);
+    }
+    let snap = snap?;
+    checks.sort_by_key(order_of);
+    let rem: Vec<String> = checks
+        .iter()
+        .filter(|c| !c["ok"].as_bool().unwrap_or(true))
+        .filter_map(|c| c["remediation"].as_str().map(|s| s.to_string()))
+        .collect();
+    let failed = checks
+        .iter()
+        .filter(|c| !c["ok"].as_bool().unwrap_or(true))
+        .count();
+    let worst = checks
+        .iter()
+        .filter(|c| !c["ok"].as_bool().unwrap_or(true))
+        .map(|c| c["severity"].as_str().unwrap_or("low"))
+        .fold("none", |acc, s| {
+            let rank = |x: &str| match x {
+                "critical" => 4,
+                "high" => 3,
+                "medium" => 2,
+                "low" => 1,
+                _ => 0,
+            };
+            if rank(s) > rank(acc) {
+                s
+            } else {
+                acc
+            }
+        })
+        .to_string();
+    let verdict = match worst.as_str() {
+        "critical" | "high" => "UNHEALTHY",
+        "medium" | "low" => "DEGRADED",
+        _ => "HEALTHY",
+    };
+    let mut report = Report {
+        verdict: verdict.into(),
+        checks,
+        failed,
+        remediation: rem,
+        framework_version: p.framework_version(),
+        cli_version: CLI_VERSION.into(),
+        root: p.root.display().to_string(),
+        release_trust: crate::srr::present::presentation("doctor"),
+        health_result: Value::Null,
+    };
+    // health-result provenance (Contract v3:808): every doctor run is recorded, and the hard-blocks its checks
+    // declare are refreshed for the G0 guard
+    report.health_result = crate::scheduler::record_doctor(
+        p,
+        &json!({"verdict": report.verdict, "checks": report.checks}),
+        Some(&snap),
+    )
+    .unwrap_or_else(|e| json!({"error": e.code, "message": e.message}));
+    Ok(report)
+}
+
+fn group_kernel_policy(p: &Project) -> Result<Vec<Value>> {
+    let mut checks = vec![];
+    let mut add = |c: Value| checks.push(c);
     let lock = p.lock()?.clone();
     let lerr = p
         .schemas()
@@ -229,6 +354,12 @@ pub fn run(p: &Project) -> Result<Report> {
         },
         Some("gov adapters generate"),
     ));
+    Ok(checks)
+}
+
+fn group_runtime(p: &Project) -> Result<Vec<Value>> {
+    let mut checks = vec![];
+    let mut add = |c: Value| checks.push(c);
     // D009 runtime
     let db_path = p.db_path();
     let (runtime_ok, runtime_msg, db) = if !db_path.exists() {
@@ -258,58 +389,7 @@ pub fn run(p: &Project) -> Result<Report> {
         runtime_msg,
         Some("gov rebuild-memory"),
     ));
-    // D010 freshness
-    let fr = freshness(p);
-    add(chk(
-        "D010",
-        "index freshness",
-        fr.manifest_present && fr.fresh && !fr.age_exceeded,
-        "medium",
-        if !fr.manifest_present {
-            "no index manifest".into()
-        } else if !fr.pin_mismatch.is_empty() {
-            format!("pin mismatch: {}", fr.pin_mismatch.join("; "))
-        } else if fr.age_exceeded {
-            format!(
-                "index older than MEMORY_POLICY.freshness.max_index_age_hours ({:.0} h)",
-                fr.age_hours.unwrap_or(0.0)
-            )
-        } else if fr.fresh {
-            format!("fresh ({} artefacts)", fr.checked)
-        } else {
-            format!(
-                "stale: {} changed, {} added, {} removed",
-                fr.stale.len(),
-                fr.added.len(),
-                fr.removed.len()
-            )
-        },
-        Some("gov rebuild-memory (full when pins changed; --incremental otherwise)"),
-    ));
-    // D011 secrets outside secret class / D012 secret content in index
-    let contract = p.contract();
     let scanner = p.secret_scanner();
-    let mut wrong = vec![];
-    for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) {
-        let d = contract.decide(&rel);
-        if d.is_secret() || scanner.path_is_secret(&rel) {
-            continue;
-        }
-        if !scanner.scan_file(&abs, &rel).is_empty() {
-            wrong.push(rel);
-        }
-    }
-    let d011_sev = if pol.get_str(
-        "SECURITY_POLICY",
-        "on_secret_outside_secret_class",
-        "block_index_and_report",
-    ) == "block_index_and_report"
-    {
-        "critical"
-    } else {
-        "high"
-    };
-    add(chk("D011", "secrets outside secret class", wrong.is_empty(), d011_sev, if wrong.is_empty() { "none".into() } else { format!("{} file(s) contain secret patterns but are not secret-class: {}", wrong.len(), wrong.join(", ")) }, Some("move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile")));
     if let Some(d) = &db {
         let leaked = d
             .query("SELECT chunk_id, text FROM chunks", &[])
@@ -403,6 +483,100 @@ pub fn run(p: &Project) -> Result<Report> {
             Some("check .governance-runtime permissions"),
         )),
     }
+    // D014 contradictions
+    let store = RecordStore::load(&p.root);
+    let conflicts = db
+        .as_ref()
+        .and_then(|d| d.get_meta("supersession_conflicts"))
+        .and_then(|v| v.as_array().cloned())
+        .unwrap_or_default();
+    let dups = store.duplicates.len();
+    add(chk(
+        "D014",
+        "authority unambiguous (no supersession conflicts / duplicate ids)",
+        conflicts.is_empty() && dups == 0,
+        "high",
+        format!(
+            "{} supersession conflict(s), {} duplicate id(s)",
+            conflicts.len(),
+            dups
+        ),
+        Some("resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids"),
+    ));
+    // D015 graph
+    if let Some(d) = &db {
+        let dang = crate::graph::dangling_edges(d)
+            .map(|v| v.len())
+            .unwrap_or(0);
+        let orph = crate::graph::orphan_nodes(d).map(|v| v.len()).unwrap_or(0);
+        add(chk(
+            "D015",
+            "graph integrity",
+            dang == 0,
+            "medium",
+            format!("{dang} dangling edge(s), {orph} orphan record(s)"),
+            Some("fix references in records or add missing records"),
+        ));
+    }
+    Ok(checks)
+}
+
+fn group_tree(p: &Project) -> Result<Vec<Value>> {
+    let mut checks = vec![];
+    let mut add = |c: Value| checks.push(c);
+    let pol = p.policies();
+    // D010 freshness
+    let fr = freshness(p);
+    add(chk(
+        "D010",
+        "index freshness",
+        fr.manifest_present && fr.fresh && !fr.age_exceeded,
+        "medium",
+        if !fr.manifest_present {
+            "no index manifest".into()
+        } else if !fr.pin_mismatch.is_empty() {
+            format!("pin mismatch: {}", fr.pin_mismatch.join("; "))
+        } else if fr.age_exceeded {
+            format!(
+                "index older than MEMORY_POLICY.freshness.max_index_age_hours ({:.0} h)",
+                fr.age_hours.unwrap_or(0.0)
+            )
+        } else if fr.fresh {
+            format!("fresh ({} artefacts)", fr.checked)
+        } else {
+            format!(
+                "stale: {} changed, {} added, {} removed",
+                fr.stale.len(),
+                fr.added.len(),
+                fr.removed.len()
+            )
+        },
+        Some("gov rebuild-memory (full when pins changed; --incremental otherwise)"),
+    ));
+    // D011 secrets outside secret class
+    let contract = p.contract();
+    let scanner = p.secret_scanner();
+    let mut wrong = vec![];
+    for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) {
+        let d = contract.decide(&rel);
+        if d.is_secret() || scanner.path_is_secret(&rel) {
+            continue;
+        }
+        if !scanner.scan_file(&abs, &rel).is_empty() {
+            wrong.push(rel);
+        }
+    }
+    let d011_sev = if pol.get_str(
+        "SECURITY_POLICY",
+        "on_secret_outside_secret_class",
+        "block_index_and_report",
+    ) == "block_index_and_report"
+    {
+        "critical"
+    } else {
+        "high"
+    };
+    add(chk("D011", "secrets outside secret class", wrong.is_empty(), d011_sev, if wrong.is_empty() { "none".into() } else { format!("{} file(s) contain secret patterns but are not secret-class: {}", wrong.len(), wrong.join(", ")) }, Some("move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile")));
     // D013 legacy mechanisms
     let store = RecordStore::load(&p.root);
     let legacy = legacy_mechanisms(&p.root);
@@ -438,40 +612,70 @@ pub fn run(p: &Project) -> Result<Report> {
         },
         Some("gov adopt (A2/A8) or register a LEGACY record / move to archive/"),
     ));
-    // D014 contradictions
-    let conflicts = db
+    // D022 ecosystems / capability gaps
+    let db = if p.db_path().exists() {
+        RuntimeDb::open(&p.db_path()).ok()
+    } else {
+        None
+    };
+    let eco = db
         .as_ref()
-        .and_then(|d| d.get_meta("supersession_conflicts"))
-        .and_then(|v| v.as_array().cloned())
+        .and_then(|d| d.get_meta("capability.ecosystems"))
+        .unwrap_or_else(|| {
+            crate::capabilities::ecosystems::detect(&p.root, &[contract.root("product")])
+        });
+    let gaps: Vec<String> = eco["ecosystems"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter(|e| !e["available"].as_bool().unwrap_or(true))
+                .map(|e| {
+                    format!(
+                        "{} ({})",
+                        e["id"].as_str().unwrap_or(""),
+                        e["required_binary"].as_str().unwrap_or("")
+                    )
+                })
+                .collect()
+        })
         .unwrap_or_default();
-    let dups = store.duplicates.len();
     add(chk(
-        "D014",
-        "authority unambiguous (no supersession conflicts / duplicate ids)",
-        conflicts.is_empty() && dups == 0,
-        "high",
-        format!(
-            "{} supersession conflict(s), {} duplicate id(s)",
-            conflicts.len(),
-            dups
-        ),
-        Some("resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids"),
+        "D022",
+        "native toolchains for detected ecosystems",
+        gaps.is_empty(),
+        "low",
+        if gaps.is_empty() {
+            format!("{} ecosystem(s) detected, tools available", eco["count"])
+        } else {
+            format!("capability gap: {}", gaps.join(", "))
+        },
+        Some("install the native toolchain or raise a tooling task (never a crash)"),
     ));
-    // D015 graph
-    if let Some(d) = &db {
-        let dang = crate::graph::dangling_edges(d)
-            .map(|v| v.len())
-            .unwrap_or(0);
-        let orph = crate::graph::orphan_nodes(d).map(|v| v.len()).unwrap_or(0);
-        add(chk(
-            "D015",
-            "graph integrity",
-            dang == 0,
-            "medium",
-            format!("{dang} dangling edge(s), {orph} orphan record(s)"),
-            Some("fix references in records or add missing records"),
-        ));
-    }
+    // D024 gitignore
+    let gi = read_text(&p.root.join(".gitignore"))
+        .map(|t| {
+            t.lines()
+                .any(|l| l.trim() == ".governance-runtime/" || l.trim() == ".governance-runtime")
+        })
+        .unwrap_or(false);
+    add(chk(
+        "D024",
+        ".governance-runtime ignored by git",
+        gi,
+        "low",
+        if gi {
+            "ignored".into()
+        } else {
+            ".gitignore lacks .governance-runtime/".into()
+        },
+        Some("add .governance-runtime/ to .gitignore"),
+    ));
+    Ok(checks)
+}
+
+fn group_records_state(p: &Project) -> Result<Vec<Value>> {
+    let mut checks = vec![];
+    let mut add = |c: Value| checks.push(c);
     // D016 interrupted transactions
     let inter = crate::cit::interrupted(p);
     add(chk(
@@ -564,60 +768,8 @@ pub fn run(p: &Project) -> Result<Report> {
         },
         Some("gov adapters generate"),
     ));
-    // D021 governance suite currency
-    let green = crate::verification::latest_green(p);
-    let ih = crate::verification::inputs_hash(p);
-    let cur = green
-        .as_ref()
-        .map(|g| g["inputs_hash"].as_str() == Some(&ih))
-        .unwrap_or(false);
-    add(chk(
-        "D021",
-        "governance suite green and current",
-        cur,
-        "medium",
-        match &green {
-            Some(g) if cur => format!("green record {} current", g["id"]),
-            Some(g) => format!("green record {} is obsolete (inputs changed)", g["id"]),
-            None => "no green governance record".into(),
-        },
-        Some("gov audit"),
-    ));
-    // D022 ecosystems / capability gaps
-    let eco = db
-        .as_ref()
-        .and_then(|d| d.get_meta("capability.ecosystems"))
-        .unwrap_or_else(|| {
-            crate::capabilities::ecosystems::detect(&p.root, &[contract.root("product")])
-        });
-    let gaps: Vec<String> = eco["ecosystems"]
-        .as_array()
-        .map(|a| {
-            a.iter()
-                .filter(|e| !e["available"].as_bool().unwrap_or(true))
-                .map(|e| {
-                    format!(
-                        "{} ({})",
-                        e["id"].as_str().unwrap_or(""),
-                        e["required_binary"].as_str().unwrap_or("")
-                    )
-                })
-                .collect()
-        })
-        .unwrap_or_default();
-    add(chk(
-        "D022",
-        "native toolchains for detected ecosystems",
-        gaps.is_empty(),
-        "low",
-        if gaps.is_empty() {
-            format!("{} ecosystem(s) detected, tools available", eco["count"])
-        } else {
-            format!("capability gap: {}", gaps.join(", "))
-        },
-        Some("install the native toolchain or raise a tooling task (never a crash)"),
-    ));
     // D023 records
+    let store = RecordStore::load(&p.root);
     let rec_problems: Vec<String> = store.problems.clone();
     add(chk(
         "D023",
@@ -631,63 +783,80 @@ pub fn run(p: &Project) -> Result<Report> {
         },
         Some("fix YAML/frontmatter errors"),
     ));
-    // D024 gitignore
-    let gi = read_text(&p.root.join(".gitignore"))
-        .map(|t| {
-            t.lines()
-                .any(|l| l.trim() == ".governance-runtime/" || l.trim() == ".governance-runtime")
-        })
-        .unwrap_or(false);
-    add(chk(
-        "D024",
-        ".governance-runtime ignored by git",
-        gi,
-        "low",
-        if gi {
-            "ignored".into()
+    Ok(checks)
+}
+
+fn group_currency_health(
+    p: &Project,
+    snap: &crate::verification::currency::Snapshot,
+) -> Result<Vec<Value>> {
+    let mut checks = vec![];
+    // D021 governance suite currency: the green record is current only while every evidence input class is unchanged
+    let cur = crate::verification::currency::Currency::evaluate(p, snap);
+    let mut c = chk(
+        "D021",
+        "governance suite green and current",
+        cur.current,
+        "medium",
+        cur.message(),
+        Some("gov health run (re-checks only the checks the changed inputs impact; gov audit runs the full suite)"),
+    );
+    c["currency"] = cur.to_value();
+    checks.push(c);
+    // D030 product tests: recorded per-family evidence, current and passing (Contract v3:751-761, :980, :1004)
+    let (pf, detail) = crate::verification::product::health_findings(p, Some(snap));
+    let failing: Vec<&Value> = pf.iter().filter(|f| f["severity"] == "high").collect();
+    let mut c = chk(
+        "D030",
+        "product tests pass (recorded per-family evidence)",
+        failing.is_empty(),
+        "high",
+        if !detail["applicable"].as_bool().unwrap_or(false) {
+            "no product test command configured or detectable".into()
+        } else if pf.is_empty() {
+            format!(
+                "{} famil(ies) recorded passing and current",
+                detail["families"].as_object().map(|m| m.len()).unwrap_or(0)
+            )
         } else {
-            ".gitignore lacks .governance-runtime/".into()
+            // failing families first; stale or missing evidence is reported but is not a failure
+            let mut v: Vec<&Value> = failing.clone();
+            v.extend(pf.iter().filter(|f| f["severity"] != "high"));
+            v.iter()
+                .map(|f| f["message"].as_str().unwrap_or("").to_string())
+                .collect::<Vec<_>>()
+                .join("; ")
         },
-        Some("add .governance-runtime/ to .gitignore"),
-    ));
-    let failed = checks
-        .iter()
-        .filter(|c| !c["ok"].as_bool().unwrap_or(true))
-        .count();
-    let worst = checks
-        .iter()
-        .filter(|c| !c["ok"].as_bool().unwrap_or(true))
-        .map(|c| c["severity"].as_str().unwrap_or("low"))
-        .fold("none", |acc, s| {
-            let rank = |x: &str| match x {
-                "critical" => 4,
-                "high" => 3,
-                "medium" => 2,
-                "low" => 1,
-                _ => 0,
-            };
-            if rank(s) > rank(acc) {
-                s
-            } else {
-                acc
-            }
-        })
-        .to_string();
-    let verdict = match worst.as_str() {
-        "critical" | "high" => "UNHEALTHY",
-        "medium" | "low" => "DEGRADED",
-        _ => "HEALTHY",
-    };
-    Ok(Report {
-        verdict: verdict.into(),
-        checks,
-        failed,
-        remediation: rem,
-        framework_version: p.framework_version(),
-        cli_version: CLI_VERSION.into(),
-        root: p.root.display().to_string(),
-        release_trust: crate::srr::present::presentation("doctor"),
-    })
+        Some("gov verify product (records per-family results as governed evidence)"),
+    );
+    if let Some(f) = failing.first() {
+        c["covers"] = f["covers"].clone();
+    }
+    c["product_tests"] = detail;
+    checks.push(c);
+    // D031 hard-blocks recorded by governance-suite checks (doctor-origin blocks are the failing checks above)
+    let st = crate::scheduler::store::load_state(p);
+    let (fam_blocks, stale_blocks) = crate::scheduler::suite_blocks(p, snap);
+    let mut c = chk(
+        "D031",
+        "no active health hard-block from the governance suite",
+        fam_blocks.is_empty(),
+        "high",
+        if fam_blocks.is_empty() {
+            format!("health state {}", crate::scheduler::health_state(&st))
+        } else {
+            fam_blocks
+                .iter()
+                .map(|b| format!("{} ({}) refuses {}: {}", b["check"].as_str().unwrap_or("?"), b["severity"].as_str().unwrap_or("?"), b["operations"], b["message"].as_str().unwrap_or("")))
+                .collect::<Vec<_>>()
+                .join("; ")
+        },
+        Some("repair the failing check; `gov health status` lists the blocks, `gov health run` re-evaluates"),
+    );
+    c["blocks"] = json!(fam_blocks);
+    c["stale_blocks"] = json!(stale_blocks);
+    checks.push(c);
+    Ok(checks)
 }
 
 impl RuntimeDb {

@@ -1,0 +1,62 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify/runtime)
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho27)
+warning: unused import: `Release`
+  --> tests/heldout_srr.rs:14:44
+   |
+14 | use gov_runtime::srr::metadata::{Envelope, Release, Root};
+   |                                            ^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `scratch` is never used
+  --> tests/heldout_srr.rs:20:4
+   |
+20 | fn scratch(name: &str) -> PathBuf {
+   |    ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `isolate` is never used
+  --> tests/heldout_srr.rs:36:4
+   |
+36 | fn isolate(state_home: &Path) {
+   |    ^^^^^^^
+
+warning: function `candidate_kernel` is never used
+  --> tests/heldout_srr.rs:45:4
+   |
+45 | fn candidate_kernel() -> PathBuf {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `measure` is never used
+  --> tests/heldout_srr.rs:54:4
+   |
+54 | fn measure(state_root: &Path) -> (String, String, BTreeMap<String, String>, String) {
+   |    ^^^^^^^
+
+warning: function `write` is never used
+  --> tests/heldout_srr.rs:65:4
+   |
+65 | fn write(p: &Path, s: &str) {
+   |    ^^^^^
+
+warning: `srr-heldout-ar0027` (test "heldout_srr") generated 6 warnings (run `cargo fix --test "heldout_srr" -p srr-heldout-ar0027` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.00s
+     Running tests/heldout_srr.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho27/debug/deps/heldout_srr-2b75a491ee915f2c)
+
+running 12 tests
+test a10_malleable_and_small_order_signatures_are_refused_by_verify_strict ... ok
+test a11_unsupported_key_scheme_is_refused ... ok
+test a12_spec_version_and_role_type_confusion_are_refused ... ok
+test a1_signature_lifted_from_a_different_document_is_refused ... ok
+test a2_keyid_cannot_be_pointed_at_another_keys_material ... ok
+test a3_role_confusion_a_timestamp_key_cannot_authorise_a_release ... ok
+test a4_threshold_cannot_be_reached_by_repeating_one_key ... ok
+test a5_unsatisfiable_threshold_is_refused_at_parse_time ... ok
+test a6_zero_threshold_is_refused ... ok
+test a7_trailing_bytes_after_the_envelope_are_refused ... ok
+test a8_a_duplicate_signed_member_is_refused_rather_than_last_wins ... ok
+test a9_unsigned_and_empty_signature_lists_are_refused ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
