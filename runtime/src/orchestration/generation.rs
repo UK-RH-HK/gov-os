@@ -640,12 +640,63 @@ pub fn health_failures(g: &GenCtx) -> Vec<Candidate> {
         .into_iter()
         .filter_map(|x| x.as_str().map(|s| s.to_string()))
         .collect();
-    let mut out = vec![];
-    for (canonical, (members, sev, at, findings)) in groups {
-        let members: Vec<String> = members.into_iter().filter(|m| !stale.contains(m)).collect();
-        if members.is_empty() {
-            continue;
+    // checks whose findings name the same path report one condition (e.g. a secret in a product file reported by
+    // the path-map and the secrets checks): one remediation, which remedies every one of them
+    let mut conds: Vec<(String, Vec<String>, String, String, Vec<Value>)> = groups
+        .into_iter()
+        .map(|(c, (m, sev, at, f))| {
+            let m: Vec<String> = m.into_iter().filter(|x| !stale.contains(x)).collect();
+            (c, m, sev, at, f)
+        })
+        .filter(|(_, m, _, _, _)| !m.is_empty())
+        .collect();
+    let paths_of = |f: &[Value]| -> BTreeSet<String> {
+        f.iter()
+            .filter_map(|x| x["path"].as_str().map(|s| s.to_string()))
+            .filter(|s| !s.is_empty() && !g.generated_tasks.contains(s))
+            .collect()
+    };
+    let mut merged = true;
+    while merged {
+        merged = false;
+        'outer: for i in 0..conds.len() {
+            for j in (i + 1)..conds.len() {
+                let (a, b) = (paths_of(&conds[i].4), paths_of(&conds[j].4));
+                if !a.is_empty() && a.intersection(&b).next().is_some() {
+                    let other = conds.remove(j);
+                    let c = &mut conds[i];
+                    if other.0 < c.0 {
+                        c.0 = other.0.clone();
+                    }
+                    for m in other.1 {
+                        if !c.1.contains(&m) {
+                            c.1.push(m);
+                        }
+                    }
+                    if crate::scheduler::catalogue::rank(&other.2)
+                        > crate::scheduler::catalogue::rank(&c.2)
+                    {
+                        c.2 = other.2;
+                    }
+                    if other.3 > c.3 {
+                        c.3 = other.3;
+                    }
+                    c.4.extend(other.4);
+                    merged = true;
+                    break 'outer;
+                }
+            }
         }
+    }
+    let markers: Vec<String> = g
+        .cfg
+        .list("security_markers")
+        .into_iter()
+        .map(|m| m.to_lowercase())
+        .collect();
+    let mut out = vec![];
+    for (canonical, mut members, sev, at, findings) in conds {
+        members.sort();
         let total = findings.len();
         let findings: Vec<Value> = findings
             .into_iter()
@@ -662,7 +713,11 @@ pub fn health_failures(g: &GenCtx) -> Vec<Candidate> {
         let is_security = members
             .iter()
             .chain(std::iter::once(&canonical))
-            .any(|m| security.contains(m));
+            .any(|m| security.contains(m))
+            || findings.iter().any(|f| {
+                let msg = f["message"].as_str().unwrap_or("").to_lowercase();
+                markers.iter().any(|m| msg.contains(m.as_str()))
+            });
         let is_memory = members
             .iter()
             .chain(std::iter::once(&canonical))

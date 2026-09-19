@@ -1084,6 +1084,81 @@ mod tests {
         );
     }
 
+    /// BC-P2-31 (P2-AR-0036): a store kept at the pre-BC-P2-31 location (inside the derived runtime directory) moves
+    /// to `paths::store_path(root, "claims")` the first time it is opened — its WAL folded in, its live claims kept
+    /// live (the OS's own move is not a copy), its recorded location rebound — and deleting the whole derived runtime
+    /// directory afterwards loses nothing. A file that reappears at the legacy path is never merged into the store.
+    #[test]
+    fn a_legacy_store_moves_to_its_state_location_with_its_live_claims() {
+        let root = tmp("reloc-live");
+        std::fs::create_dir_all(root.join(crate::RUNTIME_DIR)).unwrap();
+        let legacy = root.join(crate::RUNTIME_DIR).join("claims.db");
+        let sc = vec!["src/**".to_string()];
+        {
+            let s = ClaimsStore::open_at(&legacy).unwrap();
+            s.claim_exclusive(&req("T1", "S1", &iso("w"), &sc)).unwrap();
+            s.claim_exclusive(&req("T2", "S2", &iso("w"), &["docs/**".to_string()]))
+                .unwrap();
+            // keep a connection open with committed rows still in the WAL
+            assert_eq!(s.list().unwrap().len(), 2);
+        }
+        let p = crate::Project::open(&root);
+        assert_eq!(ClaimsStore::legacy_path_for(&p), p.runtime_dir().join("claims.db"));
+        let target = ClaimsStore::path_for(&p);
+        assert_eq!(target, crate::paths::store_path(&p.root, "claims").unwrap());
+        let s = ClaimsStore::open(&p).unwrap();
+        assert_eq!(s.path, target);
+        assert!(!legacy.exists(), "the legacy store is moved, not copied");
+        let rows = s.list().unwrap();
+        assert_eq!(rows.len(), 2, "every live claim survives the move: {rows:?}");
+        assert_eq!(
+            s.claim_exclusive(&req("T1", "S9", &iso("w"), &sc))
+                .unwrap_err()
+                .code,
+            "TASK_CLAIMED",
+            "the moved claim still binds"
+        );
+        let relocated: String = s
+            .conn
+            .query_row(
+                "SELECT value FROM store_meta WHERE key='relocated_by_os'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert!(relocated.contains("BC-P2-31"), "{relocated}");
+        drop(s);
+        assert!(crate::paths::misplaced_os_state(&root)
+            .iter()
+            .all(|m| m["store"] != "claims"));
+        // the whole derived runtime directory may now be deleted: the claims are elsewhere
+        std::fs::remove_dir_all(root.join(crate::RUNTIME_DIR)).unwrap();
+        let s = ClaimsStore::open(&p).unwrap();
+        assert_eq!(s.list().unwrap().len(), 2);
+        drop(s);
+        // a file reappearing at the legacy path is not the store: it is neither merged nor allowed to replace it
+        std::fs::create_dir_all(root.join(crate::RUNTIME_DIR)).unwrap();
+        {
+            let stray = ClaimsStore::open_at(&legacy).unwrap();
+            stray
+                .claim_exclusive(&req("T3", "S3", &iso("w"), &["x/**".to_string()]))
+                .unwrap();
+        }
+        let s = ClaimsStore::open(&p).unwrap();
+        let ids: Vec<String> = s
+            .list()
+            .unwrap()
+            .iter()
+            .map(|c| c["task_id"].as_str().unwrap().to_string())
+            .collect();
+        assert_eq!(ids, vec!["T1".to_string(), "T2".to_string()]);
+        assert!(legacy.exists(), "the stray legacy file is left for inspection");
+        assert!(crate::paths::misplaced_os_state(&root)
+            .iter()
+            .any(|m| m["store"] == "claims"));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
     #[test]
     fn linked_worktrees_share_the_main_worktree_store() {
         let d = tmp("git");
@@ -1108,6 +1183,12 @@ mod tests {
             Some(main_c.join("proj").join(crate::RUNTIME_DIR))
         );
         assert_eq!(shared_runtime_dir(&d.join("nowhere")), None);
+        // BC-P2-31: the shared store lives in the main worktree's state directory
+        assert_eq!(shared_store_root(&main), None);
+        assert_eq!(
+            shared_store_root(&wt2.join("proj")),
+            Some(SharedRoot::Worktree(main_c.join("proj")))
+        );
         let _ = std::fs::remove_dir_all(&d);
     }
 }

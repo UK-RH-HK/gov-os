@@ -36,6 +36,8 @@ sources:
 # health checks (scheduler catalogue ids) whose failures are security findings, and those of the knowledge fabric
 security_checks: [secrets_sensitivity_indexing, os_binding_integrity, plugin_governance, installation_authenticity, D003, D011, D012, D029, D032, D033]
 memory_checks: [index_content_coverage, memory_retrieval_regression, D025]
+# a finding whose message names one of these is a security finding whichever check reported it
+security_markers: ["secret", "credential", "private key", "password", "api key", "access key"]
 # checks whose failures another source already turns into work (W7 orphan investigations; failed tests; failure
 # memory), that only restate other checks (D031 active blocks; D021 evidence currency, re-established by the next
 # health run), or that report the OS's own derived views lagging behind the records (index freshness, the derived

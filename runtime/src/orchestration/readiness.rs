@@ -318,3 +318,50 @@ pub fn plan(p: &Project, feature_id: &str) -> Result<Value> {
         json!({"feature": feature_id, "created_tasks": created, "pre_implementation_gap_tasks": pre_task_ids, "implementation_tasks_blocked": linked, "gaps": view.gaps, "coverage": view.coverage}),
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::records::new_record;
+
+    /// Every pre-implementation gap of the scenario chain (`lifecycle::scenario`) belongs to a chain readiness cell,
+    /// and every chain cell is a pre-implementation dimension of the kernel taxonomy: the DAG's chain gating and the
+    /// computed readiness cells cannot disagree.
+    #[test]
+    fn every_pre_implementation_chain_gap_belongs_to_a_chain_cell() {
+        for code in crate::lifecycle::scenario::PRE_IMPLEMENTATION_CODES {
+            let cell = chain_cell_of(code).unwrap_or_else(|| panic!("{code} maps to no readiness cell"));
+            assert!(CHAIN_CELLS.contains(&cell), "{code} -> {cell}");
+        }
+        let taxonomy: Value =
+            serde_yaml::from_str(include_str!("../../../framework/taxonomy/READINESS_DIMENSIONS.yaml")).unwrap();
+        for cell in CHAIN_CELLS {
+            let d = taxonomy["dimensions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|d| d["id"].as_str() == Some(cell))
+                .unwrap_or_else(|| panic!("{cell} is not a kernel readiness dimension"));
+            assert_eq!(d["pre_implementation"], true, "{cell}");
+        }
+    }
+
+    /// A not-applicable cell is honoured only as an explicit statement with a reason (a silent N/A is invalid).
+    #[test]
+    fn not_applicable_cells_need_a_reason() {
+        let f = new_record(
+            "feature",
+            "F-0001",
+            "f",
+            json!({"readiness": {
+                "representative_test_data": {"status": "N/A_WITH_REASON", "reason": "pure arithmetic, literal inputs"},
+                "success_criteria": {"status": "N/A_WITH_REASON"},
+                "failure_criteria": "N/A",
+                "independent_acceptance_tests": "PRESENT"}}),
+        );
+        assert_eq!(
+            not_applicable_cells(&f),
+            vec!["representative_test_data".to_string()]
+        );
+    }
+}

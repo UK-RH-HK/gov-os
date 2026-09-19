@@ -27,6 +27,19 @@
 //! * **independence** (BC-P2-34, task-role side) — independence of tests and test data from the implementer is taken
 //!   from recorded authorship ([`AuthorshipIndex`]: the sealed close reports), never from what an artefact says about
 //!   itself; one session does not both implement a feature and author its independent tests or test data.
+//! * **material changes** (BC-P2-13 in-task half) — what a task changed is classified at its close by what changed
+//!   (`cit::materiality::classify_paths`), never by the task's label; a material change completes only through
+//!   CIT-P/CIT-E (a CIT committed inside the claim window that wrote exactly that content), except the initial
+//!   authoring of specification by specification work ([`material_changes`]);
+//! * **current inputs** (BC-P2-04 close side) — work done against an input that changed since it was consumed does not
+//!   close, and a re-test flag is cleared only by re-test evidence (`cit::propagation::require_current_inputs`); a
+//!   claim first propagates changes made outside change control (`detect_and_propagate`), and the DAG shows them;
+//! * **work generation** (BC-P2-24) — the events a close records (discoveries, unresolved items, proposed decisions)
+//!   generate linked work (`orchestration::generation`); generated work is created by [`create_generated`];
+//! * **where claim evidence lives** (BC-P2-31) — claim baselines and carried sets at `paths::store_path(root,
+//!   "claim-trees")`, the claims store at `paths::store_path(root, "claims")`, never in the derived runtime directory;
+//! * **availability** (round-3 rule) — a hard-block does not refuse creating or claiming the work that remedies it
+//!   ([`guard_work`]); every other applicable block refuses, typed, naming the block and its scope.
 use crate::authority;
 use crate::checkpoints;
 use crate::memory::claims::ClaimRequest;
@@ -1818,16 +1831,22 @@ pub fn is_production_path(p: &Project, path: &str) -> bool {
 /// | 8 | every governing Human Decision Gate authorises the work (BC-P2-12) | `GATE_NOT_AUTHORISED` | **no**: a human gate is not an L3 decision |
 /// | 9 | observed mutations: declared, in scope (as recorded and as claimed), and no change to OS-written state that no OS operation produced (`t2::classify_path`, BC-P2-09) | `MUTATION_SCOPE_VIOLATION` | no |
 /// | 10 | production-merge permission | `PRODUCTION_MERGE_NOT_ALLOWED` | no |
+/// | 10a | material changes made inside the task complete only through change control ([`material_changes`], BC-P2-13) | `MATERIAL_CHANGE_REQUIRES_CIT` | no |
+/// | 10b | an experiment task is linked to an OS-written experiment with a recorded run (`lifecycle::experiment::task_lifecycle_refusal`, J2) | `EXPERIMENT_LIFECYCLE_REQUIRED` | overridden, recorded |
 /// | 11 | index pins and freshness | `INDEX_PIN_MISMATCH`, `INDEX_STALE` | stale only (degraded) |
 /// | 12 | the consumption receipt against the manifest and packet (`context::receipt::require_valid`, W5) | `RECEIPT_INVALID` | no |
+/// | 12a | the inputs are current and a re-test flag is backed by re-test evidence (`cit::propagation::require_current_inputs`, BC-P2-04) | `INPUTS_STALE`, `RETEST_EVIDENCE_REQUIRED` | no |
 /// | 13 | the health close gate (`verification::close_gate`): G0 hard-blocks, G2 re-check, governance-evidence currency (O4), product-test outcome from recorded evidence (O1) | `HEALTH_HARD_BLOCK`, `GOVERNANCE_SUITE_STALE`/`_MISSING`, `PRODUCT_TEST*` | currency only (degraded) |
 ///
 /// Why this order: who may close (2, 4-7) and whether the work may complete at all (8) are decided before any
-/// evidence is weighed; the repository's own state (9-10), observed independently of the worker, is weighed before
-/// the worker's account of it (12), so an incomplete receipt never masks an out-of-scope or forged mutation; the
+/// evidence is weighed; the repository's own state (9-10b: scope, merge permission, materiality, experiment
+/// lifecycle), observed independently of the worker, is weighed before the worker's account of it (12, 12a), so an
+/// incomplete receipt never masks an out-of-scope, forged or material mutation; the
 /// evidence payload (3) keeps its long-standing place so a malformed report is refused as such; the health gate
 /// (13) runs last because it may execute checks and record a governance-suite result, which nothing before it
-/// should cause for a close that is refused anyway.
+/// should cause for a close that is refused anyway. After the task is DONE: its report is sealed, a re-test it
+/// evidenced is cleared ([`require_current_inputs`](crate::cit::propagation::require_current_inputs)), a revalidation
+/// task resolves the completed work it revalidates, and the work its report calls for is generated (BC-P2-24).
 pub fn close(
     p: &Project,
     db: &RuntimeDb,
@@ -2636,6 +2655,25 @@ mod tests {
         ] {
             assert!(operation_only(s).is_none(), "{s}");
         }
+    }
+
+    /// The evidence a task relies on — what its influence backlinks name (IP-WS10-13) — and the checks it declares it
+    /// remedies (availability rule) are read from its contract fields.
+    #[test]
+    fn cited_evidence_and_remedies_are_read_from_the_contract() {
+        let t = crate::records::new_record(
+            "task",
+            "TASK-0001",
+            "t",
+            json!({"derived_from": ["RES-0001", "EXP-0001"], "required_inputs": ["RES-0001", {"id": "D-0001", "reason": "r"}],
+                   "optional_inputs": [{"id": "RES-0002"}], "relations": [{"type": "CONSUMES", "target": "RES-0003"}, {"type": "AFFECTS", "target": "F-0001"}],
+                   "remedies": ["graph_integrity", " ", "D011"]}),
+        );
+        assert_eq!(
+            cited_evidence_ids(&t),
+            vec!["RES-0001", "EXP-0001", "D-0001", "RES-0002", "RES-0003"]
+        );
+        assert_eq!(remedies_of(&t.data), vec!["graph_integrity", "D011"]);
     }
 
     #[test]
