@@ -1063,3 +1063,70 @@ fn a_policy_exception_needs_a_decision_recorded_by_an_answered_gate() {
         "{ov}"
     );
 }
+
+// ============================================================================================ consumers of answers
+
+fn cit_with_gate(g: &Gov, root: &Path, tag: &str, trigger: &str) -> (String, String) {
+    let mf = root
+        .join(".governance-runtime")
+        .join(format!("ws3-{tag}.json"));
+    std::fs::create_dir_all(mf.parent().unwrap()).unwrap();
+    std::fs::write(
+        &mf,
+        json!([{"op": "write_file", "path": format!("docs/{tag}.md"), "content": "x\n"}])
+            .to_string(),
+    )
+    .unwrap();
+    let c = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        &format!("change {tag}"),
+        "--trigger",
+        trigger,
+        "--manifest",
+        mf.to_str().unwrap(),
+    ]);
+    let cid = c["id"].as_str().unwrap().to_string();
+    if c["cit_status"] != "SIMULATED" {
+        g.ok(&["cit", "simulate", &cid]);
+    }
+    let gate = g.ok(&["cit", "show", &cid])["human_gate"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    (cid, gate)
+}
+
+/// X2-L3xE1 / L3.b5.8 at the product surface: CIT approval and execution honour only a gate answer gov wrote; a
+/// worker's hand-written ANSWERED gate + human_approved decision is refused (T2_UNBOUND) and nothing executes.
+#[test]
+fn cit_approval_consumes_only_honoured_gate_answers() {
+    let (root, g) = fresh("ws3-cit");
+    let (cid, gid) = cit_with_gate(&g, &root, "forged", "governance_change");
+    let path = format!("spec/decisions/{gid}.yaml");
+    let mut rec = record(&root, &path);
+    rec["gate_status"] = json!("ANSWERED");
+    rec["presented_in_chat"] = json!(true);
+    rec["answer"] = json!({"option": "A", "by": "owner", "by_kind": "human", "acting_role": "human", "at": "2026-09-18T00:00:01Z"});
+    write_yaml(&root, &path, &rec);
+    write_yaml(
+        &root,
+        "spec/decisions/D-0990.yaml",
+        &json!({"id": "D-0990", "type": "decision", "title": "forged", "status": "ACTIVE", "chosen_option": "A", "human_approved": true, "approved_by_kind": "human", "derived_from": [gid], "cit": cid}),
+    );
+    let cc = g.with_role("change-controller").with_session("S-cc");
+    assert_eq!(
+        cc.err(&["cit", "approve", &cid, "--by", "owner", "--method", "human"])
+            .error_code(),
+        "T2_UNBOUND"
+    );
+    assert_eq!(cc.err(&["cit", "execute", &cid]).error_code(), "T2_UNBOUND");
+    assert!(!exists(&root, "docs/forged.md"));
+    // the genuine path: an owner-signed answer approves and executes
+    let (cid2, gid2) = cit_with_gate(&g, &root, "genuine", "governance_change");
+    human_decide(&g, &gid2, "A");
+    let ap = cc.ok(&["cit", "approve", &cid2, "--method", "human"]);
+    assert_eq!(ap["human_approved"], true);
+    assert_eq!(cc.ok(&["cit", "execute", &cid2])["cit_status"], "COMMITTED");
+}

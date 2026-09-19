@@ -958,6 +958,7 @@ pub fn verified_answer_in(
                 .get("presented_in_chat")
                 .and_then(|v| v.as_bool())
                 .unwrap_or(false)
+                || g.data["presentation_receipt"]["kind"].as_str() == Some("agent_resolution")
             {
                 return Err(GovError::new(
                     "GATE_STATE_INVALID",
@@ -1009,6 +1010,35 @@ pub fn verified_answer_in(
         human_evidence,
         record: g.clone(),
     })
+}
+
+/// **Consumer precheck (BC-P2-09)** for a consumer that reads a gate answer itself and has not yet adopted
+/// [`verified_answer`] (CIT approval/execution, framework update): refuse when the answer it would read is not what
+/// gov wrote or no longer verifies. Ordinary states (not answered, withdrawn, declined, missing) pass, so the
+/// consumer still reports its own typed refusal for them.
+pub fn require_honoured_answers(p: &Project, gate_ids: &[String]) -> Result<()> {
+    let store = RecordStore::load(&p.root);
+    for gid in gate_ids.iter().filter(|g| !g.is_empty()) {
+        if let Err(e) = verified_answer_in(p, &store, gid) {
+            if matches!(
+                e.code.as_str(),
+                "T2_UNBOUND" | "HUMAN_ANSWER_UNVERIFIED" | "GATE_STATE_INVALID"
+            ) {
+                return Err(e);
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Every gate raised for `trigger` that records an answer (for consumers that select a gate by trigger).
+pub fn answered_gates_for_trigger(p: &Project, trigger: &str) -> Vec<String> {
+    RecordStore::load(&p.root)
+        .of_type("human-gate")
+        .into_iter()
+        .filter(|g| g.get("trigger") == trigger && g.get("gate_status") == "ANSWERED")
+        .map(|g| g.id())
+        .collect()
 }
 
 /// The recorded, verified answer of a gate (`Some(option)`), or `None` while it is pending, never presented,
@@ -1435,12 +1465,25 @@ pub fn answer(p: &Project, id: &str, req: &AnswerRequest) -> Result<Value> {
     }
     g.set("gate_status", json!("ANSWERED"));
     g.set("answer", answer_obj);
-    if let Some(s) = &signed {
-        g.set("presented_in_chat", json!(true));
-        g.set(
-            "presentation_receipt",
-            json!({"kind": "answer", "acknowledged_by": s.by, "package_sha256": digest, "envelope_sha256": s.envelope_sha256}),
-        );
+    match &signed {
+        Some(s) => {
+            g.set("presented_in_chat", json!(true));
+            g.set(
+                "presentation_receipt",
+                json!({"kind": "answer", "acknowledged_by": s.by, "package_sha256": digest, "envelope_sha256": s.envelope_sha256}),
+            );
+        }
+        None => {
+            // An agent resolution: the package was rendered to, and resolved in, the resolving agent's own
+            // interface. No human receipt exists and none is claimed (`kind: agent_resolution`); human-approval
+            // consumers require `by_kind: human`, which only an owner-signed answer produces.
+            g.set("presented_in_chat", json!(true));
+            g.set(
+                "presentation_receipt",
+                json!({"kind": "agent_resolution", "resolver": {"session": p.session_id, "role": p.role}, "package_sha256": digest,
+                       "note": "resolved within HUMAN_GATE_POLICY.agent_resolvable_when; this is not a human receipt"}),
+            );
+        }
     }
     crate::t2::seal_record(g, "gate answer")?;
     let gdata = g.data.clone();

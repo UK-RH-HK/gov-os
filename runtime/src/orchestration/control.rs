@@ -286,6 +286,7 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("plugins registry", "read", Read),
     g("plugins list", "read", Read),
     g("plugins health", "read", Read),
+    g("plugins health --ping", "execute_plugin", Write),
     g("policy overrides", "read", Read),
     g("policy effective", "read", Read),
 ];

@@ -196,19 +196,17 @@ fn cit_approval_derives_only_from_an_answered_gate() {
     g.ok(&[
         "cit", "approve", &cid3, "--by", "owner", "--method", "human",
     ]);
+    // WS-3 / BC-P2-09: a gate answer can no longer be changed by editing the record at all — the edited record is
+    // not what gov wrote (T2), so execution refuses it before reading any answer field (previously APPROVAL_STALE /
+    // GATE_DECLINED, derived from the edited fields themselves).
     let mut gr = yaml(&root, &format!("spec/decisions/{gate3}.yaml"));
     gr["answer"]["at"] = json!("2030-01-01T00:00:00Z");
     write_yaml(&root, &format!("spec/decisions/{gate3}.yaml"), &gr);
-    assert_eq!(
-        g.err(&["cit", "execute", &cid3]).error_code(),
-        "APPROVAL_STALE"
-    );
+    assert_eq!(g.err(&["cit", "execute", &cid3]).error_code(), "T2_UNBOUND");
     gr["answer"]["option"] = json!("B");
     write_yaml(&root, &format!("spec/decisions/{gate3}.yaml"), &gr);
-    assert_eq!(
-        g.err(&["cit", "execute", &cid3]).error_code(),
-        "GATE_DECLINED"
-    );
+    assert_eq!(g.err(&["cit", "execute", &cid3]).error_code(), "T2_UNBOUND");
+    assert!(!exists(&root, "src/hdr3.rs"));
     // (g) the automatic path never claims human approval
     let mf = root.join(".governance-runtime/ed.json");
     std::fs::write(

@@ -1048,7 +1048,13 @@ fn g0_label(cmd: &Cmd) -> String {
             PluginsCmd::Unregister { .. } => "plugins unregister",
             PluginsCmd::Registry => "plugins registry",
             PluginsCmd::List => "plugins list",
-            PluginsCmd::Health { .. } => "plugins health",
+            PluginsCmd::Health { ping } => {
+                if *ping {
+                    "plugins health --ping"
+                } else {
+                    "plugins health"
+                }
+            }
         }),
         Cmd::Policy { op } => s(match op {
             PolicyCmd::Overrides => "policy overrides",
@@ -1085,6 +1091,17 @@ fn g0(cli: &Cli) -> Result<()> {
     };
     control::g0(&p, &label)?;
     Ok(())
+}
+
+/// BC-P2-09 at the product surface: CIT approval/execution reads its gate's answer itself, so the gate it names must
+/// be one gov wrote and whose answer verifies (`gates::require_honoured_answers`).
+fn cit_gate_precheck(p: &Project, cit_id: &str) -> Result<()> {
+    let store = gov_runtime::records::RecordStore::load(&p.root);
+    let gate = store
+        .get(cit_id)
+        .map(|c| c.get("human_gate"))
+        .unwrap_or_default();
+    gov_runtime::orchestration::gates::require_honoured_answers(p, &[gate])
 }
 
 fn db(p: &Project) -> Result<RuntimeDb> {
@@ -1138,7 +1155,7 @@ fn run(cli: &Cli) -> Result<Value> {
             let mut p = open_project(cli, true)?;
             if *rollback { return gov_runtime::update::rollback_opts(&mut p, None, reason.as_deref(), *break_glass); }
             let by = by.clone().unwrap_or_else(|| acting.clone());
-            if *apply { return gov_runtime::update::apply_update_opts(&mut p, source.as_deref(), *approve, &by, channel.clone(), *break_glass); }
+            if *apply { gov_runtime::orchestration::gates::require_honoured_answers(&p, &gov_runtime::orchestration::gates::answered_gates_for_trigger(&p, "framework_update"))?; return gov_runtime::update::apply_update_opts(&mut p, source.as_deref(), *approve, &by, channel.clone(), *break_glass); }
             let _ = check; gov_runtime::update::check(&p, source.as_deref())
         }
         Cmd::Trust { op } => {
@@ -1211,9 +1228,9 @@ fn run(cli: &Cli) -> Result<Value> {
                     if let Some(m) = manifest { f["mutation_manifest"] = load_file_value(m)?; }
                     if let Some(t) = title { f["title"] = json!(t); } c::propose(&p, f) }
                 CitCmd::Simulate { id } => { let d = db(&p)?; c::simulate(&p, &d, id) }
-                CitCmd::Approve { id, by, method } => c::approve(&p, id, by.as_deref().unwrap_or(&acting), method),
+                CitCmd::Approve { id, by, method } => { cit_gate_precheck(&p, id)?; c::approve(&p, id, by.as_deref().unwrap_or(&acting), method) }
                 CitCmd::Reject { id, by, reason } => c::reject(&p, id, by.as_deref().unwrap_or(&acting), reason.as_deref()),
-                CitCmd::Execute { id } => { let d = db(&p)?; c::execute(&p, &d, id) }
+                CitCmd::Execute { id } => { cit_gate_precheck(&p, id)?; let d = db(&p)?; c::execute(&p, &d, id) }
                 CitCmd::Rollback { id, reason } => c::rollback(&p, id, reason.as_deref()),
                 CitCmd::List => Ok(json!(c::list(&p))),
                 CitCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found"))) }

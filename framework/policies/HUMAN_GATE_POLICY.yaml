@@ -17,6 +17,7 @@ system_gate_package:
   privilege_elevation: {cost_rework: "unregistering the plugin removes its elevated standing; anything produced through it must be re-validated"}
   kernel_integrity_override: {cost_rework: "continuing on a modified kernel may produce governance evidence that must be re-established after gov kernel reinstall"}
   budget_threshold: {cost_rework: "stopping forfeits only the spend already made; continuing adds spend beyond the delegated budget"}
+  contradiction: {cost_rework: "work built on the rejected input must be re-planned; work already delivered on it is re-verified", why_now: "authoritative inputs contradict each other and deterministic precedence cannot choose between them"}
 # BC-P2-10: human answers and presentation receipts are owner-signed documents verified against the
 # administrator-provisioned `human-gate` anchor (the Signed Release Root's delegation when one is provisioned). On a
 # machine with no release root, a standalone administrator-provisioned anchor is honoured only while this is true;

@@ -28,7 +28,7 @@
 //! * **Presentation evidence**: a signed answer or a signed `human-gate-receipt` over the same package digest is the
 //!   only thing that marks a gate `presented_in_chat`. Rendering the package to an agent's stdout does not.
 //! * **Use-time re-verification**: the exact signed envelope is stored (hex) in the gate record, and every
-//!   consumer that honours the answer re-verifies it against the current anchor ([`reverify_answer`]).
+//!   consumer that honours the answer re-verifies it against the current anchor ([`reverify`]).
 //!
 //! ## What cannot produce a human answer
 //!
