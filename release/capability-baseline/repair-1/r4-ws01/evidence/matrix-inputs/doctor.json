@@ -1,0 +1,964 @@
+{
+  "ok": true,
+  "command": "doctor",
+  "result": {
+    "verdict": "DEGRADED",
+    "checks": [
+      {
+        "id": "D001",
+        "name": "framework.lock present",
+        "ok": true,
+        "severity": "info",
+        "message": "present",
+        "remediation": "gov init / gov adopt",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D002",
+        "name": "framework.lock schema",
+        "ok": true,
+        "severity": "info",
+        "message": "valid",
+        "remediation": "gov update --apply (migration) or repair lock",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D003",
+        "name": "kernel payload integrity",
+        "ok": true,
+        "severity": "info",
+        "message": "intact (4.1.6)",
+        "remediation": "gov kernel reinstall --source <release> (kernel is immutable, INV-007)",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D004",
+        "name": "lock matches kernel manifest",
+        "ok": true,
+        "severity": "info",
+        "message": "match",
+        "remediation": "gov update --apply or gov kernel reinstall",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D005",
+        "name": "CLI/kernel compatibility",
+        "ok": true,
+        "severity": "info",
+        "message": "match",
+        "remediation": "gov update --check",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D006",
+        "name": "project overlay",
+        "ok": true,
+        "severity": "info",
+        "message": "7 overlay files valid",
+        "remediation": "repair governance/project/*.yaml against kernel schemas",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D007",
+        "name": "policies",
+        "ok": true,
+        "severity": "info",
+        "message": "14 policies loaded, 0 overrides",
+        "remediation": "repair policy overrides/exceptions",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D029",
+        "name": "constitutional policy read from a verified kernel",
+        "ok": true,
+        "severity": "info",
+        "message": "installed kernel 4.1.6 intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record",
+        "remediation": "gov kernel verify; gov kernel reinstall (or `gov kernel override --reason ...` as an L4+ role, which raises a gate)",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D027",
+        "name": "policy precedence respected (no override weakens security/authority/gate floors)",
+        "ok": true,
+        "severity": "info",
+        "message": "0 override(s) applied within POLICY_PRECEDENCE; rules from installed kernel (verified)",
+        "remediation": "remove the weakening override from governance/project/PROJECT_POLICY.yaml or PROJECT_EXCEPTIONS.yaml; only strengthening overrides are applied",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D028",
+        "name": "capability plugins governed (schema-valid, registered, pinned, authorised)",
+        "ok": true,
+        "severity": "info",
+        "message": "no plugin problems",
+        "remediation": "gov plugins list; fix or register the descriptor (gov plugins register --descriptor <file>)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D008",
+        "name": "framework.json in sync with repository contract",
+        "ok": true,
+        "severity": "info",
+        "message": "in sync",
+        "remediation": "gov adapters generate",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D009",
+        "name": "derived runtime",
+        "ok": true,
+        "severity": "info",
+        "message": "state.db ok (164 artefacts)",
+        "remediation": "gov rebuild-memory",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D010",
+        "name": "index freshness",
+        "ok": true,
+        "severity": "info",
+        "message": "fresh (164 artefacts)",
+        "remediation": "gov rebuild-memory (full when pins changed; --incremental otherwise)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D011",
+        "name": "secrets outside secret class",
+        "ok": true,
+        "severity": "info",
+        "message": "none",
+        "remediation": "move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        },
+        "subjects": []
+      },
+      {
+        "id": "D012",
+        "name": "no secrets in index",
+        "ok": true,
+        "severity": "info",
+        "message": "clean",
+        "remediation": "gov rebuild-memory (fail-closed re-index) and rotate the exposed secret",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "critical",
+              "operations": [
+                "task.create",
+                "task.claim",
+                "task.close",
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "handoff.create",
+                "release.build",
+                "update.apply",
+                "adopt.migrate"
+              ],
+              "scope": "global",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim",
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        }
+      },
+      {
+        "id": "D025",
+        "name": "semantic index consistent with pinned embedder/reranker; retrieval profile governed; embedding runtime unchanged",
+        "ok": true,
+        "severity": "info",
+        "message": "consistent: hashed-ngram (382 vectors)",
+        "remediation": "gov rebuild-memory (full rebuild re-embeds every chunk with the pinned implementation); govern a profile change with gov memory benchmark + gov memory select",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        },
+        "retrieval_profile": {
+          "state": "KERNEL_DEFAULT",
+          "governed": true,
+          "decision": null
+        }
+      },
+      {
+        "id": "D026",
+        "name": "claims store present and intact",
+        "ok": true,
+        "severity": "info",
+        "message": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01/target/P2-AR-0042/tier-runs/proj/.governance-state/claims.db",
+        "remediation": "restore claims.db or gov claims sweep",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        },
+        "misplaced_os_state": []
+      },
+      {
+        "id": "D013",
+        "name": "legacy governance mechanisms retired",
+        "ok": true,
+        "severity": "info",
+        "message": "0 legacy mechanism(s), all marked LEGACY/archived",
+        "remediation": "gov adopt (A2/A8) or register a LEGACY record / move to archive/",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D014",
+        "name": "authority unambiguous (no supersession conflicts / duplicate ids)",
+        "ok": true,
+        "severity": "info",
+        "message": "0 supersession conflict(s), 0 duplicate id(s)",
+        "remediation": "resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        },
+        "subjects": []
+      },
+      {
+        "id": "D015",
+        "name": "graph integrity",
+        "ok": true,
+        "severity": "info",
+        "message": "0 relationship finding(s) above low {}, 1 orphan record(s)",
+        "remediation": "fix references in records or add missing records; move misplaced records to their canonical directory; re-point or revalidate work linked to superseded records (through a CIT)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        },
+        "orphan_records": [
+          "AUD-0001"
+        ],
+        "subjects": []
+      },
+      {
+        "id": "D016",
+        "name": "no interrupted transactions",
+        "ok": true,
+        "severity": "info",
+        "message": "none",
+        "remediation": "gov recover (classifies and rolls back/finishes interrupted mutations)",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "cit.propose",
+                "cit.execute"
+              ],
+              "scope": "global",
+              "remedies": []
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close"
+              ],
+              "scope": "subjects",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        },
+        "subjects": []
+      },
+      {
+        "id": "D017",
+        "name": "session claims",
+        "ok": true,
+        "severity": "info",
+        "message": "0 claim(s), 0 expired (claims store: .governance-state/claims.db, survives rebuilds)",
+        "remediation": "gov claims sweep",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D018",
+        "name": "control state",
+        "ok": true,
+        "severity": "info",
+        "message": "mode \"RUNNING\" writes_frozen false",
+        "remediation": "gov resume (only after the reason for the pause/freeze is resolved)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D019",
+        "name": "human gates surfaced to the human (presented = owner-signed receipt or answer)",
+        "ok": true,
+        "severity": "info",
+        "message": "0 pending gate(s): 0 presented (owner-signed receipt or answer)",
+        "remediation": "gov gate present <id> renders the decision package to the human channel; the gate is presented when the owner signs a receipt or an answer (`gov trust human-channel`)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D020",
+        "name": "adapters current and conformant",
+        "ok": true,
+        "severity": "info",
+        "message": "6 adapters verified",
+        "remediation": "gov adapters generate",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D021",
+        "name": "governance suite green and current",
+        "ok": true,
+        "severity": "info",
+        "message": "green record \"AUD-0001\" current",
+        "remediation": "gov health run (re-checks only the checks the changed inputs impact; gov audit runs the full suite)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        },
+        "currency": {
+          "green": "AUD-0001",
+          "current": true,
+          "changed_classes": [],
+          "key": "bde66aea7a7ffe56f69949c530883c312f2134176d624db8c5c19d9c276b0f3f",
+          "recorded_key": "bde66aea7a7ffe56f69949c530883c312f2134176d624db8c5c19d9c276b0f3f",
+          "unhonoured_green": [],
+          "message": "green record \"AUD-0001\" current"
+        }
+      },
+      {
+        "id": "D030",
+        "name": "product tests pass (recorded per-family evidence)",
+        "ok": true,
+        "severity": "info",
+        "message": "no product test command configured or detectable",
+        "remediation": "gov verify product (records per-family results as governed evidence)",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close"
+              ],
+              "scope": "covered-paths",
+              "remedies": []
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build"
+              ],
+              "scope": "global",
+              "remedies": []
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        },
+        "product_tests": {
+          "applicable": false,
+          "notes": [
+            "no product test command configured (PROJECT_POLICY.tests) or detectable with an available toolchain (capability gap)"
+          ],
+          "families": {}
+        }
+      },
+      {
+        "id": "D031",
+        "name": "no active health hard-block from the governance suite",
+        "ok": true,
+        "severity": "info",
+        "message": "health state YELLOW",
+        "remediation": "repair the failing check; `gov health status` lists the blocks, `gov health run` re-evaluates",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        },
+        "blocks": [],
+        "stale_blocks": []
+      },
+      {
+        "id": "D032",
+        "name": "installation authenticity established (otherwise disclosed, never presented as current/verified/certified)",
+        "ok": false,
+        "severity": "medium",
+        "message": "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.6), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).",
+        "remediation": "gov trust status; provision a trust anchor (gov trust provision --anchor <admin root>) and reinstall from a signed release (gov kernel reinstall --source <release>)",
+        "posture": {
+          "project_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01/target/P2-AR-0042/tier-runs/proj",
+          "installed": true,
+          "machine_posture": "UNPROVISIONED",
+          "authenticity": "UNKNOWN",
+          "authenticity_established": false,
+          "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+          "bootstrap": {
+            "authenticity": "UNKNOWN",
+            "binary": {
+              "cli_version": "4.1.6",
+              "embedded_commit": "9bafcb35468afa1b568fc7b46b2811c0829ffbdf",
+              "embedded_kernel_version": "4.1.6",
+              "embedded_payload_hash": "c45af395584d01de4b99727799c4c500462b88e0770a7af6b6e2f03c69129422",
+              "executable_sha256": "2817913a5368b0e506a00a96c790f04cff5ae54988715d0dee90a4f4e2066ad5",
+              "gov_version": "4.1.6"
+            },
+            "decision": "OWNER-DECISION-P2-0002",
+            "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+            "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+            "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+          },
+          "integrity": {
+            "intact": true,
+            "protected_record": "MATCHED",
+            "basis": "byte-identical to the payload embedded in the running gov binary: the bootstrap baseline a machine with no trust anchor may hold (OWNER-DECISION-P2-0002); its authenticity is UNKNOWN"
+          },
+          "bound_release": {
+            "release_version": "4.1.6",
+            "sequence": 0,
+            "channel": "unspecified",
+            "payload_hash": "c45af395584d01de4b99727799c4c500462b88e0770a7af6b6e2f03c69129422",
+            "kernel_manifest_hash": "b6aa21365da55049e30e4a6222f5c0761e21af0a8abf2e295ce0600092f8173a",
+            "authenticity": "UNKNOWN",
+            "posture_at_install": "UNPROVISIONED",
+            "release_metadata_sha256": "",
+            "ingress": "init",
+            "at": "2026-09-19T18:03:09Z",
+            "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+            "bootstrap": {
+              "authenticity": "UNKNOWN",
+              "binary": {
+                "cli_version": "4.1.6",
+                "embedded_commit": "9bafcb35468afa1b568fc7b46b2811c0829ffbdf",
+                "embedded_kernel_version": "4.1.6",
+                "embedded_payload_hash": "c45af395584d01de4b99727799c4c500462b88e0770a7af6b6e2f03c69129422",
+                "executable_sha256": "2817913a5368b0e506a00a96c790f04cff5ae54988715d0dee90a4f4e2066ad5",
+                "gov_version": "4.1.6"
+              },
+              "decision": "OWNER-DECISION-P2-0002",
+              "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+              "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+              "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+            }
+          },
+          "lock_version": "4.1.6",
+          "disclosure": "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.6), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+        },
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D033",
+        "name": "OS-written records bound to gov operations (T2)",
+        "ok": true,
+        "severity": "info",
+        "message": "no tampered OS state and no unsealed gate in force; 0 record(s) not honoured on this machine (legacy, hand-written approval claims, or sealed elsewhere)",
+        "remediation": "restore tampered records from version control; withdraw hand-written gates and raise them through gov (`gov gate list` shows what is unverified)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D034",
+        "name": "failure memory followed up",
+        "ok": true,
+        "severity": "info",
+        "message": "no open failure records",
+        "remediation": "investigate the failure and link its follow-up task (memory::failures::link_follow_up); repair or replace the failing tool",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D035",
+        "name": "repository HEALTHY: the thirteen Gate U conditions and the framework-health SLOs",
+        "ok": true,
+        "severity": "info",
+        "message": "HEALTHY: all thirteen conditions hold and every Gate U SLO is within its threshold",
+        "remediation": "repair the failing owning checks; `gov health status` shows every condition, SLO and threshold; `gov health run` re-evaluates the suite",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        },
+        "repository": {
+          "verdict": "HEALTHY",
+          "failing_conditions": [],
+          "unknown_conditions": [],
+          "crossed_slos": []
+        }
+      },
+      {
+        "id": "D022",
+        "name": "native toolchains for detected ecosystems",
+        "ok": true,
+        "severity": "info",
+        "message": "0 ecosystem(s) detected, tools available",
+        "remediation": "install the native toolchain or raise a tooling task (never a crash)",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      },
+      {
+        "id": "D023",
+        "name": "records parse",
+        "ok": true,
+        "severity": "info",
+        "message": "1 records",
+        "remediation": "fix YAML/frontmatter errors",
+        "enforcement": {
+          "mode": "hard-block",
+          "refuses": [
+            {
+              "at_or_above": "high",
+              "operations": [
+                "task.close",
+                "cit.execute"
+              ],
+              "scope": "subjects",
+              "remedies": [
+                "cit.propose",
+                "cit.approve",
+                "cit.execute",
+                "task.create",
+                "task.claim"
+              ]
+            },
+            {
+              "at_or_above": "high",
+              "operations": [
+                "release.build",
+                "update.apply"
+              ],
+              "scope": "global",
+              "remedies": [
+                "update.apply"
+              ]
+            }
+          ],
+          "below_threshold": "warning",
+          "scope_rule": "a hard-block refuses the listed operations within its scope; an operation listed as a remedy whose subjects reach the block's subjects stays available, and commits only if the block is cleared"
+        },
+        "subjects": []
+      },
+      {
+        "id": "D024",
+        "name": ".governance-runtime ignored by git",
+        "ok": true,
+        "severity": "info",
+        "message": "ignored",
+        "remediation": "add .governance-runtime/ to .gitignore",
+        "enforcement": {
+          "mode": "warning",
+          "refuses": []
+        }
+      }
+    ],
+    "failed": 1,
+    "remediation": [
+      "gov trust status; provision a trust anchor (gov trust provision --anchor <admin root>) and reinstall from a signed release (gov kernel reinstall --source <release>)"
+    ],
+    "framework_version": "4.1.6",
+    "cli_version": "4.1.6",
+    "root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01/target/P2-AR-0042/tier-runs/proj",
+    "release_trust": {
+      "surface": "doctor",
+      "below_floor": false,
+      "marking": null,
+      "presented_as": "UNAUTHENTICATED",
+      "section_6_bullet": 7,
+      "authenticity_established": false,
+      "disclosure": [
+        "BOOTSTRAP installation (OWNER-DECISION-P2-0002): the installed kernel is a gov binary's embedded payload, installed on a machine with no provisioned Signed Release Root trust anchor. Release authenticity UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+      ],
+      "detail": "gov kernel trust; gov trust status",
+      "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 §6 bullet 7 was also asked and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking."
+    },
+    "health_result": {
+      "id": "HR-20260919T180321277Z-68314759",
+      "state": "YELLOW",
+      "blocks": 0
+    }
+  },
+  "session": "S-tier",
+  "release_trust": {
+    "surface": "doctor",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "UNAUTHENTICATED",
+    "section_6_bullet": 7,
+    "authenticity_established": false,
+    "disclosure": [
+      "BOOTSTRAP installation (OWNER-DECISION-P2-0002): the installed kernel is a gov binary's embedded payload, installed on a machine with no provisioned Signed Release Root trust anchor. Release authenticity UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+    ],
+    "detail": "gov kernel trust; gov trust status",
+    "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 §6 bullet 7 was also asked and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking."
+  }
+}

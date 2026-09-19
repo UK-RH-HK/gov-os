@@ -8,7 +8,7 @@ its own project (bootstrap installation of the binary's embedded payload on a pr
 XDG_STATE_HOME and XDG_CACHE_HOME under the scratch directory, env SCRATCH), every invocation declaring its role.
 Prints one line per case:
 
-  CASE <gate> <owner> BEFORE ok=<bool> n=<findings> AFTER ok=<bool> n=<findings> -> DETECTED|NOT_DETECTED  <evidence>
+  CASE <gate> <capability> <owner> BEFORE ok=<bool> n=<findings> AFTER ok=<bool> n=<findings> -> DETECTED (how)|NOT_DETECTED  <finding>
 """
 import json
 import os
@@ -79,12 +79,15 @@ class Proj:
         kind, ref = owner.split(":", 1)
         if kind == "doctor":
             d = self.gov("doctor")
-            for c in (d.get("result") or {}).get("checks", []):
+            # a failing doctor exits UNHEALTHY and carries its report in the error details
+            r = d.get("result") or (d.get("error") or {}).get("details") or {}
+            for c in r.get("checks", []):
                 if c["id"] == ref:
                     return c["ok"], ([] if c["ok"] else [c.get("message", "")])
             return None, [f"no doctor check {ref}: {str(d)[:300]}"]
         d = self.gov("health", "run", "--check", ref, "--no-persist", "--no-cache")
-        r = d.get("result") or {}
+        # a run whose verdict is UNHEALTHY exits with the error UNHEALTHY and carries the run in its details
+        r = d.get("result") or (d.get("error") or {}).get("details") or {}
         fam = (r.get("families") or {}).get(ref)
         if fam is None:
             return None, [f"not run: {str(d)[:300]}"]
@@ -106,9 +109,11 @@ def case(gate, capability, owner, plant, expect, rebuild=False, commit=True):
     ok1, m1 = p.check(owner)
     hit = [m for m in m1 if expect.lower() in m.lower()]
     before_hit = [m for m in m0 if expect.lower() in m.lower()]
-    detected = ok1 is False and bool(hit) and not before_hit
+    # detected: the owner, run by the product, raises a finding about the planted fault that it did not raise before
+    detected = bool(hit) and not before_hit and ok1 is not None
+    how = "the check fails" if ok1 is False else "reported as a warning-level finding; the check stays ok"
     line = (f"CASE {gate} {capability} {owner} BEFORE ok={ok0} n={len(m0)} AFTER ok={ok1} n={len(m1)} -> "
-            f"{'DETECTED' if detected else 'NOT_DETECTED'}  {(hit or m1 or ['-'])[0][:220]}")
+            f"{'DETECTED (' + how + ')' if detected else 'NOT_DETECTED'}  {(hit or m1 or ['-'])[0][:220]}")
     print(line, flush=True)
     results.append((gate, detected))
 
@@ -129,7 +134,7 @@ def dangling(p):
 
 
 def stale_index(p):
-    p.w("README.md", "# planted-fault probe\nedited after the index was built\n")
+    p.w("src/lib.rs", "pub fn total(a: i64, b: i64) -> i64 { a + b }\npub fn edited_after_indexing() {}\n")
 
 
 def unregistered_plugin(p):
@@ -155,7 +160,8 @@ def silent_readiness(p):
 def dag_cycle(p):
     for a, b in [("TASK-0101", "TASK-0102"), ("TASK-0102", "TASK-0101")]:
         p.wj(f"spec/tasks/{a}.yaml", {"id": a, "type": "task", "title": a, "class": "documentation",
-                                       "status": "READY", "objective": "o", "depends_on": [b]})
+                                       "status": "ACTIVE", "task_status": "READY", "objective": "o",
+                                       "dependencies": [b]})
 
 
 def incomplete_research(p):
@@ -178,7 +184,7 @@ def forged_gate(p):
 
 def unrouted_class(p):
     p.wj("spec/tasks/TASK-0201.yaml", {"id": "TASK-0201", "type": "task", "title": "t", "class": "astrology",
-                                        "status": "READY", "objective": "o"})
+                                        "status": "ACTIVE", "task_status": "READY", "objective": "o"})
 
 
 def orphan_handoff(p):
@@ -216,7 +222,7 @@ case("A", "A3", "check:path_map_compliance", secret, "secret")
 case("A", "A3", "doctor:D011", secret, "secret")
 case("B", "B1", "doctor:D024", gitignore_runtime, ".governance-runtime")
 case("C", "C2", "check:graph_integrity", dangling, "REQ-9999", rebuild=True)
-case("D", "D1", "check:index_freshness", stale_index, "README.md")
+case("D", "D1", "check:index_freshness", stale_index, "index stale")
 case("F", "F4", "check:plugin_governance", unregistered_plugin, "sneaky")
 case("G", "G2", "check:command_contract_consistency", unknown_cli, "frobnicate", commit=False)
 case("H", "H2", "check:feature_readiness", silent_readiness, "F-0001")
@@ -229,7 +235,7 @@ case("N", "N1", "check:continuity_checkpoint_handoff", orphan_handoff, "TASK-999
 case("O", "O2", "check:schema_invariants", invalid_record, "D-0009")
 case("R", "R1", "check:legacy_authority", legacy_rules, "")
 case("T", "T3", "check:os_binding_integrity", forged_adoption_baseline, "00-BASELINE")
-case("U", "U", "check:health_slos", orphan_feature, "F-0007", rebuild=True)
+case("U", "U", "check:health_slos", orphan_feature, "orphan-graph count", rebuild=True)
 case("U", "U", "doctor:D035", secret, "")
 case("W", "W7", "check:lineage_orphans", orphan_requirement, "REQ-0007", rebuild=True)
 print(f"# SUMMARY detected {sum(1 for _, d in results if d)}/{len(results)}; gates "

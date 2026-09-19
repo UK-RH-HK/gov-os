@@ -15,3 +15,13 @@ applied: 'if !allowed_status.iter().any(|s| s == "SUPERSEDED") {' -> 'if false &
 mutant: FAILED | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.01s | thread 'context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block' (1361192) panicked at runtime/src/context/manifest.rs:1362:9: assertion failed: code("REQ-0001").contains(&"SUPERSEDED") 
 reverted: identical-to-HEAD
 ===== MUTATION P P1 owner=test:certification:greenfield::greenfield_end_to_end file=runtime/src/observability.rs
+control (unmutated): PASSED | test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 192 filtered out; finished in 175.23s
+applied: '    let path = path(p);\n    if !path.exists() {' -> '    let path = path(p);\n    if true || !path.exists() {'
+mutant: FAILED | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 192 filtered out; finished in 119.94s | thread 'greenfield::greenfield_end_to_end' (1375872) panicked at cli/../tests/certification/greenfield.rs:318:5: assertion failed: tel["events"].as_u64().unwrap() > 5 
+reverted: identical-to-HEAD
+===== MUTATION Q Q4 owner=test:certification:upstream::export_gate_fails_closed_on_content_whatever_the_name file=runtime/src/upstream.rs
+control (unmutated): PASSED | test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 192 filtered out; finished in 22.61s
+applied: 'if let Some(m) = blob_rx.find(text) {' -> 'if let Some(m) = blob_rx.find(text).filter(|_| false) {'
+mutant: FAILED | test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 192 filtered out; finished in 17.68s | thread 'upstream::export_gate_fails_closed_on_content_whatever_the_name' (1385286) panicked at cli/../tests/certification/common.rs:209:9: 
+reverted: identical-to-HEAD
+# done 2026-09-19T17:51:22Z

@@ -1,0 +1,65 @@
+# P2-AR-0042 (WS-1, repair iteration 1, round 4) — machine-readable claims. Builder claims with regression evidence
+# only (Contract v3 O3); acceptance is decided by fresh independent verifiers. Report: 00-REPAIR-REPORT.md.
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0042
+workstream: WS-1
+round: 4
+base_commit: cae2f67cf919d1506b914bf0c98c75c49e755293
+product_base: e4cb662b64564b7cd5030d5fc2c0d72e710c6a9e
+final_product_commit: 9bafcb35468afa1b568fc7b46b2811c0829ffbdf
+product_code_digest_before: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+product_code_digest_after: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9
+claims:
+  - item: BC-P2-02
+    title: every one of the 101 capabilities names at least one evidence owner that actually runs, with the Contract v3:53-73 governed fields; gov contract verify enforces it; the product generates the suite-to-contract matrix
+    status: REPAIRED_CLAIMED
+    source: repair-delta §1 BC-P2-02; frozen gate contract AC-10, AC-13; Contract v3:53-73, :81-91, :97-109; P2-HO-0041
+    files: [runtime/src/contracts.rs, framework/schemas/governance-capability-acceptance.schema.json, tests/governance/capability-evidence-map.yaml, framework/contracts/contract-source.lock, docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md, cli/src/main.rs (additive), runtime/src/orchestration/control.rs (additive), tests/certification/ws01r4.rs, tests/certification/main.rs (mod line)]
+    product_checks: [contracts::verify (owners, governed digest), contracts::generate (strict owner resolution before write), contracts::OwnerRegistry / resolve_id, contracts::test_index, contracts::derived_fields, contracts::owner_differences, contracts::suite_to_contract, gov contract matrix, contracts::owner_sources_fingerprint]
+    typed_errors: [CONTRACT_EVIDENCE_OWNER_MISSING, CONTRACT_EVIDENCE_OWNER_UNRESOLVED, CONTRACT_EVIDENCE_OWNER_INVALID, CONTRACT_EVIDENCE_MAP_NOT_RECOMPILED, CONTRACT_EVIDENCE_MAP_DIVERGED]
+    owners: {total: 762, by_kind: {test: 441, check: 127, obligation: 110, doctor: 34, g0: 19, human-gate: 13, heldout: 13, release: 5}, capabilities_with_a_G_tier_owner: 76, capabilities_by_tier: {G0: 9, G1: 44, G2: 32, G3: 25, G4: 69, G5: 74, G6: 71}, checklist_items_naming_an_owner: "586/713", deferred_in_this_tree: 0}
+    gaps:
+      - "16 capabilities owned only by builder regression tests (+ the AC-12/AC-6 obligation): C5, F5, G1, H3, K3, M2, M3, N2, Q2, Q3, Q4, R2, T2, V1, V2, V3 — no G-tier, held-out, human-gate or release owner exists for them"
+      - "9 capabilities without a G-tier owner but with a human-gate / release / held-out owner: A4, F3, K1, K4, Q1, S1, S2, S4, S5"
+      - "G6 `gov health qualify` exercised by no test or run: no G6 owner for V1-V4 or W12.7"
+      - "127 of 713 checklist items name no owner (evidence/mapping/owner-census.9bafcb3.out)"
+      - "schema / migration / security-sensitivity freshness triggers proven at unit level only"
+      - "severity null for every capability: no normative source states one"
+    mutation_controls: {owner_controls: "29/29 (evidence/mutation-controls/owner-mutation-controls.9bafcb3.out)", round1_bc_p2_01: "20/20 unedited (evidence/mutation-controls/bc-p2-01-round1-mutation-controls.9bafcb3.out)", unit: "contracts::tests::an_owner_mutation_is_a_typed_failure (15 mutations)", certification: "ws01r4::gov_contract_verify_enforces_the_evidence_owners (6 mutations + an #[ignore]d owner test)"}
+    owner_samples_per_gate: "23/23 gates: PLANTED-FAULT 20/20 cases over 18 gates (A B C D F G H I J K L M N O R T U W; M1, T3, W7 as warning-level findings), release tamper S detected, MUTATION 5/5 (E P Q V W) — evidence/owner-faults/"
+    matrix: [suite-to-contract.md, suite-to-contract.json]
+    tests: [contracts::tests::the_owner_resolver_lists_exactly_the_tests_the_lib_harness_runs, contracts::tests::the_resolver_reads_items_not_text, contracts::tests::owner_references_resolve_against_the_product, contracts::tests::what_the_owners_determine_is_derived_from_the_product, contracts::tests::every_capability_names_a_running_owner_and_every_owner_resolves, contracts::tests::an_owner_mutation_is_a_typed_failure, contracts::tests::a_tree_without_the_owners_sources_defers_and_discloses_and_never_compiles, contracts::tests::the_matrix_is_generated_from_the_map_with_the_supplied_run_evidence, contracts::tests::the_owner_sources_fingerprint_follows_what_owners_resolve_against, ws01r4::the_owner_resolver_lists_exactly_the_tests_the_certification_harness_runs, ws01r4::gov_contract_verify_enforces_the_evidence_owners, ws01r4::a_tree_without_the_owners_sources_discloses_deferred_owners_and_refuses_to_compile, ws01r4::the_suite_to_contract_matrix_is_generated_from_the_products_own_map]
+    changed_builder_tests: ["contracts::tests::governed_evidence_values_survive_regeneration: body updated to the owner-object shape; property kept (report §6.3)"]
+    integration_points: [IP-R4-WS01-1, IP-R4-WS01-2, IP-R4-WS01-3, IP-R4-WS01-4, IP-R4-WS01-5, IP-R4-WS01-6]
+    owner_decision_required: false
+  - item: AC-13 preservation (ws01-12 BC-P2-01 controls)
+    status: REPAIRED_CLAIMED
+    title: compile preserves governed fields (byte-identical regeneration); verify refuses every round-1 mutation control with the same typed code
+    probes_rerun: [release/capability-baseline/repair-1/ws01-12/evidence/bc-p2-01/mutation-controls.py unedited -> 20/20 PASS]
+    owner_decision_required: false
+  - item: AC-10 second sentence — invalidation owner per freshness trigger
+    status: REPAIRED_CLAIMED
+    title: every freshness trigger in use (all 11 of Contract v3:97-109) names resolving owners proving that a change of that input invalidates prior green evidence (map freshness_invalidation; enforced by verify)
+    gaps: [schema, migration and security/sensitivity policy proven at unit level only]
+    owner_decision_required: false
+  - {item: ws01-12 IP-3, status: REPAIRED_CLAIMED, where: "report §2-§4"}
+  - {item: ws02 IP-WS02-19, status: REPAIRED_CLAIMED, where: "O4, O5, O1, U, O2, F1, L2/L3, K2, N1/N3/W9, M1/M4"}
+  - {item: ws04 IP-11, status: REPAIRED_CLAIMED, where: "W1-W5, W8, W10; the CLI subcommands it names are exercised through the mapped tests, not owners of their own"}
+  - {item: ws05 IP-6, status: PARTIAL, where: "E4 mapped; the I2 supplementary probe is a builder probe, not a product owner — not mapped"}
+  - {item: ws06 IP-1, status: REPAIRED_CLAIMED, where: "C3, C4, C5, C8, C9, D1, D2, D3"}
+  - {item: ws08 IP-5, status: REPAIRED_CLAIMED, where: "A2, S5"}
+  - {item: ws09-11 item 6, status: REPAIRED_CLAIMED, where: "R1, R2, S4, B2, T3, W1, Q4"}
+  - {item: r2-ws02 R3-6, status: PARTIAL, where: "W7, F4/L3/T3 (os_binding_integrity, D033), A2 (D032, installation_authenticity), W1/W8, W5, W4, C3/C4/D3, I2/J2 mapped; contract_binding owns BC-P2-01 (AC-13), not a capability — not mapped; G6 `gov health qualify` exercised by nothing — not mapped (IP-R4-WS01-4)"}
+  - {item: r2-ws04 R2-14, status: REPAIRED_CLAIMED, where: "ws04r2 tests and the named lib tests"}
+  - {item: r2-ws05 IP-R3-8, status: REPAIRED_CLAIMED, where: "I4, W3, E4, L3, W5, E1, H4, O3, T2"}
+  - {item: r2-ws06 IP-R2-4, status: REPAIRED_CLAIMED, where: "C2, D1, D4, D5, B1, B3, D6"}
+  - {item: r2-ws08 IP-R2-WS08-11, status: REPAIRED_CLAIMED, where: "A2, O5, S2"}
+  - {item: r2-ws09-11 IP-R2-6, status: REPAIRED_CLAIMED, where: "T1, T2, T3, S4, O3, Q1"}
+  - {item: r2-ws10 IP-WS10-14, status: REPAIRED_CLAIMED, where: "H4, J1, J2"}
+  - {item: r3-ws04 IP-R3-WS04-10, status: REPAIRED_CLAIMED, where: "C1, C6, K2, W5, W6, W8, J2, K3, A5, B3, W2, W3, I2"}
+  - {item: r3-ws06 IP-R3-WS06-6, status: REPAIRED_CLAIMED, where: "D1, N2, C3, C4, C5, F4 (D4), J1, D5, B1"}
+  - {item: r3-ws08 IP-R3-WS08-10, status: REPAIRED_CLAIMED, where: "S6, A2, S2, S1, L4, S5, B3; `a_binding_authority_is_not_installed_below_floor` is §6 break-glass behaviour no capability states — not mapped"}
+  - {item: r3-ws09-11 IP-R3-WS09-5, status: REPAIRED_CLAIMED, where: "A3, B3, S4, S5"}
+  - {item: integration-3 §8 evidence-map rows, status: REPAIRED_CLAIMED, where: "the four round-3 IPs above"}
+owner_decision_required: []

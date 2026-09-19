@@ -33,7 +33,7 @@ def gov(*a):
 
 
 out = os.path.join(SCR, "out")
-version = "9.9.9-p2ar0042"
+version = "4.1.6"  # the kernel version the binary builds (release build refuses any other: VERSION_MISMATCH)
 b = gov("release", "build", "--version", version, "--canonical", canon, "--out", out)
 print(f"# release build ok={b.get('ok')} capability_contract={(b.get('result') or {}).get('pre_release_checks', {}).get('capability_contract', {}).get('verdict')} "
       f"error={(b.get('error') or {}).get('code')}", flush=True)
