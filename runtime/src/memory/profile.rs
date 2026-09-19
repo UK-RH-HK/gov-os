@@ -40,7 +40,7 @@
 //! The decision it writes asserts only the evidence that was supplied and derives `human_approved` only from the
 //! verified human answer (WS-3 IP-8). [`governance`] detects a live profile that no decision pins (a direct overlay
 //! edit): state `UNGOVERNED` / `UNGOVERNED_CHANGE`.
-use crate::capabilities::governance::{command_files, plugin_set, PluginSet};
+use crate::capabilities::governance::{plugin_set, PluginSet};
 use crate::capabilities::protocol::PluginDescriptor;
 use crate::memory::db::RuntimeDb;
 use crate::memory::embedder::{EmbedSpec, Embedder, Reranker, BUILTIN_ID};
@@ -356,6 +356,29 @@ fn placeholders(desc: &PluginDescriptor, root: &Path, s: &str) -> String {
         .unwrap_or_default();
     s.replace("{project_root}", &root.to_string_lossy())
         .replace("{plugin_dir}", &plugin_dir)
+}
+
+/// Files the command vector names that exist on disk (interpreter scripts, local executables), after placeholder
+/// substitution; options (`-x`) after the program are skipped. This is the retrieval-profile identity's view of a
+/// plugin's local implementation files (the adapter component). Execution binding — which bytes a plugin may run —
+/// is `capabilities::binding::resolve`'s, and is independent of this listing.
+fn command_files(desc: &PluginDescriptor, root: &Path) -> Vec<(String, PathBuf)> {
+    let mut out = vec![];
+    for (i, c) in desc.command.iter().enumerate() {
+        let c = placeholders(desc, root, c);
+        if i > 0 && c.starts_with('-') {
+            continue;
+        }
+        let cand = if Path::new(&c).is_absolute() {
+            PathBuf::from(&c)
+        } else {
+            root.join(&c)
+        };
+        if cand.is_file() {
+            out.push((c.clone(), cand));
+        }
+    }
+    out
 }
 
 fn resolve_on_path(name: &str) -> Option<PathBuf> {
