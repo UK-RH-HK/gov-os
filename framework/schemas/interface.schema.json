@@ -189,13 +189,15 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "Records that consume this interface. Each id yields the canonical edge '<id> CONSUMES <this interface>' (stored as CONSUMED_BY and read back canonically by the graph): a change to the interface reaches its consumers."
     },
     "producers": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "Records that produce/implement this interface. Each id yields the canonical edge '<id> PRODUCES <this interface>'."
     }
   },
   "required": [
