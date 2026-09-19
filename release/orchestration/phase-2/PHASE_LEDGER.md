@@ -186,3 +186,19 @@ integration builder's figures. Regression reproduction only — not a verdict.
 | Still running | P2-AR-0025 WS-4, P2-AR-0026 WS-5. |
 | P2-ADJ-0002 | `t2.rs` seals are machine-keyed: OS-written facts from machine A are `Foreign` (not honoured) on machine B. Conflicts with Contract v3 S6 / framework §1 continuity. Ruled **determined** (S6 + D-0007 rule 2 + ARCH-0003 §8 provisioning boundary + OWNER-DECISION-P2-0002): round 3 must make T2 facts portable across the owner's provisioned machines while forged/unauthorised records stay refused; mechanism is the builder's within the provisioning boundary. Recorded `GATES/P2-ADJ-0002-T2-CROSS-MACHINE-CONTINUITY.md`; owner-overridable. |
 | Integration notes collected | WS-2's three D032 test relaxations must be removed once WS-8's provisioned harness is merged; heavy test-setup overlap between WS-3, WS-8 and WS-9 round-2 test edits; WS-10/WS-6/WS-2/WS-7 added CLI subcommands and `COMMAND_GUARDS` entries additively. |
+
+## P2-L-0018 — 2026-09-19 — Round-2 integration merged; round 3 dispatched
+
+| Field | Value |
+|---|---|
+| Round 2 | Nine builders complete (P2-AR-0023…0031); WS-4 (P2-AR-0025) last: BC-11 CIT side, BC-13 materiality (not self-labelled), BC-04 propagation to completed work/reports/receipts/packets, BC-05 checkpoint/handoff continuity, BC-18 contradiction detection; 88 FAIL→PASS in its probe sweep, 4 PASS→FAIL explained (K4 relabel fixture), three self-found regressions fixed. |
+| Integration | P2-AR-0032, work `cd423a6`: nine `--no-ff` merges; two declared product fixes (memory::profile compile reconciliation; CIT propagation re-seals only previously-verified seals); harness converged on WS-8's provisioned root; WS-2's D032 relaxations removed. lib **207/0**, certification **136/0** (109/27 right after merges), Python 4/4; G0: 177 labels, every round-2 label classified once. R1 held-out at baselines, census 118 files / 1991 functions, 0 §6 violations. |
+| Merge | `phase2/repair-1-r2-integration` → `release/4.1.6-rc1` at **`e8e1ff2`**; `product_code_digest` `797da37c…1fe1`. Orchestrator regression reproduction recorded in P2-L-0019. |
+| Routed | IF-1 (W7 semantics: consumption ≠ implementation) and O-1/O-5 → WS-2 r3; O-7 (OS writers modifying sealed records) → WS-4 r3. |
+| Round 3 | Eight builders from the merged tree: P2-AR-0033 WS-2 (BC-07, BC-23, BC-44, availability rule in the catalogue) · P2-AR-0034 WS-3 (P2-ADJ-0002, T2 completeness, BC-31 control state, D-0005/API-0001 governed amendment, docs, adapters) · P2-AR-0035 WS-4 · P2-AR-0036 WS-5 (BC-24, BC-13 hook, WS-4 API wiring, claims-store move) · P2-AR-0037 WS-6 · P2-AR-0038 WS-7 · P2-AR-0039 WS-8 (P2-ADJ-0002 provisioning, kernel payload/version consistency) · P2-AR-0040 WS-9/11. Common protocol P2-HO-0031 adds a binding **availability rule** (Contract v3 L4/O5): blocks scoped to what they protect; remedies and independent work stay available. Checkpoint P2-CP-0005. |
+| Next | Round-3 integration; round 4 (BC-P2-02 evidence map); mint `cap2-candidate-1`; independent verification. |
+
+## P2-L-0019 — 2026-09-19 — Orchestrator regression reproduction at merged round-2 HEAD `e8e1ff2`
+
+`cargo build --release` ok; `cargo test --lib` **207/0**; `cargo test --test certification` **136/0** (260 s). Matches the
+integration builder. Regression reproduction only — not a verdict.

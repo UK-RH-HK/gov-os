@@ -30,4 +30,8 @@ sealing and lineage completeness for CIT/context/records, the product-release re
 - WS-10 r2 IP-WS10-08 (`data_requirements`, `test_data`, `realises` relation fields), IP-WS10-09 (experiment promotions checked at CIT approve/execute), IP-WS10-10 (non-governed evidence flagged in the context manifest).
 - WS-6 r2 IP-R2-2 (CIT-E graph-integrity verification uses `memory::integrity::check`), IP-R2-6 (a retrieval-profile change is material for CIT-P), IP-R2-10 (CIT snapshots to the BC-P2-31 store path).
 - WS-8 r2 IP-R2-WS08-7 (product-release record type and relation fields; WS-3 adds the command).
+- From the **round-2 integration report**: the integrator's `bcf0139` made CIT propagation re-seal a record only when its
+  seal verified before the write — keep that rule (a hand edit must still break the seal) and extend it: **O-7** — other OS
+  writers still modify sealed records without re-sealing (enumerate every OS write path to a sealed record type and make
+  each either re-seal a previously-verified record or record the path in the CIT's touched list).
 - Apply the availability rule (common protocol) at your host sites.

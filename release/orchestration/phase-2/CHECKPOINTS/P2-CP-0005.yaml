@@ -1,0 +1,20 @@
+schema: governance-os.phase-2.checkpoint
+schema_version: 1
+checkpoint: P2-CP-0005
+trigger: significant mutation (repair iteration 1 round 2 integrated into the release branch) + task transition (round 3 dispatch)
+date: '2026-09-19'
+lifecycle_state: P2_REPAIR_ITERATION_1
+loop_status: P2_REPAIR_1_ROUND_3_RUNNING
+round_2:
+  builders: [P2-AR-0023, P2-AR-0024, P2-AR-0025, P2-AR-0026, P2-AR-0027, P2-AR-0028, P2-AR-0029, P2-AR-0030, P2-AR-0031]
+  integration_run: P2-AR-0032
+  integration_work_commit: cd423a63313ce261459f22e8ca3defe0285860be
+  release_branch_merge_commit: e8e1ff2cf21471eca750eaeb8246b4773355a463
+  product_code_digest: 797da37c8532528e1b8f3d924e2b7b7a304bb567bd928ce80126e8e120161fe1
+  integration_tests: {lib: 207/0, certification: 136/0, python: 4/4}
+  r1_heldout: {AR-0027: 26/3, AR-0029: 26/2 (ho_f n/c), AR-0031: 27/7, AR-0033: 30/1 (hv_a::a1 size pin; census 118/1991; 0 violations)}
+owner_decisions_in_force: [OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002]
+orchestrator_adjudications: [P2-ADJ-0001 (applied in round 2), P2-ADJ-0002 (T2 cross-machine continuity; round 3)]
+not_a_candidate: true
+running_work: [P2-AR-0033, P2-AR-0034, P2-AR-0035, P2-AR-0036, P2-AR-0037, P2-AR-0038, P2-AR-0039, P2-AR-0040]
+next_deterministic_action: AWAIT_REPAIR_1_ROUND_3 (see ORCHESTRATOR_STATE.yaml)

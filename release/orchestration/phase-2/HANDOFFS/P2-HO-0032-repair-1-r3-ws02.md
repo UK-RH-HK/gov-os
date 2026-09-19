@@ -34,4 +34,13 @@ BC-P2-07 (tier duties at every trigger, incl. G1 on every material mutation howe
 - WS-5 r2 IP-R3-7 (map `GATE_NOT_AUTHORISED` and the other blocked-class codes to exit 4, API-0002).
 - **Secret-like literal (WS-8 r2 IP-R2-WS08-6):** `framework/health/SKILL_SCENARIO_CHECKS.yaml` carries a planted `AKIA…EXAMPLE` literal that the kernel's own scanner flags when installed. Keep the scenario's meaning without a scannable literal in a kernel file (e.g. construct the probe value at run time).
 - WS-2 r2 own R3-4 (coverage checker's heading-line false gaps — coordinate: the checker is WS-6's; keep your confirmation step until WS-6 fixes it), R3-8 (= BC-23, BC-44 above), R3-11 (sealed plugin-registry entries in `t2::audit` — `t2.rs` is WS-3's; consume their API).
+- From the **round-2 integration report** (`release/capability-baseline/repair-1/integration-2/00-INTEGRATION-REPORT.md`):
+  **IF-1** (integration regression routed to you) — a WS-5 closing receipt lists inherited requirements in
+  `inputs_consumed` (→ `CONSUMES` edges), and the W7 lineage counts a `CONSUMES` edge as an implementation path, so a
+  requirement the receipt declares *not implemented* is no longer reported as a delivery gap (your line W7.2b). Decide
+  BC-P2-22's semantics for "reaches a requirement" from Contract v3 W7/W5 (consumption ≠ implementation) and fix it;
+  **O-1** — a W7 remediation subject later deleted leaves a dangling `AFFECTS` edge, DEGRADES the suite and refuses
+  governance closes until a CIT repairs the generated task: apply the availability rule (a generated investigation task
+  whose subject is gone must be closable/withdrawn without deadlock); **O-5** — the planted literal (above) also sits in a
+  test project's embedded-kernel cache.
 - IP-WS02-11 (optional; `TEST_POLICY` governance-affecting task classes).
