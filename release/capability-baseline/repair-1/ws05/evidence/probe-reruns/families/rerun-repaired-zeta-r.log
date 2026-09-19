@@ -1,0 +1,21 @@
+# family zeta-r  clone HEAD ddf722a04461abacafb6011c40857eac6c0971e8  gov sha256 aebc7078f35f5b67c08b8c13b97930c9c693b4d3ff9748f8f97fcc6a315a070e  start 2026-09-19T00:36:50Z
+scratch root: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws05-scratch/fam-final/zeta-r
+gov: framework: agentic-engineering-os version: 4.1.5 cli_version: 4.1.5 runtime_version: 4.1.5 index_version: 4.1.5-idx3 
+2026-09-19T00:36:50Z W00-harness-smoke exit=0 total=1 pass=1 fail=0
+2026-09-19T00:36:50Z W01-artefact-identity exit=0 total=84 pass=71 fail=13
+2026-09-19T00:36:53Z W01b-migration-plan-identity exit=0 total=9 pass=1 fail=8
+2026-09-19T00:36:55Z W02-typed-contracts exit=0 total=16 pass=10 fail=6
+2026-09-19T00:36:56Z W03-task-input-manifest exit=0 total=20 pass=7 fail=13
+2026-09-19T00:36:58Z W04-context-delivery exit=0 total=15 pass=7 fail=8
+2026-09-19T00:36:59Z W04b-input-class-delivery exit=0 total=14 pass=5 fail=9
+2026-09-19T00:37:00Z W05-consumption-receipt exit=0 total=20 pass=7 fail=13
+2026-09-19T00:37:16Z W06-staleness-propagation exit=0 total=27 pass=10 fail=17
+2026-09-19T00:37:39Z W07-orphan-detection exit=0 total=12 pass=3 fail=9
+2026-09-19T00:37:41Z W08-lineage exit=0 total=24 pass=14 fail=10
+2026-09-19T00:37:43Z W09-session-handoff-continuity exit=0 total=16 pass=8 fail=8
+2026-09-19T00:37:45Z W10-hard-invariant-attacks exit=0 total=23 pass=13 fail=10
+2026-09-19T00:37:54Z W11-quantitative-health exit=0 total=13 pass=4 fail=9
+2026-09-19T00:37:56Z W12-scheduler-integration exit=0 total=17 pass=5 fail=12
+2026-09-19T00:38:06Z FR-freshness-invalidation exit=0 total=13 pass=7 fail=6
+2026-09-19T00:38:08Z DV-derived-view-reconciliation exit=0 total=9 pass=4 fail=5
+# family zeta-r end 2026-09-19T00:38:08Z

@@ -1,0 +1,182 @@
+
+######## zeta-r
+== DV-derived-view-reconciliation.out: REGENERATED, BYTE-IDENTICAL
+== FR-freshness-invalidation.out: SAME(normalised) markers=13/13 changed=0
+== W00-harness-smoke.out: SAME(normalised) markers=1/1 changed=0
+== W01-artefact-identity.out: DIFF 45 lines markers=84/84 changed=0
+   -"status": "AC
+   -... [truncated 60 chars]
+   +"status": "ACT
+   +... [truncated 59 chars]
+   -... [truncated 202 chars]
+   +
+   +... [truncated 201 chars]
+   -"section_6_
+   -... [truncated 60 chars]
+   +"section_6
+   +... [truncated 61 chars]
+   -"category": "exact_path",
+   -"queries": 6,
+   -"recall": 1.0
+   -},
+   -{
+   +"recall": 1.0
+   +},
+   +{
+   +"category": "exact_path",
+   +"queries": 6,
+   -"index_ms": 287,
+   +"index_ms": 83,
+   +"category": "symbol",
+   +"queries": 5,
+   +"recall": 1.0
+   +},
+   +{
+   -"queries": 6,
+   -"recall": 1.0
+   -},
+   -{
+   -"category": "exact_path",
+   -
+   -... [truncated 610 chars]
+   +
+   +... [truncated 612 chars]
+   -index_ms: 287
+   +index_ms: 83
+   -- category: exact_path
+   -queries: 6
+   -recall: 1.0
+   +recall: 1.0
+   +- category: exact_path
+   +queries: 6
+== W01b-migration-plan-identity.out: SAME(normalised) markers=9/9 changed=0
+== W02-typed-contracts.out: SAME(normalised) markers=16/16 changed=0
+== W03-task-input-manifest.out: DIFF 16 lines markers=20/20 changed=0
+   +"at": "<TS>",
+   +"carried": [],
+   -"files": 188
+   +"files": 188,
+   +"reused": false
+   +"branch": "main",
+   +"git_dir": "<PATH>",
+   +"head": "<HEX>",
+   +"renewed": false,
+   +"scope": [
+   +"src/**"
+   +],
+   -"task_id": "TASK-0201"
+   +"store": "<PATH>",
+   +"task_id": "TASK-0201",
+   +"worktree": "<PATH>"
+== W04-context-delivery.out: SAME(normalised) markers=15/15 changed=0
+== W04b-input-class-delivery.out: DIFF 2 lines markers=14/14 changed=0
+   -description: recall@k 1.0 mrr 1.0 precision 0.<HEX> latency 0.<HEX> ms
+   +description: recall@k 1.0 mrr 1.0 precision 0.<HEX> latency <DUR>
+== W05-consumption-receipt.out: DIFF 48 lines markers=20/20 changed=1
+   MARKER 'W5-c2-no-claim-observed-paths-correct': committed='FAIL' rerun='PASS'
+   +"overrides": [],
+   -persisted report RPT-0001: {"id": "RPT-0001", "type": "report", "title": "Report for TASK-0001: Implement totals", "status": "ACTIVE", "created": "2026-09-19", "work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome":
+   +persisted report RPT-0001: {"id": "RPT-0001", "type": "report", "title": "Report for TASK-0001: Implement totals", "status": "ACTIVE", "created": "2026-09-19", "work_completed": "added zeta_probe_w5", "files_changed": ["src/lib.rs"], "tests": {"status": "passed", "reason": "zeta probe"}, "outcome":
+   +"overrides": [],
+   +"overrides": [],
+   -"baseline": "claim baseline 2026-09-19 (commit <HEX>)",
+   +"attributed_elsewhere": [],
+   +"baseline": "claim baseline <TS> (commit <HEX>)",
+   +"carried": [],
+   +"cit_covered": [],
+   +"overrides": [],
+   -"code": "MUTATION_SCOPE_VIOLATION",
+   +"code": "CLAIM_REQUIRED",
+   -"evidence": {
+   -"baseline": "none (git status --porcelain)",
+   -"observed": [
+   -"o<RND>/g<RND>/index-manifest.json",
+   -"src/lib.rs"
+   -]
+   -},
+   -"observed": [
+   -"o<RND>/g<RND>/index-manifest.json",
+   -"src/lib.rs"
+   -],
+   -"out_of_scope": [
+   -"o<RND>/g<RND>/index-manifest.json: outside allowed_paths [\"src/**\", \"tests/**\"] and not governed by a committed CIT"
+   -],
+   -"reported": [
+   -"src/lib.rs"
+   -],
+   -"undeclared": [
+   -"o<RND>/g<RND>/index-manifest.json"
+   -]
+   -},
+   -"message": "task TASK-0001: the repository shows mutations the report does not declare or the contract does not allow (undeclared: [\"o<RND>/g<RND>/index-manifest.json\"]; out of scope: [\"o<RND>/g<RND>/index-manifest.json: outside allowed_paths [\\\"src/**\\\", \\\"tests/**\\\"] and not governed b
+   -}
+   -OBS W5-c2-no-claim-observed-paths-correct: FAIL -- non-existent paths attributed to the worker: ['o<RND>/g<RND>/index-manifest.json']; honest report declaring exactly src/lib.rs, no claim -> ok=False code=MUTATION_SCOPE_VIOLATION observed=['o<RND>/g<RND>/index-manifest.json', 'src/lib.rs'] undeclar
+   +"claim": null,
+   +"session": "S-zeta",
+   +"task": "TASK-0001"
+   +},
+   +"message": "TASK-0001 is not claimed by session S-zeta; claim it first (`gov task claim TASK-0001`) \u2014 the claim records the mutation baseline, scope and working tree the close is checked against"
+   +}
+   +OBS W5-c2-no-claim-observed-paths-correct: PASS -- non-existent paths attributed to the worker: []; honest report declaring exactly src/lib.rs, no claim -> ok=False code=CLAIM_REQUIRED observed=None undeclared=None
+   -W5-c2-no-claim-observed-paths-correct: FAIL
+   -total=20 pass=6 fail=14
+   +W5-c2-no-claim-observed-paths-correct: PASS
+   +total=20 pass=7 fail=13
+== W06-staleness-propagation.out: DIFF 15 lines markers=27/27 changed=0
+   +"overrides": [],
+   -"baseline": "claim baseline 2026-09-19 (commit <HEX>)",
+   +"attributed_elsewhere": [],
+   +"baseline": "claim baseline <TS> (commit <HEX>)",
+   +"carried": [],
+   +"cit_covered": [],
+   -"spec/requ<RND>/REQ-0001.yaml: outside allowed_paths [\"src/**\", \"tests/**\"] and not governed by a committed CIT"
+   +"spec/requ<RND>/REQ-0001.yaml: outside allowed_paths [\"src/**\", \"tests/**\"] and not governed by a CIT executed while this task was claimed"
+   -"message": "task TASK-0001: the repository shows mutations the report does not declare or the contract does not allow (undeclared: [\"spec/requ<RND>/REQ-0001.yaml\"]; out of scope: [\"spec/requ<RND>/REQ-0001.yaml: outside allowed_paths [\\\"src/**\\\", \\\"tests/**\\\"] and not governed by a commit
+   -}
+   -OBS W6-B2-concurrent-upstream-change-detected-at-close: PASS -- close after the governing requirement changed during the claim -> MUTATION_SCOPE_VIOLATION: undeclared=['spec/requ<RND>/REQ-0001.yaml'] out_of_scope=['spec/requ<RND>/REQ-0001.yaml: outside allowed_paths ["src/**", "tests/**"] and not g
+   +"message": "task TASK-0001: the repository shows mutations the report does not declare or the contract does not allow (undeclared: [\"spec/requ<RND>/REQ-0001.yaml\"]; out of scope: [\"spec/requ<RND>/REQ-0001.yaml: outside allowed_paths [\\\"src/**\\\", \\\"tests/**\\\"] and not governed by a CIT ex
+   +}
+   +OBS W6-B2-concurrent-upstream-change-detected-at-close: PASS -- close after the governing requirement changed during the claim -> MUTATION_SCOPE_VIOLATION: undeclared=['spec/requ<RND>/REQ-0001.yaml'] out_of_scope=['spec/requ<RND>/REQ-0001.yaml: outside allowed_paths ["src/**", "tests/**"] and not g
+   +"overrides": [],
+== W07-orphan-detection.out: SAME(normalised) markers=12/12 changed=0
+== W08-lineage.out: SAME(normalised) markers=24/24 changed=0
+== W09-session-handoff-continuity.out: SAME(normalised) markers=16/16 changed=0
+== W10-hard-invariant-attacks.out: SAME(normalised) markers=23/23 changed=0
+== W11-quantitative-health.out: DIFF 17 lines markers=13/13 changed=0
+   -"avg_ms": 26.0,
+   +"avg_ms": 34.0,
+   -"avg_ms": 500.0,
+   +"avg_ms": 572.0,
+   -"avg_ms": 36.75,
+   +"avg_ms": 41.0,
+   -"avg_ms": 114.0,
+   +"avg_ms": 109.0,
+   -"avg_ms": 38.<HEX>,
+   +"avg_ms": 39.<HEX>,
+   -"chars": 13712,
+   +"chars": 13713,
+   -"status_chars": 2106
+   +"status_chars": 2107
+   +"dangling_blocks": [],
+   -OBS W11-m9-proxy-fresh-agent-read-budget: PASS -- audit fresh_agent_reconstruction.detail={'reads': 7, 'budget': 25, 'status_chars': 2106, 'next_action': 'gov continue → claim TASK-0003'} (read-count vs budget; correctness of reconstructed inputs not measured)
+   +OBS W11-m9-proxy-fresh-agent-read-budget: PASS -- audit fresh_agent_reconstruction.detail={'reads': 7, 'budget': 25, 'status_chars': 2107, 'next_action': 'gov continue → claim TASK-0003'} (read-count vs budget; correctness of reconstructed inputs not measured)
+== W12-scheduler-integration.out: DIFF 16 lines markers=17/17 changed=0
+   +"at": "<TS>",
+   +"carried": [],
+   -"files": 181
+   +"files": 181,
+   +"reused": false
+   +"branch": "main",
+   +"git_dir": "<PATH>",
+   +"head": "<HEX>",
+   +"renewed": false,
+   +"scope": [
+   +"src/**"
+   +],
+   -"task_id": "TASK-0001"
+   +"store": "<PATH>",
+   +"task_id": "TASK-0001",
+   +"worktree": "<PATH>"
+== run-all.log: NOT REGENERATED by the re-run (not produced by the family's probe runner)
+
+# files compared: 17; files with normalised differences: 7
