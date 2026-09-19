@@ -11,7 +11,7 @@ active_gate: GATE-P2-REPAIR-1
 iteration: 1
 round: 1
 branches: [phase2/repair-1-ws03, phase2/repair-1-ws04, phase2/repair-1-ws05, phase2/repair-1-ws06, phase2/repair-1-ws08, phase2/repair-1-ws09-11, phase2/repair-1-ws02, phase2/repair-1-ws01-12]
-base_commit: null
+base_commit: 12c68d3094e5c211db137aad43f00174c43abffb
 branch: phase2/repair-1-integration
 expected_output_path: release/capability-baseline/repair-1/integration/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0022.report.yaml
