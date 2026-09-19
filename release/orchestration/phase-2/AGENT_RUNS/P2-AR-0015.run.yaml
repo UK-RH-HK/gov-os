@@ -19,5 +19,13 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/ws02/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0015.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: fd9e6e7c23fc03d6569319d62e176f1a65854353
+  branch_tip_commit: 37bfcd1fcb19da08016c3f2514ab7c2086461f46
+  branch_product_code_digest: 88b62dc383b51a56b5dfa62430498eb80b43ab25430129957e06f70a22d15afd
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-03': 'REPAIRED_CLAIMED', 'BC-P2-06': 'REPAIRED_CLAIMED', 'BC-P2-42': 'REPAIRED_CLAIMED', 'BC-P2-43': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: scope conforms (WS-2-owned verification/**, doctor.rs, skills.rs, new scheduler module, TEST_POLICY, audit schema; new framework/health/SKILL_SCENARIO_CHECKS.yaml (needs KERNEL.yaml payload_dirs entry, IP-16); main.rs +185/-0 additive gov health block; lib.rs +1/-0); lib 56/56, certification 79/79 per builder; R1 held-out AR-0027/0029/0031 match, AR-0033 only hv_a::a1 size pin; found and worked around a kernel-cache materialisation race rooted in kernel::embedded_kernel_dir (WS-8, IP-15, round 2). Leftover partial cache ~/.cache/gov/kernels/4.1.5-2120db97b369 (61/127 files, keyed to an intermediate WS-2 build only) inspected; removal was denied by the permission system and not retried — harmless, surfaced to the owner
 started_at: '2026-09-19'

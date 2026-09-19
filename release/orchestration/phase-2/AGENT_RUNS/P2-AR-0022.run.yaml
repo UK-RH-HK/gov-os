@@ -1,0 +1,19 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0022
+role: capability-repair (integration builder)
+objective: Integrate the eight round-1 repair branches into one tree that builds and passes every suite; resolve textual and semantic conflicts minimally; register new subcommands with the G0 guard; report R1 held-out counts. Claims only.
+agent_model: claude-opus-5 (pinned explicitly at dispatch)
+fresh_context: true
+independent_of: [all auditors, verifiers and round-1 builders P2-AR-0001..P2-AR-0021]
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0019-integration-1.md
+active_gate: GATE-P2-REPAIR-1
+iteration: 1
+round: 1
+branches: [phase2/repair-1-ws03, phase2/repair-1-ws04, phase2/repair-1-ws05, phase2/repair-1-ws06, phase2/repair-1-ws08, phase2/repair-1-ws09-11, phase2/repair-1-ws02, phase2/repair-1-ws01-12]
+base_commit: null
+branch: phase2/repair-1-integration
+expected_output_path: release/capability-baseline/repair-1/integration/
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0022.report.yaml
+required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, INCOMPLETE]
+status: RUNNING
