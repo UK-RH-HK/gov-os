@@ -19,4 +19,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/r2-ws04/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0025.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 5b4a89378499818e7da25c1d31833957fd4743c3
+  branch_tip_commit: 9e806786a3006a101595c98e72bcd3bdede7623f
+  branch_product_code_digest: 65d804d81b844a10b9c79c648cd28cc579cd7a40dbf91085c20e30ef7e50aee1
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-11': 'REPAIRED_CLAIMED', 'BC-P2-13': 'REPAIRED_CLAIMED', 'BC-P2-04': 'REPAIRED_CLAIMED', 'BC-P2-05': 'REPAIRED_CLAIMED', 'BC-P2-18': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: scope conforms (cit/** incl. new binding/materiality/propagation, context/** incl. new contradictions, checkpoints.rs, handoffs.rs, graph/identity.rs, records.rs relation/TYPE_DIR only, lib.rs INDEX_VERSION only, three owned policies; additive control.rs 6 COMMAND_GUARDS + main.rs 5 subcommands + tests main.rs mod line; new ws04r2.rs; repair.rs cit_auto_simulation test now answers the now-gated CIT via owner channel, SECRET_IN_MANIFEST assertion kept); lib 160/0, certification 105/0; R1 held-out via private path at baselines, census 109 files/1580 fns, 0 violations; probe sweep 88 FAIL->PASS, 4 PASS->FAIL all K4 fixture-relabel lines explained by BC-P2-13 design; three self-found regressions fixed (G2.b5, checkpoint size vs indexer limit, watchdog second). IP-WS02-05 deviation: cit execute in repair mode under a hard-block may execute only if it clears that block
