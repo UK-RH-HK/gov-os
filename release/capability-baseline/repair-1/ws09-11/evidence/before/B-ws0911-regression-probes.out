@@ -1,0 +1,128 @@
+# repo s1: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s1-5f8985/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-plan exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-review exit=0]
+$ gov adopt migrate --name s1 --alias fx-s1   [role=migration-executor session=S-exec exit=0]
+X S1-proof-covers-code-config-docs FAIL the dependency proof of a retirement covers code, configuration and docs -- {"gate_reasons": null, "roles": []}
+X S1-unreferenced-legacy-retired PASS (control) an unreferenced legacy rule file is retired in its batch -- {"migrate_ok": true}
+X S1-referenced-legacy-not-retired-without-gate FAIL a legacy file with active references is not retired without an answered gate -- {}
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-exec exit=0]
+X S1-gate-A-retires-without-repointing FAIL an answered gate retires it and leaves every active reference exactly as it was (never re-pointed at the archive) -- {"batch7_ok": true, "unchanged": false}
+$ gov adopt verify-migration   [role=migration-verifier session=S-verify exit=0]
+X S1-A7-reports-accepted-dangling FAIL A7 accepts and reports every dependant the gate accepted -- {"verdict": "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"}
+$ gov adopt verify-migration   [role=migration-verifier session=S-verify2 exit=0]
+X S1-A7-detects-repoint-into-archive FAIL live code re-pointed at archived legacy material (as the pre-repair executor did) is a verification failure -- {"problems": []}
+# repo s2: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s2-a034e9/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-plan exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-review exit=0]
+$ gov adopt migrate --name s2 --alias fx-s2   [role=migration-executor session=S-exec exit=0]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-exec exit=0]
+X S2-new-dependant-blocks-retirement FAIL a dependant that appeared after the gate was answered blocks the retirement (the gate did not see it) -- {"blocked_rows": 0, "dependants": []}
+# repo s3: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s3-5e7210/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-plan exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-review exit=0]
+$ gov adopt migrate --name s3 --alias fx-s3   [role=migration-executor session=S-exec exit=0]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-exec exit=0]
+$ gov adopt baseline   [role=orchestrator session=S-plan2 exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan2 exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan2 exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan2 exit=0]
+X S3-os-state-never-legacy-on-rerun FAIL on a re-run every Governance OS path (kernel, overlay, generated adapters, root projection, adoption evidence) is kept as current -- {"bad": {"governance/generated/adapters/api/system-instruction.txt": ["MOVE", "SUPERSEDED"], "governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md": ["MOVE", "SUPERSEDED"], "governance/generated/adapters/ide/RULES.md": ["MOVE", "LEGACY"]}, "os_paths": 154}
+# repo s3b: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s3b-99b406/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+X S3-uninstalled-os-layout-not-archived FAIL an interrupted install's OS layout is never planned for the legacy archive -- {"action": "MOVE", "authority": "LEGACY", "current_class": "GOVERNANCE_LEGACY", "os_owned": null}
+# repo s3c: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s3c-fdc518/proj
+$ gov init --name s3c   [role=orchestrator session=S-synth exit=0]
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+X S3-planted-manifest-does-not-exempt PASS (control guarding the new OS-ownership exemption; holds on the base too) an adapter manifest entry the installed kernel does not declare cannot exempt a legacy file -- {"authority": "LEGACY", "class": "GOVERNANCE_LEGACY", "os_owned": null}
+# project s4: fixture=brownfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s4-d03a8f/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-plan exit=0]
+X S4-secret-legacy-store-plan-and-tests-agree FAIL a secret-bearing legacy chat store is planned as a gated A8 extraction and no scaffolded test contradicts it -- {"entry": {"action": "KEEP_IN_PLACE", "batch": 0, "gate_reasons": null, "sensitivity": "secret"}, "tests_on_path": [{"after_batch": 0, "description": "legacy mechanism memory/chat_history.sql not active (INV-004)", "id": "MT-029", "kind": "legacy_not_active", "path": "memory/chat_history.sql", "pattern": "memory/chat_history.sql"}]}
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-review exit=0]
+X S4-contradicting-test-blocks-approval FAIL a reviewer test contradicting the plan's disposition cannot be approved against it -- {"error": null}
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-review exit=0]
+$ gov adopt migrate --name s4 --alias fx-s4   [role=migration-executor session=S-exec exit=1]
+$ gov gate present HDG-0001   [role=migration-executor session=S-exec exit=0]
+$ gov decide HDG-0001 --option A --by owner   [role=human session=S-owner exit=0]
+$ gov gate present HDG-0002   [role=migration-executor session=S-exec exit=0]
+$ gov decide HDG-0002 --option A --by owner   [role=human session=S-owner exit=0]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-exec exit=1]
+$ gov adopt verify-migration   [role=migration-verifier session=S-verify exit=1]
+$ gov adopt extract-legacy   [role=migration-executor session=S-exec exit=1]
+X S4-secret-store-retired-and-kept-secret FAIL the store is retired under its gate, its archive location is classified secret, and no secret reaches an extracted record -- {"A7": null, "migrate_ok": false, "stores": []}
+# repo s5: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s5-8370ae/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-plan exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-review exit=0]
+$ gov adopt migrate --name s5 --alias fx-s5   [role=migration-executor session=S-exec exit=1]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-exec exit=1]
+$ gov adopt verify-migration   [role=migration-verifier session=S-verify exit=1]
+$ gov adopt extract-legacy   [role=migration-executor session=S-exec exit=1]
+X S5-research-extracted FAIL a measurement without the probe's wording becomes a research record -- []
+X S5-skill-extracted FAIL a numbered procedure becomes a skill candidate -- []
+X S5-evidence-extracted FAIL an evidence claim becomes a report record -- []
+X S5-uncued-fact-registered FAIL an uncued unique fact is listed for review -- []
+X S5-secret-withheld FAIL a secret unit is withheld and counted -- []
+# repo s6: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s6-612827/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+X S6-citations-both-ends FAIL reference-style, HTML, reStructuredText and relative links appear at both ends of the path map -- {"README.citations": null, "api.references": [], "guide.cited_by": null}
+# repo s7: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s7-f14a28/proj
+$ gov adopt baseline   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-plan exit=0]
+$ gov adopt classify   [role=orchestrator session=S-plan exit=0]
+$ gov adopt map   [role=orchestrator session=S-plan exit=0]
+$ gov adopt plan   [role=orchestrator session=S-plan exit=0]
+X S7-ids-survive-inserted-artefact FAIL inserting an artefact that sorts first changes no other artefact's id -- {"changed": {"docs/b.md": ["ART-00003", "ART-00004"], "docs/c.md": ["ART-00004", "ART-00005"], "spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml": ["ART-00005", "ART-00006"], "src/app/__init__.py": ["ART-00006", "ART-00014"], "src/app/main.py": ["ART-00007", "ART-00015"]}}
+X S7-plan-versions FAIL an identical re-plan keeps its version; a changed plan becomes version 2, superseding v1 which stays retrievable -- {"catalogue_version": null, "supersedes": null, "v1": null, "v1_again": null, "v2": null}
+# repo s8: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/s8-28f387/proj
+$ gov init --name s8 --alias proj-s8   [role=orchestrator session=S-synth exit=0]
+$ gov rebuild-memory   [role=orchestrator session=S-synth exit=0]
+$ gov upstream prepare L-0201   [role=orchestrator session=S-synth exit=0]
+X S8-L-0201-blocked FAIL the export gate fails closed on a copy with one line changed -- null
+$ gov upstream prepare L-0202   [role=orchestrator session=S-synth exit=0]
+X S8-L-0202-blocked FAIL the export gate fails closed on one line of never-export (restricted) customer data -- null
+$ gov upstream prepare L-0203   [role=orchestrator session=S-synth exit=0]
+X S8-L-0203-blocked FAIL the export gate fails closed on 40 stored vector components with zeros written as integers -- null
+$ gov upstream prepare L-0204   [role=orchestrator session=S-synth exit=0]
+X S8-fenced-raw-code-with-trivial-fixture-blocked FAIL raw project code in a fenced block of the lesson text is blocked even when a synthetic fixture is present -- null
+$ gov upstream prepare L-0205   [role=orchestrator session=S-synth exit=0]
+X S8-synthetic-control-passes PASS (control) a genuinely synthetic reproducer is still exportable -- null
+$ gov upstream submit PKT-0005 --destination /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws0911/final-before/b/canon-540f28/lessons/inbox --approved-by owner   [role=orchestrator session=S-synth exit=0]
+X S8-submit-time-tamper-blocked FAIL a packet edited after prepare (fixture replaced by project source) is refused at submission and nothing leaves -- null
+SUMMARY total=27 pass=3 fail=24 failed=['S1-proof-covers-code-config-docs', 'S1-referenced-legacy-not-retired-without-gate', 'S1-gate-A-retires-without-repointing', 'S1-A7-reports-accepted-dangling', 'S1-A7-detects-repoint-into-archive', 'S2-new-dependant-blocks-retirement', 'S3-os-state-never-legacy-on-rerun', 'S3-uninstalled-os-layout-not-archived', 'S4-secret-legacy-store-plan-and-tests-agree', 'S4-contradicting-test-blocks-approval', 'S4-secret-store-retired-and-kept-secret', 'S5-research-extracted', 'S5-skill-extracted', 'S5-evidence-extracted', 'S5-uncued-fact-registered', 'S5-secret-withheld', 'S6-citations-both-ends', 'S7-ids-survive-inserted-artefact', 'S7-plan-versions', 'S8-L-0201-blocked', 'S8-L-0202-blocked', 'S8-L-0203-blocked', 'S8-fenced-raw-code-with-trivial-fixture-blocked', 'S8-submit-time-tamper-blocked']
