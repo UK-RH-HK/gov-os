@@ -101,7 +101,15 @@ fn core_runs_without_any_governed_toolchain_on_path() {
         let g = g
             .with_env("PATH", bindir.to_str().unwrap())
             .with_env("GOV_DISABLE_PLUGINS", "1");
-        let r = g.ok(&["init", "--name", fx, "--alias", "alias-x"]);
+        let r = g.ok(&[
+            "init",
+            "--source",
+            signed_source(),
+            "--name",
+            fx,
+            "--alias",
+            "alias-x",
+        ]);
         assert!(r["index"]["artifacts"].as_u64().unwrap() > 0);
         let eco = g.ok(&["capabilities", "ecosystems"]);
         let ecos = eco["ecosystems"].as_array().unwrap();
@@ -152,6 +160,8 @@ fn plugin_protocol_is_language_neutral_bash_embedder() {
     let (root, g) = setup_fixture("greenfield", "bash-plugin", "S-plug");
     g.ok(&[
         "init",
+        "--source",
+        signed_source(),
         "--name",
         "plug",
         "--alias",

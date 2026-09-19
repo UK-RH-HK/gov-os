@@ -109,7 +109,19 @@ pub fn check(p: &Project, source: Option<&str>) -> Result<Value> {
     let impact = json!({"radius": radius, "overlay_changes": dry.overlay_keys_changed, "index_rebuild": dry.index_rebuild, "regenerate_adapters": dry.regenerate_adapters, "notes": dry.notes, "breaking_changes": breaking, "human_gates": human_gates, "consequences": [
         format!("kernel {current} → {target} ({} migration step(s))", chain.len()), "spec/ and product/ are not touched (INV-013)", if dry.index_rebuild { "all derived indexes are rebuilt after install" } else { "no index rebuild required" },
         if cert == "CERTIFIED" { "target release is certified" } else { "target release is NOT certified: human approval required" }]});
-    let mut out = json!({"current": current, "available": target, "source": src.display().to_string(), "up_to_date": ord != std::cmp::Ordering::Less, "downgrade": ord == std::cmp::Ordering::Greater, "compatible": compatible, "migration_path": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "migration_path_complete": !chain.is_empty() || current == target,
+    // OWNER-DECISION-P2-0002: whether this machine may install the candidate at all, stated before anyone decides.
+    let admission = match crate::srr::verifier::refuse_external_source_if_unprovisioned(
+        crate::srr::Ingress::Update,
+        &src,
+    ) {
+        Ok(()) => {
+            json!({"refused_before_staging": false, "decided_by": "the single verification policy at `gov update --apply` (signed release metadata on a provisioned machine)"})
+        }
+        Err(e) => {
+            json!({"refused_before_staging": true, "code": e.code, "reason": e.message, "remediation": e.details["remediation"]})
+        }
+    };
+    let mut out = json!({"current": current, "available": target, "source": src.display().to_string(), "admission": admission, "up_to_date": ord != std::cmp::Ordering::Less, "downgrade": ord == std::cmp::Ordering::Greater, "compatible": compatible, "migration_path": chain.iter().map(|m| m["id"].clone()).collect::<Vec<_>>(), "migration_path_complete": !chain.is_empty() || current == target,
         "certification": cert, "certification_basis": certification.to_value(), "impact": impact, "human_gate_required": human_gate_required, "recommendation": if ord != std::cmp::Ordering::Less { "nothing to do" } else if !compatible { "unsupported upgrade path: adopt an intermediate release" } else if human_gate_required { "review impact; approve with `gov update --apply --approve --by <human>`" } else { "safe: `gov update --apply`" }});
     // **`OWNER-DECISION-0006` §6 bullet 7** (`AR31-B1`). `gov update --check` used to emit
     // `{"current": <below-floor version>, "up_to_date": true, "recommendation": "nothing to do"}` on a machine
@@ -159,6 +171,13 @@ pub fn apply_update_opts(
 ) -> Result<Value> {
     control::guard_write(p, "update --apply")?;
     crate::authority::require(p, "update_apply")?;
+    // IP-WS02-12 asked also for the G0 hard-block guard (`scheduler::guard("update.apply")`) here, at entry. It is
+    // deliberately not taken at entry: the blocks that govern `update.apply` include findings the update itself is
+    // the remedy for — an older kernel's overlay deficit (D006 on a 4.1.1 installation, whose migration adds the
+    // missing file) would refuse the only operation that repairs it. The purpose the IP states — no update applies
+    // over a defect the full suite detects — is met after the install instead: the G5 run below re-executes every
+    // check, fresh, against the updated installation, and an active hard-block (RED) or an UNHEALTHY verdict there
+    // refuses the update and rolls it back.
     let chk = check(p, source)?;
     if chk["up_to_date"].as_bool().unwrap_or(false) {
         return Ok(json!({"applied": false, "reason": "already up to date", "check": chk}));
@@ -173,6 +192,12 @@ pub fn apply_update_opts(
         .with_details(chk));
     }
     let target_v = chk["available"].as_str().unwrap_or("").to_string();
+    // OWNER-DECISION-P2-0002: on a machine with no trust anchor an external-source candidate is refused before a
+    // Human Decision Gate is raised for it — nobody is asked to approve what admission will refuse.
+    crate::srr::verifier::refuse_external_source_if_unprovisioned(
+        crate::srr::Ingress::Update,
+        Path::new(chk["source"].as_str().unwrap_or("")),
+    )?;
     if chk["human_gate_required"].as_bool().unwrap_or(true) {
         // INV-008: approval means a presented, answered gate record — never a CLI flag alone (verifier M3 / HV-11)
         let gate = match update_gate(p, &target_v) {
@@ -203,24 +228,24 @@ pub fn apply_update_opts(
                     .unwrap()
             }
         };
-        let answered_yes = gate.get("gate_status") == "ANSWERED"
-            && gate.data["answer"]["option"].as_str() == Some("A")
-            && gate
-                .data
-                .get("presented_in_chat")
-                .and_then(|v| v.as_bool())
-                .unwrap_or(false);
-        if !answered_yes {
-            return Ok(
-                json!({"applied": false, "reason": "human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record", "human_gate": gate.id(), "gate_status": gate.get("gate_status"), "presented_in_chat": gate.data.get("presented_in_chat"), "next": [format!("gov gate present {}", gate.id()), format!("gov decide {} --option A --by <human>", gate.id()), "gov update --apply --approve"], "check": chk}),
-            );
-        }
-        if gate.get("gate_status") == "ANSWERED"
-            && gate.data["answer"]["option"].as_str() == Some("B")
-        {
-            return Ok(
-                json!({"applied": false, "reason": "human declined the update", "human_gate": gate.id()}),
-            );
+        // IP-7 (WS-3, BC-P2-08/09/10): the answer is honoured only through the one consumer API, which re-verifies
+        // the T2 seal, the owner-signed human answer against the administrator-provisioned `human-gate` anchor and
+        // its presentation receipt, refuses an agent resolution of this human-only trigger, and follows a revoked
+        // decision. A field read of `gate_status`/`answer.option`/`presented_in_chat` could be satisfied by editing
+        // the record.
+        match gates::verified_answer(p, &gate.id()) {
+            Ok(a) if a.authorises_blocked_work => {}
+            Ok(a) => {
+                return Ok(
+                    json!({"applied": false, "reason": "human declined the update", "human_gate": gate.id(), "answer": a.to_value()}),
+                );
+            }
+            Err(e) if e.code == "GATE_NOT_ANSWERED" => {
+                return Ok(
+                    json!({"applied": false, "reason": "human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record", "human_gate": gate.id(), "gate_status": gate.get("gate_status"), "presented_in_chat": gate.data.get("presented_in_chat"), "next": [format!("gov gate present {}", gate.id()), format!("gov decide {} --option A --answer-file <owner-signed answer>", gate.id()), "gov update --apply --approve"], "check": chk}),
+                );
+            }
+            Err(e) => return Err(e),
         }
     }
     let target = chk["available"].as_str().unwrap_or("").to_string();
@@ -354,23 +379,32 @@ pub fn apply_update_opts(
             )
             .with_details(json!(critical)));
         }
-        let audit = crate::verification::audit(
-            p,
-            &crate::verification::SuiteOptions {
-                deep: false,
-                families: vec![
-                    "schema_invariants".into(),
-                    "mutation_scope".into(),
-                    "adapter_portability".into(),
-                    "secrets_sensitivity_indexing".into(),
-                ],
-            },
-            false,
-        )?;
-        if audit["counts"]["critical"].as_u64().unwrap_or(0) > 0 {
+        // IP-WS02-12 — G5 of the health tier contract ("Full Suite — adopt/update/release/full audit", Contract
+        // v3:798): every governance check runs, fresh, against the updated installation, where a four-family subset
+        // ran before (A0-O5-09: it applied over a defect only the full suite detects). An UNHEALTHY verdict or a RED
+        // health state (an active hard-block) refuses the update, and the transaction below rolls it back. The run is
+        // recorded in the health ledger with its tier and trigger; it writes no governed audit record, because the
+        // update still writes its lock, ledger and checkpoint afterwards, so such a record would describe inputs the
+        // transaction is about to change.
+        let mut g5 = crate::scheduler::RunOptions::new(
+            crate::scheduler::Tier::G5,
+            crate::scheduler::Trigger::new("update.apply").with_subject(&target),
+        );
+        g5.surface = "tier:G5".into();
+        g5.record = crate::scheduler::RecordPolicy::Never;
+        let audit = crate::verification::audit_with(p, &g5)?;
+        let suite_verdict = audit["verdict"].as_str().unwrap_or("UNHEALTHY");
+        let health_state = audit["state"]
+            .as_str()
+            .or_else(|| audit["health_state"].as_str())
+            .unwrap_or("");
+        if suite_verdict == "UNHEALTHY"
+            || health_state == "RED"
+            || audit["counts"]["critical"].as_u64().unwrap_or(0) > 0
+        {
             return Err(GovError::new(
                 "VERIFICATION_FAILED",
-                "governance suite reports critical findings after update",
+                format!("the G5 full governance suite does not accept the updated installation (verdict {suite_verdict}, health {health_state})"),
             )
             .with_details(audit));
         }
@@ -408,6 +442,12 @@ pub fn apply_update_opts(
                 &auth.staged,
                 "update aborted; transaction rolled back",
             );
+            // The protected record that describes the pre-update bytes is put back FIRST (BC-P2-35/38): the abort
+            // restores those bytes and then rebuilds and verifies against them, and post-install integrity must
+            // measure the restored bytes against the record of them — not against the record of the aborted update,
+            // which would make the restored kernel look rewritten and fail the abort itself.
+            crate::srr::installation::restore_project_record(&p.root, prior_record.clone())?;
+            crate::kernel_trust::clear();
             let rb = rollback_internal(
                 p,
                 Some(&target),
@@ -415,8 +455,6 @@ pub fn apply_update_opts(
                 true,
                 false,
             )?;
-            // The pre-update bytes are back; so is the protected record that describes them (BC-P2-35/38).
-            crate::srr::installation::restore_project_record(&p.root, prior_record.clone())?;
             crate::kernel_trust::clear();
             Err(
                 GovError::new(&e.code, format!("{} — update rolled back", e.message))
@@ -533,6 +571,7 @@ fn rollback_internal(
         }
     }
     std::fs::copy(dir.join("framework.lock"), p.lock_path())?;
+    crate::kernel_trust::clear();
     p.invalidate();
     let ok = p.kernel_dir().join(KERNEL_MANIFEST).exists()
         && crate::kernel::verify_kernel(&p.kernel_dir())

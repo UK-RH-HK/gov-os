@@ -213,13 +213,202 @@ impl Gov {
     }
 }
 
-/// Copy a fixture project into a scratch dir, git-init and commit; returns (root, gov).
+/// Copy a fixture project into a scratch dir, git-init and commit, and **provision the scenario's machine** with the
+/// suite's throw-away root ([`provision`]); returns (root, gov). The fixture's first install is then the documented
+/// path, "provision, then install": `init --source` [`signed_source`] (OWNER-DECISION-P2-0002).
 pub fn setup_fixture(fixture_name: &str, test_name: &str, session: &str) -> (PathBuf, Gov) {
     let root = tmp(test_name);
     copy_dir(&fixture(fixture_name), &root);
     git_init_commit(&root);
     let g = Gov::new(&root, session);
+    provision(&g);
     (root, g)
+}
+
+/// [`setup_fixture`] **without** provisioning, for a scenario that is about the unprovisioned posture itself (the
+/// bootstrap installation of the binary's embedded payload, or the refusal of external-source ingress). Such a
+/// scenario says so where it calls this.
+pub fn setup_fixture_unprovisioned(
+    fixture_name: &str,
+    test_name: &str,
+    session: &str,
+) -> (PathBuf, Gov) {
+    let root = tmp(test_name);
+    copy_dir(&fixture(fixture_name), &root);
+    git_init_commit(&root);
+    let g = Gov::new(&root, session);
+    (root, g)
+}
+
+// ================================================================================ provisioning (OWNER-DECISION-P2-0002)
+//
+// OWNER-DECISION-P2-0002 (Option A): a machine with no administrator-provisioned trust anchor refuses kernel
+// material from any external source, and "dev/test machines provision a throw-away root ... so the documented
+// first-run path is 'provision, then install'". The certification suite follows that path. Every scenario machine
+// that installs a kernel is provisioned, explicitly, with the suite's THROW-AWAY TEST ROOT and installs releases
+// signed under it:
+//
+// * the root is `srr_material::Publisher`'s published-seed key set (TEST MATERIAL ONLY: 2-of-3 root, release,
+//   snapshot, timestamp and recovery roles), with the `human-gate` role delegated to the test owner key
+//   (`ws03::owner`), because on a provisioned machine the authenticated human channel is that delegation (BC-P2-10);
+// * [`provision`] anchors one simulated machine on it (`gov trust provision --anchor`, from an administrator-domain
+//   directory outside every project);
+// * [`signed_source`] is the current framework payload signed at [`CURRENT_SEQUENCE`]; [`signed_copy`] signs any
+//   other kernel payload (a historical release, a synthetic previous release) at a chosen, lower sequence;
+// * [`break_glass`] drops an owner-signed `recovery` authorisation into a machine's protected inbox — on a
+//   provisioned machine a rollback below the release high-water is below-floor recovery (ARCH-0003 §7,
+//   OWNER-DECISION-0006), and this is how the owner authorises it.
+//
+// A scenario that is *about* the unprovisioned posture says so and does not call [`provision`].
+
+/// The sequence the suite signs the current framework release at. Historical and synthetic releases the suite
+/// signs sit below it, in version order, so an update is an upgrade and a rollback is below the high-water.
+pub const CURRENT_SEQUENCE: u64 = 100;
+/// Sequences for the older payloads the suite installs (synthetic 4.1.1; shipped 4.1.2-4.1.4).
+pub fn sequence_of(version: &str) -> u64 {
+    match version {
+        "4.1.1" => 11,
+        "4.1.2" => 12,
+        "4.1.3" => 13,
+        "4.1.4" => 14,
+        _ => CURRENT_SEQUENCE,
+    }
+}
+
+/// The suite's throw-away test root publisher (published seeds; never a production key).
+pub fn suite_publisher() -> crate::srr_material::Publisher {
+    crate::srr_material::Publisher::new()
+}
+
+/// A directory in the simulated *administrator domain*: outside every project, and outside any path the product
+/// treats as repository content (no `.git`, no `governance` component).
+fn admin_domain() -> PathBuf {
+    let d = std::env::temp_dir().join(format!("gov-cert-admin-domain-{}", std::process::id()));
+    std::fs::create_dir_all(&d).unwrap();
+    d.canonicalize().unwrap()
+}
+
+/// The suite root metadata (version 1), written once per test process into the administrator domain.
+pub fn suite_root_file() -> PathBuf {
+    static F: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    F.get_or_init(|| {
+        use crate::srr_material::*;
+        let p = suite_publisher();
+        let mut doc = root_doc(
+            1,
+            &far_future(),
+            &[&p.root_a, &p.root_b, &p.root_c],
+            2,
+            &[&p.release],
+            &p.snapshot,
+            &p.timestamp,
+            Some(&p.recovery),
+        );
+        let owner = crate::ws03::owner();
+        let (kid, entry) = key_entry(&owner);
+        doc["keys"][kid.as_str()] = entry;
+        doc["roles"]["human-gate"] =
+            serde_json::json!({"keyids": [owner.keyid.clone()], "threshold": 1});
+        let f = admin_domain().join("suite-root-1.json");
+        std::fs::write(&f, envelope(&doc, &[&p.root_a, &p.root_b])).unwrap();
+        f
+    })
+    .clone()
+}
+
+/// Is the simulated machine `g` runs on provisioned?
+pub fn is_provisioned(g: &Gov) -> bool {
+    machine_state_dir(&g.root)
+        .join("trust")
+        .join("provisioned.json")
+        .exists()
+}
+
+/// **Provision the simulated machine `g` runs on** with the suite's throw-away root (idempotent). This is the
+/// administrator step of the documented first-run path; nothing is installed by it.
+pub fn provision(g: &Gov) {
+    if is_provisioned(g) {
+        return;
+    }
+    let f = suite_root_file();
+    let o = g.run(&["trust", "provision", "--anchor", f.to_str().unwrap()]);
+    assert!(
+        o.ok() || o.error_code() == "SRR_ALREADY_PROVISIONED",
+        "provisioning the scenario machine failed: {}",
+        o.envelope
+    );
+}
+
+/// Sign the payload `<dir>/kernel` under the suite root at `sequence` (metadata version = sequence, so metadata
+/// high-water follows install order). Returns `<dir>/kernel`, the path an ingress is given as `--source`.
+pub fn sign_release(dir: &Path, sequence: u64) -> PathBuf {
+    suite_publisher().publish(
+        dir,
+        sequence,
+        sequence,
+        "stable",
+        &crate::srr_material::far_future(),
+        "",
+        0,
+    );
+    dir.join("kernel")
+}
+
+/// Stage the kernel payload at `src` (a framework tree or an installed/released `kernel/`) into a fresh release
+/// directory and sign it at `sequence`. Returns the signed `<dir>/kernel`.
+pub fn signed_copy(src: &Path, tag: &str, sequence: u64) -> PathBuf {
+    let dir = tmp(&format!("signed-{tag}"));
+    gov_runtime::kernel::stage_payload(src, &dir.join("kernel")).unwrap();
+    sign_release(&dir, sequence)
+}
+
+/// The current framework payload (this checkout's `framework/`, byte-identical to the payload embedded in the
+/// `gov` under test), signed under the suite root at [`CURRENT_SEQUENCE`]. Built once per test process.
+pub fn signed_source() -> &'static str {
+    static S: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    S.get_or_init(|| {
+        signed_copy(
+            &canonical_root().join("framework"),
+            "current",
+            CURRENT_SEQUENCE,
+        )
+        .to_string_lossy()
+        .to_string()
+    })
+    .as_str()
+}
+
+/// The owner authorises below-floor recovery on `g`'s machine: a `recovery`-role token bound to this machine, a
+/// single-use `nonce` and the digests of `recovery_kernel` (the release the recovery restores), dropped into the
+/// machine's protected inbox out of band (OWNER-DECISION-0006 §2).
+pub fn break_glass(g: &Gov, recovery_kernel: &Path, nonce: &str) {
+    use crate::srr_material::*;
+    let p = suite_publisher();
+    let inbox = PathBuf::from(
+        g.ok(&["trust", "break-glass"])["inbox"]
+            .as_str()
+            .unwrap()
+            .to_string(),
+    );
+    let mid = g.ok(&["trust", "status"])["machine_id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let (_, payload_hash, kmh, ver) = measure(recovery_kernel);
+    let tok = break_glass_doc(
+        &mid,
+        nonce,
+        "certification scenario: owner-authorised recovery below the release high-water",
+        &far_future(),
+        &ver,
+        &payload_hash,
+        &kmh,
+    );
+    std::fs::write(
+        inbox.join(format!("{nonce}.json")),
+        envelope(&tok, &[&p.recovery]),
+    )
+    .unwrap();
 }
 
 pub fn readiness_all_present_except(missing: &[&str], na: &[(&str, &str)]) -> Value {
@@ -330,6 +519,8 @@ pub fn run_brownfield_to_a6(tag: &str) -> (PathBuf, Gov, Gov) {
     executor.ok(&[
         "adopt",
         "migrate",
+        "--source",
+        signed_source(),
         "--name",
         "shipping-quotes",
         "--alias",

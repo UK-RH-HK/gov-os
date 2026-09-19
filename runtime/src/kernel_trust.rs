@@ -25,9 +25,13 @@
 //! * no record binds it and this machine holds a trust anchor → the installed kernel has not been verified here
 //!   (`KERNEL_UNANCHORED`, D-0007 rule 1: "when T1 cannot be authenticated"); `gov kernel reinstall --source
 //!   <signed release>` verifies the pinned release and records it (ARCH-0003 §8);
-//! * no trust anchor → manifest and lock decide, as before. The record this machine keeps is then itself
-//!   unauthenticated, and that sub-case is OD-P2-02, with the owner: a divergence from it is reported
-//!   (`DIVERGED_NOT_ENFORCED`, in `protected_record` and in the presentation), not enforced.
+//! * no trust anchor (OWNER-DECISION-P2-0002, Option A — the unprovisioned sub-case, now determined): such a machine
+//!   admits no kernel material but a gov binary's embedded payload, in marked bootstrap mode. The installed kernel is
+//!   anchored when it is a bootstrap installation this machine recorded, or byte-identical to the running binary's
+//!   embedded payload (the baseline rule 1 would substitute anyway). A divergence from the recorded bootstrap
+//!   installation is `DIVERGED` (`KERNEL_TAMPERED`), and any other kernel — a clone of another machine's kernel, a
+//!   checkout, an external-source install made before the decision — is `UNADMITTED` (`KERNEL_UNANCHORED`, remedy:
+//!   provision, then verify the pinned signed release).
 //!
 //! This module still establishes only *intact*. It reads digests from protected state and never a verdict of the
 //! Signed Release Root about where the bytes came from; D-0007's text is unchanged.
@@ -136,7 +140,11 @@ impl KernelTrust {
     pub fn protected_record_bears(&self) -> bool {
         matches!(
             self.protected_record.as_str(),
-            "DIVERGED" | "UNRECORDED_REQUIRED" | "DIVERGED_NOT_ENFORCED" | "UNDETERMINED"
+            "DIVERGED"
+                | "UNRECORDED_REQUIRED"
+                | "DIVERGED_NOT_ENFORCED"
+                | "UNADMITTED"
+                | "UNDETERMINED"
         )
     }
     /// One-line diagnostic for doctor / audit / context packets.
@@ -255,7 +263,8 @@ fn compute(root: &Path) -> KernelTrust {
     if let crate::srr::installation::Anchor::Unrecorded {
         required: true,
         basis,
-    } = &anchor
+    }
+    | crate::srr::installation::Anchor::Unadmitted { basis } = &anchor
     {
         problems.push(basis.clone());
     } else if let crate::srr::installation::Anchor::Diverged {
@@ -431,6 +440,25 @@ pub fn guard(p: &Project, operation: &str) -> Result<()> {
             );
             return Ok(());
         }
+    }
+    if t.protected_record == "UNADMITTED"
+        && t.modified.is_empty()
+        && t.missing.is_empty()
+        && t.added.is_empty()
+        && t.manifest_matches_lock
+    {
+        return Err(GovError::new(
+            "KERNEL_UNANCHORED",
+            format!(
+                "'{operation}' refused: this machine holds no Signed Release Root trust anchor, and the installed kernel is neither a bootstrap installation this machine made nor the payload embedded in this gov binary ({}). A machine with no trust anchor admits no external-source kernel material (OWNER-DECISION-P2-0002); until the machine is provisioned and verifies the release the project pins, constitutional policy is read from the embedded baseline. Provision it (`gov trust provision --anchor <administrator root>`), then `gov kernel reinstall --source <the signed release framework.lock pins>`.",
+                t.problems.join("; ")
+            ),
+        )
+        .with_details(json!({
+            "operation": operation, "kernel_trust": t.to_value(),
+            "decision": "OWNER-DECISION-P2-0002",
+            "remediation": ["gov kernel trust", "gov trust provision --anchor <root metadata from the administrator domain>", "gov kernel reinstall --source <signed release pinned by framework.lock>", "gov kernel override --reason <why> (L4+, raises a gate)"],
+        })));
     }
     if t.protected_record == "UNRECORDED_REQUIRED"
         && t.modified.is_empty()

@@ -225,10 +225,15 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
         return Err(GovError::new("ALREADY_INSTALLED", format!("{} already has a Governance OS installation (use gov update, or --force to reinstall the kernel)", root.display())));
     }
     {
+        // BC-P2-08 at the ingress itself (IP-7, WS-3's resolution API): the acting role is the one this process
+        // resolved (`authority::default_role_id`, through `Project::open`), and an uninstalled repository is checked
+        // against the constitution embedded in this binary — before anything is staged or written. The CLI's G0 makes
+        // the same decision first; this keeps the library entry point from being the weaker door.
         let p0 = Project::open(root);
         if p0.is_installed() {
             crate::authority::require(&p0, "install_kernel")?;
-        } else if crate::authority::parse_level(&format!("L{}", 0)).is_some() { /* uninstalled repository: authority is checked against the kernel being installed below */
+        } else {
+            crate::authority::require_with_embedded_kernel(&p0.role, "install_kernel")?;
         }
     }
     let src = resolve_kernel_source(opts.source.as_deref().map(Path::new))?;
@@ -259,6 +264,12 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
     crate::authority::require(&p, "install_kernel").inspect_err(|_e| {
         let _ = std::fs::remove_file(gov.join("framework.lock"));
     })?;
+    // Transaction step (9): the protected floors advance now — after the atomic commit, the verification of the
+    // committed bytes (`install_kernel`) and the authority check against the installed constitution, and BEFORE the
+    // conformance suite (IP-WS02-14). The conformance run and doctor below then describe the machine as it will
+    // stay, so a governance-suite record they write is not made stale by the install's own bookkeeping, and the
+    // health scheduler may count this machine's installed/verified records among its machine-trust inputs.
+    let floors = crate::srr::record_installed(&auth)?;
     if let Some(intent) = &opts.intent {
         let store = crate::records::RecordStore::load(root);
         if store.of_type("project").is_empty() {
@@ -327,8 +338,6 @@ pub fn init(root: &Path, opts: InitOptions) -> Result<Value> {
         )?;
     }
     let doctor = crate::doctor::run(&p)?; // reported on the final, fresh state
-                                          // Transaction step (9): the protected floors advance only now, after the atomic commit and its verification.
-    let floors = crate::srr::record_installed(&auth)?;
     Ok(
         json!({"root": root.display().to_string(), "version": lock["version"], "release_hash": lock["release_hash"], "source": lock["source"], "kernel_files": manifest["files"].as_object().map(|m| m.len()).unwrap_or(0), "overlay_written": overlay, "tools": registry["tools"].as_array().map(|a| a.len()).unwrap_or(0), "adapters": adapters["adapters"].as_object().map(|m| m.len()).unwrap_or(0), "index": index, "heldout_generated": heldout_generated, "doctor": doctor.verdict, "conformance": {"audit": conformance["audit"], "verdict": conformance["verdict"]}, "release_authenticity": auth.to_value(), "protected_state": floors}),
     )

@@ -14,3 +14,5 @@ Negative controls: submission without approval (`HUMAN_GATE_REQUIRED`), remote U
 (`REMOTE_TRANSPORT_NOT_CONFIGURED`), fixture files under a forbidden outbound path (blocked), the inbox receives only
 `packet.yaml` and declared synthetic fixture files, and a grep of the inbox finds no secret, customer or project
 identifier.
+
+**First-run path: provision, then install (OWNER-DECISION-P2-0002).** The harness provisions each scenario machine with the certification suite's throw-away test root (`tests/certification/common.rs::provision`, published-seed keys — never a production root) and installs a release signed under it (`gov init --source <signed release>`; `common::signed_source`). A machine with no trust anchor refuses kernel material from any external source; only the `gov` binary's own embedded payload may be installed there, as a marked bootstrap installation that is never presented as current, verified or certified.

@@ -59,7 +59,15 @@ fn plugin_script(root: &Path, rel: &str, marker: &Path) -> String {
 #[test]
 fn cit_approval_derives_only_from_an_answered_gate() {
     let (root, g) = setup_fixture("greenfield", "rep2-cit", "S-rep2");
-    g.ok(&["init", "--name", "c", "--alias", "c-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "c",
+        "--alias",
+        "c-alias",
+    ]);
     // (a) presented but unanswered
     let (cid, gate) = security_cit(&g, &root, "hdr1");
     assert_eq!(
@@ -250,7 +258,16 @@ fn cit_approval_derives_only_from_an_answered_gate() {
 #[test]
 fn project_policy_cannot_weaken_constitutional_floors() {
     let (root, g) = setup_fixture("greenfield", "rep2-prec", "S-rep2");
-    g.ok(&["init", "--name", "p", "--alias", "p-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "p",
+        "--alias",
+        "p-alias",
+        "--skip-index",
+    ]);
     set_overrides(
         &root,
         json!({
@@ -467,7 +484,16 @@ fn project_policy_cannot_weaken_constitutional_floors() {
 #[test]
 fn plugins_are_governed_capabilities_not_arbitrary_commands() {
     let (root, g) = setup_fixture("greenfield", "rep2-plug", "S-rep2");
-    g.ok(&["init", "--name", "g", "--alias", "g-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "g",
+        "--alias",
+        "g-alias",
+        "--skip-index",
+    ]);
     let marker = root.join(".governance-runtime/ran.txt");
     let script = plugin_script(&root, ".governance-runtime/rogue.sh", &marker);
     let ran = || {
@@ -779,11 +805,33 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
 fn framework_lock_is_release_identifying_and_portable() {
     let rel = canonical_root().join("release/releases/4.1.3");
     let m = json(&rel, "manifest.json");
-    let (root, g) = setup_fixture("greenfield", "rep2-lock-rel", "S-rep2");
-    g.ok(&[
+    // OWNER-DECISION-P2-0002: on a machine with no trust anchor the shipped 4.1.3 payload is external-source kernel
+    // material and is refused before it is staged for installation; it gets no identity at all.
+    let (root0, g0) = setup_fixture_unprovisioned("greenfield", "rep2-lock-unprov", "S-rep2");
+    let e = g0.err(&[
         "init",
         "--source",
         rel.join("kernel").to_str().unwrap(),
+        "--name",
+        "l0",
+        "--alias",
+        "l0-alias",
+        "--skip-index",
+    ]);
+    assert_eq!(
+        e.error_code(),
+        "SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED",
+        "{}",
+        e.envelope
+    );
+    assert!(!exists(&root0, "governance/framework.lock") && !exists(&root0, "governance/kernel"));
+    // provision, then install: the same payload, signed under the suite's throw-away root
+    let (root, g) = setup_fixture("greenfield", "rep2-lock-rel", "S-rep2");
+    let signed413 = signed_copy(&rel.join("kernel"), "rep2-lock-4.1.3", sequence_of("4.1.3"));
+    g.ok(&[
+        "init",
+        "--source",
+        signed413.to_str().unwrap(),
         "--name",
         "l",
         "--alias",
@@ -791,13 +839,14 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock = yaml(&root, "governance/framework.lock");
-    // BC-P2-37 (P2-AR-0020): the release's manifest.json is unsigned and this machine holds no trust anchor, so
-    // neither its release_commit nor a `release:` label is recorded as identity (Contract v3:149 "recorded, not
-    // invented"; D-0007 rule 2). The lock records what verification established and says why.
+    // BC-P2-37 (P2-AR-0020): the release's manifest.json is unsigned, so its release_commit is never recorded as
+    // identity (Contract v3:149 "recorded, not invented"; D-0007 rule 2); the signed metadata binds none either. What
+    // verification did establish — an authenticated release — is recorded, with its basis.
     assert_ne!(lock["release_commit"], m["release_commit"], "{lock}");
     assert_eq!(lock["release_commit"], "unverified", "{lock}");
-    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
-    assert_eq!(lock["authenticity"], "UNKNOWN", "{lock}");
+    assert_eq!(lock["source"], "release:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["authenticity"], "AUTHENTIC", "{lock}");
+    assert_eq!(lock["sequence"], sequence_of("4.1.3"), "{lock}");
     assert!(lock["identity_basis"]["release_commit"]
         .as_str()
         .unwrap()
@@ -808,8 +857,10 @@ fn framework_lock_is_release_identifying_and_portable() {
     );
     assert_eq!(lock["lock_schema_version"], "1.1.0");
     assert!(!lock["source"].as_str().unwrap().starts_with('/'));
-    // canonical checkout source: the framework tree's own commit, not the consumer's
-    let (root2, g2) = setup_fixture("greenfield", "rep2-lock-src", "S-rep2");
+    // canonical checkout source: the framework tree's own commit, not the consumer's. UNPROVISIONED on purpose (this
+    // and the next install are about the payload embedded in the binary, which OWNER-DECISION-P2-0002 admits on a
+    // machine with no trust anchor as a marked bootstrap installation, whichever path delivers the same bytes).
+    let (root2, g2) = setup_fixture_unprovisioned("greenfield", "rep2-lock-src", "S-rep2");
     g2.ok(&[
         "init",
         "--name",
@@ -828,7 +879,7 @@ fn framework_lock_is_release_identifying_and_portable() {
         .unwrap()
         .starts_with("embedded:agentic-engineering-os@"));
     // embedded payload: the commit baked into the binary; still never the consumer's HEAD
-    let (root3, g3) = setup_fixture("greenfield", "rep2-lock-emb", "S-rep2");
+    let (root3, g3) = setup_fixture_unprovisioned("greenfield", "rep2-lock-emb", "S-rep2");
     g3.with_env("GOV_CANONICAL_ROOT", "/nonexistent").ok(&[
         "init",
         "--name",
@@ -863,7 +914,26 @@ fn framework_lock_is_release_identifying_and_portable() {
     ] {
         assert_eq!(lc[k], lock[k]);
     }
-    let d = Gov::new(&clone, "S-b").ok(&["doctor"]);
+    // the other path is another machine: it is provisioned and verifies the release the lock pins before it
+    // relies on the installed kernel (ARCH-0003 §8); that verification writes nothing into the repository
+    let gb = Gov::new(&clone, "S-b");
+    provision(&gb);
+    gb.ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        signed413.to_str().unwrap(),
+    ]);
+    for k in [
+        "release_commit",
+        "release_hash",
+        "source",
+        "version",
+        "kernel_manifest_hash",
+    ] {
+        assert_eq!(yaml(&clone, "governance/framework.lock")[k], lock[k]);
+    }
+    let d = gb.ok(&["doctor"]);
     assert!(
         d["checks"]
             .as_array()
@@ -882,10 +952,22 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     let rel412 = canonical_root().join("release/releases/4.1.2");
     let rel413 = canonical_root().join("release/releases/4.1.3");
     let (root, g) = setup_fixture("greenfield", "rep2-chain", "S-rep2");
+    // provision, then install (OWNER-DECISION-P2-0002): the immutable shipped payloads, signed under the suite's
+    // throw-away root in version order, then the current release
+    let k412 = signed_copy(
+        &rel412.join("kernel"),
+        "rep2-chain-4.1.2",
+        sequence_of("4.1.2"),
+    );
+    let k413 = signed_copy(
+        &rel413.join("kernel"),
+        "rep2-chain-4.1.3",
+        sequence_of("4.1.3"),
+    );
     let r = g.ok(&[
         "init",
         "--source",
-        rel412.join("kernel").to_str().unwrap(),
+        k412.to_str().unwrap(),
         "--name",
         "chain",
         "--alias",
@@ -952,14 +1034,9 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         ])
     };
     // 4.1.2 -> 4.1.3 with the immutable 4.1.3 payload (its migration has no overlay op: reconciliation delivers it)
-    let chk = g.ok(&[
-        "update",
-        "--check",
-        "--source",
-        rel413.join("kernel").to_str().unwrap(),
-    ]);
+    let chk = g.ok(&["update", "--check", "--source", k413.to_str().unwrap()]);
     assert_eq!(chk["migration_path"], json!(["M-4.1.2-4.1.3"]));
-    let a1 = apply(&rel413.join("kernel"));
+    let a1 = apply(&k413);
     assert_eq!(a1["applied"], true);
     assert_eq!(a1["to"], "4.1.3");
     assert!(
@@ -971,14 +1048,15 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     );
     let lock = yaml(&root, "governance/framework.lock");
     assert_eq!(lock["version"], "4.1.3");
-    // BC-P2-37 (P2-AR-0020): the 4.1.3 manifest.json is unsigned and this machine holds no trust anchor; its
-    // release_commit is not recorded as identity and the release is not labelled a verified `release:`.
+    // BC-P2-37 (P2-AR-0020): the 4.1.3 manifest.json is unsigned; its release_commit is not recorded as identity
+    // (the signed metadata binds none). The release itself was verified against the trust anchor: `release:`.
     assert_ne!(
         lock["release_commit"],
         json(&rel413, "manifest.json")["release_commit"]
     );
     assert_eq!(lock["release_commit"], "unverified");
-    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["source"], "release:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["authenticity"], "AUTHENTIC");
     let rule = yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml")["paths"]
         .as_array()
         .unwrap()
@@ -1001,12 +1079,7 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     );
     git_commit_all(&root, "4.1.3");
     // 4.1.3 -> current release with the canonical kernel (M-4.1.3-4.1.4 carries the explicit set_overlay_rule)
-    let chk2 = g.ok(&[
-        "update",
-        "--check",
-        "--source",
-        canonical_root().join("framework").to_str().unwrap(),
-    ]);
+    let chk2 = g.ok(&["update", "--check", "--source", signed_source()]);
     let chain2: Vec<String> = chk2["migration_path"]
         .as_array()
         .unwrap()
@@ -1034,19 +1107,20 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         ),
         "the chain must end at the current release: {chain2:?}"
     );
-    let a2 = apply(&canonical_root().join("framework"));
+    let a2 = apply(Path::new(signed_source()));
     assert_eq!(a2["to"], gov_runtime::VERSION);
     let lock2 = yaml(&root, "governance/framework.lock");
     assert_eq!(lock2["version"], gov_runtime::VERSION);
     assert_eq!(lock2["lock_schema_version"], "1.1.0");
-    // BC-P2-37 (P2-AR-0020): the canonical framework is byte-identical to this binary's embedded payload, so the
-    // recorded identity is the binary's own (decided by content), not the checkout's unauthenticated Git HEAD.
+    // BC-P2-37 (P2-AR-0020): the current payload is byte-identical to this binary's embedded payload, so the
+    // recorded release commit is the binary's own (decided by content), not the checkout's unauthenticated Git HEAD;
+    // the release was verified against the trust anchor, so it is recorded as a verified `release:`.
     assert_eq!(
         lock2["release_commit"].as_str().unwrap(),
         gov_runtime::kernel::embedded::commit()
     );
     assert!(lock2["source"].as_str().unwrap().starts_with(&format!(
-        "embedded:agentic-engineering-os@{}",
+        "release:agentic-engineering-os@{}",
         gov_runtime::VERSION
     )));
     assert_eq!(
@@ -1102,10 +1176,19 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
         failed.iter().all(|c| c == "D021"),
         "unexpected doctor failures after the 4.1.2 -> 4.1.3 -> 4.1.4 chain: {failed:?}"
     );
-    // rollback 4.1.4 -> 4.1.3 leaves a ledger entry and consumes its snapshot; then 4.1.3 -> 4.1.2; then nothing left
+    // rollback 4.1.4 -> 4.1.3 leaves a ledger entry and consumes its snapshot; then 4.1.3 -> 4.1.2; then nothing left.
+    // On a provisioned machine each rollback is below the protected release high-water, so it is refused without,
+    // and admitted with, an owner-signed break-glass authorisation (ARCH-0003 §7; OWNER-DECISION-0006).
+    assert_eq!(
+        g.err(&["update", "--rollback", "--reason", "no authority"])
+            .error_code(),
+        "SRR_BELOW_FLOOR"
+    );
+    break_glass(&g, &k413, "rep2-chain-rb1");
     let rb = g.with_role("orchestrator").ok(&[
         "update",
         "--rollback",
+        "--break-glass",
         "--reason",
         "verifier requested downgrade",
     ]);
@@ -1139,7 +1222,8 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     assert_eq!(rbe["reason"], "verifier requested downgrade");
     assert_eq!(rbe["resulting_lock"]["version"], "4.1.3");
     assert_eq!(yaml(&root, "governance/framework.lock")["version"], "4.1.3");
-    let rb2 = g.ok(&["update", "--rollback", "--reason", "again"]);
+    break_glass(&g, &k412, "rep2-chain-rb2");
+    let rb2 = g.ok(&["update", "--rollback", "--break-glass", "--reason", "again"]);
     assert_eq!(rb2["rolled_back_to"], "4.1.2");
     assert_eq!(yaml(&root, "governance/framework.lock")["version"], "4.1.2");
     let e = g.err(&["update", "--rollback"]);
@@ -1158,7 +1242,15 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
 #[test]
 fn task_close_uses_observed_mutations_not_self_attestation() {
     let (root, g) = setup_fixture("greenfield", "rep2-scope", "S-rep2");
-    g.ok(&["init", "--name", "s", "--alias", "s-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "s",
+        "--alias",
+        "s-alias",
+    ]);
     let t = g.ok(&[
         "task",
         "create",
@@ -1258,7 +1350,15 @@ fn task_close_uses_observed_mutations_not_self_attestation() {
 #[test]
 fn incremental_rebuild_follows_record_relocation() {
     let (root, g) = setup_fixture("greenfield", "rep2-move", "S-rep2");
-    g.ok(&["init", "--name", "m", "--alias", "m-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "m",
+        "--alias",
+        "m-alias",
+    ]);
     write_yaml(
         &root,
         "spec/decisions/D-0001.yaml",

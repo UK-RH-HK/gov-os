@@ -36,11 +36,19 @@
 //! is substituted explicitly and mutating operations fail closed". What changes is that a consistent rewrite of the
 //! payload, the manifest and the lock is now a T1 that cannot be authenticated.
 //!
-//! ## What a machine with no trust anchor gets (OD-P2-02 is with the owner)
+//! ## What a machine with no trust anchor gets (OWNER-DECISION-P2-0002, Option A)
 //!
-//! Admission is untouched. The per-project record is still written — it records what was *installed*, with
-//! authenticity `UNKNOWN` — so a consistent post-install rewrite of a project this machine installed is detected on
-//! every posture. Nothing on such a machine is ever presented as authentic, current or verified ([`posture_of`]).
+//! Such a machine admits only the payload embedded in the running `gov` binary, in the marked bootstrap mode
+//! ([`crate::srr::verifier::UNPROVISIONED_ADMISSION_POLICY`]). Its per-project record carries that marking
+//! (`admission: BOOTSTRAP_EMBEDDED_PAYLOAD`, the binary identity), and post-install integrity holds the installed
+//! kernel to it: on a machine with no trust anchor an installed kernel is anchored only when it is a bootstrap
+//! installation this machine recorded, or is byte-identical to the running binary's embedded payload (the baseline
+//! D-0007 rule 1 would substitute anyway). A consistent rewrite of a bootstrap installation, or kernel material that
+//! arrived without an ingress (a clone, a checkout, a legacy external-source install), is external-source kernel
+//! material the owner's decision refuses on this posture: it is untrusted T1 (`DIVERGED`, `UNADMITTED`) until the
+//! machine is provisioned and the pinned signed release is verified. So the unprovisioned sub-case of BC-P2-35 no
+//! longer exists as a report-only case. Nothing on such a machine is ever presented as authentic, current or
+//! verified ([`posture_of`]).
 use crate::srr::state::{resolve_state_root, write_durable, MachineState};
 use crate::srr::verifier::{AuthenticatedRelease, Authenticity};
 use crate::util::{hash_value, now_iso, read_json, sha256_text};
@@ -77,6 +85,11 @@ pub struct BoundPayload {
     pub release_commit: String,
     pub ingress: String,
     pub at: String,
+    /// What admitted the bytes ([`crate::srr::verifier::AuthenticatedRelease::admission`]); empty on a record written
+    /// before OWNER-DECISION-P2-0002.
+    pub admission: String,
+    /// The bootstrap marking and binary identity when `admission` is the bootstrap mode; `Null` otherwise.
+    pub bootstrap: Value,
 }
 
 impl BoundPayload {
@@ -97,7 +110,14 @@ impl BoundPayload {
             release_commit: signed_release_commit(&auth.evidence),
             ingress: auth.ingress.as_str().to_string(),
             at: now_iso(),
+            admission: auth.admission().to_string(),
+            bootstrap: auth.bootstrap.clone().unwrap_or(Value::Null),
         }
+    }
+
+    /// Is this a bootstrap installation of a binary's embedded payload (OWNER-DECISION-P2-0002 requirement 2)?
+    pub fn is_bootstrap(&self) -> bool {
+        self.admission == crate::srr::verifier::BOOTSTRAP_MODE
     }
 
     pub fn to_value(&self) -> Value {
@@ -107,6 +127,7 @@ impl BoundPayload {
             "channel": self.channel, "authenticity": self.authenticity, "posture": self.posture,
             "release_metadata_sha256": self.release_metadata_sha256, "release_commit": self.release_commit,
             "ingress": self.ingress, "at": self.at,
+            "admission": self.admission, "bootstrap": self.bootstrap,
         })
     }
 
@@ -132,6 +153,8 @@ impl BoundPayload {
             release_commit: s("release_commit"),
             ingress: s("ingress"),
             at: s("at"),
+            admission: s("admission"),
+            bootstrap: v.get("bootstrap").cloned().unwrap_or(Value::Null),
         })
     }
 
@@ -150,6 +173,7 @@ impl BoundPayload {
             "payload_hash": self.payload_hash, "kernel_manifest_hash": self.kernel_manifest_hash,
             "authenticity": self.authenticity, "posture_at_install": self.posture,
             "release_metadata_sha256": self.release_metadata_sha256, "ingress": self.ingress, "at": self.at,
+            "admission": self.admission, "bootstrap": self.bootstrap,
         })
     }
 }
@@ -462,16 +486,18 @@ pub fn record_verified_in(ms: &MachineState, product: &str, payload: BoundPayloa
 /// How an installed payload stands against this machine's protected records. Digest-level only.
 #[derive(Debug, Clone)]
 pub enum Anchor {
-    /// A protected record on this machine binds exactly these digests.
+    /// A protected record on this machine binds exactly these digests — or, on a machine with no trust anchor, the
+    /// payload is byte-identical to the running binary's embedded payload (the bootstrap baseline).
     Matched { basis: String },
     /// This machine recorded what it committed into this project, and the installed payload is not that: a
     /// post-install rewrite however consistent its manifest and lock are, or a change made without an ingress on
     /// this machine (another machine's update arriving through Git, a checkout of an older kernel).
     ///
-    /// `enforced` — this machine holds a trust anchor, so the record it diverges from is part of the determined
-    /// requirement (BC-P2-35) and the installed kernel is untrusted T1 until it matches. On a machine with no trust
-    /// anchor the record is itself unauthenticated; that sub-case is OD-P2-02, with the owner, so the divergence is
-    /// reported (kernel trust detail, presentation) and not enforced.
+    /// `enforced` — the installed kernel is untrusted T1 until it matches. Since OWNER-DECISION-P2-0002 this holds on
+    /// every posture: on a provisioned machine the record is part of the determined requirement (BC-P2-35); on a
+    /// machine with no trust anchor the only admissible kernel is the bootstrap installation this machine recorded
+    /// (or the binary's own embedded payload), so anything else is external-source kernel material that arrived
+    /// without passing the ingress the decision refuses. The field is kept for consumers; it is always `true`.
     Diverged {
         basis: String,
         recorded_payload_hash: String,
@@ -480,6 +506,11 @@ pub enum Anchor {
     /// No protected record binds this installation. `required` — this machine holds a trust anchor, so the
     /// installed kernel must be verified against the pinned release before privileged work (ARCH-0003 §8).
     Unrecorded { required: bool, basis: String },
+    /// **OWNER-DECISION-P2-0002** — a machine with no trust anchor holds an installed kernel that is neither a
+    /// bootstrap installation it recorded nor the running binary's embedded payload: external-source kernel material
+    /// (a clone or checkout of another machine's kernel, or an install made before the decision). It is untrusted T1
+    /// until the machine is provisioned and verifies the pinned signed release.
+    Unadmitted { basis: String },
     /// Protected state could not be resolved (the hostile override input); the §6 guards refuse it themselves.
     Undetermined { basis: String },
 }
@@ -496,6 +527,7 @@ impl Anchor {
             Anchor::Unrecorded {
                 required: false, ..
             } => "UNRECORDED",
+            Anchor::Unadmitted { .. } => "UNADMITTED",
             Anchor::Undetermined { .. } => "UNDETERMINED",
         }
     }
@@ -504,6 +536,7 @@ impl Anchor {
             Anchor::Matched { basis }
             | Anchor::Diverged { basis, .. }
             | Anchor::Unrecorded { basis, .. }
+            | Anchor::Unadmitted { basis }
             | Anchor::Undetermined { basis } => basis,
         }
     }
@@ -511,20 +544,32 @@ impl Anchor {
     pub fn holds(&self) -> bool {
         !matches!(
             self,
-            Anchor::Diverged { enforced: true, .. } | Anchor::Unrecorded { required: true, .. }
+            Anchor::Diverged { enforced: true, .. }
+                | Anchor::Unrecorded { required: true, .. }
+                | Anchor::Unadmitted { .. }
         )
     }
 }
 
+/// Is `payload_hash` the payload embedded in the running `gov` binary — the one payload a machine with no trust
+/// anchor may hold as T1 (OWNER-DECISION-P2-0002 requirement 2; D-0007 rule 1's embedded baseline)?
+pub fn is_embedded_payload(payload_hash: &str) -> bool {
+    !payload_hash.is_empty() && payload_hash == crate::kernel::embedded_payload_hash()
+}
+
 /// Measure an installed payload against this machine's protected records.
 ///
-/// * a per-project record exists and binds the digests → `Matched` (on a machine with a trust anchor, only if the
-///   record records a verification; otherwise the ledger is consulted, below);
-/// * a per-project record exists and binds neither `current` nor `pending` → `Diverged` (enforced only on a machine
-///   with a trust anchor; see [`Anchor::Diverged`]);
-/// * no usable per-project record, machine holds a trust anchor → the verified-release ledger (a release this machine
-///   authenticated, by digest); else `Unrecorded { required: true }`;
-/// * no record, no trust anchor → `Unrecorded { required: false }` (OD-P2-02: posture decided by the owner).
+/// Provisioned machine (unchanged by OWNER-DECISION-P2-0002):
+/// * a per-project record exists and binds the digests with a recorded verification → `Matched`;
+/// * a per-project record exists and binds neither `current` nor `pending` → `Diverged` (enforced);
+/// * otherwise the verified-release ledger (a release this machine authenticated, by digest) → `Matched`, else
+///   `Unrecorded { required: true }`.
+///
+/// Machine with no trust anchor (OWNER-DECISION-P2-0002, Option A — the unprovisioned sub-case of BC-P2-35):
+/// * the payload is byte-identical to the running binary's embedded payload → `Matched` (the bootstrap baseline);
+/// * a per-project record binds the digests **and** records a bootstrap admission → `Matched`;
+/// * a per-project record exists and binds neither `current` nor `pending` → `Diverged` (enforced);
+/// * anything else — no record, or a record of an external-source install made before the decision → `Unadmitted`.
 pub fn anchor_for(project_root: &Path, payload_hash: &str, kernel_manifest_hash: &str) -> Anchor {
     match view() {
         View::Resolved(ms) => anchor_in(&ms, FRAMEWORK_NAME, project_root, payload_hash, kernel_manifest_hash),
@@ -561,11 +606,17 @@ pub fn anchor_posture(
     payload_hash: &str,
     kernel_manifest_hash: &str,
 ) -> Anchor {
+    if !provisioned && is_embedded_payload(payload_hash) {
+        return Anchor::Matched {
+            basis: "byte-identical to the payload embedded in the running gov binary: the bootstrap baseline a machine with no trust anchor may hold (OWNER-DECISION-P2-0002); its authenticity is UNKNOWN".into(),
+        };
+    }
     let record = load_project_record(ms, product, project_root);
     let mut unverified_install = false;
+    let mut unadmitted_install: Option<BoundPayload> = None;
     if let Some(rec) = record.as_ref().filter(|r| r.records_anything()) {
         match rec.binding(payload_hash, kernel_manifest_hash) {
-            Some(b) if !provisioned || records_a_verification(&b.authenticity) => {
+            Some(b) if provisioned && records_a_verification(&b.authenticity) => {
                 return Anchor::Matched {
                     basis: format!(
                         "matches this machine's protected installation record for this project ({} {} via {} at {})",
@@ -573,6 +624,15 @@ pub fn anchor_posture(
                     ),
                 };
             }
+            Some(b) if !provisioned && b.is_bootstrap() => {
+                return Anchor::Matched {
+                    basis: format!(
+                        "matches this machine's protected record of a bootstrap installation into this project ({} {} via {} at {}; OWNER-DECISION-P2-0002); its authenticity is UNKNOWN",
+                        b.release_version, b.admission, b.ingress, b.at
+                    ),
+                };
+            }
+            Some(b) if !provisioned => unadmitted_install = Some(b.clone()),
             Some(_) => unverified_install = true,
             None => {
                 let recorded = rec
@@ -588,11 +648,11 @@ pub fn anchor_posture(
                         )
                     } else {
                         format!(
-                            "the installed payload {payload_hash} is not the payload {recorded} this machine installed into this project. This machine holds no trust anchor, so its record is itself unauthenticated: the divergence is reported, not enforced (OD-P2-02 is with the owner)"
+                            "the installed payload {payload_hash} is not the payload {recorded} this machine installed into this project — a post-install rewrite, or a change made without an ingress on this machine; KERNEL_MANIFEST.json and framework.lock agreeing with it does not make it intact. This machine holds no trust anchor, so it admits no kernel material but the payload embedded in its gov binary (OWNER-DECISION-P2-0002): restore the installed kernel, or provision a trust anchor (`gov trust provision --anchor <administrator root>`) and verify the release framework.lock pins (`gov kernel reinstall --source <signed release>`)"
                         )
                     },
                     recorded_payload_hash: recorded,
-                    enforced: provisioned,
+                    enforced: true,
                 };
             }
         }
@@ -615,9 +675,16 @@ pub fn anchor_posture(
             },
         };
     }
-    Anchor::Unrecorded {
-        required: false,
-        basis: "this machine holds no trust anchor and no protected installation record for this project: the installed kernel is checked against KERNEL_MANIFEST.json and framework.lock only, and is not anchored to anything the repository cannot rewrite".into(),
+    Anchor::Unadmitted {
+        basis: match unadmitted_install {
+            Some(b) => format!(
+                "this machine holds no trust anchor, and the installed payload {payload_hash} ({} via {} at {}) was installed from an external source rather than as a bootstrap installation of this binary's embedded payload; external-source kernel material is refused until the machine is provisioned (OWNER-DECISION-P2-0002). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and verify the release framework.lock pins (`gov kernel reinstall --source <signed release>`)",
+                b.release_version, b.ingress, b.at
+            ),
+            None => format!(
+                "this machine holds no trust anchor and no protected record of installing the payload {payload_hash} here, and it is not the payload embedded in this gov binary: it is external-source kernel material (installed elsewhere, or by another machine), which is refused until the machine is provisioned (OWNER-DECISION-P2-0002). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and verify the release framework.lock pins (`gov kernel reinstall --source <signed release>`)"
+            ),
+        },
     }
 }
 
@@ -628,7 +695,7 @@ pub struct Divergence {
     pub missing: Vec<String>,
     pub added: Vec<String>,
     pub recorded_payload_hash: String,
-    /// See [`Anchor::Diverged`]: enforced only on a machine with a trust anchor.
+    /// See [`Anchor::Diverged`]: since OWNER-DECISION-P2-0002 a divergence is enforced on every posture.
     pub enforced: bool,
 }
 
@@ -652,6 +719,9 @@ pub fn divergence_in(
 }
 
 /// [`divergence_in`] with the machine's posture given rather than read.
+///
+/// On a machine with no trust anchor, an installed payload byte-identical to the running binary's embedded payload
+/// does not diverge: it is the bootstrap baseline ([`anchor_posture`]).
 pub fn divergence_posture(
     ms: &MachineState,
     provisioned: bool,
@@ -662,6 +732,9 @@ pub fn divergence_posture(
     let root = project_root_of_kernel_dir(kernel_dir)?;
     let rec = load_project_record(ms, product, &root)?;
     let measured = hash_value(&serde_json::to_value(actual).ok()?);
+    if !provisioned && is_embedded_payload(&measured) {
+        return None;
+    }
     let candidates: Vec<&BoundPayload> = rec.current.iter().chain(rec.pending.iter()).collect();
     if candidates.is_empty() || candidates.iter().any(|b| b.payload_hash == measured) {
         return None;
@@ -670,7 +743,7 @@ pub fn divergence_posture(
     let expected = &reference.files;
     let mut d = Divergence {
         recorded_payload_hash: reference.payload_hash.clone(),
-        enforced: provisioned,
+        enforced: true,
         ..Default::default()
     };
     if expected.is_empty() {
@@ -699,7 +772,9 @@ pub fn divergence_posture(
 ///
 /// `authenticity_established` is true only when the machine holds a trust anchor, the installed kernel is intact,
 /// and a protected record of a verification binds it. Anything else is disclosed and is never presented as
-/// current, verified or certified.
+/// current, verified or certified. `admission` says what admitted the installed bytes; on a machine with no trust
+/// anchor it is `BOOTSTRAP_EMBEDDED_PAYLOAD` (with the `bootstrap` marking and binary identity) or `NOT_ADMITTED`
+/// (OWNER-DECISION-P2-0002).
 pub fn posture_of(project_root: &Path) -> Value {
     let kt = crate::kernel_trust::trust(project_root);
     let root = canonical_project_root(project_root).display().to_string();
@@ -743,10 +818,41 @@ pub fn posture_of(project_root: &Path) -> Value {
     } else {
         "NOT_ESTABLISHED".into()
     };
+    // OWNER-DECISION-P2-0002 requirement 2: on a machine with no trust anchor the only admissible installation is a
+    // bootstrap installation of a gov binary's embedded payload; it is marked as such wherever it is described.
+    let bootstrap = machine_posture == "UNPROVISIONED" && kt.verified && anchor.holds();
+    let admission = if established {
+        bound
+            .as_ref()
+            .map(|b| b.admission.clone())
+            .filter(|a| !a.is_empty())
+            .unwrap_or_else(|| "PROTECTED_RECORD_OF_AN_EARLIER_VERIFICATION".into())
+    } else if bootstrap {
+        crate::srr::verifier::BOOTSTRAP_MODE.to_string()
+    } else if machine_posture == "UNPROVISIONED" {
+        "NOT_ADMITTED".to_string()
+    } else {
+        "NOT_ESTABLISHED".to_string()
+    };
+    let bootstrap_marking = if bootstrap {
+        bound
+            .as_ref()
+            .map(|b| b.bootstrap.clone())
+            .filter(|v| !v.is_null())
+            .unwrap_or_else(|| {
+                json!({"mode": crate::srr::verifier::BOOTSTRAP_MODE, "decision": "OWNER-DECISION-P2-0002",
+                       "binary": crate::kernel::binary_identity(),
+                       "basis": "byte-identical to the payload embedded in the running gov binary"})
+            })
+    } else {
+        Value::Null
+    };
     let disclosure = if established {
         String::new()
+    } else if bootstrap {
+        format!("this installation is a BOOTSTRAP installation of the payload embedded in a gov binary ({}), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).", kt.installed_version)
     } else if machine_posture == "UNPROVISIONED" {
-        "release authenticity of this installation is UNKNOWN: this machine holds no provisioned Signed Release Root trust anchor, so nothing installed on it can be authenticated. It is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision`) and reinstall from a signed release (`gov kernel reinstall --source <signed release>`).".to_string()
+        format!("release authenticity of this installation is UNKNOWN and the installed kernel is not admitted on this machine ({}): {} It is not current, not verified and not certified (Contract v3:150).", anchor.state(), anchor.basis())
     } else if machine_posture == "UNDETERMINED" {
         "release authenticity of this installation cannot be determined: protected machine state could not be resolved. It is not presented as current.".to_string()
     } else {
@@ -758,6 +864,8 @@ pub fn posture_of(project_root: &Path) -> Value {
         "machine_posture": machine_posture,
         "authenticity": authenticity,
         "authenticity_established": established,
+        "admission": admission,
+        "bootstrap": bootstrap_marking,
         "integrity": {"intact": kt.verified, "protected_record": anchor.state(), "basis": anchor.basis()},
         "bound_release": bound.as_ref().map(|b| b.summary()),
         "lock_version": kt.installed_version,
@@ -801,7 +909,11 @@ pub fn presentation_disclosures() -> Vec<String> {
             continue;
         }
         let line = match p["machine_posture"].as_str().unwrap_or("") {
-            "UNPROVISIONED" => "release authenticity UNKNOWN: this machine holds no provisioned Signed Release Root trust anchor, so no installation on it can be authenticated. It is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).".to_string(),
+            "UNPROVISIONED" if p["admission"] == crate::srr::verifier::BOOTSTRAP_MODE => "BOOTSTRAP installation (OWNER-DECISION-P2-0002): the installed kernel is a gov binary's embedded payload, installed on a machine with no provisioned Signed Release Root trust anchor. Release authenticity UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).".to_string(),
+            "UNPROVISIONED" => format!(
+                "release authenticity UNKNOWN and the installed kernel is NOT ADMITTED on this machine (protected installation record: {}): a machine with no provisioned Signed Release Root trust anchor admits no kernel material but a gov binary's embedded payload (OWNER-DECISION-P2-0002), so constitutional policy is read from the embedded baseline and mutations are refused. It is not current, not verified and not certified. `gov kernel trust` shows why; provision a trust anchor (`gov trust provision --anchor <administrator root>`) and verify the release framework.lock pins (`gov kernel reinstall --source <signed release>`).",
+                p["integrity"]["protected_record"].as_str().unwrap_or("")
+            ),
             "UNDETERMINED" => "release authenticity UNDETERMINED: protected machine state could not be resolved, so the installation is not presented as current. Resolve the protected state root and re-run.".to_string(),
             _ => format!(
                 "release authenticity NOT ESTABLISHED on this machine (protected installation record: {}): no protected record of a verification binds the installed kernel. It is not current, not verified and not certified. `gov kernel trust` shows why; `gov kernel reinstall --source <the signed release framework.lock pins>` verifies it.",
@@ -810,12 +922,6 @@ pub fn presentation_disclosures() -> Vec<String> {
         };
         if !out.contains(&line) {
             out.push(line);
-        }
-        if p["integrity"]["protected_record"] == "DIVERGED_NOT_ENFORCED" {
-            let extra = "the installed kernel differs from the payload this machine installed into the project (a post-install rewrite, or a change that arrived without an ingress on this machine). On a machine with no trust anchor this is reported and not enforced (OD-P2-02 is with the owner); `gov kernel trust` shows the files.".to_string();
-            if !out.contains(&extra) {
-                out.push(extra);
-            }
         }
     }
     out
@@ -934,20 +1040,51 @@ mod tests {
         assert!(!anchor_posture(&ms, prov, P, &project, &other.payload_hash, "").holds());
     }
 
-    /// OD-P2-02 is with the owner: with no trust anchor the record is unauthenticated, so a divergence from it is
-    /// reported and not enforced.
+    /// OWNER-DECISION-P2-0002 (Option A) closes the unprovisioned sub-case of BC-P2-35. Round 1 reported a divergence
+    /// on a machine with no trust anchor and did not enforce it, pending OD-P2-02; the owner decided that such a
+    /// machine admits no kernel material but a gov binary's embedded payload, so a divergence from what this machine
+    /// installed is external-source material and is enforced on this posture too.
     #[test]
-    fn an_unprovisioned_divergence_is_reported_not_enforced() {
+    fn an_unprovisioned_divergence_is_enforced_since_owner_decision_p2_0002() {
         let (ms, project, prov) = machine("rewrite-unprov", false);
-        let installed = payload(&[("a", "1")], "UNKNOWN");
+        let mut installed = payload(&[("a", "1")], "UNKNOWN");
+        installed.admission = crate::srr::verifier::BOOTSTRAP_MODE.into();
         bind_committed_in(&ms, P, &project, installed.clone()).unwrap();
         let other = payload(&[("a", "2")], "UNKNOWN");
         let a = anchor_posture(&ms, prov, P, &project, &other.payload_hash, "");
-        assert_eq!(a.state(), "DIVERGED_NOT_ENFORCED");
-        assert!(a.holds());
+        assert_eq!(a.state(), "DIVERGED");
+        assert!(!a.holds());
         let kd = project.join("governance").join("kernel");
         let d = divergence_posture(&ms, prov, P, &kd, &other.files).unwrap();
-        assert!(!d.enforced);
+        assert!(d.enforced);
+        assert_eq!(d.modified, vec!["a".to_string()]);
+        // the bootstrap installation itself stands
+        assert!(matches!(
+            anchor_posture(&ms, prov, P, &project, &installed.payload_hash, ""),
+            Anchor::Matched { .. }
+        ));
+    }
+
+    /// OWNER-DECISION-P2-0002: on a machine with no trust anchor, a recorded install that was not a bootstrap
+    /// installation (an external-source install made before the decision) is not admitted, and a kernel this
+    /// machine never installed is not admitted either — unless it is the running binary's own embedded payload.
+    #[test]
+    fn an_unprovisioned_machine_admits_only_a_bootstrap_installation_or_the_embedded_payload() {
+        let (ms, project, prov) = machine("unprov-legacy", false);
+        let legacy = payload(&[("a", "1")], "UNKNOWN");
+        bind_committed_in(&ms, P, &project, legacy.clone()).unwrap();
+        let a = anchor_posture(&ms, prov, P, &project, &legacy.payload_hash, "");
+        assert_eq!(a.state(), "UNADMITTED", "{a:?}");
+        assert!(!a.holds());
+        let (ms2, project2, _) = machine("unprov-norecord", false);
+        let a = anchor_posture(&ms2, prov, P, &project2, "ff", "");
+        assert_eq!(a.state(), "UNADMITTED");
+        assert!(!a.holds());
+        let embedded = crate::kernel::embedded_payload_hash();
+        for (m, pr) in [(&ms, &project), (&ms2, &project2)] {
+            let a = anchor_posture(m, prov, P, pr, &embedded, "");
+            assert!(matches!(a, Anchor::Matched { .. }), "{a:?}");
+        }
     }
 
     /// ARCH-0003 §8 / BC-P2-35: on a machine with a trust anchor, an installation no protected record of a
@@ -977,15 +1114,6 @@ mod tests {
             anchor_posture(&ms, prov, P, &project, &unknown.payload_hash, ""),
             Anchor::Matched { .. }
         ));
-    }
-
-    /// OD-P2-02 is with the owner: with no trust anchor and no record, nothing is required (and nothing is claimed).
-    #[test]
-    fn an_unprovisioned_machine_without_a_record_is_not_blocked() {
-        let (ms, project, prov) = machine("unprov", false);
-        let a = anchor_posture(&ms, prov, P, &project, "ff", "");
-        assert_eq!(a.state(), "UNRECORDED");
-        assert!(a.holds());
     }
 
     /// BC-P2-38: the ledger keeps the highest sequence the release role bound to the same bytes.

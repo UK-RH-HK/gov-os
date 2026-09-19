@@ -107,7 +107,16 @@ fn path_migration_with_rollback_and_memory_rebuild() {
         .with_session("S-executor")
         .with_role("migration-executor");
     executor.ok(&[
-        "adopt", "migrate", "--batch", "0", "--name", "libcore", "--alias", "fx-mig",
+        "adopt",
+        "migrate",
+        "--batch",
+        "0",
+        "--source",
+        signed_source(),
+        "--name",
+        "libcore",
+        "--alias",
+        "fx-mig",
     ]);
     assert!(exists(&root, "governance/framework.lock"));
     let contract = yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml");
@@ -366,6 +375,7 @@ fn adoption_dependency_proof_citations_and_rerun_identity() {
     );
     git_init_commit(&root);
     let planner = Gov::new(&root, "S-plan");
+    provision(&planner);
     for s in [
         "baseline",
         "inventory",
@@ -444,7 +454,16 @@ fn adoption_dependency_proof_citations_and_rerun_identity() {
         .with_role("migration-executor");
     let rules_before = read(&root, "src/app/rules.py");
     let settings_before = read(&root, "config/settings.yaml");
-    executor.ok(&["adopt", "migrate", "--name", "svc", "--alias", "fx-deps"]);
+    executor.ok(&[
+        "adopt",
+        "migrate",
+        "--source",
+        signed_source(),
+        "--name",
+        "svc",
+        "--alias",
+        "fx-deps",
+    ]);
     assert!(
         !exists(&root, "CLAUDE.md") && exists(&root, "archive/governance/legacy-rules/CLAUDE.md")
     );

@@ -7,6 +7,8 @@ fn injected_failures_are_detected_and_recovered() {
     let (root, g) = setup_fixture("greenfield", "failinj", "S-inj");
     g.ok(&[
         "init",
+        "--source",
+        signed_source(),
         "--name",
         "orders-ledger",
         "--alias",
@@ -159,7 +161,7 @@ fn injected_failures_are_detected_and_recovered() {
         .unwrap()
         .iter()
         .any(|f| f["family"] == "mutation_scope" && f["severity"] == "critical"));
-    g.ok(&["kernel", "reinstall"]);
+    g.ok(&["kernel", "reinstall", "--source", signed_source()]);
     assert_eq!(read(&root, kp), orig_k);
     assert!(doctor_check(&g, "D003").0);
     // 7. invalid policy override
