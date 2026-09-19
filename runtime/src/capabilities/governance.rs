@@ -663,13 +663,17 @@ fn gate_package(
 /// A registration request as the OS derives it **before any approval is asked or any byte is written**: the
 /// schema-valid descriptor, a healthy program, the implementation binding, the acquisition verdict (SRR-R0-L6 and
 /// `OWNER-DECISION-0006` §6 bullet 5, asked unconditionally by [`prepare`]) and the registration subject a gate
-/// approves. Only [`prepare`] constructs one, so the one registration writer ([`write_registration`]) can only run
-/// after the acquisition sink was asked for exactly this request.
+/// approves. Only [`prepare`] constructs one; the one registration writer ([`register_write`]) asks the acquisition
+/// sink again at the instant of its write.
 struct Prepared {
     id: String,
     dest: std::path::PathBuf,
     tmp: PluginDescriptor,
     imp: Implementation,
+    /// the schema-validated descriptor and the acquisition class the sink was asked about, with the release channel
+    descriptor: Value,
+    acquisition: crate::srr::plugins::Acquisition,
+    channel: String,
     acquisition_verdict: Value,
     required: Vec<String>,
     declared_elevated: Vec<String>,
@@ -748,6 +752,9 @@ fn prepare(p: &Project, mut descriptor: Value) -> Result<Prepared> {
         dest,
         tmp,
         imp,
+        descriptor,
+        acquisition,
+        channel,
         acquisition_verdict,
         required,
         declared_elevated,
@@ -759,35 +766,47 @@ fn prepare(p: &Project, mut descriptor: Value) -> Result<Prepared> {
     })
 }
 
-/// **The one writer of a registration** (the descriptor the OS normalises and the sealed registry entry). It takes
-/// a [`Prepared`] — proof that the acquisition sink was asked for exactly this request — and is reached only from the
-/// execution of the registration's own change transaction ([`apply_registration`], CIT-E), after the execution
-/// approval was re-verified there.
-fn write_registration(
+/// **The one writer of a registration** (the descriptor the OS normalises into `governance/project/plugins/` and the
+/// sealed registry entry), reached only from the execution of the registration's own change transaction
+/// ([`apply_registration`], CIT-E) after the execution approval was re-verified there. `OWNER-DECISION-0006` §6 bullet
+/// 5 is asked here, at the instant of the effect, by the function that performs it (the §6 derivation sees this
+/// function as a capability-registry writer carrying the sink), whatever was asked before.
+fn register_write(
     p: &Project,
     prep: &Prepared,
     gate_id: &Value,
     change_transaction: &str,
 ) -> Result<(Value, Value)> {
+    crate::srr::plugins::guard_acquisition(
+        &prep.id,
+        &prep.descriptor,
+        prep.acquisition,
+        &[],
+        &prep.channel,
+    )?;
+    let dest = p
+        .overlay_dir()
+        .join("plugins")
+        .join(format!("{}.yaml", prep.id));
     let mut descriptor = prep.normalized.clone();
     descriptor["pin"] = json!({"sha256": prep.imp.sha256, "files": prep.imp.paths()});
     descriptor["provenance"] = json!({"registered_by_session": p.session_id, "registered_by_role": p.role, "registered_at": now_iso(), "gate": gate_id, "method": "gov plugins register", "change_transaction": change_transaction});
     descriptor["status"] = json!("active");
-    if let Some(d) = prep.dest.parent() {
+    if let Some(d) = dest.parent() {
         std::fs::create_dir_all(d)?;
     }
-    crate::util::write_yaml(&prep.dest, &descriptor)?;
+    crate::util::write_yaml(&dest, &descriptor)?;
     // The authoritative record lives OUTSIDE the descriptor (verifier V-H1): identity, version, descriptor content
     // hash, implementation, subject, approved roles, permission classes and the approving gate are written — and
     // sealed (T2) — by the OS.
-    let written = PluginDescriptor::from_value(&descriptor, &prep.dest.to_string_lossy())
+    let written = PluginDescriptor::from_value(&descriptor, &dest.to_string_lossy())
         .ok_or_else(|| GovError::new("USAGE", "descriptor is not a plugin descriptor"))?;
     let dsha = registry::descriptor_hash(&written).ok_or_else(|| {
         GovError::new(
             "IO_ERROR",
             format!(
                 "cannot read the registered descriptor at {}",
-                prep.dest.display()
+                dest.display()
             ),
         )
     })?;
@@ -862,7 +881,7 @@ pub fn apply_registration(p: &Project, op: &Value, change_transaction: &str) -> 
         }
     }
     let legacy_before = p.root.join(registry::LEGACY_REGISTRY_PATH).exists();
-    let (descriptor, entry) = write_registration(p, &prep, &gate_id, change_transaction)?;
+    let (descriptor, entry) = register_write(p, &prep, &gate_id, change_transaction)?;
     let mut touched = vec![prep.dest_rel(), registry::REGISTRY_PATH.to_string()];
     if legacy_before && !p.root.join(registry::LEGACY_REGISTRY_PATH).exists() {
         touched.push(registry::LEGACY_REGISTRY_PATH.to_string());
