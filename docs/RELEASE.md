@@ -50,4 +50,4 @@ contract. `gov update --check` refuses paths not covered by `supported_from_vers
 ## Migrations
 Declarative YAML in `migrations/` (validated by `migration.schema.json`), executed by `gov update --apply` inside a
 snapshot; they may only touch the overlay, the lock, generated views and derived runtime. `gov update --rollback`
-restores kernel, overlay, generated views and lock from `.governance-runtime/update/<version>/`.
+restores kernel, overlay, generated views and lock from `.governance-state/update/<version>/` (the OS state store, which survives deleting everything classified derived; BC-P2-31).

@@ -826,12 +826,14 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                     ));
                 }
                 // non-rebuildable OS state kept inside the derived/generated directories is lost when those are
-                // deleted and rebuilt (BC-P2-31; WS-6 IP-R2-12). Disclosed until every writer keeps its store at
-                // `paths::store_path` (the relocations are the writers' integration points).
+                // deleted and rebuilt (BC-P2-31; WS-6 IP-R2-12). Every writer now keeps its store at
+                // `paths::store_path` (round 3: claims and claim trees WS-5, emergency control WS-3, plugin registry
+                // WS-7, CIT/update/migration snapshots WS-4/WS-8/WS-9), so a store still found in a derived location
+                // is a project defect (medium; WS-2 IP-R3-WS02-09, round-3 integration) until its writer relocates it.
                 let misplaced = crate::paths::misplaced_os_state(&p.root);
                 for m in &misplaced {
                     f.findings.push(finding(
-                        "low",
+                        "medium",
                         &fam,
                         m["message"].as_str().unwrap_or("").to_string(),
                         m["found_at"].as_str().map(|s| s.to_string()),

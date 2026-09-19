@@ -70,8 +70,11 @@ pub fn json(root: &Path, rel: &str) -> Value {
 pub fn write_yaml(root: &Path, rel: &str, v: &Value) {
     gov_runtime::util::write_yaml(&root.join(rel), v).unwrap();
 }
+/// Hash of a repository tree, excluding git and the OS's non-governed state: the derived runtime directory and the
+/// operational state store (`.governance-state/**`, where every BC-P2-31 store lives since round 3; WS-9 r3
+/// IP-R3-WS09-3, round-3 integration) — both were excluded before the stores moved out of the runtime directory.
 pub fn tree_hash(root: &Path, exclude: &[&str]) -> String {
-    let mut ex = vec![".git/**", ".governance-runtime/**"];
+    let mut ex = vec![".git/**", ".governance-runtime/**", ".governance-state/**"];
     ex.extend_from_slice(exclude);
     gov_runtime::util::hash_tree(root, &ex).unwrap().0
 }

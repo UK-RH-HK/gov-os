@@ -254,3 +254,72 @@ fn a_legacy_unsealed_task_rewritten_by_gov_inside_a_claim_window_is_reported_not
         rpt["mutation_evidence"]
     );
 }
+
+/// WS-2 IP-R3-WS02-07: a CIT that invalidates DONE work generates one revalidation task (`revalidates` -> `TESTS`,
+/// task -> task), and that relationship is well typed — the governance suite's `graph_integrity` family and doctor
+/// D015 report no ill-typed relationship for it (before the integration fix every such task was a false medium
+/// `ill_typed` finding).
+#[test]
+fn a_cit_invalidating_done_work_leaves_graph_integrity_and_d015_clean() {
+    let (root, g) = fresh("int3-reval");
+    let inputs = traceable_inputs(&root, "0831");
+    git_commit_all(&root, "inputs");
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let done = create(&g, "refactor", "totals", "src/**", inputs);
+    g.ok(&["context", "compile", &done]);
+    g.ok(&["task", "claim", &done]);
+    let c = do_and_close(&g, &root, &done, "src/totals.rs");
+    assert_eq!(c["task_status"], "DONE", "{c}");
+    git_commit_all(&root, "done");
+    let mf = root.join(".governance-runtime/mf-reval.json");
+    std::fs::write(
+        &mf,
+        json!([{"op": "set_field", "target": "REQ-0831", "field": "statement", "value": "totals are integer cents"}]).to_string(),
+    )
+    .unwrap();
+    let cit = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        "state the unit",
+        "--trigger",
+        "behaviour_change",
+        "--targets",
+        "REQ-0831",
+        "--manifest",
+        mf.to_str().unwrap(),
+    ])["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let sim = g.ok(&["cit", "simulate", &cit]);
+    crate::ws03::human_decide(&g, sim["human_gate"].as_str().unwrap(), "A");
+    g.ok(&["cit", "approve", &cit, "--method", "human"]);
+    g.ok(&["cit", "execute", &cit]);
+    let reval: Vec<Value> = g
+        .ok(&["task", "list"])
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| {
+            t["revalidates"] == json!(done) || t["generated_from"]["source"] == "cit-effect"
+        })
+        .cloned()
+        .collect();
+    assert!(!reval.is_empty(), "a revalidation task is generated");
+    let rid = reval[0]["id"].as_str().unwrap().to_string();
+    assert_eq!(g.ok(&["task", "show", &rid])["revalidates"], json!(done));
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let o = g.run(&["audit", "--no-persist", "--family", "graph_integrity"]);
+    let text = o.envelope.to_string();
+    assert!(
+        !(text.contains("ill_typed") || text.contains("does not relate in either direction"))
+            || !text.contains(&rid),
+        "the revalidation relationship is well typed: {text}"
+    );
+    let (_, d015) = doctor_check(&g, "D015");
+    assert!(
+        !d015.contains(&rid),
+        "D015 does not report the revalidation task: {d015}"
+    );
+}

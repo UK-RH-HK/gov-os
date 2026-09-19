@@ -989,6 +989,13 @@ fn gate_operations_keep_os_sealed_task_records_verifiable_and_never_bless_others
     owner_seal(&mut w, "task create");
     w["objective"] = json!("edited after sealing");
     write_yaml(&root, broken, &w);
+    // round-3 integration (P2-AR-0041): `gov task create` now seals the task record it writes (WS-5 r2 IP-R3-1, final
+    // step), so the "unsealed task record" of this test — a record the OS did not seal (legacy, or written outside
+    // gov) — is made explicitly by removing the seal; the property asserted below is unchanged
+    let unsealed = "spec/tasks/TASK-0902.yaml";
+    let mut u = yaml(&root, unsealed);
+    u.as_object_mut().unwrap().remove("os_binding");
+    write_yaml(&root, unsealed, &u);
     let gid = gate_with(
         &g,
         "HDG-0501",

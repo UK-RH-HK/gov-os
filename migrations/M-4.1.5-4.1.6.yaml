@@ -2,7 +2,9 @@ id: M-4.1.5-4.1.6
 from_version: 4.1.5
 to_version: 4.1.6
 description: >
-  Prepared during Phase-2 repair iteration 1 for the next release (4.1.6). Overlay-template changes reach installed
+  The operative migration from the shipped 4.1.5 to the working tree's release, 4.1.6 (Phase-2 repair iteration 1:
+  the working tree is 4.1.6, WS-8 r3; the kernel payload's version, supported_from_versions and schema versions are
+  framework/KERNEL.yaml's, mirrored at the round-3 integration). Overlay-template changes reach installed
   projects only through this migration: every overlay file a 4.1.5 project holds is converged with the overlay
   template of the kernel being installed by `sync_overlay_template`, a three-way merge whose base is the 4.1.5
   template carried below. Whatever the project never customised follows the new template (values, rules added,
@@ -10,9 +12,8 @@ description: >
   customisation the new template also changed is kept and reported in the update result. A 4.1.5 overlay that was
   never customised becomes byte-identical to a new 4.1.6 installation's; `gov release build` and the certification
   suite simulate that for every template (migrations::framework::check_substance). The adapters and framework.json
-  projection are regenerated and every derived index is rebuilt. The release owner completes the kernel-payload part
-  of this record when 4.1.6 is cut (version, supported_from_versions, schema versions, lock fields), as recorded in
-  repair-1 r3-ws09-11 IP-R3-WS09-2.
+  projection are regenerated and every derived index is rebuilt. A lock or payload operation the release owner needs
+  when 4.1.6 is cut is added to the operations before require_index_rebuild (repair-1 r3-ws09-11 IP-R3-WS09-2).
 breaking: false
 human_gate: none
 affected_indexes: [lexical, semantic, graph, code]

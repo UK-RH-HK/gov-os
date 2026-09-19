@@ -1280,6 +1280,22 @@ enum ReleaseCmd {
     Verify {
         dir: PathBuf,
     },
+    /// Record this project's own product release (`REL-<version>` under spec/releases): derived from the work that
+    /// produced it, validated by the evidence that accepted it (W8 forward lineage; WS-8 IP-R2-WS08-7)
+    Record {
+        #[arg(long)]
+        version: String,
+        #[arg(long)]
+        title: String,
+        /// Comma-separated task / report / feature / requirement / decision ids
+        #[arg(long, value_delimiter = ',')]
+        derived_from: Vec<String>,
+        /// Comma-separated audit / report / test-obligation / scenario ids
+        #[arg(long, value_delimiter = ',')]
+        validated_by: Vec<String>,
+        #[arg(long)]
+        notes: Option<String>,
+    },
 }
 #[derive(Subcommand)]
 enum KernelCmd {
@@ -1703,6 +1719,7 @@ fn g0_label(cmd: &Cmd) -> String {
         Cmd::Release { op } => s(match op {
             ReleaseCmd::Build { .. } => "release build",
             ReleaseCmd::Verify { .. } => "release verify",
+            ReleaseCmd::Record { .. } => "release record",
         }),
         Cmd::Kernel { op } => s(match op {
             KernelCmd::Verify => "kernel verify",
@@ -2003,7 +2020,8 @@ fn run(cli: &Cli) -> Result<Value> {
                     if let Some(s) = status { o.insert("task_status".into(), json!(s)); }
                     if let Some(i) = id { o.insert("id".into(), json!(i)); } t::create(&p, f) }
                 TaskCmd::List { status } => Ok(json!(t::list(&p, status.as_deref()))),
-                TaskCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found"))) }
+                // R3-WS5-4: the record with its DAG evaluation, staleness and generation source (`tasks::show`)
+                TaskCmd::Show { id } => t::show(&p, id),
                 TaskCmd::Status { id, status, note } => t::set_status(&p, id, status, note.as_deref()),
                 TaskCmd::Claim { id } => t::claim(&p, id),
                 TaskCmd::Release { id, force } => Ok(json!({"released": t::release(&p, id, *force)?})),
@@ -2130,6 +2148,12 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::Release { op } => match op {
             ReleaseCmd::Build { version, out, certification, evidence, canonical } => { let croot = canonical.clone().or_else(gov_runtime::kernel::canonical_root).ok_or_else(|| GovError::new("KERNEL_SOURCE_NOT_FOUND", "canonical repository root not found (pass --canonical)"))?; let out = out.clone().unwrap_or(croot.join("release")); gov_runtime::release::build(&croot, version, &out, certification, evidence.as_deref()) }
             ReleaseCmd::Verify { dir } => gov_runtime::release::verify(dir),
+            // product-release records (IP-R3-WS03-5 / IP-R3-WS08-8 / IP-R3-WS04-07): WS-8's writer, WS-4's record type,
+            // WS-3's G0 class (`release record`: Write / `record_release`)
+            ReleaseCmd::Record { version, title, derived_from, validated_by, notes } => {
+                let p = open_project(cli, true)?;
+                gov_runtime::release::record_product_release(&p, &gov_runtime::release::ProductRelease { version: version.clone(), title: title.clone(), derived_from: derived_from.clone(), validated_by: validated_by.clone(), notes: notes.clone() })
+            }
         },
         Cmd::Kernel { op } => { let mut p = open_project(cli, true)?; match op { KernelCmd::Verify => { let v = serde_json::to_value(gov_runtime::kernel::verify_kernel(&p.kernel_dir())?)?; let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"ok": v["ok"], "modified": v["modified"], "missing": v["missing"], "added": v["added"], "payload_hash": v["payload_hash"], "version": v["version"], "trust": t.to_value()})) }
             KernelCmd::Trust => { let t = gov_runtime::kernel_trust::trust(&p.root); Ok(json!({"verified": t.verified, "summary": t.summary(), "trust": t.to_value()})) }
@@ -2320,7 +2344,10 @@ fn main() {
     // failures, discoveries, human decisions, CIT effects, lessons, missing tools/skills, failures, performance
     // regressions) is generated into the task DAG, linked and idempotent (`orchestration::generation::after_command`).
     // It runs whether the command succeeded or failed (a failing run may have recorded its event) but not after a
-    // refusal before dispatch; it never changes the command's result.
+    // refusal before dispatch, and not after any refusal of the guard (round-3 integration review, R3-WS5-1: the
+    // write guard's kernel-trust, below-floor and emergency-control refusals and the availability rule's
+    // `HEALTH_HARD_BLOCK` — a refused command recorded no event, and its refusal is not work to generate); it never
+    // changes the command's result.
     if !matches!(
         result.as_ref().err().map(|e| e.code.as_str()),
         Some(
@@ -2330,6 +2357,11 @@ fn main() {
                 | "PAUSED"
                 | "USAGE"
                 | "ROLE_UNDECLARED"
+                | "HEALTH_HARD_BLOCK"
+                | "KERNEL_TAMPERED"
+                | "KERNEL_UNANCHORED"
+                | "SRR_BELOW_FLOOR_REFUSED"
+                | "SRR_BELOW_FLOOR_SUBJECT_UNDETERMINED"
         )
     ) {
         if let Ok(p) = open_project(&cli, true) {

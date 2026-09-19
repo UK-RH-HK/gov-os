@@ -565,7 +565,8 @@ pub fn compose_product_release(
 /// through the record sink.
 pub fn record_product_release(p: &crate::Project, spec: &ProductRelease) -> Result<Value> {
     crate::orchestration::control::guard_write(p, PRODUCT_RELEASE_OPERATION)?;
-    crate::authority::require(p, "mutate_spec_other")?;
+    // WS-3's G0 class for `release record` (IP-R3-WS08-8: the one line that follows WS-3's choice)
+    crate::authority::require(p, "record_release")?;
     let store = crate::records::RecordStore::load(&p.root);
     let mut rec = compose_product_release(&store, spec)?;
     // the canonical location comes from the record-type table only; nothing is written for an unregistered type

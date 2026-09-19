@@ -325,44 +325,50 @@ show <HDG>` reports the binding and scope, the answer's verification and what th
 produced, with the severity of what it is (tampering in force is high).
 
 **T2 facts across the owner's machines (P2-ADJ-0002).** A seal has a scope. *Machine scope* (`hmac-sha256/t2-v1`,
-the machine's own key) is honoured only on the machine that wrote it. *Provisioned scope* (`hmac-sha256/t2-v2`) is made
-under the owner's **T2 binding authority** and is honoured on every machine provisioned with that authority, so gates,
-decisions, CIT state, plugin registrations and governed evidence written on one of the owner's machines are honoured on
-the others after a Git clone or pull. The authority is delegated through the provisioned root, and nothing about it is
-in any repository:
+the machine's own key) is honoured only on the machine that wrote it, and only while that machine is not bound to the
+owner's authority. *Provisioned scope* (`hmac-sha256/t2-v2`) is made under the owner's **T2 binding authority** and is
+honoured on every machine bound to that authority, so gates, decisions, CIT state, plugin registrations, task records
+and governed evidence written on one of the owner's machines are honoured on the others after a Git clone or pull.
+There is **one mechanism** (`runtime/src/srr/binding.rs` provisions and keeps the keyring; `runtime/src/t2.rs` seals
+and verifies through it), delegated through the provisioned root, and nothing about it is in any repository:
 
 1. the owner's Signed Release Root delegates the role `t2-binding` to the owner's key(s);
-2. the owner generates a 32-byte binding key and signs a `t2-binding-authority` document with the `t2-binding` key(s)
-   at threshold, binding the product, the authority id (`t2a-` + a digest of the key) and a commitment to the key, with
-   `issued`/`expires` — `gov` verifies and never signs;
-3. the administrator installs the bundle (`t2-binding-provisioning`: the signed authority and the key) on each of the
-   owner's provisioned machines from the administrator domain, `gov trust t2-binding --provision <bundle>`. It is
-   refused on an unprovisioned machine (`T2_AUTHORITY_UNPROVISIONED`), for a file inside a repository
-   (`T2_AUTHORITY_FROM_REPOSITORY_REFUSED`), when this machine's root delegates no `t2-binding` role
-   (`T2_AUTHORITY_ROLE_NOT_DELEGATED`) or does not verify the signature at threshold (`T2_AUTHORITY_UNAUTHORISED` —
-   another owner's root, an agent's own key), for an expired authorisation (`T2_AUTHORITY_EXPIRED`), for a key other
-   than the one authorised (`T2_AUTHORITY_KEY_MISMATCH`), and below floor (OWNER-DECISION-0006 §6 bullet 4). The key is
-   kept with mode 0600 and never printed;
-4. a portable seal binds the authority, the sealing machine's id, the operation, the time and the content. A machine
-   honours it only when it holds the authority's key (the MAC verifies) **and** its own trusted root authorises the
-   authority now — the signature is re-verified against the current root, so a root successor that drops the
-   `t2-binding` key revokes it (records become `UNAUTHORISED`). Expiry bounds when an authority may seal new records;
-   what it sealed while valid stays honoured.
+2. the owner generates 32-byte binding keys and signs a versioned `t2-binding-authority` document with the
+   `t2-binding` key(s) at threshold: the authority id, a version, an expiry, optionally the machine ids it authorises,
+   and its keys — each by key id and commitment only, exactly one `active` (owner machines seal with it) and any
+   number `retired` (still honoured) — `gov` verifies and never signs;
+3. the administrator installs the document and a key it authorises on each of the owner's provisioned machines from
+   the administrator domain: `gov trust bind --authority <doc> --key <file>`. It is refused below floor
+   (`SRR_BELOW_FLOOR_REFUSED`), when the environment carries authority, for a file inside a repository or the governed
+   project (`T2_BINDING_FROM_REPOSITORY_REFUSED`), on an unprovisioned machine (`T2_BINDING_UNPROVISIONED`), when
+   this machine's root delegates no `t2-binding` role (`T2_BINDING_NOT_DELEGATED`) or the role's signatures do not
+   verify at threshold (another owner's root, an agent's own key: the root verifier's `SRR_*` code), expired
+   (`T2_BINDING_AUTHORITY_EXPIRED`), older than or conflicting with the version this machine accepted
+   (`T2_BINDING_AUTHORITY_ROLLBACK`, `…_CONFLICT`), for a machine the document does not list
+   (`T2_BINDING_MACHINE_NOT_AUTHORISED`), and for a key it does not authorise by id and commitment
+   (`T2_BINDING_KEY_NOT_AUTHORISED`, `T2_BINDING_KEY_MISMATCH`). Keys are kept in the machine's keyring (mode 0600,
+   directory 0700) and never printed; the machine's own key is never replaced;
+4. a portable seal binds the authority, the key, the sealing machine's id, the operation, the time and the content. A
+   machine honours it only when it holds that key (the MAC verifies) **and** its own authority verifies **now**
+   (re-verified against the current trusted root, unexpired, this machine authorised) and lists the key as `ACTIVE`
+   or `RETIRED`. A key the current version no longer lists is revoked, and root succession that drops the delegation,
+   or expiry, stops every seal of the authority being honoured (`UNAUTHORISED`) until the administrator binds a valid
+   authority; new seals then fall back to the machine scope.
 
 Anything else is refused, typed and observable: a record written by an unprovisioned machine, by a machine the owner's
-provisioning did not give the authority, or sealed before the authority existed, is `FOREIGN` (machine scope); one
-written by another owner's machine is `FOREIGN` (provisioned scope, an authority this machine does not hold). A machine
-without a usable authority keeps working in the machine scope, and `gov trust t2-binding` says so and why (unprovisioned,
-no `t2-binding` delegation, none installed, revoked, expired). `gov trust t2-binding --reseal [--dry-run]` (L4) re-seals
-under the authority exactly the records this machine sealed while it was provisioned, keeping their recorded operation
-and time; records sealed while it was unprovisioned, and records whose seal does not verify, are left as they are.
+provisioning did not bind, or by another owner's machine is `FOREIGN`; a record a bound machine sealed with its own key
+before it was bound is not an owner fact (`UNAUTHORISED` there, `FOREIGN` elsewhere) until `gov trust reseal
+[--dry-run]` (L4) re-seals under the active key exactly the records the machine sealed while it was provisioned,
+keeping their recorded operation and time; records sealed while it was unprovisioned, and records whose seal does not
+verify, are left as they are. `gov trust status` (`t2_binding`) reports whether the machine is bound, the authority and
+whether it verifies now, the scope new seals take and why, and every key held with its standing.
 *What it proves:* a process that can write the repository but cannot read protected machine state cannot produce a
 honoured record on any machine. A process with the operator's OS privileges on one of the owner's machines can read the
 binding key; against it the seal is detection-grade, and what it forges there is honoured on the owner's other machines
-holding the same authority (inherent in the requirement that one machine's facts are honoured on the others). The facts
-that must hold against it — human answers and human-approval assertions — stay bound to the owner's signature. The key
-is shared by the machines that hold it (`gov` never signs, so no per-machine signature exists): revocation is per
-authority, or per machine when the owner issues one authority per machine.
+holding the same key (inherent in the requirement that one machine's facts are honoured on the others). The facts that
+must hold against it — human answers and human-approval assertions — stay bound to the owner's signature. The key is
+shared by the machines that hold it (`gov` never signs, so no per-machine signature exists): revocation is per key (a
+new authority version), or per machine when the owner issues machine-listed authorities.
 
 **Agent resolution (BC-P2-18).** An agent answer (`gov decide <HDG> --option X --by <acting role>`) is accepted only
 for an L3+ role resolving as itself, on a complete assessment (radius ≤ R1, confidence ≥ 0.8, reversible) made by
