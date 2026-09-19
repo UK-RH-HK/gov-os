@@ -212,3 +212,14 @@ integration builder. Regression reproduction only — not a verdict.
 | Headline | 40 agents launched, 37 completed, 3 running, 0 failed; 6 superseded (first-pass audits). Round 3 of 4 in repair iteration 1. 52 classes / 134 blocking findings all OPEN pending independent verification; 48 of 52 carry at least one builder claim. Convergence counter 0 of 3. Merged tree `e8e1ff2`: lib 207/0, certification 136/0; R1 held-out at baselines. |
 | Record defects found and repaired | 17 run records were unparseable YAML (orchestrator recorder wrote notes unquoted) — quoted, content unchanged; `check_state.py verify` now refuses unparseable or duplicate-key run records (reports of runs awaiting integration are checked on their branch); `running_work` pruned to the three truly running runs. |
 | Routing | Unchanged. Round 3 continues. |
+
+## P2-L-0021 — 2026-09-19 — Context/agent analysis (owner follow-up); pre-compaction checkpoint
+
+| Field | Value |
+|---|---|
+| Request | The owner asked for a deeper context/agent analysis: token use by role, 500k/750k/1M crossings, Contract-v3 reloading, history-versus-scope context, whole-repository context, builder/verifier/synthesis ratios, whether 1M was needed, where a bounded pack would suffice, reasoning versus reading. |
+| Scoped exception | The Phase-2 prohibition on reading transcripts protects role independence. It was lifted **once, for the orchestrator only**, at the owner's request. Scope: metadata-only extraction by script from the **completed** agents' transcript JSONL — usage fields, model/effort, tool names, file paths and patterns, block sizes. No message or thinking text was loaded, no running agent was read, and nothing propagates to any role's handoff. |
+| Findings (report §C) | `subagent_tokens` ≈ final context size. The first pass actually ran `claude-opus-4-6`/`high` and compacted at 130k–167k; every later agent ran `claude-opus-5`/`xhigh`. All 31 opus-5 agents exceeded 500k (606,793–964,988), none reached 1M, and 5 compacted near 910k–965k. Contract v3 reloading is ≤ 4.4% of tool-result characters. Exact re-reads are negligible. About half of peak context is the agent's own output. Builders read a median ~45% of their source outside their owned files, mostly integration surfaces. Builders process ~3–4× a verifier's tokens and spend ~2/3 of wall time in build/test. |
+| Durable tooling | `tools/record_builder_round.py` (JSON-quoted outcome recorder), `tools/telemetry_context_extract.py`, `tools/telemetry_usage_table.py`; per-agent data in `telemetry/P2-CONTEXT-TELEMETRY.json`. |
+| Pre-compaction | The orchestrator context is at 943,882 tokens. Checkpoint **P2-CP-0006** and continuity handoff **P2-HO-ORCH-0001** record the exact next actions: await P2-AR-0033/0035/0036 → integration-3 (P2-HO-0040, unify the two P2-ADJ-0002 mechanisms) → round 4 (BC-P2-02) → mint `cap2-candidate-1` → verification iteration 1. |
+| Routing | Unchanged. |

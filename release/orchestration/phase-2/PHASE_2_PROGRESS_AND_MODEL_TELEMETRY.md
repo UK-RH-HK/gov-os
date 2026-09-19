@@ -347,3 +347,159 @@ Every fresh agent re-reads the common protocol, the frozen gate contract, the re
    - `check_state.py verify` now refuses any unparseable or duplicate-key run record.
    - The recorders now quote their notes.
 2. **Stale `running_work`.** It still listed five completed round-3 runs; now pruned to the three truly running.
+
+---
+
+# C. Context and agent analysis (owner follow-up, 2026-09-19)
+
+**Method.** This analysis is orchestrator-only and metadata-only. It is extracted by script from the transcript JSONL of the **37 completed** agents: per-request `usage`, `model`, `effort`, tool names, file paths and patterns in tool inputs, and the size of each tool result. No message or thinking text was loaded, and the three running builders were excluded. The Phase-2 transcript prohibition exists to keep roles independent, and it was lifted for this purpose only, at your request (ledger P2-L-0021). Per-agent data: `telemetry/P2-CONTEXT-TELEMETRY.json`.
+
+**Corrections to section B (which was written before the transcripts were used):**
+
+- **Now observed rather than NOT_OBSERVABLE:** the actual model and effort level; context per request (input + cache-read + cache-creation tokens); output tokens; compaction; and the time split.
+- **What `subagent_tokens` counts:** it is approximately the agent's **final context size**.
+- **The first pass ran on `claude-opus-4-6` at effort `high`, not `claude-opus-5`.** Every re-audit, synthesis, builder and integrator ran on **`claude-opus-5` at effort `xhigh`**.
+
+## C1. Token consumption by role
+
+| Role | n | Peak context median | Output tokens total | Input processed total (incl. cache reads) | Model time | Tool time |
+|---|---|---|---|---|---|---|
+| first-pass auditor (opus-4-6) | 6 | 150,968 | 369,753 | 39.7M | 1.2 h | 0.6 h |
+| re-auditor (opus-5) | 6 | 840,156 | 2,223,752 | 506.7M | 3.1 h | 0.6 h |
+| synthesis (opus-5) | 1 | 889,623 | 322,469 | 74.5M | 0.5 h | 0.5 h |
+| repair builder (opus-5) | 22 | 812,006 | 8,314,275 | 2,655.2M | 14.7 h | 27.9 h |
+| integration builder (opus-5) | 2 | 843,411 | 594,962 | 282.8M | 1.1 h | 1.4 h |
+
+**Builders vs verifiers vs synthesis (tokens processed, input plus output):**
+
+- Builders (repair plus integration, 24 agents): **2.95B**.
+- Verifiers (re-auditors, 6 agents): **0.51B**.
+- Synthesis (1 agent): **0.07B**.
+- **Ratio: about 5.8 : 1 : 0.15.**
+- Per agent, builders process about 1.4× what a verifier does. Builders run longer and loop through build/test repeatedly.
+- More than 99% of processed input is cache reads of an ever-growing context. No cost figure is exposed.
+
+## C2. Context-size thresholds
+
+| Threshold | Agents that crossed it |
+|---|---|
+| ≥ 200k | 31  |
+| ≥ 500k | 31  |
+| ≥ 750k | 25  |
+| ≥ 1M | 0  |
+
+- **Every one of the 31 `claude-opus-5` agents exceeded 500k.** Their peaks ranged 606,793–964,988.
+- **None reached 1M.**
+- **Compaction occurred** (a context drop of more than 40% after exceeding 100k) in 11 agents: P2-AR-0001, P2-AR-0002, P2-AR-0003, P2-AR-0004, P2-AR-0005, P2-AR-0006, P2-AR-0013, P2-AR-0016, P2-AR-0025, P2-AR-0026, P2-AR-0034.
+  - The six `claude-opus-4-6` first-pass auditors compacted once each at 130k–167k.
+  - Five `opus-5` agents compacted once each, at about 910k–965k.
+- **The orchestrator session itself** is at **943,882** tokens after 247 requests (`claude-opus-5`, `xhigh`, no compaction yet). A checkpoint and handoff are being written.
+
+## C3. Repeated loading of Contract v3
+
+- **Re-auditors:** loaded the whole contract 0–3 times each and their own gate sections 2–5 times each.
+- **Synthesis:** loaded the whole file 5 times.
+- **P2-AR-0014 (contract-binding builder):** 19 loads (4 whole-file), which its task explains.
+- **Other builders:** mostly 1–9 targeted loads; eight of them (P2-AR-0015, 0019, 0026, 0030, 0032, 0034, 0037, 0039, 0040) loaded the whole file at least once although their classes touch 1–4 gates.
+- **The cost is small.** Contract v3 is 42 KB. Contract reads are **0.7% (builders) to 4.4% (verifiers, synthesis)** of tool-result characters, so repeated contract loading is **not** a material driver of context size.
+
+## C4. Where the context came from: repo history versus task scope
+
+Shares of tool-result characters read into context. The agent's own output, which is 33–62% of context growth, comes on top of this.
+
+| Role | Instructions & normative | Repo history & prior evidence | Task scope (source/tests/kernel) | Own execution/probe output | Unclassified searches & large-output re-reads |
+|---|---|---|---|---|---|
+| first-pass auditor (opus-4-6) | 19% | 1% | 62% | 16% | 3% |
+| re-auditor (opus-5) | 14% | 6% | 52% | 4% | 25% |
+| synthesis (opus-5) | 11% | 50% | 4% | 16% | 18% |
+| repair builder (opus-5) | 4% | 20% | 44% | 7% | 25% |
+| integration builder (opus-5) | 3% | 25% | 21% | 33% | 19% |
+
+**Repo history and prior evidence is the second-largest source for repair builders.** It covers audit-0 evidence, earlier rounds' repair reports, git history and orchestration state, and repair builders were directed to read their predecessors' reports and integration points.
+
+**Re-reads of identical file ranges are negligible** (0–1%). The high repeated-read counts are chunked reads of different ranges of the same large files.
+
+## C5. Did builders receive whole-repository context unnecessarily?
+
+This compares product-source characters read inside each builder's **owned files** against characters read outside them.
+
+| Run | WS | In scope | Outside owned scope | Outside % |
+|---|---|---|---|---|
+| P2-AR-0014 | WS-1/12 | 37,373 | 62,576 | 63% |
+| P2-AR-0015 | WS-2 | 106,197 | 175,220 | 62% |
+| P2-AR-0016 | WS-3 | 231,464 | 264,277 | 53% |
+| P2-AR-0017 | WS-4 | 87,090 | 143,450 | 62% |
+| P2-AR-0018 | WS-5 | 108,524 | 122,171 | 53% |
+| P2-AR-0019 | WS-6 | 200,329 | 68,448 | 25% |
+| P2-AR-0020 | WS-8 | 287,905 | 61,770 | 18% |
+| P2-AR-0021 | WS-9/11 | 213,332 | 85,885 | 29% |
+| P2-AR-0023 | WS-2 | 262,924 | 218,541 | 45% |
+| P2-AR-0024 | WS-3 | 238,627 | 102,795 | 30% |
+| P2-AR-0025 | WS-4 | 299,610 | 309,154 | 51% |
+| P2-AR-0026 | WS-5 | 150,128 | 203,525 | 58% |
+| P2-AR-0027 | WS-6 | 157,499 | 159,169 | 50% |
+| P2-AR-0028 | WS-7 | 111,804 | 136,954 | 55% |
+| P2-AR-0029 | WS-8 | 335,734 | 91,256 | 21% |
+| P2-AR-0030 | WS-9/11 | 184,551 | 168,525 | 48% |
+| P2-AR-0031 | WS-10 | 15,614 | 347,810 | 96% |
+| P2-AR-0034 | WS-3 | 196,242 | 150,879 | 43% |
+| P2-AR-0037 | WS-6 | 252,825 | 159,806 | 39% |
+| P2-AR-0038 | WS-7 | 162,553 | 128,016 | 44% |
+| P2-AR-0039 | WS-8 | 170,584 | 160,157 | 48% |
+| P2-AR-0040 | WS-9/11 | 208,200 | 131,444 | 39% |
+
+- **Median outside-scope share: about 45%.**
+- **The outside reads are mostly the integration surfaces** a builder must call or not break: `cli/src/main.rs`, `gates.rs`, `t2.rs`, `tasks.rs`, `breakglass.rs`, `records.rs`. Much of this reading is necessary, because the handoffs required builders to use cross-workstream APIs and preserve R1/§6.
+- **WS-10 (P2-AR-0031) at 96% outside** is expected: its module was new.
+- **The waste is real but bounded.** No agent was *handed* whole-repository context; each explored by search. About 10% of builder tool-result characters are unscoped directory-wide searches, and about 25% are unclassified searches or re-reads of large persisted outputs.
+
+## C6. Was 1M-context Opus genuinely needed?
+
+- **As run, yes.** Every `opus-5` agent's working context reached 606k–965k.
+  - **At 200k (opus-4-6 behaviour):** the first-pass auditors compacted at about 130k–167k and produced the shallow, nonconforming audits.
+  - **For the task, partly.** About half the peak context is the agent's own accumulated output (thinking, notes, code written). The rest is exploration history retained verbatim, not a simultaneous working set.
+- **The simultaneous working set is smaller.** Product source is now 3.4 MB (about 1.0M–1.65M tokens), and each workstream's *owned* files alone are 180–520 KB, about 50k–250k tokens.
+- **Conclusion:**
+  - Audits and synthesis over a whole family genuinely benefited from a large window: they cross-reference many modules, the contract and prior evidence.
+  - Builders did not *need* 1M as a working set. They filled it because nothing bounded exploration, and every tool result stays in context.
+
+## C7. Tasks that could work from a bounded 50k–150k context pack
+
+**Plausibly bounded (estimates, not demonstrated):**
+- **Integration builders' mechanical part:** merge conflicts, G0 registration, schema-version mirroring.
+- **Docs and spec-record amendments:** D-0010, API-0001, COMMANDS/ARCHITECTURE.
+- **Single-class repairs with narrow owned files:** e.g. WS-7's pin/registry move, WS-9's command-test bound, WS-1/12's oracle schema, WS-10's lifecycle module if built from a spec.
+- **Round 4's evidence map (BC-P2-02):** mostly mapping existing check IDs to capabilities.
+
+**A pack for any of these:**
+- handoff and protocol, about 10k;
+- the class requirements, 5k–15k;
+- owned files trimmed to the touched functions, 20k–80k;
+- the signatures of consumed APIs, 5k–15k;
+- the relevant findings and probes, 10k–20k.
+
+**Not plausibly bounded:**
+- **Family audits and synthesis:** they are exhaustive by contract and cross-module by design.
+- **Cross-cutting trust and scheduler work:** WS-2 scheduler, WS-3 T2/human channel, WS-8 admission. This needed R1 held-out re-runs and wide invariants.
+
+## C8. Were long-running agents reasoning or reading?
+
+| Role | Estimated thinking share of output | Model time | Tool time (build/test/probe) | Tool-call mix |
+|---|---|---|---|---|
+| first-pass auditor (opus-4-6) | 0.00 | 1.2 h (66%) | 0.6 h | execute_probe 36%, read_file 33%, other_bash 13%, search 8% |
+| re-auditor (opus-5) | 0.32 | 3.1 h (84%) | 0.6 h | read_file 40%, execute_probe 31%, write_edit 12%, search 11% |
+| synthesis (opus-5) | 0.40 | 0.5 h (46%) | 0.5 h | read_file 37%, execute_probe 36%, write_edit 10%, search 9% |
+| repair builder (opus-5) | 0.41 | 14.7 h (34%) | 27.9 h | read_file 43%, execute_probe 22%, search 12%, build_test 9% |
+| integration builder (opus-5) | 0.46 | 1.1 h (44%) | 1.4 h | execute_probe 47%, read_file 18%, git 17%, search 7% |
+
+- **Re-auditors were reasoning-heavy.** 84% of their wall time was model time, and about a third of output was estimated thinking.
+- **Builders spent about two-thirds of wall time in tools** (cargo build/test under a machine load average of 40–100, and probe runs). Their generation was split between thinking (about 40%) and code written through Write/Edit (about half of tool-input characters).
+- **So long builder runs were mostly execution-bound, not reasoning-bound.**
+- **This split is an estimate.** Thinking text is redacted in the transcripts, so thinking tokens were estimated as output tokens minus visible text and tool-input characters at the calibrated 2.08 characters per token.
+
+## C9. Observations only (routing unchanged, per instruction)
+
+1. **Bounded exploration.** Most builder context was retained exploration. A per-workstream context pack (owned-function excerpts, API signatures, class requirements, findings), plus a rule to write findings to a scratch file instead of re-reading large outputs, would likely keep builders well under 500k.
+2. **Contract reloading is not a cost problem** (≤ 4.4% of tool-result characters).
+3. **The model tier matters for audits.** The only runs on a smaller window and older model were also the only audits that failed the evidence standard.
+4. **The orchestrator session has reached about 94% of its window.** It is checkpointing now (P2-CP-0006, handoff P2-HO-ORCH-0001) so it can continue after compaction or in a replacement session from durable state.
