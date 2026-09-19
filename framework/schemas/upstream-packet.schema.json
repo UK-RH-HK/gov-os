@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/upstream-packet.schema.json",
   "title": "upstream-packet",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "packet_id": {
@@ -80,10 +80,48 @@
       "pattern": "^\\d+\\.\\d+\\.\\d+([-+][0-9A-Za-z.-]+)?$"
     },
     "approval": {
-      "type": "object"
+      "type": "object",
+      "description": "approval evidence from upstream::resolve_export_approval, bound to the exact packet",
+      "properties": {
+        "required": {
+          "type": "string"
+        },
+        "approved_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "channel": {
+          "type": "string"
+        },
+        "authenticated": {
+          "type": "boolean"
+        },
+        "binds": {
+          "type": "object",
+          "properties": {
+            "packet_id": {
+              "type": "string"
+            },
+            "payload_hash": {
+              "type": "string"
+            },
+            "destination": {
+              "type": "string"
+            }
+          }
+        }
+      }
     },
     "scans": {
-      "type": "object"
+      "type": "object",
+      "description": "export-gate scans; `content` holds the content controls (reproduced repository lines, index data, opaque blobs)",
+      "properties": {
+        "content": {
+          "type": "object"
+        }
+      }
     }
   },
   "required": [

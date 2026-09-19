@@ -73,6 +73,452 @@ pub fn outbound_dir(p: &Project) -> std::path::PathBuf {
     p.runtime_dir().join("outbound")
 }
 
+// ------------------------------------------------------------------------------------------ content controls
+//
+// BC-P2-50: the export gate fails closed on raw project content and index data **whatever their names or synthetic
+// declaration** (Contract v3:861-866; release protocol §17 "any upstream operation that attempts to include a forbidden
+// path/content class must fail closed"; framework §75E "raw code, product specs, customer data, project vector stores
+// ... are prohibited by default", §75G "everything else is denied"). Path and file-name controls stay; these controls
+// look at the bytes that would leave:
+//
+// * reproduction of repository content — fixture lines (and fenced code in lesson text) are compared with every line
+//   of the project's tracked and untracked text files (the framework's own kernel, derived adapter output and the
+//   lesson records being exported excluded); a whole-file copy, more than a policy-bounded number of reproduced
+//   lines, one long reproduced line, or any line from a secret/never-export file blocks the export;
+// * index data — chunk identifiers of the project's derived index, runs of the stored embedding vectors, long
+//   numeric arrays (embedding-shaped data) and long opaque hex/base64 runs block the export.
+//
+// A `synthetic: true` declaration is still required and still not trusted.
+
+/// Bounds of the content controls. Fixed in the product rather than read from policy so that no overlay, policy
+/// override or kernel-policy edit can switch the gate off; `LEARNING_POLICY.upstream.forbidden_content` names the
+/// content classes they enforce.
+#[derive(Debug, Clone)]
+pub struct ContentControls {
+    /// a line with at least this many non-whitespace characters that reproduces a project line counts
+    pub reproduced_line_min_chars: usize,
+    /// reproduced lines tolerated per fixture file (any line of a secret/never-export file blocks)
+    pub reproduced_lines_max: usize,
+    /// a single reproduced line this long blocks on its own
+    pub long_line_chars: usize,
+    /// lesson prose: a verbatim excerpt of this many consecutive project lines blocks
+    pub prose_consecutive_lines: usize,
+    /// longer runs of numbers are embedding/vector-shaped data
+    pub max_numeric_array: usize,
+    /// longer hex/base64 runs are opaque (encoded or binary) content
+    pub max_opaque_blob_chars: usize,
+}
+
+impl Default for ContentControls {
+    fn default() -> Self {
+        ContentControls {
+            reproduced_line_min_chars: 16,
+            reproduced_lines_max: 1,
+            long_line_chars: 48,
+            prose_consecutive_lines: 3,
+            max_numeric_array: 32,
+            max_opaque_blob_chars: 200,
+        }
+    }
+}
+
+fn norm_line(l: &str) -> String {
+    l.split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase()
+}
+
+fn sig_chars(n: &str) -> usize {
+    n.chars().filter(|c| !c.is_whitespace()).count()
+}
+
+fn h64(s: &str) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    s.hash(&mut h);
+    h.finish()
+}
+
+/// Every significant line of the project's text files, for reproduction checks.
+struct Corpus {
+    files: Vec<(String, bool)>,
+    lines: std::collections::HashMap<u64, (usize, usize)>,
+    whole: std::collections::HashMap<u64, usize>,
+}
+
+/// Paths whose content is not project content for export purposes: the framework's own kernel (upstream already
+/// owns it), output derived from it, and the lesson records being exported.
+const CORPUS_EXCLUDED: &[&str] = &[
+    "governance/kernel/",
+    "governance/generated/",
+    "spec/lessons/",
+];
+
+fn build_corpus(p: &Project, min_chars: usize) -> Corpus {
+    let never_export = p
+        .policies()
+        .get_list("SECURITY_POLICY", "never_export_classes");
+    let classifications: Vec<(String, String)> = p
+        .overlay()
+        .get("DATA_SENSITIVITY.yaml")
+        .get("classifications")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|c| {
+                    Some((
+                        c.get("pattern")?.as_str()?.to_string(),
+                        c.get("class")?.as_str()?.to_string(),
+                    ))
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let contract = p.contract();
+    let mut c = Corpus {
+        files: vec![],
+        lines: Default::default(),
+        whole: Default::default(),
+    };
+    for (abs, rel) in crate::paths::iter_repo_files(&p.root, false) {
+        if CORPUS_EXCLUDED.iter().any(|x| rel.starts_with(x)) || rel.starts_with(".git/") {
+            continue;
+        }
+        if abs.metadata().map(|m| m.len() > 4_194_304).unwrap_or(true)
+            || !crate::util::is_text_file(&abs)
+        {
+            continue;
+        }
+        let Ok(text) = crate::util::read_text(&abs) else {
+            continue;
+        };
+        // every project file is export-denied by default; "sensitive" singles out secret and never-export
+        // (restricted/confidential) material, one reproduced line of which blocks on its own
+        let d = contract.decide(&rel);
+        let sensitive = d.is_secret()
+            || classifications
+                .iter()
+                .any(|(pat, cls)| glob_match(pat, &rel) && never_export.contains(cls));
+        let idx = c.files.len();
+        c.files.push((rel.clone(), sensitive));
+        let mut normed = vec![];
+        for (i, l) in text.lines().enumerate() {
+            let n = norm_line(l);
+            if n.is_empty() {
+                continue;
+            }
+            if sig_chars(&n) >= min_chars && n.chars().any(|ch| ch.is_alphanumeric()) {
+                c.lines.entry(h64(&n)).or_insert((idx, i + 1));
+            }
+            normed.push(n);
+        }
+        if !normed.is_empty() {
+            c.whole.entry(h64(&normed.join("\n"))).or_insert(idx);
+        }
+    }
+    c
+}
+
+/// Fingerprints of the project's derived index (chunk ids and stored embedding vectors), when an index exists.
+struct IndexPrints {
+    chunk_ids: std::collections::HashSet<String>,
+    db: Option<std::path::PathBuf>,
+}
+
+fn index_prints(p: &Project) -> IndexPrints {
+    let path = p.db_path();
+    let mut chunk_ids = std::collections::HashSet::new();
+    if path.exists() {
+        if let Ok(conn) =
+            rusqlite::Connection::open_with_flags(&path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+        {
+            if let Ok(mut st) = conn.prepare("SELECT chunk_id FROM chunks LIMIT 500000") {
+                if let Ok(rows) = st.query_map([], |r| r.get::<_, String>(0)) {
+                    for id in rows.flatten() {
+                        if id.len() >= 6 {
+                            chunk_ids.insert(id);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    IndexPrints {
+        chunk_ids,
+        db: if path.exists() { Some(path) } else { None },
+    }
+}
+
+fn float_rx() -> &'static Regex {
+    static R: std::sync::OnceLock<Regex> = std::sync::OnceLock::new();
+    R.get_or_init(|| Regex::new(r"-?\d+\.\d+(?:[eE][-+]?\d+)?").unwrap())
+}
+
+/// Consecutive float runs of `text`: (longest run length, the sequence of every float in order).
+fn float_runs(text: &str) -> (usize, Vec<f64>) {
+    let mut longest = 0;
+    let mut run = 0;
+    let mut last_end: Option<usize> = None;
+    let mut all = vec![];
+    for m in float_rx().find_iter(text) {
+        let adjacent = last_end
+            .map(|e| {
+                text[e..m.start()]
+                    .chars()
+                    .all(|c| c.is_whitespace() || matches!(c, ',' | ';' | '[' | ']' | '"' | '\''))
+            })
+            .unwrap_or(false);
+        run = if adjacent { run + 1 } else { 1 };
+        longest = longest.max(run);
+        last_end = Some(m.end());
+        if let Ok(v) = m.as_str().parse::<f64>() {
+            all.push(v);
+        }
+    }
+    (longest, all)
+}
+
+fn quantise(v: f64) -> i64 {
+    (v * 10_000.0).round() as i64
+}
+
+/// 4-grams of quantised floats with at least two non-zero members (sparse embeddings share zero runs with anything).
+fn grams(v: &[f64]) -> std::collections::HashSet<[i64; 4]> {
+    let q: Vec<i64> = v.iter().map(|x| quantise(*x)).collect();
+    q.windows(4)
+        .filter(|w| w.iter().filter(|x| **x != 0).count() >= 2)
+        .map(|w| [w[0], w[1], w[2], w[3]])
+        .collect()
+}
+
+/// The chunk of the derived index whose stored vector shares a run with `fixture_grams`, if any.
+fn vector_hit(db: &Path, fixture_grams: &std::collections::HashSet<[i64; 4]>) -> Option<String> {
+    if fixture_grams.is_empty() {
+        return None;
+    }
+    let conn =
+        rusqlite::Connection::open_with_flags(db, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
+            .ok()?;
+    let mut st = conn
+        .prepare("SELECT chunk_id, vec FROM vectors LIMIT 200000")
+        .ok()?;
+    let rows = st
+        .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))
+        .ok()?;
+    for (id, vec) in rows.flatten() {
+        let Ok(v) = serde_json::from_str::<Vec<f64>>(&vec) else {
+            continue;
+        };
+        let q: Vec<i64> = v.iter().map(|x| quantise(*x)).collect();
+        for w in q.windows(4) {
+            if w.iter().filter(|x| **x != 0).count() >= 2
+                && fixture_grams.contains(&[w[0], w[1], w[2], w[3]])
+            {
+                return Some(id);
+            }
+        }
+    }
+    None
+}
+
+fn fenced_blocks(text: &str) -> String {
+    let mut out = vec![];
+    let mut inside = false;
+    for l in text.lines() {
+        if l.trim_start().starts_with("```") {
+            inside = !inside;
+            continue;
+        }
+        if inside {
+            out.push(l);
+        }
+    }
+    out.join("\n")
+}
+
+/// Run the content controls over outbound items `(label, text, strict)`: strict for fixture files (and fenced code),
+/// prose rules for lesson text. Returns the reasons to fail closed and a report of what was examined.
+pub fn content_gate(p: &Project, items: &[(String, String, bool)]) -> (Vec<String>, Value) {
+    let ctl = ContentControls::default();
+    let corpus = build_corpus(p, ctl.reproduced_line_min_chars);
+    let prints = index_prints(p);
+    let blob_rx = Regex::new(&format!(
+        r"[A-Fa-f0-9]{{{n},}}|[A-Za-z0-9+/]{{{n},}}={{0,2}}",
+        n = ctl.max_opaque_blob_chars
+    ))
+    .unwrap();
+    let chunk_tok = Regex::new(r"[A-Za-z0-9_:./@\-]+#\d+").unwrap();
+    let mut reasons = vec![];
+    let mut report = vec![];
+    for (label, text, strict) in items {
+        if text.trim().is_empty() {
+            continue;
+        }
+        let mut item_reasons: Vec<String> = vec![];
+        // 1. whole-file copy
+        let normed: Vec<String> = text
+            .lines()
+            .map(norm_line)
+            .filter(|n| !n.is_empty())
+            .collect();
+        if let Some(fi) = corpus.whole.get(&h64(&normed.join("\n"))) {
+            item_reasons.push(format!(
+                "{label} is a copy of project file {}",
+                corpus.files[*fi].0
+            ));
+        }
+        // 2. reproduced lines
+        let check = |t: &str| -> Vec<(usize, String, usize, bool, usize)> {
+            t.lines()
+                .enumerate()
+                .filter_map(|(i, l)| {
+                    let n = norm_line(l);
+                    if sig_chars(&n) < ctl.reproduced_line_min_chars
+                        || !n.chars().any(|c| c.is_alphanumeric())
+                    {
+                        return None;
+                    }
+                    corpus.lines.get(&h64(&n)).map(|(fi, ln)| {
+                        (
+                            i + 1,
+                            corpus.files[*fi].0.clone(),
+                            *ln,
+                            corpus.files[*fi].1,
+                            sig_chars(&n),
+                        )
+                    })
+                })
+                .collect()
+        };
+        let strict_text = if *strict {
+            text.clone()
+        } else {
+            fenced_blocks(text)
+        };
+        let hits = check(&strict_text);
+        if !hits.is_empty() {
+            let sensitive: Vec<&(usize, String, usize, bool, usize)> =
+                hits.iter().filter(|h| h.3).collect();
+            let long: Vec<&(usize, String, usize, bool, usize)> =
+                hits.iter().filter(|h| h.4 >= ctl.long_line_chars).collect();
+            if !sensitive.is_empty() {
+                item_reasons.push(format!(
+                    "{label} reproduces content of a secret/never-export project file ({}:{})",
+                    sensitive[0].1, sensitive[0].2
+                ));
+            } else if hits.len() > ctl.reproduced_lines_max {
+                item_reasons.push(format!("{label} reproduces {} line(s) of raw project content (e.g. {}:{}); a synthetic fixture must not copy repository content, whatever it is named or declared", hits.len(), hits[0].1, hits[0].2));
+            } else if !long.is_empty() {
+                item_reasons.push(format!(
+                    "{label} reproduces a long line of raw project content ({}:{})",
+                    long[0].1, long[0].2
+                ));
+            }
+        }
+        if !*strict {
+            // prose: a multi-line verbatim excerpt of a project file
+            let all = check(text);
+            let mut run = 1;
+            let mut best = if all.is_empty() { 0 } else { 1 };
+            for w in all.windows(2) {
+                run = if w[1].0 == w[0].0 + 1 && w[1].1 == w[0].1 {
+                    run + 1
+                } else {
+                    1
+                };
+                best = best.max(run);
+            }
+            if best >= ctl.prose_consecutive_lines {
+                item_reasons.push(format!(
+                    "{label} contains a verbatim {best}-line excerpt of project file {}",
+                    all[0].1
+                ));
+            }
+            if all.iter().any(|h| h.3) {
+                item_reasons.push(format!("{label} quotes a secret/never-export project file"));
+            }
+        }
+        // 3. index data: chunk ids, stored vectors, embedding-shaped numbers, opaque blobs
+        if let Some(m) = chunk_tok
+            .find_iter(text)
+            .find(|m| prints.chunk_ids.contains(m.as_str()))
+        {
+            item_reasons.push(format!(
+                "{label} contains derived-index data (chunk id {})",
+                m.as_str()
+            ));
+        }
+        let (longest, floats) = float_runs(text);
+        if longest > ctl.max_numeric_array {
+            item_reasons.push(format!("{label} contains a run of {longest} numbers (embedding/vector-shaped data; limit {})", ctl.max_numeric_array));
+        }
+        if let Some(db) = &prints.db {
+            if let Some(id) = vector_hit(db, &grams(&floats)) {
+                item_reasons.push(format!(
+                    "{label} reproduces the stored embedding vector of index chunk {id}"
+                ));
+            }
+        }
+        if let Some(m) = blob_rx.find(text) {
+            item_reasons.push(format!("{label} contains an opaque {}-character hex/base64 run (encoded or binary content cannot be reviewed)", m.as_str().len()));
+        }
+        report.push(json!({"item": label, "strict": strict, "reproduced_lines": hits.len(), "longest_numeric_run": longest, "blocked": item_reasons}));
+        reasons.extend(item_reasons);
+    }
+    (
+        reasons,
+        json!({"controls": {"reproduced_line_min_chars": ctl.reproduced_line_min_chars, "reproduced_lines_max": ctl.reproduced_lines_max, "long_line_chars": ctl.long_line_chars,
+            "prose_consecutive_lines": ctl.prose_consecutive_lines, "max_numeric_array": ctl.max_numeric_array, "max_opaque_blob_chars": ctl.max_opaque_blob_chars},
+            "corpus_files": corpus.files.len(), "index_chunks_known": prints.chunk_ids.len(), "items": report}),
+    )
+}
+
+/// The export-approval request a submission must satisfy: the exact packet (id + payload hash) and destination.
+pub struct ExportApprovalRequest<'a> {
+    pub packet_id: &'a str,
+    pub lesson_id: &'a str,
+    pub payload_hash: &'a str,
+    pub destination: &'a str,
+}
+
+/// **The export-approval hook.** Every upstream submission obtains its approval here and nowhere else.
+///
+/// Today the only approval input is the caller-supplied `--approved-by` string, which is *not* an authenticated
+/// human channel: it is recorded as such (`channel: "cli-argument"`, `authenticated: false`) and bound to the exact
+/// packet and payload hash it approved, so it cannot be replayed onto another packet.
+///
+/// **Integration point (BC-P2-10, WS-3):** when the authenticated human channel lands, this function obtains the
+/// approval from it — e.g. a Human Decision Gate raised for `(packet_id, payload_hash, destination)` and answered
+/// through the channel the acting agent cannot operate — and returns its evidence here (`authenticated: true`);
+/// `submit` needs no other change. `LEARNING_POLICY.upstream.approval = human` must then refuse a CLI-string approval.
+pub fn resolve_export_approval(
+    p: &Project,
+    req: &ExportApprovalRequest,
+    approved_by: Option<&str>,
+) -> Result<Value> {
+    let policy = p
+        .policies()
+        .get_str("LEARNING_POLICY", "upstream.approval", "human");
+    if policy == "human" && approved_by.map(|s| s.trim().is_empty()).unwrap_or(true) {
+        return Err(GovError::new(
+            "HUMAN_GATE_REQUIRED",
+            "LEARNING_POLICY.upstream.approval=human: --approved-by <human> is required",
+        ));
+    }
+    Ok(
+        json!({"required": policy, "approved_by": approved_by, "approved_at": now_iso(), "channel": "cli-argument", "authenticated": false,
+            "binds": {"packet_id": req.packet_id, "lesson_id": req.lesson_id, "payload_hash": req.payload_hash, "destination": req.destination},
+            "note": "unauthenticated approval string; the authenticated human channel (BC-P2-10) replaces it at this hook"}),
+    )
+}
+
+fn payload_hash_of(packet: &Value) -> String {
+    hash_value(
+        &json!({"p": packet["problem_statement"], "f": packet["generic_failure_mode"], "i": packet["impact"], "c": packet["suggested_framework_change"], "x": packet["synthetic_fixture"], "m": packet["metrics"]}),
+    )
+}
+
 /// `gov upstream prepare <lesson-id>`: build a sanitised packet or fail closed with reasons.
 pub fn prepare(p: &Project, lesson_id: &str) -> Result<Value> {
     p.require_installed()?;
@@ -191,6 +637,18 @@ pub fn prepare(p: &Project, lesson_id: &str) -> Result<Value> {
     let _tags = sanitize("tags");
     let synthetic = lesson.data.get("synthetic_reproducer").cloned();
     let mut fixture: Option<Value> = None;
+    let mut outbound_items: Vec<(String, String, bool)> = [
+        "problem_statement",
+        "generic_failure_mode",
+        "impact",
+        "suggested_change",
+        "body",
+        "category",
+        "title",
+    ]
+    .iter()
+    .map(|f| (format!("lesson field {f}"), lesson.get(f), false))
+    .collect();
     if let Some(sf) = &synthetic {
         if sf.get("synthetic").and_then(|v| v.as_bool()) != Some(true) {
             blocked.push("synthetic_reproducer must declare synthetic: true".into());
@@ -203,6 +661,7 @@ pub fn prepare(p: &Project, lesson_id: &str) -> Result<Value> {
             .unwrap_or_default()
         {
             let text = content.as_str().unwrap_or("").to_string();
+            outbound_items.push((format!("fixture file {name}"), text.clone(), true));
             if forbidden_paths.iter().any(|f| glob_match(f, &name)) {
                 blocked.push(format!(
                     "fixture file {name} matches a forbidden outbound path"
@@ -224,6 +683,10 @@ pub fn prepare(p: &Project, lesson_id: &str) -> Result<Value> {
             json!({"synthetic": true, "description": sf.get("description").cloned().unwrap_or(json!("")), "files": files}),
         );
     }
+    // content controls: what would leave, not what it is called (BC-P2-50)
+    let (content_reasons, content_report) = content_gate(p, &outbound_items);
+    blocked.extend(content_reasons);
+    scans["content"] = content_report;
     let total_code = scans["code_lines"].as_u64().unwrap_or(0) as usize;
     if total_code > max_code && fixture.is_none() {
         blocked.push(format!("{total_code} raw code line(s) in lesson text exceed policy max {max_code}; provide a synthetic reproducer instead"));
@@ -270,9 +733,7 @@ pub fn prepare(p: &Project, lesson_id: &str) -> Result<Value> {
         )
         .with_details(json!({"reasons": blocked_all, "scans": scans})));
     }
-    let payload_hash = hash_value(
-        &json!({"p": packet["problem_statement"], "f": packet["generic_failure_mode"], "i": packet["impact"], "c": packet["suggested_framework_change"], "x": packet["synthetic_fixture"], "m": packet["metrics"]}),
-    );
+    let payload_hash = payload_hash_of(&packet);
     packet["payload_hash"] = json!(payload_hash);
     write_yaml(&dir.join("packet.yaml"), &packet)?;
     write_json(&dir.join("scans.json"), &scans)?;
@@ -314,6 +775,50 @@ pub fn submit(
             "packet has blocked reasons",
         ));
     }
+    // the packet must be the one prepared: any edit after prepare changes its payload hash
+    if packet["payload_hash"].as_str() != Some(payload_hash_of(&packet).as_str()) {
+        return Err(GovError::new(
+            "UPSTREAM_BLOCKED",
+            "packet content differs from its recorded payload hash (edited after prepare); prepare it again",
+        ));
+    }
+    // content controls again over exactly what would leave (fixture files and packet text), whatever their names
+    let mut outbound_items: Vec<(String, String, bool)> = [
+        "problem_statement",
+        "generic_failure_mode",
+        "impact",
+        "suggested_framework_change",
+        "category",
+    ]
+    .iter()
+    .map(|f| {
+        (
+            format!("packet field {f}"),
+            packet[*f].as_str().unwrap_or("").to_string(),
+            false,
+        )
+    })
+    .collect();
+    if let Some(files) = packet["synthetic_fixture"]["files"].as_object() {
+        for (name, content) in files {
+            outbound_items.push((
+                format!("fixture file {name}"),
+                content.as_str().unwrap_or("").to_string(),
+                true,
+            ));
+        }
+    }
+    let (content_reasons, content_report) = content_gate(p, &outbound_items);
+    if !content_reasons.is_empty() {
+        return Err(GovError::new(
+            "UPSTREAM_BLOCKED",
+            format!(
+                "export gate failed closed at submission: {}",
+                content_reasons.join("; ")
+            ),
+        )
+        .with_details(json!({"reasons": content_reasons, "content": content_report})));
+    }
     // re-scan at submission (content could have been edited)
     let fail_closed = pol.get_str(
         "SECURITY_POLICY",
@@ -353,13 +858,16 @@ pub fn submit(
             ));
         }
     }
-    let approval = pol.get_str("LEARNING_POLICY", "upstream.approval", "human");
-    if approval == "human" && approved_by.map(|s| s.is_empty()).unwrap_or(true) {
-        return Err(GovError::new(
-            "HUMAN_GATE_REQUIRED",
-            "LEARNING_POLICY.upstream.approval=human: --approved-by <human> is required",
-        ));
-    }
+    let approval_evidence = resolve_export_approval(
+        p,
+        &ExportApprovalRequest {
+            packet_id,
+            lesson_id: packet["lesson_id"].as_str().unwrap_or(""),
+            payload_hash: packet["payload_hash"].as_str().unwrap_or(""),
+            destination,
+        },
+        approved_by,
+    )?;
     if destination.starts_with("http://")
         || destination.starts_with("https://")
         || destination.starts_with("git@")
@@ -381,8 +889,7 @@ pub fn submit(
             "policy does not allow packet export",
         ));
     }
-    packet["approval"] =
-        json!({"required": approval, "approved_by": approved_by, "approved_at": now_iso()});
+    packet["approval"] = approval_evidence.clone();
     let target_dir = dest.join(packet_id.to_string() + "-" + p.project_alias().as_str());
     std::fs::create_dir_all(&target_dir)?;
     write_yaml(&target_dir.join("packet.yaml"), &packet)?;
@@ -405,7 +912,7 @@ pub fn submit(
             }
         }
     }
-    let entry = json!({"at": now_iso(), "packet_id": packet_id, "lesson_id": packet["lesson_id"], "payload_hash": packet["payload_hash"], "destination": target_dir.display().to_string(), "approved_by": approved_by, "session": p.session_id, "files": sent});
+    let entry = json!({"at": now_iso(), "packet_id": packet_id, "lesson_id": packet["lesson_id"], "payload_hash": packet["payload_hash"], "destination": target_dir.display().to_string(), "approved_by": approved_by, "approval": approval_evidence, "session": p.session_id, "files": sent});
     let ledger = p.root.join(pol.get_str(
         "LEARNING_POLICY",
         "upstream.ledger",

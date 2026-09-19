@@ -146,22 +146,71 @@ fn path_migration_with_rollback_and_memory_rebuild() {
         "links inside the moved file must be re-relativised: {}",
         read(&root, "spec/requirements/api-spec.md")
     );
+    // BC-P2-21: extracted records carry content-derived ids (stable across re-runs and processing order), so they are
+    // found by prefix rather than by a positional number
+    let extracted = |root: &std::path::Path| -> Vec<String> {
+        let mut v: Vec<String> = std::fs::read_dir(root.join("spec/decisions"))
+            .map(|rd| {
+                rd.filter_map(|e| e.ok())
+                    .map(|e| e.file_name().to_string_lossy().to_string())
+                    .filter(|n| n.starts_with("D-L") && n.ends_with(".yaml"))
+                    .collect()
+            })
+            .unwrap_or_default();
+        v.sort();
+        v
+    };
+    let recs = extracted(&root);
+    assert_eq!(recs.len(), 2, "legacy decisions extracted: {b2}");
+    let statuses: Vec<String> = recs
+        .iter()
+        .map(|n| {
+            yaml(&root, &format!("spec/decisions/{n}"))["status"]
+                .as_str()
+                .unwrap_or("")
+                .to_string()
+        })
+        .collect();
     assert!(
-        exists(&root, "spec/decisions/D-L0001.yaml"),
-        "legacy decisions extracted: {b2}"
+        statuses.contains(&"PROVISIONAL".to_string())
+            && statuses.contains(&"SUPERSEDED".to_string()),
+        "{statuses:?}"
     );
-    assert_eq!(
-        yaml(&root, "spec/decisions/D-L0001.yaml")["status"],
-        "PROVISIONAL"
+    // BC-P2-33: the architecture doc (active, now spec/architecture/architecture.md) cites the legacy decisions log, so
+    // the dependency proof found an active reference: the knowledge is extracted, but the original is NOT archived
+    // and the citation is NOT re-pointed at archived material; its retirement waits for a Human Decision Gate
+    assert!(
+        exists(&root, "docs/old/legacy_decisions.md")
+            && !exists(
+                &root,
+                "archive/spec/legacy-docs/docs__old__legacy_decisions.md"
+            ),
+        "a cited legacy document is not retired without an answered gate"
     );
-    assert_eq!(
-        yaml(&root, "spec/decisions/D-L0002.yaml")["status"],
-        "SUPERSEDED"
+    assert!(
+        read(&root, "spec/architecture/architecture.md")
+            .contains("](../../docs/old/legacy_decisions.md)"),
+        "the citation still resolves to the original, never to the archive: {}",
+        read(&root, "spec/architecture/architecture.md")
     );
-    assert!(exists(
+    let cat_b2: Vec<serde_json::Value> = read(
         &root,
-        "archive/spec/legacy-docs/docs__old__legacy_decisions.md"
-    ));
+        "spec/audits/GOVERNANCE-ADOPTION/04-TARGET-PATH-MAP.jsonl",
+    )
+    .lines()
+    .map(|l| serde_json::from_str(l).unwrap())
+    .collect();
+    let legacy_entry = cat_b2
+        .iter()
+        .find(|e| e["current_path"] == "docs/old/legacy_decisions.md")
+        .unwrap();
+    assert_eq!(legacy_entry["requires_human_gate"], true);
+    assert!(legacy_entry["gate_reasons"]
+        .to_string()
+        .contains("active_references"));
+    assert!(legacy_entry["dependency_proof"]["active_references"]
+        .to_string()
+        .contains("docs/architecture.md"));
     let rb = executor.ok(&["adopt", "rollback", "--batch", "2"]);
     assert!(rb["restored"].as_array().unwrap().len() >= 2);
     assert_eq!(
@@ -180,7 +229,7 @@ fn path_migration_with_rollback_and_memory_rebuild() {
         exists(&root, "notes/api-spec.md")
             && exists(&root, "docs/architecture.md")
             && !exists(&root, "spec/requirements/api-spec.md")
-            && !exists(&root, "spec/decisions/D-L0001.yaml")
+            && extracted(&root).is_empty()
     );
     executor.ok(&["adopt", "migrate", "--batch", "2"]);
     for b in ["3", "4", "5", "6", "7"] {

@@ -9,6 +9,9 @@ upstream:
   allowed_payload: [packet, synthetic_fixture]
   aggregate_metrics_enabled: false
   forbidden_paths: ["product/**", "spec/**", ".governance-runtime/**", "governance/project/**", "archive/**", "**/.env*", "**/*.db", "**/*.sqlite*"]
+  # forbidden_content is enforced on the bytes that would leave, not on file names or a `synthetic` flag (BC-P2-50):
+  # reproduced repository lines, index chunk ids / stored vectors / embedding-shaped numbers and opaque blobs fail closed
+  # (bounds are fixed in upstream::ContentControls so no overlay or policy edit can switch them off).
   forbidden_content: [secrets, customer_identifiers, project_identifiers, raw_product_code, raw_spec, vector_index]
   max_code_lines_unless_synthetic: 0
   ledger: spec/reports/upstream-ledger.jsonl
